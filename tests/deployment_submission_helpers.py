@@ -2,15 +2,12 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
+from warhammer40k_core.adapters.decisions import submit_option, submit_parameterized_payload
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     ModelPlacement,
 )
-from warhammer40k_core.engine.decision_request import (
-    PARAMETERIZED_DECISION_OPTION_ID,
-    DecisionRequest,
-)
-from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.deployment import (
     SELECT_DEPLOYMENT_UNIT_DECISION_TYPE,
     SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE,
@@ -68,12 +65,11 @@ def submit_deployment_unit_selection(
     if request.decision_type != SELECT_DEPLOYMENT_UNIT_DECISION_TYPE:
         raise GameLifecycleError("Expected deployment unit selection request.")
     selected_option_id = request.options[0].option_id if option_id is None else option_id
-    return lifecycle.submit_decision(
-        DecisionResult.for_request(
-            result_id=result_id,
-            request=request,
-            selected_option_id=selected_option_id,
-        )
+    return submit_option(
+        lifecycle=lifecycle,
+        request_id=request.request_id,
+        option_id=selected_option_id,
+        result_id=result_id,
     )
 
 
@@ -92,15 +88,11 @@ def submit_deployment_placement(
     )
     if payload_mutation is not None:
         payload_mutation(payload)
-    return lifecycle.submit_decision(
-        DecisionResult(
-            result_id=result_id,
-            request_id=request.request_id,
-            decision_type=request.decision_type,
-            actor_id=request.actor_id,
-            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
-            payload=payload,
-        )
+    return submit_parameterized_payload(
+        lifecycle=lifecycle,
+        request_id=request.request_id,
+        payload=payload,
+        result_id=result_id,
     )
 
 

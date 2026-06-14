@@ -1471,8 +1471,8 @@ Required tests:
 - stale proposal submission is rejected if it does not match the current pending request;
 - adapter projection exposes public game state for a viewer without leaking hidden opponent information;
 - adapter projection exposes pending finite decisions and pending parameterized proposal requests in a UI-readable shape;
-- `LocalGameSession.submit_option(...)` handles finite decisions;
-- `LocalGameSession.submit_payload(...)` or equivalent handles parameterized proposal decisions;
+- `LocalGameSession.submit_option(...)` handles finite decisions with explicit request IDs;
+- `LocalGameSession.submit_parameterized_payload(...)` handles parameterized proposal decisions with explicit request IDs;
 - event cursor returns deterministic event payloads since a supplied cursor;
 - import-boundary tests confirm core, geometry, rules, and engine modules do not import adapters;
 - a golden JSON fixture covers the parameterized Normal Move proposal request; inline JSON-shape regressions cover finite movement action selection, invalid movement and placement proposals, reserve placement, Disembark placement, and viewer-scoped projection/event deltas.
@@ -4612,7 +4612,8 @@ Invariants:
   documented adapter payload, exposes static datasheets, model profiles, weapon
   profiles, factions, detachments, enhancements, wargear, wargear options, and
   base-size display records for browsing, roster panels, tooltips, and client
-  caching;
+  caching, and `LocalGameSession.rules_catalog_view()` exposes that static
+  projection beside the live `LocalGameSession.view(...)` helper;
 - `GameViewPayload` exposes the selected static catalog version/hash and live
   read-only `unit_display_by_id` records keyed by stable `unit_instance_id` and
   `model_display_by_id` records keyed by stable `model_instance_id`;
@@ -4690,6 +4691,9 @@ Required tests:
   `model_display_by_id[model_instance_id]` ->
   `current_characteristics["M/T/SV/W/LD/OC"]` without placeholder unknown values
   or engine-internal imports.
+- Phase 18A projection contract sample fixture pins the static catalog schema,
+  live game-view schema, projection hash, catalog reference, and stable
+  battlefield-to-unit/model datacard join used by UI integration.
 
 ## Phase 18B: replay inspection and deterministic replay runner
 

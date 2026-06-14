@@ -18,8 +18,9 @@ from warhammer40k_core.adapters.contracts import (
 )
 from warhammer40k_core.adapters.decisions import (
     result_for_option,
-    result_for_payload,
+    result_for_parameterized_payload,
     submit_option,
+    submit_parameterized_payload,
 )
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -115,6 +116,7 @@ def test_normal_move_uses_parameterized_proposal_without_finite_endpoint_options
     assert normal_payload["movement_mode"] == MovementMode.NORMAL.value
 
     proposal_status = session.submit_option(
+        request_id=action_request.request_id,
         option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
         result_id="phase11d-normal-action",
     )
@@ -129,7 +131,8 @@ def test_normal_move_uses_parameterized_proposal_without_finite_endpoint_options
     assert proposal.context is not None
     assert proposal.context["movement_mode"] == MovementMode.NORMAL.value
 
-    status = session.submit_payload(
+    status = session.submit_parameterized_payload(
+        request_id=proposal_request.request_id,
         payload=_json(
             MovementProposalPayload(
                 proposal_request_id=proposal.request_id,
@@ -188,9 +191,10 @@ def test_non_parameterized_movement_mode_is_rejected() -> None:
 
 
 def test_parameterized_normal_move_proposal_request_matches_golden_fixture() -> None:
-    session, _action_request = _local_session_at_first_movement_action()
+    session, action_request = _local_session_at_first_movement_action()
     proposal_request = _decision_request(
         session.submit_option(
+            request_id=action_request.request_id,
             option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
             result_id="phase11d-golden-normal-action",
         )
@@ -203,9 +207,10 @@ def test_parameterized_normal_move_proposal_request_matches_golden_fixture() -> 
 
 
 def test_invalid_movement_proposal_returns_typed_invalid_without_mutation() -> None:
-    session, _action_request = _local_session_at_first_movement_action()
+    session, action_request = _local_session_at_first_movement_action()
     proposal_request = _decision_request(
         session.submit_option(
+            request_id=action_request.request_id,
             option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
             result_id="phase11d-invalid-normal-action",
         )
@@ -216,7 +221,8 @@ def test_invalid_movement_proposal_returns_typed_invalid_without_mutation() -> N
     before_payload = state.battlefield_state.to_payload() if state.battlefield_state else None
     before_record_count = len(session.lifecycle.decision_controller.records)
 
-    status = session.submit_payload(
+    status = session.submit_parameterized_payload(
+        request_id=proposal_request.request_id,
         payload=_json(
             MovementProposalPayload(
                 proposal_request_id=proposal.request_id,
@@ -251,9 +257,10 @@ def test_invalid_movement_proposal_returns_typed_invalid_without_mutation() -> N
 
 
 def test_stale_proposal_submission_is_rejected() -> None:
-    session, _action_request = _local_session_at_first_movement_action()
+    session, action_request = _local_session_at_first_movement_action()
     proposal_request = _decision_request(
         session.submit_option(
+            request_id=action_request.request_id,
             option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
             result_id="phase11d-stale-normal-action",
         )
@@ -263,7 +270,8 @@ def test_stale_proposal_submission_is_rejected() -> None:
     before = _unit_placement(state, proposal.unit_instance_id)
     before_record_count = len(session.lifecycle.decision_controller.records)
 
-    status = session.submit_payload(
+    status = session.submit_parameterized_payload(
+        request_id=proposal_request.request_id,
         payload=_json(
             MovementProposalPayload(
                 proposal_request_id="stale-proposal-request",
@@ -289,9 +297,10 @@ def test_stale_proposal_submission_is_rejected() -> None:
 
 
 def test_movement_proposal_drift_rejections_keep_pending_request_and_records_clean() -> None:
-    session, _action_request = _local_session_at_first_movement_action()
+    session, action_request = _local_session_at_first_movement_action()
     proposal_request = _decision_request(
         session.submit_option(
+            request_id=action_request.request_id,
             option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
             result_id="phase11d-drift-normal-action",
         )
@@ -332,7 +341,11 @@ def test_movement_proposal_drift_rejections_keep_pending_request_and_records_cle
     before_record_count = len(session.lifecycle.decision_controller.records)
 
     for result_id, payload, violation_code in drift_cases:
-        status = session.submit_payload(payload=_json(payload), result_id=result_id)
+        status = session.submit_parameterized_payload(
+            request_id=proposal_request.request_id,
+            payload=_json(payload),
+            result_id=result_id,
+        )
         violation = cast(
             list[dict[str, object]],
             _proposal_validation(status)["violations"],
@@ -345,16 +358,18 @@ def test_movement_proposal_drift_rejections_keep_pending_request_and_records_cle
 
 
 def test_malformed_movement_proposal_payload_returns_typed_invalid_and_keeps_request() -> None:
-    session, _action_request = _local_session_at_first_movement_action()
+    session, action_request = _local_session_at_first_movement_action()
     proposal_request = _decision_request(
         session.submit_option(
+            request_id=action_request.request_id,
             option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
             result_id="phase11d-malformed-normal-action",
         )
     )
     before_record_count = len(session.lifecycle.decision_controller.records)
 
-    status = session.submit_payload(
+    status = session.submit_parameterized_payload(
+        request_id=proposal_request.request_id,
         payload={
             "proposal_kind": ProposalKind.NORMAL_MOVE.value,
             "unit_instance_id": "army-alpha:intercessor-unit-1",
@@ -379,16 +394,18 @@ def test_malformed_movement_proposal_payload_returns_typed_invalid_and_keeps_req
 
 
 def test_malformed_movement_proposal_witness_and_kind_return_typed_invalid() -> None:
-    session, _action_request = _local_session_at_first_movement_action()
+    session, action_request = _local_session_at_first_movement_action()
     proposal_request = _decision_request(
         session.submit_option(
+            request_id=action_request.request_id,
             option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
             result_id="phase11d-malformed-witness-action",
         )
     )
     proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
 
-    witness_status = session.submit_payload(
+    witness_status = session.submit_parameterized_payload(
+        request_id=proposal_request.request_id,
         payload={
             "proposal_request_id": proposal.request_id,
             "proposal_kind": ProposalKind.NORMAL_MOVE.value,
@@ -407,7 +424,8 @@ def test_malformed_movement_proposal_witness_and_kind_return_typed_invalid() -> 
     assert witness_violation["violation_code"] == "proposal_payload_malformed"
     assert witness_violation["field"] == "witness"
 
-    kind_status = session.submit_payload(
+    kind_status = session.submit_parameterized_payload(
+        request_id=proposal_request.request_id,
         payload={
             "proposal_request_id": proposal.request_id,
             "proposal_kind": "unsupported_proposal_kind",
@@ -428,9 +446,10 @@ def test_malformed_movement_proposal_witness_and_kind_return_typed_invalid() -> 
 
 
 def test_advance_resolves_dice_then_requests_parameterized_movement() -> None:
-    session, _action_request = _local_session_at_first_movement_action()
+    session, action_request = _local_session_at_first_movement_action()
     proposal_request = _decision_request(
         session.submit_option(
+            request_id=action_request.request_id,
             option_id=MovementPhaseActionKind.ADVANCE.value,
             result_id="phase11d-advance-action",
         )
@@ -449,7 +468,8 @@ def test_advance_resolves_dice_then_requests_parameterized_movement() -> None:
         event.event_type for event in session.lifecycle.decision_controller.event_log.records
     }
 
-    status = session.submit_payload(
+    status = session.submit_parameterized_payload(
+        request_id=proposal_request.request_id,
         payload=_json(
             MovementProposalPayload(
                 proposal_request_id=proposal.request_id,
@@ -484,6 +504,7 @@ def test_fall_back_proposal_preserves_desperate_escape_follow_up() -> None:
     _move_first_enemy_model_into_overflight_engagement(state)
     action_request = _decision_request(
         session.submit_option(
+            request_id=_decision_request(movement_status).request_id,
             option_id="army-alpha:intercessor-unit-1",
             result_id="phase11d-select-fall-back-unit",
         )
@@ -492,6 +513,7 @@ def test_fall_back_proposal_preserves_desperate_escape_follow_up() -> None:
     assert _DESPERATE_FALL_BACK_OPTION_ID in {option.option_id for option in action_request.options}
     proposal_request = _decision_request(
         session.submit_option(
+            request_id=action_request.request_id,
             option_id=_DESPERATE_FALL_BACK_OPTION_ID,
             result_id="phase11d-fall-back-action",
         )
@@ -503,7 +525,8 @@ def test_fall_back_proposal_preserves_desperate_escape_follow_up() -> None:
     assert proposal.context["movement_mode"] == MovementMode.FALL_BACK.value
     assert proposal.context["fall_back_mode"] == FallBackModeKind.DESPERATE_ESCAPE.value
 
-    status = session.submit_payload(
+    status = session.submit_parameterized_payload(
+        request_id=proposal_request.request_id,
         payload=_json(
             MovementProposalPayload(
                 proposal_request_id=proposal.request_id,
@@ -531,12 +554,14 @@ def test_fall_back_mode_drift_and_malformed_payload_keep_pending_request() -> No
     _move_first_enemy_model_into_overflight_engagement(state)
     action_request = _decision_request(
         session.submit_option(
+            request_id=_decision_request(_movement_status).request_id,
             option_id="army-alpha:intercessor-unit-1",
             result_id="phase11d-select-fall-back-mode-drift-unit",
         )
     )
     proposal_request = _decision_request(
         session.submit_option(
+            request_id=action_request.request_id,
             option_id=_DESPERATE_FALL_BACK_OPTION_ID,
             result_id="phase11d-fall-back-mode-drift-action",
         )
@@ -545,7 +570,8 @@ def test_fall_back_mode_drift_and_malformed_payload_keep_pending_request() -> No
     before = _unit_placement(state, proposal.unit_instance_id)
     before_record_count = len(session.lifecycle.decision_controller.records)
 
-    drift_status = session.submit_payload(
+    drift_status = session.submit_parameterized_payload(
+        request_id=proposal_request.request_id,
         payload=_json(
             MovementProposalPayload(
                 proposal_request_id=proposal.request_id,
@@ -570,7 +596,8 @@ def test_fall_back_mode_drift_and_malformed_payload_keep_pending_request() -> No
     assert len(session.lifecycle.decision_controller.records) == before_record_count
     assert session.lifecycle.decision_controller.queue.pending_requests == (proposal_request,)
 
-    malformed_status = session.submit_payload(
+    malformed_status = session.submit_parameterized_payload(
+        request_id=proposal_request.request_id,
         payload=validate_json_value(
             {
                 "proposal_request_id": proposal.request_id,
@@ -597,9 +624,10 @@ def test_fall_back_mode_drift_and_malformed_payload_keep_pending_request() -> No
 
 
 def test_movement_proposal_model_movement_payload_contracts_are_fail_fast() -> None:
-    session, _action_request = _local_session_at_first_movement_action()
+    session, action_request = _local_session_at_first_movement_action()
     proposal_request = _decision_request(
         session.submit_option(
+            request_id=action_request.request_id,
             option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
             result_id="phase11d-model-movement-action",
         )
@@ -1303,6 +1331,7 @@ def test_viewer_scoped_event_cursor_redacts_opponent_secret_decision_payloads() 
     assert _decision_request(first_status).actor_id == "player-a"
 
     session.submit_option(
+        request_id=_decision_request(first_status).request_id,
         option_id="fixed:assassination:bring_it_down",
         result_id="phase11d-secret-secondary-a",
     )
@@ -1348,6 +1377,7 @@ def test_adapter_submission_contracts_are_fail_fast() -> None:
     session, action_request = _local_session_at_first_movement_action()
     parameterized_request = _decision_request(
         session.submit_option(
+            request_id=action_request.request_id,
             option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
             result_id="phase11d-contract-normal-action",
         )
@@ -1358,7 +1388,7 @@ def test_adapter_submission_contracts_are_fail_fast() -> None:
         option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
         result_id="phase11d-contract-finite",
     )
-    payload_result = result_for_payload(
+    payload_result = result_for_parameterized_payload(
         request=parameterized_request,
         payload={"accepted": True},
         result_id="phase11d-contract-parameterized",
@@ -1421,15 +1451,33 @@ def test_adapter_helpers_and_cursor_reject_invalid_inputs() -> None:
     with pytest.raises(GameLifecycleError, match="requires a GameLifecycle"):
         submit_option(
             lifecycle=cast(GameLifecycle, object()),
+            request_id="phase11d-helper-bad-lifecycle-request",
             option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
             result_id="phase11d-helper-bad-lifecycle",
         )
     with pytest.raises(GameLifecycleError, match="pending DecisionRequest"):
         submit_option(
             lifecycle=GameLifecycle(),
+            request_id="phase11d-helper-no-request-id",
             option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
             result_id="phase11d-helper-no-request",
         )
+    session, action_request = _local_session_at_first_movement_action()
+    with pytest.raises(GameLifecycleError, match="request_id does not match pending request"):
+        submit_option(
+            lifecycle=session.lifecycle,
+            request_id="phase11d-helper-stale-request",
+            option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+            result_id="phase11d-helper-stale-finite",
+        )
+    with pytest.raises(GameLifecycleError, match="request_id does not match pending request"):
+        submit_parameterized_payload(
+            lifecycle=session.lifecycle,
+            request_id="phase11d-helper-stale-parameterized-request",
+            payload={"accepted": True},
+            result_id="phase11d-helper-stale-parameterized",
+        )
+    assert session.lifecycle.decision_controller.queue.pending_requests == (action_request,)
 
     with pytest.raises(GameLifecycleError, match="must be an integer"):
         EventStreamCursor(value=cast(int, "0"))
@@ -1452,6 +1500,29 @@ def test_adapter_helpers_and_cursor_reject_invalid_inputs() -> None:
         "next_cursor": 1,
         "events": [],
     }
+
+
+def test_parameterized_helper_rejects_stale_request_id_when_proposal_is_pending() -> None:
+    session, action_request = _local_session_at_first_movement_action()
+    proposal_request = _decision_request(
+        session.submit_option(
+            request_id=action_request.request_id,
+            option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+            result_id="phase11d-helper-stale-proposal-action",
+        )
+    )
+    before_record_count = len(session.lifecycle.decision_controller.records)
+
+    with pytest.raises(GameLifecycleError, match="request_id does not match pending request"):
+        submit_parameterized_payload(
+            lifecycle=session.lifecycle,
+            request_id="phase11d-helper-stale-proposal-request",
+            payload={"accepted": True},
+            result_id="phase11d-helper-stale-proposal",
+        )
+
+    assert session.lifecycle.decision_controller.queue.pending_requests == (proposal_request,)
+    assert len(session.lifecycle.decision_controller.records) == before_record_count
 
 
 def test_projection_and_local_session_boundaries_are_fail_fast() -> None:
@@ -1525,12 +1596,13 @@ def test_projection_and_local_session_boundaries_are_fail_fast() -> None:
 
 def _local_session_at_first_movement_action() -> tuple[LocalGameSession, DecisionRequest]:
     session, movement_status = _local_session_at_movement_unit_selection()
+    movement_request = _decision_request(movement_status)
     action_status = session.submit_option(
+        request_id=movement_request.request_id,
         option_id="army-alpha:intercessor-unit-1",
         result_id="phase11d-select-first-unit",
     )
     action_request = _decision_request(action_status)
-    assert movement_status.decision_request is not None
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
     return session, action_request
 
@@ -1543,13 +1615,17 @@ def _local_session_at_movement_unit_selection(
     session = LocalGameSession()
     session.start(_config(game_id=game_id))
     first_status = session.advance_until_decision_or_terminal()
-    assert _decision_request(first_status).decision_type == SECONDARY_MISSION_DECISION_TYPE
+    first_request = _decision_request(first_status)
+    assert first_request.decision_type == SECONDARY_MISSION_DECISION_TYPE
     second_status = session.submit_option(
+        request_id=first_request.request_id,
         option_id="fixed:assassination:bring_it_down",
         result_id="phase11d-secondary-a",
     )
-    assert _decision_request(second_status).decision_type == SECONDARY_MISSION_DECISION_TYPE
+    second_request = _decision_request(second_status)
+    assert second_request.decision_type == SECONDARY_MISSION_DECISION_TYPE
     movement_status = session.submit_option(
+        request_id=second_request.request_id,
         option_id="fixed:assassination:bring_it_down",
         result_id="phase11d-secondary-b",
     )

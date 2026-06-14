@@ -1,0 +1,294 @@
+{
+  "game_view": {
+    "battlefield_join": {
+      "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+      "placement": {
+        "army_id": "army-alpha",
+        "model_placement": {
+          "army_id": "army-alpha",
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+          "player_id": "player-a",
+          "pose": {
+            "facing": {
+              "degrees": 0.0
+            },
+            "position": {
+              "x": 3.0,
+              "y": 24.0,
+              "z": 0.0
+            }
+          },
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
+        },
+        "player_id": "player-a",
+        "unit_instance_id": "army-alpha:intercessor-unit-1"
+      },
+      "unit_instance_id": "army-alpha:intercessor-unit-1"
+    },
+    "model_display": {
+      "base_size": {
+        "base_size_id": "base-size:core-intercessor-like",
+        "diameter_mm": 32.0,
+        "kind": "circular",
+        "length_mm": null,
+        "width_mm": null
+      },
+      "current_characteristics": {
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "model_display_name": "CORE Intercessor-like Infantry",
+      "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+      "model_profile_id": "core-intercessor-like",
+      "starting_wounds": 2,
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
+      "wounds_remaining": 2
+    },
+    "projection_schema": "game-view-v2-phase18a",
+    "projection_state_hash": "b0a01b85e30ba0a926c0ad93f7ae0313c6042c62b92d630a1fd7e0d870dd7a6d",
+    "rules_catalog": {
+      "catalog_id": "phase9a-canonical",
+      "projection_schema": "rules-catalog-view-v1",
+      "ruleset_id": {
+        "edition": "11e",
+        "game": "warhammer_40000",
+        "version": "core-v2-phase9a"
+      },
+      "source_hash": "6c1728d7d609ac017965ae569f3299b2384e59afec3772c8fe91297f0861fe86",
+      "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
+    },
+    "unit_display": {
+      "datasheet_id": "core-intercessor-like-infantry",
+      "faction_keywords": [
+        "CORE Marines"
+      ],
+      "keywords": [
+        "Battleline",
+        "Infantry"
+      ],
+      "model_instance_ids": [
+        "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:005"
+      ],
+      "selected_wargear_ids": [
+        "core-bolt-rifle"
+      ],
+      "unit_display_name": "CORE Intercessor-like Infantry",
+      "unit_instance_id": "army-alpha:intercessor-unit-1"
+    }
+  },
+  "rules_catalog": {
+    "base_size": {
+      "base_size_id": "base-size:core-intercessor-like",
+      "diameter_mm": 32.0,
+      "kind": "circular",
+      "length_mm": null,
+      "width_mm": null
+    },
+    "catalog_id": "phase9a-canonical",
+    "datasheet": {
+      "content_scope": "matched_play",
+      "datasheet_id": "core-intercessor-like-infantry",
+      "display_name": "CORE Intercessor-like Infantry",
+      "faction_keywords": [
+        "CORE Marines"
+      ],
+      "keywords": [
+        "Battleline",
+        "Infantry"
+      ],
+      "model_profile_ids": [
+        "core-intercessor-like"
+      ],
+      "source_ids": [
+        "datasheet:core-intercessor-like-infantry"
+      ],
+      "wargear_option_ids": [
+        "core-intercessor-like-infantry:default-wargear"
+      ]
+    },
+    "model_profile": {
+      "base_characteristics": {
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "base_size_id": "base-size:core-intercessor-like",
+      "datasheet_id": "core-intercessor-like-infantry",
+      "display_name": "CORE Intercessor-like Infantry",
+      "model_profile_id": "core-intercessor-like",
+      "source_ids": [
+        "datasheet:core-intercessor-like-infantry:profile"
+      ]
+    },
+    "projection_schema": "rules-catalog-view-v1",
+    "source_hash": "6c1728d7d609ac017965ae569f3299b2384e59afec3772c8fe91297f0861fe86",
+    "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
+  }
+}
