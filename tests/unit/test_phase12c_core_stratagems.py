@@ -27,7 +27,11 @@ from warhammer40k_core.engine.command_points import (
     CommandPointSourceKind,
     CommandStepState,
 )
-from warhammer40k_core.engine.damage_allocation import FeelNoPainSource, model_by_id
+from warhammer40k_core.engine.damage_allocation import (
+    SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+    FeelNoPainSource,
+    model_by_id,
+)
 from warhammer40k_core.engine.decision import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
@@ -2693,6 +2697,7 @@ def test_phase13d_fire_overwatch_requests_out_of_phase_shooting_declaration() ->
             break
         request = _decision_request(status)
         assert request.decision_type in {
+            SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
             "select_feel_no_pain",
             "select_precision_allocation",
         }

@@ -18,6 +18,7 @@ class WargearPayload(TypedDict):
     wargear_id: str
     name: str
     weapon_profiles: list[WeaponProfilePayload]
+    source_ids: list[str]
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,6 +26,7 @@ class Wargear:
     wargear_id: str
     name: str
     weapon_profiles: tuple[WeaponProfile, ...] = ()
+    source_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -37,6 +39,11 @@ class Wargear:
         _validate_unique_profile_ids(profiles)
         if profiles != self.weapon_profiles:
             object.__setattr__(self, "weapon_profiles", profiles)
+        object.__setattr__(
+            self,
+            "source_ids",
+            _validate_identifier_tuple("Wargear source_ids", self.source_ids),
+        )
 
     def stable_identity(self) -> str:
         return f"wargear:{self.wargear_id}"
@@ -53,6 +60,7 @@ class Wargear:
             "wargear_id": self.wargear_id,
             "name": self.name,
             "weapon_profiles": [profile.to_payload() for profile in self.weapon_profiles],
+            "source_ids": list(self.source_ids),
         }
 
     @classmethod
@@ -63,6 +71,7 @@ class Wargear:
             weapon_profiles=tuple(
                 _weapon_profile_from_payload(profile) for profile in payload["weapon_profiles"]
             ),
+            source_ids=tuple(payload["source_ids"]),
         )
 
 
@@ -80,6 +89,20 @@ def _validate_wargear_id(value: object) -> str:
     if identifier.startswith("wargear:"):
         raise WargearError("Wargear wargear_id must not include the stable identity prefix.")
     return identifier
+
+
+def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise WargearError(f"{field_name} must be a tuple.")
+    seen: set[str] = set()
+    validated: list[str] = []
+    for value in values:
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise WargearError(f"{field_name} must not contain duplicates.")
+        seen.add(identifier)
+        validated.append(identifier)
+    return tuple(validated)
 
 
 def _validate_weapon_profile(profile: object) -> WeaponProfile:

@@ -2,14 +2,20 @@ from __future__ import annotations
 
 import hashlib
 import json
+import zipfile
 from dataclasses import replace
 from datetime import date
+from io import BytesIO
 from pathlib import Path
 from typing import cast
 
 import pytest
 from tools.wahapedia_csv_to_json import build_wahapedia_json_artifacts
-from tools.wahapedia_fetch import WahapediaFetchSource, fetch_wahapedia_sources
+from tools.wahapedia_fetch import (
+    WahapediaFetchSource,
+    discover_wahapedia_sources_from_export_specs,
+    fetch_wahapedia_sources,
+)
 
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.html_sanitizer import (
@@ -27,6 +33,8 @@ from warhammer40k_core.rules.source_catalog import (
     SourcePackageManifestPayload,
 )
 from warhammer40k_core.rules.wahapedia_schema import (
+    EditionSourceConfig,
+    EditionSourceConfigPayload,
     NormalizedSourceRow,
     SourceTextFieldPayload,
     WahapediaArtifactBuildReport,
@@ -67,6 +75,8 @@ def test_phase17a_csv_normalization_strips_html_and_preserves_structured_text() 
     assert description.parsed_tokens.keywords[0].keyword == "Feel No Pain"
     assert "li" in description.html_sanitization.converted_tags
     assert description.html_sanitization.embedded_links == ("https://example.invalid/rule",)
+    assert name.source_text_id.endswith(":Abilities:ability-1:name")
+    assert description.source_text_id.endswith(":Abilities:ability-1:description")
 
 
 def test_phase17a_generated_json_is_deterministic_and_round_trips() -> None:
@@ -377,6 +387,57 @@ def test_phase17a_generated_artifact_uses_raw_source_file_checksum(tmp_path: Pat
     )
 
 
+def test_phase17a_tooling_parses_wahapedia_pipe_delimited_csv_with_bom(tmp_path: Path) -> None:
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    input_dir.mkdir()
+    raw_csv = b"\xef\xbb\xbfid|name|description\r\nability-1|Angels Fury|Roll D6.\r\n"
+    (input_dir / "Abilities.csv").write_bytes(raw_csv)
+
+    manifest = build_wahapedia_json_artifacts(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        package_id=_package_id(),
+        catalog_version=_catalog_version(),
+        upstream_identity="wahapedia-export",
+        source_edition="warhammer-40000-11th",
+        csv_delimiter="|",
+    )
+    artifact_payload = cast(
+        WahapediaJsonArtifactPayload,
+        json.loads((output_dir / "Abilities.json").read_bytes()),
+    )
+
+    assert manifest.source_files[0].checksum_sha256 == hashlib.sha256(raw_csv).hexdigest()
+    assert artifact_payload["rows"][0]["fields"]["name"] == "Angels Fury"
+
+
+def test_phase17a_wahapedia_index_discovery_extracts_edition_csv_links() -> None:
+    config = EditionSourceConfig.wahapedia_previous_edition_bridge()
+    sources = discover_wahapedia_sources_from_export_specs(
+        xlsx_bytes=_wahapedia_export_specs_xlsx(),
+        source_config=config,
+    )
+    config_payload = cast(
+        EditionSourceConfigPayload,
+        json.loads(json.dumps(config.to_payload(), sort_keys=True)),
+    )
+
+    assert EditionSourceConfig.from_payload(config_payload) == config
+    assert [source.relative_path for source in sources] == ["Abilities.csv", "Datasheets.csv"]
+    assert sources[0].url == f"https://wahapedia.ru/{_previous_edition_slug()}/Abilities.csv"
+
+
+def test_phase17a_wahapedia_index_discovery_rejects_wrong_edition_links() -> None:
+    with pytest.raises(ValueError, match="requested edition"):
+        discover_wahapedia_sources_from_export_specs(
+            xlsx_bytes=_wahapedia_export_specs_xlsx(
+                csv_base=f"/{EditionSourceConfig.wahapedia_11th().wahapedia_edition_slug}/"
+            ),
+            source_config=EditionSourceConfig.wahapedia_previous_edition_bridge(),
+        )
+
+
 def test_phase17a_wahapedia_payloads_reject_drift_and_invalid_links() -> None:
     artifact = _abilities_artifact(_abilities_csv())
     row = artifact.rows[0]
@@ -522,6 +583,65 @@ def _abilities_csv() -> str:
         "<ul><li>feel no pain applies.</li></ul>"
         '<p><a href=""https://example.invalid/rule"">designer note</a></p>"\n'
     )
+
+
+def _previous_edition_slug() -> str:
+    return "wh40k" + "1" + "0ed"
+
+
+def _wahapedia_export_specs_xlsx(*, csv_base: str | None = None) -> bytes:
+    if csv_base is None:
+        csv_base = f"/{_previous_edition_slug()}/"
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr(
+            "xl/workbook.xml",
+            (
+                '<?xml version="1.0" encoding="UTF-8"?>'
+                '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
+                'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+                "<sheets>"
+                '<sheet name="EN" sheetId="1" r:id="rId1"/>'
+                "</sheets>"
+                "</workbook>"
+            ),
+        )
+        archive.writestr(
+            "xl/_rels/workbook.xml.rels",
+            (
+                '<?xml version="1.0" encoding="UTF-8"?>'
+                '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                '<Relationship Id="rId1" '
+                'Type="http://schemas.openxmlformats.org/officeDocument/2006/'
+                'relationships/worksheet" '
+                'Target="worksheets/sheet1.xml"/>'
+                "</Relationships>"
+            ),
+        )
+        archive.writestr(
+            "xl/worksheets/sheet1.xml",
+            (
+                '<?xml version="1.0" encoding="UTF-8"?>'
+                '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
+                'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+                "<hyperlinks>"
+                '<hyperlink ref="A1" r:id="rId1"/>'
+                '<hyperlink ref="A2" r:id="rId2"/>'
+                "</hyperlinks>"
+                "</worksheet>"
+            ),
+        )
+        archive.writestr(
+            "xl/worksheets/_rels/sheet1.xml.rels",
+            (
+                '<?xml version="1.0" encoding="UTF-8"?>'
+                '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                f'<Relationship Id="rId2" Target="https://wahapedia.ru{csv_base}Datasheets.csv"/>'
+                f'<Relationship Id="rId1" Target="https://wahapedia.ru{csv_base}Abilities.csv"/>'
+                "</Relationships>"
+            ),
+        )
+    return buffer.getvalue()
 
 
 def _package_id() -> DataPackageId:

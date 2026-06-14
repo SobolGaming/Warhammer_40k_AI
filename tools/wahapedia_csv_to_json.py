@@ -22,6 +22,7 @@ def build_wahapedia_json_artifacts(
     catalog_version: CatalogVersion,
     upstream_identity: str,
     source_edition: str,
+    csv_delimiter: str = ",",
 ) -> SourcePackageManifest:
     csv_paths = tuple(sorted(input_dir.glob("*.csv")))
     if not csv_paths:
@@ -44,6 +45,7 @@ def build_wahapedia_json_artifacts(
         table = WahapediaCsvTable.from_csv_text(
             table_name=csv_path.stem,
             csv_text=csv_path.read_text(encoding="utf-8-sig"),
+            delimiter=csv_delimiter,
         )
         artifact = WahapediaJsonArtifact.from_csv_table(
             source_package_id=package_id,
@@ -76,6 +78,7 @@ def main() -> None:
     parser.add_argument("--source-date", required=True)
     parser.add_argument("--upstream-identity", required=True)
     parser.add_argument("--source-edition", required=True)
+    parser.add_argument("--csv-delimiter", default="|")
     args = parser.parse_args()
 
     build_wahapedia_json_artifacts(
@@ -92,6 +95,7 @@ def main() -> None:
         ),
         upstream_identity=args.upstream_identity,
         source_edition=args.source_edition,
+        csv_delimiter=args.csv_delimiter,
     )
 
 

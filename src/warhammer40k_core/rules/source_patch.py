@@ -964,7 +964,9 @@ def _replace_text_field(
         raw_html=raw_text,
     )
     normalized_text = normalize_structured_source_text(report.sanitized_text)
+    text_field = _text_field_by_column(row, column)
     replacement = SourceTextField(
+        source_text_id=text_field.source_text_id,
         column_name=column,
         raw_text=raw_text,
         sanitized_text=report.sanitized_text,

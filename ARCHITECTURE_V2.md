@@ -168,13 +168,15 @@ round one without the Phase 10A deterministic placement bridge. Invalid setup
 returns typed `setup_completion_gate_failed` diagnostics and leaves the game in
 setup.
 
-**Phase 17A is complete** for the bridge Wahapedia source mirror and CSV-to-JSON
-ETL. The source mirror now records source snapshots and package manifests with
-checksums, upstream identity, source date, source-edition identity, deterministic
-artifact hashes, HTML sanitization reports, structured source-text
-normalization, source-row provenance, runtime-field HTML exclusion, grouped
-malformed-row diagnostics, and a static boundary check that prevents engine
-runtime from importing raw source mirror or sanitizer modules.
+**Phase 17A is complete** for the edition-aware Wahapedia source mirror and
+CSV-to-JSON ETL. The source mirror now records source snapshots and package
+manifests with checksums, upstream identity, source date, source-edition
+identity, deterministic artifact hashes, HTML sanitization reports, structured
+source-text normalization, stable source text IDs, source-row provenance,
+runtime-field HTML exclusion, grouped malformed-row diagnostics, immutable
+source overlay release packages, source-reference catalog generation, and a
+static boundary check that prevents engine runtime from importing raw source
+mirror, overlay, source-reference, or sanitizer modules.
 
 **Phase 17A.1 is complete** for official 11th Edition transition patch
 packages. The patch layer now models source-linked operations, exact and
@@ -332,7 +334,7 @@ Completed / implemented foundation:
 | 16C | Complete | Reserve declaration decisions, Strategic Reserves cap enforcement, Deep Strike setup declarations, AIRCRAFT mandatory reserves, and source-backed reserve payloads |
 | 16D | Complete | Army construction completion and runtime instantiation |
 | 16E | Complete | Setup completion gate, readiness diagnostics, battle-start checkpoints, and bridge-free battle entry |
-| 17A | Complete | Bridge Wahapedia source mirror, HTML sanitization, deterministic CSV-to-JSON ETL, source manifests, and grouped import diagnostics |
+| 17A | Complete | Edition-aware Wahapedia source mirror, deterministic CSV-to-JSON ETL, immutable source overlays, source-reference catalogs, and grouped import diagnostics |
 | 17A.1 | Complete | Official 11th Edition transition patch packages, deterministic patched artifacts, target diagnostics, and FAQ classification |
 | 17B | Complete | Canonical 11th Edition catalog generation, geometry evidence, model-height records, and deterministic package hashes |
 | 17C | Complete | Rule-language IR, reusable templates, source-spanned unsupported diagnostics, and runtime parser/compiler boundary |
@@ -3848,12 +3850,14 @@ Required tests:
 # Wahapedia bridge data ingestion, language parsing, and content coverage
 
 Phase 17 imports faction content before Wahapedia publishes native 11th Edition
-tables. The active engine remains 11th Edition-only: prior-edition Wahapedia
-rows are treated as upstream bridge source material, not as a runtime
-compatibility mode. Official 11th Edition faction update instructions are
-modeled as ordered, source-linked transition patches over the normalized bridge
-source rows. The only catalog emitted for play is the patched 11th Edition
-catalog.
+tables and keeps Wahapedia as the long-lived external data feed after native
+11th Edition tables appear. The active engine remains 11th Edition-only:
+prior-edition Wahapedia rows are treated as upstream bridge source material, not
+as a runtime compatibility mode. Official 11th Edition faction update
+instructions and project-owner previous-edition-to-CORE-11 porting updates are modeled as
+ordered, immutable, source-linked overlay/transition packages over normalized
+bridge source rows. The catalog emitted for play is always an 11th Edition
+catalog generated from the selected edition source release.
 
 The faction rollout order, per-faction phase structure, and naming convention for
 detachment and datasheet subphases are tracked in
@@ -3865,12 +3869,14 @@ Status: Complete.
 
 Phase 17A provides the bridge source mirror only. It does not make prior-edition
 Wahapedia rows an active runtime catalog. CSV/source inputs are represented by
-`WahapediaSourceSnapshot`, `WahapediaCsvTable`, `NormalizedSourceRow`,
-`SourceHtmlSanitizationReport`, `WahapediaJsonArtifact`, and
-`SourcePackageManifest`; `tools/wahapedia_fetch.py` records fetched source
-checksums, and `tools/wahapedia_csv_to_json.py` emits deterministic JSON source
-artifacts plus package manifests. Runtime engine modules remain blocked from
-importing raw source-normalization or source-mirror modules.
+`EditionSourceConfig`, `WahapediaSourceSnapshot`, `WahapediaCsvTable`,
+`NormalizedSourceRow`, `SourceHtmlSanitizationReport`, `WahapediaJsonArtifact`,
+and `SourcePackageManifest`; `tools/wahapedia_fetch.py` can either consume
+explicit source mappings or discover edition CSV links from Wahapedia's export
+spreadsheet, records fetched source checksums, and `tools/wahapedia_csv_to_json.py`
+emits deterministic JSON source artifacts plus package manifests from
+Wahapedia's UTF-8 BOM, pipe-delimited CSVs. Runtime engine modules remain
+blocked from importing raw source-normalization or source-mirror modules.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are
 local-only validation inputs, not repository artifacts. Do not commit
@@ -3886,36 +3892,57 @@ The current faction-pack source manifest uses the official Warhammer 40,000
 downloads page as its shared source page:
 `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/`.
 
-CORE V1 already has generated `wahapedia_data` JSON such as `Abilities.json`, `Datasheets.json`, `Datasheets_models.json`, `Datasheets_wargear.json`, `Factions.json`, `Detachments.json`, `Enhancements.json`, and `Stratagems.json`. CORE V2 must rebuild this pipeline from the downloaded CSV/source exports, but with stricter normalization and provenance.
+CORE V1 already has generated `wahapedia_data` JSON such as `Abilities.json`,
+`Datasheets.json`, `Datasheets_abilities.json`, `Datasheets_keywords.json`,
+`Datasheets_leader.json`, `Datasheets_models.json`,
+`Datasheets_unit_composition.json`, `Datasheets_wargear.json`,
+`Datasheets_options.json`, `Factions.json`, `Detachment_abilities.json`,
+`Detachments.json`, `Enhancements.json`, and `Stratagems.json`. CORE V2 rebuilds
+this pipeline from downloaded CSV/source exports with stricter normalization,
+stable source text IDs, optional/required text-field handling, and provenance.
 
 Modules:
 
 - `tools/wahapedia_fetch.py`
 - `tools/wahapedia_csv_to_json.py`
 - `rules/source_catalog.py`
+- `rules/source_overlay.py`
+- `rules/source_reference_generation.py`
 - `rules/text_normalization.py`
 - `rules/html_sanitizer.py`
 - `rules/wahapedia_schema.py`
 
 Objects:
 
+- `EditionSourceConfig`
 - `WahapediaSourceSnapshot`
 - `WahapediaCsvTable`
 - `NormalizedSourceRow`
 - `SourceHtmlSanitizationReport`
 - `WahapediaJsonArtifact`
 - `SourcePackageManifest`
+- `SourceReleaseManifest`
+- `SourceOverlayPack`
+- `SourceOverlayOperation`
+- `SourceTextRef`
+- `SourceReferenceCatalog`
 
 Invariants:
 
 - downloaded CSV/source files are stored with checksum, source date, upstream
   identity, and source edition identity;
 - generated JSON is deterministic from source inputs;
+- Wahapedia CSV parsing uses explicit UTF-8 BOM handling and fixed delimiters,
+  not source sniffing;
 - HTML tags are stripped or converted to explicit structured markup before catalog ingestion;
 - normalized text preserves source spans, paragraph/list boundaries, dice expressions, keywords, and distance expressions;
 - smart quotes, dashes, non-breaking spaces, HTML entities, and embedded links are normalized once;
 - raw HTML is never consumed by runtime engine code;
-- generated JSON includes `raw_text`, `normalized_text`, and source-row provenance where needed;
+- generated JSON includes `raw_text`, `normalized_text`, stable source text IDs,
+  and source-row provenance where needed;
+- Previous-edition-to-CORE-11 update packs are immutable source overlays with release-manifest
+  ordering, preimage hashes for row mutations, duplicate field-edit rejection,
+  and add/update/supersede semantics;
 - generated JSON is a source mirror only and must not be imported directly by
   runtime engine code as an active prior-edition catalog;
 - invalid rows fail with actionable diagnostics rather than being silently skipped.
@@ -3927,6 +3954,11 @@ Required tests:
 - source checksum drift changes package manifest hash;
 - generated JSON contains no raw HTML tags in runtime fields;
 - every catalog-bound row has source table, source row ID, and source package ID;
+- every non-empty source text field has a package-qualified source text ID;
+- mocked Wahapedia XLSX discovery extracts stable edition CSV source mappings;
+- pipe-delimited UTF-8 BOM Wahapedia CSVs parse without CSV sniffing;
+- immutable source overlays reject stale preimage hashes and duplicate field edits;
+- source-reference catalogs round-trip and reject stale hashes;
 - failure report groups unsupported/malformed rows by reason.
 
 CORE V1 relevant areas:

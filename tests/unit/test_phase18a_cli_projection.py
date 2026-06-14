@@ -166,6 +166,7 @@ def test_rules_catalog_projection_exposes_cacheable_static_display_records() -> 
         "profile": {
             "wargear_id": "core-bolt-rifle",
             "name": "Core bolt rifle",
+            "source_ids": [],
             "weapon_profiles": [
                 payload["weapon_profile_display_by_id"]["core-bolt-rifle:standard"]["profile"]
             ],

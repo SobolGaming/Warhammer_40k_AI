@@ -8,6 +8,10 @@ from typing import cast
 from tools.build_model_geometry_overrides import load_model_geometry_overrides
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
+from warhammer40k_core.rules.source_overlay import (
+    OverlaySourceArtifact,
+    OverlaySourceArtifactPayload,
+)
 from warhammer40k_core.rules.source_patch import PatchedSourceArtifact, PatchedSourceArtifactPayload
 from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaJsonArtifact,
@@ -15,10 +19,14 @@ from warhammer40k_core.rules.wahapedia_schema import (
 )
 
 
-def load_source_artifact(path: Path) -> WahapediaJsonArtifact | PatchedSourceArtifact:
+def load_source_artifact(
+    path: Path,
+) -> WahapediaJsonArtifact | PatchedSourceArtifact | OverlaySourceArtifact:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if type(payload) is not dict:
         raise ValueError("Source artifact JSON must contain an object.")
+    if "overlay_package_hashes" in payload:
+        return OverlaySourceArtifact.from_payload(cast(OverlaySourceArtifactPayload, payload))
     if "patch_package_hash" in payload:
         return PatchedSourceArtifact.from_payload(cast(PatchedSourceArtifactPayload, payload))
     return WahapediaJsonArtifact.from_payload(cast(WahapediaJsonArtifactPayload, payload))
