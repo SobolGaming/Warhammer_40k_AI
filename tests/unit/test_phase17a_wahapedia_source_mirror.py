@@ -364,7 +364,9 @@ def test_phase17a_generated_artifact_uses_raw_source_file_checksum(tmp_path: Pat
     raw_csv = (
         b'\xef\xbb\xbfid,faction_id,name,description\r\nability-1,SM,Angels Fury,"Roll D6."\r\n'
     )
-    (input_dir / "Abilities.csv").write_bytes(raw_csv)
+    csv_path = input_dir / "Abilities.csv"
+    csv_path.write_bytes(raw_csv)
+    decoded_csv_text = csv_path.read_text(encoding="utf-8-sig")
 
     manifest = build_wahapedia_json_artifacts(
         input_dir=input_dir,
@@ -379,9 +381,9 @@ def test_phase17a_generated_artifact_uses_raw_source_file_checksum(tmp_path: Pat
         json.loads((output_dir / "Abilities.json").read_bytes()),
     )
     raw_checksum = hashlib.sha256(raw_csv).hexdigest()
-    decoded_csv_text = (input_dir / "Abilities.csv").read_text(encoding="utf-8-sig")
 
     assert hashlib.sha256(decoded_csv_text.encode()).hexdigest() != raw_checksum
+    assert not csv_path.exists()
     assert manifest.source_files[0].checksum_sha256 == raw_checksum
     assert artifact_payload["source_checksum_sha256"] == raw_checksum
     assert WahapediaJsonArtifact.from_payload(artifact_payload).source_checksum_sha256 == (
@@ -412,6 +414,29 @@ def test_phase17a_tooling_parses_wahapedia_pipe_delimited_csv_with_bom(tmp_path:
 
     assert manifest.source_files[0].checksum_sha256 == hashlib.sha256(raw_csv).hexdigest()
     assert artifact_payload["rows"][0]["fields"]["name"] == "Angels Fury"
+    assert not (input_dir / "Abilities.csv").exists()
+
+
+def test_phase17a_tooling_can_keep_input_csvs_for_local_debugging(tmp_path: Path) -> None:
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    input_dir.mkdir()
+    raw_csv = b"id|faction_id|name|description\r\nability-1|SM|Angels Fury|Roll D6.\r\n"
+    csv_path = input_dir / "Abilities.csv"
+    csv_path.write_bytes(raw_csv)
+
+    build_wahapedia_json_artifacts(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        package_id=_package_id(),
+        catalog_version=_catalog_version(),
+        upstream_identity="wahapedia-export",
+        source_edition="warhammer-40000-11th",
+        csv_delimiter="|",
+        keep_input_csvs=True,
+    )
+
+    assert csv_path.read_bytes() == raw_csv
 
 
 def test_phase17a_tooling_strips_wahapedia_trailing_empty_export_column(

@@ -3875,7 +3875,9 @@ and `SourcePackageManifest`; `tools/wahapedia_fetch.py` can either consume
 explicit source mappings or discover edition CSV links from Wahapedia's export
 spreadsheet, records fetched source checksums, and `tools/wahapedia_csv_to_json.py`
 emits deterministic JSON source artifacts plus package manifests from
-Wahapedia's UTF-8 BOM, pipe-delimited CSVs. Runtime engine modules remain
+Wahapedia's UTF-8 BOM, pipe-delimited CSVs, then removes consumed CSV files by
+default so checked-in source snapshots keep JSON artifacts and manifests only.
+Runtime engine modules remain
 blocked from importing raw source-normalization or source-mirror modules.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are

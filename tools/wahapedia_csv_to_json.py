@@ -23,7 +23,10 @@ def build_wahapedia_json_artifacts(
     upstream_identity: str,
     source_edition: str,
     csv_delimiter: str = ",",
+    keep_input_csvs: bool = False,
 ) -> SourcePackageManifest:
+    if type(keep_input_csvs) is not bool:
+        raise ValueError("keep_input_csvs must be a boolean.")
     csv_paths = tuple(sorted(input_dir.glob("*.csv")))
     if not csv_paths:
         raise ValueError("input_dir must contain at least one CSV file.")
@@ -62,6 +65,9 @@ def build_wahapedia_json_artifacts(
         json.dumps(manifest.to_payload(), sort_keys=True, indent=2),
         encoding="utf-8",
     )
+    if not keep_input_csvs:
+        for csv_path in csv_paths:
+            csv_path.unlink()
     return manifest
 
 
@@ -79,6 +85,11 @@ def main() -> None:
     parser.add_argument("--upstream-identity", required=True)
     parser.add_argument("--source-edition", required=True)
     parser.add_argument("--csv-delimiter", default="|")
+    parser.add_argument(
+        "--keep-input-csvs",
+        action="store_true",
+        help="Retain source CSVs after JSON artifacts and manifests are generated.",
+    )
     args = parser.parse_args()
 
     build_wahapedia_json_artifacts(
@@ -96,6 +107,7 @@ def main() -> None:
         upstream_identity=args.upstream_identity,
         source_edition=args.source_edition,
         csv_delimiter=args.csv_delimiter,
+        keep_input_csvs=args.keep_input_csvs,
     )
 
 
