@@ -607,9 +607,15 @@ def _core_characteristics(
     objective_control: int,
     weapon_skill: int,
     ballistic_skill: int,
+    invulnerable_save: int | None = None,
 ) -> tuple[CharacteristicValue, ...]:
     return (
         CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, ballistic_skill),
+        (
+            CharacteristicValue.source_dash(Characteristic.INVULNERABLE_SAVE)
+            if invulnerable_save is None
+            else CharacteristicValue.from_raw(Characteristic.INVULNERABLE_SAVE, invulnerable_save)
+        ),
         CharacteristicValue.from_raw(Characteristic.LEADERSHIP, leadership),
         CharacteristicValue.from_raw(Characteristic.MOVEMENT, movement),
         CharacteristicValue.from_raw(Characteristic.OBJECTIVE_CONTROL, objective_control),

@@ -307,6 +307,11 @@ def _model_profile_from_row(
                 characteristic=Characteristic.OBJECTIVE_CONTROL,
             ),
             _characteristic_from_row(row=row, column_name="sv", characteristic=Characteristic.SAVE),
+            _optional_characteristic_from_row(
+                row=row,
+                column_name="inv_sv",
+                characteristic=Characteristic.INVULNERABLE_SAVE,
+            ),
             _characteristic_from_row(
                 row=row, column_name="t", characteristic=Characteristic.TOUGHNESS
             ),
@@ -792,6 +797,18 @@ def _characteristic_from_row(
     return _characteristic_value_from_raw_text(
         characteristic=characteristic,
         raw_text=_required_field(row=row, column_name=column_name),
+    )
+
+
+def _optional_characteristic_from_row(
+    *,
+    row: NormalizedSourceRow,
+    column_name: str,
+    characteristic: Characteristic,
+) -> CharacteristicValue:
+    return _characteristic_value_from_raw_text(
+        characteristic=characteristic,
+        raw_text=_optional_field(row=row, column_name=column_name) or "-",
     )
 
 

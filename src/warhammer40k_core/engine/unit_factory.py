@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
@@ -13,8 +13,13 @@ from warhammer40k_core.core.attributes import (
 from warhammer40k_core.core.datasheet import (
     BaseSizeDefinition,
     BaseSizeDefinitionPayload,
+    DatasheetAbilityDescriptor,
+    DatasheetAbilityDescriptorPayload,
     DatasheetDefinition,
+    DatasheetWargearOption,
     ModelProfileDefinition,
+    WargearOptionConditionKind,
+    WargearOptionEffectKind,
 )
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.engine.list_validation import (
@@ -47,6 +52,7 @@ class ModelInstancePayload(TypedDict):
     geometry: ModelGeometryPayload
     starting_wounds: int
     wounds_remaining: int
+    wargear_ids: list[str]
     source_ids: list[str]
 
 
@@ -56,6 +62,7 @@ class UnitInstancePayload(TypedDict):
     name: str
     keywords: list[str]
     faction_keywords: list[str]
+    datasheet_abilities: list[DatasheetAbilityDescriptorPayload]
     datasheet_source_ids: list[str]
     own_models: list[ModelInstancePayload]
     wargear_selections: list[WargearSelectionPayload]
@@ -72,6 +79,7 @@ class ModelInstance:
     geometry: ModelGeometry
     starting_wounds: int
     wounds_remaining: int
+    wargear_ids: tuple[str, ...]
     source_ids: tuple[str, ...]
 
     def __post_init__(self) -> None:
@@ -126,6 +134,15 @@ class ModelInstance:
         object.__setattr__(self, "wounds_remaining", wounds_remaining)
         object.__setattr__(
             self,
+            "wargear_ids",
+            _validate_ordered_identifier_tuple(
+                "ModelInstance wargear_ids",
+                self.wargear_ids,
+                min_length=0,
+            ),
+        )
+        object.__setattr__(
+            self,
             "source_ids",
             _validate_identifier_tuple(
                 "ModelInstance source_ids",
@@ -141,6 +158,13 @@ class ModelInstance:
     def is_alive(self) -> bool:
         return self.wounds_remaining > 0
 
+    def characteristic(self, characteristic: Characteristic) -> CharacteristicValue:
+        requested_characteristic = _ensure_characteristic(characteristic)
+        for value in self.characteristics:
+            if value.characteristic is requested_characteristic:
+                return value
+        raise UnitFactoryError("ModelInstance characteristic was not found.")
+
     def to_payload(self) -> ModelInstancePayload:
         return {
             "model_instance_id": self.model_instance_id,
@@ -152,6 +176,7 @@ class ModelInstance:
             "geometry": self.geometry.to_payload(),
             "starting_wounds": self.starting_wounds,
             "wounds_remaining": self.wounds_remaining,
+            "wargear_ids": list(self.wargear_ids),
             "source_ids": list(self.source_ids),
         }
 
@@ -169,6 +194,7 @@ class ModelInstance:
             geometry=ModelGeometry.from_payload(payload["geometry"]),
             starting_wounds=payload["starting_wounds"],
             wounds_remaining=payload["wounds_remaining"],
+            wargear_ids=tuple(payload["wargear_ids"]),
             source_ids=tuple(payload["source_ids"]),
         )
 
@@ -180,6 +206,7 @@ class UnitInstance:
     name: str
     keywords: tuple[str, ...]
     faction_keywords: tuple[str, ...]
+    datasheet_abilities: tuple[DatasheetAbilityDescriptor, ...]
     datasheet_source_ids: tuple[str, ...]
     own_models: tuple[ModelInstance, ...]
     wargear_selections: tuple[WargearSelection, ...]
@@ -220,6 +247,14 @@ class UnitInstance:
         )
         object.__setattr__(
             self,
+            "datasheet_abilities",
+            _validate_datasheet_ability_tuple(
+                "UnitInstance datasheet_abilities",
+                self.datasheet_abilities,
+            ),
+        )
+        object.__setattr__(
+            self,
             "datasheet_source_ids",
             _validate_identifier_tuple(
                 "UnitInstance datasheet_source_ids",
@@ -253,6 +288,7 @@ class UnitInstance:
             "name": self.name,
             "keywords": list(self.keywords),
             "faction_keywords": list(self.faction_keywords),
+            "datasheet_abilities": [ability.to_payload() for ability in self.datasheet_abilities],
             "datasheet_source_ids": list(self.datasheet_source_ids),
             "own_models": [model.to_payload() for model in self.own_models],
             "wargear_selections": [selection.to_payload() for selection in self.wargear_selections],
@@ -266,6 +302,10 @@ class UnitInstance:
             name=payload["name"],
             keywords=tuple(payload["keywords"]),
             faction_keywords=tuple(payload["faction_keywords"]),
+            datasheet_abilities=tuple(
+                DatasheetAbilityDescriptor.from_payload(ability)
+                for ability in payload["datasheet_abilities"]
+            ),
             datasheet_source_ids=tuple(payload["datasheet_source_ids"]),
             own_models=tuple(ModelInstance.from_payload(model) for model in payload["own_models"]),
             wargear_selections=tuple(
@@ -333,12 +373,22 @@ class UnitFactory:
                     geometry_record=self._catalog_model_geometry(profile.model_profile_id),
                 )
             )
+        model_wargear_ids = _model_wargear_ids_by_model_id(
+            datasheet=datasheet,
+            own_models=tuple(own_models),
+            wargear_selections=wargear_selections,
+        )
+        own_models = [
+            replace(model, wargear_ids=model_wargear_ids[model.model_instance_id])
+            for model in own_models
+        ]
         return UnitInstance(
             unit_instance_id=f"{army_id}:{selection.unit_selection_id}",
             datasheet_id=datasheet.datasheet_id,
             name=datasheet.name,
             keywords=datasheet.keywords.keywords,
             faction_keywords=datasheet.keywords.faction_keywords,
+            datasheet_abilities=datasheet.abilities,
             datasheet_source_ids=datasheet.source_ids,
             own_models=tuple(own_models),
             wargear_selections=wargear_selections,
@@ -396,10 +446,100 @@ def _instantiate_models_for_profile(
             geometry=geometry,
             starting_wounds=starting_wounds,
             wounds_remaining=starting_wounds,
+            wargear_ids=(),
             source_ids=source_ids,
         )
         for index in range(1, model_count + 1)
     )
+
+
+def _model_wargear_ids_by_model_id(
+    *,
+    datasheet: DatasheetDefinition,
+    own_models: tuple[ModelInstance, ...],
+    wargear_selections: tuple[WargearSelection, ...],
+) -> dict[str, tuple[str, ...]]:
+    options_by_id = {option.option_id: option for option in datasheet.wargear_options}
+    models_by_profile: dict[str, tuple[ModelInstance, ...]] = {}
+    for model in own_models:
+        profile_models = models_by_profile.get(model.model_profile_id, ())
+        models_by_profile[model.model_profile_id] = tuple(
+            sorted((*profile_models, model), key=lambda item: item.model_instance_id)
+        )
+    wargear_by_model_id: dict[str, list[str]] = {
+        model.model_instance_id: [] for model in own_models
+    }
+
+    for selection in wargear_selections:
+        option = options_by_id.get(selection.option_id)
+        if option is None:
+            raise UnitFactoryError("WargearSelection references an unknown datasheet option.")
+        if not selection.wargear_ids:
+            continue
+        if option.effects:
+            _apply_structured_wargear_selection_to_models(
+                option=option,
+                selection=selection,
+                models=models_by_profile.get(option.model_profile_id, ()),
+                wargear_by_model_id=wargear_by_model_id,
+            )
+            continue
+        if selection.wargear_ids != option.default_wargear_ids:
+            raise UnitFactoryError(
+                "Non-default wargear selection requires structured model assignment effects."
+            )
+        for model in models_by_profile.get(option.model_profile_id, ()):
+            wargear_by_model_id[model.model_instance_id].extend(selection.wargear_ids)
+
+    return {
+        model_id: tuple(wargear_ids)
+        for model_id, wargear_ids in sorted(wargear_by_model_id.items())
+    }
+
+
+def _apply_structured_wargear_selection_to_models(
+    *,
+    option: DatasheetWargearOption,
+    selection: WargearSelection,
+    models: tuple[ModelInstance, ...],
+    wargear_by_model_id: dict[str, list[str]],
+) -> None:
+    selected_wargear = list(selection.wargear_ids)
+    for effect in option.effects:
+        if effect.kind is not WargearOptionEffectKind.ADD_WARGEAR:
+            raise UnitFactoryError("Unsupported structured wargear option effect.")
+        if effect.wargear_id not in selected_wargear:
+            continue
+        candidates = tuple(
+            model
+            for model in models
+            if _model_satisfies_wargear_option_conditions(
+                option=option,
+                current_wargear_ids=tuple(wargear_by_model_id[model.model_instance_id]),
+            )
+        )
+        if len(candidates) < effect.model_count:
+            raise UnitFactoryError(
+                "Structured wargear option has fewer eligible model bearers than required."
+            )
+        for model in candidates[: effect.model_count]:
+            wargear_by_model_id[model.model_instance_id].extend(
+                effect.wargear_id for _index in range(effect.wargear_count)
+            )
+
+
+def _model_satisfies_wargear_option_conditions(
+    *,
+    option: DatasheetWargearOption,
+    current_wargear_ids: tuple[str, ...],
+) -> bool:
+    current_wargear = set(current_wargear_ids)
+    for condition in option.conditions:
+        if condition.kind is WargearOptionConditionKind.MODEL_NOT_EQUIPPED_WITH and (
+            current_wargear.intersection(condition.wargear_ids)
+        ):
+            return False
+    return True
 
 
 def _model_geometry_for_profile(
@@ -534,6 +674,25 @@ def _validate_model_instance_tuple(
     return tuple(sorted(validated, key=lambda model: model.model_instance_id))
 
 
+def _validate_datasheet_ability_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[DatasheetAbilityDescriptor, ...]:
+    if type(values) is not tuple:
+        raise UnitFactoryError(f"{field_name} must be a tuple.")
+    validated: list[DatasheetAbilityDescriptor] = []
+    seen: set[str] = set()
+    raw_values = cast(tuple[object, ...], values)
+    for value in raw_values:
+        if type(value) is not DatasheetAbilityDescriptor:
+            raise UnitFactoryError(f"{field_name} must contain DatasheetAbilityDescriptor values.")
+        if value.ability_id in seen:
+            raise UnitFactoryError(f"{field_name} must not contain duplicate ability IDs.")
+        seen.add(value.ability_id)
+        validated.append(value)
+    return tuple(sorted(validated, key=lambda ability: ability.ability_id))
+
+
 def _validate_unique_model_instance_ids(models: tuple[ModelInstance, ...]) -> None:
     seen: set[str] = set()
     for model in models:
@@ -593,6 +752,29 @@ def _validate_identifier_tuple(
     if len(validated) < min_length:
         raise UnitFactoryError(f"{field_name} must contain at least {min_length} values.")
     return tuple(sorted(validated))
+
+
+def _validate_ordered_identifier_tuple(
+    field_name: str,
+    values: object,
+    *,
+    min_length: int,
+) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise UnitFactoryError(f"{field_name} must be a tuple.")
+    validated: list[str] = []
+    raw_values = cast(tuple[object, ...], values)
+    for value in raw_values:
+        validated.append(_validate_identifier(f"{field_name} value", value))
+    if len(validated) < min_length:
+        raise UnitFactoryError(f"{field_name} must contain at least {min_length} values.")
+    return tuple(validated)
+
+
+def _ensure_characteristic(value: object) -> Characteristic:
+    if type(value) is not Characteristic:
+        raise UnitFactoryError("Expected a Characteristic.")
+    return value
 
 
 def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str) -> str:

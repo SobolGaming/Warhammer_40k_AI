@@ -54,6 +54,7 @@ REQUIRED_MODEL_CHARACTERISTICS = frozenset(
         Characteristic.MOVEMENT,
         Characteristic.TOUGHNESS,
         Characteristic.SAVE,
+        Characteristic.INVULNERABLE_SAVE,
         Characteristic.WOUNDS,
         Characteristic.LEADERSHIP,
         Characteristic.OBJECTIVE_CONTROL,

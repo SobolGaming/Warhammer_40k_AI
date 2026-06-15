@@ -177,6 +177,7 @@ from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementKind,
     triggered_movement_unit_selection_request,
 )
+from warhammer40k_core.engine.unit_abilities import unit_has_deep_strike
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
     MovementRollbackRecordPayload,
@@ -7946,9 +7947,7 @@ def _unit_has_vehicle_or_monster_keyword(keywords: tuple[str, ...]) -> bool:
 
 
 def _unit_has_deep_strike_keyword(unit: UnitInstance) -> bool:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Deep Strike keyword check requires a UnitInstance.")
-    return "DEEP_STRIKE" in {_canonical_keyword(keyword) for keyword in unit.keywords}
+    return unit_has_deep_strike(unit)
 
 
 def _canonical_keyword(value: str) -> str:

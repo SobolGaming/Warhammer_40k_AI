@@ -5583,12 +5583,10 @@ def test_phase14e_invulnerable_and_armour_save_checks_have_no_save_kind_decision
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    defender_model = replace(
+    defender_model = _model_with_characteristic(
         defender.own_models[0],
-        characteristics=(
-            *defender.own_models[0].characteristics,
-            CharacteristicValue.from_raw(Characteristic.INVULNERABLE_SAVE, 4),
-        ),
+        characteristic=Characteristic.INVULNERABLE_SAVE,
+        raw_value=4,
     )
     _replace_unit_instance_in_state(
         state=state,
@@ -5688,12 +5686,10 @@ def test_phase14e_armour_save_can_succeed_after_invulnerable_save_fails() -> Non
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    defender_model = replace(
+    defender_model = _model_with_characteristic(
         defender.own_models[0],
-        characteristics=(
-            *defender.own_models[0].characteristics,
-            CharacteristicValue.from_raw(Characteristic.INVULNERABLE_SAVE, 5),
-        ),
+        characteristic=Characteristic.INVULNERABLE_SAVE,
+        raw_value=5,
     )
     defender = replace(defender, own_models=(defender_model, *defender.own_models[1:]))
     _replace_unit_instance_in_state(state=state, replacement=defender)

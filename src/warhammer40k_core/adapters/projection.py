@@ -18,13 +18,14 @@ from warhammer40k_core.engine.objective_control import model_objective_control_c
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
-PROJECTION_SCHEMA_VERSION = "game-view-v2-phase18a"
-RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v1"
+PROJECTION_SCHEMA_VERSION = "game-view-v3-phase18a"
+RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"
 
 _DATACARD_CHARACTERISTICS: tuple[tuple[Characteristic, str], ...] = (
     (Characteristic.MOVEMENT, "M"),
     (Characteristic.TOUGHNESS, "T"),
     (Characteristic.SAVE, "SV"),
+    (Characteristic.INVULNERABLE_SAVE, "InSv"),
     (Characteristic.WOUNDS, "W"),
     (Characteristic.LEADERSHIP, "LD"),
     (Characteristic.OBJECTIVE_CONTROL, "OC"),
@@ -56,6 +57,17 @@ class BaseSizeDisplayPayload(TypedDict):
     width_mm: float | None
 
 
+class DatasheetAbilityDisplayPayload(TypedDict):
+    ability_id: str
+    datasheet_id: str
+    display_name: str
+    source_id: str
+    support: str
+    timing_tags: list[str]
+    parameter_tokens: list[str]
+    profile: JsonValue
+
+
 class DatasheetDisplayPayload(TypedDict):
     datasheet_id: str
     display_name: str
@@ -64,6 +76,7 @@ class DatasheetDisplayPayload(TypedDict):
     faction_keywords: list[str]
     model_profile_ids: list[str]
     wargear_option_ids: list[str]
+    abilities: list[DatasheetAbilityDisplayPayload]
     source_ids: list[str]
 
 
@@ -207,6 +220,7 @@ class ModelDisplayPayload(TypedDict):
     model_profile_name: str | None
     visible_status: str
     model_display_name: str | None
+    wargear_ids: list[str]
     base_size: BaseSizeDisplayPayload | None
     geometry: JsonValue
     wounds_remaining: int | None
@@ -305,6 +319,19 @@ def project_rules_catalog_view(*, catalog: ArmyCatalog) -> RulesCatalogViewPaylo
             "faction_keywords": list(datasheet.keywords.faction_keywords),
             "model_profile_ids": sorted(model_profile_ids),
             "wargear_option_ids": sorted(wargear_option_ids),
+            "abilities": [
+                {
+                    "ability_id": ability.ability_id,
+                    "datasheet_id": datasheet.datasheet_id,
+                    "display_name": ability.name,
+                    "source_id": ability.source_id,
+                    "support": ability.support.value,
+                    "timing_tags": list(ability.timing_tags),
+                    "parameter_tokens": list(ability.parameter_tokens),
+                    "profile": validate_json_value(ability.to_payload()),
+                }
+                for ability in datasheet.abilities
+            ],
             "source_ids": list(datasheet.source_ids),
         }
 
@@ -567,6 +594,7 @@ def _model_display_payload(
             "model_profile_name": None,
             "visible_status": "hidden",
             "model_display_name": None,
+            "wargear_ids": [],
             "base_size": None,
             "geometry": None,
             "wounds_remaining": None,
@@ -597,6 +625,7 @@ def _model_display_payload(
         "model_profile_name": model.name,
         "visible_status": "visible",
         "model_display_name": model.name,
+        "wargear_ids": list(model.wargear_ids),
         "base_size": _base_size_display(
             base_size_id=_base_size_id(model.model_profile_id),
             base_size=model.base_size,
@@ -771,7 +800,11 @@ def _characteristic_display_value(
         return "-"
     if characteristic is Characteristic.MOVEMENT:
         return f'{value}"'
-    if characteristic in {Characteristic.SAVE, Characteristic.LEADERSHIP}:
+    if characteristic in {
+        Characteristic.SAVE,
+        Characteristic.INVULNERABLE_SAVE,
+        Characteristic.LEADERSHIP,
+    }:
         return f"{value}+"
     return str(value)
 

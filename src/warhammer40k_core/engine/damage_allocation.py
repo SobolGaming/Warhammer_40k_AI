@@ -2710,6 +2710,8 @@ def _profile_allocation_group_id(
 def _model_characteristic(model: ModelInstance, characteristic: Characteristic) -> int | None:
     for value in model.characteristics:
         if value.characteristic is characteristic:
+            if value.is_dash:
+                return None
             return value.final
     return None
 

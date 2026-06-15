@@ -24,9 +24,12 @@ from warhammer40k_core.core.model_geometry_catalog import (
 )
 from warhammer40k_core.engine.list_validation import (
     ListValidationError,
+    ModelProfileSelection,
+    UnitMusterSelection,
     WargearSelection,
     resolve_wargear_selections,
 )
+from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.source_reference_generation import build_source_reference_catalog
@@ -103,6 +106,7 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
     assert bloodcrusher.characteristic(Characteristic.MOVEMENT).raw == 10
     assert bloodcrusher.characteristic(Characteristic.TOUGHNESS).raw == 7
     assert bloodcrusher.characteristic(Characteristic.SAVE).raw == 3
+    assert bloodcrusher.characteristic(Characteristic.INVULNERABLE_SAVE).raw == 5
     assert bloodcrusher.characteristic(Characteristic.WOUNDS).raw == 4
     assert bloodcrusher.characteristic(Characteristic.LEADERSHIP).raw == 7
     assert bloodcrusher.characteristic(Characteristic.OBJECTIVE_CONTROL).raw == 2
@@ -145,6 +149,73 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
     assert "Daemonic Icon" in abilities_by_name
     assert "Instrument of Chaos" in abilities_by_name
     assert package.to_payload() == type(package).from_payload(package.to_payload()).to_payload()
+
+
+def test_phase17k_bloodcrushers_runtime_instances_manifest_model_wargear_and_abilities() -> None:
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_bloodcrushers_bridge_artifacts(),
+    )
+    datasheet = package.army_catalog.datasheet_by_id("000001115")
+    unit = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-khorne",
+        selection=UnitMusterSelection(
+            unit_selection_id="bloodcrushers-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="000001115:bloodcrushers",
+                    model_count=2,
+                ),
+                ModelProfileSelection(
+                    model_profile_id="000001115:bloodhunter",
+                    model_count=1,
+                ),
+            ),
+            wargear_selections=(
+                WargearSelection(
+                    option_id="000001115:instrument-of-chaos:option-1",
+                    model_profile_id="000001115:bloodcrushers",
+                    wargear_ids=("000001115:instrument-of-chaos",),
+                ),
+            ),
+        ),
+        datasheet=datasheet,
+    )
+
+    bloodcrushers = tuple(
+        model for model in unit.own_models if model.model_profile_id == "000001115:bloodcrushers"
+    )
+    bearer = bloodcrushers[0]
+
+    assert tuple(ability.name for ability in unit.datasheet_abilities) == (
+        "Brass Stampede",
+        "Daemonic Icon",
+        "Instrument of Chaos",
+        "Deep Strike",
+        "The Shadow of Chaos",
+    )
+    assert all(
+        model.characteristic(Characteristic.INVULNERABLE_SAVE).raw == 5 for model in unit.own_models
+    )
+    assert all(
+        {
+            "000001115:hellblade",
+            "000001115:juggernauts-bladed-horn",
+        }.issubset(model.wargear_ids)
+        for model in unit.own_models
+    )
+    assert bearer.wargear_ids == (
+        "000001115:hellblade",
+        "000001115:juggernauts-bladed-horn",
+        "000001115:instrument-of-chaos",
+    )
+    assert "000001115:instrument-of-chaos" not in bloodcrushers[1].wargear_ids
+    assert UnitInstance.from_payload(unit.to_payload()).to_payload() == unit.to_payload()
 
 
 def test_phase17k_bridge_datasheet_source_ids_include_pdf_correction_source_id() -> None:
@@ -369,9 +440,9 @@ def _same_faction_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
             "Datasheets_models",
             "\n".join(
                 (
-                    "datasheet_id,line,M,T,Sv,W,Ld,OC,base_size",
-                    "test-datasheet-a,1,6,4,3,2,7,1,32mm",
-                    "test-datasheet-b,1,6,4,3,2,7,1,32mm",
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-datasheet-a,1,6,4,3,-,2,7,1,32mm",
+                    "test-datasheet-b,1,6,4,3,-,2,7,1,32mm",
                 )
             ),
         ),

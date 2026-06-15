@@ -33,6 +33,7 @@ from warhammer40k_core.engine.endpoint_placement import (
     terrain_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
+from warhammer40k_core.engine.unit_abilities import unit_has_deep_strike
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyResult,
     UnitCoherencyResultPayload,
@@ -2592,7 +2593,7 @@ def _unit_by_id(armies: tuple[ArmyDefinition, ...]) -> dict[str, UnitInstance]:
 
 
 def _unit_has_deep_strike(unit: UnitInstance) -> bool:
-    return _unit_has_keyword(unit, "DEEP_STRIKE")
+    return unit_has_deep_strike(unit)
 
 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:

@@ -160,6 +160,27 @@ def test_phase16c_deep_strike_declaration_creates_deep_strike_reserve_state() ->
     assert deployment_request.actor_id == "player-b"
 
 
+def test_phase16c_deep_strike_declaration_accepts_core_ability_without_keyword() -> None:
+    config = _config(
+        catalog=_catalog_with_datasheet_keywords({"core-deep-strike-unit": ("Infantry",)}),
+        player_a_unit_selections=(
+            _unit_selection(
+                unit_selection_id="deep-strike-unit",
+                datasheet_id="core-deep-strike-unit",
+                model_profile_id="core-deep-strike-model",
+                model_count=3,
+            ),
+        ),
+    )
+    _lifecycle, reserve_status = _advance_to_reserve_request(config)
+    request = _decision_request(reserve_status)
+
+    assert _option_ids(request) == (
+        "complete_reserve_declarations",
+        "declare_deep_strike:army-alpha:deep-strike-unit",
+    )
+
+
 def test_phase16c_completion_option_records_event_without_state_mutation() -> None:
     config = _config(
         player_a_unit_selections=(_unit_selection(unit_selection_id="reserve-unit"),),
