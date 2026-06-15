@@ -10,12 +10,20 @@ from warhammer40k_core.core.content_scope import (
     catalog_content_scope_from_token,
 )
 from warhammer40k_core.core.datasheet import (
+    AttachmentEligibility,
+    AttachmentRole,
     BaseSizeDefinition,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
     DatasheetDefinition,
     DatasheetKeywordSet,
     DatasheetWargearOption,
+    DatasheetWargearOptionCondition,
+    DatasheetWargearOptionEffect,
     ModelProfileDefinition,
     UnitCompositionDefinition,
+    WargearOptionConditionKind,
+    WargearOptionEffectKind,
 )
 from warhammer40k_core.core.detachment import (
     DetachmentDefinition,
@@ -190,6 +198,9 @@ def _army_catalog_from_rows(
     faction_rows = _required_rows(rows_by_table=rows_by_table, table_name="Factions")
     wargear_rows = _required_rows(rows_by_table=rows_by_table, table_name="Datasheets_wargear")
     model_rows = _required_rows(rows_by_table=rows_by_table, table_name="Datasheets_models")
+    option_rows = rows_by_table.get("Datasheets_options", ())
+    ability_rows = rows_by_table.get("Datasheets_abilities", ())
+    leader_rows = rows_by_table.get("Datasheets_leader", ())
     wargear = tuple(_wargear_from_row(row) for row in wargear_rows)
     army_rules = tuple(_army_rule_from_faction_row(row) for row in faction_rows)
     factions = tuple(_faction_from_row(row) for row in faction_rows)
@@ -199,6 +210,9 @@ def _army_catalog_from_rows(
             row=row,
             model_rows=_rows_matching(model_rows, "datasheet_id", row.source_row_id),
             wargear_rows=_rows_matching(wargear_rows, "datasheet_id", row.source_row_id),
+            option_rows=_rows_matching(option_rows, "datasheet_id", row.source_row_id),
+            ability_rows=_rows_matching(ability_rows, "datasheet_id", row.source_row_id),
+            leader_rows=leader_rows,
             geometry_by_profile_id=geometry_by_profile_id,
         )
         for row in datasheet_rows
@@ -219,7 +233,7 @@ def _army_catalog_from_rows(
         detachments=detachments,
         enhancements=enhancements,
         stratagems=stratagems,
-        source_ids=tuple(row.stable_source_id() for row in (*datasheet_rows, *faction_rows)),
+        source_ids=_source_ids_from_rows((*datasheet_rows, *faction_rows)),
     )
 
 
@@ -228,6 +242,9 @@ def _datasheet_from_row(
     row: NormalizedSourceRow,
     model_rows: tuple[NormalizedSourceRow, ...],
     wargear_rows: tuple[NormalizedSourceRow, ...],
+    option_rows: tuple[NormalizedSourceRow, ...],
+    ability_rows: tuple[NormalizedSourceRow, ...],
+    leader_rows: tuple[NormalizedSourceRow, ...],
     geometry_by_profile_id: dict[str, ModelGeometryCatalogRecord],
 ) -> DatasheetDefinition:
     if not model_rows:
@@ -247,8 +264,20 @@ def _datasheet_from_row(
         ),
         model_profiles=model_profiles,
         composition=composition,
-        wargear_options=tuple(_wargear_option_from_row(row) for row in wargear_rows),
-        source_ids=(row.stable_source_id(),),
+        wargear_options=(
+            *tuple(
+                option
+                for wargear_row in wargear_rows
+                for option in _default_wargear_options_from_row(wargear_row)
+            ),
+            *tuple(_structured_wargear_option_from_row(row) for row in option_rows),
+        ),
+        abilities=tuple(_ability_descriptor_from_row(row) for row in ability_rows),
+        attachment_eligibilities=_attachment_eligibilities_from_rows(
+            row=row,
+            leader_rows=leader_rows,
+        ),
+        source_ids=_source_ids_from_row(row),
     )
 
 
@@ -289,7 +318,9 @@ def _model_profile_from_row(
             ),
         ),
         base_size=_base_size_from_geometry_record(geometry_record),
-        source_ids=(row.stable_source_id(), geometry_record.stable_identity()),
+        source_ids=_deduplicated_ids(
+            (*_source_ids_from_row(row), geometry_record.stable_identity())
+        ),
     )
 
 
@@ -301,26 +332,63 @@ def _composition_from_model_row(row: NormalizedSourceRow) -> UnitCompositionDefi
     )
 
 
-def _wargear_option_from_row(row: NormalizedSourceRow) -> DatasheetWargearOption:
+def _default_wargear_options_from_row(
+    row: NormalizedSourceRow,
+) -> tuple[DatasheetWargearOption, ...]:
+    default_loadout = _optional_field(row=row, column_name="default_loadout")
+    if default_loadout == "false":
+        return ()
+    if default_loadout not in {None, "true"}:
+        raise CatalogGenerationError("Wargear default_loadout must be true or false.")
     wargear_id = _required_field(row=row, column_name="wargear_id")
-    model_profile_id = _required_field(row=row, column_name="model_profile_id")
+    profile_ids = _optional_split_field(row, "model_profile_ids")
+    if not profile_ids:
+        profile_ids = (_required_field(row=row, column_name="model_profile_id"),)
+    options: list[DatasheetWargearOption] = []
+    for model_profile_id in profile_ids:
+        option_id = (
+            f"{row.source_row_id}:default"
+            if len(profile_ids) == 1
+            else f"{row.source_row_id}:{model_profile_id}:default"
+        )
+        options.append(
+            DatasheetWargearOption(
+                option_id=option_id,
+                model_profile_id=model_profile_id,
+                default_wargear_ids=(wargear_id,),
+                allowed_wargear_ids=(wargear_id,),
+                min_selections=1,
+                max_selections=1,
+                source_ids=_source_ids_from_row(row),
+            )
+        )
+    return tuple(options)
+
+
+def _structured_wargear_option_from_row(row: NormalizedSourceRow) -> DatasheetWargearOption:
+    allowed_wargear_ids = _required_split_field(row=row, column_name="allowed_wargear_ids")
+    conditions = _wargear_option_conditions_from_row(row)
+    effects = _wargear_option_effects_from_row(row)
     return DatasheetWargearOption(
-        option_id=f"{row.source_row_id}:default",
-        model_profile_id=model_profile_id,
-        default_wargear_ids=(wargear_id,),
-        allowed_wargear_ids=(wargear_id,),
-        min_selections=1,
-        max_selections=1,
-        source_ids=(row.stable_source_id(),),
+        option_id=_required_field(row=row, column_name="option_id"),
+        model_profile_id=_required_field(row=row, column_name="model_profile_id"),
+        default_wargear_ids=_optional_split_field(row, "default_wargear_ids"),
+        allowed_wargear_ids=allowed_wargear_ids,
+        min_selections=_required_non_negative_int(row=row, column_name="min_selections"),
+        max_selections=_required_positive_int(row=row, column_name="max_selections"),
+        source_ids=_source_ids_from_row(row),
+        conditions=conditions,
+        effects=effects,
     )
 
 
 def _wargear_from_row(row: NormalizedSourceRow) -> Wargear:
+    profile_id = _optional_field(row=row, column_name="weapon_profile_id")
     return Wargear(
         wargear_id=_required_field(row=row, column_name="wargear_id"),
         name=_required_field(row=row, column_name="name"),
-        weapon_profiles=(_weapon_profile_from_row(row),),
-        source_ids=(row.stable_source_id(),),
+        weapon_profiles=() if profile_id is None else (_weapon_profile_from_row(row),),
+        source_ids=_source_ids_from_row(row),
     )
 
 
@@ -349,9 +417,93 @@ def _weapon_profile_from_row(row: NormalizedSourceRow) -> WeaponProfile:
         ),
         damage_profile=_damage_profile_from_raw_text(_required_field(row=row, column_name="d")),
         keywords=_weapon_keywords_from_field(
-            _required_field(row=row, column_name="weapon_keywords")
+            _optional_field(row=row, column_name="weapon_keywords") or ""
         ),
-        source_ids=(row.stable_source_id(),),
+        source_ids=_source_ids_from_row(row),
+    )
+
+
+def _wargear_option_conditions_from_row(
+    row: NormalizedSourceRow,
+) -> tuple[DatasheetWargearOptionCondition, ...]:
+    condition_kind = _optional_field(row=row, column_name="condition_kind")
+    if condition_kind is None:
+        return ()
+    try:
+        parsed_kind = WargearOptionConditionKind(condition_kind)
+    except ValueError as exc:
+        raise CatalogGenerationError("Unsupported wargear option condition kind.") from exc
+    return (
+        DatasheetWargearOptionCondition(
+            kind=parsed_kind,
+            wargear_ids=_required_split_field(row=row, column_name="condition_wargear_ids"),
+        ),
+    )
+
+
+def _wargear_option_effects_from_row(
+    row: NormalizedSourceRow,
+) -> tuple[DatasheetWargearOptionEffect, ...]:
+    effect_kind = _optional_field(row=row, column_name="effect_kind")
+    if effect_kind is None:
+        return ()
+    try:
+        parsed_kind = WargearOptionEffectKind(effect_kind)
+    except ValueError as exc:
+        raise CatalogGenerationError("Unsupported wargear option effect kind.") from exc
+    return (
+        DatasheetWargearOptionEffect(
+            kind=parsed_kind,
+            wargear_id=_required_field(row=row, column_name="effect_wargear_id"),
+            model_count=_required_positive_int(row=row, column_name="effect_model_count"),
+            wargear_count=_required_positive_int(row=row, column_name="effect_wargear_count"),
+        ),
+    )
+
+
+def _ability_descriptor_from_row(row: NormalizedSourceRow) -> DatasheetAbilityDescriptor:
+    support = _optional_field(row=row, column_name="support")
+    try:
+        ability_support = (
+            CatalogAbilitySupport.DESCRIPTOR_ONLY
+            if support is None
+            else CatalogAbilitySupport(support)
+        )
+    except ValueError as exc:
+        raise CatalogGenerationError("Unsupported datasheet ability support.") from exc
+    return DatasheetAbilityDescriptor(
+        ability_id=_required_field(row=row, column_name="ability_id"),
+        name=_required_field(row=row, column_name="name"),
+        source_id=_source_ids_from_row(row)[0],
+        support=ability_support,
+        timing_tags=_optional_split_field(row, "timing_tags"),
+        parameter_tokens=_optional_split_field(row, "parameter_tokens"),
+    )
+
+
+def _attachment_eligibilities_from_rows(
+    *,
+    row: NormalizedSourceRow,
+    leader_rows: tuple[NormalizedSourceRow, ...],
+) -> tuple[AttachmentEligibility, ...]:
+    bodyguard_ids = tuple(
+        _required_field(row=leader_row, column_name="attached_id")
+        for leader_row in leader_rows
+        if _required_field(row=leader_row, column_name="leader_id") == row.source_row_id
+    )
+    if not bodyguard_ids:
+        return ()
+    matching_rows = tuple(
+        leader_row
+        for leader_row in leader_rows
+        if _required_field(row=leader_row, column_name="leader_id") == row.source_row_id
+    )
+    return (
+        AttachmentEligibility(
+            role=AttachmentRole.LEADER,
+            allowed_bodyguard_datasheet_ids=_deduplicated_ids(bodyguard_ids),
+            source_id=_source_ids_from_rows(matching_rows)[0],
+        ),
     )
 
 
@@ -362,7 +514,7 @@ def _faction_from_row(row: NormalizedSourceRow) -> FactionDefinition:
         content_scope=_content_scope_from_row(row),
         faction_keywords=_required_split_field(row=row, column_name="faction_keywords"),
         army_rule_ids=(_required_field(row=row, column_name="army_rule_id"),),
-        source_ids=(row.stable_source_id(),),
+        source_ids=_source_ids_from_row(row),
     )
 
 
@@ -370,7 +522,7 @@ def _army_rule_from_faction_row(row: NormalizedSourceRow) -> ArmyRuleDefinition:
     return ArmyRuleDefinition(
         rule_id=_required_field(row=row, column_name="army_rule_id"),
         name=_required_field(row=row, column_name="army_rule_name"),
-        source_id=row.stable_source_id(),
+        source_id=_source_ids_from_row(row)[0],
         content_scope=_content_scope_from_row(row),
     )
 
@@ -386,10 +538,10 @@ def _detachment_from_row(row: NormalizedSourceRow) -> DetachmentDefinition:
         ),
         unit_datasheet_ids=_required_split_field(row=row, column_name="unit_datasheet_ids"),
         force_disposition_ids=_required_split_field(row=row, column_name="force_disposition_ids"),
-        rule_source_ids=(row.stable_source_id(),),
+        rule_source_ids=_source_ids_from_row(row),
         enhancement_ids=_required_split_field(row=row, column_name="enhancement_ids"),
         stratagem_ids=_required_split_field(row=row, column_name="stratagem_ids"),
-        source_ids=(row.stable_source_id(),),
+        source_ids=_source_ids_from_row(row),
     )
 
 
@@ -398,7 +550,7 @@ def _enhancement_from_row(row: NormalizedSourceRow) -> EnhancementDefinition:
     return EnhancementDefinition(
         enhancement_id=row.source_row_id,
         name=name,
-        source_id=row.stable_source_id(),
+        source_id=_source_ids_from_row(row)[0],
         content_scope=_content_scope_from_row(row),
         subtypes=_enhancement_subtypes_from_row(row=row, name=name),
         points=_required_non_negative_int(row=row, column_name="points"),
@@ -409,7 +561,7 @@ def _stratagem_from_row(row: NormalizedSourceRow) -> StratagemDefinition:
     return StratagemDefinition(
         stratagem_id=row.source_row_id,
         name=_required_field(row=row, column_name="name"),
-        source_id=row.stable_source_id(),
+        source_id=_source_ids_from_row(row)[0],
         content_scope=_content_scope_from_row(row),
         command_point_cost=_required_non_negative_int(row=row, column_name="command_point_cost"),
         timing_tags=_required_split_field(row=row, column_name="timing_tags"),
@@ -457,6 +609,15 @@ def _geometry_record_from_model_row(
             reason=ModelGeometryDiagnosticReason.NON_DERIVABLE_FOOTPRINT,
             message="Model profile base size is not a circular or oval source footprint.",
         )
+    base_size_source_id = _optional_field(row=row, column_name="base_size_source_id")
+    if base_size_source_id is None:
+        base_size_source_id = row.stable_source_id()
+    base_size_document_reference = _optional_field(
+        row=row,
+        column_name="base_size_document_reference",
+    )
+    if base_size_document_reference is None:
+        base_size_document_reference = row.stable_source_id()
     if not _has_required_height_fields(row):
         return _geometry_diagnostic(
             row=row,
@@ -468,10 +629,10 @@ def _geometry_record_from_model_row(
         evidence_id=f"{model_profile_id}:footprint",
         evidence_kind=GeometryEvidenceKind.OFFICIAL_BASE_SIZE,
         measurement_kind=GeometryMeasurementKind.FOOTPRINT,
-        source_id=row.stable_source_id(),
+        source_id=base_size_source_id,
         source_units=GeometrySourceUnits.MILLIMETERS,
         source_dimensions=source_dimensions,
-        document_reference=row.stable_source_id(),
+        document_reference=base_size_document_reference,
     )
     height_evidence = ModelGeometrySourceEvidence.from_source_dimensions(
         evidence_id=f"{model_profile_id}:height",
@@ -513,7 +674,7 @@ def _geometry_record_from_model_row(
         z_offset=None,
         height=ModelHeightDefinition.from_evidence(height_evidence),
         evidence=(footprint_evidence, height_evidence),
-        source_ids=(row.stable_source_id(),),
+        source_ids=_deduplicated_ids((*_source_ids_from_row(row), base_size_source_id)),
     )
 
 
@@ -754,6 +915,39 @@ def _optional_split_field(row: NormalizedSourceRow, column_name: str) -> tuple[s
     if value is None or not value.strip():
         return ()
     return _split_field_value(value)
+
+
+def _optional_field(*, row: NormalizedSourceRow, column_name: str) -> str | None:
+    value = row.runtime_fields_payload().get(column_name)
+    if value is None:
+        return None
+    stripped = value.strip()
+    return stripped if stripped else None
+
+
+def _source_ids_from_row(row: NormalizedSourceRow) -> tuple[str, ...]:
+    explicit_source_ids = _optional_split_field(row, "source_ids")
+    return _deduplicated_ids((row.stable_source_id(), *explicit_source_ids))
+
+
+def _source_ids_from_rows(rows: tuple[NormalizedSourceRow, ...]) -> tuple[str, ...]:
+    return _deduplicated_ids(
+        tuple(source_id for row in rows for source_id in _source_ids_from_row(row))
+    )
+
+
+def _deduplicated_ids(values: tuple[str, ...]) -> tuple[str, ...]:
+    seen: set[str] = set()
+    deduplicated: list[str] = []
+    for value in values:
+        identifier = value.strip()
+        if not identifier:
+            raise CatalogGenerationError("Source identifier must not be empty.")
+        if identifier in seen:
+            continue
+        seen.add(identifier)
+        deduplicated.append(identifier)
+    return tuple(deduplicated)
 
 
 def _split_field_value(value: str) -> tuple[str, ...]:

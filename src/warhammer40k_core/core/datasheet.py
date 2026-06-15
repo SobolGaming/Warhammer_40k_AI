@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict
+from typing import NotRequired, Self, TypedDict
 
 from warhammer40k_core.core.attributes import (
     Characteristic,
@@ -32,6 +32,14 @@ class BaseSizeKind(StrEnum):
 class CatalogAbilitySupport(StrEnum):
     DESCRIPTOR_ONLY = "descriptor_only"
     UNSUPPORTED = "unsupported"
+
+
+class WargearOptionConditionKind(StrEnum):
+    MODEL_NOT_EQUIPPED_WITH = "model_not_equipped_with"
+
+
+class WargearOptionEffectKind(StrEnum):
+    ADD_WARGEAR = "add_wargear"
 
 
 class AttachmentRole(StrEnum):
@@ -81,6 +89,18 @@ class DatasheetKeywordSetPayload(TypedDict):
     faction_keywords: list[str]
 
 
+class DatasheetWargearOptionConditionPayload(TypedDict):
+    kind: str
+    wargear_ids: list[str]
+
+
+class DatasheetWargearOptionEffectPayload(TypedDict):
+    kind: str
+    wargear_id: str
+    model_count: int
+    wargear_count: int
+
+
 class DatasheetWargearOptionPayload(TypedDict):
     option_id: str
     model_profile_id: str
@@ -89,6 +109,8 @@ class DatasheetWargearOptionPayload(TypedDict):
     min_selections: int
     max_selections: int
     source_ids: list[str]
+    conditions: NotRequired[list[DatasheetWargearOptionConditionPayload]]
+    effects: NotRequired[list[DatasheetWargearOptionEffectPayload]]
 
 
 class DatasheetAbilityDescriptorPayload(TypedDict):
@@ -324,6 +346,83 @@ class DatasheetKeywordSet:
 
 
 @dataclass(frozen=True, slots=True)
+class DatasheetWargearOptionCondition:
+    kind: WargearOptionConditionKind
+    wargear_ids: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "kind", wargear_option_condition_kind_from_token(self.kind))
+        object.__setattr__(
+            self,
+            "wargear_ids",
+            _validate_identifier_tuple(
+                "DatasheetWargearOptionCondition wargear_ids",
+                self.wargear_ids,
+                min_length=1,
+            ),
+        )
+
+    def to_payload(self) -> DatasheetWargearOptionConditionPayload:
+        return {
+            "kind": self.kind.value,
+            "wargear_ids": list(self.wargear_ids),
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DatasheetWargearOptionConditionPayload) -> Self:
+        return cls(
+            kind=wargear_option_condition_kind_from_token(payload["kind"]),
+            wargear_ids=tuple(payload["wargear_ids"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class DatasheetWargearOptionEffect:
+    kind: WargearOptionEffectKind
+    wargear_id: str
+    model_count: int
+    wargear_count: int
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "kind", wargear_option_effect_kind_from_token(self.kind))
+        object.__setattr__(
+            self,
+            "wargear_id",
+            _validate_identifier("DatasheetWargearOptionEffect wargear_id", self.wargear_id),
+        )
+        object.__setattr__(
+            self,
+            "model_count",
+            _validate_positive_int("DatasheetWargearOptionEffect model_count", self.model_count),
+        )
+        object.__setattr__(
+            self,
+            "wargear_count",
+            _validate_positive_int(
+                "DatasheetWargearOptionEffect wargear_count",
+                self.wargear_count,
+            ),
+        )
+
+    def to_payload(self) -> DatasheetWargearOptionEffectPayload:
+        return {
+            "kind": self.kind.value,
+            "wargear_id": self.wargear_id,
+            "model_count": self.model_count,
+            "wargear_count": self.wargear_count,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DatasheetWargearOptionEffectPayload) -> Self:
+        return cls(
+            kind=wargear_option_effect_kind_from_token(payload["kind"]),
+            wargear_id=payload["wargear_id"],
+            model_count=payload["model_count"],
+            wargear_count=payload["wargear_count"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class DatasheetWargearOption:
     option_id: str
     model_profile_id: str
@@ -332,6 +431,8 @@ class DatasheetWargearOption:
     min_selections: int = 0
     max_selections: int = 1
     source_ids: tuple[str, ...] = ()
+    conditions: tuple[DatasheetWargearOptionCondition, ...] = ()
+    effects: tuple[DatasheetWargearOptionEffect, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -391,6 +492,21 @@ class DatasheetWargearOption:
             "source_ids",
             _validate_identifier_tuple("DatasheetWargearOption source_ids", self.source_ids),
         )
+        conditions = _validate_wargear_option_condition_tuple(
+            "DatasheetWargearOption conditions",
+            self.conditions,
+        )
+        effects = _validate_wargear_option_effect_tuple(
+            "DatasheetWargearOption effects",
+            self.effects,
+        )
+        for effect in effects:
+            if effect.wargear_id not in allowed_set:
+                raise DatasheetCatalogError(
+                    "DatasheetWargearOption effects must reference allowed wargear."
+                )
+        object.__setattr__(self, "conditions", conditions)
+        object.__setattr__(self, "effects", effects)
 
     def to_payload(self) -> DatasheetWargearOptionPayload:
         return {
@@ -401,6 +517,8 @@ class DatasheetWargearOption:
             "min_selections": self.min_selections,
             "max_selections": self.max_selections,
             "source_ids": list(self.source_ids),
+            "conditions": [condition.to_payload() for condition in self.conditions],
+            "effects": [effect.to_payload() for effect in self.effects],
         }
 
     @classmethod
@@ -413,6 +531,14 @@ class DatasheetWargearOption:
             min_selections=payload["min_selections"],
             max_selections=payload["max_selections"],
             source_ids=tuple(payload["source_ids"]),
+            conditions=tuple(
+                DatasheetWargearOptionCondition.from_payload(condition)
+                for condition in payload.get("conditions", [])
+            ),
+            effects=tuple(
+                DatasheetWargearOptionEffect.from_payload(effect)
+                for effect in payload.get("effects", [])
+            ),
         )
 
 
@@ -705,6 +831,30 @@ def catalog_ability_support_from_token(token: object) -> CatalogAbilitySupport:
         raise DatasheetCatalogError(f"Unsupported CatalogAbilitySupport token: {token}.") from exc
 
 
+def wargear_option_condition_kind_from_token(token: object) -> WargearOptionConditionKind:
+    if type(token) is WargearOptionConditionKind:
+        return token
+    if type(token) is not str:
+        raise DatasheetCatalogError("WargearOptionConditionKind token must be a string.")
+    try:
+        return WargearOptionConditionKind(token)
+    except ValueError as exc:
+        raise DatasheetCatalogError(
+            f"Unsupported WargearOptionConditionKind token: {token}."
+        ) from exc
+
+
+def wargear_option_effect_kind_from_token(token: object) -> WargearOptionEffectKind:
+    if type(token) is WargearOptionEffectKind:
+        return token
+    if type(token) is not str:
+        raise DatasheetCatalogError("WargearOptionEffectKind token must be a string.")
+    try:
+        return WargearOptionEffectKind(token)
+    except ValueError as exc:
+        raise DatasheetCatalogError(f"Unsupported WargearOptionEffectKind token: {token}.") from exc
+
+
 def attachment_role_from_token(token: object) -> AttachmentRole:
     if type(token) is AttachmentRole:
         return token
@@ -900,6 +1050,49 @@ def _validate_wargear_option_tuple(
         seen.add(value.option_id)
         validated.append(value)
     return tuple(validated)
+
+
+def _validate_wargear_option_condition_tuple(
+    field_name: str,
+    values: tuple[DatasheetWargearOptionCondition, ...],
+) -> tuple[DatasheetWargearOptionCondition, ...]:
+    if type(values) is not tuple:
+        raise DatasheetCatalogError(f"{field_name} must be a tuple.")
+    validated: list[DatasheetWargearOptionCondition] = []
+    for value in values:
+        if type(value) is not DatasheetWargearOptionCondition:
+            raise DatasheetCatalogError(f"{field_name} must contain condition values.")
+        validated.append(value)
+    return tuple(
+        sorted(
+            validated,
+            key=lambda condition: (condition.kind.value, condition.wargear_ids),
+        )
+    )
+
+
+def _validate_wargear_option_effect_tuple(
+    field_name: str,
+    values: tuple[DatasheetWargearOptionEffect, ...],
+) -> tuple[DatasheetWargearOptionEffect, ...]:
+    if type(values) is not tuple:
+        raise DatasheetCatalogError(f"{field_name} must be a tuple.")
+    validated: list[DatasheetWargearOptionEffect] = []
+    for value in values:
+        if type(value) is not DatasheetWargearOptionEffect:
+            raise DatasheetCatalogError(f"{field_name} must contain effect values.")
+        validated.append(value)
+    return tuple(
+        sorted(
+            validated,
+            key=lambda effect: (
+                effect.kind.value,
+                effect.wargear_id,
+                effect.model_count,
+                effect.wargear_count,
+            ),
+        )
+    )
 
 
 def _validate_ability_descriptor_tuple(

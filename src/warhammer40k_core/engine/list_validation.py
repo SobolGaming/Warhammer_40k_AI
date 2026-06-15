@@ -8,7 +8,10 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
 from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
     DatasheetWargearOption,
+    DatasheetWargearOptionEffect,
     UnitCompositionDefinition,
+    WargearOptionConditionKind,
+    WargearOptionEffectKind,
 )
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
@@ -616,7 +619,9 @@ def resolve_wargear_selections(
         for wargear_id in selection.wargear_ids:
             _catalog_wargear_by_id(catalog, wargear_id)
         resolved.append(selection)
-    return tuple(sorted(resolved, key=lambda selection: selection.option_id))
+    resolved_tuple = tuple(sorted(resolved, key=lambda selection: selection.option_id))
+    _validate_wargear_option_semantics(selections=resolved_tuple, datasheet=datasheet)
+    return resolved_tuple
 
 
 def _catalog_datasheet_by_id(catalog: ArmyCatalog, datasheet_id: str) -> DatasheetDefinition:
@@ -723,6 +728,51 @@ def _validate_wargear_selection_against_option(
     for wargear_id in selection.wargear_ids:
         if wargear_id not in allowed:
             raise ListValidationError("WargearSelection includes wargear not allowed by option.")
+
+
+def _validate_wargear_option_semantics(
+    *,
+    selections: tuple[WargearSelection, ...],
+    datasheet: DatasheetDefinition,
+) -> None:
+    options_by_id = {option.option_id: option for option in datasheet.wargear_options}
+    selected_by_profile: dict[str, set[str]] = {}
+    for selection in selections:
+        selected = selected_by_profile.setdefault(selection.model_profile_id, set())
+        selected.update(selection.wargear_ids)
+    for selection in selections:
+        if not selection.wargear_ids:
+            continue
+        option = options_by_id[selection.option_id]
+        selected_for_profile = selected_by_profile[selection.model_profile_id]
+        for condition in option.conditions:
+            if condition.kind is WargearOptionConditionKind.MODEL_NOT_EQUIPPED_WITH and (
+                selected_for_profile.intersection(condition.wargear_ids)
+            ):
+                raise ListValidationError(
+                    "WargearSelection violates a structured wargear option condition."
+                )
+        for effect in option.effects:
+            if effect.kind is WargearOptionEffectKind.ADD_WARGEAR:
+                _validate_add_wargear_effect_count(selection=selection, effect=effect)
+
+
+def _validate_add_wargear_effect_count(
+    *,
+    selection: WargearSelection,
+    effect: DatasheetWargearOptionEffect,
+) -> None:
+    if effect.model_count != 1:
+        raise ListValidationError(
+            "WargearSelection structured wargear option effect model count is unsupported."
+        )
+    selected_wargear_count = sum(
+        1 for wargear_id in selection.wargear_ids if wargear_id == effect.wargear_id
+    )
+    if selected_wargear_count != effect.wargear_count:
+        raise ListValidationError(
+            "WargearSelection does not satisfy a structured wargear option effect count."
+        )
 
 
 def _validate_model_profile_selection_tuple(

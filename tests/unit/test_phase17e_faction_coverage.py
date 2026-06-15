@@ -183,15 +183,15 @@ def test_phase17e_local_raw_faction_pdfs_match_manifest_when_present() -> None:
         else set()
     )
     if not present_pdf_filenames:
-        pytest.skip("Local raw faction PDFs are optional and are not redistributed in git.")
-    expected_pdf_filenames = {
-        record.pdf_filename for record in faction_coverage_source.faction_pdf_records()
+        pytest.skip("No local raw faction PDFs are present.")
+    records_by_filename = {
+        record.pdf_filename: record for record in faction_coverage_source.faction_pdf_records()
     }
-    missing_pdf_filenames = expected_pdf_filenames.difference(present_pdf_filenames)
-    if missing_pdf_filenames:
-        pytest.skip("Local raw faction PDF cache is incomplete and ignored by git.")
+    unknown_pdf_filenames = present_pdf_filenames.difference(records_by_filename)
+    assert not unknown_pdf_filenames
 
-    for record in faction_coverage_source.faction_pdf_records():
+    for pdf_filename in sorted(present_pdf_filenames):
+        record = records_by_filename[pdf_filename]
         pdf_path = RAW_FACTION_PDF_DIR / record.pdf_filename
         assert pdf_path.is_file()
         pdf_data = pdf_path.read_bytes()

@@ -13,7 +13,7 @@ The roadmap is intentionally rules-engine first:
 Primary references for roadmap coverage:
 
 - Warhammer 40,000 11th Edition Core Rules source PDF: [docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf](docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf)
-- Warhammer Event Companion v1.0 source PDF, used as a local-only validation input for Phase 17J source-package planning; do not commit raw event PDFs.
+- Warhammer Event Companion v1.0 source PDF: [docs/source_rules/eng_12-06_warhammer40000_event_companion-s3bfb5f9s1-ivswuij3fo.pdf](docs/source_rules/eng_12-06_warhammer40000_event_companion-s3bfb5f9s1-ivswuij3fo.pdf)
 - 11th Edition app/codex/mission-pack source imports as they are added to CORE V2 source packages.
 - 11th Edition Digital App/community clarification supplement provided by project owner for this cutover plan.
 - CORE V1 reference implementation: <https://github.com/SobolGaming/Warhammer40k_AI>
@@ -3880,16 +3880,18 @@ default so checked-in source snapshots keep JSON artifacts and manifests only.
 Runtime engine modules remain
 blocked from importing raw source-normalization or source-mirror modules.
 
-Official GW faction-pack PDFs and extracted whole-source text/page files are
-local-only validation inputs, not repository artifacts. Do not commit
-`data/raw/faction_packs/*.pdf`, `data/raw/faction_packs/*.txt`,
+Official GW faction-pack PDFs are tracked source evidence when declared in
+`data/source_manifests/gw_11e_faction_packs.yaml` and stored under
+`data/raw/faction_packs`. Extracted whole-source text/page files remain
+local-only validation inputs, not repository artifacts. The checked-in
+`docs/source_rules` Core Rules and Event Companion PDFs are source-rule evidence
+used for source-linked rules and base-size provenance. Do not commit
+`data/raw/faction_packs/*.txt`,
 `data/raw/faction_packs/extracted_pages/*.md`, `data/raw/gw/**/*.pdf`,
-`data/raw/gw/**/*.txt`, or `data/raw/gw/**/extracted_pages/*.md`, and do not
-put them in Git LFS. Phase 17 should commit source manifests, official URLs,
-retrieval metadata, SHA-256 hashes, byte counts, page/section references,
-structured patch operations, diagnostics, and generated catalog artifacts. CI,
-packaging, Docker images, wheels, npm packages, and release artifacts must not
-redistribute the PDFs unless a future explicit policy grants that right.
+`data/raw/gw/**/*.txt`, or `data/raw/gw/**/extracted_pages/*.md`. Phase 17
+should commit source manifests, official URLs, retrieval metadata, SHA-256
+hashes, byte counts, page/section references, structured patch operations,
+diagnostics, generated catalog artifacts, and approved faction-pack PDFs.
 The current faction-pack source manifest uses the official Warhammer 40,000
 downloads page as its shared source page:
 `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/`.
@@ -4063,8 +4065,10 @@ Required tests:
 Modules:
 
 - `tools/build_catalog.py`
+- `tools/build_wahapedia_bridge.py`
 - `tools/apply_transition_patches.py`
 - `tools/build_model_geometry_overrides.py`
+- `rules/wahapedia_bridge.py`
 - `core/datasheet.py`
 - `core/army_catalog.py`
 - `core/model_geometry_catalog.py`
@@ -4098,6 +4102,20 @@ Invariants:
 - all stratagems and enhancements are source-linked descriptors;
 - the catalog consumes patched 11th Edition source artifacts, never raw
   prior-edition mirror rows directly;
+- the Wahapedia bridge transform is tooling-only: it joins normalized
+  Wahapedia source artifacts into canonical-shaped 11th Edition bridge artifacts,
+  applies explicit PDF source corrections before catalog generation, and
+  preserves Wahapedia row IDs plus correction source IDs on generated datasheets,
+  model profiles, wargear, options, abilities, and keyword sets;
+- official PDF faction-pack source facts override Wahapedia bridge rows when a
+  discrepancy is identified. For example, the Chaos Daemons Bloodcrushers bridge
+  removes Wahapedia's extra `Shadow Legion` keyword because pages 30-31 of the
+  local Chaos Daemons faction-pack PDF list only `Mounted`, `Chaos`, `Daemon`,
+  `Khorne`, and `Bloodcrushers` as non-faction keywords;
+- wargear options from bridge rows preserve their source text and emit structured
+  condition/effect descriptors such as `model_not_equipped_with` and
+  `add_wargear`. These descriptors remain catalog data; runtime code must not
+  parse option prose to discover legal choices;
 - generated catalog package hash is deterministic;
 - catalog generation is idempotent and diffable;
 - missing geometry/height/base overrides are explicit import blockers or unsupported descriptors, not silent defaults;

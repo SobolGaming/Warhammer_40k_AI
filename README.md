@@ -228,6 +228,15 @@ coordinate-frame, origin, and source-evidence records, and unresolved geometry o
 height evidence blocks package emission instead of falling back to runtime
 heuristics.
 
+Phase 17B also includes the Wahapedia-to-canonical bridge tooling. The bridge
+converts normalized Wahapedia JSON artifacts into canonical-shaped 11th Edition
+source artifacts, keeps CSV exports transient, applies explicit PDF source
+corrections when faction-pack PDFs disagree with Wahapedia, and emits structured
+wargear-option condition/effect descriptors instead of leaving runtime code to
+parse option prose. Wahapedia remains the base source for official base-size
+text; representative model height still requires accepted override evidence
+before catalog emission.
+
 Phase 17C is complete for the rule-language intermediate representation.
 Normalized source text now compiles into deterministic, source-spanned, versioned
 `RuleIR` payloads with reusable template IDs, typed trigger/condition/target/effect/duration
@@ -307,7 +316,7 @@ engine-resolved M/T/SV/W/LD/OC characteristics including Battle-shock OC,
 wargear display records, wounds, base size, keywords, visible modifier display
 traces, and cache invalidation through `projection_state_hash`.
 
-Official GW faction-pack PDFs and extracted whole-source text/page files are local-only validation inputs. Do not commit them or put them in Git LFS; commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, and generated catalog artifacts instead. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
+Official GW faction-pack PDFs are tracked source evidence when declared in `data/source_manifests/gw_11e_faction_packs.yaml` and stored under `data/raw/faction_packs`. Extracted whole-source text/page files remain local-only validation inputs. Commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, generated catalog artifacts, and approved faction-pack PDFs. The checked-in `docs/source_rules` Core Rules and Event Companion PDFs are also source-rule evidence used for source-linked rules and base-size provenance. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
 
 Phase 17B catalog generation source-links physical model geometry.
 `Use model`, blank, `No official base size`, bare `Hull`, flying-base, and
