@@ -4063,8 +4063,10 @@ Required tests:
 Modules:
 
 - `tools/build_catalog.py`
+- `tools/build_wahapedia_bridge.py`
 - `tools/apply_transition_patches.py`
 - `tools/build_model_geometry_overrides.py`
+- `rules/wahapedia_bridge.py`
 - `core/datasheet.py`
 - `core/army_catalog.py`
 - `core/model_geometry_catalog.py`
@@ -4098,6 +4100,20 @@ Invariants:
 - all stratagems and enhancements are source-linked descriptors;
 - the catalog consumes patched 11th Edition source artifacts, never raw
   prior-edition mirror rows directly;
+- the Wahapedia bridge transform is tooling-only: it joins normalized
+  Wahapedia source artifacts into canonical-shaped 11th Edition bridge artifacts,
+  applies explicit PDF source corrections before catalog generation, and
+  preserves Wahapedia row IDs plus correction source IDs on generated datasheets,
+  model profiles, wargear, options, abilities, and keyword sets;
+- official PDF faction-pack source facts override Wahapedia bridge rows when a
+  discrepancy is identified. For example, the Chaos Daemons Bloodcrushers bridge
+  removes Wahapedia's extra `Shadow Legion` keyword because pages 30-31 of the
+  local Chaos Daemons faction-pack PDF list only `Mounted`, `Chaos`, `Daemon`,
+  `Khorne`, and `Bloodcrushers` as non-faction keywords;
+- wargear options from bridge rows preserve their source text and emit structured
+  condition/effect descriptors such as `model_not_equipped_with` and
+  `add_wargear`. These descriptors remain catalog data; runtime code must not
+  parse option prose to discover legal choices;
 - generated catalog package hash is deterministic;
 - catalog generation is idempotent and diffable;
 - missing geometry/height/base overrides are explicit import blockers or unsupported descriptors, not silent defaults;

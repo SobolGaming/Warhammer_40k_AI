@@ -228,6 +228,15 @@ coordinate-frame, origin, and source-evidence records, and unresolved geometry o
 height evidence blocks package emission instead of falling back to runtime
 heuristics.
 
+Phase 17B also includes the Wahapedia-to-canonical bridge tooling. The bridge
+converts normalized Wahapedia JSON artifacts into canonical-shaped 11th Edition
+source artifacts, keeps CSV exports transient, applies explicit PDF source
+corrections when faction-pack PDFs disagree with Wahapedia, and emits structured
+wargear-option condition/effect descriptors instead of leaving runtime code to
+parse option prose. Wahapedia remains the base source for official base-size
+text; representative model height still requires accepted override evidence
+before catalog emission.
+
 Phase 17C is complete for the rule-language intermediate representation.
 Normalized source text now compiles into deterministic, source-spanned, versioned
 `RuleIR` payloads with reusable template IDs, typed trigger/condition/target/effect/duration
