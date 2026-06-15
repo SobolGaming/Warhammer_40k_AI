@@ -8,11 +8,10 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 if TYPE_CHECKING:
-    from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
     from warhammer40k_core.engine.game_state import GameState
 
 
-class MovementEndSurgeGrantPayload(TypedDict):
+class ShootingEndSurgeGrantPayload(TypedDict):
     hook_id: str
     source_id: str
     unit_instance_id: str
@@ -21,56 +20,45 @@ class MovementEndSurgeGrantPayload(TypedDict):
     decision_effect_payload: JsonValue
 
 
-type MovementEndSurgeHandler = Callable[
-    ["MovementEndSurgeContext"],
-    tuple["MovementEndSurgeGrant", ...],
+type ShootingEndSurgeHandler = Callable[
+    ["ShootingEndSurgeContext"],
+    tuple["ShootingEndSurgeGrant", ...],
 ]
 
 
 @dataclass(frozen=True, slots=True)
-class MovementEndSurgeContext:
+class ShootingEndSurgeContext:
     state: GameState
-    ruleset_descriptor: RulesetDescriptor
-    triggering_unit_instance_id: str
-    triggering_player_id: str
+    shooting_unit_instance_id: str
+    shooting_player_id: str
     reacting_player_id: str
     trigger_event_id: str
-    movement_phase_action: str
-    trigger_event_payload: JsonValue
+    hit_target_unit_instance_ids: tuple[str, ...]
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
 
         if type(self.state) is not GameState:
-            raise GameLifecycleError("MovementEndSurgeContext state must be a GameState.")
-        if self.state.current_battle_phase is not BattlePhase.MOVEMENT:
-            raise GameLifecycleError("MovementEndSurgeContext requires the Movement phase.")
-        from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
-
-        if type(self.ruleset_descriptor) is not RulesetDescriptor:
-            raise GameLifecycleError(
-                "MovementEndSurgeContext ruleset_descriptor must be a RulesetDescriptor."
-            )
+            raise GameLifecycleError("ShootingEndSurgeContext state must be a GameState.")
+        if self.state.current_battle_phase is not BattlePhase.SHOOTING:
+            raise GameLifecycleError("ShootingEndSurgeContext requires the Shooting phase.")
         object.__setattr__(
             self,
-            "triggering_unit_instance_id",
-            _validate_identifier(
-                "triggering_unit_instance_id",
-                self.triggering_unit_instance_id,
-            ),
+            "shooting_unit_instance_id",
+            _validate_identifier("shooting_unit_instance_id", self.shooting_unit_instance_id),
         )
         object.__setattr__(
             self,
-            "triggering_player_id",
-            _validate_identifier("triggering_player_id", self.triggering_player_id),
+            "shooting_player_id",
+            _validate_identifier("shooting_player_id", self.shooting_player_id),
         )
         object.__setattr__(
             self,
             "reacting_player_id",
             _validate_identifier("reacting_player_id", self.reacting_player_id),
         )
-        if self.triggering_player_id == self.reacting_player_id:
-            raise GameLifecycleError("MovementEndSurgeContext requires an opposing player.")
+        if self.shooting_player_id == self.reacting_player_id:
+            raise GameLifecycleError("ShootingEndSurgeContext requires an opposing player.")
         object.__setattr__(
             self,
             "trigger_event_id",
@@ -78,18 +66,16 @@ class MovementEndSurgeContext:
         )
         object.__setattr__(
             self,
-            "movement_phase_action",
-            _validate_identifier("movement_phase_action", self.movement_phase_action),
-        )
-        object.__setattr__(
-            self,
-            "trigger_event_payload",
-            validate_json_value(self.trigger_event_payload),
+            "hit_target_unit_instance_ids",
+            _validate_identifier_tuple(
+                "hit_target_unit_instance_ids",
+                self.hit_target_unit_instance_ids,
+            ),
         )
 
 
 @dataclass(frozen=True, slots=True)
-class MovementEndSurgeGrant:
+class ShootingEndSurgeGrant:
     hook_id: str
     source_id: str
     unit_instance_id: str
@@ -120,7 +106,7 @@ class MovementEndSurgeGrant:
             validate_json_value(self.decision_effect_payload),
         )
 
-    def to_payload(self) -> MovementEndSurgeGrantPayload:
+    def to_payload(self) -> ShootingEndSurgeGrantPayload:
         return {
             "hook_id": self.hook_id,
             "source_id": self.source_id,
@@ -132,21 +118,21 @@ class MovementEndSurgeGrant:
 
 
 @dataclass(frozen=True, slots=True)
-class MovementEndSurgeHookBinding:
+class ShootingEndSurgeHookBinding:
     hook_id: str
     source_id: str
-    handler: MovementEndSurgeHandler
+    handler: ShootingEndSurgeHandler
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
         if not callable(self.handler):
-            raise GameLifecycleError("MovementEndSurgeHookBinding handler must be callable.")
+            raise GameLifecycleError("ShootingEndSurgeHookBinding handler must be callable.")
 
 
 @dataclass(frozen=True, slots=True)
-class MovementEndSurgeHookRegistry:
-    bindings: tuple[MovementEndSurgeHookBinding, ...]
+class ShootingEndSurgeHookRegistry:
+    bindings: tuple[ShootingEndSurgeHookBinding, ...]
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "bindings", _validate_hook_bindings(self.bindings))
@@ -156,63 +142,79 @@ class MovementEndSurgeHookRegistry:
         return cls(bindings=())
 
     @classmethod
-    def from_bindings(cls, bindings: tuple[MovementEndSurgeHookBinding, ...]) -> Self:
+    def from_bindings(cls, bindings: tuple[ShootingEndSurgeHookBinding, ...]) -> Self:
         return cls(bindings=bindings)
 
-    def all_bindings(self) -> tuple[MovementEndSurgeHookBinding, ...]:
+    def all_bindings(self) -> tuple[ShootingEndSurgeHookBinding, ...]:
         return self.bindings
 
-    def grants_for(self, context: MovementEndSurgeContext) -> tuple[MovementEndSurgeGrant, ...]:
-        if type(context) is not MovementEndSurgeContext:
-            raise GameLifecycleError("Movement-end surge hooks require a context.")
-        grants: list[MovementEndSurgeGrant] = []
+    def grants_for(self, context: ShootingEndSurgeContext) -> tuple[ShootingEndSurgeGrant, ...]:
+        if type(context) is not ShootingEndSurgeContext:
+            raise GameLifecycleError("Shooting-end surge hooks require a context.")
+        grants: list[ShootingEndSurgeGrant] = []
         for binding in self.bindings:
             handler_grants = binding.handler(context)
             if type(handler_grants) is not tuple:
-                raise GameLifecycleError("Movement-end surge handlers must return a tuple.")
+                raise GameLifecycleError("Shooting-end surge handlers must return a tuple.")
             for grant in handler_grants:
-                if type(grant) is not MovementEndSurgeGrant:
+                if type(grant) is not ShootingEndSurgeGrant:
                     raise GameLifecycleError(
-                        "Movement-end surge handlers must return MovementEndSurgeGrant values."
+                        "Shooting-end surge handlers must return ShootingEndSurgeGrant values."
                     )
                 if grant.hook_id != binding.hook_id:
-                    raise GameLifecycleError("Movement-end surge handler returned hook_id drift.")
+                    raise GameLifecycleError("Shooting-end surge handler returned hook_id drift.")
                 if grant.source_id != binding.source_id:
-                    raise GameLifecycleError("Movement-end surge handler returned source_id drift.")
+                    raise GameLifecycleError("Shooting-end surge handler returned source_id drift.")
                 grants.append(grant)
         return tuple(sorted(grants, key=lambda grant: (grant.hook_id, grant.unit_instance_id)))
 
 
-def _validate_hook_bindings(value: object) -> tuple[MovementEndSurgeHookBinding, ...]:
+def _validate_hook_bindings(value: object) -> tuple[ShootingEndSurgeHookBinding, ...]:
     if type(value) is not tuple:
-        raise GameLifecycleError("MovementEndSurgeHookRegistry bindings must be a tuple.")
-    bindings: list[MovementEndSurgeHookBinding] = []
+        raise GameLifecycleError("ShootingEndSurgeHookRegistry bindings must be a tuple.")
+    bindings: list[ShootingEndSurgeHookBinding] = []
     seen: set[str] = set()
     for binding in cast(tuple[object, ...], value):
-        if type(binding) is not MovementEndSurgeHookBinding:
+        if type(binding) is not ShootingEndSurgeHookBinding:
             raise GameLifecycleError(
-                "MovementEndSurgeHookRegistry bindings must contain "
-                "MovementEndSurgeHookBinding values."
+                "ShootingEndSurgeHookRegistry bindings must contain "
+                "ShootingEndSurgeHookBinding values."
             )
         if binding.hook_id in seen:
-            raise GameLifecycleError("MovementEndSurgeHookRegistry hook IDs must be unique.")
+            raise GameLifecycleError("ShootingEndSurgeHookRegistry hook IDs must be unique.")
         seen.add(binding.hook_id)
         bindings.append(binding)
     return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
 
 
+def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"Shooting-end surge hook {field_name} must be a tuple.")
+    identifiers: list[str] = []
+    seen: set[str] = set()
+    for raw_value in cast(tuple[object, ...], values):
+        value = _validate_identifier(field_name, raw_value)
+        if value in seen:
+            raise GameLifecycleError(
+                f"Shooting-end surge hook {field_name} must not contain duplicates."
+            )
+        seen.add(value)
+        identifiers.append(value)
+    return tuple(sorted(identifiers))
+
+
 def _validate_identifier(field_name: str, value: object) -> str:
     if type(value) is not str:
-        raise GameLifecycleError(f"Movement-end surge hook {field_name} must be a string.")
+        raise GameLifecycleError(f"Shooting-end surge hook {field_name} must be a string.")
     stripped = value.strip()
     if not stripped:
-        raise GameLifecycleError(f"Movement-end surge hook {field_name} must not be empty.")
+        raise GameLifecycleError(f"Shooting-end surge hook {field_name} must not be empty.")
     return stripped
 
 
 def _validate_non_negative_int(field_name: str, value: object) -> int:
     if type(value) is not int:
-        raise GameLifecycleError(f"Movement-end surge hook {field_name} must be an int.")
+        raise GameLifecycleError(f"Shooting-end surge hook {field_name} must be an int.")
     if value < 0:
-        raise GameLifecycleError(f"Movement-end surge hook {field_name} must not be negative.")
+        raise GameLifecycleError(f"Shooting-end surge hook {field_name} must not be negative.")
     return value

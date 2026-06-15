@@ -132,6 +132,7 @@ from warhammer40k_core.engine.timing_windows import (
 )
 from warhammer40k_core.engine.unit_abilities import unit_has_deep_strike
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_rule_effects import fire_overwatch_forbidden_by_effects
 from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
@@ -3631,6 +3632,11 @@ def _fire_overwatch_target_binding_error(
         return "unknown_fire_overwatch_trigger_unit"
     if triggering_owner == player_id:
         return "fire_overwatch_trigger_unit_not_enemy"
+    if fire_overwatch_forbidden_by_effects(
+        state.persisting_effects_for_unit(triggering_unit_id),
+        owner_player_id=triggering_owner,
+    ):
+        return "fire_overwatch_target_forbidden"
     if state.battlefield_state is None:
         return "fire_overwatch_requires_battlefield"
     shooting_unit_id = _require_target_unit_id(target_binding)

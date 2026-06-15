@@ -15,10 +15,15 @@ from warhammer40k_core.engine.abilities import (
     default_ability_handler_registry,
 )
 from warhammer40k_core.engine.ability_catalog import build_player_ability_index
+from warhammer40k_core.engine.advance_hooks import AdvanceMoveHookBinding, AdvanceMoveHookRegistry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
     BattleShockHookRegistry,
+)
+from warhammer40k_core.engine.charge_declaration_hooks import (
+    ChargeDeclarationHookBinding,
+    ChargeDeclarationHookRegistry,
 )
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectBinding,
@@ -57,6 +62,10 @@ from warhammer40k_core.engine.rule_execution import (
     RuleExecutionRegistry,
     RuleRuntimeBinding,
 )
+from warhammer40k_core.engine.shooting_end_surge_hooks import (
+    ShootingEndSurgeHookBinding,
+    ShootingEndSurgeHookRegistry,
+)
 from warhammer40k_core.engine.sticky_objective_control import (
     PhaseEndObjectiveControlHookBinding,
     PhaseEndObjectiveControlHookRegistry,
@@ -84,8 +93,11 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     rule_runtime_binding_ids: list[str]
     event_subscriptions: list[dict[str, JsonValue]]
     battle_shock_hook_ids: list[str]
+    advance_move_hook_ids: list[str]
     fall_back_hook_ids: list[str]
     movement_end_surge_hook_ids: list[str]
+    charge_declaration_hook_ids: list[str]
+    shooting_end_surge_hook_ids: list[str]
     enhancement_effect_binding_ids: list[str]
     fight_activation_ability_hook_ids: list[str]
     phase_end_objective_control_hook_ids: list[str]
@@ -112,8 +124,11 @@ class RuntimeContentContribution:
     event_subscriptions: tuple[RuntimeContentEventSubscription, ...] = ()
     event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = ()
     battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = ()
+    advance_move_hook_bindings: tuple[AdvanceMoveHookBinding, ...] = ()
     fall_back_hook_bindings: tuple[FallBackEligibilityHookBinding, ...] = ()
     movement_end_surge_hook_bindings: tuple[MovementEndSurgeHookBinding, ...] = ()
+    charge_declaration_hook_bindings: tuple[ChargeDeclarationHookBinding, ...] = ()
+    shooting_end_surge_hook_bindings: tuple[ShootingEndSurgeHookBinding, ...] = ()
     enhancement_effect_bindings: tuple[EnhancementEffectBinding, ...] = ()
     fight_activation_ability_hook_bindings: tuple[FightActivationAbilityHookBinding, ...] = ()
     phase_end_objective_control_hook_bindings: tuple[PhaseEndObjectiveControlHookBinding, ...] = ()
@@ -201,6 +216,15 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "advance_move_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution advance_move_hook_bindings",
+                self.advance_move_hook_bindings,
+                AdvanceMoveHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "fall_back_hook_bindings",
             _validate_tuple(
                 "RuntimeContentContribution fall_back_hook_bindings",
@@ -215,6 +239,24 @@ class RuntimeContentContribution:
                 "RuntimeContentContribution movement_end_surge_hook_bindings",
                 self.movement_end_surge_hook_bindings,
                 MovementEndSurgeHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "charge_declaration_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution charge_declaration_hook_bindings",
+                self.charge_declaration_hook_bindings,
+                ChargeDeclarationHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "shooting_end_surge_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution shooting_end_surge_hook_bindings",
+                self.shooting_end_surge_hook_bindings,
+                ShootingEndSurgeHookBinding,
             ),
         )
         object.__setattr__(
@@ -261,8 +303,11 @@ class RuntimeContentContribution:
             event_subscriptions=self.event_subscriptions,
             event_handler_bindings=self.event_handler_bindings,
             battle_shock_hook_bindings=self.battle_shock_hook_bindings,
+            advance_move_hook_bindings=self.advance_move_hook_bindings,
             fall_back_hook_bindings=self.fall_back_hook_bindings,
             movement_end_surge_hook_bindings=self.movement_end_surge_hook_bindings,
+            charge_declaration_hook_bindings=self.charge_declaration_hook_bindings,
+            shooting_end_surge_hook_bindings=self.shooting_end_surge_hook_bindings,
             enhancement_effect_bindings=self.enhancement_effect_bindings,
             fight_activation_ability_hook_bindings=self.fight_activation_ability_hook_bindings,
             phase_end_objective_control_hook_bindings=(
@@ -352,6 +397,15 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.hook_id,
         ),
+        advance_move_hook_bindings=_combine_unique_values(
+            "Advance hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.advance_move_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
         fall_back_hook_bindings=_combine_unique_values(
             "Fall Back eligibility hook binding",
             tuple(
@@ -367,6 +421,24 @@ def combine_runtime_content_contributions(
                 binding
                 for contribution in validated_contributions
                 for binding in contribution.movement_end_surge_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
+        charge_declaration_hook_bindings=_combine_unique_values(
+            "charge declaration hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.charge_declaration_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
+        shooting_end_surge_hook_bindings=_combine_unique_values(
+            "shooting-end surge hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.shooting_end_surge_hook_bindings
             ),
             lambda binding: binding.hook_id,
         ),
@@ -412,8 +484,11 @@ class RuntimeContentBundle:
     faction_rule_execution_registry: FactionRuleExecutionRegistry
     event_index: RuntimeContentEventIndex
     battle_shock_hook_registry: BattleShockHookRegistry
+    advance_move_hook_registry: AdvanceMoveHookRegistry
     fall_back_hook_registry: FallBackEligibilityHookRegistry
     movement_end_surge_hook_registry: MovementEndSurgeHookRegistry
+    charge_declaration_hook_registry: ChargeDeclarationHookRegistry
+    shooting_end_surge_hook_registry: ShootingEndSurgeHookRegistry
     enhancement_effect_registry: EnhancementEffectRegistry
     fight_activation_ability_hook_registry: FightActivationAbilityHookRegistry
     phase_end_objective_control_hook_registry: PhaseEndObjectiveControlHookRegistry
@@ -452,12 +527,18 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires RuntimeContentEventIndex.")
         if type(self.battle_shock_hook_registry) is not BattleShockHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires BattleShockHookRegistry.")
+        if type(self.advance_move_hook_registry) is not AdvanceMoveHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires AdvanceMoveHookRegistry.")
         if type(self.fall_back_hook_registry) is not FallBackEligibilityHookRegistry:
             raise GameLifecycleError(
                 "RuntimeContentBundle requires FallBackEligibilityHookRegistry."
             )
         if type(self.movement_end_surge_hook_registry) is not MovementEndSurgeHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires MovementEndSurgeHookRegistry.")
+        if type(self.charge_declaration_hook_registry) is not ChargeDeclarationHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires ChargeDeclarationHookRegistry.")
+        if type(self.shooting_end_surge_hook_registry) is not ShootingEndSurgeHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires ShootingEndSurgeHookRegistry.")
         if type(self.enhancement_effect_registry) is not EnhancementEffectRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires EnhancementEffectRegistry.")
         if (
@@ -592,6 +673,13 @@ class RuntimeContentBundle:
                 for binding in contribution.battle_shock_hook_bindings
             )
         )
+        advance_move_hook_registry = AdvanceMoveHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.advance_move_hook_bindings
+            )
+        )
         fall_back_hook_registry = FallBackEligibilityHookRegistry.from_bindings(
             tuple(
                 binding
@@ -604,6 +692,20 @@ class RuntimeContentBundle:
                 binding
                 for contribution in validated_contributions
                 for binding in contribution.movement_end_surge_hook_bindings
+            )
+        )
+        charge_declaration_hook_registry = ChargeDeclarationHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.charge_declaration_hook_bindings
+            )
+        )
+        shooting_end_surge_hook_registry = ShootingEndSurgeHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.shooting_end_surge_hook_bindings
             )
         )
         enhancement_effect_registry = EnhancementEffectRegistry.from_bindings(
@@ -647,8 +749,11 @@ class RuntimeContentBundle:
             faction_rule_execution_registry=faction_registry,
             event_index=event_index,
             battle_shock_hook_registry=battle_shock_hook_registry,
+            advance_move_hook_registry=advance_move_hook_registry,
             fall_back_hook_registry=fall_back_hook_registry,
             movement_end_surge_hook_registry=movement_end_surge_hook_registry,
+            charge_declaration_hook_registry=charge_declaration_hook_registry,
+            shooting_end_surge_hook_registry=shooting_end_surge_hook_registry,
             enhancement_effect_registry=enhancement_effect_registry,
             fight_activation_ability_hook_registry=fight_activation_ability_hook_registry,
             phase_end_objective_control_hook_registry=(phase_end_objective_control_hook_registry),
@@ -685,11 +790,20 @@ class RuntimeContentBundle:
             "battle_shock_hook_ids": [
                 binding.hook_id for binding in self.battle_shock_hook_registry.all_bindings()
             ],
+            "advance_move_hook_ids": [
+                binding.hook_id for binding in self.advance_move_hook_registry.all_bindings()
+            ],
             "fall_back_hook_ids": [
                 binding.hook_id for binding in self.fall_back_hook_registry.all_bindings()
             ],
             "movement_end_surge_hook_ids": [
                 binding.hook_id for binding in self.movement_end_surge_hook_registry.all_bindings()
+            ],
+            "charge_declaration_hook_ids": [
+                binding.hook_id for binding in self.charge_declaration_hook_registry.all_bindings()
+            ],
+            "shooting_end_surge_hook_ids": [
+                binding.hook_id for binding in self.shooting_end_surge_hook_registry.all_bindings()
             ],
             "enhancement_effect_binding_ids": [
                 binding.effect_id for binding in self.enhancement_effect_registry.all_bindings()

@@ -20,17 +20,27 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
     MissionDeploymentZoneSource,
     MovementMode,
     RulesetDescriptor,
     RulesetDescriptorError,
     movement_mode_from_token,
 )
+from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.actions import (
     MissionActionState,
     MissionActionStatus,
     interrupt_mission_action_for_battlefield_departure,
     interrupt_mission_action_for_displacement,
+)
+from warhammer40k_core.engine.advance_hooks import (
+    DECLINE_ADVANCE_MOVE_GRANT_OPTION_ID,
+    SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
+    AdvanceMoveContext,
+    AdvanceMoveGrant,
+    AdvanceMoveGrantPayload,
+    AdvanceMoveHookRegistry,
 )
 from warhammer40k_core.engine.aircraft import (
     AircraftMovementPolicy,
@@ -66,6 +76,7 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
 )
@@ -187,6 +198,7 @@ from warhammer40k_core.engine.unit_coherency import (
     unit_placement_coherency_result,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.unit_rule_effects import movement_bonus_inches_from_effects
 from warhammer40k_core.geometry.pathing import (
     PathConstraintViolation,
     PathValidationResult,
@@ -1607,6 +1619,25 @@ class MovementPhaseState:
             pending_action=pending_action,
         )
 
+    def without_pending_action(self) -> Self:
+        if self.pending_action is None:
+            return self
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            step=self.step,
+            reinforcements_completed=self.reinforcements_completed,
+            declined_disembark_unit_ids=self.declined_disembark_unit_ids,
+            declined_post_normal_move_disembark_unit_ids=(
+                self.declined_post_normal_move_disembark_unit_ids
+            ),
+            selected_unit_ids=self.selected_unit_ids,
+            moved_unit_ids=self.moved_unit_ids,
+            movement_distance_records=self.movement_distance_records,
+            active_selection=self.active_selection,
+            pending_action=None,
+        )
+
     def with_disembark_declined(self, unit_instance_ids: tuple[str, ...]) -> Self:
         declined_ids = _validate_identifier_tuple("unit_instance_ids", unit_instance_ids)
         if self.step is not MovementPhaseStepKind.MOVE_UNITS:
@@ -2321,6 +2352,9 @@ class MovementPhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
     parameterized_proposals: bool = True
     stratagem_index: StratagemCatalogIndex = field(default_factory=eleventh_edition_stratagem_index)
+    advance_move_hooks: AdvanceMoveHookRegistry = field(
+        default_factory=AdvanceMoveHookRegistry.empty
+    )
     fall_back_hooks: FallBackEligibilityHookRegistry = field(
         default_factory=FallBackEligibilityHookRegistry.empty
     )
@@ -2342,6 +2376,8 @@ class MovementPhaseHandler:
             raise GameLifecycleError("MovementPhaseHandler requires parameterized proposals.")
         if type(self.stratagem_index) is not StratagemCatalogIndex:
             raise GameLifecycleError("MovementPhaseHandler stratagem_index must be an index.")
+        if type(self.advance_move_hooks) is not AdvanceMoveHookRegistry:
+            raise GameLifecycleError("MovementPhaseHandler advance_move_hooks must be a registry.")
         if type(self.fall_back_hooks) is not FallBackEligibilityHookRegistry:
             raise GameLifecycleError("MovementPhaseHandler fall_back_hooks must be a registry.")
         if type(self.movement_end_surge_hooks) is not MovementEndSurgeHookRegistry:
@@ -2386,10 +2422,17 @@ class MovementPhaseHandler:
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             )
 
+        scenario = _battlefield_scenario(state)
+        legal_unit_ids = movement_state.legal_unit_ids(
+            scenario,
+            accounted_unplaced_model_ids=state.unavailable_model_ids(),
+        )
+
         surge_status = _request_movement_end_surge_if_available(
             state=state,
             decisions=decisions,
             registry=self.movement_end_surge_hooks,
+            ruleset_descriptor=_ruleset_descriptor_for_handler(self),
         )
         if surge_status is not None:
             return surge_status
@@ -2403,11 +2446,6 @@ class MovementPhaseHandler:
             if disembark_status is not None:
                 return disembark_status
 
-        scenario = _battlefield_scenario(state)
-        legal_unit_ids = movement_state.legal_unit_ids(
-            scenario,
-            accounted_unplaced_model_ids=state.unavailable_model_ids(),
-        )
         if not legal_unit_ids:
             return _begin_reinforcements_step(
                 state=state,
@@ -2546,6 +2584,17 @@ class MovementPhaseHandler:
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 reaction_queue=reaction_queue,
                 stratagem_index=self.stratagem_index,
+                advance_move_hooks=self.advance_move_hooks,
+            )
+        if result.decision_type == SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE:
+            return _apply_advance_move_grant_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                reaction_queue=reaction_queue,
+                stratagem_index=self.stratagem_index,
+                advance_move_hooks=self.advance_move_hooks,
             )
         if result.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
             return _apply_movement_proposal_decision(
@@ -2555,6 +2604,7 @@ class MovementPhaseHandler:
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 reaction_queue=reaction_queue,
                 stratagem_index=self.stratagem_index,
+                advance_move_hooks=self.advance_move_hooks,
                 fall_back_hooks=self.fall_back_hooks,
             )
         if result.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE:
@@ -3196,6 +3246,7 @@ def _request_movement_end_surge_if_available(
     state: GameState,
     decisions: DecisionController,
     registry: MovementEndSurgeHookRegistry,
+    ruleset_descriptor: RulesetDescriptor,
 ) -> LifecycleStatus | None:
     if type(registry) is not MovementEndSurgeHookRegistry:
         raise GameLifecycleError("Movement-end surge trigger requires a registry.")
@@ -3242,15 +3293,18 @@ def _request_movement_end_surge_if_available(
         ):
             context = MovementEndSurgeContext(
                 state=state,
+                ruleset_descriptor=ruleset_descriptor,
                 triggering_unit_instance_id=triggering_unit_id,
                 triggering_player_id=active_player_id,
                 reacting_player_id=reacting_player_id,
                 trigger_event_id=record.event_id,
                 movement_phase_action=movement_action,
+                trigger_event_payload=payload,
             )
             grants = registry.grants_for(context)
             if not grants:
                 continue
+            max_distance_bonus_inches = _movement_end_surge_grant_distance_bonus(grants)
             roll_state = _dice_roll_manager_for_state(state=state, decisions=decisions).roll(
                 _movement_end_surge_distance_roll_spec(
                     source_rule_id=grants[0].source_id,
@@ -3268,7 +3322,7 @@ def _request_movement_end_surge_if_available(
                     source_step=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE.value,
                     source_event_id=record.event_id,
                 ),
-                max_distance_inches=float(roll_state.current_total),
+                max_distance_inches=float(roll_state.current_total + max_distance_bonus_inches),
                 movement_mode=MovementMode.NORMAL,
                 allow_battle_shocked=False,
                 allow_within_engagement_range=False,
@@ -3294,6 +3348,7 @@ def _request_movement_end_surge_if_available(
                     "trigger_event_id": record.event_id,
                     "movement_phase_action": movement_action,
                     "surge_distance_roll": roll_state.to_payload(),
+                    "max_distance_bonus_inches": max_distance_bonus_inches,
                     "descriptor": descriptor.to_payload(),
                     "grants": [grant.to_payload() for grant in grants],
                     "request_id": request.request_id,
@@ -3345,9 +3400,26 @@ def _eligible_triggered_movement_units_from_grants(
                 hook_id=grant.hook_id,
                 source_id=grant.source_id,
                 replay_payload=grant.replay_payload,
+                decision_effect_payload=grant.decision_effect_payload,
             )
         )
     return tuple(sorted(units, key=lambda unit: unit.unit_instance_id))
+
+
+def _movement_end_surge_grant_distance_bonus(
+    grants: tuple[MovementEndSurgeGrant, ...],
+) -> int:
+    if type(grants) is not tuple:
+        raise GameLifecycleError("Movement-end surge distance bonus requires grant tuple.")
+    for grant in grants:
+        if type(grant) is not MovementEndSurgeGrant:
+            raise GameLifecycleError(
+                "Movement-end surge distance bonus requires MovementEndSurgeGrant values."
+            )
+    bonuses = {grant.max_distance_bonus_inches for grant in grants}
+    if len(bonuses) != 1:
+        raise GameLifecycleError("Movement-end surge grants must share one distance bonus.")
+    return bonuses.pop()
 
 
 def _movement_end_surge_event_already_processed(
@@ -4848,6 +4920,7 @@ def _apply_movement_action_decision(  # noqa: RET503
     ruleset_descriptor: RulesetDescriptor,
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    advance_move_hooks: AdvanceMoveHookRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -4869,7 +4942,6 @@ def _apply_movement_action_decision(  # noqa: RET503
     unit_placement = scenario.battlefield_state.unit_placement_by_id(
         active_selection.unit_instance_id
     )
-    unit = scenario.unit_instance_for_placement(unit_placement)
     availability_result = _movement_action_availability_result(
         scenario=scenario,
         unit_placement=unit_placement,
@@ -4910,6 +4982,25 @@ def _apply_movement_action_decision(  # noqa: RET503
         return None
     if action is MovementPhaseActionKind.NORMAL_MOVE:
         movement_mode = _movement_mode_from_payload(payload=payload, action=action)
+        pending_action = PendingMovementActionSelection.from_result(
+            result=result,
+            player_id=active_player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=active_selection.unit_instance_id,
+            movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+            movement_mode=movement_mode,
+            fall_back_mode=None,
+        )
+        movement_grant_status = _request_advance_move_grant_decision_if_available(
+            state=state,
+            decisions=decisions,
+            unit_placement=unit_placement,
+            pending_action=pending_action,
+            registry=advance_move_hooks,
+        )
+        if movement_grant_status is not None:
+            state.movement_phase_state = movement_state.with_pending_action(pending_action)
+            return movement_grant_status
         return _request_movement_proposal(
             state=state,
             decisions=decisions,
@@ -4922,50 +5013,32 @@ def _apply_movement_action_decision(  # noqa: RET503
 
     if action is MovementPhaseActionKind.ADVANCE:
         movement_mode = _movement_mode_from_payload(payload=payload, action=action)
-        advance_roll_request = _advance_roll_request_for_action(
-            state=state,
-            unit=unit,
-            unit_placement=unit_placement,
-            action_result=result,
-        )
-        advance_roll_state = _roll_advance_dice(
-            state=state,
-            decisions=decisions,
-            request=advance_roll_request,
-        )
-        if advance_roll_request.reroll_permission is not None:
-            reroll_request = _advance_roll_reroll_request(
-                state=state,
-                decisions=decisions,
-                dice_roll_state=advance_roll_state,
-                advance_roll_request=advance_roll_request,
-                action_result=result,
-                movement_mode=movement_mode,
-            )
-            decisions.request_decision(reroll_request)
-            return LifecycleStatus.waiting_for_decision(
-                stage=GameLifecycleStage.BATTLE,
-                decision_request=reroll_request,
-                payload={
-                    "phase": BattlePhase.MOVEMENT.value,
-                    "phase_body_status": "advance_roll_reroll_pending",
-                    "battle_round": state.battle_round,
-                    "active_player_id": active_player_id,
-                    "unit_instance_id": active_selection.unit_instance_id,
-                },
-            )
-        advance_roll = AdvanceRollResult.from_roll_state(
-            request=advance_roll_request,
-            roll_state=advance_roll_state,
-        )
-        return _resolve_and_apply_advance_move(
-            state=state,
-            decisions=decisions,
+        pending_action = PendingMovementActionSelection.from_result(
             result=result,
+            player_id=active_player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=active_selection.unit_instance_id,
+            movement_phase_action=MovementPhaseActionKind.ADVANCE,
+            movement_mode=movement_mode,
+            fall_back_mode=None,
+        )
+        advance_grant_status = _request_advance_move_grant_decision_if_available(
+            state=state,
+            decisions=decisions,
+            unit_placement=unit_placement,
+            pending_action=pending_action,
+            registry=advance_move_hooks,
+        )
+        if advance_grant_status is not None:
+            state.movement_phase_state = movement_state.with_pending_action(pending_action)
+            return advance_grant_status
+        return _resolve_pending_advance_action(
+            state=state,
+            decisions=decisions,
+            pending_action=pending_action,
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
-            advance_roll=advance_roll,
-            movement_mode=movement_mode,
+            selected_advance_move_grants=(),
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
         )
@@ -4992,6 +5065,16 @@ def _apply_movement_action_decision(  # noqa: RET503
         if fall_back_stratagem_status is not None:
             state.movement_phase_state = movement_state.with_pending_action(pending_action)
             return fall_back_stratagem_status
+        movement_grant_status = _request_advance_move_grant_decision_if_available(
+            state=state,
+            decisions=decisions,
+            unit_placement=unit_placement,
+            pending_action=pending_action,
+            registry=advance_move_hooks,
+        )
+        if movement_grant_status is not None:
+            state.movement_phase_state = movement_state.with_pending_action(pending_action)
+            return movement_grant_status
         return _request_movement_proposal(
             state=state,
             decisions=decisions,
@@ -5004,6 +5087,449 @@ def _apply_movement_action_decision(  # noqa: RET503
                 "fall_back_mode": fall_back_mode.value,
             },
         )
+
+
+def _request_advance_move_grant_decision_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    unit_placement: UnitPlacement,
+    pending_action: PendingMovementActionSelection,
+    registry: AdvanceMoveHookRegistry,
+) -> LifecycleStatus | None:
+    if type(pending_action) is not PendingMovementActionSelection:
+        raise GameLifecycleError("Movement action grant decision requires a pending action.")
+    if type(registry) is not AdvanceMoveHookRegistry:
+        raise GameLifecycleError("Movement action grant decision requires a hook registry.")
+    grants = registry.grants_for(
+        AdvanceMoveContext(
+            state=state,
+            player_id=pending_action.player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit_placement.unit_instance_id,
+            movement_phase_action=pending_action.movement_phase_action.value,
+            movement_request_id=pending_action.request_id,
+            movement_result_id=pending_action.result_id,
+        )
+    )
+    if not grants:
+        return None
+    request = DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
+        actor_id=pending_action.player_id,
+        payload={
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.MOVEMENT.value,
+            "active_player_id": pending_action.player_id,
+            "unit_instance_id": unit_placement.unit_instance_id,
+            "movement_phase_action": pending_action.movement_phase_action.value,
+            "movement_mode": pending_action.movement_mode.value,
+            "source_decision_request_id": pending_action.request_id,
+            "source_decision_result_id": pending_action.result_id,
+            "available_grants": validate_json_value([grant.to_payload() for grant in grants]),
+        },
+        options=(
+            _decline_advance_move_grant_option(pending_action=pending_action),
+            *tuple(
+                _advance_move_grant_option(pending_action=pending_action, grant=grant)
+                for grant in grants
+            ),
+        ),
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "advance_move_grant_decision_requested",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": pending_action.player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": unit_placement.unit_instance_id,
+            "movement_phase_action": pending_action.movement_phase_action.value,
+            "request_id": request.request_id,
+            "source_decision_request_id": pending_action.request_id,
+            "source_decision_result_id": pending_action.result_id,
+            "available_grants": validate_json_value([grant.to_payload() for grant in grants]),
+            "phase_body_status": "movement_action_grant_decision_pending",
+        },
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.MOVEMENT.value,
+            "phase_body_status": "movement_action_grant_decision_pending",
+            "battle_round": state.battle_round,
+            "active_player_id": pending_action.player_id,
+            "unit_instance_id": unit_placement.unit_instance_id,
+        },
+    )
+
+
+def _decline_advance_move_grant_option(
+    *,
+    pending_action: PendingMovementActionSelection,
+) -> DecisionOption:
+    return DecisionOption(
+        option_id=DECLINE_ADVANCE_MOVE_GRANT_OPTION_ID,
+        label="Decline Movement Action Grant",
+        payload={
+            "submission_kind": SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
+            "unit_instance_id": pending_action.unit_instance_id,
+            "movement_phase_action": pending_action.movement_phase_action.value,
+            "movement_mode": pending_action.movement_mode.value,
+            "source_decision_request_id": pending_action.request_id,
+            "source_decision_result_id": pending_action.result_id,
+            "selected_movement_action_grants": [],
+        },
+    )
+
+
+def _advance_move_grant_option(
+    *,
+    pending_action: PendingMovementActionSelection,
+    grant: AdvanceMoveGrant,
+) -> DecisionOption:
+    return DecisionOption(
+        option_id=grant.hook_id,
+        label=grant.label,
+        payload={
+            "submission_kind": SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
+            "unit_instance_id": pending_action.unit_instance_id,
+            "movement_phase_action": pending_action.movement_phase_action.value,
+            "movement_mode": pending_action.movement_mode.value,
+            "source_decision_request_id": pending_action.request_id,
+            "source_decision_result_id": pending_action.result_id,
+            "selected_movement_action_grants": validate_json_value([grant.to_payload()]),
+        },
+    )
+
+
+def _apply_advance_move_grant_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
+    advance_move_hooks: AdvanceMoveHookRegistry,
+) -> LifecycleStatus | None:
+    _validate_movement_phase_state(state)
+    active_player_id = _active_player_id(state)
+    if result.actor_id != active_player_id:
+        raise GameLifecycleError("Advance move grant actor must be the active player.")
+    movement_state = state.movement_phase_state
+    if (
+        movement_state is None
+        or movement_state.active_selection is None
+        or movement_state.pending_action is None
+    ):
+        raise GameLifecycleError("Movement action grant decision requires a pending action.")
+    pending_action = movement_state.pending_action
+    payload = _decision_payload_object(result.payload)
+    if _payload_string(payload, key="submission_kind") != SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE:
+        raise GameLifecycleError("Movement action grant payload has invalid submission_kind.")
+    if _payload_string(payload, key="unit_instance_id") != pending_action.unit_instance_id:
+        raise GameLifecycleError("Movement action grant unit drift.")
+    if _payload_string(payload, key="source_decision_request_id") != pending_action.request_id:
+        raise GameLifecycleError("Movement action grant source request drift.")
+    if _payload_string(payload, key="source_decision_result_id") != pending_action.result_id:
+        raise GameLifecycleError("Movement action grant source result drift.")
+    if (
+        _payload_string(payload, key="movement_phase_action")
+        != pending_action.movement_phase_action.value
+    ):
+        raise GameLifecycleError("Movement action grant action drift.")
+    movement_mode = _movement_mode_from_payload(
+        payload=payload,
+        action=pending_action.movement_phase_action,
+    )
+    if movement_mode is not pending_action.movement_mode:
+        raise GameLifecycleError("Movement action grant movement mode drift.")
+
+    selected_grants = _advance_move_grants_from_context(payload)
+    if result.selected_option_id == DECLINE_ADVANCE_MOVE_GRANT_OPTION_ID:
+        if selected_grants:
+            raise GameLifecycleError("Declined movement action grant cannot carry selected grants.")
+    else:
+        if len(selected_grants) != 1:
+            raise GameLifecycleError("Movement action grant selection must carry one grant.")
+        if selected_grants[0].hook_id != result.selected_option_id:
+            raise GameLifecycleError("Movement action grant selected option drift.")
+        _assert_advance_move_grant_still_available(
+            state=state,
+            pending_action=pending_action,
+            selected_grant=selected_grants[0],
+            registry=advance_move_hooks,
+        )
+
+    persisting_effects = tuple(
+        effect
+        for grant in selected_grants
+        for effect in _record_movement_action_grant_effects(
+            state=state,
+            player_id=active_player_id,
+            unit_instance_id=pending_action.unit_instance_id,
+            result=result,
+            grant=grant,
+        )
+    )
+    state.movement_phase_state = movement_state.without_pending_action()
+    decisions.event_log.append(
+        "movement_action_grant_decision_resolved",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": active_player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": pending_action.unit_instance_id,
+            "movement_phase_action": pending_action.movement_phase_action.value,
+            "request_id": result.request_id,
+            "result_id": result.result_id,
+            "selected_option_id": result.selected_option_id,
+            "selected_grants": validate_json_value(
+                [grant.to_payload() for grant in selected_grants]
+            ),
+            "persisting_effects": validate_json_value(
+                [effect.to_payload() for effect in persisting_effects]
+            ),
+        },
+    )
+
+    scenario = _battlefield_scenario(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        pending_action.unit_instance_id
+    )
+    return _resolve_pending_movement_action_after_grants(
+        state=state,
+        decisions=decisions,
+        pending_action=pending_action,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_placement=unit_placement,
+        selected_advance_move_grants=selected_grants,
+        reaction_queue=reaction_queue,
+        stratagem_index=stratagem_index,
+    )
+
+
+def _assert_advance_move_grant_still_available(
+    *,
+    state: GameState,
+    pending_action: PendingMovementActionSelection,
+    selected_grant: AdvanceMoveGrant,
+    registry: AdvanceMoveHookRegistry,
+) -> None:
+    current_grants = registry.grants_for(
+        AdvanceMoveContext(
+            state=state,
+            player_id=pending_action.player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=pending_action.unit_instance_id,
+            movement_phase_action=pending_action.movement_phase_action.value,
+            movement_request_id=pending_action.request_id,
+            movement_result_id=pending_action.result_id,
+        )
+    )
+    for current_grant in current_grants:
+        if current_grant == selected_grant:
+            return
+    raise GameLifecycleError("Advance move grant selection is no longer available.")
+
+
+def _record_movement_action_grant_effects(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+    result: DecisionResult,
+    grant: AdvanceMoveGrant,
+) -> tuple[PersistingEffect, ...]:
+    effects: list[PersistingEffect] = []
+    if grant.decision_effect_payload is not None:
+        spend_effect = PersistingEffect(
+            effect_id=f"{grant.hook_id}:{result.request_id}:{result.result_id}:decision",
+            source_rule_id=grant.source_id,
+            owner_player_id=player_id,
+            target_unit_instance_ids=(unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.MOVEMENT,
+            expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
+            effect_payload=grant.decision_effect_payload,
+        )
+        state.record_persisting_effect(spend_effect)
+        effects.append(spend_effect)
+    if grant.unit_effect_payload is not None:
+        unit_effect = PersistingEffect(
+            effect_id=f"{grant.hook_id}:{result.request_id}:{result.result_id}:unit",
+            source_rule_id=grant.source_id,
+            owner_player_id=player_id,
+            target_unit_instance_ids=(unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.MOVEMENT,
+            expiration=_movement_action_grant_effect_expiration(
+                state=state,
+                player_id=player_id,
+                expiration=grant.unit_effect_expiration,
+            ),
+            effect_payload=grant.unit_effect_payload,
+        )
+        state.record_persisting_effect(unit_effect)
+        effects.append(unit_effect)
+    return tuple(effects)
+
+
+def _movement_action_grant_effect_expiration(
+    *,
+    state: GameState,
+    player_id: str,
+    expiration: str | None,
+) -> EffectExpiration:
+    if expiration == "end_phase":
+        return EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=BattlePhase.MOVEMENT,
+            player_id=player_id,
+        )
+    if expiration == "end_turn":
+        return EffectExpiration.end_turn(
+            battle_round=state.battle_round,
+            player_id=player_id,
+        )
+    raise GameLifecycleError("Movement action grant effect expiration is missing.")
+
+
+def _resolve_pending_movement_action_after_grants(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    pending_action: PendingMovementActionSelection,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_placement: UnitPlacement,
+    selected_advance_move_grants: tuple[AdvanceMoveGrant, ...],
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
+) -> LifecycleStatus | None:
+    if pending_action.movement_phase_action is MovementPhaseActionKind.NORMAL_MOVE:
+        return _request_movement_proposal(
+            state=state,
+            decisions=decisions,
+            result=pending_action.to_decision_result(),
+            unit_instance_id=pending_action.unit_instance_id,
+            action=MovementPhaseActionKind.NORMAL_MOVE,
+            proposal_kind=ProposalKind.NORMAL_MOVE,
+            context={
+                "movement_mode": pending_action.movement_mode.value,
+                "selected_movement_action_grant_hook_ids": [
+                    grant.hook_id for grant in selected_advance_move_grants
+                ],
+                "selected_movement_action_grants": validate_json_value(
+                    [grant.to_payload() for grant in selected_advance_move_grants]
+                ),
+            },
+        )
+    if pending_action.movement_phase_action is MovementPhaseActionKind.ADVANCE:
+        return _resolve_pending_advance_action(
+            state=state,
+            decisions=decisions,
+            pending_action=pending_action,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_placement=unit_placement,
+            selected_advance_move_grants=selected_advance_move_grants,
+            reaction_queue=reaction_queue,
+            stratagem_index=stratagem_index,
+        )
+    if pending_action.movement_phase_action is MovementPhaseActionKind.FALL_BACK:
+        if pending_action.fall_back_mode is None:
+            raise GameLifecycleError("Pending Fall Back action requires fall_back_mode.")
+        return _request_movement_proposal(
+            state=state,
+            decisions=decisions,
+            result=pending_action.to_decision_result(),
+            unit_instance_id=pending_action.unit_instance_id,
+            action=MovementPhaseActionKind.FALL_BACK,
+            proposal_kind=ProposalKind.FALL_BACK,
+            context={
+                "movement_mode": pending_action.movement_mode.value,
+                "fall_back_mode": pending_action.fall_back_mode.value,
+                "selected_movement_action_grant_hook_ids": [
+                    grant.hook_id for grant in selected_advance_move_grants
+                ],
+                "selected_movement_action_grants": validate_json_value(
+                    [grant.to_payload() for grant in selected_advance_move_grants]
+                ),
+            },
+        )
+    raise GameLifecycleError("Unsupported pending movement action after grant decision.")
+
+
+def _resolve_pending_advance_action(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    pending_action: PendingMovementActionSelection,
+    ruleset_descriptor: RulesetDescriptor,
+    unit_placement: UnitPlacement,
+    selected_advance_move_grants: tuple[AdvanceMoveGrant, ...],
+    reaction_queue: ReactionQueue | None,
+    stratagem_index: StratagemCatalogIndex | None,
+) -> LifecycleStatus | None:
+    if pending_action.movement_phase_action is not MovementPhaseActionKind.ADVANCE:
+        raise GameLifecycleError("Pending Advance resolution requires an Advance action.")
+    action_result = pending_action.to_decision_result()
+    scenario = _battlefield_scenario(state)
+    unit = scenario.unit_instance_for_placement(unit_placement)
+    advance_roll_request = _advance_roll_request_for_action(
+        state=state,
+        unit=unit,
+        unit_placement=unit_placement,
+        action_result=action_result,
+    )
+    advance_roll_state = _roll_advance_dice(
+        state=state,
+        decisions=decisions,
+        request=advance_roll_request,
+    )
+    if advance_roll_request.reroll_permission is not None:
+        reroll_request = _advance_roll_reroll_request(
+            state=state,
+            decisions=decisions,
+            dice_roll_state=advance_roll_state,
+            advance_roll_request=advance_roll_request,
+            action_result=action_result,
+            movement_mode=pending_action.movement_mode,
+            selected_advance_move_grants=selected_advance_move_grants,
+        )
+        decisions.request_decision(reroll_request)
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=reroll_request,
+            payload={
+                "phase": BattlePhase.MOVEMENT.value,
+                "phase_body_status": "advance_roll_reroll_pending",
+                "battle_round": state.battle_round,
+                "active_player_id": pending_action.player_id,
+                "unit_instance_id": pending_action.unit_instance_id,
+            },
+        )
+    advance_roll = AdvanceRollResult.from_roll_state(
+        request=advance_roll_request,
+        roll_state=advance_roll_state,
+    )
+    return _resolve_and_apply_advance_move(
+        state=state,
+        decisions=decisions,
+        result=action_result,
+        ruleset_descriptor=ruleset_descriptor,
+        unit_placement=unit_placement,
+        advance_roll=advance_roll,
+        movement_mode=pending_action.movement_mode,
+        selected_advance_move_grants=selected_advance_move_grants,
+        reaction_queue=reaction_queue,
+        stratagem_index=stratagem_index,
+    )
 
 
 def _request_pending_movement_action_proposal(
@@ -5230,6 +5756,7 @@ def _apply_movement_proposal_decision(
     ruleset_descriptor: RulesetDescriptor,
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    advance_move_hooks: AdvanceMoveHookRegistry,
     fall_back_hooks: FallBackEligibilityHookRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
@@ -5286,6 +5813,11 @@ def _apply_movement_proposal_decision(
             path_witness=submission.witness,
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
+            movement_bonus_inches=_movement_bonus_inches_for_unit(
+                state=state,
+                player_id=active_player_id,
+                unit_instance_id=proposal_request.unit_instance_id,
+            ),
             temporary_movement_keywords=_temporary_movement_keywords_for_unit(
                 state=state,
                 player_id=active_player_id,
@@ -5386,6 +5918,11 @@ def _apply_movement_proposal_decision(
             path_witness=submission.witness,
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
+            movement_bonus_inches=_movement_bonus_inches_for_unit(
+                state=state,
+                player_id=active_player_id,
+                unit_instance_id=proposal_request.unit_instance_id,
+            ),
             temporary_movement_keywords=_temporary_movement_keywords_for_unit(
                 state=state,
                 player_id=active_player_id,
@@ -5416,19 +5953,29 @@ def _apply_movement_proposal_decision(
         state.replace_battlefield_state(
             battlefield_state.with_unit_placement(advance_resolution.attempted_placement)
         )
+        movement_dice_record = MovementDiceRecord(
+            player_id=active_player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit_placement.unit_instance_id,
+            movement_phase_action=MovementPhaseActionKind.ADVANCE,
+            advance_roll=advance_roll,
+        )
         state.record_advanced_unit_state(
             AdvancedUnitState(
                 player_id=active_player_id,
                 battle_round=state.battle_round,
                 unit_instance_id=unit_placement.unit_instance_id,
-                movement_dice_record=MovementDiceRecord(
-                    player_id=active_player_id,
-                    battle_round=state.battle_round,
-                    unit_instance_id=unit_placement.unit_instance_id,
-                    movement_phase_action=MovementPhaseActionKind.ADVANCE,
-                    advance_roll=advance_roll,
-                ),
+                movement_dice_record=movement_dice_record,
             )
+        )
+        advance_grants = _apply_advance_move_grants(
+            state=state,
+            decisions=decisions,
+            registry=advance_move_hooks,
+            player_id=active_player_id,
+            unit_instance_id=unit_placement.unit_instance_id,
+            proposal_request=proposal_request,
+            proposal_result=result,
         )
         return _request_embark_after_move_or_complete_activation(
             state=state,
@@ -5449,6 +5996,9 @@ def _apply_movement_proposal_decision(
             movement_payload={
                 **advance_resolution.movement_payload,
                 "proposal_request_id": proposal_request.request_id,
+                "advance_move_grants": validate_json_value(
+                    [grant.to_payload() for grant in advance_grants]
+                ),
             },
             displacement_kind=ModelDisplacementKind.ADVANCE,
             transition_batch=transition_batch,
@@ -5477,6 +6027,11 @@ def _apply_movement_proposal_decision(
             forced_desperate_escape_source_rule_ids=forced_desperate_escape_source_rule_ids,
             objective_markers=_objective_markers_for_state(state),
             hover_mode_states=tuple(state.hover_mode_states),
+            movement_bonus_inches=_movement_bonus_inches_for_unit(
+                state=state,
+                player_id=active_player_id,
+                unit_instance_id=proposal_request.unit_instance_id,
+            ),
             temporary_movement_keywords=_temporary_movement_keywords_for_unit(
                 state=state,
                 player_id=active_player_id,
@@ -5758,6 +6313,7 @@ def _apply_advance_roll_reroll_decision(
         unit_placement=unit_placement,
         advance_roll=advance_roll,
         movement_mode=movement_mode,
+        selected_advance_move_grants=_advance_move_grants_from_context(context_payload),
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
     )
@@ -5772,6 +6328,7 @@ def _resolve_and_apply_advance_move(
     unit_placement: UnitPlacement,
     advance_roll: AdvanceRollResult,
     movement_mode: MovementMode,
+    selected_advance_move_grants: tuple[AdvanceMoveGrant, ...],
     reaction_queue: ReactionQueue | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
 ) -> LifecycleStatus | None:
@@ -5790,8 +6347,113 @@ def _resolve_and_apply_advance_move(
         context={
             "advance_roll": validate_json_value(advance_roll.to_payload()),
             "movement_mode": movement_mode.value,
+            "selected_movement_action_grant_hook_ids": [
+                grant.hook_id for grant in selected_advance_move_grants
+            ],
+            "selected_movement_action_grants": validate_json_value(
+                [grant.to_payload() for grant in selected_advance_move_grants]
+            ),
         },
     )
+
+
+def _advance_move_grants_from_context(
+    context: dict[str, JsonValue],
+) -> tuple[AdvanceMoveGrant, ...]:
+    value = context.get("selected_movement_action_grants")
+    if value is None:
+        return ()
+    if not isinstance(value, list):
+        raise GameLifecycleError("selected_movement_action_grants must be a list.")
+    grants: list[AdvanceMoveGrant] = []
+    seen_hook_ids: set[str] = set()
+    for item in value:
+        if not isinstance(item, dict):
+            raise GameLifecycleError("selected_movement_action_grants must contain objects.")
+        grant = AdvanceMoveGrant.from_payload(cast(AdvanceMoveGrantPayload, item))
+        if grant.hook_id in seen_hook_ids:
+            raise GameLifecycleError("selected_movement_action_grants must not contain duplicates.")
+        seen_hook_ids.add(grant.hook_id)
+        grants.append(grant)
+    return tuple(sorted(grants, key=lambda grant: grant.hook_id))
+
+
+def _selected_advance_move_grant_hook_ids_from_context(
+    context: dict[str, JsonValue],
+) -> tuple[str, ...]:
+    value = context.get("selected_movement_action_grant_hook_ids")
+    if value is None:
+        return ()
+    if not isinstance(value, list):
+        raise GameLifecycleError("selected_movement_action_grant_hook_ids must be a list.")
+    hook_ids: list[str] = []
+    for item in value:
+        if type(item) is not str:
+            raise GameLifecycleError("selected_movement_action_grant_hook_ids must be strings.")
+        hook_ids.append(item)
+    return tuple(
+        sorted(
+            _validate_identifier_tuple(
+                "selected_movement_action_grant_hook_ids",
+                tuple(hook_ids),
+            )
+        )
+    )
+
+
+def _apply_advance_move_grants(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    registry: AdvanceMoveHookRegistry,
+    player_id: str,
+    unit_instance_id: str,
+    proposal_request: MovementProposalRequest,
+    proposal_result: DecisionResult,
+) -> tuple[AdvanceMoveGrant, ...]:
+    if type(registry) is not AdvanceMoveHookRegistry:
+        raise GameLifecycleError("Advance grants require an AdvanceMoveHookRegistry.")
+    if type(proposal_request) is not MovementProposalRequest:
+        raise GameLifecycleError("Advance grants require a MovementProposalRequest.")
+    if type(proposal_result) is not DecisionResult:
+        raise GameLifecycleError("Advance grants require a DecisionResult.")
+    grants = _advance_move_grants_from_context(proposal_request.context or {})
+    if not grants:
+        return ()
+    selected_hook_ids = _selected_advance_move_grant_hook_ids_from_context(
+        proposal_request.context or {}
+    )
+    if selected_hook_ids != tuple(grant.hook_id for grant in grants):
+        raise GameLifecycleError("Advance move grant context hook IDs drift.")
+    for grant in grants:
+        _grant_ranged_weapon_keywords(grant)
+    decisions.event_log.append(
+        "advance_move_hooks_resolved",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": unit_instance_id,
+            "proposal_request_id": proposal_request.request_id,
+            "proposal_result_id": proposal_result.result_id,
+            "grants": validate_json_value([grant.to_payload() for grant in grants]),
+            "persisting_effects": [],
+        },
+    )
+    return grants
+
+
+def _grant_ranged_weapon_keywords(grant: AdvanceMoveGrant) -> tuple[WeaponKeyword, ...]:
+    if type(grant) is not AdvanceMoveGrant:
+        raise GameLifecycleError("Advance grant keyword conversion requires a grant.")
+    keywords: list[WeaponKeyword] = []
+    for raw_keyword in grant.granted_ranged_weapon_keywords:
+        if raw_keyword == WeaponKeyword.ASSAULT.value:
+            keywords.append(WeaponKeyword.ASSAULT)
+            continue
+        raise GameLifecycleError("Advance grant contains unsupported ranged weapon keyword.")
+    return tuple(sorted(keywords, key=lambda keyword: keyword.value))
 
 
 def _aircraft_reserve_transition_reason_for_normal_move(
@@ -6809,6 +7471,7 @@ def _advance_roll_reroll_request(
     advance_roll_request: AdvanceRollRequest,
     action_result: DecisionResult,
     movement_mode: MovementMode,
+    selected_advance_move_grants: tuple[AdvanceMoveGrant, ...],
 ) -> DecisionRequest:
     permission = advance_roll_request.reroll_permission
     if permission is None:
@@ -6832,6 +7495,12 @@ def _advance_roll_reroll_request(
                 "action_selected_option_id": action_result.selected_option_id,
                 "advance_roll_request": validate_json_value(advance_roll_request.to_payload()),
                 "advance_roll_state": validate_json_value(dice_roll_state.to_payload()),
+                "selected_movement_action_grant_hook_ids": [
+                    grant.hook_id for grant in selected_advance_move_grants
+                ],
+                "selected_movement_action_grants": validate_json_value(
+                    [grant.to_payload() for grant in selected_advance_move_grants]
+                ),
             }
         },
     )
@@ -6982,6 +7651,7 @@ def resolve_normal_move(
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
+    movement_bonus_inches: int = 0,
     temporary_movement_keywords: tuple[str, ...] = (),
 ) -> NormalMoveResolution:
     resolved = _resolve_unit_move(
@@ -6994,7 +7664,7 @@ def resolve_normal_move(
         terrain=terrain,
         terrain_features=terrain_features,
         objective_markers=objective_markers,
-        movement_bonus_inches=0,
+        movement_bonus_inches=movement_bonus_inches,
         movement_mode=_movement_mode_for_action(
             action=MovementPhaseActionKind.NORMAL_MOVE,
             movement_mode=movement_mode,
@@ -7032,6 +7702,7 @@ def resolve_advance_move(
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
+    movement_bonus_inches: int = 0,
     temporary_movement_keywords: tuple[str, ...] = (),
 ) -> AdvanceMoveResolution:
     if type(advance_roll) is not AdvanceRollResult:
@@ -7046,7 +7717,7 @@ def resolve_advance_move(
         terrain=terrain,
         terrain_features=terrain_features,
         objective_markers=objective_markers,
-        movement_bonus_inches=advance_roll.value,
+        movement_bonus_inches=advance_roll.value + movement_bonus_inches,
         movement_mode=_movement_mode_for_action(
             action=MovementPhaseActionKind.ADVANCE,
             movement_mode=movement_mode,
@@ -7091,6 +7762,7 @@ def resolve_fall_back_move(
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
+    movement_bonus_inches: int = 0,
     temporary_movement_keywords: tuple[str, ...] = (),
 ) -> FallBackActionResult:
     forced_source_ids = _validate_identifier_tuple(
@@ -7112,7 +7784,7 @@ def resolve_fall_back_move(
         terrain=terrain,
         terrain_features=terrain_features,
         objective_markers=objective_markers,
-        movement_bonus_inches=0,
+        movement_bonus_inches=movement_bonus_inches,
         movement_mode=_movement_mode_for_action(
             action=MovementPhaseActionKind.FALL_BACK,
             movement_mode=movement_mode,
@@ -8522,6 +9194,18 @@ def _temporary_movement_keywords_for_unit(
     unit_instance_id: str,
 ) -> tuple[str, ...]:
     return movement_keywords_granted_by_effects(
+        state.persisting_effects_for_unit(unit_instance_id),
+        owner_player_id=player_id,
+    )
+
+
+def _movement_bonus_inches_for_unit(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+) -> int:
+    return movement_bonus_inches_from_effects(
         state.persisting_effects_for_unit(unit_instance_id),
         owner_player_id=player_id,
     )

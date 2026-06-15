@@ -5,6 +5,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusteringError,
@@ -20,6 +21,9 @@ from warhammer40k_core.engine.attack_sequence import (
 )
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
+from warhammer40k_core.engine.charge_declaration_hooks import (
+    SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
+)
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
     SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
@@ -97,6 +101,7 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.charge import (
     SELECT_CHARGING_UNIT_DECISION_TYPE,
     ChargePhaseHandler,
+    invalid_charge_declaration_grant_status,
     invalid_charge_move_proposal_status,
     invalid_charging_unit_selection_status,
 )
@@ -212,6 +217,7 @@ _MOVEMENT_DECISION_TYPES = frozenset(
     (
         SELECT_MOVEMENT_UNIT_DECISION_TYPE,
         SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+        SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
         SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
         SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
         SELECT_DISEMBARK_UNIT_DECISION_TYPE,
@@ -237,7 +243,12 @@ _SHOOTING_DECISION_TYPES = frozenset(
         DICE_REROLL_DECISION_TYPE,
     )
 )
-_CHARGE_DECISION_TYPES = frozenset((SELECT_CHARGING_UNIT_DECISION_TYPE,))
+_CHARGE_DECISION_TYPES = frozenset(
+    (
+        SELECT_CHARGING_UNIT_DECISION_TYPE,
+        SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
+    )
+)
 _COMMAND_DECISION_TYPES = frozenset(
     (
         TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
@@ -726,6 +737,19 @@ class GameLifecycle:
                 request=pending_request,
                 result=result,
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE
+        ):
+            invalid_status = invalid_charge_declaration_grant_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                charge_declaration_hooks=(self._charge_phase_handler.charge_declaration_hooks),
             )
             if invalid_status is not None:
                 return invalid_status
@@ -1617,10 +1641,20 @@ class GameLifecycle:
             ruleset_descriptor=self._movement_phase_handler.ruleset_descriptor,
             parameterized_proposals=self._movement_phase_handler.parameterized_proposals,
             stratagem_index=runtime_stratagem_index,
+            advance_move_hooks=self._runtime_content_bundle.advance_move_hook_registry,
             fall_back_hooks=self._runtime_content_bundle.fall_back_hook_registry,
             movement_end_surge_hooks=(
                 self._runtime_content_bundle.movement_end_surge_hook_registry
             ),
+        )
+        self._charge_phase_handler = ChargePhaseHandler(
+            ruleset_descriptor=self._charge_phase_handler.ruleset_descriptor,
+            charge_declaration_hooks=self._runtime_content_bundle.charge_declaration_hook_registry,
+        )
+        self._shooting_phase_handler = ShootingPhaseHandler(
+            ruleset_descriptor=self._shooting_phase_handler.ruleset_descriptor,
+            army_catalog=self._shooting_phase_handler.army_catalog,
+            shooting_end_surge_hooks=self._runtime_content_bundle.shooting_end_surge_hook_registry,
         )
         self._fight_phase_handler = FightPhaseHandler(
             ruleset_descriptor=self._fight_phase_handler.ruleset_descriptor,
