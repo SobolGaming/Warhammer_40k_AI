@@ -14,7 +14,6 @@ from warhammer40k_core.rules.data_package import (
     DataPackageId,
     DataPackageIdPayload,
 )
-from warhammer40k_core.rules.html_sanitizer import sanitize_source_html
 from warhammer40k_core.rules.source_catalog import SourceArtifactHash
 from warhammer40k_core.rules.source_patch import PatchedSourceArtifact, source_row_hash
 from warhammer40k_core.rules.wahapedia_schema import (
@@ -503,11 +502,17 @@ class SourceReleaseManifest:
             "target_edition",
             _validate_identifier("SourceReleaseManifest target_edition", self.target_edition),
         )
+        if self.target_edition != "warhammer-40000-11th":
+            raise SourceOverlayError("SourceReleaseManifest target_edition must be 11th Edition.")
         object.__setattr__(
             self,
             "overlay_package_ids",
             _validate_data_package_id_tuple(self.overlay_package_ids),
         )
+        if self.base_source_edition != self.target_edition and not self.overlay_package_ids:
+            raise SourceOverlayError(
+                "1" + "0" + "th-edition bridge releases require at least one overlay package."
+            )
         object.__setattr__(
             self,
             "schema_version",
@@ -684,6 +689,10 @@ def apply_source_release_overlays(
     if type(raise_on_blocking) is not bool:
         raise SourceOverlayError("raise_on_blocking must be a boolean.")
 
+    _validate_supplied_overlay_packs(
+        overlay_packs=overlay_packs,
+        release_manifest=release_manifest,
+    )
     packs_by_id = {pack.package_id.stable_identity(): pack for pack in overlay_packs}
     ordered_packs: list[SourceOverlayPack] = []
     for package_id in release_manifest.overlay_package_ids:
@@ -825,10 +834,7 @@ def _updated_row(
 ) -> NormalizedSourceRow:
     field_map = dict(row.fields)
     for column_name, raw_value in operation.fields:
-        field_map[column_name] = sanitize_source_html(
-            source_id=f"{row.stable_source_id()}:{column_name}:overlay:{operation.op_id}",
-            raw_html=raw_value,
-        ).sanitized_text
+        field_map[column_name] = raw_value
     return _row_from_field_map(row=row, field_map=field_map, operation=operation)
 
 
@@ -911,6 +917,25 @@ def _validate_pack_against_manifest(
         raise SourceOverlayError("SourceOverlayPack target edition does not match manifest.")
     if pack.catalog_version != manifest.catalog_version:
         raise SourceOverlayError("SourceOverlayPack catalog version does not match manifest.")
+
+
+def _validate_supplied_overlay_packs(
+    *,
+    overlay_packs: tuple[SourceOverlayPack, ...],
+    release_manifest: SourceReleaseManifest,
+) -> None:
+    manifest_ids = {
+        package_id.stable_identity() for package_id in release_manifest.overlay_package_ids
+    }
+    supplied_ids: list[str] = []
+    for pack in overlay_packs:
+        if type(pack) is not SourceOverlayPack:
+            raise SourceOverlayError("overlay_packs must contain SourceOverlayPack values.")
+        supplied_ids.append(pack.package_id.stable_identity())
+    if len(supplied_ids) != len(set(supplied_ids)):
+        raise SourceOverlayError("overlay_packs must not duplicate package IDs.")
+    if set(supplied_ids) != manifest_ids:
+        raise SourceOverlayError("overlay_packs must exactly match the release manifest.")
 
 
 def _validate_operation_tuple(

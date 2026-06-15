@@ -20,7 +20,7 @@ Primary references for roadmap coverage:
 - CORE V1 generated Wahapedia data: <https://github.com/SobolGaming/Warhammer40k_AI/tree/dev/wahapedia_data>
 - CORE V2 repository: <https://github.com/SobolGaming/Warhammer_40k_AI>
 
-CORE V2 is now 11th Edition-only. Previous-edition source package names, descriptor IDs, tests, and comments are migration debt, not supported compatibility targets. Do not add edition-diff switches, compatibility shims, or dual-edition behavior unless a future repository policy explicitly reverses this decision.
+CORE V2 is now 11th Edition-only. Edition 10 source package names, descriptor IDs, tests, and comments are migration debt unless they are explicitly part of the Wahapedia bridge into Edition 11, not supported compatibility targets. Do not add edition-diff switches, compatibility shims, or dual-edition behavior unless a future repository policy explicitly reverses this decision.
 
 ## Roadmap status
 
@@ -3852,9 +3852,9 @@ Required tests:
 Phase 17 imports faction content before Wahapedia publishes native 11th Edition
 tables and keeps Wahapedia as the long-lived external data feed after native
 11th Edition tables appear. The active engine remains 11th Edition-only:
-prior-edition Wahapedia rows are treated as upstream bridge source material, not
+Edition 10 Wahapedia rows are treated as upstream bridge source material, not
 as a runtime compatibility mode. Official 11th Edition faction update
-instructions and project-owner previous-edition-to-CORE-11 porting updates are modeled as
+instructions and project-owner Edition 10-to-CORE-11 porting updates are modeled as
 ordered, immutable, source-linked overlay/transition packages over normalized
 bridge source rows. The catalog emitted for play is always an 11th Edition
 catalog generated from the selected edition source release.
@@ -3867,7 +3867,7 @@ detachment and datasheet subphases are tracked in
 
 Status: Complete.
 
-Phase 17A provides the bridge source mirror only. It does not make prior-edition
+Phase 17A provides the bridge source mirror only. It does not make Edition 10
 Wahapedia rows an active runtime catalog. CSV/source inputs are represented by
 `EditionSourceConfig`, `WahapediaSourceSnapshot`, `WahapediaCsvTable`,
 `NormalizedSourceRow`, `SourceHtmlSanitizationReport`, `WahapediaJsonArtifact`,
@@ -3940,7 +3940,7 @@ Invariants:
 - raw HTML is never consumed by runtime engine code;
 - generated JSON includes `raw_text`, `normalized_text`, stable source text IDs,
   and source-row provenance where needed;
-- Previous-edition-to-CORE-11 update packs are immutable source overlays with release-manifest
+- Edition 10-to-CORE-11 update packs are immutable source overlays with release-manifest
   ordering, preimage hashes for row mutations, duplicate field-edit rejection,
   and add/update/supersede semantics;
 - generated JSON is a source mirror only and must not be imported directly by

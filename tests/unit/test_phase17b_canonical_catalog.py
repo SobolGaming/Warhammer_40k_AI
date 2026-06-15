@@ -198,16 +198,16 @@ def test_phase17b_wargear_faction_detachment_enhancement_and_stratagem_records_r
     assert (
         datasheet.wargear_options[0]
         .source_ids[0]
-        .endswith(":Datasheets_wargear:dg-plague-marines:1")
+        .endswith(":Datasheets_wargear:dg-plague-marines:1:1:2")
     )
     assert catalog.wargear[0].wargear_id == "dg-plague-bolter"
-    assert catalog.wargear[0].source_ids[0].endswith(":Datasheets_wargear:dg-plague-marines:1")
+    assert catalog.wargear[0].source_ids[0].endswith(":Datasheets_wargear:dg-plague-marines:1:1:2")
     assert catalog.wargear[0].weapon_profiles[0].profile_id == "dg-plague-bolter:standard"
     assert (
         catalog.wargear[0]
         .weapon_profiles[0]
         .source_ids[0]
-        .endswith(":Datasheets_wargear:dg-plague-marines:1")
+        .endswith(":Datasheets_wargear:dg-plague-marines:1:1:2")
     )
     assert catalog.factions[0].faction_id == "death-guard"
     assert catalog.army_rules[0].rule_id == "nurgles-gift"
@@ -722,9 +722,9 @@ def _source_artifacts(
         _artifact(
             table_name="Datasheets_wargear",
             csv_text=(
-                "datasheet_id,line,name,wargear_id,weapon_profile_id,model_profile_id,range,a,"
-                "skill_characteristic,skill,s,ap,d,weapon_keywords\n"
-                "dg-plague-marines,1,Plague bolter,dg-plague-bolter,"
+                "datasheet_id,line,line_in_wargear,name,wargear_id,weapon_profile_id,"
+                "model_profile_id,range,a,skill_characteristic,skill,s,ap,d,weapon_keywords\n"
+                "dg-plague-marines,1,1,Plague bolter,dg-plague-bolter,"
                 "dg-plague-bolter:standard,dg-plague-marine,"
                 f"{weapon_range},{weapon_attacks},{skill_characteristic},{skill},4,-1,"
                 f"{weapon_damage},"

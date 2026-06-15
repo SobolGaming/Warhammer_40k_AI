@@ -1,0 +1,199 @@
+{
+  "artifacts": [
+    {
+      "artifact_hash": "380e272a2b8d9e29ff89e04d1af2c1424793962578fd898b33c4a09ad487b12e",
+      "artifact_name": "Abilities.json"
+    },
+    {
+      "artifact_hash": "14132f301c76f94816620c112e43873af3e1df0979af43f745df7dfa3689b5c0",
+      "artifact_name": "Datasheets.json"
+    },
+    {
+      "artifact_hash": "293607d87ca2c6d2a2a31a62ecc3d49d263ce5951886f8d925c7f9440dbae27c",
+      "artifact_name": "Datasheets_abilities.json"
+    },
+    {
+      "artifact_hash": "0d9e2ef65cecc3b22444623ffad029410fddf93dcbc49121101a0fc5b8977e32",
+      "artifact_name": "Datasheets_detachment_abilities.json"
+    },
+    {
+      "artifact_hash": "ebfbf50c092888c318569d92e698a56d892e18b65ec08e8708f2b421d9a84b35",
+      "artifact_name": "Datasheets_enhancements.json"
+    },
+    {
+      "artifact_hash": "b37dc970764e6a22369dd9f23a539e368128929457e84ab78a7e544d42f8a4d1",
+      "artifact_name": "Datasheets_keywords.json"
+    },
+    {
+      "artifact_hash": "581c60f74358aed92c927d93b4c1abcac1b7047cca8c3dcef768708b6a761b62",
+      "artifact_name": "Datasheets_leader.json"
+    },
+    {
+      "artifact_hash": "8f36f37ffe46f825a33cc220c0690b457ddb06318797f4ad362b0ccc65785a3e",
+      "artifact_name": "Datasheets_models.json"
+    },
+    {
+      "artifact_hash": "3cd3af1cd8c97cbbc83a9831cfdbe9d493b63f8f78bb27aff3b1f1d0322dc53e",
+      "artifact_name": "Datasheets_models_cost.json"
+    },
+    {
+      "artifact_hash": "85b11104df2e9b1befde254d547980cb12495dc98e9de7300d6114a21b9d67df",
+      "artifact_name": "Datasheets_options.json"
+    },
+    {
+      "artifact_hash": "07ff859b4441baed3d62ee56ca1a5fb8ac2ff0edda93cec330402849d2923512",
+      "artifact_name": "Datasheets_stratagems.json"
+    },
+    {
+      "artifact_hash": "b57d6ff9e99259c9161b3459c71c3913adab7a54e44e1edcc832748cdf4a42b4",
+      "artifact_name": "Datasheets_unit_composition.json"
+    },
+    {
+      "artifact_hash": "4e6f4fc111e4abdf9089da7575f2aa8cfda25ce2387049a307367d25c7263052",
+      "artifact_name": "Datasheets_wargear.json"
+    },
+    {
+      "artifact_hash": "57e27de5c2962a0abc34ea80ac7016cd38ab5ab0069d479cb8fb2a6799f6d745",
+      "artifact_name": "Detachment_abilities.json"
+    },
+    {
+      "artifact_hash": "55f9f8896c79c9c6e362e96da4d0b9cc769d800ea9f9c83a6df967ace0b89a8c",
+      "artifact_name": "Detachments.json"
+    },
+    {
+      "artifact_hash": "85b2959e9e96c9fb5ee0d66048defe6993ff5c7d443025c2c913317df5981afa",
+      "artifact_name": "Enhancements.json"
+    },
+    {
+      "artifact_hash": "1d20b49e7f559fb79af8845ba952ef8736f1380540b2319239c2d776c5eac487",
+      "artifact_name": "Factions.json"
+    },
+    {
+      "artifact_hash": "07e50facbccc5dbaf969387dcf5d6263ccfa433cf642f7eb649697e5b8e5d7b8",
+      "artifact_name": "Last_update.json"
+    },
+    {
+      "artifact_hash": "f41c15a07f980e76c135d0f4388656d660a56d570ff10689c323f32deed4e176",
+      "artifact_name": "Source.json"
+    },
+    {
+      "artifact_hash": "18d0f4f272e84f90563e445b5de2af7ac69673942c61f9445cd3258cda87553e",
+      "artifact_name": "Stratagems.json"
+    }
+  ],
+  "catalog_version": {
+    "source_date": "2026-06-14",
+    "version_id": "wahapedia-10th-edition-2026-06-14"
+  },
+  "package_hash": "13027a43c47ada7400176521a063f572d3ba3fb3afebac2a8c76ea21b97fba3e",
+  "package_id": {
+    "namespace": "wahapedia",
+    "package_name": "source-mirror",
+    "version": "10th-edition-2026-06-14"
+  },
+  "schema_version": "phase17a-source-mirror-v1",
+  "source_edition": "warhammer-40000-10th",
+  "source_files": [
+    {
+      "checksum_sha256": "7bcd46ac51565119ab26f2457aa3806b037db9fd87ee2564ef2b07d998caef1e",
+      "path": "Abilities.csv",
+      "size_bytes": 199490
+    },
+    {
+      "checksum_sha256": "33b23bc06fcfb87bca3b60d2ba811849d0cc826fffdf5553321437d2a143a4d6",
+      "path": "Datasheets.csv",
+      "size_bytes": 896626
+    },
+    {
+      "checksum_sha256": "6328d78850cfea5840071fcafaf98a264c8b3ac9ef1b55752367dbddbdb20a6f",
+      "path": "Datasheets_abilities.csv",
+      "size_bytes": 1007290
+    },
+    {
+      "checksum_sha256": "25dd3082bebd92fa8df5688dc18dc633a546107aa3905f3cf202685e0dddd4bd",
+      "path": "Datasheets_detachment_abilities.csv",
+      "size_bytes": 363282
+    },
+    {
+      "checksum_sha256": "f93e6297402dbf65bf420f475671fa8fab5471ae1f002ba59db863805fcb6717",
+      "path": "Datasheets_enhancements.csv",
+      "size_bytes": 289608
+    },
+    {
+      "checksum_sha256": "3169e6aebbde9e3be3ede491bcc1c3b2af7213de1d44a4ae48b47e0fd2318179",
+      "path": "Datasheets_keywords.csv",
+      "size_bytes": 469748
+    },
+    {
+      "checksum_sha256": "dd0402011cc1506ecbefdac431f8116687afb718e4d5dad309f7337e51c59aab",
+      "path": "Datasheets_leader.csv",
+      "size_bytes": 42223
+    },
+    {
+      "checksum_sha256": "0228c66ef0fcb41c41296a61cd68d638642f8c3d17a77785b79eec1724701eb3",
+      "path": "Datasheets_models.csv",
+      "size_bytes": 110557
+    },
+    {
+      "checksum_sha256": "3dcfdb50b26e2d1a5e7f362fe8cbe04c0502ea8f77b36845a3c769b6fac964d1",
+      "path": "Datasheets_models_cost.csv",
+      "size_bytes": 57410
+    },
+    {
+      "checksum_sha256": "940314465ff7e753d15e0cdb60bda6d4634fb40e6beb6b42a83349e2329f7990",
+      "path": "Datasheets_options.csv",
+      "size_bytes": 384525
+    },
+    {
+      "checksum_sha256": "8a221747a6514cd5a7aea7ce7a81794d0b30d996372fa30e966ca94605b932d5",
+      "path": "Datasheets_stratagems.csv",
+      "size_bytes": 2277806
+    },
+    {
+      "checksum_sha256": "58e75ff8ff632a7ccf19af09652c604f4527efa4e0966f1fa3566f6237ad6bd0",
+      "path": "Datasheets_unit_composition.csv",
+      "size_bytes": 88382
+    },
+    {
+      "checksum_sha256": "0a122a4c2bda9747d561d87b2bed58292de8d5190b89c57f8c6becc00736f586",
+      "path": "Datasheets_wargear.csv",
+      "size_bytes": 654301
+    },
+    {
+      "checksum_sha256": "a130a79c41d69b2fc25826f3155b81dcb4070739c818df9a0efa9eb56584c506",
+      "path": "Detachment_abilities.csv",
+      "size_bytes": 299211
+    },
+    {
+      "checksum_sha256": "2920d57d4a80c66b74098ca66eee276c628e32c93c641690753923f047c8e8ea",
+      "path": "Detachments.csv",
+      "size_bytes": 143719
+    },
+    {
+      "checksum_sha256": "b08fafdbd11bff3a37762f1a0938b670de3c60b3698a7ac1cc600940f9c2efe5",
+      "path": "Enhancements.csv",
+      "size_bytes": 437366
+    },
+    {
+      "checksum_sha256": "562f3f83aa09ed5bdfd160a79d0b734c6073818770c1d8807bcfd8fba1a3b9ef",
+      "path": "Factions.csv",
+      "size_bytes": 1955
+    },
+    {
+      "checksum_sha256": "d1c928b45e5d706971974c1f631a912449bcf3acc5848c6e67e53b4a9e08adc6",
+      "path": "Last_update.csv",
+      "size_bytes": 39
+    },
+    {
+      "checksum_sha256": "f1be0d383554894aeb2fc25aacfb47fbfdedaa14bf392265c284ed0b0b0ad4ec",
+      "path": "Source.csv",
+      "size_bytes": 9388
+    },
+    {
+      "checksum_sha256": "493599d1f979b27b4d174bfe5fde4f1d4a3dafcede926a9f08fea959411436ed",
+      "path": "Stratagems.csv",
+      "size_bytes": 1060678
+    }
+  ],
+  "upstream_identity": "wahapedia-export-specs-2026-06-14"
+}

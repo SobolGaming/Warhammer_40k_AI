@@ -60,9 +60,9 @@ def test_phase17a_csv_normalization_strips_html_and_preserves_structured_text() 
     description = text_fields["description"]
 
     assert row.source_table == "Abilities"
-    assert row.source_row_id == "ability-1"
+    assert row.source_row_id == "ability-1:SM"
     assert row.source_package_id == _package_id()
-    assert row.stable_source_id().endswith(":Abilities:ability-1")
+    assert row.stable_source_id().endswith(":Abilities:ability-1:SM")
     assert name.normalized_text == "Angels' Fury"
     assert description.sanitized_text == (
         "roll d6 + 2 attacks within 12 inches.\n- feel no pain applies.\ndesigner note"
@@ -75,8 +75,8 @@ def test_phase17a_csv_normalization_strips_html_and_preserves_structured_text() 
     assert description.parsed_tokens.keywords[0].keyword == "Feel No Pain"
     assert "li" in description.html_sanitization.converted_tags
     assert description.html_sanitization.embedded_links == ("https://example.invalid/rule",)
-    assert name.source_text_id.endswith(":Abilities:ability-1:name")
-    assert description.source_text_id.endswith(":Abilities:ability-1:description")
+    assert name.source_text_id.endswith(":Abilities:ability-1:SM:name")
+    assert description.source_text_id.endswith(":Abilities:ability-1:SM:description")
 
 
 def test_phase17a_generated_json_is_deterministic_and_round_trips() -> None:
@@ -155,7 +155,7 @@ def test_phase17a_every_normalized_row_has_required_provenance() -> None:
 
     assert row_payload["source_package_id"] == _package_id().to_payload()
     assert row_payload["source_table"] == "Abilities"
-    assert row_payload["source_row_id"] == "ability-1"
+    assert row_payload["source_row_id"] == "ability-1:SM"
     assert row_payload["source_row_number"] == 2
 
 
@@ -163,11 +163,11 @@ def test_phase17a_failure_report_groups_malformed_rows_by_reason() -> None:
     table = WahapediaCsvTable.from_csv_text(
         table_name="Abilities",
         csv_text=(
-            "id,name,description\n"
-            ',Missing ID,"Roll D6."\n'
-            'duplicate,First,"Roll D6."\n'
-            'duplicate,Second,"Roll D3."\n'
-            'empty,Empty," "\n'
+            "id,faction_id,name,description\n"
+            ',SM,Missing ID,"Roll D6."\n'
+            'duplicate,SM,First,"Roll D6."\n'
+            'duplicate,SM,Second,"Roll D3."\n'
+            'empty,SM,Empty," "\n'
         ),
     )
     report = build_wahapedia_artifact_report(
@@ -196,7 +196,7 @@ def test_phase17a_failure_report_groups_malformed_rows_by_reason() -> None:
 def test_phase17a_failure_report_groups_missing_required_columns() -> None:
     table = WahapediaCsvTable.from_csv_text(
         table_name="Abilities",
-        csv_text='id,name\nability-1,"Missing description"\n',
+        csv_text='id,faction_id,name\nability-1,SM,"Missing description"\n',
     )
     report = build_wahapedia_artifact_report(
         source_package_id=_package_id(),
@@ -266,7 +266,7 @@ def test_phase17a_csv_table_payloads_and_shape_failures_are_explicit() -> None:
         WahapediaCsvTable.from_csv_text(table_name="Abilities", csv_text="")
     with pytest.raises(WahapediaSchemaError, match="duplicates"):
         WahapediaCsvTable.from_csv_text(table_name="Abilities", csv_text="id,id\n1,2\n")
-    with pytest.raises(WahapediaSchemaError, match="header width"):
+    with pytest.raises(WahapediaSchemaError, match="unterminated multiline field"):
         WahapediaCsvTable.from_csv_text(table_name="Abilities", csv_text="id,name\n1\n")
     with pytest.raises(WahapediaSchemaError, match="row_number"):
         WahapediaCsvRow(row_number=1, values=(("id", "x"),))
@@ -361,7 +361,9 @@ def test_phase17a_generated_artifact_uses_raw_source_file_checksum(tmp_path: Pat
     input_dir = tmp_path / "input"
     output_dir = tmp_path / "output"
     input_dir.mkdir()
-    raw_csv = b'\xef\xbb\xbfid,name,description\r\nability-1,Angels Fury,"Roll D6."\r\n'
+    raw_csv = (
+        b'\xef\xbb\xbfid,faction_id,name,description\r\nability-1,SM,Angels Fury,"Roll D6."\r\n'
+    )
     (input_dir / "Abilities.csv").write_bytes(raw_csv)
 
     manifest = build_wahapedia_json_artifacts(
@@ -391,7 +393,7 @@ def test_phase17a_tooling_parses_wahapedia_pipe_delimited_csv_with_bom(tmp_path:
     input_dir = tmp_path / "input"
     output_dir = tmp_path / "output"
     input_dir.mkdir()
-    raw_csv = b"\xef\xbb\xbfid|name|description\r\nability-1|Angels Fury|Roll D6.\r\n"
+    raw_csv = b"\xef\xbb\xbfid|faction_id|name|description\r\nability-1|SM|Angels Fury|Roll D6.\r\n"
     (input_dir / "Abilities.csv").write_bytes(raw_csv)
 
     manifest = build_wahapedia_json_artifacts(
@@ -410,6 +412,108 @@ def test_phase17a_tooling_parses_wahapedia_pipe_delimited_csv_with_bom(tmp_path:
 
     assert manifest.source_files[0].checksum_sha256 == hashlib.sha256(raw_csv).hexdigest()
     assert artifact_payload["rows"][0]["fields"]["name"] == "Angels Fury"
+
+
+def test_phase17a_tooling_strips_wahapedia_trailing_empty_export_column(
+    tmp_path: Path,
+) -> None:
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    input_dir.mkdir()
+    raw_csv = b"id|faction_id|name|description|\r\nability-1|SM|Angels Fury|Roll D6.|\r\n"
+    (input_dir / "Abilities.csv").write_bytes(raw_csv)
+
+    build_wahapedia_json_artifacts(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        package_id=_package_id(),
+        catalog_version=_catalog_version(),
+        upstream_identity="wahapedia-export",
+        source_edition="warhammer-40000-11th",
+        csv_delimiter="|",
+    )
+    artifact_payload = cast(
+        WahapediaJsonArtifactPayload,
+        json.loads((output_dir / "Abilities.json").read_bytes()),
+    )
+
+    assert artifact_payload["rows"][0]["fields"] == {
+        "description": "Roll D6.",
+        "faction_id": "SM",
+        "id": "ability-1",
+        "name": "Angels Fury",
+    }
+
+
+def test_phase17a_tooling_repairs_wahapedia_unquoted_multiline_fields() -> None:
+    table = WahapediaCsvTable.from_csv_text(
+        table_name="Stratagems",
+        csv_text=(
+            "faction_id|name|id|type|cp_cost|legend|turn|phase|detachment|detachment_id|"
+            "description|\n"
+            "AdM|THREAT-COGITATION TARGETERS|strat-1|Wargear Stratagem|1|"
+            "Supplementary routines identify targets\n"
+            "rapid elimination.|Your turn|Shooting phase|Eradication Cohort|det-1|"
+            "<b>WHEN:</b> Your Shooting phase.|\n"
+        ),
+        delimiter="|",
+    )
+    artifact = WahapediaJsonArtifact.from_csv_table(
+        source_package_id=_package_id(),
+        table=table,
+    )
+    legend = next(field for field in artifact.rows[0].text_fields if field.column_name == "legend")
+
+    assert artifact.rows[0].source_row_id == "strat-1"
+    assert legend.raw_text == "Supplementary routines identify targets\nrapid elimination."
+
+
+def test_phase17a_abilities_blank_faction_id_uses_global_source_identity() -> None:
+    artifact = _abilities_artifact(
+        'id,faction_id,name,description\nability-core,,Firing Deck,"Roll D6."\n'
+    )
+
+    assert artifact.rows[0].source_row_id == "ability-core:global"
+
+
+def test_phase17a_datasheet_keyword_identity_preserves_model_scope_and_blank_tokens() -> None:
+    table = WahapediaCsvTable.from_csv_text(
+        table_name="Datasheets_keywords",
+        csv_text=(
+            "datasheet_id,keyword,model,is_faction_keyword\n"
+            "ds-1,Fly,MODEL A,false\n"
+            "ds-1,Fly,MODEL B,false\n"
+            "ds-2,,,true\n"
+        ),
+    )
+    artifact = WahapediaJsonArtifact.from_csv_table(
+        source_package_id=_package_id(),
+        table=table,
+    )
+
+    assert [row.source_row_id for row in artifact.rows] == [
+        "ds-1:Fly:MODEL A:false:2",
+        "ds-1:Fly:MODEL B:false:3",
+        "ds-2:blank-keyword:global:true:4",
+    ]
+    assert artifact.rows[2].text_fields == ()
+
+
+def test_phase17a_datasheet_model_blank_name_is_optional_source_text() -> None:
+    table = WahapediaCsvTable.from_csv_text(
+        table_name="Datasheets_models",
+        csv_text=(
+            "datasheet_id,line,name,M,T,Sv,inv_sv,inv_sv_descr,W,Ld,OC,base_size,base_size_descr\n"
+            "ds-1,1,,5,5,2+,-,,6,6+,1,40mm,\n"
+        ),
+    )
+    artifact = WahapediaJsonArtifact.from_csv_table(
+        source_package_id=_package_id(),
+        table=table,
+    )
+
+    assert artifact.rows[0].source_row_id == "ds-1:1"
+    assert "name" not in {field.column_name for field in artifact.rows[0].text_fields}
 
 
 def test_phase17a_wahapedia_index_discovery_extracts_edition_csv_links() -> None:
@@ -436,6 +540,16 @@ def test_phase17a_wahapedia_index_discovery_rejects_wrong_edition_links() -> Non
             ),
             source_config=EditionSourceConfig.wahapedia_previous_edition_bridge(),
         )
+
+
+def test_phase17a_wahapedia_index_discovery_canonicalizes_same_host_http_links() -> None:
+    config = EditionSourceConfig.wahapedia_previous_edition_bridge()
+    sources = discover_wahapedia_sources_from_export_specs(
+        xlsx_bytes=_wahapedia_export_specs_xlsx(url_scheme="http"),
+        source_config=config,
+    )
+
+    assert all(source.url.startswith("https://wahapedia.ru/") for source in sources)
 
 
 def test_phase17a_wahapedia_payloads_reject_drift_and_invalid_links() -> None:
@@ -578,8 +692,8 @@ def _abilities_artifact(csv_text: str) -> WahapediaJsonArtifact:
 
 def _abilities_csv() -> str:
     return (
-        "id,name,description\n"
-        'ability-1,Angels\u2019 Fury,"<p>roll d6 + 2 attacks within 12 inches.</p>'
+        "id,faction_id,name,description\n"
+        'ability-1,SM,Angels\u2019 Fury,"<p>roll d6 + 2 attacks within 12 inches.</p>'
         "<ul><li>feel no pain applies.</li></ul>"
         '<p><a href=""https://example.invalid/rule"">designer note</a></p>"\n'
     )
@@ -589,7 +703,11 @@ def _previous_edition_slug() -> str:
     return "wh40k" + "1" + "0ed"
 
 
-def _wahapedia_export_specs_xlsx(*, csv_base: str | None = None) -> bytes:
+def _wahapedia_export_specs_xlsx(
+    *,
+    csv_base: str | None = None,
+    url_scheme: str = "https",
+) -> bytes:
     if csv_base is None:
         csv_base = f"/{_previous_edition_slug()}/"
     buffer = BytesIO()
@@ -636,8 +754,10 @@ def _wahapedia_export_specs_xlsx(*, csv_base: str | None = None) -> bytes:
             (
                 '<?xml version="1.0" encoding="UTF-8"?>'
                 '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-                f'<Relationship Id="rId2" Target="https://wahapedia.ru{csv_base}Datasheets.csv"/>'
-                f'<Relationship Id="rId1" Target="https://wahapedia.ru{csv_base}Abilities.csv"/>'
+                f'<Relationship Id="rId2" Target="{url_scheme}://wahapedia.ru'
+                f'{csv_base}Datasheets.csv"/>'
+                f'<Relationship Id="rId1" Target="{url_scheme}://wahapedia.ru'
+                f'{csv_base}Abilities.csv"/>'
                 "</Relationships>"
             ),
         )

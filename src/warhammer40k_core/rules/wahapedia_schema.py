@@ -44,6 +44,9 @@ class WahapediaSchemaError(ValueError):
     """Raised when Wahapedia source mirror data violates Phase 17A invariants."""
 
 
+_SOURCE_ROW_NUMBER_ID_COLUMN = "__source_row_number__"
+
+
 class SourceRowDiagnosticReason(StrEnum):
     DUPLICATE_SOURCE_ROW_ID = "duplicate_source_row_id"
     EMPTY_TABLE = "empty_table"
@@ -131,6 +134,7 @@ class WahapediaTableSchema:
     text_columns: tuple[str, ...]
     required_columns: tuple[str, ...]
     optional_text_columns: tuple[str, ...] = ()
+    source_row_id_empty_tokens: tuple[tuple[str, str], ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -174,8 +178,15 @@ class WahapediaTableSchema:
                 allow_empty=False,
             ),
         )
+        object.__setattr__(
+            self,
+            "source_row_id_empty_tokens",
+            _validate_source_row_id_empty_tokens(self.source_row_id_empty_tokens),
+        )
         required = set(self.required_columns)
         for column_name in (*self.source_row_id_columns, *self.text_columns):
+            if column_name == _SOURCE_ROW_NUMBER_ID_COLUMN:
+                continue
             if column_name not in required:
                 raise WahapediaSchemaError(
                     "WahapediaTableSchema required_columns must include ID and text columns."
@@ -196,10 +207,17 @@ class WahapediaTableSchema:
 
     def source_row_id(self, row: WahapediaCsvRow) -> str:
         parts: list[str] = []
+        empty_tokens = dict(self.source_row_id_empty_tokens)
         for column_name in self.source_row_id_columns:
+            if column_name == _SOURCE_ROW_NUMBER_ID_COLUMN:
+                parts.append(str(row.row_number))
+                continue
             value = row.value_by_column(column_name).strip()
             if not value:
-                raise WahapediaSchemaError("source row ID column must not be empty.")
+                replacement = empty_tokens.get(column_name)
+                if replacement is None:
+                    raise WahapediaSchemaError("source row ID column must not be empty.")
+                value = replacement
             parts.append(value)
         return ":".join(parts)
 
@@ -304,6 +322,8 @@ class WahapediaCsvTable:
         rows = tuple(csv.reader(io.StringIO(csv_text), delimiter=csv_delimiter))
         if not rows:
             raise WahapediaSchemaError("CSV input must include a header.")
+        rows = _with_repaired_unquoted_newline_rows(rows)
+        rows = _without_trailing_empty_export_column(rows)
         columns = tuple(cell.strip() for cell in rows[0])
         _validate_identifier_tuple("CSV header", columns, allow_empty=False)
         csv_rows: list[WahapediaCsvRow] = []
@@ -1093,6 +1113,84 @@ def _validate_identifier_tuple(
     return tuple(validated)
 
 
+def _validate_source_row_id_empty_tokens(
+    values: tuple[tuple[str, str], ...],
+) -> tuple[tuple[str, str], ...]:
+    if type(values) is not tuple:
+        raise WahapediaSchemaError(
+            "WahapediaTableSchema source_row_id_empty_tokens must be a tuple."
+        )
+    seen: set[str] = set()
+    validated: list[tuple[str, str]] = []
+    for column_name, token in values:
+        column = _validate_identifier("source_row_id_empty_tokens column", column_name)
+        replacement = _validate_identifier("source_row_id_empty_tokens token", token)
+        if column in seen:
+            raise WahapediaSchemaError(
+                "WahapediaTableSchema source_row_id_empty_tokens must not duplicate columns."
+            )
+        seen.add(column)
+        validated.append((column, replacement))
+    return tuple(validated)
+
+
+def _with_repaired_unquoted_newline_rows(
+    rows: tuple[list[str], ...],
+) -> tuple[list[str], ...]:
+    header_width = len(rows[0])
+    repaired: list[list[str]] = [rows[0]]
+    index = 1
+    while index < len(rows):
+        row = rows[index]
+        physical_row_number = index + 1
+        index += 1
+        if len(row) >= header_width:
+            repaired.append(row)
+            continue
+        current = row
+        while len(current) < header_width:
+            if index >= len(rows):
+                raise WahapediaSchemaError(
+                    f"CSV row {physical_row_number} has an unterminated multiline field."
+                )
+            continuation = rows[index]
+            index += 1
+            if not current or not continuation:
+                raise WahapediaSchemaError(
+                    f"CSV row {physical_row_number} has an invalid multiline field."
+                )
+            current = [
+                *current[:-1],
+                f"{current[-1]}\n{continuation[0]}",
+                *continuation[1:],
+            ]
+            if len(current) > header_width:
+                raise WahapediaSchemaError(
+                    f"CSV row {physical_row_number} multiline field exceeds header width."
+                )
+        repaired.append(current)
+    return tuple(repaired)
+
+
+def _without_trailing_empty_export_column(
+    rows: tuple[list[str], ...],
+) -> tuple[list[str], ...]:
+    header = rows[0]
+    if not header or header[-1].strip():
+        return rows
+    normalized: list[list[str]] = []
+    expected_width = len(header)
+    for index, row in enumerate(rows, start=1):
+        if len(row) != expected_width:
+            raise WahapediaSchemaError(
+                f"CSV row {index} does not match trailing-delimiter export width."
+            )
+        if row[-1].strip():
+            raise WahapediaSchemaError(f"CSV row {index} trailing export column must be empty.")
+        normalized.append(row[:-1])
+    return tuple(normalized)
+
+
 def _validate_field_tuple(values: tuple[tuple[str, str], ...]) -> tuple[tuple[str, str], ...]:
     if type(values) is not tuple:
         raise WahapediaSchemaError("NormalizedSourceRow fields must be a tuple.")
@@ -1210,10 +1308,11 @@ def _sha256_payload(payload: object) -> str:
 WAHAPEDIA_TABLE_SCHEMAS = (
     WahapediaTableSchema(
         table_name="Abilities",
-        source_row_id_columns=("id",),
+        source_row_id_columns=("id", "faction_id"),
         text_columns=("name", "description"),
-        required_columns=("id", "name", "description"),
+        required_columns=("id", "faction_id", "name", "description"),
         optional_text_columns=("legend",),
+        source_row_id_empty_tokens=(("faction_id", "global"),),
     ),
     WahapediaTableSchema(
         table_name="Datasheets",
@@ -1250,23 +1349,33 @@ WAHAPEDIA_TABLE_SCHEMAS = (
     ),
     WahapediaTableSchema(
         table_name="Datasheets_keywords",
-        source_row_id_columns=("datasheet_id", "keyword", "is_faction_keyword"),
-        text_columns=("keyword",),
-        required_columns=("datasheet_id", "keyword", "is_faction_keyword"),
-        optional_text_columns=("model",),
+        source_row_id_columns=(
+            "datasheet_id",
+            "keyword",
+            "model",
+            "is_faction_keyword",
+            _SOURCE_ROW_NUMBER_ID_COLUMN,
+        ),
+        text_columns=(),
+        required_columns=("datasheet_id", "keyword", "model", "is_faction_keyword"),
+        optional_text_columns=("keyword", "model"),
+        source_row_id_empty_tokens=(
+            ("keyword", "blank-keyword"),
+            ("model", "global"),
+        ),
     ),
     WahapediaTableSchema(
         table_name="Datasheets_leader",
-        source_row_id_columns=("leader_id", "attached_id"),
+        source_row_id_columns=("leader_id", "attached_id", _SOURCE_ROW_NUMBER_ID_COLUMN),
         text_columns=(),
         required_columns=("leader_id", "attached_id"),
     ),
     WahapediaTableSchema(
         table_name="Datasheets_models",
         source_row_id_columns=("datasheet_id", "line"),
-        text_columns=("name",),
-        required_columns=("datasheet_id", "line", "name"),
-        optional_text_columns=("inv_sv_descr", "base_size_descr"),
+        text_columns=(),
+        required_columns=("datasheet_id", "line"),
+        optional_text_columns=("name", "inv_sv_descr", "base_size_descr"),
     ),
     WahapediaTableSchema(
         table_name="Datasheets_models_cost",
@@ -1295,10 +1404,16 @@ WAHAPEDIA_TABLE_SCHEMAS = (
     ),
     WahapediaTableSchema(
         table_name="Datasheets_wargear",
-        source_row_id_columns=("datasheet_id", "line"),
-        text_columns=("name",),
-        required_columns=("datasheet_id", "line", "name"),
-        optional_text_columns=("description",),
+        source_row_id_columns=(
+            "datasheet_id",
+            "line",
+            "line_in_wargear",
+            _SOURCE_ROW_NUMBER_ID_COLUMN,
+        ),
+        text_columns=(),
+        required_columns=("datasheet_id", "line", "line_in_wargear"),
+        optional_text_columns=("name", "description"),
+        source_row_id_empty_tokens=(("line", "blank-line"),),
     ),
     WahapediaTableSchema(
         table_name="Detachment_abilities",

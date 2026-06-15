@@ -154,16 +154,16 @@ def _patched_death_guard_source_artifacts() -> tuple[PatchedSourceArtifact, ...]
     wargear = _artifact(
         table_name="Datasheets_wargear",
         csv_text=(
-            "datasheet_id,line,name,wargear_id,weapon_profile_id,model_profile_id,range,a,"
-            "skill_characteristic,skill,s,ap,d,weapon_keywords\n"
-            "dg-plague-marines,1,Plague bolter,dg-plague-bolter,"
+            "datasheet_id,line,line_in_wargear,name,wargear_id,weapon_profile_id,"
+            "model_profile_id,range,a,skill_characteristic,skill,s,ap,d,weapon_keywords\n"
+            "dg-plague-marines,1,1,Plague bolter,dg-plague-bolter,"
             "dg-plague-bolter:standard,dg-plague-marine,24,2,ballistic_skill,3+,4,-1,1,"
             '"Lethal Hits"\n'
         ),
     )
     patch_package = _death_guard_c0_patch_package(
         datasheet_row=_row_by_id(datasheets, "dg-plague-marines"),
-        wargear_row=_row_by_id(wargear, "dg-plague-marines:1"),
+        wargear_row=_row_by_id(wargear, "dg-plague-marines:1:1:2"),
     )
 
     return tuple(

@@ -145,9 +145,9 @@ def test_phase17a1_keyword_add_updates_declared_targets_and_rejects_missing_targ
 
 def test_phase17a1_weapon_characteristic_replacement_is_exact_and_source_linked() -> None:
     artifact = _wargear_artifact(
-        "datasheet_id,line,name,strength,range\n"
-        "dg-pm,1,Plague bolter,4,24\n"
-        "dg-pm,2,Plague knife,3,Melee\n"
+        "datasheet_id,line,line_in_wargear,name,strength,range\n"
+        "dg-pm,1,1,Plague bolter,4,24\n"
+        "dg-pm,2,1,Plague knife,3,Melee\n"
     )
     package = _patch_package(
         operations=(
@@ -157,7 +157,7 @@ def test_phase17a1_weapon_characteristic_replacement_is_exact_and_source_linked(
                 family=SourceTransitionPatchOperationFamily.REPLACE_WEAPON_CHARACTERISTIC,
                 target=SourcePatchTarget.from_rows(
                     source_table="Datasheets_wargear",
-                    rows=(_row_by_id(artifact, "dg-pm:1"),),
+                    rows=(_row_by_id(artifact, "dg-pm:1:1:2"),),
                 ),
                 instruction_text="Change Plague bolter Strength to 5.",
                 payload=(("column_name", "strength"), ("value", "5")),
@@ -167,8 +167,8 @@ def test_phase17a1_weapon_characteristic_replacement_is_exact_and_source_linked(
 
     patched = apply_transition_patch_package(artifact=artifact, patch_package=package)
 
-    assert _patched_row_by_id(patched, "dg-pm:1").runtime_fields_payload()["strength"] == "5"
-    assert _patched_row_by_id(patched, "dg-pm:2").runtime_fields_payload()["strength"] == "3"
+    assert _patched_row_by_id(patched, "dg-pm:1:1:2").runtime_fields_payload()["strength"] == "5"
+    assert _patched_row_by_id(patched, "dg-pm:2:1:3").runtime_fields_payload()["strength"] == "3"
     assert patched.source_artifact_hash == artifact.artifact_hash()
     assert patched.patch_package_hash == package.package_hash()
 
@@ -218,7 +218,7 @@ def test_phase17a1_profile_characteristic_replacement_is_not_weapon_specific() -
 
 def test_phase17a1_rule_text_patch_operations_rerun_normalization_and_strip_html() -> None:
     artifact = _abilities_artifact(
-        'id,name,description\ndg-aura,Nurgle Gift,"<p>roll d3 attacks.</p>"\n'
+        'id,faction_id,name,description\ndg-aura,DG,Nurgle Gift,"<p>roll d3 attacks.</p>"\n'
     )
     package = _patch_package(
         operations=(
@@ -228,7 +228,7 @@ def test_phase17a1_rule_text_patch_operations_rerun_normalization_and_strip_html
                 family=SourceTransitionPatchOperationFamily.REPLACE_DATASHEET_ABILITY,
                 target=SourcePatchTarget.from_rows(
                     source_table="Abilities",
-                    rows=(_row_by_id(artifact, "dg-aura"),),
+                    rows=(_row_by_id(artifact, "dg-aura:DG"),),
                 ),
                 instruction_text="Replace the ability text with the official update.",
                 payload=(
@@ -245,7 +245,7 @@ def test_phase17a1_rule_text_patch_operations_rerun_normalization_and_strip_html
                 family=SourceTransitionPatchOperationFamily.APPEND_RULE_TEXT,
                 target=SourcePatchTarget.from_rows(
                     source_table="Abilities",
-                    rows=(_row_by_id(artifact, "dg-aura"),),
+                    rows=(_row_by_id(artifact, "dg-aura:DG"),),
                 ),
                 instruction_text="Append the designer note.",
                 payload=(("column_name", "description"), ("text", "<p>Add 1 to the roll.</p>")),
@@ -254,7 +254,7 @@ def test_phase17a1_rule_text_patch_operations_rerun_normalization_and_strip_html
     )
 
     patched = apply_transition_patch_package(artifact=artifact, patch_package=package)
-    row = _patched_row_by_id(patched, "dg-aura")
+    row = _patched_row_by_id(patched, "dg-aura:DG")
     description = _text_field(row, "description")
 
     assert row.runtime_fields_payload()["description"] == (
@@ -271,8 +271,12 @@ def test_phase17a1_rule_text_patch_operations_rerun_normalization_and_strip_html
 
 
 def test_phase17a1_artifact_hash_changes_on_source_or_patch_drift() -> None:
-    artifact = _abilities_artifact('id,name,description\ndg-aura,Nurgle Gift,"Roll D6."\n')
-    drifted_artifact = _abilities_artifact('id,name,description\ndg-aura,Nurgle Gift,"Roll D3."\n')
+    artifact = _abilities_artifact(
+        'id,faction_id,name,description\ndg-aura,DG,Nurgle Gift,"Roll D6."\n'
+    )
+    drifted_artifact = _abilities_artifact(
+        'id,faction_id,name,description\ndg-aura,DG,Nurgle Gift,"Roll D3."\n'
+    )
     package = _text_replace_package(artifact=artifact, text="Roll D6 within 12 inches.")
     patch_drift_package = _text_replace_package(
         artifact=artifact,
@@ -297,9 +301,9 @@ def test_phase17a1_artifact_hash_changes_on_source_or_patch_drift() -> None:
 
 def test_phase17a1_target_diagnostics_cover_unresolved_ambiguous_stale_and_malformed() -> None:
     artifact = _abilities_artifact(
-        'id,name,description\na-1,Shared,"Roll D6."\na-2,Shared,"Roll D3."\n'
+        'id,faction_id,name,description\na-1,DG,Shared,"Roll D6."\na-2,DG,Shared,"Roll D3."\n'
     )
-    row = _row_by_id(artifact, "a-1")
+    row = _row_by_id(artifact, "a-1:DG")
     wrong_hash = hashlib.sha256(b"wrong").hexdigest()
     package = _patch_package(
         operations=(
@@ -367,10 +371,12 @@ def test_phase17a1_target_diagnostics_cover_unresolved_ambiguous_stale_and_malfo
 
 
 def test_phase17a1_faq_classification_rejects_executable_advisory_records() -> None:
-    artifact = _abilities_artifact('id,name,description\nfaq-row,FAQ Anchor,"Roll D6."\n')
+    artifact = _abilities_artifact(
+        'id,faction_id,name,description\nfaq-row,DG,FAQ Anchor,"Roll D6."\n'
+    )
     target = SourcePatchTarget.from_rows(
         source_table="Abilities",
-        rows=(_row_by_id(artifact, "faq-row"),),
+        rows=(_row_by_id(artifact, "faq-row:DG"),),
     )
 
     with pytest.raises(SourcePatchError, match="advisory-only"):
@@ -423,7 +429,9 @@ def test_phase17a1_faq_classification_rejects_executable_advisory_records() -> N
 
 
 def test_phase17a1_packages_and_patched_artifacts_round_trip_and_reject_hash_drift() -> None:
-    artifact = _abilities_artifact('id,name,description\ndg-aura,Nurgle Gift,"Roll D6."\n')
+    artifact = _abilities_artifact(
+        'id,faction_id,name,description\ndg-aura,DG,Nurgle Gift,"Roll D6."\n'
+    )
     package = _text_replace_package(artifact=artifact, text="Roll D6 within 12 inches.")
     patched = apply_transition_patch_package(artifact=artifact, patch_package=package)
     package_payload = cast(
@@ -452,7 +460,9 @@ def test_phase17a1_packages_and_patched_artifacts_round_trip_and_reject_hash_dri
 
 
 def test_phase17a1_tools_write_canonical_package_and_patched_artifacts(tmp_path: Path) -> None:
-    artifact = _abilities_artifact('id,name,description\ndg-aura,Nurgle Gift,"Roll D6."\n')
+    artifact = _abilities_artifact(
+        'id,faction_id,name,description\ndg-aura,DG,Nurgle Gift,"Roll D6."\n'
+    )
     package = _text_replace_package(artifact=artifact, text="Roll D6 within 12 inches.")
     input_dir = tmp_path / "input"
     output_dir = tmp_path / "output"
@@ -480,7 +490,7 @@ def test_phase17a1_tools_write_canonical_package_and_patched_artifacts(tmp_path:
     assert (output_dir / "transition_patch_package.json").exists()
     assert len(patched) == 1
     assert (
-        _patched_row_by_id(patched[0], "dg-aura").runtime_fields_payload()["description"]
+        _patched_row_by_id(patched[0], "dg-aura:DG").runtime_fields_payload()["description"]
         == "Roll D6 within 12 inches."
     )
 
@@ -489,7 +499,7 @@ def test_phase17a1_apply_cli_stages_outputs_until_all_artifacts_succeed(
     tmp_path: Path,
 ) -> None:
     abilities_artifact = _abilities_artifact(
-        'id,name,description\ndg-aura,Nurgle Gift,"Roll D6."\n'
+        'id,faction_id,name,description\ndg-aura,DG,Nurgle Gift,"Roll D6."\n'
     )
     datasheets_source = _datasheets_artifact('id,name,keywords\ndg-pm,Plague Marines,"INFANTRY"\n')
     datasheets_drifted = _datasheets_artifact(
@@ -503,7 +513,7 @@ def test_phase17a1_apply_cli_stages_outputs_until_all_artifacts_succeed(
                 family=SourceTransitionPatchOperationFamily.REPLACE_RULE_TEXT,
                 target=SourcePatchTarget.from_rows(
                     source_table="Abilities",
-                    rows=(_row_by_id(abilities_artifact, "dg-aura"),),
+                    rows=(_row_by_id(abilities_artifact, "dg-aura:DG"),),
                 ),
                 instruction_text="Replace the source rule text.",
                 payload=(("column_name", "description"), ("text", "Roll D6 within 12 inches.")),
@@ -541,7 +551,7 @@ def test_phase17a1_apply_cli_rejects_patch_package_with_missing_target_table(
     tmp_path: Path,
 ) -> None:
     abilities_artifact = _abilities_artifact(
-        'id,name,description\ndg-aura,Nurgle Gift,"Roll D6."\n'
+        'id,faction_id,name,description\ndg-aura,DG,Nurgle Gift,"Roll D6."\n'
     )
     datasheets_artifact = _datasheets_artifact(
         'id,name,keywords\ndg-pm,Plague Marines,"INFANTRY"\n'
@@ -594,7 +604,9 @@ def test_phase17a1_apply_cli_rejects_patch_package_with_missing_target_table(
 
 
 def test_phase17a1_build_tool_accepts_unhashed_draft_patch_packages(tmp_path: Path) -> None:
-    artifact = _abilities_artifact('id,name,description\ndg-aura,Nurgle Gift,"Roll D6."\n')
+    artifact = _abilities_artifact(
+        'id,faction_id,name,description\ndg-aura,DG,Nurgle Gift,"Roll D6."\n'
+    )
     package = _text_replace_package(artifact=artifact, text="Roll D6 within 12 inches.")
     missing_hash_input = tmp_path / "missing_hash_package.json"
     empty_hash_input = tmp_path / "empty_hash_package.json"
@@ -631,8 +643,10 @@ def test_phase17a1_build_tool_accepts_unhashed_draft_patch_packages(tmp_path: Pa
 
 
 def test_phase17a1_patch_type_validation_is_fail_fast() -> None:
-    artifact = _abilities_artifact('id,name,description\ndg-aura,Nurgle Gift,"Roll D6."\n')
-    row = _row_by_id(artifact, "dg-aura")
+    artifact = _abilities_artifact(
+        'id,faction_id,name,description\ndg-aura,DG,Nurgle Gift,"Roll D6."\n'
+    )
+    row = _row_by_id(artifact, "dg-aura:DG")
     target = SourcePatchTarget.from_rows(source_table="Abilities", rows=(row,))
     operation = _operation(
         operation_id="valid",
@@ -647,7 +661,7 @@ def test_phase17a1_patch_type_validation_is_fail_fast() -> None:
     diagnostic = SourcePatchDiagnostic(
         operation_id="diag",
         source_table="Abilities",
-        source_row_id="dg-aura",
+        source_row_id="dg-aura:DG",
         reason=SourcePatchDiagnosticReason.MALFORMED_TARGET,
         message="Bad target.",
     )
@@ -831,7 +845,7 @@ def _text_replace_package(
                 family=SourceTransitionPatchOperationFamily.REPLACE_RULE_TEXT,
                 target=SourcePatchTarget.from_rows(
                     source_table="Abilities",
-                    rows=(_row_by_id(artifact, "dg-aura"),),
+                    rows=(_row_by_id(artifact, "dg-aura:DG"),),
                 ),
                 instruction_text="Replace the source rule text.",
                 payload=(("column_name", "description"), ("text", text)),

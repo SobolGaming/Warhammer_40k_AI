@@ -112,7 +112,9 @@ def discover_wahapedia_sources_from_export_specs(
     discovered: list[WahapediaFetchSource] = []
     seen_paths: set[str] = set()
     for target in csv_targets:
-        url = urllib.parse.urljoin(source_config.export_specs_url, target)
+        url = _canonical_discovered_wahapedia_url(
+            urllib.parse.urljoin(source_config.export_specs_url, target)
+        )
         _validate_wahapedia_source_url(url=url, source_config=source_config)
         parsed = urllib.parse.urlparse(url)
         filename = urllib.parse.unquote(PurePosixPath(parsed.path).name)
@@ -278,6 +280,13 @@ def _validate_wahapedia_source_url(*, url: str, source_config: EditionSourceConf
         raise ValueError("Discovered CSV URL path does not match the requested edition.")
     if PurePosixPath(parsed.path).suffix.casefold() != ".csv":
         raise ValueError("Discovered source URL must reference a CSV file.")
+
+
+def _canonical_discovered_wahapedia_url(url: str) -> str:
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme == "http" and parsed.netloc.casefold() == "wahapedia.ru":
+        return urllib.parse.urlunparse(parsed._replace(scheme="https"))
+    return url
 
 
 def _target_path_inside_output_dir(output_dir: Path, relative_path: str) -> Path:

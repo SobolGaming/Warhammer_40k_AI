@@ -8,6 +8,7 @@ from typing import cast
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,
     OverlaySourceArtifactPayload,
+    SourceOverlayError,
     SourceOverlayPack,
     SourceOverlayPackPayload,
     SourceReleaseManifest,
@@ -34,7 +35,7 @@ def apply_source_overlays(
         source_artifacts=source_artifacts,
         release_manifest=release_manifest,
         overlay_packs=overlay_packs,
-        raise_on_blocking=raise_on_blocking,
+        raise_on_blocking=False,
     )
     if any(artifact.blocking_diagnostics() for artifact in overlay_artifacts):
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -43,6 +44,8 @@ def apply_source_overlays(
             release_manifest=release_manifest,
             artifacts=overlay_artifacts,
         )
+        if raise_on_blocking:
+            raise SourceOverlayError("Source overlay application failed with diagnostics.")
         return overlay_artifacts
 
     output_dir.mkdir(parents=True, exist_ok=True)
