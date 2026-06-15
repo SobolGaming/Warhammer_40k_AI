@@ -70,6 +70,9 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.ranged_weapon_keyword_effects import (
+    weapon_profile_with_ranged_keyword_effects,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_id_for_unit_id,
@@ -3326,10 +3329,12 @@ def _available_weapons_for_unit(
     weapons: list[_AvailableWeapon] = []
     for model in unit.own_models:
         weapons.extend(
-            _available_weapons_for_model(
+            _available_own_weapons_for_model(
+                state=state,
                 model=model,
                 unit=unit,
                 army_catalog=army_catalog,
+                player_id=player_id,
             )
         )
     weapons.extend(
@@ -3508,6 +3513,40 @@ def _available_weapons_for_model(
                         "weapon_profile": profile,
                     }
                 )
+    return tuple(weapons)
+
+
+def _available_own_weapons_for_model(
+    *,
+    state: GameState,
+    model: ModelInstance,
+    unit: UnitInstance,
+    army_catalog: ArmyCatalog,
+    player_id: str | None,
+) -> tuple[_AvailableWeapon, ...]:
+    owner_player_id = (
+        rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id).owner_player_id
+        if player_id is None
+        else player_id
+    )
+    effects = state.persisting_effects_for_unit(unit.unit_instance_id)
+    weapons: list[_AvailableWeapon] = []
+    for weapon in _available_weapons_for_model(
+        model=model,
+        unit=unit,
+        army_catalog=army_catalog,
+    ):
+        weapons.append(
+            {
+                "model_instance_id": weapon["model_instance_id"],
+                "wargear_id": weapon["wargear_id"],
+                "weapon_profile": weapon_profile_with_ranged_keyword_effects(
+                    weapon["weapon_profile"],
+                    effects,
+                    owner_player_id=owner_player_id,
+                ),
+            }
+        )
     return tuple(weapons)
 
 
@@ -3905,7 +3944,12 @@ def _unit_can_select_to_shoot(
     if (
         advanced_state is not None
         and not advanced_state.can_shoot
-        and not _unit_has_assault_ranged_weapon(unit=unit, army_catalog=army_catalog)
+        and not _unit_has_assault_ranged_weapon(
+            state=state,
+            unit=unit,
+            army_catalog=army_catalog,
+            player_id=actor_id,
+        )
     ):
         return False
     fell_back_state = state.fell_back_unit_state_for_unit(
@@ -3929,8 +3973,10 @@ def _rules_unit_can_select_to_shoot(
         rules_unit=rules_unit,
         player_id=actor_id,
     ) and not _rules_unit_has_assault_ranged_weapon(
+        state=state,
         rules_unit=rules_unit,
         army_catalog=army_catalog,
+        player_id=actor_id,
     ):
         return False
     for unit_id in _rules_unit_state_unit_ids(rules_unit):
@@ -4015,12 +4061,20 @@ def _rules_unit_advanced_this_turn(
     )
 
 
-def _unit_has_assault_ranged_weapon(*, unit: UnitInstance, army_catalog: ArmyCatalog) -> bool:
+def _unit_has_assault_ranged_weapon(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    army_catalog: ArmyCatalog,
+    player_id: str,
+) -> bool:
     for model in unit.own_models:
-        for weapon in _available_weapons_for_model(
+        for weapon in _available_own_weapons_for_model(
+            state=state,
             model=model,
             unit=unit,
             army_catalog=army_catalog,
+            player_id=player_id,
         ):
             if has_weapon_keyword(weapon["weapon_profile"], WeaponKeyword.ASSAULT):
                 return True
@@ -4029,11 +4083,18 @@ def _unit_has_assault_ranged_weapon(*, unit: UnitInstance, army_catalog: ArmyCat
 
 def _rules_unit_has_assault_ranged_weapon(
     *,
+    state: GameState,
     rules_unit: RulesUnitView,
     army_catalog: ArmyCatalog,
+    player_id: str,
 ) -> bool:
     return any(
-        _unit_has_assault_ranged_weapon(unit=component.unit, army_catalog=army_catalog)
+        _unit_has_assault_ranged_weapon(
+            state=state,
+            unit=component.unit,
+            army_catalog=army_catalog,
+            player_id=player_id,
+        )
         for component in rules_unit.components
     )
 

@@ -5,6 +5,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusteringError,
@@ -212,6 +213,7 @@ _MOVEMENT_DECISION_TYPES = frozenset(
     (
         SELECT_MOVEMENT_UNIT_DECISION_TYPE,
         SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+        SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
         SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
         SELECT_REINFORCEMENT_UNIT_DECISION_TYPE,
         SELECT_DISEMBARK_UNIT_DECISION_TYPE,
@@ -1617,6 +1619,7 @@ class GameLifecycle:
             ruleset_descriptor=self._movement_phase_handler.ruleset_descriptor,
             parameterized_proposals=self._movement_phase_handler.parameterized_proposals,
             stratagem_index=runtime_stratagem_index,
+            advance_move_hooks=self._runtime_content_bundle.advance_move_hook_registry,
             fall_back_hooks=self._runtime_content_bundle.fall_back_hook_registry,
             movement_end_surge_hooks=(
                 self._runtime_content_bundle.movement_end_surge_hook_registry
