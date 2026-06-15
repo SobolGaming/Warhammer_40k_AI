@@ -11,7 +11,7 @@ from typing import Any, TypedDict
 
 
 class OfficialSourceFetchError(ValueError):
-    """Raised when an official source manifest or download violates local-cache policy."""
+    """Raised when an official source manifest or download violates source policy."""
 
 
 class OfficialSourceManifestEntryPayload(TypedDict, total=False):
@@ -107,10 +107,17 @@ def fetch_official_sources(
     for entry in entries:
         cache_path = _cache_path_for_entry(entry=entry, cache_dir=cache_dir)
         resolved_cache_path = cache_path.resolve()
-        if resolved_cache_path != resolved_cache_dir and resolved_cache_dir not in (
-            resolved_cache_path.parents
-        ):
-            raise OfficialSourceFetchError("Official source cache path must be inside cache-dir.")
+        if entry.local_cache_path is None:
+            if resolved_cache_path != resolved_cache_dir and resolved_cache_dir not in (
+                resolved_cache_path.parents
+            ):
+                raise OfficialSourceFetchError(
+                    "Official source cache path must be inside cache-dir."
+                )
+        elif Path.cwd().resolve() not in resolved_cache_path.parents:
+            raise OfficialSourceFetchError(
+                "Official source manifest path must stay inside the repository."
+            )
 
         data = _download(entry.source_url)
         sha256 = _sha256(data)
@@ -153,7 +160,7 @@ def load_official_source_manifest(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Fetch official GW source PDFs into an ignored local cache and verify hashes."
+        description="Fetch official GW source PDFs into manifest paths and verify hashes."
     )
     parser.add_argument("--manifest", required=True, type=Path)
     parser.add_argument("--cache-dir", required=True, type=Path)

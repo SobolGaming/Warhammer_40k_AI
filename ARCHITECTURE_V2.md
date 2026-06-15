@@ -3880,18 +3880,18 @@ default so checked-in source snapshots keep JSON artifacts and manifests only.
 Runtime engine modules remain
 blocked from importing raw source-normalization or source-mirror modules.
 
-Official GW faction-pack PDFs and extracted whole-source text/page files are
+Official GW faction-pack PDFs are tracked source evidence when declared in
+`data/source_manifests/gw_11e_faction_packs.yaml` and stored under
+`data/raw/faction_packs`. Extracted whole-source text/page files remain
 local-only validation inputs, not repository artifacts. The checked-in
-`docs/source_rules` Core Rules and Event Companion PDFs are explicit source-rule
-exceptions used for source-linked rules and base-size provenance. Do not commit
-`data/raw/faction_packs/*.pdf`, `data/raw/faction_packs/*.txt`,
+`docs/source_rules` Core Rules and Event Companion PDFs are source-rule evidence
+used for source-linked rules and base-size provenance. Do not commit
+`data/raw/faction_packs/*.txt`,
 `data/raw/faction_packs/extracted_pages/*.md`, `data/raw/gw/**/*.pdf`,
-`data/raw/gw/**/*.txt`, or `data/raw/gw/**/extracted_pages/*.md`, and do not
-put them in Git LFS. Phase 17 should commit source manifests, official URLs,
-retrieval metadata, SHA-256 hashes, byte counts, page/section references,
-structured patch operations, diagnostics, and generated catalog artifacts. CI,
-packaging, Docker images, wheels, npm packages, and release artifacts must not
-redistribute the PDFs unless a future explicit policy grants that right.
+`data/raw/gw/**/*.txt`, or `data/raw/gw/**/extracted_pages/*.md`. Phase 17
+should commit source manifests, official URLs, retrieval metadata, SHA-256
+hashes, byte counts, page/section references, structured patch operations,
+diagnostics, generated catalog artifacts, and approved faction-pack PDFs.
 The current faction-pack source manifest uses the official Warhammer 40,000
 downloads page as its shared source page:
 `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/`.

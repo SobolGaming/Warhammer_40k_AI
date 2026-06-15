@@ -209,9 +209,9 @@ tempCodeRunnerFile.py
 # Ruff stuff:
 .ruff_cache/
 
-# Official GW source artifacts are local-only validation inputs.
-# Commit manifests, hashes, page/section references, structured patches, and generated catalogs;
-# do not commit downloaded PDFs, extracted text, or extracted page markdown.
+# Official GW extracted source text/page artifacts are local-only validation inputs.
+# Faction-pack PDFs may be tracked under data/raw/faction_packs when declared in
+# the source manifest; keep ad hoc fetch caches ignored.
 .cache/
 
 # PyPI configuration file
