@@ -26,6 +26,7 @@ from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.fight_activation_abilities import (
+    FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
     FightActivationAbilityContext,
     FightActivationAbilityHookBinding,
     FightActivationAbilityOption,
@@ -73,7 +74,7 @@ VEHICLE = "VEHICLE"
 TITANIC = "TITANIC"
 _BATTLE_FOCUS_TOKENS_BY_BATTLE_SIZE = {BattleSize.STRIKE_FORCE: 4}
 _SWIFT_MOVEMENT_BONUS_INCHES = 2
-_SUDDEN_STRIKE_PROXIMITY_INCHES = 6.0
+_SUDDEN_STRIKE_FIGHT_MOVE_DISTANCE_INCHES = 6.0
 _AGILE_SURGE_DISTANCE_BONUS_INCHES = 1
 
 
@@ -529,13 +530,17 @@ def sudden_strike_fight_activation_option(
         source_id=SOURCE_RULE_ID,
         ability_id=SUDDEN_STRIKE_MANEUVER,
         enhancement_id="aeldari_army_rule",
-        model_proximity_inches=_SUDDEN_STRIKE_PROXIMITY_INCHES,
+        effect_kind=FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
+        pile_in_distance_inches=_SUDDEN_STRIKE_FIGHT_MOVE_DISTANCE_INCHES,
+        consolidate_distance_inches=_SUDDEN_STRIKE_FIGHT_MOVE_DISTANCE_INCHES,
         replay_payload={
             "effect_kind": AGILE_MANOEUVRE_EFFECT_KIND,
             "maneuver": SUDDEN_STRIKE_MANEUVER,
             "unit_instance_id": unit.unit_instance_id,
             "activation_request_id": context.activation.request_id,
             "activation_result_id": context.activation.result_id,
+            "pile_in_distance_inches": _SUDDEN_STRIKE_FIGHT_MOVE_DISTANCE_INCHES,
+            "consolidate_distance_inches": _SUDDEN_STRIKE_FIGHT_MOVE_DISTANCE_INCHES,
         },
         decision_effect_payload={
             "effect_kind": BATTLE_FOCUS_TOKEN_SPENT_EFFECT_KIND,

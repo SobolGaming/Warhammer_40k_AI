@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -18,6 +18,13 @@ DECLINE_FIGHT_ACTIVATION_ABILITY_OPTION_ID = "decline_fight_activation_ability"
 USE_FIGHT_ACTIVATION_ABILITY_SUBMISSION_KIND = "use_fight_activation_ability"
 DECLINE_FIGHT_ACTIVATION_ABILITY_SUBMISSION_KIND = "decline_fight_activation_ability"
 FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND = "fight_activation_melee_targeting_distance"
+FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND = "fight_activation_movement_distance"
+FIGHT_ACTIVATION_ABILITY_EFFECT_KINDS = frozenset(
+    {
+        FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND,
+        FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
+    }
+)
 
 
 class FightActivationAbilityUsePayload(TypedDict):
@@ -32,10 +39,12 @@ class FightActivationAbilityUsePayload(TypedDict):
     unit_instance_id: str
     activation_request_id: str
     activation_result_id: str
-    model_proximity_inches: float
     effect_kind: str
     replay_payload: JsonValue
     decision_effect_payload: JsonValue
+    model_proximity_inches: NotRequired[float]
+    pile_in_distance_inches: NotRequired[float]
+    consolidate_distance_inches: NotRequired[float]
 
 
 class FightActivationAbilityRequestPayload(TypedDict):
@@ -117,7 +126,10 @@ class FightActivationAbilityOption:
     source_id: str
     ability_id: str
     enhancement_id: str
-    model_proximity_inches: float
+    effect_kind: str = FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND
+    model_proximity_inches: float | None = None
+    pile_in_distance_inches: float | None = None
+    consolidate_distance_inches: float | None = None
     replay_payload: JsonValue = None
     decision_effect_payload: JsonValue = None
 
@@ -136,9 +148,40 @@ class FightActivationAbilityOption:
         )
         object.__setattr__(
             self,
-            "model_proximity_inches",
-            _validate_positive_float("model_proximity_inches", self.model_proximity_inches),
+            "effect_kind",
+            _validate_fight_activation_effect_kind(self.effect_kind),
         )
+        if self.effect_kind == FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND:
+            if (
+                self.pile_in_distance_inches is not None
+                or self.consolidate_distance_inches is not None
+            ):
+                raise GameLifecycleError(
+                    "Fight activation melee targeting options must not define movement distances."
+                )
+            object.__setattr__(
+                self,
+                "model_proximity_inches",
+                _validate_positive_float("model_proximity_inches", self.model_proximity_inches),
+            )
+        elif self.effect_kind == FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND:
+            if self.model_proximity_inches is not None:
+                raise GameLifecycleError(
+                    "Fight activation movement distance options must not define model proximity."
+                )
+            object.__setattr__(
+                self,
+                "pile_in_distance_inches",
+                _validate_positive_float("pile_in_distance_inches", self.pile_in_distance_inches),
+            )
+            object.__setattr__(
+                self,
+                "consolidate_distance_inches",
+                _validate_positive_float(
+                    "consolidate_distance_inches",
+                    self.consolidate_distance_inches,
+                ),
+            )
         object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
         object.__setattr__(
             self,
@@ -156,7 +199,7 @@ class FightActivationAbilityOption:
     ) -> FightActivationAbilityUsePayload:
         if type(context) is not FightActivationAbilityContext:
             raise GameLifecycleError("Fight activation ability option payload requires context.")
-        return {
+        payload: dict[str, JsonValue] = {
             "submission_kind": USE_FIGHT_ACTIVATION_ABILITY_SUBMISSION_KIND,
             "hook_id": self.hook_id,
             "source_id": self.source_id,
@@ -168,11 +211,17 @@ class FightActivationAbilityOption:
             "unit_instance_id": context.unit_instance_id,
             "activation_request_id": context.activation.request_id,
             "activation_result_id": context.activation.result_id,
-            "model_proximity_inches": self.model_proximity_inches,
-            "effect_kind": FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND,
+            "effect_kind": self.effect_kind,
             "replay_payload": self.replay_payload,
             "decision_effect_payload": self.decision_effect_payload,
         }
+        if self.model_proximity_inches is not None:
+            payload["model_proximity_inches"] = self.model_proximity_inches
+        if self.pile_in_distance_inches is not None:
+            payload["pile_in_distance_inches"] = self.pile_in_distance_inches
+        if self.consolidate_distance_inches is not None:
+            payload["consolidate_distance_inches"] = self.consolidate_distance_inches
+        return cast(FightActivationAbilityUsePayload, validate_json_value(payload))
 
     def to_decision_option(self, context: FightActivationAbilityContext) -> DecisionOption:
         return DecisionOption(
@@ -252,8 +301,10 @@ class FightActivationAbilityUse:
     unit_instance_id: str
     activation_request_id: str
     activation_result_id: str
-    model_proximity_inches: float
     effect_kind: str
+    model_proximity_inches: float | None
+    pile_in_distance_inches: float | None
+    consolidate_distance_inches: float | None
     replay_payload: JsonValue
     decision_effect_payload: JsonValue
 
@@ -303,16 +354,40 @@ class FightActivationAbilityUse:
         )
         object.__setattr__(
             self,
-            "model_proximity_inches",
-            _validate_positive_float("model_proximity_inches", self.model_proximity_inches),
-        )
-        object.__setattr__(
-            self,
             "effect_kind",
-            _validate_identifier("effect_kind", self.effect_kind),
+            _validate_fight_activation_effect_kind(self.effect_kind),
         )
-        if self.effect_kind != FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND:
-            raise GameLifecycleError("Fight activation ability effect kind drift.")
+        if self.effect_kind == FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND:
+            if (
+                self.pile_in_distance_inches is not None
+                or self.consolidate_distance_inches is not None
+            ):
+                raise GameLifecycleError(
+                    "Fight activation melee targeting use must not define movement distances."
+                )
+            object.__setattr__(
+                self,
+                "model_proximity_inches",
+                _validate_positive_float("model_proximity_inches", self.model_proximity_inches),
+            )
+        elif self.effect_kind == FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND:
+            if self.model_proximity_inches is not None:
+                raise GameLifecycleError(
+                    "Fight activation movement distance use must not define model proximity."
+                )
+            object.__setattr__(
+                self,
+                "pile_in_distance_inches",
+                _validate_positive_float("pile_in_distance_inches", self.pile_in_distance_inches),
+            )
+            object.__setattr__(
+                self,
+                "consolidate_distance_inches",
+                _validate_positive_float(
+                    "consolidate_distance_inches",
+                    self.consolidate_distance_inches,
+                ),
+            )
         object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
         object.__setattr__(
             self,
@@ -329,6 +404,7 @@ class FightActivationAbilityUse:
         result_id: str,
     ) -> Self:
         raw = _json_object("Fight activation ability result payload", payload)
+        effect_kind = _payload_string(raw, key="effect_kind")
         return cls(
             request_id=request_id,
             result_id=result_id,
@@ -341,17 +417,25 @@ class FightActivationAbilityUse:
             unit_instance_id=_payload_string(raw, key="unit_instance_id"),
             activation_request_id=_payload_string(raw, key="activation_request_id"),
             activation_result_id=_payload_string(raw, key="activation_result_id"),
-            model_proximity_inches=_payload_positive_float(
+            effect_kind=effect_kind,
+            model_proximity_inches=_payload_optional_positive_float(
                 raw,
                 key="model_proximity_inches",
             ),
-            effect_kind=_payload_string(raw, key="effect_kind"),
+            pile_in_distance_inches=_payload_optional_positive_float(
+                raw,
+                key="pile_in_distance_inches",
+            ),
+            consolidate_distance_inches=_payload_optional_positive_float(
+                raw,
+                key="consolidate_distance_inches",
+            ),
             replay_payload=raw.get("replay_payload"),
             decision_effect_payload=raw.get("decision_effect_payload"),
         )
 
     def to_payload(self) -> FightActivationAbilityUsePayload:
-        return {
+        payload: dict[str, JsonValue] = {
             "submission_kind": USE_FIGHT_ACTIVATION_ABILITY_SUBMISSION_KIND,
             "hook_id": self.hook_id,
             "source_id": self.source_id,
@@ -363,11 +447,17 @@ class FightActivationAbilityUse:
             "unit_instance_id": self.unit_instance_id,
             "activation_request_id": self.activation_request_id,
             "activation_result_id": self.activation_result_id,
-            "model_proximity_inches": self.model_proximity_inches,
             "effect_kind": self.effect_kind,
             "replay_payload": self.replay_payload,
             "decision_effect_payload": self.decision_effect_payload,
         }
+        if self.model_proximity_inches is not None:
+            payload["model_proximity_inches"] = self.model_proximity_inches
+        if self.pile_in_distance_inches is not None:
+            payload["pile_in_distance_inches"] = self.pile_in_distance_inches
+        if self.consolidate_distance_inches is not None:
+            payload["consolidate_distance_inches"] = self.consolidate_distance_inches
+        return cast(FightActivationAbilityUsePayload, validate_json_value(payload))
 
 
 def build_fight_activation_ability_request(
@@ -513,9 +603,18 @@ def _payload_positive_int(payload: dict[str, JsonValue], *, key: str) -> int:
     return _validate_positive_int(key, value)
 
 
-def _payload_positive_float(payload: dict[str, JsonValue], *, key: str) -> float:
+def _payload_optional_positive_float(payload: dict[str, JsonValue], *, key: str) -> float | None:
     value = payload.get(key)
+    if value is None:
+        return None
     return _validate_positive_float(key, value)
+
+
+def _validate_fight_activation_effect_kind(value: object) -> str:
+    effect_kind = _validate_identifier("effect_kind", value)
+    if effect_kind not in FIGHT_ACTIVATION_ABILITY_EFFECT_KINDS:
+        raise GameLifecycleError("Fight activation ability effect kind is unsupported.")
+    return effect_kind
 
 
 def _validate_identifier_tuple(field_name: str, value: object) -> tuple[str, ...]:

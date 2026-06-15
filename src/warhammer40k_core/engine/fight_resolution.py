@@ -33,6 +33,7 @@ from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND,
+    FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
 )
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
@@ -412,6 +413,7 @@ class FightMovementResolution:
     proposal_kind: ProposalKind
     movement_phase_action: str
     movement_mode: MovementMode
+    maximum_distance_inches: float
     attempted_placement: UnitPlacement
     witness: PathWitness | None
     endpoint_witness: FightMovementEndpointPayload
@@ -431,6 +433,14 @@ class FightMovementResolution:
             self, "movement_phase_action", _fight_movement_action(self.movement_phase_action)
         )
         object.__setattr__(self, "movement_mode", _fight_movement_mode(self.movement_mode))
+        object.__setattr__(
+            self,
+            "maximum_distance_inches",
+            _validate_positive_float(
+                "FightMovementResolution maximum_distance_inches",
+                self.maximum_distance_inches,
+            ),
+        )
         if type(self.attempted_placement) is not UnitPlacement:
             raise GameLifecycleError(
                 "FightMovementResolution attempted_placement must be UnitPlacement."
@@ -492,7 +502,7 @@ class FightMovementResolution:
         return {
             "movement_mode": self.movement_mode.value,
             "movement_phase_action": self.movement_phase_action,
-            "maximum_distance_inches": _maximum_distance_for_proposal_kind(self.proposal_kind),
+            "maximum_distance_inches": self.maximum_distance_inches,
             "endpoint_witness": self.endpoint_witness,
             "path_validation_results": [
                 validate_json_value(result.to_payload()) for result in self.path_validation_results
@@ -965,12 +975,18 @@ def resolve_fight_movement(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     proposal: FightMovementProposal,
+    maximum_distance_inches: float | None = None,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
 ) -> FightMovementResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Fight movement requires a BattlefieldScenario.")
     if type(ruleset_descriptor) is not RulesetDescriptor:
         raise GameLifecycleError("Fight movement requires a RulesetDescriptor.")
+    distance_budget_inches = (
+        _maximum_distance_for_proposal_kind(proposal.proposal_kind)
+        if maximum_distance_inches is None
+        else _validate_positive_float("maximum_distance_inches", maximum_distance_inches)
+    )
     unit_placement = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
     if proposal.is_no_move_choice:
         return FightMovementResolution(
@@ -978,6 +994,7 @@ def resolve_fight_movement(
             proposal_kind=proposal.proposal_kind,
             movement_phase_action=proposal.movement_phase_action,
             movement_mode=proposal.movement_mode,
+            maximum_distance_inches=distance_budget_inches,
             attempted_placement=unit_placement,
             witness=None,
             endpoint_witness=_endpoint_witness(
@@ -1009,7 +1026,7 @@ def resolve_fight_movement(
         witness=witness,
         movement_mode=proposal.movement_mode,
         displacement_kind=_displacement_kind_for_proposal(proposal),
-        distance_budget_inches=_maximum_distance_for_proposal_kind(proposal.proposal_kind),
+        distance_budget_inches=distance_budget_inches,
         terrain_features=terrain_features,
     )
     _, coherency_result, rollback_record = resolve_unit_movement_endpoint_coherency(
@@ -1032,6 +1049,7 @@ def resolve_fight_movement(
         proposal_kind=proposal.proposal_kind,
         movement_phase_action=proposal.movement_phase_action,
         movement_mode=proposal.movement_mode,
+        maximum_distance_inches=distance_budget_inches,
         attempted_placement=attempted_placement,
         witness=witness,
         endpoint_witness=endpoint_witness,
@@ -1189,6 +1207,39 @@ def legal_consolidation_modes(
     ):
         return (ConsolidationModeKind.OBJECTIVE,)
     return ()
+
+
+def fight_movement_maximum_distance_inches(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    proposal_kind: ProposalKind,
+) -> float:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    resolved_kind = _fight_movement_proposal_kind(proposal_kind)
+    maximum_distance = _maximum_distance_for_proposal_kind(resolved_kind)
+    for effect in state.persisting_effects:
+        if requested_unit_id not in effect.target_unit_instance_ids:
+            continue
+        payload = effect.effect_payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("effect_kind") != FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND:
+            continue
+        if payload.get("source_id") != effect.source_rule_id:
+            raise GameLifecycleError("Fight activation movement distance source_id drift.")
+        if resolved_kind is ProposalKind.PILE_IN:
+            effect_distance = _validate_positive_float(
+                "pile_in_distance_inches",
+                payload.get("pile_in_distance_inches"),
+            )
+        else:
+            effect_distance = _validate_positive_float(
+                "consolidate_distance_inches",
+                payload.get("consolidate_distance_inches"),
+            )
+        maximum_distance = max(maximum_distance, effect_distance)
+    return maximum_distance
 
 
 def melee_target_unit_ids(

@@ -58,6 +58,7 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_activation_abilities import (
     DECLINE_FIGHT_ACTIVATION_ABILITY_OPTION_ID,
     FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
+    FIGHT_ACTIVATION_ABILITY_EFFECT_KINDS,
     FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND,
     FightActivationAbilityContext,
     FightActivationAbilityHookRegistry,
@@ -101,6 +102,7 @@ from warhammer40k_core.engine.fight_resolution import (
     available_melee_weapons_payloads,
     build_fight_movement_request,
     build_melee_declaration_request,
+    fight_movement_maximum_distance_inches,
     fight_movement_proposal_from_payload,
     fight_movement_proposal_payload_parse_failure,
     fight_movement_resolution_violation,
@@ -679,7 +681,7 @@ def _fight_activation_ability_window_resolved(
         effect_payload = effect.effect_payload
         if not isinstance(effect_payload, dict):
             continue
-        if effect_payload.get("effect_kind") != FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND:
+        if effect_payload.get("effect_kind") not in FIGHT_ACTIVATION_ABILITY_EFFECT_KINDS:
             continue
         if effect_payload.get("activation_result_id") == activation.result_id:
             return True
@@ -1162,6 +1164,11 @@ def _apply_fight_movement_proposal(
         scenario=scenario,
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
         proposal=proposal,
+        maximum_distance_inches=fight_movement_maximum_distance_inches(
+            state=state,
+            unit_instance_id=proposal.unit_instance_id,
+            proposal_kind=proposal.proposal_kind,
+        ),
         terrain_features=_terrain_features_for_state(state),
     )
     resolution_violation = fight_movement_resolution_violation(
@@ -1437,9 +1444,15 @@ def _fight_movement_request_context(
 ) -> dict[str, JsonValue]:
     scenario = _battlefield_scenario(state)
     if movement_state.step is FightPhaseStepKind.PILE_IN:
+        maximum_distance_inches = fight_movement_maximum_distance_inches(
+            state=state,
+            unit_instance_id=unit_instance_id,
+            proposal_kind=ProposalKind.PILE_IN,
+        )
         return {
             "fight_movement_step": movement_state.step.value,
             "movement_mode": "pile_in",
+            "maximum_distance_inches": maximum_distance_inches,
             "eligible_unit_ids": list(
                 _eligible_fight_movement_unit_ids(
                     state=state,
@@ -1458,9 +1471,15 @@ def _fight_movement_request_context(
             ),
         }
     objective_markers = _objective_markers_for_state(state)
+    maximum_distance_inches = fight_movement_maximum_distance_inches(
+        state=state,
+        unit_instance_id=unit_instance_id,
+        proposal_kind=ProposalKind.CONSOLIDATE,
+    )
     return {
         "fight_movement_step": movement_state.step.value,
         "movement_mode": "consolidate",
+        "maximum_distance_inches": maximum_distance_inches,
         "eligible_unit_ids": list(
             _eligible_fight_movement_unit_ids(
                 state=state,
@@ -1796,6 +1815,14 @@ def _invalid_if_current_option_payload_drifted(
 def _is_overrun_movement_request(proposal_request: MovementProposalRequest) -> bool:
     context = proposal_request.context or {}
     return context.get("fight_movement_timing") == "overrun"
+
+
+def _fight_activation_effect_id_suffix(effect_kind: str) -> str:
+    if effect_kind == FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND:
+        return "melee-targeting"
+    if effect_kind in FIGHT_ACTIVATION_ABILITY_EFFECT_KINDS:
+        return effect_kind.replace("_", "-")
+    raise GameLifecycleError("Unsupported fight activation effect kind.")
 
 
 def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
@@ -2463,7 +2490,10 @@ def _apply_fight_activation_ability_decision(
         validate_json_value(cast(JsonValue, ability_use.to_payload())),
     )
     effect = PersistingEffect(
-        effect_id=f"{ability_use.result_id}:{ability_use.ability_id}:melee-targeting",
+        effect_id=(
+            f"{ability_use.result_id}:{ability_use.ability_id}:"
+            f"{_fight_activation_effect_id_suffix(ability_use.effect_kind)}"
+        ),
         source_rule_id=ability_use.source_id,
         owner_player_id=ability_use.player_id,
         target_unit_instance_ids=(ability_use.unit_instance_id,),
@@ -2476,7 +2506,7 @@ def _apply_fight_activation_ability_decision(
         ),
         effect_payload={
             **ability_use_payload,
-            "effect_kind": FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND,
+            "effect_kind": ability_use.effect_kind,
         },
     )
     state.record_persisting_effect(effect)

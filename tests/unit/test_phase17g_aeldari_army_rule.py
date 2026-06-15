@@ -13,13 +13,16 @@ from tests.movement_submission_helpers import (
     submit_movement_proposal,
 )
 
+from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import (
+    ConsolidationModeKind,
     FightEligibilityKind,
     FightOrderingBandKind,
+    FightPhaseStepKind,
     FightTypeKind,
     MovementMode,
     RulesetDescriptor,
@@ -45,8 +48,22 @@ from warhammer40k_core.engine.effects import EffectExpirationKind, PersistingEff
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import army_rule
-from warhammer40k_core.engine.fight_activation_abilities import FightActivationAbilityContext
-from warhammer40k_core.engine.fight_order import FightActivationSelection
+from warhammer40k_core.engine.fight_activation_abilities import (
+    FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
+    FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
+    FightActivationAbilityContext,
+)
+from warhammer40k_core.engine.fight_order import (
+    FIGHT_ACTIVATION_DECISION_TYPE,
+    FightActivationSelection,
+    FightMovementStepState,
+    fight_activation_option_id,
+)
+from warhammer40k_core.engine.fight_resolution import (
+    CONSOLIDATE_ACTION,
+    FightMovementProposal,
+    fight_movement_maximum_distance_inches,
+)
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -56,7 +73,11 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.movement_end_surge_hooks import MovementEndSurgeContext
-from warhammer40k_core.engine.movement_proposals import MOVEMENT_PROPOSAL_DECISION_TYPE
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+    ProposalKind,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     LifecycleStatus,
@@ -86,6 +107,7 @@ from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27
 _AELDARI_UNIT_ID = "army-alpha:aeldari-vehicle"
 _AELDARI_UNIT_SELECTION_ID = "aeldari-vehicle"
 _AELDARI_DATASHEET_ID = "phase17g-aeldari-star-engine-vehicle"
+_AELDARI_FIGHT_DATASHEET_ID = "phase17g-aeldari-sudden-strike-fighter"
 _AELDARI_DETACHMENT_ID = "warhost"
 _ENEMY_UNIT_SELECTION_ID = "enemy-unit"
 _ENEMY_UNIT_ID = f"army-beta:{_ENEMY_UNIT_SELECTION_ID}"
@@ -529,10 +551,157 @@ def test_aeldari_sudden_strike_fight_option_extends_pile_in_and_consolidation() 
     assert option is not None
     assert option.hook_id == army_rule.SUDDEN_STRIKE_HOOK_ID
     assert option.ability_id == army_rule.SUDDEN_STRIKE_MANEUVER
-    assert option.model_proximity_inches == 6.0
+    assert option.effect_kind == FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND
+    assert option.model_proximity_inches is None
+    assert option.pile_in_distance_inches == 6.0
+    assert option.consolidate_distance_inches == 6.0
     spend_payload = cast(dict[str, JsonValue], option.decision_effect_payload)
     assert spend_payload["maneuver"] == army_rule.SUDDEN_STRIKE_MANEUVER
     assert spend_payload["battle_focus_token_cost"] == 1
+
+
+def test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect() -> None:
+    lifecycle, _movement_status = _advance_to_movement_unit_selection(
+        _aeldari_config(
+            aeldari_datasheet_id=_AELDARI_FIGHT_DATASHEET_ID,
+            aeldari_model_profile_id="core-character-leader",
+        )
+    )
+    state = _state(lifecycle)
+    _place_unit_poses(
+        state,
+        unit_instance_id=_AELDARI_UNIT_ID,
+        poses=(Pose.at(10.0, 20.0, 0.0),),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=_ENEMY_UNIT_ID,
+        poses=_unit_line_poses(x=12.15, y=20.0),
+    )
+    _advance_lifecycle_state_to_phase(lifecycle, BattlePhase.FIGHT)
+    lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
+    state = _state(lifecycle)
+    bundle = _runtime_content_bundle(lifecycle)
+    summary = bundle.to_summary_payload()
+
+    assert army_rule.SUDDEN_STRIKE_HOOK_ID in summary["fight_activation_ability_hook_ids"]
+
+    activation_request = _decision_request(
+        _drain_fight_movement_requests(
+            lifecycle,
+            lifecycle.advance_until_decision_or_terminal(),
+        )
+    )
+    assert activation_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+
+    ability_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-aeldari-sudden-strike-activation",
+            request=activation_request,
+            selected_option_id=fight_activation_option_id(
+                unit_instance_id=_AELDARI_UNIT_ID,
+                fight_type=FightTypeKind.NORMAL,
+            ),
+        )
+    )
+    ability_request = _decision_request(ability_status)
+    assert ability_request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE
+
+    melee_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-aeldari-sudden-strike-use",
+            request=ability_request,
+            selected_option_id=f"use:{army_rule.SUDDEN_STRIKE_MANEUVER}",
+        )
+    )
+    assert melee_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+
+    state = _state(lifecycle)
+    assert (
+        fight_movement_maximum_distance_inches(
+            state=state,
+            unit_instance_id=_AELDARI_UNIT_ID,
+            proposal_kind=ProposalKind.PILE_IN,
+        )
+        == 6.0
+    )
+    assert (
+        fight_movement_maximum_distance_inches(
+            state=state,
+            unit_instance_id=_AELDARI_UNIT_ID,
+            proposal_kind=ProposalKind.CONSOLIDATE,
+        )
+        == 6.0
+    )
+    used_event = _last_event_payload(lifecycle, "fight_activation_ability_used")
+    persisting_effect = cast(dict[str, JsonValue], used_event["persisting_effect"])
+    effect_payload = cast(dict[str, JsonValue], persisting_effect["effect_payload"])
+    assert effect_payload["effect_kind"] == FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND
+    assert effect_payload["pile_in_distance_inches"] == 6.0
+    assert effect_payload["consolidate_distance_inches"] == 6.0
+
+    _place_unit_poses(
+        state,
+        unit_instance_id=_AELDARI_UNIT_ID,
+        poses=(Pose.at(10.0, 20.0, 0.0),),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=_ENEMY_UNIT_ID,
+        poses=_unit_line_poses(x=14.0, y=20.0),
+    )
+    fight_state = state.fight_phase_state
+    assert fight_state is not None
+    policy = state.runtime_ruleset_descriptor().fight_policy
+    state.fight_phase_state = (
+        fight_state.with_active_activation(None)
+        .with_consolidate_state(
+            FightMovementStepState.start(
+                step=FightPhaseStepKind.CONSOLIDATE,
+                next_player_id="player-a",
+            )
+        )
+        .with_current_step(current_step=FightPhaseStepKind.CONSOLIDATE, policy=policy)
+    )
+    lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
+    consolidate_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        consolidate_request.payload
+    )
+    assert proposal_request.proposal_kind is ProposalKind.CONSOLIDATE
+    assert proposal_request.context is not None
+    assert proposal_request.context["maximum_distance_inches"] == 6.0
+
+    consolidate_status = lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=consolidate_request.request_id,
+            result_id="phase17g-aeldari-sudden-strike-consolidate",
+            payload=cast(
+                JsonValue,
+                FightMovementProposal(
+                    proposal_request_id=proposal_request.request_id,
+                    proposal_kind=ProposalKind.CONSOLIDATE,
+                    unit_instance_id=_AELDARI_UNIT_ID,
+                    movement_phase_action=CONSOLIDATE_ACTION,
+                    movement_mode=MovementMode.CONSOLIDATE,
+                    consolidation_mode=ConsolidationModeKind.ENGAGING,
+                    consolidate_target_unit_instance_ids=(_ENEMY_UNIT_ID,),
+                    witness=straight_line_witness_for_unit(
+                        lifecycle,
+                        unit_instance_id=_AELDARI_UNIT_ID,
+                        dx=2.5,
+                        dy=2.0,
+                    ),
+                ).to_payload(),
+            ),
+        ).to_result(consolidate_request)
+    )
+
+    completed_event = _last_event_payload(lifecycle, "fight_movement_completed")
+    resolution = cast(dict[str, JsonValue], completed_event["resolution"])
+    assert consolidate_status.status_kind is not LifecycleStatusKind.INVALID
+    assert completed_event["result_id"] == "phase17g-aeldari-sudden-strike-consolidate"
+    assert resolution["maximum_distance_inches"] == 6.0
 
 
 def test_aeldari_opportunity_seized_grants_d6_plus_one_after_enemy_fall_back() -> None:
@@ -615,7 +784,12 @@ def _wahapedia_aeldari_battle_focus_row() -> dict[str, JsonValue]:
     raise AssertionError("missing Aeldari Battle Focus source row")
 
 
-def _aeldari_config() -> GameConfig:
+def _aeldari_config(
+    *,
+    aeldari_datasheet_id: str = _AELDARI_DATASHEET_ID,
+    aeldari_model_profile_id: str = "core-vehicle-monster",
+    aeldari_model_count: int = 1,
+) -> GameConfig:
     catalog = _aeldari_catalog()
     return GameConfig(
         game_id="phase17g-aeldari-star-engines",
@@ -632,9 +806,9 @@ def _aeldari_config() -> GameConfig:
                 faction_id=army_rule.AELDARI_FACTION_ID,
                 detachment_id=_AELDARI_DETACHMENT_ID,
                 unit_selection_id=_AELDARI_UNIT_SELECTION_ID,
-                datasheet_id=_AELDARI_DATASHEET_ID,
-                model_profile_id="core-vehicle-monster",
-                model_count=1,
+                datasheet_id=aeldari_datasheet_id,
+                model_profile_id=aeldari_model_profile_id,
+                model_count=aeldari_model_count,
             ),
             _army_muster_request(
                 catalog=catalog,
@@ -660,9 +834,12 @@ def _aeldari_catalog() -> ArmyCatalog:
     aeldari_vehicle = _aeldari_vehicle_datasheet(
         base_catalog.datasheet_by_id("core-vehicle-monster")
     )
+    aeldari_fighter = _aeldari_fight_datasheet(
+        base_catalog.datasheet_by_id("core-character-leader")
+    )
     return replace(
         base_catalog,
-        datasheets=(*base_catalog.datasheets, aeldari_vehicle),
+        datasheets=(*base_catalog.datasheets, aeldari_vehicle, aeldari_fighter),
         factions=(
             *base_catalog.factions,
             FactionDefinition(
@@ -679,7 +856,7 @@ def _aeldari_catalog() -> ArmyCatalog:
                 name="Warhost",
                 faction_id=army_rule.AELDARI_FACTION_ID,
                 detachment_point_cost=3,
-                unit_datasheet_ids=(_AELDARI_DATASHEET_ID,),
+                unit_datasheet_ids=(_AELDARI_DATASHEET_ID, _AELDARI_FIGHT_DATASHEET_ID),
                 force_disposition_ids=("phase17g-force",),
                 source_ids=("gw-11e-faction-detachments-2026-27:detachment:aeldari:warhost",),
             ),
@@ -698,6 +875,20 @@ def _aeldari_vehicle_datasheet(base_datasheet: DatasheetDefinition) -> Datasheet
         ),
         attachment_eligibilities=(),
         source_ids=("phase17g:test:aeldari:star-engines-vehicle",),
+    )
+
+
+def _aeldari_fight_datasheet(base_datasheet: DatasheetDefinition) -> DatasheetDefinition:
+    return replace(
+        base_datasheet,
+        datasheet_id=_AELDARI_FIGHT_DATASHEET_ID,
+        name="Sudden Strike Test Fighter",
+        keywords=DatasheetKeywordSet(
+            keywords=base_datasheet.keywords.keywords,
+            faction_keywords=("Asuryani",),
+        ),
+        attachment_eligibilities=(),
+        source_ids=("phase17g:test:aeldari:sudden-strike-fighter",),
     )
 
 
@@ -911,6 +1102,56 @@ def _prepared_aeldari_state_at_phase(phase: BattlePhase) -> GameState:
     return _state_at_phase(_state(lifecycle), phase)
 
 
+def _advance_lifecycle_state_to_phase(lifecycle: GameLifecycle, phase: BattlePhase) -> None:
+    state = _state(lifecycle)
+    while state.current_battle_phase is not phase:
+        if state.current_battle_phase is None:
+            raise AssertionError("battle state ended before expected phase")
+        state.advance_to_next_battle_phase()
+
+
+def _rehydrate_lifecycle_with_empty_decisions(lifecycle: GameLifecycle) -> GameLifecycle:
+    payload = lifecycle.to_payload()
+    payload["decisions"] = DecisionController().to_payload()
+    return GameLifecycle.from_payload(payload)
+
+
+def _drain_fight_movement_requests(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+) -> LifecycleStatus:
+    current = status
+    while (
+        current.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+        and current.decision_request is not None
+        and current.decision_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    ):
+        request = current.decision_request
+        proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+        assert proposal_request.proposal_kind in {
+            ProposalKind.PILE_IN,
+            ProposalKind.CONSOLIDATE,
+        }
+        context = cast(dict[str, JsonValue], proposal_request.context)
+        current = lifecycle.submit_decision(
+            ParameterizedSubmission(
+                request_id=request.request_id,
+                result_id=f"{request.request_id}:phase17g-aeldari-no-move",
+                payload=cast(
+                    JsonValue,
+                    {
+                        "proposal_request_id": proposal_request.request_id,
+                        "proposal_kind": proposal_request.proposal_kind.value,
+                        "unit_instance_id": proposal_request.unit_instance_id,
+                        "movement_phase_action": proposal_request.movement_phase_action,
+                        "movement_mode": context["movement_mode"],
+                    },
+                ),
+            ).to_result(request)
+        )
+    return current
+
+
 def _place_unit_poses(
     state: GameState,
     *,
@@ -1021,6 +1262,13 @@ def _runtime_content_bundle(lifecycle: GameLifecycle) -> RuntimeContentBundle:
 
 def _event_payload(lifecycle: GameLifecycle, event_type: str) -> dict[str, JsonValue]:
     for event in lifecycle.decision_controller.event_log.records:
+        if event.event_type == event_type:
+            return cast(dict[str, JsonValue], event.payload)
+    raise AssertionError(f"missing event {event_type}")
+
+
+def _last_event_payload(lifecycle: GameLifecycle, event_type: str) -> dict[str, JsonValue]:
+    for event in reversed(lifecycle.decision_controller.event_log.records):
         if event.event_type == event_type:
             return cast(dict[str, JsonValue], event.payload)
     raise AssertionError(f"missing event {event_type}")
