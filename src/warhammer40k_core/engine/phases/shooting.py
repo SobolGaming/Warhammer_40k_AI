@@ -88,6 +88,9 @@ from warhammer40k_core.engine.transports import (
     FiringDeckWeaponSelection,
     resolve_firing_deck_selection,
 )
+from warhammer40k_core.engine.unit_abilities import (
+    firing_deck_value_for_unit as unit_firing_deck_value,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
     ASSAULT_RULE_ID,
@@ -135,7 +138,6 @@ SELECT_SHOOTING_TYPE_DECISION_TYPE = "select_shooting_type"
 SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE = "submit_shooting_declaration"
 COMPLETE_SHOOTING_PHASE_OPTION_ID = "complete_shooting_phase"
 _COMPLETE_SHOOTING_PHASE_STATUS = "shooting_phase_complete"
-_FIRING_DECK_ABILITY_ID = "core-firing-deck"
 
 
 class ShootingUnitSelectionPayload(TypedDict):
@@ -4425,23 +4427,9 @@ def _firing_deck_value_for_unit(
     unit: UnitInstance,
     army_catalog: ArmyCatalog,
 ) -> int | None:
-    datasheet = army_catalog.datasheet_by_id(unit.datasheet_id)
-    descriptors = tuple(
-        ability for ability in datasheet.abilities if ability.ability_id == _FIRING_DECK_ABILITY_ID
-    )
-    if not descriptors:
-        return None
-    if len(descriptors) > 1:
-        raise GameLifecycleError("Datasheet must not contain duplicate Firing Deck descriptors.")
-    descriptor = next(iter(descriptors))
-    if len(descriptor.parameter_tokens) != 1:
-        raise GameLifecycleError("Firing Deck descriptor requires exactly one value token.")
-    token = descriptor.parameter_tokens[0]
-    try:
-        value = int(token)
-    except ValueError as exc:
-        raise GameLifecycleError("Firing Deck descriptor value token must be an int.") from exc
-    return _validate_positive_int("Firing Deck descriptor value", value)
+    if type(army_catalog) is not ArmyCatalog:
+        raise GameLifecycleError("Firing Deck lookup requires an ArmyCatalog.")
+    return unit_firing_deck_value(unit)
 
 
 def _firing_deck_value_for_rules_unit(

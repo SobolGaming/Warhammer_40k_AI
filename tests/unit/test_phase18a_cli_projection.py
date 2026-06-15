@@ -159,6 +159,26 @@ def test_rules_catalog_projection_exposes_cacheable_static_display_records() -> 
     assert len(payload["source_hash"]) == 64
     assert "core-intercessor-like-infantry" in payload["datasheet_display_by_id"]
     assert "core-intercessor-like" in payload["model_profile_display_by_id"]
+    deep_strike_datasheet = payload["datasheet_display_by_id"]["core-deep-strike-unit"]
+    assert deep_strike_datasheet["abilities"] == [
+        {
+            "ability_id": "core-deep-strike",
+            "datasheet_id": "core-deep-strike-unit",
+            "display_name": "CORE Deep Strike",
+            "source_id": "datasheet:core-deep-strike-unit:ability:deep-strike",
+            "support": "unsupported",
+            "timing_tags": ["deployment", "reserves"],
+            "parameter_tokens": [],
+            "profile": {
+                "ability_id": "core-deep-strike",
+                "name": "CORE Deep Strike",
+                "source_id": "datasheet:core-deep-strike-unit:ability:deep-strike",
+                "support": "unsupported",
+                "timing_tags": ["deployment", "reserves"],
+                "parameter_tokens": [],
+            },
+        }
+    ]
     assert payload["wargear_display_by_id"]["core-bolt-rifle"] == {
         "wargear_id": "core-bolt-rifle",
         "display_name": "Core bolt rifle",
@@ -232,14 +252,24 @@ def test_game_view_exposes_issue145_unit_model_datacard_join_without_unknowns() 
     assert unit_display["datasheet_id"] == "core-intercessor-like-infantry"
     assert model_id in unit_display["model_instance_ids"]
     assert model_display["model_profile_id"] == "core-intercessor-like"
+    assert model_display["wargear_ids"] == ["core-bolt-rifle"]
     base_size = model_display["base_size"]
     assert base_size is not None
     assert base_size["diameter_mm"] == 32.0
-    assert set(model_display["current_characteristics"]) == {"M", "T", "SV", "W", "LD", "OC"}
+    assert set(model_display["current_characteristics"]) == {
+        "M",
+        "T",
+        "SV",
+        "InSv",
+        "W",
+        "LD",
+        "OC",
+    }
     assert {
         key: characteristic["final"]
         for key, characteristic in model_display["current_characteristics"].items()
-    } == {"M": 6, "T": 4, "SV": 3, "W": 2, "LD": 6, "OC": 2}
+    } == {"M": 6, "T": 4, "SV": 3, "InSv": 0, "W": 2, "LD": 6, "OC": 2}
+    assert model_display["current_characteristics"]["InSv"]["display_value"] == "-"
     assert all(
         characteristic["value_kind"] != "unknown"
         for characteristic in model_display["current_characteristics"].values()
@@ -492,7 +522,7 @@ def _phase18a_projection_join_sample(
     assert model_profile_id is not None
     assert base_size is not None
 
-    characteristic_keys = ("M", "T", "SV", "W", "LD", "OC")
+    characteristic_keys = ("M", "T", "SV", "InSv", "W", "LD", "OC")
     return validate_json_value(
         {
             "rules_catalog": {
@@ -532,6 +562,7 @@ def _phase18a_projection_join_sample(
                     "unit_instance_id": model_display["unit_instance_id"],
                     "model_profile_id": model_display["model_profile_id"],
                     "model_display_name": model_display["model_display_name"],
+                    "wargear_ids": model_display["wargear_ids"],
                     "base_size": model_display["base_size"],
                     "wounds_remaining": model_display["wounds_remaining"],
                     "starting_wounds": model_display["starting_wounds"],

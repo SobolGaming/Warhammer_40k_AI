@@ -649,6 +649,8 @@ def _selectable_save_options(options: tuple[SaveOption, ...]) -> tuple[SaveOptio
 def _model_characteristic(model: ModelInstance, characteristic: Characteristic) -> int | None:
     for value in model.characteristics:
         if value.characteristic is characteristic:
+            if value.is_dash:
+                return None
             return value.final
     return None
 

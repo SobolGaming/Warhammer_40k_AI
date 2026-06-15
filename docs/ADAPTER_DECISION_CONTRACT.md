@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, and Phase 18A hybrid catalog/live unit-model display projection requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, and Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, and Phase 18A hybrid catalog/live unit-model display projection requirements, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, and Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -77,8 +77,9 @@ The shared contract uses these objects and payloads:
 - `EventRecord`: deterministic event-log payload.
 - `GameViewPayload`: read-only viewer projection for adapters.
 - `RulesCatalogViewPayload`: cacheable source-hashed static catalog display
-  projection for datasheets, model profiles, weapon profiles, factions,
-  detachments, enhancements, wargear, wargear options, and base sizes.
+  projection for datasheets, datasheet abilities, model profiles, weapon
+  profiles, factions, detachments, enhancements, wargear, wargear options, and
+  base sizes.
 - `RulesCatalogReferencePayload`: live-game reference to the static catalog
   projection used by a `GameViewPayload`.
 - `EventStreamDeltaPayload`: viewer-scoped adapter event delta.
@@ -1195,16 +1196,19 @@ Phase 18A extends the viewer projection for
 hybrid projection model:
 
 1. Static catalog projection/cache. `project_rules_catalog_view(...)` returns a
-   `RulesCatalogViewPayload` with `projection_schema: "rules-catalog-view-v1"`,
+   `RulesCatalogViewPayload` with `projection_schema: "rules-catalog-view-v2"`,
    catalog identity, source package identity, `source_hash`, and display records
-   for datasheets, model profiles, weapon profiles, factions, detachments,
-   enhancements, wargear, wargear options, and base sizes. Adapters may cache this
-   payload by catalog ID/schema/hash and render catalog browsing, roster panels,
-   and tooltips from it. `LocalGameSession.rules_catalog_view()` exposes the same
+   for datasheets, datasheet abilities, model profiles, weapon profiles,
+   factions, detachments, enhancements, wargear, wargear options, and base sizes.
+   Datasheet display records include structured ability display payloads with
+   ability ID, display name, source ID, support status, timing tags, parameter
+   tokens, and the full descriptor profile. Adapters may cache this payload by
+   catalog ID/schema/hash and render catalog browsing, roster panels, and
+   tooltips from it. `LocalGameSession.rules_catalog_view()` exposes the same
    static projection for local UI/CLI clients that already consume
    `LocalGameSession.view(...)`.
 2. Live viewer-safe unit/model projection. `GameViewPayload` uses
-   `projection_schema: "game-view-v2-phase18a"`, includes
+   `projection_schema: "game-view-v3-phase18a"`, includes
    `projection_state_hash`, references the static catalog through
    `rules_catalog`, and exposes read-only `unit_display_by_id` and
    `model_display_by_id` maps keyed by stable `unit_instance_id` and
@@ -1225,11 +1229,13 @@ state:
   status, and redaction metadata.
 - `ModelDisplayPayload` records include `model_instance_id`,
   `unit_instance_id`, `datasheet_id`, `model_profile_id`, display names,
-  `base_size`, starting/current wounds, `base_characteristics`,
+  manifested model `wargear_ids`, `base_size`, starting/current wounds,
+  `base_characteristics`,
   `current_characteristics`, `visible_modifiers`, source metadata, visibility
   status, and redaction metadata.
 - `base_characteristics` and `current_characteristics` cover the canonical
-  datacard characteristics `M`, `T`, `SV`, `W`, `LD`, and `OC`.
+  datacard characteristics `M`, `T`, `SV`, `InSv`, `W`, `LD`, and `OC`. Models
+  without an invulnerable save expose `InSv` as a source dash.
 - `CharacteristicDisplayPayload` entries expose `characteristic`, `label`,
   `value_kind`, raw/base/final values, `display_value`, applied modifier IDs,
   and redaction metadata. Unknown values use `value_kind: "unknown"` and null
@@ -1267,7 +1273,7 @@ this join without placeholder unknowns:
 
 `battlefield_state` placement -> `unit_display_by_id[unit_instance_id]` ->
 `model_display_by_id[model_instance_id]` ->
-`current_characteristics["M/T/SV/W/LD/OC"]`.
+`current_characteristics["M/T/SV/InSv/W/LD/OC"]`.
 
 Phase 11E adds scoring state to the viewer projection:
 

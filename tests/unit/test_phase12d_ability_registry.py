@@ -84,6 +84,7 @@ def test_source_backed_core_ability_rows_include_phase12d_families() -> None:
         "core-lone-operative",
         "core-scouts",
         "core-stealth",
+        "core-support",
     }.issubset(ability_ids)
     assert "<" not in blob
     assert "object at 0x" not in blob
@@ -125,6 +126,7 @@ def test_phase14i_core_ability_rows_are_supported_or_explicitly_unsupported() ->
         ("core-lone-operative", "unsupported:phase-13b:lone-operative"),
         ("core-scouts", "unsupported:phase-15b:scouts"),
         ("core-stealth", "unsupported:phase-13d:stealth"),
+        ("core-support", "unsupported:phase-15c:support"),
     )
 
 

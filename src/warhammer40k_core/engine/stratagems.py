@@ -130,6 +130,7 @@ from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
     timing_trigger_kind_from_token,
 )
+from warhammer40k_core.engine.unit_abilities import unit_has_deep_strike
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
@@ -4275,10 +4276,7 @@ def _reserve_proposal_kind(reserve_state: ReserveState) -> ProposalKind:
 
 
 def _unit_has_deep_strike_keyword(unit: UnitInstance) -> bool:
-    return any(
-        keyword.replace("-", " ").replace("_", " ").upper() == "DEEP STRIKE"
-        for keyword in unit.keywords
-    )
+    return unit_has_deep_strike(unit)
 
 
 def _battlefield_scenario(state: GameState) -> BattlefieldScenario:

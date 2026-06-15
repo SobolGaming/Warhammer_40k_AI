@@ -5,11 +5,7 @@ from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import NotRequired, Self, TypedDict, cast
 
-from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
-from warhammer40k_core.core.datasheet import (
-    CatalogAbilitySupport,
-    DatasheetAbilityDescriptor,
-)
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.deployment_zones import (
     DeploymentZone,
     DeploymentZoneError,
@@ -78,6 +74,10 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindow,
     TimingWindowDescriptor,
 )
+from warhammer40k_core.engine.unit_abilities import (
+    scouts_ability_descriptors_for_unit,
+    scouts_distance_inches_from_descriptor,
+)
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyContext,
     UnitCoherencyResult,
@@ -105,8 +105,6 @@ SCOUT_RESERVE_SETUP_PROPOSAL_KIND = "scout_reserve_setup"
 
 CORE_REDEPLOY_SOURCE_RULE_ID = "core_rules:redeploy"
 CORE_SCOUTS_SOURCE_RULE_ID = "core_rules:scouts"
-CORE_SCOUTS_TIMING_TAG = "scouts"
-CORE_SCOUTS_BEFORE_BATTLE_TAG = "before_battle"
 SCOUT_ENEMY_DISTANCE_INCHES = 8.0
 PREBATTLE_SEQUENCING_EVENT_TYPE = "sequencing_order_resolved"
 _EPSILON = 1e-9
@@ -2707,10 +2705,7 @@ def scout_ability_instances_for_rules_unit(
         raise GameLifecycleError("Scouts ability lookup requires an ArmyCatalog.")
     instances: list[ScoutAbilityInstance] = []
     for component in view.components:
-        descriptors = _scouts_descriptors_for_unit(
-            unit=component.unit,
-            army_catalog=army_catalog,
-        )
+        descriptors = scouts_ability_descriptors_for_unit(component.unit)
         if not descriptors:
             if _unit_has_keyword(component.unit, "SCOUTS"):
                 raise GameLifecycleError(
@@ -2722,7 +2717,7 @@ def scout_ability_instances_for_rules_unit(
                 instances.append(
                     ScoutAbilityInstance(
                         model_instance_id=model.model_instance_id,
-                        distance_inches=_scouts_distance_inches_from_descriptor(descriptor),
+                        distance_inches=scouts_distance_inches_from_descriptor(descriptor),
                         source_id=descriptor.source_id,
                     )
                 )
@@ -3295,51 +3290,6 @@ def _rules_unit_any_component_has_keyword(view: RulesUnitView, keyword: str) -> 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     requested = _canonical_keyword(keyword)
     return requested in {_canonical_keyword(value) for value in unit.keywords}
-
-
-def _scouts_descriptors_for_unit(
-    *,
-    unit: UnitInstance,
-    army_catalog: ArmyCatalog,
-) -> tuple[DatasheetAbilityDescriptor, ...]:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Scouts descriptor lookup requires a UnitInstance.")
-    if type(army_catalog) is not ArmyCatalog:
-        raise GameLifecycleError("Scouts descriptor lookup requires an ArmyCatalog.")
-    try:
-        datasheet = army_catalog.datasheet_by_id(unit.datasheet_id)
-    except ArmyCatalogError as exc:
-        raise GameLifecycleError("Scouts descriptor lookup requires a catalog datasheet.") from exc
-    descriptors = tuple(
-        ability
-        for ability in datasheet.abilities
-        if CORE_SCOUTS_TIMING_TAG
-        in {_canonical_keyword(tag).lower() for tag in ability.timing_tags}
-    )
-    return tuple(sorted(descriptors, key=lambda ability: ability.ability_id))
-
-
-def _scouts_distance_inches_from_descriptor(
-    descriptor: DatasheetAbilityDescriptor,
-) -> float:
-    if type(descriptor) is not DatasheetAbilityDescriptor:
-        raise GameLifecycleError("Scouts distance requires a DatasheetAbilityDescriptor.")
-    if descriptor.support is not CatalogAbilitySupport.DESCRIPTOR_ONLY:
-        raise GameLifecycleError("Scouts descriptor must be descriptor-only catalog data.")
-    timing_tags = {_canonical_keyword(tag).lower() for tag in descriptor.timing_tags}
-    if (
-        CORE_SCOUTS_BEFORE_BATTLE_TAG not in timing_tags
-        or CORE_SCOUTS_TIMING_TAG not in timing_tags
-    ):
-        raise GameLifecycleError("Scouts descriptor requires before-battle Scouts timing tags.")
-    if len(descriptor.parameter_tokens) != 1:
-        raise GameLifecycleError("Scouts descriptor requires exactly one distance token.")
-    token = descriptor.parameter_tokens[0]
-    try:
-        distance_inches = float(token)
-    except ValueError as exc:
-        raise GameLifecycleError("Scouts descriptor distance token must be numeric.") from exc
-    return _validate_positive_number("Scouts descriptor distance_inches", distance_inches)
 
 
 def _canonical_keyword(keyword: str) -> str:

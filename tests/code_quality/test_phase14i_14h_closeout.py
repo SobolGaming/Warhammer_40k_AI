@@ -73,6 +73,7 @@ def test_phase14i_unsupported_core_ability_contract_is_explicit() -> None:
         ("core-lone-operative", "unsupported:phase-13b:lone-operative"),
         ("core-scouts", "unsupported:phase-15b:scouts"),
         ("core-stealth", "unsupported:phase-13d:stealth"),
+        ("core-support", "unsupported:phase-15c:support"),
     )
 
 

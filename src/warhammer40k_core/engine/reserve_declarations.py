@@ -32,6 +32,7 @@ from warhammer40k_core.engine.reserves import (
     reserve_kind_from_token,
     reserve_origin_from_token,
 )
+from warhammer40k_core.engine.unit_abilities import unit_has_deep_strike
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
 SELECT_RESERVE_DECLARATION_DECISION_TYPE = "select_reserve_declaration"
@@ -1021,7 +1022,7 @@ def _deep_strike_option_for_unit(
     context: ReserveLegalityContext,
     unit: UnitInstance,
 ) -> DecisionOption | None:
-    if not _unit_has_keyword(unit, "DEEP_STRIKE"):
+    if not unit_has_deep_strike(unit):
         return None
     points_value = context.points_for_unit(unit.unit_instance_id)
     source_ids = unit.datasheet_source_ids

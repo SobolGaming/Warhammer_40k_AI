@@ -237,6 +237,7 @@ def _bridge_datasheet(
                 "m": _required_field(model_source_row, "M"),
                 "t": _required_field(model_source_row, "T"),
                 "sv": _required_field(model_source_row, "Sv"),
+                "inv_sv": _required_field(model_source_row, "inv_sv"),
                 "w": _required_field(model_source_row, "W"),
                 "ld": _required_field(model_source_row, "Ld"),
                 "oc": _required_field(model_source_row, "OC"),
@@ -463,6 +464,7 @@ def _bridge_abilities(
             description = _raw_or_field(ability_source, "description")
         else:
             ability_id = f"{datasheet_id}:{_slug(name)}"
+        parameter = _raw_or_field(row, "parameter")
         bridged_rows["Datasheets_abilities"].append(
             {
                 "datasheet_id": datasheet_id,
@@ -470,11 +472,11 @@ def _bridge_abilities(
                 "ability_id": ability_id,
                 "name": name,
                 "description": description,
-                "parameter": _raw_or_field(row, "parameter"),
+                "parameter": parameter,
                 "type": _required_field(row, "type"),
                 "support": "descriptor_only",
                 "timing_tags": _ability_timing_tags(name),
-                "parameter_tokens": _raw_or_field(row, "parameter"),
+                "parameter_tokens": _ability_parameter_tokens(name=name, parameter=parameter),
                 "source_ids": _joined(_source_ids(*source_rows)),
             }
         )
@@ -650,6 +652,7 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "m",
             "t",
             "sv",
+            "inv_sv",
             "w",
             "ld",
             "oc",
@@ -897,9 +900,47 @@ def _weapon_keywords(description: str) -> tuple[str, ...]:
 
 
 def _ability_timing_tags(name: str) -> str:
-    if _name_key(name) == "deep-strike":
+    key = _core_ability_name_key(name)
+    if key == "deep-strike":
         return "deployment,reserves"
+    if key == "infiltrators":
+        return "deployment"
+    if key == "leader":
+        return "declare_battle_formations,attachments"
+    if key == "support":
+        return "declare_battle_formations,attachments"
+    if key.startswith("scouts"):
+        return "before_battle,scouts"
+    if key.startswith("firing-deck"):
+        return "shooting"
+    if key.startswith("deadly-demise"):
+        return "after_destroyed,deadly_demise"
     return ""
+
+
+def _ability_parameter_tokens(*, name: str, parameter: str) -> str:
+    stripped_parameter = _ability_parameter_token(parameter)
+    if stripped_parameter:
+        return stripped_parameter
+    key = _core_ability_name_key(name)
+    match = re.fullmatch(r"(scouts|firing-deck|deadly-demise)-(.+)", key)
+    if match is None:
+        return ""
+    return _ability_parameter_token(match.group(2))
+
+
+def _ability_parameter_token(value: str) -> str:
+    stripped = value.strip().removesuffix('"').strip()
+    if not stripped:
+        return ""
+    return stripped.upper()
+
+
+def _core_ability_name_key(name: str) -> str:
+    key = _name_key(name)
+    if key.startswith("core-"):
+        return key.removeprefix("core-")
+    return key
 
 
 def _model_profiles_by_name(entries: tuple[_CompositionEntry, ...]) -> dict[str, str]:
