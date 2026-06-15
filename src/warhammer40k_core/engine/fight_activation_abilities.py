@@ -35,6 +35,7 @@ class FightActivationAbilityUsePayload(TypedDict):
     model_proximity_inches: float
     effect_kind: str
     replay_payload: JsonValue
+    decision_effect_payload: JsonValue
 
 
 class FightActivationAbilityRequestPayload(TypedDict):
@@ -118,6 +119,7 @@ class FightActivationAbilityOption:
     enhancement_id: str
     model_proximity_inches: float
     replay_payload: JsonValue = None
+    decision_effect_payload: JsonValue = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
@@ -138,6 +140,11 @@ class FightActivationAbilityOption:
             _validate_positive_float("model_proximity_inches", self.model_proximity_inches),
         )
         object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
+        object.__setattr__(
+            self,
+            "decision_effect_payload",
+            validate_json_value(self.decision_effect_payload),
+        )
 
     @property
     def option_id(self) -> str:
@@ -164,6 +171,7 @@ class FightActivationAbilityOption:
             "model_proximity_inches": self.model_proximity_inches,
             "effect_kind": FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND,
             "replay_payload": self.replay_payload,
+            "decision_effect_payload": self.decision_effect_payload,
         }
 
     def to_decision_option(self, context: FightActivationAbilityContext) -> DecisionOption:
@@ -247,6 +255,7 @@ class FightActivationAbilityUse:
     model_proximity_inches: float
     effect_kind: str
     replay_payload: JsonValue
+    decision_effect_payload: JsonValue
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -305,6 +314,11 @@ class FightActivationAbilityUse:
         if self.effect_kind != FIGHT_ACTIVATION_MELEE_TARGETING_EFFECT_KIND:
             raise GameLifecycleError("Fight activation ability effect kind drift.")
         object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
+        object.__setattr__(
+            self,
+            "decision_effect_payload",
+            validate_json_value(self.decision_effect_payload),
+        )
 
     @classmethod
     def from_result_payload(
@@ -333,6 +347,7 @@ class FightActivationAbilityUse:
             ),
             effect_kind=_payload_string(raw, key="effect_kind"),
             replay_payload=raw.get("replay_payload"),
+            decision_effect_payload=raw.get("decision_effect_payload"),
         )
 
     def to_payload(self) -> FightActivationAbilityUsePayload:
@@ -351,6 +366,7 @@ class FightActivationAbilityUse:
             "model_proximity_inches": self.model_proximity_inches,
             "effect_kind": self.effect_kind,
             "replay_payload": self.replay_payload,
+            "decision_effect_payload": self.decision_effect_payload,
         }
 
 

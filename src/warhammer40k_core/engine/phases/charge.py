@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -30,8 +30,17 @@ from warhammer40k_core.engine.charge_declaration import (
     ChargeTargetCandidate,
     phase15a_charge_roll_payload,
 )
+from warhammer40k_core.engine.charge_declaration_hooks import (
+    DECLINE_CHARGE_DECLARATION_GRANT_OPTION_ID,
+    SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
+    ChargeDeclarationContext,
+    ChargeDeclarationGrant,
+    ChargeDeclarationGrantPayload,
+    ChargeDeclarationHookRegistry,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
+    DecisionError,
     DecisionOption,
     DecisionRequest,
 )
@@ -695,6 +704,9 @@ class ChargePhaseState:
 @dataclass(frozen=True, slots=True)
 class ChargePhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
+    charge_declaration_hooks: ChargeDeclarationHookRegistry = field(
+        default_factory=ChargeDeclarationHookRegistry.empty
+    )
 
     def __post_init__(self) -> None:
         if (
@@ -703,6 +715,10 @@ class ChargePhaseHandler:
         ):
             raise GameLifecycleError(
                 "ChargePhaseHandler ruleset_descriptor must be a RulesetDescriptor."
+            )
+        if type(self.charge_declaration_hooks) is not ChargeDeclarationHookRegistry:
+            raise GameLifecycleError(
+                "ChargePhaseHandler charge_declaration_hooks must be a registry."
             )
 
     @property
@@ -824,6 +840,15 @@ class ChargePhaseHandler:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                charge_declaration_hooks=self.charge_declaration_hooks,
+            )
+        if result.decision_type == SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE:
+            return _apply_charge_declaration_grant_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                charge_declaration_hooks=self.charge_declaration_hooks,
             )
         if result.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
             return _apply_charge_move_proposal_decision(
@@ -1012,12 +1037,80 @@ def invalid_charge_move_proposal_status(
     return None
 
 
+def invalid_charge_declaration_grant_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    charge_declaration_hooks: ChargeDeclarationHookRegistry,
+) -> LifecycleStatus | None:
+    if request.decision_type != SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE:
+        raise GameLifecycleError(
+            "Charge declaration grant prevalidation received unsupported decision_type."
+        )
+    try:
+        result.validate_for_request(request)
+    except DecisionError as exc:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Charge declaration grant result is malformed.",
+            payload={
+                "invalid_reason": "invalid_charge_declaration_grant_result",
+                "detail": str(exc),
+            },
+        )
+    charge_state = state.charge_phase_state
+    if charge_state is None or charge_state.active_selection is None:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Charge declaration grant has no active selection.",
+            payload={
+                "invalid_reason": "invalid_charge_declaration_grant_result",
+                "field": "charge_phase_state",
+            },
+        )
+    selection = charge_state.active_selection
+    payload = _decision_payload_object(result.payload)
+    if _payload_string(payload, key="unit_instance_id") != selection.unit_instance_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Charge declaration grant unit drifted.",
+            payload={
+                "invalid_reason": "invalid_charge_declaration_grant_result",
+                "field": "unit_instance_id",
+            },
+        )
+    if result.selected_option_id == DECLINE_CHARGE_DECLARATION_GRANT_OPTION_ID:
+        return None
+    selected_grants = _selected_charge_declaration_grants_from_payload(
+        cast(dict[str, JsonValue], payload)
+    )
+    try:
+        _validate_selected_charge_declaration_grants(
+            state=state,
+            selection=selection,
+            registry=charge_declaration_hooks,
+            selected_grants=selected_grants,
+        )
+    except GameLifecycleError as exc:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Charge declaration grant is no longer legal.",
+            payload={
+                "invalid_reason": "invalid_charge_declaration_grant_result",
+                "detail": str(exc),
+            },
+        )
+    return None
+
+
 def _apply_charging_unit_selection_decision(
     *,
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    charge_declaration_hooks: ChargeDeclarationHookRegistry,
 ) -> LifecycleStatus | None:
     _validate_charge_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -1073,12 +1166,309 @@ def _apply_charging_unit_selection_decision(
             }
         ),
     )
+    grant_status = _request_charge_declaration_grant_if_available(
+        state=state,
+        decisions=decisions,
+        selection=selection,
+        registry=charge_declaration_hooks,
+    )
+    if grant_status is not None:
+        return grant_status
     return _resolve_charge_roll(
         state=state,
         selection=selection,
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
     )
+
+
+def _request_charge_declaration_grant_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    selection: ChargingUnitSelection,
+    registry: ChargeDeclarationHookRegistry,
+) -> LifecycleStatus | None:
+    if type(selection) is not ChargingUnitSelection:
+        raise GameLifecycleError("Charge declaration grant request requires a selection.")
+    if type(registry) is not ChargeDeclarationHookRegistry:
+        raise GameLifecycleError("Charge declaration grant request requires a registry.")
+    context = ChargeDeclarationContext(
+        state=state,
+        player_id=selection.player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=selection.unit_instance_id,
+        selection_request_id=selection.request_id,
+        selection_result_id=selection.result_id,
+    )
+    grants = registry.grants_for(context)
+    if not grants:
+        return None
+    request = DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
+        actor_id=selection.player_id,
+        payload=validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.CHARGE.value,
+                "active_player_id": selection.player_id,
+                "unit_instance_id": selection.unit_instance_id,
+                "source_decision_request_id": selection.request_id,
+                "source_decision_result_id": selection.result_id,
+                "available_charge_declaration_grants": [grant.to_payload() for grant in grants],
+            }
+        ),
+        options=_charge_declaration_grant_options(selection=selection, grants=grants),
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "charge_declaration_grant_decision_requested",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.CHARGE.value,
+                "active_player_id": selection.player_id,
+                "unit_instance_id": selection.unit_instance_id,
+                "request_id": request.request_id,
+                "source_decision_request_id": selection.request_id,
+                "source_decision_result_id": selection.result_id,
+                "available_charge_declaration_grants": [grant.to_payload() for grant in grants],
+                "phase_body_status": "charge_declaration_grant_decision_pending",
+            }
+        ),
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.CHARGE.value,
+            "phase_body_status": "charge_declaration_grant_decision_pending",
+            "battle_round": state.battle_round,
+            "active_player_id": selection.player_id,
+            "unit_instance_id": selection.unit_instance_id,
+            "decision_type": request.decision_type,
+        },
+    )
+
+
+def _charge_declaration_grant_options(
+    *,
+    selection: ChargingUnitSelection,
+    grants: tuple[ChargeDeclarationGrant, ...],
+) -> tuple[DecisionOption, ...]:
+    options = [
+        DecisionOption(
+            option_id=DECLINE_CHARGE_DECLARATION_GRANT_OPTION_ID,
+            label="Decline Charge Declaration Grant",
+            payload=validate_json_value(
+                {
+                    "submission_kind": SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
+                    "unit_instance_id": selection.unit_instance_id,
+                    "source_decision_request_id": selection.request_id,
+                    "source_decision_result_id": selection.result_id,
+                    "selected_charge_declaration_grants": [],
+                }
+            ),
+        )
+    ]
+    for grant in grants:
+        options.append(
+            DecisionOption(
+                option_id=grant.hook_id,
+                label=grant.label,
+                payload=validate_json_value(
+                    {
+                        "submission_kind": SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
+                        "unit_instance_id": selection.unit_instance_id,
+                        "source_decision_request_id": selection.request_id,
+                        "source_decision_result_id": selection.result_id,
+                        "selected_charge_declaration_grants": [grant.to_payload()],
+                    }
+                ),
+            )
+        )
+    return tuple(options)
+
+
+def _apply_charge_declaration_grant_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    charge_declaration_hooks: ChargeDeclarationHookRegistry,
+) -> LifecycleStatus | None:
+    charge_state = state.charge_phase_state
+    if charge_state is None or charge_state.active_selection is None:
+        raise GameLifecycleError("Charge declaration grant requires active selection.")
+    selection = charge_state.active_selection
+    payload = _decision_payload_object(result.payload)
+    if _payload_string(payload, key="unit_instance_id") != selection.unit_instance_id:
+        raise GameLifecycleError("Charge declaration grant unit drift.")
+    if (
+        _payload_string(payload, key="source_decision_request_id") != selection.request_id
+        or _payload_string(payload, key="source_decision_result_id") != selection.result_id
+    ):
+        raise GameLifecycleError("Charge declaration grant source decision drift.")
+    if result.selected_option_id == DECLINE_CHARGE_DECLARATION_GRANT_OPTION_ID:
+        selected_grants: tuple[ChargeDeclarationGrant, ...] = ()
+    else:
+        selected_grants = _selected_charge_declaration_grants_from_payload(
+            cast(dict[str, JsonValue], payload)
+        )
+        _validate_selected_charge_declaration_grants(
+            state=state,
+            selection=selection,
+            registry=charge_declaration_hooks,
+            selected_grants=selected_grants,
+        )
+    persisting_effects = tuple(
+        effect
+        for grant in selected_grants
+        for effect in _record_charge_declaration_grant_effects(
+            state=state,
+            result=result,
+            selection=selection,
+            grant=grant,
+        )
+    )
+    decisions.event_log.append(
+        "charge_declaration_grant_decision_resolved",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.CHARGE.value,
+                "active_player_id": selection.player_id,
+                "unit_instance_id": selection.unit_instance_id,
+                "request_id": result.request_id,
+                "result_id": result.result_id,
+                "selected_option_id": result.selected_option_id,
+                "selected_charge_declaration_grants": [
+                    grant.to_payload() for grant in selected_grants
+                ],
+                "persisting_effects": [effect.to_payload() for effect in persisting_effects],
+                "phase_body_status": "charge_declaration_grant_decision_resolved",
+            }
+        ),
+    )
+    return _resolve_charge_roll(
+        state=state,
+        selection=selection,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
+    )
+
+
+def _selected_charge_declaration_grants_from_payload(
+    payload: dict[str, JsonValue],
+) -> tuple[ChargeDeclarationGrant, ...]:
+    raw_grants = payload.get("selected_charge_declaration_grants")
+    if not isinstance(raw_grants, list):
+        raise GameLifecycleError("Charge declaration grant payload missing selected grants.")
+    grants: list[ChargeDeclarationGrant] = []
+    for raw_grant in raw_grants:
+        if not isinstance(raw_grant, dict):
+            raise GameLifecycleError("Charge declaration selected grants must be objects.")
+        grants.append(
+            ChargeDeclarationGrant.from_payload(cast(ChargeDeclarationGrantPayload, raw_grant))
+        )
+    return tuple(sorted(grants, key=lambda grant: grant.hook_id))
+
+
+def _validate_selected_charge_declaration_grants(
+    *,
+    state: GameState,
+    selection: ChargingUnitSelection,
+    registry: ChargeDeclarationHookRegistry,
+    selected_grants: tuple[ChargeDeclarationGrant, ...],
+) -> None:
+    if not selected_grants:
+        raise GameLifecycleError("Charge declaration grant selection requires a selected grant.")
+    context = ChargeDeclarationContext(
+        state=state,
+        player_id=selection.player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=selection.unit_instance_id,
+        selection_request_id=selection.request_id,
+        selection_result_id=selection.result_id,
+    )
+    available_payloads = {
+        grant.hook_id: grant.to_payload() for grant in registry.grants_for(context)
+    }
+    for grant in selected_grants:
+        expected = available_payloads.get(grant.hook_id)
+        if expected is None:
+            raise GameLifecycleError("Selected charge declaration grant is not available.")
+        if grant.to_payload() != expected:
+            raise GameLifecycleError("Selected charge declaration grant payload drift.")
+
+
+def _record_charge_declaration_grant_effects(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    selection: ChargingUnitSelection,
+    grant: ChargeDeclarationGrant,
+) -> tuple[PersistingEffect, ...]:
+    effects: list[PersistingEffect] = []
+    if grant.decision_effect_payload is not None:
+        spend_effect = PersistingEffect(
+            effect_id=f"{result.result_id}:{grant.hook_id}:decision",
+            source_rule_id=grant.source_id,
+            owner_player_id=selection.player_id,
+            target_unit_instance_ids=(selection.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.CHARGE,
+            expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
+            effect_payload=grant.decision_effect_payload,
+        )
+        state.record_persisting_effect(spend_effect)
+        effects.append(spend_effect)
+    if grant.unit_effect_payload is None:
+        if not effects:
+            raise GameLifecycleError("Charge declaration grant has no effect to record.")
+        return tuple(effects)
+    unit_effect = PersistingEffect(
+        effect_id=f"{result.result_id}:{grant.hook_id}:unit",
+        source_rule_id=grant.source_id,
+        owner_player_id=selection.player_id,
+        target_unit_instance_ids=(selection.unit_instance_id,),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhaseKind.CHARGE,
+        expiration=_charge_declaration_grant_unit_effect_expiration(
+            state=state,
+            selection=selection,
+            grant=grant,
+        ),
+        effect_payload=grant.unit_effect_payload,
+    )
+    state.record_persisting_effect(unit_effect)
+    effects.append(unit_effect)
+    return tuple(effects)
+
+
+def _charge_declaration_grant_unit_effect_expiration(
+    *,
+    state: GameState,
+    selection: ChargingUnitSelection,
+    grant: ChargeDeclarationGrant,
+) -> EffectExpiration:
+    if grant.unit_effect_expiration == "end_phase":
+        return EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=BattlePhaseKind.CHARGE,
+            player_id=selection.player_id,
+        )
+    if grant.unit_effect_expiration == "end_turn":
+        return EffectExpiration.end_turn(
+            battle_round=state.battle_round,
+            player_id=selection.player_id,
+        )
+    raise GameLifecycleError("Charge declaration grant effect expiration is unsupported.")
 
 
 def _resolve_charge_roll(

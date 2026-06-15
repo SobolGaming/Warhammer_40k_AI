@@ -17,13 +17,27 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
-from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    FightEligibilityKind,
+    FightOrderingBandKind,
+    FightTypeKind,
+    MovementMode,
+    RulesetDescriptor,
+)
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.advance_hooks import (
-    DECLINE_ADVANCE_MOVE_GRANT_OPTION_ID,
-    SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
+    DECLINE_MOVEMENT_ACTION_GRANT_OPTION_ID,
+    SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE,
 )
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldTransitionBatch,
+    ModelDisplacementKind,
+    ModelDisplacementRecord,
+    ModelPlacement,
+    UnitPlacement,
+)
+from warhammer40k_core.engine.charge_declaration_hooks import ChargeDeclarationContext
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -31,6 +45,8 @@ from warhammer40k_core.engine.effects import EffectExpirationKind, PersistingEff
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari import army_rule
+from warhammer40k_core.engine.fight_activation_abilities import FightActivationAbilityContext
+from warhammer40k_core.engine.fight_order import FightActivationSelection
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -39,6 +55,7 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_end_surge_hooks import MovementEndSurgeContext
 from warhammer40k_core.engine.movement_proposals import MOVEMENT_PROPOSAL_DECISION_TYPE
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -57,6 +74,7 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseHandler,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.shooting_end_surge_hooks import ShootingEndSurgeContext
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
@@ -70,15 +88,17 @@ _AELDARI_UNIT_SELECTION_ID = "aeldari-vehicle"
 _AELDARI_DATASHEET_ID = "phase17g-aeldari-star-engine-vehicle"
 _AELDARI_DETACHMENT_ID = "warhost"
 _ENEMY_UNIT_SELECTION_ID = "enemy-unit"
+_ENEMY_UNIT_ID = f"army-beta:{_ENEMY_UNIT_SELECTION_ID}"
 
 
-def test_aeldari_battle_focus_star_engines_text_is_source_backed_from_json() -> None:
+def test_aeldari_battle_focus_agile_manoeuvres_text_is_source_backed_from_json() -> None:
     row = _wahapedia_aeldari_battle_focus_row()
     fields = cast(dict[str, JsonValue], row["fields"])
     description = cast(str, fields["description"])
 
     assert row["source_row_id"] == "000009894:AE"
     assert "AGILE MANOEUVRES\nSWIFT AS THE WIND" in description
+    assert "FLITTING SHADOWS\nTRIGGER: When an eligible unit from your army" in description
     assert (
         "STAR ENGINES\n"
         "TRIGGER: When an eligible VEHICLE unit from your army is selected to make an "
@@ -86,13 +106,28 @@ def test_aeldari_battle_focus_star_engines_text_is_source_backed_from_json() -> 
         "EFFECT: Until the end of the turn, Ranged weapons equipped by this unit have "
         "the [ASSAULT] ability."
     ) in description
+    assert "SUDDEN STRIKE\nTRIGGER: When an eligible unit from your army is selected to fight." in (
+        description
+    )
+    assert "OPPORTUNITY SEIZED\nTRIGGER: When an enemy unit ends a Fall Back move." in description
+    assert "FADE BACK\nTRIGGER: In your opponent" in description
+    assert "Shooting phase, just after an enemy unit has shot." in description
 
 
 def test_aeldari_star_engines_grants_advanced_vehicle_assault_until_end_of_turn() -> None:
     config = _aeldari_config()
     lifecycle, movement_status = _advance_to_movement_unit_selection(config)
     bundle = _runtime_content_bundle(lifecycle)
-    assert army_rule.HOOK_ID in bundle.to_summary_payload()["advance_move_hook_ids"]
+    summary = bundle.to_summary_payload()
+    assert {
+        army_rule.SWIFT_AS_THE_WIND_HOOK_ID,
+        army_rule.FLITTING_SHADOWS_HOOK_ID,
+        army_rule.STAR_ENGINES_HOOK_ID,
+    } <= set(summary["advance_move_hook_ids"])
+    assert army_rule.OPPORTUNITY_SEIZED_HOOK_ID in summary["movement_end_surge_hook_ids"]
+    assert army_rule.FLITTING_SHADOWS_HOOK_ID in summary["charge_declaration_hook_ids"]
+    assert army_rule.FADE_BACK_HOOK_ID in summary["shooting_end_surge_hook_ids"]
+    assert army_rule.SUDDEN_STRIKE_HOOK_ID in summary["fight_activation_ability_hook_ids"]
 
     action_status = lifecycle.submit_decision(
         DecisionResult.for_request(
@@ -117,9 +152,11 @@ def test_aeldari_star_engines_grants_advanced_vehicle_assault_until_end_of_turn(
         )
     )
     grant_request = _decision_request(grant_status)
-    assert grant_request.decision_type == SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
+    assert grant_request.decision_type == SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE
     assert {option.option_id for option in grant_request.options} == {
-        DECLINE_ADVANCE_MOVE_GRANT_OPTION_ID,
+        DECLINE_MOVEMENT_ACTION_GRANT_OPTION_ID,
+        army_rule.SWIFT_AS_THE_WIND_HOOK_ID,
+        army_rule.FLITTING_SHADOWS_HOOK_ID,
         army_rule.HOOK_ID,
     }
 
@@ -178,7 +215,7 @@ def test_aeldari_star_engines_grants_advanced_vehicle_assault_until_end_of_turn(
         "movement_action_result_id": "phase17g-aeldari-advance-action",
     }
 
-    grant_event = _event_payload(lifecycle, "advance_move_hooks_resolved")
+    grant_event = _event_payload(lifecycle, "movement_action_grant_decision_resolved")
     effect = _single_persisting_effect_for_unit_by_kind(
         state,
         _AELDARI_UNIT_ID,
@@ -192,11 +229,11 @@ def test_aeldari_star_engines_grants_advanced_vehicle_assault_until_end_of_turn(
     assert effect_payload == {
         "effect_kind": "ranged_weapon_keyword_grant",
         "granted_weapon_keywords": [WeaponKeyword.ASSAULT.value],
-        "source_movement_request_id": grant_event["proposal_request_id"],
-        "source_movement_result_id": "phase17g-aeldari-advance-proposal",
+        "source_movement_request_id": action_request.request_id,
+        "source_movement_result_id": "phase17g-aeldari-advance-action",
     }
 
-    grants = cast(list[JsonValue], grant_event["grants"])
+    grants = cast(list[JsonValue], grant_event["selected_grants"])
     grant = cast(dict[str, JsonValue], grants[0])
     assert grant["hook_id"] == army_rule.HOOK_ID
     assert grant["source_id"] == army_rule.SOURCE_RULE_ID
@@ -236,13 +273,13 @@ def test_aeldari_star_engines_decline_does_not_grant_assault() -> None:
         )
     )
     grant_request = _decision_request(grant_status)
-    assert grant_request.decision_type == SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
+    assert grant_request.decision_type == SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE
 
     proposal_status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase17g-aeldari-decline-star-engines",
             request=grant_request,
-            selected_option_id=DECLINE_ADVANCE_MOVE_GRANT_OPTION_ID,
+            selected_option_id=DECLINE_MOVEMENT_ACTION_GRANT_OPTION_ID,
         )
     )
     proposal_request = _decision_request(proposal_status)
@@ -299,7 +336,7 @@ def test_aeldari_star_engines_rejects_invented_advance_grant_option() -> None:
         )
     )
     grant_request = _decision_request(grant_status)
-    assert grant_request.decision_type == SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
+    assert grant_request.decision_type == SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE
 
     with pytest.raises(DecisionError):
         lifecycle.submit_decision(
@@ -310,13 +347,13 @@ def test_aeldari_star_engines_rejects_invented_advance_grant_option() -> None:
                 actor_id=grant_request.actor_id,
                 selected_option_id="invented_star_engines",
                 payload={
-                    "submission_kind": SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
+                    "submission_kind": SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE,
                     "unit_instance_id": _AELDARI_UNIT_ID,
                     "movement_phase_action": MovementPhaseActionKind.ADVANCE.value,
                     "movement_mode": MovementMode.ADVANCE.value,
                     "source_decision_request_id": action_request.request_id,
                     "source_decision_result_id": "phase17g-aeldari-invalid-advance-action",
-                    "selected_advance_move_grants": [],
+                    "selected_movement_action_grants": [],
                 },
             )
         )
@@ -329,6 +366,235 @@ def test_aeldari_star_engines_rejects_invented_advance_grant_option() -> None:
         )
         == ()
     )
+
+
+def test_aeldari_swift_as_the_wind_adds_two_inches_to_normal_move() -> None:
+    config = _aeldari_config()
+    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
+    action_request = _select_aeldari_vehicle_for_movement(lifecycle, movement_status)
+
+    grant_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-aeldari-swift-normal-action",
+            request=action_request,
+            selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        )
+    )
+    grant_request = _decision_request(grant_status)
+    assert grant_request.decision_type == SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE
+    assert {option.option_id for option in grant_request.options} == {
+        DECLINE_MOVEMENT_ACTION_GRANT_OPTION_ID,
+        army_rule.SWIFT_AS_THE_WIND_HOOK_ID,
+        army_rule.FLITTING_SHADOWS_HOOK_ID,
+    }
+
+    proposal_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-aeldari-swift-selected",
+            request=grant_request,
+            selected_option_id=army_rule.SWIFT_AS_THE_WIND_HOOK_ID,
+        )
+    )
+    proposal_request = _decision_request(proposal_status)
+    assert proposal_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+
+    move_status = submit_movement_proposal(
+        lifecycle,
+        request=proposal_request,
+        result_id="phase17g-aeldari-swift-move-proposal",
+        unit_instance_id=_AELDARI_UNIT_ID,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id=_AELDARI_UNIT_ID,
+            dx=12.0,
+        ),
+    )
+    _decline_stratagem_window_if_present(
+        lifecycle,
+        move_status,
+        result_id="phase17g-aeldari-decline-after-swift",
+    )
+
+    state = _state(lifecycle)
+    agile_effect = _single_persisting_effect_for_unit_by_kind(
+        state,
+        _AELDARI_UNIT_ID,
+        army_rule.AGILE_MANOEUVRE_EFFECT_KIND,
+    )
+    payload = cast(dict[str, JsonValue], agile_effect.effect_payload)
+    assert agile_effect.expiration.expiration_kind is EffectExpirationKind.END_PHASE
+    assert payload["maneuver"] == army_rule.SWIFT_AS_THE_WIND_MANEUVER
+    assert payload["movement_bonus_inches"] == 2
+
+
+def test_aeldari_flitting_shadows_movement_blocks_fire_overwatch_until_end_of_turn() -> None:
+    config = _aeldari_config()
+    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
+    action_request = _select_aeldari_vehicle_for_movement(lifecycle, movement_status)
+
+    grant_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-aeldari-flitting-normal-action",
+            request=action_request,
+            selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        )
+    )
+    grant_request = _decision_request(grant_status)
+    proposal_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-aeldari-flitting-selected",
+            request=grant_request,
+            selected_option_id=army_rule.FLITTING_SHADOWS_HOOK_ID,
+        )
+    )
+    proposal_request = _decision_request(proposal_status)
+    move_status = submit_movement_proposal(
+        lifecycle,
+        request=proposal_request,
+        result_id="phase17g-aeldari-flitting-move-proposal",
+        unit_instance_id=_AELDARI_UNIT_ID,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id=_AELDARI_UNIT_ID,
+            dx=6.0,
+        ),
+    )
+    _decline_stratagem_window_if_present(
+        lifecycle,
+        move_status,
+        result_id="phase17g-aeldari-decline-after-flitting",
+    )
+
+    effect = _single_persisting_effect_for_unit_by_kind(
+        _state(lifecycle),
+        _AELDARI_UNIT_ID,
+        army_rule.AGILE_MANOEUVRE_EFFECT_KIND,
+    )
+    payload = cast(dict[str, JsonValue], effect.effect_payload)
+    assert effect.expiration.expiration_kind is EffectExpirationKind.END_TURN
+    assert payload["maneuver"] == army_rule.FLITTING_SHADOWS_MANEUVER
+    assert payload["fire_overwatch_forbidden"] is True
+
+
+def test_aeldari_flitting_shadows_charge_declaration_grant_blocks_overwatch() -> None:
+    charge_state = _prepared_aeldari_state_at_phase(BattlePhase.CHARGE)
+    context = ChargeDeclarationContext(
+        state=charge_state,
+        player_id="player-a",
+        battle_round=charge_state.battle_round,
+        unit_instance_id=_AELDARI_UNIT_ID,
+        selection_request_id="phase17g-aeldari-charge-select-request",
+        selection_result_id="phase17g-aeldari-charge-select-result",
+    )
+
+    grant = army_rule.flitting_shadows_charge_declaration_grant(context)
+
+    assert grant is not None
+    assert grant.hook_id == army_rule.FLITTING_SHADOWS_HOOK_ID
+    assert grant.unit_effect_expiration == "end_turn"
+    payload = cast(dict[str, JsonValue], grant.unit_effect_payload)
+    assert payload["maneuver"] == army_rule.FLITTING_SHADOWS_MANEUVER
+    assert payload["fire_overwatch_forbidden"] is True
+
+
+def test_aeldari_sudden_strike_fight_option_extends_pile_in_and_consolidation() -> None:
+    fight_state = _prepared_aeldari_state_at_phase(BattlePhase.FIGHT)
+    activation = FightActivationSelection(
+        player_id="player-a",
+        battle_round=fight_state.battle_round,
+        unit_instance_id=_AELDARI_UNIT_ID,
+        ordering_band=FightOrderingBandKind.REMAINING_COMBATS,
+        fight_type=FightTypeKind.NORMAL,
+        eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
+        request_id="phase17g-aeldari-fight-activation-request",
+        result_id="phase17g-aeldari-fight-activation-result",
+    )
+    context = FightActivationAbilityContext(
+        state=fight_state,
+        game_id=fight_state.game_id,
+        battle_round=fight_state.battle_round,
+        active_player_id="player-a",
+        player_id="player-a",
+        unit_instance_id=_AELDARI_UNIT_ID,
+        activation=activation,
+        target_unit_instance_ids=(_ENEMY_UNIT_ID,),
+    )
+
+    option = army_rule.sudden_strike_fight_activation_option(context)
+
+    assert option is not None
+    assert option.hook_id == army_rule.SUDDEN_STRIKE_HOOK_ID
+    assert option.ability_id == army_rule.SUDDEN_STRIKE_MANEUVER
+    assert option.model_proximity_inches == 6.0
+    spend_payload = cast(dict[str, JsonValue], option.decision_effect_payload)
+    assert spend_payload["maneuver"] == army_rule.SUDDEN_STRIKE_MANEUVER
+    assert spend_payload["battle_focus_token_cost"] == 1
+
+
+def test_aeldari_opportunity_seized_grants_d6_plus_one_after_enemy_fall_back() -> None:
+    config = _aeldari_config()
+    lifecycle, _movement_status = _advance_to_movement_unit_selection(config)
+    state = _state(lifecycle)
+    _place_unit_poses(
+        state,
+        unit_instance_id=_AELDARI_UNIT_ID,
+        poses=(Pose.at(20.0, 20.0, 0.0),),
+    )
+    enemy_start_poses = _unit_line_poses(x=24.0, y=20.0)
+    enemy_end_poses = _unit_line_poses(x=34.0, y=20.0)
+    _place_unit_poses(state, unit_instance_id=_ENEMY_UNIT_ID, poses=enemy_end_poses)
+    transition_batch = _displacement_batch_for_unit(
+        state=state,
+        unit_instance_id=_ENEMY_UNIT_ID,
+        start_poses=enemy_start_poses,
+        end_poses=enemy_end_poses,
+    )
+    context = MovementEndSurgeContext(
+        state=state,
+        ruleset_descriptor=config.ruleset_descriptor,
+        triggering_unit_instance_id=_ENEMY_UNIT_ID,
+        triggering_player_id="player-b",
+        reacting_player_id="player-a",
+        trigger_event_id="phase17g-aeldari-enemy-fall-back-event",
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK.value,
+        trigger_event_payload={"transition_batch": cast(JsonValue, transition_batch.to_payload())},
+    )
+
+    grants = army_rule.opportunity_seized_surge_grants(context)
+
+    assert len(grants) == 1
+    grant = grants[0]
+    assert grant.hook_id == army_rule.OPPORTUNITY_SEIZED_HOOK_ID
+    assert grant.unit_instance_id == _AELDARI_UNIT_ID
+    assert grant.max_distance_bonus_inches == 1
+    payload = cast(dict[str, JsonValue], grant.decision_effect_payload)
+    assert payload["maneuver"] == army_rule.OPPORTUNITY_SEIZED_MANEUVER
+
+
+def test_aeldari_fade_back_grants_d6_plus_one_to_hit_unit_after_enemy_shoots() -> None:
+    shooting_state = _prepared_aeldari_state_at_phase(BattlePhase.SHOOTING)
+    context = ShootingEndSurgeContext(
+        state=shooting_state,
+        shooting_unit_instance_id=_ENEMY_UNIT_ID,
+        shooting_player_id="player-b",
+        reacting_player_id="player-a",
+        trigger_event_id="phase17g-aeldari-enemy-shooting-event",
+        hit_target_unit_instance_ids=(_AELDARI_UNIT_ID,),
+    )
+
+    grants = army_rule.fade_back_surge_grants(context)
+
+    assert len(grants) == 1
+    grant = grants[0]
+    assert grant.hook_id == army_rule.FADE_BACK_HOOK_ID
+    assert grant.unit_instance_id == _AELDARI_UNIT_ID
+    assert grant.max_distance_bonus_inches == 1
+    payload = cast(dict[str, JsonValue], grant.decision_effect_payload)
+    assert payload["maneuver"] == army_rule.FADE_BACK_MANEUVER
 
 
 def _wahapedia_aeldari_battle_focus_row() -> dict[str, JsonValue]:
@@ -638,6 +904,88 @@ def _state_at_phase(state: GameState, phase: BattlePhase) -> GameState:
             raise AssertionError("battle state ended before expected phase")
         phase_state.advance_to_next_battle_phase()
     return phase_state
+
+
+def _prepared_aeldari_state_at_phase(phase: BattlePhase) -> GameState:
+    lifecycle, _status = _advance_to_movement_unit_selection(_aeldari_config())
+    return _state_at_phase(_state(lifecycle), phase)
+
+
+def _place_unit_poses(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    poses: tuple[Pose, ...],
+) -> None:
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
+    placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)
+    state.replace_battlefield_state(
+        state.battlefield_state.with_unit_placement(_with_model_poses(placement, poses=poses))
+    )
+
+
+def _unit_line_poses(*, x: float, y: float) -> tuple[Pose, ...]:
+    return tuple(Pose.at(x, y + index * 1.8, 0.0) for index in range(5))
+
+
+def _with_model_poses(
+    unit_placement: UnitPlacement,
+    *,
+    poses: tuple[Pose, ...],
+) -> UnitPlacement:
+    if len(poses) != len(unit_placement.model_placements):
+        raise AssertionError("test pose fixture must match unit model count")
+    return UnitPlacement(
+        army_id=unit_placement.army_id,
+        player_id=unit_placement.player_id,
+        unit_instance_id=unit_placement.unit_instance_id,
+        model_placements=tuple(
+            ModelPlacement(
+                army_id=placement.army_id,
+                player_id=placement.player_id,
+                unit_instance_id=placement.unit_instance_id,
+                model_instance_id=placement.model_instance_id,
+                pose=pose,
+            )
+            for placement, pose in zip(unit_placement.model_placements, poses, strict=True)
+        ),
+    )
+
+
+def _displacement_batch_for_unit(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    start_poses: tuple[Pose, ...],
+    end_poses: tuple[Pose, ...],
+) -> BattlefieldTransitionBatch:
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
+    placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)
+    if len(start_poses) != len(placement.model_placements):
+        raise AssertionError("test start poses must match unit model count")
+    if len(end_poses) != len(placement.model_placements):
+        raise AssertionError("test end poses must match unit model count")
+    return BattlefieldTransitionBatch(
+        displacements=tuple(
+            ModelDisplacementRecord(
+                model_instance_id=model_placement.model_instance_id,
+                displacement_kind=ModelDisplacementKind.FALL_BACK,
+                start_pose=start_pose,
+                end_pose=end_pose,
+                source_phase=BattlePhase.MOVEMENT.value,
+                source_step="move_units",
+                source_event_id="phase17g-aeldari-enemy-fall-back-event",
+            )
+            for model_placement, start_pose, end_pose in zip(
+                placement.model_placements,
+                start_poses,
+                end_poses,
+                strict=True,
+            )
+        )
+    )
 
 
 def _single_persisting_effect_for_unit_by_kind(

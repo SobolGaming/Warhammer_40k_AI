@@ -11,47 +11,42 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 
-class AdvanceMoveGrantPayload(TypedDict):
+SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE = "select_charge_declaration_grant"
+DECLINE_CHARGE_DECLARATION_GRANT_OPTION_ID = "decline_charge_declaration_grant"
+
+
+class ChargeDeclarationGrantPayload(TypedDict):
     hook_id: str
     source_id: str
     label: str
-    granted_ranged_weapon_keywords: list[str]
-    movement_bonus_inches: int
     replay_payload: JsonValue
     decision_effect_payload: JsonValue
     unit_effect_payload: JsonValue
     unit_effect_expiration: str | None
 
 
-SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE = "select_movement_action_grant"
-DECLINE_MOVEMENT_ACTION_GRANT_OPTION_ID = "decline_movement_action_grant"
-SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE = SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE
-DECLINE_ADVANCE_MOVE_GRANT_OPTION_ID = DECLINE_MOVEMENT_ACTION_GRANT_OPTION_ID
-
-
-type AdvanceMoveHandler = Callable[
-    ["AdvanceMoveContext"],
-    "AdvanceMoveGrant | None",
+type ChargeDeclarationHandler = Callable[
+    ["ChargeDeclarationContext"],
+    "ChargeDeclarationGrant | None",
 ]
 
 
 @dataclass(frozen=True, slots=True)
-class AdvanceMoveContext:
+class ChargeDeclarationContext:
     state: GameState
     player_id: str
     battle_round: int
     unit_instance_id: str
-    movement_phase_action: str
-    movement_request_id: str
-    movement_result_id: str
+    selection_request_id: str
+    selection_result_id: str
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
 
         if type(self.state) is not GameState:
-            raise GameLifecycleError("AdvanceMoveContext state must be a GameState.")
-        if self.state.current_battle_phase is not BattlePhase.MOVEMENT:
-            raise GameLifecycleError("AdvanceMoveContext requires the Movement phase.")
+            raise GameLifecycleError("ChargeDeclarationContext state must be a GameState.")
+        if self.state.current_battle_phase is not BattlePhase.CHARGE:
+            raise GameLifecycleError("ChargeDeclarationContext requires the Charge phase.")
         object.__setattr__(self, "player_id", _validate_identifier("player_id", self.player_id))
         object.__setattr__(
             self,
@@ -63,29 +58,23 @@ class AdvanceMoveContext:
             "unit_instance_id",
             _validate_identifier("unit_instance_id", self.unit_instance_id),
         )
-        action = _validate_identifier("movement_phase_action", self.movement_phase_action)
-        if action not in {"normal_move", "advance", "fall_back"}:
-            raise GameLifecycleError("AdvanceMoveContext movement action is unsupported.")
-        object.__setattr__(self, "movement_phase_action", action)
         object.__setattr__(
             self,
-            "movement_request_id",
-            _validate_identifier("movement_request_id", self.movement_request_id),
+            "selection_request_id",
+            _validate_identifier("selection_request_id", self.selection_request_id),
         )
         object.__setattr__(
             self,
-            "movement_result_id",
-            _validate_identifier("movement_result_id", self.movement_result_id),
+            "selection_result_id",
+            _validate_identifier("selection_result_id", self.selection_result_id),
         )
 
 
 @dataclass(frozen=True, slots=True)
-class AdvanceMoveGrant:
+class ChargeDeclarationGrant:
     hook_id: str
     source_id: str
     label: str
-    granted_ranged_weapon_keywords: tuple[str, ...]
-    movement_bonus_inches: int = 0
     replay_payload: JsonValue = None
     decision_effect_payload: JsonValue = None
     unit_effect_payload: JsonValue = None
@@ -95,19 +84,6 @@ class AdvanceMoveGrant:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
         object.__setattr__(self, "label", _validate_identifier("label", self.label))
-        object.__setattr__(
-            self,
-            "granted_ranged_weapon_keywords",
-            _validate_identifier_tuple(
-                "granted_ranged_weapon_keywords",
-                self.granted_ranged_weapon_keywords,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "movement_bonus_inches",
-            _validate_non_negative_int("movement_bonus_inches", self.movement_bonus_inches),
-        )
         object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
         object.__setattr__(
             self,
@@ -125,17 +101,15 @@ class AdvanceMoveGrant:
             _validate_optional_expiration("unit_effect_expiration", self.unit_effect_expiration),
         )
         if self.unit_effect_payload is None and self.unit_effect_expiration is not None:
-            raise GameLifecycleError("Advance grant expiration requires a unit effect payload.")
+            raise GameLifecycleError("Charge declaration expiration requires a unit effect.")
         if self.unit_effect_payload is not None and self.unit_effect_expiration is None:
-            raise GameLifecycleError("Advance grant unit effect requires an expiration.")
+            raise GameLifecycleError("Charge declaration unit effect requires an expiration.")
 
-    def to_payload(self) -> AdvanceMoveGrantPayload:
+    def to_payload(self) -> ChargeDeclarationGrantPayload:
         return {
             "hook_id": self.hook_id,
             "source_id": self.source_id,
             "label": self.label,
-            "granted_ranged_weapon_keywords": list(self.granted_ranged_weapon_keywords),
-            "movement_bonus_inches": self.movement_bonus_inches,
             "replay_payload": self.replay_payload,
             "decision_effect_payload": self.decision_effect_payload,
             "unit_effect_payload": self.unit_effect_payload,
@@ -143,13 +117,11 @@ class AdvanceMoveGrant:
         }
 
     @classmethod
-    def from_payload(cls, payload: AdvanceMoveGrantPayload) -> Self:
+    def from_payload(cls, payload: ChargeDeclarationGrantPayload) -> Self:
         return cls(
             hook_id=payload["hook_id"],
             source_id=payload["source_id"],
             label=payload["label"],
-            granted_ranged_weapon_keywords=tuple(payload["granted_ranged_weapon_keywords"]),
-            movement_bonus_inches=payload["movement_bonus_inches"],
             replay_payload=payload["replay_payload"],
             decision_effect_payload=payload["decision_effect_payload"],
             unit_effect_payload=payload["unit_effect_payload"],
@@ -158,21 +130,21 @@ class AdvanceMoveGrant:
 
 
 @dataclass(frozen=True, slots=True)
-class AdvanceMoveHookBinding:
+class ChargeDeclarationHookBinding:
     hook_id: str
     source_id: str
-    handler: AdvanceMoveHandler
+    handler: ChargeDeclarationHandler
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
         if not callable(self.handler):
-            raise GameLifecycleError("AdvanceMoveHookBinding handler must be callable.")
+            raise GameLifecycleError("ChargeDeclarationHookBinding handler must be callable.")
 
 
 @dataclass(frozen=True, slots=True)
-class AdvanceMoveHookRegistry:
-    bindings: tuple[AdvanceMoveHookBinding, ...]
+class ChargeDeclarationHookRegistry:
+    bindings: tuple[ChargeDeclarationHookBinding, ...]
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "bindings", _validate_hook_bindings(self.bindings))
@@ -182,74 +154,56 @@ class AdvanceMoveHookRegistry:
         return cls(bindings=())
 
     @classmethod
-    def from_bindings(cls, bindings: tuple[AdvanceMoveHookBinding, ...]) -> Self:
+    def from_bindings(cls, bindings: tuple[ChargeDeclarationHookBinding, ...]) -> Self:
         return cls(bindings=bindings)
 
-    def all_bindings(self) -> tuple[AdvanceMoveHookBinding, ...]:
+    def all_bindings(self) -> tuple[ChargeDeclarationHookBinding, ...]:
         return self.bindings
 
-    def grants_for(self, context: AdvanceMoveContext) -> tuple[AdvanceMoveGrant, ...]:
-        if type(context) is not AdvanceMoveContext:
-            raise GameLifecycleError("Advance hooks require a context.")
-        grants: list[AdvanceMoveGrant] = []
+    def grants_for(
+        self,
+        context: ChargeDeclarationContext,
+    ) -> tuple[ChargeDeclarationGrant, ...]:
+        if type(context) is not ChargeDeclarationContext:
+            raise GameLifecycleError("Charge declaration hooks require a context.")
+        grants: list[ChargeDeclarationGrant] = []
         for binding in self.bindings:
             grant = binding.handler(context)
             if grant is None:
                 continue
-            if type(grant) is not AdvanceMoveGrant:
-                raise GameLifecycleError("Advance handlers must return grants or None.")
+            if type(grant) is not ChargeDeclarationGrant:
+                raise GameLifecycleError("Charge declaration handlers must return grants or None.")
             if grant.hook_id != binding.hook_id:
-                raise GameLifecycleError("Advance handler returned hook_id drift.")
+                raise GameLifecycleError("Charge declaration handler returned hook_id drift.")
             if grant.source_id != binding.source_id:
-                raise GameLifecycleError("Advance handler returned source_id drift.")
+                raise GameLifecycleError("Charge declaration handler returned source_id drift.")
             grants.append(grant)
         return tuple(sorted(grants, key=lambda grant: grant.hook_id))
 
 
-def _validate_hook_bindings(value: object) -> tuple[AdvanceMoveHookBinding, ...]:
+def _validate_hook_bindings(value: object) -> tuple[ChargeDeclarationHookBinding, ...]:
     if type(value) is not tuple:
-        raise GameLifecycleError("AdvanceMoveHookRegistry bindings must be a tuple.")
-    bindings: list[AdvanceMoveHookBinding] = []
+        raise GameLifecycleError("ChargeDeclarationHookRegistry bindings must be a tuple.")
+    bindings: list[ChargeDeclarationHookBinding] = []
     seen: set[str] = set()
     for binding in cast(tuple[object, ...], value):
-        if type(binding) is not AdvanceMoveHookBinding:
+        if type(binding) is not ChargeDeclarationHookBinding:
             raise GameLifecycleError(
-                "AdvanceMoveHookRegistry bindings must contain AdvanceMoveHookBinding values."
+                "ChargeDeclarationHookRegistry bindings must contain "
+                "ChargeDeclarationHookBinding values."
             )
         if binding.hook_id in seen:
-            raise GameLifecycleError("AdvanceMoveHookRegistry hook IDs must be unique.")
+            raise GameLifecycleError("ChargeDeclarationHookRegistry hook IDs must be unique.")
         seen.add(binding.hook_id)
         bindings.append(binding)
     return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
 
 
-def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError(f"Advance hook {field_name} must be a tuple.")
-    validated: list[str] = []
-    seen: set[str] = set()
-    for raw_value in cast(tuple[object, ...], values):
-        value = _validate_identifier(field_name, raw_value)
-        if value in seen:
-            raise GameLifecycleError(f"Advance hook {field_name} must be unique.")
-        seen.add(value)
-        validated.append(value)
-    return tuple(sorted(validated))
-
-
 def _validate_positive_int(field_name: str, value: object) -> int:
     if type(value) is not int:
-        raise GameLifecycleError(f"Advance hook {field_name} must be an int.")
+        raise GameLifecycleError(f"Charge declaration hook {field_name} must be an int.")
     if value <= 0:
-        raise GameLifecycleError(f"Advance hook {field_name} must be greater than zero.")
-    return value
-
-
-def _validate_non_negative_int(field_name: str, value: object) -> int:
-    if type(value) is not int:
-        raise GameLifecycleError(f"Advance hook {field_name} must be an int.")
-    if value < 0:
-        raise GameLifecycleError(f"Advance hook {field_name} must not be negative.")
+        raise GameLifecycleError(f"Charge declaration hook {field_name} must be greater than zero.")
     return value
 
 
@@ -258,14 +212,16 @@ def _validate_optional_expiration(field_name: str, value: object) -> str | None:
         return None
     expiration = _validate_identifier(field_name, value)
     if expiration not in {"end_phase", "end_turn"}:
-        raise GameLifecycleError(f"Advance hook {field_name} is unsupported.")
+        raise GameLifecycleError(
+            f"Charge declaration hook {field_name} must be end_phase or end_turn."
+        )
     return expiration
 
 
 def _validate_identifier(field_name: str, value: object) -> str:
     if type(value) is not str:
-        raise GameLifecycleError(f"Advance hook {field_name} must be a string.")
+        raise GameLifecycleError(f"Charge declaration hook {field_name} must be a string.")
     stripped = value.strip()
     if not stripped:
-        raise GameLifecycleError(f"Advance hook {field_name} must not be empty.")
+        raise GameLifecycleError(f"Charge declaration hook {field_name} must not be empty.")
     return stripped

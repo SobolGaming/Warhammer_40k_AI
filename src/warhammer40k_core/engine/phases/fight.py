@@ -2480,6 +2480,19 @@ def _apply_fight_activation_ability_decision(
         },
     )
     state.record_persisting_effect(effect)
+    spend_effect = None
+    if ability_use.decision_effect_payload is not None:
+        spend_effect = PersistingEffect(
+            effect_id=f"{ability_use.result_id}:{ability_use.ability_id}:decision",
+            source_rule_id=ability_use.source_id,
+            owner_player_id=ability_use.player_id,
+            target_unit_instance_ids=(ability_use.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhase.FIGHT,
+            expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
+            effect_payload=ability_use.decision_effect_payload,
+        )
+        state.record_persisting_effect(spend_effect)
     decisions.event_log.append(
         "fight_activation_ability_used",
         validate_json_value(
@@ -2493,6 +2506,9 @@ def _apply_fight_activation_ability_decision(
                 "activation_result_id": activation.result_id,
                 "ability_use": ability_use_payload,
                 "persisting_effect": effect.to_payload(),
+                "decision_persisting_effect": (
+                    None if spend_effect is None else spend_effect.to_payload()
+                ),
             }
         ),
     )

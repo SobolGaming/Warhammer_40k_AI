@@ -6,6 +6,7 @@ from enum import StrEnum
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
     MovementMode,
     RulesetDescriptor,
     movement_mode_from_token,
@@ -27,6 +28,7 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
@@ -126,6 +128,7 @@ class TriggeredMovementEligibleUnitPayload(TypedDict):
     hook_id: str
     source_id: str
     replay_payload: JsonValue
+    decision_effect_payload: JsonValue
 
 
 @dataclass(frozen=True, slots=True)
@@ -517,6 +520,7 @@ class TriggeredMovementEligibleUnit:
     hook_id: str
     source_id: str
     replay_payload: JsonValue = None
+    decision_effect_payload: JsonValue = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -538,6 +542,11 @@ class TriggeredMovementEligibleUnit:
             _validate_identifier("TriggeredMovementEligibleUnit source_id", self.source_id),
         )
         object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
+        object.__setattr__(
+            self,
+            "decision_effect_payload",
+            validate_json_value(self.decision_effect_payload),
+        )
 
     def to_payload(self) -> TriggeredMovementEligibleUnitPayload:
         return {
@@ -545,6 +554,7 @@ class TriggeredMovementEligibleUnit:
             "hook_id": self.hook_id,
             "source_id": self.source_id,
             "replay_payload": self.replay_payload,
+            "decision_effect_payload": self.decision_effect_payload,
         }
 
     @classmethod
@@ -554,6 +564,7 @@ class TriggeredMovementEligibleUnit:
             hook_id=payload["hook_id"],
             source_id=payload["source_id"],
             replay_payload=payload["replay_payload"],
+            decision_effect_payload=payload["decision_effect_payload"],
         )
 
 
@@ -1612,6 +1623,12 @@ def _apply_triggered_movement_unit_selection_decision(
             "selection_option_id": result.selected_option_id,
         },
     ).to_decision_request()
+    decision_effect = _record_triggered_movement_decision_effect_if_needed(
+        state=state,
+        selected_unit=selected_unit,
+        result=result,
+        descriptor=descriptor,
+    )
     decisions.request_decision(request)
     decisions.event_log.append(
         "triggered_movement_unit_selected",
@@ -1628,6 +1645,9 @@ def _apply_triggered_movement_unit_selection_decision(
             "result_id": result.result_id,
             "proposal_request_id": request.request_id,
             "eligible_unit": selected_unit.to_payload(),
+            "decision_persisting_effect": (
+                None if decision_effect is None else decision_effect.to_payload()
+            ),
             "phase_body_status": "triggered_movement_proposal_pending",
         },
     )
@@ -1643,6 +1663,36 @@ def _apply_triggered_movement_unit_selection_decision(
             "phase_body_status": "triggered_movement_proposal_pending",
         },
     )
+
+
+def _record_triggered_movement_decision_effect_if_needed(
+    *,
+    state: GameState,
+    selected_unit: TriggeredMovementEligibleUnit,
+    result: DecisionResult,
+    descriptor: TriggeredMovementDescriptor,
+) -> PersistingEffect | None:
+    if type(selected_unit) is not TriggeredMovementEligibleUnit:
+        raise GameLifecycleError("Triggered movement decision effect requires an eligible unit.")
+    if type(descriptor) is not TriggeredMovementDescriptor:
+        raise GameLifecycleError("Triggered movement decision effect requires a descriptor.")
+    if selected_unit.decision_effect_payload is None:
+        return None
+    current_phase = state.current_battle_phase
+    if current_phase is None:
+        raise GameLifecycleError("Triggered movement decision effect requires a battle phase.")
+    effect = PersistingEffect(
+        effect_id=f"{result.result_id}:{selected_unit.hook_id}:decision",
+        source_rule_id=selected_unit.source_id,
+        owner_player_id=_validate_identifier("actor_id", result.actor_id),
+        target_unit_instance_ids=(selected_unit.unit_instance_id,),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhaseKind(current_phase.value),
+        expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
+        effect_payload=selected_unit.decision_effect_payload,
+    )
+    state.record_persisting_effect(effect)
+    return effect
 
 
 def _triggered_movement_proposal_request_from_request(

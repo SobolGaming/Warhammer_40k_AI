@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.ruleset_descriptor import (
+    MovementMode,
     RulesetDescriptor,
     battle_phase_kind_from_token,
 )
@@ -23,6 +25,7 @@ from warhammer40k_core.engine.attack_sequence import (
     SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackSequence,
     AttackSequencePayload,
+    AttackSequenceStep,
     apply_allocation_order_decision,
     apply_attack_weapon_group_decision,
     apply_damage_allocation_model_decision,
@@ -73,11 +76,22 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.ranged_weapon_keyword_effects import (
     weapon_profile_with_ranged_keyword_effects,
 )
+from warhammer40k_core.engine.reaction_windows import (
+    ReactionWindow as TriggeredReactionWindow,
+)
+from warhammer40k_core.engine.reaction_windows import (
+    ReactionWindowKind,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_id_for_unit_id,
     rules_unit_view_by_id,
     rules_unit_view_from_armies,
+)
+from warhammer40k_core.engine.shooting_end_surge_hooks import (
+    ShootingEndSurgeContext,
+    ShootingEndSurgeGrant,
+    ShootingEndSurgeHookRegistry,
 )
 from warhammer40k_core.engine.shooting_targets import (
     ShootingTargetCandidate,
@@ -90,6 +104,12 @@ from warhammer40k_core.engine.shooting_types import ShootingType, shooting_type_
 from warhammer40k_core.engine.transports import (
     FiringDeckWeaponSelection,
     resolve_firing_deck_selection,
+)
+from warhammer40k_core.engine.triggered_movement import (
+    TriggeredMovementDescriptor,
+    TriggeredMovementEligibleUnit,
+    TriggeredMovementKind,
+    triggered_movement_unit_selection_request,
 )
 from warhammer40k_core.engine.unit_abilities import (
     firing_deck_value_for_unit as unit_firing_deck_value,
@@ -828,6 +848,9 @@ class OutOfPhaseShootingState:
 class ShootingPhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
     army_catalog: ArmyCatalog | None = None
+    shooting_end_surge_hooks: ShootingEndSurgeHookRegistry = field(
+        default_factory=ShootingEndSurgeHookRegistry.empty
+    )
 
     def __post_init__(self) -> None:
         if (
@@ -839,6 +862,10 @@ class ShootingPhaseHandler:
             )
         if self.army_catalog is not None and type(self.army_catalog) is not ArmyCatalog:
             raise GameLifecycleError("ShootingPhaseHandler army_catalog must be an ArmyCatalog.")
+        if type(self.shooting_end_surge_hooks) is not ShootingEndSurgeHookRegistry:
+            raise GameLifecycleError(
+                "ShootingPhaseHandler shooting_end_surge_hooks must be a registry."
+            )
 
     @property
     def phase(self) -> BattlePhase:
@@ -855,6 +882,7 @@ class ShootingPhaseHandler:
         _validate_shooting_phase_state(state)
         shooting_state = _ensure_shooting_phase_state(state=state)
         if shooting_state.attack_sequence is not None:
+            completed_candidate = shooting_state.attack_sequence
             attack_sequence, allocated_model_ids, status = resolve_attack_sequence_until_blocked(
                 state=state,
                 decisions=decisions,
@@ -869,6 +897,15 @@ class ShootingPhaseHandler:
             state.shooting_phase_state = shooting_state
             if status is not None:
                 return status
+            if attack_sequence is None:
+                surge_status = _request_shooting_end_surge_if_available(
+                    state=state,
+                    decisions=decisions,
+                    registry=self.shooting_end_surge_hooks,
+                    completed_sequence=completed_candidate,
+                )
+                if surge_status is not None:
+                    return surge_status
         if shooting_state.phase_complete:
             decisions.event_log.append(
                 "shooting_phase_completed",
@@ -1254,6 +1291,243 @@ class ShootingPhaseHandler:
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             )
         raise GameLifecycleError("ShootingPhaseHandler received unsupported decision_type.")
+
+
+def _request_shooting_end_surge_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    registry: ShootingEndSurgeHookRegistry,
+    completed_sequence: AttackSequence,
+) -> LifecycleStatus | None:
+    if type(registry) is not ShootingEndSurgeHookRegistry:
+        raise GameLifecycleError("Shooting-end surge trigger requires a registry.")
+    if type(completed_sequence) is not AttackSequence:
+        raise GameLifecycleError("Shooting-end surge trigger requires an AttackSequence.")
+    if not registry.all_bindings():
+        return None
+    completed_event_id = _attack_sequence_completed_event_id(
+        decisions=decisions,
+        sequence=completed_sequence,
+    )
+    if completed_event_id is None:
+        raise GameLifecycleError("Completed shooting sequence missing completion event.")
+    if _shooting_end_surge_event_already_processed(
+        decisions=decisions,
+        trigger_event_id=completed_event_id,
+    ):
+        return None
+    hit_target_ids = _successful_hit_target_unit_ids_for_sequence(
+        decisions=decisions,
+        sequence=completed_sequence,
+    )
+    if not hit_target_ids:
+        return None
+    shooting_player_id = completed_sequence.attacker_player_id
+    for reacting_player_id in sorted(
+        player_id for player_id in state.player_ids if player_id != shooting_player_id
+    ):
+        context = ShootingEndSurgeContext(
+            state=state,
+            shooting_unit_instance_id=completed_sequence.attacking_unit_instance_id,
+            shooting_player_id=shooting_player_id,
+            reacting_player_id=reacting_player_id,
+            trigger_event_id=completed_event_id,
+            hit_target_unit_instance_ids=hit_target_ids,
+        )
+        grants = registry.grants_for(context)
+        if not grants:
+            continue
+        max_distance_bonus_inches = _shooting_end_surge_grant_distance_bonus(grants)
+        roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
+            _shooting_end_surge_distance_roll_spec(
+                source_rule_id=grants[0].source_id,
+                player_id=reacting_player_id,
+                shooting_unit_instance_id=completed_sequence.attacking_unit_instance_id,
+                trigger_event_id=completed_event_id,
+            )
+        )
+        descriptor = TriggeredMovementDescriptor(
+            movement_kind=TriggeredMovementKind.SURGE,
+            source_rule_id=grants[0].source_id,
+            trigger_timing=TriggeredReactionWindow(
+                phase=BattlePhase.SHOOTING,
+                window_kind=ReactionWindowKind.RULE_TRIGGER,
+                source_step="just_after_enemy_unit_has_shot",
+                source_event_id=completed_event_id,
+            ),
+            max_distance_inches=float(roll_state.current_total + max_distance_bonus_inches),
+            movement_mode=MovementMode.NORMAL,
+            allow_battle_shocked=False,
+            allow_within_engagement_range=False,
+            one_per_phase=True,
+            optional=True,
+        )
+        request = triggered_movement_unit_selection_request(
+            state=state,
+            player_id=reacting_player_id,
+            descriptor=descriptor,
+            eligible_units=_eligible_triggered_movement_units_from_shooting_grants(grants),
+        )
+        decisions.request_decision(request)
+        decisions.event_log.append(
+            "shooting_end_surge_triggered",
+            validate_json_value(
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": state.active_player_id,
+                    "shooting_player_id": shooting_player_id,
+                    "reacting_player_id": reacting_player_id,
+                    "phase": BattlePhase.SHOOTING.value,
+                    "shooting_unit_instance_id": completed_sequence.attacking_unit_instance_id,
+                    "trigger_event_id": completed_event_id,
+                    "hit_target_unit_instance_ids": list(hit_target_ids),
+                    "surge_distance_roll": roll_state.to_payload(),
+                    "max_distance_bonus_inches": max_distance_bonus_inches,
+                    "descriptor": descriptor.to_payload(),
+                    "grants": [grant.to_payload() for grant in grants],
+                    "request_id": request.request_id,
+                    "phase_body_status": "shooting_end_surge_pending",
+                }
+            ),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=request,
+            payload={
+                "phase": BattlePhase.SHOOTING.value,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "reacting_player_id": reacting_player_id,
+                "shooting_unit_instance_id": completed_sequence.attacking_unit_instance_id,
+                "decision_type": request.decision_type,
+                "phase_body_status": "shooting_end_surge_pending",
+            },
+        )
+    return None
+
+
+def _eligible_triggered_movement_units_from_shooting_grants(
+    grants: tuple[ShootingEndSurgeGrant, ...],
+) -> tuple[TriggeredMovementEligibleUnit, ...]:
+    return tuple(
+        TriggeredMovementEligibleUnit(
+            unit_instance_id=grant.unit_instance_id,
+            hook_id=grant.hook_id,
+            source_id=grant.source_id,
+            replay_payload=grant.replay_payload,
+            decision_effect_payload=grant.decision_effect_payload,
+        )
+        for grant in grants
+    )
+
+
+def _shooting_end_surge_grant_distance_bonus(
+    grants: tuple[ShootingEndSurgeGrant, ...],
+) -> int:
+    if type(grants) is not tuple:
+        raise GameLifecycleError("Shooting-end surge distance bonus requires grant tuple.")
+    for grant in grants:
+        if type(grant) is not ShootingEndSurgeGrant:
+            raise GameLifecycleError(
+                "Shooting-end surge distance bonus requires ShootingEndSurgeGrant values."
+            )
+    bonuses = {grant.max_distance_bonus_inches for grant in grants}
+    if len(bonuses) != 1:
+        raise GameLifecycleError("Shooting-end surge grants must share one distance bonus.")
+    return bonuses.pop()
+
+
+def _shooting_end_surge_distance_roll_spec(
+    *,
+    source_rule_id: str,
+    player_id: str,
+    shooting_unit_instance_id: str,
+    trigger_event_id: str,
+) -> DiceRollSpec:
+    return DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=(
+            "Shooting-end surge distance "
+            f"{source_rule_id} for {shooting_unit_instance_id} from {trigger_event_id}"
+        ),
+        roll_type="shooting_end_surge.distance",
+        actor_id=player_id,
+    )
+
+
+def _attack_sequence_completed_event_id(
+    *,
+    decisions: DecisionController,
+    sequence: AttackSequence,
+) -> str | None:
+    for record in reversed(decisions.event_log.records):
+        if record.event_type != "attack_sequence_completed":
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("sequence_id") == sequence.sequence_id:
+            return record.event_id
+    return None
+
+
+def _successful_hit_target_unit_ids_for_sequence(
+    *,
+    decisions: DecisionController,
+    sequence: AttackSequence,
+) -> tuple[str, ...]:
+    target_ids: set[str] = set()
+    for record in decisions.event_log.records:
+        if record.event_type != "attack_sequence_step":
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("sequence_id") != sequence.sequence_id:
+            continue
+        if payload.get("step") != AttackSequenceStep.HIT.value:
+            continue
+        step_payload = payload.get("payload")
+        if not isinstance(step_payload, dict):
+            raise GameLifecycleError("Attack sequence hit payload must be an object.")
+        if step_payload.get("successful") is not True:
+            continue
+        pool_index = payload.get("pool_index")
+        if type(pool_index) is not int:
+            raise GameLifecycleError("Attack sequence hit event pool_index must be an int.")
+        if pool_index < 0 or pool_index >= len(sequence.attack_pools):
+            raise GameLifecycleError("Attack sequence hit event pool_index is out of range.")
+        target_ids.add(sequence.attack_pools[pool_index].target_unit_instance_id)
+    return tuple(sorted(target_ids))
+
+
+def _shooting_end_surge_event_already_processed(
+    *,
+    decisions: DecisionController,
+    trigger_event_id: str,
+) -> bool:
+    requested_event_id = _validate_identifier("trigger_event_id", trigger_event_id)
+    for record in decisions.event_log.records:
+        if record.event_type not in {
+            "shooting_end_surge_triggered",
+            "triggered_movement_declined",
+            "triggered_movement_unit_selected",
+            "triggered_movement_resolved",
+        }:
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("trigger_event_id") == requested_event_id:
+            return True
+        trigger_timing = payload.get("trigger_timing")
+        if isinstance(trigger_timing, dict) and trigger_timing.get("source_event_id") == (
+            requested_event_id
+        ):
+            return True
+    return False
 
 
 def _request_shooting_type_selection(

@@ -212,21 +212,23 @@ Movement action option payloads include the selected `movement_mode`. Default No
 
 Accepted Fall Back proposals may include source-backed `fall_back_eligibility_grants` in the resulting `movement_activation_completed` event. These grants are replay-safe audit payloads produced by runtime faction content and do not create a new adapter choice. The Movement engine remains the only writer of `FellBackUnitState.can_shoot` and `FellBackUnitState.can_declare_charge`; Shooting and Charge phase selection consume those recorded permissions instead of adapters inferring Fall Back exceptions locally.
 
-Advance-triggered optional grants use a finite/proposal split. After an Advance
-movement action is selected, the engine may emit `select_advance_move_grant`
-before the movement proposal if one or more source-backed optional grants are
-currently legal. Each grant option ID is the deterministic hook ID emitted by
-runtime content; `decline_advance_move_grant` explicitly declines the window.
-The option payload includes the selected unit, source movement action
+Movement-action optional grants use a finite/proposal split. After a Normal
+Move, Advance, or Fall Back movement action is selected, the engine may emit
+`select_movement_action_grant` before the movement proposal or Advance roll if
+one or more source-backed optional grants are currently legal. Each grant option
+ID is the deterministic hook ID emitted by runtime content;
+`decline_movement_action_grant` explicitly declines the window. The option
+payload includes the selected unit, movement action, source movement action
 request/result IDs, movement mode, and JSON-safe selected grant payloads.
 Adapters must select one pending option ID, must not invent grant IDs, and must
-not spend resources or mutate weapon abilities locally. Accepted grant choices
-record any source-backed spend effect before the Advance roll and carry the
-selected grant payload into the later `submit_movement_proposal` request. The
-engine still validates the movement proposal, mutates battlefield state, and
-applies any resulting persisting weapon-keyword effects. Stale, malformed,
-wrong-context, or unavailable grant submissions are rejected before grant/spend
-mutation.
+not spend resources, apply movement bonuses, mutate weapon abilities, or apply
+defensive restrictions locally. Accepted grant choices record engine-owned
+source-backed spend and unit effects before the follow-up movement resolution
+and carry the selected grant payload into the later `submit_movement_proposal`
+request when that action uses one. The engine still validates the movement
+proposal, mutates battlefield state, and consumes structured grant effects.
+Stale, malformed, wrong-context, or unavailable grant submissions are rejected
+before grant/spend mutation.
 
 Phase 17G Movement-end surge rules use the same finite/proposal split as other
 physical movement. After an enemy unit completes a Normal Move, Advance, or
@@ -235,12 +237,20 @@ for the reacting player. Optional surge windows include
 `decline_triggered_movement`; each legal reacting unit is exposed through a
 deterministic `surge:<unit_instance_id>` option. The option payload identifies
 the selected rules unit, source hook, source rule, triggering unit, triggering
-move event, and engine-rolled maximum surge distance. Selecting a surge unit
-records only that finite choice and immediately emits a parameterized
+move event, optional engine-owned decision effect payload, and engine-rolled
+maximum surge distance. Selecting a surge unit records that finite choice,
+records any source-backed decision effect, and immediately emits a parameterized
 `submit_movement_proposal` request with proposal kind `surge_move`. Adapters
 must not roll the D6 locally, invent candidate units, move models from the
-finite option payload, or continue the Movement phase while either request is
-pending.
+finite option payload, spend source resources locally, or continue the Movement
+phase while either request is pending.
+
+Shooting phase after-shot surge rules reuse `select_triggered_movement` and the
+same `surge_move` proposal contract. After an enemy unit has shot, runtime
+content may expose eligible hit units as deterministic `surge:<unit_instance_id>`
+options for the reacting player. The engine owns the hit-unit filtering,
+distance roll, source spend recording, and physical movement proposal; adapters
+must not infer hit eligibility or move models from the finite option payload.
 
 Phase 17G phase-end objective-control retention hooks do not create
 adapter-submitted decisions. The engine snapshots objective proximity at the
@@ -631,15 +641,16 @@ Required Phase 13 adapter-contract tests:
 
 ## Phase 15 Charge Decisions
 
-Phase 15A implements Charge phase eligibility, declaration, and deterministic charge-distance rolls. Phase 15B implements the post-roll Charge Move as a parameterized physical proposal. Adapters must not synthesize target selection, placement mutation, displacement records, or Fights First state from the Phase 15A roll payload; they must answer the pending Phase 15B proposal request.
+Phase 15A implements Charge phase eligibility, declaration, optional source-backed declaration grants, and deterministic charge-distance rolls. Phase 15B implements the post-roll Charge Move as a parameterized physical proposal. Adapters must not synthesize target selection, placement mutation, displacement records, source-backed declaration effects, or Fights First state from the Phase 15A roll payload; they must answer the pending Phase 15B proposal request.
 
 Phase 15A exposes this active-player decision:
 
 - `select_charging_unit`: finite active-player choice. Option IDs are either the selected `unit_instance_id` or `complete_charge_phase`. Unit option payloads include `submission_kind: "select_charging_unit"`, game, round, phase, active player, selected unit ID, target candidates, and the current eligibility context. The completion option uses `submission_kind: "complete_charge_phase"` and includes deterministic `skipped_unit_ids` for all currently legal active-player charging units.
+- `select_charge_declaration_grant`: finite active-player choice emitted after `select_charging_unit` and before the Charge roll when runtime content exposes legal declaration grants. Option IDs are deterministic source hook IDs, plus `decline_charge_declaration_grant`. Accepted options may record engine-owned source spend and unit effects; adapters must not spend resources, invent grant IDs, or mutate defensive restrictions locally.
 
 Charge eligibility target candidates are engine-enumerated from battlefield state and the active ruleset's `charge_policy`. Phase 15A rejects chargers that Advanced, Fell Back, are within Engagement Range, are off the battlefield, already declared a Charge this phase, or have no enemy unit within the descriptor-sourced declaration range, currently 12", unless a future source-backed rule explicitly marks that unit as allowed to declare a charge.
 
-Selecting a charging unit records the finite `DecisionRecord`, emits `charging_unit_selected`, and immediately rolls 2D6 through the deterministic dice manager with `roll_type: "charge_roll"`. There is no Phase 15A adapter-visible target declaration payload. The generated charge-roll `DiceRollSpec` includes `reroll_forbidden_rule_ids` with `phase15a:charge-roll-command-reroll-forbidden`, so Phase 15A Charge rolls must not emit a Command Re-roll request even though the source-backed 11th Edition Stratagem catalog contains Charge as an eligible roll class.
+Selecting a charging unit records the finite `DecisionRecord`, emits `charging_unit_selected`, and either emits a `select_charge_declaration_grant` request or rolls 2D6 through the deterministic dice manager with `roll_type: "charge_roll"`. There is no Phase 15A adapter-visible target declaration payload. The generated charge-roll `DiceRollSpec` includes `reroll_forbidden_rule_ids` with `phase15a:charge-roll-command-reroll-forbidden`, so Phase 15A Charge rolls must not emit a Command Re-roll request even though the source-backed 11th Edition Stratagem catalog contains Charge as an eligible roll class.
 
 The `charge_roll_resolved` payload includes:
 
