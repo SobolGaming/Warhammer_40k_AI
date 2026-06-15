@@ -119,6 +119,7 @@ class WeaponProfilePayload(TypedDict):
     damage_profile: DamageProfilePayload
     keywords: list[str]
     abilities: list[AbilityDescriptorPayload]
+    source_ids: list[str]
 
 
 @dataclass(frozen=True, slots=True)
@@ -475,6 +476,7 @@ class WeaponProfile:
     damage_profile: DamageProfile
     keywords: tuple[WeaponKeyword, ...] = ()
     abilities: tuple[AbilityDescriptor, ...] = ()
+    source_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -507,6 +509,16 @@ class WeaponProfile:
         abilities = _canonical_ability_tuple(self.abilities)
         if abilities != self.abilities:
             object.__setattr__(self, "abilities", abilities)
+        object.__setattr__(
+            self,
+            "source_ids",
+            _validate_identifier_tuple(
+                "WeaponProfile source_ids",
+                self.source_ids,
+                min_length=0,
+                sort_values=True,
+            ),
+        )
 
     def stable_identity(self) -> str:
         return f"weapon-profile:{self.profile_id}"
@@ -523,6 +535,7 @@ class WeaponProfile:
             "damage_profile": self.damage_profile.to_payload(),
             "keywords": [keyword.value for keyword in self.keywords],
             "abilities": [ability.to_payload() for ability in self.abilities],
+            "source_ids": list(self.source_ids),
         }
 
     @classmethod
@@ -546,6 +559,7 @@ class WeaponProfile:
             abilities=tuple(
                 AbilityDescriptor.from_payload(ability) for ability in payload["abilities"]
             ),
+            source_ids=tuple(payload["source_ids"]),
         )
 
 
@@ -626,6 +640,30 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise WeaponProfileError(f"{field_name} must not be empty.")
     return stripped
+
+
+def _validate_identifier_tuple(
+    field_name: str,
+    values: tuple[str, ...],
+    *,
+    min_length: int,
+    sort_values: bool,
+) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise WeaponProfileError(f"{field_name} must be a tuple.")
+    validated: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        identifier = _validate_identifier(f"{field_name} value", value)
+        if identifier in seen:
+            raise WeaponProfileError(f"{field_name} must not contain duplicates.")
+        seen.add(identifier)
+        validated.append(identifier)
+    if len(validated) < min_length:
+        raise WeaponProfileError(f"{field_name} must contain at least {min_length} values.")
+    if sort_values:
+        return tuple(sorted(validated))
+    return tuple(validated)
 
 
 def _validate_ability_id(value: object) -> str:

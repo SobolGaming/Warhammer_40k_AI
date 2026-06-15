@@ -44,6 +44,9 @@ class WahapediaSchemaError(ValueError):
     """Raised when Wahapedia source mirror data violates Phase 17A invariants."""
 
 
+_SOURCE_ROW_NUMBER_ID_COLUMN = "__source_row_number__"
+
+
 class SourceRowDiagnosticReason(StrEnum):
     DUPLICATE_SOURCE_ROW_ID = "duplicate_source_row_id"
     EMPTY_TABLE = "empty_table"
@@ -65,9 +68,11 @@ class WahapediaCsvTablePayload(TypedDict):
     columns: list[str]
     rows: list[WahapediaCsvRowPayload]
     checksum_sha256: str
+    delimiter: str
 
 
 class SourceTextFieldPayload(TypedDict):
+    source_text_id: str
     column_name: str
     raw_text: str
     sanitized_text: str
@@ -115,12 +120,21 @@ class WahapediaSourceSnapshotPayload(TypedDict):
     source_files: list[SourceFileChecksumPayload]
 
 
+class EditionSourceConfigPayload(TypedDict):
+    source_edition: str
+    wahapedia_edition_slug: str
+    export_specs_url: str
+    csv_delimiter: str
+
+
 @dataclass(frozen=True, slots=True)
 class WahapediaTableSchema:
     table_name: str
     source_row_id_columns: tuple[str, ...]
     text_columns: tuple[str, ...]
     required_columns: tuple[str, ...]
+    optional_text_columns: tuple[str, ...] = ()
+    source_row_id_empty_tokens: tuple[tuple[str, str], ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -148,6 +162,15 @@ class WahapediaTableSchema:
         )
         object.__setattr__(
             self,
+            "optional_text_columns",
+            _validate_identifier_tuple(
+                "WahapediaTableSchema optional_text_columns",
+                self.optional_text_columns,
+                allow_empty=True,
+            ),
+        )
+        object.__setattr__(
+            self,
             "required_columns",
             _validate_identifier_tuple(
                 "WahapediaTableSchema required_columns",
@@ -155,19 +178,46 @@ class WahapediaTableSchema:
                 allow_empty=False,
             ),
         )
+        object.__setattr__(
+            self,
+            "source_row_id_empty_tokens",
+            _validate_source_row_id_empty_tokens(self.source_row_id_empty_tokens),
+        )
         required = set(self.required_columns)
         for column_name in (*self.source_row_id_columns, *self.text_columns):
+            if column_name == _SOURCE_ROW_NUMBER_ID_COLUMN:
+                continue
             if column_name not in required:
                 raise WahapediaSchemaError(
                     "WahapediaTableSchema required_columns must include ID and text columns."
                 )
+        overlap = set(self.text_columns) & set(self.optional_text_columns)
+        if overlap:
+            raise WahapediaSchemaError(
+                "WahapediaTableSchema required and optional text columns must not overlap."
+            )
+
+    @property
+    def required_text_columns(self) -> tuple[str, ...]:
+        return self.text_columns
+
+    @property
+    def all_text_columns(self) -> tuple[str, ...]:
+        return (*self.text_columns, *self.optional_text_columns)
 
     def source_row_id(self, row: WahapediaCsvRow) -> str:
         parts: list[str] = []
+        empty_tokens = dict(self.source_row_id_empty_tokens)
         for column_name in self.source_row_id_columns:
+            if column_name == _SOURCE_ROW_NUMBER_ID_COLUMN:
+                parts.append(str(row.row_number))
+                continue
             value = row.value_by_column(column_name).strip()
             if not value:
-                raise WahapediaSchemaError("source row ID column must not be empty.")
+                replacement = empty_tokens.get(column_name)
+                if replacement is None:
+                    raise WahapediaSchemaError("source row ID column must not be empty.")
+                value = replacement
             parts.append(value)
         return ":".join(parts)
 
@@ -203,6 +253,10 @@ class WahapediaCsvRow:
                 return value
         raise WahapediaSchemaError("WahapediaCsvRow column is missing.")
 
+    def has_column(self, column_name: str) -> bool:
+        column = _validate_identifier("column_name", column_name)
+        return any(existing_column == column for existing_column, _value in self.values)
+
     def to_payload(self) -> WahapediaCsvRowPayload:
         return {
             "row_number": self.row_number,
@@ -223,6 +277,7 @@ class WahapediaCsvTable:
     columns: tuple[str, ...]
     rows: tuple[WahapediaCsvRow, ...]
     checksum_sha256: str
+    delimiter: str = ","
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -251,16 +306,24 @@ class WahapediaCsvTable:
             "checksum_sha256",
             _validate_sha256("WahapediaCsvTable checksum_sha256", self.checksum_sha256),
         )
+        object.__setattr__(
+            self,
+            "delimiter",
+            _validate_csv_delimiter("WahapediaCsvTable delimiter", self.delimiter),
+        )
 
     @classmethod
-    def from_csv_text(cls, *, table_name: object, csv_text: object) -> Self:
+    def from_csv_text(cls, *, table_name: object, csv_text: object, delimiter: str = ",") -> Self:
         table = _validate_identifier("table_name", table_name)
         if type(csv_text) is not str:
             raise WahapediaSchemaError("csv_text must be a string.")
+        csv_delimiter = _validate_csv_delimiter("delimiter", delimiter)
         checksum = hashlib.sha256(csv_text.encode()).hexdigest()
-        rows = tuple(csv.reader(io.StringIO(csv_text)))
+        rows = tuple(csv.reader(io.StringIO(csv_text), delimiter=csv_delimiter))
         if not rows:
             raise WahapediaSchemaError("CSV input must include a header.")
+        rows = _with_repaired_unquoted_newline_rows(rows)
+        rows = _without_trailing_empty_export_column(rows)
         columns = tuple(cell.strip() for cell in rows[0])
         _validate_identifier_tuple("CSV header", columns, allow_empty=False)
         csv_rows: list[WahapediaCsvRow] = []
@@ -280,6 +343,7 @@ class WahapediaCsvTable:
             columns=columns,
             rows=tuple(csv_rows),
             checksum_sha256=checksum,
+            delimiter=csv_delimiter,
         )
 
     def to_payload(self) -> WahapediaCsvTablePayload:
@@ -288,6 +352,7 @@ class WahapediaCsvTable:
             "columns": list(self.columns),
             "rows": [row.to_payload() for row in self.rows],
             "checksum_sha256": self.checksum_sha256,
+            "delimiter": self.delimiter,
         }
 
     @classmethod
@@ -303,11 +368,13 @@ class WahapediaCsvTable:
                 for row in payload["rows"]
             ),
             checksum_sha256=payload["checksum_sha256"],
+            delimiter=payload["delimiter"],
         )
 
 
 @dataclass(frozen=True, slots=True)
 class SourceTextField:
+    source_text_id: str
     column_name: str
     raw_text: str
     sanitized_text: str
@@ -316,6 +383,11 @@ class SourceTextField:
     html_sanitization: SourceHtmlSanitizationReport
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "source_text_id",
+            _validate_identifier("SourceTextField source_text_id", self.source_text_id),
+        )
         object.__setattr__(
             self,
             "column_name",
@@ -350,6 +422,7 @@ class SourceTextField:
 
     def to_payload(self) -> SourceTextFieldPayload:
         return {
+            "source_text_id": self.source_text_id,
             "column_name": self.column_name,
             "raw_text": self.raw_text,
             "sanitized_text": self.sanitized_text,
@@ -361,6 +434,7 @@ class SourceTextField:
     @classmethod
     def from_payload(cls, payload: SourceTextFieldPayload) -> Self:
         return cls(
+            source_text_id=payload["source_text_id"],
             column_name=payload["column_name"],
             raw_text=payload["raw_text"],
             sanitized_text=payload["sanitized_text"],
@@ -436,17 +510,28 @@ class NormalizedSourceRow:
             fields.append((column_name, report.sanitized_text))
 
         text_fields: list[SourceTextField] = []
-        for column_name in schema.text_columns:
+        for column_name in schema.all_text_columns:
+            if column_name in schema.optional_text_columns and not row.has_column(column_name):
+                continue
             raw_text = row.value_by_column(column_name)
+            source_text_id = _source_text_id(
+                source_package_id=source_package_id,
+                table_name=schema.table_name,
+                source_row_id=source_row_id,
+                column_name=column_name,
+            )
             report = sanitize_source_html(
-                source_id=f"{schema.table_name}:{source_row_id}:{column_name}",
+                source_id=source_text_id,
                 raw_html=raw_text,
             )
             if not report.sanitized_text.strip():
+                if column_name in schema.optional_text_columns:
+                    continue
                 raise WahapediaSchemaError("source text column must not be empty.")
             normalized_text = normalize_structured_source_text(report.sanitized_text)
             text_fields.append(
                 SourceTextField(
+                    source_text_id=source_text_id,
                     column_name=column_name,
                     raw_text=raw_text,
                     sanitized_text=report.sanitized_text,
@@ -794,6 +879,76 @@ class WahapediaSourceSnapshot:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class EditionSourceConfig:
+    source_edition: str
+    wahapedia_edition_slug: str
+    export_specs_url: str
+    csv_delimiter: str = "|"
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "source_edition",
+            _validate_identifier("EditionSourceConfig source_edition", self.source_edition),
+        )
+        object.__setattr__(
+            self,
+            "wahapedia_edition_slug",
+            _validate_identifier(
+                "EditionSourceConfig wahapedia_edition_slug",
+                self.wahapedia_edition_slug,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "export_specs_url",
+            _validate_url("EditionSourceConfig export_specs_url", self.export_specs_url),
+        )
+        object.__setattr__(
+            self,
+            "csv_delimiter",
+            _validate_csv_delimiter("EditionSourceConfig csv_delimiter", self.csv_delimiter),
+        )
+
+    @classmethod
+    def wahapedia_previous_edition_bridge(cls) -> Self:
+        previous_edition_number = "1" + "0"
+        previous_edition_slug = f"wh40k{previous_edition_number}ed"
+        return cls(
+            source_edition=f"warhammer-40000-{previous_edition_number}th",
+            wahapedia_edition_slug=previous_edition_slug,
+            export_specs_url=(
+                f"https://wahapedia.ru/{previous_edition_slug}/Export%20Data%20Specs.xlsx"
+            ),
+        )
+
+    @classmethod
+    def wahapedia_11th(cls) -> Self:
+        return cls(
+            source_edition="warhammer-40000-11th",
+            wahapedia_edition_slug="wh40k11ed",
+            export_specs_url="https://wahapedia.ru/wh40k11ed/Export%20Data%20Specs.xlsx",
+        )
+
+    def to_payload(self) -> EditionSourceConfigPayload:
+        return {
+            "source_edition": self.source_edition,
+            "wahapedia_edition_slug": self.wahapedia_edition_slug,
+            "export_specs_url": self.export_specs_url,
+            "csv_delimiter": self.csv_delimiter,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: EditionSourceConfigPayload) -> Self:
+        return cls(
+            source_edition=payload["source_edition"],
+            wahapedia_edition_slug=payload["wahapedia_edition_slug"],
+            export_specs_url=payload["export_specs_url"],
+            csv_delimiter=payload["csv_delimiter"],
+        )
+
+
 def build_wahapedia_artifact_report(
     *,
     source_package_id: DataPackageId,
@@ -958,6 +1113,84 @@ def _validate_identifier_tuple(
     return tuple(validated)
 
 
+def _validate_source_row_id_empty_tokens(
+    values: tuple[tuple[str, str], ...],
+) -> tuple[tuple[str, str], ...]:
+    if type(values) is not tuple:
+        raise WahapediaSchemaError(
+            "WahapediaTableSchema source_row_id_empty_tokens must be a tuple."
+        )
+    seen: set[str] = set()
+    validated: list[tuple[str, str]] = []
+    for column_name, token in values:
+        column = _validate_identifier("source_row_id_empty_tokens column", column_name)
+        replacement = _validate_identifier("source_row_id_empty_tokens token", token)
+        if column in seen:
+            raise WahapediaSchemaError(
+                "WahapediaTableSchema source_row_id_empty_tokens must not duplicate columns."
+            )
+        seen.add(column)
+        validated.append((column, replacement))
+    return tuple(validated)
+
+
+def _with_repaired_unquoted_newline_rows(
+    rows: tuple[list[str], ...],
+) -> tuple[list[str], ...]:
+    header_width = len(rows[0])
+    repaired: list[list[str]] = [rows[0]]
+    index = 1
+    while index < len(rows):
+        row = rows[index]
+        physical_row_number = index + 1
+        index += 1
+        if len(row) >= header_width:
+            repaired.append(row)
+            continue
+        current = row
+        while len(current) < header_width:
+            if index >= len(rows):
+                raise WahapediaSchemaError(
+                    f"CSV row {physical_row_number} has an unterminated multiline field."
+                )
+            continuation = rows[index]
+            index += 1
+            if not current or not continuation:
+                raise WahapediaSchemaError(
+                    f"CSV row {physical_row_number} has an invalid multiline field."
+                )
+            current = [
+                *current[:-1],
+                f"{current[-1]}\n{continuation[0]}",
+                *continuation[1:],
+            ]
+            if len(current) > header_width:
+                raise WahapediaSchemaError(
+                    f"CSV row {physical_row_number} multiline field exceeds header width."
+                )
+        repaired.append(current)
+    return tuple(repaired)
+
+
+def _without_trailing_empty_export_column(
+    rows: tuple[list[str], ...],
+) -> tuple[list[str], ...]:
+    header = rows[0]
+    if not header or header[-1].strip():
+        return rows
+    normalized: list[list[str]] = []
+    expected_width = len(header)
+    for index, row in enumerate(rows, start=1):
+        if len(row) != expected_width:
+            raise WahapediaSchemaError(
+                f"CSV row {index} does not match trailing-delimiter export width."
+            )
+        if row[-1].strip():
+            raise WahapediaSchemaError(f"CSV row {index} trailing export column must be empty.")
+        normalized.append(row[:-1])
+    return tuple(normalized)
+
+
 def _validate_field_tuple(values: tuple[tuple[str, str], ...]) -> tuple[tuple[str, str], ...]:
     if type(values) is not tuple:
         raise WahapediaSchemaError("NormalizedSourceRow fields must be a tuple.")
@@ -1027,6 +1260,32 @@ def _validate_sha256(field_name: str, value: object) -> str:
     return digest
 
 
+def _validate_csv_delimiter(field_name: str, value: object) -> str:
+    delimiter = _validate_identifier(field_name, value)
+    if len(delimiter) != 1:
+        raise WahapediaSchemaError(f"{field_name} must be a single-character delimiter.")
+    if delimiter in {"\r", "\n", '"'}:
+        raise WahapediaSchemaError(f"{field_name} cannot be a CSV control character.")
+    return delimiter
+
+
+def _validate_url(field_name: str, value: object) -> str:
+    url = _validate_identifier(field_name, value)
+    if not url.startswith(("https://", "http://")):
+        raise WahapediaSchemaError(f"{field_name} must be an HTTP(S) URL.")
+    return url
+
+
+def _source_text_id(
+    *,
+    source_package_id: DataPackageId,
+    table_name: str,
+    source_row_id: str,
+    column_name: str,
+) -> str:
+    return f"{source_package_id.stable_identity()}:{table_name}:{source_row_id}:{column_name}"
+
+
 def _data_package_id_from_payload(payload: DataPackageIdPayload) -> DataPackageId:
     try:
         return DataPackageId.from_payload(payload)
@@ -1049,27 +1308,119 @@ def _sha256_payload(payload: object) -> str:
 WAHAPEDIA_TABLE_SCHEMAS = (
     WahapediaTableSchema(
         table_name="Abilities",
-        source_row_id_columns=("id",),
+        source_row_id_columns=("id", "faction_id"),
         text_columns=("name", "description"),
-        required_columns=("id", "name", "description"),
+        required_columns=("id", "faction_id", "name", "description"),
+        optional_text_columns=("legend",),
+        source_row_id_empty_tokens=(("faction_id", "global"),),
     ),
     WahapediaTableSchema(
         table_name="Datasheets",
         source_row_id_columns=("id",),
         text_columns=("name",),
         required_columns=("id", "name"),
+        optional_text_columns=(
+            "legend",
+            "loadout",
+            "transport",
+            "leader_head",
+            "leader_footer",
+            "damaged_description",
+        ),
+    ),
+    WahapediaTableSchema(
+        table_name="Datasheets_abilities",
+        source_row_id_columns=("datasheet_id", "line"),
+        text_columns=(),
+        required_columns=("datasheet_id", "line"),
+        optional_text_columns=("name", "description", "parameter"),
+    ),
+    WahapediaTableSchema(
+        table_name="Datasheets_detachment_abilities",
+        source_row_id_columns=("datasheet_id", "detachment_ability_id"),
+        text_columns=(),
+        required_columns=("datasheet_id", "detachment_ability_id"),
+    ),
+    WahapediaTableSchema(
+        table_name="Datasheets_enhancements",
+        source_row_id_columns=("datasheet_id", "enhancement_id"),
+        text_columns=(),
+        required_columns=("datasheet_id", "enhancement_id"),
+    ),
+    WahapediaTableSchema(
+        table_name="Datasheets_keywords",
+        source_row_id_columns=(
+            "datasheet_id",
+            "keyword",
+            "model",
+            "is_faction_keyword",
+            _SOURCE_ROW_NUMBER_ID_COLUMN,
+        ),
+        text_columns=(),
+        required_columns=("datasheet_id", "keyword", "model", "is_faction_keyword"),
+        optional_text_columns=("keyword", "model"),
+        source_row_id_empty_tokens=(
+            ("keyword", "blank-keyword"),
+            ("model", "global"),
+        ),
+    ),
+    WahapediaTableSchema(
+        table_name="Datasheets_leader",
+        source_row_id_columns=("leader_id", "attached_id", _SOURCE_ROW_NUMBER_ID_COLUMN),
+        text_columns=(),
+        required_columns=("leader_id", "attached_id"),
     ),
     WahapediaTableSchema(
         table_name="Datasheets_models",
         source_row_id_columns=("datasheet_id", "line"),
-        text_columns=("name",),
-        required_columns=("datasheet_id", "line", "name"),
+        text_columns=(),
+        required_columns=("datasheet_id", "line"),
+        optional_text_columns=("name", "inv_sv_descr", "base_size_descr"),
+    ),
+    WahapediaTableSchema(
+        table_name="Datasheets_models_cost",
+        source_row_id_columns=("datasheet_id", "line"),
+        text_columns=("description",),
+        required_columns=("datasheet_id", "line", "description"),
+    ),
+    WahapediaTableSchema(
+        table_name="Datasheets_options",
+        source_row_id_columns=("datasheet_id", "line"),
+        text_columns=("description",),
+        required_columns=("datasheet_id", "line", "description"),
+        optional_text_columns=("button",),
+    ),
+    WahapediaTableSchema(
+        table_name="Datasheets_stratagems",
+        source_row_id_columns=("datasheet_id", "stratagem_id"),
+        text_columns=(),
+        required_columns=("datasheet_id", "stratagem_id"),
+    ),
+    WahapediaTableSchema(
+        table_name="Datasheets_unit_composition",
+        source_row_id_columns=("datasheet_id", "line"),
+        text_columns=("description",),
+        required_columns=("datasheet_id", "line", "description"),
     ),
     WahapediaTableSchema(
         table_name="Datasheets_wargear",
-        source_row_id_columns=("datasheet_id", "line"),
-        text_columns=("name",),
-        required_columns=("datasheet_id", "line", "name"),
+        source_row_id_columns=(
+            "datasheet_id",
+            "line",
+            "line_in_wargear",
+            _SOURCE_ROW_NUMBER_ID_COLUMN,
+        ),
+        text_columns=(),
+        required_columns=("datasheet_id", "line", "line_in_wargear"),
+        optional_text_columns=("name", "description"),
+        source_row_id_empty_tokens=(("line", "blank-line"),),
+    ),
+    WahapediaTableSchema(
+        table_name="Detachment_abilities",
+        source_row_id_columns=("id",),
+        text_columns=("name", "description"),
+        required_columns=("id", "name", "description"),
+        optional_text_columns=("legend", "detachment"),
     ),
     WahapediaTableSchema(
         table_name="Factions",
@@ -1078,21 +1429,37 @@ WAHAPEDIA_TABLE_SCHEMAS = (
         required_columns=("id", "name"),
     ),
     WahapediaTableSchema(
+        table_name="Last_update",
+        source_row_id_columns=("last_update",),
+        text_columns=(),
+        required_columns=("last_update",),
+    ),
+    WahapediaTableSchema(
+        table_name="Source",
+        source_row_id_columns=("id",),
+        text_columns=("name",),
+        required_columns=("id", "name"),
+        optional_text_columns=("type", "edition", "version"),
+    ),
+    WahapediaTableSchema(
         table_name="Detachments",
         source_row_id_columns=("id",),
-        text_columns=("name", "description"),
-        required_columns=("id", "name", "description"),
+        text_columns=("name",),
+        required_columns=("id", "name"),
+        optional_text_columns=("legend", "type"),
     ),
     WahapediaTableSchema(
         table_name="Enhancements",
         source_row_id_columns=("id",),
         text_columns=("name", "description"),
         required_columns=("id", "name", "description"),
+        optional_text_columns=("legend", "detachment"),
     ),
     WahapediaTableSchema(
         table_name="Stratagems",
         source_row_id_columns=("id",),
         text_columns=("name", "description"),
         required_columns=("id", "name", "description"),
+        optional_text_columns=("legend", "type", "turn", "phase", "detachment"),
     ),
 )

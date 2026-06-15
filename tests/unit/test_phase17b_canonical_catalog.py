@@ -195,8 +195,20 @@ def test_phase17b_wargear_faction_detachment_enhancement_and_stratagem_records_r
     datasheet = catalog.datasheet_by_id("dg-plague-marines")
 
     assert datasheet.wargear_options[0].default_wargear_ids == ("dg-plague-bolter",)
+    assert (
+        datasheet.wargear_options[0]
+        .source_ids[0]
+        .endswith(":Datasheets_wargear:dg-plague-marines:1:1:2")
+    )
     assert catalog.wargear[0].wargear_id == "dg-plague-bolter"
+    assert catalog.wargear[0].source_ids[0].endswith(":Datasheets_wargear:dg-plague-marines:1:1:2")
     assert catalog.wargear[0].weapon_profiles[0].profile_id == "dg-plague-bolter:standard"
+    assert (
+        catalog.wargear[0]
+        .weapon_profiles[0]
+        .source_ids[0]
+        .endswith(":Datasheets_wargear:dg-plague-marines:1:1:2")
+    )
     assert catalog.factions[0].faction_id == "death-guard"
     assert catalog.army_rules[0].rule_id == "nurgles-gift"
     assert catalog.detachments[0].detachment_id == "plague-company"
@@ -206,6 +218,16 @@ def test_phase17b_wargear_faction_detachment_enhancement_and_stratagem_records_r
         CanonicalCatalogPackage.from_payload(package.to_payload()).to_payload()
         == package.to_payload()
     )
+
+
+def test_phase17b_weapon_random_attack_and_damage_profiles_are_source_backed() -> None:
+    package = _catalog_package(weapon_attacks="D6", weapon_damage="D3+3")
+    weapon_profile = package.army_catalog.wargear[0].weapon_profiles[0]
+
+    assert weapon_profile.attack_profile.dice_expression is not None
+    assert weapon_profile.attack_profile.dice_expression.canonical() == "D6"
+    assert weapon_profile.damage_profile.dice_expression is not None
+    assert weapon_profile.damage_profile.dice_expression.canonical() == "D3+3"
 
 
 @pytest.mark.parametrize(
@@ -566,8 +588,10 @@ def _catalog_package(
     model_max: str = "10",
     datasheet_keywords: str = "Infantry, Battleline",
     weapon_range: str = "24",
+    weapon_attacks: str = "2",
     skill_characteristic: str = "ballistic_skill",
     skill: str = "3+",
+    weapon_damage: str = "1",
     weapon_keywords: str = "Lethal Hits",
     detachment_point_cost: str = "1",
     enhancement_name: str = "Deadly Pathogen",
@@ -589,8 +613,10 @@ def _catalog_package(
             model_max=model_max,
             datasheet_keywords=datasheet_keywords,
             weapon_range=weapon_range,
+            weapon_attacks=weapon_attacks,
             skill_characteristic=skill_characteristic,
             skill=skill,
+            weapon_damage=weapon_damage,
             weapon_keywords=weapon_keywords,
             detachment_point_cost=detachment_point_cost,
             enhancement_name=enhancement_name,
@@ -650,8 +676,10 @@ def _source_artifacts(
     model_max: str = "10",
     datasheet_keywords: str = "Infantry, Battleline",
     weapon_range: str = "24",
+    weapon_attacks: str = "2",
     skill_characteristic: str = "ballistic_skill",
     skill: str = "3+",
+    weapon_damage: str = "1",
     weapon_keywords: str = "Lethal Hits",
     detachment_point_cost: str = "1",
     enhancement_name: str = "Deadly Pathogen",
@@ -694,11 +722,12 @@ def _source_artifacts(
         _artifact(
             table_name="Datasheets_wargear",
             csv_text=(
-                "datasheet_id,line,name,wargear_id,weapon_profile_id,model_profile_id,range,a,"
-                "skill_characteristic,skill,s,ap,d,weapon_keywords\n"
-                "dg-plague-marines,1,Plague bolter,dg-plague-bolter,"
+                "datasheet_id,line,line_in_wargear,name,wargear_id,weapon_profile_id,"
+                "model_profile_id,range,a,skill_characteristic,skill,s,ap,d,weapon_keywords\n"
+                "dg-plague-marines,1,1,Plague bolter,dg-plague-bolter,"
                 "dg-plague-bolter:standard,dg-plague-marine,"
-                f"{weapon_range},2,{skill_characteristic},{skill},4,-1,1,"
+                f"{weapon_range},{weapon_attacks},{skill_characteristic},{skill},4,-1,"
+                f"{weapon_damage},"
                 f'"{weapon_keywords}"\n'
             ),
         ),

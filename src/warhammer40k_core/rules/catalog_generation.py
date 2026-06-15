@@ -23,6 +23,7 @@ from warhammer40k_core.core.detachment import (
     EnhancementSubtype,
     StratagemDefinition,
 )
+from warhammer40k_core.core.dice import DiceExpression, DiceRollSpecError
 from warhammer40k_core.core.faction import ArmyRuleDefinition, FactionDefinition
 from warhammer40k_core.core.model_geometry_catalog import (
     GeometryEvidenceKind,
@@ -51,6 +52,7 @@ from warhammer40k_core.core.weapon_profiles import (
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.source_catalog import SourceArtifactHash
+from warhammer40k_core.rules.source_overlay import OverlaySourceArtifact
 from warhammer40k_core.rules.source_patch import PatchedSourceArtifact
 from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow, WahapediaJsonArtifact
 
@@ -59,7 +61,7 @@ class CatalogGenerationError(ValueError):
     """Raised when Phase 17B catalog generation violates strict source invariants."""
 
 
-SourceArtifact = WahapediaJsonArtifact | PatchedSourceArtifact
+SourceArtifact = WahapediaJsonArtifact | PatchedSourceArtifact | OverlaySourceArtifact
 
 _BASE_SIZE_BLOCKERS = frozenset(
     {
@@ -77,6 +79,11 @@ _OVAL_BASE_RE = re.compile(
     r"^(?P<length>\d+(?:\.\d+)?)\s*x\s*(?P<width>\d+(?:\.\d+)?)\s*mm(?:\s*oval)?$",
     re.IGNORECASE,
 )
+_DICE_CHARACTERISTIC_RE = re.compile(
+    r"^(?P<quantity>\d*)D(?P<sides>\d+)(?P<modifier>[+-]\d+)?$",
+    re.IGNORECASE,
+)
+_INTEGER_CHARACTERISTIC_RE = re.compile(r"^[+-]?\d+$")
 
 
 @dataclass(frozen=True, slots=True)
@@ -304,6 +311,7 @@ def _wargear_option_from_row(row: NormalizedSourceRow) -> DatasheetWargearOption
         allowed_wargear_ids=(wargear_id,),
         min_selections=1,
         max_selections=1,
+        source_ids=(row.stable_source_id(),),
     )
 
 
@@ -312,6 +320,7 @@ def _wargear_from_row(row: NormalizedSourceRow) -> Wargear:
         wargear_id=_required_field(row=row, column_name="wargear_id"),
         name=_required_field(row=row, column_name="name"),
         weapon_profiles=(_weapon_profile_from_row(row),),
+        source_ids=(row.stable_source_id(),),
     )
 
 
@@ -323,7 +332,7 @@ def _weapon_profile_from_row(row: NormalizedSourceRow) -> WeaponProfile:
         profile_id=_required_field(row=row, column_name="weapon_profile_id"),
         name=_required_field(row=row, column_name="name"),
         range_profile=_range_profile_from_token(_required_field(row=row, column_name="range")),
-        attack_profile=AttackProfile.fixed(_required_positive_int(row=row, column_name="a")),
+        attack_profile=_attack_profile_from_raw_text(_required_field(row=row, column_name="a")),
         skill=_characteristic_value_from_raw_text(
             characteristic=skill_characteristic,
             raw_text=_required_field(row=row, column_name="skill"),
@@ -338,10 +347,11 @@ def _weapon_profile_from_row(row: NormalizedSourceRow) -> WeaponProfile:
             column_name="ap",
             characteristic=Characteristic.ARMOR_PENETRATION,
         ),
-        damage_profile=DamageProfile.fixed(_required_int(row=row, column_name="d")),
+        damage_profile=_damage_profile_from_raw_text(_required_field(row=row, column_name="d")),
         keywords=_weapon_keywords_from_field(
             _required_field(row=row, column_name="weapon_keywords")
         ),
+        source_ids=(row.stable_source_id(),),
     )
 
 
@@ -544,7 +554,11 @@ def _rows_by_table(
         raise CatalogGenerationError("source_artifacts must not be empty.")
     rows_by_table: dict[str, tuple[NormalizedSourceRow, ...]] = {}
     for artifact in source_artifacts:
-        if type(artifact) not in {WahapediaJsonArtifact, PatchedSourceArtifact}:
+        if type(artifact) not in {
+            WahapediaJsonArtifact,
+            PatchedSourceArtifact,
+            OverlaySourceArtifact,
+        }:
             raise CatalogGenerationError("source_artifacts must contain normalized artifacts.")
         existing = rows_by_table.get(artifact.source_table, ())
         rows_by_table[artifact.source_table] = (*existing, *artifact.rows)
@@ -569,7 +583,7 @@ def _source_artifact_hashes(
     for artifact in source_artifacts:
         if type(artifact) is WahapediaJsonArtifact:
             hashes.append(artifact.source_artifact_hash())
-        elif type(artifact) is PatchedSourceArtifact:
+        elif type(artifact) is PatchedSourceArtifact or type(artifact) is OverlaySourceArtifact:
             hashes.append(artifact.source_artifact_hash_record())
         else:
             raise CatalogGenerationError("Unsupported source artifact type.")
@@ -645,6 +659,41 @@ def _range_profile_from_token(value: str) -> RangeProfile:
     if value.strip().lower() == "melee":
         return RangeProfile.melee()
     return RangeProfile.distance(_int_from_text(value))
+
+
+def _attack_profile_from_raw_text(value: str) -> AttackProfile:
+    fixed = _optional_int_from_text(value)
+    if fixed is not None:
+        if fixed < 1:
+            raise CatalogGenerationError("Attack profile fixed attacks must be at least 1.")
+        return AttackProfile.fixed(fixed)
+    return AttackProfile.dice(_dice_expression_from_text(value))
+
+
+def _damage_profile_from_raw_text(value: str) -> DamageProfile:
+    fixed = _optional_int_from_text(value)
+    if fixed is not None:
+        if fixed < 1:
+            raise CatalogGenerationError("Damage profile fixed damage must be at least 1.")
+        return DamageProfile.fixed(fixed)
+    return DamageProfile.dice(_dice_expression_from_text(value))
+
+
+def _dice_expression_from_text(value: str) -> DiceExpression:
+    match = _DICE_CHARACTERISTIC_RE.fullmatch(value.strip().replace(" ", ""))
+    if match is None:
+        raise CatalogGenerationError(
+            f"Source value must be fixed integer or dice expression: {value}."
+        )
+    quantity_token = match.group("quantity")
+    quantity = 1 if not quantity_token else _int_from_text(quantity_token)
+    sides = _int_from_text(match.group("sides"))
+    modifier_token = match.group("modifier")
+    modifier = 0 if modifier_token is None else _int_from_text(modifier_token)
+    try:
+        return DiceExpression(quantity=quantity, sides=sides, modifier=modifier)
+    except DiceRollSpecError as exc:
+        raise CatalogGenerationError("Source dice expression is invalid.") from exc
 
 
 def _weapon_keywords_from_field(value: str) -> tuple[WeaponKeyword, ...]:
@@ -782,6 +831,13 @@ def _int_from_text(value: str) -> int:
         return int(normalized)
     except ValueError as exc:
         raise CatalogGenerationError(f"Source value must be an integer: {value}.") from exc
+
+
+def _optional_int_from_text(value: str) -> int | None:
+    normalized = value.strip().removesuffix('"').removesuffix("+")
+    if _INTEGER_CHARACTERISTIC_RE.fullmatch(normalized) is None:
+        return None
+    return int(normalized)
 
 
 def _required_field(*, row: NormalizedSourceRow, column_name: str) -> str:

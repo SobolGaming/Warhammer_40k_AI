@@ -10,7 +10,9 @@ _FORBIDDEN_IMPORT_MODULES = {
     "warhammer40k_core.rules.html_sanitizer",
     "warhammer40k_core.rules.text_normalization",
     "warhammer40k_core.rules.source_data",
+    "warhammer40k_core.rules.source_overlay",
     "warhammer40k_core.rules.source_patch",
+    "warhammer40k_core.rules.source_reference_generation",
     "warhammer40k_core.rules.wahapedia_schema",
 }
 _FORBIDDEN_IMPORT_NAMES = {

@@ -88,6 +88,7 @@ class DatasheetWargearOptionPayload(TypedDict):
     allowed_wargear_ids: list[str]
     min_selections: int
     max_selections: int
+    source_ids: list[str]
 
 
 class DatasheetAbilityDescriptorPayload(TypedDict):
@@ -330,6 +331,7 @@ class DatasheetWargearOption:
     allowed_wargear_ids: tuple[str, ...]
     min_selections: int = 0
     max_selections: int = 1
+    source_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -384,6 +386,11 @@ class DatasheetWargearOption:
         object.__setattr__(self, "allowed_wargear_ids", allowed_wargear_ids)
         object.__setattr__(self, "min_selections", min_selections)
         object.__setattr__(self, "max_selections", max_selections)
+        object.__setattr__(
+            self,
+            "source_ids",
+            _validate_identifier_tuple("DatasheetWargearOption source_ids", self.source_ids),
+        )
 
     def to_payload(self) -> DatasheetWargearOptionPayload:
         return {
@@ -393,6 +400,7 @@ class DatasheetWargearOption:
             "allowed_wargear_ids": list(self.allowed_wargear_ids),
             "min_selections": self.min_selections,
             "max_selections": self.max_selections,
+            "source_ids": list(self.source_ids),
         }
 
     @classmethod
@@ -404,6 +412,7 @@ class DatasheetWargearOption:
             allowed_wargear_ids=tuple(payload["allowed_wargear_ids"]),
             min_selections=payload["min_selections"],
             max_selections=payload["max_selections"],
+            source_ids=tuple(payload["source_ids"]),
         )
 
 
