@@ -15,6 +15,7 @@ from tests.deployment_submission_helpers import (
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.datasheet import CatalogAbilitySupport, DatasheetAbilityDescriptor
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
@@ -390,6 +391,27 @@ def test_phase16a_infiltrators_may_deploy_outside_zone_more_than_eight_from_enem
     }
 
 
+def test_phase16a_infiltrators_datasheet_ability_enables_midfield_deployment() -> None:
+    state = _deployment_state_with_mustered_armies(player_b_infiltrators_ability=True)
+    request = _deployment_placement_request_for_player(state, player_id="player-b")
+    request_context = DeploymentPlacementRequest.from_decision_request_payload(request.payload)
+
+    resolution = resolve_deployment_placement(
+        state=state,
+        ruleset_descriptor=_ruleset(),
+        request=request_context,
+        proposal=deployment_proposal_for_state(
+            state,
+            request=request,
+            pose_factory=_infiltrators_valid_midfield_pose,
+        ),
+    )
+
+    assert resolution.is_valid
+    assert resolution.transition_batch is not None
+    assert len(resolution.transition_batch.placements) == 5
+
+
 def test_phase16a_attached_rules_unit_deploys_group_aware_component_models() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     config = _config(
@@ -656,16 +678,34 @@ def _advance_to_second_deployment_placement() -> tuple[GameLifecycle, DecisionRe
 def _deployment_state_with_mustered_armies(
     *,
     player_b_infiltrators: bool = False,
+    player_b_infiltrators_ability: bool = False,
 ) -> GameState:
     config = _config()
     state = GameState.from_config(config)
     for request in config.army_muster_requests:
         army = muster_army(catalog=config.army_catalog, request=request)
-        if player_b_infiltrators and army.player_id == "player-b":
+        if army.player_id == "player-b" and (
+            player_b_infiltrators or player_b_infiltrators_ability
+        ):
             unit = army.units[0]
+            keywords = unit.keywords
+            abilities = unit.datasheet_abilities
+            if player_b_infiltrators:
+                keywords = (*keywords, "INFILTRATORS")
+            if player_b_infiltrators_ability:
+                abilities = (
+                    *abilities,
+                    DatasheetAbilityDescriptor(
+                        ability_id="core-infiltrators",
+                        name="Core Infiltrators",
+                        source_id="datasheet:core-intercessor-like-infantry:ability:infiltrators",
+                        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+                        timing_tags=("deployment",),
+                    ),
+                )
             army = replace(
                 army,
-                units=(replace(unit, keywords=(*unit.keywords, "INFILTRATORS")),),
+                units=(replace(unit, keywords=keywords, datasheet_abilities=abilities),),
             )
         state.record_army_definition(army)
     while state.current_setup_step is not SetupStep.DEPLOY_ARMIES:

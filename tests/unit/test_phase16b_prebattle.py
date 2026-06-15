@@ -252,7 +252,7 @@ def test_phase16b_simultaneous_scouts_use_phase12a_sequencing_order() -> None:
 
 def test_phase16b_scout_distance_is_sourced_from_datasheet_ability_descriptors() -> None:
     catalog = _catalog_with_datasheet_keywords(
-        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "SCOUTS")},
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline")},
         scouts_distances_by_datasheet={"core-intercessor-like-infantry": (6.0, 8.0)},
     )
     lifecycle, status = _advance_after_deployments(

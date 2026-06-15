@@ -275,6 +275,7 @@ def _datasheet_from_row(
         abilities=tuple(_ability_descriptor_from_row(row) for row in ability_rows),
         attachment_eligibilities=_attachment_eligibilities_from_rows(
             row=row,
+            ability_rows=ability_rows,
             leader_rows=leader_rows,
         ),
         source_ids=_source_ids_from_row(row),
@@ -489,6 +490,7 @@ def _ability_descriptor_from_row(row: NormalizedSourceRow) -> DatasheetAbilityDe
 def _attachment_eligibilities_from_rows(
     *,
     row: NormalizedSourceRow,
+    ability_rows: tuple[NormalizedSourceRow, ...],
     leader_rows: tuple[NormalizedSourceRow, ...],
 ) -> tuple[AttachmentEligibility, ...]:
     bodyguard_ids = tuple(
@@ -498,6 +500,7 @@ def _attachment_eligibilities_from_rows(
     )
     if not bodyguard_ids:
         return ()
+    role = _attachment_role_from_ability_rows(ability_rows)
     matching_rows = tuple(
         leader_row
         for leader_row in leader_rows
@@ -505,11 +508,43 @@ def _attachment_eligibilities_from_rows(
     )
     return (
         AttachmentEligibility(
-            role=AttachmentRole.LEADER,
+            role=role,
             allowed_bodyguard_datasheet_ids=_deduplicated_ids(bodyguard_ids),
             source_id=_source_ids_from_rows(matching_rows)[0],
         ),
     )
+
+
+def _attachment_role_from_ability_rows(
+    ability_rows: tuple[NormalizedSourceRow, ...],
+) -> AttachmentRole:
+    has_leader = any(_ability_row_matches_family(row, "LEADER") for row in ability_rows)
+    has_support = any(_ability_row_matches_family(row, "SUPPORT") for row in ability_rows)
+    if has_leader and has_support:
+        raise CatalogGenerationError("Datasheet cannot declare both Leader and Support roles.")
+    if has_support:
+        return AttachmentRole.SUPPORT
+    return AttachmentRole.LEADER
+
+
+def _ability_row_matches_family(row: NormalizedSourceRow, family: str) -> bool:
+    fields = row.runtime_fields_payload()
+    ability_id = fields.get("ability_id", "")
+    name = fields.get("name", "")
+    family_token = _canonical_ability_token(family)
+    return _canonical_ability_token(ability_id).removeprefix("CORE_") == family_token or (
+        _canonical_ability_name_words(name) == ("CORE", family_token)
+        or _canonical_ability_name_words(name) == (family_token,)
+    )
+
+
+def _canonical_ability_token(value: str) -> str:
+    return value.strip().upper().replace("-", "_").replace(" ", "_")
+
+
+def _canonical_ability_name_words(value: str) -> tuple[str, ...]:
+    token = _canonical_ability_token(value)
+    return tuple(part for part in token.split("_") if part)
 
 
 def _faction_from_row(row: NormalizedSourceRow) -> FactionDefinition:

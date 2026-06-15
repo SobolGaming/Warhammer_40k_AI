@@ -51,6 +51,7 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_id_for_unit_id,
     rules_unit_view_from_armies,
 )
+from warhammer40k_core.engine.unit_abilities import unit_has_infiltrators
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyContext,
     UnitCoherencyResult,
@@ -1586,13 +1587,11 @@ def _unit_for_model(*, view: RulesUnitView, model_instance_id: str) -> UnitInsta
 
 
 def _rules_unit_has_infiltrators(view: RulesUnitView) -> bool:
-    return all(_unit_has_keyword(component.unit, "INFILTRATORS") for component in view.components)
+    return all(unit_has_infiltrators(component.unit) for component in view.components)
 
 
 def _rules_unit_has_mixed_infiltrators(view: RulesUnitView) -> bool:
-    states = tuple(
-        _unit_has_keyword(component.unit, "INFILTRATORS") for component in view.components
-    )
+    states = tuple(unit_has_infiltrators(component.unit) for component in view.components)
     return any(states) and not all(states)
 
 

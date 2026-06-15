@@ -12,6 +12,7 @@ import pytest
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import (
+    AttachmentRole,
     BaseSizeKind,
     DatasheetWargearOption,
     DatasheetWargearOptionEffect,
@@ -266,6 +267,78 @@ def test_phase17k_bridge_deduplicates_same_faction_rows_for_multiple_datasheets(
     assert tuple(row.source_row_id for row in faction_rows) == ("test-faction",)
 
 
+def test_phase17k_bridge_normalizes_core_keyword_ability_timing_and_parameters() -> None:
+    artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_keyword_ability_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-keyword-unit",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-keyword-unit",
+                model_name="Alpha",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:keyword-height",
+                height_document_reference="test-doc:keyword-height",
+            ),
+        ),
+    )
+    ability_rows = _artifact_by_table(artifacts, "Datasheets_abilities").rows
+    fields_by_name = {
+        row.runtime_fields_payload()["name"]: row.runtime_fields_payload()
+        for row in ability_rows
+        if row.runtime_fields_payload()["type"] == "Core"
+    }
+
+    assert fields_by_name["Deep Strike"]["timing_tags"] == "deployment,reserves"
+    assert fields_by_name["Infiltrators"]["timing_tags"] == "deployment"
+    assert fields_by_name["Leader"]["timing_tags"] == "declare_battle_formations,attachments"
+    assert fields_by_name["Support"]["timing_tags"] == "declare_battle_formations,attachments"
+    assert fields_by_name['Scouts 6"']["timing_tags"] == "before_battle,scouts"
+    assert fields_by_name['Scouts 6"']["parameter_tokens"] == "6"
+    assert fields_by_name["Firing Deck 2"]["timing_tags"] == "shooting"
+    assert fields_by_name["Firing Deck 2"]["parameter_tokens"] == "2"
+    assert fields_by_name["Deadly Demise D3"]["timing_tags"] == "after_destroyed,deadly_demise"
+    assert fields_by_name["Deadly Demise D3"]["parameter_tokens"] == "D3"
+
+
+def test_phase17k_support_ability_marks_attachment_eligibility_role_as_support() -> None:
+    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_support_attachment_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-support-unit", "test-bodyguard-unit"),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-support-unit",
+                model_name="Support",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:support-height",
+                height_document_reference="test-doc:support-height",
+            ),
+            ModelHeightOverride(
+                datasheet_id="test-bodyguard-unit",
+                model_name="Bodyguard",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:bodyguard-height",
+                height_document_reference="test-doc:bodyguard-height",
+            ),
+        ),
+    )
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=bridge_artifacts,
+    )
+    support = package.army_catalog.datasheet_by_id("test-support-unit")
+
+    assert support.attachment_eligibilities[0].role is AttachmentRole.SUPPORT
+    assert support.attachment_eligibilities[0].allowed_bodyguard_datasheet_ids == (
+        "test-bodyguard-unit",
+    )
+
+
 def test_phase17k_bridge_preserves_raw_source_text_for_reference_catalog() -> None:
     source_reference_catalog = build_source_reference_catalog(
         package_id=_bridge_package_id(),
@@ -453,6 +526,166 @@ def _same_faction_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                     "datasheet_id,line,description",
                     "test-datasheet-a,1,1 Alpha",
                     "test-datasheet-b,1,1 Beta",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _keyword_ability_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Test Army Rule,Test rule text.",
+                    "core-deep-strike,,Deep Strike,Deep Strike text.",
+                    "core-infiltrators,,Infiltrators,Infiltrators text.",
+                    "core-leader,,Leader,Leader text.",
+                    "core-support,,Support,Support text.",
+                    'core-scouts,,"Scouts 6""",Scouts text.',
+                    "core-firing-deck,,Firing Deck 2,Firing Deck text.",
+                    "core-deadly-demise,,Deadly Demise D3,Deadly Demise text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(("id,name,faction_id", "test-keyword-unit,Keyword Unit,test-faction")),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    "test-keyword-unit,1,Faction,test-army-rule,Test Army Rule,Test rule text.,",
+                    "test-keyword-unit,2,Core,core-deep-strike,,,",
+                    "test-keyword-unit,3,Core,core-infiltrators,,,",
+                    "test-keyword-unit,4,Core,core-leader,,,",
+                    "test-keyword-unit,5,Core,core-support,,,",
+                    "test-keyword-unit,6,Core,core-scouts,,,",
+                    "test-keyword-unit,7,Core,core-firing-deck,,,",
+                    "test-keyword-unit,8,Core,core-deadly-demise,,,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-keyword-unit,Infantry,,false",
+                    "test-keyword-unit,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-keyword-unit,1,6,4,3,-,2,7,1,32mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(("datasheet_id,line,description", "test-keyword-unit,1,1 Alpha")),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _support_attachment_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Test Army Rule,Test rule text.",
+                    "core-support,,Support,Support text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-support-unit,Support Unit,test-faction",
+                    "test-bodyguard-unit,Bodyguard Unit,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    "test-support-unit,1,Faction,test-army-rule,Test Army Rule,Test rule text.,",
+                    "test-support-unit,2,Core,core-support,,,",
+                    "test-bodyguard-unit,1,Faction,test-army-rule,Test Army Rule,Test rule text.,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-support-unit,Character,,false",
+                    "test-support-unit,Infantry,,false",
+                    "test-support-unit,Test Faction,,true",
+                    "test-bodyguard-unit,Infantry,,false",
+                    "test-bodyguard-unit,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_leader",
+            "\n".join(
+                (
+                    "leader_id,attached_id",
+                    "test-support-unit,test-bodyguard-unit",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    "test-support-unit,1,1,Support blade,Melee,Melee,1,3,4,0,1,",
+                    "test-bodyguard-unit,1,1,Bodyguard blade,Melee,Melee,1,3,4,0,1,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-support-unit,1,6,4,3,-,2,7,1,32mm",
+                    "test-bodyguard-unit,1,6,4,3,-,2,7,1,32mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    "test-support-unit,1,1 Support",
+                    "test-bodyguard-unit,1,1 Bodyguard",
                 )
             ),
         ),
