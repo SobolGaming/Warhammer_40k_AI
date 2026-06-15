@@ -21,6 +21,7 @@ from warhammer40k_core.rules.source_overlay import (
     SourceReleaseManifest,
     SourceReleaseManifestPayload,
     apply_source_release_overlays,
+    build_source_release_overlay_report,
 )
 from warhammer40k_core.rules.source_patch import source_row_hash
 from warhammer40k_core.rules.source_reference_generation import (
@@ -282,6 +283,68 @@ def test_phase17_source_overlay_cli_writes_diagnostics_before_blocking(
     diagnostics = json.loads((output_dir / "source_overlay_diagnostics.json").read_text())
 
     assert diagnostics["diagnostics"][0]["reason"] == "target_drift"
+
+
+def test_phase17_source_overlay_missing_source_table_blocks_and_reports(
+    tmp_path: Path,
+) -> None:
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    input_dir.mkdir()
+    artifact = _abilities_artifact()
+    package = _overlay_pack(
+        operations=(
+            SourceOverlayOperation(
+                op_id="missing-table",
+                order_index=1,
+                operation_kind=SourceOverlayOperationKind.ADD_ROW,
+                target_edition="warhammer-40000-11th",
+                source_table="Missing_Table",
+                source_row_id="missing-1",
+                source_reference="gw-11e-transition-update:p1",
+                effective_date="2026-06-01",
+                reason="Test missing source table.",
+                expected_preimage_hash=None,
+                fields=(("id", "missing-1"),),
+            ),
+        )
+    )
+
+    with pytest.raises(SourceOverlayError, match="missing_source_table"):
+        apply_source_release_overlays(
+            source_artifacts=(artifact,),
+            release_manifest=_release_manifest(overlay_package_ids=(package.package_id,)),
+            overlay_packs=(package,),
+        )
+    report = build_source_release_overlay_report(
+        source_artifacts=(artifact,),
+        release_manifest=_release_manifest(overlay_package_ids=(package.package_id,)),
+        overlay_packs=(package,),
+    )
+
+    assert report.release_diagnostics[0].reason.value == "missing_source_table"
+    assert report.blocking_diagnostics()[0].reason.value == "missing_source_table"
+
+    (input_dir / "Abilities.json").write_bytes(artifact.to_json_bytes())
+    with pytest.raises(SourceOverlayError, match="failed with diagnostics"):
+        apply_source_overlays(
+            input_dir=input_dir,
+            output_dir=output_dir,
+            release_manifest=_release_manifest(overlay_package_ids=(package.package_id,)),
+            overlay_packs=(package,),
+        )
+    diagnostics = json.loads((output_dir / "source_overlay_diagnostics.json").read_text())
+
+    assert diagnostics["diagnostics"] == [
+        {
+            "blocking": True,
+            "message": "Overlay operation references a missing source table.",
+            "op_id": "missing-table",
+            "reason": "missing_source_table",
+            "source_row_id": "missing-1",
+            "source_table": "Missing_Table",
+        }
+    ]
 
 
 def test_phase17_source_overlay_and_reference_payloads_reject_hash_drift() -> None:

@@ -671,6 +671,51 @@ class OverlaySourceArtifact:
 SourceArtifact = WahapediaJsonArtifact | PatchedSourceArtifact | OverlaySourceArtifact
 
 
+@dataclass(frozen=True, slots=True)
+class SourceOverlayApplicationReport:
+    artifacts: tuple[OverlaySourceArtifact, ...]
+    release_diagnostics: tuple[SourceOverlayDiagnostic, ...] = ()
+
+    def __post_init__(self) -> None:
+        if type(self.artifacts) is not tuple:
+            raise SourceOverlayError("SourceOverlayApplicationReport artifacts must be a tuple.")
+        for artifact in self.artifacts:
+            if type(artifact) is not OverlaySourceArtifact:
+                raise SourceOverlayError(
+                    "SourceOverlayApplicationReport artifacts must contain overlay artifacts."
+                )
+        object.__setattr__(
+            self,
+            "release_diagnostics",
+            _validate_diagnostic_tuple(self.release_diagnostics),
+        )
+
+    def blocking_diagnostics(self) -> tuple[SourceOverlayDiagnostic, ...]:
+        return tuple(
+            diagnostic
+            for diagnostic in (
+                *self.release_diagnostics,
+                *(diagnostic for artifact in self.artifacts for diagnostic in artifact.diagnostics),
+            )
+            if diagnostic.blocking
+        )
+
+    def require_success(self) -> Self:
+        blocking = self.blocking_diagnostics()
+        if blocking:
+            reasons = ", ".join(sorted({diagnostic.reason.value for diagnostic in blocking}))
+            raise SourceOverlayError(
+                f"Source overlay application failed with diagnostics: {reasons}."
+            )
+        return self
+
+    def all_diagnostics(self) -> tuple[SourceOverlayDiagnostic, ...]:
+        return (
+            *self.release_diagnostics,
+            *(diagnostic for artifact in self.artifacts for diagnostic in artifact.diagnostics),
+        )
+
+
 def apply_source_release_overlays(
     *,
     source_artifacts: tuple[SourceArtifact, ...],
@@ -678,6 +723,24 @@ def apply_source_release_overlays(
     overlay_packs: tuple[SourceOverlayPack, ...],
     raise_on_blocking: bool = True,
 ) -> tuple[OverlaySourceArtifact, ...]:
+    if type(raise_on_blocking) is not bool:
+        raise SourceOverlayError("raise_on_blocking must be a boolean.")
+    report = build_source_release_overlay_report(
+        source_artifacts=source_artifacts,
+        release_manifest=release_manifest,
+        overlay_packs=overlay_packs,
+    )
+    if raise_on_blocking:
+        report.require_success()
+    return report.artifacts
+
+
+def build_source_release_overlay_report(
+    *,
+    source_artifacts: tuple[SourceArtifact, ...],
+    release_manifest: SourceReleaseManifest,
+    overlay_packs: tuple[SourceOverlayPack, ...],
+) -> SourceOverlayApplicationReport:
     if type(source_artifacts) is not tuple:
         raise SourceOverlayError("source_artifacts must be a tuple.")
     if not source_artifacts:
@@ -686,8 +749,6 @@ def apply_source_release_overlays(
         raise SourceOverlayError("release_manifest must be SourceReleaseManifest.")
     if type(overlay_packs) is not tuple:
         raise SourceOverlayError("overlay_packs must be a tuple.")
-    if type(raise_on_blocking) is not bool:
-        raise SourceOverlayError("raise_on_blocking must be a boolean.")
 
     _validate_supplied_overlay_packs(
         overlay_packs=overlay_packs,
@@ -717,12 +778,13 @@ def apply_source_release_overlays(
         rows_by_table.setdefault(artifact.source_table, []).extend(artifact.rows)
         source_hash_by_table[artifact.source_table] = _artifact_hash(artifact)
 
+    release_diagnostics: list[SourceOverlayDiagnostic] = []
     diagnostics: list[SourceOverlayDiagnostic] = []
     for pack in ordered_packs:
         for operation in pack.operations:
             table_rows = rows_by_table.get(operation.source_table)
             if table_rows is None:
-                diagnostics.append(
+                release_diagnostics.append(
                     _diagnostic(
                         operation=operation,
                         reason=SourceOverlayDiagnosticReason.MISSING_SOURCE_TABLE,
@@ -752,13 +814,10 @@ def apply_source_release_overlays(
         )
         for source_table, rows in sorted(rows_by_table.items())
     )
-    blocking = tuple(
-        diagnostic for artifact in artifacts for diagnostic in artifact.blocking_diagnostics()
+    return SourceOverlayApplicationReport(
+        artifacts=artifacts,
+        release_diagnostics=tuple(release_diagnostics),
     )
-    if blocking and raise_on_blocking:
-        reasons = ", ".join(sorted({diagnostic.reason.value for diagnostic in blocking}))
-        raise SourceOverlayError(f"Source overlay application failed with diagnostics: {reasons}.")
-    return artifacts
 
 
 def _apply_overlay_operation(

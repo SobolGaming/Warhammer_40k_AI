@@ -8,12 +8,13 @@ from typing import cast
 from warhammer40k_core.rules.source_overlay import (
     OverlaySourceArtifact,
     OverlaySourceArtifactPayload,
+    SourceOverlayDiagnostic,
     SourceOverlayError,
     SourceOverlayPack,
     SourceOverlayPackPayload,
     SourceReleaseManifest,
     SourceReleaseManifestPayload,
-    apply_source_release_overlays,
+    build_source_release_overlay_report,
 )
 from warhammer40k_core.rules.source_patch import PatchedSourceArtifact, PatchedSourceArtifactPayload
 from warhammer40k_core.rules.wahapedia_schema import (
@@ -31,18 +32,18 @@ def apply_source_overlays(
     raise_on_blocking: bool = True,
 ) -> tuple[OverlaySourceArtifact, ...]:
     source_artifacts = _load_source_artifacts(input_dir)
-    overlay_artifacts = apply_source_release_overlays(
+    report = build_source_release_overlay_report(
         source_artifacts=source_artifacts,
         release_manifest=release_manifest,
         overlay_packs=overlay_packs,
-        raise_on_blocking=False,
     )
-    if any(artifact.blocking_diagnostics() for artifact in overlay_artifacts):
+    overlay_artifacts = report.artifacts
+    if report.blocking_diagnostics():
         output_dir.mkdir(parents=True, exist_ok=True)
         _write_overlay_diagnostics(
             output_dir=output_dir,
             release_manifest=release_manifest,
-            artifacts=overlay_artifacts,
+            diagnostics=report.all_diagnostics(),
         )
         if raise_on_blocking:
             raise SourceOverlayError("Source overlay application failed with diagnostics.")
@@ -128,18 +129,14 @@ def _write_overlay_diagnostics(
     *,
     output_dir: Path,
     release_manifest: SourceReleaseManifest,
-    artifacts: tuple[OverlaySourceArtifact, ...],
+    diagnostics: tuple[SourceOverlayDiagnostic, ...],
 ) -> None:
     output_dir.joinpath("source_overlay_diagnostics.json").write_text(
         json.dumps(
             {
                 "schema_version": "phase17-source-overlay-diagnostics-v1",
                 "release_hash": release_manifest.release_hash(),
-                "diagnostics": [
-                    diagnostic.to_payload()
-                    for artifact in artifacts
-                    for diagnostic in artifact.diagnostics
-                ],
+                "diagnostics": [diagnostic.to_payload() for diagnostic in diagnostics],
             },
             sort_keys=True,
             indent=2,
