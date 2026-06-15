@@ -609,6 +609,15 @@ def _geometry_record_from_model_row(
             reason=ModelGeometryDiagnosticReason.NON_DERIVABLE_FOOTPRINT,
             message="Model profile base size is not a circular or oval source footprint.",
         )
+    base_size_source_id = _optional_field(row=row, column_name="base_size_source_id")
+    if base_size_source_id is None:
+        base_size_source_id = row.stable_source_id()
+    base_size_document_reference = _optional_field(
+        row=row,
+        column_name="base_size_document_reference",
+    )
+    if base_size_document_reference is None:
+        base_size_document_reference = row.stable_source_id()
     if not _has_required_height_fields(row):
         return _geometry_diagnostic(
             row=row,
@@ -620,10 +629,10 @@ def _geometry_record_from_model_row(
         evidence_id=f"{model_profile_id}:footprint",
         evidence_kind=GeometryEvidenceKind.OFFICIAL_BASE_SIZE,
         measurement_kind=GeometryMeasurementKind.FOOTPRINT,
-        source_id=row.stable_source_id(),
+        source_id=base_size_source_id,
         source_units=GeometrySourceUnits.MILLIMETERS,
         source_dimensions=source_dimensions,
-        document_reference=row.stable_source_id(),
+        document_reference=base_size_document_reference,
     )
     height_evidence = ModelGeometrySourceEvidence.from_source_dimensions(
         evidence_id=f"{model_profile_id}:height",
@@ -665,7 +674,7 @@ def _geometry_record_from_model_row(
         z_offset=None,
         height=ModelHeightDefinition.from_evidence(height_evidence),
         evidence=(footprint_evidence, height_evidence),
-        source_ids=(row.stable_source_id(),),
+        source_ids=_deduplicated_ids((*_source_ids_from_row(row), base_size_source_id)),
     )
 
 

@@ -8,6 +8,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
 from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
     DatasheetWargearOption,
+    DatasheetWargearOptionEffect,
     UnitCompositionDefinition,
     WargearOptionConditionKind,
     WargearOptionEffectKind,
@@ -752,13 +753,26 @@ def _validate_wargear_option_semantics(
                     "WargearSelection violates a structured wargear option condition."
                 )
         for effect in option.effects:
-            if (
-                effect.kind is WargearOptionEffectKind.ADD_WARGEAR
-                and effect.wargear_id not in selection.wargear_ids
-            ):
-                raise ListValidationError(
-                    "WargearSelection does not satisfy a structured wargear option effect."
-                )
+            if effect.kind is WargearOptionEffectKind.ADD_WARGEAR:
+                _validate_add_wargear_effect_count(selection=selection, effect=effect)
+
+
+def _validate_add_wargear_effect_count(
+    *,
+    selection: WargearSelection,
+    effect: DatasheetWargearOptionEffect,
+) -> None:
+    if effect.model_count != 1:
+        raise ListValidationError(
+            "WargearSelection structured wargear option effect model count is unsupported."
+        )
+    selected_wargear_count = sum(
+        1 for wargear_id in selection.wargear_ids if wargear_id == effect.wargear_id
+    )
+    if selected_wargear_count != effect.wargear_count:
+        raise ListValidationError(
+            "WargearSelection does not satisfy a structured wargear option effect count."
+        )
 
 
 def _validate_model_profile_selection_tuple(

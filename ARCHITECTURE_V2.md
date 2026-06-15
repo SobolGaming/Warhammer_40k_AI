@@ -13,7 +13,7 @@ The roadmap is intentionally rules-engine first:
 Primary references for roadmap coverage:
 
 - Warhammer 40,000 11th Edition Core Rules source PDF: [docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf](docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf)
-- Warhammer Event Companion v1.0 source PDF, used as a local-only validation input for Phase 17J source-package planning; do not commit raw event PDFs.
+- Warhammer Event Companion v1.0 source PDF: [docs/source_rules/eng_12-06_warhammer40000_event_companion-s3bfb5f9s1-ivswuij3fo.pdf](docs/source_rules/eng_12-06_warhammer40000_event_companion-s3bfb5f9s1-ivswuij3fo.pdf)
 - 11th Edition app/codex/mission-pack source imports as they are added to CORE V2 source packages.
 - 11th Edition Digital App/community clarification supplement provided by project owner for this cutover plan.
 - CORE V1 reference implementation: <https://github.com/SobolGaming/Warhammer40k_AI>
@@ -3881,7 +3881,9 @@ Runtime engine modules remain
 blocked from importing raw source-normalization or source-mirror modules.
 
 Official GW faction-pack PDFs and extracted whole-source text/page files are
-local-only validation inputs, not repository artifacts. Do not commit
+local-only validation inputs, not repository artifacts. The checked-in
+`docs/source_rules` Core Rules and Event Companion PDFs are explicit source-rule
+exceptions used for source-linked rules and base-size provenance. Do not commit
 `data/raw/faction_packs/*.pdf`, `data/raw/faction_packs/*.txt`,
 `data/raw/faction_packs/extracted_pages/*.md`, `data/raw/gw/**/*.pdf`,
 `data/raw/gw/**/*.txt`, or `data/raw/gw/**/extracted_pages/*.md`, and do not

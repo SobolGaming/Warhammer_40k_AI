@@ -149,6 +149,14 @@ class _CompositionEntry:
     source_row: NormalizedSourceRow
 
 
+EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID = (
+    "pdf:warhammer40000-event-companion:2026-06-12:base-size-guide"
+)
+EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE = (
+    "docs/source_rules/eng_12-06_warhammer40000_event_companion-s3bfb5f9s1-ivswuij3fo.pdf"
+)
+
+
 def _bridge_datasheet(
     *,
     datasheet_id: str,
@@ -177,8 +185,9 @@ def _bridge_datasheet(
     faction_ability_row = _faction_ability_row(context=context, datasheet_id=datasheet_id)
     faction_ability_source = _ability_source_row(context=context, ability_row=faction_ability_row)
     faction_source_ids = _source_ids(faction_row, faction_ability_row, faction_ability_source)
-    bridged_rows["Factions"].append(
-        {
+    _append_or_merge_faction_row(
+        bridged_rows=bridged_rows,
+        row={
             "id": faction_id,
             "name": _raw_or_field(faction_row, "name"),
             "content_scope": "matched_play",
@@ -186,7 +195,15 @@ def _bridge_datasheet(
             "army_rule_id": _required_field(faction_ability_row, "ability_id"),
             "army_rule_name": _raw_or_field(faction_ability_source, "name"),
             "source_ids": _joined(faction_source_ids),
-        }
+        },
+    )
+    model_source_ids = tuple(
+        _deduplicated(
+            [
+                *_source_ids(model_source_row, *cost_rows),
+                EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID,
+            ]
+        )
     )
     bridged_rows["Datasheets"].append(
         {
@@ -228,13 +245,17 @@ def _bridge_datasheet(
                 "min_models": str(entry.min_models),
                 "max_models": str(entry.max_models),
                 "base_size": _required_field(model_source_row, "base_size"),
+                "base_size_source_id": EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID,
+                "base_size_document_reference": EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE,
                 "height": str(height.height),
                 "height_units": height.height_units.value,
                 "height_source_id": height.height_source_id,
                 "height_document_reference": height.height_document_reference,
                 "height_reviewer_status": height.reviewer_status.value,
                 "height_evidence_kind": height.evidence_kind.value,
-                "source_ids": _joined(_source_ids(model_source_row, entry.source_row, *cost_rows)),
+                "source_ids": _joined(
+                    tuple(_deduplicated([*model_source_ids, entry.source_row.stable_source_id()]))
+                ),
             }
         )
     _bridge_unit_composition(
@@ -637,6 +658,8 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "min_models",
             "max_models",
             "base_size",
+            "base_size_source_id",
+            "base_size_document_reference",
             "height",
             "height_units",
             "height_source_id",
@@ -755,7 +778,43 @@ def _raw_or_field(row: NormalizedSourceRow, column_name: str) -> str:
 
 
 def _source_ids(*rows: NormalizedSourceRow) -> tuple[str, ...]:
-    return tuple(_deduplicated([row.stable_source_id() for row in rows]))
+    source_ids: list[str] = []
+    for row in rows:
+        source_ids.append(row.stable_source_id())
+        fields = row.runtime_fields_payload()
+        if row.source_table == "PdfCorrections":
+            correction_source_id = fields.get("source_id")
+            if correction_source_id is not None and correction_source_id.strip():
+                source_ids.append(correction_source_id.strip())
+        explicit_source_ids = fields.get("source_ids")
+        if explicit_source_ids is not None:
+            source_ids.extend(_split_source_ids(explicit_source_ids))
+    return tuple(_deduplicated(source_ids))
+
+
+def _append_or_merge_faction_row(
+    *,
+    bridged_rows: dict[str, list[dict[str, str]]],
+    row: dict[str, str],
+) -> None:
+    for existing in bridged_rows["Factions"]:
+        if existing["id"] != row["id"]:
+            continue
+        for key, value in row.items():
+            if key == "source_ids":
+                continue
+            if existing[key] != value:
+                raise WahapediaBridgeError("Conflicting faction rows were produced.")
+        merged_source_ids = _deduplicated(
+            [*_split_source_ids(existing["source_ids"]), *_split_source_ids(row["source_ids"])]
+        )
+        existing["source_ids"] = _joined(tuple(merged_source_ids))
+        return
+    bridged_rows["Factions"].append(row)
+
+
+def _split_source_ids(value: str) -> list[str]:
+    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 def _correction_source_row(correction: PdfDatasheetCorrection) -> NormalizedSourceRow:
