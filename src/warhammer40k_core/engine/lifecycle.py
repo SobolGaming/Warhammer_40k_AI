@@ -1625,6 +1625,7 @@ class GameLifecycle:
             base_indexes=(
                 self._command_phase_handler.stratagem_index,
                 self._movement_phase_handler.stratagem_index,
+                self._shooting_phase_handler.stratagem_index,
                 self._fight_phase_handler.stratagem_index,
             ),
         )
@@ -1654,6 +1655,7 @@ class GameLifecycle:
         self._shooting_phase_handler = ShootingPhaseHandler(
             ruleset_descriptor=self._shooting_phase_handler.ruleset_descriptor,
             army_catalog=self._shooting_phase_handler.army_catalog,
+            stratagem_index=runtime_stratagem_index,
             shooting_end_surge_hooks=self._runtime_content_bundle.shooting_end_surge_hook_registry,
         )
         self._fight_phase_handler = FightPhaseHandler(

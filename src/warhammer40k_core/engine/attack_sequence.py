@@ -9,9 +9,12 @@ from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
     DiceExpression,
+    DiceRollResult,
+    DiceRollResultPayload,
     DiceRollSpec,
     DiceRollState,
     DiceRollStatePayload,
+    RandomCharacteristicRoll,
     RandomCharacteristicTiming,
     RerollComponentSelectionPolicy,
     RerollPermission,
@@ -148,6 +151,7 @@ from warhammer40k_core.engine.shooting_targets import (
     shooting_dynamic_model_blockers,
     shooting_visibility_cache_key,
 )
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.transports import (
     DestroyedTransportDisembark,
     DestroyedTransportDisembarkPayload,
@@ -192,6 +196,7 @@ from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 
 
 ATTACK_ALLOCATION_DECISION_TYPES = frozenset(
@@ -2272,6 +2277,7 @@ def resolve_attack_sequence_until_blocked(
     already_allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks | None = None,
     dice_manager: DiceRollManager | None = None,
+    stratagem_index: StratagemCatalogIndex | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     active_hooks = AttackSequenceHooks.empty() if hooks is None else hooks
     allocated_model_ids = already_allocated_model_ids
@@ -2308,6 +2314,7 @@ def resolve_attack_sequence_until_blocked(
                 manager=manager,
                 attack_sequence=current,
                 hooks=active_hooks,
+                stratagem_index=stratagem_index,
             )
             if status is not None:
                 return next_current, allocated_model_ids, status
@@ -2333,6 +2340,7 @@ def resolve_attack_sequence_until_blocked(
             attack_sequence=current,
             allocated_model_ids=allocated_model_ids,
             hooks=active_hooks,
+            stratagem_index=stratagem_index,
         )
         if status is not None:
             return next_current, allocated_model_ids, status
@@ -3346,6 +3354,7 @@ def apply_allocation_order_decision(
     result: DecisionResult,
     already_allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks | None = None,
+    stratagem_index: StratagemCatalogIndex | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     record = decisions.record_for_result(result)
     request = record.request
@@ -3374,6 +3383,7 @@ def apply_allocation_order_decision(
         allocation_groups=decision.ordered_groups(),
         allocated_model_ids=already_allocated_model_ids,
         hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
+        stratagem_index=stratagem_index,
     )
 
 
@@ -3387,6 +3397,7 @@ def apply_damage_allocation_model_decision(
     already_allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks | None = None,
     dice_manager: DiceRollManager | None = None,
+    stratagem_index: StratagemCatalogIndex | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     record = decisions.record_for_result(result)
     request = record.request
@@ -3416,6 +3427,7 @@ def apply_damage_allocation_model_decision(
         ),
         hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
         selected_model_id=decision.selected_model_id,
+        stratagem_index=stratagem_index,
     )
 
 
@@ -3447,6 +3459,7 @@ def apply_precision_allocation_decision(
     result: DecisionResult,
     already_allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks | None = None,
+    stratagem_index: StratagemCatalogIndex | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     record = decisions.record_for_result(result)
     request = record.request
@@ -3508,6 +3521,7 @@ def apply_precision_allocation_decision(
         allocated_model_ids=already_allocated_model_ids,
         hooks=AttackSequenceHooks.empty() if hooks is None else hooks,
         priority_group_ids=priority_group_ids,
+        stratagem_index=stratagem_index,
     )
 
 
@@ -4378,6 +4392,7 @@ def _resolve_grouped_current_pool(
     attack_sequence: AttackSequence,
     allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks,
+    stratagem_index: StratagemCatalogIndex | None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if attack_sequence.attack_index != 0:
         raise GameLifecycleError("Pooled attack resolution must enter pools at attack_index 0.")
@@ -4402,26 +4417,33 @@ def _resolve_grouped_current_pool(
     if not allocation_groups:
         raise GameLifecycleError("Pooled attack resolution has no legal allocation groups.")
 
-    wounded_contexts = _grouped_wounded_contexts_for_pool(
+    wounded_contexts, status = _grouped_wounded_contexts_for_pool(
         state=state,
         decisions=decisions,
         manager=manager,
         attack_sequence=attack_sequence,
         hooks=hooks,
+        stratagem_index=stratagem_index,
     )
+    if status is not None:
+        return attack_sequence, allocated_model_ids, status
     if not wounded_contexts:
         return (
             _advance_after_current_pool(attack_sequence=attack_sequence),
             allocated_model_ids,
             None,
         )
-    attack_sequence, normal_wounded_contexts = _defer_grouped_devastating_wounds(
+    attack_sequence, normal_wounded_contexts, status = _defer_grouped_devastating_wounds(
+        state=state,
         decisions=decisions,
         manager=manager,
         attack_sequence=attack_sequence,
         wounded_contexts=wounded_contexts,
         hooks=hooks,
+        stratagem_index=stratagem_index,
     )
+    if status is not None:
+        return attack_sequence, allocated_model_ids, status
     if not normal_wounded_contexts:
         return (
             _advance_after_current_pool(attack_sequence=attack_sequence),
@@ -4439,6 +4461,7 @@ def _resolve_grouped_current_pool(
         wounded_contexts=normal_wounded_contexts,
         allocated_model_ids=allocated_model_ids,
         hooks=hooks,
+        stratagem_index=stratagem_index,
     )
 
 
@@ -4449,7 +4472,11 @@ def _grouped_wounded_contexts_for_pool(
     manager: DiceRollManager,
     attack_sequence: AttackSequence,
     hooks: AttackSequenceHooks,
-) -> tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...]:
+    stratagem_index: StratagemCatalogIndex | None,
+) -> tuple[
+    tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
+    LifecycleStatus | None,
+]:
     pool = attack_sequence.current_pool()
     wounded_contexts: list[tuple[AttackSequence, AttackResolutionContextPayload]] = []
     for attack_index in range(pool.attacks):
@@ -4467,13 +4494,16 @@ def _grouped_wounded_contexts_for_pool(
             deferred_mortal_wounds=attack_sequence.deferred_mortal_wounds,
         )
         while True:
-            attack_context = _roll_hit_and_wound(
+            attack_context, status = _roll_hit_and_wound(
                 state=state,
                 decisions=decisions,
                 manager=manager,
                 attack_sequence=current,
                 hooks=hooks,
+                stratagem_index=stratagem_index,
             )
+            if status is not None:
+                return (), status
             if attack_context is None:
                 break
             if attack_context["wound_roll"]["successful"]:
@@ -4488,17 +4518,23 @@ def _grouped_wounded_contexts_for_pool(
             ):
                 break
             current = next_sequence
-    return tuple(wounded_contexts)
+    return tuple(wounded_contexts), None
 
 
 def _defer_grouped_devastating_wounds(
     *,
+    state: GameState,
     decisions: DecisionController,
     manager: DiceRollManager,
     attack_sequence: AttackSequence,
     wounded_contexts: tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
     hooks: AttackSequenceHooks,
-) -> tuple[AttackSequence, tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...]]:
+    stratagem_index: StratagemCatalogIndex | None,
+) -> tuple[
+    AttackSequence,
+    tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
+    LifecycleStatus | None,
+]:
     current = attack_sequence
     normal_contexts: list[tuple[AttackSequence, AttackResolutionContextPayload]] = []
     pool = attack_sequence.current_pool()
@@ -4510,12 +4546,22 @@ def _defer_grouped_devastating_wounds(
         if resolution is not DevastatingWoundsResolution.MORTAL_WOUNDS:
             normal_contexts.append((wounded_sequence, attack_context))
             continue
-        mortal_wounds = _damage_value(
+        damage_value, status = _damage_value(
+            state=state,
+            decisions=decisions,
             manager=manager,
             profile=pool.weapon_profile.damage_profile,
             attack_context_id=attack_context["attack_context_id"],
             attacker_player_id=attack_sequence.attacker_player_id,
-        ) + _melta_damage_modifier(pool)
+            affected_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            source_phase=attack_sequence.source_phase,
+            stratagem_index=stratagem_index,
+        )
+        if status is not None:
+            return current, (), status
+        if damage_value is None:
+            raise GameLifecycleError("Damage roll did not resolve a value.")
+        mortal_wounds = damage_value + _melta_damage_modifier(pool)
         deferred = DeferredMortalWounds(
             source_rule_id=DEVASTATING_WOUNDS_RULE_ID,
             target_unit_instance_id=attack_context["target_unit_instance_id"],
@@ -4552,7 +4598,7 @@ def _defer_grouped_devastating_wounds(
             },
         )
         current = current.with_deferred_mortal_wounds(deferred)
-    return current, tuple(normal_contexts)
+    return current, tuple(normal_contexts), None
 
 
 def _continue_grouped_allocation_for_wound_contexts(
@@ -4568,6 +4614,7 @@ def _continue_grouped_allocation_for_wound_contexts(
     allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks,
     priority_group_ids: tuple[str, ...] = (),
+    stratagem_index: StratagemCatalogIndex | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if not wounded_contexts:
         raise GameLifecycleError("Grouped allocation requires wounded contexts.")
@@ -4683,13 +4730,17 @@ def _continue_grouped_allocation_for_wound_contexts(
         allocation_context=allocation_context,
         allocation_groups=ordered_groups,
     )
-    save_results = _roll_grouped_saves(
+    save_results, status = _roll_grouped_saves(
         state=state,
+        decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
         manager=manager,
         wounded_contexts=wounded_contexts,
         allocation_group=_first_allocation_group("Grouped allocation order", ordered_groups),
+        stratagem_index=stratagem_index,
     )
+    if status is not None:
+        return attack_sequence, allocated_model_ids, status
     pending = PendingGroupedDamage(
         sorted_save_dice=save_results,
         ordered_allocation_group_payloads=tuple(group.to_payload() for group in ordered_groups),
@@ -4703,6 +4754,7 @@ def _continue_grouped_allocation_for_wound_contexts(
         manager=manager,
         attack_sequence=attack_sequence.with_pending_grouped_damage(pending),
         hooks=hooks,
+        stratagem_index=stratagem_index,
     )
 
 
@@ -4718,6 +4770,7 @@ def _continue_after_grouped_allocation_order(
     allocation_groups: tuple[AllocationGroup, ...],
     allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks,
+    stratagem_index: StratagemCatalogIndex | None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if not attack_contexts:
         raise GameLifecycleError("Grouped allocation order requires attack contexts.")
@@ -4743,13 +4796,17 @@ def _continue_after_grouped_allocation_order(
         allocation_context=allocation_context,
         allocation_groups=ordered_groups,
     )
-    save_results = _roll_grouped_saves(
+    save_results, status = _roll_grouped_saves(
         state=state,
+        decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
         manager=manager,
         wounded_contexts=wounded_contexts,
         allocation_group=_first_allocation_group("Grouped allocation order", ordered_groups),
+        stratagem_index=stratagem_index,
     )
+    if status is not None:
+        return attack_sequence, allocated_model_ids, status
     pending = PendingGroupedDamage(
         sorted_save_dice=save_results,
         ordered_allocation_group_payloads=tuple(group.to_payload() for group in ordered_groups),
@@ -4763,6 +4820,7 @@ def _continue_after_grouped_allocation_order(
         manager=manager,
         attack_sequence=attack_sequence.with_pending_grouped_damage(pending),
         hooks=hooks,
+        stratagem_index=stratagem_index,
     )
 
 
@@ -4775,6 +4833,7 @@ def _resolve_grouped_damage_from(
     attack_sequence: AttackSequence,
     hooks: AttackSequenceHooks,
     selected_model_id: str | None = None,
+    stratagem_index: StratagemCatalogIndex | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if attack_sequence.pending_grouped_damage is None:
         raise GameLifecycleError("Grouped damage resume requires pending grouped damage.")
@@ -4915,12 +4974,26 @@ def _resolve_grouped_damage_from(
             )
             current_pending = pending_for_die.advanced_after_current_die()
             continue
-        damage_amount = _damage_value(
+        damage_value, status = _damage_value(
+            state=state,
+            decisions=decisions,
             manager=manager,
             profile=pool.weapon_profile.damage_profile,
             attack_context_id=damage_attack_context["attack_context_id"],
             attacker_player_id=attack_sequence.attacker_player_id,
-        ) + _melta_damage_modifier(pool)
+            affected_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            source_phase=attack_sequence.source_phase,
+            stratagem_index=stratagem_index,
+        )
+        if status is not None:
+            return (
+                attack_sequence.with_pending_grouped_damage(pending_for_die),
+                pending_for_die.allocated_model_ids,
+                status,
+            )
+        if damage_value is None:
+            raise GameLifecycleError("Damage roll did not resolve a value.")
+        damage_amount = damage_value + _melta_damage_modifier(pool)
         _next_sequence, resolved_allocated_ids, status = _resolve_lost_wound_stage(
             state=state,
             decisions=decisions,
@@ -5134,11 +5207,13 @@ def _emit_grouped_allocation_event(
 def _roll_grouped_saves(
     *,
     state: GameState,
+    decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     manager: DiceRollManager,
     wounded_contexts: tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
     allocation_group: AllocationGroup,
-) -> tuple[SaveDieEntryPayload, ...]:
+    stratagem_index: StratagemCatalogIndex | None,
+) -> tuple[tuple[SaveDieEntryPayload, ...], LifecycleStatus | None]:
     results: list[SaveDieEntryPayload] = []
     for wounded_sequence, attack_context in wounded_contexts:
         current_model_id = _current_model_id_for_allocation_group(
@@ -5154,22 +5229,35 @@ def _roll_grouped_saves(
         )
         save_roll_option = mandatory_save_option(save_options)
         if save_roll_option is None:
-            roll_state = manager.roll(
+            roll_state = _roll_or_reuse_state(
+                manager,
                 _no_save_damage_order_roll_spec(
                     player_id=attack_context["defender_player_id"],
                     allocated_model_id=current_model_id,
                     attack_context_id=attack_context["attack_context_id"],
-                )
+                ),
             )
         else:
-            roll_state = manager.roll(
+            roll_state = _roll_or_reuse_state(
+                manager,
                 saving_throw_roll_spec(
                     save_kind=save_roll_option.save_kind,
                     player_id=attack_context["defender_player_id"],
                     allocated_model_id=current_model_id,
                     attack_context_id=attack_context["attack_context_id"],
-                )
+                ),
             )
+            status = _request_command_reroll_for_attack_roll_if_available(
+                state=state,
+                decisions=decisions,
+                roll_state=roll_state,
+                affected_unit_instance_id=attack_context["target_unit_instance_id"],
+                source_phase=battle_phase_kind_from_token(attack_context["source_phase"]),
+                stratagem_index=stratagem_index,
+                phase_body_status="attack_save_command_reroll_pending",
+            )
+            if status is not None:
+                return (), status
         results.append(
             {
                 "roll_state": roll_state.to_payload(),
@@ -5186,7 +5274,7 @@ def _roll_grouped_saves(
                 entry["attack_context"]["attack_context_id"],
             ),
         )
-    )
+    ), None
 
 
 def _emit_grouped_save_die_event(
@@ -6443,7 +6531,8 @@ def _roll_hit_and_wound(
     manager: DiceRollManager,
     attack_sequence: AttackSequence,
     hooks: AttackSequenceHooks,
-) -> AttackResolutionContextPayload | None:
+    stratagem_index: StratagemCatalogIndex | None,
+) -> tuple[AttackResolutionContextPayload | None, LifecycleStatus | None]:
     pool = attack_sequence.current_pool()
     attack_context_id = attack_sequence.attack_context_id()
     if attack_sequence.generated_hit_index == 0:
@@ -6454,6 +6543,17 @@ def _roll_hit_and_wound(
             attacker_player_id=attack_sequence.attacker_player_id,
             attack_context_id=attack_context_id,
         )
+        status = _request_command_reroll_for_attack_roll_if_available(
+            state=state,
+            decisions=decisions,
+            roll_state=hit_roll.roll_state,
+            affected_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            source_phase=attack_sequence.source_phase,
+            stratagem_index=stratagem_index,
+            phase_body_status="attack_hit_command_reroll_pending",
+        )
+        if status is not None:
+            return None, status
         _emit_event(
             decisions=decisions,
             hooks=hooks,
@@ -6496,7 +6596,7 @@ def _roll_hit_and_wound(
             raise GameLifecycleError("Generated hit resolution requires a hit roll.")
         hit_roll = attack_sequence.current_hit_roll
     if not hit_roll.successful:
-        return None
+        return None, None
 
     target_rules_unit = rules_unit_view_by_id(
         state=state,
@@ -6529,6 +6629,17 @@ def _roll_hit_and_wound(
             attack_context_id=attack_context_id,
             wound_modifier=_wound_roll_modifier(pool),
         )
+        status = _request_command_reroll_for_attack_roll_if_available(
+            state=state,
+            decisions=decisions,
+            roll_state=wound_roll.roll_state,
+            affected_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            source_phase=attack_sequence.source_phase,
+            stratagem_index=stratagem_index,
+            phase_body_status="attack_wound_command_reroll_pending",
+        )
+        if status is not None:
+            return None, status
         wound_roll = _reroll_wound_for_twin_linked_if_needed(
             manager=manager,
             decisions=decisions,
@@ -6598,7 +6709,171 @@ def _roll_hit_and_wound(
         "wound_roll": wound_roll.to_payload(),
         "allocation": None,
         "save_options": [],
-    }
+    }, None
+
+
+def _roll_or_reuse_state(manager: DiceRollManager, spec: DiceRollSpec) -> DiceRollState:
+    if type(manager) is not DiceRollManager:
+        raise GameLifecycleError("Roll reuse requires a DiceRollManager.")
+    if type(spec) is not DiceRollSpec:
+        raise GameLifecycleError("Roll reuse requires a DiceRollSpec.")
+    spec_payload = spec.to_payload()
+    original_state: DiceRollState | None = None
+    for event in manager.event_log.records:
+        if event.event_type != "dice_rolled":
+            continue
+        if not isinstance(event.payload, dict):
+            raise GameLifecycleError("dice_rolled event payload must be an object.")
+        result = DiceRollResult.from_payload(cast(DiceRollResultPayload, event.payload))
+        if result.spec.to_payload() == spec_payload:
+            original_state = DiceRollState.from_result(result)
+            break
+    if original_state is None:
+        return manager.roll(spec)
+    return _latest_reroll_state_for_original_roll(
+        manager=manager,
+        original_state=original_state,
+    )
+
+
+def _latest_reroll_state_for_original_roll(
+    *,
+    manager: DiceRollManager,
+    original_state: DiceRollState,
+) -> DiceRollState:
+    current = original_state
+    roll_id = original_state.original_result.roll_id
+    for event in manager.event_log.records:
+        if event.event_type not in {"dice_reroll_resolved", "command_reroll_resolved"}:
+            continue
+        if not isinstance(event.payload, dict):
+            raise GameLifecycleError("Reroll event payload must be an object.")
+        if event.event_type == "command_reroll_resolved":
+            updated_payload = event.payload.get("updated_roll_state")
+            if not isinstance(updated_payload, dict):
+                raise GameLifecycleError("Command Re-roll event missing updated roll state.")
+            updated_state = DiceRollState.from_payload(cast(DiceRollStatePayload, updated_payload))
+        else:
+            updated_state = DiceRollState.from_payload(cast(DiceRollStatePayload, event.payload))
+        if updated_state.original_result.roll_id == roll_id:
+            current = updated_state
+    return current
+
+
+def _request_command_reroll_for_attack_roll_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    roll_state: DiceRollState | None,
+    affected_unit_instance_id: str,
+    source_phase: BattlePhase,
+    stratagem_index: StratagemCatalogIndex | None,
+    phase_body_status: str,
+) -> LifecycleStatus | None:
+    if roll_state is None or stratagem_index is None:
+        return None
+    actor_id = roll_state.original_result.spec.actor_id
+    if actor_id is None:
+        return None
+    from warhammer40k_core.engine.stratagems import (
+        COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY,
+        COMMAND_REROLL_DICE_CONTEXT_KEY,
+        CORE_COMMAND_REROLL_HANDLER_ID,
+        StratagemEligibilityContext,
+        create_stratagem_use_decision_request,
+        stratagem_decline_option,
+        stratagem_use_options_for_handler_from_index,
+        stratagem_window_declined_for_context,
+    )
+
+    phase = battle_phase_kind_from_token(source_phase)
+    window_id = (
+        f"command-reroll-{phase.value}-round-{state.battle_round:02d}-"
+        f"{roll_state.original_result.roll_id}"
+    )
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=actor_id,
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+        timing_window_id=window_id,
+        trigger_payload=validate_json_value(
+            {
+                COMMAND_REROLL_DICE_CONTEXT_KEY: roll_state.to_payload(),
+                COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY: affected_unit_instance_id,
+                "source_phase": phase.value,
+                "roll_id": roll_state.original_result.roll_id,
+                "roll_type": roll_state.original_result.spec.roll_type,
+            }
+        ),
+    )
+    if stratagem_window_declined_for_context(decisions=decisions, context=context):
+        return None
+    options = stratagem_use_options_for_handler_from_index(
+        state=state,
+        index=stratagem_index,
+        context=context,
+        handler_id=CORE_COMMAND_REROLL_HANDLER_ID,
+    )
+    if not options:
+        return None
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(*options, stratagem_decline_option()),
+    )
+    decisions.request_decision(request)
+    return LifecycleStatus.waiting_for_decision(
+        stage=state.stage,
+        decision_request=request,
+        payload={
+            "phase": phase.value,
+            "phase_body_status": phase_body_status,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "player_id": actor_id,
+            "roll_id": roll_state.original_result.roll_id,
+            "roll_type": roll_state.original_result.spec.roll_type,
+            "affected_unit_instance_id": affected_unit_instance_id,
+            "pending_request_id": request.request_id,
+        },
+    )
+
+
+def _random_characteristic_roll_spec(
+    *,
+    characteristic: Characteristic,
+    timing: RandomCharacteristicTiming,
+    scope_id: str,
+    expression: DiceExpression,
+    reason: str,
+    actor_id: str | None,
+) -> DiceRollSpec:
+    if type(characteristic) is not Characteristic:
+        raise GameLifecycleError("Random characteristic requires a Characteristic.")
+    if type(timing) is not RandomCharacteristicTiming:
+        raise GameLifecycleError("Random characteristic requires a timing.")
+    if type(expression) is not DiceExpression:
+        raise GameLifecycleError("Random characteristic requires a DiceExpression.")
+    scope = _validate_identifier("Random characteristic scope_id", scope_id)
+    return DiceRollSpec(
+        expression=expression,
+        reason=reason,
+        roll_type=f"random_characteristic.{characteristic.value}.{timing.value}.{scope}",
+        actor_id=actor_id,
+    )
+
+
+def _append_event_once(
+    *,
+    decisions: DecisionController,
+    event_type: str,
+    payload: JsonValue,
+) -> EventRecord:
+    event_payload = validate_json_value(payload)
+    for event in decisions.event_log.records:
+        if event.event_type == event_type and event.payload == event_payload:
+            return event
+    return decisions.event_log.append(event_type, event_payload)
 
 
 def _roll_hit(
@@ -6625,7 +6900,8 @@ def _roll_hit(
         state=state,
         target_unit_instance_id=pool.target_unit_instance_id,
     )
-    roll_state = manager.roll(
+    roll_state = _roll_or_reuse_state(
+        manager,
         attack_sequence_hit_roll_spec(
             weapon_profile_id=pool.weapon_profile_id,
             attack_context_id=attack_context_id,
@@ -6634,7 +6910,7 @@ def _roll_hit(
                 is_snap_shooting=is_snap_shooting,
                 targeting_rule_ids=pool.targeting_rule_ids,
             ),
-        )
+        ),
     )
     unmodified = roll_state.current_total
     capped_modifier = _cap_roll_modifier(modifier)
@@ -6694,12 +6970,13 @@ def _roll_wound(
 ) -> WoundRoll:
     strength = pool.weapon_profile.strength.final
     target_number = wound_roll_target_number(strength=strength, toughness=toughness)
-    roll_state = manager.roll(
+    roll_state = _roll_or_reuse_state(
+        manager,
         attack_sequence_wound_roll_spec(
             weapon_profile_id=pool.weapon_profile_id,
             attack_context_id=attack_context_id,
             attacker_player_id=attacker_player_id,
-        )
+        ),
     )
     unmodified = roll_state.current_total
     capped_modifier = _cap_roll_modifier(wound_modifier)
@@ -6942,7 +7219,11 @@ def _emit_event(
     event: AttackSequenceEvent,
 ) -> EventRecord:
     emitted = hooks.emit(event)
-    return decisions.event_log.append("attack_sequence_step", emitted.to_payload())
+    return _append_event_once(
+        decisions=decisions,
+        event_type="attack_sequence_step",
+        payload=validate_json_value(emitted.to_payload()),
+    )
 
 
 def _target_has_effect_cover(*, state: GameState, target_unit_instance_id: str) -> bool:
@@ -7475,26 +7756,59 @@ def _toughness_values_for_models(
 
 def _damage_value(
     *,
+    state: GameState,
+    decisions: DecisionController,
     manager: DiceRollManager,
     profile: DamageProfile,
     attack_context_id: str,
     attacker_player_id: str,
-) -> int:
+    affected_unit_instance_id: str,
+    source_phase: BattlePhase,
+    stratagem_index: StratagemCatalogIndex | None,
+) -> tuple[int | None, LifecycleStatus | None]:
     if type(profile) is not DamageProfile:
         raise GameLifecycleError("Damage resolution requires a DamageProfile.")
     if profile.fixed_damage is not None:
-        return profile.fixed_damage
+        return profile.fixed_damage, None
     if profile.dice_expression is None:
         raise GameLifecycleError("DamageProfile requires fixed damage or a dice expression.")
-    roll = manager.roll_random_characteristic(
-        characteristic=Characteristic.DAMAGE,
-        timing=RandomCharacteristicTiming.PER_ATTACK,
-        scope_id=f"{attack_context_id}:damage",
-        expression=profile.dice_expression,
-        reason="Phase 13C random Damage roll",
-        actor_id=attacker_player_id,
+    scope_id = f"{attack_context_id}:damage"
+    timing = RandomCharacteristicTiming.PER_ATTACK
+    roll_state = _roll_or_reuse_state(
+        manager,
+        _random_characteristic_roll_spec(
+            characteristic=Characteristic.DAMAGE,
+            timing=timing,
+            scope_id=scope_id,
+            expression=profile.dice_expression,
+            reason="Phase 13C random Damage roll",
+            actor_id=attacker_player_id,
+        ),
     )
-    return roll.value
+    status = _request_command_reroll_for_attack_roll_if_available(
+        state=state,
+        decisions=decisions,
+        roll_state=roll_state,
+        affected_unit_instance_id=affected_unit_instance_id,
+        source_phase=source_phase,
+        stratagem_index=stratagem_index,
+        phase_body_status="attack_damage_command_reroll_pending",
+    )
+    if status is not None:
+        return None, status
+    random_roll = RandomCharacteristicRoll(
+        characteristic=Characteristic.DAMAGE,
+        timing=timing,
+        scope_id=scope_id,
+        roll_state=roll_state,
+        value=roll_state.current_total,
+    )
+    _append_event_once(
+        decisions=decisions,
+        event_type="random_characteristic_rolled",
+        payload=validate_json_value(random_roll.to_payload()),
+    )
+    return random_roll.value, None
 
 
 def _model_is_alive(*, state: GameState, model_instance_id: str) -> bool:

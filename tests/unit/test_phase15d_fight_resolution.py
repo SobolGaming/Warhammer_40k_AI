@@ -33,6 +33,7 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelPlacement,
     UnitPlacement,
 )
+from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -72,6 +73,7 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest, ProposalKind
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
     UnitCoherencyResult,
@@ -356,6 +358,94 @@ def test_phase14e_melee_lance_uses_charge_move_wound_modifier() -> None:
     assert wound_payload["capped_modifier"] == 1
     assert wound_payload["final_roll"] == 3
     assert wound_payload["successful"] is True
+
+
+def test_phase18b_command_reroll_window_opens_after_fight_hit_roll() -> None:
+    catalog, ruleset, scenario, attacker, target_a, _target_b = _melee_fixture(
+        target_b_pose=Pose.at(30.0, 30.0),
+    )
+    request = _melee_request(
+        catalog=catalog,
+        ruleset=ruleset,
+        scenario=scenario,
+        attacker=attacker,
+    )
+    proposal = _melee_proposal(
+        request=request,
+        attacker=attacker,
+        declarations=(
+            MeleeWeaponDeclaration(
+                attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                wargear_id="core-leader-blade",
+                weapon_profile_id="core-leader-blade:standard",
+                target_allocations=(MeleeTargetAllocation(target_a.unit_instance_id),),
+            ),
+        ),
+    )
+    state = _attack_sequence_state(
+        game_id="phase18b-fight-command-reroll-hit",
+        ruleset=ruleset,
+        scenario=scenario,
+    )
+    state.gain_command_points(
+        player_id="player-a",
+        amount=1,
+        source_id="phase18b-fight-command-reroll-cp",
+        source_kind=CommandPointSourceKind.OTHER,
+        cap_exempt=True,
+    )
+    sequence = melee_attack_sequence_from_proposal(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        proposal=proposal,
+        army_catalog=catalog,
+        dice_manager=DiceRollManager("phase18b-fight-command-reroll-attacks"),
+        sequence_id="phase18b-fight-command-reroll-hit",
+        state=state,
+    )
+    attack_context_id = sequence.attack_context_id()
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=sequence.current_pool().weapon_profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id=sequence.attacker_player_id,
+    )
+    decisions = DecisionController()
+
+    _remaining, _allocated, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset,
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase18b-fight-command-reroll-hit",
+            event_log=decisions.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase18b-fight-command-reroll-hit-roll",
+                    spec=hit_spec,
+                    value=2,
+                ),
+            ),
+        ),
+        stratagem_index=eleventh_edition_stratagem_index(),
+    )
+
+    assert status is not None
+    stratagem_request = status.decision_request
+    assert stratagem_request is not None
+    assert stratagem_request.decision_type == "use_stratagem"
+    assert stratagem_request.actor_id == "player-a"
+    status_payload = cast(dict[str, object], status.payload)
+    assert status_payload["phase"] == BattlePhase.FIGHT.value
+    assert status_payload["phase_body_status"] == "attack_hit_command_reroll_pending"
+    option_ids = {option.option_id for option in stratagem_request.options}
+    assert any(option_id.startswith("use-stratagem:command-reroll:") for option_id in option_ids)
+    payload = cast(dict[str, object], stratagem_request.payload)
+    context = cast(dict[str, object], payload["stratagem_context"])
+    trigger_payload = cast(dict[str, object], context["trigger_payload"])
+    assert trigger_payload["roll_type"] == "attack_sequence.hit"
+    assert trigger_payload["affected_unit_instance_id"] == attacker.unit_instance_id
 
 
 def test_phase15d_melee_request_and_proposal_payloads_round_trip() -> None:

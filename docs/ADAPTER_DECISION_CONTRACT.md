@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered grant decisions, and Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, and Phase 18B trigger opportunity-window and interface-intent requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered grant decisions, and Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, and Phase 18B trigger opportunity-window/interface-intent requirements for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -90,6 +90,22 @@ The shared contract uses these objects and payloads:
   payloads through `retained_control_source_id`, but adapters must not create or
   mutate it directly.
 - `ReactionWindow` and `TriggeredDecisionRequest`: interrupt-style finite decisions emitted from typed timing windows.
+- `OpportunityWindow`: deterministic trigger envelope for optional Stratagems,
+  abilities, rerolls, reactions, and phase side actions. It carries a timing
+  window, state hash, sequence number, revision, anchor events, eligible
+  players, priority order, legal actions, default pass action, close condition,
+  and per-player legal-action fingerprints.
+- `OpportunityLegalAction`: one engine-enumerated legal action inside an
+  opportunity window, with JSON-safe source, cost, target, batching, and handler
+  payloads. Adapters select these actions only through the pending
+  `DecisionRequest` option IDs.
+- `WindowPass`: replay-safe prompt-suppression record keyed by window ID,
+  player, revision, and legal-action fingerprint. A matching pass can suppress
+  another prompt only while the legal action fingerprint is unchanged.
+- `InterfaceIntent`: adapter-captured proactive intent. It is not a mutation and
+  not a decision record. It may materialize into a normal `DecisionResult` only
+  when the current pending request matches its window timing, state hash, source,
+  action, targets, and expiration.
 - `SequencingDecision`: finite order choice for simultaneous rule conflicts after active-player or roll-off ownership is determined.
 - `PersistingEffect`: replay-safe effect state with deterministic expiration and unit-ID ownership across Embark/Disembark and Attached-unit splits.
 
@@ -113,6 +129,7 @@ Relevant modules:
 - `src/warhammer40k_core/engine/fight_order.py`
 - `src/warhammer40k_core/engine/phases/fight.py`
 - `src/warhammer40k_core/engine/timing_windows.py`
+- `src/warhammer40k_core/engine/opportunity_windows.py`
 - `src/warhammer40k_core/engine/reaction_queue.py`
 - `src/warhammer40k_core/engine/sequencing.py`
 - `src/warhammer40k_core/engine/effects.py`
@@ -142,6 +159,52 @@ Those producers still converge on the same engine-facing objects:
 - valid engine application -> `DecisionRecord` and `EventRecord`.
 
 The lifecycle should not care whether a result came from a person, AI, CLI, network client, or replay driver. It should care only whether the current pending request accepts that result and whether engine validators accept the proposed rule outcome.
+
+## Trigger Opportunity Windows
+
+Optional trigger-based rules use synchronous engine-owned opportunity windows,
+not adapter-private polling or asynchronous mutation. The trigger host reaches a
+supported timing point, enumerates legal `OpportunityLegalAction` values, opens
+an `OpportunityWindow`, and emits a normal pending `DecisionRequest`. That
+request may use an existing host decision type such as `resolve_reaction_window`
+or `use_stratagem`; the opportunity envelope is the shared payload shape around
+the legal options, not a separate rules path.
+
+Adapters may render opportunity windows as a reaction tray, enabled Stratagem
+button, CLI command list, AI candidate list, network message, or replay record.
+They must still answer by selecting one pending option ID or by submitting the
+host's parameterized payload. They must not apply the action, spend resources,
+move models, reveal hidden data, or suppress replay events locally.
+
+Human-facing adapters may capture proactive declarations as `InterfaceIntent`
+records. An intent can be queued by the adapter while no matching engine window
+is open, but it is advisory only. It materializes into a `DecisionResult` only if
+the current pending request matches the intended timing, player, state hash,
+source, action ID, targets, and expiration. Stale, expired, wrong-context,
+malformed, or unavailable intents are rejected without consuming the pending
+request and without mutating authoritative state.
+
+Fast-rolled or repeated equivalent triggers should be batched inside one
+opportunity window when the rules permit it. `TriggerBatchingMode` records
+whether an action applies to one item, a subset, a quantity, the whole group, or
+requires atomic non-batched timing. Fast rolling remains an optimization; if a
+rule can legally interrupt between atomic events, the host must split the roll
+group or open the opportunity before consuming the group result.
+
+Prompt suppression is represented as a pass, not as a missing opportunity.
+`WindowPass` records are keyed by window ID, player, revision, and
+legal-action fingerprint. If nothing changed, the same player should not be
+reprompted. If state changes, legal actions change, or the window revision
+changes, the fingerprint changes and the player may need a fresh opportunity.
+
+When both players can act, the opportunity window's `priority_order` is
+authoritative. Network clients must submit requested action IDs for the current
+window and state hash; they must never send direct "apply this Stratagem now"
+commands. Replay consumes recorded `DecisionResult` payloads and verifies that
+the same opportunity request and legal-action fingerprint are reproduced.
+
+See [TRIGGER_OPPORTUNITY_WINDOWS.md](TRIGGER_OPPORTUNITY_WINDOWS.md) for the
+implementation-level contract.
 
 ## Finite Decisions
 
@@ -364,7 +427,7 @@ Parameterized Stratagem submissions follow the Phase 11D invalid-submission rule
 
 Phase 12C source-backed Core Stratagems are adapter-visible through these handler bindings:
 
-- `core:command-reroll`: finite `use_stratagem` option at `after_dice_roll`; the option payload context includes `trigger_payload.dice_roll_state` and `trigger_payload.affected_unit_instance_id`, and the source-backed catalog definition includes `eligible_roll_types` for the edition-specific roll classes that may be re-rolled. The affected unit ID is canonicalized into the resulting `StratagemUseRecord.affected_unit_instance_ids` before the engine enforces the one-Stratagem-per-unit-per-phase restriction; missing, unknown, wrong-owner, stale attached-unit, or otherwise malformed affected-unit context is rejected before option emission and before queue pop. The 11th Edition source list covers Hit, Wound, Damage, saving throw, Advance, Charge, Hazardous, and number-of-attacks rolls; the normalized number-of-attacks roll type is `number_of_attacks_roll`. It does not include Leadership, Battle-shock, Desperate Escape, or no-save allocation-order roll classes. Desperate Escape uses hazard rolls in 11th Edition. Runtime attack/save roll specs can remain precise (`attack_sequence.hit`, `attack_sequence.wound`, `attack_sequence.save.*`, and random Damage roll types); Command Re-roll normalizes those to source-backed roll classes before eligibility comparison. A real armour or invulnerable saving throw remains an `attack_sequence.save.*` roll even when its target number is above 6 and cannot succeed on a D6. Synthetic ordered-allocation dice for effects that permit no saving throw use `attack_sequence.allocation_order.no_save` and are not saving throws. The engine rejects unlisted non-roll-off roll types and roll actor drift before option emission and before queue pop. Single-die rolls and Charge rolls resolve through Phase 10J whole-roll reroll semantics. Non-Charge multi-dice rolls emit a nested `select_dice_reroll` finite request with one legal reroll option per die, and lifecycle submission must select one engine-emitted option ID. This can be offered in a Phase 12A reaction window, and the parent resumes only after `command_reroll_resolved` and `reaction_parent_resumed` are emitted.
+- `core:command-reroll`: finite `use_stratagem` option at `after_dice_roll`; the option payload context includes `trigger_payload.dice_roll_state` and `trigger_payload.affected_unit_instance_id`, and the source-backed catalog definition includes `eligible_roll_types` for the edition-specific roll classes that may be re-rolled. The affected unit ID is canonicalized into the resulting `StratagemUseRecord.affected_unit_instance_ids` before the engine enforces the one-Stratagem-per-unit-per-phase restriction; missing, unknown, wrong-owner, stale attached-unit, or otherwise malformed affected-unit context is rejected before option emission and before queue pop. The 11th Edition source list covers Hit, Wound, Damage, saving throw, Advance, Charge, Hazardous, and number-of-attacks rolls; the normalized number-of-attacks roll type is `number_of_attacks_roll`. It does not include Leadership, Battle-shock, Desperate Escape, or no-save allocation-order roll classes. Desperate Escape uses hazard rolls in 11th Edition. Runtime attack/save roll specs can remain precise (`attack_sequence.hit`, `attack_sequence.wound`, `attack_sequence.save.*`, and random Damage roll types); Command Re-roll normalizes those to source-backed roll classes before eligibility comparison. Shooting and Fight attack-sequence hosts now open the optional `use_stratagem` window after Hit rolls, Wound rolls, real armour/invulnerable saving throws, and random Damage rolls before that roll is consumed by the next attack step. A real armour or invulnerable saving throw remains an `attack_sequence.save.*` roll even when its target number is above 6 and cannot succeed on a D6. Synthetic ordered-allocation dice for effects that permit no saving throw use `attack_sequence.allocation_order.no_save` and are not saving throws. The engine rejects unlisted non-roll-off roll types and roll actor drift before option emission and before queue pop. Single-die rolls and Charge rolls resolve through Phase 10J whole-roll reroll semantics. Non-Charge multi-dice rolls emit a nested `select_dice_reroll` finite request with one legal reroll option per die, and lifecycle submission must select one engine-emitted option ID. Attack-sequence resumes reuse the recorded original or replacement roll state from the event log so replay, decline, and accepted reroll paths do not re-roll locally. This can be offered in a Phase 12A reaction window, and the parent resumes only after `command_reroll_resolved` and `reaction_parent_resumed` are emitted.
 - `core:insane-bravery`: parameterized `submit_stratagem_target_proposal` for a unit pending a Battle-shock test. Accepted use records a persisting auto-pass effect and the Command phase resolves the Battle-shock test as passed without adapter-owned mutation.
 - `core:rapid-ingress`: parameterized target proposal for an unarrived reserves unit during the opponent Movement phase end. Accepted use spends CP and records the Stratagem use, then emits a `submit_placement_proposal` request using the existing placement proposal contract. The placement answer must also go through `GameLifecycle.submit_decision(...)`. When Rapid Ingress is offered from a Phase 12A reaction window, the reaction frame continues from the target proposal to the placement proposal and the parent resumes only after a valid placement resolves. Rule-invalid but well-formed placement proposals are recorded as rejected attempts and emit a fresh pending placement request for retry; stale, malformed, or wrong-context placement proposals are rejected before queue pop.
 - `core:new-orders`: finite `use_stratagem` options for active Tactical secondary cards. The target binding uses `target_kind: "tactical_secondary_card"` and `target_secondary_mission_id`; accepted use costs 1 CP, is once per game, discards that card, and draws one replacement through engine-owned Tactical secondary state.

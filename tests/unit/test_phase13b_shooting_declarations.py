@@ -59,7 +59,9 @@ from warhammer40k_core.engine.attack_sequence import (
     WoundRoll,
     apply_damage_allocation_model_decision,
     apply_destroyed_transport_disembark_proposal_decision,
+    attack_sequence_hit_roll_spec,
     attack_sequence_step_from_token,
+    attack_sequence_wound_roll_spec,
     cover_for_allocated_model,
     deadly_demise_mortal_wounds_roll_spec,
     deadly_demise_trigger_roll_spec,
@@ -78,6 +80,7 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacedArmy,
     UnitPlacement,
 )
+from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.core_stratagem_effects import GO_TO_GROUND_EFFECT_KIND
 from warhammer40k_core.engine.damage_allocation import (
     DECLINE_DESTRUCTION_REACTION_OPTION_ID,
@@ -207,6 +210,7 @@ from warhammer40k_core.engine.shooting_types import (
     shooting_type_from_token,
     validate_shooting_type_tuple,
 )
+from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.transports import (
     TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
     DisembarkModeKind,
@@ -1021,6 +1025,281 @@ def test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effect
     assert applied_payload["mortal_wounds"] == 1
     assert applications[0]["model_instance_id"] == defender_model.model_instance_id
     assert applications[0]["damage_kind"] == DamageKind.MORTAL.value
+
+
+def test_phase18b_command_reroll_window_opens_after_shooting_hit_roll() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    _grant_command_reroll_cp(state, player_id="player-a")
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase18b-command-reroll-hit",
+    )
+    sequence_id = "phase18b-command-reroll-hit"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+
+    _remaining, _allocated, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id=f"{sequence_id}:hit", spec=hit_spec, value=2),
+            ),
+        ),
+        stratagem_index=eleventh_edition_stratagem_index(),
+    )
+
+    _assert_command_reroll_request(
+        status,
+        actor_id="player-a",
+        phase_body_status="attack_hit_command_reroll_pending",
+        roll_type="attack_sequence.hit",
+        affected_unit_instance_id=attacker.unit_instance_id,
+    )
+
+
+def test_phase18b_command_reroll_window_opens_after_shooting_wound_roll() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    _grant_command_reroll_cp(state, player_id="player-a")
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase18b-command-reroll-wound",
+    )
+    sequence_id = "phase18b-command-reroll-wound"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+        reroll_forbidden_rule_ids=(SNAP_SHOOTING_RULE_ID,),
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            replace(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+                targeting_rule_ids=(SNAP_SHOOTING_RULE_ID,),
+            ),
+        ),
+    )
+
+    _remaining, _allocated, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id=f"{sequence_id}:hit", spec=hit_spec, value=6),
+                _fixed_roll_result(roll_id=f"{sequence_id}:wound", spec=wound_spec, value=2),
+            ),
+        ),
+        stratagem_index=eleventh_edition_stratagem_index(),
+    )
+
+    _assert_command_reroll_request(
+        status,
+        actor_id="player-a",
+        phase_body_status="attack_wound_command_reroll_pending",
+        roll_type="attack_sequence.wound",
+        affected_unit_instance_id=attacker.unit_instance_id,
+    )
+
+
+def test_phase18b_command_reroll_window_opens_after_shooting_save_roll() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    _grant_command_reroll_cp(state, player_id="player-b")
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase18b-command-reroll-save",
+    )
+    sequence_id = "phase18b-command-reroll-save"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+
+    _remaining, _allocated, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id=f"{sequence_id}:hit", spec=hit_spec, value=6),
+                _fixed_roll_result(roll_id=f"{sequence_id}:wound", spec=wound_spec, value=6),
+                _fixed_roll_result(roll_id=f"{sequence_id}:save", spec=save_spec, value=1),
+            ),
+        ),
+        stratagem_index=eleventh_edition_stratagem_index(),
+    )
+
+    _assert_command_reroll_request(
+        status,
+        actor_id="player-b",
+        phase_body_status="attack_save_command_reroll_pending",
+        roll_type="attack_sequence.save.armour",
+        affected_unit_instance_id=defender.unit_instance_id,
+    )
+
+
+def test_phase18b_command_reroll_window_opens_after_shooting_damage_roll() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    _grant_command_reroll_cp(state, player_id="player-a")
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase18b-command-reroll-damage",
+        keywords=(WeaponKeyword.LETHAL_HITS,),
+        abilities=(AbilityDescriptor.lethal_hits(),),
+        damage_profile=DamageProfile.dice(DiceExpression(quantity=1, sides=3)),
+    )
+    sequence_id = "phase18b-command-reroll-damage"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+        reroll_forbidden_rule_ids=(SNAP_SHOOTING_RULE_ID,),
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    damage_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=3),
+        reason="Phase 13C random Damage roll",
+        roll_type=f"random_characteristic.damage.per_attack.{attack_context_id}:damage",
+        actor_id="player-a",
+    )
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            replace(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+                targeting_rule_ids=(SNAP_SHOOTING_RULE_ID,),
+            ),
+        ),
+    )
+
+    _remaining, _allocated, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id=f"{sequence_id}:hit", spec=hit_spec, value=6),
+                _fixed_roll_result(roll_id=f"{sequence_id}:save", spec=save_spec, value=1),
+                _fixed_roll_result(roll_id=f"{sequence_id}:damage", spec=damage_spec, value=2),
+            ),
+        ),
+        stratagem_index=eleventh_edition_stratagem_index(),
+    )
+
+    _assert_command_reroll_request(
+        status,
+        actor_id="player-a",
+        phase_body_status="attack_damage_command_reroll_pending",
+        roll_type=f"random_characteristic.damage.per_attack.{attack_context_id}:damage",
+        affected_unit_instance_id=attacker.unit_instance_id,
+    )
 
 
 def test_phase13d_deferred_devastating_mortal_wounds_route_feel_no_pain_choice() -> None:
@@ -15073,6 +15352,42 @@ def _fixed_roll_result(
         values=(value,),
         source="fixed",
     )
+
+
+def _grant_command_reroll_cp(state: GameState, *, player_id: str) -> None:
+    state.gain_command_points(
+        player_id=player_id,
+        amount=1,
+        source_id=f"phase18b-command-reroll-cp-{player_id}",
+        source_kind=CommandPointSourceKind.OTHER,
+        cap_exempt=True,
+    )
+
+
+def _assert_command_reroll_request(
+    status: LifecycleStatus | None,
+    *,
+    actor_id: str,
+    phase_body_status: str,
+    roll_type: str,
+    affected_unit_instance_id: str,
+) -> DecisionRequest:
+    assert status is not None
+    request = _decision_request(status)
+    assert request.decision_type == "use_stratagem"
+    assert request.actor_id == actor_id
+    status_payload = cast(dict[str, object], status.payload)
+    assert status_payload["phase_body_status"] == phase_body_status
+    option_ids = {option.option_id for option in request.options}
+    assert any(option_id.startswith("use-stratagem:command-reroll:") for option_id in option_ids)
+    assert "decline_stratagem_window" in option_ids
+    payload = cast(dict[str, object], request.payload)
+    context = cast(dict[str, object], payload["stratagem_context"])
+    trigger_payload = cast(dict[str, object], context["trigger_payload"])
+    assert context["trigger_kind"] == "after_dice_roll"
+    assert trigger_payload["roll_type"] == roll_type
+    assert trigger_payload["affected_unit_instance_id"] == affected_unit_instance_id
+    return request
 
 
 def _model_with_characteristic(

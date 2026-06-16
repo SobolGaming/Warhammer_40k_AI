@@ -410,6 +410,7 @@ def _advance_fight_attack_sequence(
         ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
         attack_sequence=fight_state.attack_sequence,
         already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
+        stratagem_index=handler.stratagem_index,
     )
     updated_state = fight_state.with_attack_sequence_update(
         attack_sequence=attack_sequence,
@@ -1329,6 +1330,7 @@ def _apply_fight_attack_sequence_decision(
             attack_sequence=fight_state.attack_sequence,
             result=result,
             already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
+            stratagem_index=handler.stratagem_index,
         )
     elif result.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_damage_allocation_model_decision(
@@ -1338,6 +1340,7 @@ def _apply_fight_attack_sequence_decision(
             attack_sequence=fight_state.attack_sequence,
             result=result,
             already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
+            stratagem_index=handler.stratagem_index,
         )
     elif result.decision_type == SELECT_PRECISION_ALLOCATION_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_precision_allocation_decision(
@@ -1347,6 +1350,7 @@ def _apply_fight_attack_sequence_decision(
             attack_sequence=fight_state.attack_sequence,
             result=result,
             already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
+            stratagem_index=handler.stratagem_index,
         )
     elif result.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_feel_no_pain_decision(

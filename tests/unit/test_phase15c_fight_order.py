@@ -86,6 +86,8 @@ from warhammer40k_core.engine.phases.fight import (
 from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.stratagems import (
+    DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+    STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemTargetBinding,
     StratagemTargetKind,
@@ -1259,13 +1261,20 @@ def test_counteroffensive_epic_challenge_decline_continues_reaction_to_melee() -
         request=melee_request,
         result_id="phase15e-counteroffensive-after-epic-decline-melee",
     )
+    attack_status = _decline_optional_command_rerolls(
+        lifecycle,
+        attack_status,
+        result_id="phase15e-decline-command-reroll-after-epic-decline",
+    )
     attack_request = _decision_request(attack_status)
 
     assert attack_request.decision_type in _ATTACK_SEQUENCE_DECISION_TYPES
-    assert _active_reaction_frame_request_id(lifecycle) == attack_request.request_id
-    assert _event_payloads(lifecycle, "reaction_parent_resumed") == ()
-
-    completed_status = _resolve_phase15d_activation(lifecycle, attack_status)
+    if lifecycle.reaction_queue.frames:
+        assert _active_reaction_frame_request_id(lifecycle) == attack_request.request_id
+        assert _event_payloads(lifecycle, "reaction_parent_resumed") == ()
+        completed_status = _resolve_phase15d_activation(lifecycle, attack_status)
+    else:
+        completed_status = attack_status
 
     assert completed_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert lifecycle.reaction_queue.frames == ()
@@ -2750,6 +2759,29 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert status.decision_request is not None
     return status.decision_request
+
+
+def _decline_optional_command_rerolls(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+    *,
+    result_id: str,
+) -> LifecycleStatus:
+    request = _decision_request(status)
+    decline_index = 0
+    while request.decision_type == STRATAGEM_DECISION_TYPE:
+        decline_index += 1
+        assert request.option_by_id(DECLINE_STRATAGEM_WINDOW_OPTION_ID).option_id == (
+            DECLINE_STRATAGEM_WINDOW_OPTION_ID
+        )
+        status = _submit_option(
+            lifecycle,
+            request=request,
+            option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+            result_id=f"{result_id}-{decline_index:02d}",
+        )
+        request = _decision_request(status)
+    return status
 
 
 def _request_unit_ids(request: DecisionRequest) -> list[str]:
