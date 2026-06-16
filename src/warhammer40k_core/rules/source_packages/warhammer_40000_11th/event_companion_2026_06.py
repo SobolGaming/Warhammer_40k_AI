@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import Literal
@@ -63,6 +63,12 @@ type DeploymentZoneLayoutTemplateId = Literal[
     "deployment-zone-layout-5-short-edge-strip",
     "deployment-zone-layout-6-triangle",
 ]
+type DeploymentZoneLayoutTemplateNumber = Literal[1, 2, 3, 4, 5, 6]
+type DeploymentZoneLayoutTemplateTriplet = tuple[
+    DeploymentZoneLayoutTemplateNumber,
+    DeploymentZoneLayoutTemplateNumber,
+    DeploymentZoneLayoutTemplateNumber,
+]
 type DeploymentZoneShapeTransform = Literal[
     "identity",
     "point_reflection",
@@ -95,6 +101,25 @@ _DEPLOYMENT_ZONE_LAYOUT_TEMPLATE_IDS: tuple[DeploymentZoneLayoutTemplateId, ...]
     DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP,
     DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE,
 )
+_DEPLOYMENT_ZONE_LAYOUT_TEMPLATE_NUMBERS_BY_SOURCE_PAIR: Mapping[
+    tuple[str, str], DeploymentZoneLayoutTemplateTriplet
+] = {
+    ("take-and-hold", "take-and-hold"): (1, 2, 3),
+    ("take-and-hold", "purge-the-foe"): (4, 3, 5),
+    ("take-and-hold", "disruption"): (4, 6, 5),
+    ("take-and-hold", "reconnaissance"): (1, 2, 3),
+    ("take-and-hold", "priority-assets"): (6, 5, 2),
+    ("purge-the-foe", "purge-the-foe"): (3, 1, 4),
+    ("purge-the-foe", "disruption"): (3, 1, 4),
+    ("purge-the-foe", "reconnaissance"): (5, 2, 6),
+    ("purge-the-foe", "priority-assets"): (2, 3, 5),
+    ("disruption", "disruption"): (6, 1, 4),
+    ("disruption", "reconnaissance"): (1, 2, 3),
+    ("disruption", "priority-assets"): (4, 1, 3),
+    ("reconnaissance", "reconnaissance"): (4, 6, 1),
+    ("reconnaissance", "priority-assets"): (6, 1, 4),
+    ("priority-assets", "priority-assets"): (4, 6, 1),
+}
 
 
 class GeometryResolutionStatus(StrEnum):
@@ -2416,14 +2441,39 @@ def _deployment_zone_layout_template_id(
     layout_id: str,
     layout_number: int,
 ) -> DeploymentZoneLayoutTemplateId:
-    if layout_id == "take-and-hold-vs-purge-the-foe-layout-3":
-        return DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP
-    if layout_number == 1:
+    if layout_number not in (1, 2, 3):
+        raise MissionPackError("Unsupported battlefield layout number.")
+    if _layout_number_from_layout_id(layout_id) != layout_number:
+        raise MissionPackError("Battlefield layout number does not match layout ID.")
+
+    force_disposition_pair = _layout_force_disposition_pair_from_layout_id(layout_id)
+    template_numbers = _DEPLOYMENT_ZONE_LAYOUT_TEMPLATE_NUMBERS_BY_SOURCE_PAIR.get(
+        force_disposition_pair
+    )
+    if template_numbers is None:
+        template_numbers = _DEPLOYMENT_ZONE_LAYOUT_TEMPLATE_NUMBERS_BY_SOURCE_PAIR.get(
+            (force_disposition_pair[1], force_disposition_pair[0])
+        )
+    if template_numbers is None:
+        raise MissionPackError("Unsupported deployment-zone layout matchup.")
+    return _deployment_zone_layout_template_id_from_number(template_numbers[layout_number - 1])
+
+
+def _deployment_zone_layout_template_id_from_number(
+    template_number: DeploymentZoneLayoutTemplateNumber,
+) -> DeploymentZoneLayoutTemplateId:
+    if template_number == 1:
         return DEPLOYMENT_ZONE_LAYOUT_1_STAGGERED
-    if layout_number == 2:
+    if template_number == 2:
         return DEPLOYMENT_ZONE_LAYOUT_2_LONG_EDGE_STRIP
-    if layout_number == 3:
+    if template_number == 3:
         return DEPLOYMENT_ZONE_LAYOUT_3_QUARTER_CIRCLE_CUTOUT
+    if template_number == 4:
+        return DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE
+    if template_number == 5:
+        return DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP
+    if template_number == 6:
+        return DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE
     raise MissionPackError("Unsupported battlefield layout number.")
 
 
@@ -2456,7 +2506,7 @@ def _deployment_zone_template_base_shape(
                 (44.0, 12.0),
                 (22.0, 12.0),
                 (22.0, 20.0),
-                (0.0, 22.0),
+                (0.0, 20.0),
             )
         )
     if template_id == DEPLOYMENT_ZONE_LAYOUT_2_LONG_EDGE_STRIP:
@@ -2481,10 +2531,10 @@ def _deployment_zone_template_base_shape(
         return _shape_from_vertices(
             (
                 (0.0, 0.0),
-                (14.0, 0.0),
-                (14.0, 30.0),
+                (8.0, 0.0),
                 (8.0, 30.0),
-                (8.0, 60.0),
+                (14.0, 30.0),
+                (14.0, 60.0),
                 (0.0, 60.0),
             )
         )
@@ -2496,7 +2546,7 @@ def _deployment_zone_template_base_shape(
             max_y=18.0,
         )
     if template_id == DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE:
-        return _shape_from_vertices(((0.0, 0.0), (44.0, 0.0), (0.0, 30.0)))
+        return _shape_from_vertices(((0.0, 60.0), (44.0, 60.0), (0.0, 30.0)))
     raise MissionPackError("Unsupported deployment-zone layout template.")
 
 
@@ -2767,11 +2817,11 @@ def _extracted_no_mans_land_shape(layout_id: str) -> DeploymentZoneShape:
                 (0.0, 12.0),
                 (22.0, 12.0),
                 (22.0, 20.0),
-                (44.0, 22.0),
+                (44.0, 20.0),
                 (44.0, 48.0),
                 (22.0, 48.0),
                 (22.0, 40.0),
-                (0.0, 38.0),
+                (0.0, 40.0),
             )
         )
     if layout_number == 2:
@@ -3054,7 +3104,7 @@ def _deployment_zone_layout_edges(template_id: DeploymentZoneLayoutTemplateId) -
     if template_id == DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP:
         return "south", "north"
     if template_id == DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE:
-        return "south_west_corner", "north_east_corner"
+        return "north_west_corner", "south_east_corner"
     raise MissionPackError("Unsupported deployment-zone layout template.")
 
 
@@ -3073,6 +3123,14 @@ def _layout_number_from_layout_id(layout_id: str) -> int:
     if suffix not in {"1", "2", "3"}:
         raise MissionPackError("Battlefield layout ID must end in layout number.")
     return int(suffix)
+
+
+def _layout_force_disposition_pair_from_layout_id(layout_id: str) -> tuple[str, str]:
+    pair_id = layout_id.rsplit("-layout-", maxsplit=1)[0]
+    first_id, separator, second_id = pair_id.partition("-vs-")
+    if separator == "" or first_id == "" or second_id == "":
+        raise MissionPackError("Battlefield layout ID must include force disposition pair.")
+    return (first_id, second_id)
 
 
 def _pending_layout_point(x_inches: float, y_inches: float) -> tuple[float, float]:
