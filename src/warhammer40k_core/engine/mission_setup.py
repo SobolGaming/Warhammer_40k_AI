@@ -16,6 +16,8 @@ from warhammer40k_core.core.missions import (
     MissionPoolEntry,
     ObjectiveMarkerDefinition,
     ObjectiveMarkerDefinitionPayload,
+    ObjectiveTerrainAreaDefinition,
+    ObjectiveTerrainAreaDefinitionPayload,
 )
 from warhammer40k_core.core.terrain_areas import PlacedTerrainArea, PlacedTerrainAreaPayload
 from warhammer40k_core.core.terrain_layouts import (
@@ -50,6 +52,7 @@ class MissionSetupPayload(TypedDict):
     deployment_zones: list[DeploymentZonePayload]
     battlefield_regions: list[BattlefieldRegionPayload]
     terrain_areas: list[PlacedTerrainAreaPayload]
+    objective_terrain_areas: list[ObjectiveTerrainAreaDefinitionPayload]
     terrain_features: list[TerrainFeatureDefinitionPayload]
 
 
@@ -76,6 +79,7 @@ class MissionSetup:
     battlefield_regions: tuple[BattlefieldRegion, ...]
     terrain_areas: tuple[PlacedTerrainArea, ...]
     terrain_features: tuple[TerrainFeatureDefinition, ...]
+    objective_terrain_areas: tuple[ObjectiveTerrainAreaDefinition, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -151,6 +155,7 @@ class MissionSetup:
         regions = _validate_battlefield_regions(self.battlefield_regions)
         terrain_areas = _validate_terrain_areas(self.terrain_areas)
         features = _validate_terrain_features(self.terrain_features)
+        objective_terrain_areas = _validate_objective_terrain_areas(self.objective_terrain_areas)
         _validate_markers_within_battlefield(
             markers=markers,
             width=self.battlefield_width_inches,
@@ -176,11 +181,17 @@ class MissionSetup:
             width=self.battlefield_width_inches,
             depth=self.battlefield_depth_inches,
         )
+        _validate_objective_terrain_area_references(
+            objective_terrain_areas=objective_terrain_areas,
+            objective_markers=markers,
+            terrain_areas=terrain_areas,
+        )
         object.__setattr__(self, "objective_markers", markers)
         object.__setattr__(self, "deployment_zones", zones)
         object.__setattr__(self, "battlefield_regions", regions)
         object.__setattr__(self, "terrain_areas", terrain_areas)
         object.__setattr__(self, "terrain_features", features)
+        object.__setattr__(self, "objective_terrain_areas", objective_terrain_areas)
 
     @classmethod
     def from_mission_pack(
@@ -317,6 +328,9 @@ class MissionSetup:
             ),
             terrain_areas=(() if battlefield_layout is None else battlefield_layout.terrain_areas),
             terrain_features=instantiate_terrain_layout_template(terrain_layout),
+            objective_terrain_areas=(
+                () if battlefield_layout is None else battlefield_layout.objective_terrain_areas
+            ),
         )
 
     def enemy_deployment_zones_for_player(self, player_id: str) -> tuple[DeploymentZone, ...]:
@@ -345,6 +359,10 @@ class MissionSetup:
             "deployment_zones": [zone.to_payload() for zone in self.deployment_zones],
             "battlefield_regions": [region.to_payload() for region in self.battlefield_regions],
             "terrain_areas": [area.to_payload() for area in self.terrain_areas],
+            "objective_terrain_areas": [
+                objective_terrain_area.to_payload()
+                for objective_terrain_area in self.objective_terrain_areas
+            ],
             "terrain_features": [feature.to_payload() for feature in self.terrain_features],
         }
 
@@ -375,6 +393,10 @@ class MissionSetup:
             ),
             terrain_areas=tuple(
                 PlacedTerrainArea.from_payload(area) for area in payload["terrain_areas"]
+            ),
+            objective_terrain_areas=tuple(
+                ObjectiveTerrainAreaDefinition.from_payload(objective_terrain_area)
+                for objective_terrain_area in payload["objective_terrain_areas"]
             ),
             terrain_features=tuple(
                 TerrainFeatureDefinition.from_payload(feature)
@@ -740,6 +762,68 @@ def _validate_terrain_areas(values: object) -> tuple[PlacedTerrainArea, ...]:
         seen.add(value.terrain_area_id)
         terrain_areas.append(value)
     return tuple(sorted(terrain_areas, key=lambda area: area.terrain_area_id))
+
+
+def _validate_objective_terrain_areas(
+    values: object,
+) -> tuple[ObjectiveTerrainAreaDefinition, ...]:
+    if type(values) is not tuple:
+        raise MissionSetupError("MissionSetup objective_terrain_areas must be a tuple.")
+    objective_terrain_areas: list[ObjectiveTerrainAreaDefinition] = []
+    seen_objective_ids: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not ObjectiveTerrainAreaDefinition:
+            raise MissionSetupError(
+                "MissionSetup objective_terrain_areas must contain "
+                "ObjectiveTerrainAreaDefinition values."
+            )
+        if value.objective_marker_id in seen_objective_ids:
+            raise MissionSetupError(
+                "MissionSetup objective_terrain_areas must not contain duplicate "
+                "objective marker IDs."
+            )
+        seen_objective_ids.add(value.objective_marker_id)
+        objective_terrain_areas.append(value)
+    return tuple(
+        sorted(
+            objective_terrain_areas,
+            key=lambda objective_terrain_area: objective_terrain_area.objective_marker_id,
+        )
+    )
+
+
+def _validate_objective_terrain_area_references(
+    *,
+    objective_terrain_areas: tuple[ObjectiveTerrainAreaDefinition, ...],
+    objective_markers: tuple[ObjectiveMarkerDefinition, ...],
+    terrain_areas: tuple[PlacedTerrainArea, ...],
+) -> None:
+    marker_roles_by_id = {
+        marker.objective_marker_id: marker.objective_role for marker in objective_markers
+    }
+    terrain_area_ids = {terrain_area.terrain_area_id for terrain_area in terrain_areas}
+    seen_terrain_area_ids: set[str] = set()
+    for objective_terrain_area in objective_terrain_areas:
+        marker_role = marker_roles_by_id.get(objective_terrain_area.objective_marker_id)
+        if marker_role is None:
+            raise MissionSetupError(
+                "MissionSetup objective_terrain_areas references unknown objective."
+            )
+        if marker_role is not objective_terrain_area.objective_role:
+            raise MissionSetupError(
+                "MissionSetup objective_terrain_areas role does not match the objective marker."
+            )
+        for terrain_area_id in objective_terrain_area.terrain_area_ids:
+            if terrain_area_id not in terrain_area_ids:
+                raise MissionSetupError(
+                    "MissionSetup objective_terrain_areas references unknown terrain area."
+                )
+            if terrain_area_id in seen_terrain_area_ids:
+                raise MissionSetupError(
+                    "MissionSetup objective_terrain_areas terrain areas must belong to at "
+                    "most one objective."
+                )
+            seen_terrain_area_ids.add(terrain_area_id)
 
 
 def _validate_markers_within_battlefield(

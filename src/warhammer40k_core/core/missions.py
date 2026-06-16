@@ -93,6 +93,13 @@ class ObjectiveMarkerDefinitionPayload(TypedDict):
     source_id: str
 
 
+class ObjectiveTerrainAreaDefinitionPayload(TypedDict):
+    objective_marker_id: str
+    objective_role: str
+    terrain_area_ids: list[str]
+    source_id: str
+
+
 class DeploymentMapDefinitionPayload(TypedDict):
     deployment_map_id: str
     name: str
@@ -124,6 +131,7 @@ class BattlefieldLayoutDefinitionPayload(TypedDict):
     battlefield_regions: list[BattlefieldRegionPayload]
     terrain_areas: list[PlacedTerrainAreaPayload]
     objective_role_counts: list[ObjectiveMarkerRoleCountPayload]
+    objective_terrain_areas: list[ObjectiveTerrainAreaDefinitionPayload]
     source_id: str
 
 
@@ -453,6 +461,62 @@ class ObjectiveMarkerDefinition:
 
 
 @dataclass(frozen=True, slots=True)
+class ObjectiveTerrainAreaDefinition:
+    objective_marker_id: str
+    objective_role: ObjectiveMarkerRole
+    terrain_area_ids: tuple[str, ...]
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "objective_marker_id",
+            _validate_unprefixed_identifier(
+                "ObjectiveTerrainAreaDefinition objective_marker_id",
+                self.objective_marker_id,
+                reserved_prefix="objective:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "objective_role",
+            objective_marker_role_from_token(self.objective_role),
+        )
+        object.__setattr__(
+            self,
+            "terrain_area_ids",
+            _validate_identifier_tuple(
+                "ObjectiveTerrainAreaDefinition terrain_area_ids",
+                self.terrain_area_ids,
+                min_length=1,
+                sort_values=True,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("ObjectiveTerrainAreaDefinition source_id", self.source_id),
+        )
+
+    def to_payload(self) -> ObjectiveTerrainAreaDefinitionPayload:
+        return {
+            "objective_marker_id": self.objective_marker_id,
+            "objective_role": self.objective_role.value,
+            "terrain_area_ids": list(self.terrain_area_ids),
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: ObjectiveTerrainAreaDefinitionPayload) -> Self:
+        return cls(
+            objective_marker_id=payload["objective_marker_id"],
+            objective_role=objective_marker_role_from_token(payload["objective_role"]),
+            terrain_area_ids=tuple(payload["terrain_area_ids"]),
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class DeploymentMapDefinition:
     deployment_map_id: str
     name: str
@@ -584,6 +648,7 @@ class BattlefieldLayoutDefinition:
     terrain_areas: tuple[PlacedTerrainArea, ...]
     objective_role_counts: tuple[tuple[ObjectiveMarkerRole, int], ...]
     source_id: str
+    objective_terrain_areas: tuple[ObjectiveTerrainAreaDefinition, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -666,6 +731,9 @@ class BattlefieldLayoutDefinition:
         regions = _validate_battlefield_regions(self.battlefield_regions)
         terrain_areas = _validate_placed_terrain_areas(self.terrain_areas)
         objective_role_counts = _validate_objective_role_counts(self.objective_role_counts)
+        objective_terrain_areas = _validate_objective_terrain_area_tuple(
+            self.objective_terrain_areas
+        )
         _validate_markers_within_battlefield(
             markers=markers,
             width=self.battlefield_width_inches,
@@ -686,6 +754,11 @@ class BattlefieldLayoutDefinition:
             width=self.battlefield_width_inches,
             depth=self.battlefield_depth_inches,
         )
+        _validate_objective_terrain_area_references(
+            objective_terrain_areas=objective_terrain_areas,
+            objective_markers=markers,
+            terrain_areas=terrain_areas,
+        )
         _validate_battlefield_layout_region_invariants(
             objective_markers=markers,
             deployment_zones=zones,
@@ -699,6 +772,7 @@ class BattlefieldLayoutDefinition:
         object.__setattr__(self, "battlefield_regions", regions)
         object.__setattr__(self, "terrain_areas", terrain_areas)
         object.__setattr__(self, "objective_role_counts", objective_role_counts)
+        object.__setattr__(self, "objective_terrain_areas", objective_terrain_areas)
         object.__setattr__(
             self,
             "source_id",
@@ -724,6 +798,10 @@ class BattlefieldLayoutDefinition:
             "objective_role_counts": [
                 {"objective_role": role.value, "count": count}
                 for role, count in self.objective_role_counts
+            ],
+            "objective_terrain_areas": [
+                objective_terrain_area.to_payload()
+                for objective_terrain_area in self.objective_terrain_areas
             ],
             "source_id": self.source_id,
         }
@@ -766,6 +844,10 @@ class BattlefieldLayoutDefinition:
                 for role_count in raw_payload["objective_role_counts"]
             ),
             source_id=raw_payload["source_id"],
+            objective_terrain_areas=tuple(
+                ObjectiveTerrainAreaDefinition.from_payload(objective_terrain_area)
+                for objective_terrain_area in raw_payload["objective_terrain_areas"]
+            ),
         )
 
 
@@ -2274,6 +2356,73 @@ def _validate_placed_terrain_areas(values: object) -> tuple[PlacedTerrainArea, .
     return tuple(sorted(terrain_areas, key=lambda area: area.terrain_area_id))
 
 
+def _validate_objective_terrain_area_tuple(
+    values: object,
+) -> tuple[ObjectiveTerrainAreaDefinition, ...]:
+    if type(values) is not tuple:
+        raise MissionPackError(
+            "BattlefieldLayoutDefinition objective_terrain_areas must be a tuple."
+        )
+    objective_terrain_areas: list[ObjectiveTerrainAreaDefinition] = []
+    seen_objective_ids: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not ObjectiveTerrainAreaDefinition:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition objective_terrain_areas must contain "
+                "ObjectiveTerrainAreaDefinition values."
+            )
+        if value.objective_marker_id in seen_objective_ids:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition objective_terrain_areas must not duplicate "
+                "objective marker IDs."
+            )
+        seen_objective_ids.add(value.objective_marker_id)
+        objective_terrain_areas.append(value)
+    return tuple(
+        sorted(
+            objective_terrain_areas,
+            key=lambda objective_terrain_area: objective_terrain_area.objective_marker_id,
+        )
+    )
+
+
+def _validate_objective_terrain_area_references(
+    *,
+    objective_terrain_areas: tuple[ObjectiveTerrainAreaDefinition, ...],
+    objective_markers: tuple[ObjectiveMarkerDefinition, ...],
+    terrain_areas: tuple[PlacedTerrainArea, ...],
+) -> None:
+    marker_roles_by_id = {
+        marker.objective_marker_id: marker.objective_role for marker in objective_markers
+    }
+    terrain_area_ids = {terrain_area.terrain_area_id for terrain_area in terrain_areas}
+    seen_terrain_area_ids: set[str] = set()
+    for objective_terrain_area in objective_terrain_areas:
+        marker_role = marker_roles_by_id.get(objective_terrain_area.objective_marker_id)
+        if marker_role is None:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition objective_terrain_areas references unknown "
+                "objective marker."
+            )
+        if marker_role is not objective_terrain_area.objective_role:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition objective_terrain_areas objective_role must "
+                "match the referenced objective marker."
+            )
+        for terrain_area_id in objective_terrain_area.terrain_area_ids:
+            if terrain_area_id not in terrain_area_ids:
+                raise MissionPackError(
+                    "BattlefieldLayoutDefinition objective_terrain_areas references unknown "
+                    "terrain area."
+                )
+            if terrain_area_id in seen_terrain_area_ids:
+                raise MissionPackError(
+                    "BattlefieldLayoutDefinition objective_terrain_areas terrain areas must "
+                    "belong to at most one objective."
+                )
+            seen_terrain_area_ids.add(terrain_area_id)
+
+
 def _validate_objective_role_counts(
     values: object,
 ) -> tuple[tuple[ObjectiveMarkerRole, int], ...]:
@@ -2695,6 +2844,7 @@ def _validate_placed_terrain_areas_match_templates(
             center_x_inches=terrain_area.center_x_inches,
             center_y_inches=terrain_area.center_y_inches,
             rotation_degrees=terrain_area.rotation_degrees,
+            local_transform=terrain_area.local_transform,
         )
         if not _terrain_area_polygons_close(terrain_area.footprint_polygon, expected_polygon):
             raise MissionPackError(

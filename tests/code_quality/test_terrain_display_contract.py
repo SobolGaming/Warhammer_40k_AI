@@ -58,6 +58,21 @@ def test_projection_fixtures_with_terrain_features_include_display_geometry() ->
     )
 
 
+def test_projection_fixtures_with_terrain_areas_include_typed_footprints() -> None:
+    violations: list[str] = []
+    for path in sorted(FIXTURE_ROOT.rglob("*.json")):
+        payload = validate_json_value(json.loads(path.read_text(encoding="utf-8")))
+        for area_path, area in _terrain_area_payloads(payload, path="$"):
+            footprint_polygon = area.get("footprint_polygon")
+            if not isinstance(footprint_polygon, list) or not footprint_polygon:
+                violations.append(f"{path.relative_to(ROOT)}:{area_path}")
+
+    assert not violations, (
+        "Projection fixtures that expose terrain areas must include typed footprint_polygon:\n"
+        + "\n".join(violations)
+    )
+
+
 def _is_source_id_expression(node: ast.expr) -> bool:
     if isinstance(node, ast.Name):
         return node.id == "source_id"
@@ -101,4 +116,29 @@ def _terrain_feature_payloads(
     elif isinstance(value, list):
         for index, child in enumerate(value):
             matches.extend(_terrain_feature_payloads(child, path=f"{path}[{index}]"))
+    return matches
+
+
+def _terrain_area_payloads(
+    value: JsonValue,
+    *,
+    path: str,
+) -> list[tuple[str, dict[str, JsonValue]]]:
+    matches: list[tuple[str, dict[str, JsonValue]]] = []
+    if isinstance(value, dict):
+        terrain_area = value.get("terrain_area")
+        if isinstance(terrain_area, dict):
+            matches.append((f"{path}.terrain_area", terrain_area))
+        terrain_areas = value.get("terrain_areas")
+        if isinstance(terrain_areas, list):
+            for index, area in enumerate(terrain_areas):
+                if isinstance(area, dict):
+                    matches.append((f"{path}.terrain_areas[{index}]", area))
+        for key, child in value.items():
+            if key in {"terrain_area", "terrain_areas"}:
+                continue
+            matches.extend(_terrain_area_payloads(child, path=f"{path}.{key}"))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            matches.extend(_terrain_area_payloads(child, path=f"{path}[{index}]"))
     return matches

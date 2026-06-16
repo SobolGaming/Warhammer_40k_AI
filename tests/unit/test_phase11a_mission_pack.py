@@ -19,7 +19,6 @@ from warhammer40k_core.core.missions import (
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, TerrainFeatureKind
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
-from warhammer40k_core.core.terrain_layouts import TerrainLayoutTemplate
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -568,7 +567,7 @@ def test_deployment_map_objective_marker_coordinates_match_source_snapshot() -> 
     }
 
 
-def test_terrain_layout_template_instantiates_deterministic_features() -> None:
+def test_pending_chapter_approved_layout_has_no_terrain_features_until_validated() -> None:
     mission_pack = chapter_approved_2026_27_mission_pack()
     template = mission_pack.terrain_layout_template(PHASE16A_BATTLEFIELD_LAYOUT_ID)
 
@@ -578,13 +577,8 @@ def test_terrain_layout_template_instantiates_deterministic_features() -> None:
     assert [feature.to_payload() for feature in first] == [
         feature.to_payload() for feature in second
     ]
-    assert {feature.feature_kind for feature in first} == {
-        TerrainFeatureKind.BARRICADE_AND_FUEL_PIPES,
-        TerrainFeatureKind.BATTLEFIELD_DEBRIS_AND_STATUARY,
-        TerrainFeatureKind.RUINS,
-    }
-    assert len(first) == 15
-    assert first[0].source_id is not None
+    assert first == ()
+    assert template.terrain_features == ()
 
 
 def test_phase16a_battlefield_layout_template_matches_source_snapshot() -> None:
@@ -631,122 +625,17 @@ def test_phase16a_battlefield_layout_template_matches_source_snapshot() -> None:
         "home",
         "home",
     )
-    assert _terrain_feature_snapshot(terrain_layout) == {
-        "take-and-hold-vs-purge-the-foe-layout-3-center-ruin": ("ruins", 31.0, 23.5, 8.0, 13.0),
-        "take-and-hold-vs-purge-the-foe-layout-3-left-diagonal-ruin": (
-            "ruins",
-            49.0,
-            17.0,
-            8.0,
-            9.0,
-        ),
-        "take-and-hold-vs-purge-the-foe-layout-3-left-home-ruin": (
-            "ruins",
-            10.5,
-            11.0,
-            7.0,
-            12.0,
-        ),
-        "take-and-hold-vs-purge-the-foe-layout-3-left-midfield-debris": (
-            "battlefield_debris_and_statuary",
-            24.0,
-            10.5,
-            6.0,
-            5.0,
-        ),
-        "take-and-hold-vs-purge-the-foe-layout-3-left-midline-wall": (
-            "barricade_and_fuel_pipes",
-            18.0,
-            22.0,
-            1.0,
-            12.0,
-        ),
-        "take-and-hold-vs-purge-the-foe-layout-3-left-no-mans-barricade": (
-            "barricade_and_fuel_pipes",
-            28.0,
-            7.5,
-            1.5,
-            8.0,
-        ),
-        "take-and-hold-vs-purge-the-foe-layout-3-left-pipe-field": (
-            "barricade_and_fuel_pipes",
-            49.0,
-            8.0,
-            8.0,
-            12.0,
-        ),
-        "take-and-hold-vs-purge-the-foe-layout-3-lower-flank-ruin": (
-            "ruins",
-            38.0,
-            7.5,
-            8.0,
-            15.0,
-        ),
-        "take-and-hold-vs-purge-the-foe-layout-3-right-diagonal-ruin": (
-            "ruins",
-            12.5,
-            29.0,
-            7.0,
-            8.0,
-        ),
-        "take-and-hold-vs-purge-the-foe-layout-3-right-home-ruin": (
-            "ruins",
-            52.5,
-            36.5,
-            7.0,
-            13.0,
-        ),
-        "take-and-hold-vs-purge-the-foe-layout-3-right-midfield-debris": (
-            "battlefield_debris_and_statuary",
-            37.0,
-            35.5,
-            6.0,
-            5.0,
-        ),
-        "take-and-hold-vs-purge-the-foe-layout-3-right-midline-wall": (
-            "barricade_and_fuel_pipes",
-            42.0,
-            22.0,
-            1.0,
-            12.0,
-        ),
-        "take-and-hold-vs-purge-the-foe-layout-3-right-no-mans-barricade": (
-            "barricade_and_fuel_pipes",
-            30.5,
-            38.0,
-            1.5,
-            8.0,
-        ),
-        "take-and-hold-vs-purge-the-foe-layout-3-right-pipe-field": (
-            "barricade_and_fuel_pipes",
-            11.0,
-            37.0,
-            8.0,
-            10.0,
-        ),
-        "take-and-hold-vs-purge-the-foe-layout-3-upper-flank-ruin": (
-            "ruins",
-            22.0,
-            36.5,
-            6.5,
-            11.0,
-        ),
-    }
-    display_snapshot = _terrain_display_snapshot(terrain_layout)
-    assert display_snapshot["take-and-hold-vs-purge-the-foe-layout-3-left-diagonal-ruin"] == (
-        "ruins_diagonal_down_right_estimate_v1",
-        ((45.0, 14.5), (47.0, 12.5), (53.0, 19.5), (51.0, 21.5)),
+    assert layout_row.source_status == "layout_identity_coordinate_extraction_pending"
+    assert terrain_layout.terrain_features == ()
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
+        terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
     )
-    assert display_snapshot["take-and-hold-vs-purge-the-foe-layout-3-right-diagonal-ruin"] == (
-        "ruins_diagonal_up_right_estimate_v1",
-        ((10.75, 25.0), (16.0, 26.75), (14.25, 33.0), (9.0, 31.25)),
-    )
-    assert _has_non_axis_aligned_edge(
-        display_snapshot["take-and-hold-vs-purge-the-foe-layout-3-left-diagonal-ruin"][1]
-    )
-    assert _has_non_axis_aligned_edge(
-        display_snapshot["take-and-hold-vs-purge-the-foe-layout-3-right-diagonal-ruin"][1]
-    )
+    assert setup.terrain_features == ()
+    assert setup.terrain_areas == ()
 
 
 def test_phase16a_battlefield_layout_identifiers_are_cross_platform_file_safe() -> None:
@@ -866,6 +755,7 @@ def test_mission_setup_from_payload_rejects_out_of_bounds_terrain() -> None:
         attacker_player_id="player-a",
         defender_player_id="player-b",
     )
+    setup = replace(setup, terrain_features=(_blocking_terrain_feature(x=30.0, y=22.0),))
     payload = setup.to_payload()
     payload["terrain_features"][0]["footprint_width_inches"] = 1000.0
 
@@ -1365,47 +1255,6 @@ def _objective_coordinate_snapshot(
         }
         for deployment_map in mission_pack.deployment_maps
     }
-
-
-def _terrain_feature_snapshot(
-    terrain_layout: TerrainLayoutTemplate,
-) -> dict[str, tuple[str, float, float, float, float]]:
-    return {
-        feature.feature_id: (
-            feature.feature_kind.value,
-            feature.footprint_center_x_inches,
-            feature.footprint_center_y_inches,
-            feature.footprint_width_inches,
-            feature.footprint_depth_inches,
-        )
-        for feature in terrain_layout.terrain_features
-    }
-
-
-def _terrain_display_snapshot(
-    terrain_layout: TerrainLayoutTemplate,
-) -> dict[str, tuple[str | None, tuple[tuple[float, float], ...]]]:
-    return {
-        feature.feature_id: (
-            feature.display_geometry.display_template_id,
-            tuple(
-                (point.x_inches, point.y_inches)
-                for point in feature.display_geometry.footprint_polygon
-            ),
-        )
-        for feature in terrain_layout.terrain_features
-    }
-
-
-def _has_non_axis_aligned_edge(vertices: tuple[tuple[float, float], ...]) -> bool:
-    return any(
-        x != next_x and y != next_y
-        for (x, y), (next_x, next_y) in zip(
-            vertices,
-            (*vertices[1:], vertices[0]),
-            strict=True,
-        )
-    )
 
 
 def _config(*, mission_setup: MissionSetup | None) -> GameConfig:

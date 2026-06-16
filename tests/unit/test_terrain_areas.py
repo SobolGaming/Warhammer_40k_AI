@@ -12,6 +12,7 @@ from warhammer40k_core.core.terrain_areas import (
     TerrainAreaClassification,
     TerrainAreaError,
     TerrainAreaFootprintTemplate,
+    TerrainAreaLocalTransform,
     mirror_placed_terrain_area,
     transform_polygon,
 )
@@ -77,6 +78,28 @@ def test_transform_polygon_rotates_and_translates_deterministically() -> None:
         (10.5, 21.0),
         (9.5, 21.0),
         (9.5, 19.0),
+    ]
+
+
+def test_transform_polygon_can_mirror_across_anchor_y_axis() -> None:
+    transformed = transform_polygon(
+        (
+            TerrainDisplayPoint(-3.0, 1.0),
+            TerrainDisplayPoint(3.0, 1.0),
+            TerrainDisplayPoint(3.0, -1.0),
+            TerrainDisplayPoint(-3.0, -1.0),
+        ),
+        center_x_inches=10.0,
+        center_y_inches=20.0,
+        rotation_degrees=0.0,
+        local_transform=TerrainAreaLocalTransform.MIRROR_Y_AXIS,
+    )
+
+    assert [(point.x_inches, point.y_inches) for point in transformed] == [
+        (7.0, 21.0),
+        (1.0, 21.0),
+        (1.0, 19.0),
+        (7.0, 19.0),
     ]
 
 

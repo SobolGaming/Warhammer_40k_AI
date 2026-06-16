@@ -24,7 +24,7 @@ from warhammer40k_core.adapters.decisions import (
 )
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
-from warhammer40k_core.adapters.projection import GameViewPayload, project_game_view
+from warhammer40k_core.adapters.projection import project_game_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import (
@@ -1225,17 +1225,10 @@ def test_projection_submission_helpers_and_event_cursor_are_viewer_scoped() -> N
         "fixed_mission_ids": ["assassination", "bring_it_down"],
         "hidden": False,
     }
-    diagonal_display_geometry = _terrain_display_geometry_from_view(
-        view,
-        feature_id="take-and-hold-vs-purge-the-foe-layout-3-left-diagonal-ruin",
-    )
-    assert diagonal_display_geometry["schema_version"] == "terrain-display-v1"
-    assert diagonal_display_geometry["coordinate_space"] == "battlefield_inches"
-    assert diagonal_display_geometry["footprint_kind"] == "polygon"
-    assert diagonal_display_geometry["display_template_id"] == (
-        "ruins_diagonal_down_right_estimate_v1"
-    )
-    assert _has_non_axis_aligned_projection_edge(diagonal_display_geometry["footprint_polygon"])
+    mission_setup = view["mission_setup"]
+    assert isinstance(mission_setup, dict)
+    assert mission_setup["terrain_features"] == []
+    assert mission_setup["terrain_areas"] == []
     assert event_delta["cursor"] == 0
     assert event_delta["viewer_player_id"] == "player-b"
     assert event_delta["next_cursor"] == len(
@@ -1244,53 +1237,6 @@ def test_projection_submission_helpers_and_event_cursor_are_viewer_scoped() -> N
     assert event_delta["events"]
     assert "<" not in json.dumps(view, sort_keys=True)
     assert "object at 0x" not in json.dumps(view, sort_keys=True)
-
-
-def _terrain_display_geometry_from_view(
-    view: GameViewPayload,
-    *,
-    feature_id: str,
-) -> dict[str, JsonValue]:
-    mission_setup = view["mission_setup"]
-    if not isinstance(mission_setup, dict):
-        raise TypeError("projection requires mission setup payload")
-    terrain_features = mission_setup["terrain_features"]
-    if not isinstance(terrain_features, list):
-        raise TypeError("projection terrain_features must be a list")
-    for feature_payload in terrain_features:
-        if not isinstance(feature_payload, dict):
-            raise TypeError("projection terrain feature payload must be a mapping")
-        if feature_payload["feature_id"] != feature_id:
-            continue
-        display_geometry = feature_payload["display_geometry"]
-        if not isinstance(display_geometry, dict):
-            raise TypeError("terrain display_geometry must be a mapping")
-        return display_geometry
-    raise AssertionError("terrain feature was not projected")
-
-
-def _has_non_axis_aligned_projection_edge(points_payload: JsonValue) -> bool:
-    if not isinstance(points_payload, list):
-        raise TypeError("display footprint_polygon must be a list")
-    vertices: list[tuple[float, float]] = []
-    for point_payload in points_payload:
-        if not isinstance(point_payload, dict):
-            raise TypeError("display footprint point must be a mapping")
-        x_inches = point_payload["x_inches"]
-        y_inches = point_payload["y_inches"]
-        if not isinstance(x_inches, int | float) or type(x_inches) is bool:
-            raise AssertionError("display footprint x_inches must be a number")
-        if not isinstance(y_inches, int | float) or type(y_inches) is bool:
-            raise AssertionError("display footprint y_inches must be a number")
-        vertices.append((float(x_inches), float(y_inches)))
-    return any(
-        x != next_x and y != next_y
-        for (x, y), (next_x, next_y) in zip(
-            vertices,
-            (*vertices[1:], vertices[0]),
-            strict=True,
-        )
-    )
 
 
 def test_projection_redacts_secret_pending_decisions_for_non_actor_viewers() -> None:

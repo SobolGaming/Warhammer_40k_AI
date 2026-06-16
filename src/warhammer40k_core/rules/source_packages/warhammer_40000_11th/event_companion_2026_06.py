@@ -3,8 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
 from enum import StrEnum
+from typing import Literal
 
 from warhammer40k_core.core.battlefield_regions import BattlefieldRegion, BattlefieldRegionKind
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
@@ -19,15 +21,20 @@ from warhammer40k_core.core.missions import (
     MissionPackError,
     MissionSourcePackageDefinition,
     ObjectiveMarkerDefinition,
+    ObjectiveTerrainAreaDefinition,
     objective_marker_role_from_token,
 )
 from warhammer40k_core.core.terrain_areas import (
     PlacedTerrainArea,
     SymmetryAxis,
+    TerrainAreaClassification,
     TerrainAreaFootprintTemplate,
+    TerrainAreaLocalTransform,
     mirror_placed_terrain_area,
+    rotate_point,
+    terrain_area_local_transform_from_token,
 )
-from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry, TerrainDisplayPoint
+from warhammer40k_core.core.terrain_display import TerrainDisplayPoint
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2026_27 as chapter_approved,
 )
@@ -53,6 +60,71 @@ BATTLEFIELD_SIZE = "44x60_inches"
 TERRAIN_AREA_FEATURE_KIND = "terrain_area"
 LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES = 9.0
 LAYOUT_C_ARC_SEGMENTS = 16
+type DeploymentZoneLayoutTemplateId = Literal[
+    "deployment-zone-layout-1-staggered",
+    "deployment-zone-layout-2-long-edge-strip",
+    "deployment-zone-layout-3-quarter-circle-cutout",
+    "deployment-zone-layout-4-stepped-long-edge",
+    "deployment-zone-layout-5-short-edge-strip",
+    "deployment-zone-layout-6-triangle",
+]
+type DeploymentZoneLayoutTemplateNumber = Literal[1, 2, 3, 4, 5, 6]
+type DeploymentZoneLayoutTemplateTriplet = tuple[
+    DeploymentZoneLayoutTemplateNumber,
+    DeploymentZoneLayoutTemplateNumber,
+    DeploymentZoneLayoutTemplateNumber,
+]
+type DeploymentZoneShapeTransform = Literal[
+    "identity",
+    "point_reflection",
+    "horizontal_reflection",
+    "vertical_reflection",
+]
+DEPLOYMENT_ZONE_LAYOUT_1_STAGGERED: DeploymentZoneLayoutTemplateId = (
+    "deployment-zone-layout-1-staggered"
+)
+DEPLOYMENT_ZONE_LAYOUT_2_LONG_EDGE_STRIP: DeploymentZoneLayoutTemplateId = (
+    "deployment-zone-layout-2-long-edge-strip"
+)
+DEPLOYMENT_ZONE_LAYOUT_3_QUARTER_CIRCLE_CUTOUT: DeploymentZoneLayoutTemplateId = (
+    "deployment-zone-layout-3-quarter-circle-cutout"
+)
+DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE: DeploymentZoneLayoutTemplateId = (
+    "deployment-zone-layout-4-stepped-long-edge"
+)
+DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP: DeploymentZoneLayoutTemplateId = (
+    "deployment-zone-layout-5-short-edge-strip"
+)
+DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE: DeploymentZoneLayoutTemplateId = (
+    "deployment-zone-layout-6-triangle"
+)
+_DEPLOYMENT_ZONE_LAYOUT_TEMPLATE_IDS: tuple[DeploymentZoneLayoutTemplateId, ...] = (
+    DEPLOYMENT_ZONE_LAYOUT_1_STAGGERED,
+    DEPLOYMENT_ZONE_LAYOUT_2_LONG_EDGE_STRIP,
+    DEPLOYMENT_ZONE_LAYOUT_3_QUARTER_CIRCLE_CUTOUT,
+    DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE,
+    DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP,
+    DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE,
+)
+_DEPLOYMENT_ZONE_LAYOUT_TEMPLATE_NUMBERS_BY_SOURCE_PAIR: Mapping[
+    tuple[str, str], DeploymentZoneLayoutTemplateTriplet
+] = {
+    ("take-and-hold", "take-and-hold"): (1, 2, 3),
+    ("take-and-hold", "purge-the-foe"): (4, 3, 5),
+    ("take-and-hold", "disruption"): (4, 6, 5),
+    ("take-and-hold", "reconnaissance"): (1, 2, 3),
+    ("take-and-hold", "priority-assets"): (6, 5, 2),
+    ("purge-the-foe", "purge-the-foe"): (3, 1, 4),
+    ("purge-the-foe", "disruption"): (3, 1, 4),
+    ("purge-the-foe", "reconnaissance"): (5, 2, 6),
+    ("purge-the-foe", "priority-assets"): (2, 3, 5),
+    ("disruption", "disruption"): (6, 1, 4),
+    ("disruption", "reconnaissance"): (1, 2, 3),
+    ("disruption", "priority-assets"): (4, 1, 3),
+    ("reconnaissance", "reconnaissance"): (4, 6, 1),
+    ("reconnaissance", "priority-assets"): (6, 1, 4),
+    ("priority-assets", "priority-assets"): (4, 6, 1),
+}
 
 
 class GeometryResolutionStatus(StrEnum):
@@ -2040,19 +2112,23 @@ def terrain_area_footprint_templates() -> tuple[TerrainAreaFootprintTemplate, ..
         _footprint_template(
             template_id=event_layouts.FOOTPRINT_6X4,
             name='6" x 4" Terrain Area Footprint',
-            width=6.0,
-            depth=4.0,
+            width=6.5,
+            depth=4.5,
             vertices=(
-                (-3.0, -1.64),
-                (-1.68, -1.64),
-                (-1.45, -2.0),
-                (0.45, -2.0),
-                (0.88, -1.64),
-                (3.0, -1.64),
-                (3.0, 1.64),
-                (1.38, 1.64),
-                (1.0, 2.0),
-                (-3.0, 2.0),
+                (-3.25, 2.25),
+                (2.75, 2.25),
+                (2.75, 0.95),
+                (3.25, 0.25),
+                (2.85, -0.45),
+                (3.05, -0.75),
+                (2.75, -0.95),
+                (2.75, -1.75),
+                (0.05, -1.75),
+                (-0.05, -1.95),
+                (-0.45, -1.85),
+                (-1.25, -2.25),
+                (-2.05, -1.75),
+                (-3.25, -1.75),
             ),
             source_id=source_id,
         ),
@@ -2060,78 +2136,97 @@ def terrain_area_footprint_templates() -> tuple[TerrainAreaFootprintTemplate, ..
             template_id=event_layouts.FOOTPRINT_10X2_5,
             name='10" x 2.5" Terrain Area Footprint',
             width=10.0,
-            depth=2.5,
+            depth=3.6,
             vertices=(
-                (-5.0, -0.88),
-                (-1.15, -0.88),
-                (-0.82, -1.25),
-                (0.4, -1.25),
-                (0.76, -0.88),
-                (5.0, -0.88),
-                (5.0, 0.88),
-                (1.64, 0.88),
-                (1.34, 1.25),
-                (0.2, 1.25),
-                (-0.2, 0.88),
-                (-5.0, 0.88),
+                (-5.0, 1.2),
+                (-4.5, 1.2),
+                (-4.5, 1.3),
+                (-3.0, 1.8),
+                (-2.5, 1.2),
+                (2.4, 1.2),
+                (2.6, 1.45),
+                (3.3, 1.2),
+                (5.0, 1.2),
+                (5.0, -1.3),
+                (2.15, -1.3),
+                (1.85, -1.6),
+                (0.85, -1.8),
+                (0.5, -1.3),
+                (-5.0, -1.3),
             ),
             source_id=source_id,
         ),
         _footprint_template(
             template_id=event_layouts.FOOTPRINT_6X2,
             name='6" x 2" Terrain Area Footprint',
-            width=6.0,
-            depth=2.0,
+            width=6.1,
+            depth=2.7,
             vertices=(
-                (-3.0, -0.72),
-                (-0.74, -0.72),
-                (-0.46, -1.0),
-                (0.76, -1.0),
-                (1.04, -0.72),
-                (3.0, -0.72),
-                (3.0, 0.72),
-                (0.54, 0.72),
-                (0.24, 1.0),
-                (-0.86, 1.0),
-                (-1.12, 0.72),
-                (-3.0, 0.72),
+                (-3.05, 1.15),
+                (-2.05, 1.15),
+                (-2.05, 1.35),
+                (-1.05, 1.35),
+                (-1.05, 1.15),
+                (3.05, 1.15),
+                (3.05, -0.85),
+                (2.15, -0.85),
+                (1.3, -1.35),
+                (0.45, -0.85),
+                (-3.05, -0.85),
             ),
             source_id=source_id,
         ),
         _footprint_template(
             template_id=event_layouts.FOOTPRINT_7X11_5,
             name='7" x 11.5" Terrain Area Footprint',
-            width=7.0,
+            width=7.6,
             depth=11.5,
             vertices=(
-                (-3.5, -5.75),
-                (2.35, -5.75),
-                (2.88, -4.94),
-                (3.5, -4.2),
-                (3.5, 4.58),
-                (2.9, 4.95),
-                (2.46, 5.75),
-                (-3.5, 5.75),
+                (-3.8, 5.75),
+                (3.2, 5.75),
+                (3.2, 4.65),
+                (3.5, 4.05),
+                (3.45, 3.75),
+                (3.8, 2.75),
+                (3.2, 2.25),
+                (3.2, 1.45),
+                (3.3, 0.75),
+                (3.2, 0.05),
+                (3.7, -1.15),
+                (3.2, -2.25),
+                (3.2, -5.75),
+                (-3.8, -5.75),
             ),
             source_id=source_id,
         ),
         _footprint_template(
             template_id=event_layouts.FOOTPRINT_8X11_5_POLYGON,
             name='8" x 11.5" Polygon Terrain Area Footprint',
-            width=11.5,
+            width=12.0,
             depth=8.0,
             vertices=(
-                (-5.75, -4.0),
-                (3.7, -4.0),
-                (5.75, -2.55),
-                (5.75, 4.0),
-                (-1.05, 4.0),
-                (-2.55, 2.72),
-                (-4.1, 1.08),
-                (-5.75, -0.2),
+                (-5.5, 4.0),
+                (6.0, 4.0),
+                (6.0, 2.0),
+                (5.5, 2.0),
+                (-5.0, -4.0),
+                (-5.5, -4.0),
+                (-5.5, -1.8),
+                (-6.0, -0.6),
+                (-5.5, 0.0),
             ),
             source_id=source_id,
         ),
+    )
+
+
+def deployment_zone_layout_template_shapes() -> tuple[
+    tuple[DeploymentZoneLayoutTemplateId, DeploymentZoneShape],
+    ...,
+]:
+    return tuple(
+        (template_id, _deployment_zone_template_base_shape(template_id))
+        for template_id in _DEPLOYMENT_ZONE_LAYOUT_TEMPLATE_IDS
     )
 
 
@@ -2147,6 +2242,8 @@ def _extracted_layout_definition(
     layout_id: str,
 ) -> BattlefieldLayoutDefinition:
     layout_source = _extracted_layout_source(layout_id)
+    objective_markers = _extracted_objective_definitions(layout_id=layout_id)
+    terrain_areas = _extracted_terrain_areas(layout_id)
     return BattlefieldLayoutDefinition(
         battlefield_layout_id=layout_id,
         name=layout_source.name,
@@ -2158,7 +2255,7 @@ def _extracted_layout_definition(
         coordinate_orientation="x_right_along_44_inch_edge_y_up_along_60_inch_edge",
         attacker_edge=_layout_attacker_edge(layout_id, _layout_number_from_layout_id(layout_id)),
         defender_edge=_layout_defender_edge(layout_id, _layout_number_from_layout_id(layout_id)),
-        objective_markers=_extracted_objective_definitions(layout_id=layout_id),
+        objective_markers=objective_markers,
         deployment_zones=tuple(
             DeploymentZone(
                 deployment_zone_id=zone.deployment_zone_id,
@@ -2168,9 +2265,14 @@ def _extracted_layout_definition(
             for zone in _extracted_deployment_zones(layout_id=layout_id)
         ),
         battlefield_regions=_extracted_regions(layout_id=layout_id),
-        terrain_areas=_extracted_terrain_areas(layout_id),
+        terrain_areas=terrain_areas,
         objective_role_counts=layout_source.objective_role_counts,
         source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_source.source_layout_id}",
+        objective_terrain_areas=_extracted_objective_terrain_area_definitions(
+            layout_id=layout_id,
+            objective_markers=objective_markers,
+            terrain_areas=terrain_areas,
+        ),
     )
 
 
@@ -2246,10 +2348,7 @@ def _battlefield_layout_row(
             layout_id=layout_id,
             layout_number=layout_number,
         ),
-        terrain_features=_layout_terrain_features(
-            layout_id=layout_id,
-            layout_number=layout_number,
-        ),
+        terrain_features=(),
     )
 
 
@@ -2320,44 +2419,7 @@ def _layout_deployment_zones(
 ) -> tuple[chapter_approved.SourceBattlefieldDeploymentZoneRow, ...]:
     if _is_extracted_layout(layout_id):
         return _extracted_deployment_zones(layout_id=layout_id)
-    if layout_number == 2:
-        attacker = DeploymentZoneShape.rectangle(
-            min_x=0.0,
-            min_y=0.0,
-            max_x=_pending_layout_x(18.0),
-            max_y=_pending_layout_y(18.0),
-        )
-        defender = DeploymentZoneShape.rectangle(
-            min_x=_pending_layout_x(42.0),
-            min_y=_pending_layout_y(26.0),
-            max_x=BATTLEFIELD_WIDTH_INCHES,
-            max_y=BATTLEFIELD_DEPTH_INCHES,
-        )
-    else:
-        attacker = DeploymentZoneShape.rectangle(
-            min_x=0.0,
-            min_y=0.0,
-            max_x=_pending_layout_x(18.0),
-            max_y=BATTLEFIELD_DEPTH_INCHES,
-        )
-        defender = DeploymentZoneShape.rectangle(
-            min_x=_pending_layout_x(42.0),
-            min_y=0.0,
-            max_x=BATTLEFIELD_WIDTH_INCHES,
-            max_y=BATTLEFIELD_DEPTH_INCHES,
-        )
-    return (
-        chapter_approved.SourceBattlefieldDeploymentZoneRow(
-            deployment_zone_id=f"{layout_id}-attacker",
-            player_role="attacker",
-            shape=attacker,
-        ),
-        chapter_approved.SourceBattlefieldDeploymentZoneRow(
-            deployment_zone_id=f"{layout_id}-defender",
-            player_role="defender",
-            shape=defender,
-        ),
-    )
+    return _deployment_zone_rows_for_layout(layout_id=layout_id, layout_number=layout_number)
 
 
 def _extracted_deployment_zones(
@@ -2366,64 +2428,25 @@ def _extracted_deployment_zones(
 ) -> tuple[chapter_approved.SourceBattlefieldDeploymentZoneRow, ...]:
     if layout_id not in event_layouts.EXTRACTED_LAYOUT_IDS:
         raise MissionPackError("Unsupported extracted battlefield layout ID.")
-    layout_number = _layout_number_from_layout_id(layout_id)
-    if layout_number == 1:
-        attacker_shape = _shape_from_vertices(
-            (
-                (0.0, 60.0),
-                (44.0, 60.0),
-                (44.0, 48.0),
-                (22.0, 48.0),
-                (22.0, 40.0),
-                (0.0, 40.0),
-            )
-        )
-        defender_shape = _shape_from_vertices(
-            (
-                (0.0, 0.0),
-                (44.0, 0.0),
-                (44.0, 20.0),
-                (22.0, 20.0),
-                (22.0, 12.0),
-                (0.0, 12.0),
-            )
-        )
-    elif layout_number == 2:
-        attacker_shape = DeploymentZoneShape.rectangle(
-            min_x=0.0,
-            min_y=0.0,
-            max_x=12.0,
-            max_y=60.0,
-        )
-        defender_shape = DeploymentZoneShape.rectangle(
-            min_x=32.0,
-            min_y=0.0,
-            max_x=44.0,
-            max_y=60.0,
-        )
-    elif layout_number == 3:
-        attacker_shape = _shape_from_vertices(
-            _rectangle_with_quarter_circle_cutout_vertices(
-                min_x=0.0,
-                min_y=30.0,
-                max_x=22.0,
-                max_y=60.0,
-                corner="lower_right",
-                radius=LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES,
-            )
-        )
-        defender_shape = _shape_from_vertices(
-            _rectangle_with_quarter_circle_cutout_vertices(
-                min_x=22.0,
-                min_y=0.0,
-                max_x=44.0,
-                max_y=30.0,
-                corner="upper_left",
-                radius=LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES,
-            )
-        )
-    else:
-        raise MissionPackError("Unsupported extracted battlefield layout number.")
+    return _deployment_zone_rows_for_layout(
+        layout_id=layout_id,
+        layout_number=_layout_number_from_layout_id(layout_id),
+    )
+
+
+def _deployment_zone_rows_for_layout(
+    *,
+    layout_id: str,
+    layout_number: int,
+) -> tuple[chapter_approved.SourceBattlefieldDeploymentZoneRow, ...]:
+    template_id = _deployment_zone_layout_template_id(
+        layout_id=layout_id,
+        layout_number=layout_number,
+    )
+    attacker_transform, defender_transform = _deployment_zone_shape_transforms(template_id)
+    base_shape = _deployment_zone_template_base_shape(template_id)
+    attacker_shape = _transform_deployment_zone_shape(base_shape, attacker_transform)
+    defender_shape = _transform_deployment_zone_shape(base_shape, defender_transform)
     return (
         chapter_approved.SourceBattlefieldDeploymentZoneRow(
             deployment_zone_id=f"{layout_id}-attacker",
@@ -2438,94 +2461,149 @@ def _extracted_deployment_zones(
     )
 
 
-def _layout_terrain_features(
+def _deployment_zone_layout_template_id(
     *,
     layout_id: str,
     layout_number: int,
-) -> tuple[chapter_approved.SourceBattlefieldTerrainFeatureRow, ...]:
-    if _is_extracted_layout(layout_id):
-        return ()
-    templates = {
-        1: (
-            ("attacker-home-ruin", "ruins", 10.0, 22.0, 8.0, 14.0, "dense"),
-            ("defender-home-ruin", "ruins", 50.0, 22.0, 8.0, 14.0, "dense"),
-            ("midfield-north-ruin", "ruins", 29.0, 9.0, 9.0, 10.0, "dense"),
-            ("midfield-south-ruin", "ruins", 31.0, 35.0, 9.0, 10.0, "dense"),
-            ("center-debris", "battlefield_debris_and_statuary", 30.0, 22.0, 6.0, 5.0, "light"),
-            ("north-barricade", "barricade_and_fuel_pipes", 38.0, 10.0, 1.5, 8.0, "light"),
-            ("south-barricade", "barricade_and_fuel_pipes", 22.0, 34.0, 1.5, 8.0, "light"),
-        ),
-        2: (
-            ("attacker-corner-ruin", "ruins", 11.0, 10.0, 9.0, 12.0, "dense"),
-            ("defender-corner-ruin", "ruins", 49.0, 34.0, 9.0, 12.0, "dense"),
-            ("north-east-ruin", "ruins", 43.0, 12.0, 9.0, 10.0, "dense"),
-            ("south-west-ruin", "ruins", 17.0, 32.0, 9.0, 10.0, "dense"),
-            ("central-crater", "crater_and_rubble", 30.0, 22.0, 8.0, 8.0, "light"),
-            ("north-barricade", "barricade_and_fuel_pipes", 26.0, 8.0, 1.5, 8.0, "light"),
-            ("south-barricade", "barricade_and_fuel_pipes", 34.0, 36.0, 1.5, 8.0, "light"),
-        ),
-        3: (
-            ("left-home-ruin", "ruins", 10.5, 11.0, 7.0, 12.0, "dense"),
-            ("right-home-ruin", "ruins", 52.5, 36.5, 7.0, 13.0, "dense"),
-            ("center-ruin", "ruins", 31.0, 23.5, 8.0, 13.0, "dense"),
-            ("upper-flank-ruin", "ruins", 22.0, 36.5, 6.5, 11.0, "dense"),
-            ("lower-flank-ruin", "ruins", 38.0, 7.5, 8.0, 15.0, "dense"),
-            (
-                "left-midfield-debris",
-                "battlefield_debris_and_statuary",
-                24.0,
-                10.5,
-                6.0,
-                5.0,
-                "light",
-            ),
-            (
-                "right-midfield-debris",
-                "battlefield_debris_and_statuary",
-                37.0,
-                35.5,
-                6.0,
-                5.0,
-                "light",
-            ),
-            (
-                "left-no-mans-barricade",
-                "barricade_and_fuel_pipes",
-                28.0,
-                7.5,
-                1.5,
-                8.0,
-                "light",
-            ),
-            (
-                "right-no-mans-barricade",
-                "barricade_and_fuel_pipes",
-                30.5,
-                38.0,
-                1.5,
-                8.0,
-                "light",
-            ),
-        ),
-    }[layout_number]
-    return tuple(
-        chapter_approved.SourceBattlefieldTerrainFeatureRow(
-            feature_id=f"{layout_id}-{feature_suffix}",
-            feature_kind=feature_kind,
-            footprint_center_x_inches=_pending_layout_x(x),
-            footprint_center_y_inches=_pending_layout_y(y),
-            footprint_width_inches=_pending_layout_x(width),
-            footprint_depth_inches=_pending_layout_y(depth),
-            source_note=f"event companion {density} terrain footprint",
-            display_geometry=_axis_aligned_display(
-                x=_pending_layout_x(x),
-                y=_pending_layout_y(y),
-                width=_pending_layout_x(width),
-                depth=_pending_layout_y(depth),
-                display_template_id=f"{feature_kind}_{width:g}x{depth:g}",
-            ),
+) -> DeploymentZoneLayoutTemplateId:
+    if layout_number not in (1, 2, 3):
+        raise MissionPackError("Unsupported battlefield layout number.")
+    if _layout_number_from_layout_id(layout_id) != layout_number:
+        raise MissionPackError("Battlefield layout number does not match layout ID.")
+
+    force_disposition_pair = _layout_force_disposition_pair_from_layout_id(layout_id)
+    template_numbers = _DEPLOYMENT_ZONE_LAYOUT_TEMPLATE_NUMBERS_BY_SOURCE_PAIR.get(
+        force_disposition_pair
+    )
+    if template_numbers is None:
+        template_numbers = _DEPLOYMENT_ZONE_LAYOUT_TEMPLATE_NUMBERS_BY_SOURCE_PAIR.get(
+            (force_disposition_pair[1], force_disposition_pair[0])
         )
-        for feature_suffix, feature_kind, x, y, width, depth, density in templates
+    if template_numbers is None:
+        raise MissionPackError("Unsupported deployment-zone layout matchup.")
+    return _deployment_zone_layout_template_id_from_number(template_numbers[layout_number - 1])
+
+
+def _deployment_zone_layout_template_id_from_number(
+    template_number: DeploymentZoneLayoutTemplateNumber,
+) -> DeploymentZoneLayoutTemplateId:
+    if template_number == 1:
+        return DEPLOYMENT_ZONE_LAYOUT_1_STAGGERED
+    if template_number == 2:
+        return DEPLOYMENT_ZONE_LAYOUT_2_LONG_EDGE_STRIP
+    if template_number == 3:
+        return DEPLOYMENT_ZONE_LAYOUT_3_QUARTER_CIRCLE_CUTOUT
+    if template_number == 4:
+        return DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE
+    if template_number == 5:
+        return DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP
+    if template_number == 6:
+        return DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE
+    raise MissionPackError("Unsupported battlefield layout number.")
+
+
+def _deployment_zone_shape_transforms(
+    template_id: DeploymentZoneLayoutTemplateId,
+) -> tuple[DeploymentZoneShapeTransform, DeploymentZoneShapeTransform]:
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_1_STAGGERED:
+        return "vertical_reflection", "horizontal_reflection"
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_2_LONG_EDGE_STRIP:
+        return "identity", "point_reflection"
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_3_QUARTER_CIRCLE_CUTOUT:
+        return "vertical_reflection", "horizontal_reflection"
+    if template_id in (
+        DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE,
+        DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP,
+        DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE,
+    ):
+        return "identity", "point_reflection"
+    raise MissionPackError("Unsupported deployment-zone layout template.")
+
+
+def _deployment_zone_template_base_shape(
+    template_id: DeploymentZoneLayoutTemplateId,
+) -> DeploymentZoneShape:
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_1_STAGGERED:
+        return _shape_from_vertices(
+            (
+                (0.0, 0.0),
+                (44.0, 0.0),
+                (44.0, 12.0),
+                (22.0, 12.0),
+                (22.0, 20.0),
+                (0.0, 20.0),
+            )
+        )
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_2_LONG_EDGE_STRIP:
+        return DeploymentZoneShape.rectangle(
+            min_x=0.0,
+            min_y=0.0,
+            max_x=12.0,
+            max_y=60.0,
+        )
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_3_QUARTER_CIRCLE_CUTOUT:
+        return _shape_from_vertices(
+            _rectangle_with_quarter_circle_cutout_vertices(
+                min_x=0.0,
+                min_y=0.0,
+                max_x=22.0,
+                max_y=30.0,
+                corner="upper_right",
+                radius=LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES,
+            )
+        )
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE:
+        return _shape_from_vertices(
+            (
+                (0.0, 0.0),
+                (8.0, 0.0),
+                (8.0, 30.0),
+                (14.0, 30.0),
+                (14.0, 60.0),
+                (0.0, 60.0),
+            )
+        )
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP:
+        return DeploymentZoneShape.rectangle(
+            min_x=0.0,
+            min_y=0.0,
+            max_x=44.0,
+            max_y=18.0,
+        )
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE:
+        return _shape_from_vertices(((0.0, 60.0), (44.0, 60.0), (0.0, 30.0)))
+    raise MissionPackError("Unsupported deployment-zone layout template.")
+
+
+def _transform_deployment_zone_shape(
+    shape: DeploymentZoneShape,
+    transform: DeploymentZoneShapeTransform,
+) -> DeploymentZoneShape:
+    if transform == "identity":
+        return shape
+    if transform == "point_reflection":
+        return _map_deployment_zone_shape(shape, lambda x, y: (44.0 - x, 60.0 - y))
+    if transform == "horizontal_reflection":
+        return _map_deployment_zone_shape(shape, lambda x, y: (44.0 - x, y))
+    if transform == "vertical_reflection":
+        return _map_deployment_zone_shape(shape, lambda x, y: (x, 60.0 - y))
+    raise MissionPackError("Unsupported deployment-zone shape transform.")
+
+
+def _map_deployment_zone_shape(
+    shape: DeploymentZoneShape,
+    transform: Callable[[float, float], tuple[float, float]],
+) -> DeploymentZoneShape:
+    if shape.cutouts:
+        raise MissionPackError("Deployment-zone layout template transforms require polygons.")
+    return _shape_from_polygons(
+        tuple(
+            tuple(
+                _rounded_point(*transform(vertex.x, vertex.y))
+                for vertex in reversed(polygon.vertices)
+            )
+            for polygon in shape.polygons
+        )
     )
 
 
@@ -2682,21 +2760,7 @@ def _descriptor_terrain(
             )
             for area in _extracted_terrain_areas(layout_id)
         )
-    terrain: list[EventTerrainSourceRecord] = []
-    for feature in _layout_terrain_features(layout_id=layout_id, layout_number=layout_number):
-        density = "dense" if feature.feature_kind == "ruins" else "light"
-        terrain.append(
-            EventTerrainSourceRecord(
-                feature_id=feature.feature_id,
-                feature_kind=feature.feature_kind,
-                density=density,
-                x_inches=feature.footprint_center_x_inches,
-                y_inches=feature.footprint_center_y_inches,
-                width_inches=feature.footprint_width_inches,
-                depth_inches=feature.footprint_depth_inches,
-            )
-        )
-    return tuple(terrain)
+    return ()
 
 
 def _extracted_objective_definitions(
@@ -2717,6 +2781,50 @@ def _extracted_objective_definitions(
         )
         for objective in _extracted_objectives(layout_id=layout_id)
     )
+
+
+def _extracted_objective_terrain_area_definitions(
+    *,
+    layout_id: str,
+    objective_markers: tuple[ObjectiveMarkerDefinition, ...],
+    terrain_areas: tuple[PlacedTerrainArea, ...],
+) -> tuple[ObjectiveTerrainAreaDefinition, ...]:
+    layout_source = _extracted_layout_source(layout_id)
+    if not layout_source.objective_terrain_area_specs:
+        return ()
+    objective_markers_by_suffix = {
+        marker.objective_marker_id.removeprefix(f"{layout_id}-"): marker
+        for marker in objective_markers
+    }
+    terrain_area_ids_by_suffix = {
+        area.terrain_area_id.removeprefix(f"{layout_id}-"): area.terrain_area_id
+        for area in terrain_areas
+    }
+    objective_terrain_areas: list[ObjectiveTerrainAreaDefinition] = []
+    for objective_suffix, terrain_area_suffixes in layout_source.objective_terrain_area_specs:
+        marker = objective_markers_by_suffix.get(objective_suffix)
+        if marker is None:
+            raise MissionPackError("Objective terrain area spec references unknown objective.")
+        terrain_area_ids: list[str] = []
+        for terrain_area_suffix in terrain_area_suffixes:
+            terrain_area_id = terrain_area_ids_by_suffix.get(terrain_area_suffix)
+            if terrain_area_id is None:
+                raise MissionPackError(
+                    "Objective terrain area spec references unknown terrain area."
+                )
+            terrain_area_ids.append(terrain_area_id)
+        objective_terrain_areas.append(
+            ObjectiveTerrainAreaDefinition(
+                objective_marker_id=marker.objective_marker_id,
+                objective_role=marker.objective_role,
+                terrain_area_ids=tuple(terrain_area_ids),
+                source_id=(
+                    f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_source.source_layout_id}:"
+                    f"objective-terrain-area:{objective_suffix}"
+                ),
+            )
+        )
+    return tuple(objective_terrain_areas)
 
 
 def _extracted_regions(*, layout_id: str) -> tuple[BattlefieldRegion, ...]:
@@ -2847,6 +2955,7 @@ def _extracted_terrain_areas(
         source_layout_id=layout_source.source_layout_id,
         explicit_specs=layout_source.terrain_area_specs,
         mirrored_pairs=layout_source.terrain_area_mirror_pairs,
+        local_transform_specs=layout_source.terrain_area_local_transform_specs,
     )
 
 
@@ -2856,25 +2965,28 @@ def _placed_terrain_areas_from_specs(
     source_layout_id: str,
     explicit_specs: tuple[event_layouts.EventTerrainAreaSpec, ...],
     mirrored_pairs: tuple[event_layouts.EventTerrainAreaMirrorPair, ...],
+    local_transform_specs: tuple[event_layouts.EventTerrainAreaLocalTransformSpec, ...],
 ) -> tuple[PlacedTerrainArea, ...]:
     templates = {
         template.footprint_template_id: template for template in terrain_area_footprint_templates()
     }
+    local_transforms_by_area_id = _terrain_area_local_transforms_by_area_id(
+        explicit_specs=explicit_specs,
+        local_transform_specs=local_transform_specs,
+    )
     explicit_areas = tuple(
-        PlacedTerrainArea.from_template(
-            terrain_area_id=f"{layout_id}-{area_id}",
-            template=templates[template_id],
-            terrain_feature_kind=TERRAIN_AREA_FEATURE_KIND,
-            classification=classification,
-            center_x_inches=center_x,
-            center_y_inches=center_y,
-            rotation_degrees=rotation,
+        _placed_terrain_area_from_anchor_spec(
+            layout_id=layout_id,
             source_layout_id=source_layout_id,
-            source_id=(
-                f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:terrain-area:{area_id}"
-            ),
+            area_id=area_id,
+            template=templates[template_id],
+            classification=classification,
+            anchor_x_inches=anchor_x,
+            anchor_y_inches=anchor_y,
+            rotation_degrees=rotation,
+            local_transform=local_transforms_by_area_id[area_id],
         )
-        for area_id, template_id, classification, center_x, center_y, rotation in explicit_specs
+        for area_id, template_id, classification, anchor_x, anchor_y, rotation in explicit_specs
     )
     explicit_by_suffix = {
         area.terrain_area_id.removeprefix(f"{layout_id}-"): area for area in explicit_areas
@@ -2894,6 +3006,72 @@ def _placed_terrain_areas_from_specs(
         for source_suffix, target_suffix in mirrored_pairs
     )
     return tuple(sorted((*explicit_areas, *mirrored), key=lambda area: area.terrain_area_id))
+
+
+def _terrain_area_local_transforms_by_area_id(
+    *,
+    explicit_specs: tuple[event_layouts.EventTerrainAreaSpec, ...],
+    local_transform_specs: tuple[event_layouts.EventTerrainAreaLocalTransformSpec, ...],
+) -> dict[str, TerrainAreaLocalTransform]:
+    explicit_area_ids = tuple(area_id for area_id, *_ in explicit_specs)
+    local_transforms: dict[str, TerrainAreaLocalTransform] = {}
+    for area_id in explicit_area_ids:
+        local_transforms[area_id] = TerrainAreaLocalTransform.IDENTITY
+    for area_id, local_transform_token in local_transform_specs:
+        if area_id not in local_transforms:
+            raise MissionPackError("Terrain area local transform references unknown area ID.")
+        if local_transforms[area_id] is not TerrainAreaLocalTransform.IDENTITY:
+            raise MissionPackError("Terrain area local transform must not duplicate area IDs.")
+        local_transform = terrain_area_local_transform_from_token(local_transform_token)
+        local_transforms[area_id] = local_transform
+    return local_transforms
+
+
+def _placed_terrain_area_from_anchor_spec(
+    *,
+    layout_id: str,
+    source_layout_id: str,
+    area_id: str,
+    template: TerrainAreaFootprintTemplate,
+    classification: TerrainAreaClassification,
+    anchor_x_inches: float,
+    anchor_y_inches: float,
+    rotation_degrees: float,
+    local_transform: TerrainAreaLocalTransform,
+) -> PlacedTerrainArea:
+    center_x, center_y = _terrain_area_center_from_anchor(
+        template,
+        anchor_x_inches=anchor_x_inches,
+        anchor_y_inches=anchor_y_inches,
+        rotation_degrees=rotation_degrees,
+    )
+    return PlacedTerrainArea.from_template(
+        terrain_area_id=f"{layout_id}-{area_id}",
+        template=template,
+        terrain_feature_kind=TERRAIN_AREA_FEATURE_KIND,
+        classification=classification,
+        center_x_inches=center_x,
+        center_y_inches=center_y,
+        rotation_degrees=rotation_degrees,
+        local_transform=local_transform,
+        source_layout_id=source_layout_id,
+        source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:terrain-area:{area_id}",
+    )
+
+
+def _terrain_area_center_from_anchor(
+    template: TerrainAreaFootprintTemplate,
+    *,
+    anchor_x_inches: float,
+    anchor_y_inches: float,
+    rotation_degrees: float,
+) -> tuple[float, float]:
+    anchor_local_point = template.polygon_vertices_inches[0]
+    rotated_anchor_point = rotate_point(anchor_local_point, rotation_degrees)
+    return (
+        anchor_x_inches - rotated_anchor_point.x_inches,
+        anchor_y_inches - rotated_anchor_point.y_inches,
+    )
 
 
 def _footprint_template(
@@ -2934,6 +3112,10 @@ def _shape_from_polygons(
     )
 
 
+def _rounded_point(x: float, y: float) -> tuple[float, float]:
+    return (round(x, 6), round(y, 6))
+
+
 def _rectangle_with_quarter_circle_cutout_vertices(
     *,
     min_x: float,
@@ -2968,6 +3150,19 @@ def _rectangle_with_quarter_circle_cutout_vertices(
                 start_degrees=0.0,
                 end_degrees=-90.0,
             ),
+        )
+    if corner == "upper_right":
+        return (
+            (min_x, min_y),
+            (max_x, min_y),
+            *_arc_points(
+                center_x=max_x,
+                center_y=max_y,
+                radius=radius,
+                start_degrees=-90.0,
+                end_degrees=-180.0,
+            ),
+            (min_x, max_y),
         )
     raise MissionPackError("Unsupported quarter-circle cutout corner.")
 
@@ -3021,15 +3216,35 @@ def _layout_battlefield_depth(layout_id: str) -> float:
 
 
 def _layout_attacker_edge(layout_id: str, layout_number: int) -> str:
-    if _is_extracted_layout(layout_id):
-        return {1: "north", 2: "west", 3: "west"}[layout_number]
-    return _attacker_edge(layout_number)
+    template_id = _deployment_zone_layout_template_id(
+        layout_id=layout_id,
+        layout_number=layout_number,
+    )
+    return _deployment_zone_layout_edges(template_id)[0]
 
 
 def _layout_defender_edge(layout_id: str, layout_number: int) -> str:
-    if _is_extracted_layout(layout_id):
-        return {1: "south", 2: "east", 3: "east"}[layout_number]
-    return _defender_edge(layout_number)
+    template_id = _deployment_zone_layout_template_id(
+        layout_id=layout_id,
+        layout_number=layout_number,
+    )
+    return _deployment_zone_layout_edges(template_id)[1]
+
+
+def _deployment_zone_layout_edges(template_id: DeploymentZoneLayoutTemplateId) -> tuple[str, str]:
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_1_STAGGERED:
+        return "north", "south"
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_2_LONG_EDGE_STRIP:
+        return "west", "east"
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_3_QUARTER_CIRCLE_CUTOUT:
+        return "west", "east"
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE:
+        return "west", "east"
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP:
+        return "south", "north"
+    if template_id == DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE:
+        return "north_west_corner", "south_east_corner"
+    raise MissionPackError("Unsupported deployment-zone layout template.")
 
 
 def _layout_geometry_extraction_status(layout_id: str) -> str:
@@ -3049,6 +3264,14 @@ def _layout_number_from_layout_id(layout_id: str) -> int:
     return int(suffix)
 
 
+def _layout_force_disposition_pair_from_layout_id(layout_id: str) -> tuple[str, str]:
+    pair_id = layout_id.rsplit("-layout-", maxsplit=1)[0]
+    first_id, separator, second_id = pair_id.partition("-vs-")
+    if separator == "" or first_id == "" or second_id == "":
+        raise MissionPackError("Battlefield layout ID must include force disposition pair.")
+    return (first_id, second_id)
+
+
 def _pending_layout_point(x_inches: float, y_inches: float) -> tuple[float, float]:
     return (_pending_layout_x(x_inches), _pending_layout_y(y_inches))
 
@@ -3059,25 +3282,6 @@ def _pending_layout_x(x_inches: float) -> float:
 
 def _pending_layout_y(y_inches: float) -> float:
     return round(y_inches * (BATTLEFIELD_DEPTH_INCHES / 44.0), 2)
-
-
-def _axis_aligned_display(
-    *,
-    x: float,
-    y: float,
-    width: float,
-    depth: float,
-    display_template_id: str,
-) -> TerrainDisplayGeometry:
-    return TerrainDisplayGeometry(
-        display_template_id=display_template_id,
-        footprint_polygon=(
-            TerrainDisplayPoint(x - width / 2.0, y - depth / 2.0),
-            TerrainDisplayPoint(x + width / 2.0, y - depth / 2.0),
-            TerrainDisplayPoint(x + width / 2.0, y + depth / 2.0),
-            TerrainDisplayPoint(x - width / 2.0, y + depth / 2.0),
-        ),
-    )
 
 
 def _shape_polygons(shape: DeploymentZoneShape) -> tuple[tuple[tuple[float, float], ...], ...]:
@@ -3259,14 +3463,6 @@ def _force_disposition_name(force_disposition_id: str) -> str:
         if row.force_disposition_id == force_disposition_id:
             return row.name
     raise MissionPackError("Event Companion force disposition was not found.")
-
-
-def _attacker_edge(layout_number: int) -> str:
-    return "north_west_corner" if layout_number == 2 else "west_long_edge"
-
-
-def _defender_edge(layout_number: int) -> str:
-    return "south_east_corner" if layout_number == 2 else "east_long_edge"
 
 
 def _title_from_slug(value: str) -> str:

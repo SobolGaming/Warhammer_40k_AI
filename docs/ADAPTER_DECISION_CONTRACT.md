@@ -1272,14 +1272,41 @@ Important behavior:
 
 The submission contract is shared. The information available to a producer is not always identical.
 
-Mission setup terrain projections expose first-class display geometry under
-`GameViewPayload.mission_setup.terrain_features[*].display_geometry`.
-The display geometry payload uses schema `terrain-display-v1`, coordinate space
-`battlefield_inches`, footprint kind `polygon`, optional `display_template_id`,
-and an unclosed `footprint_polygon` list of `{x_inches, y_inches}` vertices.
-Adapters should render terrain footprints from this typed display geometry.
-`source_id` remains provenance only; adapters must not parse it to recover
-terrain preset, origin, rotation, or footprint details.
+Mission setup terrain projections expose typed geometry for both current
+validated layout areas and future terrain features. Chapter Approved 2026-27
+layout geometry imported from Event Companion is represented as
+`GameViewPayload.mission_setup.terrain_areas[*]`; adapters should render those
+area footprints from the typed `footprint_polygon` list of `{x_inches,
+y_inches}` vertices, along with the area `classification`,
+`footprint_template_id`, `center_x_inches`, `center_y_inches`, and
+`rotation_degrees` metadata. Terrain areas are layout footprints; they are not
+the terrain features that will later be placed on those areas.
+
+Mission setup projections may also expose
+`GameViewPayload.mission_setup.objective_terrain_areas[*]` when source-backed
+objectives are terrain footprints rather than standalone marker disks. Each
+entry links one objective marker ID and role to one or more `terrain_area_ids`.
+Multiple terrain area IDs on one entry represent a single composite objective
+made from bordered footprint polygons. Adapters should render those linked
+terrain areas as the objective footprint and treat the objective marker as
+stable objective identity/label metadata. Adapters must not infer objective
+terrain, light/dense terrain traits, or terrain-feature rules from footprint
+colors, terrain area IDs, template IDs, or `source_id` strings.
+
+Terrain features, when present, expose first-class display geometry under
+`GameViewPayload.mission_setup.terrain_features[*].display_geometry`. The
+display geometry payload uses schema `terrain-display-v1`, coordinate space
+`battlefield_inches`, footprint kind `polygon`, optional
+`display_template_id`, and an unclosed `footprint_polygon` list of
+`{x_inches, y_inches}` vertices. Adapters should render from these typed
+payloads. `source_id` remains provenance only; adapters must not parse it to
+recover terrain preset, origin, rotation, or footprint details.
+
+Chapter Approved 2026-27 layout source geometry is canonical in `44x60` portrait
+orientation. UI clients that prefer wide battlefield displays may rotate the
+rendered view by -90 degrees into landscape, but the adapter payload coordinates
+remain portrait source coordinates and should not be reinterpreted as native
+`60x44` layout data.
 
 Phase 18A extends the viewer projection for
 [Issue #145](https://github.com/SobolGaming/Warhammer_40k_AI/issues/145) with a

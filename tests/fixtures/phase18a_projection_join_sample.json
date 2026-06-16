@@ -26,35 +26,8 @@
       "unit_instance_id": "army-alpha:intercessor-unit-1"
     },
     "mission_setup": {
-      "terrain_feature": {
-        "display_geometry": {
-          "coordinate_space": "battlefield_inches",
-          "display_template_id": "ruins_diagonal_down_right_estimate_v1",
-          "footprint_kind": "polygon",
-          "footprint_polygon": [
-            {
-              "x_inches": 45.0,
-              "y_inches": 14.5
-            },
-            {
-              "x_inches": 47.0,
-              "y_inches": 12.5
-            },
-            {
-              "x_inches": 53.0,
-              "y_inches": 19.5
-            },
-            {
-              "x_inches": 51.0,
-              "y_inches": 21.5
-            }
-          ],
-          "schema_version": "terrain-display-v1"
-        },
-        "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-left-diagonal-ruin",
-        "feature_kind": "ruins",
-        "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:terrain:take-and-hold-vs-purge-the-foe-layout-3-left-diagonal-ruin"
-      }
+      "terrain_areas": [],
+      "terrain_features": []
     },
     "model_display": {
       "base_size": {
