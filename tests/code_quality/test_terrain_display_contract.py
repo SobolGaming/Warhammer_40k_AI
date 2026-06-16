@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import ast
+import json
 from pathlib import Path
+
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC_ROOT = ROOT / "src" / "warhammer40k_core"
+FIXTURE_ROOT = ROOT / "tests" / "fixtures"
 SOURCE_ID_STRING_PARSE_METHODS = frozenset(
     (
         "partition",
@@ -40,6 +44,20 @@ def test_terrain_display_contract_forbids_source_id_string_parsing() -> None:
     )
 
 
+def test_projection_fixtures_with_terrain_features_include_display_geometry() -> None:
+    violations: list[str] = []
+    for path in sorted(FIXTURE_ROOT.rglob("*.json")):
+        payload = validate_json_value(json.loads(path.read_text(encoding="utf-8")))
+        for feature_path, feature in _terrain_feature_payloads(payload, path="$"):
+            if "display_geometry" not in feature:
+                violations.append(f"{path.relative_to(ROOT)}:{feature_path}")
+
+    assert not violations, (
+        "Projection fixtures that expose terrain features must include typed display_geometry:\n"
+        + "\n".join(violations)
+    )
+
+
 def _is_source_id_expression(node: ast.expr) -> bool:
     if isinstance(node, ast.Name):
         return node.id == "source_id"
@@ -54,3 +72,33 @@ def _is_source_id_key(node: ast.expr) -> bool:
     if isinstance(node, ast.Constant):
         return node.value == "source_id"
     return False
+
+
+def _terrain_feature_payloads(
+    value: JsonValue,
+    *,
+    path: str,
+) -> list[tuple[str, dict[str, JsonValue]]]:
+    matches: list[tuple[str, dict[str, JsonValue]]] = []
+    if isinstance(value, dict):
+        terrain_feature = value.get("terrain_feature")
+        if isinstance(terrain_feature, dict):
+            matches.append((f"{path}.terrain_feature", terrain_feature))
+        terrain_features = value.get("terrain_features")
+        if isinstance(terrain_features, list):
+            for index, feature in enumerate(terrain_features):
+                if isinstance(feature, dict):
+                    matches.append(
+                        (
+                            f"{path}.terrain_features[{index}]",
+                            feature,
+                        )
+                    )
+        for key, child in value.items():
+            if key in {"terrain_feature", "terrain_features"}:
+                continue
+            matches.extend(_terrain_feature_payloads(child, path=f"{path}.{key}"))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            matches.extend(_terrain_feature_payloads(child, path=f"{path}[{index}]"))
+    return matches
