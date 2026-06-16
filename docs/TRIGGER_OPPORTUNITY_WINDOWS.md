@@ -69,11 +69,22 @@ fingerprint are reproduced. It should not ask a UI or AI to choose again.
 
 ## Command Re-roll Hosts
 
-Command Re-roll remains an ordinary finite `use_stratagem` submission. Attack
-resolution hosts in Shooting and Fight surface that submission immediately after
-eligible Hit, Wound, real Save, and random Damage rolls. The host records the
-original dice state, opens the optional Stratagem window, and then resumes from
-the event-log state after decline or accepted reroll.
+Command Re-roll remains answered as an ordinary finite `use_stratagem`
+submission, but attack-resolution hosts wrap that request in an
+`OpportunityWindow` envelope. Shooting and Fight surface the window immediately
+after eligible Hit, Wound, real Save, and random Damage rolls. The request
+payload carries `submission_family: "opportunity_window"`, the window payload,
+the window ID, the boundary state hash, the boundary sequence number, anchor
+event IDs, and the legal-action fingerprint. Each use or decline option carries
+a matching nested `opportunity_submission` payload.
+
+`GameLifecycle.submit_decision(...)` validates the opportunity envelope before
+queue pop, CP spend, reroll mutation, or decline recording. A stale state hash,
+stale sequence number, wrong window ID, changed legal-action fingerprint, wrong
+player, unavailable action, or malformed opportunity payload returns typed
+invalid diagnostics and leaves the pending request unresolved. The host records
+the original dice state, opens the optional Stratagem window, and then resumes
+from the event-log state after decline or accepted reroll.
 
 Adapters must not apply a reroll locally or infer eligibility from displayed
 roll text. They submit the engine-emitted `use_stratagem` option or the decline

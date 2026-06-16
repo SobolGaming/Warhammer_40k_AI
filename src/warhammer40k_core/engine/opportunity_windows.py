@@ -21,6 +21,8 @@ from warhammer40k_core.engine.timing_windows import (
 )
 
 OPPORTUNITY_ACTION_SUBMISSION_KIND = "opportunity_action"
+OPPORTUNITY_REQUEST_FAMILY = "opportunity_window"
+OPPORTUNITY_SUBMISSION_PAYLOAD_KEY = "opportunity_submission"
 
 
 class OpportunityWindowError(ValueError):
@@ -112,6 +114,26 @@ class IntentMaterializationPayload(TypedDict):
     status: str
     diagnostic: JsonValue
     result: DecisionResultPayload | None
+
+
+class OpportunityBoundaryHashPayload(TypedDict):
+    state: JsonValue
+    event_count: int
+    last_event_id: str | None
+
+
+class OpportunityBoundaryGameStatePayload(TypedDict):
+    game_id: str
+    ruleset_descriptor_hash: str
+    stage: str
+    battle_phase_index: int | None
+    battle_round: int
+    active_player_id: str | None
+    player_ids: list[str]
+    turn_order: list[str]
+    decision_request_count: int
+    command_point_ledgers: JsonValue
+    stratagem_use_records: JsonValue
 
 
 def _new_passes() -> list[WindowPass]:
@@ -367,7 +389,7 @@ class OpportunityWindow:
         requested_actor = _validate_identifier("actor_id", actor_id)
         request_payload = validate_json_value(
             {
-                "submission_family": "opportunity_window",
+                "submission_family": OPPORTUNITY_REQUEST_FAMILY,
                 "opportunity_window": self.to_payload(),
                 "opportunity_window_id": self.window_id,
                 "legal_action_fingerprint": self.legal_action_fingerprint(requested_actor),
@@ -802,6 +824,173 @@ class IntentMaterialization:
             "diagnostic": self.diagnostic,
             "result": None if self.result is None else self.result.to_payload(),
         }
+
+
+def opportunity_boundary_state_hash(
+    *,
+    state_payload: JsonValue,
+    event_count: int,
+    last_event_id: str | None,
+) -> str:
+    payload: OpportunityBoundaryHashPayload = {
+        "state": validate_json_value(state_payload),
+        "event_count": _validate_non_negative_int("event_count", event_count),
+        "last_event_id": _validate_optional_identifier("last_event_id", last_event_id),
+    }
+    return hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
+
+
+def opportunity_boundary_game_state_payload(
+    *,
+    game_id: str,
+    ruleset_descriptor_hash: str,
+    stage: str,
+    battle_phase_index: int | None,
+    battle_round: int,
+    active_player_id: str | None,
+    player_ids: tuple[str, ...],
+    turn_order: tuple[str, ...],
+    decision_request_count: int,
+    command_point_ledgers: JsonValue,
+    stratagem_use_records: JsonValue,
+) -> JsonValue:
+    payload: OpportunityBoundaryGameStatePayload = {
+        "game_id": _validate_identifier("game_id", game_id),
+        "ruleset_descriptor_hash": _validate_identifier(
+            "ruleset_descriptor_hash",
+            ruleset_descriptor_hash,
+        ),
+        "stage": _validate_identifier("stage", stage),
+        "battle_phase_index": (
+            None
+            if battle_phase_index is None
+            else _validate_non_negative_int("battle_phase_index", battle_phase_index)
+        ),
+        "battle_round": _validate_non_negative_int("battle_round", battle_round),
+        "active_player_id": _validate_optional_identifier("active_player_id", active_player_id),
+        "player_ids": list(
+            _validate_identifier_tuple(
+                "player_ids",
+                player_ids,
+                min_length=1,
+                sort_values=False,
+            )
+        ),
+        "turn_order": list(
+            _validate_identifier_tuple(
+                "turn_order",
+                turn_order,
+                min_length=1,
+                sort_values=False,
+            )
+        ),
+        "decision_request_count": _validate_non_negative_int(
+            "decision_request_count",
+            decision_request_count,
+        ),
+        "command_point_ledgers": validate_json_value(command_point_ledgers),
+        "stratagem_use_records": validate_json_value(stratagem_use_records),
+    }
+    return validate_json_value(payload)
+
+
+def opportunity_submission_invalid_reason(
+    *,
+    request: DecisionRequest,
+    result: DecisionResult,
+    current_state_hash: str,
+    current_sequence_number: int,
+) -> str | None:
+    if type(request) is not DecisionRequest:
+        raise OpportunityWindowError("Opportunity validation requires a DecisionRequest.")
+    if type(result) is not DecisionResult:
+        raise OpportunityWindowError("Opportunity validation requires a DecisionResult.")
+    request_payload = request.payload
+    if not isinstance(request_payload, dict):
+        return None
+    if request_payload.get("submission_family") is None:
+        return None
+    if request_payload.get("submission_family") != OPPORTUNITY_REQUEST_FAMILY:
+        return "malformed_opportunity_request"
+    window_payload = request_payload.get("opportunity_window")
+    if not isinstance(window_payload, dict):
+        return "malformed_opportunity_request"
+    try:
+        window = OpportunityWindow.from_payload(cast(OpportunityWindowPayload, window_payload))
+    except (KeyError, OpportunityWindowError):  # fmt: skip
+        return "malformed_opportunity_request"
+    if request_payload.get("opportunity_window_id") != window.window_id:
+        return "opportunity_window_id_mismatch"
+    expected_fingerprint = request_payload.get("legal_action_fingerprint")
+    if type(expected_fingerprint) is not str:
+        return "malformed_opportunity_request"
+    actor_id = request.actor_id
+    if actor_id is None:
+        return "opportunity_actor_required"
+    if window.legal_action_fingerprint(actor_id) != expected_fingerprint:
+        return "opportunity_fingerprint_mismatch"
+    if _validate_identifier("current_state_hash", current_state_hash) != window.state_hash:
+        return "stale_opportunity_state_hash"
+    if (
+        _validate_non_negative_int("current_sequence_number", current_sequence_number)
+        != window.sequence_number
+    ):
+        return "stale_opportunity_sequence"
+    result_payload = result.payload
+    if not isinstance(result_payload, dict):
+        return "malformed_opportunity_submission"
+    submission_payload = result_payload.get(OPPORTUNITY_SUBMISSION_PAYLOAD_KEY)
+    if not isinstance(submission_payload, dict):
+        return "malformed_opportunity_submission"
+    return _opportunity_submission_payload_invalid_reason(
+        window=window,
+        actor_id=actor_id,
+        selected_option_id=result.selected_option_id,
+        expected_fingerprint=expected_fingerprint,
+        submission_payload=submission_payload,
+    )
+
+
+def _opportunity_submission_payload_invalid_reason(
+    *,
+    window: OpportunityWindow,
+    actor_id: str,
+    selected_option_id: str,
+    expected_fingerprint: str,
+    submission_payload: dict[str, JsonValue],
+) -> str | None:
+    if submission_payload.get("submission_kind") != OPPORTUNITY_ACTION_SUBMISSION_KIND:
+        return "malformed_opportunity_submission"
+    if submission_payload.get("window_id") != window.window_id:
+        return "opportunity_window_id_mismatch"
+    if submission_payload.get("state_hash") != window.state_hash:
+        return "stale_opportunity_state_hash"
+    if submission_payload.get("sequence_number") != window.sequence_number:
+        return "stale_opportunity_sequence"
+    if submission_payload.get("revision") != window.revision:
+        return "opportunity_revision_mismatch"
+    if submission_payload.get("legal_action_fingerprint") != expected_fingerprint:
+        return "opportunity_fingerprint_mismatch"
+    action_payload = submission_payload.get("action")
+    if not isinstance(action_payload, dict):
+        return "malformed_opportunity_submission"
+    try:
+        action = OpportunityLegalAction.from_payload(
+            cast(OpportunityLegalActionPayload, action_payload)
+        )
+    except (KeyError, OpportunityWindowError):  # fmt: skip
+        return "malformed_opportunity_submission"
+    if action.action_id != selected_option_id:
+        return "opportunity_action_mismatch"
+    try:
+        current_action = window.action_by_id(action.action_id)
+    except OpportunityWindowError:
+        return "opportunity_action_unavailable"
+    if current_action.to_payload() != action.to_payload():
+        return "opportunity_action_drift"
+    if not current_action.is_available_to(actor_id):
+        return "opportunity_action_wrong_player"
+    return None
 
 
 def opportunity_action_kind_from_token(token: object) -> OpportunityActionKind:

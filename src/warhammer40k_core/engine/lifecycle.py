@@ -47,7 +47,12 @@ from warhammer40k_core.engine.deployment import (
 )
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.enhancement_effects import apply_enhancement_effects
-from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
+from warhammer40k_core.engine.event_log import (
+    EventRecord,
+    JsonValue,
+    canonical_json,
+    validate_json_value,
+)
 from warhammer40k_core.engine.faction_content.bundle import (
     RuntimeContentBundle,
 )
@@ -88,6 +93,11 @@ from warhammer40k_core.engine.movement_proposals import (
     PLACEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
     ProposalKind,
+)
+from warhammer40k_core.engine.opportunity_windows import (
+    opportunity_boundary_game_state_payload,
+    opportunity_boundary_state_hash,
+    opportunity_submission_invalid_reason,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -905,6 +915,23 @@ class GameLifecycle:
             and pending_request is not None
             and pending_request.decision_type == STRATAGEM_DECISION_TYPE
         ):
+            opportunity_invalid_reason = opportunity_submission_invalid_reason(
+                request=pending_request,
+                result=result,
+                current_state_hash=self._opportunity_boundary_state_hash(
+                    state=state,
+                    request=pending_request,
+                ),
+                current_sequence_number=self._opportunity_boundary_sequence_number(
+                    request=pending_request,
+                ),
+            )
+            if opportunity_invalid_reason is not None:
+                return LifecycleStatus.invalid(
+                    stage=state.stage,
+                    message="Opportunity-window submission is no longer valid.",
+                    payload={"invalid_reason": opportunity_invalid_reason},
+                )
             result.validate_for_request(pending_request)
             if self._result_resolves_active_reaction_frame(result):
                 self.reaction_queue.validate_result(result)
@@ -1736,6 +1763,63 @@ class GameLifecycle:
             STRATAGEM_WINDOW_DECLINED_EVENT_TYPE,
             stratagem_window_decline_event_payload(request=record.request, result=result),
         )
+
+    def _opportunity_boundary_state_hash(
+        self,
+        *,
+        state: GameState,
+        request: DecisionRequest,
+    ) -> str:
+        records = self._opportunity_boundary_records(request=request)
+        return opportunity_boundary_state_hash(
+            state_payload=opportunity_boundary_game_state_payload(
+                game_id=state.game_id,
+                ruleset_descriptor_hash=state.ruleset_descriptor_hash,
+                stage=state.stage.value,
+                battle_phase_index=state.battle_phase_index,
+                battle_round=state.battle_round,
+                active_player_id=state.active_player_id,
+                player_ids=state.player_ids,
+                turn_order=state.turn_order,
+                decision_request_count=state.decision_request_count,
+                command_point_ledgers=cast(
+                    JsonValue,
+                    [ledger.to_payload() for ledger in state.command_point_ledgers],
+                ),
+                stratagem_use_records=cast(
+                    JsonValue,
+                    [record.to_payload() for record in state.stratagem_use_records],
+                ),
+            ),
+            event_count=len(records),
+            last_event_id=None if not records else records[-1].event_id,
+        )
+
+    def _opportunity_boundary_sequence_number(self, *, request: DecisionRequest) -> int:
+        return len(self._opportunity_boundary_records(request=request))
+
+    def _opportunity_boundary_records(self, *, request: DecisionRequest) -> tuple[EventRecord, ...]:
+        records = self.decision_controller.event_log.records
+        while records:
+            last = records[-1]
+            if last.event_type == "decision_requested":
+                if not isinstance(last.payload, dict):
+                    raise GameLifecycleError("decision_requested event payload must be an object.")
+                if last.payload.get("request_id") != request.request_id:
+                    return records
+                records = records[:-1]
+                continue
+            if last.event_type == "reaction_window_continued":
+                if not isinstance(last.payload, dict):
+                    raise GameLifecycleError(
+                        "reaction_window_continued event payload must be an object."
+                    )
+                if last.payload.get("next_request_id") != request.request_id:
+                    return records
+                records = records[:-1]
+                continue
+            return records
+        return records
 
     def _continue_or_resolve_out_of_phase_reaction(
         self,

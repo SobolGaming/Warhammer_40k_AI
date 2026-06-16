@@ -1325,17 +1325,25 @@ def create_stratagem_use_decision_request(
     state: GameState,
     context: StratagemEligibilityContext,
     options: tuple[DecisionOption, ...],
+    request_id: str | None = None,
+    payload_extra: dict[str, JsonValue] | None = None,
 ) -> DecisionRequest:
     if type(context) is not StratagemEligibilityContext:
         raise GameLifecycleError("Stratagem decision requires an eligibility context.")
+    extra = {} if payload_extra is None else payload_extra
+    if type(extra) is not dict:
+        raise GameLifecycleError("Stratagem decision payload_extra must be a dictionary.")
     return DecisionRequest(
-        request_id=state.next_decision_request_id(),
+        request_id=state.next_decision_request_id()
+        if request_id is None
+        else _validate_identifier("request_id", request_id),
         decision_type=STRATAGEM_DECISION_TYPE,
         actor_id=context.player_id,
         payload=validate_json_value(
             {
                 "stratagem_context": context.to_payload(),
                 "finite": True,
+                **extra,
             }
         ),
         options=options,
