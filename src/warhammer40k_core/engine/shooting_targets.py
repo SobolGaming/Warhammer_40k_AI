@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict, cast
@@ -58,6 +59,7 @@ class ShootingTargetViolationCode(StrEnum):
     NOT_ENEMY_UNIT = "not_enemy_unit"
     TARGET_NOT_PLACED = "target_not_placed"
     OUT_OF_RANGE = "out_of_range"
+    OUTSIDE_DETECTION_RANGE = "outside_detection_range"
     NOT_VISIBLE = "not_visible"
     LONE_OPERATIVE = "lone_operative"
     LOCKED_IN_COMBAT = "locked_in_combat"
@@ -343,6 +345,8 @@ def shooting_target_candidates_for_unit(
     weapon_profile: WeaponProfile,
     target_unit_ids: tuple[str, ...],
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+    hidden_target_unit_ids: tuple[str, ...] = (),
+    target_detection_range_bonus_inches_by_unit_id: Mapping[str, int] | None = None,
 ) -> tuple[ShootingTargetCandidate, ...]:
     _validate_target_query_inputs(
         scenario=scenario,
@@ -351,6 +355,10 @@ def shooting_target_candidates_for_unit(
         weapon_profile=weapon_profile,
         target_unit_ids=target_unit_ids,
         terrain_features=terrain_features,
+    )
+    hidden_target_ids = _validate_identifier_tuple("hidden_target_unit_ids", hidden_target_unit_ids)
+    detection_range_bonus_by_unit_id = _validate_detection_range_bonus_mapping(
+        target_detection_range_bonus_inches_by_unit_id
     )
     canonical_target_unit_ids = _canonical_target_unit_ids(
         scenario=scenario,
@@ -365,6 +373,10 @@ def shooting_target_candidates_for_unit(
             weapon_profile=weapon_profile,
             target_unit_id=target_unit_id,
             terrain_features=terrain_features,
+            hidden_target_unit_ids=hidden_target_ids,
+            target_detection_range_bonus_inches=(
+                detection_range_bonus_by_unit_id.get(target_unit_id, 0)
+            ),
         )
         for target_unit_id in canonical_target_unit_ids
     )
@@ -379,6 +391,8 @@ def shooting_target_candidate_for_model(
     weapon_profile: WeaponProfile,
     target_unit_id: str,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+    hidden_target_unit_ids: tuple[str, ...] = (),
+    target_detection_range_bonus_inches: int = 0,
 ) -> ShootingTargetCandidate:
     _validate_target_query_inputs(
         scenario=scenario,
@@ -388,6 +402,7 @@ def shooting_target_candidate_for_model(
         target_unit_ids=(target_unit_id,),
         terrain_features=terrain_features,
     )
+    hidden_target_ids = _validate_identifier_tuple("hidden_target_unit_ids", hidden_target_unit_ids)
     return _target_candidate(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -399,6 +414,11 @@ def shooting_target_candidate_for_model(
         weapon_profile=weapon_profile,
         target_unit_id=target_unit_id,
         terrain_features=terrain_features,
+        hidden_target_unit_ids=hidden_target_ids,
+        target_detection_range_bonus_inches=_validate_non_negative_int(
+            "target_detection_range_bonus_inches",
+            target_detection_range_bonus_inches,
+        ),
     )
 
 
@@ -521,6 +541,8 @@ def _target_candidate(
     weapon_profile: WeaponProfile,
     target_unit_id: str,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
+    hidden_target_unit_ids: tuple[str, ...],
+    target_detection_range_bonus_inches: int,
 ) -> ShootingTargetCandidate:
     target_rules_unit = rules_unit_view_from_armies(
         armies=scenario.armies,
@@ -604,6 +626,24 @@ def _target_candidate(
             violation_code=ShootingTargetViolationCode.OUT_OF_RANGE,
             message="No target model is within the weapon's range profile.",
             visibility_cache_key=visibility_cache_key,
+        )
+    detection_validation = _hidden_target_detection_validation(
+        ruleset_descriptor=ruleset_descriptor,
+        attacker_models=attacker_models,
+        target_models=target_models,
+        target_unit_id=target_unit_id,
+        hidden_target_unit_ids=hidden_target_unit_ids,
+        target_detection_range_bonus_inches=target_detection_range_bonus_inches,
+    )
+    if detection_validation is not None:
+        return _invalid_candidate(
+            attacker_unit=attacker_unit,
+            weapon_profile=weapon_profile,
+            target_unit_id=target_unit_id,
+            violation_code=ShootingTargetViolationCode.OUTSIDE_DETECTION_RANGE,
+            message=detection_validation,
+            visibility_cache_key=visibility_cache_key,
+            target_in_range_model_ids=target_in_range_model_ids,
         )
 
     evidence = _best_line_of_sight_range_evidence(
@@ -981,7 +1021,7 @@ def _target_in_range_model_ids(
     *,
     attacker_models: tuple[Model, ...],
     target_models: tuple[Model, ...],
-    range_inches: int,
+    range_inches: int | float,
 ) -> tuple[str, ...]:
     ids: set[str] = set()
     for attacker_model in attacker_models:
@@ -989,6 +1029,34 @@ def _target_in_range_model_ids(
             if attacker_model.range_to(target_model) <= float(range_inches):
                 ids.add(target_model.model_id)
     return tuple(sorted(ids))
+
+
+def _hidden_target_detection_validation(
+    *,
+    ruleset_descriptor: RulesetDescriptor,
+    attacker_models: tuple[Model, ...],
+    target_models: tuple[Model, ...],
+    target_unit_id: str,
+    hidden_target_unit_ids: tuple[str, ...],
+    target_detection_range_bonus_inches: int,
+) -> str | None:
+    if target_unit_id not in hidden_target_unit_ids:
+        return None
+    visibility_policy = ruleset_descriptor.terrain_visibility_policy
+    if not visibility_policy.hidden_supported:
+        raise GameLifecycleError("Hidden target state requires hidden visibility support.")
+    hidden_detection_range = visibility_policy.hidden_detection_range_inches
+    if hidden_detection_range is None:
+        raise GameLifecycleError("Hidden target state requires a detection range.")
+    effective_detection_range = hidden_detection_range + float(target_detection_range_bonus_inches)
+    target_within_detection_ids = _target_in_range_model_ids(
+        attacker_models=attacker_models,
+        target_models=target_models,
+        range_inches=effective_detection_range,
+    )
+    if target_within_detection_ids:
+        return None
+    return "Hidden target is outside the attacker's effective detection range."
 
 
 def _plunging_fire_applies(
@@ -1407,3 +1475,31 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
     if len(set(validated)) != len(validated):
         raise GameLifecycleError(f"{field_name} must not contain duplicates.")
     return validated
+
+
+def _validate_detection_range_bonus_mapping(
+    value: object,
+) -> Mapping[str, int]:
+    if value is None:
+        return {}
+    if not isinstance(value, Mapping):
+        raise GameLifecycleError("target_detection_range_bonus_inches_by_unit_id must map units.")
+    validated: dict[str, int] = {}
+    raw_mapping = cast(Mapping[object, object], value)
+    for raw_unit_id, raw_bonus in raw_mapping.items():
+        unit_id = _validate_identifier("target_detection_range_bonus unit id", raw_unit_id)
+        if unit_id in validated:
+            raise GameLifecycleError("target_detection_range_bonus unit IDs must be unique.")
+        validated[unit_id] = _validate_non_negative_int(
+            "target_detection_range_bonus inches",
+            raw_bonus,
+        )
+    return validated
+
+
+def _validate_non_negative_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GameLifecycleError(f"{field_name} must be an integer.")
+    if value < 0:
+        raise GameLifecycleError(f"{field_name} must not be negative.")
+    return value

@@ -32,6 +32,7 @@ BATTLE_SHOCK_ROLL_TYPE = "battle_shock_roll"
 class BattleShockTestReason(StrEnum):
     BELOW_HALF_STRENGTH = "below_half_strength"
     BELOW_STARTING_STRENGTH_FORCED = "below_starting_strength_forced"
+    FORCED_BY_STRATAGEM = "forced_by_stratagem"
 
 
 class StratagemTargetPermissionStatus(StrEnum):

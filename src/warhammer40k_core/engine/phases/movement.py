@@ -6899,6 +6899,7 @@ def _post_move_embark_options(
             selection=selection,
             unit_placement=unit_placement,
             transport_placement=transport_placement,
+            persisting_effects=state.persisting_effects_for_unit(unit_instance_id),
         )
         if not resolution.is_valid:
             continue
@@ -7013,6 +7014,7 @@ def _apply_embark_transport_selection_decision(
         transport_placement=scenario.battlefield_state.unit_placement_by_id(
             selection.transport_unit_instance_id
         ),
+        persisting_effects=state.persisting_effects_for_unit(active_selection.unit_instance_id),
     )
     if not resolution.is_valid:
         invalid_payload = _transport_operation_invalid_payload(

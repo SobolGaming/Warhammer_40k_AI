@@ -11,6 +11,7 @@ from warhammer40k_core.engine.army_mustering import (
     EnhancementAssignment,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
@@ -31,9 +32,18 @@ class EnhancementCharacteristicModifierPayload(TypedDict):
     replay_payload: JsonValue
 
 
+class EnhancementPersistingEffectGrantPayload(TypedDict):
+    effect_id: str
+    source_id: str
+    enhancement_id: str
+    target_unit_instance_id: str
+    persisting_effect: JsonValue
+    replay_payload: JsonValue
+
+
 type EnhancementEffectHandler = Callable[
     ["EnhancementEffectContext"],
-    tuple["EnhancementCharacteristicModifier", ...],
+    tuple[object, ...],
 ]
 
 
@@ -118,6 +128,49 @@ class EnhancementCharacteristicModifier:
 
 
 @dataclass(frozen=True, slots=True)
+class EnhancementPersistingEffectGrant:
+    effect_id: str
+    source_id: str
+    enhancement_id: str
+    target_unit_instance_id: str
+    persisting_effect: PersistingEffect
+    replay_payload: JsonValue = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "effect_id", _validate_identifier("effect_id", self.effect_id))
+        object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
+        object.__setattr__(
+            self,
+            "enhancement_id",
+            _validate_identifier("enhancement_id", self.enhancement_id),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier("target_unit_instance_id", self.target_unit_instance_id),
+        )
+        if type(self.persisting_effect) is not PersistingEffect:
+            raise GameLifecycleError(
+                "EnhancementPersistingEffectGrant persisting_effect must be a PersistingEffect."
+            )
+        if self.persisting_effect.source_rule_id != self.source_id:
+            raise GameLifecycleError("Enhancement persisting effect source drift.")
+        if self.target_unit_instance_id not in self.persisting_effect.target_unit_instance_ids:
+            raise GameLifecycleError("Enhancement persisting effect target drift.")
+        object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
+
+    def to_payload(self) -> EnhancementPersistingEffectGrantPayload:
+        return {
+            "effect_id": self.effect_id,
+            "source_id": self.source_id,
+            "enhancement_id": self.enhancement_id,
+            "target_unit_instance_id": self.target_unit_instance_id,
+            "persisting_effect": validate_json_value(self.persisting_effect.to_payload()),
+            "replay_payload": self.replay_payload,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class EnhancementEffectBinding:
     effect_id: str
     source_id: str
@@ -134,6 +187,12 @@ class EnhancementEffectBinding:
         )
         if not callable(self.handler):
             raise GameLifecycleError("EnhancementEffectBinding handler must be callable.")
+
+
+def _enhancement_effect_sort_key(
+    effect: EnhancementCharacteristicModifier | EnhancementPersistingEffectGrant,
+) -> str:
+    return effect.effect_id
 
 
 @dataclass(frozen=True, slots=True)
@@ -157,10 +216,10 @@ class EnhancementEffectRegistry:
     def effects_for(
         self,
         context: EnhancementEffectContext,
-    ) -> tuple[EnhancementCharacteristicModifier, ...]:
+    ) -> tuple[object, ...]:
         if type(context) is not EnhancementEffectContext:
             raise GameLifecycleError("Enhancement effects require a context.")
-        effects: list[EnhancementCharacteristicModifier] = []
+        effects: list[EnhancementCharacteristicModifier | EnhancementPersistingEffectGrant] = []
         for binding in self.bindings:
             if binding.enhancement_id != context.assignment.enhancement_id:
                 continue
@@ -168,24 +227,30 @@ class EnhancementEffectRegistry:
             if type(binding_effects) is not tuple:
                 raise GameLifecycleError("Enhancement effect handlers must return a tuple.")
             for effect in binding_effects:
-                if type(effect) is not EnhancementCharacteristicModifier:
+                if type(effect) is EnhancementCharacteristicModifier:
+                    supported_effect: (
+                        EnhancementCharacteristicModifier | EnhancementPersistingEffectGrant
+                    ) = effect
+                elif type(effect) is EnhancementPersistingEffectGrant:
+                    supported_effect = effect
+                else:
                     raise GameLifecycleError(
-                        "Enhancement effect handlers must return characteristic modifiers."
+                        "Enhancement effect handlers must return supported enhancement effects."
                     )
-                if effect.effect_id != binding.effect_id:
+                if supported_effect.effect_id != binding.effect_id:
                     raise GameLifecycleError("Enhancement effect handler returned effect_id drift.")
-                if effect.source_id != binding.source_id:
+                if supported_effect.source_id != binding.source_id:
                     raise GameLifecycleError("Enhancement effect handler returned source_id drift.")
-                if effect.enhancement_id != binding.enhancement_id:
+                if supported_effect.enhancement_id != binding.enhancement_id:
                     raise GameLifecycleError(
                         "Enhancement effect handler returned enhancement_id drift."
                     )
-                if effect.target_unit_instance_id != context.target_unit.unit_instance_id:
+                if supported_effect.target_unit_instance_id != context.target_unit.unit_instance_id:
                     raise GameLifecycleError(
                         "Enhancement effect handler returned target unit drift."
                     )
-                effects.append(effect)
-        return tuple(sorted(effects, key=lambda effect: effect.effect_id))
+                effects.append(supported_effect)
+        return tuple(sorted(effects, key=_enhancement_effect_sort_key))
 
 
 def apply_enhancement_effects(
@@ -218,12 +283,23 @@ def apply_enhancement_effects(
                 target_unit=target_unit,
             )
             for effect in registry.effects_for(context):
-                updated_army, payload = _apply_characteristic_modifier(
-                    army=updated_army,
-                    effect=effect,
-                )
-                if payload is not None:
-                    event_payloads.append(payload)
+                if type(effect) is EnhancementCharacteristicModifier:
+                    updated_army, payload = _apply_characteristic_modifier(
+                        army=updated_army,
+                        effect=effect,
+                    )
+                    if payload is not None:
+                        event_payloads.append(payload)
+                    continue
+                if type(effect) is EnhancementPersistingEffectGrant:
+                    if not any(
+                        stored.effect_id == effect.persisting_effect.effect_id
+                        for stored in state.persisting_effects
+                    ):
+                        state.record_persisting_effect(effect.persisting_effect)
+                        event_payloads.append(cast(dict[str, JsonValue], effect.to_payload()))
+                    continue
+                raise GameLifecycleError("Enhancement effect application received unknown effect.")
         updated_armies.append(updated_army)
 
     if not event_payloads:

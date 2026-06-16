@@ -2363,6 +2363,31 @@ class GameState:
             if effect.applies_to_unit(requested_unit_id)
         )
 
+    def remove_persisting_effects_by_id(
+        self,
+        effect_ids: tuple[str, ...],
+    ) -> tuple[PersistingEffect, ...]:
+        requested_effect_ids = _validate_identifier_tuple(
+            "effect_ids",
+            effect_ids,
+            min_length=0,
+            sort_values=True,
+        )
+        if not requested_effect_ids:
+            return ()
+        by_id = {effect.effect_id: effect for effect in self.persisting_effects}
+        missing_ids = tuple(
+            effect_id for effect_id in requested_effect_ids if effect_id not in by_id
+        )
+        if missing_ids:
+            raise GameLifecycleError("Cannot remove unknown PersistingEffect IDs.")
+        removed = tuple(by_id[effect_id] for effect_id in requested_effect_ids)
+        removed_ids = {effect.effect_id for effect in removed}
+        self.persisting_effects = [
+            effect for effect in self.persisting_effects if effect.effect_id not in removed_ids
+        ]
+        return tuple(sorted(removed, key=lambda effect: effect.effect_id))
+
     def expire_persisting_effects_at_boundary(
         self,
         boundary: EffectExpirationBoundary,
