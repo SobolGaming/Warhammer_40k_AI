@@ -11,7 +11,13 @@ import warhammer40k_core.engine.phases.shooting as shooting_phase_module
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetWargearOption
-from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec, DiceRollState
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollResult,
+    DiceRollSpec,
+    DiceRollState,
+    DiceRollStatePayload,
+)
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.modifiers import ModifierStack, RollModifier
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -211,10 +217,7 @@ from warhammer40k_core.engine.shooting_types import (
     validate_shooting_type_tuple,
 )
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
-from warhammer40k_core.engine.stratagems import (
-    STRATAGEM_WINDOW_DECLINED_EVENT_TYPE,
-    stratagem_window_decline_event_payload,
-)
+from warhammer40k_core.engine.stratagems import STRATAGEM_WINDOW_DECLINED_EVENT_TYPE
 from warhammer40k_core.engine.transports import (
     TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
     DisembarkModeKind,
@@ -1045,6 +1048,72 @@ def test_phase18b_command_reroll_window_opens_after_shooting_hit_roll() -> None:
     )
 
 
+def test_phase18b_command_reroll_use_spends_cp_once_and_resumes_shooting_hit_roll() -> None:
+    lifecycle, attacker, remaining, allocated, status = (
+        _phase18b_shooting_hit_command_reroll_status()
+    )
+    state = _state(lifecycle)
+    request = _assert_command_reroll_request(
+        status,
+        actor_id="player-a",
+        phase_body_status="attack_hit_command_reroll_pending",
+        roll_type="attack_sequence.hit",
+        affected_unit_instance_id=attacker.unit_instance_id,
+    )
+    assert remaining is not None
+    option_id = _command_reroll_use_option_id(request)
+    trigger_payload = cast(
+        dict[str, object],
+        cast(dict[str, object], cast(dict[str, object], request.payload)["stratagem_context"])[
+            "trigger_payload"
+        ],
+    )
+    dice_roll_state_payload = cast(dict[str, object], trigger_payload["dice_roll_state"])
+    original_result_payload = cast(dict[str, object], dice_roll_state_payload["original_result"])
+    original_roll_id = cast(str, original_result_payload["roll_id"])
+    original_hit_spec_payload = cast(dict[str, object], original_result_payload["spec"])
+    assert len(_dice_rolled_payloads_for_spec(lifecycle, original_hit_spec_payload)) == 1
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=remaining.attack_pools,
+        attack_sequence=remaining,
+        allocated_model_ids_this_phase=allocated,
+    )
+
+    accepted = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            request=request,
+            selected_option_id=option_id,
+            result_id="phase18b-use-command-reroll-hit",
+        )
+    )
+
+    assert accepted.status_kind is not LifecycleStatusKind.INVALID
+    spend_payloads = _event_payloads(lifecycle, "command_points_spent")
+    assert len(spend_payloads) == 1
+    assert spend_payloads[0]["player_id"] == "player-a"
+    assert spend_payloads[0]["requested_amount"] == 1
+    assert spend_payloads[0]["applied_amount"] == 1
+    resolved_payloads = _event_payloads(lifecycle, "command_reroll_resolved")
+    assert len(resolved_payloads) == 1
+    updated_state = DiceRollState.from_payload(
+        cast(DiceRollStatePayload, resolved_payloads[0]["updated_roll_state"])
+    )
+    assert updated_state.original_result.roll_id == original_roll_id
+    assert len(updated_state.rerolls) == 1
+    assert len(_dice_rolled_payloads_for_spec(lifecycle, original_hit_spec_payload)) == 1
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    resolved_hit = cast(dict[str, object], hit_payload["payload"])
+    assert resolved_hit["unmodified_roll"] == updated_state.current_total
+    assert cast(dict[str, object], resolved_hit["roll_state"]) == updated_state.to_payload()
+
+
 def test_phase18b_command_reroll_rejects_stale_shooting_hit_opportunity() -> None:
     lifecycle, attacker, _remaining, _allocated, status = (
         _phase18b_shooting_hit_command_reroll_status()
@@ -1127,11 +1196,8 @@ def test_phase18b_command_reroll_decline_suppresses_same_shooting_hit_opportunit
         selected_option_id="decline_stratagem_window",
         result_id="phase18b-decline-command-reroll-hit",
     )
-    lifecycle.decision_controller.submit_result(decline)
-    lifecycle.decision_controller.event_log.append(
-        STRATAGEM_WINDOW_DECLINED_EVENT_TYPE,
-        stratagem_window_decline_event_payload(request=request, result=decline),
-    )
+    decline_status = lifecycle.submit_decision(decline)
+    assert decline_status.status_kind is not LifecycleStatusKind.INVALID
     assert remaining is not None
 
     _next_remaining, _next_allocated, repeat_status = resolve_attack_sequence_until_blocked(
@@ -1298,11 +1364,8 @@ def test_phase18b_command_reroll_decline_then_twin_linked_rerolls_wound_once() -
         selected_option_id="decline_stratagem_window",
         result_id="phase18b-decline-command-reroll-before-twin-linked",
     )
-    lifecycle.decision_controller.submit_result(decline)
-    lifecycle.decision_controller.event_log.append(
-        STRATAGEM_WINDOW_DECLINED_EVENT_TYPE,
-        stratagem_window_decline_event_payload(request=request, result=decline),
-    )
+    decline_status = lifecycle.submit_decision(decline)
+    assert decline_status.status_kind is not LifecycleStatusKind.INVALID
     assert remaining is not None
 
     completed, _allocated_after_resume, repeat_status = resolve_attack_sequence_until_blocked(
@@ -16777,6 +16840,17 @@ def _event_payloads(lifecycle: GameLifecycle, event_type: str) -> tuple[dict[str
         cast(dict[str, object], event.payload)
         for event in lifecycle.decision_controller.event_log.records
         if event.event_type == event_type
+    )
+
+
+def _dice_rolled_payloads_for_spec(
+    lifecycle: GameLifecycle,
+    spec_payload: dict[str, object],
+) -> tuple[dict[str, object], ...]:
+    return tuple(
+        payload
+        for payload in _event_payloads(lifecycle, "dice_rolled")
+        if cast(dict[str, object], payload["spec"]) == spec_payload
     )
 
 

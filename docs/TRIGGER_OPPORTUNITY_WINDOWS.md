@@ -37,6 +37,11 @@ envelope types:
 
 Opportunity windows do not mutate state by themselves. They produce request
 payloads and option payloads that later flow through `GameLifecycle.submit_decision(...)`.
+Lifecycle validation is keyed to the request payload's
+`submission_family: "opportunity_window"` envelope, not to a specific
+`decision_type`, so reaction, ability, Stratagem, reroll, and side-action hosts
+share the same stale-state, sequence, window, fingerprint, drift, wrong-player,
+and malformed-submission checks.
 
 ## Adapter Behavior
 

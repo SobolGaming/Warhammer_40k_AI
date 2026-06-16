@@ -95,6 +95,7 @@ from warhammer40k_core.engine.movement_proposals import (
     ProposalKind,
 )
 from warhammer40k_core.engine.opportunity_windows import (
+    OPPORTUNITY_REQUEST_FAMILY,
     opportunity_boundary_game_state_payload,
     opportunity_boundary_state_hash,
     opportunity_submission_invalid_reason,
@@ -536,6 +537,28 @@ class GameLifecycle:
         if (
             type(result) is DecisionResult
             and pending_request is not None
+            and _is_opportunity_window_request(pending_request)
+        ):
+            opportunity_invalid_reason = opportunity_submission_invalid_reason(
+                request=pending_request,
+                result=result,
+                current_state_hash=self._opportunity_boundary_state_hash(
+                    state=state,
+                    request=pending_request,
+                ),
+                current_sequence_number=self._opportunity_boundary_sequence_number(
+                    request=pending_request,
+                ),
+            )
+            if opportunity_invalid_reason is not None:
+                return LifecycleStatus.invalid(
+                    stage=state.stage,
+                    message="Opportunity-window submission is no longer valid.",
+                    payload={"invalid_reason": opportunity_invalid_reason},
+                )
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
             and is_stratagem_placement_proposal_request(pending_request)
         ):
             stratagem_placement_request = pending_request
@@ -915,23 +938,6 @@ class GameLifecycle:
             and pending_request is not None
             and pending_request.decision_type == STRATAGEM_DECISION_TYPE
         ):
-            opportunity_invalid_reason = opportunity_submission_invalid_reason(
-                request=pending_request,
-                result=result,
-                current_state_hash=self._opportunity_boundary_state_hash(
-                    state=state,
-                    request=pending_request,
-                ),
-                current_sequence_number=self._opportunity_boundary_sequence_number(
-                    request=pending_request,
-                ),
-            )
-            if opportunity_invalid_reason is not None:
-                return LifecycleStatus.invalid(
-                    stage=state.stage,
-                    message="Opportunity-window submission is no longer valid.",
-                    payload={"invalid_reason": opportunity_invalid_reason},
-                )
             result.validate_for_request(pending_request)
             if self._result_resolves_active_reaction_frame(result):
                 self.reaction_queue.validate_result(result)
@@ -1954,6 +1960,15 @@ def _is_fight_movement_proposal_request(request: DecisionRequest) -> bool:
         ProposalKind.PILE_IN,
         ProposalKind.CONSOLIDATE,
     }
+
+
+def _is_opportunity_window_request(request: DecisionRequest) -> bool:
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("Opportunity request routing requires a DecisionRequest.")
+    payload = request.payload
+    if not isinstance(payload, dict):
+        return False
+    return payload.get("submission_family") == OPPORTUNITY_REQUEST_FAMILY
 
 
 def _fight_attack_sequence_is_active_for_request(

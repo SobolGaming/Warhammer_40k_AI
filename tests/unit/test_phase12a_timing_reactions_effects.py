@@ -32,6 +32,11 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.opportunity_windows import (
+    OpportunityActionKind,
+    OpportunityLegalAction,
+    OpportunityWindow,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -191,6 +196,92 @@ def test_lifecycle_submit_decision_resolves_reaction_after_replay_restore() -> N
             "reaction_parent_resumed",
         )["resume_token"]
         == "resume-after-replay"
+    )
+
+
+def test_lifecycle_rejects_stale_reaction_opportunity_before_reaction_resolution() -> None:
+    lifecycle = _battle_lifecycle(unit_selection_ids=("intercessor-unit-1",))
+    state = lifecycle.state
+    assert state is not None
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    reaction_window = ReactionWindow(
+        timing_window=_timing_window(
+            state=state,
+            trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+            phase=BattlePhase.MOVEMENT,
+            window_id="phase18b-generic-opportunity-reaction-window",
+        ),
+        eligible_player_ids=("player-b",),
+    )
+    opportunity_window = OpportunityWindow(
+        window_id="phase18b-generic-opportunity-window",
+        timing_window=reaction_window.timing_window,
+        state_hash="phase18b-stale-reaction-opportunity-state",
+        sequence_number=99,
+        revision=1,
+        anchor_event_ids=("event-source-000001",),
+        acting_player_id="player-a",
+        eligible_player_ids=("player-b",),
+        priority_order=("player-b",),
+        legal_actions=(
+            OpportunityLegalAction(
+                action_id="pass",
+                source_id="core:pass",
+                action_kind=OpportunityActionKind.PASS,
+                controller_id=None,
+                label="Pass",
+            ),
+            OpportunityLegalAction(
+                action_id="use_reaction_ability",
+                source_id="phase18b:reaction-ability",
+                action_kind=OpportunityActionKind.ABILITY,
+                controller_id="player-b",
+                label="Use Reaction Ability",
+                target_ids=("army-alpha:intercessor-unit-1",),
+            ),
+        ),
+        default_action_id="pass",
+    )
+
+    triggered = lifecycle.reaction_queue.emit_decision_request(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        reaction_window=reaction_window,
+        parent_phase=BattlePhase.MOVEMENT,
+        parent_step="move_units",
+        resume_token="resume-after-generic-opportunity",
+        actor_id="player-b",
+        options=opportunity_window.decision_options_for_player("player-b"),
+        payload_factory=lambda request_id, decision_type, actor_id: (
+            opportunity_window.decision_request(
+                request_id=request_id,
+                actor_id=actor_id,
+                decision_type=decision_type,
+            ).payload
+        ),
+    )
+    waiting = lifecycle.advance_until_decision_or_terminal()
+    assert waiting.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = waiting.decision_request
+    assert request is not None
+    assert request == triggered.decision_request
+
+    invalid = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase18b-stale-generic-opportunity-reaction",
+            request=request,
+            selected_option_id="use_reaction_ability",
+        )
+    )
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    payload = cast(dict[str, object], invalid.payload)
+    assert payload["invalid_reason"] == "stale_opportunity_state_hash"
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert lifecycle.reaction_queue.frames
+    assert not any(
+        event.event_type == "reaction_window_resolved"
+        for event in lifecycle.decision_controller.event_log.records
     )
 
 
