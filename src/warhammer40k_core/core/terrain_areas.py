@@ -31,6 +31,11 @@ class SymmetryAxis(StrEnum):
     POINT_CENTER = "point_center"
 
 
+class TerrainAreaLocalTransform(StrEnum):
+    IDENTITY = "identity"
+    MIRROR_Y_AXIS = "mirror_y_axis"
+
+
 class TerrainAreaFootprintTemplatePayload(TypedDict):
     footprint_template_id: str
     name: str
@@ -48,6 +53,7 @@ class PlacedTerrainAreaPayload(TypedDict):
     center_x_inches: float
     center_y_inches: float
     rotation_degrees: float
+    local_transform: str
     footprint_polygon: list[TerrainDisplayPointPayload]
     source_layout_id: str
     source_id: str
@@ -157,6 +163,7 @@ class PlacedTerrainArea:
     center_x_inches: float
     center_y_inches: float
     rotation_degrees: float
+    local_transform: TerrainAreaLocalTransform
     footprint_polygon: tuple[TerrainDisplayPoint, ...]
     source_layout_id: str
     source_id: str
@@ -211,6 +218,11 @@ class PlacedTerrainArea:
         )
         object.__setattr__(
             self,
+            "local_transform",
+            terrain_area_local_transform_from_token(self.local_transform),
+        )
+        object.__setattr__(
+            self,
             "footprint_polygon",
             _validate_polygon("PlacedTerrainArea footprint_polygon", self.footprint_polygon),
         )
@@ -248,6 +260,7 @@ class PlacedTerrainArea:
         rotation_degrees: float,
         source_layout_id: str,
         source_id: str,
+        local_transform: TerrainAreaLocalTransform = TerrainAreaLocalTransform.IDENTITY,
         source_transform: str = "explicit",
         symmetry_axis: SymmetryAxis = SymmetryAxis.NONE,
     ) -> Self:
@@ -261,11 +274,13 @@ class PlacedTerrainArea:
             center_x_inches=center_x_inches,
             center_y_inches=center_y_inches,
             rotation_degrees=rotation_degrees,
+            local_transform=local_transform,
             footprint_polygon=transform_polygon(
                 template.polygon_vertices_inches,
                 center_x_inches=center_x_inches,
                 center_y_inches=center_y_inches,
                 rotation_degrees=rotation_degrees,
+                local_transform=local_transform,
             ),
             source_layout_id=source_layout_id,
             source_id=source_id,
@@ -294,6 +309,7 @@ class PlacedTerrainArea:
             "center_x_inches": self.center_x_inches,
             "center_y_inches": self.center_y_inches,
             "rotation_degrees": self.rotation_degrees,
+            "local_transform": self.local_transform.value,
             "footprint_polygon": [point.to_payload() for point in self.footprint_polygon],
             "source_layout_id": self.source_layout_id,
             "source_id": self.source_id,
@@ -317,6 +333,7 @@ class PlacedTerrainArea:
                 "center_x_inches",
                 "center_y_inches",
                 "rotation_degrees",
+                "local_transform",
                 "footprint_polygon",
                 "source_layout_id",
                 "source_id",
@@ -332,6 +349,7 @@ class PlacedTerrainArea:
             center_x_inches=raw_payload["center_x_inches"],
             center_y_inches=raw_payload["center_y_inches"],
             rotation_degrees=raw_payload["rotation_degrees"],
+            local_transform=terrain_area_local_transform_from_token(raw_payload["local_transform"]),
             footprint_polygon=tuple(
                 TerrainDisplayPoint.from_payload(point_payload)
                 for point_payload in raw_payload["footprint_polygon"]
@@ -363,6 +381,17 @@ def symmetry_axis_from_token(token: object) -> SymmetryAxis:
         return SymmetryAxis(token)
     except ValueError as exc:
         raise TerrainAreaError(f"Unsupported SymmetryAxis token: {token}.") from exc
+
+
+def terrain_area_local_transform_from_token(token: object) -> TerrainAreaLocalTransform:
+    if type(token) is TerrainAreaLocalTransform:
+        return token
+    if type(token) is not str:
+        raise TerrainAreaError("TerrainAreaLocalTransform token must be a string.")
+    try:
+        return TerrainAreaLocalTransform(token)
+    except ValueError as exc:
+        raise TerrainAreaError(f"Unsupported TerrainAreaLocalTransform token: {token}.") from exc
 
 
 def rotate_point(point: TerrainDisplayPoint, degrees: float) -> TerrainDisplayPoint:
@@ -397,18 +426,23 @@ def transform_polygon(
     center_x_inches: float,
     center_y_inches: float,
     rotation_degrees: float,
+    local_transform: TerrainAreaLocalTransform = TerrainAreaLocalTransform.IDENTITY,
 ) -> tuple[TerrainDisplayPoint, ...]:
     polygon = _validate_polygon("transform_polygon points", points)
     center_x = _validate_finite_number("center_x_inches", center_x_inches)
     center_y = _validate_finite_number("center_y_inches", center_y_inches)
     rotation = _validate_finite_number("rotation_degrees", rotation_degrees)
+    transformed_polygon = _apply_local_transform(
+        polygon,
+        terrain_area_local_transform_from_token(local_transform),
+    )
     return tuple(
         translate_point(
             rotate_point(point, rotation),
             dx_inches=center_x,
             dy_inches=center_y,
         )
-        for point in polygon
+        for point in transformed_polygon
     )
 
 
@@ -444,6 +478,7 @@ def mirror_placed_terrain_area(
         center_x_inches=center_x,
         center_y_inches=center_y,
         rotation_degrees=rotation,
+        local_transform=area.local_transform,
         footprint_polygon=tuple(
             _mirror_point(
                 point,
@@ -516,6 +551,29 @@ def _mirror_point(
             y_inches=battlefield_depth - point.y_inches,
         )
     raise TerrainAreaError("Unsupported mirror symmetry axis.")
+
+
+def _apply_local_transform(
+    points: tuple[TerrainDisplayPoint, ...],
+    local_transform: TerrainAreaLocalTransform,
+) -> tuple[TerrainDisplayPoint, ...]:
+    polygon = _validate_polygon("_apply_local_transform points", points)
+    transform = terrain_area_local_transform_from_token(local_transform)
+    if transform is TerrainAreaLocalTransform.IDENTITY:
+        return polygon
+    if transform is TerrainAreaLocalTransform.MIRROR_Y_AXIS:
+        anchor = polygon[0]
+        return _validate_polygon(
+            "_apply_local_transform mirrored polygon",
+            tuple(
+                TerrainDisplayPoint(
+                    x_inches=(2.0 * anchor.x_inches) - point.x_inches,
+                    y_inches=point.y_inches,
+                )
+                for point in polygon
+            ),
+        )
+    raise TerrainAreaError("Unsupported TerrainAreaLocalTransform.")
 
 
 def _generated_rotation(value: float) -> float:

@@ -2695,6 +2695,7 @@ def _validate_placed_terrain_areas_match_templates(
             center_x_inches=terrain_area.center_x_inches,
             center_y_inches=terrain_area.center_y_inches,
             rotation_degrees=terrain_area.rotation_degrees,
+            local_transform=terrain_area.local_transform,
         )
         if not _terrain_area_polygons_close(terrain_area.footprint_polygon, expected_polygon):
             raise MissionPackError(

@@ -26,8 +26,12 @@ from warhammer40k_core.core.missions import (
 from warhammer40k_core.core.terrain_areas import (
     PlacedTerrainArea,
     SymmetryAxis,
+    TerrainAreaClassification,
     TerrainAreaFootprintTemplate,
+    TerrainAreaLocalTransform,
     mirror_placed_terrain_area,
+    rotate_point,
+    terrain_area_local_transform_from_token,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayPoint
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -2107,19 +2111,23 @@ def terrain_area_footprint_templates() -> tuple[TerrainAreaFootprintTemplate, ..
         _footprint_template(
             template_id=event_layouts.FOOTPRINT_6X4,
             name='6" x 4" Terrain Area Footprint',
-            width=6.0,
-            depth=4.0,
+            width=6.5,
+            depth=4.5,
             vertices=(
-                (-3.0, -1.64),
-                (-1.68, -1.64),
-                (-1.45, -2.0),
-                (0.45, -2.0),
-                (0.88, -1.64),
-                (3.0, -1.64),
-                (3.0, 1.64),
-                (1.38, 1.64),
-                (1.0, 2.0),
-                (-3.0, 2.0),
+                (-3.25, 2.25),
+                (2.75, 2.25),
+                (2.75, 0.95),
+                (3.25, 0.25),
+                (2.85, -0.45),
+                (3.05, -0.75),
+                (2.75, -0.95),
+                (2.75, -1.75),
+                (0.05, -1.75),
+                (-0.05, -1.95),
+                (-0.45, -1.85),
+                (-1.25, -2.25),
+                (-2.05, -1.75),
+                (-3.25, -1.75),
             ),
             source_id=source_id,
         ),
@@ -2127,75 +2135,84 @@ def terrain_area_footprint_templates() -> tuple[TerrainAreaFootprintTemplate, ..
             template_id=event_layouts.FOOTPRINT_10X2_5,
             name='10" x 2.5" Terrain Area Footprint',
             width=10.0,
-            depth=2.5,
+            depth=3.6,
             vertices=(
-                (-5.0, -0.88),
-                (-1.15, -0.88),
-                (-0.82, -1.25),
-                (0.4, -1.25),
-                (0.76, -0.88),
-                (5.0, -0.88),
-                (5.0, 0.88),
-                (1.64, 0.88),
-                (1.34, 1.25),
-                (0.2, 1.25),
-                (-0.2, 0.88),
-                (-5.0, 0.88),
+                (-5.0, 1.2),
+                (-4.5, 1.2),
+                (-4.5, 1.3),
+                (-3.0, 1.8),
+                (-2.5, 1.2),
+                (2.4, 1.2),
+                (2.6, 1.45),
+                (3.3, 1.2),
+                (5.0, 1.2),
+                (5.0, -1.3),
+                (2.15, -1.3),
+                (1.85, -1.6),
+                (0.85, -1.8),
+                (0.5, -1.3),
+                (-5.0, -1.3),
             ),
             source_id=source_id,
         ),
         _footprint_template(
             template_id=event_layouts.FOOTPRINT_6X2,
             name='6" x 2" Terrain Area Footprint',
-            width=6.0,
-            depth=2.0,
+            width=6.1,
+            depth=2.7,
             vertices=(
-                (-3.0, -0.72),
-                (-0.74, -0.72),
-                (-0.46, -1.0),
-                (0.76, -1.0),
-                (1.04, -0.72),
-                (3.0, -0.72),
-                (3.0, 0.72),
-                (0.54, 0.72),
-                (0.24, 1.0),
-                (-0.86, 1.0),
-                (-1.12, 0.72),
-                (-3.0, 0.72),
+                (-3.05, 1.15),
+                (-2.05, 1.15),
+                (-2.05, 1.35),
+                (-1.05, 1.35),
+                (-1.05, 1.15),
+                (3.05, 1.15),
+                (3.05, -0.85),
+                (2.15, -0.85),
+                (1.3, -1.35),
+                (0.45, -0.85),
+                (-3.05, -0.85),
             ),
             source_id=source_id,
         ),
         _footprint_template(
             template_id=event_layouts.FOOTPRINT_7X11_5,
             name='7" x 11.5" Terrain Area Footprint',
-            width=7.0,
+            width=7.6,
             depth=11.5,
             vertices=(
-                (-3.5, -5.75),
-                (2.35, -5.75),
-                (2.88, -4.94),
-                (3.5, -4.2),
-                (3.5, 4.58),
-                (2.9, 4.95),
-                (2.46, 5.75),
-                (-3.5, 5.75),
+                (-3.8, 5.75),
+                (3.2, 5.75),
+                (3.2, 4.65),
+                (3.5, 4.05),
+                (3.45, 3.75),
+                (3.8, 2.75),
+                (3.2, 2.25),
+                (3.2, 1.45),
+                (3.3, 0.75),
+                (3.2, 0.05),
+                (3.7, -1.15),
+                (3.2, -2.25),
+                (3.2, -5.75),
+                (-3.8, -5.75),
             ),
             source_id=source_id,
         ),
         _footprint_template(
             template_id=event_layouts.FOOTPRINT_8X11_5_POLYGON,
             name='8" x 11.5" Polygon Terrain Area Footprint',
-            width=11.5,
+            width=12.0,
             depth=8.0,
             vertices=(
-                (-5.75, -4.0),
-                (3.7, -4.0),
-                (5.75, -2.55),
-                (5.75, 4.0),
-                (-1.05, 4.0),
-                (-2.55, 2.72),
-                (-4.1, 1.08),
-                (-5.75, -0.2),
+                (-5.5, 4.0),
+                (6.0, 4.0),
+                (6.0, 2.0),
+                (5.5, 2.0),
+                (-5.0, -4.0),
+                (-5.5, -4.0),
+                (-5.5, -1.8),
+                (-6.0, -0.6),
+                (-5.5, 0.0),
             ),
             source_id=source_id,
         ),
@@ -2886,6 +2903,7 @@ def _extracted_terrain_areas(
         source_layout_id=layout_source.source_layout_id,
         explicit_specs=layout_source.terrain_area_specs,
         mirrored_pairs=layout_source.terrain_area_mirror_pairs,
+        local_transform_specs=layout_source.terrain_area_local_transform_specs,
     )
 
 
@@ -2895,25 +2913,28 @@ def _placed_terrain_areas_from_specs(
     source_layout_id: str,
     explicit_specs: tuple[event_layouts.EventTerrainAreaSpec, ...],
     mirrored_pairs: tuple[event_layouts.EventTerrainAreaMirrorPair, ...],
+    local_transform_specs: tuple[event_layouts.EventTerrainAreaLocalTransformSpec, ...],
 ) -> tuple[PlacedTerrainArea, ...]:
     templates = {
         template.footprint_template_id: template for template in terrain_area_footprint_templates()
     }
+    local_transforms_by_area_id = _terrain_area_local_transforms_by_area_id(
+        explicit_specs=explicit_specs,
+        local_transform_specs=local_transform_specs,
+    )
     explicit_areas = tuple(
-        PlacedTerrainArea.from_template(
-            terrain_area_id=f"{layout_id}-{area_id}",
-            template=templates[template_id],
-            terrain_feature_kind=TERRAIN_AREA_FEATURE_KIND,
-            classification=classification,
-            center_x_inches=center_x,
-            center_y_inches=center_y,
-            rotation_degrees=rotation,
+        _placed_terrain_area_from_anchor_spec(
+            layout_id=layout_id,
             source_layout_id=source_layout_id,
-            source_id=(
-                f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:terrain-area:{area_id}"
-            ),
+            area_id=area_id,
+            template=templates[template_id],
+            classification=classification,
+            anchor_x_inches=anchor_x,
+            anchor_y_inches=anchor_y,
+            rotation_degrees=rotation,
+            local_transform=local_transforms_by_area_id[area_id],
         )
-        for area_id, template_id, classification, center_x, center_y, rotation in explicit_specs
+        for area_id, template_id, classification, anchor_x, anchor_y, rotation in explicit_specs
     )
     explicit_by_suffix = {
         area.terrain_area_id.removeprefix(f"{layout_id}-"): area for area in explicit_areas
@@ -2933,6 +2954,72 @@ def _placed_terrain_areas_from_specs(
         for source_suffix, target_suffix in mirrored_pairs
     )
     return tuple(sorted((*explicit_areas, *mirrored), key=lambda area: area.terrain_area_id))
+
+
+def _terrain_area_local_transforms_by_area_id(
+    *,
+    explicit_specs: tuple[event_layouts.EventTerrainAreaSpec, ...],
+    local_transform_specs: tuple[event_layouts.EventTerrainAreaLocalTransformSpec, ...],
+) -> dict[str, TerrainAreaLocalTransform]:
+    explicit_area_ids = tuple(area_id for area_id, *_ in explicit_specs)
+    local_transforms: dict[str, TerrainAreaLocalTransform] = {}
+    for area_id in explicit_area_ids:
+        local_transforms[area_id] = TerrainAreaLocalTransform.IDENTITY
+    for area_id, local_transform_token in local_transform_specs:
+        if area_id not in local_transforms:
+            raise MissionPackError("Terrain area local transform references unknown area ID.")
+        if local_transforms[area_id] is not TerrainAreaLocalTransform.IDENTITY:
+            raise MissionPackError("Terrain area local transform must not duplicate area IDs.")
+        local_transform = terrain_area_local_transform_from_token(local_transform_token)
+        local_transforms[area_id] = local_transform
+    return local_transforms
+
+
+def _placed_terrain_area_from_anchor_spec(
+    *,
+    layout_id: str,
+    source_layout_id: str,
+    area_id: str,
+    template: TerrainAreaFootprintTemplate,
+    classification: TerrainAreaClassification,
+    anchor_x_inches: float,
+    anchor_y_inches: float,
+    rotation_degrees: float,
+    local_transform: TerrainAreaLocalTransform,
+) -> PlacedTerrainArea:
+    center_x, center_y = _terrain_area_center_from_anchor(
+        template,
+        anchor_x_inches=anchor_x_inches,
+        anchor_y_inches=anchor_y_inches,
+        rotation_degrees=rotation_degrees,
+    )
+    return PlacedTerrainArea.from_template(
+        terrain_area_id=f"{layout_id}-{area_id}",
+        template=template,
+        terrain_feature_kind=TERRAIN_AREA_FEATURE_KIND,
+        classification=classification,
+        center_x_inches=center_x,
+        center_y_inches=center_y,
+        rotation_degrees=rotation_degrees,
+        local_transform=local_transform,
+        source_layout_id=source_layout_id,
+        source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:terrain-area:{area_id}",
+    )
+
+
+def _terrain_area_center_from_anchor(
+    template: TerrainAreaFootprintTemplate,
+    *,
+    anchor_x_inches: float,
+    anchor_y_inches: float,
+    rotation_degrees: float,
+) -> tuple[float, float]:
+    anchor_local_point = template.polygon_vertices_inches[0]
+    rotated_anchor_point = rotate_point(anchor_local_point, rotation_degrees)
+    return (
+        anchor_x_inches - rotated_anchor_point.x_inches,
+        anchor_y_inches - rotated_anchor_point.y_inches,
+    )
 
 
 def _footprint_template(

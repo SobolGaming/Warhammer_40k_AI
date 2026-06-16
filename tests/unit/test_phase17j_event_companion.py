@@ -25,6 +25,8 @@ from warhammer40k_core.core.missions import (
     ObjectiveMarkerRole,
     objective_marker_role_from_token,
 )
+from warhammer40k_core.core.terrain_areas import TerrainAreaLocalTransform
+from warhammer40k_core.core.terrain_display import TerrainDisplayPoint
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.missions import (
     deterministic_tactical_secondary_draw,
@@ -45,6 +47,9 @@ from warhammer40k_core.rules.mission_pack_import import (
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_2026_06 as event_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    event_companion_layouts_2026_06 as event_layouts,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_patches,
@@ -228,6 +233,181 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
         )
         assert len(setup.objective_markers) == expected_objective_count
         assert len(setup.deployment_zones) == 2
+
+
+def test_phase17j_terrain_area_footprint_templates_match_source_polygons() -> None:
+    templates = {
+        template.footprint_template_id: template
+        for template in event_source.terrain_area_footprint_templates()
+    }
+    expected_templates = {
+        "FOOTPRINT_6X2": (
+            6.1,
+            2.7,
+            (
+                (-3.05, 1.15),
+                (-2.05, 1.15),
+                (-2.05, 1.35),
+                (-1.05, 1.35),
+                (-1.05, 1.15),
+                (3.05, 1.15),
+                (3.05, -0.85),
+                (2.15, -0.85),
+                (1.3, -1.35),
+                (0.45, -0.85),
+                (-3.05, -0.85),
+            ),
+        ),
+        "FOOTPRINT_6X4": (
+            6.5,
+            4.5,
+            (
+                (-3.25, 2.25),
+                (2.75, 2.25),
+                (2.75, 0.95),
+                (3.25, 0.25),
+                (2.85, -0.45),
+                (3.05, -0.75),
+                (2.75, -0.95),
+                (2.75, -1.75),
+                (0.05, -1.75),
+                (-0.05, -1.95),
+                (-0.45, -1.85),
+                (-1.25, -2.25),
+                (-2.05, -1.75),
+                (-3.25, -1.75),
+            ),
+        ),
+        "FOOTPRINT_10X2_5": (
+            10.0,
+            3.6,
+            (
+                (-5.0, 1.2),
+                (-4.5, 1.2),
+                (-4.5, 1.3),
+                (-3.0, 1.8),
+                (-2.5, 1.2),
+                (2.4, 1.2),
+                (2.6, 1.45),
+                (3.3, 1.2),
+                (5.0, 1.2),
+                (5.0, -1.3),
+                (2.15, -1.3),
+                (1.85, -1.6),
+                (0.85, -1.8),
+                (0.5, -1.3),
+                (-5.0, -1.3),
+            ),
+        ),
+        "FOOTPRINT_7X11_5": (
+            7.6,
+            11.5,
+            (
+                (-3.8, 5.75),
+                (3.2, 5.75),
+                (3.2, 4.65),
+                (3.5, 4.05),
+                (3.45, 3.75),
+                (3.8, 2.75),
+                (3.2, 2.25),
+                (3.2, 1.45),
+                (3.3, 0.75),
+                (3.2, 0.05),
+                (3.7, -1.15),
+                (3.2, -2.25),
+                (3.2, -5.75),
+                (-3.8, -5.75),
+            ),
+        ),
+        "FOOTPRINT_8X11_5_POLYGON": (
+            12.0,
+            8.0,
+            (
+                (-5.5, 4.0),
+                (6.0, 4.0),
+                (6.0, 2.0),
+                (5.5, 2.0),
+                (-5.0, -4.0),
+                (-5.5, -4.0),
+                (-5.5, -1.8),
+                (-6.0, -0.6),
+                (-5.5, 0.0),
+            ),
+        ),
+    }
+
+    assert set(templates) == set(expected_templates)
+    for template_id, (width, depth, expected_vertices) in expected_templates.items():
+        template = templates[template_id]
+        assert template.bounding_width_inches == width
+        assert template.bounding_depth_inches == depth
+        assert _terrain_display_points(template.polygon_vertices_inches) == expected_vertices
+
+
+def test_phase17j_take_and_hold_layout_a_terrain_area_specs_are_corner_anchored() -> None:
+    source = cast(
+        event_layouts.EventBattlefieldLayoutSource,
+        _source_extracted_layout_source("take-and-hold-vs-take-and-hold-layout-1"),
+    )
+    expected_anchors = {
+        "dense-7x11-5-upper-right": ("FOOTPRINT_7X11_5", "dense", 40.0, 35.5, 180.0),
+        "dense-7x11-5-upper-left": ("FOOTPRINT_7X11_5", "dense", 14.0, 54.0, 0.0),
+        "light-10x2-5-upper-left": ("FOOTPRINT_10X2_5", "light", 12.0, 43.5, 180.0),
+        "light-6x2-upper-center": ("FOOTPRINT_6X2", "light", 27.0, 42.5, 0.0),
+        "light-6x2-east-midfield": ("FOOTPRINT_6X2", "light", 40.0, 28.0, 180.0),
+        "light-6x4-lower-left": ("FOOTPRINT_6X4", "light", 11.0, 13.0, 0.0),
+        "light-6x4-east-midfield": ("FOOTPRINT_6X4", "light", 36.0, 28.0, -90.0),
+        "dense-8x11-5-polygon-central-north": (
+            "FOOTPRINT_8X11_5_POLYGON",
+            "dense",
+            16.25,
+            35.0,
+            0.0,
+        ),
+    }
+    source_anchors = {
+        area_id: (template_id, classification.value, anchor_x, anchor_y, rotation)
+        for area_id, template_id, classification, anchor_x, anchor_y, rotation in (
+            source.terrain_area_specs
+        )
+    }
+    layout = warhammer_event_companion_2026_06_mission_pack().battlefield_layout(
+        "take-and-hold-vs-take-and-hold-layout-1"
+    )
+    placed_areas = {
+        area.terrain_area_id.removeprefix("take-and-hold-vs-take-and-hold-layout-1-"): area
+        for area in layout.terrain_areas
+        if area.source_transform == "explicit"
+    }
+
+    assert source_anchors == expected_anchors
+    assert source.terrain_area_local_transform_specs == (
+        ("light-6x2-upper-center", TerrainAreaLocalTransform.MIRROR_Y_AXIS),
+    )
+    assert set(placed_areas) == set(expected_anchors)
+    for area_id, (_, _, anchor_x, anchor_y, _) in expected_anchors.items():
+        first_point = placed_areas[area_id].footprint_polygon[0]
+        assert _rounded_terrain_display_point(first_point) == (anchor_x, anchor_y)
+    assert placed_areas["light-6x2-upper-center"].local_transform.value == "mirror_y_axis"
+
+
+def test_phase17j_extracted_terrain_area_specs_anchor_first_vertices() -> None:
+    mission_pack = warhammer_event_companion_2026_06_mission_pack()
+    for source in event_layouts.EXTRACTED_LAYOUTS:
+        layout = mission_pack.battlefield_layout(source.layout_id)
+        placed_areas = {
+            area.terrain_area_id.removeprefix(f"{source.layout_id}-"): area
+            for area in layout.terrain_areas
+            if area.source_transform == "explicit"
+        }
+
+        assert len(placed_areas) == len(source.terrain_area_specs)
+        for area_id, _, _, anchor_x, anchor_y, _ in source.terrain_area_specs:
+            first_point = placed_areas[area_id].footprint_polygon[0]
+            assert _rounded_terrain_display_point(first_point) == (
+                round(anchor_x, 6),
+                round(anchor_y, 6),
+            )
 
 
 def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_order() -> None:
@@ -2055,6 +2235,16 @@ def _shape_polygons(shape: DeploymentZoneShape) -> tuple[tuple[tuple[float, floa
     return tuple(
         tuple((point.x, point.y) for point in polygon.vertices) for polygon in shape.polygons
     )
+
+
+def _terrain_display_points(
+    points: tuple[TerrainDisplayPoint, ...],
+) -> tuple[tuple[float, float], ...]:
+    return tuple((point.x_inches, point.y_inches) for point in points)
+
+
+def _rounded_terrain_display_point(point: TerrainDisplayPoint) -> tuple[float, float]:
+    return (round(point.x_inches, 6), round(point.y_inches, 6))
 
 
 def _deployment_zones_for_players(

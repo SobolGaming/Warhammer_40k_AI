@@ -121,6 +121,7 @@ def _terrain_area_payloads(
             "center_x_inches": area.center_x_inches,
             "center_y_inches": area.center_y_inches,
             "rotation_degrees": area.rotation_degrees,
+            "local_transform": area.local_transform.value,
             "polygon": [
                 {"x": point.x_inches, "y": point.y_inches} for point in area.footprint_polygon
             ],

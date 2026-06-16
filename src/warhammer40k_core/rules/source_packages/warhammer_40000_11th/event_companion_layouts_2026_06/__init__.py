@@ -9,6 +9,7 @@ from .common import (
     EventBattlefieldLayoutSource,
     EventObjectiveRoleCountSpec,
     EventObjectiveSpec,
+    EventTerrainAreaLocalTransformSpec,
     EventTerrainAreaMirrorPair,
     EventTerrainAreaSpec,
 )
@@ -31,6 +32,7 @@ __all__ = (
     "EventBattlefieldLayoutSource",
     "EventObjectiveRoleCountSpec",
     "EventObjectiveSpec",
+    "EventTerrainAreaLocalTransformSpec",
     "EventTerrainAreaMirrorPair",
     "EventTerrainAreaSpec",
 )

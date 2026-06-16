@@ -3,7 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
-from warhammer40k_core.core.terrain_areas import TerrainAreaClassification
+from warhammer40k_core.core.terrain_areas import (
+    TerrainAreaClassification,
+    TerrainAreaLocalTransform,
+)
 
 FOOTPRINT_6X4 = "FOOTPRINT_6X4"
 FOOTPRINT_10X2_5 = "FOOTPRINT_10X2_5"
@@ -13,6 +16,7 @@ FOOTPRINT_8X11_5_POLYGON = "FOOTPRINT_8X11_5_POLYGON"
 
 type EventObjectiveSpec = tuple[str, str, str, float, float]
 type EventObjectiveRoleCountSpec = tuple[ObjectiveMarkerRole, int]
+# Terrain area specs store battlefield anchor x/y for the footprint template's first vertex.
 type EventTerrainAreaSpec = tuple[
     str,
     str,
@@ -22,6 +26,7 @@ type EventTerrainAreaSpec = tuple[
     float,
 ]
 type EventTerrainAreaMirrorPair = tuple[str, str]
+type EventTerrainAreaLocalTransformSpec = tuple[str, TerrainAreaLocalTransform]
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,3 +38,4 @@ class EventBattlefieldLayoutSource:
     objective_role_counts: tuple[EventObjectiveRoleCountSpec, ...]
     terrain_area_specs: tuple[EventTerrainAreaSpec, ...]
     terrain_area_mirror_pairs: tuple[EventTerrainAreaMirrorPair, ...]
+    terrain_area_local_transform_specs: tuple[EventTerrainAreaLocalTransformSpec, ...] = ()
