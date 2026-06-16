@@ -86,6 +86,12 @@ invalid diagnostics and leaves the pending request unresolved. The host records
 the original dice state, opens the optional Stratagem window, and then resumes
 from the event-log state after decline or accepted reroll.
 
+For wound rolls with native weapon rerolls such as Twin-linked, the attack
+sequence opens Command Re-roll at the failed wound timing first. If the player
+declines Command Re-roll, the native reroll permission resolves next and the
+same original wound roll does not immediately reopen a duplicate Command
+Re-roll prompt.
+
 Adapters must not apply a reroll locally or infer eligibility from displayed
 roll text. They submit the engine-emitted `use_stratagem` option or the decline
 option, and any nested `select_dice_reroll` option when a multi-die eligible roll

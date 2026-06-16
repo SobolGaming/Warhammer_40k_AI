@@ -7082,12 +7082,20 @@ def _random_characteristic_roll_spec(
     )
 
 
-def _append_event_once(
+def _append_replay_resume_unique_event_once(
     *,
     decisions: DecisionController,
     event_type: str,
     payload: JsonValue,
 ) -> EventRecord:
+    """Append one logical replay event whose payload carries a stable unique identity.
+
+    This is only for attack-sequence resume paths where rerunning a resolver can
+    revisit an already-emitted event with the same roll, attack context, or
+    characteristic scope. Do not use it for events whose payloads can be
+    legitimately identical across separate game happenings.
+    """
+
     event_payload = validate_json_value(payload)
     for event in decisions.event_log.records:
         if event.event_type == event_type and event.payload == event_payload:
@@ -7438,7 +7446,7 @@ def _emit_event(
     event: AttackSequenceEvent,
 ) -> EventRecord:
     emitted = hooks.emit(event)
-    return _append_event_once(
+    return _append_replay_resume_unique_event_once(
         decisions=decisions,
         event_type="attack_sequence_step",
         payload=validate_json_value(emitted.to_payload()),
@@ -8022,7 +8030,7 @@ def _damage_value(
         roll_state=roll_state,
         value=roll_state.current_total,
     )
-    _append_event_once(
+    _append_replay_resume_unique_event_once(
         decisions=decisions,
         event_type="random_characteristic_rolled",
         payload=validate_json_value(random_roll.to_payload()),

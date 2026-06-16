@@ -1218,6 +1218,119 @@ def test_phase18b_command_reroll_window_opens_after_shooting_wound_roll() -> Non
     )
 
 
+def test_phase18b_command_reroll_decline_then_twin_linked_rerolls_wound_once() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    _grant_command_reroll_cp(state, player_id="player-a")
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase18b-command-reroll-twin-linked",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -6),
+        keywords=(WeaponKeyword.TORRENT, WeaponKeyword.TWIN_LINKED),
+    )
+    sequence_id = "phase18b-command-reroll-twin-linked"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    reroll_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Reroll selected dice for {wound_spec.reason}",
+        roll_type="attack_sequence.wound.reroll",
+        actor_id="player-a",
+    )
+    dice_manager = DiceRollManager(
+        sequence_id,
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=(
+            _fixed_roll_result(
+                roll_id="phase18b-command-reroll-twin-linked-wound",
+                spec=wound_spec,
+                value=1,
+            ),
+            _fixed_roll_result(
+                roll_id="phase18b-command-reroll-twin-linked-reroll",
+                spec=reroll_spec,
+                value=6,
+            ),
+        ),
+    )
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            _attack_pool_for_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    remaining, allocated, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+        stratagem_index=eleventh_edition_stratagem_index(),
+    )
+    request = _assert_command_reroll_request(
+        status,
+        actor_id="player-a",
+        phase_body_status="attack_wound_command_reroll_pending",
+        roll_type="attack_sequence.wound",
+        affected_unit_instance_id=attacker.unit_instance_id,
+    )
+    decline = DecisionResult.for_request(
+        request=request,
+        selected_option_id="decline_stratagem_window",
+        result_id="phase18b-decline-command-reroll-before-twin-linked",
+    )
+    lifecycle.decision_controller.submit_result(decline)
+    lifecycle.decision_controller.event_log.append(
+        STRATAGEM_WINDOW_DECLINED_EVENT_TYPE,
+        stratagem_window_decline_event_payload(request=request, result=decline),
+    )
+    assert remaining is not None
+
+    completed, _allocated_after_resume, repeat_status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=remaining,
+        already_allocated_model_ids=allocated,
+        dice_manager=dice_manager,
+        stratagem_index=eleventh_edition_stratagem_index(),
+    )
+
+    assert completed is None
+    assert repeat_status is None
+    reroll_payload = _last_event_payload(lifecycle, "weapon_ability_reroll_resolved")
+    assert cast(dict[str, object], reroll_payload["wound_roll"])["unmodified_roll"] == 6
+    assert len(_event_payloads(lifecycle, "weapon_ability_reroll_resolved")) == 1
+    assert len(_event_payloads(lifecycle, STRATAGEM_WINDOW_DECLINED_EVENT_TYPE)) == 1
+    command_reroll_requests = [
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "decision_requested"
+        and isinstance(event.payload, dict)
+        and event.payload.get("decision_type") == "use_stratagem"
+    ]
+    assert len(command_reroll_requests) == 1
+
+
 def test_phase18b_command_reroll_window_opens_after_shooting_save_roll() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)

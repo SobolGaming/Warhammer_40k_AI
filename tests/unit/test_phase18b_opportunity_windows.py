@@ -6,7 +6,10 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.opportunity_windows import (
+    OPPORTUNITY_SUBMISSION_PAYLOAD_KEY,
     IntentMaterializationStatus,
     InterfaceIntent,
     OpportunityActionKind,
@@ -15,6 +18,7 @@ from warhammer40k_core.engine.opportunity_windows import (
     OpportunityWindowError,
     TriggerBatchingMode,
     WindowPassLedger,
+    opportunity_submission_invalid_reason,
 )
 from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.engine.reaction_queue import REACTION_DECISION_TYPE
@@ -145,6 +149,45 @@ def test_interface_intent_materializes_as_normal_decision_result_only_for_curren
     assert rejected.result is None
 
 
+def test_interface_intent_rejects_stale_window_object_with_same_window_id() -> None:
+    stale_window = _opportunity_window(legal_actions=(_pass_action(), _smoke_action()))
+    current_window = replace(
+        stale_window,
+        legal_actions=(
+            _pass_action(),
+            OpportunityLegalAction(
+                action_id="use_smoke",
+                source_id="core:smoke",
+                action_kind=OpportunityActionKind.STRATAGEM,
+                controller_id="player-b",
+                label="Use Smoke Elsewhere",
+                cost=({"resource": "cp", "amount": 1},),
+                target_ids=("unit-99",),
+                target_spec={"unit_instance_id": "unit-99"},
+                batching_mode=TriggerBatchingMode.WHOLE_GROUP,
+                payload={"stratagem_id": "smoke", "target_unit_instance_id": "unit-99"},
+            ),
+        ),
+    )
+    request = current_window.decision_request(
+        request_id="phase18b-current-window-request",
+        actor_id="player-b",
+        decision_type=REACTION_DECISION_TYPE,
+    )
+
+    rejected = _intent().materialize(
+        window=stale_window,
+        request=request,
+        current_sequence_number=12,
+        result_id="phase18b-stale-window-intent",
+    )
+
+    assert rejected.status is IntentMaterializationStatus.REQUEST_MISMATCH
+    assert rejected.result is None
+    diagnostic = cast(dict[str, object], rejected.diagnostic)
+    assert diagnostic["reason"] == "window_payload_mismatch"
+
+
 def test_interface_intent_rejects_stale_expired_wrong_timing_and_target_drift() -> None:
     window = _opportunity_window(legal_actions=(_pass_action(), _smoke_action()))
     request = window.decision_request(
@@ -197,6 +240,152 @@ def test_interface_intent_rejects_stale_expired_wrong_timing_and_target_drift() 
     assert target_drift.to_payload()["result"] is None
 
 
+def test_opportunity_submission_validator_rejects_supported_negative_paths() -> None:
+    window = _opportunity_window(legal_actions=(_pass_action(), _smoke_action()))
+    request = window.decision_request(
+        request_id="phase18b-validator-request",
+        actor_id="player-b",
+        decision_type=REACTION_DECISION_TYPE,
+    )
+    result = DecisionResult.for_request(
+        request=request,
+        selected_option_id="use_smoke",
+        result_id="phase18b-validator-result",
+    )
+
+    assert (
+        _opportunity_invalid_reason(
+            request=request,
+            result=result,
+            current_state_hash=window.state_hash,
+            current_sequence_number=window.sequence_number,
+        )
+        is None
+    )
+    assert (
+        _opportunity_invalid_reason(
+            request=request,
+            result=result,
+            current_state_hash=window.state_hash,
+            current_sequence_number=window.sequence_number + 1,
+        )
+        == "stale_opportunity_sequence"
+    )
+    assert (
+        _opportunity_invalid_reason(
+            request=request,
+            result=replace(result, payload=None),
+            current_state_hash=window.state_hash,
+            current_sequence_number=window.sequence_number,
+        )
+        == "malformed_opportunity_submission"
+    )
+    assert (
+        _opportunity_invalid_reason(
+            request=request,
+            result=replace(result, selected_option_id="pass"),
+            current_state_hash=window.state_hash,
+            current_sequence_number=window.sequence_number,
+        )
+        == "opportunity_action_mismatch"
+    )
+    assert (
+        _opportunity_invalid_reason(
+            request=request,
+            result=_result_with_submission(
+                result,
+                _submission_with_action_drift(result, label="Changed Smoke"),
+            ),
+            current_state_hash=window.state_hash,
+            current_sequence_number=window.sequence_number,
+        )
+        == "opportunity_action_drift"
+    )
+    assert (
+        _opportunity_invalid_reason(
+            request=request,
+            result=_result_with_submission(
+                result,
+                window.submission_payload_for_action(
+                    action=OpportunityLegalAction(
+                        action_id="missing_action",
+                        source_id="core:smoke",
+                        action_kind=OpportunityActionKind.STRATAGEM,
+                        controller_id="player-b",
+                        label="Missing Action",
+                    ),
+                    player_id="player-b",
+                    legal_action_fingerprint=window.legal_action_fingerprint("player-b"),
+                ),
+                selected_option_id="missing_action",
+            ),
+            current_state_hash=window.state_hash,
+            current_sequence_number=window.sequence_number,
+        )
+        == "opportunity_action_unavailable"
+    )
+    assert (
+        _opportunity_invalid_reason(
+            request=_request_with_payload(
+                request,
+                {
+                    **cast(dict[str, object], request.payload),
+                    "legal_action_fingerprint": "phase18b-fingerprint-drift",
+                },
+            ),
+            result=result,
+            current_state_hash=window.state_hash,
+            current_sequence_number=window.sequence_number,
+        )
+        == "opportunity_fingerprint_mismatch"
+    )
+
+
+def test_opportunity_submission_validator_rejects_wrong_player_action() -> None:
+    window = _opportunity_window(
+        legal_actions=(
+            _pass_action(),
+            OpportunityLegalAction(
+                action_id="player_a_smoke",
+                source_id="core:smoke",
+                action_kind=OpportunityActionKind.STRATAGEM,
+                controller_id="player-a",
+                label="Player A Smoke",
+                target_ids=("unit-17",),
+            ),
+        ),
+        eligible_player_ids=("player-a", "player-b"),
+        priority_order=("player-a", "player-b"),
+    )
+    request = window.decision_request(
+        request_id="phase18b-wrong-player-request",
+        actor_id="player-b",
+        decision_type=REACTION_DECISION_TYPE,
+    )
+    result = DecisionResult(
+        request_id=request.request_id,
+        result_id="phase18b-wrong-player-result",
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id="player_a_smoke",
+        payload=window.submission_payload_for_action(
+            action=window.action_by_id("player_a_smoke"),
+            player_id="player-a",
+            legal_action_fingerprint=window.legal_action_fingerprint("player-b"),
+        ),
+    )
+
+    assert (
+        _opportunity_invalid_reason(
+            request=request,
+            result=result,
+            current_state_hash=window.state_hash,
+            current_sequence_number=window.sequence_number,
+        )
+        == "opportunity_action_wrong_player"
+    )
+
+
 def test_opportunity_window_fail_fast_validation() -> None:
     with pytest.raises(OpportunityWindowError, match="priority_order must cover"):
         _opportunity_window(
@@ -224,6 +413,53 @@ def test_opportunity_window_fail_fast_validation() -> None:
 
     with pytest.raises(OpportunityWindowError, match="expiration must not precede creation"):
         replace(_intent(), expires_after_sequence=10)
+
+
+def _opportunity_invalid_reason(
+    *,
+    request: DecisionRequest,
+    result: DecisionResult,
+    current_state_hash: str,
+    current_sequence_number: int,
+) -> str | None:
+    return opportunity_submission_invalid_reason(
+        request=request,
+        result=result,
+        current_state_hash=current_state_hash,
+        current_sequence_number=current_sequence_number,
+    )
+
+
+def _result_with_submission(
+    result: DecisionResult,
+    submission: object,
+    *,
+    selected_option_id: str | None = None,
+) -> DecisionResult:
+    payload = {OPPORTUNITY_SUBMISSION_PAYLOAD_KEY: submission}
+    return replace(
+        result,
+        selected_option_id=result.selected_option_id
+        if selected_option_id is None
+        else selected_option_id,
+        payload=cast(JsonValue, payload),
+    )
+
+
+def _submission_with_action_drift(result: DecisionResult, *, label: str) -> dict[str, object]:
+    payload = cast(dict[str, object], result.payload)
+    if OPPORTUNITY_SUBMISSION_PAYLOAD_KEY in payload:
+        submission = dict(cast(dict[str, object], payload[OPPORTUNITY_SUBMISSION_PAYLOAD_KEY]))
+    else:
+        submission = dict(payload)
+    action = dict(cast(dict[str, object], submission["action"]))
+    action["label"] = label
+    submission["action"] = action
+    return submission
+
+
+def _request_with_payload(request: DecisionRequest, payload: object) -> DecisionRequest:
+    return replace(request, payload=cast(JsonValue, payload))
 
 
 def _intent() -> InterfaceIntent:

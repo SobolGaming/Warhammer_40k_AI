@@ -662,11 +662,25 @@ class InterfaceIntent:
             "current_sequence_number",
             current_sequence_number,
         )
-        if not _request_matches_window(request=request, window=window):
+        if type(window) is not OpportunityWindow:
+            raise OpportunityWindowError("Intent materialization requires an OpportunityWindow.")
+        request_window = _request_window(request=request)
+        if request_window is None:
             return IntentMaterialization.rejected(
                 IntentMaterializationStatus.REQUEST_MISMATCH,
                 diagnostic={"request_id": request.request_id, "window_id": window.window_id},
             )
+        if window.to_payload() != request_window.to_payload():
+            return IntentMaterialization.rejected(
+                IntentMaterializationStatus.REQUEST_MISMATCH,
+                diagnostic={
+                    "intent_id": self.intent_id,
+                    "reason": "window_payload_mismatch",
+                    "request_id": request.request_id,
+                    "window_id": window.window_id,
+                },
+            )
+        window = request_window
         if sequence_number > self.expires_after_sequence:
             return IntentMaterialization.rejected(
                 IntentMaterializationStatus.EXPIRED,
@@ -940,6 +954,11 @@ def opportunity_submission_invalid_reason(
     if not isinstance(result_payload, dict):
         return "malformed_opportunity_submission"
     submission_payload = result_payload.get(OPPORTUNITY_SUBMISSION_PAYLOAD_KEY)
+    if (
+        submission_payload is None
+        and result_payload.get("submission_kind") == OPPORTUNITY_ACTION_SUBMISSION_KIND
+    ):
+        submission_payload = result_payload
     if not isinstance(submission_payload, dict):
         return "malformed_opportunity_submission"
     return _opportunity_submission_payload_invalid_reason(
@@ -1028,19 +1047,25 @@ def intent_materialization_status_from_token(token: object) -> IntentMaterializa
         ) from exc
 
 
-def _request_matches_window(*, request: DecisionRequest, window: OpportunityWindow) -> bool:
+def _request_window(*, request: DecisionRequest) -> OpportunityWindow | None:
     if type(request) is not DecisionRequest:
         raise OpportunityWindowError("Intent materialization requires a DecisionRequest.")
     payload = request.payload
     if not isinstance(payload, dict):
-        return False
+        return None
     opportunity_window_id = payload.get("opportunity_window_id")
-    if opportunity_window_id != window.window_id:
-        return False
     opportunity_window_payload = payload.get("opportunity_window")
     if not isinstance(opportunity_window_payload, dict):
-        return False
-    return opportunity_window_payload.get("window_id") == window.window_id
+        return None
+    try:
+        window = OpportunityWindow.from_payload(
+            cast(OpportunityWindowPayload, opportunity_window_payload)
+        )
+    except (KeyError, OpportunityWindowError):  # fmt: skip
+        return None
+    if opportunity_window_id != window.window_id:
+        return None
+    return window
 
 
 def _action_by_id(
