@@ -405,6 +405,22 @@ engine-owned temporary movement keyword effects, such as `MOBILE`, that are
 consumed by later movement proposal validation. Adapters must not add movement
 keywords, adjust terrain traversal, spend CP, or mutate movement state directly.
 
+Phase 17G also adds Shooting post-resolution Stratagem windows to the finite
+`use_stratagem` contract. After a friendly shooting attack sequence completes,
+the Shooting engine may emit an optional active-player request with trigger kind
+`just_after_friendly_unit_has_shot`. The trigger payload includes
+`shot_unit_instance_id`, `hit_target_unit_instance_ids`,
+`destroyed_target_unit_instance_ids`, `attack_sequence_id`, and
+`attack_sequence_completed_event_id`. Path of the Outcast Stratagem options use
+the just-shot unit as the target binding. Stratagems whose effect chooses an
+enemy hit by those attacks carry `effect_selection` with
+`effect_selection_kind: "hit_enemy_unit"` and
+`hit_enemy_unit_instance_id`; adapters must submit one emitted option and must
+not invent or substitute hit targets. Accepted handlers may record Battle-shock
+results, detection-range persisting effects, or emit a nested triggered-movement
+selection/proposal request. That follow-up movement request remains engine-owned
+and must be answered through `GameLifecycle.submit_decision(...)`.
+
 Accepted `StratagemUseRecord` payloads include `active_player_id`, `targeted_unit_instance_ids`, `affected_unit_instance_ids`, and `effect_selection`. The active-player ID is part of the phase-instance key for matched-play same-Stratagem and same-target restrictions. `targeted_unit_instance_ids` is the sorted canonical rules-unit list used for the 11th Edition "same unit targeted" restriction and is scoped to the player using the Stratagem. `affected_unit_instance_ids` records every canonical rules unit affected by the handler, including non-target enemy units hit by an effect. Non-attached units use their own unit instance ID. Units that are part of an attached unit use the attached-unit ID, so a Leader/Support component and Bodyguard component share one phase restriction key. Targetless Stratagems record empty target lists unless their official TARGET field binds a unit.
 
 Source-backed records whose `handler_id` starts with `unsupported:` are catalog descriptors only. They must not emit finite options, must not emit parameterized pending requests, and stale or hand-crafted submissions for them must be rejected with `unsupported_handler` before queue pop, CP spend, or Stratagem-use record creation.

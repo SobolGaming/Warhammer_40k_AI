@@ -65,6 +65,7 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.movement_proposals import PLACEMENT_PROPOSAL_DECISION_TYPE
 from warhammer40k_core.engine.phase import (
@@ -72,6 +73,10 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
+)
+from warhammer40k_core.engine.ranged_rule_effects import (
+    detection_range_bonus_payload,
+    weapon_profile_with_character_target_ap_effects,
 )
 from warhammer40k_core.engine.ranged_weapon_keyword_effects import (
     weapon_profile_with_ranged_keyword_effects,
@@ -154,7 +159,10 @@ from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.reaction_queue import ReactionQueue
-    from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
+    from warhammer40k_core.engine.stratagems import (
+        StratagemCatalogIndex,
+        StratagemEligibilityContext,
+    )
 
 
 SELECT_SHOOTING_UNIT_DECISION_TYPE = "select_shooting_unit"
@@ -911,6 +919,14 @@ class ShootingPhaseHandler:
             if status is not None:
                 return status
             if attack_sequence is None:
+                stratagem_status = _request_friendly_unit_has_shot_stratagem_if_available(
+                    state=state,
+                    decisions=decisions,
+                    stratagem_index=self.stratagem_index,
+                    completed_sequence=completed_candidate,
+                )
+                if stratagem_status is not None:
+                    return stratagem_status
                 surge_status = _request_shooting_end_surge_if_available(
                     state=state,
                     decisions=decisions,
@@ -1309,6 +1325,104 @@ class ShootingPhaseHandler:
         raise GameLifecycleError("ShootingPhaseHandler received unsupported decision_type.")
 
 
+def _request_friendly_unit_has_shot_stratagem_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    stratagem_index: StratagemCatalogIndex,
+    completed_sequence: AttackSequence,
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.stratagems import (
+        DESTROYED_TARGET_UNIT_CONTEXT_KEY,
+        HIT_TARGET_UNIT_CONTEXT_KEY,
+        JUST_SHOT_UNIT_CONTEXT_KEY,
+        StratagemEligibilityContext,
+        create_stratagem_use_decision_request,
+        stratagem_decline_option,
+        stratagem_use_options_from_index,
+        stratagem_window_declined_for_context,
+    )
+    from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+
+    if type(completed_sequence) is not AttackSequence:
+        raise GameLifecycleError("Friendly-unit-has-shot trigger requires an AttackSequence.")
+    completed_event_id = _attack_sequence_completed_event_id(
+        decisions=decisions,
+        sequence=completed_sequence,
+    )
+    if completed_event_id is None:
+        raise GameLifecycleError("Completed shooting sequence missing completion event.")
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=completed_sequence.attacker_player_id,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+        timing_window_id=_friendly_unit_has_shot_timing_window_id(completed_event_id),
+        trigger_payload={
+            JUST_SHOT_UNIT_CONTEXT_KEY: completed_sequence.attacking_unit_instance_id,
+            HIT_TARGET_UNIT_CONTEXT_KEY: list(
+                _successful_hit_target_unit_ids_for_sequence(
+                    decisions=decisions,
+                    sequence=completed_sequence,
+                )
+            ),
+            DESTROYED_TARGET_UNIT_CONTEXT_KEY: list(
+                _destroyed_target_unit_ids_for_sequence(
+                    decisions=decisions,
+                    sequence=completed_sequence,
+                )
+            ),
+            "attack_sequence_id": completed_sequence.sequence_id,
+            "attack_sequence_completed_event_id": completed_event_id,
+        },
+    )
+    if stratagem_window_declined_for_context(decisions=decisions, context=context):
+        return None
+    if _stratagem_used_for_context(decisions=decisions, context=context):
+        return None
+    options = stratagem_use_options_from_index(
+        state=state,
+        index=stratagem_index,
+        context=context,
+    )
+    if not options:
+        return None
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(*options, stratagem_decline_option()),
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "friendly_unit_has_shot_stratagem_window_opened",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": BattlePhase.SHOOTING.value,
+            "player_id": completed_sequence.attacker_player_id,
+            "shooting_unit_instance_id": completed_sequence.attacking_unit_instance_id,
+            "attack_sequence_id": completed_sequence.sequence_id,
+            "trigger_event_id": completed_event_id,
+            "stratagem_context": context.to_payload(),
+            "request_id": request.request_id,
+            "phase_body_status": "friendly_unit_has_shot_stratagem_pending",
+        },
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=state.stage,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.SHOOTING.value,
+            "battle_round": state.battle_round,
+            "active_player_id": _active_player_id(state),
+            "player_id": completed_sequence.attacker_player_id,
+            "shooting_unit_instance_id": completed_sequence.attacking_unit_instance_id,
+            "phase_body_status": "friendly_unit_has_shot_stratagem_pending",
+            "pending_request_id": request.request_id,
+        },
+    )
+
+
 def _request_shooting_end_surge_if_available(
     *,
     state: GameState,
@@ -1489,6 +1603,35 @@ def _attack_sequence_completed_event_id(
     return None
 
 
+def _friendly_unit_has_shot_timing_window_id(trigger_event_id: str) -> str:
+    return f"friendly-unit-has-shot:{_validate_identifier('trigger_event_id', trigger_event_id)}"
+
+
+def _stratagem_used_for_context(
+    *,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+) -> bool:
+    context_payload = context.to_payload()
+    for record in decisions.event_log.records:
+        if record.event_type != "stratagem_used":
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError("Stratagem use event payload must be an object.")
+        payload_object = cast(dict[str, object], payload)
+        if (
+            payload_object.get("game_id") == context_payload.get("game_id")
+            and payload_object.get("player_id") == context_payload.get("player_id")
+            and payload_object.get("battle_round") == context_payload.get("battle_round")
+            and payload_object.get("phase") == context_payload.get("phase")
+            and payload_object.get("active_player_id") == context_payload.get("active_player_id")
+            and payload_object.get("timing_window_id") == context_payload.get("timing_window_id")
+        ):
+            return True
+    return False
+
+
 def _successful_hit_target_unit_ids_for_sequence(
     *,
     decisions: DecisionController,
@@ -1516,6 +1659,27 @@ def _successful_hit_target_unit_ids_for_sequence(
         if pool_index < 0 or pool_index >= len(sequence.attack_pools):
             raise GameLifecycleError("Attack sequence hit event pool_index is out of range.")
         target_ids.add(sequence.attack_pools[pool_index].target_unit_instance_id)
+    return tuple(sorted(target_ids))
+
+
+def _destroyed_target_unit_ids_for_sequence(
+    *,
+    decisions: DecisionController,
+    sequence: AttackSequence,
+) -> tuple[str, ...]:
+    target_ids: set[str] = set()
+    for record in decisions.event_log.records:
+        if record.event_type != "model_destroyed":
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError("Model destroyed payload must be an object.")
+        if payload.get("sequence_id") != sequence.sequence_id:
+            continue
+        target_unit_id = payload.get("target_unit_instance_id")
+        if type(target_unit_id) is not str:
+            raise GameLifecycleError("Model destroyed payload requires target unit id.")
+        target_ids.add(_validate_identifier("target_unit_instance_id", target_unit_id))
     return tuple(sorted(target_ids))
 
 
@@ -2107,6 +2271,76 @@ def _apply_shooting_unit_selection_decision(
             "request_id": result.request_id,
             "result_id": result.result_id,
             "phase_body_status": "unit_selected",
+        },
+    )
+    _apply_far_reaching_doom_if_available(
+        state=state,
+        decisions=decisions,
+        selection=selection,
+    )
+
+
+def _apply_far_reaching_doom_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    selection: ShootingUnitSelection,
+) -> None:
+    aeldari_faction_id = "aeldari"
+    path_of_the_outcast_detachment_id = "path-of-the-outcast"
+    far_reaching_doom_source_rule_id = (
+        "phase17f:phase17e:aeldari:path-of-the-outcast:far-reaching-doom"
+    )
+    far_reaching_doom_effect_kind = "aeldari_path_of_the_outcast_far_reaching_doom"
+    rangers = "RANGERS"
+    shroud_runners = "SHROUD RUNNERS"
+
+    army = state.army_definition_for_player(selection.player_id)
+    if army is None:
+        raise GameLifecycleError("Far-reaching Doom requires selected player's army.")
+    if army.detachment_selection.faction_id != aeldari_faction_id:
+        return
+    if path_of_the_outcast_detachment_id not in army.detachment_selection.detachment_ids:
+        return
+    unit = _unit_by_id(state=state, unit_instance_id=selection.unit_instance_id)
+    if not (_unit_has_keyword(unit, rangers) or _unit_has_keyword(unit, shroud_runners)):
+        return
+    target_unit_ids = _enemy_placed_unit_ids(state=state, player_id=selection.player_id)
+    if not target_unit_ids:
+        return
+    effect = PersistingEffect(
+        effect_id=f"{selection.result_id}:far-reaching-doom",
+        source_rule_id=far_reaching_doom_source_rule_id,
+        owner_player_id=selection.player_id,
+        target_unit_instance_ids=target_unit_ids,
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhase.SHOOTING,
+        expiration=EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=BattlePhase.SHOOTING,
+            player_id=selection.player_id,
+        ),
+        effect_payload=detection_range_bonus_payload(
+            bonus_inches=6,
+            source_rule_kind=far_reaching_doom_effect_kind,
+            source_unit_instance_id=selection.unit_instance_id,
+            source_decision_request_id=selection.request_id,
+            source_decision_result_id=selection.result_id,
+            expires_when_source_unit_has_shot=True,
+        ),
+    )
+    state.record_persisting_effect(effect)
+    decisions.event_log.append(
+        "far_reaching_doom_detection_range_granted",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": BattlePhase.SHOOTING.value,
+            "player_id": selection.player_id,
+            "shooting_unit_instance_id": selection.unit_instance_id,
+            "target_unit_instance_ids": list(target_unit_ids),
+            "persisting_effect": effect.to_payload(),
         },
     )
 
@@ -2725,6 +2959,12 @@ def _attack_pools_or_validation(
         target_rules_unit = rules_unit_view_by_id(
             state=state,
             unit_instance_id=declaration.target_unit_instance_id,
+        )
+        weapon_profile = weapon_profile_with_character_target_ap_effects(
+            weapon_profile,
+            state.persisting_effects_for_unit(source_unit.unit_instance_id),
+            owner_player_id=player_id,
+            target_keywords=target_rules_unit.keywords,
         )
         ability_selection_validation = _validate_duplicate_weapon_ability_selection(
             proposal=proposal,
