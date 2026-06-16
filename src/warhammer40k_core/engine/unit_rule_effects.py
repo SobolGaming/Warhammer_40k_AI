@@ -50,6 +50,42 @@ def fire_overwatch_forbidden_by_effects(
     return False
 
 
+def embark_transport_forbidden_effect_source_ids(
+    effects: tuple[PersistingEffect, ...],
+    *,
+    owner_player_id: str,
+) -> tuple[str, ...]:
+    requested_owner = _validate_identifier("owner_player_id", owner_player_id)
+    source_ids: list[str] = []
+    for effect in _validated_effects(effects):
+        if effect.owner_player_id != requested_owner:
+            continue
+        payload = effect.effect_payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError("Embark restriction effect payload must be an object.")
+        raw_forbidden = payload.get("embark_transport_forbidden")
+        if raw_forbidden is None:
+            continue
+        if type(raw_forbidden) is not bool:
+            raise GameLifecycleError("embark_transport_forbidden effect value must be a bool.")
+        if raw_forbidden:
+            source_ids.append(effect.source_rule_id)
+    return tuple(sorted(source_ids))
+
+
+def embark_transport_forbidden_by_effects(
+    effects: tuple[PersistingEffect, ...],
+    *,
+    owner_player_id: str,
+) -> bool:
+    return bool(
+        embark_transport_forbidden_effect_source_ids(
+            effects,
+            owner_player_id=owner_player_id,
+        )
+    )
+
+
 def _validated_effects(effects: tuple[PersistingEffect, ...]) -> tuple[PersistingEffect, ...]:
     if type(effects) is not tuple:
         raise GameLifecycleError("Rule effect helpers require a tuple of effects.")

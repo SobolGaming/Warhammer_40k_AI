@@ -32,6 +32,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest, DecisionRequestPayload
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
     terrain_endpoint_placement_violation,
@@ -51,6 +52,9 @@ from warhammer40k_core.engine.unit_coherency import (
     unit_placement_coherency_result,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_rule_effects import (
+    embark_transport_forbidden_effect_source_ids,
+)
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model
@@ -94,6 +98,7 @@ class TransportOperationViolationCode(StrEnum):
     UNIT_NOT_EMBARKED = "unit_not_embarked"
     UNIT_DID_NOT_START_PHASE_EMBARKED = "unit_did_not_start_phase_embarked"
     EMBARK_AFTER_DISEMBARK_FORBIDDEN = "embark_after_disembark_forbidden"
+    EMBARK_FORBIDDEN_BY_EFFECT = "embark_forbidden_by_effect"
     EMBARK_DISTANCE = "embark_distance"
     DISEMBARK_DISTANCE = "disembark_distance"
     TRANSPORT_ADVANCED_OR_FELL_BACK = "transport_advanced_or_fell_back"
@@ -1920,6 +1925,7 @@ def resolve_embark(
     selection: EmbarkSelection,
     unit_placement: UnitPlacement,
     transport_placement: UnitPlacement,
+    persisting_effects: tuple[PersistingEffect, ...] = (),
 ) -> EmbarkResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("resolve_embark requires a BattlefieldScenario.")
@@ -1931,6 +1937,11 @@ def resolve_embark(
         raise GameLifecycleError("resolve_embark unit_placement must be UnitPlacement.")
     if type(transport_placement) is not UnitPlacement:
         raise GameLifecycleError("resolve_embark transport_placement must be UnitPlacement.")
+    if type(persisting_effects) is not tuple:
+        raise GameLifecycleError("resolve_embark persisting_effects must be a tuple.")
+    for effect in persisting_effects:
+        if type(effect) is not PersistingEffect:
+            raise GameLifecycleError("resolve_embark persisting_effects must contain effects.")
     active_cargo = cargo_state.for_movement_phase(battle_round=selection.battle_round)
     unit = scenario.unit_instance_for_placement(unit_placement)
     transport = scenario.unit_instance_for_placement(transport_placement)
@@ -1964,6 +1975,19 @@ def resolve_embark(
                 violation_code=TransportOperationViolationCode.UNIT_ALREADY_EMBARKED,
                 message="Unit is already embarked in this Transport.",
                 unit_instance_id=unit_placement.unit_instance_id,
+            )
+        )
+    forbidden_source_ids = embark_transport_forbidden_effect_source_ids(
+        persisting_effects,
+        owner_player_id=selection.player_id,
+    )
+    for source_rule_id in forbidden_source_ids:
+        violations.append(
+            TransportOperationViolation(
+                violation_code=TransportOperationViolationCode.EMBARK_FORBIDDEN_BY_EFFECT,
+                message="A persisting rule effect forbids this unit from Embarking.",
+                unit_instance_id=unit_placement.unit_instance_id,
+                source_rule_id=source_rule_id,
             )
         )
     if active_cargo.unit_disembarked_this_phase(unit_placement.unit_instance_id) and not (

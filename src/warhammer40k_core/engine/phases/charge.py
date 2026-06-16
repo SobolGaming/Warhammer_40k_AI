@@ -2008,6 +2008,8 @@ def _charge_unit_ineligibility_reason(
         ruleset_descriptor=ruleset_descriptor,
     ).can_declare_charge:
         return "charge_unit_aircraft"
+    if _charge_forbidden_by_effects(state=state, unit_instance_id=requested_unit_id):
+        return "charge_unit_forbidden_by_effect"
     if ruleset_descriptor.charge_policy.requires_unengaged_unit and _unit_is_engaged(
         state=state,
         unit_instance_id=requested_unit_id,
@@ -2023,6 +2025,17 @@ def _charge_unit_ineligibility_reason(
     if not any(candidate.is_legal for candidate in candidates):
         return "charge_unit_no_legal_targets"
     return None
+
+
+def _charge_forbidden_by_effects(*, state: GameState, unit_instance_id: str) -> bool:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for effect in state.persisting_effects_for_unit(requested_unit_id):
+        payload = effect.effect_payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("charge_forbidden") is True:
+            return True
+    return False
 
 
 def _charge_target_candidates(

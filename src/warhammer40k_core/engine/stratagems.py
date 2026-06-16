@@ -181,6 +181,7 @@ COUNTEROFFENSIVE_TARGET_POLICY_ID = "counteroffensive_unit"
 CRUSHING_IMPACT_TARGET_POLICY_ID = "crushing_impact_unit"
 EPIC_CHALLENGE_TARGET_POLICY_ID = "epic_challenge_unit"
 SELECTED_TO_MOVE_TARGET_POLICY_ID = "selected_to_move_unit"
+JUST_SHOT_UNIT_TARGET_POLICY_ID = "just_shot_unit"
 ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID = "engaged_with_fall_back_unit"
 EXPLOSIVES_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
 CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
@@ -191,6 +192,11 @@ HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND = "leap_to_defend"
 HEROIC_INTERVENTION_MODE_INTO_THE_FRAY = "into_the_fray"
 SELECTED_TARGET_UNIT_CONTEXT_KEY = "selected_target_unit_instance_ids"
 SELECTED_TO_MOVE_UNIT_CONTEXT_KEY = "selected_to_move_unit_instance_id"
+JUST_SHOT_UNIT_CONTEXT_KEY = "shot_unit_instance_id"
+HIT_TARGET_UNIT_CONTEXT_KEY = "hit_target_unit_instance_ids"
+DESTROYED_TARGET_UNIT_CONTEXT_KEY = "destroyed_target_unit_instance_ids"
+HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND = "hit_enemy_unit"
+HIT_ENEMY_UNIT_CONTEXT_KEY = "hit_enemy_unit_instance_id"
 FALL_BACK_UNIT_CONTEXT_KEY = "fall_back_unit_instance_id"
 FALL_BACK_MODE_CONTEXT_KEY = "fall_back_mode"
 FORCED_FALL_BACK_DESPERATE_ESCAPE_EFFECT_KIND = "forced_fall_back_desperate_escape"
@@ -262,6 +268,7 @@ class StratagemTargetSpecPayload(TypedDict):
     enumerable: bool
     target_policy_id: str
     required_keywords: list[str]
+    required_keywords_any: list[str]
     required_faction_keywords: list[str]
 
 
@@ -455,6 +462,7 @@ class StratagemTargetSpec:
     enumerable: bool = True
     target_policy_id: str = ""
     required_keywords: tuple[str, ...] = ()
+    required_keywords_any: tuple[str, ...] = ()
     required_faction_keywords: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -492,10 +500,18 @@ class StratagemTargetSpec:
                 self.required_faction_keywords,
             ),
         )
+        object.__setattr__(
+            self,
+            "required_keywords_any",
+            _validate_identifier_tuple(
+                "StratagemTargetSpec required_keywords_any",
+                self.required_keywords_any,
+            ),
+        )
         if self.target_kind is StratagemTargetKind.NONE and not self.enumerable:
             raise GameLifecycleError("Targetless StratagemTargetSpec must be enumerable.")
         if self.target_kind is StratagemTargetKind.NONE and (
-            self.required_keywords or self.required_faction_keywords
+            self.required_keywords or self.required_keywords_any or self.required_faction_keywords
         ):
             raise GameLifecycleError("Targetless StratagemTargetSpec cannot require keywords.")
 
@@ -509,6 +525,7 @@ class StratagemTargetSpec:
             "enumerable": self.enumerable,
             "target_policy_id": self.target_policy_id,
             "required_keywords": list(self.required_keywords),
+            "required_keywords_any": list(self.required_keywords_any),
             "required_faction_keywords": list(self.required_faction_keywords),
         }
 
@@ -519,6 +536,7 @@ class StratagemTargetSpec:
             enumerable=payload["enumerable"],
             target_policy_id=payload["target_policy_id"],
             required_keywords=tuple(payload["required_keywords"]),
+            required_keywords_any=tuple(payload["required_keywords_any"]),
             required_faction_keywords=tuple(payload["required_faction_keywords"]),
         )
 
@@ -1518,6 +1536,16 @@ def stratagem_use_options_for_handler_from_index(
     )
 
 
+def hit_enemy_unit_effect_selection(unit_instance_id: str) -> JsonValue:
+    return {
+        "effect_selection_kind": HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+        HIT_ENEMY_UNIT_CONTEXT_KEY: _validate_identifier(
+            HIT_ENEMY_UNIT_CONTEXT_KEY,
+            unit_instance_id,
+        ),
+    }
+
+
 def _stratagem_use_options_for_records(
     *,
     state: GameState,
@@ -1551,14 +1579,47 @@ def _stratagem_use_options_for_records(
                 is not None
             ):
                 continue
-            options.append(
-                _stratagem_decision_option(
-                    record=record,
-                    context=context,
-                    target_binding=binding,
+            for effect_selection in _effect_selections_for_binding(
+                definition=definition,
+                context=context,
+                target_binding=binding,
+            ):
+                if (
+                    _stratagem_unavailable_reason(
+                        state=state,
+                        record=record,
+                        context=context,
+                        target_binding=binding,
+                        effect_selection=effect_selection,
+                    )
+                    is not None
+                ):
+                    continue
+                options.append(
+                    _stratagem_decision_option(
+                        record=record,
+                        context=context,
+                        target_binding=binding,
+                        effect_selection=effect_selection,
+                    )
                 )
-            )
     return tuple(sorted(options, key=lambda option: option.option_id))
+
+
+def _effect_selections_for_binding(
+    *,
+    definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+) -> tuple[JsonValue, ...]:
+    del target_binding
+    payload = definition.effect_payload
+    if not isinstance(payload, dict):
+        return (None,)
+    if payload.get("effect_selection_kind") != HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND:
+        return (None,)
+    hit_target_ids = _hit_target_unit_ids_or_empty(context)
+    return tuple(hit_enemy_unit_effect_selection(unit_id) for unit_id in hit_target_ids)
 
 
 def request_stratagem_target_proposal(
@@ -2285,11 +2346,14 @@ def _stratagem_decision_option(
     record: StratagemCatalogRecord,
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding,
+    effect_selection: JsonValue = None,
 ) -> DecisionOption:
     definition = record.definition
     option_id = (
         f"use-stratagem:{definition.stratagem_id}:target:{_target_binding_token(target_binding)}"
     )
+    if effect_selection is not None:
+        option_id = f"{option_id}:effect:{_effect_selection_token(effect_selection)}"
     return DecisionOption(
         option_id=option_id,
         label=definition.name,
@@ -2299,10 +2363,17 @@ def _stratagem_decision_option(
                 "context": context.to_payload(),
                 "catalog_record": record.to_payload(),
                 "target_binding": target_binding.to_payload(),
-                "effect_selection": None,
+                "effect_selection": effect_selection,
             }
         ),
     )
+
+
+def _effect_selection_token(effect_selection: JsonValue) -> str:
+    hit_enemy_unit_id = _hit_enemy_unit_id_or_none(effect_selection)
+    if hit_enemy_unit_id is not None:
+        return f"{HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND}:{hit_enemy_unit_id}"
+    raise GameLifecycleError("Unsupported Stratagem effect selection token.")
 
 
 def _stratagem_selection_from_result_payload(
@@ -2396,6 +2467,7 @@ def _stratagem_unavailable_reason(
         return "timing_window_mismatch"
     effect_selection_error = _effect_selection_error(
         definition=record.definition,
+        context=context,
         effect_selection=effect_selection,
     )
     if effect_selection_error is not None:
@@ -2476,6 +2548,7 @@ def _detachment_gate_allows(
 def _effect_selection_error(
     *,
     definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
     effect_selection: JsonValue,
 ) -> str | None:
     if definition.handler_id == CORE_HEROIC_INTERVENTION_HANDLER_ID:
@@ -2500,6 +2573,32 @@ def _effect_selection_error(
             effect_selection=effect_selection,
             field_names=(EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY,),
         )
+    payload = definition.effect_payload
+    if isinstance(payload, dict) and payload.get("effect_selection_kind") == (
+        HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND
+    ):
+        if effect_selection is None:
+            return None
+        field_error = _required_effect_selection_fields_error(
+            effect_selection=effect_selection,
+            field_names=(HIT_ENEMY_UNIT_CONTEXT_KEY,),
+        )
+        if field_error is not None:
+            return field_error
+        if (
+            _effect_selection_string_or_none(
+                effect_selection=effect_selection,
+                key="effect_selection_kind",
+            )
+            != HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND
+        ):
+            return "effect_selection_kind_mismatch"
+        selected_unit_id = _hit_enemy_unit_id_or_none(effect_selection)
+        if selected_unit_id is None:
+            return f"{HIT_ENEMY_UNIT_CONTEXT_KEY}_required"
+        if selected_unit_id not in _hit_target_unit_ids_or_empty(context):
+            return "hit_enemy_unit_not_in_trigger_context"
+        return None
     if effect_selection is not None:
         return "effect_selection_not_supported"
     return None
@@ -2890,6 +2989,9 @@ def _stratagem_affected_unit_ids(
         fall_back_unit_id = _fall_back_unit_id_or_none(context)
         if fall_back_unit_id is not None:
             raw_unit_ids.append(fall_back_unit_id)
+    hit_enemy_unit_id = _hit_enemy_unit_id_or_none(effect_selection)
+    if hit_enemy_unit_id is not None:
+        raw_unit_ids.append(hit_enemy_unit_id)
     if not raw_unit_ids:
         return ()
     return _validate_stratagem_affected_unit_ids(
@@ -3034,6 +3136,35 @@ def _enumerated_target_bindings(
             is None
             else ()
         )
+    if target_spec.target_policy_id == JUST_SHOT_UNIT_TARGET_POLICY_ID:
+        if context is None:
+            return ()
+        shot_unit_id = _just_shot_unit_id_or_none(context)
+        if shot_unit_id is None:
+            return ()
+        target_owner = _unit_owner(state=state, unit_instance_id=shot_unit_id)
+        if target_owner is None:
+            return ()
+        binding = StratagemTargetBinding(
+            target_kind=target_spec.target_kind,
+            target_player_id=target_owner,
+            target_unit_instance_id=shot_unit_id,
+        )
+        return (
+            (binding,)
+            if _target_binding_error(
+                state=state,
+                player_id=player_id,
+                target_spec=target_spec,
+                policy=definition.restriction_policy,
+                target_binding=binding,
+                context=context,
+                ruleset_descriptor=None,
+                army_catalog=None,
+            )
+            is None
+            else ()
+        )
     bindings: list[StratagemTargetBinding] = []
     for army in state.army_definitions:
         if (
@@ -3136,6 +3267,12 @@ def _target_binding_error(
         required_keywords=target_spec.required_keywords,
     ):
         return "unit_missing_required_keyword"
+    if not _target_unit_satisfies_required_keywords_any(
+        state=state,
+        target_binding=target_binding,
+        required_keywords_any=target_spec.required_keywords_any,
+    ):
+        return "unit_missing_required_keyword"
     if not _target_unit_satisfies_required_faction_keywords(
         state=state,
         target_binding=target_binding,
@@ -3234,6 +3371,13 @@ def _target_binding_error(
             context=context,
             target_binding=target_binding,
         )
+    if target_spec.target_policy_id == JUST_SHOT_UNIT_TARGET_POLICY_ID:
+        if context is None:
+            return None
+        return _just_shot_target_context_error(
+            context=context,
+            target_binding=target_binding,
+        )
     if target_spec.target_policy_id == ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID:
         if context is None:
             return None
@@ -3294,6 +3438,23 @@ def _target_unit_satisfies_required_keywords(
         raise GameLifecycleError("Stratagem target unit is unknown.")
     stored = {_canonical_keyword(keyword) for keyword in unit.keywords}
     return required.issubset(stored)
+
+
+def _target_unit_satisfies_required_keywords_any(
+    *,
+    state: GameState,
+    target_binding: StratagemTargetBinding,
+    required_keywords_any: tuple[str, ...],
+) -> bool:
+    required = {_canonical_keyword(keyword) for keyword in required_keywords_any}
+    if not required:
+        return True
+    target_unit_id = _require_target_unit_id(target_binding)
+    unit = _unit_by_id_or_none(state=state, unit_instance_id=target_unit_id)
+    if unit is None:
+        raise GameLifecycleError("Stratagem target unit is unknown.")
+    stored = {_canonical_keyword(keyword) for keyword in unit.keywords}
+    return bool(required & stored)
 
 
 def _target_unit_satisfies_required_faction_keywords(
@@ -3558,6 +3719,93 @@ def _selected_to_move_unit_id_or_none(context: StratagemEligibilityContext) -> s
     if type(raw_unit_id) is not str:
         return None
     return _validate_identifier("Selected to move unit id", raw_unit_id)
+
+
+def _just_shot_target_context_error(
+    *,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+) -> str | None:
+    if context.trigger_kind is not TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT:
+        return "just_shot_requires_unit_has_shot_trigger"
+    if context.phase is not BattlePhase.SHOOTING:
+        return "just_shot_requires_shooting_phase"
+    shot_unit_id = _just_shot_unit_id_or_none(context)
+    if shot_unit_id is None:
+        return "missing_just_shot_unit_context"
+    if target_binding is None:
+        return None
+    if _require_target_unit_id(target_binding) != shot_unit_id:
+        return "unit_not_just_shot"
+    return None
+
+
+def _just_shot_unit_id_or_none(context: StratagemEligibilityContext) -> str | None:
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        return None
+    raw_unit_id = trigger_payload.get(JUST_SHOT_UNIT_CONTEXT_KEY)
+    if type(raw_unit_id) is not str:
+        return None
+    return _validate_identifier("Just-shot unit id", raw_unit_id)
+
+
+def _hit_target_unit_ids_or_empty(context: StratagemEligibilityContext) -> tuple[str, ...]:
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        return ()
+    return _identifier_list_from_trigger_payload(
+        trigger_payload=trigger_payload,
+        key=HIT_TARGET_UNIT_CONTEXT_KEY,
+        field_name="Hit target unit id",
+    )
+
+
+def destroyed_target_unit_ids_from_context(
+    context: StratagemEligibilityContext,
+) -> tuple[str, ...]:
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        return ()
+    return _identifier_list_from_trigger_payload(
+        trigger_payload=trigger_payload,
+        key=DESTROYED_TARGET_UNIT_CONTEXT_KEY,
+        field_name="Destroyed target unit id",
+    )
+
+
+def _identifier_list_from_trigger_payload(
+    *,
+    trigger_payload: Mapping[str, object],
+    key: str,
+    field_name: str,
+) -> tuple[str, ...]:
+    raw_unit_ids = trigger_payload.get(key)
+    if raw_unit_ids is None:
+        return ()
+    if not isinstance(raw_unit_ids, list):
+        return ()
+    raw_unit_id_values = cast(list[object], raw_unit_ids)
+    unit_ids: list[str] = []
+    seen: set[str] = set()
+    for raw_unit_id in raw_unit_id_values:
+        if type(raw_unit_id) is not str:
+            return ()
+        unit_id = _validate_identifier(field_name, raw_unit_id)
+        if unit_id in seen:
+            return ()
+        seen.add(unit_id)
+        unit_ids.append(unit_id)
+    return tuple(sorted(unit_ids))
+
+
+def _hit_enemy_unit_id_or_none(effect_selection: JsonValue) -> str | None:
+    if not isinstance(effect_selection, dict):
+        return None
+    raw_unit_id = effect_selection.get(HIT_ENEMY_UNIT_CONTEXT_KEY)
+    if type(raw_unit_id) is not str:
+        return None
+    return _validate_identifier("Hit enemy unit id", raw_unit_id)
 
 
 def _engaged_with_fall_back_unit_target_context_error(

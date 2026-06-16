@@ -391,6 +391,12 @@ The finite decision type is `use_stratagem`. A pending request exposes one optio
 - target-binding payload for fully enumerated targets;
 - restriction context such as same-Stratagem-per-phase and any own once-per-turn/battle/per-target rule already checked by the engine.
 
+`StratagemTargetSpec` payloads expose both all-of and any-of keyword gates.
+`required_keywords` lists keywords that must all be present on the bound target.
+`required_keywords_any` lists keywords where at least one must be present; an
+empty list means no any-of gate. Adapters may display these gates, but must not
+use them to invent targets or override engine-emitted option enumeration.
+
 Phase 17G adds Movement selected-to-move Stratagem windows to the same finite
 `use_stratagem` contract. After `select_movement_unit` records a unit selection
 and before `select_movement_action` is emitted, the Movement engine may emit an
@@ -404,6 +410,22 @@ targets or skip directly to movement-action selection while a pending
 engine-owned temporary movement keyword effects, such as `MOBILE`, that are
 consumed by later movement proposal validation. Adapters must not add movement
 keywords, adjust terrain traversal, spend CP, or mutate movement state directly.
+
+Phase 17G also adds Shooting post-resolution Stratagem windows to the finite
+`use_stratagem` contract. After a friendly shooting attack sequence completes,
+the Shooting engine may emit an optional active-player request with trigger kind
+`just_after_friendly_unit_has_shot`. The trigger payload includes
+`shot_unit_instance_id`, `hit_target_unit_instance_ids`,
+`destroyed_target_unit_instance_ids`, `attack_sequence_id`, and
+`attack_sequence_completed_event_id`. Path of the Outcast Stratagem options use
+the just-shot unit as the target binding. Stratagems whose effect chooses an
+enemy hit by those attacks carry `effect_selection` with
+`effect_selection_kind: "hit_enemy_unit"` and
+`hit_enemy_unit_instance_id`; adapters must submit one emitted option and must
+not invent or substitute hit targets. Accepted handlers may record Battle-shock
+results, detection-range persisting effects, or emit a nested triggered-movement
+selection/proposal request. That follow-up movement request remains engine-owned
+and must be answered through `GameLifecycle.submit_decision(...)`.
 
 Accepted `StratagemUseRecord` payloads include `active_player_id`, `targeted_unit_instance_ids`, `affected_unit_instance_ids`, and `effect_selection`. The active-player ID is part of the phase-instance key for matched-play same-Stratagem and same-target restrictions. `targeted_unit_instance_ids` is the sorted canonical rules-unit list used for the 11th Edition "same unit targeted" restriction and is scoped to the player using the Stratagem. `affected_unit_instance_ids` records every canonical rules unit affected by the handler, including non-target enemy units hit by an effect. Non-attached units use their own unit instance ID. Units that are part of an attached unit use the attached-unit ID, so a Leader/Support component and Bodyguard component share one phase restriction key. Targetless Stratagems record empty target lists unless their official TARGET field binds a unit.
 

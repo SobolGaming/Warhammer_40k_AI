@@ -33,6 +33,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.hazard import (
@@ -179,6 +180,50 @@ def test_embark_removes_unit_to_transport_cargo_and_emits_records() -> None:
         for army in updated_battlefield.placed_armies
         for placement in army.unit_placements
     }
+
+
+def test_embark_rejects_unit_forbidden_by_persisting_effect() -> None:
+    scenario, passenger, transport, _enemy, _catalog = _transport_scenario()
+    passenger_placement = scenario.battlefield_state.unit_placement_by_id(
+        passenger.unit_instance_id
+    )
+    transport_placement = scenario.battlefield_state.unit_placement_by_id(
+        transport.unit_instance_id
+    )
+    restriction_effect = PersistingEffect(
+        effect_id="nomads:embark-forbidden",
+        source_rule_id="aeldari:path-of-the-outcast:nomads-of-the-hidden-way",
+        owner_player_id="player-a",
+        target_unit_instance_ids=(passenger.unit_instance_id,),
+        started_battle_round=1,
+        started_phase=BattlePhase.SHOOTING,
+        expiration=EffectExpiration.end_turn(battle_round=1, player_id="player-a"),
+        effect_payload={
+            "effect_kind": "aeldari_path_of_the_outcast_nomads_restriction",
+            "embark_transport_forbidden": True,
+        },
+    )
+
+    resolution = resolve_embark(
+        scenario=scenario,
+        cargo_state=_cargo_state(transport=transport),
+        selection=EmbarkSelection(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=passenger.unit_instance_id,
+            transport_unit_instance_id=transport.unit_instance_id,
+            movement_phase_action=TransportMovementStatus.NORMAL_MOVE,
+        ),
+        unit_placement=passenger_placement,
+        transport_placement=transport_placement,
+        persisting_effects=(restriction_effect,),
+    )
+
+    assert not resolution.is_valid
+    assert {violation.violation_code for violation in resolution.violations} == {
+        TransportOperationViolationCode.EMBARK_FORBIDDEN_BY_EFFECT
+    }
+    assert resolution.violations[0].source_rule_id == restriction_effect.source_rule_id
 
 
 def test_embarked_units_are_unavailable_for_movement_selection() -> None:
