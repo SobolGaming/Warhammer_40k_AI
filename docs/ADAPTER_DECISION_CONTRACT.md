@@ -391,6 +391,12 @@ The finite decision type is `use_stratagem`. A pending request exposes one optio
 - target-binding payload for fully enumerated targets;
 - restriction context such as same-Stratagem-per-phase and any own once-per-turn/battle/per-target rule already checked by the engine.
 
+`StratagemTargetSpec` payloads expose both all-of and any-of keyword gates.
+`required_keywords` lists keywords that must all be present on the bound target.
+`required_keywords_any` lists keywords where at least one must be present; an
+empty list means no any-of gate. Adapters may display these gates, but must not
+use them to invent targets or override engine-emitted option enumeration.
+
 Phase 17G adds Movement selected-to-move Stratagem windows to the same finite
 `use_stratagem` contract. After `select_movement_unit` records a unit selection
 and before `select_movement_action` is emitted, the Movement engine may emit an

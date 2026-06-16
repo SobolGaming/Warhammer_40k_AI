@@ -20,6 +20,7 @@ from warhammer40k_core.core.weapon_profiles import (
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
+    BattlefieldScenario,
     ModelPlacement,
     PlacedArmy,
     UnitPlacement,
@@ -42,16 +43,32 @@ from warhammer40k_core.engine.faction_content.stratagem_handlers import (
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari.detachments.path_of_the_outcast import (  # noqa: E501
     enhancements,
     manifest,
+    rule,
     stratagems,
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import DetachmentSelection
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phases.shooting import (
+    apply_hidden_status_loss_after_ranged_attacks,
+)
 from warhammer40k_core.engine.ranged_rule_effects import (
     character_target_ap_bonus_payload,
     detection_range_bonus_inches_for_effects,
     detection_range_bonus_payload,
+    unit_hidden_payload,
+    unit_is_hidden_by_effects,
     weapon_profile_with_character_target_ap_effects,
+)
+from warhammer40k_core.engine.shooting_targets import (
+    ShootingTargetViolationCode,
+    shooting_target_candidate_for_model,
+)
+from warhammer40k_core.engine.shooting_unit_selected_hooks import (
+    ShootingUnitSelectedContext,
+    ShootingUnitSelectedEffectGrant,
+    ShootingUnitSelectedHookBinding,
+    ShootingUnitSelectedHookRegistry,
 )
 from warhammer40k_core.engine.stratagems import (
     DESTROYED_TARGET_UNIT_CONTEXT_KEY,
@@ -97,6 +114,245 @@ def test_path_of_the_outcast_runtime_contribution_registers_content() -> None:
         enhancements.CAMOUFLAGED_SNIPERS_ENHANCEMENT_ID,
         enhancements.ASSASSINS_EYE_ENHANCEMENT_ID,
     }
+    assert {binding.hook_id for binding in contribution.shooting_unit_selected_hook_bindings} == {
+        rule.FAR_REACHING_DOOM_HOOK_ID,
+    }
+
+
+def test_far_reaching_doom_selection_hook_grants_detection_effect() -> None:
+    state, _army, _rangers, _shroud_runners, _enemy = _path_state()
+    registry = ShootingUnitSelectedHookRegistry.from_bindings(
+        manifest.runtime_contribution().shooting_unit_selected_hook_bindings
+    )
+    context = ShootingUnitSelectedContext(
+        state=state,
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=_RANGERS_UNIT_ID,
+        request_id="request:selected-rangers",
+        result_id="result:selected-rangers",
+    )
+
+    grants = registry.grants_for(context)
+
+    assert len(grants) == 1
+    grant = grants[0]
+    assert grant.hook_id == rule.FAR_REACHING_DOOM_HOOK_ID
+    assert grant.event_type == "far_reaching_doom_detection_range_granted"
+    assert grant.persisting_effect.target_unit_instance_ids == (_ENEMY_UNIT_ID,)
+    payload = _json_object(grant.persisting_effect.effect_payload)
+    assert payload["effect_kind"] == "detection_range_bonus"
+    assert payload["bonus_inches"] == 6
+    assert payload["source_unit_instance_id"] == _RANGERS_UNIT_ID
+    assert payload["expires_when_source_unit_has_shot"] is True
+    assert grant.to_payload()["hook_id"] == rule.FAR_REACHING_DOOM_HOOK_ID
+
+
+def test_shooting_unit_selected_hook_registry_rejects_malformed_handlers() -> None:
+    state, _army, _rangers, _shroud_runners, _enemy = _path_state()
+    context = ShootingUnitSelectedContext(
+        state=state,
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=_RANGERS_UNIT_ID,
+        request_id="request:selected-rangers",
+        result_id="result:selected-rangers",
+    )
+    valid_grant = rule.apply_far_reaching_doom(context)[0]
+    valid_binding = ShootingUnitSelectedHookBinding(
+        hook_id="hook:valid",
+        source_id=rule.FAR_REACHING_DOOM_SOURCE_RULE_ID,
+        handler=lambda _context: (
+            ShootingUnitSelectedEffectGrant(
+                hook_id="hook:valid",
+                source_id=rule.FAR_REACHING_DOOM_SOURCE_RULE_ID,
+                unit_instance_id=_RANGERS_UNIT_ID,
+                persisting_effect=replace(
+                    valid_grant.persisting_effect,
+                    effect_id="effect:valid",
+                ),
+            ),
+        ),
+    )
+
+    assert ShootingUnitSelectedHookRegistry.empty().all_bindings() == ()
+    assert ShootingUnitSelectedHookRegistry.from_bindings((valid_binding,)).grants_for(context)
+
+    with pytest.raises(GameLifecycleError, match="bindings must be a tuple"):
+        ShootingUnitSelectedHookRegistry(
+            bindings=cast(tuple[ShootingUnitSelectedHookBinding, ...], [])
+        )
+    with pytest.raises(GameLifecycleError, match="hook IDs must be unique"):
+        ShootingUnitSelectedHookRegistry.from_bindings((valid_binding, valid_binding))
+    with pytest.raises(GameLifecycleError, match="handler must be callable"):
+        ShootingUnitSelectedHookBinding(
+            hook_id="hook:not-callable",
+            source_id=rule.FAR_REACHING_DOOM_SOURCE_RULE_ID,
+            handler=cast(
+                Callable[
+                    [ShootingUnitSelectedContext], tuple[ShootingUnitSelectedEffectGrant, ...]
+                ],
+                object(),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="handlers must return a tuple"):
+        ShootingUnitSelectedHookRegistry.from_bindings(
+            (
+                ShootingUnitSelectedHookBinding(
+                    hook_id="hook:list",
+                    source_id=rule.FAR_REACHING_DOOM_SOURCE_RULE_ID,
+                    handler=lambda _context: cast(
+                        tuple[ShootingUnitSelectedEffectGrant, ...],
+                        [],
+                    ),
+                ),
+            )
+        ).grants_for(context)
+    with pytest.raises(GameLifecycleError, match="ShootingUnitSelectedEffectGrant values"):
+        ShootingUnitSelectedHookRegistry.from_bindings(
+            (
+                ShootingUnitSelectedHookBinding(
+                    hook_id="hook:object",
+                    source_id=rule.FAR_REACHING_DOOM_SOURCE_RULE_ID,
+                    handler=lambda _context: cast(
+                        tuple[ShootingUnitSelectedEffectGrant, ...],
+                        (object(),),
+                    ),
+                ),
+            )
+        ).grants_for(context)
+    with pytest.raises(GameLifecycleError, match="hook_id drift"):
+        ShootingUnitSelectedHookRegistry.from_bindings(
+            (
+                ShootingUnitSelectedHookBinding(
+                    hook_id="hook:expected",
+                    source_id=rule.FAR_REACHING_DOOM_SOURCE_RULE_ID,
+                    handler=lambda _context: (
+                        ShootingUnitSelectedEffectGrant(
+                            hook_id="hook:actual",
+                            source_id=rule.FAR_REACHING_DOOM_SOURCE_RULE_ID,
+                            unit_instance_id=_RANGERS_UNIT_ID,
+                            persisting_effect=replace(
+                                valid_grant.persisting_effect,
+                                effect_id="effect:drift",
+                            ),
+                        ),
+                    ),
+                ),
+            )
+        ).grants_for(context)
+
+
+def test_shooting_unit_selected_hooks_reject_invalid_inputs() -> None:
+    state, _army, _rangers, _shroud_runners, _enemy = _path_state()
+    valid_context = ShootingUnitSelectedContext(
+        state=state,
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=_RANGERS_UNIT_ID,
+        request_id="request:selected-rangers",
+        result_id="result:selected-rangers",
+    )
+    valid_grant = rule.apply_far_reaching_doom(valid_context)[0]
+
+    with pytest.raises(GameLifecycleError, match="state must be a GameState"):
+        ShootingUnitSelectedContext(
+            state=cast(GameState, object()),
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=_RANGERS_UNIT_ID,
+            request_id="request:selected-rangers",
+            result_id="result:selected-rangers",
+        )
+
+    movement_state, *_ = _path_state()
+    movement_state.battle_phase_index = tuple(movement_state.battle_phase_sequence).index(
+        BattlePhase.MOVEMENT
+    )
+    with pytest.raises(GameLifecycleError, match="requires the Shooting phase"):
+        ShootingUnitSelectedContext(
+            state=movement_state,
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=_RANGERS_UNIT_ID,
+            request_id="request:selected-rangers",
+            result_id="result:selected-rangers",
+        )
+
+    with pytest.raises(GameLifecycleError, match="battle_round must be an int"):
+        ShootingUnitSelectedContext(
+            state=state,
+            player_id="player-a",
+            battle_round=cast(int, "1"),
+            unit_instance_id=_RANGERS_UNIT_ID,
+            request_id="request:selected-rangers",
+            result_id="result:selected-rangers",
+        )
+    with pytest.raises(GameLifecycleError, match="battle_round must be positive"):
+        ShootingUnitSelectedContext(
+            state=state,
+            player_id="player-a",
+            battle_round=0,
+            unit_instance_id=_RANGERS_UNIT_ID,
+            request_id="request:selected-rangers",
+            result_id="result:selected-rangers",
+        )
+
+    with pytest.raises(GameLifecycleError, match="persisting_effect"):
+        ShootingUnitSelectedEffectGrant(
+            hook_id=rule.FAR_REACHING_DOOM_HOOK_ID,
+            source_id=rule.FAR_REACHING_DOOM_SOURCE_RULE_ID,
+            unit_instance_id=_RANGERS_UNIT_ID,
+            persisting_effect=cast(PersistingEffect, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="source_id must match"):
+        ShootingUnitSelectedEffectGrant(
+            hook_id=rule.FAR_REACHING_DOOM_HOOK_ID,
+            source_id="source:other",
+            unit_instance_id=_RANGERS_UNIT_ID,
+            persisting_effect=valid_grant.persisting_effect,
+        )
+    with pytest.raises(GameLifecycleError, match="require a context"):
+        ShootingUnitSelectedHookRegistry.empty().grants_for(
+            cast(ShootingUnitSelectedContext, object())
+        )
+    with pytest.raises(GameLifecycleError, match="bindings must contain"):
+        ShootingUnitSelectedHookRegistry(
+            bindings=cast(tuple[ShootingUnitSelectedHookBinding, ...], (object(),))
+        )
+    with pytest.raises(GameLifecycleError, match="hook_id must be a string"):
+        ShootingUnitSelectedHookBinding(
+            hook_id=cast(str, 123),
+            source_id=rule.FAR_REACHING_DOOM_SOURCE_RULE_ID,
+            handler=lambda _context: (),
+        )
+    with pytest.raises(GameLifecycleError, match="hook_id must not be empty"):
+        ShootingUnitSelectedHookBinding(
+            hook_id=" ",
+            source_id=rule.FAR_REACHING_DOOM_SOURCE_RULE_ID,
+            handler=lambda _context: (),
+        )
+    with pytest.raises(GameLifecycleError, match="source_id drift"):
+        ShootingUnitSelectedHookRegistry.from_bindings(
+            (
+                ShootingUnitSelectedHookBinding(
+                    hook_id="hook:source-drift",
+                    source_id="source:expected",
+                    handler=lambda _context: (
+                        ShootingUnitSelectedEffectGrant(
+                            hook_id="hook:source-drift",
+                            source_id="source:actual",
+                            unit_instance_id=_RANGERS_UNIT_ID,
+                            persisting_effect=replace(
+                                valid_grant.persisting_effect,
+                                effect_id="effect:source-drift",
+                                source_rule_id="source:actual",
+                            ),
+                        ),
+                    ),
+                ),
+            )
+        ).grants_for(valid_context)
 
 
 def test_path_of_the_outcast_post_shot_records_use_structured_context() -> None:
@@ -110,6 +366,9 @@ def test_path_of_the_outcast_post_shot_records_use_structured_context() -> None:
     assert eldritch.target_spec.target_policy_id == "just_shot_unit"
     assert casting.target_spec.target_policy_id == "just_shot_unit"
     assert nomads.target_spec.target_policy_id == "just_shot_unit"
+    assert eldritch.target_spec.required_keywords_any == ("RANGERS", "SHROUD RUNNERS")
+    assert casting.target_spec.required_keywords_any == ("RANGERS", "SHROUD RUNNERS")
+    assert nomads.target_spec.required_keywords_any == ("RANGERS", "SHROUD RUNNERS")
     assert eldritch.effect_payload == {"effect_selection_kind": "hit_enemy_unit"}
     assert casting.effect_payload == {"effect_selection_kind": "hit_enemy_unit"}
     assert nomads.effect_payload == {"effect_kind": "nomads_of_the_hidden_way"}
@@ -318,6 +577,114 @@ def test_casting_back_the_veil_applies_detection_effect_to_hit_enemy() -> None:
     assert payload["source_unit_instance_id"] == _RANGERS_UNIT_ID
 
 
+def test_detection_range_effect_makes_hidden_target_legal_for_shooting() -> None:
+    state, _army, rangers, _shroud_runners, _enemy = _path_state()
+    state.record_persisting_effect(
+        _hidden_effect(effect_id="hidden:enemy", target_id=_ENEMY_UNIT_ID)
+    )
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=_battlefield_state(state),
+    )
+    ruleset = _ruleset_with_hidden_detection()
+    profile = _test_weapon_profile(ap=0)
+
+    without_bonus = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        attacker_unit=rangers,
+        attacker_model_instance_id=rangers.own_models[0].model_instance_id,
+        weapon_profile=profile,
+        target_unit_id=_ENEMY_UNIT_ID,
+        hidden_target_unit_ids=(_ENEMY_UNIT_ID,),
+    )
+
+    assert not without_bonus.is_legal
+    assert without_bonus.violation_code is ShootingTargetViolationCode.OUTSIDE_DETECTION_RANGE
+
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="casting-back:enemy-detection",
+            source_rule_id=stratagems.SOURCE_RULE_ID,
+            owner_player_id="player-a",
+            target_unit_instance_ids=(_ENEMY_UNIT_ID,),
+            started_battle_round=1,
+            started_phase=BattlePhase.SHOOTING,
+            expiration=EffectExpiration.end_phase(
+                battle_round=1,
+                phase=BattlePhase.SHOOTING,
+                player_id="player-a",
+            ),
+            effect_payload=detection_range_bonus_payload(
+                bonus_inches=6,
+                source_rule_kind="aeldari_path_of_the_outcast_casting_back_the_veil",
+                source_unit_instance_id=_RANGERS_UNIT_ID,
+                source_decision_request_id="request:casting-back",
+                source_decision_result_id="result:casting-back",
+            ),
+        )
+    )
+    with_bonus = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        attacker_unit=rangers,
+        attacker_model_instance_id=rangers.own_models[0].model_instance_id,
+        weapon_profile=profile,
+        target_unit_id=_ENEMY_UNIT_ID,
+        hidden_target_unit_ids=(_ENEMY_UNIT_ID,),
+        target_detection_range_bonus_inches=detection_range_bonus_inches_for_effects(
+            state.persisting_effects_for_unit(_ENEMY_UNIT_ID),
+        ),
+    )
+
+    assert with_bonus.is_legal
+
+
+def test_far_reaching_doom_detection_effect_makes_hidden_target_legal_until_source_shoots() -> None:
+    state, _army, rangers, _shroud_runners, _enemy = _path_state()
+    state.record_persisting_effect(
+        _hidden_effect(effect_id="hidden:enemy", target_id=_ENEMY_UNIT_ID)
+    )
+    grant = rule.apply_far_reaching_doom(
+        ShootingUnitSelectedContext(
+            state=state,
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=_RANGERS_UNIT_ID,
+            request_id="request:selected-rangers",
+            result_id="result:selected-rangers",
+        )
+    )[0]
+    state.record_persisting_effect(grant.persisting_effect)
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=_battlefield_state(state),
+    )
+
+    candidate = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset_with_hidden_detection(),
+        attacker_unit=rangers,
+        attacker_model_instance_id=rangers.own_models[0].model_instance_id,
+        weapon_profile=_test_weapon_profile(ap=0),
+        target_unit_id=_ENEMY_UNIT_ID,
+        hidden_target_unit_ids=(_ENEMY_UNIT_ID,),
+        target_detection_range_bonus_inches=detection_range_bonus_inches_for_effects(
+            state.persisting_effects_for_unit(_ENEMY_UNIT_ID),
+            shot_source_unit_ids=(),
+        ),
+    )
+
+    assert candidate.is_legal
+    assert (
+        detection_range_bonus_inches_for_effects(
+            state.persisting_effects_for_unit(_ENEMY_UNIT_ID),
+            shot_source_unit_ids=(_RANGERS_UNIT_ID,),
+        )
+        == 0
+    )
+
+
 def test_nomads_of_the_hidden_way_records_restriction_and_move_request() -> None:
     state, _army, _rangers, _shroud_runners, _enemy = _path_state()
     context = _stratagem_handler_context(
@@ -387,6 +754,62 @@ def test_apply_enhancement_effects_records_persisting_grant_once() -> None:
         for record in decisions.event_log.records
         if record.event_type == "enhancement_effects_applied"
     ] == ["enhancement_effects_applied"]
+
+
+def test_camouflaged_snipers_preserves_hidden_status_after_ranged_attacks() -> None:
+    ruleset = _ruleset_with_hidden_detection()
+    normal_state, _normal_army, _normal_rangers, _normal_shroud, _normal_enemy = _path_state()
+    normal_state.record_persisting_effect(
+        _hidden_effect(effect_id="hidden:normal-rangers", target_id=_RANGERS_UNIT_ID)
+    )
+    normal_decisions = DecisionController()
+
+    apply_hidden_status_loss_after_ranged_attacks(
+        state=normal_state,
+        decisions=normal_decisions,
+        unit_instance_id=_RANGERS_UNIT_ID,
+        request_id="request:normal-shooting",
+        result_id="result:normal-shooting",
+        ruleset_descriptor=ruleset,
+        event_type="unit_hidden_status_lost_after_shooting",
+    )
+
+    assert not unit_is_hidden_by_effects(normal_state.persisting_effects_for_unit(_RANGERS_UNIT_ID))
+    assert any(
+        record.event_type == "unit_hidden_status_lost_after_shooting"
+        for record in normal_decisions.event_log.records
+    )
+
+    camo_state, camo_army, camo_rangers, _camo_shroud, _camo_enemy = _path_state()
+    camo_state.record_persisting_effect(
+        _hidden_effect(effect_id="hidden:camouflaged-rangers", target_id=_RANGERS_UNIT_ID)
+    )
+    camo_grants = enhancements.camouflaged_snipers_effect(
+        _enhancement_context(
+            state=camo_state,
+            army=camo_army,
+            unit=camo_rangers,
+            enhancement_id=enhancements.CAMOUFLAGED_SNIPERS_ENHANCEMENT_ID,
+        )
+    )
+    camo_state.record_persisting_effect(camo_grants[0].persisting_effect)
+    camo_decisions = DecisionController()
+
+    apply_hidden_status_loss_after_ranged_attacks(
+        state=camo_state,
+        decisions=camo_decisions,
+        unit_instance_id=_RANGERS_UNIT_ID,
+        request_id="request:camouflaged-shooting",
+        result_id="result:camouflaged-shooting",
+        ruleset_descriptor=ruleset,
+        event_type="unit_hidden_status_lost_after_shooting",
+    )
+
+    assert unit_is_hidden_by_effects(camo_state.persisting_effects_for_unit(_RANGERS_UNIT_ID))
+    assert any(
+        record.event_type == "unit_hidden_status_preserved_after_shooting"
+        for record in camo_decisions.event_log.records
+    )
 
 
 def test_enhancement_framework_rejects_malformed_persisting_grants_and_handlers() -> None:
@@ -720,6 +1143,39 @@ def _test_weapon_profile(*, ap: int) -> WeaponProfile:
         armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, ap),
         damage_profile=DamageProfile.fixed(1),
     )
+
+
+def _ruleset_with_hidden_detection() -> RulesetDescriptor:
+    ruleset = RulesetDescriptor.warhammer_40000_eleventh()
+    return replace(
+        ruleset,
+        terrain_visibility_policy=replace(
+            ruleset.terrain_visibility_policy,
+            hidden_supported=True,
+            hidden_detection_range_inches=6.0,
+            hidden_lost_after_shooting=True,
+        ),
+        descriptor_hash="",
+    )
+
+
+def _hidden_effect(*, effect_id: str, target_id: str) -> PersistingEffect:
+    return PersistingEffect(
+        effect_id=effect_id,
+        source_rule_id="test:hidden",
+        owner_player_id="player-a" if target_id.startswith("army-a:") else "player-b",
+        target_unit_instance_ids=(target_id,),
+        started_battle_round=1,
+        started_phase=BattlePhase.SHOOTING,
+        expiration=EffectExpiration.end_of_battle(),
+        effect_payload=unit_hidden_payload(source_rule_kind="test_hidden_state"),
+    )
+
+
+def _battlefield_state(state: GameState) -> BattlefieldRuntimeState:
+    if state.battlefield_state is None:
+        raise AssertionError("Expected test battlefield state.")
+    return state.battlefield_state
 
 
 def _path_state(

@@ -438,6 +438,7 @@ def _post_shot_record(
                 target_kind=StratagemTargetKind.FRIENDLY_UNIT,
                 enumerable=True,
                 target_policy_id=JUST_SHOT_UNIT_TARGET_POLICY_ID,
+                required_keywords_any=(RANGERS, SHROUD_RUNNERS),
             ),
             handler_id=handler_id,
             effect_payload=effect_payload,

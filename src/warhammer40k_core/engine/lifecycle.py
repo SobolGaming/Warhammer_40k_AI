@@ -1689,6 +1689,9 @@ class GameLifecycle:
             ruleset_descriptor=self._shooting_phase_handler.ruleset_descriptor,
             army_catalog=self._shooting_phase_handler.army_catalog,
             stratagem_index=runtime_stratagem_index,
+            shooting_unit_selected_hooks=(
+                self._runtime_content_bundle.shooting_unit_selected_hook_registry
+            ),
             shooting_end_surge_hooks=self._runtime_content_bundle.shooting_end_surge_hook_registry,
         )
         self._fight_phase_handler = FightPhaseHandler(

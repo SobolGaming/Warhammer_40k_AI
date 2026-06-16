@@ -268,6 +268,7 @@ class StratagemTargetSpecPayload(TypedDict):
     enumerable: bool
     target_policy_id: str
     required_keywords: list[str]
+    required_keywords_any: list[str]
     required_faction_keywords: list[str]
 
 
@@ -461,6 +462,7 @@ class StratagemTargetSpec:
     enumerable: bool = True
     target_policy_id: str = ""
     required_keywords: tuple[str, ...] = ()
+    required_keywords_any: tuple[str, ...] = ()
     required_faction_keywords: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -498,10 +500,18 @@ class StratagemTargetSpec:
                 self.required_faction_keywords,
             ),
         )
+        object.__setattr__(
+            self,
+            "required_keywords_any",
+            _validate_identifier_tuple(
+                "StratagemTargetSpec required_keywords_any",
+                self.required_keywords_any,
+            ),
+        )
         if self.target_kind is StratagemTargetKind.NONE and not self.enumerable:
             raise GameLifecycleError("Targetless StratagemTargetSpec must be enumerable.")
         if self.target_kind is StratagemTargetKind.NONE and (
-            self.required_keywords or self.required_faction_keywords
+            self.required_keywords or self.required_keywords_any or self.required_faction_keywords
         ):
             raise GameLifecycleError("Targetless StratagemTargetSpec cannot require keywords.")
 
@@ -515,6 +525,7 @@ class StratagemTargetSpec:
             "enumerable": self.enumerable,
             "target_policy_id": self.target_policy_id,
             "required_keywords": list(self.required_keywords),
+            "required_keywords_any": list(self.required_keywords_any),
             "required_faction_keywords": list(self.required_faction_keywords),
         }
 
@@ -525,6 +536,7 @@ class StratagemTargetSpec:
             enumerable=payload["enumerable"],
             target_policy_id=payload["target_policy_id"],
             required_keywords=tuple(payload["required_keywords"]),
+            required_keywords_any=tuple(payload["required_keywords_any"]),
             required_faction_keywords=tuple(payload["required_faction_keywords"]),
         )
 
@@ -3255,6 +3267,12 @@ def _target_binding_error(
         required_keywords=target_spec.required_keywords,
     ):
         return "unit_missing_required_keyword"
+    if not _target_unit_satisfies_required_keywords_any(
+        state=state,
+        target_binding=target_binding,
+        required_keywords_any=target_spec.required_keywords_any,
+    ):
+        return "unit_missing_required_keyword"
     if not _target_unit_satisfies_required_faction_keywords(
         state=state,
         target_binding=target_binding,
@@ -3420,6 +3438,23 @@ def _target_unit_satisfies_required_keywords(
         raise GameLifecycleError("Stratagem target unit is unknown.")
     stored = {_canonical_keyword(keyword) for keyword in unit.keywords}
     return required.issubset(stored)
+
+
+def _target_unit_satisfies_required_keywords_any(
+    *,
+    state: GameState,
+    target_binding: StratagemTargetBinding,
+    required_keywords_any: tuple[str, ...],
+) -> bool:
+    required = {_canonical_keyword(keyword) for keyword in required_keywords_any}
+    if not required:
+        return True
+    target_unit_id = _require_target_unit_id(target_binding)
+    unit = _unit_by_id_or_none(state=state, unit_instance_id=target_unit_id)
+    if unit is None:
+        raise GameLifecycleError("Stratagem target unit is unknown.")
+    stored = {_canonical_keyword(keyword) for keyword in unit.keywords}
+    return bool(required & stored)
 
 
 def _target_unit_satisfies_required_faction_keywords(

@@ -65,7 +65,6 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.movement_proposals import PLACEMENT_PROPOSAL_DECISION_TYPE
 from warhammer40k_core.engine.phase import (
@@ -75,7 +74,10 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.ranged_rule_effects import (
-    detection_range_bonus_payload,
+    detection_range_bonus_inches_for_effects,
+    hidden_unit_effect_ids,
+    ranged_attacks_keep_hidden_by_effects,
+    unit_is_hidden_by_effects,
     weapon_profile_with_character_target_ap_effects,
 )
 from warhammer40k_core.engine.ranged_weapon_keyword_effects import (
@@ -106,6 +108,10 @@ from warhammer40k_core.engine.shooting_targets import (
     unit_has_line_of_sight_to_target,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType, shooting_type_from_token
+from warhammer40k_core.engine.shooting_unit_selected_hooks import (
+    ShootingUnitSelectedContext,
+    ShootingUnitSelectedHookRegistry,
+)
 from warhammer40k_core.engine.transports import (
     FiringDeckWeaponSelection,
     resolve_firing_deck_selection,
@@ -255,7 +261,7 @@ class _AvailableWeapon(TypedDict):
     firing_deck_source_model_instance_id: NotRequired[str]
 
 
-type _ShootingUnitCandidateCacheKey = tuple[str, str, str, str]
+type _ShootingUnitCandidateCacheKey = tuple[str, str, str, str, str]
 type _ShootingModelCandidateCacheKey = tuple[
     str,
     str,
@@ -264,6 +270,8 @@ type _ShootingModelCandidateCacheKey = tuple[
     str | None,
     str,
     str,
+    bool,
+    int,
 ]
 type _ShootingModelCandidateCache = dict[
     _ShootingModelCandidateCacheKey,
@@ -864,6 +872,9 @@ class ShootingPhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
     army_catalog: ArmyCatalog | None = None
     stratagem_index: StratagemCatalogIndex = field(default_factory=_default_stratagem_index)
+    shooting_unit_selected_hooks: ShootingUnitSelectedHookRegistry = field(
+        default_factory=ShootingUnitSelectedHookRegistry.empty
+    )
     shooting_end_surge_hooks: ShootingEndSurgeHookRegistry = field(
         default_factory=ShootingEndSurgeHookRegistry.empty
     )
@@ -882,6 +893,10 @@ class ShootingPhaseHandler:
 
         if type(self.stratagem_index) is not StratagemCatalogIndex:
             raise GameLifecycleError("ShootingPhaseHandler stratagem_index must be an index.")
+        if type(self.shooting_unit_selected_hooks) is not ShootingUnitSelectedHookRegistry:
+            raise GameLifecycleError(
+                "ShootingPhaseHandler shooting_unit_selected_hooks must be a registry."
+            )
         if type(self.shooting_end_surge_hooks) is not ShootingEndSurgeHookRegistry:
             raise GameLifecycleError(
                 "ShootingPhaseHandler shooting_end_surge_hooks must be a registry."
@@ -1279,6 +1294,7 @@ class ShootingPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 army_catalog=_army_catalog_for_handler(self),
+                shooting_unit_selected_hooks=self.shooting_unit_selected_hooks,
             )
             return None
         if result.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE:
@@ -1819,6 +1835,18 @@ def _request_shooting_declaration(
         if target_unit_ids is None
         else _validate_identifier_tuple("shooting target_unit_ids", target_unit_ids)
     )
+    hidden_target_unit_ids = _hidden_target_unit_ids(
+        state=state,
+        target_unit_ids=candidate_target_unit_ids,
+    )
+    detection_range_bonus_by_target_id = _detection_range_bonus_inches_by_target_id(
+        state=state,
+        target_unit_ids=candidate_target_unit_ids,
+    )
+    detection_context_fingerprint = _targeting_detection_context_fingerprint(
+        hidden_target_unit_ids=hidden_target_unit_ids,
+        detection_range_bonus_by_target_id=detection_range_bonus_by_target_id,
+    )
     target_candidates: list[JsonValue] = []
     target_candidate_cache: dict[
         _ShootingUnitCandidateCacheKey,
@@ -1833,6 +1861,7 @@ def _request_shooting_declaration(
         candidate_cache_key = _shooting_unit_candidate_cache_key(
             weapon=weapon,
             attacker_unit=attacker_unit,
+            detection_context_fingerprint=detection_context_fingerprint,
         )
         if candidate_cache_key not in target_candidate_cache:
             target_candidate_cache[candidate_cache_key] = shooting_target_candidates_for_unit(
@@ -1842,6 +1871,8 @@ def _request_shooting_declaration(
                 weapon_profile=profile,
                 target_unit_ids=candidate_target_unit_ids,
                 terrain_features=terrain_features,
+                hidden_target_unit_ids=hidden_target_unit_ids,
+                target_detection_range_bonus_inches_by_unit_id=(detection_range_bonus_by_target_id),
             )
         candidates = target_candidate_cache[candidate_cache_key]
         target_candidates.extend(
@@ -2214,6 +2245,7 @@ def _apply_shooting_unit_selection_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    shooting_unit_selected_hooks: ShootingUnitSelectedHookRegistry,
 ) -> None:
     _validate_shooting_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -2273,76 +2305,50 @@ def _apply_shooting_unit_selection_decision(
             "phase_body_status": "unit_selected",
         },
     )
-    _apply_far_reaching_doom_if_available(
+    _apply_shooting_unit_selected_effect_grants(
         state=state,
         decisions=decisions,
         selection=selection,
+        registry=shooting_unit_selected_hooks,
     )
 
 
-def _apply_far_reaching_doom_if_available(
+def _apply_shooting_unit_selected_effect_grants(
     *,
     state: GameState,
     decisions: DecisionController,
     selection: ShootingUnitSelection,
+    registry: ShootingUnitSelectedHookRegistry,
 ) -> None:
-    aeldari_faction_id = "aeldari"
-    path_of_the_outcast_detachment_id = "path-of-the-outcast"
-    far_reaching_doom_source_rule_id = (
-        "phase17f:phase17e:aeldari:path-of-the-outcast:far-reaching-doom"
+    if type(registry) is not ShootingUnitSelectedHookRegistry:
+        raise GameLifecycleError("Shooting-unit-selected effect grants require a registry.")
+    context = ShootingUnitSelectedContext(
+        state=state,
+        player_id=selection.player_id,
+        battle_round=selection.battle_round,
+        unit_instance_id=selection.unit_instance_id,
+        request_id=selection.request_id,
+        result_id=selection.result_id,
     )
-    far_reaching_doom_effect_kind = "aeldari_path_of_the_outcast_far_reaching_doom"
-    rangers = "RANGERS"
-    shroud_runners = "SHROUD RUNNERS"
-
-    army = state.army_definition_for_player(selection.player_id)
-    if army is None:
-        raise GameLifecycleError("Far-reaching Doom requires selected player's army.")
-    if army.detachment_selection.faction_id != aeldari_faction_id:
-        return
-    if path_of_the_outcast_detachment_id not in army.detachment_selection.detachment_ids:
-        return
-    unit = _unit_by_id(state=state, unit_instance_id=selection.unit_instance_id)
-    if not (_unit_has_keyword(unit, rangers) or _unit_has_keyword(unit, shroud_runners)):
-        return
-    target_unit_ids = _enemy_placed_unit_ids(state=state, player_id=selection.player_id)
-    if not target_unit_ids:
-        return
-    effect = PersistingEffect(
-        effect_id=f"{selection.result_id}:far-reaching-doom",
-        source_rule_id=far_reaching_doom_source_rule_id,
-        owner_player_id=selection.player_id,
-        target_unit_instance_ids=target_unit_ids,
-        started_battle_round=state.battle_round,
-        started_phase=BattlePhase.SHOOTING,
-        expiration=EffectExpiration.end_phase(
-            battle_round=state.battle_round,
-            phase=BattlePhase.SHOOTING,
-            player_id=selection.player_id,
-        ),
-        effect_payload=detection_range_bonus_payload(
-            bonus_inches=6,
-            source_rule_kind=far_reaching_doom_effect_kind,
-            source_unit_instance_id=selection.unit_instance_id,
-            source_decision_request_id=selection.request_id,
-            source_decision_result_id=selection.result_id,
-            expires_when_source_unit_has_shot=True,
-        ),
-    )
-    state.record_persisting_effect(effect)
-    decisions.event_log.append(
-        "far_reaching_doom_detection_range_granted",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": BattlePhase.SHOOTING.value,
-            "player_id": selection.player_id,
-            "shooting_unit_instance_id": selection.unit_instance_id,
-            "target_unit_instance_ids": list(target_unit_ids),
-            "persisting_effect": effect.to_payload(),
-        },
-    )
+    for grant in registry.grants_for(context):
+        state.record_persisting_effect(grant.persisting_effect)
+        decisions.event_log.append(
+            grant.event_type,
+            validate_json_value(
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": state.active_player_id,
+                    "phase": BattlePhase.SHOOTING.value,
+                    "player_id": selection.player_id,
+                    "shooting_unit_instance_id": selection.unit_instance_id,
+                    "request_id": selection.request_id,
+                    "result_id": selection.result_id,
+                    "grant": grant.to_payload(),
+                    "persisting_effect": grant.persisting_effect.to_payload(),
+                }
+            ),
+        )
 
 
 def _apply_shooting_type_selection_decision(
@@ -2443,6 +2449,15 @@ def _apply_shooting_declaration_decision(
         ineligible_unit_instance_ids=ineligible_unit_ids,
         attack_sequence=attack_sequence,
     )
+    apply_hidden_status_loss_after_ranged_attacks(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=proposal.unit_instance_id,
+        request_id=result.request_id,
+        result_id=result.result_id,
+        ruleset_descriptor=ruleset_descriptor,
+        event_type="unit_hidden_status_lost_after_shooting",
+    )
     decisions.event_log.append(
         "shooting_declaration_accepted",
         validate_json_value(
@@ -2503,6 +2518,15 @@ def _apply_out_of_phase_shooting_declaration_decision(
         attack_pools=attack_pools,
         attack_sequence=attack_sequence,
     )
+    apply_hidden_status_loss_after_ranged_attacks(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=proposal.unit_instance_id,
+        request_id=result.request_id,
+        result_id=result.result_id,
+        ruleset_descriptor=ruleset_descriptor,
+        event_type="unit_hidden_status_lost_after_out_of_phase_shooting",
+    )
     decisions.event_log.append(
         "out_of_phase_shooting_declaration_accepted",
         validate_json_value(
@@ -2522,6 +2546,62 @@ def _apply_out_of_phase_shooting_declaration_decision(
         ),
     )
     return True
+
+
+def apply_hidden_status_loss_after_ranged_attacks(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    unit_instance_id: str,
+    request_id: str,
+    result_id: str,
+    ruleset_descriptor: RulesetDescriptor,
+    event_type: str,
+) -> None:
+    if not ruleset_descriptor.terrain_visibility_policy.hidden_lost_after_shooting:
+        return
+    effects = state.persisting_effects_for_unit(unit_instance_id)
+    hidden_effect_ids = hidden_unit_effect_ids(effects)
+    if not hidden_effect_ids:
+        return
+    current_phase = state.current_battle_phase
+    if current_phase is None:
+        raise GameLifecycleError("Hidden shooting status loss requires a battle phase.")
+    if ranged_attacks_keep_hidden_by_effects(effects):
+        decisions.event_log.append(
+            "unit_hidden_status_preserved_after_shooting",
+            validate_json_value(
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": state.active_player_id,
+                    "phase": current_phase.value,
+                    "unit_instance_id": unit_instance_id,
+                    "request_id": request_id,
+                    "result_id": result_id,
+                    "hidden_effect_ids": list(hidden_effect_ids),
+                    "phase_body_status": "hidden_status_preserved",
+                }
+            ),
+        )
+        return
+    removed_effects = state.remove_persisting_effects_by_id(hidden_effect_ids)
+    decisions.event_log.append(
+        event_type,
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": current_phase.value,
+                "unit_instance_id": unit_instance_id,
+                "request_id": request_id,
+                "result_id": result_id,
+                "removed_persisting_effects": [effect.to_payload() for effect in removed_effects],
+                "phase_body_status": "hidden_status_lost",
+            }
+        ),
+    )
 
 
 def _apply_attack_sequence_decision(
@@ -2880,6 +2960,17 @@ def _attack_pools_or_validation(
         state,
         out_of_phase_state,
     )
+    proposal_target_unit_ids = tuple(
+        sorted({declaration.target_unit_instance_id for declaration in proposal.declarations})
+    )
+    hidden_target_unit_ids = _hidden_target_unit_ids(
+        state=state,
+        target_unit_ids=proposal_target_unit_ids,
+    )
+    detection_range_bonus_by_target_id = _detection_range_bonus_inches_by_target_id(
+        state=state,
+        target_unit_ids=proposal_target_unit_ids,
+    )
     attack_pools: list[RangedAttackPool] = []
     seen_declaration_keys: set[tuple[str, str, str, str | None, str | None]] = set()
     model_pistol_declaration_kind: dict[tuple[str, str], bool] = {}
@@ -2945,6 +3036,11 @@ def _attack_pools_or_validation(
             weapon_profile=weapon_profile,
             target_unit_id=declaration.target_unit_instance_id,
             terrain_features=terrain_features,
+            hidden_target_unit_ids=hidden_target_unit_ids,
+            target_detection_range_bonus_inches=detection_range_bonus_by_target_id.get(
+                declaration.target_unit_instance_id,
+                0,
+            ),
         )
         if not candidate.is_legal:
             violation = candidate.violation_code
@@ -4201,6 +4297,14 @@ def _rules_unit_has_legal_shooting_declaration(
         else _validate_identifier_tuple("shooting declaration target_unit_ids", target_unit_ids)
     )
     terrain_features = _terrain_features_for_state(state)
+    hidden_target_unit_ids = _hidden_target_unit_ids(
+        state=state,
+        target_unit_ids=resolved_target_unit_ids,
+    )
+    detection_range_bonus_by_target_id = _detection_range_bonus_inches_by_target_id(
+        state=state,
+        target_unit_ids=resolved_target_unit_ids,
+    )
     candidate_cache: _ShootingModelCandidateCache = {}
     for weapon in _available_weapons_for_rules_unit(
         state=state,
@@ -4222,6 +4326,11 @@ def _rules_unit_has_legal_shooting_declaration(
                 weapon=weapon,
                 target_unit_id=target_unit_id,
                 terrain_features=terrain_features,
+                hidden_target_unit_ids=hidden_target_unit_ids,
+                target_detection_range_bonus_inches=detection_range_bonus_by_target_id.get(
+                    target_unit_id,
+                    0,
+                ),
             )
             if not candidate.is_legal:
                 continue
@@ -4238,6 +4347,65 @@ def _rules_unit_has_legal_shooting_declaration(
             ):
                 return True
     return False
+
+
+def _hidden_target_unit_ids(
+    *,
+    state: GameState,
+    target_unit_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            target_unit_id
+            for target_unit_id in _validate_identifier_tuple(
+                "hidden target target_unit_ids",
+                target_unit_ids,
+            )
+            if unit_is_hidden_by_effects(state.persisting_effects_for_unit(target_unit_id))
+        )
+    )
+
+
+def _detection_range_bonus_inches_by_target_id(
+    *,
+    state: GameState,
+    target_unit_ids: tuple[str, ...],
+) -> dict[str, int]:
+    shot_source_unit_ids = _shot_source_unit_ids_for_detection_effects(state)
+    bonuses: dict[str, int] = {}
+    for target_unit_id in _validate_identifier_tuple(
+        "detection range target_unit_ids",
+        target_unit_ids,
+    ):
+        bonus_inches = detection_range_bonus_inches_for_effects(
+            state.persisting_effects_for_unit(target_unit_id),
+            shot_source_unit_ids=shot_source_unit_ids,
+        )
+        if bonus_inches > 0:
+            bonuses[target_unit_id] = bonus_inches
+    return bonuses
+
+
+def _shot_source_unit_ids_for_detection_effects(state: GameState) -> tuple[str, ...]:
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None:
+        return ()
+    return shooting_state.shot_unit_ids
+
+
+def _targeting_detection_context_fingerprint(
+    *,
+    hidden_target_unit_ids: tuple[str, ...],
+    detection_range_bonus_by_target_id: dict[str, int],
+) -> str:
+    return canonical_json(
+        validate_json_value(
+            {
+                "hidden_target_unit_ids": list(hidden_target_unit_ids),
+                "detection_range_bonus_by_target_id": detection_range_bonus_by_target_id,
+            }
+        )
+    )
 
 
 def _unit_has_legal_shooting_declaration(
@@ -4258,6 +4426,14 @@ def _unit_has_legal_shooting_declaration(
         else _validate_identifier_tuple("shooting declaration target_unit_ids", target_unit_ids)
     )
     terrain_features = _terrain_features_for_state(state)
+    hidden_target_unit_ids = _hidden_target_unit_ids(
+        state=state,
+        target_unit_ids=resolved_target_unit_ids,
+    )
+    detection_range_bonus_by_target_id = _detection_range_bonus_inches_by_target_id(
+        state=state,
+        target_unit_ids=resolved_target_unit_ids,
+    )
     candidate_cache: _ShootingModelCandidateCache = {}
     for weapon in _available_weapons_for_unit(
         state=state,
@@ -4275,6 +4451,11 @@ def _unit_has_legal_shooting_declaration(
                 weapon=weapon,
                 target_unit_id=target_unit_id,
                 terrain_features=terrain_features,
+                hidden_target_unit_ids=hidden_target_unit_ids,
+                target_detection_range_bonus_inches=detection_range_bonus_by_target_id.get(
+                    target_unit_id,
+                    0,
+                ),
             )
             if not candidate.is_legal:
                 continue
@@ -4310,6 +4491,14 @@ def _legal_shooting_types_for_rules_unit(
     )
     scenario = _battlefield_scenario(state)
     terrain_features = _terrain_features_for_state(state)
+    hidden_target_unit_ids = _hidden_target_unit_ids(
+        state=state,
+        target_unit_ids=resolved_target_unit_ids,
+    )
+    detection_range_bonus_by_target_id = _detection_range_bonus_inches_by_target_id(
+        state=state,
+        target_unit_ids=resolved_target_unit_ids,
+    )
     candidate_cache: _ShootingModelCandidateCache = {}
     legal_types: set[ShootingType] = set()
     for shooting_type in (
@@ -4338,6 +4527,11 @@ def _legal_shooting_types_for_rules_unit(
                     weapon=weapon,
                     target_unit_id=target_unit_id,
                     terrain_features=terrain_features,
+                    hidden_target_unit_ids=hidden_target_unit_ids,
+                    target_detection_range_bonus_inches=detection_range_bonus_by_target_id.get(
+                        target_unit_id,
+                        0,
+                    ),
                 )
                 if not candidate.is_legal:
                     continue
@@ -4375,8 +4569,15 @@ def _cached_shooting_target_candidate_for_model(
     weapon: _AvailableWeapon,
     target_unit_id: str,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
+    hidden_target_unit_ids: tuple[str, ...],
+    target_detection_range_bonus_inches: int,
 ) -> ShootingTargetCandidate:
-    cache_key = _shooting_model_candidate_cache_key(weapon=weapon, target_unit_id=target_unit_id)
+    cache_key = _shooting_model_candidate_cache_key(
+        weapon=weapon,
+        target_unit_id=target_unit_id,
+        target_is_hidden=target_unit_id in hidden_target_unit_ids,
+        target_detection_range_bonus_inches=target_detection_range_bonus_inches,
+    )
     if cache_key not in cache:
         cache[cache_key] = shooting_target_candidate_for_model(
             scenario=scenario,
@@ -4386,6 +4587,8 @@ def _cached_shooting_target_candidate_for_model(
             weapon_profile=weapon["weapon_profile"],
             target_unit_id=target_unit_id,
             terrain_features=terrain_features,
+            hidden_target_unit_ids=hidden_target_unit_ids,
+            target_detection_range_bonus_inches=target_detection_range_bonus_inches,
         )
     return cache[cache_key]
 
@@ -4393,6 +4596,7 @@ def _cached_shooting_target_candidate_for_model(
 def _shooting_unit_candidate_cache_key(
     weapon: _AvailableWeapon,
     attacker_unit: UnitInstance,
+    detection_context_fingerprint: str,
 ) -> _ShootingUnitCandidateCacheKey:
     profile = weapon["weapon_profile"]
     return (
@@ -4400,6 +4604,7 @@ def _shooting_unit_candidate_cache_key(
         weapon["wargear_id"],
         profile.profile_id,
         _weapon_profile_cache_fingerprint(profile),
+        detection_context_fingerprint,
     )
 
 
@@ -4407,6 +4612,8 @@ def _shooting_model_candidate_cache_key(
     *,
     weapon: _AvailableWeapon,
     target_unit_id: str,
+    target_is_hidden: bool,
+    target_detection_range_bonus_inches: int,
 ) -> _ShootingModelCandidateCacheKey:
     profile = weapon["weapon_profile"]
     return (
@@ -4417,6 +4624,8 @@ def _shooting_model_candidate_cache_key(
         weapon.get("firing_deck_source_model_instance_id"),
         _weapon_profile_cache_fingerprint(profile),
         target_unit_id,
+        target_is_hidden,
+        target_detection_range_bonus_inches,
     )
 
 
