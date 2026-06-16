@@ -139,193 +139,51 @@ adapters -> may import engine, never the reverse
 
 ## 4. Build order
 
-The CORE V2 build order roadmap now lives in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
+The detailed phase roadmap belongs in [ARCHITECTURE_V2.md](ARCHITECTURE_V2.md).
+This README keeps only the build sequence and the current high-level status.
 
-Current roadmap implementation status: phases 1-15F, phases 16A-16E,
-Phases 17A-17F plus Phase 17J, and Phase 18A are complete. Phase 14E is
-complete: its allocation-group host includes Benefit of Cover and Plunging Fire
-BS modifiers, ordered InSv-then-armour Save resolution with no save-kind adapter
-choice, automatic allocation groups, defender ordered allocation decisions only
-for legal same-tier group choices, grouped fixed-damage save-before-damage
-resolution, current group transitions, low-to-high failed-save damage ordering,
-normal-damage-before-routed-mortal ordering, grouped-host Precision/Lethal
-Hits/Sustained Hits/Devastating Wounds revalidation, derived terrain objectives
-that require terrain-area containment rather than marker-radius contribution,
-melee Cleave dice gathering, and Lance charge-gated Wound-roll modifiers through
-the Phase 15 Charge/Fight host. Phase 14F completes the shooting-type cutover
-with finite shooting-type selection, supported grouped attack resolution,
-Normal/Assault/Close-quarters/Indirect/Snap routing, Indirect and Snap Hit-roll
-reroll bans, and the Shooting-phase Mission Action start lock. Phase 14G
-completes the Charge/Fight source contract as typed ruleset descriptor payloads
-and deferred unsupported Core Stratagem hooks. Phase 14H is complete for the
-current transport/reserve plus attached-unit attack/healing projection slice:
-runtime Attached Unit formation uses structured army-list Leader/Support declarations
-against catalog attachment eligibility, emits first-class attached rules-unit formation records,
-derives attached-unit Starting Strength until
-split, and feeds source-backed Bodyguard/Leader/Support evidence used by
-Shooting acting-unit selection, mixed-Toughness attacks, healing, revival, persisting effects,
-and stratagem target canonicalization. Phase 16D now completes the strict
-army-construction records that those runtime hosts consume: Warlord,
-Enhancement, roster-legality, Dedicated Transport manifest provenance, and
-the source army-definition data from which `GameState` derives
-`StartingStrengthRecord` entries. Phase 14H also covers
-Movement-phase Combat Disembark fallback with engine-owned Tactical-invalid
-evidence, Combat/Emergency hazard rolls through the official 1-2 Hazard Roll
-threshold and shared mortal-wound/Feel No Pain service, destroyed-Transport
-Emergency Disembark from actual destruction timing before Transport removal and
-Deadly Demise, setup-time Strategic Reserve declarations and battle-formation
-Transport embarkation, repositioned-unit Advance/Fall Back/Disembark history and
-persisting effects, exact At Half-strength replay payload state, and runtime
-added-unit Starting Strength records. Phase 14I is complete for the current Core
-Stratagem and core ability source cutover: all 11th Edition Core Stratagem source
-rows have supported handlers, implemented duplicate weapon ability selection is
-adapter-visible and replay-safe, and unimplemented Core ability families are
-fail-closed as explicit unsupported descriptors. Phase 14J completes the current
-mission/catalog replacement slice with source-tracked 11th Edition Force
-Dispositions, the named 25-cell Primary Mission matrix, three layout identifiers
-per matrix cell, the Armageddon 18-card Secondary Mission deck identity and
-Fixed/Tactical availability, and engine-achievement-gated finite Tactical
-Secondary score/retain decisions; individual secondary achievement semantics
-beyond current state-backed rows and layout geometry remain pending source work,
-while Event Companion Primary Mission scoring coverage tracks source-known,
-engine-pending, and awaiting-source missions. Phase 14K is complete:
-attack/save cutover hardening
-rejects retired save/allocation decision surfaces, grouped Inflict Damage uses defender
-`select_damage_allocation_model` decisions with pre-pop stale-legality rejection,
-old Aircraft minimum-move/pivot runtime policy is removed, reserve arrivals use
-Move Units records and more-than-8" enemy spacing, and source/audit coverage
-rejects retired Core Stratagem names.
+Build in this order:
 
-Phase 14L and Phase 15A-F are complete for ranged attack grouping, charge declaration/roll/movement, Fight phase activation/pass/interrupt ordering, Pile In/Consolidate proposal routing, melee declarations that reuse the shared Making Attacks sequence, source-backed Heroic Intervention, Counteroffensive, Crushing Impact, and Epic Challenge Stratagem handling, and Charge/Fight completion gates that drain pending phase work before completion.
+1. Governance, quality gates, deterministic RNG, dice, attributes, modifiers,
+   and source-text normalization.
+2. Wargear, weapon profiles, model geometry, units, attached units, battlefield
+   geometry, visibility, pathing, objectives, and mission setup.
+3. Decision requests/results, event records, replay, lifecycle routing, and the
+   shared adapter contract.
+4. Movement, shooting, charge, fight, deployment, reserves, transports,
+   reactive movement, and grouped attack/damage resolution.
+5. Source packages, catalog generation, rule IR, generic rule execution,
+   faction coverage, and faction-specific runtime handlers.
+6. Adapters and interfaces: headless, CLI, UI, network, event streams,
+   viewer-safe projection, and trigger opportunity windows.
+7. AI, rankers, training, and performance work only after the deterministic
+   rules core and replay records are trustworthy.
 
-Phase 16A is complete for source-backed Deploy Armies. The lifecycle now creates an empty source-backed battlefield at Create Battlefield, deploys units through `select_deployment_unit` and `submit_deployment_placement`, validates deployment zones, `INFILTRATORS`, terrain/objective/engagement/coherency endpoints, attached rules-unit model sets, reserves exclusion, stale/malformed submissions, and deterministic replay-safe placement events without using the Phase 10A deterministic bridge.
+Current status:
 
-Phase 16B is complete for redeployments, Scouts, and pre-battle ability resolution. Setup now exposes redeploy and pre-battle finite decisions, uses Phase 12A sequencing when both players have simultaneous pre-battle effects, validates redeploy and Scout reserve setup as typed placement proposals, validates Scout Move proposals with per-model `PathWitness` evidence and shared pathing/terrain/coherency checks, derives `Scouts X"` distances from structured datasheet ability descriptors, applies the official Scouts duplicate-distance rule, records deterministic `PreBattleActionRecord` payloads, and keeps Scout moves out of Movement phase action state. Current catalog ability ownership is datasheet/component-granular; future per-model catalog ownership can narrow mixed-model Scouts eligibility without changing the adapter proposal path.
+- Core rules infrastructure through movement, shooting, charge, fight, setup,
+  reserves, transports, missions, replay, source ingestion, catalog generation,
+  rule IR, generic rule execution, and adapter decision submission is in place.
+- Faction semantic execution is active incremental work. Current runtime
+  support includes selected Chaos Daemons and Aeldari Phase 17G slices; broad
+  datasheet, wargear, weapon, and remaining faction execution remains later
+  Phase 17 work.
+- Local CLI/human decision entry, viewer-safe catalog/live unit-model projection,
+  and trigger opportunity-window intent support are documented in
+  [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) and
+  [docs/TRIGGER_OPPORTUNITY_WINDOWS.md](docs/TRIGGER_OPPORTUNITY_WINDOWS.md).
+- Official source evidence lives in `docs/source_rules`,
+  `data/source_manifests`, `data/raw/faction_packs`, and generated source
+  package artifacts. Runtime engine code must consume structured descriptors,
+  not raw PDFs, CSV rows, HTML, or prose parsing.
+- README milestone anchors retained for code-quality audits: Phase 14H is complete;
+  Phase 14I is complete; Phase 14K is complete; Phase 17A.1 is complete.
+  Phase 14H anchors: runtime Attached Unit formation; structured army-list Leader/Support declarations; first-class attached rules-unit formation records; healing, revival, persisting effects; Movement-phase Combat Disembark fallback with engine-owned evidence; setup-time Strategic Reserve declarations; repositioned-unit Advance/Fall Back/Disembark history.
+  Source-linked model geometry still requires a representative model height with provenance
+  before runtime catalog use.
 
-Phase 16C is complete for reserve declarations during Declare Battle Formations. Setup now exposes `select_reserve_declaration`, records Strategic Reserves and Deep Strike setup choices through lifecycle decisions, enforces source-backed Strategic Reserves points caps and FORTIFICATION exclusions, records AIRCRAFT mandatory reserves as ordinary `ReserveState` payloads, rejects stale reserve submissions before queue pop, and excludes declared reserves from Deploy Armies options.
-
-Phase 16D is complete for source-backed army construction and runtime instantiation. Strict roster requests now validate Strike Force unit points plus selected Enhancement points, unit limits, Warlord selection, Enhancement assignment rules, attached-squad Enhancement limits, Epic Hero restrictions, required Dedicated Transport manifest source data, and provided Dedicated Transport cargo legality with deterministic `RosterLegalityReport` diagnostics. Production `GameConfig` values require strict mustering requests by default; legacy smoke fixtures must opt into `allow_legacy_non_strict_rosters`. Mustered armies preserve Warlord, Enhancement, unit-point, Dedicated Transport, and legality provenance in JSON-safe payloads, promote the selected Warlord with a `WARLORD` keyword, and setup records starting embarked cargo from source-backed manifests before Deploy Armies while explicit empty Dedicated Transport manifests become deterministic setup consequences that exclude the transport from deployment and mark it destroyed in battle round 1. `GameState.record_army_definition(...)` derives the `StartingStrengthRecord` set consumed by later phases.
-
-Phase 16E is complete for setup completion gates. Setup-to-battle transition is now engine-owned: the lifecycle audits drained decision and reaction queues, final setup-step position, source-backed mission and army readiness, Secondary Mission choices, attacker/defender state, reserve declarations, deployment completion, battlefield coherency, and unresolved redeploy/pre-battle actions before battle round one can start. Legal completion emits deterministic setup legality, replay checkpoint, and battle-start payloads; invalid setup returns typed `setup_completion_gate_failed` diagnostics and remains in setup without using the Phase 10A deterministic placement bridge.
-
-Phase 17A is complete for the edition-aware Wahapedia source mirror and CSV-to-JSON ETL. Source snapshots and package manifests now preserve checksums, upstream identity, source date, source-edition identity, deterministic artifact hashes, source-row provenance, stable source text IDs, HTML sanitization reports, structured source-text normalization, runtime-field HTML exclusion, immutable source overlay release packages, source-reference catalog generation, and grouped malformed-row diagnostics. CSV exports are transient fetch inputs and are removed after JSON artifact generation by default; checked-in Wahapedia snapshots keep JSON artifacts and manifests. The source mirror remains ingest/catalog tooling only; engine runtime is statically blocked from importing raw source mirror, overlay, source-reference, or sanitizer modules.
-
-Phase 17A.1 is complete for official 11th Edition transition patch packages.
-Transition patches now preserve official source package identity, source date,
-faction ID, normalized instruction text, stable source IDs, deterministic
-operation ordering, exact or explicit multi-row source targets, target-drift
-diagnostics, FAQ classification, unsupported executable-change diagnostics, and
-patched source artifact hashes. Rule-text replacement and append operations
-rerun HTML sanitization, structured normalization, and parsed-token generation,
-profile and weapon characteristic replacements update exact source fields, and
-engine runtime is statically blocked from importing transition patch tooling.
-
-Phase 17B is complete for canonical 11th Edition catalog generation from patched
-source data. Catalog packages now preserve deterministic datasheet, model,
-wargear, weapon, faction, detachment, enhancement, Stratagem, physical geometry,
-support-base, z-offset, representative-height, source-unit, canonical-unit,
-coordinate-frame, origin, and source-evidence records, and unresolved geometry or
-height evidence blocks package emission instead of falling back to runtime
-heuristics.
-
-Phase 17B also includes the Wahapedia-to-canonical bridge tooling. The bridge
-converts normalized Wahapedia JSON artifacts into canonical-shaped 11th Edition
-source artifacts, keeps CSV exports transient, applies explicit PDF source
-corrections when faction-pack PDFs disagree with Wahapedia, and emits structured
-wargear-option condition/effect descriptors instead of leaving runtime code to
-parse option prose. Wahapedia remains the base source for official base-size
-text; representative model height still requires accepted override evidence
-before catalog emission.
-
-Phase 17C is complete for the rule-language intermediate representation.
-Normalized source text now compiles into deterministic, source-spanned, versioned
-`RuleIR` payloads with reusable template IDs, typed trigger/condition/target/effect/duration
-components, explicit unsupported diagnostics, stable IR hashes, and a static
-runtime boundary that keeps engine code from importing parser/compiler tooling.
-
-Phase 17D is complete for generic rule execution handlers. Compiled `RuleIR`
-clauses now execute through registered generic handlers for modifiers, reroll
-permissions, VP and CP resource changes, Stratagem target binding, and Aura
-recomputation from current battlefield positions. Unsupported IR fails closed as
-typed unsupported results, source-linked execution events are deterministic and
-JSON-safe, and ability/Stratagem bridges can execute replay-safe compiled IR
-payloads without importing parser/compiler/template tooling.
-
-Phase 17J is complete for Warhammer Event Companion v1.0 mission-pack
-compliance and source geometry inventory. The source package now records Event
-Mission Sequence ordering, Tactical/Fixed Secondary procedures, all 25
-implemented Primary Mission matrix cells, Primary Mission scoring coverage rows
-grouped as engine-implemented, source-known engine-pending, or awaiting-source,
-all 45 source-page layout identities with pending coordinate-extraction status,
-no Deployment/Twist card usage, separate empty card-amendment and FAQ patch
-records, Base Size Guide source rows with geometry-resolution statuses, Event
-Companion mission-pack import, setup/scoring pack lookup, deployment
-remainder-drain coverage, and a static audit that runtime code does not parse
-Event Companion PDF text or images.
-
-Phase 17E is complete for source-backed faction coverage. The
-`gw-11e-phase17e-faction-coverage-2026-27` package validates every official
-faction-pack PDF manifest record, links every seeded faction to an army-rule
-coverage descriptor, links every seeded detachment to detachment rule,
-enhancement, and Stratagem descriptor coverage, and emits deterministic coverage
-totals grouped as implemented, generic-supported, named-handler-required, and
-unsupported. Exact datasheet-intake rows, enhancement subrows, and Stratagem
-subrows that are absent from the update PDFs are fail-closed as approved
-unsupported diagnostics, keeping broad datasheet, wargear, and weapon execution
-in Phase 17H.
-
-Phase 17F is complete for faction execution dispatch and status over every
-Phase 17E coverage row. The
-`gw-11e-phase17f-faction-execution-2026-27` package maps every Phase 17E
-coverage descriptor to an execution record, and
-`engine/faction_rule_execution.py` provides one deterministic engine path that
-returns replay-safe results. Current faction army-rule, detachment-rule,
-enhancement, Stratagem, and datasheet-intake rows are blocked by explicit
-approved execution reasons until native structured rule semantics exist.
-Executable statuses also fail closed unless a registered generic IR executor or
-named handler runs; APPLIED is not emitted by status alone, and no covered row
-falls through as a missing handler or silent fallback.
-
-Phase 17G is underway for actual faction-level semantic execution. The current
-Chaos Daemons slice supports the Shadow of Chaos army-rule Battle-shock runtime
-hook, the Cavalcade of Chaos / Unholy Avalanche Fall Back eligibility hook, and
-the Cavalcade of Chaos / Apocalyptic Steeds Upgrade enhancement effect as a
-source-linked static Movement characteristic modifier, plus the Cavalcade of
-Chaos / Soul-Shattering Charge Upgrade selected-to-fight ability hook for
-source-linked melee targeting permissions and the Cavalcade of Chaos /
-Warp-Riders selected-to-move Stratagem through the shared `use_stratagem` CP,
-targeting, and temporary movement-keyword path. Cavalcade also supports From
-Beyond the Veil through the shared end-Movement ingress Stratagem and Strategic
-Reserves placement path, and Inescapable Manifestations through the opponent
-Fall Back reaction window that forces Desperate Escape through the normal
-Movement proposal path. The slice also supports Blood Legion / Murdercall
-through source-linked Movement-end surge hooks and Blood Legion / Blood Tainted
-through phase-end objective-control retention hooks; remaining army rules,
-detachment rules, enhancement effects, and faction/detachment Stratagems are
-still planned Phase 17G work. Phase 17H is planned for datasheet, wargear, and
-weapon ability execution. Phase 17I is planned for source-content coverage,
-execution-status, and unsupported-descriptor audits.
-
-Phase 18A is complete for local CLI/human decision entry and viewer-safe
-datacard projection. CLI helpers render pending finite and parameterized
-`DecisionRequest`s, convert human choices into normal `DecisionResult`s through
-the lifecycle, and never mutate state directly. The adapter projection now
-exposes a source-hashed `RulesCatalogViewPayload` plus live
-`unit_display_by_id` and `model_display_by_id` records keyed by stable IDs, with
-engine-resolved M/T/SV/W/LD/OC characteristics including Battle-shock OC,
-wargear display records, wounds, base size, keywords, visible modifier display
-traces, and cache invalidation through `projection_state_hash`.
-
-Official GW faction-pack PDFs are tracked source evidence when declared in `data/source_manifests/gw_11e_faction_packs.yaml` and stored under `data/raw/faction_packs`. Extracted whole-source text/page files remain local-only validation inputs. Commit source manifests, official URLs, retrieval metadata, hashes, page/section references, structured patch operations, diagnostics, generated catalog artifacts, and approved faction-pack PDFs. The checked-in `docs/source_rules` Core Rules and Event Companion PDFs are also source-rule evidence used for source-linked rules and base-size provenance. The Phase 17 faction-pack source manifest uses the official Warhammer 40,000 downloads page at `https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/` as its shared source page.
-
-Phase 17B catalog generation source-links physical model geometry.
-`Use model`, blank, `No official base size`, bare `Hull`, flying-base, and
-other non-circular/non-oval model footprints require reviewed geometry override
-records before runtime instantiation. Each unique model profile must carry a
-representative model height with provenance so LoS, vertical distance, and
-multi-floor terrain collision do not depend on runtime heuristics.
-
-Adapter, UI, CLI, headless, network, AI, replay, and test-driver teams should use [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) for the shared Phase 11D decision/proposal submission contract plus viewer-scoped scoring, event, and Phase 18A unit/model display projection rules.
+When a phase status changes, update the focused status document or contract
+for that subsystem instead of turning this README into a changelog.
 
 ## 5. Test policy
 

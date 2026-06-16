@@ -154,6 +154,7 @@ from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.reaction_queue import ReactionQueue
+    from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 
 
 SELECT_SHOOTING_UNIT_DECISION_TYPE = "select_shooting_unit"
@@ -161,6 +162,12 @@ SELECT_SHOOTING_TYPE_DECISION_TYPE = "select_shooting_type"
 SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE = "submit_shooting_declaration"
 COMPLETE_SHOOTING_PHASE_OPTION_ID = "complete_shooting_phase"
 _COMPLETE_SHOOTING_PHASE_STATUS = "shooting_phase_complete"
+
+
+def _default_stratagem_index() -> StratagemCatalogIndex:
+    from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
+
+    return eleventh_edition_stratagem_index()
 
 
 class ShootingUnitSelectionPayload(TypedDict):
@@ -848,6 +855,7 @@ class OutOfPhaseShootingState:
 class ShootingPhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
     army_catalog: ArmyCatalog | None = None
+    stratagem_index: StratagemCatalogIndex = field(default_factory=_default_stratagem_index)
     shooting_end_surge_hooks: ShootingEndSurgeHookRegistry = field(
         default_factory=ShootingEndSurgeHookRegistry.empty
     )
@@ -862,6 +870,10 @@ class ShootingPhaseHandler:
             )
         if self.army_catalog is not None and type(self.army_catalog) is not ArmyCatalog:
             raise GameLifecycleError("ShootingPhaseHandler army_catalog must be an ArmyCatalog.")
+        from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
+
+        if type(self.stratagem_index) is not StratagemCatalogIndex:
+            raise GameLifecycleError("ShootingPhaseHandler stratagem_index must be an index.")
         if type(self.shooting_end_surge_hooks) is not ShootingEndSurgeHookRegistry:
             raise GameLifecycleError(
                 "ShootingPhaseHandler shooting_end_surge_hooks must be a registry."
@@ -889,6 +901,7 @@ class ShootingPhaseHandler:
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 attack_sequence=shooting_state.attack_sequence,
                 already_allocated_model_ids=shooting_state.allocated_model_ids_this_phase,
+                stratagem_index=self.stratagem_index,
             )
             shooting_state = shooting_state.with_attack_sequence_update(
                 attack_sequence=attack_sequence,
@@ -1015,6 +1028,7 @@ class ShootingPhaseHandler:
             ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             attack_sequence=out_of_phase_state.attack_sequence,
             already_allocated_model_ids=out_of_phase_state.allocated_model_ids,
+            stratagem_index=self.stratagem_index,
         )
         state.out_of_phase_shooting_state = out_of_phase_state.with_attack_sequence_update(
             attack_sequence=attack_sequence,
@@ -1282,6 +1296,7 @@ class ShootingPhaseHandler:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                stratagem_index=self.stratagem_index,
             )
         if result.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE:
             return _apply_attack_sequence_decision(
@@ -1289,6 +1304,7 @@ class ShootingPhaseHandler:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                stratagem_index=self.stratagem_index,
             )
         raise GameLifecycleError("ShootingPhaseHandler received unsupported decision_type.")
 
@@ -2280,6 +2296,7 @@ def _apply_attack_sequence_decision(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    stratagem_index: StratagemCatalogIndex,
 ) -> LifecycleStatus | None:
     out_of_phase_state = state.out_of_phase_shooting_state
     if out_of_phase_state is not None and out_of_phase_state.attack_sequence is not None:
@@ -2290,6 +2307,7 @@ def _apply_attack_sequence_decision(
             ruleset_descriptor=ruleset_descriptor,
             attack_sequence=out_of_phase_state.attack_sequence,
             already_allocated_model_ids=out_of_phase_state.allocated_model_ids,
+            stratagem_index=stratagem_index,
         )
         state.out_of_phase_shooting_state = out_of_phase_state.with_attack_sequence_update(
             attack_sequence=attack_sequence,
@@ -2306,6 +2324,7 @@ def _apply_attack_sequence_decision(
         ruleset_descriptor=ruleset_descriptor,
         attack_sequence=shooting_state.attack_sequence,
         already_allocated_model_ids=shooting_state.allocated_model_ids_this_phase,
+        stratagem_index=stratagem_index,
     )
     state.shooting_phase_state = shooting_state.with_attack_sequence_update(
         attack_sequence=attack_sequence,
@@ -2373,6 +2392,7 @@ def _apply_attack_sequence_decision_to_sequence(
     ruleset_descriptor: RulesetDescriptor,
     attack_sequence: AttackSequence,
     already_allocated_model_ids: tuple[str, ...],
+    stratagem_index: StratagemCatalogIndex,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if result.decision_type == SELECT_ALLOCATION_ORDER_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_allocation_order_decision(
@@ -2382,6 +2402,7 @@ def _apply_attack_sequence_decision_to_sequence(
             attack_sequence=attack_sequence,
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
+            stratagem_index=stratagem_index,
         )
     elif result.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_damage_allocation_model_decision(
@@ -2391,6 +2412,7 @@ def _apply_attack_sequence_decision_to_sequence(
             attack_sequence=attack_sequence,
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
+            stratagem_index=stratagem_index,
         )
     elif result.decision_type == SELECT_PRECISION_ALLOCATION_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_precision_allocation_decision(
@@ -2400,6 +2422,7 @@ def _apply_attack_sequence_decision_to_sequence(
             attack_sequence=attack_sequence,
             result=result,
             already_allocated_model_ids=already_allocated_model_ids,
+            stratagem_index=stratagem_index,
         )
     elif result.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_feel_no_pain_decision(
