@@ -1282,6 +1282,17 @@ y_inches}` vertices, along with the area `classification`,
 `rotation_degrees` metadata. Terrain areas are layout footprints; they are not
 the terrain features that will later be placed on those areas.
 
+Mission setup projections may also expose
+`GameViewPayload.mission_setup.objective_terrain_areas[*]` when source-backed
+objectives are terrain footprints rather than standalone marker disks. Each
+entry links one objective marker ID and role to one or more `terrain_area_ids`.
+Multiple terrain area IDs on one entry represent a single composite objective
+made from bordered footprint polygons. Adapters should render those linked
+terrain areas as the objective footprint and treat the objective marker as
+stable objective identity/label metadata. Adapters must not infer objective
+terrain, light/dense terrain traits, or terrain-feature rules from footprint
+colors, terrain area IDs, template IDs, or `source_id` strings.
+
 Terrain features, when present, expose first-class display geometry under
 `GameViewPayload.mission_setup.terrain_features[*].display_geometry`. The
 display geometry payload uses schema `terrain-display-v1`, coordinate space

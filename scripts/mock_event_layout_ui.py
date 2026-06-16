@@ -103,9 +103,41 @@ def _layout_payload(
             }
             for zone in row.deployment_zones
         ],
+        "objective_markers": _objective_marker_payloads(row),
+        "objective_terrain_areas": _objective_terrain_area_payloads(extracted_layout),
         "terrain_areas": _terrain_area_payloads(extracted_layout),
         "terrain_features": [_terrain_feature_payload(feature) for feature in row.terrain_features],
     }
+
+
+def _objective_marker_payloads(
+    row: chapter_approved.SourceBattlefieldLayoutRow,
+) -> list[dict[str, object]]:
+    return [
+        {
+            "id": marker.objective_marker_id,
+            "name": marker.name,
+            "role": marker.objective_kind,
+            "x_inches": marker.x_inches,
+            "y_inches": marker.y_inches,
+        }
+        for marker in row.objective_markers
+    ]
+
+
+def _objective_terrain_area_payloads(
+    layout: BattlefieldLayoutDefinition | None,
+) -> list[dict[str, object]]:
+    if layout is None:
+        return []
+    return [
+        {
+            "objective_marker_id": objective_terrain_area.objective_marker_id,
+            "objective_role": objective_terrain_area.objective_role.value,
+            "terrain_area_ids": list(objective_terrain_area.terrain_area_ids),
+        }
+        for objective_terrain_area in layout.objective_terrain_areas
+    ]
 
 
 def _terrain_area_payloads(
@@ -220,8 +252,7 @@ def _html_document() -> str:
       --panel: #f4f6f8;
       --attacker: #b35433;
       --defender: #2878a9;
-      --dense: #6f7f5f;
-      --light: #b7a36a;
+      --terrain-footprint: #aeb7c0;
       --feature: #7d7394;
       --objective: #323b43;
     }
@@ -317,11 +348,12 @@ def _html_document() -> str:
     .swatch.defender {
       background: color-mix(in srgb, var(--defender) 28%, transparent);
     }
-    .swatch.dense {
-      background: color-mix(in srgb, var(--dense) 55%, transparent);
+    .swatch.terrain-footprint {
+      background: color-mix(in srgb, var(--terrain-footprint) 45%, transparent);
     }
-    .swatch.light {
-      background: color-mix(in srgb, var(--light) 58%, transparent);
+    .swatch.objective-terrain {
+      background: #fff;
+      border-color: var(--objective);
     }
     .stage {
       display: grid;
@@ -381,17 +413,18 @@ def _html_document() -> str:
       fill: color-mix(in srgb, var(--defender) 28%, transparent);
       stroke: var(--defender);
     }
-    .terrain-dense {
-      fill: color-mix(in srgb, var(--dense) 55%, transparent);
-      stroke: var(--dense);
-    }
-    .terrain-light {
-      fill: color-mix(in srgb, var(--light) 58%, transparent);
-      stroke: #8a763e;
+    .terrain-footprint {
+      fill: color-mix(in srgb, var(--terrain-footprint) 45%, transparent);
+      stroke: #7d8790;
     }
     .terrain-feature {
       fill: color-mix(in srgb, var(--feature) 26%, transparent);
       stroke: var(--feature);
+    }
+    .objective-terrain {
+      fill: none;
+      stroke: var(--objective);
+      stroke-width: 0.18;
     }
     .objective {
       fill: #fff;
@@ -460,8 +493,12 @@ def _html_document() -> str:
       <div class="legend" aria-label="Legend">
         <div class="legend-row"><span class="swatch attacker"></span>Attacker deployment</div>
         <div class="legend-row"><span class="swatch defender"></span>Defender deployment</div>
-        <div class="legend-row"><span class="swatch dense"></span>Dense terrain area</div>
-        <div class="legend-row"><span class="swatch light"></span>Light terrain area</div>
+        <div class="legend-row">
+          <span class="swatch terrain-footprint"></span>Terrain footprint
+        </div>
+        <div class="legend-row">
+          <span class="swatch objective-terrain"></span>Objective terrain
+        </div>
       </div>
     </aside>
     <section class="stage">
@@ -550,8 +587,9 @@ def _html_document() -> str:
       state.attackerEdge.textContent = layout.attacker_edge;
       state.defenderEdge.textContent = layout.defender_edge;
       state.terrainCount.textContent = [
-        `${layout.terrain_areas.length} areas`,
+        `${layout.terrain_areas.length} footprints`,
         `${layout.terrain_features.length} features`,
+        `${layout.objective_terrain_areas.length} objective terrain`,
       ].join(", ");
       renderBoard(layout);
     }
@@ -582,10 +620,61 @@ def _html_document() -> str:
       for (const area of layout.terrain_areas) {
         const polygon = svgElement("polygon", {
           points: area.polygon.map(pointToSvg).join(" "),
-          class: area.classification === "dense" ? "terrain-dense" : "terrain-light",
+          class: "terrain-footprint",
         });
-        polygon.append(svgElement("title", {}, `${area.classification}: ${area.id}`));
+        polygon.append(svgElement("title", {}, `${area.footprint_template_id}: ${area.id}`));
         state.board.append(polygon);
+      }
+      renderObjectives(layout);
+    }
+
+    function renderObjectives(layout) {
+      const areaById = new Map(layout.terrain_areas.map((area) => [area.id, area]));
+      const markerById = new Map(layout.objective_markers.map((marker) => [marker.id, marker]));
+      const terrainObjectiveMarkerIds = new Set();
+      for (const objectiveTerrain of layout.objective_terrain_areas) {
+        terrainObjectiveMarkerIds.add(objectiveTerrain.objective_marker_id);
+        const marker = markerById.get(objectiveTerrain.objective_marker_id);
+        if (!marker) {
+          throw new Error(
+            `Objective terrain references unknown marker: ${objectiveTerrain.objective_marker_id}`,
+          );
+        }
+        for (const terrainAreaId of objectiveTerrain.terrain_area_ids) {
+          const area = areaById.get(terrainAreaId);
+          if (!area) {
+            throw new Error(`Objective terrain references unknown area: ${terrainAreaId}`);
+          }
+          const polygon = svgElement("polygon", {
+            points: area.polygon.map(pointToSvg).join(" "),
+            class: "objective-terrain",
+          });
+          polygon.append(svgElement("title", {}, `${marker.name}: ${terrainAreaId}`));
+          state.board.append(polygon);
+        }
+        state.board.append(svgElement("text", {
+          x: marker.x_inches,
+          y: DEPTH - marker.y_inches,
+          class: "label",
+        }, objectiveLabel(marker.role)));
+      }
+      for (const marker of layout.objective_markers) {
+        if (terrainObjectiveMarkerIds.has(marker.id)) {
+          continue;
+        }
+        const circle = svgElement("circle", {
+          cx: marker.x_inches,
+          cy: DEPTH - marker.y_inches,
+          r: 0.79,
+          class: "objective",
+        });
+        circle.append(svgElement("title", {}, marker.name));
+        state.board.append(circle);
+        state.board.append(svgElement("text", {
+          x: marker.x_inches,
+          y: DEPTH - marker.y_inches,
+          class: "label",
+        }, objectiveLabel(marker.role)));
       }
     }
 
@@ -644,6 +733,19 @@ def _html_document() -> str:
 
     function pointToSvg(point) {
       return `${point.x},${DEPTH - point.y}`;
+    }
+
+    function objectiveLabel(role) {
+      if (role === "attacker_home") {
+        return "A Home";
+      }
+      if (role === "defender_home") {
+        return "D Home";
+      }
+      if (role === "central") {
+        return "Central";
+      }
+      return "Expansion";
     }
 
     function svgElement(tagName, attributes = {}, text = null) {

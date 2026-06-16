@@ -16,6 +16,7 @@ FOOTPRINT_8X11_5_POLYGON = "FOOTPRINT_8X11_5_POLYGON"
 
 type EventObjectiveSpec = tuple[str, str, str, float, float]
 type EventObjectiveRoleCountSpec = tuple[ObjectiveMarkerRole, int]
+type EventObjectiveTerrainAreaSpec = tuple[str, tuple[str, ...]]
 # Terrain area specs store battlefield anchor x/y for the footprint template's first vertex.
 type EventTerrainAreaSpec = tuple[
     str,
@@ -39,3 +40,4 @@ class EventBattlefieldLayoutSource:
     terrain_area_specs: tuple[EventTerrainAreaSpec, ...]
     terrain_area_mirror_pairs: tuple[EventTerrainAreaMirrorPair, ...]
     terrain_area_local_transform_specs: tuple[EventTerrainAreaLocalTransformSpec, ...] = ()
+    objective_terrain_area_specs: tuple[EventObjectiveTerrainAreaSpec, ...] = ()

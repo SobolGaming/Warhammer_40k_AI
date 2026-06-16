@@ -121,6 +121,19 @@ LAYOUTS = (
         terrain_area_local_transform_specs=(
             ("light-6x2-upper-center", TerrainAreaLocalTransform.MIRROR_Y_AXIS),
         ),
+        objective_terrain_area_specs=(
+            ("attacker-home", ("dense-7x11-5-upper-left",)),
+            ("defender-home", ("dense-7x11-5-lower-right",)),
+            (
+                "central",
+                (
+                    "dense-8x11-5-polygon-central-north",
+                    "dense-8x11-5-polygon-central-south",
+                ),
+            ),
+            ("expansion-west", ("dense-7x11-5-lower-left",)),
+            ("expansion-east", ("dense-7x11-5-upper-right",)),
+        ),
     ),
     EventBattlefieldLayoutSource(
         layout_id=TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUT_B_ID,

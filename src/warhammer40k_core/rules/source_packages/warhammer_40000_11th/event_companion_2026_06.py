@@ -21,6 +21,7 @@ from warhammer40k_core.core.missions import (
     MissionPackError,
     MissionSourcePackageDefinition,
     ObjectiveMarkerDefinition,
+    ObjectiveTerrainAreaDefinition,
     objective_marker_role_from_token,
 )
 from warhammer40k_core.core.terrain_areas import (
@@ -2241,6 +2242,8 @@ def _extracted_layout_definition(
     layout_id: str,
 ) -> BattlefieldLayoutDefinition:
     layout_source = _extracted_layout_source(layout_id)
+    objective_markers = _extracted_objective_definitions(layout_id=layout_id)
+    terrain_areas = _extracted_terrain_areas(layout_id)
     return BattlefieldLayoutDefinition(
         battlefield_layout_id=layout_id,
         name=layout_source.name,
@@ -2252,7 +2255,7 @@ def _extracted_layout_definition(
         coordinate_orientation="x_right_along_44_inch_edge_y_up_along_60_inch_edge",
         attacker_edge=_layout_attacker_edge(layout_id, _layout_number_from_layout_id(layout_id)),
         defender_edge=_layout_defender_edge(layout_id, _layout_number_from_layout_id(layout_id)),
-        objective_markers=_extracted_objective_definitions(layout_id=layout_id),
+        objective_markers=objective_markers,
         deployment_zones=tuple(
             DeploymentZone(
                 deployment_zone_id=zone.deployment_zone_id,
@@ -2262,9 +2265,14 @@ def _extracted_layout_definition(
             for zone in _extracted_deployment_zones(layout_id=layout_id)
         ),
         battlefield_regions=_extracted_regions(layout_id=layout_id),
-        terrain_areas=_extracted_terrain_areas(layout_id),
+        terrain_areas=terrain_areas,
         objective_role_counts=layout_source.objective_role_counts,
         source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_source.source_layout_id}",
+        objective_terrain_areas=_extracted_objective_terrain_area_definitions(
+            layout_id=layout_id,
+            objective_markers=objective_markers,
+            terrain_areas=terrain_areas,
+        ),
     )
 
 
@@ -2773,6 +2781,50 @@ def _extracted_objective_definitions(
         )
         for objective in _extracted_objectives(layout_id=layout_id)
     )
+
+
+def _extracted_objective_terrain_area_definitions(
+    *,
+    layout_id: str,
+    objective_markers: tuple[ObjectiveMarkerDefinition, ...],
+    terrain_areas: tuple[PlacedTerrainArea, ...],
+) -> tuple[ObjectiveTerrainAreaDefinition, ...]:
+    layout_source = _extracted_layout_source(layout_id)
+    if not layout_source.objective_terrain_area_specs:
+        return ()
+    objective_markers_by_suffix = {
+        marker.objective_marker_id.removeprefix(f"{layout_id}-"): marker
+        for marker in objective_markers
+    }
+    terrain_area_ids_by_suffix = {
+        area.terrain_area_id.removeprefix(f"{layout_id}-"): area.terrain_area_id
+        for area in terrain_areas
+    }
+    objective_terrain_areas: list[ObjectiveTerrainAreaDefinition] = []
+    for objective_suffix, terrain_area_suffixes in layout_source.objective_terrain_area_specs:
+        marker = objective_markers_by_suffix.get(objective_suffix)
+        if marker is None:
+            raise MissionPackError("Objective terrain area spec references unknown objective.")
+        terrain_area_ids: list[str] = []
+        for terrain_area_suffix in terrain_area_suffixes:
+            terrain_area_id = terrain_area_ids_by_suffix.get(terrain_area_suffix)
+            if terrain_area_id is None:
+                raise MissionPackError(
+                    "Objective terrain area spec references unknown terrain area."
+                )
+            terrain_area_ids.append(terrain_area_id)
+        objective_terrain_areas.append(
+            ObjectiveTerrainAreaDefinition(
+                objective_marker_id=marker.objective_marker_id,
+                objective_role=marker.objective_role,
+                terrain_area_ids=tuple(terrain_area_ids),
+                source_id=(
+                    f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_source.source_layout_id}:"
+                    f"objective-terrain-area:{objective_suffix}"
+                ),
+            )
+        )
+    return tuple(objective_terrain_areas)
 
 
 def _extracted_regions(*, layout_id: str) -> tuple[BattlefieldRegion, ...]:
