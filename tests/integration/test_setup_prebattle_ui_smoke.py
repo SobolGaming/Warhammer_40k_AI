@@ -146,12 +146,7 @@ def test_setup_prebattle_ui_smoke_projects_real_requests_and_typed_terrain() -> 
         payload=_prebattle_placement_payload(
             state=_state(session),
             request=redeploy_placement_request,
-            pose_factory=lambda index: Pose.at(
-                57.0 - ((index // 3) * 1.8),
-                24.0 + ((index % 3) * 1.8),
-                0.0,
-                facing_degrees=180.0,
-            ),
+            pose_factory=lambda index: _event_companion_prebattle_pose(index, "player-b"),
         ),
         result_id="setup-smoke-place-redeploy-b",
     )
@@ -283,6 +278,7 @@ def _submit_deployment_pair(
         session.lifecycle,
         request=placement_request,
         result_id=f"{result_id_prefix}-place",
+        pose_factory=_event_companion_deployment_pose,
     )
 
 
@@ -324,24 +320,67 @@ def _projected_request(
     assert pending["request_id"] == request.request_id
     assert pending["decision_type"] == expected_decision_type
     assert pending["options"] == [option.to_payload() for option in request.options]
-    _assert_pending_layout_has_no_terrain_geometry(view)
+    _assert_pending_layout_has_typed_terrain_geometry(view)
     observed_decision_types.append(expected_decision_type)
     return request
 
 
-def _assert_pending_layout_has_no_terrain_geometry(view: GameViewPayload) -> None:
+def _assert_pending_layout_has_typed_terrain_geometry(view: GameViewPayload) -> None:
     mission_setup = view["mission_setup"]
     assert isinstance(mission_setup, dict)
-    _assert_empty_terrain_geometry_payload(mission_setup)
+    _assert_typed_terrain_geometry_payload(mission_setup)
 
 
-def _assert_empty_terrain_geometry_payload(mission_setup: dict[str, JsonValue]) -> None:
+def _assert_typed_terrain_geometry_payload(mission_setup: dict[str, JsonValue]) -> None:
+    assert mission_setup["mission_pack_id"] == "11e-chapter-approved-2026-27"
+    assert mission_setup["primary_mission_id"] == "primary-immovable-object"
+    assert mission_setup["battlefield_layout_id"] == "take-and-hold-vs-take-and-hold-layout-3"
+    assert (
+        mission_setup["deployment_map_id"] == "take-and-hold-vs-take-and-hold-layout-3-deployment"
+    )
+    assert mission_setup["terrain_layout_id"] == "take-and-hold-vs-take-and-hold-layout-3"
+    assert mission_setup["battlefield_width_inches"] == 44.0
+    assert mission_setup["battlefield_depth_inches"] == 60.0
     terrain_features = mission_setup["terrain_features"]
     assert isinstance(terrain_features, list)
     assert terrain_features == []
     terrain_areas = mission_setup["terrain_areas"]
     assert isinstance(terrain_areas, list)
-    assert terrain_areas == []
+    assert len(terrain_areas) == 16
+    footprint_template_ids: set[str] = set()
+    for area in terrain_areas:
+        assert isinstance(area, dict)
+        footprint_template_ids.add(_payload_string(area, "footprint_template_id"))
+    assert footprint_template_ids == {
+        "FOOTPRINT_6X2",
+        "FOOTPRINT_6X4",
+        "FOOTPRINT_7X11_5",
+        "FOOTPRINT_8X11_5_POLYGON",
+        "FOOTPRINT_10X2_5",
+    }
+    objective_terrain_areas = mission_setup["objective_terrain_areas"]
+    assert isinstance(objective_terrain_areas, list)
+    assert len(objective_terrain_areas) == 5
+    objective_roles: set[str] = set()
+    for area in objective_terrain_areas:
+        assert isinstance(area, dict)
+        objective_roles.add(_payload_string(area, "objective_role"))
+    assert objective_roles == {"attacker_home", "central", "defender_home", "expansion"}
+    battlefield_regions = mission_setup["battlefield_regions"]
+    assert isinstance(battlefield_regions, list)
+    assert len(battlefield_regions) == 5
+    region_kinds: set[str] = set()
+    for region in battlefield_regions:
+        assert isinstance(region, dict)
+        region_kinds.add(_payload_string(region, "region_kind"))
+    assert region_kinds == {
+        "deployment_zone",
+        "no_mans_land",
+        "territory",
+    }
+    objective_markers = mission_setup["objective_markers"]
+    assert isinstance(objective_markers, list)
+    assert len(objective_markers) == 5
 
 
 def _assert_pending_proposal(view: GameViewPayload, proposal_kind: str) -> None:
@@ -350,7 +389,13 @@ def _assert_pending_proposal(view: GameViewPayload, proposal_kind: str) -> None:
     assert proposal["proposal_kind"] == proposal_kind
     mission_setup = proposal["mission_setup"]
     assert isinstance(mission_setup, dict)
-    _assert_empty_terrain_geometry_payload(mission_setup)
+    _assert_typed_terrain_geometry_payload(mission_setup)
+
+
+def _payload_string(payload: dict[str, JsonValue], key: str) -> str:
+    value = payload[key]
+    assert isinstance(value, str)
+    return value
 
 
 def _prebattle_placement_payload(
@@ -399,6 +444,32 @@ def _prebattle_placement_payload(
 
 
 type _PoseFactory = Callable[[int], Pose]
+
+
+def _event_companion_deployment_pose(
+    index: int,
+    player_id: str,
+    _model_instance_id: str,
+) -> Pose:
+    return _event_companion_prebattle_pose(index, player_id)
+
+
+def _event_companion_prebattle_pose(index: int, player_id: str) -> Pose:
+    row = index // 3
+    column = index % 3
+    if player_id == "player-b":
+        return Pose.at(
+            40.0 - (row * 1.8),
+            18.0 + (column * 1.8),
+            0.0,
+            facing_degrees=180.0,
+        )
+    return Pose.at(
+        4.0 + (row * 1.8),
+        36.0 + (column * 1.8),
+        0.0,
+        facing_degrees=0.0,
+    )
 
 
 def _scout_move_payload(

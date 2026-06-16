@@ -19,7 +19,16 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.reserves import ReserveUnitPointValue
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.mission_pack_import import (
+    chapter_approved_2026_27_mission_pack,
+    warhammer_event_companion_2026_06_mission_pack,
+)
+
+_SMOKE_IMPLEMENTED_MISSION_POOL_ENTRY_ID = "mission-take-and-hold-vs-purge-the-foe-layout-3"
+_SMOKE_IMPLEMENTED_TERRAIN_LAYOUT_ID = "take-and-hold-vs-purge-the-foe-layout-3"
+_SMOKE_EVENT_COMPANION_GEOMETRY_MISSION_POOL_ENTRY_ID = (
+    "mission-take-and-hold-vs-take-and-hold-layout-3"
+)
 
 
 def canonical_setup_prebattle_smoke_config(
@@ -66,13 +75,7 @@ def canonical_setup_prebattle_smoke_config(
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
-        mission_setup=MissionSetup.from_mission_pack(
-            mission_pack=chapter_approved_2026_27_mission_pack(),
-            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
-            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
-            attacker_player_id="player-a",
-            defender_player_id="player-b",
-        ),
+        mission_setup=_setup_prebattle_smoke_mission_setup(),
         reserve_unit_points=(
             ReserveUnitPointValue(
                 unit_instance_id="army-alpha:strategic-reserve-unit",
@@ -80,6 +83,38 @@ def canonical_setup_prebattle_smoke_config(
                 source_id="setup-smoke-points:army-alpha:strategic-reserve-unit",
             ),
         ),
+    )
+
+
+def _setup_prebattle_smoke_mission_setup() -> MissionSetup:
+    implemented_setup = MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id=_SMOKE_IMPLEMENTED_MISSION_POOL_ENTRY_ID,
+        terrain_layout_id=_SMOKE_IMPLEMENTED_TERRAIN_LAYOUT_ID,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    event_geometry_setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_06_mission_pack(),
+        mission_pool_entry_id=_SMOKE_EVENT_COMPANION_GEOMETRY_MISSION_POOL_ENTRY_ID,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    # Event Companion Layout C provides typed terrain/deployment geometry; the Chapter
+    # Approved setup keeps this smoke on an implemented primary mission and scoring path.
+    return replace(
+        implemented_setup,
+        battlefield_layout_id=event_geometry_setup.battlefield_layout_id,
+        deployment_map_id=event_geometry_setup.deployment_map_id,
+        terrain_layout_id=event_geometry_setup.terrain_layout_id,
+        battlefield_width_inches=event_geometry_setup.battlefield_width_inches,
+        battlefield_depth_inches=event_geometry_setup.battlefield_depth_inches,
+        objective_markers=event_geometry_setup.objective_markers,
+        deployment_zones=event_geometry_setup.deployment_zones,
+        battlefield_regions=event_geometry_setup.battlefield_regions,
+        terrain_areas=event_geometry_setup.terrain_areas,
+        terrain_features=event_geometry_setup.terrain_features,
+        objective_terrain_areas=event_geometry_setup.objective_terrain_areas,
     )
 
 
