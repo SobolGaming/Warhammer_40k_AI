@@ -16,7 +16,12 @@ from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
-from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    MovementMode,
+    RulesetDescriptor,
+    TerrainFeatureKind,
+)
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.actions import (
     MissionActionState,
     MissionActionStatus,
@@ -141,6 +146,7 @@ from warhammer40k_core.rules.mission_pack_import import (
 
 SEEDED_TACTICAL_DRAW_REQUEST_ID = "phase11e-seeded-tactical-draw-request"
 SEEDED_TACTICAL_DRAW_RESULT_ID = "phase11e-seeded-tactical-draw"
+SCORING_TERRAIN_FEATURE_ID = "phase11e-scoring-terrain"
 
 
 def test_take_and_hold_does_not_score_before_battle_round_two() -> None:
@@ -334,7 +340,7 @@ def test_unstoppable_force_scores_kills_new_objectives_and_end_battle_central_co
 
 
 def test_death_trap_booby_trap_action_tracks_and_scores_trapped_objective_terrain() -> None:
-    feature_id = "take-and-hold-vs-purge-the-foe-layout-3-center-ruin"
+    feature_id = SCORING_TERRAIN_FEATURE_ID
     lifecycle = _battle_lifecycle_for_primary(
         "primary-death-trap",
         objective_terrain_feature_id=feature_id,
@@ -405,8 +411,13 @@ def test_death_trap_booby_trap_action_tracks_and_scores_trapped_objective_terrai
 
 
 def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
-    feature_id = "take-and-hold-vs-purge-the-foe-layout-3-center-ruin"
-    state = _battle_state_for_primary("primary-death-trap")
+    feature_id = SCORING_TERRAIN_FEATURE_ID
+    state = _battle_state_from_config(
+        _config_for_primary(
+            "primary-death-trap",
+            objective_terrain_feature_id=feature_id,
+        )
+    )
     first_turn_start = state.primary_objective_turn_start_states[0]
 
     with pytest.raises(GameLifecycleError, match="unknown started-turn terrain"):
@@ -490,7 +501,7 @@ def test_booby_trap_action_is_primary_scoped_and_immediate_zero_vp() -> None:
         action_id="mission-action:phase16-zero-vp-complete",
         player_id="player-a",
         unit_instance_id="army-alpha:intercessor-unit-1",
-        target_id="take-and-hold-vs-purge-the-foe-layout-3-center-ruin",
+        target_id=SCORING_TERRAIN_FEATURE_ID,
         mission_id="primary-death-trap",
         battle_round=1,
         phase=BattlePhase.SHOOTING.value,
@@ -976,7 +987,10 @@ def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
         phase=BattlePhase.FIGHT,
     )
 
-    plunder_state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    plunder_state = _battle_state(
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+        mission_setup=_mission_setup_with_scoring_terrain_feature(),
+    )
     plunder_state.battle_phase_index = plunder_state.battle_phase_sequence.index(BattlePhase.FIGHT)
     plunder_state.record_secondary_mission_card_state(
         SecondaryMissionCardState.active_tactical(
@@ -1323,7 +1337,10 @@ def test_state_backed_secondary_scoring_rejects_invalid_contexts_and_zero_eviden
 
 def test_game_state_secondary_scoring_evidence_round_trips_and_rejects_duplicates() -> None:
     state = _battle_state_from_config(
-        _config_with_player_b_vehicles(("vehicle-unit-3",)),
+        replace(
+            _config_with_player_b_vehicles(("vehicle-unit-3",)),
+            mission_setup=_mission_setup_with_scoring_terrain_feature(),
+        ),
         player_a_secondary=SecondaryMissionMode.TACTICAL,
     )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
@@ -2680,7 +2697,10 @@ def test_mission_action_can_complete_interrupt_and_score() -> None:
 
 
 def test_plunder_mission_action_completes_immediately_and_records_secondary_evidence() -> None:
-    lifecycle = _battle_lifecycle(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    lifecycle = _battle_lifecycle(
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+        mission_setup=_mission_setup_with_scoring_terrain_feature(),
+    )
     state = lifecycle.state
     assert state is not None
     assert state.mission_setup is not None
@@ -2738,7 +2758,12 @@ def test_plunder_mission_action_completes_immediately_and_records_secondary_evid
 
 
 def test_public_payload_redacts_hidden_secondary_scoring_evidence() -> None:
-    state = _battle_state_from_config(_config_with_player_b_vehicles(("vehicle-unit-3",)))
+    state = _battle_state_from_config(
+        replace(
+            _config_with_player_b_vehicles(("vehicle-unit-3",)),
+            mission_setup=_mission_setup_with_scoring_terrain_feature(),
+        )
+    )
     state.secondary_mission_choices = [
         choice for choice in state.secondary_mission_choices if choice.player_id == "player-a"
     ]
@@ -3827,14 +3852,20 @@ def _battle_state_with_center_objective_positions(
 ) -> GameState:
     state = _battle_state_for_primary("take-and-hold")
     assert state.battlefield_state is not None
-    marker = _center_marker_definition(state)
+    center_marker = _objective_marker_definition(state, "center")
+    home_marker = _objective_marker_definition(state, "left-home")
     player_a = state.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
     player_b = state.battlefield_state.unit_placement_by_id("army-beta:intercessor-unit-3")
-    battlefield_state = state.battlefield_state.with_unit_placement(
-        _with_model_offsets(player_a, marker, offsets=player_a_offsets)
+    player_a = _with_model_offsets(player_a, center_marker, offsets=player_a_offsets)
+    player_a = _with_model_offsets(
+        player_a,
+        home_marker,
+        offsets=((0.0, 0.0),),
+        start_index=len(player_a_offsets),
     )
+    battlefield_state = state.battlefield_state.with_unit_placement(player_a)
     battlefield_state = battlefield_state.with_unit_placement(
-        _with_model_offsets(player_b, marker, offsets=player_b_offsets)
+        _with_model_offsets(player_b, center_marker, offsets=player_b_offsets)
     )
     state.battlefield_state = battlefield_state
     return state
@@ -3845,11 +3876,13 @@ def _with_model_offsets(
     marker: ObjectiveMarkerDefinition,
     *,
     offsets: tuple[tuple[float, float], ...],
+    start_index: int = 0,
 ) -> UnitPlacement:
     placements = list(unit_placement.model_placements)
     for index, (offset_x, offset_y) in enumerate(offsets):
-        placement = placements[index]
-        placements[index] = placement.with_pose(
+        placement_index = start_index + index
+        placement = placements[placement_index]
+        placements[placement_index] = placement.with_pose(
             Pose.at(
                 marker.x_inches + offset_x,
                 marker.y_inches + offset_y,
@@ -3971,12 +4004,19 @@ def _mission_action_state(
 
 
 def _center_marker_definition(state: GameState) -> ObjectiveMarkerDefinition:
+    return _objective_marker_definition(state, "center")
+
+
+def _objective_marker_definition(
+    state: GameState,
+    target_suffix: str,
+) -> ObjectiveMarkerDefinition:
     if state.mission_setup is None:
         raise AssertionError("test state requires mission setup")
     for marker in state.mission_setup.objective_markers:
-        if _objective_marker_matches_suffix(marker.objective_marker_id, "center"):
+        if _objective_marker_matches_suffix(marker.objective_marker_id, target_suffix):
             return marker
-    raise AssertionError("missing center objective marker")
+    raise AssertionError(f"missing {target_suffix} objective marker")
 
 
 def _public_ledger(payload: dict[str, JsonValue], *, player_id: str) -> dict[str, JsonValue]:
@@ -4587,11 +4627,11 @@ def _mission_setup_for_primary(
     mission_setup = replace(_mission_setup(), primary_mission_id=primary_mission_id)
     if objective_terrain_feature_id is None:
         return mission_setup
-    feature = next(
-        feature
-        for feature in mission_setup.terrain_features
-        if feature.feature_id == objective_terrain_feature_id
+    mission_setup = _with_scoring_terrain_feature(
+        mission_setup,
+        feature_id=objective_terrain_feature_id,
     )
+    feature = _terrain_feature_by_id(mission_setup, objective_terrain_feature_id)
     center_marker = _center_marker_definition_for_setup(mission_setup)
     objective_markers = tuple(
         replace(
@@ -4604,6 +4644,58 @@ def _mission_setup_for_primary(
         for marker in mission_setup.objective_markers
     )
     return replace(mission_setup, objective_markers=objective_markers)
+
+
+def _mission_setup_with_scoring_terrain_feature(
+    *,
+    feature_id: str = SCORING_TERRAIN_FEATURE_ID,
+) -> MissionSetup:
+    return _with_scoring_terrain_feature(_mission_setup(), feature_id=feature_id)
+
+
+def _with_scoring_terrain_feature(
+    mission_setup: MissionSetup,
+    *,
+    feature_id: str,
+) -> MissionSetup:
+    if any(feature.feature_id == feature_id for feature in mission_setup.terrain_features):
+        return mission_setup
+    return replace(
+        mission_setup,
+        terrain_features=(
+            *mission_setup.terrain_features,
+            _scoring_terrain_feature(feature_id=feature_id),
+        ),
+    )
+
+
+def _scoring_terrain_feature(*, feature_id: str) -> TerrainFeatureDefinition:
+    return TerrainFeatureDefinition(
+        feature_id=feature_id,
+        feature_kind=TerrainFeatureKind.BATTLEFIELD_DEBRIS_AND_STATUARY,
+        footprint_center_x_inches=30.0,
+        footprint_center_y_inches=22.0,
+        footprint_width_inches=8.0,
+        footprint_depth_inches=8.0,
+        display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=30.0,
+            center_y_inches=22.0,
+            width_inches=8.0,
+            depth_inches=8.0,
+            display_template_id="phase11e_scoring_debris_8x8",
+        ),
+        source_id=f"test:phase11e:terrain:{feature_id}",
+    )
+
+
+def _terrain_feature_by_id(
+    mission_setup: MissionSetup,
+    feature_id: str,
+) -> TerrainFeatureDefinition:
+    for feature in mission_setup.terrain_features:
+        if feature.feature_id == feature_id:
+            return feature
+    raise AssertionError("missing test terrain feature")
 
 
 def _center_marker_definition_for_setup(

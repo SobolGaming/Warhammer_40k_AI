@@ -17,7 +17,8 @@ from tests.deployment_submission_helpers import (
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import CatalogAbilitySupport, DatasheetAbilityDescriptor
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, TerrainFeatureKind
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import BattlefieldPlacementKind, PlacementError
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -61,6 +62,7 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
@@ -210,7 +212,9 @@ def test_phase16a_rejects_out_of_bounds_pose_without_mutation() -> None:
 
 
 def test_phase16a_rejects_illegal_terrain_endpoint_without_mutation() -> None:
-    lifecycle, placement_request = _advance_to_first_deployment_placement()
+    lifecycle, placement_request = _advance_to_first_deployment_placement(
+        _config_with_terrain_endpoint_feature()
+    )
 
     _assert_invalid_deployment_without_mutation(
         lifecycle,
@@ -975,6 +979,24 @@ def _config_with_blocking_objective_marker() -> GameConfig:
     return replace(base, mission_setup=mission_setup)
 
 
+def _config_with_terrain_endpoint_feature() -> GameConfig:
+    base = _config()
+    assert base.mission_setup is not None
+    mission_setup = replace(
+        base.mission_setup,
+        terrain_features=(
+            _terrain_endpoint_feature(
+                feature_id="phase16a-terrain-endpoint-hill",
+                center_x_inches=44.5,
+                center_y_inches=8.5,
+                width_inches=8.0,
+                depth_inches=12.0,
+            ),
+        ),
+    )
+    return replace(base, mission_setup=mission_setup)
+
+
 def _ruleset() -> RulesetDescriptor:
     return RulesetDescriptor.warhammer_40000_eleventh(descriptor_version="core-v2-phase16a-test")
 
@@ -986,6 +1008,32 @@ def _mission_setup() -> MissionSetup:
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
         defender_player_id="player-b",
+    )
+
+
+def _terrain_endpoint_feature(
+    *,
+    feature_id: str,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+) -> TerrainFeatureDefinition:
+    return TerrainFeatureDefinition(
+        feature_id=feature_id,
+        feature_kind=TerrainFeatureKind.HILLS,
+        footprint_center_x_inches=center_x_inches,
+        footprint_center_y_inches=center_y_inches,
+        footprint_width_inches=width_inches,
+        footprint_depth_inches=depth_inches,
+        display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=center_x_inches,
+            center_y_inches=center_y_inches,
+            width_inches=width_inches,
+            depth_inches=depth_inches,
+            display_template_id="phase16a_terrain_endpoint_hill",
+        ),
+        source_id=f"phase16a-test:terrain:{feature_id}",
     )
 
 

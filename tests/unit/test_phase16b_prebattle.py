@@ -15,7 +15,8 @@ from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
     DatasheetKeywordSet,
 )
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, TerrainFeatureKind
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
@@ -86,6 +87,7 @@ from warhammer40k_core.engine.transports import TransportCapacityProfile, Transp
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
@@ -507,6 +509,7 @@ def test_phase16b_redeploy_rejects_illegal_terrain_endpoint_without_mutation() -
         player_b_unit_selections=(
             _vehicle_unit_selection(unit_selection_id="vehicle-redeploy-unit"),
         ),
+        mission_setup=_mission_setup_with_terrain_endpoint_feature(),
     )
 
     invalid_status = _submit_redeploy_placement_payload(
@@ -1312,6 +1315,7 @@ def _redeploy_placement_request(
     *,
     player_a_unit_selections: tuple[UnitMusterSelection, ...] | None = None,
     player_b_unit_selections: tuple[UnitMusterSelection, ...] | None = None,
+    mission_setup: MissionSetup | None = None,
 ) -> tuple[GameLifecycle, DecisionRequest]:
     lifecycle, status = _advance_after_deployments(
         _config(
@@ -1322,6 +1326,7 @@ def _redeploy_placement_request(
                 else player_a_unit_selections
             ),
             player_b_unit_selections=player_b_unit_selections,
+            mission_setup=mission_setup,
         )
     )
     selection_request = _decision_request(status)
@@ -1737,6 +1742,7 @@ def _config(
     catalog: ArmyCatalog | None = None,
     player_a_unit_selections: tuple[UnitMusterSelection, ...] | None = None,
     player_b_unit_selections: tuple[UnitMusterSelection, ...] | None = None,
+    mission_setup: MissionSetup | None = None,
 ) -> GameConfig:
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
@@ -1756,7 +1762,7 @@ def _config(
             "bring_it_down",
             "cleanse",
         ),
-        mission_setup=_mission_setup(),
+        mission_setup=_mission_setup() if mission_setup is None else mission_setup,
     )
 
 
@@ -1771,6 +1777,47 @@ def _mission_setup() -> MissionSetup:
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
         defender_player_id="player-b",
+    )
+
+
+def _mission_setup_with_terrain_endpoint_feature() -> MissionSetup:
+    return replace(
+        _mission_setup(),
+        terrain_features=(
+            _terrain_endpoint_feature(
+                feature_id="phase16b-redeploy-terrain-endpoint-hill",
+                center_x_inches=49.0,
+                center_y_inches=17.0,
+                width_inches=8.0,
+                depth_inches=8.0,
+            ),
+        ),
+    )
+
+
+def _terrain_endpoint_feature(
+    *,
+    feature_id: str,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+) -> TerrainFeatureDefinition:
+    return TerrainFeatureDefinition(
+        feature_id=feature_id,
+        feature_kind=TerrainFeatureKind.HILLS,
+        footprint_center_x_inches=center_x_inches,
+        footprint_center_y_inches=center_y_inches,
+        footprint_width_inches=width_inches,
+        footprint_depth_inches=depth_inches,
+        display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=center_x_inches,
+            center_y_inches=center_y_inches,
+            width_inches=width_inches,
+            depth_inches=depth_inches,
+            display_template_id="phase16b_terrain_endpoint_hill",
+        ),
+        source_id=f"phase16b-test:terrain:{feature_id}",
     )
 
 

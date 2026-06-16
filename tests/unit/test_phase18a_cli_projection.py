@@ -43,7 +43,9 @@ from warhammer40k_core.interfaces.cli import (
     submit_cli_choice,
     submit_cli_payload,
 )
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.mission_pack_import import (
+    chapter_approved_2026_27_mission_pack,
+)
 
 FIXTURE_ROOT = Path(__file__).resolve().parents[1] / "fixtures"
 
@@ -227,10 +229,8 @@ def test_local_session_phase18a_projection_sample_contract_joins_datacards() -> 
     sample_payload = cast(dict[str, JsonValue], sample)
     game_view = cast(dict[str, JsonValue], sample_payload["game_view"])
     mission_setup = cast(dict[str, JsonValue], game_view["mission_setup"])
-    terrain_feature = cast(dict[str, JsonValue], mission_setup["terrain_feature"])
-    display_geometry = cast(dict[str, JsonValue], terrain_feature["display_geometry"])
-    assert display_geometry["schema_version"] == "terrain-display-v1"
-    assert display_geometry["footprint_kind"] == "polygon"
+    assert mission_setup["terrain_features"] == []
+    assert mission_setup["terrain_areas"] == []
     assert sample == _fixture_json("phase18a_projection_join_sample.json")
     assert validate_json_value(json.loads(json.dumps(sample, sort_keys=True))) == sample
 
@@ -556,10 +556,7 @@ def _phase18a_projection_join_sample(
                     },
                 },
                 "mission_setup": {
-                    "terrain_feature": _terrain_feature_projection_sample(
-                        view,
-                        feature_id="take-and-hold-vs-purge-the-foe-layout-3-left-diagonal-ruin",
-                    ),
+                    **_terrain_projection_sample(view),
                 },
                 "unit_display": {
                     "unit_instance_id": unit_display["unit_instance_id"],
@@ -589,34 +586,25 @@ def _phase18a_projection_join_sample(
     )
 
 
-def _terrain_feature_projection_sample(
-    view: GameViewPayload,
-    *,
-    feature_id: str,
-) -> JsonValue:
+def _terrain_projection_sample(view: GameViewPayload) -> dict[str, JsonValue]:
     mission_setup = view["mission_setup"]
     if not isinstance(mission_setup, dict):
         raise GameLifecycleError("Projection sample requires mission setup.")
     terrain_features = mission_setup["terrain_features"]
     if not isinstance(terrain_features, list):
         raise GameLifecycleError("Projection sample terrain_features must be a list.")
-    for feature in terrain_features:
-        if not isinstance(feature, dict):
-            raise GameLifecycleError("Projection sample terrain feature must be an object.")
-        if feature["feature_id"] != feature_id:
-            continue
-        display_geometry = feature["display_geometry"]
-        if not isinstance(display_geometry, dict):
-            raise GameLifecycleError("Projection sample terrain feature needs display_geometry.")
-        return validate_json_value(
-            {
-                "feature_id": feature["feature_id"],
-                "feature_kind": feature["feature_kind"],
-                "source_id": feature["source_id"],
-                "display_geometry": display_geometry,
-            }
-        )
-    raise GameLifecycleError("Projection sample terrain feature was not found.")
+    terrain_areas = mission_setup["terrain_areas"]
+    if not isinstance(terrain_areas, list):
+        raise GameLifecycleError("Projection sample terrain_areas must be a list.")
+    payload = validate_json_value(
+        {
+            "terrain_features": terrain_features,
+            "terrain_areas": terrain_areas,
+        }
+    )
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Projection sample terrain payload must be an object.")
+    return payload
 
 
 def _fixture_json(name: str) -> JsonValue:

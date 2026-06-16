@@ -3,12 +3,17 @@ from __future__ import annotations
 import json
 import math
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import replace
 from typing import cast
 
 import pytest
 
-from warhammer40k_core.core.deployment_zones import DeploymentZone, DeploymentZoneShape
+from warhammer40k_core.core.deployment_zones import (
+    DeploymentZone,
+    DeploymentZoneCircleCutout,
+    DeploymentZoneShape,
+)
 from warhammer40k_core.core.missions import (
     BattlefieldLayoutDefinition,
     MissionPackDefinition,
@@ -217,7 +222,7 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
             assert setup.battlefield_layout_id is None
             assert setup.terrain_areas == ()
             assert setup.battlefield_regions == ()
-            assert setup.terrain_features
+            assert setup.terrain_features == ()
         expected_objective_count = (
             6 if terrain_layout_id in disruption_reconnaissance_layout_ids else 5
         )
@@ -297,6 +302,23 @@ def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_ord
         "reconnaissance-vs-priority-assets-layout-3",
     )
 
+    source_row_payload = source_rows[0].to_payload()
+    assert source_row_payload == {
+        "source_left_force_disposition_id": "take-and-hold",
+        "source_right_force_disposition_id": "take-and-hold",
+        "source_left_primary_mission_id": "primary-battlefield-dominance",
+        "source_left_primary_mission_name": "Battlefield Dominance",
+        "source_right_primary_mission_id": "primary-battlefield-dominance",
+        "source_right_primary_mission_name": "Battlefield Dominance",
+        "layout_pair_id": "take-and-hold-vs-take-and-hold",
+        "layout_source_page_start": 9,
+        "source_id": (
+            "gw-11e-warhammer-event-companion-v1-0-2026-06:"
+            "primary-mission-matrix-source:take-and-hold-vs-take-and-hold"
+        ),
+    }
+    assert "<" not in json.dumps(source_row_payload, sort_keys=True)
+
 
 def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> None:
     descriptors = event_source.layout_descriptor_rows()
@@ -373,8 +395,16 @@ def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> 
     )
     assert all(
         {"dense", "light"} <= {feature.density for feature in descriptor.terrain_features}
-        for descriptor in descriptors
+        for descriptor in (
+            layout_a,
+            layout_b,
+            layout_c,
+            disruption_layout_a,
+            disruption_layout_b,
+            disruption_layout_c,
+        )
     )
+    assert all(descriptor.terrain_features == () for descriptor in pending_descriptors)
     assert all(
         objective.objective_kind
         in {"attacker_home", "defender_home", "center", "central", "expansion"}
@@ -412,6 +442,241 @@ def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> 
         for row in event_source.battlefield_layout_rows()
         if row.battlefield_layout_id not in extracted_layout_ids
     )
+
+
+def test_phase17j_deployment_zone_layout_templates_match_source_shapes() -> None:
+    template_shapes = dict(event_source.deployment_zone_layout_template_shapes())
+
+    assert set(template_shapes) == {
+        event_source.DEPLOYMENT_ZONE_LAYOUT_1_STAGGERED,
+        event_source.DEPLOYMENT_ZONE_LAYOUT_2_LONG_EDGE_STRIP,
+        event_source.DEPLOYMENT_ZONE_LAYOUT_3_QUARTER_CIRCLE_CUTOUT,
+        event_source.DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE,
+        event_source.DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP,
+        event_source.DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE,
+    }
+    assert _shape_polygons(template_shapes[event_source.DEPLOYMENT_ZONE_LAYOUT_1_STAGGERED]) == (
+        ((0.0, 0.0), (44.0, 0.0), (44.0, 12.0), (22.0, 12.0), (22.0, 20.0), (0.0, 22.0)),
+    )
+    assert _shape_polygons(
+        template_shapes[event_source.DEPLOYMENT_ZONE_LAYOUT_2_LONG_EDGE_STRIP]
+    ) == (((0.0, 0.0), (12.0, 0.0), (12.0, 60.0), (0.0, 60.0)),)
+    assert _shape_polygons(
+        template_shapes[event_source.DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE]
+    ) == (((0.0, 0.0), (14.0, 0.0), (14.0, 30.0), (8.0, 30.0), (8.0, 60.0), (0.0, 60.0)),)
+    assert _shape_polygons(
+        template_shapes[event_source.DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP]
+    ) == (((0.0, 0.0), (44.0, 0.0), (44.0, 18.0), (0.0, 18.0)),)
+    assert _shape_polygons(template_shapes[event_source.DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE]) == (
+        ((0.0, 0.0), (44.0, 0.0), (0.0, 30.0)),
+    )
+
+    quarter_cutout = template_shapes[event_source.DEPLOYMENT_ZONE_LAYOUT_3_QUARTER_CIRCLE_CUTOUT]
+    assert quarter_cutout.contains_point(8.0, 8.0)
+    assert not quarter_cutout.contains_point(22.0, 30.0)
+    assert not quarter_cutout.contains_point(18.0, 28.0)
+    assert len(quarter_cutout.polygons[0].vertices) > 4
+
+
+def test_phase17j_known_layouts_use_canonical_deployment_zone_helpers() -> None:
+    rows = {row.battlefield_layout_id: row for row in event_source.battlefield_layout_rows()}
+    layout_a = rows["take-and-hold-vs-take-and-hold-layout-1"]
+    layout_b = rows["take-and-hold-vs-take-and-hold-layout-2"]
+    layout_c = rows["take-and-hold-vs-take-and-hold-layout-3"]
+    take_vs_purge_c = rows["take-and-hold-vs-purge-the-foe-layout-3"]
+
+    assert _shape_polygons(layout_a.deployment_zones[0].shape) == (
+        ((0.0, 38.0), (22.0, 40.0), (22.0, 48.0), (44.0, 48.0), (44.0, 60.0), (0.0, 60.0)),
+    )
+    assert _shape_polygons(layout_a.deployment_zones[1].shape) == (
+        ((44.0, 22.0), (22.0, 20.0), (22.0, 12.0), (0.0, 12.0), (0.0, 0.0), (44.0, 0.0)),
+    )
+    assert _shape_polygons(layout_b.deployment_zones[0].shape) == (
+        ((0.0, 0.0), (12.0, 0.0), (12.0, 60.0), (0.0, 60.0)),
+    )
+    assert _shape_polygons(layout_b.deployment_zones[1].shape) == (
+        ((44.0, 0.0), (32.0, 0.0), (32.0, 60.0), (44.0, 60.0)),
+    )
+    assert not layout_c.deployment_zones[0].shape.contains_point(22.0, 30.0)
+    assert not layout_c.deployment_zones[1].shape.contains_point(22.0, 30.0)
+    assert _shape_polygons(take_vs_purge_c.deployment_zones[0].shape) == (
+        ((0.0, 0.0), (44.0, 0.0), (44.0, 18.0), (0.0, 18.0)),
+    )
+    assert _shape_polygons(take_vs_purge_c.deployment_zones[1].shape) == (
+        ((44.0, 42.0), (0.0, 42.0), (0.0, 60.0), (44.0, 60.0)),
+    )
+    assert take_vs_purge_c.terrain_features == ()
+
+    descriptor = _layout_descriptor("take-and-hold", "purge-the-foe", "c")
+    assert descriptor.attacker_edge == "south"
+    assert descriptor.defender_edge == "north"
+
+
+def test_phase17j_unmapped_deployment_zone_templates_keep_canonical_edges() -> None:
+    assert _source_deployment_zone_layout_edges(
+        event_source.DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE
+    ) == ("west", "east")
+    assert _source_deployment_zone_layout_edges(event_source.DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE) == (
+        "south_west_corner",
+        "north_east_corner",
+    )
+
+    stepped_shape = _source_deployment_zone_template_base_shape(
+        event_source.DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE
+    )
+    triangle_shape = _source_deployment_zone_template_base_shape(
+        event_source.DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE
+    )
+
+    assert _shape_polygons(
+        _source_transform_deployment_zone_shape(
+            stepped_shape,
+            "point_reflection",
+        )
+    ) == (
+        (
+            (44.0, 0.0),
+            (36.0, 0.0),
+            (36.0, 30.0),
+            (30.0, 30.0),
+            (30.0, 60.0),
+            (44.0, 60.0),
+        ),
+    )
+    assert _shape_polygons(
+        _source_transform_deployment_zone_shape(
+            triangle_shape,
+            "point_reflection",
+        )
+    ) == (((44.0, 30.0), (0.0, 60.0), (44.0, 60.0)),)
+
+
+def test_phase17j_deployment_zone_helpers_fail_closed_for_unknown_shapes() -> None:
+    unsupported_template = cast(
+        event_source.DeploymentZoneLayoutTemplateId,
+        "deployment-zone-layout-unsupported",
+    )
+    unsupported_transform = cast(
+        event_source.DeploymentZoneShapeTransform,
+        "diagonal_reflection",
+    )
+    base_shape = _source_deployment_zone_template_base_shape(
+        event_source.DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP
+    )
+    cutout_shape = DeploymentZoneShape(
+        polygons=base_shape.polygons,
+        cutouts=(DeploymentZoneCircleCutout(center_x=1.0, center_y=1.0, radius=0.5),),
+    )
+
+    with pytest.raises(MissionPackError, match="Unsupported battlefield layout number"):
+        _source_deployment_zone_layout_template_id(
+            layout_id="take-and-hold-vs-purge-the-foe-layout-9",
+            layout_number=9,
+        )
+    with pytest.raises(MissionPackError, match="Unsupported deployment-zone layout template"):
+        _source_deployment_zone_shape_transforms(unsupported_template)
+    with pytest.raises(MissionPackError, match="Unsupported deployment-zone layout template"):
+        _source_deployment_zone_template_base_shape(unsupported_template)
+    with pytest.raises(MissionPackError, match="Unsupported deployment-zone layout template"):
+        _source_deployment_zone_layout_edges(unsupported_template)
+    with pytest.raises(MissionPackError, match="Unsupported deployment-zone shape transform"):
+        _source_transform_deployment_zone_shape(
+            base_shape,
+            unsupported_transform,
+        )
+    with pytest.raises(MissionPackError, match="Battlefield layout ID must end in layout number"):
+        _source_layout_number_from_layout_id("take-and-hold-vs-purge-the-foe-layout-z")
+    with pytest.raises(MissionPackError, match="Unsupported extracted battlefield layout ID"):
+        _source_extracted_deployment_zones(layout_id="take-and-hold-vs-purge-the-foe-layout-1")
+    with pytest.raises(
+        MissionPackError,
+        match="Deployment-zone layout template transforms require polygons",
+    ):
+        _source_map_deployment_zone_shape(
+            cutout_shape,
+            lambda x, y: (x, y),
+        )
+
+
+def test_phase17j_quarter_circle_cutout_vertices_cover_supported_corners() -> None:
+    lower_right = _source_rectangle_with_quarter_circle_cutout_vertices(
+        min_x=0.0,
+        min_y=0.0,
+        max_x=22.0,
+        max_y=30.0,
+        corner="lower_right",
+        radius=event_source.LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES,
+    )
+    upper_left = _source_rectangle_with_quarter_circle_cutout_vertices(
+        min_x=0.0,
+        min_y=0.0,
+        max_x=22.0,
+        max_y=30.0,
+        corner="upper_left",
+        radius=event_source.LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES,
+    )
+
+    assert lower_right[0] == (0.0, 0.0)
+    assert lower_right[-2:] == ((22.0, 30.0), (0.0, 30.0))
+    assert upper_left[:3] == ((0.0, 0.0), (22.0, 0.0), (22.0, 30.0))
+    assert upper_left[-1] == (0.0, 21.0)
+
+    with pytest.raises(MissionPackError, match="Unsupported quarter-circle cutout corner"):
+        _source_rectangle_with_quarter_circle_cutout_vertices(
+            min_x=0.0,
+            min_y=0.0,
+            max_x=22.0,
+            max_y=30.0,
+            corner="upper_center",
+            radius=event_source.LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES,
+        )
+
+
+def test_phase17j_base_size_source_kinds_cover_noncanonical_entries() -> None:
+    assert _source_base_source_kind_and_geometry("Use model") == (
+        "use_model",
+        event_source.GeometryResolutionStatus.REQUIRES_PROJECT_GEOMETRY_OVERRIDE,
+        None,
+    )
+    assert _source_base_source_kind_and_geometry("No official base size") == (
+        "no_official_base_size",
+        event_source.GeometryResolutionStatus.UNSUPPORTED_FOR_PHYSICAL_GEOMETRY,
+        None,
+    )
+    assert _source_base_source_kind_and_geometry("Tactical Rock") == (
+        "unresolved_source_shape",
+        event_source.GeometryResolutionStatus.UNSUPPORTED_FOR_PHYSICAL_GEOMETRY,
+        None,
+    )
+
+
+def test_phase17j_unmapped_primary_missions_remain_source_descriptor_only(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def unknown_primary_names() -> tuple[tuple[str, str], ...]:
+        return (("primary-source-pending", "Source Pending"),)
+
+    monkeypatch.setattr(event_source, "_event_primary_mission_names", unknown_primary_names)
+
+    primary_row = event_source.primary_mission_rows()[0]
+    coverage_row = event_source.primary_mission_scoring_coverage_rows()[0]
+
+    assert primary_row.primary_mission_id == "primary-source-pending"
+    assert primary_row.scoring_kind == "event_companion_primary_source_descriptor_only"
+    assert coverage_row.status is event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE
+    assert coverage_row.needed_work == ("source_primary_scoring_text",)
+
+
+def test_phase17j_source_lookup_helpers_fail_closed_for_unknown_ids() -> None:
+    with pytest.raises(MissionPackError, match="Unsupported extracted battlefield layout ID"):
+        _source_extracted_layout_source("unknown-layout")
+    with pytest.raises(MissionPackError, match="Event Companion matrix row was not found"):
+        _source_matrix_row(
+            player_force_disposition_id="unknown-force",
+            opponent_force_disposition_id="take-and-hold",
+        )
+    with pytest.raises(MissionPackError, match="Event Companion force disposition was not found"):
+        _source_force_disposition_name("unknown-force")
 
 
 def test_phase17j_take_and_hold_layout_a_encodes_terrain_areas_and_regions() -> None:
@@ -1510,6 +1775,164 @@ def test_phase17j_final_scoring_uses_event_caps_battle_ready_and_draw_rules() ->
     assert audit["battle_ready_vp_cap"] == 10
 
 
+def _source_deployment_zone_layout_template_id(
+    *,
+    layout_id: str,
+    layout_number: int,
+) -> event_source.DeploymentZoneLayoutTemplateId:
+    function = cast(
+        Callable[..., event_source.DeploymentZoneLayoutTemplateId],
+        vars(event_source)["_deployment_zone_layout_template_id"],
+    )
+    return function(layout_id=layout_id, layout_number=layout_number)
+
+
+def _source_deployment_zone_layout_edges(
+    template_id: event_source.DeploymentZoneLayoutTemplateId,
+) -> tuple[str, str]:
+    function = cast(
+        Callable[[event_source.DeploymentZoneLayoutTemplateId], tuple[str, str]],
+        vars(event_source)["_deployment_zone_layout_edges"],
+    )
+    return function(template_id)
+
+
+def _source_deployment_zone_shape_transforms(
+    template_id: event_source.DeploymentZoneLayoutTemplateId,
+) -> tuple[event_source.DeploymentZoneShapeTransform, event_source.DeploymentZoneShapeTransform]:
+    function = cast(
+        Callable[
+            [event_source.DeploymentZoneLayoutTemplateId],
+            tuple[
+                event_source.DeploymentZoneShapeTransform,
+                event_source.DeploymentZoneShapeTransform,
+            ],
+        ],
+        vars(event_source)["_deployment_zone_shape_transforms"],
+    )
+    return function(template_id)
+
+
+def _source_deployment_zone_template_base_shape(
+    template_id: event_source.DeploymentZoneLayoutTemplateId,
+) -> DeploymentZoneShape:
+    function = cast(
+        Callable[[event_source.DeploymentZoneLayoutTemplateId], DeploymentZoneShape],
+        vars(event_source)["_deployment_zone_template_base_shape"],
+    )
+    return function(template_id)
+
+
+def _source_transform_deployment_zone_shape(
+    shape: DeploymentZoneShape,
+    transform: event_source.DeploymentZoneShapeTransform,
+) -> DeploymentZoneShape:
+    function = cast(
+        Callable[
+            [DeploymentZoneShape, event_source.DeploymentZoneShapeTransform], DeploymentZoneShape
+        ],
+        vars(event_source)["_transform_deployment_zone_shape"],
+    )
+    return function(shape, transform)
+
+
+def _source_layout_number_from_layout_id(layout_id: str) -> int:
+    function = cast(
+        Callable[[str], int],
+        vars(event_source)["_layout_number_from_layout_id"],
+    )
+    return function(layout_id)
+
+
+def _source_extracted_deployment_zones(
+    *,
+    layout_id: str,
+) -> tuple[object, ...]:
+    function = cast(
+        Callable[..., tuple[object, ...]],
+        vars(event_source)["_extracted_deployment_zones"],
+    )
+    return function(layout_id=layout_id)
+
+
+def _source_map_deployment_zone_shape(
+    shape: DeploymentZoneShape,
+    transform: Callable[[float, float], tuple[float, float]],
+) -> DeploymentZoneShape:
+    function = cast(
+        Callable[
+            [DeploymentZoneShape, Callable[[float, float], tuple[float, float]]],
+            DeploymentZoneShape,
+        ],
+        vars(event_source)["_map_deployment_zone_shape"],
+    )
+    return function(shape, transform)
+
+
+def _source_rectangle_with_quarter_circle_cutout_vertices(
+    *,
+    min_x: float,
+    min_y: float,
+    max_x: float,
+    max_y: float,
+    corner: str,
+    radius: float,
+) -> tuple[tuple[float, float], ...]:
+    function = cast(
+        Callable[..., tuple[tuple[float, float], ...]],
+        vars(event_source)["_rectangle_with_quarter_circle_cutout_vertices"],
+    )
+    return function(
+        min_x=min_x,
+        min_y=min_y,
+        max_x=max_x,
+        max_y=max_y,
+        corner=corner,
+        radius=radius,
+    )
+
+
+def _source_base_source_kind_and_geometry(
+    base_text: str,
+) -> tuple[str, event_source.GeometryResolutionStatus, object | None]:
+    function = cast(
+        Callable[..., tuple[str, event_source.GeometryResolutionStatus, object | None]],
+        vars(event_source)["_base_source_kind_and_geometry"],
+    )
+    return function(base_text)
+
+
+def _source_extracted_layout_source(layout_id: str) -> object:
+    function = cast(
+        Callable[[str], object],
+        vars(event_source)["_extracted_layout_source"],
+    )
+    return function(layout_id)
+
+
+def _source_matrix_row(
+    *,
+    player_force_disposition_id: str,
+    opponent_force_disposition_id: str,
+) -> object:
+    function = cast(
+        Callable[..., object],
+        vars(event_source)["_matrix_row"],
+    )
+    return function(
+        player_force_disposition_id=player_force_disposition_id,
+        opponent_force_disposition_id=opponent_force_disposition_id,
+    )
+
+
+def _source_force_disposition_name(force_disposition_id: str) -> str:
+    function = cast(
+        Callable[[str], str],
+        vars(event_source)["_force_disposition_name"],
+    )
+    return function(force_disposition_id)
+
+
 def _layout_descriptor(
     player_force_disposition_id: str,
     opponent_force_disposition_id: str,
@@ -1536,6 +1959,12 @@ def _shape_area(shape: DeploymentZoneShape) -> float:
             previous = current
         total += abs(area) / 2.0
     return round(total, 6)
+
+
+def _shape_polygons(shape: DeploymentZoneShape) -> tuple[tuple[tuple[float, float], ...], ...]:
+    return tuple(
+        tuple((point.x, point.y) for point in polygon.vertices) for polygon in shape.polygons
+    )
 
 
 def _deployment_zones_for_players(

@@ -324,27 +324,24 @@ def _projected_request(
     assert pending["request_id"] == request.request_id
     assert pending["decision_type"] == expected_decision_type
     assert pending["options"] == [option.to_payload() for option in request.options]
-    _assert_all_terrain_features_have_display_geometry(view)
+    _assert_pending_layout_has_no_terrain_geometry(view)
     observed_decision_types.append(expected_decision_type)
     return request
 
 
-def _assert_all_terrain_features_have_display_geometry(view: GameViewPayload) -> None:
+def _assert_pending_layout_has_no_terrain_geometry(view: GameViewPayload) -> None:
     mission_setup = view["mission_setup"]
     assert isinstance(mission_setup, dict)
+    _assert_empty_terrain_geometry_payload(mission_setup)
+
+
+def _assert_empty_terrain_geometry_payload(mission_setup: dict[str, JsonValue]) -> None:
     terrain_features = mission_setup["terrain_features"]
     assert isinstance(terrain_features, list)
-    assert terrain_features
-    for feature in terrain_features:
-        assert isinstance(feature, dict)
-        display_geometry = feature["display_geometry"]
-        assert isinstance(display_geometry, dict)
-        assert display_geometry["schema_version"] == "terrain-display-v1"
-        assert display_geometry["coordinate_space"] == "battlefield_inches"
-        assert display_geometry["footprint_kind"] == "polygon"
-        polygon = display_geometry["footprint_polygon"]
-        assert isinstance(polygon, list)
-        assert len(polygon) >= 3
+    assert terrain_features == []
+    terrain_areas = mission_setup["terrain_areas"]
+    assert isinstance(terrain_areas, list)
+    assert terrain_areas == []
 
 
 def _assert_pending_proposal(view: GameViewPayload, proposal_kind: str) -> None:
@@ -353,12 +350,7 @@ def _assert_pending_proposal(view: GameViewPayload, proposal_kind: str) -> None:
     assert proposal["proposal_kind"] == proposal_kind
     mission_setup = proposal["mission_setup"]
     assert isinstance(mission_setup, dict)
-    terrain_features = mission_setup["terrain_features"]
-    assert isinstance(terrain_features, list)
-    assert terrain_features
-    for feature in terrain_features:
-        assert isinstance(feature, dict)
-        assert isinstance(feature["display_geometry"], dict)
+    _assert_empty_terrain_geometry_payload(mission_setup)
 
 
 def _prebattle_placement_payload(
