@@ -1,0 +1,86 @@
+[
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "datasheet_id": "000001115",
+    "datasheet_name": "Bloodcrushers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [],
+    "semantic_categories": [
+      "core.descriptor"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "descriptor_only"
+  },
+  {
+    "ability_id": "000001115:brass-stampede",
+    "ability_name": "Brass Stampede",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "datasheet_id": "000001115",
+    "datasheet_name": "Bloodcrushers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [],
+    "semantic_categories": [
+      "datasheet.descriptor"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "descriptor_only"
+  },
+  {
+    "ability_id": "000008433",
+    "ability_name": "The Shadow of Chaos",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "datasheet_id": "000001115",
+    "datasheet_name": "Bloodcrushers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [],
+    "semantic_categories": [
+      "faction.descriptor"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "descriptor_only"
+  },
+  {
+    "ability_id": "000001115:daemonic-icon",
+    "ability_name": "Daemonic Icon",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "datasheet_id": "000001115",
+    "datasheet_name": "Bloodcrushers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:leadership-characteristic-query"
+    ],
+    "semantic_categories": [
+      "wargear.characteristic_set.leadership.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000001115:daemonic-icon",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001115:instrument-of-chaos",
+    "ability_name": "Instrument of Chaos",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "datasheet_id": "000001115",
+    "datasheet_name": "Bloodcrushers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:charge-roll-modifier"
+    ],
+    "semantic_categories": [
+      "wargear.roll_modifier.charge.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000001115:instrument-of-chaos",
+    "support_stage": "engine_consumed"
+  }
+]

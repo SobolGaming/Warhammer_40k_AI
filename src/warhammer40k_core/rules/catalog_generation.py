@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass
+from typing import cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -13,7 +15,9 @@ from warhammer40k_core.core.datasheet import (
     AttachmentEligibility,
     AttachmentRole,
     BaseSizeDefinition,
+    CatalogAbilitySourceKind,
     CatalogAbilitySupport,
+    CatalogJsonObject,
     DatasheetAbilityDescriptor,
     DatasheetDefinition,
     DatasheetKeywordSet,
@@ -24,6 +28,7 @@ from warhammer40k_core.core.datasheet import (
     UnitCompositionDefinition,
     WargearOptionConditionKind,
     WargearOptionEffectKind,
+    catalog_ability_source_kind_from_token,
 )
 from warhammer40k_core.core.detachment import (
     DetachmentDefinition,
@@ -482,9 +487,70 @@ def _ability_descriptor_from_row(row: NormalizedSourceRow) -> DatasheetAbilityDe
         name=_required_field(row=row, column_name="name"),
         source_id=_source_ids_from_row(row)[0],
         support=ability_support,
+        source_kind=_ability_source_kind_from_row(row),
+        effect_description=_required_field(row=row, column_name="effect_description"),
         timing_tags=_optional_split_field(row, "timing_tags"),
         parameter_tokens=_optional_split_field(row, "parameter_tokens"),
+        source_wargear_id=_optional_field(row=row, column_name="source_wargear_id"),
+        rule_ir_payload=_rule_ir_payload_from_row(row),
+        rule_ir_diagnostics=_rule_ir_diagnostics_from_row(row),
     )
+
+
+def _ability_source_kind_from_row(row: NormalizedSourceRow) -> CatalogAbilitySourceKind:
+    source_kind = _optional_field(row=row, column_name="source_kind")
+    if source_kind is not None:
+        try:
+            return catalog_ability_source_kind_from_token(source_kind)
+        except ValueError as exc:
+            raise CatalogGenerationError("Unsupported datasheet ability source kind.") from exc
+    ability_type = _required_field(row=row, column_name="type").strip().lower()
+    if ability_type == "core":
+        return CatalogAbilitySourceKind.CORE
+    if ability_type == "faction":
+        return CatalogAbilitySourceKind.FACTION
+    if ability_type == "datasheet":
+        return CatalogAbilitySourceKind.DATASHEET
+    if ability_type == "wargear":
+        return CatalogAbilitySourceKind.WARGEAR
+    raise CatalogGenerationError("Unsupported datasheet ability type.")
+
+
+def _rule_ir_payload_from_row(row: NormalizedSourceRow) -> CatalogJsonObject | None:
+    value = _optional_field(row=row, column_name="rule_ir_payload")
+    if value is None:
+        return None
+    try:
+        payload = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise CatalogGenerationError(
+            "Datasheet ability rule_ir_payload is malformed JSON."
+        ) from exc
+    if type(payload) is not dict:
+        raise CatalogGenerationError("Datasheet ability rule_ir_payload must be a JSON object.")
+    return cast(CatalogJsonObject, payload)
+
+
+def _rule_ir_diagnostics_from_row(row: NormalizedSourceRow) -> tuple[CatalogJsonObject, ...]:
+    value = _optional_field(row=row, column_name="rule_ir_diagnostics")
+    if value is None:
+        return ()
+    try:
+        payload = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise CatalogGenerationError(
+            "Datasheet ability rule_ir_diagnostics is malformed JSON."
+        ) from exc
+    if type(payload) is not list:
+        raise CatalogGenerationError("Datasheet ability rule_ir_diagnostics must be a JSON list.")
+    diagnostics: list[CatalogJsonObject] = []
+    for diagnostic in cast(list[object], payload):
+        if type(diagnostic) is not dict:
+            raise CatalogGenerationError(
+                "Datasheet ability rule_ir_diagnostics entries must be JSON objects."
+            )
+        diagnostics.append(cast(CatalogJsonObject, diagnostic))
+    return tuple(diagnostics)
 
 
 def _attachment_eligibilities_from_rows(

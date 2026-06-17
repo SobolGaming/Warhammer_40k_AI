@@ -136,6 +136,36 @@ def test_phase17d_this_unit_effect_uses_source_unit_binding() -> None:
     assert applied.effect_payloads[0]["target_unit_instance_ids"] == [source_unit_id]
 
 
+def test_phase17d_optional_wargear_bearer_unit_effects_execute_generically() -> None:
+    source_unit_id = "army-alpha:bloodletters-1"
+    icon = _compiled("Models in the bearer's unit have a Leadership characteristic of 6+.")
+    instrument = _compiled("Add 1 to Charge rolls made for the bearer's unit.")
+
+    icon_result = execute_rule_ir(
+        rule_ir=icon.rule_ir,
+        context=_execution_context(source_unit_instance_id=source_unit_id),
+        registry=default_rule_execution_registry(),
+    )
+    instrument_result = execute_rule_ir(
+        rule_ir=instrument.rule_ir,
+        context=_execution_context(source_unit_instance_id=source_unit_id),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert icon_result.status is RuleExecutionStatus.APPLIED
+    assert icon_result.effect_payloads[0]["target_unit_instance_ids"] == [source_unit_id]
+    assert _json_object(icon_result.effect_payloads[0]["effect"])["parameters"] == [
+        {"key": "characteristic", "value": "leadership"},
+        {"key": "value", "value": "6+"},
+    ]
+    assert instrument_result.status is RuleExecutionStatus.APPLIED
+    assert instrument_result.effect_payloads[0]["target_unit_instance_ids"] == [source_unit_id]
+    assert _json_object(instrument_result.effect_payloads[0]["effect"])["parameters"] == [
+        {"key": "delta", "value": 1},
+        {"key": "roll_type", "value": "charge"},
+    ]
+
+
 def test_phase17d_generic_reroll_permission_executes() -> None:
     compiled = _compiled("After a hit roll, re-roll hit rolls.")
 

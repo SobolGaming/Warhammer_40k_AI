@@ -125,6 +125,7 @@ class RuleEffectKind(StrEnum):
     PLACEMENT_PERMISSION = "placement_permission"
     PLACEMENT_RESTRICTION = "placement_restriction"
     REROLL_PERMISSION = "reroll_permission"
+    SET_CHARACTERISTIC = "set_characteristic"
 
 
 class RuleDurationKind(StrEnum):

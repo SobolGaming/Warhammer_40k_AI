@@ -1,9 +1,17 @@
 from __future__ import annotations
 
+from typing import cast
+
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+)
 from warhammer40k_core.core.ruleset_descriptor import battle_phase_kind_from_token
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.engine.abilities import (
+    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
     AbilityDefinition,
@@ -15,6 +23,7 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, RuleIRError, RuleIRPayload
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_abilities as source_data,
 )
@@ -36,6 +45,24 @@ def eleventh_edition_ability_catalog_records() -> tuple[AbilityCatalogRecord, ..
 
 def eleventh_edition_ability_index() -> AbilityCatalogIndex:
     return AbilityCatalogIndex.from_records(eleventh_edition_ability_catalog_records())
+
+
+def catalog_ability_records_from_catalog(catalog: ArmyCatalog) -> tuple[AbilityCatalogRecord, ...]:
+    if type(catalog) is not ArmyCatalog:
+        raise GameLifecycleError("Catalog ability record build requires an ArmyCatalog.")
+    records: list[AbilityCatalogRecord] = []
+    for datasheet in catalog.datasheets:
+        for descriptor in datasheet.abilities:
+            if descriptor.support is not CatalogAbilitySupport.GENERIC_RULE_IR:
+                continue
+            records.append(
+                _catalog_record_from_descriptor(
+                    catalog=catalog,
+                    datasheet_id=datasheet.datasheet_id,
+                    descriptor=descriptor,
+                )
+            )
+    return tuple(sorted(records, key=lambda record: record.record_id))
 
 
 def build_player_ability_index(
@@ -119,6 +146,81 @@ def _record_from_source_row(row: source_data.SourceAbilityRow) -> AbilityCatalog
         weapon_profile_id=row.weapon_profile_id,
         disabled=row.disabled,
     )
+
+
+def _catalog_record_from_descriptor(
+    *,
+    catalog: ArmyCatalog,
+    datasheet_id: str,
+    descriptor: DatasheetAbilityDescriptor,
+) -> AbilityCatalogRecord:
+    if descriptor.rule_ir_payload is None:
+        raise GameLifecycleError("Catalog generic rule ability descriptor is missing rule_ir.")
+    try:
+        rule_ir = RuleIR.from_payload(cast(RuleIRPayload, descriptor.rule_ir_payload))
+    except RuleIRError as exc:
+        raise GameLifecycleError("Catalog generic rule ability descriptor has invalid IR.") from exc
+    return AbilityCatalogRecord(
+        record_id=(
+            f"{catalog.source_package_id}:catalog-ability:{datasheet_id}:{descriptor.ability_id}"
+        ),
+        definition=AbilityDefinition(
+            ability_id=descriptor.ability_id,
+            name=descriptor.name,
+            source_id=descriptor.source_id,
+            when_descriptor=_catalog_when_descriptor(descriptor),
+            effect_descriptor=descriptor.effect_description,
+            restrictions_descriptor=_catalog_restrictions_descriptor(descriptor),
+            timing=_catalog_timing_descriptor(rule_ir),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value({"rule_ir": rule_ir.to_payload()}),
+        ),
+        source_kind=_catalog_ability_source_kind(descriptor.source_kind),
+        datasheet_id=datasheet_id,
+        wargear_id=descriptor.source_wargear_id,
+    )
+
+
+def _catalog_ability_source_kind(source_kind: CatalogAbilitySourceKind) -> AbilitySourceKind:
+    if source_kind is CatalogAbilitySourceKind.DATASHEET:
+        return AbilitySourceKind.DATASHEET
+    if source_kind is CatalogAbilitySourceKind.WARGEAR:
+        return AbilitySourceKind.WARGEAR
+    raise GameLifecycleError("Catalog generic rule ability source kind is unsupported.")
+
+
+def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
+    if any(
+        effect.kind is RuleEffectKind.SET_CHARACTERISTIC
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+    ):
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
+    if any(
+        effect.kind
+        in {
+            RuleEffectKind.MODIFY_DICE_ROLL,
+            RuleEffectKind.REROLL_PERMISSION,
+        }
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+    ):
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL)
+    return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE)
+
+
+def _catalog_when_descriptor(descriptor: DatasheetAbilityDescriptor) -> str:
+    if descriptor.timing_tags:
+        return f"Catalog timing tags: {','.join(descriptor.timing_tags)}."
+    return "Catalog generic rule IR."
+
+
+def _catalog_restrictions_descriptor(descriptor: DatasheetAbilityDescriptor) -> str:
+    if descriptor.source_kind is CatalogAbilitySourceKind.WARGEAR:
+        if descriptor.source_wargear_id is None:
+            raise GameLifecycleError("Wargear catalog ability is missing source_wargear_id.")
+        return f"Selected wargear required: {descriptor.source_wargear_id}."
+    return f"Datasheet ability source kind: {descriptor.source_kind.value}."
 
 
 def _record_source_matches_player(

@@ -5,7 +5,7 @@ from typing import TypedDict
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.core.datasheet import BaseSizeDefinition
+from warhammer40k_core.core.datasheet import BaseSizeDefinition, DatasheetAbilityDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.decision_request import (
     DecisionOptionPayload,
@@ -328,7 +328,7 @@ def project_rules_catalog_view(*, catalog: ArmyCatalog) -> RulesCatalogViewPaylo
                     "support": ability.support.value,
                     "timing_tags": list(ability.timing_tags),
                     "parameter_tokens": list(ability.parameter_tokens),
-                    "profile": validate_json_value(ability.to_payload()),
+                    "profile": validate_json_value(_datasheet_ability_display_profile(ability)),
                 }
                 for ability in datasheet.abilities
             ],
@@ -788,6 +788,21 @@ def _datacard_characteristics(
             )
         )
     return payload
+
+
+def _datasheet_ability_display_profile(
+    ability: DatasheetAbilityDescriptor,
+) -> dict[str, JsonValue]:
+    if type(ability) is not DatasheetAbilityDescriptor:
+        raise GameLifecycleError("Ability display profile requires a datasheet ability descriptor.")
+    return {
+        "ability_id": ability.ability_id,
+        "name": ability.name,
+        "source_id": ability.source_id,
+        "support": ability.support.value,
+        "timing_tags": list(ability.timing_tags),
+        "parameter_tokens": list(ability.parameter_tokens),
+    }
 
 
 def _characteristic_display_value(

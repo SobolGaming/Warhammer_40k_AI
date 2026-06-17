@@ -17,6 +17,7 @@ from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.abilities import (
     CORE_HAZARDOUS_HANDLER_ID,
     CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID,
+    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
     AbilityDefinition,
@@ -271,6 +272,22 @@ def test_registry_executes_only_opted_in_bucket_and_rejects_unsupported_handlers
             timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL),
             handler=handler,
         )
+
+
+def test_generic_rule_ir_handler_requires_registry_binding() -> None:
+    generic_rule_ir = _ability_record(
+        "generic-rule-ir",
+        handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+    )
+
+    result = AbilityHandlerRegistry.empty().execute(
+        record=generic_rule_ir,
+        context=_context(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL),
+    )
+
+    assert result.status is AbilityResolutionStatus.UNSUPPORTED
+    assert result.reason == "missing_handler"
 
 
 def test_keyword_gated_movement_capabilities_are_dispatched_from_ability_index() -> None:

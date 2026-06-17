@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
+from types import MappingProxyType
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -9,6 +11,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     movement_mode_from_token,
 )
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.aircraft import AircraftMovementPolicy, HoverModeState
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -19,6 +22,9 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacementError,
     UnitPlacement,
     geometry_model_for_placement,
+)
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_charge_roll_modifiers_for_unit,
 )
 from warhammer40k_core.engine.charge_declaration import (
     CHARGE_MOVE_PENDING_STATUS,
@@ -92,6 +98,10 @@ _CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS = "charge_move_proposal_required"
 _CHARGE_MOVE_INVALID_STATUS = "charge_move_invalid"
 _CHARGE_MOVE_DECLINED_STATUS = "charge_move_declined"
 _CHARGE_MOVE_COMPLETED_STATUS = "charge_move_completed"
+
+
+def _empty_ability_indexes() -> Mapping[str, AbilityCatalogIndex]:
+    return MappingProxyType({})
 
 
 class ChargingUnitSelectionPayload(TypedDict):
@@ -707,6 +717,9 @@ class ChargePhaseHandler:
     charge_declaration_hooks: ChargeDeclarationHookRegistry = field(
         default_factory=ChargeDeclarationHookRegistry.empty
     )
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = field(
+        default_factory=_empty_ability_indexes
+    )
 
     def __post_init__(self) -> None:
         if (
@@ -720,6 +733,11 @@ class ChargePhaseHandler:
             raise GameLifecycleError(
                 "ChargePhaseHandler charge_declaration_hooks must be a registry."
             )
+        object.__setattr__(
+            self,
+            "ability_indexes_by_player_id",
+            _validate_ability_index_mapping(self.ability_indexes_by_player_id),
+        )
 
     @property
     def phase(self) -> BattlePhase:
@@ -841,6 +859,10 @@ class ChargePhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 charge_declaration_hooks=self.charge_declaration_hooks,
+                ability_index=_ability_index_for_player(
+                    self.ability_indexes_by_player_id,
+                    player_id=_active_player_id(state),
+                ),
             )
         if result.decision_type == SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE:
             return _apply_charge_declaration_grant_decision(
@@ -849,6 +871,10 @@ class ChargePhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 charge_declaration_hooks=self.charge_declaration_hooks,
+                ability_index=_ability_index_for_player(
+                    self.ability_indexes_by_player_id,
+                    player_id=_active_player_id(state),
+                ),
             )
         if result.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
             return _apply_charge_move_proposal_decision(
@@ -1111,6 +1137,7 @@ def _apply_charging_unit_selection_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     charge_declaration_hooks: ChargeDeclarationHookRegistry,
+    ability_index: AbilityCatalogIndex,
 ) -> LifecycleStatus | None:
     _validate_charge_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -1179,6 +1206,7 @@ def _apply_charging_unit_selection_decision(
         selection=selection,
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
+        ability_index=ability_index,
     )
 
 
@@ -1300,6 +1328,7 @@ def _apply_charge_declaration_grant_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     charge_declaration_hooks: ChargeDeclarationHookRegistry,
+    ability_index: AbilityCatalogIndex,
 ) -> LifecycleStatus | None:
     charge_state = state.charge_phase_state
     if charge_state is None or charge_state.active_selection is None:
@@ -1360,6 +1389,7 @@ def _apply_charge_declaration_grant_decision(
         selection=selection,
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
+        ability_index=ability_index,
     )
 
 
@@ -1477,7 +1507,17 @@ def _resolve_charge_roll(
     selection: ChargingUnitSelection,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    ability_index: AbilityCatalogIndex,
 ) -> LifecycleStatus | None:
+    unit = _unit_for_selection(state=state, selection=selection)
+    roll_modifiers = catalog_charge_roll_modifiers_for_unit(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=_current_model_instance_ids_for_charge_unit(
+            state=state,
+            unit=unit,
+        ),
+    )
     roll_request = ChargeRollRequest(
         request_id=f"charge-roll:{selection.result_id}",
         game_id=state.game_id,
@@ -1486,6 +1526,7 @@ def _resolve_charge_roll(
         unit_instance_id=selection.unit_instance_id,
         source_decision_request_id=selection.request_id,
         source_decision_result_id=selection.result_id,
+        roll_modifiers=roll_modifiers,
     )
     roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
         roll_request.spec
@@ -1525,6 +1566,28 @@ def _resolve_charge_roll(
         charge_state=charge_state,
         roll_result=roll_result,
     )
+
+
+def _current_model_instance_ids_for_charge_unit(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+) -> tuple[str, ...]:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Charge roll current model evidence requires a UnitInstance.")
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Charge roll current model evidence requires battlefield_state.")
+    placement = battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+    known_model_ids = {model.model_instance_id for model in unit.own_models}
+    current_ids: list[str] = []
+    for model_placement in placement.model_placements:
+        if model_placement.model_instance_id not in known_model_ids:
+            raise GameLifecycleError("Charge roll unit placement contains unknown models.")
+        current_ids.append(model_placement.model_instance_id)
+    if not current_ids:
+        raise GameLifecycleError("Charge roll current model evidence must not be empty.")
+    return tuple(sorted(current_ids))
 
 
 def _request_charge_move_proposal(
@@ -2578,6 +2641,44 @@ def _unit_by_id(*, state: GameState, unit_instance_id: str) -> UnitInstance:
             if unit.unit_instance_id == requested_id:
                 return unit
     raise GameLifecycleError("Charge unit_instance_id is unknown.")
+
+
+def _unit_for_selection(*, state: GameState, selection: ChargingUnitSelection) -> UnitInstance:
+    if type(selection) is not ChargingUnitSelection:
+        raise GameLifecycleError("Charge unit lookup requires a ChargingUnitSelection.")
+    return _unit_by_id(state=state, unit_instance_id=selection.unit_instance_id)
+
+
+def _validate_ability_index_mapping(indexes: object) -> Mapping[str, AbilityCatalogIndex]:
+    if not isinstance(indexes, Mapping):
+        raise GameLifecycleError("ability_indexes_by_player_id must be a mapping.")
+    mapped_indexes = cast(Mapping[object, object], indexes)
+    validated: dict[str, AbilityCatalogIndex] = {}
+    for raw_player_id, raw_index in mapped_indexes.items():
+        player_id = _validate_identifier("ability_indexes_by_player_id key", raw_player_id)
+        if type(raw_index) is not AbilityCatalogIndex:
+            raise GameLifecycleError(
+                "ability_indexes_by_player_id values must be AbilityCatalogIndex."
+            )
+        validated[player_id] = raw_index
+    return MappingProxyType(validated)
+
+
+def _ability_index_for_player(
+    indexes: object,
+    *,
+    player_id: str,
+) -> AbilityCatalogIndex:
+    player = _validate_identifier("player_id", player_id)
+    if not isinstance(indexes, Mapping):
+        raise GameLifecycleError("ability_indexes_by_player_id must be a mapping.")
+    mapped_indexes = cast(Mapping[str, AbilityCatalogIndex], indexes)
+    index = mapped_indexes.get(player)
+    if index is None:
+        return AbilityCatalogIndex.from_records(())
+    if type(index) is not AbilityCatalogIndex:
+        raise GameLifecycleError("ability index mapping contained an invalid value.")
+    return index
 
 
 def _charge_phase_status_payload(

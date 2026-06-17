@@ -10,6 +10,7 @@ from tests.deployment_submission_helpers import submit_all_deployments_if_pendin
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
     CatalogAbilitySupport,
     DatasheetAbilityDescriptor,
     DatasheetDefinition,
@@ -1958,6 +1959,8 @@ def _scouts_ability_descriptors(
             name=f"CORE Scouts {distance:g}",
             source_id=f"datasheet:{datasheet_id}:ability:scouts:{index + 1}",
             support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+            source_kind=CatalogAbilitySourceKind.CORE,
+            effect_description=f"CORE Scouts {distance:g} descriptor.",
             timing_tags=("before_battle", "scouts"),
             parameter_tokens=(f"{distance:g}",),
         )

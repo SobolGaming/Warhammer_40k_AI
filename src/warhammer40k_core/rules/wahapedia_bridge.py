@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import csv
 import io
+import json
 import re
 import unicodedata
 from dataclasses import dataclass
 
 from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
     WargearOptionConditionKind,
     WargearOptionEffectKind,
 )
@@ -17,6 +20,8 @@ from warhammer40k_core.core.model_geometry_catalog import (
 )
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.rules.data_package import DataPackageId
+from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.wahapedia_schema import (
     NormalizedSourceRow,
     WahapediaCsvTable,
@@ -465,6 +470,33 @@ def _bridge_abilities(
         else:
             ability_id = f"{datasheet_id}:{_slug(name)}"
         parameter = _raw_or_field(row, "parameter")
+        source_kind = _ability_source_kind(_required_field(row, "type"))
+        source_wargear_id = ""
+        rule_ir_payload = ""
+        rule_ir_diagnostics = ""
+        support = CatalogAbilitySupport.DESCRIPTOR_ONLY
+        if source_kind is CatalogAbilitySourceKind.WARGEAR:
+            source_wargear_id = f"{datasheet_id}:{_slug(name)}"
+            compiled = compile_rule_source_text(
+                RuleSourceText.from_raw(
+                    source_id=_source_text_id(row=row, column_name="description"),
+                    raw_text=description,
+                )
+            )
+            rule_ir_payload = json.dumps(
+                compiled.rule_ir.to_payload(),
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            rule_ir_diagnostics = json.dumps(
+                _rule_ir_diagnostics(compiled.rule_ir),
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            if compiled.rule_ir.is_supported:
+                support = CatalogAbilitySupport.GENERIC_RULE_IR
+            else:
+                support = CatalogAbilitySupport.UNSUPPORTED
         bridged_rows["Datasheets_abilities"].append(
             {
                 "datasheet_id": datasheet_id,
@@ -474,14 +506,19 @@ def _bridge_abilities(
                 "description": description,
                 "parameter": parameter,
                 "type": _required_field(row, "type"),
-                "support": "descriptor_only",
+                "support": support.value,
+                "source_kind": source_kind.value,
+                "effect_description": description,
+                "source_wargear_id": source_wargear_id,
+                "rule_ir_payload": rule_ir_payload,
+                "rule_ir_diagnostics": rule_ir_diagnostics,
                 "timing_tags": _ability_timing_tags(name),
                 "parameter_tokens": _ability_parameter_tokens(name=name, parameter=parameter),
                 "source_ids": _joined(_source_ids(*source_rows)),
             }
         )
-        if _required_field(row, "type") == "Wargear":
-            wargear_id = f"{datasheet_id}:{_slug(name)}"
+        if source_kind is CatalogAbilitySourceKind.WARGEAR:
+            wargear_id = source_wargear_id
             wargear_ids_by_name[_name_key(name)] = wargear_id
             bridged_rows["Datasheets_wargear"].append(
                 {
@@ -717,6 +754,11 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "parameter",
             "type",
             "support",
+            "source_kind",
+            "effect_description",
+            "source_wargear_id",
+            "rule_ir_payload",
+            "rule_ir_diagnostics",
             "timing_tags",
             "parameter_tokens",
             "source_ids",
@@ -778,6 +820,67 @@ def _raw_or_field(row: NormalizedSourceRow, column_name: str) -> str:
         if text_field.column_name == column_name:
             return text_field.raw_text
     return row.runtime_fields_payload().get(column_name, "")
+
+
+def _source_text_id(*, row: NormalizedSourceRow, column_name: str) -> str:
+    for text_field in row.text_fields:
+        if text_field.column_name == column_name:
+            return text_field.source_text_id
+    return f"{row.stable_source_id()}:{column_name}"
+
+
+def _ability_source_kind(ability_type: str) -> CatalogAbilitySourceKind:
+    normalized = _validate_identifier("ability_type", ability_type).lower()
+    if normalized == "core":
+        return CatalogAbilitySourceKind.CORE
+    if normalized == "faction":
+        return CatalogAbilitySourceKind.FACTION
+    if normalized == "datasheet":
+        return CatalogAbilitySourceKind.DATASHEET
+    if normalized == "wargear":
+        return CatalogAbilitySourceKind.WARGEAR
+    raise WahapediaBridgeError("Unsupported datasheet ability type.")
+
+
+def _rule_ir_diagnostics(rule_ir: object) -> list[dict[str, object]]:
+    from warhammer40k_core.rules.rule_ir import RuleIR
+
+    if type(rule_ir) is not RuleIR:
+        raise WahapediaBridgeError("Rule IR diagnostics require a RuleIR.")
+    diagnostics: list[dict[str, object]] = [
+        {
+            "scope": "rule",
+            "reason": diagnostic.reason.value,
+            "message": diagnostic.message,
+            "source_span": diagnostic.source_span.to_payload(),
+            "blocking": diagnostic.blocking,
+        }
+        for diagnostic in rule_ir.diagnostics
+    ]
+    for clause in rule_ir.clauses:
+        if clause.unsupported_reason is not None:
+            diagnostics.append(
+                {
+                    "scope": "clause",
+                    "clause_id": clause.clause_id,
+                    "reason": clause.unsupported_reason.value,
+                    "message": "Unsupported rule clause.",
+                    "source_span": clause.source_span.to_payload(),
+                    "blocking": True,
+                }
+            )
+        for diagnostic in clause.diagnostics:
+            diagnostics.append(
+                {
+                    "scope": "clause",
+                    "clause_id": clause.clause_id,
+                    "reason": diagnostic.reason.value,
+                    "message": diagnostic.message,
+                    "source_span": diagnostic.source_span.to_payload(),
+                    "blocking": diagnostic.blocking,
+                }
+            )
+    return diagnostics
 
 
 def _source_ids(*rows: NormalizedSourceRow) -> tuple[str, ...]:
