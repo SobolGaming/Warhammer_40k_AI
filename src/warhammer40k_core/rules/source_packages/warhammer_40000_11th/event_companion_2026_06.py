@@ -2406,8 +2406,8 @@ def _extracted_objectives(
             x_inches,
             y_inches,
         )
-        for suffix, name, objective_kind, x_inches, y_inches in (
-            _extracted_layout_source(layout_id).objective_specs
+        for suffix, name, objective_kind, x_inches, y_inches, _terrain_area_suffixes in (
+            _extracted_layout_source(layout_id).objective_terrain_area_specs
         )
     )
 
@@ -2790,8 +2790,6 @@ def _extracted_objective_terrain_area_definitions(
     terrain_areas: tuple[PlacedTerrainArea, ...],
 ) -> tuple[ObjectiveTerrainAreaDefinition, ...]:
     layout_source = _extracted_layout_source(layout_id)
-    if not layout_source.objective_terrain_area_specs:
-        return ()
     objective_markers_by_suffix = {
         marker.objective_marker_id.removeprefix(f"{layout_id}-"): marker
         for marker in objective_markers
@@ -2801,7 +2799,16 @@ def _extracted_objective_terrain_area_definitions(
         for area in terrain_areas
     }
     objective_terrain_areas: list[ObjectiveTerrainAreaDefinition] = []
-    for objective_suffix, terrain_area_suffixes in layout_source.objective_terrain_area_specs:
+    for (
+        objective_suffix,
+        _name,
+        _objective_kind,
+        _x_inches,
+        _y_inches,
+        terrain_area_suffixes,
+    ) in layout_source.objective_terrain_area_specs:
+        if not terrain_area_suffixes:
+            continue
         marker = objective_markers_by_suffix.get(objective_suffix)
         if marker is None:
             raise MissionPackError("Objective terrain area spec references unknown objective.")
@@ -2980,13 +2987,12 @@ def _placed_terrain_areas_from_specs(
             source_layout_id=source_layout_id,
             area_id=area_id,
             template=templates[template_id],
-            classification=classification,
             anchor_x_inches=anchor_x,
             anchor_y_inches=anchor_y,
             rotation_degrees=rotation,
             local_transform=local_transforms_by_area_id[area_id],
         )
-        for area_id, template_id, classification, anchor_x, anchor_y, rotation in explicit_specs
+        for area_id, template_id, anchor_x, anchor_y, rotation in explicit_specs
     )
     explicit_by_suffix = {
         area.terrain_area_id.removeprefix(f"{layout_id}-"): area for area in explicit_areas
@@ -3033,7 +3039,6 @@ def _placed_terrain_area_from_anchor_spec(
     source_layout_id: str,
     area_id: str,
     template: TerrainAreaFootprintTemplate,
-    classification: TerrainAreaClassification,
     anchor_x_inches: float,
     anchor_y_inches: float,
     rotation_degrees: float,
@@ -3049,7 +3054,9 @@ def _placed_terrain_area_from_anchor_spec(
         terrain_area_id=f"{layout_id}-{area_id}",
         template=template,
         terrain_feature_kind=TERRAIN_AREA_FEATURE_KIND,
-        classification=classification,
+        classification=_terrain_area_classification_for_footprint_template(
+            template.footprint_template_id
+        ),
         center_x_inches=center_x,
         center_y_inches=center_y,
         rotation_degrees=rotation_degrees,
@@ -3057,6 +3064,23 @@ def _placed_terrain_area_from_anchor_spec(
         source_layout_id=source_layout_id,
         source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{source_layout_id}:terrain-area:{area_id}",
     )
+
+
+def _terrain_area_classification_for_footprint_template(
+    footprint_template_id: str,
+) -> TerrainAreaClassification:
+    if footprint_template_id in {
+        event_layouts.FOOTPRINT_7X11_5,
+        event_layouts.FOOTPRINT_8X11_5_POLYGON,
+    }:
+        return TerrainAreaClassification.DENSE
+    if footprint_template_id in {
+        event_layouts.FOOTPRINT_6X2,
+        event_layouts.FOOTPRINT_6X4,
+        event_layouts.FOOTPRINT_10X2_5,
+    }:
+        return TerrainAreaClassification.LIGHT
+    raise MissionPackError("Unsupported terrain area footprint template classification.")
 
 
 def _terrain_area_center_from_anchor(
