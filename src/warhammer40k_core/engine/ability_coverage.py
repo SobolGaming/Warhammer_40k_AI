@@ -34,6 +34,7 @@ class AbilityCoverageSupportStage(StrEnum):
 
 
 class AbilityCoverageRowPayload(TypedDict):
+    coverage_row_id: str
     catalog_id: str
     datasheet_id: str
     datasheet_name: str
@@ -48,9 +49,22 @@ class AbilityCoverageRowPayload(TypedDict):
     diagnostic_reasons: list[str]
 
 
+class AbilityCoverageAbilityDatasheetPairPayload(TypedDict):
+    coverage_row_id: str
+    ability_id: str
+    ability_name: str
+    datasheet_id: str
+    datasheet_name: str
+    source_kind: str
+
+
 class AbilityCoverageCategoryRowPayload(TypedDict):
     category_id: str
     category_name: str
+    coverage_row_count: int
+    coverage_row_ids: list[str]
+    ability_datasheet_pairs: list[AbilityCoverageAbilityDatasheetPairPayload]
+    source_kind_counts: dict[str, int]
     support_stages: list[str]
     runtime_consumer_ids: list[str]
     ability_names: list[str]
@@ -115,8 +129,17 @@ class AbilityCoverageRow:
             _validate_string_tuple("diagnostic_reasons", self.diagnostic_reasons),
         )
 
+    @property
+    def coverage_row_id(self) -> str:
+        source_wargear_id = self.source_wargear_id or "none"
+        return (
+            f"{self.catalog_id}/{self.datasheet_id}/{self.source_kind.value}/"
+            f"{self.ability_id}/{source_wargear_id}"
+        )
+
     def to_payload(self) -> AbilityCoverageRowPayload:
         return {
+            "coverage_row_id": self.coverage_row_id,
             "catalog_id": self.catalog_id,
             "datasheet_id": self.datasheet_id,
             "datasheet_name": self.datasheet_name,
@@ -133,9 +156,59 @@ class AbilityCoverageRow:
 
 
 @dataclass(frozen=True, slots=True)
+class AbilityCoverageAbilityDatasheetPair:
+    coverage_row_id: str
+    ability_id: str
+    ability_name: str
+    datasheet_id: str
+    datasheet_name: str
+    source_kind: CatalogAbilitySourceKind
+
+    def __post_init__(self) -> None:
+        if type(self.coverage_row_id) is not str or not self.coverage_row_id.strip():
+            raise GameLifecycleError(
+                "AbilityCoverageAbilityDatasheetPair coverage_row_id must be a string."
+            )
+        if type(self.ability_id) is not str or not self.ability_id.strip():
+            raise GameLifecycleError(
+                "AbilityCoverageAbilityDatasheetPair ability_id must be a string."
+            )
+        if type(self.ability_name) is not str or not self.ability_name.strip():
+            raise GameLifecycleError(
+                "AbilityCoverageAbilityDatasheetPair ability_name must be a string."
+            )
+        if type(self.datasheet_id) is not str or not self.datasheet_id.strip():
+            raise GameLifecycleError(
+                "AbilityCoverageAbilityDatasheetPair datasheet_id must be a string."
+            )
+        if type(self.datasheet_name) is not str or not self.datasheet_name.strip():
+            raise GameLifecycleError(
+                "AbilityCoverageAbilityDatasheetPair datasheet_name must be a string."
+            )
+        if type(self.source_kind) is not CatalogAbilitySourceKind:
+            raise GameLifecycleError(
+                "AbilityCoverageAbilityDatasheetPair source_kind must be CatalogAbilitySourceKind."
+            )
+
+    def to_payload(self) -> AbilityCoverageAbilityDatasheetPairPayload:
+        return {
+            "coverage_row_id": self.coverage_row_id,
+            "ability_id": self.ability_id,
+            "ability_name": self.ability_name,
+            "datasheet_id": self.datasheet_id,
+            "datasheet_name": self.datasheet_name,
+            "source_kind": self.source_kind.value,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class AbilityCoverageCategoryRow:
     category_id: str
     category_name: str
+    coverage_row_count: int
+    coverage_row_ids: tuple[str, ...]
+    ability_datasheet_pairs: tuple[AbilityCoverageAbilityDatasheetPair, ...]
+    source_kind_counts: tuple[tuple[str, int], ...]
     support_stages: tuple[AbilityCoverageSupportStage, ...]
     runtime_consumer_ids: tuple[str, ...]
     ability_names: tuple[str, ...]
@@ -146,6 +219,40 @@ class AbilityCoverageCategoryRow:
             raise GameLifecycleError("AbilityCoverageCategoryRow category_id must be a string.")
         if type(self.category_name) is not str or not self.category_name.strip():
             raise GameLifecycleError("AbilityCoverageCategoryRow category_name must be a string.")
+        if type(self.coverage_row_count) is not int or self.coverage_row_count < 1:
+            raise GameLifecycleError(
+                "AbilityCoverageCategoryRow coverage_row_count must be a positive integer."
+            )
+        object.__setattr__(
+            self,
+            "coverage_row_ids",
+            _validate_string_tuple("coverage_row_ids", self.coverage_row_ids),
+        )
+        if len(self.coverage_row_ids) != self.coverage_row_count:
+            raise GameLifecycleError(
+                "AbilityCoverageCategoryRow coverage_row_ids must match coverage_row_count."
+            )
+        if type(self.ability_datasheet_pairs) is not tuple:
+            raise GameLifecycleError(
+                "AbilityCoverageCategoryRow ability_datasheet_pairs must be a tuple."
+            )
+        if len(self.ability_datasheet_pairs) != self.coverage_row_count:
+            raise GameLifecycleError(
+                "AbilityCoverageCategoryRow ability_datasheet_pairs must match coverage_row_count."
+            )
+        for pair in self.ability_datasheet_pairs:
+            if type(pair) is not AbilityCoverageAbilityDatasheetPair:
+                raise GameLifecycleError(
+                    "AbilityCoverageCategoryRow ability_datasheet_pairs must contain pairs."
+                )
+        object.__setattr__(
+            self,
+            "source_kind_counts",
+            _validate_source_kind_counts(
+                self.source_kind_counts,
+                expected_row_count=self.coverage_row_count,
+            ),
+        )
         if type(self.support_stages) is not tuple:
             raise GameLifecycleError("AbilityCoverageCategoryRow support_stages must be a tuple.")
         for stage in self.support_stages:
@@ -173,6 +280,10 @@ class AbilityCoverageCategoryRow:
         return {
             "category_id": self.category_id,
             "category_name": self.category_name,
+            "coverage_row_count": self.coverage_row_count,
+            "coverage_row_ids": list(self.coverage_row_ids),
+            "ability_datasheet_pairs": [pair.to_payload() for pair in self.ability_datasheet_pairs],
+            "source_kind_counts": dict(self.source_kind_counts),
             "support_stages": [stage.value for stage in self.support_stages],
             "runtime_consumer_ids": list(self.runtime_consumer_ids),
             "ability_names": list(self.ability_names),
@@ -229,27 +340,7 @@ def ability_coverage_category_rows(
         for semantic_category in row.semantic_categories:
             grouped.setdefault(semantic_category, []).append(row)
     return tuple(
-        AbilityCoverageCategoryRow(
-            category_id=category_id,
-            category_name=_category_name(category_id),
-            support_stages=tuple(
-                sorted(
-                    {row.support_stage for row in category_rows},
-                    key=lambda stage: _SUPPORT_STAGE_ORDER[stage],
-                )
-            ),
-            runtime_consumer_ids=tuple(
-                sorted(
-                    {
-                        runtime_consumer_id
-                        for row in category_rows
-                        for runtime_consumer_id in row.runtime_consumer_ids
-                    }
-                )
-            ),
-            ability_names=tuple(sorted({row.ability_name for row in category_rows})),
-            datasheet_names=tuple(sorted({row.datasheet_name for row in category_rows})),
-        )
+        _category_row_for_group(category_id=category_id, category_rows=tuple(category_rows))
         for category_id, category_rows in sorted(
             grouped.items(),
             key=lambda item: (_category_name(item[0]), item[0]),
@@ -268,6 +359,53 @@ def ability_coverage_category_rows_payload(
                 "Ability coverage category row payloads require category rows."
             )
     return [row.to_payload() for row in rows]
+
+
+def _category_row_for_group(
+    *,
+    category_id: str,
+    category_rows: tuple[AbilityCoverageRow, ...],
+) -> AbilityCoverageCategoryRow:
+    if type(category_id) is not str or not category_id.strip():
+        raise GameLifecycleError("Ability coverage category_id must be a string.")
+    if type(category_rows) is not tuple or not category_rows:
+        raise GameLifecycleError("Ability coverage category rows require rows.")
+    sorted_rows = tuple(sorted(category_rows, key=_coverage_row_sort_key))
+    return AbilityCoverageCategoryRow(
+        category_id=category_id,
+        category_name=_category_name(category_id),
+        coverage_row_count=len(sorted_rows),
+        coverage_row_ids=tuple(row.coverage_row_id for row in sorted_rows),
+        ability_datasheet_pairs=tuple(
+            AbilityCoverageAbilityDatasheetPair(
+                coverage_row_id=row.coverage_row_id,
+                ability_id=row.ability_id,
+                ability_name=row.ability_name,
+                datasheet_id=row.datasheet_id,
+                datasheet_name=row.datasheet_name,
+                source_kind=row.source_kind,
+            )
+            for row in sorted_rows
+        ),
+        source_kind_counts=_source_kind_counts(sorted_rows),
+        support_stages=tuple(
+            sorted(
+                {row.support_stage for row in sorted_rows},
+                key=lambda stage: _SUPPORT_STAGE_ORDER[stage],
+            )
+        ),
+        runtime_consumer_ids=tuple(
+            sorted(
+                {
+                    runtime_consumer_id
+                    for row in sorted_rows
+                    for runtime_consumer_id in row.runtime_consumer_ids
+                }
+            )
+        ),
+        ability_names=tuple(sorted({row.ability_name for row in sorted_rows})),
+        datasheet_names=tuple(sorted({row.datasheet_name for row in sorted_rows})),
+    )
 
 
 def _ability_coverage_rows_for_datasheet(
@@ -334,6 +472,8 @@ def _descriptor_runtime_consumer_ids(
             "descriptor:movement:deep-strike-placement",
             "descriptor:reserve-declaration:deep-strike",
         )
+    if _descriptor_is_shadow_of_chaos(ability):
+        return (_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_ID,)
     return ()
 
 
@@ -407,7 +547,9 @@ def _descriptor_semantic_categories(
         raise GameLifecycleError("Ability descriptor categories require a descriptor.")
     if descriptor_is_deep_strike(ability):
         return ("core.reserve.deep_strike",)
-    return (f"{ability.source_kind.value}.descriptor",)
+    if _descriptor_is_shadow_of_chaos(ability):
+        return ("faction.army_rule.shadow_of_chaos",)
+    return ("unknown.ability_text",)
 
 
 def _string_parameter(parameters: Mapping[str, object], *, key: str) -> str:
@@ -427,6 +569,81 @@ def _diagnostic_reasons(ability: DatasheetAbilityDescriptor) -> tuple[str, ...]:
             raise GameLifecycleError("Ability coverage diagnostic reason must be a string.")
         reasons.add(reason)
     return tuple(sorted(reasons))
+
+
+def _descriptor_is_shadow_of_chaos(ability: DatasheetAbilityDescriptor) -> bool:
+    if type(ability) is not DatasheetAbilityDescriptor:
+        raise GameLifecycleError("Shadow of Chaos descriptor matching requires a descriptor.")
+    return (
+        ability.source_kind is CatalogAbilitySourceKind.FACTION
+        and ability.name.strip().casefold() == "the shadow of chaos"
+    )
+
+
+def _coverage_row_sort_key(
+    row: AbilityCoverageRow,
+) -> tuple[str, str, str, str, str]:
+    if type(row) is not AbilityCoverageRow:
+        raise GameLifecycleError("Ability coverage row sort requires a coverage row.")
+    return (
+        row.datasheet_name,
+        row.datasheet_id,
+        row.source_kind.value,
+        row.ability_name,
+        row.ability_id,
+    )
+
+
+def _source_kind_counts(
+    rows: tuple[AbilityCoverageRow, ...],
+) -> tuple[tuple[str, int], ...]:
+    if type(rows) is not tuple or not rows:
+        raise GameLifecycleError("Ability coverage source kind counts require rows.")
+    counts: dict[str, int] = {}
+    for row in rows:
+        if type(row) is not AbilityCoverageRow:
+            raise GameLifecycleError("Ability coverage source kind counts require coverage rows.")
+        source_kind = row.source_kind.value
+        counts[source_kind] = counts.get(source_kind, 0) + 1
+    return tuple(sorted(counts.items()))
+
+
+def _validate_source_kind_counts(
+    values: tuple[tuple[str, int], ...],
+    *,
+    expected_row_count: int,
+) -> tuple[tuple[str, int], ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("AbilityCoverageCategoryRow source_kind_counts must be a tuple.")
+    if type(expected_row_count) is not int or expected_row_count < 1:
+        raise GameLifecycleError("Source kind count validation requires a positive row count.")
+    seen: set[str] = set()
+    total = 0
+    for value in values:
+        if type(value) is not tuple or len(value) != 2:
+            raise GameLifecycleError(
+                "AbilityCoverageCategoryRow source_kind_counts entries must be pairs."
+            )
+        source_kind, count = value
+        if type(source_kind) is not str or not source_kind.strip():
+            raise GameLifecycleError(
+                "AbilityCoverageCategoryRow source_kind_counts keys must be strings."
+            )
+        if source_kind in seen:
+            raise GameLifecycleError(
+                "AbilityCoverageCategoryRow source_kind_counts keys must be unique."
+            )
+        if type(count) is not int or count < 1:
+            raise GameLifecycleError(
+                "AbilityCoverageCategoryRow source_kind_counts values must be positive integers."
+            )
+        seen.add(source_kind)
+        total += count
+    if total != expected_row_count:
+        raise GameLifecycleError(
+            "AbilityCoverageCategoryRow source_kind_counts must match coverage_row_count."
+        )
+    return values
 
 
 def _validate_string_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
@@ -450,11 +667,16 @@ _SUPPORT_STAGE_ORDER: Mapping[AbilityCoverageSupportStage, int] = {
 _CATEGORY_NAMES: Mapping[str, str] = {
     "core.descriptor": "Core Ability Descriptor",
     "core.reserve.deep_strike": "Deep Strike Reserve Arrival",
-    "datasheet.descriptor": "Datasheet Descriptor",
+    "faction.army_rule.shadow_of_chaos": "Chaos Daemons Army Rule",
+    "unknown.ability_text": "Unknown Abilities",
     "faction.descriptor": "Faction Descriptor",
     "wargear.characteristic_set.leadership.this_unit": "Leadership Characteristic",
     "wargear.roll_modifier.charge.this_unit": "Charge Roll Modifier",
 }
+
+_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_ID = (
+    "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+)
 
 
 def _category_name(category_id: str) -> str:

@@ -38,6 +38,7 @@ from warhammer40k_core.engine.ability_catalog import (
     catalog_ability_records_from_catalog,
 )
 from warhammer40k_core.engine.ability_coverage import (
+    AbilityCoverageAbilityDatasheetPair,
     AbilityCoverageCategoryRow,
     AbilityCoverageRow,
     AbilityCoverageSupportStage,
@@ -646,10 +647,28 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
         for row in rows_by_name["Deep Strike"]
     )
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["The Shadow of Chaos"]
+    )
+    assert all(
+        row.runtime_consumer_ids
+        == ("warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",)
+        for row in rows_by_name["The Shadow of Chaos"]
+    )
     assert categories_by_name["Leadership Characteristic"].ability_names == ("Daemonic Icon",)
     assert categories_by_name["Leadership Characteristic"].datasheet_names == (
         "Bloodcrushers",
         "Bloodletters",
+    )
+    assert categories_by_name["Leadership Characteristic"].coverage_row_count == 2
+    assert categories_by_name["Leadership Characteristic"].source_kind_counts == (("wargear", 2),)
+    assert tuple(
+        (pair.ability_name, pair.datasheet_name)
+        for pair in categories_by_name["Leadership Characteristic"].ability_datasheet_pairs
+    ) == (
+        ("Daemonic Icon", "Bloodcrushers"),
+        ("Daemonic Icon", "Bloodletters"),
     )
     assert categories_by_name["Leadership Characteristic"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
@@ -669,6 +688,21 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert categories_by_name["Deep Strike Reserve Arrival"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["Chaos Daemons Army Rule"].ability_names == ("The Shadow of Chaos",)
+    assert categories_by_name["Chaos Daemons Army Rule"].runtime_consumer_ids == (
+        "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",
+    )
+    assert categories_by_name["Chaos Daemons Army Rule"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["Unknown Abilities"].ability_names == (
+        "Bane of Cowards",
+        "Brass Stampede",
+    )
+    assert categories_by_name["Unknown Abilities"].runtime_consumer_ids == ()
+    assert categories_by_name["Unknown Abilities"].support_stages == (
+        AbilityCoverageSupportStage.DESCRIPTOR_ONLY,
     )
 
 
@@ -766,6 +800,69 @@ def test_phase17k_ability_coverage_api_fails_fast_and_classifies_unsupported_ir(
         _ability_coverage_row(runtime_consumer_ids=cast(tuple[str, ...], []))
     with pytest.raises(GameLifecycleError, match="diagnostic_reasons"):
         _ability_coverage_row(diagnostic_reasons=("",))
+    with pytest.raises(GameLifecycleError, match="coverage_row_id"):
+        _ability_datasheet_pair(coverage_row_id="")
+    with pytest.raises(GameLifecycleError, match="ability_id"):
+        _ability_datasheet_pair(ability_id="")
+    with pytest.raises(GameLifecycleError, match="ability_name"):
+        _ability_datasheet_pair(ability_name="")
+    with pytest.raises(GameLifecycleError, match="datasheet_id"):
+        _ability_datasheet_pair(datasheet_id="")
+    with pytest.raises(GameLifecycleError, match="datasheet_name"):
+        _ability_datasheet_pair(datasheet_name="")
+    with pytest.raises(GameLifecycleError, match="source_kind"):
+        _ability_datasheet_pair(source_kind=cast(CatalogAbilitySourceKind, "bad"))
+    with pytest.raises(GameLifecycleError, match="category_id"):
+        _ability_coverage_category_row(category_id="")
+    with pytest.raises(GameLifecycleError, match="category_name"):
+        _ability_coverage_category_row(category_name="")
+    with pytest.raises(GameLifecycleError, match="coverage_row_count"):
+        _ability_coverage_category_row(coverage_row_count=0)
+    with pytest.raises(GameLifecycleError, match="coverage_row_ids"):
+        _ability_coverage_category_row(coverage_row_ids=())
+    with pytest.raises(GameLifecycleError, match="ability_datasheet_pairs must be a tuple"):
+        _ability_coverage_category_row(
+            ability_datasheet_pairs=cast(tuple[AbilityCoverageAbilityDatasheetPair, ...], [])
+        )
+    with pytest.raises(GameLifecycleError, match="ability_datasheet_pairs must match"):
+        _ability_coverage_category_row(ability_datasheet_pairs=())
+    with pytest.raises(GameLifecycleError, match="ability_datasheet_pairs must contain"):
+        _ability_coverage_category_row(
+            ability_datasheet_pairs=cast(
+                tuple[AbilityCoverageAbilityDatasheetPair, ...],
+                (object(),),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="source_kind_counts must be a tuple"):
+        _ability_coverage_category_row(source_kind_counts=cast(tuple[tuple[str, int], ...], []))
+    with pytest.raises(GameLifecycleError, match="source_kind_counts entries must be pairs"):
+        _ability_coverage_category_row(source_kind_counts=cast(tuple[tuple[str, int], ...], ((),)))
+    with pytest.raises(GameLifecycleError, match="source_kind_counts keys must be strings"):
+        _ability_coverage_category_row(
+            source_kind_counts=cast(tuple[tuple[str, int], ...], ((1, 1),))
+        )
+    with pytest.raises(GameLifecycleError, match="source_kind_counts keys must be unique"):
+        _ability_coverage_category_row(
+            coverage_row_count=2,
+            coverage_row_ids=("test-row-1", "test-row-2"),
+            ability_datasheet_pairs=(
+                _ability_datasheet_pair(coverage_row_id="test-row-1"),
+                _ability_datasheet_pair(coverage_row_id="test-row-2"),
+            ),
+            source_kind_counts=(("wargear", 1), ("wargear", 1)),
+        )
+    with pytest.raises(GameLifecycleError, match="source_kind_counts values"):
+        _ability_coverage_category_row(source_kind_counts=(("wargear", 0),))
+    with pytest.raises(GameLifecycleError, match="source_kind_counts must match"):
+        _ability_coverage_category_row(source_kind_counts=(("wargear", 2),))
+    with pytest.raises(GameLifecycleError, match="support_stages"):
+        _ability_coverage_category_row(
+            support_stages=cast(tuple[AbilityCoverageSupportStage, ...], [])
+        )
+    with pytest.raises(GameLifecycleError, match="support_stages"):
+        _ability_coverage_category_row(
+            support_stages=cast(tuple[AbilityCoverageSupportStage, ...], ("bad",))
+        )
 
 
 def test_phase17k_bridge_datasheet_source_ids_include_pdf_correction_source_id() -> None:
@@ -1235,6 +1332,56 @@ def _ability_coverage_row(
         semantic_categories=semantic_categories,
         runtime_consumer_ids=runtime_consumer_ids,
         diagnostic_reasons=diagnostic_reasons,
+    )
+
+
+def _ability_datasheet_pair(
+    *,
+    coverage_row_id: str = "test-row",
+    ability_id: str = "test-ability",
+    ability_name: str = "Test Ability",
+    datasheet_id: str = "test-datasheet",
+    datasheet_name: str = "Test Datasheet",
+    source_kind: CatalogAbilitySourceKind = CatalogAbilitySourceKind.WARGEAR,
+) -> AbilityCoverageAbilityDatasheetPair:
+    return AbilityCoverageAbilityDatasheetPair(
+        coverage_row_id=coverage_row_id,
+        ability_id=ability_id,
+        ability_name=ability_name,
+        datasheet_id=datasheet_id,
+        datasheet_name=datasheet_name,
+        source_kind=source_kind,
+    )
+
+
+def _ability_coverage_category_row(
+    *,
+    category_id: str = "wargear.roll_modifier.charge.this_unit",
+    category_name: str = "Charge Roll Modifier",
+    coverage_row_count: int = 1,
+    coverage_row_ids: tuple[str, ...] = ("test-row",),
+    ability_datasheet_pairs: tuple[AbilityCoverageAbilityDatasheetPair, ...] | None = None,
+    source_kind_counts: tuple[tuple[str, int], ...] = (("wargear", 1),),
+    support_stages: tuple[AbilityCoverageSupportStage, ...] = (
+        AbilityCoverageSupportStage.DESCRIPTOR_ONLY,
+    ),
+    runtime_consumer_ids: tuple[str, ...] = (),
+    ability_names: tuple[str, ...] = ("Test Ability",),
+    datasheet_names: tuple[str, ...] = ("Test Datasheet",),
+) -> AbilityCoverageCategoryRow:
+    if ability_datasheet_pairs is None:
+        ability_datasheet_pairs = (_ability_datasheet_pair(),)
+    return AbilityCoverageCategoryRow(
+        category_id=category_id,
+        category_name=category_name,
+        coverage_row_count=coverage_row_count,
+        coverage_row_ids=coverage_row_ids,
+        ability_datasheet_pairs=ability_datasheet_pairs,
+        source_kind_counts=source_kind_counts,
+        support_stages=support_stages,
+        runtime_consumer_ids=runtime_consumer_ids,
+        ability_names=ability_names,
+        datasheet_names=datasheet_names,
     )
 
 
