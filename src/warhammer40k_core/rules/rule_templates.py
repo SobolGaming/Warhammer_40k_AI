@@ -12,6 +12,7 @@ class RuleTemplateError(ValueError):
 class RuleTemplateFamily(StrEnum):
     AURA = "aura"
     CHARACTERISTIC_MODIFICATION = "characteristic_modification"
+    CHARACTERISTIC_SET = "characteristic_set"
     CONDITIONAL_WEAPON_ABILITY_GRANT = "conditional_weapon_ability_grant"
     DICE_ROLL_MODIFICATION = "dice_roll_modification"
     DISTANCE_PREDICATE = "distance_predicate"
@@ -82,6 +83,7 @@ SELECTED_TARGET_TEMPLATE_ID = "phase17c:selected-target-constraint"
 DICE_ROLL_MODIFIER_TEMPLATE_ID = "phase17c:dice-roll-modifier"
 REROLL_PERMISSION_TEMPLATE_ID = "phase17c:reroll-permission"
 CHARACTERISTIC_MODIFIER_TEMPLATE_ID = "phase17c:characteristic-modifier"
+CHARACTERISTIC_SET_TEMPLATE_ID = "phase17c:characteristic-set"
 RESOURCE_MODIFIER_TEMPLATE_ID = "phase17c:resource-modifier"
 GRANT_ABILITY_TEMPLATE_ID = "phase17c:grant-ability"
 WEAPON_ABILITY_GRANT_TEMPLATE_ID = "phase17c:weapon-ability-grant"
@@ -176,6 +178,14 @@ INITIAL_RULE_TEMPLATES: tuple[RuleTemplate, ...] = (
         family=RuleTemplateFamily.CHARACTERISTIC_MODIFICATION,
         description="Characteristic modifier clauses.",
         canonical_patterns=("add <n> to the <characteristic> characteristic",),
+    ),
+    RuleTemplate(
+        template_id=CHARACTERISTIC_SET_TEMPLATE_ID,
+        family=RuleTemplateFamily.CHARACTERISTIC_SET,
+        description="Characteristic replacement clauses.",
+        canonical_patterns=(
+            "models in the bearer's unit have a <characteristic> characteristic of <value>",
+        ),
     ),
     RuleTemplate(
         template_id=RESOURCE_MODIFIER_TEMPLATE_ID,

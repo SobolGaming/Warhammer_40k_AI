@@ -14,6 +14,8 @@ from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import (
     AttachmentRole,
     BaseSizeKind,
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
     DatasheetWargearOption,
     DatasheetWargearOptionEffect,
     WargearOptionConditionKind,
@@ -23,16 +25,29 @@ from warhammer40k_core.core.model_geometry_catalog import (
     GeometryMeasurementKind,
     GeometrySourceUnits,
 )
+from warhammer40k_core.engine.abilities import (
+    AbilityExecutionContext,
+    AbilityResolutionStatus,
+    default_ability_handler_registry,
+)
+from warhammer40k_core.engine.ability_catalog import (
+    build_player_ability_index,
+    catalog_ability_records_from_catalog,
+)
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.list_validation import (
+    DetachmentSelection,
     ListValidationError,
     ModelProfileSelection,
     UnitMusterSelection,
     WargearSelection,
     resolve_wargear_selections,
 )
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, RuleIRPayload, parameter_payload
 from warhammer40k_core.rules.source_reference_generation import build_source_reference_catalog
 from warhammer40k_core.rules.wahapedia_bridge import (
     EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE,
@@ -149,6 +164,32 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
     assert "Brass Stampede" in abilities_by_name
     assert "Daemonic Icon" in abilities_by_name
     assert "Instrument of Chaos" in abilities_by_name
+    daemonic_icon = abilities_by_name["Daemonic Icon"]
+    instrument = abilities_by_name["Instrument of Chaos"]
+    assert daemonic_icon.source_kind is CatalogAbilitySourceKind.WARGEAR
+    assert daemonic_icon.source_wargear_id == "000001115:daemonic-icon"
+    assert daemonic_icon.support is CatalogAbilitySupport.GENERIC_RULE_IR
+    assert instrument.source_kind is CatalogAbilitySourceKind.WARGEAR
+    assert instrument.source_wargear_id == "000001115:instrument-of-chaos"
+    assert instrument.support is CatalogAbilitySupport.GENERIC_RULE_IR
+    icon_ir = RuleIR.from_payload(cast(RuleIRPayload, daemonic_icon.rule_ir_payload))
+    instrument_ir = RuleIR.from_payload(cast(RuleIRPayload, instrument.rule_ir_payload))
+    icon_effect = icon_ir.clauses[0].effects[0]
+    instrument_effect = instrument_ir.clauses[0].effects[0]
+    assert icon_ir.clauses[0].target is not None
+    assert icon_ir.clauses[0].target.kind.value == "this_unit"
+    assert icon_effect.kind is RuleEffectKind.SET_CHARACTERISTIC
+    assert parameter_payload(icon_effect.parameters) == {
+        "characteristic": "leadership",
+        "value": "6+",
+    }
+    assert instrument_ir.clauses[0].target is not None
+    assert instrument_ir.clauses[0].target.kind.value == "this_unit"
+    assert instrument_effect.kind is RuleEffectKind.MODIFY_DICE_ROLL
+    assert parameter_payload(instrument_effect.parameters) == {
+        "delta": 1,
+        "roll_type": "charge",
+    }
     assert package.to_payload() == type(package).from_payload(package.to_payload()).to_payload()
 
 
@@ -217,6 +258,91 @@ def test_phase17k_bloodcrushers_runtime_instances_manifest_model_wargear_and_abi
     )
     assert "000001115:instrument-of-chaos" not in bloodcrushers[1].wargear_ids
     assert UnitInstance.from_payload(unit.to_payload()).to_payload() == unit.to_payload()
+
+
+def test_phase17k_selected_optional_wargear_adds_catalog_ir_ability_record() -> None:
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_bloodcrushers_bridge_artifacts(),
+    )
+    datasheet = package.army_catalog.datasheet_by_id("000001115")
+    unit = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-khorne",
+        selection=UnitMusterSelection(
+            unit_selection_id="bloodcrushers-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="000001115:bloodcrushers",
+                    model_count=2,
+                ),
+                ModelProfileSelection(
+                    model_profile_id="000001115:bloodhunter",
+                    model_count=1,
+                ),
+            ),
+            wargear_selections=(
+                WargearSelection(
+                    option_id="000001115:instrument-of-chaos:option-1",
+                    model_profile_id="000001115:bloodcrushers",
+                    wargear_ids=("000001115:instrument-of-chaos",),
+                ),
+            ),
+        ),
+        datasheet=datasheet,
+    )
+    army = ArmyDefinition(
+        army_id="army-khorne",
+        player_id="player-khorne",
+        catalog_id=package.army_catalog.catalog_id,
+        source_package_id=package.army_catalog.source_package_id,
+        ruleset_id=package.army_catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id=package.army_catalog.factions[0].faction_id,
+            detachment_ids=("phase17k-daemons",),
+        ),
+        units=(unit,),
+    )
+
+    all_records = catalog_ability_records_from_catalog(package.army_catalog)
+    player_index = build_player_ability_index(
+        all_records,
+        army=army,
+        catalog=package.army_catalog,
+    )
+    player_records_by_name = {
+        record.definition.name: record for record in player_index.all_records()
+    }
+    result = default_ability_handler_registry().execute(
+        record=player_records_by_name["Instrument of Chaos"],
+        context=AbilityExecutionContext(
+            game_id="phase17k-game",
+            player_id="player-khorne",
+            battle_round=1,
+            phase=None,
+            active_player_id="player-khorne",
+            trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+            source_unit_instance_id=unit.unit_instance_id,
+            source_keywords=unit.keywords,
+            trigger_payload={"roll_type": "charge"},
+        ),
+    )
+
+    assert "Instrument of Chaos" in player_records_by_name
+    assert "Daemonic Icon" not in player_records_by_name
+    assert result.status is AbilityResolutionStatus.APPLIED
+    assert isinstance(result.replay_payload, dict)
+    rule_execution = result.replay_payload["rule_execution"]
+    assert isinstance(rule_execution, dict)
+    effect_payloads = rule_execution["effect_payloads"]
+    assert isinstance(effect_payloads, list)
+    effect_payload = effect_payloads[0]
+    assert isinstance(effect_payload, dict)
+    assert effect_payload["target_unit_instance_ids"] == [unit.unit_instance_id]
 
 
 def test_phase17k_bridge_datasheet_source_ids_include_pdf_correction_source_id() -> None:

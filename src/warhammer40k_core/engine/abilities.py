@@ -760,7 +760,7 @@ class AbilityHandlerRegistry:
         binding = self._handlers.get(record.definition.handler_id)
         if binding is None:
             return AbilityResolutionResult.unsupported(record, reason="missing_handler")
-        if not binding.timing.matches(context):
+        if not _handler_timing_matches(timing=binding.timing, context=context):
             return AbilityResolutionResult.invalid(record, reason="handler_timing_window_mismatch")
         missing_input_keys = _missing_required_input_keys(
             context=context,
@@ -793,6 +793,11 @@ def default_ability_handler_registry() -> AbilityHandlerRegistry:
             handler_id=CORE_HAZARDOUS_HANDLER_ID,
             timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL),
             handler=_hazardous_keyword_handler,
+        )
+        .with_handler(
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
+            handler=_generic_rule_ir_ability_handler,
         )
     )
 
@@ -994,6 +999,24 @@ def _ability_records_for_context(
         if not record.disabled
         and record.definition.timing.matches(context)
         and record.definition.keyword_gate.matches(context.source_keywords)
+    )
+
+
+def _handler_timing_matches(
+    *,
+    timing: AbilityTimingDescriptor,
+    context: AbilityExecutionContext,
+) -> bool:
+    if type(timing) is not AbilityTimingDescriptor:
+        raise GameLifecycleError("Ability handler timing requires a descriptor.")
+    if type(context) is not AbilityExecutionContext:
+        raise GameLifecycleError("Ability handler timing requires an execution context.")
+    if timing.trigger_kind is not TimingTriggerKind.ANY_PHASE:
+        return timing.matches(context)
+    if timing.phase is not None and timing.phase is not context.phase:
+        return False
+    return not (
+        timing.timing_window_id is not None and timing.timing_window_id != context.timing_window_id
     )
 
 

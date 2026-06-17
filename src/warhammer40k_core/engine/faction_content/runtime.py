@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from warhammer40k_core.core.ruleset import RulesetEdition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, muster_army
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
@@ -47,6 +48,7 @@ def build_runtime_content_bundle_for_armies(
         armies=armies,
         catalog=config.army_catalog,
         contributions=contributions,
+        base_ability_records=catalog_ability_records_from_catalog(config.army_catalog),
     )
 
 

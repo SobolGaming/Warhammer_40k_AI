@@ -170,11 +170,25 @@ def test_phase17c_death_guard_cloud_of_flies_fixture_text_keeps_residual_explici
             RuleEffectKind.MODIFY_CHARACTERISTIC,
         ),
         (
+            "Models in the bearer's unit have a Leadership characteristic of 6+.",
+            None,
+            None,
+            RuleTargetKind.THIS_UNIT,
+            RuleEffectKind.SET_CHARACTERISTIC,
+        ),
+        (
             "Add 2 inches to the Move characteristic.",
             None,
             None,
             None,
             RuleEffectKind.MODIFY_MOVE_DISTANCE,
+        ),
+        (
+            "Add 1 to Charge rolls made for the bearer's unit.",
+            None,
+            None,
+            RuleTargetKind.THIS_UNIT,
+            RuleEffectKind.MODIFY_DICE_ROLL,
         ),
         (
             "Gain 1CP and score 3VP.",
@@ -255,6 +269,32 @@ def test_phase17c_equivalent_roll_modifier_forms_compile_to_same_semantics() -> 
     )
 
     assert parameter_payload(add_effect.parameters) == parameter_payload(signed_effect.parameters)
+
+
+def test_phase17c_optional_wargear_ability_text_compiles_to_bearer_unit_ir() -> None:
+    icon = _compiled("Models in the bearer's unit have a Leadership characteristic of 6+.").rule_ir
+    instrument = _compiled("Add 1 to Charge rolls made for the bearer's unit.").rule_ir
+    icon_effect = next(
+        effect for effect in _effects(icon) if effect.kind is RuleEffectKind.SET_CHARACTERISTIC
+    )
+    instrument_effect = next(
+        effect for effect in _effects(instrument) if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL
+    )
+
+    assert icon.is_supported
+    assert icon.clauses[0].target is not None
+    assert icon.clauses[0].target.kind is RuleTargetKind.THIS_UNIT
+    assert parameter_payload(icon_effect.parameters) == {
+        "characteristic": "leadership",
+        "value": "6+",
+    }
+    assert instrument.is_supported
+    assert instrument.clauses[0].target is not None
+    assert instrument.clauses[0].target.kind is RuleTargetKind.THIS_UNIT
+    assert parameter_payload(instrument_effect.parameters) == {
+        "delta": 1,
+        "roll_type": "charge",
+    }
 
 
 @pytest.mark.parametrize(

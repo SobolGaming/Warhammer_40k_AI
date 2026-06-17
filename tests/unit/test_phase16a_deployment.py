@@ -15,7 +15,11 @@ from tests.deployment_submission_helpers import (
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.datasheet import CatalogAbilitySupport, DatasheetAbilityDescriptor
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+)
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, TerrainFeatureKind
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
@@ -704,6 +708,8 @@ def _deployment_state_with_mustered_armies(
                         name="Core Infiltrators",
                         source_id="datasheet:core-intercessor-like-infantry:ability:infiltrators",
                         support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+                        source_kind=CatalogAbilitySourceKind.CORE,
+                        effect_description="Core Infiltrators descriptor.",
                         timing_tags=("deployment",),
                     ),
                 )

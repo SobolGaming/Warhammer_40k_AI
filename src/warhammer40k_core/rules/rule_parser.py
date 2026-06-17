@@ -28,6 +28,7 @@ from warhammer40k_core.rules.rule_ir import (
 from warhammer40k_core.rules.rule_templates import (
     AURA_TEMPLATE_ID,
     CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
+    CHARACTERISTIC_SET_TEMPLATE_ID,
     DICE_ROLL_MODIFIER_TEMPLATE_ID,
     DISTANCE_PREDICATE_TEMPLATE_ID,
     GRANT_ABILITY_TEMPLATE_ID,
@@ -73,6 +74,12 @@ _TARGET_RE = re.compile(
     re.IGNORECASE,
 )
 _THIS_UNIT_RE = re.compile(r"\bthis\s+unit\b", re.IGNORECASE)
+_BEARER_APOSTROPHE_RE = r"(?:'|\u2019)?"
+_BEARERS_UNIT_RE = re.compile(
+    rf"\b(?:models\s+in\s+)?(?:the\s+)?bearer{_BEARER_APOSTROPHE_RE}s\s+unit\b|"
+    rf"\bmade\s+for\s+(?:the\s+)?bearer{_BEARER_APOSTROPHE_RE}s\s+unit\b",
+    re.IGNORECASE,
+)
 _THAT_UNIT_RE = re.compile(r"\b(?:that|selected|target)\s+unit\b", re.IGNORECASE)
 _PLAYER_RE = re.compile(r"\b(?:you|that\s+player|the\s+player)\b", re.IGNORECASE)
 _RESOURCE_TARGET_RE = re.compile(
@@ -108,6 +115,11 @@ _CHARACTERISTIC_NAMES = (
 _CHARACTERISTIC_RE = re.compile(
     rf"\b(?P<verb>add|subtract)\s+(?P<value>\d+)(?:\")?\s+(?:to|from)\s+"
     rf"(?:the\s+)?(?P<characteristic>{_CHARACTERISTIC_NAMES})\s+characteristic\b",
+    re.IGNORECASE,
+)
+_SET_CHARACTERISTIC_RE = re.compile(
+    rf"\b(?:have|has)\s+a\s+(?P<characteristic>{_CHARACTERISTIC_NAMES})\s+"
+    r"characteristic\s+of\s+(?P<value>[A-Za-z0-9+/-]+)(?=[\s.,;)]|$)",
     re.IGNORECASE,
 )
 _ADDITIONAL_MOVE_RE = re.compile(
@@ -538,6 +550,11 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
         return RuleTargetSpec(
             kind=RuleTargetKind.THIS_UNIT, source_span=_span_from_match(clause_text, match)
         )
+    match = _BEARERS_UNIT_RE.search(clause_text.text)
+    if match is not None:
+        return RuleTargetSpec(
+            kind=RuleTargetKind.THIS_UNIT, source_span=_span_from_match(clause_text, match)
+        )
     match = _THAT_UNIT_RE.search(clause_text.text)
     if match is not None:
         return RuleTargetSpec(
@@ -652,6 +669,20 @@ def _parse_characteristic_effects(clause_text: _ClauseText) -> tuple[RuleEffectS
                     (
                         ("characteristic", characteristic.value),
                         ("delta", delta),
+                    )
+                ),
+            )
+        )
+    for match in _SET_CHARACTERISTIC_RE.finditer(clause_text.text):
+        characteristic = _characteristic_from_label(match.group("characteristic"))
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.SET_CHARACTERISTIC,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("characteristic", characteristic.value),
+                        ("value", match.group("value")),
                     )
                 ),
             )
@@ -904,6 +935,8 @@ def _template_id_for_clause(
             candidates.append(REROLL_PERMISSION_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.MODIFY_CHARACTERISTIC:
             candidates.append(CHARACTERISTIC_MODIFIER_TEMPLATE_ID)
+        elif effect.kind is RuleEffectKind.SET_CHARACTERISTIC:
+            candidates.append(CHARACTERISTIC_SET_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.MODIFY_MOVE_DISTANCE:
             candidates.append(MOVEMENT_DISTANCE_TEMPLATE_ID)
         elif effect.kind in {

@@ -4,6 +4,7 @@ from dataclasses import replace
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
     CatalogAbilitySupport,
     DatasheetAbilityDescriptor,
     DatasheetDefinition,
@@ -158,6 +159,8 @@ def _scouts_ability_descriptors(*, datasheet_id: str) -> tuple[DatasheetAbilityD
             name="CORE Scouts 6",
             source_id=f"datasheet:{datasheet_id}:ability:setup-smoke-scouts-6",
             support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+            source_kind=CatalogAbilitySourceKind.CORE,
+            effect_description="CORE Scouts 6 descriptor.",
             timing_tags=("before_battle", "scouts"),
             parameter_tokens=("6",),
         ),

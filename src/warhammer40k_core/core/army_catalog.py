@@ -12,6 +12,7 @@ from warhammer40k_core.core.datasheet import (
     AttachmentEligibility,
     AttachmentRole,
     BaseSizeDefinition,
+    CatalogAbilitySourceKind,
     CatalogAbilitySupport,
     DatasheetAbilityDescriptor,
     DatasheetCatalogError,
@@ -208,6 +209,8 @@ class ArmyCatalog:
             name="CORE Firing Deck",
             source_id="datasheet:core-transport:ability:firing-deck",
             support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+            source_kind=CatalogAbilitySourceKind.CORE,
+            effect_description="CORE Firing Deck descriptor.",
             timing_tags=("shooting",),
             parameter_tokens=("2",),
         )
@@ -547,6 +550,8 @@ def _deep_strike_datasheet(wargear_id: str) -> DatasheetDefinition:
         name="CORE Deep Strike",
         source_id=f"datasheet:{datasheet_id}:ability:deep-strike",
         support=CatalogAbilitySupport.UNSUPPORTED,
+        source_kind=CatalogAbilitySourceKind.CORE,
+        effect_description="CORE Deep Strike descriptor.",
         timing_tags=("deployment", "reserves"),
     )
     return DatasheetDefinition(
