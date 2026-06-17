@@ -86,6 +86,11 @@ from warhammer40k_core.engine.fall_back_hooks import (
     FallBackEligibilityGrant,
     FallBackEligibilityHookRegistry,
 )
+from warhammer40k_core.engine.live_geometry import (
+    DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
+    DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
+    live_battlefield_geometry_for_state,
+)
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeContext,
     MovementEndSurgeGrant,
@@ -260,8 +265,6 @@ _MOVEMENT_ACTIONS_INSIDE_ENEMY_ENGAGEMENT = (
     MovementPhaseActionKind.REMAIN_STATIONARY,
     MovementPhaseActionKind.FALL_BACK,
 )
-_DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES = 60.0
-_DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES = 44.0
 _ADVANCE_REROLL_KEYWORD = "ADVANCE_REROLL"
 _ADVANCED_UNIT_CLEANUP_POINT = "end_of_turn"
 _FELL_BACK_UNIT_CLEANUP_POINT = "end_of_turn"
@@ -5799,6 +5802,11 @@ def _apply_movement_proposal_decision(
         proposal_request.context or {},
         key="source_selected_option_id",
     )
+    movement_geometry = live_battlefield_geometry_for_state(
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+        context="Live movement",
+    )
 
     if action is MovementPhaseActionKind.NORMAL_MOVE:
         movement_mode = _movement_mode_from_proposal_submission(
@@ -5823,13 +5831,16 @@ def _apply_movement_proposal_decision(
                 player_id=active_player_id,
                 unit_instance_id=proposal_request.unit_instance_id,
             ),
+            battlefield_width_inches=movement_geometry.battlefield_width_inches,
+            battlefield_depth_inches=movement_geometry.battlefield_depth_inches,
+            terrain_features=movement_geometry.terrain_features,
         )
         transition_reason = _aircraft_reserve_transition_reason_for_normal_move(
             resolution=resolution,
             scenario=scenario,
             unit_placement=unit_placement,
-            battlefield_width_inches=_DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
-            battlefield_depth_inches=_DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
+            battlefield_width_inches=movement_geometry.battlefield_width_inches,
+            battlefield_depth_inches=movement_geometry.battlefield_depth_inches,
         )
         if transition_reason is not None:
             _apply_aircraft_reserve_transition_for_normal_move(
@@ -5928,6 +5939,9 @@ def _apply_movement_proposal_decision(
                 player_id=active_player_id,
                 unit_instance_id=proposal_request.unit_instance_id,
             ),
+            battlefield_width_inches=movement_geometry.battlefield_width_inches,
+            battlefield_depth_inches=movement_geometry.battlefield_depth_inches,
+            terrain_features=movement_geometry.terrain_features,
         )
         if not advance_resolution.is_valid:
             violation_code = _normal_move_violation_code(advance_resolution)
@@ -6037,6 +6051,9 @@ def _apply_movement_proposal_decision(
                 player_id=active_player_id,
                 unit_instance_id=proposal_request.unit_instance_id,
             ),
+            battlefield_width_inches=movement_geometry.battlefield_width_inches,
+            battlefield_depth_inches=movement_geometry.battlefield_depth_inches,
+            terrain_features=movement_geometry.terrain_features,
         )
         fall_back_resolution = _fall_back_result_with_mode(
             resolution=fall_back_resolution,
@@ -7648,8 +7665,8 @@ def resolve_normal_move(
     movement_mode: MovementMode = MovementMode.NORMAL,
     path_witness: PathWitness | None = None,
     hover_mode_states: tuple[HoverModeState, ...] = (),
-    battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
-    battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
+    battlefield_width_inches: float = DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
+    battlefield_depth_inches: float = DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
@@ -7699,8 +7716,8 @@ def resolve_advance_move(
     movement_mode: MovementMode = MovementMode.ADVANCE,
     path_witness: PathWitness | None = None,
     hover_mode_states: tuple[HoverModeState, ...] = (),
-    battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
-    battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
+    battlefield_width_inches: float = DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
+    battlefield_depth_inches: float = DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
@@ -7759,8 +7776,8 @@ def resolve_fall_back_move(
     battle_shocked_unit_ids: tuple[str, ...] = (),
     forced_desperate_escape_source_rule_ids: tuple[str, ...] = (),
     hover_mode_states: tuple[HoverModeState, ...] = (),
-    battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
-    battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
+    battlefield_width_inches: float = DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
+    battlefield_depth_inches: float = DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),

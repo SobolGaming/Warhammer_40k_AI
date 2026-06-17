@@ -46,6 +46,7 @@ from warhammer40k_core.engine.list_validation import (
     ModelProfileSelection,
     UnitMusterSelection,
 )
+from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -132,6 +133,7 @@ from warhammer40k_core.geometry.terrain import (
     TerrainFloorDefinition,
     TerrainWallDefinition,
 )
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
 def test_embark_removes_unit_to_transport_cargo_and_emits_records() -> None:
@@ -3428,6 +3430,17 @@ def _battle_state(
         active_player_id="player-a",
         army_definitions=list(scenario.armies),
         battlefield_state=scenario.battlefield_state,
+        mission_setup=_mission_setup(),
+    )
+
+
+def _mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
     )
 
 

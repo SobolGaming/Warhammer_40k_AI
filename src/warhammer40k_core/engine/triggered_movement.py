@@ -30,6 +30,11 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.live_geometry import (
+    DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
+    DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
+    live_battlefield_geometry_for_state,
+)
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -67,8 +72,6 @@ SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE = "select_triggered_movement"
 DECLINE_TRIGGERED_MOVEMENT_OPTION_ID = "decline_triggered_movement"
 TRIGGERED_MOVEMENT_PROPOSAL_ACTION = "surge_move"
 TRIGGERED_MOVEMENT_PROPOSAL_CONTEXT_KIND = "triggered_movement"
-_DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES = 60.0
-_DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES = 44.0
 
 
 class TriggeredMovementKind(StrEnum):
@@ -766,6 +769,11 @@ class TriggeredMovementHandler:
             raise GameLifecycleError("Triggered movement requires at least one movement choice.")
         scenario = _battlefield_scenario(state)
         unit_placement = scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
+        movement_geometry = live_battlefield_geometry_for_state(
+            state=state,
+            ruleset_descriptor=ruleset_descriptor,
+            context="Triggered movement",
+        )
         resolutions = tuple(
             resolve_triggered_movement(
                 scenario=scenario,
@@ -777,6 +785,9 @@ class TriggeredMovementHandler:
                 battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
                 surge_move_states=tuple(state.surge_move_states),
                 hover_mode_states=tuple(state.hover_mode_states),
+                battlefield_width_inches=movement_geometry.battlefield_width_inches,
+                battlefield_depth_inches=movement_geometry.battlefield_depth_inches,
+                terrain_features=movement_geometry.terrain_features,
             )
             for witness in candidate_witness_tuple
         )
@@ -860,6 +871,11 @@ class TriggeredMovementHandler:
             )
             return None
         witness = _payload_path_witness(payload, "witness")
+        movement_geometry = live_battlefield_geometry_for_state(
+            state=state,
+            ruleset_descriptor=ruleset_descriptor,
+            context="Triggered movement",
+        )
         resolution = resolve_triggered_movement(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
@@ -870,6 +886,9 @@ class TriggeredMovementHandler:
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
             surge_move_states=tuple(state.surge_move_states),
             hover_mode_states=tuple(state.hover_mode_states),
+            battlefield_width_inches=movement_geometry.battlefield_width_inches,
+            battlefield_depth_inches=movement_geometry.battlefield_depth_inches,
+            terrain_features=movement_geometry.terrain_features,
         )
         drift_code = resolution.selected_payload_drift_code(payload)
         if drift_code is not None:
@@ -965,6 +984,11 @@ class TriggeredMovementHandler:
         )
         if result.actor_id != unit_placement.player_id:
             raise GameLifecycleError("Triggered movement proposal actor must own the unit.")
+        movement_geometry = live_battlefield_geometry_for_state(
+            state=state,
+            ruleset_descriptor=ruleset_descriptor,
+            context="Triggered movement",
+        )
         resolution = resolve_triggered_movement(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
@@ -975,6 +999,9 @@ class TriggeredMovementHandler:
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
             surge_move_states=tuple(state.surge_move_states),
             hover_mode_states=tuple(state.hover_mode_states),
+            battlefield_width_inches=movement_geometry.battlefield_width_inches,
+            battlefield_depth_inches=movement_geometry.battlefield_depth_inches,
+            terrain_features=movement_geometry.terrain_features,
         )
         if not resolution.is_valid:
             violation_code = _triggered_movement_violation_code(resolution)
@@ -1047,8 +1074,8 @@ def resolve_triggered_movement(
     battle_shocked_unit_ids: tuple[str, ...] = (),
     surge_move_states: tuple[SurgeMoveState, ...] = (),
     hover_mode_states: tuple[HoverModeState, ...] = (),
-    battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
-    battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
+    battlefield_width_inches: float = DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
+    battlefield_depth_inches: float = DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
     terrain: tuple[TerrainVolume, ...] = (),
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
 ) -> TriggeredMovementResolution:

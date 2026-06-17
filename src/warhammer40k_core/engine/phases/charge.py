@@ -48,6 +48,7 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.live_geometry import live_battlefield_geometry_for_state
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -1712,6 +1713,11 @@ def _apply_charge_move_proposal_decision(
         raise GameLifecycleError("Validated Charge Move proposal must include a witness.")
     scenario = _battlefield_scenario(state)
     unit_placement = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
+    movement_geometry = live_battlefield_geometry_for_state(
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+        context="Charge Move",
+    )
     resolution = resolve_charge_move(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -1720,7 +1726,9 @@ def _apply_charge_move_proposal_decision(
         maximum_distance_inches=pending_distance.roll_result.value,
         path_witness=proposal.witness,
         hover_mode_states=tuple(state.hover_mode_states),
-        terrain_features=_terrain_features_for_state(state),
+        battlefield_width_inches=movement_geometry.battlefield_width_inches,
+        battlefield_depth_inches=movement_geometry.battlefield_depth_inches,
+        terrain_features=movement_geometry.terrain_features,
     )
     violation_code = _charge_move_violation_code(
         resolution=resolution,
@@ -2990,12 +2998,6 @@ def _validate_charge_witness_matches_unit(
     )
     if tuple(sorted(witness.model_ids())) != expected_model_ids:
         raise GameLifecycleError("Charge Move witness must match the selected unit models.")
-
-
-def _terrain_features_for_state(state: GameState) -> tuple[TerrainFeatureDefinition, ...]:
-    if state.mission_setup is None:
-        return ()
-    return tuple(state.mission_setup.terrain_features)
 
 
 def _terrain_volumes_for_features(

@@ -976,6 +976,8 @@ def resolve_fight_movement(
     ruleset_descriptor: RulesetDescriptor,
     proposal: FightMovementProposal,
     maximum_distance_inches: float | None = None,
+    battlefield_width_inches: float = 60.0,
+    battlefield_depth_inches: float = 44.0,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
 ) -> FightMovementResolution:
     if type(scenario) is not BattlefieldScenario:
@@ -1027,6 +1029,8 @@ def resolve_fight_movement(
         movement_mode=proposal.movement_mode,
         displacement_kind=_displacement_kind_for_proposal(proposal),
         distance_budget_inches=distance_budget_inches,
+        battlefield_width_inches=battlefield_width_inches,
+        battlefield_depth_inches=battlefield_depth_inches,
         terrain_features=terrain_features,
     )
     _, coherency_result, rollback_record = resolve_unit_movement_endpoint_coherency(
@@ -1817,6 +1821,8 @@ def _validate_fight_paths(
     movement_mode: MovementMode,
     displacement_kind: ModelDisplacementKind,
     distance_budget_inches: float,
+    battlefield_width_inches: float,
+    battlefield_depth_inches: float,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
 ) -> tuple[tuple[PathValidationResult, ...], tuple[TerrainPathLegalityResult, ...]]:
     path_results: list[PathValidationResult] = []
@@ -1842,8 +1848,8 @@ def _validate_fight_paths(
             legality_context.to_path_validation_context(
                 moving_model=moving_model,
                 witness=model_witness,
-                battlefield_width_inches=60.0,
-                battlefield_depth_inches=44.0,
+                battlefield_width_inches=battlefield_width_inches,
+                battlefield_depth_inches=battlefield_depth_inches,
                 friendly_models=_friendly_geometry_models_for_path(
                     scenario=scenario,
                     unit_placement=before,

@@ -115,6 +115,7 @@ from warhammer40k_core.engine.fight_resolution import (
     resolve_fight_movement,
     validate_melee_declaration_rules,
 )
+from warhammer40k_core.engine.live_geometry import live_battlefield_geometry_for_state
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -150,7 +151,6 @@ from warhammer40k_core.engine.timing_windows import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import GeometryError
-from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -1161,16 +1161,24 @@ def _apply_fight_movement_proposal(
             message="Fight movement PathWitness must not repeat only endpoint poses.",
         )
     scenario = _battlefield_scenario(state)
+    ruleset_descriptor = state.runtime_ruleset_descriptor()
+    movement_geometry = live_battlefield_geometry_for_state(
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+        context="Fight movement",
+    )
     resolution = resolve_fight_movement(
         scenario=scenario,
-        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        ruleset_descriptor=ruleset_descriptor,
         proposal=proposal,
         maximum_distance_inches=fight_movement_maximum_distance_inches(
             state=state,
             unit_instance_id=proposal.unit_instance_id,
             proposal_kind=proposal.proposal_kind,
         ),
-        terrain_features=_terrain_features_for_state(state),
+        battlefield_width_inches=movement_geometry.battlefield_width_inches,
+        battlefield_depth_inches=movement_geometry.battlefield_depth_inches,
+        terrain_features=movement_geometry.terrain_features,
     )
     resolution_violation = fight_movement_resolution_violation(
         proposal_request=proposal_request,
@@ -1840,12 +1848,6 @@ def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
         )
     except PlacementError as exc:
         raise GameLifecycleError("Fight battlefield scenario is invalid.") from exc
-
-
-def _terrain_features_for_state(state: GameState) -> tuple[TerrainFeatureDefinition, ...]:
-    if state.mission_setup is None:
-        return ()
-    return tuple(state.mission_setup.terrain_features)
 
 
 def _objective_markers_for_state(state: GameState) -> tuple[ObjectiveMarker, ...]:

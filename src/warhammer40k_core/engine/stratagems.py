@@ -83,6 +83,7 @@ from warhammer40k_core.engine.fight_order import (
     eligible_fight_contexts_for_player,
     legal_fight_types_for_context,
 )
+from warhammer40k_core.engine.live_geometry import live_battlefield_geometry_for_state
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -2156,6 +2157,11 @@ def apply_heroic_intervention_charge_move(
     maximum_distance = _heroic_intervention_maximum_distance(proposal_request)
     scenario = _battlefield_scenario_for_stratagem(state)
     unit_placement = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
+    movement_geometry = live_battlefield_geometry_for_state(
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+        context="Heroic Intervention",
+    )
     resolution = resolve_charge_move(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -2164,7 +2170,9 @@ def apply_heroic_intervention_charge_move(
         maximum_distance_inches=maximum_distance,
         path_witness=proposal.witness,
         hover_mode_states=tuple(state.hover_mode_states),
-        terrain_features=_stratagem_terrain_features(state),
+        battlefield_width_inches=movement_geometry.battlefield_width_inches,
+        battlefield_depth_inches=movement_geometry.battlefield_depth_inches,
+        terrain_features=movement_geometry.terrain_features,
     )
     violation = charge_move_violation_code(
         resolution=resolution,
