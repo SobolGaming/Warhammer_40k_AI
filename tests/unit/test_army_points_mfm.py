@@ -1,3 +1,5 @@
+import subprocess
+import sys
 from dataclasses import replace
 
 import pytest
@@ -25,6 +27,8 @@ from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     EnhancementAssignment,
+    RosterUnitPointValue,
+    validate_roster_legality,
 )
 from warhammer40k_core.engine.army_points import (
     ArmyPointsError,
@@ -33,6 +37,7 @@ from warhammer40k_core.engine.army_points import (
     MfmUnitPointLine,
     calculate_mfm_army_points,
     catalog_with_mfm_leader_allowances,
+    catalog_with_mfm_points,
     mfm_roster_unit_point_values,
 )
 from warhammer40k_core.engine.list_validation import (
@@ -51,6 +56,26 @@ from warhammer40k_core.rules.mfm_source import (
     MfmUnitRecord,
     MfmWargearCost,
 )
+
+
+def test_army_points_import_does_not_eagerly_load_generated_mfm_package() -> None:
+    module_name = "warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            (
+                "import sys; "
+                "import warhammer40k_core.engine.army_points; "
+                f"print({module_name!r} in sys.modules)"
+            ),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.stdout.strip() == "False"
 
 
 def test_calculate_mfm_army_points_handles_variable_add_on_wargear_and_enhancements() -> None:
@@ -202,6 +227,113 @@ def test_catalog_with_mfm_leader_allowances_replaces_stale_catalog_leader_target
     assert leader_eligibilities[0].allowed_bodyguard_datasheet_ids == ("bodyguard-b",)
     assert leader_eligibilities[0].source_id == "test-mfm:faction:test-faction:unit:leader:leader"
     assert overlay.datasheet_by_id("foreign-unit") == catalog.datasheet_by_id("foreign-unit")
+
+
+def test_catalog_with_mfm_points_overlays_enhancement_prices_for_roster_total() -> None:
+    catalog = _catalog()
+    request = ArmyMusterRequest(
+        army_id="army-one",
+        player_id="player-one",
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="test-faction",
+            detachment_ids=("test-detachment",),
+            enhancement_ids=("test-enhancement",),
+        ),
+        unit_selections=(
+            _unit_selection("variable-one", "variable-unit", (("variable-model", 1),)),
+            _unit_selection("variable-two", "variable-unit", (("variable-model", 1),)),
+            _unit_selection("defiler-one", "defiler", (("defiler", 1),)),
+            _unit_selection(
+                "outrider-one",
+                "outrider-squad",
+                (("invader-atv", 1), ("outrider", 3)),
+            ),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="test-enhancement",
+                target_unit_selection_id="variable-one",
+                source_id="test:enhancement-assignment",
+            ),
+        ),
+    )
+
+    overlay = catalog_with_mfm_points(
+        catalog=catalog,
+        faction_id="test-faction",
+        source_package=_mfm_package(),
+    )
+    unit_points = mfm_roster_unit_point_values(
+        catalog=catalog,
+        request=request,
+        source_package=_mfm_package(),
+    )
+    enhancement_points_by_id = {
+        enhancement.enhancement_id: enhancement.points
+        for enhancement in overlay.enhancements
+        if enhancement.points is not None
+    }
+    roster_total = sum(point.points for point in unit_points) + sum(
+        enhancement_points_by_id[assignment.enhancement_id]
+        for assignment in request.enhancement_assignments
+    )
+
+    assert catalog.enhancements[0].points == 999
+    assert enhancement_points_by_id["test-enhancement"] == 15
+    assert sum(point.points for point in unit_points) == 635
+    assert roster_total == 650
+
+
+def test_catalog_with_mfm_points_feeds_roster_legality_enhancement_prices() -> None:
+    catalog = _catalog()
+    request = ArmyMusterRequest(
+        army_id="army-one",
+        player_id="player-one",
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="test-faction",
+            detachment_ids=("test-detachment",),
+            enhancement_ids=("test-enhancement",),
+        ),
+        unit_selections=(_unit_selection("leader-one", "leader", (("leader", 1),)),),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="leader-one",
+                points=1980,
+                source_id="test:mfm:leader-one",
+            ),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="test-enhancement",
+                target_unit_selection_id="leader-one",
+                source_id="test:enhancement-assignment",
+            ),
+        ),
+    )
+    overlay = catalog_with_mfm_points(
+        catalog=catalog,
+        faction_id="test-faction",
+        source_package=_mfm_package(),
+    )
+
+    stale_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(catalog=catalog, request=request).violations
+    }
+    overlay_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(catalog=overlay, request=request).violations
+    }
+
+    assert "points_limit_exceeded" in stale_codes
+    assert "points_limit_exceeded" not in overlay_codes
+    assert "source_awaiting_enhancement_points" not in overlay_codes
 
 
 def test_mfm_army_point_lines_reject_invalid_structured_values() -> None:
@@ -401,6 +533,7 @@ def _catalog() -> ArmyCatalog:
             datasheet_id="leader",
             name="Leader",
             profiles=(("leader", "Leader", 1, 1),),
+            keywords=("INFANTRY", "CHARACTER"),
             attachment_eligibilities=(
                 AttachmentEligibility(
                     role=AttachmentRole.LEADER,
@@ -472,13 +605,14 @@ def _datasheet(
     profiles: tuple[tuple[str, str, int, int], ...],
     wargear_options: tuple[DatasheetWargearOption, ...] = (),
     attachment_eligibilities: tuple[AttachmentEligibility, ...] = (),
+    keywords: tuple[str, ...] = ("INFANTRY",),
     faction_keywords: tuple[str, ...] = ("TEST",),
 ) -> DatasheetDefinition:
     return DatasheetDefinition(
         datasheet_id=datasheet_id,
         name=name,
         content_scope=CatalogContentScope.MATCHED_PLAY,
-        keywords=DatasheetKeywordSet(keywords=("INFANTRY",), faction_keywords=faction_keywords),
+        keywords=DatasheetKeywordSet(keywords=keywords, faction_keywords=faction_keywords),
         model_profiles=tuple(
             ModelProfileDefinition(
                 model_profile_id=model_profile_id,

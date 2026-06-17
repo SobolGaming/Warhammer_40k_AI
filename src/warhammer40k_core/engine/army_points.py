@@ -36,12 +36,6 @@ from warhammer40k_core.rules.mfm_source import (
     MfmUnitRecord,
     source_label_slug,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06 import (
-    faction_record as current_mfm_faction_record,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06 import (
-    supported_faction_ids as current_mfm_supported_faction_ids,
-)
 
 
 class ArmyPointsError(ValueError):
@@ -195,6 +189,52 @@ def catalog_with_mfm_leader_allowances(
         source_package=source_package,
     )
     catalog_faction = _catalog_faction(catalog=catalog, faction_id=requested_faction_id)
+    return replace(
+        catalog,
+        datasheets=_datasheets_with_mfm_leader_allowances(
+            catalog=catalog,
+            catalog_faction=catalog_faction,
+            faction=faction,
+        ),
+    )
+
+
+def catalog_with_mfm_points(
+    *,
+    catalog: ArmyCatalog,
+    faction_id: str,
+    source_package: MfmSourcePackage | None = None,
+) -> ArmyCatalog:
+    if type(catalog) is not ArmyCatalog:
+        raise ArmyPointsError("MFM point overlay requires an ArmyCatalog.")
+    requested_faction_id = _validate_identifier(faction_id)
+    faction = _mfm_faction_by_catalog_faction_id(
+        catalog=catalog,
+        faction_id=requested_faction_id,
+        source_package=source_package,
+    )
+    catalog_faction = _catalog_faction(catalog=catalog, faction_id=requested_faction_id)
+    return replace(
+        catalog,
+        datasheets=_datasheets_with_mfm_leader_allowances(
+            catalog=catalog,
+            catalog_faction=catalog_faction,
+            faction=faction,
+        ),
+        enhancements=_enhancements_with_mfm_points(
+            catalog=catalog,
+            faction=faction,
+            faction_id=requested_faction_id,
+        ),
+    )
+
+
+def _datasheets_with_mfm_leader_allowances(
+    *,
+    catalog: ArmyCatalog,
+    catalog_faction: FactionDefinition,
+    faction: MfmFactionRecord,
+) -> tuple[DatasheetDefinition, ...]:
     datasheets_by_unit_id = _catalog_datasheets_by_mfm_unit_id(catalog.datasheets)
     updated_datasheets: list[DatasheetDefinition] = []
     for datasheet in catalog.datasheets:
@@ -227,7 +267,65 @@ def catalog_with_mfm_leader_allowances(
                 ),
             )
         )
-    return replace(catalog, datasheets=tuple(updated_datasheets))
+    return tuple(updated_datasheets)
+
+
+def _enhancements_with_mfm_points(
+    *,
+    catalog: ArmyCatalog,
+    faction: MfmFactionRecord,
+    faction_id: str,
+) -> tuple[EnhancementDefinition, ...]:
+    points_by_catalog_enhancement_id = _mfm_enhancement_points_by_catalog_enhancement_id(
+        catalog=catalog,
+        faction=faction,
+        faction_id=faction_id,
+    )
+    return tuple(
+        replace(
+            enhancement,
+            points=points_by_catalog_enhancement_id[enhancement.enhancement_id],
+        )
+        if enhancement.enhancement_id in points_by_catalog_enhancement_id
+        else enhancement
+        for enhancement in catalog.enhancements
+    )
+
+
+def _mfm_enhancement_points_by_catalog_enhancement_id(
+    *,
+    catalog: ArmyCatalog,
+    faction: MfmFactionRecord,
+    faction_id: str,
+) -> dict[str, int]:
+    catalog_enhancements_by_id = {
+        enhancement.enhancement_id: enhancement for enhancement in catalog.enhancements
+    }
+    points_by_id: dict[str, int] = {}
+    for detachment in catalog.detachments:
+        if detachment.faction_id != faction_id:
+            continue
+        mfm_detachment = _mfm_detachment_for_catalog_detachment(
+            faction=faction,
+            detachment=detachment,
+        )
+        for enhancement_id in detachment.enhancement_ids:
+            catalog_enhancement = catalog_enhancements_by_id.get(enhancement_id)
+            if catalog_enhancement is None:
+                raise ArmyPointsError(
+                    "MFM enhancement point overlay found a missing catalog enhancement."
+                )
+            mfm_enhancement = _mfm_enhancement_for_catalog_enhancement(
+                detachment=mfm_detachment,
+                enhancement=catalog_enhancement,
+            )
+            previous_points = points_by_id.get(catalog_enhancement.enhancement_id)
+            if previous_points is not None and previous_points != mfm_enhancement.points:
+                raise ArmyPointsError(
+                    "MFM enhancement point overlay found conflicting enhancement prices."
+                )
+            points_by_id[catalog_enhancement.enhancement_id] = mfm_enhancement.points
+    return points_by_id
 
 
 def _priced_unit_records(
@@ -470,16 +568,45 @@ def _mfm_detachments_for_request(
     records: list[MfmDetachmentRecord] = []
     for detachment_id in request.detachment_selection.detachment_ids:
         detachment = _catalog_detachment(catalog=catalog, detachment_id=detachment_id)
-        requested_ids = (detachment.detachment_id, source_label_slug(detachment.name))
-        matches = tuple(
-            mfm_detachment
-            for mfm_detachment in faction.detachments
-            if mfm_detachment.detachment_id in requested_ids
+        records.append(
+            _mfm_detachment_for_catalog_detachment(
+                faction=faction,
+                detachment=detachment,
+            )
         )
-        if len(matches) != 1:
-            raise ArmyPointsError("MFM detachment selection did not resolve to one detachment.")
-        records.append(matches[0])
     return tuple(records)
+
+
+def _mfm_detachment_for_catalog_detachment(
+    *,
+    faction: MfmFactionRecord,
+    detachment: DetachmentDefinition,
+) -> MfmDetachmentRecord:
+    requested_ids = (detachment.detachment_id, source_label_slug(detachment.name))
+    matches = tuple(
+        mfm_detachment
+        for mfm_detachment in faction.detachments
+        if mfm_detachment.detachment_id in requested_ids
+    )
+    if len(matches) != 1:
+        raise ArmyPointsError("MFM detachment selection did not resolve to one detachment.")
+    return matches[0]
+
+
+def _mfm_enhancement_for_catalog_enhancement(
+    *,
+    detachment: MfmDetachmentRecord,
+    enhancement: EnhancementDefinition,
+) -> MfmEnhancementRecord:
+    requested_ids = (enhancement.enhancement_id, source_label_slug(enhancement.name))
+    matches = tuple(
+        mfm_enhancement
+        for mfm_enhancement in detachment.enhancements
+        if mfm_enhancement.enhancement_id in requested_ids
+    )
+    if len(matches) != 1:
+        raise ArmyPointsError("MFM enhancement did not resolve to one enhancement.")
+    return matches[0]
 
 
 def _mfm_faction_for_request(
@@ -516,11 +643,27 @@ def _mfm_faction_by_catalog_faction_id(
 
 
 def _current_mfm_faction_by_ids(requested_ids: tuple[str, str]) -> MfmFactionRecord:
-    supported_ids = frozenset(current_mfm_supported_faction_ids())
+    supported_ids = frozenset(_current_mfm_supported_faction_ids())
     matches = tuple(requested_id for requested_id in requested_ids if requested_id in supported_ids)
     if len(matches) != 1:
         raise ArmyPointsError("MFM faction selection did not resolve to one generated faction.")
-    return current_mfm_faction_record(matches[0])
+    return _current_mfm_faction_record(matches[0])
+
+
+def _current_mfm_supported_faction_ids() -> tuple[str, ...]:
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06 import (
+        supported_faction_ids,
+    )
+
+    return supported_faction_ids()
+
+
+def _current_mfm_faction_record(faction_id: str) -> MfmFactionRecord:
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06 import (
+        faction_record,
+    )
+
+    return faction_record(faction_id)
 
 
 def _mfm_unit_for_datasheet(
