@@ -56,13 +56,6 @@ def html_document() -> str:
 
 def _build_data_payload() -> dict[str, object]:
     mission_pack = warhammer_event_companion_2026_06_mission_pack()
-    force_dispositions = [
-        {
-            "id": force.force_disposition_id,
-            "name": force.name,
-        }
-        for force in mission_pack.force_dispositions
-    ]
     matrix = {
         f"{cell.player_force_disposition_id}|{cell.opponent_force_disposition_id}": {
             "primary_mission_id": cell.primary_mission_id,
@@ -86,10 +79,31 @@ def _build_data_payload() -> dict[str, object]:
     }
     return {
         "battlefield": {"width_inches": 44.0, "depth_inches": 60.0},
-        "force_dispositions": force_dispositions,
+        "force_dispositions": _force_disposition_payloads(),
         "matrix": matrix,
         "layouts": layouts,
     }
+
+
+def _force_disposition_payloads() -> list[dict[str, object]]:
+    return [
+        {
+            "id": row.force_disposition_id,
+            "name": _force_disposition_display_name(row.force_disposition_id),
+        }
+        for row in event_source.force_disposition_rows()
+    ]
+
+
+def _force_disposition_display_name(force_disposition_id: str) -> str:
+    names = {
+        "purge-the-foe": "Purge the Foe",
+        "take-and-hold": "Take and Hold",
+        "disruption": "Disruption",
+        "reconnaissance": "Reconnaissance",
+        "priority-assets": "Priority Assets",
+    }
+    return names[force_disposition_id]
 
 
 def _layout_payload(

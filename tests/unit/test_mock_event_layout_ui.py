@@ -7,6 +7,14 @@ from scripts import mock_event_layout_ui
 
 def test_mock_event_layout_ui_exposes_terrain_anchor_rotation_tooltips() -> None:
     data = mock_event_layout_ui.build_data_payload()
+    assert data["force_dispositions"] == [
+        {"id": "purge-the-foe", "name": "Purge the Foe"},
+        {"id": "take-and-hold", "name": "Take and Hold"},
+        {"id": "disruption", "name": "Disruption"},
+        {"id": "reconnaissance", "name": "Reconnaissance"},
+        {"id": "priority-assets", "name": "Priority Assets"},
+    ]
+
     layouts = _object_map(data["layouts"])
     layout_b = _object_map(layouts["take-and-hold-vs-take-and-hold-layout-2"])
     terrain_areas = _object_list(layout_b["terrain_areas"])
