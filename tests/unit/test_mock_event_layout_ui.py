@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import cast
 
 from scripts import mock_event_layout_ui
@@ -46,6 +47,37 @@ def test_mock_event_layout_ui_exposes_terrain_anchor_rotation_tooltips() -> None
     assert '<option value="purge-the-foe">Purge the Foe</option>' in html
 
 
+def test_mock_event_layout_ui_embeds_renderable_default_layout_data() -> None:
+    data = mock_event_layout_ui.build_data_payload()
+    html = mock_event_layout_ui.html_document(data=data)
+    embedded_data = _embedded_layout_data(html)
+
+    assert embedded_data == data
+    assert "initializeData(JSON.parse" in html
+    assert 'fetch("/data.json")' in html
+    assert "`${marker.name}\\n${terrainAreaTitle(area)}`" in html
+    assert '].join("\\n");' in html
+
+    matrix = _object_map(embedded_data["matrix"])
+    default_cell = _object_map(matrix["take-and-hold|take-and-hold"])
+    layout_ids = _string_list(default_cell["layout_ids"])
+    layouts = _object_map(embedded_data["layouts"])
+    layout = _object_map(layouts[layout_ids[0]])
+
+    assert layout["id"] == "take-and-hold-vs-take-and-hold-layout-1"
+    assert _object_list(layout["deployment_zones"])
+    assert _object_list(layout["terrain_areas"])
+    assert _object_list(layout["objective_terrain_areas"])
+
+
+def _embedded_layout_data(html: str) -> dict[str, object]:
+    start_tag = '  <script id="layout-data" type="application/json">\n'
+    end_tag = "\n  </script>\n  <script>"
+    start = html.index(start_tag) + len(start_tag)
+    end = html.index(end_tag, start)
+    return _object_map(json.loads(html[start:end].strip()))
+
+
 def _object_map(value: object) -> dict[str, object]:
     assert isinstance(value, dict)
     raw = cast(dict[object, object], value)
@@ -68,3 +100,12 @@ def _object_list(value: object) -> list[dict[str, object]]:
 def _string(value: object) -> str:
     assert isinstance(value, str)
     return value
+
+
+def _string_list(value: object) -> list[str]:
+    assert isinstance(value, list)
+    raw = cast(list[object], value)
+    result: list[str] = []
+    for item in raw:
+        result.append(_string(item))
+    return result

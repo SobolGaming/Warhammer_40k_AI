@@ -34,7 +34,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     data = build_data_payload()
-    html = html_document()
+    html = html_document(data=data)
     handler = _handler_for(html=html, data=data)
     server = ThreadingHTTPServer((args.host, args.port), handler)
     print(f"Serving Event Companion layout mock UI at http://{args.host}:{args.port}/")
@@ -51,8 +51,8 @@ def build_data_payload() -> dict[str, object]:
     return _build_data_payload()
 
 
-def html_document() -> str:
-    return _html_document()
+def html_document(*, data: dict[str, object] | None = None) -> str:
+    return _html_document(data=build_data_payload() if data is None else data)
 
 
 def _build_data_payload() -> dict[str, object]:
@@ -115,6 +115,15 @@ def _force_disposition_options_html() -> str:
         selected = " selected" if disposition_id == "take-and-hold" else ""
         lines.append(f'          <option value="{disposition_id}"{selected}>{name}</option>')
     return "\n".join(lines)
+
+
+def _embedded_data_json(data: dict[str, object]) -> str:
+    return (
+        json.dumps(data, sort_keys=True, separators=(",", ":"))
+        .replace("&", "\\u0026")
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+    )
 
 
 def _layout_payload(
@@ -275,7 +284,7 @@ def _handler_for(
     return EventLayoutMockHandler
 
 
-def _html_document() -> str:
+def _html_document(*, data: dict[str, object]) -> str:
     return """<!doctype html>
 <html lang="en">
 <head>
@@ -554,6 +563,9 @@ def _html_document() -> str:
       </div>
     </section>
   </main>
+  <script id="layout-data" type="application/json">
+<!-- layout-data-json -->
+  </script>
   <script>
     const state = {
       data: null,
@@ -572,6 +584,8 @@ def _html_document() -> str:
     const WIDTH = 44;
     const DEPTH = 60;
 
+    initializeData(JSON.parse(document.querySelector("#layout-data").textContent));
+
     fetch("/data.json")
       .then((response) => {
         if (!response.ok) {
@@ -579,20 +593,32 @@ def _html_document() -> str:
         }
         return response.json();
       })
-      .then((data) => {
-        state.data = data;
-        populateForceDispositions(data.force_dispositions);
-        renderSelection();
-      });
+      .then((data) => initializeData(data));
 
     state.forceOne.addEventListener("change", renderSelection);
     state.forceTwo.addEventListener("change", renderSelection);
     state.layoutVariant.addEventListener("change", renderSelection);
     window.setInterval(renderSelection, 250);
 
+    function initializeData(data) {
+      if (!data || typeof data !== "object") {
+        throw new Error("Layout payload must be an object.");
+      }
+      state.data = data;
+      populateForceDispositions(data.force_dispositions);
+      state.lastSelectionKey = null;
+      renderSelection();
+    }
+
     function populateForceDispositions(forceDispositions) {
       if (!Array.isArray(forceDispositions)) {
         throw new Error("Force disposition payload must be an array.");
+      }
+      const previousOne = state.forceOne.value;
+      const previousTwo = state.forceTwo.value;
+      const optionIds = new Set(forceDispositions.map((force) => force.id));
+      if (!optionIds.has("take-and-hold")) {
+        throw new Error("Default force disposition is missing: take-and-hold.");
       }
       const options = forceDispositions.map((force) => {
         const option = document.createElement("option");
@@ -606,8 +632,8 @@ def _html_document() -> str:
           select.append(option.cloneNode(true));
         }
       }
-      state.forceOne.value = "take-and-hold";
-      state.forceTwo.value = "take-and-hold";
+      state.forceOne.value = optionIds.has(previousOne) ? previousOne : "take-and-hold";
+      state.forceTwo.value = optionIds.has(previousTwo) ? previousTwo : "take-and-hold";
     }
 
     function renderSelection() {
@@ -699,7 +725,7 @@ def _html_document() -> str:
             class: "objective-terrain",
           });
           polygon.append(
-            svgElement("title", {}, `${marker.name}\n${terrainAreaTitle(area)}`),
+            svgElement("title", {}, `${marker.name}\\n${terrainAreaTitle(area)}`),
           );
           state.board.append(polygon);
         }
@@ -791,7 +817,7 @@ def _html_document() -> str:
         area.name,
         `Anchor: (${formatNumber(area.anchor_x_inches)}, ${formatNumber(area.anchor_y_inches)})`,
         `Rotation: ${formatNumber(area.rotation_degrees)} deg`,
-      ].join("\n");
+      ].join("\\n");
     }
 
     function formatNumber(value) {
@@ -824,7 +850,10 @@ def _html_document() -> str:
   </script>
 </body>
 </html>
-""".replace("<!-- force-disposition-options -->", _force_disposition_options_html())
+""".replace("<!-- force-disposition-options -->", _force_disposition_options_html()).replace(
+        "<!-- layout-data-json -->",
+        _embedded_data_json(data),
+    )
 
 
 if __name__ == "__main__":
