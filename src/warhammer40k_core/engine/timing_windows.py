@@ -17,6 +17,7 @@ class TimingWindowError(ValueError):
 
 class TimingTriggerKind(StrEnum):
     ANY_PHASE = "any_phase"
+    PASSIVE_QUERY = "passive_query"
     START_PHASE = "start_phase"
     END_PHASE = "end_phase"
     START_TURN = "start_turn"

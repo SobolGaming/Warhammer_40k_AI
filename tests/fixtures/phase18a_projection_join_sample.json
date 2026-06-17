@@ -148,7 +148,7 @@
       "wounds_remaining": 2
     },
     "projection_schema": "game-view-v3-phase18a",
-    "projection_state_hash": "48cc5ccacbd2f1ca84ec89cc132d922bc1abbf3983d56cbd954f3f63336d58c4",
+    "projection_state_hash": "7f3038da887b6f9bc4d1f6f45a7bf58eafc226cb99b9068c4fa64c16bbe89173",
     "rules_catalog": {
       "catalog_id": "phase9a-canonical",
       "projection_schema": "rules-catalog-view-v2",
@@ -157,7 +157,7 @@
         "game": "warhammer_40000",
         "version": "core-v2-phase9a"
       },
-      "source_hash": "5bdb8899ee17eea61cac5893f3f204653f82c21d968b4a48bcd0ddb27897b60a",
+      "source_hash": "933733fb11cd1ad6e9be8838e4579c5854e50f02df6993337a34be1ce5357f46",
       "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
     },
     "unit_display": {
@@ -324,7 +324,7 @@
       ]
     },
     "projection_schema": "rules-catalog-view-v2",
-    "source_hash": "5bdb8899ee17eea61cac5893f3f204653f82c21d968b4a48bcd0ddb27897b60a",
+    "source_hash": "933733fb11cd1ad6e9be8838e4579c5854e50f02df6993337a34be1ce5357f46",
     "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
   }
 }

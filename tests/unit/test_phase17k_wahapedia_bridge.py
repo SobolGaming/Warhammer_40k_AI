@@ -10,12 +10,14 @@ from typing import cast
 
 import pytest
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import (
     AttachmentRole,
     BaseSizeKind,
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
+    DatasheetDefinition,
     DatasheetWargearOption,
     DatasheetWargearOptionEffect,
     WargearOptionConditionKind,
@@ -26,6 +28,7 @@ from warhammer40k_core.core.model_geometry_catalog import (
     GeometrySourceUnits,
 )
 from warhammer40k_core.engine.abilities import (
+    AbilityCatalogIndex,
     AbilityExecutionContext,
     AbilityResolutionStatus,
     default_ability_handler_registry,
@@ -34,7 +37,25 @@ from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
     catalog_ability_records_from_catalog,
 )
+from warhammer40k_core.engine.ability_coverage import (
+    AbilityCoverageRow,
+    AbilityCoverageSupportStage,
+    ability_coverage_rows_from_catalog,
+    ability_coverage_rows_payload,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battle_shock import collect_battle_shock_test_requests
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldRuntimeState,
+    ModelPlacement,
+    PlacedArmy,
+    UnitPlacement,
+)
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_charge_roll_modifiers_for_unit,
+)
+from warhammer40k_core.engine.charge_declaration import ChargeRollRequest, ChargeRollResult
+from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ListValidationError,
@@ -43,9 +64,13 @@ from warhammer40k_core.engine.list_validation import (
     WargearSelection,
     resolve_wargear_selections,
 )
+from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+from warhammer40k_core.engine.unit_state import StartingStrengthRecord
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
+from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, RuleIRPayload, parameter_payload
 from warhammer40k_core.rules.source_reference_generation import build_source_reference_catalog
@@ -345,6 +370,190 @@ def test_phase17k_selected_optional_wargear_adds_catalog_ir_ability_record() -> 
     assert effect_payload["target_unit_instance_ids"] == [unit.unit_instance_id]
 
 
+def test_phase17k_instrument_of_chaos_catalog_ir_modifies_charge_roll_result() -> None:
+    package = _bloodcrushers_package()
+    unit = _bloodcrushers_unit(
+        package=package,
+        selected_wargear_id="000001115:instrument-of-chaos",
+    )
+    army = _bloodcrushers_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+
+    modifiers = catalog_charge_roll_modifiers_for_unit(
+        ability_index=player_index,
+        unit=unit,
+    )
+    request = ChargeRollRequest(
+        request_id="phase17k-charge-roll",
+        game_id="phase17k-game",
+        battle_round=1,
+        player_id=army.player_id,
+        unit_instance_id=unit.unit_instance_id,
+        source_decision_request_id="phase17k-charge-selection-request",
+        source_decision_result_id="phase17k-charge-selection-result",
+        roll_modifiers=modifiers,
+    )
+    roll_state = DiceRollManager("phase17k-game").roll_fixed(request.spec, [3, 4])
+    result = ChargeRollResult.from_roll_state(
+        request=request,
+        roll_state=roll_state,
+        reachable_target_distances_inches={},
+    )
+
+    assert records_by_name["Instrument of Chaos"].definition.timing.trigger_kind is (
+        TimingTriggerKind.AFTER_DICE_ROLL
+    )
+    assert len(modifiers) == 1
+    assert modifiers[0].operand == 1
+    assert request.spec.expression.modifier == 1
+    assert result.value == 8
+    assert result.to_payload()["request"]["roll_modifiers"][0]["operand"] == 1
+
+
+def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() -> None:
+    package = _bloodcrushers_package()
+    unit = _bloodcrushers_unit(
+        package=package,
+        selected_wargear_id="000001115:daemonic-icon",
+    )
+    army = _bloodcrushers_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
+    battlefield = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in unit.own_models[:2])
+    )
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    starting_strength = (StartingStrengthRecord.from_unit(player_id=army.player_id, unit=unit),)
+
+    requests_without_index = collect_battle_shock_test_requests(
+        game_id="phase17k-game",
+        battle_round=1,
+        player_id=army.player_id,
+        army=army,
+        battlefield_state=battlefield,
+        starting_strength_records=starting_strength,
+    )
+    requests_with_index = collect_battle_shock_test_requests(
+        game_id="phase17k-game",
+        battle_round=1,
+        player_id=army.player_id,
+        army=army,
+        battlefield_state=battlefield,
+        starting_strength_records=starting_strength,
+        ability_index=player_index,
+    )
+
+    assert records_by_name["Daemonic Icon"].definition.timing.trigger_kind is (
+        TimingTriggerKind.PASSIVE_QUERY
+    )
+    assert records_by_name["Daemonic Icon"].definition.name == "Daemonic Icon"
+    assert len(requests_without_index) == 1
+    assert len(requests_with_index) == 1
+    assert requests_without_index[0].leadership_target == 7
+    assert requests_with_index[0].leadership_target == 6
+
+
+def test_phase17k_bloodcrushers_ability_coverage_snapshot_is_current() -> None:
+    rows = ability_coverage_rows_from_catalog(
+        _bloodcrushers_package().army_catalog,
+        datasheet_ids=("000001115",),
+    )
+    snapshot = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "data"
+            / "generated"
+            / "ability_coverage"
+            / "ability_coverage_rows.json"
+        ).read_text(encoding="utf-8")
+    )
+    rows_by_name = {row.ability_name: row for row in rows}
+
+    assert ability_coverage_rows_payload(rows) == snapshot
+    assert rows_by_name["Instrument of Chaos"].support_stage.value == "engine_consumed"
+    assert rows_by_name["Daemonic Icon"].support_stage.value == "engine_consumed"
+
+
+def test_phase17k_ability_coverage_api_fails_fast_and_classifies_unsupported_ir() -> None:
+    package = _bloodcrushers_package()
+    unsupported_package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=build_wahapedia_canonical_bridge_artifacts(
+            source_artifacts=_unsupported_wargear_rule_source_artifacts(),
+            bridge_package_id=_bridge_package_id(),
+            datasheet_ids=("test-unsupported-unit",),
+            height_overrides=(
+                ModelHeightOverride(
+                    datasheet_id="test-unsupported-unit",
+                    model_name="Alpha",
+                    height=1.0,
+                    height_units=GeometrySourceUnits.INCHES,
+                    height_source_id="test-source:unsupported-height",
+                    height_document_reference="test-doc:unsupported-height",
+                ),
+            ),
+        ),
+    )
+    unsupported_rows = ability_coverage_rows_from_catalog(
+        unsupported_package.army_catalog,
+        datasheet_ids=("test-unsupported-unit",),
+    )
+    rows_by_name = {row.ability_name: row for row in unsupported_rows}
+    scatter = rows_by_name["Scatter Icon"]
+    hit_charm = rows_by_name["Hit Charm"]
+    tithe_charm = rows_by_name["Tithe Charm"]
+
+    assert (
+        ability_coverage_rows_from_catalog(
+            package.army_catalog,
+            datasheet_ids=("not-a-datasheet",),
+        )
+        == ()
+    )
+    assert scatter.support_stage is AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED
+    assert scatter.diagnostic_reasons == ("unsupported_language",)
+    assert scatter.semantic_categories == ("wargear.unsupported.unsupported_language",)
+    assert hit_charm.support_stage is AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE
+    assert hit_charm.semantic_categories == ("wargear.roll_modifier.hit.this_unit",)
+    assert tithe_charm.support_stage is AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE
+    assert tithe_charm.semantic_categories == ("wargear.rule_ir.modify_command_points.unscoped",)
+    with pytest.raises(GameLifecycleError, match="requires an ArmyCatalog"):
+        ability_coverage_rows_from_catalog(cast(ArmyCatalog, object()))
+    with pytest.raises(GameLifecycleError, match="datasheet_ids must be a tuple"):
+        ability_coverage_rows_from_catalog(
+            package.army_catalog,
+            datasheet_ids=cast(tuple[str, ...], ["000001115"]),
+        )
+    with pytest.raises(GameLifecycleError, match="rows must be a tuple"):
+        ability_coverage_rows_payload(cast(tuple[AbilityCoverageRow, ...], []))
+    with pytest.raises(GameLifecycleError, match="catalog_id"):
+        _ability_coverage_row(catalog_id="")
+    with pytest.raises(GameLifecycleError, match="datasheet_id"):
+        _ability_coverage_row(datasheet_id="")
+    with pytest.raises(GameLifecycleError, match="datasheet_name"):
+        _ability_coverage_row(datasheet_name="")
+    with pytest.raises(GameLifecycleError, match="ability_id"):
+        _ability_coverage_row(ability_id="")
+    with pytest.raises(GameLifecycleError, match="ability_name"):
+        _ability_coverage_row(ability_name="")
+    with pytest.raises(GameLifecycleError, match="source_kind"):
+        _ability_coverage_row(source_kind=cast(CatalogAbilitySourceKind, "bad"))
+    with pytest.raises(GameLifecycleError, match="source_wargear_id"):
+        _ability_coverage_row(source_wargear_id="")
+    with pytest.raises(GameLifecycleError, match="catalog_support"):
+        _ability_coverage_row(catalog_support=cast(CatalogAbilitySupport, "bad"))
+    with pytest.raises(GameLifecycleError, match="support_stage"):
+        _ability_coverage_row(support_stage=cast(AbilityCoverageSupportStage, "bad"))
+    with pytest.raises(GameLifecycleError, match="semantic_categories"):
+        _ability_coverage_row(semantic_categories=("",))
+    with pytest.raises(GameLifecycleError, match="runtime_consumer_ids"):
+        _ability_coverage_row(runtime_consumer_ids=cast(tuple[str, ...], []))
+    with pytest.raises(GameLifecycleError, match="diagnostic_reasons"):
+        _ability_coverage_row(diagnostic_reasons=("",))
+
+
 def test_phase17k_bridge_datasheet_source_ids_include_pdf_correction_source_id() -> None:
     artifacts = _bloodcrushers_bridge_artifacts()
     datasheet_row = _row_by_id(_artifact_by_table(artifacts, "Datasheets"), "000001115")
@@ -490,6 +699,51 @@ def test_phase17k_bridge_preserves_raw_source_text_for_reference_catalog() -> No
     )
 
 
+def test_phase17k_bridge_preserves_unsupported_rule_ir_diagnostics() -> None:
+    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_unsupported_wargear_rule_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-unsupported-unit",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-unsupported-unit",
+                model_name="Alpha",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:unsupported-height",
+                height_document_reference="test-doc:unsupported-height",
+            ),
+        ),
+    )
+    ability_row = next(
+        row
+        for row in _artifact_by_table(bridge_artifacts, "Datasheets_abilities").rows
+        if row.runtime_fields_payload()["name"] == "Scatter Icon"
+    )
+    fields = ability_row.runtime_fields_payload()
+    diagnostics = json.loads(fields["rule_ir_diagnostics"])
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=bridge_artifacts,
+    )
+    abilities_by_name = {
+        ability.name: ability
+        for ability in package.army_catalog.datasheet_by_id("test-unsupported-unit").abilities
+    }
+    ability = abilities_by_name["Scatter Icon"]
+
+    assert fields["support"] == "unsupported"
+    assert fields["rule_ir_payload"]
+    assert diagnostics[0]["reason"] == "unsupported_language"
+    assert diagnostics[0]["source_span"]["text"] == (
+        "Roll a scatter die and consult the legacy table."
+    )
+    assert ability.support is CatalogAbilitySupport.UNSUPPORTED
+    assert ability.rule_ir_payload is not None
+    assert ability.rule_ir_diagnostics == tuple(diagnostics)
+
+
 def test_phase17k_structured_wargear_option_semantics_block_icon_and_instrument_together() -> None:
     package = build_canonical_catalog_package(
         package_id=_catalog_package_id(),
@@ -582,6 +836,159 @@ def test_phase17k_bridge_requires_accepted_height_overrides() -> None:
             datasheet_ids=("000001115",),
             height_overrides=(),
         )
+
+
+def _bloodcrushers_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_bloodcrushers_bridge_artifacts(),
+    )
+
+
+def _bloodcrushers_unit(
+    *,
+    package: CanonicalCatalogPackage,
+    selected_wargear_id: str,
+) -> UnitInstance:
+    datasheet = package.army_catalog.datasheet_by_id("000001115")
+    option = _wargear_option_for_wargear(datasheet, selected_wargear_id)
+    return UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-khorne",
+        selection=UnitMusterSelection(
+            unit_selection_id="bloodcrushers-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="000001115:bloodcrushers",
+                    model_count=2,
+                ),
+                ModelProfileSelection(
+                    model_profile_id="000001115:bloodhunter",
+                    model_count=1,
+                ),
+            ),
+            wargear_selections=(
+                WargearSelection(
+                    option_id=option.option_id,
+                    model_profile_id=option.model_profile_id,
+                    wargear_ids=(selected_wargear_id,),
+                ),
+            ),
+        ),
+        datasheet=datasheet,
+    )
+
+
+def _wargear_option_for_wargear(
+    datasheet: DatasheetDefinition,
+    wargear_id: str,
+) -> DatasheetWargearOption:
+    for option in datasheet.wargear_options:
+        if option.allowed_wargear_ids == (wargear_id,):
+            return option
+    raise AssertionError(f"Missing option for wargear: {wargear_id}.")
+
+
+def _bloodcrushers_army(
+    *,
+    package: CanonicalCatalogPackage,
+    unit: UnitInstance,
+) -> ArmyDefinition:
+    return ArmyDefinition(
+        army_id="army-khorne",
+        player_id="player-khorne",
+        catalog_id=package.army_catalog.catalog_id,
+        source_package_id=package.army_catalog.source_package_id,
+        ruleset_id=package.army_catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id=package.army_catalog.factions[0].faction_id,
+            detachment_ids=("phase17k-daemons",),
+        ),
+        units=(unit,),
+    )
+
+
+def _player_ability_index(
+    *,
+    package: CanonicalCatalogPackage,
+    army: ArmyDefinition,
+) -> AbilityCatalogIndex:
+    return build_player_ability_index(
+        catalog_ability_records_from_catalog(package.army_catalog),
+        army=army,
+        catalog=package.army_catalog,
+    )
+
+
+def _bloodcrushers_battlefield_state(
+    *,
+    army: ArmyDefinition,
+    unit: UnitInstance,
+) -> BattlefieldRuntimeState:
+    placements = tuple(
+        ModelPlacement(
+            army_id=army.army_id,
+            player_id=army.player_id,
+            unit_instance_id=unit.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            pose=Pose.at(12.0 + (index * 2.0), 12.0),
+        )
+        for index, model in enumerate(unit.own_models)
+    )
+    return BattlefieldRuntimeState(
+        battlefield_id="phase17k-battlefield",
+        battlefield_width_inches=60.0,
+        battlefield_depth_inches=44.0,
+        placed_armies=(
+            PlacedArmy(
+                army_id=army.army_id,
+                player_id=army.player_id,
+                unit_placements=(
+                    UnitPlacement(
+                        army_id=army.army_id,
+                        player_id=army.player_id,
+                        unit_instance_id=unit.unit_instance_id,
+                        model_placements=placements,
+                    ),
+                ),
+            ),
+        ),
+    )
+
+
+def _ability_coverage_row(
+    *,
+    catalog_id: str = "test-catalog",
+    datasheet_id: str = "test-datasheet",
+    datasheet_name: str = "Test Datasheet",
+    ability_id: str = "test-ability",
+    ability_name: str = "Test Ability",
+    source_kind: CatalogAbilitySourceKind = CatalogAbilitySourceKind.WARGEAR,
+    source_wargear_id: str | None = "test-wargear",
+    catalog_support: CatalogAbilitySupport = CatalogAbilitySupport.DESCRIPTOR_ONLY,
+    support_stage: AbilityCoverageSupportStage = AbilityCoverageSupportStage.DESCRIPTOR_ONLY,
+    semantic_categories: tuple[str, ...] = ("wargear.descriptor",),
+    runtime_consumer_ids: tuple[str, ...] = (),
+    diagnostic_reasons: tuple[str, ...] = (),
+) -> AbilityCoverageRow:
+    return AbilityCoverageRow(
+        catalog_id=catalog_id,
+        datasheet_id=datasheet_id,
+        datasheet_name=datasheet_name,
+        ability_id=ability_id,
+        ability_name=ability_name,
+        source_kind=source_kind,
+        source_wargear_id=source_wargear_id,
+        catalog_support=catalog_support,
+        support_stage=support_stage,
+        semantic_categories=semantic_categories,
+        runtime_consumer_ids=runtime_consumer_ids,
+        diagnostic_reasons=diagnostic_reasons,
+    )
 
 
 def _bloodcrushers_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
@@ -814,6 +1221,77 @@ def _support_attachment_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                     "test-bodyguard-unit,1,1 Bodyguard",
                 )
             ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _unsupported_wargear_rule_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Test Army Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-unsupported-unit,Unsupported Unit,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-unsupported-unit,1,Faction,test-army-rule,"
+                        "Test Army Rule,Test rule text.,"
+                    ),
+                    (
+                        "test-unsupported-unit,2,Wargear,,Scatter Icon,"
+                        "Roll a scatter die and consult the legacy table.,"
+                    ),
+                    (
+                        "test-unsupported-unit,3,Wargear,,Hit Charm,"
+                        "Add 1 to hit rolls for the bearer's unit.,"
+                    ),
+                    "test-unsupported-unit,4,Wargear,,Tithe Charm,Gain 1CP.,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-unsupported-unit,Infantry,,false",
+                    "test-unsupported-unit,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-unsupported-unit,1,6,4,3,-,2,7,1,32mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(("datasheet_id,line,description", "test-unsupported-unit,1,1 Alpha")),
         ),
         _artifact_from_csv(
             "Factions",

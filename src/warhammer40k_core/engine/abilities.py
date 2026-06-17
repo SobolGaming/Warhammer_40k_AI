@@ -755,8 +755,6 @@ class AbilityHandlerRegistry:
             return AbilityResolutionResult.invalid(record, reason="keyword_gate_closed")
         if record.definition.handler_id.startswith("unsupported:"):
             return AbilityResolutionResult.unsupported(record, reason="unsupported_handler")
-        if record.definition.handler_id == GENERIC_RULE_IR_ABILITY_HANDLER_ID:
-            return _generic_rule_ir_ability_handler(record, context)
         binding = self._handlers.get(record.definition.handler_id)
         if binding is None:
             return AbilityResolutionResult.unsupported(record, reason="missing_handler")

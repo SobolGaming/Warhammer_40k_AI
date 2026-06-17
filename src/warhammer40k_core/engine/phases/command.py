@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
+from types import MappingProxyType
+from typing import cast
 
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.battle_shock import (
     BattleShockResult,
     collect_battle_shock_test_requests,
@@ -61,11 +65,18 @@ TACTICAL_SECONDARY_REPLACEMENT_DECLINE_OPTION_ID = "decline_tactical_secondary_r
 EVENT_COMPANION_MISSION_PACK_ID = "11e-warhammer-event-companion-2026-06"
 
 
+def _empty_ability_indexes() -> Mapping[str, AbilityCatalogIndex]:
+    return MappingProxyType({})
+
+
 @dataclass(frozen=True, slots=True)
 class CommandPhaseHandler:
     stratagem_index: StratagemCatalogIndex = field(default_factory=eleventh_edition_stratagem_index)
     battle_shock_hooks: BattleShockHookRegistry = field(
         default_factory=BattleShockHookRegistry.empty
+    )
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = field(
+        default_factory=_empty_ability_indexes
     )
 
     def __post_init__(self) -> None:
@@ -73,6 +84,11 @@ class CommandPhaseHandler:
             raise GameLifecycleError("CommandPhaseHandler stratagem_index must be an index.")
         if type(self.battle_shock_hooks) is not BattleShockHookRegistry:
             raise GameLifecycleError("CommandPhaseHandler battle_shock_hooks must be a registry.")
+        object.__setattr__(
+            self,
+            "ability_indexes_by_player_id",
+            _validate_ability_index_mapping(self.ability_indexes_by_player_id),
+        )
 
     @property
     def phase(self) -> BattlePhase:
@@ -134,6 +150,10 @@ class CommandPhaseHandler:
                 state=state,
                 decisions=decisions,
                 battle_shock_hooks=self.battle_shock_hooks,
+                ability_index=_ability_index_for_player(
+                    self.ability_indexes_by_player_id,
+                    player_id=active_player_id,
+                ),
             )
             command_state = _command_step_state(state)
 
@@ -365,6 +385,46 @@ def _active_player_id(state: GameState) -> str:
     if state.active_player_id is None:
         raise GameLifecycleError("Battle state requires an active player.")
     return state.active_player_id
+
+
+def _validate_player_id(field_name: str, value: object) -> str:
+    if type(field_name) is not str or not field_name:
+        raise GameLifecycleError("Player identifier validation requires a field name.")
+    if type(value) is not str or not value.strip():
+        raise GameLifecycleError(f"{field_name} must be a non-empty string.")
+    return value
+
+
+def _validate_ability_index_mapping(indexes: object) -> Mapping[str, AbilityCatalogIndex]:
+    if not isinstance(indexes, Mapping):
+        raise GameLifecycleError("ability_indexes_by_player_id must be a mapping.")
+    mapped_indexes = cast(Mapping[object, object], indexes)
+    validated: dict[str, AbilityCatalogIndex] = {}
+    for raw_player_id, raw_index in mapped_indexes.items():
+        player_id = _validate_player_id("ability_indexes_by_player_id key", raw_player_id)
+        if type(raw_index) is not AbilityCatalogIndex:
+            raise GameLifecycleError(
+                "ability_indexes_by_player_id values must be AbilityCatalogIndex."
+            )
+        validated[player_id] = raw_index
+    return MappingProxyType(validated)
+
+
+def _ability_index_for_player(
+    indexes: object,
+    *,
+    player_id: str,
+) -> AbilityCatalogIndex:
+    player = _validate_player_id("player_id", player_id)
+    if not isinstance(indexes, Mapping):
+        raise GameLifecycleError("ability_indexes_by_player_id must be a mapping.")
+    mapped_indexes = cast(Mapping[str, AbilityCatalogIndex], indexes)
+    index = mapped_indexes.get(player)
+    if index is None:
+        return AbilityCatalogIndex.from_records(())
+    if type(index) is not AbilityCatalogIndex:
+        raise GameLifecycleError("ability index mapping contained an invalid value.")
+    return index
 
 
 def _decision_payload_object(payload: JsonValue) -> dict[str, JsonValue]:
@@ -808,6 +868,7 @@ def _resolve_battle_shock_step(
     state: GameState,
     decisions: DecisionController,
     battle_shock_hooks: BattleShockHookRegistry,
+    ability_index: AbilityCatalogIndex,
 ) -> None:
     active_player_id = _active_player_id(state)
     battlefield_state = state.battlefield_state
@@ -826,6 +887,7 @@ def _resolve_battle_shock_step(
         army=army,
         battlefield_state=battlefield_state,
         starting_strength_records=tuple(state.starting_strength_records),
+        ability_index=ability_index,
     )
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     result_payloads: list[JsonValue] = []

@@ -16,8 +16,12 @@ from warhammer40k_core.core.dice import (
     UnmodifiedRollResult,
 )
 from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState, PlacementError
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_leadership_characteristic_for_unit,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import (
@@ -497,6 +501,7 @@ def collect_battle_shock_test_requests(
     starting_strength_records: tuple[StartingStrengthRecord, ...],
     forced_below_starting_strength_unit_ids: tuple[str, ...] = (),
     allow_duplicate_below_half_tests: bool = False,
+    ability_index: AbilityCatalogIndex | None = None,
 ) -> tuple[BattleShockTestRequest, ...]:
     requested_game_id = _validate_identifier("game_id", game_id)
     requested_round = _validate_positive_int("battle_round", battle_round)
@@ -507,6 +512,7 @@ def collect_battle_shock_test_requests(
         raise GameLifecycleError("Battle-shock request army player drift.")
     if type(battlefield_state) is not BattlefieldRuntimeState:
         raise GameLifecycleError("Battle-shock requests require BattlefieldRuntimeState.")
+    catalog_ability_index = _battle_shock_ability_index(ability_index)
     records = _starting_strength_by_unit(
         starting_strength_records,
         player_id=requested_player_id,
@@ -549,6 +555,7 @@ def collect_battle_shock_test_requests(
                     context=context,
                     current_model_ids=current_model_ids,
                     reason=BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED,
+                    ability_index=catalog_ability_index,
                 )
             )
             forced_test_added = True
@@ -564,6 +571,7 @@ def collect_battle_shock_test_requests(
                     context=context,
                     current_model_ids=current_model_ids,
                     reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
+                    ability_index=catalog_ability_index,
                 )
             )
     return tuple(
@@ -650,6 +658,7 @@ def _battle_shock_request_for_context(
     context: BelowHalfStrengthContext,
     current_model_ids: tuple[str, ...],
     reason: BattleShockTestReason,
+    ability_index: AbilityCatalogIndex,
 ) -> BattleShockTestRequest:
     return BattleShockTestRequest.for_unit(
         request_id=(
@@ -660,17 +669,34 @@ def _battle_shock_request_for_context(
         player_id=player_id,
         unit_instance_id=unit.unit_instance_id,
         reason=reason,
-        leadership_target=_best_leadership(unit, current_model_ids=current_model_ids),
+        leadership_target=_best_leadership(
+            unit,
+            current_model_ids=current_model_ids,
+            ability_index=ability_index,
+        ),
         below_half_strength_context=context,
     )
 
 
-def _best_leadership(unit: UnitInstance, *, current_model_ids: tuple[str, ...]) -> int:
+def _best_leadership(
+    unit: UnitInstance,
+    *,
+    current_model_ids: tuple[str, ...],
+    ability_index: AbilityCatalogIndex,
+) -> int:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Leadership lookup requires a UnitInstance.")
+    if type(ability_index) is not AbilityCatalogIndex:
+        raise GameLifecycleError("Leadership lookup requires an AbilityCatalogIndex.")
     model_ids = set(_validate_identifier_tuple("current_model_ids", current_model_ids))
     if not model_ids:
         raise GameLifecycleError("Battle-shock Leadership lookup requires current models.")
+    catalog_value = catalog_leadership_characteristic_for_unit(
+        ability_index=ability_index,
+        unit=unit,
+    )
+    if catalog_value is not None:
+        return catalog_value
     leadership_values = tuple(
         _model_leadership(model)
         for model in unit.own_models
@@ -679,6 +705,16 @@ def _best_leadership(unit: UnitInstance, *, current_model_ids: tuple[str, ...]) 
     if not leadership_values:
         raise GameLifecycleError("Battle-shock Leadership lookup found no models.")
     return min(leadership_values)
+
+
+def _battle_shock_ability_index(
+    ability_index: AbilityCatalogIndex | None,
+) -> AbilityCatalogIndex:
+    if ability_index is None:
+        return AbilityCatalogIndex.from_records(())
+    if type(ability_index) is not AbilityCatalogIndex:
+        raise GameLifecycleError("Battle-shock ability_index must be an AbilityCatalogIndex.")
+    return ability_index
 
 
 def _model_leadership(model: ModelInstance) -> int:

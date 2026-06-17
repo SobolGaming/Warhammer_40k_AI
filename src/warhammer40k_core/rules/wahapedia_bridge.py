@@ -473,6 +473,7 @@ def _bridge_abilities(
         source_kind = _ability_source_kind(_required_field(row, "type"))
         source_wargear_id = ""
         rule_ir_payload = ""
+        rule_ir_diagnostics = ""
         support = CatalogAbilitySupport.DESCRIPTOR_ONLY
         if source_kind is CatalogAbilitySourceKind.WARGEAR:
             source_wargear_id = f"{datasheet_id}:{_slug(name)}"
@@ -482,13 +483,18 @@ def _bridge_abilities(
                     raw_text=description,
                 )
             )
+            rule_ir_payload = json.dumps(
+                compiled.rule_ir.to_payload(),
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            rule_ir_diagnostics = json.dumps(
+                _rule_ir_diagnostics(compiled.rule_ir),
+                sort_keys=True,
+                separators=(",", ":"),
+            )
             if compiled.rule_ir.is_supported:
                 support = CatalogAbilitySupport.GENERIC_RULE_IR
-                rule_ir_payload = json.dumps(
-                    compiled.rule_ir.to_payload(),
-                    sort_keys=True,
-                    separators=(",", ":"),
-                )
             else:
                 support = CatalogAbilitySupport.UNSUPPORTED
         bridged_rows["Datasheets_abilities"].append(
@@ -505,6 +511,7 @@ def _bridge_abilities(
                 "effect_description": description,
                 "source_wargear_id": source_wargear_id,
                 "rule_ir_payload": rule_ir_payload,
+                "rule_ir_diagnostics": rule_ir_diagnostics,
                 "timing_tags": _ability_timing_tags(name),
                 "parameter_tokens": _ability_parameter_tokens(name=name, parameter=parameter),
                 "source_ids": _joined(_source_ids(*source_rows)),
@@ -751,6 +758,7 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "effect_description",
             "source_wargear_id",
             "rule_ir_payload",
+            "rule_ir_diagnostics",
             "timing_tags",
             "parameter_tokens",
             "source_ids",
@@ -832,6 +840,47 @@ def _ability_source_kind(ability_type: str) -> CatalogAbilitySourceKind:
     if normalized == "wargear":
         return CatalogAbilitySourceKind.WARGEAR
     raise WahapediaBridgeError("Unsupported datasheet ability type.")
+
+
+def _rule_ir_diagnostics(rule_ir: object) -> list[dict[str, object]]:
+    from warhammer40k_core.rules.rule_ir import RuleIR
+
+    if type(rule_ir) is not RuleIR:
+        raise WahapediaBridgeError("Rule IR diagnostics require a RuleIR.")
+    diagnostics: list[dict[str, object]] = [
+        {
+            "scope": "rule",
+            "reason": diagnostic.reason.value,
+            "message": diagnostic.message,
+            "source_span": diagnostic.source_span.to_payload(),
+            "blocking": diagnostic.blocking,
+        }
+        for diagnostic in rule_ir.diagnostics
+    ]
+    for clause in rule_ir.clauses:
+        if clause.unsupported_reason is not None:
+            diagnostics.append(
+                {
+                    "scope": "clause",
+                    "clause_id": clause.clause_id,
+                    "reason": clause.unsupported_reason.value,
+                    "message": "Unsupported rule clause.",
+                    "source_span": clause.source_span.to_payload(),
+                    "blocking": True,
+                }
+            )
+        for diagnostic in clause.diagnostics:
+            diagnostics.append(
+                {
+                    "scope": "clause",
+                    "clause_id": clause.clause_id,
+                    "reason": diagnostic.reason.value,
+                    "message": diagnostic.message,
+                    "source_span": diagnostic.source_span.to_payload(),
+                    "blocking": diagnostic.blocking,
+                }
+            )
+    return diagnostics
 
 
 def _source_ids(*rows: NormalizedSourceRow) -> tuple[str, ...]:

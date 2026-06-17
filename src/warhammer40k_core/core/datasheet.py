@@ -133,6 +133,7 @@ class DatasheetAbilityDescriptorPayload(TypedDict):
     effect_description: str
     source_wargear_id: str | None
     rule_ir_payload: CatalogJsonObject | None
+    rule_ir_diagnostics: list[CatalogJsonObject]
     timing_tags: list[str]
     parameter_tokens: list[str]
 
@@ -569,6 +570,7 @@ class DatasheetAbilityDescriptor:
     parameter_tokens: tuple[str, ...] = ()
     source_wargear_id: str | None = None
     rule_ir_payload: CatalogJsonObject | None = None
+    rule_ir_diagnostics: tuple[CatalogJsonObject, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -629,6 +631,14 @@ class DatasheetAbilityDescriptor:
         object.__setattr__(self, "rule_ir_payload", rule_ir_payload)
         object.__setattr__(
             self,
+            "rule_ir_diagnostics",
+            _validate_json_object_tuple(
+                "DatasheetAbilityDescriptor rule_ir_diagnostics",
+                self.rule_ir_diagnostics,
+            ),
+        )
+        object.__setattr__(
+            self,
             "timing_tags",
             _validate_identifier_tuple(
                 "DatasheetAbilityDescriptor timing_tags",
@@ -654,6 +664,7 @@ class DatasheetAbilityDescriptor:
             "effect_description": self.effect_description,
             "source_wargear_id": self.source_wargear_id,
             "rule_ir_payload": self.rule_ir_payload,
+            "rule_ir_diagnostics": list(self.rule_ir_diagnostics),
             "timing_tags": list(self.timing_tags),
             "parameter_tokens": list(self.parameter_tokens),
         }
@@ -671,6 +682,7 @@ class DatasheetAbilityDescriptor:
             parameter_tokens=tuple(payload["parameter_tokens"]),
             source_wargear_id=payload["source_wargear_id"],
             rule_ir_payload=payload["rule_ir_payload"],
+            rule_ir_diagnostics=tuple(payload["rule_ir_diagnostics"]),
         )
 
 
@@ -1041,6 +1053,15 @@ def _validate_json_value(field_name: str, value: object) -> CatalogJsonValue:
     if type(value) is dict:
         return _validate_json_object(field_name, cast(dict[object, object], value))
     raise DatasheetCatalogError(f"{field_name} must be JSON-safe.")
+
+
+def _validate_json_object_tuple(
+    field_name: str,
+    values: tuple[CatalogJsonObject, ...],
+) -> tuple[CatalogJsonObject, ...]:
+    if type(values) is not tuple:
+        raise DatasheetCatalogError(f"{field_name} must be a tuple.")
+    return tuple(_validate_json_object(field_name, value) for value in values)
 
 
 def _validate_positive_number(field_name: str, value: object) -> float:

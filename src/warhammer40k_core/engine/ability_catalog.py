@@ -191,6 +191,12 @@ def _catalog_ability_source_kind(source_kind: CatalogAbilitySourceKind) -> Abili
 
 def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
     if any(
+        effect.kind is RuleEffectKind.SET_CHARACTERISTIC
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+    ):
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
+    if any(
         effect.kind
         in {
             RuleEffectKind.MODIFY_DICE_ROLL,

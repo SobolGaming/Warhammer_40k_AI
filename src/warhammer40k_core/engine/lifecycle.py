@@ -1670,6 +1670,9 @@ class GameLifecycle:
         self._command_phase_handler = CommandPhaseHandler(
             stratagem_index=runtime_stratagem_index,
             battle_shock_hooks=self._runtime_content_bundle.battle_shock_hook_registry,
+            ability_indexes_by_player_id=(
+                self._runtime_content_bundle.ability_indexes_by_player_id
+            ),
         )
         self._movement_phase_handler = MovementPhaseHandler(
             ruleset_descriptor=self._movement_phase_handler.ruleset_descriptor,
@@ -1684,6 +1687,9 @@ class GameLifecycle:
         self._charge_phase_handler = ChargePhaseHandler(
             ruleset_descriptor=self._charge_phase_handler.ruleset_descriptor,
             charge_declaration_hooks=self._runtime_content_bundle.charge_declaration_hook_registry,
+            ability_indexes_by_player_id=(
+                self._runtime_content_bundle.ability_indexes_by_player_id
+            ),
         )
         self._shooting_phase_handler = ShootingPhaseHandler(
             ruleset_descriptor=self._shooting_phase_handler.ruleset_descriptor,

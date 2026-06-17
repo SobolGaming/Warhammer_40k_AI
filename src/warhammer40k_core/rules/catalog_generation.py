@@ -493,6 +493,7 @@ def _ability_descriptor_from_row(row: NormalizedSourceRow) -> DatasheetAbilityDe
         parameter_tokens=_optional_split_field(row, "parameter_tokens"),
         source_wargear_id=_optional_field(row=row, column_name="source_wargear_id"),
         rule_ir_payload=_rule_ir_payload_from_row(row),
+        rule_ir_diagnostics=_rule_ir_diagnostics_from_row(row),
     )
 
 
@@ -528,6 +529,28 @@ def _rule_ir_payload_from_row(row: NormalizedSourceRow) -> CatalogJsonObject | N
     if type(payload) is not dict:
         raise CatalogGenerationError("Datasheet ability rule_ir_payload must be a JSON object.")
     return cast(CatalogJsonObject, payload)
+
+
+def _rule_ir_diagnostics_from_row(row: NormalizedSourceRow) -> tuple[CatalogJsonObject, ...]:
+    value = _optional_field(row=row, column_name="rule_ir_diagnostics")
+    if value is None:
+        return ()
+    try:
+        payload = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise CatalogGenerationError(
+            "Datasheet ability rule_ir_diagnostics is malformed JSON."
+        ) from exc
+    if type(payload) is not list:
+        raise CatalogGenerationError("Datasheet ability rule_ir_diagnostics must be a JSON list.")
+    diagnostics: list[CatalogJsonObject] = []
+    for diagnostic in cast(list[object], payload):
+        if type(diagnostic) is not dict:
+            raise CatalogGenerationError(
+                "Datasheet ability rule_ir_diagnostics entries must be JSON objects."
+            )
+        diagnostics.append(cast(CatalogJsonObject, diagnostic))
+    return tuple(diagnostics)
 
 
 def _attachment_eligibilities_from_rows(

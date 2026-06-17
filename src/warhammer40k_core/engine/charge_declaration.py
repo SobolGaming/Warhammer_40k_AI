@@ -11,6 +11,11 @@ from warhammer40k_core.core.dice import (
     DiceRollState,
     DiceRollStatePayload,
 )
+from warhammer40k_core.core.modifiers import (
+    RollModifier,
+    RollModifierOperation,
+    RollModifierPayload,
+)
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
@@ -42,6 +47,7 @@ class ChargeRollRequestPayload(TypedDict):
     player_id: str
     unit_instance_id: str
     spec: DiceRollSpecPayload
+    roll_modifiers: list[RollModifierPayload]
     source_decision_request_id: str
     source_decision_result_id: str
 
@@ -181,6 +187,7 @@ class ChargeRollRequest:
     unit_instance_id: str
     source_decision_request_id: str
     source_decision_result_id: str
+    roll_modifiers: tuple[RollModifier, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -224,11 +231,20 @@ class ChargeRollRequest:
                 self.source_decision_result_id,
             ),
         )
+        object.__setattr__(
+            self,
+            "roll_modifiers",
+            _validate_charge_roll_modifiers(self.roll_modifiers),
+        )
 
     @property
     def spec(self) -> DiceRollSpec:
         return DiceRollSpec(
-            expression=DiceExpression(quantity=2, sides=6),
+            expression=DiceExpression(
+                quantity=2,
+                sides=6,
+                modifier=sum(modifier.operand for modifier in self.roll_modifiers),
+            ),
             reason=f"Charge distance for {self.unit_instance_id}",
             roll_type=CHARGE_ROLL_TYPE,
             actor_id=self.player_id,
@@ -243,6 +259,7 @@ class ChargeRollRequest:
             "player_id": self.player_id,
             "unit_instance_id": self.unit_instance_id,
             "spec": self.spec.to_payload(),
+            "roll_modifiers": [modifier.to_payload() for modifier in self.roll_modifiers],
             "source_decision_request_id": self.source_decision_request_id,
             "source_decision_result_id": self.source_decision_result_id,
         }
@@ -257,6 +274,9 @@ class ChargeRollRequest:
             unit_instance_id=payload["unit_instance_id"],
             source_decision_request_id=payload["source_decision_request_id"],
             source_decision_result_id=payload["source_decision_result_id"],
+            roll_modifiers=tuple(
+                RollModifier.from_payload(modifier) for modifier in payload["roll_modifiers"]
+            ),
         )
         if DiceRollSpec.from_payload(payload["spec"]) != request.spec:
             raise GameLifecycleError("ChargeRollRequest spec payload drift.")
@@ -281,8 +301,13 @@ class ChargeRollResult:
             raise GameLifecycleError("ChargeRollResult roll_state spec must match request.")
         if self.value != self.roll_state.current_total:
             raise GameLifecycleError("ChargeRollResult value must match roll_state total.")
-        if self.value < 2 or self.value > 12:
-            raise GameLifecycleError("ChargeRollResult value must be between 2 and 12.")
+        min_value = self.request.spec.expression.quantity + self.request.spec.expression.modifier
+        max_value = (
+            self.request.spec.expression.quantity * self.request.spec.expression.sides
+            + self.request.spec.expression.modifier
+        )
+        if self.value < min_value or self.value > max_value:
+            raise GameLifecycleError("ChargeRollResult value must match request expression bounds.")
         object.__setattr__(
             self,
             "reachable_target_distances_inches",
@@ -407,6 +432,9 @@ def phase15a_charge_roll_payload(
                 "phase": phase.value,
                 "unit_instance_id": roll_result.request.unit_instance_id,
                 "maximum_distance_inches": roll_result.value,
+                "charge_roll_modifiers": [
+                    modifier.to_payload() for modifier in roll_result.request.roll_modifiers
+                ],
                 "reachable_target_unit_instance_ids": list(
                     roll_result.reachable_target_distances_inches
                 ),
@@ -435,6 +463,25 @@ def _candidate_missing_field(payload: object) -> str | None:
         if field not in raw_payload:
             return field
     return None
+
+
+def _validate_charge_roll_modifiers(
+    modifiers: tuple[RollModifier, ...],
+) -> tuple[RollModifier, ...]:
+    if type(modifiers) is not tuple:
+        raise GameLifecycleError("ChargeRollRequest roll_modifiers must be a tuple.")
+    seen_ids: set[str] = set()
+    validated: list[RollModifier] = []
+    for modifier in modifiers:
+        if type(modifier) is not RollModifier:
+            raise GameLifecycleError("ChargeRollRequest roll_modifiers must contain RollModifier.")
+        if modifier.operation is not RollModifierOperation.ADD:
+            raise GameLifecycleError("Charge roll modifiers must be additive.")
+        if modifier.modifier_id in seen_ids:
+            raise GameLifecycleError("ChargeRollRequest roll_modifiers must not duplicate IDs.")
+        seen_ids.add(modifier.modifier_id)
+        validated.append(modifier)
+    return tuple(sorted(validated, key=lambda modifier: modifier.modifier_id))
 
 
 def _validate_target_candidates(values: object) -> tuple[ChargeTargetCandidate, ...]:
