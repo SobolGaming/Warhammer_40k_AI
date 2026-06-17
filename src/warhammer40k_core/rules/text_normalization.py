@@ -146,6 +146,12 @@ def normalize_structured_source_text(raw_text: object) -> str:
     return "\n".join(blocks)
 
 
+def normalize_source_label(raw_text: object) -> str:
+    text = _validate_raw_text(raw_text)
+    text = _normalize_unicode(text)
+    return _collapse_whitespace(text)
+
+
 def canonical_keyword_forms() -> tuple[str, ...]:
     return _CANONICAL_KEYWORDS
 
