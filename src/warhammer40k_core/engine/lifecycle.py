@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
@@ -18,6 +18,9 @@ from warhammer40k_core.engine.attack_sequence import (
     current_legal_damage_allocation_model_ids,
     invalid_destroyed_transport_disembark_proposal_status,
     is_destroyed_transport_disembark_proposal_request,
+)
+from warhammer40k_core.engine.battle_formation_hooks import (
+    SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
@@ -311,6 +314,7 @@ _SETUP_DECISION_TYPES = frozenset(
         SELECT_PREBATTLE_ACTION_DECISION_TYPE,
         SUBMIT_SCOUT_MOVE_DECISION_TYPE,
         SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE,
+        SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
     )
 )
 
@@ -890,6 +894,19 @@ class GameLifecycle:
                 config=self._require_config(),
                 request=pending_request,
                 result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE
+        ):
+            invalid_status = _invalid_finite_decision_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                invalid_reason="invalid_faction_rule_setup_option_result",
             )
             if invalid_status is not None:
                 return invalid_status
@@ -1653,6 +1670,10 @@ class GameLifecycle:
             config=self._config,
             armies=armies,
         )
+        self._setup_flow = replace(
+            self._setup_flow,
+            battle_formation_hooks=self._runtime_content_bundle.battle_formation_hook_registry,
+        )
         runtime_stratagem_index = _combined_runtime_stratagem_index(
             self._runtime_content_bundle,
             base_indexes=(
@@ -1804,6 +1825,10 @@ class GameLifecycle:
                 stratagem_use_records=cast(
                     JsonValue,
                     [record.to_payload() for record in state.stratagem_use_records],
+                ),
+                faction_rule_states=cast(
+                    JsonValue,
+                    [record.to_payload() for record in state.faction_rule_states],
                 ),
             ),
             event_count=len(records),

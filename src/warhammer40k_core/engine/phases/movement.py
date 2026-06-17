@@ -5808,6 +5808,7 @@ def _apply_movement_proposal_decision(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
+            state=state,
             movement_mode=movement_mode,
             path_witness=submission.witness,
             objective_markers=_objective_markers_for_state(state),
@@ -5910,6 +5911,7 @@ def _apply_movement_proposal_decision(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
+            state=state,
             advance_roll=advance_roll,
             movement_mode=movement_mode,
             path_witness=submission.witness,
@@ -6017,6 +6019,7 @@ def _apply_movement_proposal_decision(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=unit_placement,
+            state=state,
             movement_mode=movement_mode,
             path_witness=submission.witness,
             battle_round=state.battle_round,
@@ -7640,6 +7643,7 @@ def resolve_normal_move(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     unit_placement: UnitPlacement,
+    state: GameState | None = None,
     movement_mode: MovementMode = MovementMode.NORMAL,
     path_witness: PathWitness | None = None,
     hover_mode_states: tuple[HoverModeState, ...] = (),
@@ -7652,6 +7656,7 @@ def resolve_normal_move(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
+        state=state,
         path_witness=path_witness,
         battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
         battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
@@ -7688,6 +7693,7 @@ def resolve_advance_move(
     ruleset_descriptor: RulesetDescriptor,
     unit_placement: UnitPlacement,
     advance_roll: AdvanceRollResult,
+    state: GameState | None = None,
     movement_mode: MovementMode = MovementMode.ADVANCE,
     path_witness: PathWitness | None = None,
     hover_mode_states: tuple[HoverModeState, ...] = (),
@@ -7702,6 +7708,7 @@ def resolve_advance_move(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
+        state=state,
         path_witness=path_witness,
         battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
         battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
@@ -7742,6 +7749,7 @@ def resolve_fall_back_move(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     unit_placement: UnitPlacement,
+    state: GameState | None = None,
     movement_mode: MovementMode = MovementMode.FALL_BACK,
     path_witness: PathWitness | None = None,
     battle_round: int = 1,
@@ -7758,7 +7766,11 @@ def resolve_fall_back_move(
         forced_desperate_escape_source_rule_ids,
     )
     fall_back_witness = (
-        _default_fall_back_witness(scenario=scenario, unit_placement=unit_placement)
+        _default_fall_back_witness(
+            scenario=scenario,
+            unit_placement=unit_placement,
+            state=state,
+        )
         if path_witness is None
         else path_witness
     )
@@ -7766,6 +7778,7 @@ def resolve_fall_back_move(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
+        state=state,
         path_witness=fall_back_witness,
         battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
         battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
@@ -7820,6 +7833,7 @@ def _resolve_unit_move(
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     unit_placement: UnitPlacement,
+    state: GameState | None,
     path_witness: PathWitness | None,
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
@@ -7871,6 +7885,7 @@ def _resolve_unit_move(
         _default_move_witness(
             scenario=scenario,
             unit_placement=unit_placement,
+            state=state,
             ruleset_descriptor=ruleset_descriptor,
             aircraft_policy=aircraft_policy,
             movement_bonus_inches=movement_bonus_inches,
@@ -7904,11 +7919,15 @@ def _resolve_unit_move(
         base_movement_inches = _model_base_movement_inches(
             model=model,
             aircraft_policy=aircraft_policy,
+            state=state,
+            unit_instance_id=unit_placement.unit_instance_id,
         )
         movement_inches = _model_default_movement_distance_inches(
             model=model,
             aircraft_policy=aircraft_policy,
             ruleset_descriptor=ruleset_descriptor,
+            state=state,
+            unit_instance_id=unit_placement.unit_instance_id,
             movement_bonus_inches=movement_bonus_inches,
             movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
@@ -7917,6 +7936,8 @@ def _resolve_unit_move(
             model=model,
             aircraft_policy=aircraft_policy,
             ruleset_descriptor=ruleset_descriptor,
+            state=state,
+            unit_instance_id=unit_placement.unit_instance_id,
             movement_bonus_inches=movement_bonus_inches,
             movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
@@ -8088,6 +8109,7 @@ def _default_move_witness(
     *,
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
+    state: GameState | None,
     ruleset_descriptor: RulesetDescriptor,
     aircraft_policy: AircraftMovementPolicy,
     movement_bonus_inches: int,
@@ -8101,6 +8123,8 @@ def _default_move_witness(
             model=model,
             aircraft_policy=aircraft_policy,
             ruleset_descriptor=ruleset_descriptor,
+            state=state,
+            unit_instance_id=unit_placement.unit_instance_id,
             movement_bonus_inches=movement_bonus_inches,
             movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
@@ -8123,11 +8147,25 @@ def _default_fall_back_witness(
     *,
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
+    state: GameState | None,
 ) -> PathWitness:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
+        army_rule,
+    )
+
     model_paths: list[tuple[str, Pose, Pose]] = []
     for placement in unit_placement.model_placements:
         model = scenario.model_instance_for_placement(placement)
-        movement_inches = _model_movement_inches(model)
+        base_movement_inches = float(_model_movement_inches(model))
+        movement_inches = (
+            base_movement_inches
+            if state is None
+            else army_rule.nurgles_gift_modified_movement_inches(
+                state=state,
+                unit_instance_id=unit_placement.unit_instance_id,
+                base_movement_inches=base_movement_inches,
+            )
+        )
         model_paths.append(
             (
                 placement.model_instance_id,
@@ -9088,14 +9126,30 @@ def _model_base_movement_inches(
     *,
     model: ModelInstance,
     aircraft_policy: AircraftMovementPolicy,
+    state: GameState | None = None,
+    unit_instance_id: str | None = None,
 ) -> float:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
+        army_rule,
+    )
+
     if type(model) is not ModelInstance:
         raise GameLifecycleError("Movement model must be a ModelInstance.")
     if type(aircraft_policy) is not AircraftMovementPolicy:
         raise GameLifecycleError("Movement budget requires an AircraftMovementPolicy.")
     if aircraft_policy.hover_mode_active:
-        return 20.0
-    return _model_movement_inches(model)
+        base_movement = 20.0
+    else:
+        base_movement = float(_model_movement_inches(model))
+    if state is None:
+        return base_movement
+    if unit_instance_id is None:
+        raise GameLifecycleError("Death Guard Movement modifier requires unit_instance_id.")
+    return army_rule.nurgles_gift_modified_movement_inches(
+        state=state,
+        unit_instance_id=unit_instance_id,
+        base_movement_inches=base_movement,
+    )
 
 
 def _model_movement_budget_inches(
@@ -9106,6 +9160,8 @@ def _model_movement_budget_inches(
     movement_bonus_inches: int,
     movement_mode: MovementMode,
     movement_phase_action: MovementPhaseActionKind,
+    state: GameState | None = None,
+    unit_instance_id: str | None = None,
 ) -> float | None:
     if type(movement_phase_action) is not MovementPhaseActionKind:
         raise GameLifecycleError("movement_phase_action must be a MovementPhaseActionKind.")
@@ -9113,6 +9169,8 @@ def _model_movement_budget_inches(
         _model_base_movement_inches(
             model=model,
             aircraft_policy=aircraft_policy,
+            state=state,
+            unit_instance_id=unit_instance_id,
         )
         + float(movement_bonus_inches)
         + _movement_distance_modifier_inches(
@@ -9220,11 +9278,15 @@ def _model_default_movement_distance_inches(
     movement_bonus_inches: int,
     movement_mode: MovementMode,
     movement_phase_action: MovementPhaseActionKind,
+    state: GameState | None = None,
+    unit_instance_id: str | None = None,
 ) -> float:
     movement_budget = _model_movement_budget_inches(
         model=model,
         aircraft_policy=aircraft_policy,
         ruleset_descriptor=ruleset_descriptor,
+        state=state,
+        unit_instance_id=unit_instance_id,
         movement_bonus_inches=movement_bonus_inches,
         movement_mode=movement_mode,
         movement_phase_action=movement_phase_action,

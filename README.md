@@ -165,9 +165,9 @@ Current status:
   reserves, transports, missions, replay, source ingestion, catalog generation,
   rule IR, generic rule execution, and adapter decision submission is in place.
 - Faction semantic execution is active incremental work. Current runtime
-  support includes selected Chaos Daemons and Aeldari Phase 17G slices; broad
-  datasheet, wargear, weapon, and remaining faction execution remains later
-  Phase 17 work.
+  support includes selected Chaos Daemons, Aeldari, and Death Guard Phase 17G
+  slices; broad datasheet, wargear, weapon, and remaining faction execution
+  remains later Phase 17 work.
 - Local CLI/human decision entry, viewer-safe catalog/live unit-model projection,
   and trigger opportunity-window intent support are documented in
   [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) and

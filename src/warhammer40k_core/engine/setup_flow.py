@@ -1,10 +1,16 @@
 from __future__ import annotations
 
-from dataclasses import replace
+from dataclasses import dataclass, field, replace
 from itertools import combinations
 from typing import cast
 
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusteringError, muster_army
+from warhammer40k_core.engine.battle_formation_hooks import (
+    SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
+    BattleFormationHookRegistry,
+    BattleFormationRequestContext,
+    BattleFormationResultContext,
+)
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -69,7 +75,16 @@ from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_
 SECONDARY_MISSION_DECISION_TYPE = "select_secondary_missions"
 
 
+@dataclass(slots=True)
 class SetupFlow:
+    battle_formation_hooks: BattleFormationHookRegistry = field(
+        default_factory=BattleFormationHookRegistry.empty
+    )
+
+    def __post_init__(self) -> None:
+        if type(self.battle_formation_hooks) is not BattleFormationHookRegistry:
+            raise GameLifecycleError("SetupFlow battle_formation_hooks must be a registry.")
+
     def advance(
         self,
         *,
@@ -211,6 +226,18 @@ class SetupFlow:
         decisions: DecisionController,
         config: GameConfig,
     ) -> None:
+        if result.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE:
+            if self.battle_formation_hooks.apply_result(
+                BattleFormationResultContext(
+                    state=state,
+                    decisions=decisions,
+                    config=config,
+                    request=decisions.record_for_result(result).request,
+                    result=result,
+                )
+            ):
+                return
+            raise GameLifecycleError("Faction rule setup decision was not handled.")
         if result.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE:
             apply_reserve_declaration_decision(
                 state=state,
@@ -437,6 +464,23 @@ class SetupFlow:
             config=config,
             decisions=decisions,
         )
+        hook_request = self.battle_formation_hooks.next_request_for(
+            BattleFormationRequestContext(
+                state=state,
+                decisions=decisions,
+                config=config,
+            )
+        )
+        if hook_request is not None:
+            decisions.request_decision(hook_request)
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.SETUP,
+                decision_request=hook_request,
+                payload={
+                    "setup_step": SetupStep.DECLARE_BATTLE_FORMATIONS.value,
+                    "battle_formation_hook_request": hook_request.payload,
+                },
+            )
         setup_state = reserve_declaration_state_for_state(
             state=state,
             config=config,

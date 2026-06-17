@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.objectives import (
@@ -31,6 +31,9 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.spatial_index import SpatialIndex
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model as GeometryModel
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
 
 
 class ObjectiveControlTiming(StrEnum):
@@ -394,8 +397,11 @@ class ObjectiveControlContext:
     ruleset_descriptor: RulesetDescriptor | None = None
     terrain_objectives: tuple[Objective, ...] = ()
     terrain_features: tuple[TerrainFeatureDefinition, ...] = ()
+    state: GameState | None = None
 
     def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
         object.__setattr__(self, "game_id", _validate_identifier("game_id", self.game_id))
         if type(self.scenario) is not BattlefieldScenario:
             raise GameLifecycleError(
@@ -453,6 +459,8 @@ class ObjectiveControlContext:
         )
         if self.terrain_objectives and self.ruleset_descriptor is None:
             raise GameLifecycleError("Terrain objective control requires a RulesetDescriptor.")
+        if self.state is not None and type(self.state) is not GameState:
+            raise GameLifecycleError("ObjectiveControlContext state must be GameState.")
 
     @classmethod
     def from_game_state(
@@ -499,6 +507,7 @@ class ObjectiveControlContext:
             ruleset_descriptor=ruleset_descriptor,
             terrain_objectives=resolved_terrain_objectives,
             terrain_features=terrain_features,
+            state=state,
         )
 
 
@@ -590,6 +599,7 @@ def resolve_objective_control(context: ObjectiveControlContext) -> ObjectiveCont
                 placement=placement_by_model_id[geometry_model.model_id],
                 model_instance=model_instance_by_id[geometry_model.model_id],
                 battle_shocked_unit_ids=context.battle_shocked_unit_ids,
+                state=context.state,
             )
             for geometry_model in spatial_index.models_controlling_objective_marker(marker)
             if model_instance_by_id[geometry_model.model_id].is_alive
@@ -695,6 +705,7 @@ def _objective_control_contribution(
     placement: ModelPlacement,
     model_instance: ModelInstance,
     battle_shocked_unit_ids: tuple[str, ...],
+    state: GameState | None,
 ) -> ObjectiveControlContribution:
     context = DistanceMeasurementContext.from_objective_marker_to_model(
         marker_id=marker.objective_marker_id,
@@ -706,10 +717,14 @@ def _objective_control_contribution(
     objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
         battle_shocked=False,
+        state=state,
+        unit_instance_id=placement.unit_instance_id,
     )
     effective_objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
         battle_shocked=battle_shocked,
+        state=state,
+        unit_instance_id=placement.unit_instance_id,
     )
     return ObjectiveControlContribution(
         player_id=placement.player_id,
@@ -763,6 +778,7 @@ def _terrain_objective_result(
                 placement=placement_by_model_id[geometry_model.model_id],
                 model_instance=model_instance_by_id[geometry_model.model_id],
                 battle_shocked_unit_ids=context.battle_shocked_unit_ids,
+                state=context.state,
             ),
         )
         if contribution is not None
@@ -781,6 +797,7 @@ def _terrain_objective_contribution(
     placement: ModelPlacement,
     model_instance: ModelInstance,
     battle_shocked_unit_ids: tuple[str, ...],
+    state: GameState | None,
 ) -> ObjectiveControlContribution | None:
     horizontal_distance = shapely_backend.base_footprint_distance_to_bounds(
         geometry_model.base,
@@ -796,10 +813,14 @@ def _terrain_objective_contribution(
     objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
         battle_shocked=False,
+        state=state,
+        unit_instance_id=placement.unit_instance_id,
     )
     effective_objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
         battle_shocked=battle_shocked,
+        state=state,
+        unit_instance_id=placement.unit_instance_id,
     )
     return ObjectiveControlContribution(
         player_id=placement.player_id,
@@ -953,7 +974,13 @@ def model_objective_control_characteristic(
     model: ModelInstance,
     *,
     battle_shocked: bool,
+    state: GameState | None = None,
+    unit_instance_id: str | None = None,
 ) -> CharacteristicValue:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
+        army_rule,
+    )
+
     if type(model) is not ModelInstance:
         raise GameLifecycleError("Objective control requires a ModelInstance.")
     if type(battle_shocked) is not bool:
@@ -965,7 +992,29 @@ def model_objective_control_characteristic(
         )
     for characteristic in model.characteristics:
         if characteristic.characteristic is Characteristic.OBJECTIVE_CONTROL:
-            return characteristic
+            if state is None:
+                return characteristic
+            if unit_instance_id is None:
+                raise GameLifecycleError(
+                    "Objective control Death Guard modifier requires unit_instance_id."
+                )
+            modified = army_rule.nurgles_gift_modified_objective_control(
+                state=state,
+                unit_instance_id=unit_instance_id,
+                base_objective_control=characteristic.final,
+            )
+            if modified == characteristic.final:
+                return characteristic
+            return CharacteristicValue(
+                characteristic=Characteristic.OBJECTIVE_CONTROL,
+                raw=characteristic.raw,
+                base=characteristic.base,
+                final=modified,
+                applied_modifier_ids=tuple(
+                    dict.fromkeys((*characteristic.applied_modifier_ids, army_rule.SOURCE_RULE_ID))
+                ),
+                value_kind=characteristic.value_kind,
+            )
     raise GameLifecycleError("ModelInstance is missing Objective Control.")
 
 

@@ -134,6 +134,7 @@ class OpportunityBoundaryGameStatePayload(TypedDict):
     decision_request_count: int
     command_point_ledgers: JsonValue
     stratagem_use_records: JsonValue
+    faction_rule_states: JsonValue
 
 
 def _new_passes() -> list[WindowPass]:
@@ -867,6 +868,7 @@ def opportunity_boundary_game_state_payload(
     decision_request_count: int,
     command_point_ledgers: JsonValue,
     stratagem_use_records: JsonValue,
+    faction_rule_states: JsonValue,
 ) -> JsonValue:
     payload: OpportunityBoundaryGameStatePayload = {
         "game_id": _validate_identifier("game_id", game_id),
@@ -904,6 +906,7 @@ def opportunity_boundary_game_state_payload(
         ),
         "command_point_ledgers": validate_json_value(command_point_ledgers),
         "stratagem_use_records": validate_json_value(stratagem_use_records),
+        "faction_rule_states": validate_json_value(faction_rule_states),
     }
     return validate_json_value(payload)
 

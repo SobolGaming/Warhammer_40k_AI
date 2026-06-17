@@ -887,6 +887,7 @@ def _resolve_battle_shock_step(
         army=army,
         battlefield_state=battlefield_state,
         starting_strength_records=tuple(state.starting_strength_records),
+        state=state,
         ability_index=ability_index,
     )
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)

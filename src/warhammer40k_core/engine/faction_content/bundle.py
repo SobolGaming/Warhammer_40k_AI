@@ -17,6 +17,10 @@ from warhammer40k_core.engine.abilities import (
 from warhammer40k_core.engine.ability_catalog import build_player_ability_index
 from warhammer40k_core.engine.advance_hooks import AdvanceMoveHookBinding, AdvanceMoveHookRegistry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battle_formation_hooks import (
+    BattleFormationHookBinding,
+    BattleFormationHookRegistry,
+)
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
     BattleShockHookRegistry,
@@ -96,6 +100,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     stratagem_handler_ids: list[str]
     rule_runtime_binding_ids: list[str]
     event_subscriptions: list[dict[str, JsonValue]]
+    battle_formation_hook_ids: list[str]
     battle_shock_hook_ids: list[str]
     advance_move_hook_ids: list[str]
     fall_back_hook_ids: list[str]
@@ -128,6 +133,7 @@ class RuntimeContentContribution:
     rule_runtime_bindings: tuple[RuleRuntimeBinding, ...] = ()
     event_subscriptions: tuple[RuntimeContentEventSubscription, ...] = ()
     event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = ()
+    battle_formation_hook_bindings: tuple[BattleFormationHookBinding, ...] = ()
     battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = ()
     advance_move_hook_bindings: tuple[AdvanceMoveHookBinding, ...] = ()
     fall_back_hook_bindings: tuple[FallBackEligibilityHookBinding, ...] = ()
@@ -209,6 +215,15 @@ class RuntimeContentContribution:
                 "RuntimeContentContribution event_handler_bindings",
                 self.event_handler_bindings,
                 RuntimeContentEventHandlerBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "battle_formation_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution battle_formation_hook_bindings",
+                self.battle_formation_hook_bindings,
+                BattleFormationHookBinding,
             ),
         )
         object.__setattr__(
@@ -317,6 +332,7 @@ class RuntimeContentContribution:
             rule_runtime_bindings=self.rule_runtime_bindings,
             event_subscriptions=self.event_subscriptions,
             event_handler_bindings=self.event_handler_bindings,
+            battle_formation_hook_bindings=self.battle_formation_hook_bindings,
             battle_shock_hook_bindings=self.battle_shock_hook_bindings,
             advance_move_hook_bindings=self.advance_move_hook_bindings,
             fall_back_hook_bindings=self.fall_back_hook_bindings,
@@ -403,6 +419,15 @@ def combine_runtime_content_contributions(
                 for binding in contribution.event_handler_bindings
             ),
             lambda binding: binding.handler_id,
+        ),
+        battle_formation_hook_bindings=_combine_unique_values(
+            "battle formation hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.battle_formation_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
         ),
         battle_shock_hook_bindings=_combine_unique_values(
             "Battle-shock hook binding",
@@ -508,6 +533,7 @@ class RuntimeContentBundle:
     rule_execution_registry: RuleExecutionRegistry
     faction_rule_execution_registry: FactionRuleExecutionRegistry
     event_index: RuntimeContentEventIndex
+    battle_formation_hook_registry: BattleFormationHookRegistry
     battle_shock_hook_registry: BattleShockHookRegistry
     advance_move_hook_registry: AdvanceMoveHookRegistry
     fall_back_hook_registry: FallBackEligibilityHookRegistry
@@ -551,6 +577,8 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires FactionRuleExecutionRegistry.")
         if type(self.event_index) is not RuntimeContentEventIndex:
             raise GameLifecycleError("RuntimeContentBundle requires RuntimeContentEventIndex.")
+        if type(self.battle_formation_hook_registry) is not BattleFormationHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires BattleFormationHookRegistry.")
         if type(self.battle_shock_hook_registry) is not BattleShockHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires BattleShockHookRegistry.")
         if type(self.advance_move_hook_registry) is not AdvanceMoveHookRegistry:
@@ -696,6 +724,13 @@ class RuntimeContentBundle:
             ),
             handler_registry=event_handler_registry,
         )
+        battle_formation_hook_registry = BattleFormationHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.battle_formation_hook_bindings
+            )
+        )
         battle_shock_hook_registry = BattleShockHookRegistry.from_bindings(
             tuple(
                 binding
@@ -785,6 +820,7 @@ class RuntimeContentBundle:
             rule_execution_registry=rule_registry,
             faction_rule_execution_registry=faction_registry,
             event_index=event_index,
+            battle_formation_hook_registry=battle_formation_hook_registry,
             battle_shock_hook_registry=battle_shock_hook_registry,
             advance_move_hook_registry=advance_move_hook_registry,
             fall_back_hook_registry=fall_back_hook_registry,
@@ -825,6 +861,9 @@ class RuntimeContentBundle:
                 binding.binding_id for binding in self.rule_execution_registry.all_bindings()
             ],
             "event_subscriptions": self.event_index.to_summary_payload(),
+            "battle_formation_hook_ids": [
+                binding.hook_id for binding in self.battle_formation_hook_registry.all_bindings()
+            ],
             "battle_shock_hook_ids": [
                 binding.hook_id for binding in self.battle_shock_hook_registry.all_bindings()
             ],

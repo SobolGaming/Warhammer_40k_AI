@@ -5364,6 +5364,10 @@ def _save_options_for_allocation(
     attack_context: AttackResolutionContextPayload,
     allocated_model_id: str,
 ) -> tuple[SaveOption, ...]:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
+        army_rule,
+    )
+
     pool = attack_sequence.current_pool()
     cover_result = _cover_for_allocated_model(
         state=state,
@@ -5397,11 +5401,15 @@ def _save_options_for_allocation(
         )
         is DevastatingWoundsResolution.NO_SAVES
     )
-    save_options = save_options_for_model(
-        model=model_by_id(state=state, model_instance_id=allocated_model_id),
-        armor_penetration=pool.weapon_profile.armor_penetration.final,
-        cover_result=cover_result,
-        no_saves_allowed=no_saves_allowed,
+    save_options = army_rule.nurgles_gift_modified_save_options(
+        state=state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+        save_options=save_options_for_model(
+            model=model_by_id(state=state, model_instance_id=allocated_model_id),
+            armor_penetration=pool.weapon_profile.armor_penetration.final,
+            cover_result=cover_result,
+            no_saves_allowed=no_saves_allowed,
+        ),
     )
     return _save_options_with_effect_invulnerable(
         state=state,
@@ -6554,6 +6562,7 @@ def _roll_hit_and_wound(
             pool=pool,
             attacker_player_id=attack_sequence.attacker_player_id,
             attack_context_id=attack_context_id,
+            source_phase=attack_sequence.source_phase,
         )
         status = _request_command_reroll_for_attack_roll_if_available(
             state=state,
@@ -7040,6 +7049,10 @@ def _command_reroll_opportunity_boundary_state_payload(state: GameState) -> Json
             JsonValue,
             [record.to_payload() for record in state.stratagem_use_records],
         ),
+        faction_rule_states=cast(
+            JsonValue,
+            [record.to_payload() for record in state.faction_rule_states],
+        ),
     )
 
 
@@ -7108,7 +7121,12 @@ def _roll_hit(
     pool: RangedAttackPool,
     attacker_player_id: str,
     attack_context_id: str,
+    source_phase: BattlePhase,
 ) -> HitRoll:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
+        army_rule,
+    )
+
     skill = (
         _hit_skill(pool.weapon_profile)
         + _benefit_of_cover_ballistic_skill_penalty(state=state, pool=pool)
@@ -7121,9 +7139,17 @@ def _roll_hit(
     )
     if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT):
         return HitRoll.auto_hit(target_number=skill)
-    modifier = pool.hit_roll_modifier + _persisting_hit_roll_modifier(
-        state=state,
-        target_unit_instance_id=pool.target_unit_instance_id,
+    modifier = (
+        pool.hit_roll_modifier
+        + _persisting_hit_roll_modifier(
+            state=state,
+            target_unit_instance_id=pool.target_unit_instance_id,
+        )
+        + army_rule.nurgles_gift_hit_roll_modifier(
+            state=state,
+            attacker_model_instance_id=pool.attacker_model_instance_id,
+            source_phase=source_phase,
+        )
     )
     roll_state = _roll_or_reuse_state(
         manager,
@@ -7922,6 +7948,10 @@ def _hit_skill(profile: WeaponProfile) -> int:
 
 
 def _target_unit_toughness(*, state: GameState, target_unit_instance_id: str) -> int:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
+        army_rule,
+    )
+
     allocation_context = allocation_context_for_unit(
         state=state,
         target_unit_instance_id=target_unit_instance_id,
@@ -7936,14 +7966,25 @@ def _target_unit_toughness(*, state: GameState, target_unit_instance_id: str) ->
             if allocation_context.attached_unit_bodyguard_model_ids
             else alive_model_ids
         )
-        return _highest_toughness_for_models(state=state, model_instance_ids=model_ids)
+        return army_rule.nurgles_gift_modified_toughness(
+            state=state,
+            target_unit_instance_id=target_unit_instance_id,
+            base_toughness=_highest_toughness_for_models(
+                state=state,
+                model_instance_ids=model_ids,
+            ),
+        )
     toughness_values = _toughness_values_for_models(
         state=state,
         model_instance_ids=alive_model_ids,
     )
     if len(toughness_values) != 1:
         raise GameLifecycleError("Mixed Toughness target units are deferred to Phase 14H/16D.")
-    return next(iter(toughness_values))
+    return army_rule.nurgles_gift_modified_toughness(
+        state=state,
+        target_unit_instance_id=target_unit_instance_id,
+        base_toughness=next(iter(toughness_values)),
+    )
 
 
 def _highest_toughness_for_models(

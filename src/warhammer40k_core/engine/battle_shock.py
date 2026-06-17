@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
@@ -29,6 +29,9 @@ from warhammer40k_core.engine.unit_state import (
     BelowHalfStrengthContextPayload,
     StartingStrengthRecord,
 )
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
 
 BATTLE_SHOCK_ROLL_TYPE = "battle_shock_roll"
 
@@ -499,6 +502,7 @@ def collect_battle_shock_test_requests(
     army: ArmyDefinition,
     battlefield_state: BattlefieldRuntimeState,
     starting_strength_records: tuple[StartingStrengthRecord, ...],
+    state: GameState | None = None,
     forced_below_starting_strength_unit_ids: tuple[str, ...] = (),
     allow_duplicate_below_half_tests: bool = False,
     ability_index: AbilityCatalogIndex | None = None,
@@ -556,6 +560,7 @@ def collect_battle_shock_test_requests(
                     current_model_ids=current_model_ids,
                     reason=BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED,
                     ability_index=catalog_ability_index,
+                    state=state,
                 )
             )
             forced_test_added = True
@@ -572,6 +577,7 @@ def collect_battle_shock_test_requests(
                     current_model_ids=current_model_ids,
                     reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
                     ability_index=catalog_ability_index,
+                    state=state,
                 )
             )
     return tuple(
@@ -659,6 +665,7 @@ def _battle_shock_request_for_context(
     current_model_ids: tuple[str, ...],
     reason: BattleShockTestReason,
     ability_index: AbilityCatalogIndex,
+    state: GameState | None,
 ) -> BattleShockTestRequest:
     return BattleShockTestRequest.for_unit(
         request_id=(
@@ -673,6 +680,7 @@ def _battle_shock_request_for_context(
             unit,
             current_model_ids=current_model_ids,
             ability_index=ability_index,
+            state=state,
         ),
         below_half_strength_context=context,
     )
@@ -683,7 +691,12 @@ def _best_leadership(
     *,
     current_model_ids: tuple[str, ...],
     ability_index: AbilityCatalogIndex,
+    state: GameState | None,
 ) -> int:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
+        army_rule,
+    )
+
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Leadership lookup requires a UnitInstance.")
     if type(ability_index) is not AbilityCatalogIndex:
@@ -697,7 +710,16 @@ def _best_leadership(
         current_model_instance_ids=current_model_ids,
     )
     if catalog_value is not None:
-        return catalog_value
+        base_leadership = catalog_value
+        return (
+            base_leadership
+            if state is None
+            else army_rule.nurgles_gift_modified_leadership_target(
+                state=state,
+                unit_instance_id=unit.unit_instance_id,
+                base_leadership=base_leadership,
+            )
+        )
     leadership_values = tuple(
         _model_leadership(model)
         for model in unit.own_models
@@ -705,7 +727,16 @@ def _best_leadership(
     )
     if not leadership_values:
         raise GameLifecycleError("Battle-shock Leadership lookup found no models.")
-    return min(leadership_values)
+    base_leadership = min(leadership_values)
+    return (
+        base_leadership
+        if state is None
+        else army_rule.nurgles_gift_modified_leadership_target(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+            base_leadership=base_leadership,
+        )
+    )
 
 
 def _battle_shock_ability_index(
