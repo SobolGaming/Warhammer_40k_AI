@@ -1,10 +1,76 @@
 [
   {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000008433",
+        "ability_name": "The Shadow of Chaos",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/faction/000008433/none",
+        "datasheet_id": "000001115",
+        "datasheet_name": "Bloodcrushers",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000008433",
+        "ability_name": "The Shadow of Chaos",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/faction/000008433/none",
+        "datasheet_id": "000001114",
+        "datasheet_name": "Bloodletters",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "The Shadow of Chaos"
+    ],
+    "category_id": "faction.army_rule.shadow_of_chaos",
+    "category_name": "Chaos Daemons Army Rule",
+    "coverage_row_count": 2,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001115/faction/000008433/none",
+      "chaos-daemons-bridge-catalog/000001114/faction/000008433/none"
+    ],
+    "datasheet_names": [
+      "Bloodcrushers",
+      "Bloodletters"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+    ],
+    "source_kind_counts": {
+      "faction": 2
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000001115:instrument-of-chaos",
+        "ability_name": "Instrument of Chaos",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/wargear/000001115:instrument-of-chaos/000001115:instrument-of-chaos",
+        "datasheet_id": "000001115",
+        "datasheet_name": "Bloodcrushers",
+        "source_kind": "wargear"
+      },
+      {
+        "ability_id": "000001114:instrument-of-chaos",
+        "ability_name": "Instrument of Chaos",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/wargear/000001114:instrument-of-chaos/000001114:instrument-of-chaos",
+        "datasheet_id": "000001114",
+        "datasheet_name": "Bloodletters",
+        "source_kind": "wargear"
+      }
+    ],
     "ability_names": [
       "Instrument of Chaos"
     ],
     "category_id": "wargear.roll_modifier.charge.this_unit",
     "category_name": "Charge Roll Modifier",
+    "coverage_row_count": 2,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001115/wargear/000001115:instrument-of-chaos/000001115:instrument-of-chaos",
+      "chaos-daemons-bridge-catalog/000001114/wargear/000001114:instrument-of-chaos/000001114:instrument-of-chaos"
+    ],
     "datasheet_names": [
       "Bloodcrushers",
       "Bloodletters"
@@ -12,32 +78,42 @@
     "runtime_consumer_ids": [
       "catalog-ir:charge-roll-modifier"
     ],
+    "source_kind_counts": {
+      "wargear": 2
+    },
     "support_stages": [
       "engine_consumed"
     ]
   },
   {
-    "ability_names": [
-      "Bane of Cowards",
-      "Brass Stampede"
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/core/000008343/none",
+        "datasheet_id": "000001115",
+        "datasheet_name": "Bloodcrushers",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/core/000008343/none",
+        "datasheet_id": "000001114",
+        "datasheet_name": "Bloodletters",
+        "source_kind": "core"
+      }
     ],
-    "category_id": "datasheet.descriptor",
-    "category_name": "Datasheet Descriptor",
-    "datasheet_names": [
-      "Bloodcrushers",
-      "Bloodletters"
-    ],
-    "runtime_consumer_ids": [],
-    "support_stages": [
-      "descriptor_only"
-    ]
-  },
-  {
     "ability_names": [
       "Deep Strike"
     ],
     "category_id": "core.reserve.deep_strike",
     "category_name": "Deep Strike Reserve Arrival",
+    "coverage_row_count": 2,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001115/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000001114/core/000008343/none"
+    ],
     "datasheet_names": [
       "Bloodcrushers",
       "Bloodletters"
@@ -46,31 +122,42 @@
       "descriptor:movement:deep-strike-placement",
       "descriptor:reserve-declaration:deep-strike"
     ],
+    "source_kind_counts": {
+      "core": 2
+    },
     "support_stages": [
       "engine_consumed"
     ]
   },
   {
-    "ability_names": [
-      "The Shadow of Chaos"
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000001115:daemonic-icon",
+        "ability_name": "Daemonic Icon",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/wargear/000001115:daemonic-icon/000001115:daemonic-icon",
+        "datasheet_id": "000001115",
+        "datasheet_name": "Bloodcrushers",
+        "source_kind": "wargear"
+      },
+      {
+        "ability_id": "000001114:daemonic-icon",
+        "ability_name": "Daemonic Icon",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/wargear/000001114:daemonic-icon/000001114:daemonic-icon",
+        "datasheet_id": "000001114",
+        "datasheet_name": "Bloodletters",
+        "source_kind": "wargear"
+      }
     ],
-    "category_id": "faction.descriptor",
-    "category_name": "Faction Descriptor",
-    "datasheet_names": [
-      "Bloodcrushers",
-      "Bloodletters"
-    ],
-    "runtime_consumer_ids": [],
-    "support_stages": [
-      "descriptor_only"
-    ]
-  },
-  {
     "ability_names": [
       "Daemonic Icon"
     ],
     "category_id": "wargear.characteristic_set.leadership.this_unit",
     "category_name": "Leadership Characteristic",
+    "coverage_row_count": 2,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001115/wargear/000001115:daemonic-icon/000001115:daemonic-icon",
+      "chaos-daemons-bridge-catalog/000001114/wargear/000001114:daemonic-icon/000001114:daemonic-icon"
+    ],
     "datasheet_names": [
       "Bloodcrushers",
       "Bloodletters"
@@ -78,8 +165,53 @@
     "runtime_consumer_ids": [
       "catalog-ir:leadership-characteristic-query"
     ],
+    "source_kind_counts": {
+      "wargear": 2
+    },
     "support_stages": [
       "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000001115:brass-stampede",
+        "ability_name": "Brass Stampede",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none",
+        "datasheet_id": "000001115",
+        "datasheet_name": "Bloodcrushers",
+        "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000001114:bane-of-cowards",
+        "ability_name": "Bane of Cowards",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none",
+        "datasheet_id": "000001114",
+        "datasheet_name": "Bloodletters",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Bane of Cowards",
+      "Brass Stampede"
+    ],
+    "category_id": "unknown.ability_text",
+    "category_name": "Unknown Abilities",
+    "coverage_row_count": 2,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none",
+      "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none"
+    ],
+    "datasheet_names": [
+      "Bloodcrushers",
+      "Bloodletters"
+    ],
+    "runtime_consumer_ids": [],
+    "source_kind_counts": {
+      "datasheet": 2
+    },
+    "support_stages": [
+      "descriptor_only"
     ]
   }
 ]
