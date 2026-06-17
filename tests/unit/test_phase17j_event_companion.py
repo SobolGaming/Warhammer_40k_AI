@@ -442,15 +442,15 @@ def test_phase17j_take_and_hold_layout_b_terrain_area_specs_are_corner_anchored(
         "7x11-5-left-home": ("FOOTPRINT_7X11_5", 11.0, 24.0, 180.0),
         "8x11-5-polygon-central-north": (
             "FOOTPRINT_8X11_5_POLYGON",
-            17.0,
-            35.75,
-            0.0,
+            27.0,
+            24.0,
+            -90.0,
         ),
-        "8x11-5-polygon-north-expansion": (
-            "FOOTPRINT_8X11_5_POLYGON",
-            19.5,
-            53.0,
-            0.0,
+        "7x11-5-north-expansion": (
+            "FOOTPRINT_7X11_5",
+            31.0,
+            14.0,
+            180.0,
         ),
         "10x2-5-north-west": (
             "FOOTPRINT_10X2_5",
@@ -459,7 +459,7 @@ def test_phase17j_take_and_hold_layout_b_terrain_area_specs_are_corner_anchored(
             66.0,
         ),
         "6x4-north-east": ("FOOTPRINT_6X4", 33.5, 50.5, 30.0),
-        "6x4-north-west": ("FOOTPRINT_6X4", 16.0, 46.25, 330.0),
+        "6x4-north-west": ("FOOTPRINT_6X4", 14.0, 17.0, 30.0),
         "6x2-north-east": ("FOOTPRINT_6X2", 34.0, 42.0, 55.0),
         "6x2-north-west": ("FOOTPRINT_6X2", 4.75, 51.75, 35.0),
     }
@@ -511,7 +511,7 @@ def test_phase17j_take_and_hold_layout_b_terrain_area_specs_are_corner_anchored(
             "expansion",
             19.2,
             10.28,
-            ("8x11-5-polygon-south-expansion",),
+            ("7x11-5-south-expansion",),
         ),
         (
             "expansion-north",
@@ -519,7 +519,7 @@ def test_phase17j_take_and_hold_layout_b_terrain_area_specs_are_corner_anchored(
             "expansion",
             24.92,
             50.61,
-            ("8x11-5-polygon-north-expansion",),
+            ("7x11-5-north-expansion",),
         ),
     )
     assert set(placed_areas) == set(expected_anchors)
@@ -1349,8 +1349,8 @@ def test_phase17j_take_and_hold_layout_b_encodes_terrain_areas_and_regions() -> 
         "FOOTPRINT_6X4": 4,
         "FOOTPRINT_10X2_5": 2,
         "FOOTPRINT_6X2": 4,
-        "FOOTPRINT_7X11_5": 2,
-        "FOOTPRINT_8X11_5_POLYGON": 4,
+        "FOOTPRINT_7X11_5": 4,
+        "FOOTPRINT_8X11_5_POLYGON": 2,
     }
     assert len(layout.terrain_areas) == 16
     assert sum(area.source_transform == "explicit" for area in layout.terrain_areas) == 8
@@ -1392,8 +1392,8 @@ def test_phase17j_take_and_hold_layout_b_encodes_terrain_areas_and_regions() -> 
                 "8x11-5-polygon-central-south",
             ),
         ),
-        "expansion-south": ("expansion", ("8x11-5-polygon-south-expansion",)),
-        "expansion-north": ("expansion", ("8x11-5-polygon-north-expansion",)),
+        "expansion-south": ("expansion", ("7x11-5-south-expansion",)),
+        "expansion-north": ("expansion", ("7x11-5-north-expansion",)),
     }
     objective_by_role = {marker.objective_role.value: marker for marker in layout.objective_markers}
     attacker_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "attacker")

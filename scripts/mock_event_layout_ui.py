@@ -32,8 +32,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
     args = parser.parse_args(argv)
 
-    data = _build_data_payload()
-    html = _html_document()
+    data = build_data_payload()
+    html = html_document()
     handler = _handler_for(html=html, data=data)
     server = ThreadingHTTPServer((args.host, args.port), handler)
     print(f"Serving Event Companion layout mock UI at http://{args.host}:{args.port}/")
@@ -44,6 +44,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     finally:
         server.server_close()
     return 0
+
+
+def build_data_payload() -> dict[str, object]:
+    return _build_data_payload()
+
+
+def html_document() -> str:
+    return _html_document()
 
 
 def _build_data_payload() -> dict[str, object]:
@@ -145,21 +153,27 @@ def _terrain_area_payloads(
 ) -> list[dict[str, object]]:
     if layout is None:
         return []
-    return [
-        {
-            "id": area.terrain_area_id,
-            "footprint_template_id": area.footprint_template_id,
-            "classification": area.classification.value,
-            "center_x_inches": area.center_x_inches,
-            "center_y_inches": area.center_y_inches,
-            "rotation_degrees": area.rotation_degrees,
-            "local_transform": area.local_transform.value,
-            "polygon": [
-                {"x": point.x_inches, "y": point.y_inches} for point in area.footprint_polygon
-            ],
-        }
-        for area in layout.terrain_areas
-    ]
+    payloads: list[dict[str, object]] = []
+    for area in layout.terrain_areas:
+        anchor = area.footprint_polygon[0]
+        payloads.append(
+            {
+                "id": area.terrain_area_id,
+                "name": area.terrain_area_id.removeprefix(f"{layout.battlefield_layout_id}-"),
+                "footprint_template_id": area.footprint_template_id,
+                "classification": area.classification.value,
+                "anchor_x_inches": anchor.x_inches,
+                "anchor_y_inches": anchor.y_inches,
+                "center_x_inches": area.center_x_inches,
+                "center_y_inches": area.center_y_inches,
+                "rotation_degrees": area.rotation_degrees,
+                "local_transform": area.local_transform.value,
+                "polygon": [
+                    {"x": point.x_inches, "y": point.y_inches} for point in area.footprint_polygon
+                ],
+            }
+        )
+    return payloads
 
 
 def _shape_payload(shape: DeploymentZoneShape) -> dict[str, object]:
@@ -397,12 +411,12 @@ def _html_document() -> str:
       border: 1px solid #9aa3ad;
     }
     .grid-line {
-      stroke: #e4e8ec;
+      stroke: #b8c2cc;
       stroke-width: 0.035;
       vector-effect: non-scaling-stroke;
     }
     .grid-line.major {
-      stroke: #c8d0d8;
+      stroke: #8895a3;
       stroke-width: 0.06;
     }
     .deployment-attacker {
@@ -622,7 +636,7 @@ def _html_document() -> str:
           points: area.polygon.map(pointToSvg).join(" "),
           class: "terrain-footprint",
         });
-        polygon.append(svgElement("title", {}, `${area.footprint_template_id}: ${area.id}`));
+        polygon.append(svgElement("title", {}, terrainAreaTitle(area)));
         state.board.append(polygon);
       }
       renderObjectives(layout);
@@ -649,7 +663,9 @@ def _html_document() -> str:
             points: area.polygon.map(pointToSvg).join(" "),
             class: "objective-terrain",
           });
-          polygon.append(svgElement("title", {}, `${marker.name}: ${terrainAreaId}`));
+          polygon.append(
+            svgElement("title", {}, `${marker.name}\n${terrainAreaTitle(area)}`),
+          );
           state.board.append(polygon);
         }
         state.board.append(svgElement("text", {
@@ -733,6 +749,18 @@ def _html_document() -> str:
 
     function pointToSvg(point) {
       return `${point.x},${DEPTH - point.y}`;
+    }
+
+    function terrainAreaTitle(area) {
+      return [
+        area.name,
+        `Anchor: (${formatNumber(area.anchor_x_inches)}, ${formatNumber(area.anchor_y_inches)})`,
+        `Rotation: ${formatNumber(area.rotation_degrees)} deg`,
+      ].join("\n");
+    }
+
+    function formatNumber(value) {
+      return String(Math.round(Number(value) * 100) / 100);
     }
 
     function objectiveLabel(role) {
