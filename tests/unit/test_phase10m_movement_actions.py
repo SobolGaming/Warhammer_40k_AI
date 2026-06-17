@@ -223,13 +223,13 @@ def test_normal_move_rejects_forbidden_terrain_transit_in_terrain_layer() -> Non
     unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
     witness = _single_model_pivot_witness(unit_placement, movement_inches=8.0)
     ruins = _ruins_wall_feature(center_x_inches=10.0, center_y_inches=6.0)
+    scenario = _scenario_with_terrain_features(scenario, (ruins,))
 
     resolution = resolve_normal_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=witness,
-        terrain_features=(ruins,),
     )
 
     assert not resolution.is_valid
@@ -247,13 +247,13 @@ def test_infantry_normal_move_can_traverse_ruins_wall() -> None:
     scenario = _single_model_infantry_scenario()
     unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
     ruins = _ruins_wall_feature(center_x_inches=9.0, center_y_inches=6.0)
+    scenario = _scenario_with_terrain_features(scenario, (ruins,))
 
     resolution = resolve_normal_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_single_model_witness_to_pose(unit_placement, end_pose=Pose.at(12.0, 6.0)),
-        terrain_features=(ruins,),
     )
 
     assert resolution.path_validation_results[0].is_valid
@@ -265,13 +265,13 @@ def test_vehicle_normal_move_cannot_traverse_ruins_wall() -> None:
     scenario = _vehicle_scenario()
     unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
     ruins = _ruins_wall_feature(center_x_inches=10.0, center_y_inches=6.0)
+    scenario = _scenario_with_terrain_features(scenario, (ruins,))
 
     resolution = resolve_normal_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_single_model_witness_to_pose(unit_placement, end_pose=Pose.at(14.0, 6.0)),
-        terrain_features=(ruins,),
     )
 
     assert resolution.path_validation_results[0].is_valid
@@ -287,13 +287,13 @@ def test_infantry_normal_move_cannot_end_inside_ruins_wall() -> None:
     scenario = _single_model_infantry_scenario()
     unit_placement = scenario.battlefield_state.unit_placement_by_id("army-alpha:transport-1")
     ruins = _ruins_wall_feature(center_x_inches=9.0, center_y_inches=6.0)
+    scenario = _scenario_with_terrain_features(scenario, (ruins,))
 
     resolution = resolve_normal_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_single_model_witness_to_pose(unit_placement, end_pose=Pose.at(9.0, 6.0)),
-        terrain_features=(ruins,),
     )
 
     assert resolution.path_validation_results[0].is_valid
@@ -315,13 +315,13 @@ def test_infantry_normal_move_can_end_on_upper_ruins_floor_with_vertical_movemen
         center_y_inches=6.0,
         upper_floor_z_inches=3.0,
     )
+    scenario = _scenario_with_terrain_features(scenario, (ruins,))
 
     resolution = resolve_normal_move(
         scenario=scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         path_witness=_unit_vertical_witness_to_z(unit_placement, z_inches=3.0),
-        terrain_features=(ruins,),
     )
 
     assert resolution.is_valid
@@ -696,6 +696,19 @@ def _vehicle_scenario() -> BattlefieldScenario:
     return create_deterministic_battlefield_scenario(
         battlefield_id="phase10m-vehicle-battlefield",
         armies=armies,
+    )
+
+
+def _scenario_with_terrain_features(
+    scenario: BattlefieldScenario,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+) -> BattlefieldScenario:
+    return BattlefieldScenario(
+        armies=scenario.armies,
+        battlefield_state=replace(
+            scenario.battlefield_state,
+            terrain_features=terrain_features,
+        ),
     )
 
 

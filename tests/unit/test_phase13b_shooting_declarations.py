@@ -6014,6 +6014,9 @@ def test_phase13c_attached_unit_roles_require_runtime_keyword_not_identifier_pre
     )
     state.battlefield_state = BattlefieldRuntimeState(
         battlefield_id=battlefield.battlefield_id,
+        battlefield_width_inches=battlefield.battlefield_width_inches,
+        battlefield_depth_inches=battlefield.battlefield_depth_inches,
+        terrain_features=battlefield.terrain_features,
         placed_armies=tuple(
             (
                 PlacedArmy(
@@ -14276,8 +14279,10 @@ def test_unit_level_target_legality_requires_one_model_with_range_and_visibility
     )
     assert candidates[0].violation_code is ShootingTargetViolationCode.NOT_VISIBLE
 
-    state.battlefield_state = scenario.battlefield_state
-    state.mission_setup = replace(state.mission_setup, terrain_features=(blocking_ruin,))
+    state.battlefield_state = replace(
+        scenario.battlefield_state,
+        terrain_features=(blocking_ruin,),
+    )
     status = lifecycle.advance_until_decision_or_terminal()
     _assert_waiting_for_movement_unit(status)
     assert state.current_battle_phase is BattlePhase.MOVEMENT
@@ -14437,8 +14442,10 @@ def test_phase13c_allocated_cover_excludes_attacker_and_target_units_as_blockers
             ),
         ),
     )
-    state.battlefield_state = scenario.battlefield_state
-    state.mission_setup = replace(state.mission_setup, terrain_features=(far_ruin,))
+    state.battlefield_state = replace(
+        scenario.battlefield_state,
+        terrain_features=(far_ruin,),
+    )
     weapon_profile = _first_weapon_profile(lifecycle, attacker)
     pool = _attack_pool_for_test(
         attacker=attacker,
@@ -14863,8 +14870,12 @@ def _shooting_lifecycle(
         catalog=catalog,
     )
     armies = _mustered_armies(config)
+    mission_setup = config.mission_setup
+    assert mission_setup is not None
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase13b-battlefield",
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
         armies=armies,
     )
     units = {

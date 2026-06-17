@@ -976,7 +976,6 @@ def resolve_fight_movement(
     ruleset_descriptor: RulesetDescriptor,
     proposal: FightMovementProposal,
     maximum_distance_inches: float | None = None,
-    terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
 ) -> FightMovementResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Fight movement requires a BattlefieldScenario.")
@@ -1027,7 +1026,6 @@ def resolve_fight_movement(
         movement_mode=proposal.movement_mode,
         displacement_kind=_displacement_kind_for_proposal(proposal),
         distance_budget_inches=distance_budget_inches,
-        terrain_features=terrain_features,
     )
     _, coherency_result, rollback_record = resolve_unit_movement_endpoint_coherency(
         scenario=scenario,
@@ -1817,10 +1815,10 @@ def _validate_fight_paths(
     movement_mode: MovementMode,
     displacement_kind: ModelDisplacementKind,
     distance_budget_inches: float,
-    terrain_features: tuple[TerrainFeatureDefinition, ...],
 ) -> tuple[tuple[PathValidationResult, ...], tuple[TerrainPathLegalityResult, ...]]:
     path_results: list[PathValidationResult] = []
     terrain_results: list[TerrainPathLegalityResult] = []
+    terrain_features = scenario.battlefield_state.terrain_features
     terrain_volumes = _terrain_volumes_for_features(terrain_features)
     unit = scenario.unit_instance_for_placement(before)
     for placement in before.model_placements:
@@ -1842,8 +1840,8 @@ def _validate_fight_paths(
             legality_context.to_path_validation_context(
                 moving_model=moving_model,
                 witness=model_witness,
-                battlefield_width_inches=60.0,
-                battlefield_depth_inches=44.0,
+                battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
+                battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
                 friendly_models=_friendly_geometry_models_for_path(
                     scenario=scenario,
                     unit_placement=before,

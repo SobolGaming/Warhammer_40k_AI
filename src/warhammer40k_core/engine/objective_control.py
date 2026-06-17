@@ -477,7 +477,7 @@ class ObjectiveControlContext:
         objective_markers = tuple(
             marker.to_objective_marker() for marker in state.mission_setup.objective_markers
         )
-        terrain_features = tuple(state.mission_setup.terrain_features)
+        terrain_features = state.battlefield_state.terrain_features
         objective_markers, resolved_terrain_objectives = _objective_control_sources_for_ruleset(
             objective_markers=objective_markers,
             terrain_features=terrain_features,

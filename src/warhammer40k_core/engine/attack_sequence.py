@@ -3107,7 +3107,9 @@ def _resolve_destroyed_transport_disembark_submission(
         transport_movement_status=TransportMovementStatus.NOT_MOVED,
         restriction_overrides=submission.restriction_overrides,
     )
-    mission_setup = state.mission_setup
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Destroyed Transport disembark requires battlefield_state.")
     return resolve_destroyed_transport_disembark(
         scenario=_battlefield_scenario_for_attack_sequence(state),
         ruleset_descriptor=ruleset_descriptor,
@@ -3116,13 +3118,9 @@ def _resolve_destroyed_transport_disembark_submission(
         unit=unit,
         transport_placement=transport_placement,
         dice_manager=dice_manager,
-        battlefield_width_inches=(
-            60.0 if mission_setup is None else mission_setup.battlefield_width_inches
-        ),
-        battlefield_depth_inches=(
-            44.0 if mission_setup is None else mission_setup.battlefield_depth_inches
-        ),
-        terrain_features=() if mission_setup is None else mission_setup.terrain_features,
+        battlefield_width_inches=battlefield_state.battlefield_width_inches,
+        battlefield_depth_inches=battlefield_state.battlefield_depth_inches,
+        terrain_features=battlefield_state.terrain_features,
         objective_markers=_objective_markers_for_attack_sequence(state),
     )
 
@@ -7824,12 +7822,11 @@ def _cover_for_allocated_model(
     pool: RangedAttackPool,
     allocated_model_id: str,
 ) -> BenefitOfCoverResult | None:
-    mission_setup = state.mission_setup
-    if mission_setup is None or not mission_setup.terrain_features:
-        return None
     battlefield = state.battlefield_state
     if battlefield is None:
         raise GameLifecycleError("Allocated-model cover requires battlefield_state.")
+    if not battlefield.terrain_features:
+        return None
     try:
         scenario = BattlefieldScenario(
             armies=tuple(state.army_definitions),
@@ -7852,7 +7849,7 @@ def _cover_for_allocated_model(
         )
     except PlacementError as exc:
         raise GameLifecycleError("Allocated-model cover context is invalid.") from exc
-    terrain_features = mission_setup.terrain_features
+    terrain_features = battlefield.terrain_features
     terrain_volumes = tuple(
         volume for feature in terrain_features for volume in feature.terrain_volumes()
     )

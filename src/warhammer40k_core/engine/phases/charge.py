@@ -1720,7 +1720,6 @@ def _apply_charge_move_proposal_decision(
         maximum_distance_inches=pending_distance.roll_result.value,
         path_witness=proposal.witness,
         hover_mode_states=tuple(state.hover_mode_states),
-        terrain_features=_terrain_features_for_state(state),
     )
     violation_code = _charge_move_violation_code(
         resolution=resolution,
@@ -1775,10 +1774,7 @@ def resolve_charge_move(
     maximum_distance_inches: int,
     path_witness: PathWitness,
     hover_mode_states: tuple[HoverModeState, ...] = (),
-    battlefield_width_inches: float = 60.0,
-    battlefield_depth_inches: float = 44.0,
     terrain: tuple[TerrainVolume, ...] = (),
-    terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
 ) -> ChargeMoveResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Charge Move requires a BattlefieldScenario.")
@@ -1815,6 +1811,7 @@ def resolve_charge_move(
             placement.with_pose(path_witness.final_pose_for_model(placement.model_instance_id))
         )
     attempted_placement = unit_placement.with_model_placements(tuple(moved_placements))
+    terrain_features = scenario.battlefield_state.terrain_features
     terrain_volumes = (*terrain, *_terrain_volumes_for_features(terrain_features))
     path_validation_results: list[PathValidationResult] = []
     terrain_path_legality_results: list[TerrainPathLegalityResult] = []
@@ -1840,8 +1837,8 @@ def resolve_charge_move(
         path_result = legality_context.to_path_validation_context(
             moving_model=moving_model,
             witness=model_witness,
-            battlefield_width_inches=battlefield_width_inches,
-            battlefield_depth_inches=battlefield_depth_inches,
+            battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
+            battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
             friendly_models=_friendly_geometry_models_for_charge_path(
                 scenario=scenario,
                 unit_placement=unit_placement,
@@ -2990,12 +2987,6 @@ def _validate_charge_witness_matches_unit(
     )
     if tuple(sorted(witness.model_ids())) != expected_model_ids:
         raise GameLifecycleError("Charge Move witness must match the selected unit models.")
-
-
-def _terrain_features_for_state(state: GameState) -> tuple[TerrainFeatureDefinition, ...]:
-    if state.mission_setup is None:
-        return ()
-    return tuple(state.mission_setup.terrain_features)
 
 
 def _terrain_volumes_for_features(

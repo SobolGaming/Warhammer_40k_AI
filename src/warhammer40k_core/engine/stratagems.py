@@ -2164,7 +2164,6 @@ def apply_heroic_intervention_charge_move(
         maximum_distance_inches=maximum_distance,
         path_witness=proposal.witness,
         hover_mode_states=tuple(state.hover_mode_states),
-        terrain_features=_stratagem_terrain_features(state),
     )
     violation = charge_move_violation_code(
         resolution=resolution,
@@ -4441,10 +4440,10 @@ def _battlefield_scenario_for_stratagem(state: GameState) -> BattlefieldScenario
 
 
 def _stratagem_terrain_features(state: GameState) -> tuple[TerrainFeatureDefinition, ...]:
-    mission_setup = state.mission_setup
-    if mission_setup is None:
-        raise GameLifecycleError("Stratagem terrain requires mission_setup.")
-    return mission_setup.terrain_features
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Stratagem terrain requires battlefield_state.")
+    return battlefield_state.terrain_features
 
 
 def _stratagem_ruleset_descriptor() -> RulesetDescriptor:
@@ -4740,16 +4739,18 @@ def _apply_rapid_ingress_placement(
     mission_setup = state.mission_setup
     if mission_setup is None:
         raise GameLifecycleError("Rapid Ingress placement requires MissionSetup.")
+    scenario = _battlefield_scenario(state)
+    manifested_battlefield = scenario.battlefield_state
     placement = resolve_reserve_arrival(
-        scenario=_battlefield_scenario(state),
+        scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         reserve_state=reserve_state,
         attempted_placement=submitted.attempted_placement,
         battle_round=state.battle_round,
         placement_kind=submitted.placement_kind,
-        battlefield_width_inches=mission_setup.battlefield_width_inches,
-        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
-        terrain_features=mission_setup.terrain_features,
+        battlefield_width_inches=manifested_battlefield.battlefield_width_inches,
+        battlefield_depth_inches=manifested_battlefield.battlefield_depth_inches,
+        terrain_features=manifested_battlefield.terrain_features,
         objective_markers=tuple(
             marker.to_objective_marker() for marker in mission_setup.objective_markers
         ),

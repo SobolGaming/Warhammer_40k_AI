@@ -311,6 +311,9 @@ def test_deployment_placement_outside_coherency_is_rejected() -> None:
         armies=scenario.armies,
         battlefield_state=BattlefieldRuntimeState(
             battlefield_id=scenario.battlefield_state.battlefield_id,
+            battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
+            battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
+            terrain_features=scenario.battlefield_state.terrain_features,
             placed_armies=(
                 replace(placed_army, unit_placements=(broken_unit,)),
                 other_army,

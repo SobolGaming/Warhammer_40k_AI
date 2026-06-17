@@ -256,9 +256,12 @@ def test_terrain_objectives_derive_from_coincident_marker_and_control_area() -> 
             depth_inches=6.0,
         ),
     )
-    if state.mission_setup is None:
-        raise AssertionError("test state requires mission setup")
-    state.mission_setup = replace(state.mission_setup, terrain_features=(terrain_feature,))
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield state")
+    state.battlefield_state = replace(
+        state.battlefield_state,
+        terrain_features=(terrain_feature,),
+    )
 
     context = ObjectiveControlContext.from_game_state(
         state,
@@ -310,9 +313,12 @@ def test_terrain_objective_control_requires_terrain_area_containment_not_marker_
             depth_inches=6.0,
         ),
     )
-    if state.mission_setup is None:
-        raise AssertionError("test state requires mission setup")
-    state.mission_setup = replace(state.mission_setup, terrain_features=(terrain_feature,))
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield state")
+    state.battlefield_state = replace(
+        state.battlefield_state,
+        terrain_features=(terrain_feature,),
+    )
 
     context = ObjectiveControlContext.from_game_state(
         state,

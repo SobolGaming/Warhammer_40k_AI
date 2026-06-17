@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict, cast
@@ -17,6 +18,7 @@ from warhammer40k_core.geometry.pose import Pose, PosePayload
 from warhammer40k_core.geometry.spatial_index import SpatialIndex
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
+    TerrainFeatureDefinitionPayload,
     TerrainFeatureRulesGeometryPayload,
 )
 from warhammer40k_core.geometry.volume import Model as GeometryModel
@@ -126,6 +128,9 @@ class PlacedArmyPayload(TypedDict):
 
 class BattlefieldRuntimeStatePayload(TypedDict):
     battlefield_id: str
+    battlefield_width_inches: float
+    battlefield_depth_inches: float
+    terrain_features: list[TerrainFeatureDefinitionPayload]
     placed_armies: list[PlacedArmyPayload]
     removed_model_ids: list[str]
 
@@ -785,7 +790,10 @@ class PlacedArmy:
 @dataclass(frozen=True, slots=True)
 class BattlefieldRuntimeState:
     battlefield_id: str
+    battlefield_width_inches: float
+    battlefield_depth_inches: float
     placed_armies: tuple[PlacedArmy, ...]
+    terrain_features: tuple[TerrainFeatureDefinition, ...] = ()
     removed_model_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -797,6 +805,31 @@ class BattlefieldRuntimeState:
                 self.battlefield_id,
                 "battlefield:",
             ),
+        )
+        object.__setattr__(
+            self,
+            "battlefield_width_inches",
+            _validate_positive_number(
+                "BattlefieldRuntimeState battlefield_width_inches",
+                self.battlefield_width_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "battlefield_depth_inches",
+            _validate_positive_number(
+                "BattlefieldRuntimeState battlefield_depth_inches",
+                self.battlefield_depth_inches,
+            ),
+        )
+        terrain_features = _validate_terrain_feature_tuple(
+            "BattlefieldRuntimeState terrain_features",
+            self.terrain_features,
+        )
+        _validate_terrain_features_within_battlefield(
+            terrain_features=terrain_features,
+            width=self.battlefield_width_inches,
+            depth=self.battlefield_depth_inches,
         )
         placed_armies = _validate_placed_armies(
             "BattlefieldRuntimeState placed_armies",
@@ -815,6 +848,7 @@ class BattlefieldRuntimeState:
             raise PlacementError(
                 "BattlefieldRuntimeState removed_model_ids must not still be placed."
             )
+        object.__setattr__(self, "terrain_features", terrain_features)
         object.__setattr__(self, "placed_armies", placed_armies)
         object.__setattr__(self, "removed_model_ids", removed_model_ids)
 
@@ -884,7 +918,10 @@ class BattlefieldRuntimeState:
             raise PlacementError("BattlefieldRuntimeState updated unit is not placed.")
         return type(self)(
             battlefield_id=self.battlefield_id,
+            battlefield_width_inches=self.battlefield_width_inches,
+            battlefield_depth_inches=self.battlefield_depth_inches,
             placed_armies=tuple(placed_armies),
+            terrain_features=self.terrain_features,
             removed_model_ids=self.removed_model_ids,
         )
 
@@ -929,7 +966,10 @@ class BattlefieldRuntimeState:
             )
         return type(self)(
             battlefield_id=self.battlefield_id,
+            battlefield_width_inches=self.battlefield_width_inches,
+            battlefield_depth_inches=self.battlefield_depth_inches,
             placed_armies=tuple(placed_armies),
+            terrain_features=self.terrain_features,
             removed_model_ids=self.removed_model_ids,
         )
 
@@ -963,7 +1003,10 @@ class BattlefieldRuntimeState:
             raise PlacementError("BattlefieldRuntimeState removed unit is not placed.")
         return type(self)(
             battlefield_id=self.battlefield_id,
+            battlefield_width_inches=self.battlefield_width_inches,
+            battlefield_depth_inches=self.battlefield_depth_inches,
             placed_armies=tuple(placed_armies),
+            terrain_features=self.terrain_features,
             removed_model_ids=self.removed_model_ids,
         )
 
@@ -1005,7 +1048,10 @@ class BattlefieldRuntimeState:
                 )
         return type(self)(
             battlefield_id=self.battlefield_id,
+            battlefield_width_inches=self.battlefield_width_inches,
+            battlefield_depth_inches=self.battlefield_depth_inches,
             placed_armies=tuple(placed_armies),
+            terrain_features=self.terrain_features,
             removed_model_ids=tuple(sorted((*self.removed_model_ids, *removed_model_ids))),
         )
 
@@ -1057,7 +1103,10 @@ class BattlefieldRuntimeState:
             raise PlacementError("BattlefieldRuntimeState returned model army is not placed.")
         return type(self)(
             battlefield_id=self.battlefield_id,
+            battlefield_width_inches=self.battlefield_width_inches,
+            battlefield_depth_inches=self.battlefield_depth_inches,
             placed_armies=tuple(placed_armies),
+            terrain_features=self.terrain_features,
             removed_model_ids=tuple(
                 removed_id for removed_id in self.removed_model_ids if removed_id != model_id
             ),
@@ -1079,13 +1128,19 @@ class BattlefieldRuntimeState:
                 raise PlacementError("BattlefieldRuntimeState model is already removed.")
         return type(self)(
             battlefield_id=self.battlefield_id,
+            battlefield_width_inches=self.battlefield_width_inches,
+            battlefield_depth_inches=self.battlefield_depth_inches,
             placed_armies=self.placed_armies,
+            terrain_features=self.terrain_features,
             removed_model_ids=tuple(sorted((*self.removed_model_ids, *removed_model_ids))),
         )
 
     def to_payload(self) -> BattlefieldRuntimeStatePayload:
         return {
             "battlefield_id": self.battlefield_id,
+            "battlefield_width_inches": self.battlefield_width_inches,
+            "battlefield_depth_inches": self.battlefield_depth_inches,
+            "terrain_features": [feature.to_payload() for feature in self.terrain_features],
             "placed_armies": [placed_army.to_payload() for placed_army in self.placed_armies],
             "removed_model_ids": list(self.removed_model_ids),
         }
@@ -1094,6 +1149,12 @@ class BattlefieldRuntimeState:
     def from_payload(cls, payload: BattlefieldRuntimeStatePayload) -> Self:
         return cls(
             battlefield_id=payload["battlefield_id"],
+            battlefield_width_inches=payload["battlefield_width_inches"],
+            battlefield_depth_inches=payload["battlefield_depth_inches"],
+            terrain_features=tuple(
+                TerrainFeatureDefinition.from_payload(feature)
+                for feature in payload["terrain_features"]
+            ),
             placed_armies=tuple(
                 PlacedArmy.from_payload(placed_army) for placed_army in payload["placed_armies"]
             ),
@@ -1499,6 +1560,17 @@ def _validate_non_negative_int(field_name: str, value: object) -> int:
     return value
 
 
+def _validate_positive_number(field_name: str, value: object) -> float:
+    if not isinstance(value, int | float) or type(value) is bool:
+        raise PlacementError(f"{field_name} must be a number.")
+    number = float(value)
+    if not math.isfinite(number):
+        raise PlacementError(f"{field_name} must be finite.")
+    if number <= 0.0:
+        raise PlacementError(f"{field_name} must be greater than 0.")
+    return number
+
+
 def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise PlacementError(f"{field_name} must be a tuple.")
@@ -1529,6 +1601,24 @@ def _validate_terrain_feature_tuple(
         seen.add(value.feature_id)
         features.append(value)
     return tuple(sorted(features, key=lambda feature: feature.feature_id))
+
+
+def _validate_terrain_features_within_battlefield(
+    *,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+    width: float,
+    depth: float,
+) -> None:
+    for feature in terrain_features:
+        min_x, min_y, max_x, max_y = feature.bounds()
+        if min_x < 0.0 or max_x > width:
+            raise PlacementError(
+                "BattlefieldRuntimeState terrain feature x is outside the battlefield."
+            )
+        if min_y < 0.0 or max_y > depth:
+            raise PlacementError(
+                "BattlefieldRuntimeState terrain feature y is outside the battlefield."
+            )
 
 
 def _terrain_revision_for_features(features: tuple[TerrainFeatureDefinition, ...]) -> int:

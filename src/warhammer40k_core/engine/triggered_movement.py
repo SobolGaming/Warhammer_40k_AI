@@ -56,7 +56,7 @@ from warhammer40k_core.geometry.pathing import (
     TerrainPathLegalityResult,
     TerrainPathLegalityResultPayload,
 )
-from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainVolume
+from warhammer40k_core.geometry.terrain import TerrainVolume
 from warhammer40k_core.geometry.volume import Model
 
 if TYPE_CHECKING:
@@ -67,8 +67,6 @@ SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE = "select_triggered_movement"
 DECLINE_TRIGGERED_MOVEMENT_OPTION_ID = "decline_triggered_movement"
 TRIGGERED_MOVEMENT_PROPOSAL_ACTION = "surge_move"
 TRIGGERED_MOVEMENT_PROPOSAL_CONTEXT_KIND = "triggered_movement"
-_DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES = 60.0
-_DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES = 44.0
 
 
 class TriggeredMovementKind(StrEnum):
@@ -1047,10 +1045,7 @@ def resolve_triggered_movement(
     battle_shocked_unit_ids: tuple[str, ...] = (),
     surge_move_states: tuple[SurgeMoveState, ...] = (),
     hover_mode_states: tuple[HoverModeState, ...] = (),
-    battlefield_width_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
-    battlefield_depth_inches: float = _DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
     terrain: tuple[TerrainVolume, ...] = (),
-    terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
 ) -> TriggeredMovementResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Triggered movement requires a BattlefieldScenario.")
@@ -1113,8 +1108,8 @@ def resolve_triggered_movement(
         path_result = legality_context.to_path_validation_context(
             moving_model=moving_model,
             witness=model_witness,
-            battlefield_width_inches=battlefield_width_inches,
-            battlefield_depth_inches=battlefield_depth_inches,
+            battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
+            battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
             friendly_models=_friendly_geometry_models_for_path(
                 scenario=scenario,
                 unit_placement=unit_placement,
@@ -1146,7 +1141,7 @@ def resolve_triggered_movement(
             moving_model=moving_model,
             witness=model_witness,
             terrain=terrain,
-            terrain_features=terrain_features,
+            terrain_features=scenario.battlefield_state.terrain_features,
         ).validate()
         path_validation_results.append(path_result)
         terrain_path_legality_results.append(terrain_result)

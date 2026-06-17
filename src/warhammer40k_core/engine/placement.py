@@ -11,12 +11,19 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
+
+DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES = 60.0
+DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES = 44.0
 
 
 def create_deterministic_battlefield_scenario(
     *,
     battlefield_id: str,
     armies: tuple[ArmyDefinition, ...],
+    battlefield_width_inches: float = DETERMINISTIC_BRIDGE_BATTLEFIELD_WIDTH_INCHES,
+    battlefield_depth_inches: float = DETERMINISTIC_BRIDGE_BATTLEFIELD_DEPTH_INCHES,
+    terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
 ) -> BattlefieldScenario:
     """Create a minimal deterministic placement bridge for vertical-slice tests.
 
@@ -39,6 +46,9 @@ def create_deterministic_battlefield_scenario(
         armies=armies,
         battlefield_state=BattlefieldRuntimeState(
             battlefield_id=battlefield_id,
+            battlefield_width_inches=battlefield_width_inches,
+            battlefield_depth_inches=battlefield_depth_inches,
+            terrain_features=terrain_features,
             placed_armies=placed_armies,
         ),
     )

@@ -466,6 +466,9 @@ def _unit_intersects_no_mans_land(
 ) -> bool:
     if state.mission_setup is None:
         raise GameLifecycleError("No Man's Land Shadow check requires MissionSetup.")
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("No Man's Land Shadow check requires battlefield_state.")
     for geometry_model in _unit_geometry_models(state=state, unit_instance_id=unit_instance_id):
         if shapely_backend.base_footprint_intersects_no_mans_land(
             geometry_model.base,
@@ -473,8 +476,8 @@ def _unit_intersects_no_mans_land(
             battlefield_bounds=(
                 0.0,
                 0.0,
-                state.mission_setup.battlefield_width_inches,
-                state.mission_setup.battlefield_depth_inches,
+                battlefield_state.battlefield_width_inches,
+                battlefield_state.battlefield_depth_inches,
             ),
             deployment_zones=state.mission_setup.deployment_zones,
         ):

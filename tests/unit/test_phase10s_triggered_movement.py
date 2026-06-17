@@ -1830,6 +1830,7 @@ def _battle_state_from_scenario(scenario: BattlefieldScenario) -> GameState:
         active_player_id="player-a",
         army_definitions=list(scenario.armies),
         battlefield_state=scenario.battlefield_state,
+        mission_setup=_mission_setup(),
     )
 
 

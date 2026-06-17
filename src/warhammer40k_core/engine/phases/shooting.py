@@ -5009,10 +5009,10 @@ def _battlefield_scenario(state: GameState) -> BattlefieldScenario:
 
 
 def _terrain_features_for_state(state: GameState) -> tuple[TerrainFeatureDefinition, ...]:
-    mission_setup = state.mission_setup
-    if mission_setup is None:
-        raise GameLifecycleError("Shooting phase requires mission_setup.")
-    return mission_setup.terrain_features
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Shooting phase requires battlefield_state.")
+    return battlefield_state.terrain_features
 
 
 def _active_player_id(state: GameState) -> str:
