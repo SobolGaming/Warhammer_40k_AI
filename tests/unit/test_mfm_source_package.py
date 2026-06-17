@@ -20,7 +20,9 @@ from warhammer40k_core.rules.mfm_source import (
     unit_cost_row_label_details,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06 import (
+    faction_record,
     source_package,
+    supported_faction_ids,
 )
 
 
@@ -28,8 +30,11 @@ def test_mfm_source_package_excludes_unsupported_factions_and_sections() -> None
     package = source_package()
 
     assert len(package.factions) == 28
+    assert len(supported_faction_ids()) == 28
     assert "chaos-titan-legions" not in {faction.faction_id for faction in package.factions}
     assert "titan-legions" not in {faction.faction_id for faction in package.factions}
+    assert "chaos-titan-legions" not in set(supported_faction_ids())
+    assert "titan-legions" not in set(supported_faction_ids())
 
     unsupported_sections = {
         "combat-patrol",
@@ -48,7 +53,9 @@ def test_mfm_source_package_excludes_unsupported_factions_and_sections() -> None
 
 
 def test_mfm_source_package_preserves_world_eaters_defiler_special_pricing() -> None:
-    defiler = source_package().faction_by_id("world-eaters").unit_by_id("units-defiler")
+    world_eaters = faction_record("world-eaters")
+    assert faction_record("world-eaters") is world_eaters
+    defiler = world_eaters.unit_by_id("units-defiler")
 
     assert [
         (bracket.label, [(row.label, row.points) for row in bracket.rows])

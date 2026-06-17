@@ -37,7 +37,10 @@ from warhammer40k_core.rules.mfm_source import (
     source_label_slug,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06 import (
-    source_package as current_mfm_source_package,
+    faction_record as current_mfm_faction_record,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06 import (
+    supported_faction_ids as current_mfm_supported_faction_ids,
 )
 
 
@@ -136,10 +139,11 @@ def calculate_mfm_army_points(
     if type(request) is not ArmyMusterRequest:
         raise ArmyPointsError("MFM army points require an ArmyMusterRequest.")
     _validate_request_catalog_identity(catalog=catalog, request=request)
-    package = current_mfm_source_package() if source_package is None else source_package
-    if type(package) is not MfmSourcePackage:
-        raise ArmyPointsError("MFM army points require an MfmSourcePackage.")
-    faction = _mfm_faction_for_request(catalog=catalog, request=request, source_package=package)
+    faction = _mfm_faction_for_request(
+        catalog=catalog,
+        request=request,
+        source_package=source_package,
+    )
     priced_units = _priced_unit_records(catalog=catalog, request=request, faction=faction)
     unit_lines = tuple(
         _unit_point_line(
@@ -185,13 +189,10 @@ def catalog_with_mfm_leader_allowances(
     if type(catalog) is not ArmyCatalog:
         raise ArmyPointsError("MFM leader overlay requires an ArmyCatalog.")
     requested_faction_id = _validate_identifier(faction_id)
-    package = current_mfm_source_package() if source_package is None else source_package
-    if type(package) is not MfmSourcePackage:
-        raise ArmyPointsError("MFM leader overlay requires an MfmSourcePackage.")
     faction = _mfm_faction_by_catalog_faction_id(
         catalog=catalog,
         faction_id=requested_faction_id,
-        source_package=package,
+        source_package=source_package,
     )
     catalog_faction = _catalog_faction(catalog=catalog, faction_id=requested_faction_id)
     datasheets_by_unit_id = _catalog_datasheets_by_mfm_unit_id(catalog.datasheets)
@@ -485,7 +486,7 @@ def _mfm_faction_for_request(
     *,
     catalog: ArmyCatalog,
     request: ArmyMusterRequest,
-    source_package: MfmSourcePackage,
+    source_package: MfmSourcePackage | None,
 ) -> MfmFactionRecord:
     return _mfm_faction_by_catalog_faction_id(
         catalog=catalog,
@@ -498,16 +499,28 @@ def _mfm_faction_by_catalog_faction_id(
     *,
     catalog: ArmyCatalog,
     faction_id: str,
-    source_package: MfmSourcePackage,
+    source_package: MfmSourcePackage | None,
 ) -> MfmFactionRecord:
     catalog_faction = _catalog_faction(catalog=catalog, faction_id=faction_id)
     requested_ids = (catalog_faction.faction_id, source_label_slug(catalog_faction.name))
+    if source_package is None:
+        return _current_mfm_faction_by_ids(requested_ids)
+    if type(source_package) is not MfmSourcePackage:
+        raise ArmyPointsError("MFM lookup requires an MfmSourcePackage.")
     matches = tuple(
         faction for faction in source_package.factions if faction.faction_id in requested_ids
     )
     if len(matches) != 1:
         raise ArmyPointsError("MFM faction selection did not resolve to one faction.")
     return matches[0]
+
+
+def _current_mfm_faction_by_ids(requested_ids: tuple[str, str]) -> MfmFactionRecord:
+    supported_ids = frozenset(current_mfm_supported_faction_ids())
+    matches = tuple(requested_id for requested_id in requested_ids if requested_id in supported_ids)
+    if len(matches) != 1:
+        raise ArmyPointsError("MFM faction selection did not resolve to one generated faction.")
+    return current_mfm_faction_record(matches[0])
 
 
 def _mfm_unit_for_datasheet(
