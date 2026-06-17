@@ -694,6 +694,7 @@ def _best_leadership(
     catalog_value = catalog_leadership_characteristic_for_unit(
         ability_index=ability_index,
         unit=unit,
+        current_model_instance_ids=current_model_ids,
     )
     if catalog_value is not None:
         return catalog_value

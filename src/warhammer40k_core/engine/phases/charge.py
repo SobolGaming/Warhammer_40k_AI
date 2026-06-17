@@ -1513,6 +1513,10 @@ def _resolve_charge_roll(
     roll_modifiers = catalog_charge_roll_modifiers_for_unit(
         ability_index=ability_index,
         unit=unit,
+        current_model_instance_ids=_current_model_instance_ids_for_charge_unit(
+            state=state,
+            unit=unit,
+        ),
     )
     roll_request = ChargeRollRequest(
         request_id=f"charge-roll:{selection.result_id}",
@@ -1562,6 +1566,28 @@ def _resolve_charge_roll(
         charge_state=charge_state,
         roll_result=roll_result,
     )
+
+
+def _current_model_instance_ids_for_charge_unit(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+) -> tuple[str, ...]:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Charge roll current model evidence requires a UnitInstance.")
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Charge roll current model evidence requires battlefield_state.")
+    placement = battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+    known_model_ids = {model.model_instance_id for model in unit.own_models}
+    current_ids: list[str] = []
+    for model_placement in placement.model_placements:
+        if model_placement.model_instance_id not in known_model_ids:
+            raise GameLifecycleError("Charge roll unit placement contains unknown models.")
+        current_ids.append(model_placement.model_instance_id)
+    if not current_ids:
+        raise GameLifecycleError("Charge roll current model evidence must not be empty.")
+    return tuple(sorted(current_ids))
 
 
 def _request_charge_move_proposal(

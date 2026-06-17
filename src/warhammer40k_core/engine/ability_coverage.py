@@ -211,7 +211,12 @@ def _support_stage(
         raise GameLifecycleError("Ability support stage requires a descriptor.")
     if type(consumer_ids) is not tuple:
         raise GameLifecycleError("Ability support stage consumer_ids must be a tuple.")
-    if consumer_ids:
+    if (
+        ability.support is CatalogAbilitySupport.GENERIC_RULE_IR
+        and rule_ir is not None
+        and rule_ir.is_supported
+        and consumer_ids
+    ):
         return AbilityCoverageSupportStage.ENGINE_CONSUMED
     if ability.support is CatalogAbilitySupport.GENERIC_RULE_IR:
         return AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE

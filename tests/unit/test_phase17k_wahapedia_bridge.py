@@ -53,6 +53,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_charge_roll_modifiers_for_unit,
+    catalog_rule_ir_consumers_for_rule,
 )
 from warhammer40k_core.engine.charge_declaration import ChargeRollRequest, ChargeRollResult
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -66,7 +67,7 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
-from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitFactory, UnitInstance
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
@@ -378,11 +379,32 @@ def test_phase17k_instrument_of_chaos_catalog_ir_modifies_charge_roll_result() -
     )
     army = _bloodcrushers_army(package=package, unit=unit)
     player_index = _player_ability_index(package=package, army=army)
+    battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
+    destroyed_bearer_battlefield = battlefield.with_removed_models(
+        (
+            _model_bearing_wargear(
+                unit,
+                "000001115:instrument-of-chaos",
+            ).model_instance_id,
+        )
+    )
     records_by_name = {record.definition.name: record for record in player_index.all_records()}
 
     modifiers = catalog_charge_roll_modifiers_for_unit(
         ability_index=player_index,
         unit=unit,
+        current_model_instance_ids=_current_model_ids(
+            battlefield=battlefield,
+            unit=unit,
+        ),
+    )
+    destroyed_bearer_modifiers = catalog_charge_roll_modifiers_for_unit(
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=_current_model_ids(
+            battlefield=destroyed_bearer_battlefield,
+            unit=unit,
+        ),
     )
     request = ChargeRollRequest(
         request_id="phase17k-charge-roll",
@@ -400,15 +422,90 @@ def test_phase17k_instrument_of_chaos_catalog_ir_modifies_charge_roll_result() -
         roll_state=roll_state,
         reachable_target_distances_inches={},
     )
+    destroyed_bearer_request = ChargeRollRequest(
+        request_id="phase17k-charge-roll-destroyed-bearer",
+        game_id="phase17k-game",
+        battle_round=1,
+        player_id=army.player_id,
+        unit_instance_id=unit.unit_instance_id,
+        source_decision_request_id="phase17k-charge-selection-request",
+        source_decision_result_id="phase17k-charge-selection-destroyed-bearer-result",
+        roll_modifiers=destroyed_bearer_modifiers,
+    )
+    destroyed_bearer_roll_state = DiceRollManager("phase17k-game").roll_fixed(
+        destroyed_bearer_request.spec,
+        [3, 4],
+    )
+    destroyed_bearer_result = ChargeRollResult.from_roll_state(
+        request=destroyed_bearer_request,
+        roll_state=destroyed_bearer_roll_state,
+        reachable_target_distances_inches={},
+    )
 
     assert records_by_name["Instrument of Chaos"].definition.timing.trigger_kind is (
         TimingTriggerKind.AFTER_DICE_ROLL
     )
     assert len(modifiers) == 1
+    assert destroyed_bearer_modifiers == ()
     assert modifiers[0].operand == 1
     assert request.spec.expression.modifier == 1
+    assert destroyed_bearer_request.spec.expression.modifier == 0
     assert result.value == 8
+    assert destroyed_bearer_result.value == 7
     assert result.to_payload()["request"]["roll_modifiers"][0]["operand"] == 1
+    with pytest.raises(GameLifecycleError, match="current model evidence must be a tuple"):
+        catalog_charge_roll_modifiers_for_unit(
+            ability_index=player_index,
+            unit=unit,
+            current_model_instance_ids=cast(tuple[str, ...], ["not-a-tuple"]),
+        )
+    with pytest.raises(GameLifecycleError, match="current model evidence must not be empty"):
+        catalog_charge_roll_modifiers_for_unit(
+            ability_index=player_index,
+            unit=unit,
+            current_model_instance_ids=(),
+        )
+    with pytest.raises(GameLifecycleError, match="current model evidence must not duplicate"):
+        catalog_charge_roll_modifiers_for_unit(
+            ability_index=player_index,
+            unit=unit,
+            current_model_instance_ids=(
+                unit.own_models[0].model_instance_id,
+                unit.own_models[0].model_instance_id,
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="current model evidence contains unknown"):
+        catalog_charge_roll_modifiers_for_unit(
+            ability_index=player_index,
+            unit=unit,
+            current_model_instance_ids=("army-khorne:bloodcrushers-1:model:missing",),
+        )
+    with pytest.raises(GameLifecycleError, match="requires an AbilityCatalogIndex"):
+        catalog_charge_roll_modifiers_for_unit(
+            ability_index=cast(AbilityCatalogIndex, object()),
+            unit=unit,
+            current_model_instance_ids=_current_model_ids(
+                battlefield=battlefield,
+                unit=unit,
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="requires a UnitInstance"):
+        catalog_charge_roll_modifiers_for_unit(
+            ability_index=player_index,
+            unit=cast(UnitInstance, object()),
+            current_model_instance_ids=_current_model_ids(
+                battlefield=battlefield,
+                unit=unit,
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="current model evidence must contain IDs"):
+        catalog_charge_roll_modifiers_for_unit(
+            ability_index=player_index,
+            unit=unit,
+            current_model_instance_ids=("",),
+        )
+    with pytest.raises(GameLifecycleError, match="classification requires RuleIR"):
+        catalog_rule_ir_consumers_for_rule(cast(RuleIR, object()))
 
 
 def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() -> None:
@@ -420,8 +517,15 @@ def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() ->
     army = _bloodcrushers_army(package=package, unit=unit)
     player_index = _player_ability_index(package=package, army=army)
     battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
-    battlefield = battlefield.with_removed_models(
-        tuple(model.model_instance_id for model in unit.own_models[:2])
+    bearer = _model_bearing_wargear(unit, "000001115:daemonic-icon")
+    alive_bearer_battlefield = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in unit.own_models if model != bearer)
+    )
+    destroyed_bearer_battlefield = battlefield.with_removed_models(
+        (
+            bearer.model_instance_id,
+            next(model.model_instance_id for model in unit.own_models if model != bearer),
+        )
     )
     records_by_name = {record.definition.name: record for record in player_index.all_records()}
     starting_strength = (StartingStrengthRecord.from_unit(player_id=army.player_id, unit=unit),)
@@ -431,15 +535,24 @@ def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() ->
         battle_round=1,
         player_id=army.player_id,
         army=army,
-        battlefield_state=battlefield,
+        battlefield_state=alive_bearer_battlefield,
         starting_strength_records=starting_strength,
     )
-    requests_with_index = collect_battle_shock_test_requests(
+    alive_bearer_requests_with_index = collect_battle_shock_test_requests(
         game_id="phase17k-game",
         battle_round=1,
         player_id=army.player_id,
         army=army,
-        battlefield_state=battlefield,
+        battlefield_state=alive_bearer_battlefield,
+        starting_strength_records=starting_strength,
+        ability_index=player_index,
+    )
+    destroyed_bearer_requests_with_index = collect_battle_shock_test_requests(
+        game_id="phase17k-game",
+        battle_round=1,
+        player_id=army.player_id,
+        army=army,
+        battlefield_state=destroyed_bearer_battlefield,
         starting_strength_records=starting_strength,
         ability_index=player_index,
     )
@@ -449,9 +562,11 @@ def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() ->
     )
     assert records_by_name["Daemonic Icon"].definition.name == "Daemonic Icon"
     assert len(requests_without_index) == 1
-    assert len(requests_with_index) == 1
+    assert len(alive_bearer_requests_with_index) == 1
+    assert len(destroyed_bearer_requests_with_index) == 1
     assert requests_without_index[0].leadership_target == 7
-    assert requests_with_index[0].leadership_target == 6
+    assert alive_bearer_requests_with_index[0].leadership_target == 6
+    assert destroyed_bearer_requests_with_index[0].leadership_target == 7
 
 
 def test_phase17k_bloodcrushers_ability_coverage_snapshot_is_current() -> None:
@@ -502,6 +617,7 @@ def test_phase17k_ability_coverage_api_fails_fast_and_classifies_unsupported_ir(
     )
     rows_by_name = {row.ability_name: row for row in unsupported_rows}
     scatter = rows_by_name["Scatter Icon"]
+    broken_instrument = rows_by_name["Broken Instrument"]
     hit_charm = rows_by_name["Hit Charm"]
     tithe_charm = rows_by_name["Tithe Charm"]
 
@@ -515,6 +631,12 @@ def test_phase17k_ability_coverage_api_fails_fast_and_classifies_unsupported_ir(
     assert scatter.support_stage is AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED
     assert scatter.diagnostic_reasons == ("unsupported_language",)
     assert scatter.semantic_categories == ("wargear.unsupported.unsupported_language",)
+    assert broken_instrument.support_stage is AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED
+    assert broken_instrument.runtime_consumer_ids == ("catalog-ir:charge-roll-modifier",)
+    assert broken_instrument.semantic_categories == (
+        "wargear.roll_modifier.charge.this_unit",
+        "wargear.unsupported.unsupported_language",
+    )
     assert hit_charm.support_stage is AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE
     assert hit_charm.semantic_categories == ("wargear.roll_modifier.hit.this_unit",)
     assert tithe_charm.support_stage is AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE
@@ -960,6 +1082,27 @@ def _bloodcrushers_battlefield_state(
     )
 
 
+def _current_model_ids(
+    *,
+    battlefield: BattlefieldRuntimeState,
+    unit: UnitInstance,
+) -> tuple[str, ...]:
+    return tuple(
+        placement.model_instance_id
+        for placement in battlefield.unit_placement_by_id(unit.unit_instance_id).model_placements
+    )
+
+
+def _model_bearing_wargear(
+    unit: UnitInstance,
+    wargear_id: str,
+) -> ModelInstance:
+    for model in unit.own_models:
+        if wargear_id in model.wargear_ids:
+            return model
+    raise AssertionError(f"Missing bearer for wargear: {wargear_id}.")
+
+
 def _ability_coverage_row(
     *,
     catalog_id: str = "test-catalog",
@@ -1267,6 +1410,11 @@ def _unsupported_wargear_rule_source_artifacts() -> tuple[WahapediaJsonArtifact,
                         "Add 1 to hit rolls for the bearer's unit.,"
                     ),
                     "test-unsupported-unit,4,Wargear,,Tithe Charm,Gain 1CP.,",
+                    (
+                        "test-unsupported-unit,5,Wargear,,Broken Instrument,"
+                        "Add 1 to Charge rolls made for the bearer's unit. "
+                        "Roll a scatter die and consult the legacy table.,"
+                    ),
                 )
             ),
         ),
