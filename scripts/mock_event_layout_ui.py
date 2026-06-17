@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 from collections.abc import Sequence
+from html import escape
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
@@ -104,6 +105,16 @@ def _force_disposition_display_name(force_disposition_id: str) -> str:
         "priority-assets": "Priority Assets",
     }
     return names[force_disposition_id]
+
+
+def _force_disposition_options_html() -> str:
+    lines: list[str] = []
+    for row in _force_disposition_payloads():
+        disposition_id = escape(str(row["id"]), quote=True)
+        name = escape(str(row["name"]), quote=False)
+        selected = " selected" if disposition_id == "take-and-hold" else ""
+        lines.append(f'          <option value="{disposition_id}"{selected}>{name}</option>')
+    return "\n".join(lines)
 
 
 def _layout_payload(
@@ -498,11 +509,15 @@ def _html_document() -> str:
       <h1>Event Companion Layout Mock</h1>
       <label>
         Force Disposition 1
-        <select id="force-one"></select>
+        <select id="force-one">
+<!-- force-disposition-options -->
+        </select>
       </label>
       <label>
         Force Disposition 2
-        <select id="force-two"></select>
+        <select id="force-two">
+<!-- force-disposition-options -->
+        </select>
       </label>
       <label>
         Layout
@@ -576,13 +591,19 @@ def _html_document() -> str:
     window.setInterval(renderSelection, 250);
 
     function populateForceDispositions(forceDispositions) {
+      if (!Array.isArray(forceDispositions)) {
+        throw new Error("Force disposition payload must be an array.");
+      }
+      const options = forceDispositions.map((force) => {
+        const option = document.createElement("option");
+        option.value = force.id;
+        option.textContent = force.name;
+        return option;
+      });
       for (const select of [state.forceOne, state.forceTwo]) {
         select.replaceChildren();
-        for (const force of forceDispositions) {
-          const option = document.createElement("option");
-          option.value = force.id;
-          option.textContent = force.name;
-          select.append(option);
+        for (const option of options) {
+          select.append(option.cloneNode(true));
         }
       }
       state.forceOne.value = "take-and-hold";
@@ -803,7 +824,7 @@ def _html_document() -> str:
   </script>
 </body>
 </html>
-"""
+""".replace("<!-- force-disposition-options -->", _force_disposition_options_html())
 
 
 if __name__ == "__main__":

@@ -42,6 +42,8 @@ def test_mock_event_layout_ui_exposes_terrain_anchor_rotation_tooltips() -> None
     assert "Rotation:" in html
     assert "stroke: #b8c2cc;" in html
     assert "stroke: #8895a3;" in html
+    assert html.count('<option value="take-and-hold" selected>Take and Hold</option>') == 2
+    assert '<option value="purge-the-foe">Purge the Foe</option>' in html
 
 
 def _object_map(value: object) -> dict[str, object]:
