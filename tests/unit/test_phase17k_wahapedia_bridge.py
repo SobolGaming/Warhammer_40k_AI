@@ -38,8 +38,11 @@ from warhammer40k_core.engine.ability_catalog import (
     catalog_ability_records_from_catalog,
 )
 from warhammer40k_core.engine.ability_coverage import (
+    AbilityCoverageCategoryRow,
     AbilityCoverageRow,
     AbilityCoverageSupportStage,
+    ability_coverage_category_rows,
+    ability_coverage_category_rows_payload,
     ability_coverage_rows_from_catalog,
     ability_coverage_rows_payload,
 )
@@ -76,6 +79,7 @@ from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, RuleIRPayload, parameter_payload
 from warhammer40k_core.rules.source_reference_generation import build_source_reference_catalog
 from warhammer40k_core.rules.wahapedia_bridge import (
+    CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE,
     EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID,
     ModelHeightOverride,
@@ -110,6 +114,24 @@ _REQUIRED_TABLES = (
     "Datasheets_unit_composition",
     "Datasheets_wargear",
     "Factions",
+)
+_BLOODLETTERS_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000001114",
+        model_name="Bloodreaper",
+        height=1.5,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:chaos-daemons:bloodletters:bloodreaper:height",
+        height_document_reference="Chaos Daemons Faction Pack p.28-29",
+    ),
+    ModelHeightOverride(
+        datasheet_id="000001114",
+        model_name="Bloodletters",
+        height=1.5,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:chaos-daemons:bloodletters:bloodletters:height",
+        height_document_reference="Chaos Daemons Faction Pack p.28-29",
+    ),
 )
 
 
@@ -569,10 +591,10 @@ def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() ->
     assert destroyed_bearer_requests_with_index[0].leadership_target == 7
 
 
-def test_phase17k_bloodcrushers_ability_coverage_snapshot_is_current() -> None:
+def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     rows = ability_coverage_rows_from_catalog(
-        _bloodcrushers_package().army_catalog,
-        datasheet_ids=("000001115",),
+        _daemon_wargear_coverage_package().army_catalog,
+        datasheet_ids=_daemon_wargear_coverage_datasheet_ids(),
     )
     snapshot = json.loads(
         (
@@ -583,11 +605,71 @@ def test_phase17k_bloodcrushers_ability_coverage_snapshot_is_current() -> None:
             / "ability_coverage_rows.json"
         ).read_text(encoding="utf-8")
     )
-    rows_by_name = {row.ability_name: row for row in rows}
+    category_rows = ability_coverage_category_rows(rows)
+    category_snapshot = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "data"
+            / "generated"
+            / "ability_coverage"
+            / "ability_support_category_rows.json"
+        ).read_text(encoding="utf-8")
+    )
+    rows_by_name: dict[str, list[AbilityCoverageRow]] = {}
+    for row in rows:
+        rows_by_name.setdefault(row.ability_name, []).append(row)
+    categories_by_name = {row.category_name: row for row in category_rows}
 
     assert ability_coverage_rows_payload(rows) == snapshot
-    assert rows_by_name["Instrument of Chaos"].support_stage.value == "engine_consumed"
-    assert rows_by_name["Daemonic Icon"].support_stage.value == "engine_consumed"
+    assert ability_coverage_category_rows_payload(category_rows) == category_snapshot
+    assert tuple(row.datasheet_name for row in rows_by_name["Instrument of Chaos"]) == (
+        "Bloodletters",
+        "Bloodcrushers",
+    )
+    assert tuple(row.datasheet_name for row in rows_by_name["Daemonic Icon"]) == (
+        "Bloodletters",
+        "Bloodcrushers",
+    )
+    assert tuple(row.datasheet_name for row in rows_by_name["Deep Strike"]) == (
+        "Bloodletters",
+        "Bloodcrushers",
+    )
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Instrument of Chaos"]
+    )
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Daemonic Icon"]
+    )
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Deep Strike"]
+    )
+    assert categories_by_name["Leadership Characteristic"].ability_names == ("Daemonic Icon",)
+    assert categories_by_name["Leadership Characteristic"].datasheet_names == (
+        "Bloodcrushers",
+        "Bloodletters",
+    )
+    assert categories_by_name["Leadership Characteristic"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["Charge Roll Modifier"].ability_names == ("Instrument of Chaos",)
+    assert categories_by_name["Charge Roll Modifier"].datasheet_names == (
+        "Bloodcrushers",
+        "Bloodletters",
+    )
+    assert categories_by_name["Charge Roll Modifier"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["Deep Strike Reserve Arrival"].ability_names == ("Deep Strike",)
+    assert categories_by_name["Deep Strike Reserve Arrival"].runtime_consumer_ids == (
+        "descriptor:movement:deep-strike-placement",
+        "descriptor:reserve-declaration:deep-strike",
+    )
+    assert categories_by_name["Deep Strike Reserve Arrival"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
 
 
 def test_phase17k_ability_coverage_api_fails_fast_and_classifies_unsupported_ir() -> None:
@@ -650,6 +732,16 @@ def test_phase17k_ability_coverage_api_fails_fast_and_classifies_unsupported_ir(
         )
     with pytest.raises(GameLifecycleError, match="rows must be a tuple"):
         ability_coverage_rows_payload(cast(tuple[AbilityCoverageRow, ...], []))
+    with pytest.raises(GameLifecycleError, match="rows must be a tuple"):
+        ability_coverage_category_rows(cast(tuple[AbilityCoverageRow, ...], []))
+    with pytest.raises(GameLifecycleError, match="require coverage rows"):
+        ability_coverage_category_rows(cast(tuple[AbilityCoverageRow, ...], (object(),)))
+    with pytest.raises(GameLifecycleError, match="category rows must be a tuple"):
+        ability_coverage_category_rows_payload(cast(tuple[AbilityCoverageCategoryRow, ...], []))
+    with pytest.raises(GameLifecycleError, match="require category rows"):
+        ability_coverage_category_rows_payload(
+            cast(tuple[AbilityCoverageCategoryRow, ...], (object(),))
+        )
     with pytest.raises(GameLifecycleError, match="catalog_id"):
         _ability_coverage_row(catalog_id="")
     with pytest.raises(GameLifecycleError, match="datasheet_id"):
@@ -968,6 +1060,18 @@ def _bloodcrushers_package() -> CanonicalCatalogPackage:
     )
 
 
+def _daemon_wargear_coverage_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_daemon_wargear_coverage_bridge_artifacts(),
+    )
+
+
+def _daemon_wargear_coverage_datasheet_ids() -> tuple[str, ...]:
+    return ("000001114", "000001115")
+
+
 def _bloodcrushers_unit(
     *,
     package: CanonicalCatalogPackage,
@@ -1139,6 +1243,17 @@ def _bloodcrushers_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
         source_artifacts=_wahapedia_source_artifacts(),
         bridge_package_id=_bridge_package_id(),
         datasheet_ids=("000001115",),
+    )
+
+
+def _daemon_wargear_coverage_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=_daemon_wargear_coverage_datasheet_ids(),
+        height_overrides=(
+            CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES + _BLOODLETTERS_HEIGHT_OVERRIDES
+        ),
     )
 
 

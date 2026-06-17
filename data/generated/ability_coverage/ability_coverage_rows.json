@@ -4,16 +4,106 @@
     "ability_name": "Deep Strike",
     "catalog_id": "chaos-daemons-bridge-catalog",
     "catalog_support": "descriptor_only",
-    "datasheet_id": "000001115",
-    "datasheet_name": "Bloodcrushers",
+    "datasheet_id": "000001114",
+    "datasheet_name": "Bloodletters",
     "diagnostic_reasons": [],
-    "runtime_consumer_ids": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
     "semantic_categories": [
-      "core.descriptor"
+      "core.reserve.deep_strike"
     ],
     "source_kind": "core",
     "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001114:bane-of-cowards",
+    "ability_name": "Bane of Cowards",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "datasheet_id": "000001114",
+    "datasheet_name": "Bloodletters",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [],
+    "semantic_categories": [
+      "datasheet.descriptor"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
     "support_stage": "descriptor_only"
+  },
+  {
+    "ability_id": "000008433",
+    "ability_name": "The Shadow of Chaos",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "datasheet_id": "000001114",
+    "datasheet_name": "Bloodletters",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [],
+    "semantic_categories": [
+      "faction.descriptor"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "descriptor_only"
+  },
+  {
+    "ability_id": "000001114:daemonic-icon",
+    "ability_name": "Daemonic Icon",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "datasheet_id": "000001114",
+    "datasheet_name": "Bloodletters",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:leadership-characteristic-query"
+    ],
+    "semantic_categories": [
+      "wargear.characteristic_set.leadership.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000001114:daemonic-icon",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001114:instrument-of-chaos",
+    "ability_name": "Instrument of Chaos",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "datasheet_id": "000001114",
+    "datasheet_name": "Bloodletters",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:charge-roll-modifier"
+    ],
+    "semantic_categories": [
+      "wargear.roll_modifier.charge.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000001114:instrument-of-chaos",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "datasheet_id": "000001115",
+    "datasheet_name": "Bloodcrushers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
   },
   {
     "ability_id": "000001115:brass-stampede",

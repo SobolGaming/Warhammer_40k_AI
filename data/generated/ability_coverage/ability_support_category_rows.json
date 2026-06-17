@@ -1,0 +1,85 @@
+[
+  {
+    "ability_names": [
+      "Instrument of Chaos"
+    ],
+    "category_id": "wargear.roll_modifier.charge.this_unit",
+    "category_name": "Charge Roll Modifier",
+    "datasheet_names": [
+      "Bloodcrushers",
+      "Bloodletters"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:charge-roll-modifier"
+    ],
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_names": [
+      "Bane of Cowards",
+      "Brass Stampede"
+    ],
+    "category_id": "datasheet.descriptor",
+    "category_name": "Datasheet Descriptor",
+    "datasheet_names": [
+      "Bloodcrushers",
+      "Bloodletters"
+    ],
+    "runtime_consumer_ids": [],
+    "support_stages": [
+      "descriptor_only"
+    ]
+  },
+  {
+    "ability_names": [
+      "Deep Strike"
+    ],
+    "category_id": "core.reserve.deep_strike",
+    "category_name": "Deep Strike Reserve Arrival",
+    "datasheet_names": [
+      "Bloodcrushers",
+      "Bloodletters"
+    ],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_names": [
+      "The Shadow of Chaos"
+    ],
+    "category_id": "faction.descriptor",
+    "category_name": "Faction Descriptor",
+    "datasheet_names": [
+      "Bloodcrushers",
+      "Bloodletters"
+    ],
+    "runtime_consumer_ids": [],
+    "support_stages": [
+      "descriptor_only"
+    ]
+  },
+  {
+    "ability_names": [
+      "Daemonic Icon"
+    ],
+    "category_id": "wargear.characteristic_set.leadership.this_unit",
+    "category_name": "Leadership Characteristic",
+    "datasheet_names": [
+      "Bloodcrushers",
+      "Bloodletters"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:leadership-characteristic-query"
+    ],
+    "support_stages": [
+      "engine_consumed"
+    ]
+  }
+]
