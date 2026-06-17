@@ -24,30 +24,38 @@ _MONSTER_UNIT_ID = "army-alpha:vehicle-monster-1"
 
 
 def test_advance_resolver_uses_explicit_battlefield_depth_for_large_model_edge() -> None:
-    scenario = _monster_scenario_with_active_pose(Pose.at(10.0, 50.0, 0.0, facing_degrees=0.0))
-    unit_placement = scenario.battlefield_state.unit_placement_by_id(_MONSTER_UNIT_ID)
+    valid_scenario = _monster_scenario_with_active_pose(
+        Pose.at(10.0, 50.0, 0.0, facing_degrees=0.0),
+        battlefield_width_inches=44.0,
+        battlefield_depth_inches=60.0,
+    )
+    invalid_scenario = _monster_scenario_with_active_pose(
+        Pose.at(10.0, 50.0, 0.0, facing_degrees=0.0),
+        battlefield_width_inches=44.0,
+        battlefield_depth_inches=44.0,
+    )
+    unit_placement = valid_scenario.battlefield_state.unit_placement_by_id(_MONSTER_UNIT_ID)
     witness = _single_model_witness_to_pose(
         unit_placement,
         end_pose=Pose.at(5.660714285714285, 54.73214285714286, 0.0, facing_degrees=0.0),
     )
 
     valid_on_mission_depth = resolve_advance_move(
-        scenario=scenario,
+        scenario=valid_scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         unit_placement=unit_placement,
         advance_roll=_fixed_advance_roll(value=1),
         path_witness=witness,
-        battlefield_width_inches=44.0,
-        battlefield_depth_inches=60.0,
+    )
+    invalid_unit_placement = invalid_scenario.battlefield_state.unit_placement_by_id(
+        _MONSTER_UNIT_ID
     )
     invalid_on_stale_depth = resolve_advance_move(
-        scenario=scenario,
+        scenario=invalid_scenario,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
-        unit_placement=unit_placement,
+        unit_placement=invalid_unit_placement,
         advance_roll=_fixed_advance_roll(value=1),
         path_witness=witness,
-        battlefield_width_inches=44.0,
-        battlefield_depth_inches=44.0,
     )
 
     assert valid_on_mission_depth.is_valid
@@ -56,10 +64,17 @@ def test_advance_resolver_uses_explicit_battlefield_depth_for_large_model_edge()
     assert "battlefield_edge_crossed" in _violation_codes(invalid_on_stale_depth)
 
 
-def _monster_scenario_with_active_pose(pose: Pose) -> BattlefieldScenario:
+def _monster_scenario_with_active_pose(
+    pose: Pose,
+    *,
+    battlefield_width_inches: float,
+    battlefield_depth_inches: float,
+) -> BattlefieldScenario:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase10v-mission-geometry",
+        battlefield_width_inches=battlefield_width_inches,
+        battlefield_depth_inches=battlefield_depth_inches,
         armies=(
             muster_army(
                 catalog=catalog,

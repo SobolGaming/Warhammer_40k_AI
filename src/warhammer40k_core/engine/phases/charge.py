@@ -48,7 +48,6 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.live_geometry import live_battlefield_geometry_for_state
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -1713,11 +1712,6 @@ def _apply_charge_move_proposal_decision(
         raise GameLifecycleError("Validated Charge Move proposal must include a witness.")
     scenario = _battlefield_scenario(state)
     unit_placement = scenario.battlefield_state.unit_placement_by_id(proposal.unit_instance_id)
-    movement_geometry = live_battlefield_geometry_for_state(
-        state=state,
-        ruleset_descriptor=ruleset_descriptor,
-        context="Charge Move",
-    )
     resolution = resolve_charge_move(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -1726,9 +1720,6 @@ def _apply_charge_move_proposal_decision(
         maximum_distance_inches=pending_distance.roll_result.value,
         path_witness=proposal.witness,
         hover_mode_states=tuple(state.hover_mode_states),
-        battlefield_width_inches=movement_geometry.battlefield_width_inches,
-        battlefield_depth_inches=movement_geometry.battlefield_depth_inches,
-        terrain_features=movement_geometry.terrain_features,
     )
     violation_code = _charge_move_violation_code(
         resolution=resolution,
@@ -1783,10 +1774,7 @@ def resolve_charge_move(
     maximum_distance_inches: int,
     path_witness: PathWitness,
     hover_mode_states: tuple[HoverModeState, ...] = (),
-    battlefield_width_inches: float = 60.0,
-    battlefield_depth_inches: float = 44.0,
     terrain: tuple[TerrainVolume, ...] = (),
-    terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
 ) -> ChargeMoveResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Charge Move requires a BattlefieldScenario.")
@@ -1823,6 +1811,7 @@ def resolve_charge_move(
             placement.with_pose(path_witness.final_pose_for_model(placement.model_instance_id))
         )
     attempted_placement = unit_placement.with_model_placements(tuple(moved_placements))
+    terrain_features = scenario.battlefield_state.terrain_features
     terrain_volumes = (*terrain, *_terrain_volumes_for_features(terrain_features))
     path_validation_results: list[PathValidationResult] = []
     terrain_path_legality_results: list[TerrainPathLegalityResult] = []
@@ -1848,8 +1837,8 @@ def resolve_charge_move(
         path_result = legality_context.to_path_validation_context(
             moving_model=moving_model,
             witness=model_witness,
-            battlefield_width_inches=battlefield_width_inches,
-            battlefield_depth_inches=battlefield_depth_inches,
+            battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
+            battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
             friendly_models=_friendly_geometry_models_for_charge_path(
                 scenario=scenario,
                 unit_placement=unit_placement,

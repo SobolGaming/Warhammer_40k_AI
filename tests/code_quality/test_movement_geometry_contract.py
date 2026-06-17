@@ -7,92 +7,85 @@ ROOT = Path(__file__).resolve().parents[2]
 MOVEMENT_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement.py"
 CHARGE_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "charge.py"
 FIGHT_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "fight.py"
+FIGHT_RESOLUTION = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_resolution.py"
 STRATAGEMS = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems.py"
 TRIGGERED_MOVEMENT = ROOT / "src" / "warhammer40k_core" / "engine" / "triggered_movement.py"
 
-REQUIRED_GEOMETRY_KEYWORDS = {
-    "resolve_normal_move": frozenset(
-        ("battlefield_width_inches", "battlefield_depth_inches", "terrain_features")
-    ),
-    "resolve_advance_move": frozenset(
-        ("battlefield_width_inches", "battlefield_depth_inches", "terrain_features")
-    ),
-    "resolve_fall_back_move": frozenset(
-        ("battlefield_width_inches", "battlefield_depth_inches", "terrain_features")
-    ),
-    "_aircraft_reserve_transition_reason_for_normal_move": frozenset(
-        ("battlefield_width_inches", "battlefield_depth_inches")
-    ),
-}
-LIVE_MOVEMENT_FAMILY_CALLS = (
-    (
-        CHARGE_PHASE,
-        "resolve_charge_move",
-        frozenset(("battlefield_width_inches", "battlefield_depth_inches", "terrain_features")),
-    ),
-    (
-        FIGHT_PHASE,
-        "resolve_fight_movement",
-        frozenset(("battlefield_width_inches", "battlefield_depth_inches", "terrain_features")),
-    ),
-    (
-        STRATAGEMS,
-        "resolve_charge_move",
-        frozenset(("battlefield_width_inches", "battlefield_depth_inches", "terrain_features")),
-    ),
-    (
-        TRIGGERED_MOVEMENT,
-        "resolve_triggered_movement",
-        frozenset(("battlefield_width_inches", "battlefield_depth_inches", "terrain_features")),
-    ),
+LIVE_MOVEMENT_CALLS = (
+    (MOVEMENT_PHASE, "_apply_movement_proposal_decision", "resolve_normal_move"),
+    (MOVEMENT_PHASE, "_apply_movement_proposal_decision", "resolve_advance_move"),
+    (MOVEMENT_PHASE, "_apply_movement_proposal_decision", "resolve_fall_back_move"),
+    (CHARGE_PHASE, "_apply_charge_move_proposal_decision", "resolve_charge_move"),
+    (FIGHT_PHASE, "_apply_fight_movement_proposal", "resolve_fight_movement"),
+    (STRATAGEMS, "apply_heroic_intervention_charge_move", "resolve_charge_move"),
+    (TRIGGERED_MOVEMENT, "request_from_state", "resolve_triggered_movement"),
+    (TRIGGERED_MOVEMENT, "apply_decision", "resolve_triggered_movement"),
+    (TRIGGERED_MOVEMENT, "apply_proposal_decision", "resolve_triggered_movement"),
+)
+GEOMETRY_KEYWORDS = frozenset(
+    ("battlefield_width_inches", "battlefield_depth_inches", "terrain_features")
+)
+RESOLVER_GEOMETRY_READS = (
+    (MOVEMENT_PHASE, "resolve_normal_move"),
+    (MOVEMENT_PHASE, "resolve_advance_move"),
+    (MOVEMENT_PHASE, "resolve_fall_back_move"),
+    (CHARGE_PHASE, "resolve_charge_move"),
+    (FIGHT_RESOLUTION, "_validate_fight_paths"),
+    (TRIGGERED_MOVEMENT, "resolve_triggered_movement"),
 )
 
 
-def test_live_movement_proposals_pass_mission_geometry_to_resolvers() -> None:
-    tree = ast.parse(MOVEMENT_PHASE.read_text(encoding="utf-8"), filename=str(MOVEMENT_PHASE))
-    handler = _function_by_name(tree, "_apply_movement_proposal_decision")
-
-    assert _function_calls(handler, "live_battlefield_geometry_for_state")
-
+def test_live_movement_callers_do_not_pass_copied_battlefield_geometry() -> None:
     violations: list[str] = []
-    for node in ast.walk(handler):
-        if not isinstance(node, ast.Call):
-            continue
-        call_name = _call_name(node)
-        if call_name not in REQUIRED_GEOMETRY_KEYWORDS:
-            continue
-        keyword_names = {keyword.arg for keyword in node.keywords if keyword.arg is not None}
-        missing = REQUIRED_GEOMETRY_KEYWORDS[call_name] - keyword_names
-        if missing:
-            violations.append(f"{call_name} missing {', '.join(sorted(missing))}")
-
-    assert not violations, (
-        "Live movement proposal resolution must pass active battlefield geometry:\n"
-        + "\n".join(violations)
-    )
-
-
-def test_live_movement_family_calls_pass_battlefield_geometry() -> None:
-    violations: list[str] = []
-    for path, call_name, required_keywords in LIVE_MOVEMENT_FAMILY_CALLS:
+    for path, function_name, call_name in LIVE_MOVEMENT_CALLS:
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        if not _module_calls(tree, "live_battlefield_geometry_for_state"):
-            violations.append(f"{path.relative_to(ROOT)} does not call live geometry helper")
-        for node in ast.walk(tree):
+        if _module_imports_name(tree, "live_battlefield_geometry_for_state"):
+            violations.append(f"{path.relative_to(ROOT)} imports live geometry helper")
+        function = _function_by_name(tree, function_name)
+        for node in ast.walk(function):
             if not isinstance(node, ast.Call):
                 continue
             if _call_name(node) != call_name:
                 continue
-            keyword_names = {keyword.arg for keyword in node.keywords if keyword.arg is not None}
-            missing = required_keywords - keyword_names
-            if missing:
+            copied_keywords = {
+                keyword.arg
+                for keyword in node.keywords
+                if keyword.arg is not None and keyword.arg in GEOMETRY_KEYWORDS
+            }
+            if copied_keywords:
                 violations.append(
-                    f"{path.relative_to(ROOT)}:{node.lineno} {call_name} missing "
-                    + ", ".join(sorted(missing))
+                    f"{path.relative_to(ROOT)}:{node.lineno} {call_name} passes "
+                    + ", ".join(sorted(copied_keywords))
                 )
 
     assert not violations, (
-        "Live movement-family calls must pass active battlefield geometry:\n"
+        "Live movement-family callers must use the manifested BattlefieldRuntimeState "
+        "through the resolver scenario instead of copying geometry into each phase:\n"
+        + "\n".join(violations)
+    )
+
+
+def test_movement_resolvers_read_manifested_battlefield_geometry() -> None:
+    violations: list[str] = []
+    for path, function_name in RESOLVER_GEOMETRY_READS:
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        function = _function_by_name(tree, function_name)
+        source = ast.unparse(function)
+        missing: list[str] = []
+        if "scenario.battlefield_state.battlefield_width_inches" not in source:
+            missing.append("battlefield_width_inches")
+        if "scenario.battlefield_state.battlefield_depth_inches" not in source:
+            missing.append("battlefield_depth_inches")
+        if "scenario.battlefield_state.terrain_features" not in source:
+            missing.append("terrain_features")
+        if missing:
+            violations.append(
+                f"{path.relative_to(ROOT)}:{function.lineno} {function_name} missing "
+                + ", ".join(missing)
+            )
+
+    assert not violations, (
+        "Movement-family resolvers must read geometry from scenario.battlefield_state:\n"
         + "\n".join(violations)
     )
 
@@ -104,21 +97,12 @@ def _function_by_name(tree: ast.AST, name: str) -> ast.FunctionDef:
     raise AssertionError(f"Missing function: {name}")
 
 
-def _function_calls(node: ast.FunctionDef, function_name: str) -> bool:
-    for child in ast.walk(node):
-        if not isinstance(child, ast.Call):
-            continue
-        if _call_name(child) == function_name:
-            return True
-    return False
-
-
-def _module_calls(tree: ast.AST, function_name: str) -> bool:
-    for child in ast.walk(tree):
-        if not isinstance(child, ast.Call):
-            continue
-        if _call_name(child) == function_name:
-            return True
+def _module_imports_name(tree: ast.AST, imported_name: str) -> bool:
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                if alias.name == imported_name or alias.asname == imported_name:
+                    return True
     return False
 
 

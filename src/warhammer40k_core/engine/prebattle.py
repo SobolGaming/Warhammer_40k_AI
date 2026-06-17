@@ -2379,6 +2379,7 @@ def _append_setup_geometry_violations(
     deployment_zones: tuple[DeploymentZone, ...],
 ) -> None:
     mission_setup = _require_mission_setup(state)
+    battlefield_state = scenario.battlefield_state
     placed_models = scenario.placed_geometry_models()
     enemy_models = tuple(
         model
@@ -2394,8 +2395,8 @@ def _append_setup_geometry_violations(
     for model in models:
         if not _model_is_within_battlefield(
             model,
-            battlefield_width_inches=mission_setup.battlefield_width_inches,
-            battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+            battlefield_width_inches=battlefield_state.battlefield_width_inches,
+            battlefield_depth_inches=battlefield_state.battlefield_depth_inches,
         ):
             violations.append(
                 PreBattleViolation(
@@ -2442,7 +2443,7 @@ def _append_setup_geometry_violations(
             model=model,
             unit=_unit_for_model(view=view, model_instance_id=model.model_id),
             ruleset_descriptor=ruleset_descriptor,
-            terrain_features=mission_setup.terrain_features,
+            terrain_features=battlefield_state.terrain_features,
             violation_code=PreBattleViolationCode.TERRAIN_ENDPOINT_ILLEGAL.value,
             placement_label="Pre-battle placement",
         )
@@ -2503,8 +2504,11 @@ def _append_scout_path_violations(
     scout_distance_inches: float,
 ) -> None:
     mission_setup = _require_mission_setup(state)
+    battlefield_state = scenario.battlefield_state
     terrain_volumes = tuple(
-        volume for feature in mission_setup.terrain_features for volume in feature.terrain_volumes()
+        volume
+        for feature in battlefield_state.terrain_features
+        for volume in feature.terrain_volumes()
     )
     aircraft_model_ids: tuple[str, ...] = ()
     for placement in current.model_placements:
@@ -2523,8 +2527,8 @@ def _append_scout_path_violations(
         path_result = legality_context.to_path_validation_context(
             moving_model=moving_model,
             witness=model_witness,
-            battlefield_width_inches=mission_setup.battlefield_width_inches,
-            battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+            battlefield_width_inches=battlefield_state.battlefield_width_inches,
+            battlefield_depth_inches=battlefield_state.battlefield_depth_inches,
             friendly_models=_friendly_geometry_models_for_path(
                 scenario=scenario,
                 unit_placement=current,
@@ -2563,7 +2567,7 @@ def _append_scout_path_violations(
             moving_model=moving_model,
             witness=model_witness,
             terrain=terrain_volumes,
-            terrain_features=mission_setup.terrain_features,
+            terrain_features=battlefield_state.terrain_features,
         ).validate()
         if not terrain_result.is_valid:
             first_terrain_violation = terrain_result.violations[0]

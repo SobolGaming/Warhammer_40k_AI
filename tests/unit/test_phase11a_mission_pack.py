@@ -916,7 +916,7 @@ def test_live_reinforcements_use_mission_deployment_zones_for_round_2_restrictio
     )
 
 
-def test_live_reinforcements_use_instantiated_mission_terrain_for_endpoint_validation() -> None:
+def test_live_reinforcements_use_manifested_battlefield_terrain_for_endpoint_validation() -> None:
     state, reserve_state = _battle_state_with_mission_setup(
         attacker_player_id="player-a",
         defender_player_id="player-b",
@@ -944,15 +944,17 @@ def test_live_reinforcements_use_instantiated_mission_terrain_for_endpoint_valid
         pose=_south_edge_touching_pose(reserve_unit=reserve_unit, x=6.0),
     )
     pose = _first_placement_pose(placement)
-    assert state.mission_setup is not None
-    state.mission_setup = replace(
-        state.mission_setup,
-        terrain_features=(
-            _blocking_terrain_feature(
-                x=pose["x"],
-                y=pose["y"],
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        replace(
+            state.battlefield_state,
+            terrain_features=(
+                _blocking_terrain_feature(
+                    x=pose["x"],
+                    y=pose["y"],
+                ),
             ),
-        ),
+        )
     )
 
     invalid_status = _submit_reserve_placement_payload(
@@ -999,6 +1001,9 @@ def _battle_state_with_mission_setup(
     placed_scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase11a-battlefield",
         armies=armies,
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+        terrain_features=mission_setup.terrain_features,
     )
     reserve_unit = armies[0].unit_by_id("army-alpha:intercessor-unit-1")
     battlefield_state = placed_scenario.battlefield_state.without_unit_placement(

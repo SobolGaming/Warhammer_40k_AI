@@ -329,7 +329,10 @@ def test_battlefield_state_and_scenario_fail_fast_on_invalid_shapes() -> None:
     with pytest.raises(PlacementError, match="stable identity prefix"):
         BattlefieldRuntimeState(
             battlefield_id="battlefield:bad-id",
+            battlefield_width_inches=placement_state.battlefield_width_inches,
+            battlefield_depth_inches=placement_state.battlefield_depth_inches,
             placed_armies=placement_state.placed_armies,
+            terrain_features=placement_state.terrain_features,
         )
     with pytest.raises(PlacementError, match="placed_armies must be a tuple"):
         replace(placement_state, placed_armies=cast(tuple[PlacedArmy, ...], []))

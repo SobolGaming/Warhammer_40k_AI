@@ -1138,6 +1138,9 @@ def _battlefield_with_returned_model_new_component(
         raise GameLifecycleError("Revival placement army is not on the battlefield.")
     return BattlefieldRuntimeState(
         battlefield_id=battlefield.battlefield_id,
+        battlefield_width_inches=battlefield.battlefield_width_inches,
+        battlefield_depth_inches=battlefield.battlefield_depth_inches,
+        terrain_features=battlefield.terrain_features,
         placed_armies=tuple(placed_armies),
         removed_model_ids=tuple(
             sorted(

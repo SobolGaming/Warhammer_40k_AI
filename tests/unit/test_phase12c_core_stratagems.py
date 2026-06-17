@@ -4564,9 +4564,9 @@ def _mark_attached_unit_join(
 
 
 def _clear_terrain(state: GameState) -> None:
-    mission_setup = state.mission_setup
-    assert mission_setup is not None
-    state.mission_setup = replace(mission_setup, terrain_features=())
+    battlefield_state = state.battlefield_state
+    assert battlefield_state is not None
+    state.battlefield_state = replace(battlefield_state, terrain_features=())
 
 
 def _proposal_request_from_decision(request: DecisionRequest) -> StratagemTargetProposal:

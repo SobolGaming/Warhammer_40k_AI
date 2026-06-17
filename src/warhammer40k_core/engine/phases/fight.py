@@ -115,7 +115,6 @@ from warhammer40k_core.engine.fight_resolution import (
     resolve_fight_movement,
     validate_melee_declaration_rules,
 )
-from warhammer40k_core.engine.live_geometry import live_battlefield_geometry_for_state
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -1162,11 +1161,6 @@ def _apply_fight_movement_proposal(
         )
     scenario = _battlefield_scenario(state)
     ruleset_descriptor = state.runtime_ruleset_descriptor()
-    movement_geometry = live_battlefield_geometry_for_state(
-        state=state,
-        ruleset_descriptor=ruleset_descriptor,
-        context="Fight movement",
-    )
     resolution = resolve_fight_movement(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -1176,9 +1170,6 @@ def _apply_fight_movement_proposal(
             unit_instance_id=proposal.unit_instance_id,
             proposal_kind=proposal.proposal_kind,
         ),
-        battlefield_width_inches=movement_geometry.battlefield_width_inches,
-        battlefield_depth_inches=movement_geometry.battlefield_depth_inches,
-        terrain_features=movement_geometry.terrain_features,
     )
     resolution_violation = fight_movement_resolution_violation(
         proposal_request=proposal_request,

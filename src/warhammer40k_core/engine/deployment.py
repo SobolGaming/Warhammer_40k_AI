@@ -798,6 +798,9 @@ def create_empty_deployment_battlefield_state(*, state: GameState) -> Battlefiel
     mission_setup = _require_mission_setup(state)
     return BattlefieldRuntimeState(
         battlefield_id=f"{state.game_id}:{mission_setup.deployment_map_id}:battlefield",
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+        terrain_features=mission_setup.terrain_features,
         placed_armies=(),
     )
 
@@ -1231,6 +1234,7 @@ def _append_geometry_violations(
     deployment_zones: tuple[DeploymentZone, ...],
 ) -> None:
     mission_setup = _require_mission_setup(state)
+    battlefield_state = scenario.battlefield_state
     placed_models = scenario.placed_geometry_models()
     enemy_models = tuple(
         model
@@ -1246,8 +1250,8 @@ def _append_geometry_violations(
     for model in models:
         if not _model_is_within_battlefield(
             model,
-            battlefield_width_inches=mission_setup.battlefield_width_inches,
-            battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+            battlefield_width_inches=battlefield_state.battlefield_width_inches,
+            battlefield_depth_inches=battlefield_state.battlefield_depth_inches,
         ):
             violations.append(
                 DeploymentPlacementViolation(
@@ -1307,7 +1311,7 @@ def _append_geometry_violations(
             model=model,
             unit=_unit_for_model(view=view, model_instance_id=model.model_id),
             ruleset_descriptor=ruleset_descriptor,
-            terrain_features=mission_setup.terrain_features,
+            terrain_features=battlefield_state.terrain_features,
             violation_code=DeploymentPlacementViolationCode.TERRAIN_ENDPOINT_ILLEGAL.value,
             placement_label="Deployment placement",
         )

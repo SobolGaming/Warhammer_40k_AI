@@ -1251,6 +1251,8 @@ def _path_state(
         ],
         battlefield_state=BattlefieldRuntimeState(
             battlefield_id="battlefield-alpha",
+            battlefield_width_inches=60.0,
+            battlefield_depth_inches=44.0,
             placed_armies=(
                 PlacedArmy(
                     army_id="army-a",
