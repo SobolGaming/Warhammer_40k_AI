@@ -17,9 +17,13 @@ from warhammer40k_core.engine.list_validation import (
     ModelProfileSelection,
     UnitMusterSelection,
 )
-from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mission_setup import MissionSetup, instantiate_terrain_layout_template
 from warhammer40k_core.engine.reserves import ReserveUnitPointValue
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+
+_SMOKE_IMPLEMENTED_MISSION_POOL_ENTRY_ID = "mission-take-and-hold-vs-purge-the-foe-layout-3"
+_SMOKE_IMPLEMENTED_TERRAIN_LAYOUT_ID = "take-and-hold-vs-purge-the-foe-layout-3"
+_SMOKE_TYPED_BATTLEFIELD_LAYOUT_ID = "take-and-hold-vs-take-and-hold-layout-3"
 
 
 def canonical_setup_prebattle_smoke_config(
@@ -66,13 +70,7 @@ def canonical_setup_prebattle_smoke_config(
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
-        mission_setup=MissionSetup.from_mission_pack(
-            mission_pack=chapter_approved_2026_27_mission_pack(),
-            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
-            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
-            attacker_player_id="player-a",
-            defender_player_id="player-b",
-        ),
+        mission_setup=_setup_prebattle_smoke_mission_setup(),
         reserve_unit_points=(
             ReserveUnitPointValue(
                 unit_instance_id="army-alpha:strategic-reserve-unit",
@@ -80,6 +78,37 @@ def canonical_setup_prebattle_smoke_config(
                 source_id="setup-smoke-points:army-alpha:strategic-reserve-unit",
             ),
         ),
+    )
+
+
+def _setup_prebattle_smoke_mission_setup() -> MissionSetup:
+    mission_pack = chapter_approved_2026_27_mission_pack()
+    implemented_setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id=_SMOKE_IMPLEMENTED_MISSION_POOL_ENTRY_ID,
+        terrain_layout_id=_SMOKE_IMPLEMENTED_TERRAIN_LAYOUT_ID,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    typed_layout = mission_pack.battlefield_layout(_SMOKE_TYPED_BATTLEFIELD_LAYOUT_ID)
+    typed_deployment_map = mission_pack.deployment_map(typed_layout.deployment_map_id)
+    typed_terrain_layout = mission_pack.terrain_layout_template(typed_layout.terrain_layout_id)
+    return replace(
+        implemented_setup,
+        battlefield_layout_id=typed_layout.battlefield_layout_id,
+        deployment_map_id=typed_layout.deployment_map_id,
+        terrain_layout_id=typed_layout.terrain_layout_id,
+        battlefield_width_inches=typed_layout.battlefield_width_inches,
+        battlefield_depth_inches=typed_layout.battlefield_depth_inches,
+        objective_markers=typed_layout.objective_markers,
+        deployment_zones=typed_deployment_map.deployment_zones_for_players(
+            attacker_player_id="player-a",
+            defender_player_id="player-b",
+        ),
+        battlefield_regions=typed_layout.battlefield_regions,
+        terrain_areas=typed_layout.terrain_areas,
+        terrain_features=instantiate_terrain_layout_template(typed_terrain_layout),
+        objective_terrain_areas=typed_layout.objective_terrain_areas,
     )
 
 

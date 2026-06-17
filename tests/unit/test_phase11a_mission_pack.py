@@ -76,6 +76,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 PHASE16A_BATTLEFIELD_LAYOUT_ID = "take-and-hold-vs-purge-the-foe-layout-3"
 PHASE16A_DEPLOYMENT_MAP_ID = "take-and-hold-vs-purge-the-foe-layout-3-deployment"
 PHASE16A_MISSION_POOL_ENTRY_ID = "mission-take-and-hold-vs-purge-the-foe-layout-3"
+TYPED_TAKE_AND_HOLD_LAYOUT_C_ID = "take-and-hold-vs-take-and-hold-layout-3"
 
 
 def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> None:
@@ -89,8 +90,10 @@ def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> Non
     assert "object at 0x" not in encoded
     assert MissionPackDefinition.from_payload(decoded).to_payload() == payload
     assert mission_pack.sequence.steps[0] == "muster_armies"
-    assert len(mission_pack.deployment_maps) == 1
-    assert len(mission_pack.terrain_layout_templates) == 1
+    assert len(mission_pack.deployment_maps) == 7
+    assert len(mission_pack.terrain_layout_templates) == 7
+    assert len(mission_pack.battlefield_layouts) == 6
+    assert len(mission_pack.terrain_area_footprint_templates) == 5
     assert len(mission_pack.mission_pool_entries) == 1
     assert len(mission_pack.secondary_missions) == 18
     assert tuple(mission.secondary_mission_id for mission in mission_pack.secondary_missions) == (
@@ -271,7 +274,13 @@ def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
         for second_disposition_id in layout_disposition_order[first_index:]
     }
     assert tuple(layout.terrain_layout_id for layout in mission_pack.terrain_layout_templates) == (
+        "disruption-vs-reconnaissance-layout-1",
+        "disruption-vs-reconnaissance-layout-2",
+        "disruption-vs-reconnaissance-layout-3",
         PHASE16A_BATTLEFIELD_LAYOUT_ID,
+        "take-and-hold-vs-take-and-hold-layout-1",
+        "take-and-hold-vs-take-and-hold-layout-2",
+        TYPED_TAKE_AND_HOLD_LAYOUT_C_ID,
     )
     assert MissionPackDefinition.from_payload(mission_pack.to_payload()).to_payload() == (
         mission_pack.to_payload()
@@ -556,15 +565,30 @@ def test_deployment_map_and_objective_marker_policy_round_trip() -> None:
 def test_deployment_map_objective_marker_coordinates_match_source_snapshot() -> None:
     mission_pack = chapter_approved_2026_27_mission_pack()
 
-    assert _objective_coordinate_snapshot(mission_pack) == {
-        PHASE16A_DEPLOYMENT_MAP_ID: {
-            "take-and-hold-vs-purge-the-foe-layout-3-center-central": (30.0, 22.0),
-            "take-and-hold-vs-purge-the-foe-layout-3-left-home": (9.5, 10.5),
-            "take-and-hold-vs-purge-the-foe-layout-3-lower-central": (28.5, 35.5),
-            "take-and-hold-vs-purge-the-foe-layout-3-right-home": (52.5, 34.5),
-            "take-and-hold-vs-purge-the-foe-layout-3-upper-central": (28.5, 8.5),
-        },
+    assert _objective_coordinate_snapshot(mission_pack)[PHASE16A_DEPLOYMENT_MAP_ID] == {
+        "take-and-hold-vs-purge-the-foe-layout-3-center-central": (30.0, 22.0),
+        "take-and-hold-vs-purge-the-foe-layout-3-left-home": (9.5, 10.5),
+        "take-and-hold-vs-purge-the-foe-layout-3-lower-central": (28.5, 35.5),
+        "take-and-hold-vs-purge-the-foe-layout-3-right-home": (52.5, 34.5),
+        "take-and-hold-vs-purge-the-foe-layout-3-upper-central": (28.5, 8.5),
     }
+
+
+def test_chapter_approved_exposes_typed_event_companion_battlefield_layouts() -> None:
+    mission_pack = chapter_approved_2026_27_mission_pack()
+    layout = mission_pack.battlefield_layout(TYPED_TAKE_AND_HOLD_LAYOUT_C_ID)
+    deployment_map = mission_pack.deployment_map(layout.deployment_map_id)
+    terrain_layout = mission_pack.terrain_layout_template(layout.terrain_layout_id)
+
+    assert layout.battlefield_width_inches == 44.0
+    assert layout.battlefield_depth_inches == 60.0
+    assert len(layout.terrain_areas) == 16
+    assert len(layout.objective_terrain_areas) == 5
+    assert deployment_map.objective_markers == layout.objective_markers
+    assert deployment_map.deployment_zones == layout.deployment_zones
+    assert terrain_layout.battlefield_width_inches == 44.0
+    assert terrain_layout.battlefield_depth_inches == 60.0
+    assert terrain_layout.terrain_features == ()
 
 
 def test_pending_chapter_approved_layout_has_no_terrain_features_until_validated() -> None:

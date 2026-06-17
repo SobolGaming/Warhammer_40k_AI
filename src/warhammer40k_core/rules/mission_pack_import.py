@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from warhammer40k_core.core.deployment_zones import DeploymentZone
 from warhammer40k_core.core.missions import (
+    BattlefieldLayoutDefinition,
     ChallengerCardDefinition,
     ChapterApprovedMissionSequence,
     DeploymentMapDefinition,
@@ -45,13 +46,27 @@ EVENT_COMPANION_2026_06_SOURCE_VERSION = event_source_data.SOURCE_VERSION
 def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
     """Build the source-linked Chapter Approved 2026-27 mission pack descriptors."""
 
-    deployment_maps = _deployment_maps(
-        rows=source_data.battlefield_layout_rows(),
-        source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
+    typed_battlefield_layouts = event_source_data.battlefield_layout_definitions()
+    chapter_approved_rows = source_data.battlefield_layout_rows()
+    typed_deployment_maps = _deployment_maps_from_typed_battlefield_layouts(
+        typed_battlefield_layouts=typed_battlefield_layouts,
     )
-    terrain_layouts = _terrain_layouts(
-        rows=source_data.battlefield_layout_rows(),
-        source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
+    typed_terrain_layouts = _terrain_layouts_from_typed_battlefield_layouts(
+        typed_battlefield_layouts=typed_battlefield_layouts,
+    )
+    deployment_maps = (
+        *_deployment_maps(
+            rows=chapter_approved_rows,
+            source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
+        ),
+        *typed_deployment_maps,
+    )
+    terrain_layouts = (
+        *_terrain_layouts(
+            rows=chapter_approved_rows,
+            source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
+        ),
+        *typed_terrain_layouts,
     )
     primary_missions = _primary_missions(
         rows=source_data.primary_mission_rows(),
@@ -97,8 +112,8 @@ def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
         ),
         deployment_maps=deployment_maps,
         terrain_layout_templates=terrain_layouts,
-        terrain_area_footprint_templates=(),
-        battlefield_layouts=(),
+        terrain_area_footprint_templates=(event_source_data.terrain_area_footprint_templates()),
+        battlefield_layouts=typed_battlefield_layouts,
         mission_deck=MissionDeckDefinition(
             mission_deck_id="chapter-approved-2026-27-strike-force",
             primary_mission_ids=tuple(mission.primary_mission_id for mission in primary_missions),
@@ -121,7 +136,7 @@ def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
             source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
         ),
         mission_pool_entries=_mission_pool_entries(
-            rows=source_data.battlefield_layout_rows(),
+            rows=chapter_approved_rows,
             source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
         ),
         scoring_caps=TournamentScoringCaps(
@@ -301,6 +316,24 @@ def _deployment_map_from_battlefield_layout(
     )
 
 
+def _deployment_maps_from_typed_battlefield_layouts(
+    *,
+    typed_battlefield_layouts: tuple[BattlefieldLayoutDefinition, ...],
+) -> tuple[DeploymentMapDefinition, ...]:
+    return tuple(
+        DeploymentMapDefinition(
+            deployment_map_id=layout.deployment_map_id,
+            name=layout.name,
+            battlefield_width_inches=layout.battlefield_width_inches,
+            battlefield_depth_inches=layout.battlefield_depth_inches,
+            objective_markers=layout.objective_markers,
+            deployment_zones=layout.deployment_zones,
+            source_id=f"{layout.source_id}:deployment-map",
+        )
+        for layout in typed_battlefield_layouts
+    )
+
+
 def _terrain_layouts(
     *,
     rows: tuple[source_data.SourceBattlefieldLayoutRow, ...],
@@ -329,6 +362,23 @@ def _terrain_layout_from_battlefield_layout(
             for feature in row.terrain_features
         ),
         source_id=layout_source_id,
+    )
+
+
+def _terrain_layouts_from_typed_battlefield_layouts(
+    *,
+    typed_battlefield_layouts: tuple[BattlefieldLayoutDefinition, ...],
+) -> tuple[TerrainLayoutTemplate, ...]:
+    return tuple(
+        TerrainLayoutTemplate(
+            terrain_layout_id=layout.terrain_layout_id,
+            name=layout.name,
+            battlefield_width_inches=layout.battlefield_width_inches,
+            battlefield_depth_inches=layout.battlefield_depth_inches,
+            terrain_features=(),
+            source_id=f"{layout.source_id}:terrain-layout",
+        )
+        for layout in typed_battlefield_layouts
     )
 
 

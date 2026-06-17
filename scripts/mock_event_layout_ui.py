@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 from collections.abc import Sequence
+from html import escape
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
@@ -32,8 +33,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
     args = parser.parse_args(argv)
 
-    data = _build_data_payload()
-    html = _html_document()
+    data = build_data_payload()
+    html = html_document(data=data)
     handler = _handler_for(html=html, data=data)
     server = ThreadingHTTPServer((args.host, args.port), handler)
     print(f"Serving Event Companion layout mock UI at http://{args.host}:{args.port}/")
@@ -46,15 +47,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     return 0
 
 
+def build_data_payload() -> dict[str, object]:
+    return _build_data_payload()
+
+
+def html_document(*, data: dict[str, object] | None = None) -> str:
+    return _html_document(data=build_data_payload() if data is None else data)
+
+
 def _build_data_payload() -> dict[str, object]:
     mission_pack = warhammer_event_companion_2026_06_mission_pack()
-    force_dispositions = [
-        {
-            "id": force.force_disposition_id,
-            "name": force.name,
-        }
-        for force in mission_pack.force_dispositions
-    ]
     matrix = {
         f"{cell.player_force_disposition_id}|{cell.opponent_force_disposition_id}": {
             "primary_mission_id": cell.primary_mission_id,
@@ -78,10 +80,50 @@ def _build_data_payload() -> dict[str, object]:
     }
     return {
         "battlefield": {"width_inches": 44.0, "depth_inches": 60.0},
-        "force_dispositions": force_dispositions,
+        "force_dispositions": _force_disposition_payloads(),
         "matrix": matrix,
         "layouts": layouts,
     }
+
+
+def _force_disposition_payloads() -> list[dict[str, object]]:
+    return [
+        {
+            "id": row.force_disposition_id,
+            "name": _force_disposition_display_name(row.force_disposition_id),
+        }
+        for row in event_source.force_disposition_rows()
+    ]
+
+
+def _force_disposition_display_name(force_disposition_id: str) -> str:
+    names = {
+        "purge-the-foe": "Purge the Foe",
+        "take-and-hold": "Take and Hold",
+        "disruption": "Disruption",
+        "reconnaissance": "Reconnaissance",
+        "priority-assets": "Priority Assets",
+    }
+    return names[force_disposition_id]
+
+
+def _force_disposition_options_html() -> str:
+    lines: list[str] = []
+    for row in _force_disposition_payloads():
+        disposition_id = escape(str(row["id"]), quote=True)
+        name = escape(str(row["name"]), quote=False)
+        selected = " selected" if disposition_id == "take-and-hold" else ""
+        lines.append(f'          <option value="{disposition_id}"{selected}>{name}</option>')
+    return "\n".join(lines)
+
+
+def _embedded_data_json(data: dict[str, object]) -> str:
+    return (
+        json.dumps(data, sort_keys=True, separators=(",", ":"))
+        .replace("&", "\\u0026")
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+    )
 
 
 def _layout_payload(
@@ -145,21 +187,27 @@ def _terrain_area_payloads(
 ) -> list[dict[str, object]]:
     if layout is None:
         return []
-    return [
-        {
-            "id": area.terrain_area_id,
-            "footprint_template_id": area.footprint_template_id,
-            "classification": area.classification.value,
-            "center_x_inches": area.center_x_inches,
-            "center_y_inches": area.center_y_inches,
-            "rotation_degrees": area.rotation_degrees,
-            "local_transform": area.local_transform.value,
-            "polygon": [
-                {"x": point.x_inches, "y": point.y_inches} for point in area.footprint_polygon
-            ],
-        }
-        for area in layout.terrain_areas
-    ]
+    payloads: list[dict[str, object]] = []
+    for area in layout.terrain_areas:
+        anchor = area.footprint_polygon[0]
+        payloads.append(
+            {
+                "id": area.terrain_area_id,
+                "name": area.terrain_area_id.removeprefix(f"{layout.battlefield_layout_id}-"),
+                "footprint_template_id": area.footprint_template_id,
+                "classification": area.classification.value,
+                "anchor_x_inches": anchor.x_inches,
+                "anchor_y_inches": anchor.y_inches,
+                "center_x_inches": area.center_x_inches,
+                "center_y_inches": area.center_y_inches,
+                "rotation_degrees": area.rotation_degrees,
+                "local_transform": area.local_transform.value,
+                "polygon": [
+                    {"x": point.x_inches, "y": point.y_inches} for point in area.footprint_polygon
+                ],
+            }
+        )
+    return payloads
 
 
 def _shape_payload(shape: DeploymentZoneShape) -> dict[str, object]:
@@ -236,7 +284,7 @@ def _handler_for(
     return EventLayoutMockHandler
 
 
-def _html_document() -> str:
+def _html_document(*, data: dict[str, object]) -> str:
     return """<!doctype html>
 <html lang="en">
 <head>
@@ -397,12 +445,12 @@ def _html_document() -> str:
       border: 1px solid #9aa3ad;
     }
     .grid-line {
-      stroke: #e4e8ec;
+      stroke: #b8c2cc;
       stroke-width: 0.035;
       vector-effect: non-scaling-stroke;
     }
     .grid-line.major {
-      stroke: #c8d0d8;
+      stroke: #8895a3;
       stroke-width: 0.06;
     }
     .deployment-attacker {
@@ -470,11 +518,15 @@ def _html_document() -> str:
       <h1>Event Companion Layout Mock</h1>
       <label>
         Force Disposition 1
-        <select id="force-one"></select>
+        <select id="force-one">
+<!-- force-disposition-options -->
+        </select>
       </label>
       <label>
         Force Disposition 2
-        <select id="force-two"></select>
+        <select id="force-two">
+<!-- force-disposition-options -->
+        </select>
       </label>
       <label>
         Layout
@@ -511,6 +563,9 @@ def _html_document() -> str:
       </div>
     </section>
   </main>
+  <script id="layout-data" type="application/json">
+<!-- layout-data-json -->
+  </script>
   <script>
     const state = {
       data: null,
@@ -529,6 +584,8 @@ def _html_document() -> str:
     const WIDTH = 44;
     const DEPTH = 60;
 
+    initializeData(JSON.parse(document.querySelector("#layout-data").textContent));
+
     fetch("/data.json")
       .then((response) => {
         if (!response.ok) {
@@ -536,29 +593,47 @@ def _html_document() -> str:
         }
         return response.json();
       })
-      .then((data) => {
-        state.data = data;
-        populateForceDispositions(data.force_dispositions);
-        renderSelection();
-      });
+      .then((data) => initializeData(data));
 
     state.forceOne.addEventListener("change", renderSelection);
     state.forceTwo.addEventListener("change", renderSelection);
     state.layoutVariant.addEventListener("change", renderSelection);
     window.setInterval(renderSelection, 250);
 
+    function initializeData(data) {
+      if (!data || typeof data !== "object") {
+        throw new Error("Layout payload must be an object.");
+      }
+      state.data = data;
+      populateForceDispositions(data.force_dispositions);
+      state.lastSelectionKey = null;
+      renderSelection();
+    }
+
     function populateForceDispositions(forceDispositions) {
+      if (!Array.isArray(forceDispositions)) {
+        throw new Error("Force disposition payload must be an array.");
+      }
+      const previousOne = state.forceOne.value;
+      const previousTwo = state.forceTwo.value;
+      const optionIds = new Set(forceDispositions.map((force) => force.id));
+      if (!optionIds.has("take-and-hold")) {
+        throw new Error("Default force disposition is missing: take-and-hold.");
+      }
+      const options = forceDispositions.map((force) => {
+        const option = document.createElement("option");
+        option.value = force.id;
+        option.textContent = force.name;
+        return option;
+      });
       for (const select of [state.forceOne, state.forceTwo]) {
         select.replaceChildren();
-        for (const force of forceDispositions) {
-          const option = document.createElement("option");
-          option.value = force.id;
-          option.textContent = force.name;
-          select.append(option);
+        for (const option of options) {
+          select.append(option.cloneNode(true));
         }
       }
-      state.forceOne.value = "take-and-hold";
-      state.forceTwo.value = "take-and-hold";
+      state.forceOne.value = optionIds.has(previousOne) ? previousOne : "take-and-hold";
+      state.forceTwo.value = optionIds.has(previousTwo) ? previousTwo : "take-and-hold";
     }
 
     function renderSelection() {
@@ -622,7 +697,7 @@ def _html_document() -> str:
           points: area.polygon.map(pointToSvg).join(" "),
           class: "terrain-footprint",
         });
-        polygon.append(svgElement("title", {}, `${area.footprint_template_id}: ${area.id}`));
+        polygon.append(svgElement("title", {}, terrainAreaTitle(area)));
         state.board.append(polygon);
       }
       renderObjectives(layout);
@@ -649,7 +724,9 @@ def _html_document() -> str:
             points: area.polygon.map(pointToSvg).join(" "),
             class: "objective-terrain",
           });
-          polygon.append(svgElement("title", {}, `${marker.name}: ${terrainAreaId}`));
+          polygon.append(
+            svgElement("title", {}, `${marker.name}\\n${terrainAreaTitle(area)}`),
+          );
           state.board.append(polygon);
         }
         state.board.append(svgElement("text", {
@@ -735,6 +812,18 @@ def _html_document() -> str:
       return `${point.x},${DEPTH - point.y}`;
     }
 
+    function terrainAreaTitle(area) {
+      return [
+        area.name,
+        `Anchor: (${formatNumber(area.anchor_x_inches)}, ${formatNumber(area.anchor_y_inches)})`,
+        `Rotation: ${formatNumber(area.rotation_degrees)} deg`,
+      ].join("\\n");
+    }
+
+    function formatNumber(value) {
+      return String(Math.round(Number(value) * 100) / 100);
+    }
+
     function objectiveLabel(role) {
       if (role === "attacker_home") {
         return "A Home";
@@ -761,7 +850,10 @@ def _html_document() -> str:
   </script>
 </body>
 </html>
-"""
+""".replace("<!-- force-disposition-options -->", _force_disposition_options_html()).replace(
+        "<!-- layout-data-json -->",
+        _embedded_data_json(data),
+    )
 
 
 if __name__ == "__main__":

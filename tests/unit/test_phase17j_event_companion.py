@@ -350,26 +350,23 @@ def test_phase17j_take_and_hold_layout_a_terrain_area_specs_are_corner_anchored(
         _source_extracted_layout_source("take-and-hold-vs-take-and-hold-layout-1"),
     )
     expected_anchors = {
-        "dense-7x11-5-upper-right": ("FOOTPRINT_7X11_5", "dense", 40.0, 35.5, 180.0),
-        "dense-7x11-5-upper-left": ("FOOTPRINT_7X11_5", "dense", 14.0, 54.0, 0.0),
-        "light-10x2-5-upper-left": ("FOOTPRINT_10X2_5", "light", 12.0, 43.5, 180.0),
-        "light-6x2-upper-center": ("FOOTPRINT_6X2", "light", 27.0, 42.5, 0.0),
-        "light-6x2-east-midfield": ("FOOTPRINT_6X2", "light", 40.0, 28.0, 180.0),
-        "light-6x4-lower-left": ("FOOTPRINT_6X4", "light", 11.0, 13.0, 0.0),
-        "light-6x4-east-midfield": ("FOOTPRINT_6X4", "light", 36.0, 28.0, -90.0),
-        "dense-8x11-5-polygon-central-north": (
+        "7x11-5-upper-right": ("FOOTPRINT_7X11_5", 40.0, 35.5, 180.0),
+        "7x11-5-upper-left": ("FOOTPRINT_7X11_5", 14.0, 54.0, 0.0),
+        "10x2-5-upper-left": ("FOOTPRINT_10X2_5", 12.0, 43.5, 180.0),
+        "6x2-upper-center": ("FOOTPRINT_6X2", 27.0, 42.5, 0.0),
+        "6x2-east-midfield": ("FOOTPRINT_6X2", 40.0, 28.0, 180.0),
+        "6x4-lower-left": ("FOOTPRINT_6X4", 11.0, 13.0, 0.0),
+        "6x4-east-midfield": ("FOOTPRINT_6X4", 36.0, 28.0, -90.0),
+        "8x11-5-polygon-central-north": (
             "FOOTPRINT_8X11_5_POLYGON",
-            "dense",
             16.25,
             35.0,
             0.0,
         ),
     }
     source_anchors = {
-        area_id: (template_id, classification.value, anchor_x, anchor_y, rotation)
-        for area_id, template_id, classification, anchor_x, anchor_y, rotation in (
-            source.terrain_area_specs
-        )
+        area_id: (template_id, anchor_x, anchor_y, rotation)
+        for area_id, template_id, anchor_x, anchor_y, rotation in (source.terrain_area_specs)
     }
     layout = warhammer_event_companion_2026_06_mission_pack().battlefield_layout(
         "take-and-hold-vs-take-and-hold-layout-1"
@@ -382,31 +379,256 @@ def test_phase17j_take_and_hold_layout_a_terrain_area_specs_are_corner_anchored(
 
     assert source_anchors == expected_anchors
     assert source.terrain_area_local_transform_specs == (
-        ("light-6x2-upper-center", TerrainAreaLocalTransform.MIRROR_Y_AXIS),
+        ("6x2-upper-center", TerrainAreaLocalTransform.MIRROR_Y_AXIS),
     )
     assert source.objective_terrain_area_specs == (
-        ("attacker-home", ("dense-7x11-5-upper-left",)),
-        ("defender-home", ("dense-7x11-5-lower-right",)),
+        (
+            "attacker-home",
+            "Attacker Home Objective",
+            "attacker_home",
+            16.49,
+            49.82,
+            ("7x11-5-upper-left",),
+        ),
+        (
+            "defender-home",
+            "Defender Home Objective",
+            "defender_home",
+            25.76,
+            12.72,
+            ("7x11-5-lower-right",),
+        ),
         (
             "central",
+            "Central Objective",
+            "central",
+            22.02,
+            30.0,
             (
-                "dense-8x11-5-polygon-central-north",
-                "dense-8x11-5-polygon-central-south",
+                "8x11-5-polygon-central-north",
+                "8x11-5-polygon-central-south",
             ),
         ),
-        ("expansion-west", ("dense-7x11-5-lower-left",)),
-        ("expansion-east", ("dense-7x11-5-upper-right",)),
+        (
+            "expansion-west",
+            "West Expansion Objective",
+            "expansion",
+            7.4,
+            19.16,
+            ("7x11-5-lower-left",),
+        ),
+        (
+            "expansion-east",
+            "East Expansion Objective",
+            "expansion",
+            36.72,
+            41.87,
+            ("7x11-5-upper-right",),
+        ),
     )
     assert set(placed_areas) == set(expected_anchors)
-    for area_id, (_, _, anchor_x, anchor_y, _) in expected_anchors.items():
+    for area_id, (_, anchor_x, anchor_y, _) in expected_anchors.items():
         first_point = placed_areas[area_id].footprint_polygon[0]
         assert _rounded_terrain_display_point(first_point) == (anchor_x, anchor_y)
-    assert placed_areas["light-6x2-upper-center"].local_transform.value == "mirror_y_axis"
+    assert placed_areas["6x2-upper-center"].local_transform.value == "mirror_y_axis"
+
+
+def test_phase17j_take_and_hold_layout_b_terrain_area_specs_are_corner_anchored() -> None:
+    source = cast(
+        event_layouts.EventBattlefieldLayoutSource,
+        _source_extracted_layout_source("take-and-hold-vs-take-and-hold-layout-2"),
+    )
+    expected_anchors = {
+        "7x11-5-left-home": ("FOOTPRINT_7X11_5", 11.0, 24.0, 180.0),
+        "8x11-5-polygon-central-north": (
+            "FOOTPRINT_8X11_5_POLYGON",
+            17.0,
+            24.25,
+            90.0,
+        ),
+        "7x11-5-north-expansion": (
+            "FOOTPRINT_7X11_5",
+            19.5,
+            46.0,
+            90.0,
+        ),
+        "10x2-5-north-west": (
+            "FOOTPRINT_10X2_5",
+            12.5,
+            48.75,
+            246.0,
+        ),
+        "6x4-north-east": ("FOOTPRINT_6X4", 41.0, 50.0, 210.0),
+        "6x4-north-west": ("FOOTPRINT_6X4", 29.75, 17.0, 210.0),
+        "6x2-north-east": ("FOOTPRINT_6X2", 37.5, 41.0, 125.0),
+        "6x2-north-west": ("FOOTPRINT_6X2", 10.25, 49.75, 145.0),
+    }
+    source_anchors = {
+        area_id: (template_id, anchor_x, anchor_y, rotation)
+        for area_id, template_id, anchor_x, anchor_y, rotation in (source.terrain_area_specs)
+    }
+    layout = warhammer_event_companion_2026_06_mission_pack().battlefield_layout(
+        "take-and-hold-vs-take-and-hold-layout-2"
+    )
+    placed_areas = {
+        area.terrain_area_id.removeprefix("take-and-hold-vs-take-and-hold-layout-2-"): area
+        for area in layout.terrain_areas
+        if area.source_transform == "explicit"
+    }
+
+    assert source_anchors == expected_anchors
+    assert source.objective_terrain_area_specs == (
+        (
+            "attacker-home",
+            "Attacker Home Objective",
+            "attacker_home",
+            6.76,
+            31.2,
+            ("7x11-5-left-home",),
+        ),
+        (
+            "defender-home",
+            "Defender Home Objective",
+            "defender_home",
+            37.24,
+            28.67,
+            ("7x11-5-right-home",),
+        ),
+        (
+            "central",
+            "Central Objective",
+            "central",
+            22.16,
+            30.04,
+            (
+                "8x11-5-polygon-central-north",
+                "8x11-5-polygon-central-south",
+            ),
+        ),
+        (
+            "expansion-south",
+            "South Expansion Objective",
+            "expansion",
+            19.2,
+            10.28,
+            ("7x11-5-south-expansion",),
+        ),
+        (
+            "expansion-north",
+            "North Expansion Objective",
+            "expansion",
+            24.92,
+            50.61,
+            ("7x11-5-north-expansion",),
+        ),
+    )
+    assert set(placed_areas) == set(expected_anchors)
+    for area_id, (_, anchor_x, anchor_y, _) in expected_anchors.items():
+        first_point = placed_areas[area_id].footprint_polygon[0]
+        assert _rounded_terrain_display_point(first_point) == (anchor_x, anchor_y)
+
+
+def test_phase17j_take_and_hold_layout_c_terrain_area_specs_are_corner_anchored() -> None:
+    source = cast(
+        event_layouts.EventBattlefieldLayoutSource,
+        _source_extracted_layout_source("take-and-hold-vs-take-and-hold-layout-3"),
+    )
+    expected_anchors = {
+        "7x11-5-north-west": ("FOOTPRINT_7X11_5", 11.25, 56.75, 315.0),
+        "7x11-5-south-west": ("FOOTPRINT_7X11_5", 6.0, 16.5, 0.0),
+        "8x11-5-polygon-central-north-west": (
+            "FOOTPRINT_8X11_5_POLYGON",
+            16.25,
+            35.0,
+            0.0,
+        ),
+        "10x2-5-north-center": (
+            "FOOTPRINT_10X2_5",
+            15.75,
+            44.25,
+            35.0,
+        ),
+        "6x4-north-west": ("FOOTPRINT_6X4", 11.0, 37.25, 90.0),
+        "6x4-central-east": ("FOOTPRINT_6X4", 31.0, 30.75, 90.0),
+        "6x2-west-midfield": ("FOOTPRINT_6X2", 2.75, 37.25, 0.0),
+        "6x2-south-west": ("FOOTPRINT_6X2", 4.25, 24.5, 0.0),
+    }
+    source_anchors = {
+        area_id: (template_id, anchor_x, anchor_y, rotation)
+        for area_id, template_id, anchor_x, anchor_y, rotation in (source.terrain_area_specs)
+    }
+    layout = warhammer_event_companion_2026_06_mission_pack().battlefield_layout(
+        "take-and-hold-vs-take-and-hold-layout-3"
+    )
+    placed_areas = {
+        area.terrain_area_id.removeprefix("take-and-hold-vs-take-and-hold-layout-3-"): area
+        for area in layout.terrain_areas
+        if area.source_transform == "explicit"
+    }
+
+    assert source_anchors == expected_anchors
+    assert source.objective_terrain_area_specs == (
+        (
+            "attacker-home",
+            "Attacker Home Objective",
+            "attacker_home",
+            9.45,
+            50.3,
+            ("7x11-5-north-west",),
+        ),
+        (
+            "defender-home",
+            "Defender Home Objective",
+            "defender_home",
+            34.55,
+            9.7,
+            ("7x11-5-south-east",),
+        ),
+        (
+            "central",
+            "Central Objective",
+            "central",
+            22.0,
+            30.0,
+            (
+                "8x11-5-polygon-central-north-west",
+                "8x11-5-polygon-central-south-east",
+            ),
+        ),
+        (
+            "expansion-south-west",
+            "South-west Expansion Objective",
+            "expansion",
+            9.7,
+            10.55,
+            ("7x11-5-south-west",),
+        ),
+        (
+            "expansion-north-east",
+            "North-east Expansion Objective",
+            "expansion",
+            34.3,
+            49.45,
+            ("7x11-5-north-east",),
+        ),
+    )
+    assert set(placed_areas) == set(expected_anchors)
+    for area_id, (_, anchor_x, anchor_y, _) in expected_anchors.items():
+        first_point = placed_areas[area_id].footprint_polygon[0]
+        assert _rounded_terrain_display_point(first_point) == (anchor_x, anchor_y)
 
 
 def test_phase17j_extracted_terrain_area_specs_anchor_first_vertices() -> None:
     mission_pack = warhammer_event_companion_2026_06_mission_pack()
     for source in event_layouts.EXTRACTED_LAYOUTS:
+        assert not any(
+            area_id.startswith(("dense-", "light-")) for area_id, *_ in source.terrain_area_specs
+        )
+        assert not any(
+            terrain_area_id.startswith(("dense-", "light-"))
+            for objective_spec in source.objective_terrain_area_specs
+            for terrain_area_id in objective_spec[-1]
+        )
         layout = mission_pack.battlefield_layout(source.layout_id)
         placed_areas = {
             area.terrain_area_id.removeprefix(f"{source.layout_id}-"): area
@@ -415,7 +637,7 @@ def test_phase17j_extracted_terrain_area_specs_anchor_first_vertices() -> None:
         }
 
         assert len(placed_areas) == len(source.terrain_area_specs)
-        for area_id, _, _, anchor_x, anchor_y, _ in source.terrain_area_specs:
+        for area_id, _, anchor_x, anchor_y, _ in source.terrain_area_specs:
             first_point = placed_areas[area_id].footprint_polygon[0]
             assert _rounded_terrain_display_point(first_point) == (
                 round(anchor_x, 6),
@@ -1023,17 +1245,17 @@ def test_phase17j_take_and_hold_layout_a_encodes_terrain_areas_and_regions() -> 
         for objective_terrain_area in layout.objective_terrain_areas
     }
     assert objective_terrain_by_suffix == {
-        "attacker-home": ("attacker_home", ("dense-7x11-5-upper-left",)),
-        "defender-home": ("defender_home", ("dense-7x11-5-lower-right",)),
+        "attacker-home": ("attacker_home", ("7x11-5-upper-left",)),
+        "defender-home": ("defender_home", ("7x11-5-lower-right",)),
         "central": (
             "central",
             (
-                "dense-8x11-5-polygon-central-north",
-                "dense-8x11-5-polygon-central-south",
+                "8x11-5-polygon-central-north",
+                "8x11-5-polygon-central-south",
             ),
         ),
-        "expansion-west": ("expansion", ("dense-7x11-5-lower-left",)),
-        "expansion-east": ("expansion", ("dense-7x11-5-upper-right",)),
+        "expansion-west": ("expansion", ("7x11-5-lower-left",)),
+        "expansion-east": ("expansion", ("7x11-5-upper-right",)),
     }
     objective_by_role = {marker.objective_role.value: marker for marker in layout.objective_markers}
     attacker_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "attacker")
@@ -1110,6 +1332,11 @@ def test_phase17j_take_and_hold_layout_b_encodes_terrain_areas_and_regions() -> 
     assert len(setup.terrain_areas) == 16
     assert len(setup.battlefield_regions) == 5
     assert setup.objective_markers == layout.objective_markers
+    assert setup.objective_terrain_areas == layout.objective_terrain_areas
+    assert (
+        MissionSetup.from_payload(setup.to_payload()).objective_terrain_areas
+        == setup.objective_terrain_areas
+    )
     assert setup.deployment_zones == _deployment_zones_for_players(
         layout,
         attacker_player_id="player-alpha",
@@ -1142,6 +1369,31 @@ def test_phase17j_take_and_hold_layout_b_encodes_terrain_areas_and_regions() -> 
         "defender_home": 1,
         "central": 1,
         "expansion": 2,
+    }
+    objective_terrain_by_suffix = {
+        objective_terrain_area.objective_marker_id.removeprefix(
+            "take-and-hold-vs-take-and-hold-layout-2-"
+        ): (
+            objective_terrain_area.objective_role.value,
+            tuple(
+                terrain_area_id.removeprefix("take-and-hold-vs-take-and-hold-layout-2-")
+                for terrain_area_id in objective_terrain_area.terrain_area_ids
+            ),
+        )
+        for objective_terrain_area in layout.objective_terrain_areas
+    }
+    assert objective_terrain_by_suffix == {
+        "attacker-home": ("attacker_home", ("7x11-5-left-home",)),
+        "defender-home": ("defender_home", ("7x11-5-right-home",)),
+        "central": (
+            "central",
+            (
+                "8x11-5-polygon-central-north",
+                "8x11-5-polygon-central-south",
+            ),
+        ),
+        "expansion-south": ("expansion", ("7x11-5-south-expansion",)),
+        "expansion-north": ("expansion", ("7x11-5-north-expansion",)),
     }
     objective_by_role = {marker.objective_role.value: marker for marker in layout.objective_markers}
     attacker_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "attacker")
@@ -1211,6 +1463,12 @@ def test_phase17j_take_and_hold_layout_c_encodes_cutout_deployments_and_terrain_
     assert len(setup.battlefield_regions) == 5
     assert len(direct_setup.battlefield_regions) == 5
     assert setup.objective_markers == layout.objective_markers
+    assert setup.objective_terrain_areas == layout.objective_terrain_areas
+    assert direct_setup.objective_terrain_areas == layout.objective_terrain_areas
+    assert (
+        MissionSetup.from_payload(setup.to_payload()).objective_terrain_areas
+        == setup.objective_terrain_areas
+    )
     assert setup.deployment_zones == _deployment_zones_for_players(
         layout,
         attacker_player_id="player-alpha",
@@ -1235,6 +1493,31 @@ def test_phase17j_take_and_hold_layout_c_encodes_cutout_deployments_and_terrain_
         for point in area.footprint_polygon
     )
 
+    objective_terrain_by_suffix = {
+        objective_terrain_area.objective_marker_id.removeprefix(
+            "take-and-hold-vs-take-and-hold-layout-3-"
+        ): (
+            objective_terrain_area.objective_role.value,
+            tuple(
+                terrain_area_id.removeprefix("take-and-hold-vs-take-and-hold-layout-3-")
+                for terrain_area_id in objective_terrain_area.terrain_area_ids
+            ),
+        )
+        for objective_terrain_area in layout.objective_terrain_areas
+    }
+    assert objective_terrain_by_suffix == {
+        "attacker-home": ("attacker_home", ("7x11-5-north-west",)),
+        "defender-home": ("defender_home", ("7x11-5-south-east",)),
+        "central": (
+            "central",
+            (
+                "8x11-5-polygon-central-north-west",
+                "8x11-5-polygon-central-south-east",
+            ),
+        ),
+        "expansion-south-west": ("expansion", ("7x11-5-south-west",)),
+        "expansion-north-east": ("expansion", ("7x11-5-north-east",)),
+    }
     objective_by_role = {marker.objective_role.value: marker for marker in layout.objective_markers}
     attacker_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "attacker")
     defender_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "defender")
