@@ -22,20 +22,20 @@ def test_mock_event_layout_ui_exposes_terrain_anchor_rotation_tooltips() -> None
     area_by_name = {_string(area["name"]): area for area in terrain_areas}
 
     central = area_by_name["8x11-5-polygon-central-north"]
-    assert central["anchor_x_inches"] == 27.0
-    assert central["anchor_y_inches"] == 24.0
-    assert central["rotation_degrees"] == -90.0
+    assert central["anchor_x_inches"] == 17.0
+    assert central["anchor_y_inches"] == 24.25
+    assert central["rotation_degrees"] == 90.0
 
     north_expansion = area_by_name["7x11-5-north-expansion"]
     assert north_expansion["footprint_template_id"] == "FOOTPRINT_7X11_5"
-    assert north_expansion["anchor_x_inches"] == 31.0
-    assert north_expansion["anchor_y_inches"] == 14.0
-    assert north_expansion["rotation_degrees"] == 180.0
+    assert north_expansion["anchor_x_inches"] == 19.5
+    assert north_expansion["anchor_y_inches"] == 46.0
+    assert north_expansion["rotation_degrees"] == 90.0
 
     north_west = area_by_name["6x4-north-west"]
-    assert north_west["anchor_x_inches"] == 14.0
+    assert north_west["anchor_x_inches"] == 29.75
     assert north_west["anchor_y_inches"] == 17.0
-    assert north_west["rotation_degrees"] == 30.0
+    assert north_west["rotation_degrees"] == 210.0
 
     html = mock_event_layout_ui.html_document()
     assert "terrainAreaTitle(area)" in html
