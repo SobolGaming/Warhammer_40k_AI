@@ -12,7 +12,7 @@ Support stages:
 - `descriptor_only`: catalog descriptor exists, but no structured executable IR is available.
 - `ir_compiled_unsupported`: rule text compiled to IR with preserved diagnostics, but the IR is not supported.
 - `generic_ir_executable`: rule text compiled to supported generic IR and can execute through the generic IR handler.
-- `engine_consumed`: a structured descriptor or supported generic IR is consumed by a phase/query host through a named runtime consumer.
+- `engine_consumed`: a structured descriptor, supported generic IR, or implementation-backed runtime content is consumed by a phase/query host through a named runtime consumer.
 
 Current coverage categories:
 
@@ -20,10 +20,12 @@ Current coverage categories:
 | --- | --- | --- | ---: | --- | --- | --- |
 | Chaos Daemons Army Rule | `engine_consumed` | `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos` | 2 | `faction`: 2 | The Shadow of Chaos (Bloodcrushers)<br>The Shadow of Chaos (Bloodletters) | `faction.army_rule.shadow_of_chaos` |
 | Charge Roll Modifier | `engine_consumed` | `catalog-ir:charge-roll-modifier` | 2 | `wargear`: 2 | Instrument of Chaos (Bloodcrushers)<br>Instrument of Chaos (Bloodletters) | `wargear.roll_modifier.charge.this_unit` |
+| Death Guard Army Rule | `engine_consumed` | `warhammer_40000_11th:death_guard:army_rule:nurgles_gift`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:armour-save-option`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:leadership`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:melee-hit-roll`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:movement-budget`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:objective-control`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:toughness` | 1 | `faction`: 1 | Nurgle's Gift (Death Guard) | `faction.army_rule.nurgles_gift` |
 | Deep Strike Reserve Arrival | `engine_consumed` | `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike` | 2 | `core`: 2 | Deep Strike (Bloodcrushers)<br>Deep Strike (Bloodletters) | `core.reserve.deep_strike` |
 | Leadership Characteristic | `engine_consumed` | `catalog-ir:leadership-characteristic-query` | 2 | `wargear`: 2 | Daemonic Icon (Bloodcrushers)<br>Daemonic Icon (Bloodletters) | `wargear.characteristic_set.leadership.this_unit` |
 | Unknown Abilities | `descriptor_only` | None | 2 | `datasheet`: 2 | Brass Stampede (Bloodcrushers)<br>Bane of Cowards (Bloodletters) | `unknown.ability_text` |
+| World Eaters Army Rule | `engine_consumed` | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords` | 1 | `faction`: 1 | Blessings of Khorne (World Eaters) | `faction.army_rule.blessings_of_khorne` |
 
 Unknown Abilities are descriptors that are present in the canonical catalog but are not yet parsed into a supported IR template or tied to a runtime consumer. Parsed-but-unconsumed IR remains separated by its semantic category and support stage instead of being collapsed into Unknown Abilities.
 
-Broad CORE V1-to-CORE V2 category forecasting is intentionally deferred until current-edition faction-pack modifications are complete. Until then, this report only marks support from the current canonical rows, typed IR or descriptor consumers, and tests proving the behavior.
+Broad CORE V1-to-CORE V2 category forecasting is intentionally deferred until current-edition faction-pack modifications are complete. Until then, this report only marks support from the current canonical rows, typed IR, descriptor consumers, explicitly declared runtime-content rows, and tests proving the behavior.
