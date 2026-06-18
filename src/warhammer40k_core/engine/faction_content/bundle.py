@@ -21,6 +21,10 @@ from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationHookBinding,
     BattleFormationHookRegistry,
 )
+from warhammer40k_core.engine.battle_round_hooks import (
+    BattleRoundStartHookBinding,
+    BattleRoundStartHookRegistry,
+)
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
     BattleShockHookRegistry,
@@ -67,12 +71,14 @@ from warhammer40k_core.engine.rule_execution import (
     RuleRuntimeBinding,
 )
 from warhammer40k_core.engine.runtime_modifiers import (
+    ChargeRollModifierBinding,
     HitRollModifierBinding,
     MovementBudgetModifierBinding,
     ObjectiveControlModifierBinding,
     RuntimeModifierRegistry,
     SaveOptionModifierBinding,
     UnitCharacteristicModifierBinding,
+    WeaponProfileModifierBinding,
 )
 from warhammer40k_core.engine.shooting_end_surge_hooks import (
     ShootingEndSurgeHookBinding,
@@ -109,6 +115,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     rule_runtime_binding_ids: list[str]
     event_subscriptions: list[dict[str, JsonValue]]
     battle_formation_hook_ids: list[str]
+    battle_round_start_hook_ids: list[str]
     battle_shock_hook_ids: list[str]
     advance_move_hook_ids: list[str]
     fall_back_hook_ids: list[str]
@@ -124,6 +131,8 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     save_option_modifier_ids: list[str]
     movement_budget_modifier_ids: list[str]
     objective_control_modifier_ids: list[str]
+    charge_roll_modifier_ids: list[str]
+    weapon_profile_modifier_ids: list[str]
     faction_execution_record_ids: list[str]
     selected_execution_record_ids: list[str]
     bundle_summary_hash: str
@@ -147,6 +156,7 @@ class RuntimeContentContribution:
     event_subscriptions: tuple[RuntimeContentEventSubscription, ...] = ()
     event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = ()
     battle_formation_hook_bindings: tuple[BattleFormationHookBinding, ...] = ()
+    battle_round_start_hook_bindings: tuple[BattleRoundStartHookBinding, ...] = ()
     battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = ()
     advance_move_hook_bindings: tuple[AdvanceMoveHookBinding, ...] = ()
     fall_back_hook_bindings: tuple[FallBackEligibilityHookBinding, ...] = ()
@@ -162,6 +172,8 @@ class RuntimeContentContribution:
     save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = ()
     movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = ()
     objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = ()
+    charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = ()
+    weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = ()
     faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = field(
         default_factory=_empty_named_handlers
     )
@@ -242,6 +254,15 @@ class RuntimeContentContribution:
                 "RuntimeContentContribution battle_formation_hook_bindings",
                 self.battle_formation_hook_bindings,
                 BattleFormationHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "battle_round_start_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution battle_round_start_hook_bindings",
+                self.battle_round_start_hook_bindings,
+                BattleRoundStartHookBinding,
             ),
         )
         object.__setattr__(
@@ -381,6 +402,24 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "charge_roll_modifier_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution charge_roll_modifier_bindings",
+                self.charge_roll_modifier_bindings,
+                ChargeRollModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "weapon_profile_modifier_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution weapon_profile_modifier_bindings",
+                self.weapon_profile_modifier_bindings,
+                WeaponProfileModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "faction_named_handlers",
             _validate_named_handlers(self.faction_named_handlers),
         )
@@ -396,6 +435,7 @@ class RuntimeContentContribution:
             event_subscriptions=self.event_subscriptions,
             event_handler_bindings=self.event_handler_bindings,
             battle_formation_hook_bindings=self.battle_formation_hook_bindings,
+            battle_round_start_hook_bindings=self.battle_round_start_hook_bindings,
             battle_shock_hook_bindings=self.battle_shock_hook_bindings,
             advance_move_hook_bindings=self.advance_move_hook_bindings,
             fall_back_hook_bindings=self.fall_back_hook_bindings,
@@ -413,6 +453,8 @@ class RuntimeContentContribution:
             save_option_modifier_bindings=self.save_option_modifier_bindings,
             movement_budget_modifier_bindings=self.movement_budget_modifier_bindings,
             objective_control_modifier_bindings=self.objective_control_modifier_bindings,
+            charge_roll_modifier_bindings=self.charge_roll_modifier_bindings,
+            weapon_profile_modifier_bindings=self.weapon_profile_modifier_bindings,
             faction_named_handlers=self.faction_named_handlers,
         )
 
@@ -494,6 +536,15 @@ def combine_runtime_content_contributions(
                 binding
                 for contribution in validated_contributions
                 for binding in contribution.battle_formation_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
+        battle_round_start_hook_bindings=_combine_unique_values(
+            "battle-round start hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.battle_round_start_hook_bindings
             ),
             lambda binding: binding.hook_id,
         ),
@@ -632,6 +683,24 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.modifier_id,
         ),
+        charge_roll_modifier_bindings=_combine_unique_values(
+            "charge roll modifier binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.charge_roll_modifier_bindings
+            ),
+            lambda binding: binding.modifier_id,
+        ),
+        weapon_profile_modifier_bindings=_combine_unique_values(
+            "weapon profile modifier binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.weapon_profile_modifier_bindings
+            ),
+            lambda binding: binding.modifier_id,
+        ),
         faction_named_handlers=_merged_named_handlers(validated_contributions),
     )
 
@@ -647,6 +716,7 @@ class RuntimeContentBundle:
     faction_rule_execution_registry: FactionRuleExecutionRegistry
     event_index: RuntimeContentEventIndex
     battle_formation_hook_registry: BattleFormationHookRegistry
+    battle_round_start_hook_registry: BattleRoundStartHookRegistry
     battle_shock_hook_registry: BattleShockHookRegistry
     advance_move_hook_registry: AdvanceMoveHookRegistry
     fall_back_hook_registry: FallBackEligibilityHookRegistry
@@ -693,6 +763,8 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires RuntimeContentEventIndex.")
         if type(self.battle_formation_hook_registry) is not BattleFormationHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires BattleFormationHookRegistry.")
+        if type(self.battle_round_start_hook_registry) is not BattleRoundStartHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires BattleRoundStartHookRegistry.")
         if type(self.battle_shock_hook_registry) is not BattleShockHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires BattleShockHookRegistry.")
         if type(self.advance_move_hook_registry) is not AdvanceMoveHookRegistry:
@@ -847,6 +919,13 @@ class RuntimeContentBundle:
                 for binding in contribution.battle_formation_hook_bindings
             )
         )
+        battle_round_start_hook_registry = BattleRoundStartHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.battle_round_start_hook_bindings
+            )
+        )
         battle_shock_hook_registry = BattleShockHookRegistry.from_bindings(
             tuple(
                 binding
@@ -945,6 +1024,16 @@ class RuntimeContentBundle:
                 for contribution in validated_contributions
                 for binding in contribution.objective_control_modifier_bindings
             ),
+            charge_roll_modifier_bindings=tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.charge_roll_modifier_bindings
+            ),
+            weapon_profile_modifier_bindings=tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.weapon_profile_modifier_bindings
+            ),
         )
         return cls(
             activation=activation,
@@ -964,6 +1053,7 @@ class RuntimeContentBundle:
             faction_rule_execution_registry=faction_registry,
             event_index=event_index,
             battle_formation_hook_registry=battle_formation_hook_registry,
+            battle_round_start_hook_registry=battle_round_start_hook_registry,
             battle_shock_hook_registry=battle_shock_hook_registry,
             advance_move_hook_registry=advance_move_hook_registry,
             fall_back_hook_registry=fall_back_hook_registry,
@@ -1007,6 +1097,9 @@ class RuntimeContentBundle:
             "event_subscriptions": self.event_index.to_summary_payload(),
             "battle_formation_hook_ids": [
                 binding.hook_id for binding in self.battle_formation_hook_registry.all_bindings()
+            ],
+            "battle_round_start_hook_ids": [
+                binding.hook_id for binding in self.battle_round_start_hook_registry.all_bindings()
             ],
             "battle_shock_hook_ids": [
                 binding.hook_id for binding in self.battle_shock_hook_registry.all_bindings()
@@ -1060,6 +1153,14 @@ class RuntimeContentBundle:
             "objective_control_modifier_ids": [
                 binding.modifier_id
                 for binding in self.runtime_modifier_registry.all_objective_control_bindings()
+            ],
+            "charge_roll_modifier_ids": [
+                binding.modifier_id
+                for binding in self.runtime_modifier_registry.all_charge_roll_bindings()
+            ],
+            "weapon_profile_modifier_ids": [
+                binding.modifier_id
+                for binding in self.runtime_modifier_registry.all_weapon_profile_bindings()
             ],
             "faction_execution_record_ids": [
                 record.execution_id for record in self.faction_rule_execution_registry.all_records()

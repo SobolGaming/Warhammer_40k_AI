@@ -51,6 +51,8 @@ Use existing `RuntimeContentContribution` surfaces:
 - event subscriptions and event handler bindings;
 - Battle-formation hook bindings for source-backed setup-time faction or army
   rule choices;
+- Battle-round start hook bindings for source-backed faction or army rules that
+  require a player choice at the start of a battle round;
 - Battle-shock hook bindings for rules whose trigger is Battle-shock modifier
   or outcome resolution;
 - Fall Back eligibility hook bindings for rules whose effect is that a Fall Back
@@ -76,6 +78,10 @@ Use existing `RuntimeContentContribution` surfaces:
   movement budget modifiers consumed by Movement phase path validation;
 - objective-control modifier bindings for source-backed Objective Control
   characteristic modifiers consumed by objective-control scoring;
+- charge roll modifier bindings for source-backed modifiers consumed by Charge
+  phase roll resolution;
+- weapon profile modifier bindings for source-backed keyword or ability changes
+  consumed by attack declaration/resolution hosts;
 - RuleIR runtime bindings;
 - faction named handlers.
 
@@ -102,6 +108,17 @@ recorded through engine-owned `DecisionRequest` / `DecisionResult` handling,
 must emit deterministic replay-safe payloads, and must not mutate downstream
 phase state directly.
 
+Battle-round start hook bindings are an approved runtime contribution surface
+only for source-backed choices made at the start of a battle round before the
+first player's Command phase proceeds. Each hook binding must use a `source_id`
+from the generated Phase 17F execution rows for the implemented rule, and tests
+must prove that the selected runtime manifest row loads the hook through
+`GameLifecycle` without manual handler injection. Hook request handlers may use
+engine-owned dice services when the source rule requires a roll, but accepted
+choices must still be recorded through engine-owned `DecisionRequest` /
+`DecisionResult` handling, emit deterministic replay-safe payloads, and avoid
+mutating downstream phase state directly.
+
 Runtime modifier bindings are approved runtime contribution surfaces only for
 source-backed modifiers that can be expressed as a typed value adjustment at an
 existing engine query point. Each modifier binding must use a source-linked
@@ -111,11 +128,12 @@ Handlers must return typed values only: unit characteristic modifiers return the
 modified characteristic value, Hit roll modifiers return an integer roll
 modifier, save option modifiers return the modified save-option tuple, movement
 budget modifiers return the modified movement budget in inches, and
-objective-control modifiers return the modified OC value. Faction modules must
-not roll dice, move models, mutate battlefield/objective state, spend CP, or
-rewrite attack sequence state from these handlers; the engine-owned consumer
-continues to perform validation, mutation, event emission, and replay-safe
-payload generation.
+objective-control modifiers return the modified OC value. Charge roll modifiers
+return the modified roll-modifier tuple, and weapon profile modifiers return the
+modified `WeaponProfile`. Faction modules must not roll dice, move models,
+mutate battlefield/objective state, spend CP, or rewrite attack sequence state
+from these handlers; the engine-owned consumer continues to perform validation,
+mutation, event emission, and replay-safe payload generation.
 
 Fall Back eligibility hook bindings are an approved runtime contribution surface
 only for source-backed rules that modify the consequences of a completed Fall

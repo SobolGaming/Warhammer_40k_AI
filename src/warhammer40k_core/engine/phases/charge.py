@@ -68,6 +68,10 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.runtime_modifiers import (
+    ChargeRollModifierContext,
+    RuntimeModifierRegistry,
+)
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
     UnitCoherencyResult,
@@ -720,6 +724,9 @@ class ChargePhaseHandler:
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = field(
         default_factory=_empty_ability_indexes
     )
+    runtime_modifier_registry: RuntimeModifierRegistry = field(
+        default_factory=RuntimeModifierRegistry.empty
+    )
 
     def __post_init__(self) -> None:
         if (
@@ -738,6 +745,10 @@ class ChargePhaseHandler:
             "ability_indexes_by_player_id",
             _validate_ability_index_mapping(self.ability_indexes_by_player_id),
         )
+        if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
+            raise GameLifecycleError(
+                "ChargePhaseHandler runtime_modifier_registry must be a registry."
+            )
 
     @property
     def phase(self) -> BattlePhase:
@@ -863,6 +874,7 @@ class ChargePhaseHandler:
                     self.ability_indexes_by_player_id,
                     player_id=_active_player_id(state),
                 ),
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE:
             return _apply_charge_declaration_grant_decision(
@@ -875,6 +887,7 @@ class ChargePhaseHandler:
                     self.ability_indexes_by_player_id,
                     player_id=_active_player_id(state),
                 ),
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
             return _apply_charge_move_proposal_decision(
@@ -1138,6 +1151,7 @@ def _apply_charging_unit_selection_decision(
     ruleset_descriptor: RulesetDescriptor,
     charge_declaration_hooks: ChargeDeclarationHookRegistry,
     ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _validate_charge_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -1207,6 +1221,7 @@ def _apply_charging_unit_selection_decision(
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
         ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
 
 
@@ -1329,6 +1344,7 @@ def _apply_charge_declaration_grant_decision(
     ruleset_descriptor: RulesetDescriptor,
     charge_declaration_hooks: ChargeDeclarationHookRegistry,
     ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     charge_state = state.charge_phase_state
     if charge_state is None or charge_state.active_selection is None:
@@ -1390,6 +1406,7 @@ def _apply_charge_declaration_grant_decision(
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
         ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
 
 
@@ -1508,6 +1525,7 @@ def _resolve_charge_roll(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     ability_index: AbilityCatalogIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     unit = _unit_for_selection(state=state, selection=selection)
     roll_modifiers = catalog_charge_roll_modifiers_for_unit(
@@ -1517,6 +1535,13 @@ def _resolve_charge_roll(
             state=state,
             unit=unit,
         ),
+    )
+    roll_modifiers = runtime_modifier_registry.charge_roll_modifiers(
+        ChargeRollModifierContext(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+            current_roll_modifiers=roll_modifiers,
+        )
     )
     roll_request = ChargeRollRequest(
         request_id=f"charge-roll:{selection.result_id}",
