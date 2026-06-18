@@ -55,6 +55,8 @@ Use existing `RuntimeContentContribution` surfaces:
   require a player choice at the start of a battle round;
 - Battle-shock hook bindings for rules whose trigger is Battle-shock modifier
   or outcome resolution;
+- Advance eligibility hook bindings for rules whose effect is that an Advance
+  move does not prevent later Shooting or Charge eligibility;
 - Fall Back eligibility hook bindings for rules whose effect is that a Fall Back
   move does not prevent later Shooting or Charge eligibility;
 - Movement-end surge hook bindings for opponent Movement phase rules that
@@ -82,6 +84,10 @@ Use existing `RuntimeContentContribution` surfaces:
   phase roll resolution;
 - weapon profile modifier bindings for source-backed keyword or ability changes
   consumed by attack declaration/resolution hosts;
+- Shooting target restriction hook bindings for source-backed restrictions on
+  legal Shooting declaration targets;
+- Charge target restriction hook bindings for source-backed restrictions on
+  legal Charge declaration targets;
 - RuleIR runtime bindings;
 - faction named handlers.
 
@@ -135,6 +141,15 @@ mutate battlefield/objective state, spend CP, or rewrite attack sequence state
 from these handlers; the engine-owned consumer continues to perform validation,
 mutation, event emission, and replay-safe payload generation.
 
+Advance eligibility hook bindings are an approved runtime contribution surface
+only for source-backed rules that modify the consequences of a completed Advance
+move. Each hook binding must use a `source_id` from the generated Phase 17F
+execution rows for the implemented rule. Hook handlers must return typed
+permission grants; the Movement engine records the authoritative
+`AdvancedUnitState`, emits deterministic replay-safe grant payloads, and the
+Shooting and Charge phases consume that engine-owned state. Faction modules must
+not mutate Advance, Shooting, or Charge phase state directly.
+
 Fall Back eligibility hook bindings are an approved runtime contribution surface
 only for source-backed rules that modify the consequences of a completed Fall
 Back move. Each hook binding must use a `source_id` from the generated Phase 17F
@@ -187,6 +202,18 @@ such as `PersistingEffect` records or placement proposal requests. Faction
 modules must not spend CP, add movement keywords, mutate movement state, set
 reserve arrivals, or adjust terrain legality outside the engine
 Stratagem/movement services.
+
+Shooting and Charge target restriction hook bindings are approved runtime
+contribution surfaces only for source-backed rules that forbid otherwise legal
+targets using typed current-state evidence such as turn-start Engagement Range,
+prior declarations, or prior attack targets. Each hook binding must use a
+`source_id` from the generated Phase 17F execution rows for the implemented
+rule, return typed restriction diagnostics, and prove both runtime bundle
+loading and at least one real consumer path. The Shooting and Charge engines own
+target enumeration, stale proposal validation, event payloads, and final
+declaration or movement mutation. Faction modules must not remove targets,
+rewrite attack pools, mutate Charge phase state, or parse raw rule text from
+these handlers.
 
 Enhancement effect bindings are an approved runtime contribution surface for
 source-backed Enhancement or Upgrade effects whose selected army-construction
@@ -255,6 +282,9 @@ Required:
   choices, and link them to generated Phase 17F execution row IDs.
 - Register Battle-shock hook bindings only for Battle-shock timing semantics,
   and link them to generated Phase 17F execution row IDs.
+- Register Advance eligibility hook bindings only for source-backed rules that
+  change Advance Shooting or Charge permissions, and link them to generated
+  Phase 17F execution row IDs.
 - Register Fall Back eligibility hook bindings only for source-backed rules
   that change Fall Back Shooting or Charge permissions, and link them to
   generated Phase 17F execution row IDs.
@@ -282,6 +312,11 @@ Required:
   options, movement budgets, or Objective Control. Link each binding to a
   generated Phase 17F execution row ID, prove lifecycle bundle loading, and add
   at least one real consumer-path regression for every modified engine area.
+- Register Shooting or Charge target restriction hook bindings only for
+  source-backed target restrictions consumed by the corresponding phase target
+  enumeration and stale-proposal validation paths. Link each binding to a
+  generated Phase 17F execution row ID and add at least one real consumer-path
+  regression.
 - Return typed unsupported results with source-linked reasons for unsupported semantics.
 - Add replay and audit assertions for state-changing behavior.
 - Do not edit runtime loader, lifecycle, bundle, or manifest machinery in

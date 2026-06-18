@@ -72,6 +72,11 @@ from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     RuntimeModifierRegistry,
 )
+from warhammer40k_core.engine.target_restriction_hooks import (
+    ChargeTargetRestrictionContext,
+    ChargeTargetRestrictionHookRegistry,
+    TargetRestriction,
+)
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
     UnitCoherencyResult,
@@ -108,6 +113,10 @@ def _empty_ability_indexes() -> Mapping[str, AbilityCatalogIndex]:
     return MappingProxyType({})
 
 
+def _empty_declared_charge_targets() -> dict[str, tuple[str, ...]]:
+    return {}
+
+
 class ChargingUnitSelectionPayload(TypedDict):
     player_id: str
     battle_round: int
@@ -123,6 +132,7 @@ class ChargePhaseStatePayload(TypedDict):
     selected_unit_ids: list[str]
     active_selection: ChargingUnitSelectionPayload | None
     distance_states: list[ChargeDistanceStatePayload]
+    declared_target_unit_instance_ids_by_unit: dict[str, list[str]]
 
 
 class ChargeMoveProposalPayload(TypedDict):
@@ -546,6 +556,9 @@ class ChargePhaseState:
     selected_unit_ids: tuple[str, ...] = ()
     active_selection: ChargingUnitSelection | None = None
     distance_states: tuple[ChargeDistanceState, ...] = ()
+    declared_target_unit_instance_ids_by_unit: dict[str, tuple[str, ...]] = field(
+        default_factory=_empty_declared_charge_targets
+    )
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -583,6 +596,11 @@ class ChargePhaseState:
             "distance_states",
             _validate_charge_distance_states(self.distance_states),
         )
+        object.__setattr__(
+            self,
+            "declared_target_unit_instance_ids_by_unit",
+            _validate_charge_declared_target_map(self.declared_target_unit_instance_ids_by_unit),
+        )
         if self.phase_complete and self.active_selection is not None:
             raise GameLifecycleError("Completed Charge phase cannot have active_selection.")
         if self.phase_complete and self.move_pending_distance_state() is not None:
@@ -608,6 +626,9 @@ class ChargePhaseState:
             selected_unit_ids=(*self.selected_unit_ids, selection.unit_instance_id),
             active_selection=selection,
             distance_states=self.distance_states,
+            declared_target_unit_instance_ids_by_unit=(
+                self.declared_target_unit_instance_ids_by_unit
+            ),
         )
 
     def with_charge_roll_result(self, roll_result: ChargeRollResult) -> Self:
@@ -635,10 +656,22 @@ class ChargePhaseState:
             selected_unit_ids=self.selected_unit_ids,
             active_selection=self.active_selection if roll_result.move_available else None,
             distance_states=(*self.distance_states, distance_state),
+            declared_target_unit_instance_ids_by_unit=(
+                self.declared_target_unit_instance_ids_by_unit
+            ),
         )
 
-    def with_charge_move_resolved(self, unit_instance_id: str) -> Self:
+    def with_charge_move_resolved(
+        self,
+        unit_instance_id: str,
+        *,
+        selected_target_unit_instance_ids: tuple[str, ...] = (),
+    ) -> Self:
         resolved_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        target_ids = _validate_identifier_tuple(
+            "selected_target_unit_instance_ids",
+            selected_target_unit_instance_ids,
+        )
         if self.phase_complete:
             raise GameLifecycleError("Cannot resolve a charge move after phase completion.")
         if self.active_selection is None:
@@ -654,6 +687,10 @@ class ChargePhaseState:
             selected_unit_ids=self.selected_unit_ids,
             active_selection=None,
             distance_states=self.distance_states,
+            declared_target_unit_instance_ids_by_unit={
+                **self.declared_target_unit_instance_ids_by_unit,
+                resolved_unit_id: target_ids,
+            },
         )
 
     def with_phase_complete(self, *, skipped_unit_ids: tuple[str, ...] = ()) -> Self:
@@ -669,6 +706,9 @@ class ChargePhaseState:
             selected_unit_ids=tuple(sorted({*self.selected_unit_ids, *skipped_ids})),
             active_selection=None,
             distance_states=self.distance_states,
+            declared_target_unit_instance_ids_by_unit=(
+                self.declared_target_unit_instance_ids_by_unit
+            ),
         )
 
     def move_pending_distance_state(self) -> ChargeDistanceState | None:
@@ -693,6 +733,12 @@ class ChargePhaseState:
                 None if self.active_selection is None else self.active_selection.to_payload()
             ),
             "distance_states": [distance.to_payload() for distance in self.distance_states],
+            "declared_target_unit_instance_ids_by_unit": {
+                unit_id: list(target_ids)
+                for unit_id, target_ids in sorted(
+                    self.declared_target_unit_instance_ids_by_unit.items()
+                )
+            },
         }
 
     @classmethod
@@ -712,6 +758,12 @@ class ChargePhaseState:
                 ChargeDistanceState.from_payload(distance)
                 for distance in payload["distance_states"]
             ),
+            declared_target_unit_instance_ids_by_unit={
+                unit_id: tuple(target_ids)
+                for unit_id, target_ids in payload[
+                    "declared_target_unit_instance_ids_by_unit"
+                ].items()
+            },
         )
 
 
@@ -720,6 +772,9 @@ class ChargePhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
     charge_declaration_hooks: ChargeDeclarationHookRegistry = field(
         default_factory=ChargeDeclarationHookRegistry.empty
+    )
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry = field(
+        default_factory=ChargeTargetRestrictionHookRegistry.empty
     )
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = field(
         default_factory=_empty_ability_indexes
@@ -739,6 +794,10 @@ class ChargePhaseHandler:
         if type(self.charge_declaration_hooks) is not ChargeDeclarationHookRegistry:
             raise GameLifecycleError(
                 "ChargePhaseHandler charge_declaration_hooks must be a registry."
+            )
+        if type(self.charge_target_restriction_hooks) is not ChargeTargetRestrictionHookRegistry:
+            raise GameLifecycleError(
+                "ChargePhaseHandler charge_target_restriction_hooks must be a registry."
             )
         object.__setattr__(
             self,
@@ -794,6 +853,7 @@ class ChargePhaseHandler:
             state=state,
             charge_state=charge_state,
             ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            charge_target_restriction_hooks=self.charge_target_restriction_hooks,
         )
         if not legal_unit_ids:
             state.charge_phase_state = charge_state.with_phase_complete()
@@ -829,6 +889,7 @@ class ChargePhaseHandler:
                 unit_ids=legal_unit_ids,
                 include_complete=True,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                charge_target_restriction_hooks=self.charge_target_restriction_hooks,
             ),
         )
         decisions.request_decision(request)
@@ -875,6 +936,7 @@ class ChargePhaseHandler:
                     player_id=_active_player_id(state),
                 ),
                 runtime_modifier_registry=self.runtime_modifier_registry,
+                charge_target_restriction_hooks=self.charge_target_restriction_hooks,
             )
         if result.decision_type == SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE:
             return _apply_charge_declaration_grant_decision(
@@ -888,6 +950,7 @@ class ChargePhaseHandler:
                     player_id=_active_player_id(state),
                 ),
                 runtime_modifier_registry=self.runtime_modifier_registry,
+                charge_target_restriction_hooks=self.charge_target_restriction_hooks,
             )
         if result.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
             return _apply_charge_move_proposal_decision(
@@ -895,6 +958,7 @@ class ChargePhaseHandler:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                charge_target_restriction_hooks=self.charge_target_restriction_hooks,
             )
         raise GameLifecycleError("Charge phase received unsupported decision type.")
 
@@ -905,6 +969,7 @@ def invalid_charging_unit_selection_status(
     request: DecisionRequest,
     result: DecisionResult,
     ruleset_descriptor: RulesetDescriptor,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
 ) -> LifecycleStatus | None:
     invalid_status = _invalid_charging_unit_finite_decision_status(
         state=state,
@@ -927,6 +992,7 @@ def invalid_charging_unit_selection_status(
         state=state,
         charge_state=charge_state,
         ruleset_descriptor=ruleset_descriptor,
+        charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
     payload = _decision_payload_object(result.payload)
     if result.selected_option_id == COMPLETE_CHARGE_PHASE_OPTION_ID:
@@ -970,6 +1036,7 @@ def invalid_charge_move_proposal_status(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
 ) -> LifecycleStatus | None:
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
     parsed = _parse_charge_move_proposal_submission_or_invalid(
@@ -1039,6 +1106,8 @@ def invalid_charge_move_proposal_status(
         unit_instance_id=proposal.unit_instance_id,
         maximum_distance_inches=pending_distance.roll_result.value,
         ruleset_descriptor=ruleset_descriptor,
+        charge_target_restriction_hooks=charge_target_restriction_hooks
+        or ChargeTargetRestrictionHookRegistry.empty(),
     )
     requested_reachable = _payload_distance_map(
         _proposal_context(proposal_request),
@@ -1152,6 +1221,7 @@ def _apply_charging_unit_selection_decision(
     charge_declaration_hooks: ChargeDeclarationHookRegistry,
     ability_index: AbilityCatalogIndex,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
 ) -> LifecycleStatus | None:
     _validate_charge_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -1182,6 +1252,7 @@ def _apply_charging_unit_selection_decision(
         state=state,
         charge_state=charge_state,
         ruleset_descriptor=ruleset_descriptor,
+        charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
     if unit_instance_id not in legal_unit_ids:
         raise GameLifecycleError("Charging unit selection is not currently legal.")
@@ -1222,6 +1293,7 @@ def _apply_charging_unit_selection_decision(
         ruleset_descriptor=ruleset_descriptor,
         ability_index=ability_index,
         runtime_modifier_registry=runtime_modifier_registry,
+        charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
 
 
@@ -1345,6 +1417,7 @@ def _apply_charge_declaration_grant_decision(
     charge_declaration_hooks: ChargeDeclarationHookRegistry,
     ability_index: AbilityCatalogIndex,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
 ) -> LifecycleStatus | None:
     charge_state = state.charge_phase_state
     if charge_state is None or charge_state.active_selection is None:
@@ -1407,6 +1480,7 @@ def _apply_charge_declaration_grant_decision(
         ruleset_descriptor=ruleset_descriptor,
         ability_index=ability_index,
         runtime_modifier_registry=runtime_modifier_registry,
+        charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
 
 
@@ -1526,6 +1600,7 @@ def _resolve_charge_roll(
     ruleset_descriptor: RulesetDescriptor,
     ability_index: AbilityCatalogIndex,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
 ) -> LifecycleStatus | None:
     unit = _unit_for_selection(state=state, selection=selection)
     roll_modifiers = catalog_charge_roll_modifiers_for_unit(
@@ -1561,6 +1636,7 @@ def _resolve_charge_roll(
         unit_instance_id=selection.unit_instance_id,
         maximum_distance_inches=roll_state.current_total,
         ruleset_descriptor=ruleset_descriptor,
+        charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
     roll_result = ChargeRollResult.from_roll_state(
         request=roll_request,
@@ -1746,6 +1822,7 @@ def _apply_charge_move_proposal_decision(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
 ) -> LifecycleStatus | None:
     _validate_charge_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -1832,7 +1909,10 @@ def _apply_charge_move_proposal_decision(
     state.replace_battlefield_state(
         battlefield_state.with_unit_placement(resolution.attempted_placement)
     )
-    state.charge_phase_state = charge_state.with_charge_move_resolved(proposal.unit_instance_id)
+    state.charge_phase_state = charge_state.with_charge_move_resolved(
+        proposal.unit_instance_id,
+        selected_target_unit_instance_ids=resolution.selected_target_unit_instance_ids,
+    )
     effect = _record_fights_first_effect_if_needed(
         state=state,
         ruleset_descriptor=ruleset_descriptor,
@@ -2032,6 +2112,7 @@ def _legal_charging_unit_ids(
     state: GameState,
     charge_state: ChargePhaseState,
     ruleset_descriptor: RulesetDescriptor,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
 ) -> tuple[str, ...]:
     active_player_id = _active_player_id(state)
     placed_unit_ids = _active_player_placed_unit_ids(state=state, player_id=active_player_id)
@@ -2043,6 +2124,7 @@ def _legal_charging_unit_ids(
             ruleset_descriptor=ruleset_descriptor,
             charge_state=charge_state,
             ignore_already_selected=False,
+            charge_target_restriction_hooks=charge_target_restriction_hooks,
         )
         if ineligible_reason is None:
             legal_ids.append(unit_id)
@@ -2056,6 +2138,7 @@ def _charge_unit_ineligibility_reason(
     ruleset_descriptor: RulesetDescriptor,
     charge_state: ChargePhaseState,
     ignore_already_selected: bool,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
 ) -> str | None:
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     if not ignore_already_selected and requested_unit_id in charge_state.selected_unit_ids:
@@ -2106,6 +2189,7 @@ def _charge_unit_ineligibility_reason(
         state=state,
         unit_instance_id=requested_unit_id,
         ruleset_descriptor=ruleset_descriptor,
+        charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
     if not any(candidate.is_legal for candidate in candidates):
         return "charge_unit_no_legal_targets"
@@ -2123,11 +2207,35 @@ def _charge_forbidden_by_effects(*, state: GameState, unit_instance_id: str) -> 
     return False
 
 
+def _charge_target_restriction(
+    *,
+    state: GameState,
+    charging_unit_instance_id: str,
+    target_unit_instance_id: str,
+    registry: ChargeTargetRestrictionHookRegistry | None,
+) -> TargetRestriction | None:
+    if registry is None:
+        return None
+    if type(registry) is not ChargeTargetRestrictionHookRegistry:
+        raise GameLifecycleError("Charge target restriction requires a registry.")
+    restrictions = registry.restrictions_for(
+        ChargeTargetRestrictionContext(
+            state=state,
+            player_id=_active_player_id(state),
+            battle_round=state.battle_round,
+            charging_unit_instance_id=charging_unit_instance_id,
+            target_unit_instance_id=target_unit_instance_id,
+        )
+    )
+    return restrictions[0] if restrictions else None
+
+
 def _charge_target_candidates(
     *,
     state: GameState,
     unit_instance_id: str,
     ruleset_descriptor: RulesetDescriptor,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
 ) -> tuple[ChargeTargetCandidate, ...]:
     scenario = _battlefield_scenario(state)
     max_range = ruleset_descriptor.charge_policy.max_declaration_range_inches
@@ -2139,12 +2247,24 @@ def _charge_target_candidates(
             target_unit_instance_id=target_id,
         )
         is_legal = distance <= max_range
+        restriction = _charge_target_restriction(
+            state=state,
+            charging_unit_instance_id=unit_instance_id,
+            target_unit_instance_id=target_id,
+            registry=charge_target_restriction_hooks,
+        )
+        violation_code: str | None
+        if is_legal and restriction is not None:
+            is_legal = False
+            violation_code = restriction.violation_code
+        else:
+            violation_code = None if is_legal else "target_out_of_declaration_range"
         candidates.append(
             ChargeTargetCandidate(
                 target_unit_instance_id=target_id,
                 closest_distance_inches=distance,
                 is_legal=is_legal,
-                violation_code=None if is_legal else "target_out_of_declaration_range",
+                violation_code=violation_code,
             )
         )
     return tuple(sorted(candidates, key=lambda candidate: candidate.target_unit_instance_id))
@@ -2156,12 +2276,14 @@ def _reachable_charge_target_distances(
     unit_instance_id: str,
     maximum_distance_inches: int,
     ruleset_descriptor: RulesetDescriptor,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
 ) -> dict[str, float]:
     distances: dict[str, float] = {}
     for candidate in _charge_target_candidates(
         state=state,
         unit_instance_id=unit_instance_id,
         ruleset_descriptor=ruleset_descriptor,
+        charge_target_restriction_hooks=charge_target_restriction_hooks,
     ):
         if candidate.is_legal and candidate.closest_distance_inches <= maximum_distance_inches:
             distances[candidate.target_unit_instance_id] = candidate.closest_distance_inches
@@ -2533,6 +2655,7 @@ def _charging_unit_options(
     unit_ids: tuple[str, ...],
     include_complete: bool,
     ruleset_descriptor: RulesetDescriptor,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
 ) -> tuple[DecisionOption, ...]:
     options: list[DecisionOption] = []
     for unit_id in unit_ids:
@@ -2541,6 +2664,7 @@ def _charging_unit_options(
             state=state,
             unit_instance_id=unit_id,
             ruleset_descriptor=ruleset_descriptor,
+            charge_target_restriction_hooks=charge_target_restriction_hooks,
         )
         eligibility_context = ChargeEligibilityContext(
             player_id=_active_player_id(state),
@@ -3332,6 +3456,25 @@ def _validate_charge_distance_states(values: object) -> tuple[ChargeDistanceStat
         seen.add(result_id)
         states.append(value)
     return tuple(states)
+
+
+def _validate_charge_declared_target_map(values: object) -> dict[str, tuple[str, ...]]:
+    if type(values) is not dict:
+        raise GameLifecycleError(
+            "ChargePhaseState declared_target_unit_instance_ids_by_unit must be a dict."
+        )
+    validated: dict[str, tuple[str, ...]] = {}
+    for raw_unit_id, raw_target_ids in cast(dict[object, object], values).items():
+        unit_id = _validate_identifier("declared target unit id", raw_unit_id)
+        if unit_id in validated:
+            raise GameLifecycleError("ChargePhaseState declared target map duplicates unit IDs.")
+        if type(raw_target_ids) is not tuple:
+            raise GameLifecycleError("ChargePhaseState declared target map values must be tuples.")
+        validated[unit_id] = _validate_identifier_tuple(
+            "declared target unit ids",
+            cast(tuple[object, ...], raw_target_ids),
+        )
+    return dict(sorted(validated.items()))
 
 
 def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:

@@ -21,6 +21,9 @@ from warhammer40k_core.engine.ability_coverage import (
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
     army_rule as death_guard_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
+    army_rule as emperors_children_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
     army_rule as world_eaters_army_rule,
 )
@@ -177,6 +180,13 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             semantic_category="faction.army_rule.blessings_of_khorne",
             runtime_consumer_ids=_world_eaters_runtime_consumer_ids(),
         ),
+        _implemented_faction_army_rule_row(
+            faction_id=emperors_children_army_rule.EMPERORS_CHILDREN_FACTION_ID,
+            ability_id=emperors_children_army_rule.HOOK_ID,
+            ability_name="Thrill Seekers",
+            semantic_category="faction.army_rule.thrill_seekers",
+            runtime_consumer_ids=_emperors_children_runtime_consumer_ids(),
+        ),
     )
 
 
@@ -249,6 +259,26 @@ def _world_eaters_runtime_consumer_ids() -> tuple[str, ...]:
                     for binding in contribution.fight_activation_ability_hook_bindings
                 ),
                 *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
+            }
+        )
+    )
+
+
+def _emperors_children_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = emperors_children_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                *(binding.hook_id for binding in contribution.advance_eligibility_hook_bindings),
+                *(binding.hook_id for binding in contribution.fall_back_hook_bindings),
+                *(
+                    binding.hook_id
+                    for binding in contribution.shooting_target_restriction_hook_bindings
+                ),
+                *(
+                    binding.hook_id
+                    for binding in contribution.charge_target_restriction_hook_bindings
+                ),
             }
         )
     )

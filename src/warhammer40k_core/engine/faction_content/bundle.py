@@ -15,6 +15,10 @@ from warhammer40k_core.engine.abilities import (
     default_ability_handler_registry,
 )
 from warhammer40k_core.engine.ability_catalog import build_player_ability_index
+from warhammer40k_core.engine.advance_eligibility_hooks import (
+    AdvanceEligibilityHookBinding,
+    AdvanceEligibilityHookRegistry,
+)
 from warhammer40k_core.engine.advance_hooks import AdvanceMoveHookBinding, AdvanceMoveHookRegistry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_formation_hooks import (
@@ -94,6 +98,12 @@ from warhammer40k_core.engine.sticky_objective_control import (
 )
 from warhammer40k_core.engine.stratagem_catalog import build_player_stratagem_index
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex, StratagemCatalogRecord
+from warhammer40k_core.engine.target_restriction_hooks import (
+    ChargeTargetRestrictionHookBinding,
+    ChargeTargetRestrictionHookRegistry,
+    ShootingTargetRestrictionHookBinding,
+    ShootingTargetRestrictionHookRegistry,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
 )
@@ -117,10 +127,13 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     battle_formation_hook_ids: list[str]
     battle_round_start_hook_ids: list[str]
     battle_shock_hook_ids: list[str]
+    advance_eligibility_hook_ids: list[str]
     advance_move_hook_ids: list[str]
     fall_back_hook_ids: list[str]
     movement_end_surge_hook_ids: list[str]
     charge_declaration_hook_ids: list[str]
+    shooting_target_restriction_hook_ids: list[str]
+    charge_target_restriction_hook_ids: list[str]
     shooting_unit_selected_hook_ids: list[str]
     shooting_end_surge_hook_ids: list[str]
     enhancement_effect_binding_ids: list[str]
@@ -158,10 +171,19 @@ class RuntimeContentContribution:
     battle_formation_hook_bindings: tuple[BattleFormationHookBinding, ...] = ()
     battle_round_start_hook_bindings: tuple[BattleRoundStartHookBinding, ...] = ()
     battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = ()
+    advance_eligibility_hook_bindings: tuple[AdvanceEligibilityHookBinding, ...] = ()
     advance_move_hook_bindings: tuple[AdvanceMoveHookBinding, ...] = ()
     fall_back_hook_bindings: tuple[FallBackEligibilityHookBinding, ...] = ()
     movement_end_surge_hook_bindings: tuple[MovementEndSurgeHookBinding, ...] = ()
     charge_declaration_hook_bindings: tuple[ChargeDeclarationHookBinding, ...] = ()
+    shooting_target_restriction_hook_bindings: tuple[
+        ShootingTargetRestrictionHookBinding,
+        ...,
+    ] = ()
+    charge_target_restriction_hook_bindings: tuple[
+        ChargeTargetRestrictionHookBinding,
+        ...,
+    ] = ()
     shooting_unit_selected_hook_bindings: tuple[ShootingUnitSelectedHookBinding, ...] = ()
     shooting_end_surge_hook_bindings: tuple[ShootingEndSurgeHookBinding, ...] = ()
     enhancement_effect_bindings: tuple[EnhancementEffectBinding, ...] = ()
@@ -276,6 +298,15 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "advance_eligibility_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution advance_eligibility_hook_bindings",
+                self.advance_eligibility_hook_bindings,
+                AdvanceEligibilityHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "advance_move_hook_bindings",
             _validate_tuple(
                 "RuntimeContentContribution advance_move_hook_bindings",
@@ -308,6 +339,24 @@ class RuntimeContentContribution:
                 "RuntimeContentContribution charge_declaration_hook_bindings",
                 self.charge_declaration_hook_bindings,
                 ChargeDeclarationHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "shooting_target_restriction_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution shooting_target_restriction_hook_bindings",
+                self.shooting_target_restriction_hook_bindings,
+                ShootingTargetRestrictionHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "charge_target_restriction_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution charge_target_restriction_hook_bindings",
+                self.charge_target_restriction_hook_bindings,
+                ChargeTargetRestrictionHookBinding,
             ),
         )
         object.__setattr__(
@@ -437,10 +486,15 @@ class RuntimeContentContribution:
             battle_formation_hook_bindings=self.battle_formation_hook_bindings,
             battle_round_start_hook_bindings=self.battle_round_start_hook_bindings,
             battle_shock_hook_bindings=self.battle_shock_hook_bindings,
+            advance_eligibility_hook_bindings=self.advance_eligibility_hook_bindings,
             advance_move_hook_bindings=self.advance_move_hook_bindings,
             fall_back_hook_bindings=self.fall_back_hook_bindings,
             movement_end_surge_hook_bindings=self.movement_end_surge_hook_bindings,
             charge_declaration_hook_bindings=self.charge_declaration_hook_bindings,
+            shooting_target_restriction_hook_bindings=(
+                self.shooting_target_restriction_hook_bindings
+            ),
+            charge_target_restriction_hook_bindings=(self.charge_target_restriction_hook_bindings),
             shooting_unit_selected_hook_bindings=self.shooting_unit_selected_hook_bindings,
             shooting_end_surge_hook_bindings=self.shooting_end_surge_hook_bindings,
             enhancement_effect_bindings=self.enhancement_effect_bindings,
@@ -557,6 +611,15 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.hook_id,
         ),
+        advance_eligibility_hook_bindings=_combine_unique_values(
+            "Advance eligibility hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.advance_eligibility_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
         advance_move_hook_bindings=_combine_unique_values(
             "Advance hook binding",
             tuple(
@@ -590,6 +653,24 @@ def combine_runtime_content_contributions(
                 binding
                 for contribution in validated_contributions
                 for binding in contribution.charge_declaration_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
+        shooting_target_restriction_hook_bindings=_combine_unique_values(
+            "shooting target restriction hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.shooting_target_restriction_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
+        charge_target_restriction_hook_bindings=_combine_unique_values(
+            "charge target restriction hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.charge_target_restriction_hook_bindings
             ),
             lambda binding: binding.hook_id,
         ),
@@ -718,10 +799,13 @@ class RuntimeContentBundle:
     battle_formation_hook_registry: BattleFormationHookRegistry
     battle_round_start_hook_registry: BattleRoundStartHookRegistry
     battle_shock_hook_registry: BattleShockHookRegistry
+    advance_eligibility_hook_registry: AdvanceEligibilityHookRegistry
     advance_move_hook_registry: AdvanceMoveHookRegistry
     fall_back_hook_registry: FallBackEligibilityHookRegistry
     movement_end_surge_hook_registry: MovementEndSurgeHookRegistry
     charge_declaration_hook_registry: ChargeDeclarationHookRegistry
+    shooting_target_restriction_hook_registry: ShootingTargetRestrictionHookRegistry
+    charge_target_restriction_hook_registry: ChargeTargetRestrictionHookRegistry
     shooting_unit_selected_hook_registry: ShootingUnitSelectedHookRegistry
     shooting_end_surge_hook_registry: ShootingEndSurgeHookRegistry
     enhancement_effect_registry: EnhancementEffectRegistry
@@ -767,6 +851,10 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires BattleRoundStartHookRegistry.")
         if type(self.battle_shock_hook_registry) is not BattleShockHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires BattleShockHookRegistry.")
+        if type(self.advance_eligibility_hook_registry) is not AdvanceEligibilityHookRegistry:
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires AdvanceEligibilityHookRegistry."
+            )
         if type(self.advance_move_hook_registry) is not AdvanceMoveHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires AdvanceMoveHookRegistry.")
         if type(self.fall_back_hook_registry) is not FallBackEligibilityHookRegistry:
@@ -777,6 +865,20 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires MovementEndSurgeHookRegistry.")
         if type(self.charge_declaration_hook_registry) is not ChargeDeclarationHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires ChargeDeclarationHookRegistry.")
+        if (
+            type(self.shooting_target_restriction_hook_registry)
+            is not ShootingTargetRestrictionHookRegistry
+        ):
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires ShootingTargetRestrictionHookRegistry."
+            )
+        if (
+            type(self.charge_target_restriction_hook_registry)
+            is not ChargeTargetRestrictionHookRegistry
+        ):
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires ChargeTargetRestrictionHookRegistry."
+            )
         if type(self.shooting_unit_selected_hook_registry) is not ShootingUnitSelectedHookRegistry:
             raise GameLifecycleError(
                 "RuntimeContentBundle requires ShootingUnitSelectedHookRegistry."
@@ -933,6 +1035,13 @@ class RuntimeContentBundle:
                 for binding in contribution.battle_shock_hook_bindings
             )
         )
+        advance_eligibility_hook_registry = AdvanceEligibilityHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.advance_eligibility_hook_bindings
+            )
+        )
         advance_move_hook_registry = AdvanceMoveHookRegistry.from_bindings(
             tuple(
                 binding
@@ -959,6 +1068,22 @@ class RuntimeContentBundle:
                 binding
                 for contribution in validated_contributions
                 for binding in contribution.charge_declaration_hook_bindings
+            )
+        )
+        shooting_target_restriction_hook_registry = (
+            ShootingTargetRestrictionHookRegistry.from_bindings(
+                tuple(
+                    binding
+                    for contribution in validated_contributions
+                    for binding in contribution.shooting_target_restriction_hook_bindings
+                )
+            )
+        )
+        charge_target_restriction_hook_registry = ChargeTargetRestrictionHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.charge_target_restriction_hook_bindings
             )
         )
         shooting_end_surge_hook_registry = ShootingEndSurgeHookRegistry.from_bindings(
@@ -1055,10 +1180,13 @@ class RuntimeContentBundle:
             battle_formation_hook_registry=battle_formation_hook_registry,
             battle_round_start_hook_registry=battle_round_start_hook_registry,
             battle_shock_hook_registry=battle_shock_hook_registry,
+            advance_eligibility_hook_registry=advance_eligibility_hook_registry,
             advance_move_hook_registry=advance_move_hook_registry,
             fall_back_hook_registry=fall_back_hook_registry,
             movement_end_surge_hook_registry=movement_end_surge_hook_registry,
             charge_declaration_hook_registry=charge_declaration_hook_registry,
+            shooting_target_restriction_hook_registry=shooting_target_restriction_hook_registry,
+            charge_target_restriction_hook_registry=charge_target_restriction_hook_registry,
             shooting_unit_selected_hook_registry=shooting_unit_selected_hook_registry,
             shooting_end_surge_hook_registry=shooting_end_surge_hook_registry,
             enhancement_effect_registry=enhancement_effect_registry,
@@ -1104,6 +1232,9 @@ class RuntimeContentBundle:
             "battle_shock_hook_ids": [
                 binding.hook_id for binding in self.battle_shock_hook_registry.all_bindings()
             ],
+            "advance_eligibility_hook_ids": [
+                binding.hook_id for binding in self.advance_eligibility_hook_registry.all_bindings()
+            ],
             "advance_move_hook_ids": [
                 binding.hook_id for binding in self.advance_move_hook_registry.all_bindings()
             ],
@@ -1115,6 +1246,14 @@ class RuntimeContentBundle:
             ],
             "charge_declaration_hook_ids": [
                 binding.hook_id for binding in self.charge_declaration_hook_registry.all_bindings()
+            ],
+            "shooting_target_restriction_hook_ids": [
+                binding.hook_id
+                for binding in self.shooting_target_restriction_hook_registry.all_bindings()
+            ],
+            "charge_target_restriction_hook_ids": [
+                binding.hook_id
+                for binding in self.charge_target_restriction_hook_registry.all_bindings()
             ],
             "shooting_unit_selected_hook_ids": [
                 binding.hook_id

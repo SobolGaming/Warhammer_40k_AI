@@ -171,6 +171,42 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers",
+        "ability_name": "Thrill Seekers",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/emperors-children/faction/warhammer_40000_11th:emperors_children:army_rule:thrill_seekers/none",
+        "datasheet_id": "emperors-children",
+        "datasheet_name": "Emperor's Children",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Thrill Seekers"
+    ],
+    "category_id": "faction.army_rule.thrill_seekers",
+    "category_name": "Emperor's Children Army Rule",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/emperors-children/faction/warhammer_40000_11th:emperors_children:army_rule:thrill_seekers/none"
+    ],
+    "datasheet_names": [
+      "Emperor's Children"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001115:daemonic-icon",
         "ability_name": "Daemonic Icon",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/wargear/000001115:daemonic-icon/000001115:daemonic-icon",

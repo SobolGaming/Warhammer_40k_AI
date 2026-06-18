@@ -59,6 +59,9 @@ from warhammer40k_core.engine.stratagems import (
     stratagem_window_declined_for_context,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.turn_start_engagement import (
+    record_turn_start_engagement_snapshot,
+)
 
 TACTICAL_SECONDARY_DRAW_DECISION_TYPE = "draw_tactical_secondary_missions"
 TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE = "replace_tactical_secondary_mission"
@@ -114,6 +117,10 @@ class CommandPhaseHandler:
         if state.current_battle_phase is not BattlePhase.COMMAND:
             raise GameLifecycleError("CommandPhaseHandler can run only in the COMMAND phase.")
         active_player_id = _active_player_id(state)
+        record_turn_start_engagement_snapshot(
+            state=state,
+            player_id=active_player_id,
+        )
         choice = state.secondary_mission_choice_for_player(active_player_id)
         if choice is None:
             raise GameLifecycleError("Command phase requires secondary mission choices.")

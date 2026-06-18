@@ -65,6 +65,9 @@ from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
     army_rule as death_guard_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
+    army_rule as emperors_children_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
     army_rule as world_eaters_army_rule,
 )
@@ -645,6 +648,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         for row in rows_by_name["Blessings of Khorne"]
     )
     assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Thrill Seekers"]
+    )
+    assert all(
         row.runtime_consumer_ids
         == ("warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",)
         for row in rows_by_name["The Shadow of Chaos"]
@@ -652,6 +659,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert tuple(row.datasheet_name for row in rows_by_name["Nurgle's Gift"]) == ("Death Guard",)
     assert tuple(row.datasheet_name for row in rows_by_name["Blessings of Khorne"]) == (
         "World Eaters",
+    )
+    assert tuple(row.datasheet_name for row in rows_by_name["Thrill Seekers"]) == (
+        "Emperor's Children",
     )
     assert set(rows_by_name["Nurgle's Gift"][0].runtime_consumer_ids) == {
         death_guard_army_rule.HOOK_ID,
@@ -668,6 +678,12 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         world_eaters_army_rule.TOTAL_CARNAGE_HOOK_ID,
         world_eaters_army_rule.UNBRIDLED_BLOODLUST_CHARGE_MODIFIER_ID,
         f"{world_eaters_army_rule.HOOK_ID}:weapon-profile-keywords",
+    }
+    assert set(rows_by_name["Thrill Seekers"][0].runtime_consumer_ids) == {
+        emperors_children_army_rule.ADVANCE_ELIGIBILITY_HOOK_ID,
+        emperors_children_army_rule.FALL_BACK_ELIGIBILITY_HOOK_ID,
+        emperors_children_army_rule.SHOOTING_TARGET_RESTRICTION_HOOK_ID,
+        emperors_children_army_rule.CHARGE_TARGET_RESTRICTION_HOOK_ID,
     }
     assert categories_by_name["Leadership Characteristic"].ability_names == ("Daemonic Icon",)
     assert categories_by_name["Leadership Characteristic"].datasheet_names == (
@@ -715,6 +731,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert categories_by_name["World Eaters Army Rule"].ability_names == ("Blessings of Khorne",)
     assert categories_by_name["World Eaters Army Rule"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["Emperor's Children Army Rule"].ability_names == ("Thrill Seekers",)
+    assert categories_by_name["Emperor's Children Army Rule"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
     )
     assert categories_by_name["Unknown Abilities"].ability_names == (

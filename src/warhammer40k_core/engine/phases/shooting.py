@@ -103,6 +103,7 @@ from warhammer40k_core.engine.shooting_end_surge_hooks import (
 )
 from warhammer40k_core.engine.shooting_targets import (
     ShootingTargetCandidate,
+    ShootingTargetViolationCode,
     shooting_target_candidate_for_model,
     shooting_target_candidates_for_unit,
     shooting_visibility_cache_key,
@@ -112,6 +113,10 @@ from warhammer40k_core.engine.shooting_types import ShootingType, shooting_type_
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedContext,
     ShootingUnitSelectedHookRegistry,
+)
+from warhammer40k_core.engine.target_restriction_hooks import (
+    ShootingTargetRestrictionContext,
+    ShootingTargetRestrictionHookRegistry,
 )
 from warhammer40k_core.engine.transports import (
     FiringDeckWeaponSelection,
@@ -876,6 +881,9 @@ class ShootingPhaseHandler:
     shooting_unit_selected_hooks: ShootingUnitSelectedHookRegistry = field(
         default_factory=ShootingUnitSelectedHookRegistry.empty
     )
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry = field(
+        default_factory=ShootingTargetRestrictionHookRegistry.empty
+    )
     shooting_end_surge_hooks: ShootingEndSurgeHookRegistry = field(
         default_factory=ShootingEndSurgeHookRegistry.empty
     )
@@ -900,6 +908,12 @@ class ShootingPhaseHandler:
         if type(self.shooting_unit_selected_hooks) is not ShootingUnitSelectedHookRegistry:
             raise GameLifecycleError(
                 "ShootingPhaseHandler shooting_unit_selected_hooks must be a registry."
+            )
+        if type(self.shooting_target_restriction_hooks) is not (
+            ShootingTargetRestrictionHookRegistry
+        ):
+            raise GameLifecycleError(
+                "ShootingPhaseHandler shooting_target_restriction_hooks must be a registry."
             )
         if type(self.shooting_end_surge_hooks) is not ShootingEndSurgeHookRegistry:
             raise GameLifecycleError(
@@ -986,6 +1000,7 @@ class ShootingPhaseHandler:
                 shooting_state=shooting_state,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 army_catalog=_army_catalog_for_handler(self),
+                shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
             )
         if (
             shooting_state.active_selection is not None
@@ -998,6 +1013,7 @@ class ShootingPhaseHandler:
                 selected_shooting_type=shooting_state.selected_shooting_type.shooting_type,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 army_catalog=_army_catalog_for_handler(self),
+                shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
             )
 
         legal_unit_ids = _legal_shooting_unit_ids(
@@ -1005,6 +1021,7 @@ class ShootingPhaseHandler:
             shooting_state=shooting_state,
             ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             army_catalog=_army_catalog_for_handler(self),
+            shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
         )
         if not legal_unit_ids:
             state.shooting_phase_state = shooting_state.with_phase_complete()
@@ -1150,6 +1167,7 @@ class ShootingPhaseHandler:
             proposal=proposal,
             ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             army_catalog=_army_catalog_for_handler(self),
+            shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
         )
         if not rule_validation.is_valid:
             return _reject_invalid_declaration(
@@ -1192,6 +1210,7 @@ class ShootingPhaseHandler:
             rules_unit=rules_unit,
             ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             army_catalog=_army_catalog_for_handler(self),
+            shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
         )
         if shooting_type not in legal_types:
             return LifecycleStatus.invalid(
@@ -1305,6 +1324,7 @@ class ShootingPhaseHandler:
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 army_catalog=_army_catalog_for_handler(self),
                 shooting_unit_selected_hooks=self.shooting_unit_selected_hooks,
+                shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
             )
             return None
         if result.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE:
@@ -1314,6 +1334,7 @@ class ShootingPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 army_catalog=_army_catalog_for_handler(self),
+                shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
             )
             return None
         if result.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE:
@@ -1323,6 +1344,7 @@ class ShootingPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 army_catalog=_army_catalog_for_handler(self),
+                shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
             )
             return None
         if result.decision_type in ATTACK_RESOLUTION_SELECTION_DECISION_TYPES:
@@ -1743,6 +1765,7 @@ def _request_shooting_type_selection(
     shooting_state: ShootingPhaseState,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
 ) -> LifecycleStatus:
     active_selection = shooting_state.active_selection
     if active_selection is None:
@@ -1756,6 +1779,7 @@ def _request_shooting_type_selection(
         rules_unit=rules_unit,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     )
     if not legal_types:
         raise GameLifecycleError("Selected shooting unit has no legal shooting types.")
@@ -1823,6 +1847,7 @@ def _request_shooting_declaration(
     request_context: JsonValue | None = None,
     target_unit_ids: tuple[str, ...] | None = None,
     forced_shooting_type: ShootingType | None = None,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> LifecycleStatus:
     scenario = _battlefield_scenario(state)
     terrain_features = _terrain_features_for_state(state)
@@ -1874,15 +1899,27 @@ def _request_shooting_declaration(
             detection_context_fingerprint=detection_context_fingerprint,
         )
         if candidate_cache_key not in target_candidate_cache:
-            target_candidate_cache[candidate_cache_key] = shooting_target_candidates_for_unit(
-                scenario=scenario,
-                ruleset_descriptor=ruleset_descriptor,
-                attacker_unit=attacker_unit,
-                weapon_profile=profile,
-                target_unit_ids=candidate_target_unit_ids,
-                terrain_features=terrain_features,
-                hidden_target_unit_ids=hidden_target_unit_ids,
-                target_detection_range_bonus_inches_by_unit_id=(detection_range_bonus_by_target_id),
+            target_candidate_cache[candidate_cache_key] = tuple(
+                _shooting_candidate_with_target_restrictions(
+                    candidate=candidate,
+                    state=state,
+                    player_id=active_selection.player_id,
+                    attacking_unit_instance_id=attacker_unit.unit_instance_id,
+                    target_unit_instance_id=candidate.target_unit_instance_id,
+                    registry=shooting_target_restriction_hooks,
+                )
+                for candidate in shooting_target_candidates_for_unit(
+                    scenario=scenario,
+                    ruleset_descriptor=ruleset_descriptor,
+                    attacker_unit=attacker_unit,
+                    weapon_profile=profile,
+                    target_unit_ids=candidate_target_unit_ids,
+                    terrain_features=terrain_features,
+                    hidden_target_unit_ids=hidden_target_unit_ids,
+                    target_detection_range_bonus_inches_by_unit_id=(
+                        detection_range_bonus_by_target_id
+                    ),
+                )
             )
         candidates = target_candidate_cache[candidate_cache_key]
         target_candidates.extend(
@@ -2256,6 +2293,7 @@ def _apply_shooting_unit_selection_decision(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     shooting_unit_selected_hooks: ShootingUnitSelectedHookRegistry,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
 ) -> None:
     _validate_shooting_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -2270,6 +2308,7 @@ def _apply_shooting_unit_selection_decision(
             shooting_state=shooting_state,
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
+            shooting_target_restriction_hooks=shooting_target_restriction_hooks,
         )
         state.shooting_phase_state = shooting_state.with_phase_complete(
             skipped_unit_ids=skipped_unit_ids,
@@ -2291,6 +2330,7 @@ def _apply_shooting_unit_selection_decision(
         shooting_state=shooting_state,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     )
     if unit_instance_id not in legal_unit_ids:
         raise GameLifecycleError("Shooting unit selection is not currently legal.")
@@ -2368,6 +2408,7 @@ def _apply_shooting_type_selection_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
 ) -> None:
     _validate_shooting_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -2389,6 +2430,7 @@ def _apply_shooting_type_selection_decision(
         rules_unit=rules_unit,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     )
     if shooting_type not in legal_types:
         raise GameLifecycleError("Shooting type selection is not currently legal.")
@@ -2426,6 +2468,7 @@ def _apply_shooting_declaration_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
 ) -> None:
     if _apply_out_of_phase_shooting_declaration_decision(
         state=state,
@@ -2433,6 +2476,7 @@ def _apply_shooting_declaration_decision(
         decisions=decisions,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     ):
         return
     _validate_shooting_phase_state(state)
@@ -2447,6 +2491,7 @@ def _apply_shooting_declaration_decision(
         army_catalog=army_catalog,
         decisions=decisions,
         result_id=result.result_id,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     )
     attack_sequence = AttackSequence.start(
         sequence_id=f"attack-sequence:{result.result_id}",
@@ -2496,6 +2541,7 @@ def _apply_out_of_phase_shooting_declaration_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
 ) -> bool:
     out_of_phase_state = state.out_of_phase_shooting_state
     if out_of_phase_state is None:
@@ -2515,6 +2561,7 @@ def _apply_out_of_phase_shooting_declaration_decision(
         result_id=result.result_id,
         shooting_player_id=out_of_phase_state.player_id,
         out_of_phase_state=out_of_phase_state,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     )
     if ineligible_unit_ids:
         raise GameLifecycleError("Out-of-phase shooting cannot mark extra units as shot.")
@@ -2793,6 +2840,7 @@ def _validate_declaration_submission(
     proposal: ShootingDeclarationProposal,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
 ) -> ShootingProposalValidationResult:
     out_of_phase_state = state.out_of_phase_shooting_state
     if (
@@ -2806,6 +2854,7 @@ def _validate_declaration_submission(
             out_of_phase_state=out_of_phase_state,
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
+            shooting_target_restriction_hooks=shooting_target_restriction_hooks,
         )
     shooting_state = state.shooting_phase_state
     if shooting_state is None or shooting_state.active_selection is None:
@@ -2847,6 +2896,7 @@ def _validate_declaration_submission(
         proposal=proposal,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     )
     if isinstance(attack_validation, ShootingProposalValidationResult):
         return attack_validation
@@ -2860,6 +2910,7 @@ def _validate_out_of_phase_declaration_submission(
     out_of_phase_state: OutOfPhaseShootingState,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
 ) -> ShootingProposalValidationResult:
     if proposal.player_id != out_of_phase_state.player_id:
         return ShootingProposalValidationResult.invalid(
@@ -2895,6 +2946,7 @@ def _validate_out_of_phase_declaration_submission(
         army_catalog=army_catalog,
         shooting_player_id=out_of_phase_state.player_id,
         out_of_phase_state=out_of_phase_state,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     )
     if isinstance(attack_validation, ShootingProposalValidationResult):
         return attack_validation
@@ -2909,6 +2961,7 @@ def _attack_pools_for_proposal(
     army_catalog: ArmyCatalog,
     decisions: DecisionController,
     result_id: str,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
     shooting_player_id: str | None = None,
     out_of_phase_state: OutOfPhaseShootingState | None = None,
 ) -> tuple[tuple[RangedAttackPool, ...], tuple[str, ...]]:
@@ -2921,6 +2974,7 @@ def _attack_pools_for_proposal(
         attack_count_scope_prefix=result_id,
         shooting_player_id=shooting_player_id,
         out_of_phase_state=out_of_phase_state,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     )
     if isinstance(result, ShootingProposalValidationResult):
         raise GameLifecycleError("Accepted shooting declaration failed revalidation.")
@@ -2942,6 +2996,7 @@ def _attack_pools_or_validation(
     attack_count_scope_prefix: str | None = None,
     shooting_player_id: str | None = None,
     out_of_phase_state: OutOfPhaseShootingState | None = None,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> _AttackPoolValidationResult:
     player_id = proposal.player_id if shooting_player_id is None else shooting_player_id
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
@@ -3051,6 +3106,14 @@ def _attack_pools_or_validation(
                 declaration.target_unit_instance_id,
                 0,
             ),
+        )
+        candidate = _shooting_candidate_with_target_restrictions(
+            candidate=candidate,
+            state=state,
+            player_id=player_id,
+            attacking_unit_instance_id=source_unit.unit_instance_id,
+            target_unit_instance_id=declaration.target_unit_instance_id,
+            registry=shooting_target_restriction_hooks,
         )
         if not candidate.is_legal:
             violation = candidate.violation_code
@@ -3245,6 +3308,51 @@ def _validate_duplicate_weapon_ability_selection(
             field="declarations",
         )
     return None
+
+
+def _shooting_candidate_with_target_restrictions(
+    *,
+    candidate: ShootingTargetCandidate,
+    state: GameState,
+    player_id: str,
+    attacking_unit_instance_id: str,
+    target_unit_instance_id: str,
+    registry: ShootingTargetRestrictionHookRegistry | None,
+) -> ShootingTargetCandidate:
+    if type(candidate) is not ShootingTargetCandidate:
+        raise GameLifecycleError("Shooting target restriction requires a target candidate.")
+    if not candidate.is_legal:
+        return candidate
+    if registry is None:
+        return candidate
+    if type(registry) is not ShootingTargetRestrictionHookRegistry:
+        raise GameLifecycleError("Shooting target restriction requires a registry.")
+    restrictions = registry.restrictions_for(
+        ShootingTargetRestrictionContext(
+            state=state,
+            player_id=player_id,
+            battle_round=state.battle_round,
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            target_unit_instance_id=target_unit_instance_id,
+        )
+    )
+    if not restrictions:
+        return candidate
+    restriction = restrictions[0]
+    return ShootingTargetCandidate.invalid(
+        attacker_unit_instance_id=candidate.attacker_unit_instance_id,
+        weapon_profile_id=candidate.weapon_profile_id,
+        target_unit_instance_id=candidate.target_unit_instance_id,
+        violation_code=ShootingTargetViolationCode.RUNTIME_TARGET_RESTRICTION,
+        message=restriction.message,
+        visibility_cache_key=candidate.visibility_cache_key,
+        target_visible_model_ids=candidate.target_visible_model_ids,
+        target_in_range_model_ids=candidate.target_in_range_model_ids,
+        line_of_sight_witness=candidate.line_of_sight_witness,
+        observer_model_id=candidate.observer_model_id,
+        hit_roll_modifier=candidate.hit_roll_modifier,
+        targeting_rule_ids=(*candidate.targeting_rule_ids, restriction.hook_id),
+    )
 
 
 def _out_of_phase_allowed_target_unit_ids(
@@ -4259,6 +4367,7 @@ def _legal_shooting_unit_ids(
     shooting_state: ShootingPhaseState,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
 ) -> tuple[str, ...]:
     scenario = _battlefield_scenario(state)
     active_player_id = _active_player_id(state)
@@ -4284,6 +4393,7 @@ def _legal_shooting_unit_ids(
             rules_unit=rules_unit,
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
+            shooting_target_restriction_hooks=shooting_target_restriction_hooks,
         ):
             legal.append(rules_unit.unit_instance_id)
     return tuple(sorted(legal))
@@ -4299,6 +4409,7 @@ def _rules_unit_has_legal_shooting_declaration(
     player_id: str | None = None,
     target_unit_ids: tuple[str, ...] | None = None,
     selected_shooting_type: ShootingType | None = None,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> bool:
     actor_id = _active_player_id(state) if player_id is None else player_id
     resolved_target_unit_ids = (
@@ -4341,6 +4452,9 @@ def _rules_unit_has_legal_shooting_declaration(
                     target_unit_id,
                     0,
                 ),
+                shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+                state=state,
+                player_id=actor_id,
             )
             if not candidate.is_legal:
                 continue
@@ -4428,6 +4542,7 @@ def _unit_has_legal_shooting_declaration(
     player_id: str | None = None,
     target_unit_ids: tuple[str, ...] | None = None,
     selected_shooting_type: ShootingType | None = None,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> bool:
     actor_id = _active_player_id(state) if player_id is None else player_id
     resolved_target_unit_ids = (
@@ -4466,6 +4581,9 @@ def _unit_has_legal_shooting_declaration(
                     target_unit_id,
                     0,
                 ),
+                shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+                state=state,
+                player_id=actor_id,
             )
             if not candidate.is_legal:
                 continue
@@ -4492,6 +4610,7 @@ def _legal_shooting_types_for_rules_unit(
     army_catalog: ArmyCatalog,
     player_id: str | None = None,
     target_unit_ids: tuple[str, ...] | None = None,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> tuple[ShootingType, ...]:
     actor_id = _active_player_id(state) if player_id is None else player_id
     resolved_target_unit_ids = (
@@ -4542,6 +4661,9 @@ def _legal_shooting_types_for_rules_unit(
                         target_unit_id,
                         0,
                     ),
+                    shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+                    state=state,
+                    player_id=actor_id,
                 )
                 if not candidate.is_legal:
                     continue
@@ -4581,6 +4703,9 @@ def _cached_shooting_target_candidate_for_model(
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     hidden_target_unit_ids: tuple[str, ...],
     target_detection_range_bonus_inches: int,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
+    state: GameState | None = None,
+    player_id: str | None = None,
 ) -> ShootingTargetCandidate:
     cache_key = _shooting_model_candidate_cache_key(
         weapon=weapon,
@@ -4589,7 +4714,7 @@ def _cached_shooting_target_candidate_for_model(
         target_detection_range_bonus_inches=target_detection_range_bonus_inches,
     )
     if cache_key not in cache:
-        cache[cache_key] = shooting_target_candidate_for_model(
+        candidate = shooting_target_candidate_for_model(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             attacker_unit=attacker_unit,
@@ -4600,6 +4725,18 @@ def _cached_shooting_target_candidate_for_model(
             hidden_target_unit_ids=hidden_target_unit_ids,
             target_detection_range_bonus_inches=target_detection_range_bonus_inches,
         )
+        if shooting_target_restriction_hooks is not None:
+            if state is None or player_id is None:
+                raise GameLifecycleError("Shooting target restriction requires state/player.")
+            candidate = _shooting_candidate_with_target_restrictions(
+                candidate=candidate,
+                state=state,
+                player_id=player_id,
+                attacking_unit_instance_id=attacker_unit.unit_instance_id,
+                target_unit_instance_id=target_unit_id,
+                registry=shooting_target_restriction_hooks,
+            )
+        cache[cache_key] = candidate
     return cache[cache_key]
 
 

@@ -34,6 +34,10 @@ from warhammer40k_core.engine.actions import (
     interrupt_mission_action_for_battlefield_departure,
     interrupt_mission_action_for_displacement,
 )
+from warhammer40k_core.engine.advance_eligibility_hooks import (
+    AdvanceEligibilityContext,
+    AdvanceEligibilityHookRegistry,
+)
 from warhammer40k_core.engine.advance_hooks import (
     DECLINE_ADVANCE_MOVE_GRANT_OPTION_ID,
     SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
@@ -2357,6 +2361,9 @@ class MovementPhaseHandler:
     advance_move_hooks: AdvanceMoveHookRegistry = field(
         default_factory=AdvanceMoveHookRegistry.empty
     )
+    advance_eligibility_hooks: AdvanceEligibilityHookRegistry = field(
+        default_factory=AdvanceEligibilityHookRegistry.empty
+    )
     fall_back_hooks: FallBackEligibilityHookRegistry = field(
         default_factory=FallBackEligibilityHookRegistry.empty
     )
@@ -2383,6 +2390,10 @@ class MovementPhaseHandler:
             raise GameLifecycleError("MovementPhaseHandler stratagem_index must be an index.")
         if type(self.advance_move_hooks) is not AdvanceMoveHookRegistry:
             raise GameLifecycleError("MovementPhaseHandler advance_move_hooks must be a registry.")
+        if type(self.advance_eligibility_hooks) is not AdvanceEligibilityHookRegistry:
+            raise GameLifecycleError(
+                "MovementPhaseHandler advance_eligibility_hooks must be a registry."
+            )
         if type(self.fall_back_hooks) is not FallBackEligibilityHookRegistry:
             raise GameLifecycleError("MovementPhaseHandler fall_back_hooks must be a registry.")
         if type(self.movement_end_surge_hooks) is not MovementEndSurgeHookRegistry:
@@ -2617,6 +2628,7 @@ class MovementPhaseHandler:
                 reaction_queue=reaction_queue,
                 stratagem_index=self.stratagem_index,
                 advance_move_hooks=self.advance_move_hooks,
+                advance_eligibility_hooks=self.advance_eligibility_hooks,
                 fall_back_hooks=self.fall_back_hooks,
                 runtime_modifier_registry=self.runtime_modifier_registry,
             )
@@ -5774,6 +5786,7 @@ def _apply_movement_proposal_decision(
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
     advance_move_hooks: AdvanceMoveHookRegistry,
+    advance_eligibility_hooks: AdvanceEligibilityHookRegistry,
     fall_back_hooks: FallBackEligibilityHookRegistry,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
@@ -5979,14 +5992,42 @@ def _apply_movement_proposal_decision(
             movement_phase_action=MovementPhaseActionKind.ADVANCE,
             advance_roll=advance_roll,
         )
+        permission_grants = advance_eligibility_hooks.grants_for(
+            AdvanceEligibilityContext(
+                state=state,
+                player_id=active_player_id,
+                battle_round=state.battle_round,
+                unit_instance_id=unit_placement.unit_instance_id,
+                movement_request_id=proposal_request.request_id,
+                movement_result_id=result.result_id,
+            )
+        )
         state.record_advanced_unit_state(
             AdvancedUnitState(
                 player_id=active_player_id,
                 battle_round=state.battle_round,
                 unit_instance_id=unit_placement.unit_instance_id,
                 movement_dice_record=movement_dice_record,
+                can_shoot=any(grant.can_shoot for grant in permission_grants),
+                can_declare_charge=any(grant.can_declare_charge for grant in permission_grants),
             )
         )
+        if permission_grants:
+            decisions.event_log.append(
+                "advance_eligibility_hooks_resolved",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": active_player_id,
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "unit_instance_id": unit_placement.unit_instance_id,
+                    "request_id": proposal_request.request_id,
+                    "result_id": result.result_id,
+                    "grants": [
+                        validate_json_value(grant.to_payload()) for grant in permission_grants
+                    ],
+                },
+            )
         advance_grants = _apply_advance_move_grants(
             state=state,
             decisions=decisions,
@@ -6015,6 +6056,9 @@ def _apply_movement_proposal_decision(
             movement_payload={
                 **advance_resolution.movement_payload,
                 "proposal_request_id": proposal_request.request_id,
+                "advance_eligibility_grants": validate_json_value(
+                    [grant.to_payload() for grant in permission_grants]
+                ),
                 "advance_move_grants": validate_json_value(
                     [grant.to_payload() for grant in advance_grants]
                 ),
