@@ -254,6 +254,13 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             semantic_category="faction.army_rule.thrill_seekers",
             runtime_consumer_ids=_emperors_children_runtime_consumer_ids(),
         ),
+        _implemented_faction_army_rule_row(
+            faction_id="drukhari",
+            ability_id="phase17g:drukhari:corsairs-and-travelling-players",
+            ability_name="Corsairs and Travelling Players",
+            semantic_category="faction.army_rule.corsairs_and_travelling_players",
+            runtime_consumer_ids=("army-mustering:drukhari-corsairs-and-travelling-players",),
+        ),
     )
 
 
@@ -559,6 +566,19 @@ def _structured_support_sections_markdown() -> list[str]:
                     "Focused faction runtime tests",
                     "Full",
                     "Includes movement, charge, and shooting target restrictions.",
+                ),
+                SupportSectionRow(
+                    "Drukhari - Corsairs and Travelling Players",
+                    "Shared mustering/list-validation host",
+                    "README, faction integration note, and generated matrix",
+                    "Focused mustering tests",
+                    "Full",
+                    (
+                        "Allows non-DRUKHARI HARLEQUINS and ANHRATHE allies under "
+                        "Incursion, Strike Force, and Onslaught caps; forbids allied "
+                        "Warlords and Enhancements. No player-facing decision or phase "
+                        "runtime hook is introduced."
+                    ),
                 ),
             ),
         )

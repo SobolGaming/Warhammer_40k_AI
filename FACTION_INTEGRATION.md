@@ -435,6 +435,13 @@ the approved blocker.
 | Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
+Mustering addendum: `Corsairs and Travelling Players` is implemented in the shared
+`army_mustering` and `list_validation` path. DRUKHARI armies can include
+non-DRUKHARI HARLEQUINS and ANHRATHE units up to the Incursion, Strike Force,
+or Onslaught battle-size cap, and those allied units cannot be selected as
+WARLORD or receive Enhancements. The generated execution-status row above
+remains blocked for non-mustering runtime semantics.
+
 ### Tyranids Execution Status
 
 | Covered item family | Rows | Execution status | Engine result | Source block |

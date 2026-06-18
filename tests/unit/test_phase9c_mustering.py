@@ -112,6 +112,7 @@ def _muster_request(
     dedicated_transport_manifests: tuple[DedicatedTransportManifest, ...] = (),
     roster_legality_required: bool = False,
     catalog_id: str | None = None,
+    battle_size: BattleSize = BattleSize.STRIKE_FORCE,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -132,6 +133,7 @@ def _muster_request(
         warlord_selection=warlord_selection,
         dedicated_transport_manifests=dedicated_transport_manifests,
         roster_legality_required=roster_legality_required,
+        battle_size=battle_size,
     )
 
 
@@ -343,6 +345,92 @@ def _daemonic_pact_catalog() -> ArmyCatalog:
     )
 
 
+def _drukhari_corsairs_and_travelling_players_catalog() -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_datasheet = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
+    datasheets = (
+        _phase17g_datasheet(
+            base_datasheet,
+            datasheet_id="phase17g-drukhari-archon",
+            name="Archon",
+            keywords=("Character", "Infantry", "Drukhari"),
+            faction_keywords=("Drukhari",),
+        ),
+        _phase17g_datasheet(
+            base_datasheet,
+            datasheet_id="phase17g-harlequin-troupe-master",
+            name="Troupe Master",
+            keywords=("Character", "Infantry", "Harlequins"),
+            faction_keywords=("Aeldari", "Harlequins"),
+        ),
+        _phase17g_datasheet(
+            base_datasheet,
+            datasheet_id="phase17g-corsair-voidscarred",
+            name="Corsair Voidscarred",
+            keywords=("Anhrathe", "Infantry"),
+            faction_keywords=("Aeldari",),
+        ),
+        _phase17g_datasheet(
+            base_datasheet,
+            datasheet_id="phase17g-imperial-outsider",
+            name="Imperial Outsider",
+            keywords=("Character", "Infantry"),
+            faction_keywords=("Imperium",),
+        ),
+    )
+    factions = (
+        FactionDefinition(
+            faction_id="drukhari",
+            name="Drukhari",
+            faction_keywords=("Drukhari",),
+            source_ids=("phase17g:drukhari",),
+        ),
+        FactionDefinition(
+            faction_id="aeldari",
+            name="Aeldari",
+            faction_keywords=("Aeldari",),
+            source_ids=("phase17g:aeldari",),
+        ),
+        FactionDefinition(
+            faction_id="imperium",
+            name="Imperium",
+            faction_keywords=("Imperium",),
+            source_ids=("phase17g:imperium",),
+        ),
+    )
+    enhancements = (
+        EnhancementDefinition(
+            enhancement_id="phase17g-soul-trap",
+            name="Soul Trap",
+            source_id="phase17g:soul-trap",
+            points=15,
+        ),
+    )
+    detachments = (
+        DetachmentDefinition(
+            detachment_id="phase17g-drukhari-detachment",
+            name="Phase 17G Drukhari Detachment",
+            faction_id="drukhari",
+            detachment_point_cost=1,
+            unit_datasheet_ids=("phase17g-drukhari-archon",),
+            force_disposition_ids=("phase17g-force",),
+            enhancement_ids=("phase17g-soul-trap",),
+            source_ids=("phase17g:drukhari-detachment",),
+        ),
+    )
+    return ArmyCatalog(
+        catalog_id="phase17g-drukhari-corsairs-catalog",
+        ruleset_id=base_catalog.ruleset_id,
+        source_package_id="phase17g-drukhari-corsairs-source",
+        datasheets=datasheets,
+        wargear=base_catalog.wargear,
+        factions=factions,
+        detachments=detachments,
+        enhancements=enhancements,
+        source_ids=("phase17g:drukhari-corsairs-catalog",),
+    )
+
+
 def _phase17g_datasheet(
     base_datasheet: DatasheetDefinition,
     *,
@@ -406,6 +494,55 @@ def _daemonic_pact_request(
         unit_points=unit_points,
         enhancement_assignments=enhancement_assignments,
         warlord_selection=warlord_selection,
+    )
+
+
+def _drukhari_corsairs_and_travelling_players_request(
+    catalog: ArmyCatalog,
+    *,
+    unit_points: tuple[RosterUnitPointValue, ...],
+    warlord_selection: WarlordSelection,
+    enhancement_assignments: tuple[EnhancementAssignment, ...] = (),
+    include_outsider: bool = False,
+    battle_size: BattleSize = BattleSize.STRIKE_FORCE,
+) -> ArmyMusterRequest:
+    return _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id="drukhari",
+            detachment_ids=("phase17g-drukhari-detachment",),
+            enhancement_ids=tuple(
+                assignment.enhancement_id for assignment in enhancement_assignments
+            ),
+        ),
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="archon",
+                datasheet_id="phase17g-drukhari-archon",
+            ),
+            _unit_selection(
+                unit_selection_id="troupe-master",
+                datasheet_id="phase17g-harlequin-troupe-master",
+            ),
+            _unit_selection(
+                unit_selection_id="voidscarred",
+                datasheet_id="phase17g-corsair-voidscarred",
+            ),
+            *(
+                (
+                    _unit_selection(
+                        unit_selection_id="outsider",
+                        datasheet_id="phase17g-imperial-outsider",
+                    ),
+                )
+                if include_outsider
+                else ()
+            ),
+        ),
+        unit_points=unit_points,
+        enhancement_assignments=enhancement_assignments,
+        warlord_selection=warlord_selection,
+        battle_size=battle_size,
     )
 
 
@@ -1088,11 +1225,17 @@ def test_detachment_enhancement_and_stratagem_selections_are_validated_as_data()
         muster_army(catalog=catalog_with_content, request=invalid_request)
 
 
-def test_strike_force_is_the_only_supported_battle_size_policy() -> None:
+def test_supported_battle_size_policies_are_source_backed() -> None:
+    incursion = BattleSizeMusteringPolicy.incursion()
     policy = BattleSizeMusteringPolicy.strike_force()
+    onslaught = BattleSizeMusteringPolicy.onslaught()
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     request = _muster_request(catalog)
 
+    assert incursion.points_limit == 1000
+    assert incursion.battlefield_width_inches == 44.0
+    assert incursion.battlefield_depth_inches == 30.0
+    assert incursion.detachment_point_limit == 2
     assert policy.points_limit == 2000
     assert policy.battlefield_width_inches == 60.0
     assert policy.battlefield_depth_inches == 44.0
@@ -1100,12 +1243,16 @@ def test_strike_force_is_the_only_supported_battle_size_policy() -> None:
     assert policy.enhancement_limit == 4
     assert policy.unit_limit == 3
     assert policy.battleline_unit_limit == 6
+    assert onslaught.points_limit == 3000
+    assert onslaught.battlefield_width_inches == 90.0
+    assert onslaught.battlefield_depth_inches == 44.0
+    assert onslaught.detachment_point_limit == 4
     assert muster_army(catalog=catalog, request=request).battle_size.value == "strike_force"
 
     with pytest.raises(ListValidationError, match="Unsupported BattleSize"):
-        battle_size_from_token("incursion")
+        battle_size_from_token("combat_patrol")
     with pytest.raises(ArmyMusteringError, match="battle_size"):
-        replace(request, battle_size=cast(BattleSize, "incursion"))
+        replace(request, battle_size=cast(BattleSize, "combat_patrol"))
 
 
 def test_strike_force_detachment_points_force_dispositions_and_unit_grants() -> None:
@@ -1304,6 +1451,128 @@ def test_phase17g_daemonic_pact_reports_roster_violations() -> None:
         "daemonic_pact_points_limit_exceeded",
         "daemonic_pact_warlord_forbidden",
     }
+
+
+def test_phase17g_drukhari_corsairs_and_travelling_players_allows_allies() -> None:
+    catalog = _drukhari_corsairs_and_travelling_players_catalog()
+    request = _drukhari_corsairs_and_travelling_players_request(
+        catalog,
+        unit_points=(
+            _unit_points("archon", 100),
+            _unit_points("troupe-master", 250),
+            _unit_points("voidscarred", 250),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="archon",
+            source_id="phase17g:warlord",
+        ),
+    )
+
+    army = muster_army(catalog=catalog, request=request)
+
+    assert army.roster_legality_report.is_legal
+    assert {unit.datasheet_id for unit in army.units} == {
+        "phase17g-corsair-voidscarred",
+        "phase17g-drukhari-archon",
+        "phase17g-harlequin-troupe-master",
+    }
+
+
+@pytest.mark.parametrize(
+    ("battle_size", "cap"),
+    [
+        (BattleSize.INCURSION, 250),
+        (BattleSize.STRIKE_FORCE, 500),
+        (BattleSize.ONSLAUGHT, 750),
+    ],
+)
+def test_phase17g_drukhari_corsairs_points_cap_scales_by_battle_size(
+    battle_size: BattleSize,
+    cap: int,
+) -> None:
+    catalog = _drukhari_corsairs_and_travelling_players_catalog()
+    legal_request = _drukhari_corsairs_and_travelling_players_request(
+        catalog,
+        unit_points=(
+            _unit_points("archon", 100),
+            _unit_points("troupe-master", cap),
+            _unit_points("voidscarred", 0),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="archon",
+            source_id="phase17g:warlord",
+        ),
+        battle_size=battle_size,
+    )
+    over_cap_request = replace(
+        legal_request,
+        unit_points=(
+            _unit_points("archon", 100),
+            _unit_points("troupe-master", cap + 1),
+            _unit_points("voidscarred", 0),
+        ),
+    )
+
+    legal_report = validate_roster_legality(catalog=catalog, request=legal_request)
+    over_cap_report = validate_roster_legality(catalog=catalog, request=over_cap_request)
+
+    assert legal_report.is_legal
+    assert "drukhari_corsairs_and_travelling_players_points_limit_exceeded" in {
+        violation.violation_code for violation in over_cap_report.violations
+    }
+
+
+def test_phase17g_drukhari_corsairs_reports_roster_violations() -> None:
+    catalog = _drukhari_corsairs_and_travelling_players_catalog()
+    request = _drukhari_corsairs_and_travelling_players_request(
+        catalog,
+        unit_points=(
+            _unit_points("archon", 100),
+            _unit_points("troupe-master", 300),
+            _unit_points("voidscarred", 260),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="phase17g-soul-trap",
+                target_unit_selection_id="troupe-master",
+                source_id="phase17g:enhancement-assignment",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="troupe-master",
+            source_id="phase17g:warlord",
+        ),
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+
+    assert {violation.violation_code for violation in report.violations} >= {
+        "drukhari_corsairs_and_travelling_players_enhancement_forbidden",
+        "drukhari_corsairs_and_travelling_players_points_limit_exceeded",
+        "warlord_drukhari_corsairs_and_travelling_players_forbidden",
+    }
+
+
+def test_phase17g_drukhari_corsairs_rejects_other_faction_allies() -> None:
+    catalog = _drukhari_corsairs_and_travelling_players_catalog()
+    request = _drukhari_corsairs_and_travelling_players_request(
+        catalog,
+        unit_points=(
+            _unit_points("archon", 100),
+            _unit_points("troupe-master", 200),
+            _unit_points("voidscarred", 200),
+            _unit_points("outsider", 50),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="archon",
+            source_id="phase17g:warlord",
+        ),
+        include_outsider=True,
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+
+    assert "unit_selection_invalid" in {violation.violation_code for violation in report.violations}
 
 
 def test_phase16d_enhancement_points_count_toward_strike_force_limit() -> None:

@@ -256,5 +256,24 @@
     "source_kind": "faction",
     "source_wargear_id": null,
     "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "phase17g:drukhari:corsairs-and-travelling-players",
+    "ability_name": "Corsairs and Travelling Players",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/drukhari/faction/phase17g:drukhari:corsairs-and-travelling-players/none",
+    "datasheet_id": "drukhari",
+    "datasheet_name": "Drukhari",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "army-mustering:drukhari-corsairs-and-travelling-players"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.corsairs_and_travelling_players"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
   }
 ]
