@@ -98,6 +98,62 @@ class SupportSectionRow:
     notes: str
 
 
+@dataclass(frozen=True)
+class DetachmentRuleSupportRow:
+    faction: str
+    detachment: str
+    engine: str
+    documentation: str
+    tests: str
+    overall: str
+    notes: str
+
+
+_DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
+    (
+        "aeldari",
+        "path-of-the-outcast",
+    ): SupportSectionRow(
+        subject="Path of the Outcast",
+        engine="Far-reaching Doom shooting-unit-selected hook",
+        documentation="Source row, execution record, and generated matrix",
+        tests="Focused hook, lifecycle, and hidden-target detection tests",
+        overall="Full",
+        notes=(
+            "Runtime grants the 6 inch detection-range effect and expires it after the "
+            "source shoots."
+        ),
+    ),
+    (
+        "chaos-daemons",
+        "blood-legion",
+    ): SupportSectionRow(
+        subject="Blood Legion",
+        engine="Murdercall surge and Blood Tainted sticky-objective hooks",
+        documentation="Source row, execution record, and generated matrix",
+        tests="Focused triggered-move and phase-end objective-control tests",
+        overall="Full",
+        notes=(
+            "Includes Khorne daemon, range, Aircraft, Battle-shock, and "
+            "destruction-attribution gates."
+        ),
+    ),
+    (
+        "chaos-daemons",
+        "cavalcade-of-chaos",
+    ): SupportSectionRow(
+        subject="Cavalcade of Chaos",
+        engine="Unholy Avalanche Fall Back eligibility hook",
+        documentation="Source row, execution record, and generated matrix",
+        tests="Focused Fall Back, Shoot, Charge, and handler-drift tests",
+        overall="Full",
+        notes=(
+            "Mounted Legiones Daemonica units retain Shoot and Charge permissions after Fall Back."
+        ),
+    ),
+}
+
+
 def main() -> None:
     args = _parse_args()
     source_json_dir = _resolve_repo_path(args.source_json_dir)
@@ -389,7 +445,8 @@ def _structured_support_sections_markdown() -> list[str]:
             "engine owners usually reason about. `Full` means the current CORE V2 scope has "
             "engine/runtime support, documentation or contract coverage when adapter-visible, "
             "and focused tests. `Partial` means at least one known rule edge, generated "
-            "source-row path, or runtime host remains incomplete."
+            "source-row path, or runtime host remains incomplete. `None` means the source row "
+            "and generated scaffold exist, but no semantic engine rule path is present."
         ),
     ]
     lines.extend(
@@ -506,22 +563,7 @@ def _structured_support_sections_markdown() -> list[str]:
             ),
         )
     )
-    lines.extend(
-        _support_section_markdown(
-            "Detachment Rules",
-            "Detachment rules should be nested under each faction as source coverage expands.",
-            (
-                SupportSectionRow(
-                    "Faction-pack detachment rules",
-                    "Coverage/report rows exist; semantic handlers vary",
-                    "Architecture and coverage reports",
-                    "Faction-specific tests where implemented",
-                    "Partial",
-                    "Future generator work should split this table by faction and detachment.",
-                ),
-            ),
-        )
-    )
+    lines.extend(_detachment_rules_section_markdown())
     lines.extend(
         _support_section_markdown(
             "Faction Stratagems",
@@ -614,6 +656,73 @@ def _support_section_markdown(
     return lines
 
 
+def _detachment_rules_section_markdown() -> list[str]:
+    lines = [
+        "",
+        "## Detachment Rules",
+        "",
+        (
+            "Detachment rule support is source-row complete, but semantic engine support is "
+            "only marked where the faction detachment module contributes gameplay hooks. "
+            "Rows are grouped by faction through the `Faction` column."
+        ),
+        "",
+        "| Faction | Detachment | Engine support | Documentation | Tests | Overall | Notes |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for row in _detachment_rule_support_rows():
+        lines.append(
+            "| "
+            + " | ".join(
+                (
+                    _markdown_text(row.faction),
+                    _markdown_text(row.detachment),
+                    _markdown_text(row.engine),
+                    _markdown_text(row.documentation),
+                    _markdown_text(row.tests),
+                    _markdown_text(row.overall),
+                    _markdown_text(row.notes),
+                )
+            )
+            + " |"
+        )
+    return lines
+
+
+def _detachment_rule_support_rows() -> tuple[DetachmentRuleSupportRow, ...]:
+    faction_names = {row.faction_id: row.name for row in faction_detachments_2026_27.faction_rows()}
+    rows: list[DetachmentRuleSupportRow] = []
+    for source_row in faction_detachments_2026_27.detachment_rows():
+        override = _DETACHMENT_RULE_SUPPORT_OVERRIDES.get(
+            (source_row.faction_id, source_row.detachment_id)
+        )
+        if override is None:
+            rows.append(
+                DetachmentRuleSupportRow(
+                    faction=faction_names[source_row.faction_id],
+                    detachment=source_row.name,
+                    engine="Generated scaffold only",
+                    documentation="Source row and generated module scaffold",
+                    tests="Source-row/catalog coverage",
+                    overall="None",
+                    notes="No semantic detachment-rule hook is implemented.",
+                )
+            )
+        else:
+            rows.append(
+                DetachmentRuleSupportRow(
+                    faction=faction_names[source_row.faction_id],
+                    detachment=source_row.name,
+                    engine=override.engine,
+                    documentation=override.documentation,
+                    tests=override.tests,
+                    overall=override.overall,
+                    notes=override.notes,
+                )
+            )
+    return tuple(rows)
+
+
 def _wargear_keyword_support_rows() -> tuple[SupportSectionRow, ...]:
     return (
         _full_wargear_row(
@@ -656,13 +765,13 @@ def _wargear_keyword_support_rows() -> tuple[SupportSectionRow, ...]:
             "Post-attack Hazardous roll and mortal-wound routing",
             "Uses shared damage-allocation/FNP path.",
         ),
-        SupportSectionRow(
+        _full_wargear_row(
             "[HEAVY]",
-            "Movement-evidence Hit-roll modifier slice",
-            "Architecture notes remaining official gates",
-            "Focused movement/modifier tests",
-            "Partial",
-            "Own-Shooting-phase, unengaged, and setup-this-turn denial gates remain future work.",
+            "Stationary-gated Hit-roll modifier",
+            (
+                "Includes own-Shooting-phase, out-of-phase denial, engagement, movement, "
+                "Advance/Fall Back, and setup-this-turn gates."
+            ),
         ),
         _full_wargear_row(
             "[HUNTER X]",

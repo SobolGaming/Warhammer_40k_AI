@@ -29,7 +29,7 @@ Current coverage categories:
 
 ## Structured Support Sections
 
-These sections organize the support matrix by the rule families adapters and engine owners usually reason about. `Full` means the current CORE V2 scope has engine/runtime support, documentation or contract coverage when adapter-visible, and focused tests. `Partial` means at least one known rule edge, generated source-row path, or runtime host remains incomplete.
+These sections organize the support matrix by the rule families adapters and engine owners usually reason about. `Full` means the current CORE V2 scope has engine/runtime support, documentation or contract coverage when adapter-visible, and focused tests. `Partial` means at least one known rule edge, generated source-row path, or runtime host remains incomplete. `None` means the source row and generated scaffold exist, but no semantic engine rule path is present.
 
 ## Core Keyword Abilities
 
@@ -54,7 +54,7 @@ Weapon and wargear keyword abilities are normalized into `WeaponKeyword` values 
 | [DEVASTATING WOUNDS] | Critical Wound to mortal-wound damage routing | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Runs through grouped damage and mortal-wound hosts. |
 | [EXTRA ATTACKS] | Additional melee declaration path | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Does not replace the model's primary melee weapon. |
 | [HAZARDOUS] | Post-attack Hazardous roll and mortal-wound routing | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Uses shared damage-allocation/FNP path. |
-| [HEAVY] | Movement-evidence Hit-roll modifier slice | Architecture notes remaining official gates | Focused movement/modifier tests | Partial | Own-Shooting-phase, unengaged, and setup-this-turn denial gates remain future work. |
+| [HEAVY] | Stationary-gated Hit-roll modifier | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Includes own-Shooting-phase, out-of-phase denial, engagement, movement, Advance/Fall Back, and setup-this-turn gates. |
 | [HUNTER X] | Target eligibility gate | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Matches at least one listed target keyword. |
 | [IGNORES COVER] | Removes Benefit of Cover for the attack | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Applies across terrain, Stealth, Smokescreen, Indirect Fire, and other cover sources. |
 | [INDIRECT FIRE] | Indirect targeting restrictions and modifiers | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Includes no-visible-target and no-reroll restrictions. |
@@ -92,11 +92,276 @@ Faction army rules are grouped by faction-specific runtime consumers.
 
 ## Detachment Rules
 
-Detachment rules should be nested under each faction as source coverage expands.
+Detachment rule support is source-row complete, but semantic engine support is only marked where the faction detachment module contributes gameplay hooks. Rows are grouped by faction through the `Faction` column.
 
-| Subject | Engine support | Documentation | Tests | Overall | Notes |
-| --- | --- | --- | --- | --- | --- |
-| Faction-pack detachment rules | Coverage/report rows exist; semantic handlers vary | Architecture and coverage reports | Faction-specific tests where implemented | Partial | Future generator work should split this table by faction and detachment. |
+| Faction | Detachment | Engine support | Documentation | Tests | Overall | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Orks | More Dakka! | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Orks | Rollin' Deff | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Orks | Taktikal Brigade | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Orks | Blitz Brigade | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Orks | Bully Boyz | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Orks | Da Big Hunt | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Orks | Dread Mob | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Orks | Freebooter Krew | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Orks | Green Tide | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Orks | Kult of Speed | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Orks | Speedwaaagh! | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Orks | War Horde | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Armoured Warhost | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Fateful Performance | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Path of the Outcast | Far-reaching Doom shooting-unit-selected hook | Source row, execution record, and generated matrix | Focused hook, lifecycle, and hidden-target detection tests | Full | Runtime grants the 6 inch detection-range effect and expires it after the source shoots. |
+| Aeldari | Twilight Flickers | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Aspect Host | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Corsair Coterie | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Devoted of Ynnead | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Eldritch Raiders | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Ghosts of the Webway | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Guardian Battlehost | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Seer Council | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Serpent's Brood | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Spirit Conclave | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Warhost | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Aeldari | Windrider Host | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Drukhari | Exhibition of Slaughter | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Drukhari | Kabalite Agonysts | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Drukhari | Tools of Torment | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Drukhari | Covenite Coterie | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Drukhari | Kabalite Cartel | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Drukhari | Realspace Raiders | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Drukhari | Reaper's Wager | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Drukhari | Skysplinter Assault | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Drukhari | Spectacle of Spite | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Tyranids | Ambush Predators | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Tyranids | Talons of the Norn Queen | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Tyranids | Warrior Bioform Onslaught | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Tyranids | Assimilation Swarm | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Tyranids | Crusher Stampede | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Tyranids | Invasion Fleet | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Tyranids | Subterranean Assault | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Tyranids | Synaptic Nexus | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Tyranids | Unending Swarm | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Tyranids | Vanguard Onslaught | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Genestealer Cults | Heroes of the Uprising | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Genestealer Cults | Purestrain Broodswarm | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Genestealer Cults | Xenocult Masses | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Genestealer Cults | Biosanctic Broodsurge | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Genestealer Cults | Brood Brothers Auxillia | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Genestealer Cults | Final Day | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Genestealer Cults | Host of Ascension | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Genestealer Cults | Outlander Claw | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Genestealer Cults | Xenocreed Congregation | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Necrons | Hand of the Dynasty | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Necrons | Skyshroud Spearhead | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Necrons | The Phaeron's Armoury | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Necrons | Annihilation Legion | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Necrons | Awakened Dynasty | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Necrons | Canoptek Court | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Necrons | Cryptek Conclave | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Necrons | Cursed Legion | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Necrons | Hypercrypt Legion | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Necrons | Obeisance Phalanx | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Necrons | Pantheon of Woe | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Necrons | Starshatter Arsenal | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Leagues of Votann | Armoured Trailblazers | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Leagues of Votann | Farseekers | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Leagues of Votann | Hearthguard Covenant | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Leagues of Votann | Brandfast Oathband | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Leagues of Votann | Delve Assault Shift | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Leagues of Votann | Hearthband | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Leagues of Votann | Hearthfyre Arsenal | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Leagues of Votann | Mercenary Oathband | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Leagues of Votann | Needgaard Oathband | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Leagues of Votann | Persecution Prospect | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| T'au Empire | Advanced Acquisition Cadre | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| T'au Empire | Auxillary Cadre | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| T'au Empire | Experimental Prototype Cadre | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| T'au Empire | Kauyon | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| T'au Empire | Kroot Hunting Pack | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| T'au Empire | Mont'ka | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| T'au Empire | Retaliation Cadre | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Fulguris Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Librarius Conclave | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Subversion Assets | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | 1st Company Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Anvil Siege Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Armoured Speartip | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Bastion Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Blade of Ultramar | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Ceramite Sentinels | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Emperor's Shield | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Firestorm Assault Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Forgefather's Seekers | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Gladius Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Hammer of Avernii | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Headhunter Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Ironstorm Spearhead | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Orbital Assault Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Reclamation Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Shadowmark Talon | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Spearpoint Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Stormlance Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Marines | Vanguard Spearhead | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Dark Angels | Dark Age Arsenal | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Dark Angels | Darkflight Pursuit | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Dark Angels | Interrogation Conclave | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Dark Angels | Company of Hunters | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Dark Angels | Inner Circle Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Dark Angels | Lion's Blade Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Dark Angels | Unforgiven Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Dark Angels | Wrath of the Rock | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Blood Angels | Encarmine Speartip | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Blood Angels | Legacy of Grace | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Blood Angels | Wrath of the Doomed | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Blood Angels | Angelic Inheritors | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Blood Angels | Liberator Assault Group | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Blood Angels | Rage-cursed Onslaught | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Blood Angels | The Angelic Host | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Blood Angels | The Lost Brethren | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Wolves | Champions of Fenris | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Wolves | Legends of Saga and Song | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Wolves | Veterans of the Fang | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Wolves | Saga of the Beastslayer | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Wolves | Saga of the Bold | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Wolves | Saga of the Great Wolf | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Space Wolves | Saga of the Hunter | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Black Templars | Marshal's Household | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Black Templars | The Living Miracle | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Black Templars | Wrathful Procession | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Black Templars | Companions of Vehemence | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Black Templars | Godhammer Assault Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Black Templars | Vindication Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Deathwatch | Black Spear Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Grey Knights | Argent Assault | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Grey Knights | Fires of Purgation | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Grey Knights | Immaterial Interdiction | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Grey Knights | Augurium Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Grey Knights | Banishers | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Grey Knights | Brotherhood Strike | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Grey Knights | Hallowed Conclave | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Grey Knights | Sanctic Spearhead | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Grey Knights | Warpbane Task Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Cabal of Chaos | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Devotees of Destruction | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Murdertalon Raiders | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Chaos Cult | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Creations of Bile | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Cult of the Arkifane | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Deceptors | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Dread Talons | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Fellhammer Siege-host | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Huron's Marauders | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Nightmare Hunt | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Pactbound Zealots | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Renegade Raiders | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Renegade Warband | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Soulforged Warpack | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Veterans of the Long War | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Space Marines | Warpstrike Champions | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| World Eaters | Butchers of Khorne | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| World Eaters | Brazen Engines | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| World Eaters | Vessels of Wrath | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| World Eaters | Berzerker Warband | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| World Eaters | Cult of Blood | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| World Eaters | Goretrack Onslaught | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| World Eaters | Khorne Daemonkin | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| World Eaters | Possessed Slaughterband | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Emperor's Children | Elegant Brutes | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Emperor's Children | Frenzied Host | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Emperor's Children | Spectacle of Slaughter | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Emperor's Children | Carnival of Excess | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Emperor's Children | Coterie of the Conceited | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Emperor's Children | Court of the Phoenician | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Emperor's Children | Mercurial Host | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Emperor's Children | Peerless Bladesmen | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Emperor's Children | Rapid Evisceration | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Emperor's Children | Slaanesh's Chosen | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Death Guard | Paragons of Putrescence | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Death Guard | Contagion Engines | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Death Guard | Flyblown Host | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Death Guard | Champions of Contagion | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Death Guard | Death Lord's Chosen | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Death Guard | Mortarion's Hammer | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Death Guard | Shamblerot Vectorium | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Death Guard | Tallyband Summoners | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Death Guard | Virulent Vectorium | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Thousand Sons | Ritual of Regeneration | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Thousand Sons | Sekhetar Cohort | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Thousand Sons | Servants of Change | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Thousand Sons | Changehost of Deceit | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Thousand Sons | Grand Coven | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Thousand Sons | Hexwarp Thrallband | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Thousand Sons | Rubricae Phalanx | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Thousand Sons | Warpforged Cabal | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Thousand Sons | Warpmeld Pact | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Knights | Bastions of Tyranny | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Knights | Hunting Warpack | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Knights | Iconoclast Fiefdom | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Knights | Helhunt Lance | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Knights | Houndpack Lance | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Knights | Infernal Lance | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Knights | Lords of Dread | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Knights | Traitoris Lance | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Daemons | Cavalcade of Chaos | Unholy Avalanche Fall Back eligibility hook | Source row, execution record, and generated matrix | Focused Fall Back, Shoot, Charge, and handler-drift tests | Full | Mounted Legiones Daemonica units retain Shoot and Charge permissions after Fall Back. |
+| Chaos Daemons | Lords of the Warp | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Daemons | Warptide | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Daemons | Blood Legion | Murdercall surge and Blood Tainted sticky-objective hooks | Source row, execution record, and generated matrix | Focused triggered-move and phase-end objective-control tests | Full | Includes Khorne daemon, range, Aircraft, Battle-shock, and destruction-attribution gates. |
+| Chaos Daemons | Daemonic Incursion | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Daemons | Legion of Excess | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Daemons | Plague Legion | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Daemons | Scintillating Legion | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Daemons | Shadow Legion | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Astra Militarum | Abhuman Auxiliaries | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Astra Militarum | Bridgehead Strike | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Astra Militarum | Designation Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Astra Militarum | Armoured Infantry | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Astra Militarum | Combined Arms | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Astra Militarum | Grizzled Company | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Astra Militarum | Hammer of the Emperor | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Astra Militarum | Mechanised Assault | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Astra Militarum | Recon Element | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Astra Militarum | Siege Regiment | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Astra Militarum | Steel Hammer | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adepta Sororitas | Chorus of Condemnation | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adepta Sororitas | Sacred Champions | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adepta Sororitas | Sanctified Orators | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adepta Sororitas | Army of Faith | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adepta Sororitas | Bringers of Flame | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adepta Sororitas | Champions of Faith | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adepta Sororitas | Hallowed Martyrs | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adepta Sororitas | Penitent Host | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Mechanicus | Cohort Acquisitus | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Mechanicus | Lords of the Forge | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Mechanicus | Luminen Auto-Choir | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Mechanicus | Cohort Cybernetica | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Mechanicus | Data-psalm Conclave | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Mechanicus | Eradication Cohort | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Mechanicus | Explorator Maniple | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Mechanicus | Haloscreed Battle Clade | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Mechanicus | Rad-zone Corps | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Mechanicus | Skitarii Hunter Cohort | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Imperial Knights | Dominus Foebreakers | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Imperial Knights | Questor Forgepact | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Imperial Knights | Throne-bonded Outriders | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Imperial Knights | Freeblade Company | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Imperial Knights | Gate Warden Lance | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Imperial Knights | Questoris Companions | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Imperial Knights | Spearhead-at-arms | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Imperial Knights | Valourstrike Lance | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Custodes | Might of the Moritoi | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Custodes | Silent Hunters | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Custodes | Tharanatoi Hammerblow | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Custodes | Auric Champions | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Custodes | Lions of the Emperor | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Custodes | Null Maiden Vigil | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Custodes | Shield Host | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Custodes | Solar Spearhead | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Adeptus Custodes | Talons of the Emperor | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Imperial Agents | Imperialis Fleet | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Imperial Agents | Ordo Hereticus, Purgation Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Imperial Agents | Ordo Malleus, Daemon Hunters | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Imperial Agents | Ordo Xenos, Alien Hunters | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Imperial Agents | Veiled Blade Elimination Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
 
 ## Faction Stratagems
 
