@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, and Phase 18B trigger opportunity-window and interface-intent requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, and Phase 18B trigger opportunity-window and interface-intent requirements. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, and Phase 18B trigger opportunity-window/interface-intent requirements for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G fight activation ability decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, and Phase 18B trigger opportunity-window/interface-intent requirements for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -63,6 +63,8 @@ The shared contract uses these objects and payloads:
 - `DeploymentPlacementRequest`: Deploy Armies parameterized request context containing source mission setup, owning deployment zone IDs, selected rules-unit/component/model IDs, ruleset hash, and setup-step context.
 - `DeploymentPlacementProposal`: Deploy Armies placement answer containing the complete selected rules-unit model placement set, placement kind `deployment`, proposal request ID, ruleset hash, and replay-safe source context.
 - `BattleFormationDeclarationState`: Declare Battle Formations reserve declaration state containing the next player, completed players, and per-player available reserve declaration counts.
+- `FactionRuleState`: deterministic replay-safe setup state for faction-rule selections, keyed by player, faction, source rule, state kind, setup request, and setup result.
+- `FactionRuleSetupSelection`: finite setup answer selecting one engine-emitted option from a faction runtime hook during `declare_battle_formations`.
 - `ReserveDeclarationRequest`: finite setup request context for declaring Strategic Reserves or Deep Strike units during `declare_battle_formations`.
 - `ReserveDeclarationSelection`: finite reserve declaration answer selecting one emitted reserve declaration option or `complete_reserve_declarations`.
 - `PreBattleProposalRequest`: redeploy and Scout pre-battle parameterized request context containing setup step, source decision context, selected rules-unit/component/model IDs, owning deployment-zone payloads, source rule ID, action kind, proposal kind, and ruleset hash.
@@ -124,6 +126,8 @@ Relevant modules:
 - `src/warhammer40k_core/engine/prebattle.py`
 - `src/warhammer40k_core/engine/prebattle_records.py`
 - `src/warhammer40k_core/engine/setup_completion.py`
+- `src/warhammer40k_core/engine/battle_formation_hooks.py`
+- `src/warhammer40k_core/engine/faction_rule_states.py`
 - `src/warhammer40k_core/engine/charge_declaration.py`
 - `src/warhammer40k_core/engine/phases/charge.py`
 - `src/warhammer40k_core/engine/fight_order.py`
@@ -925,6 +929,32 @@ Required Phase 16C adapter-contract tests:
 - declared reserve units are absent from Deploy Armies options and later use the shared Move Units reserve-arrival path;
 - deterministic JSON-safe decision, reserve-state, event, lifecycle, and replay payload round-trip;
 - viewer-scoped projection/event redaction for any future hidden reserve declaration information.
+
+## Phase 17G Setup Faction-Rule Decisions
+
+Phase 17G adds opt-in setup decisions for faction runtime content during Declare Battle Formations. These decisions are emitted only when the mustered army's faction runtime contribution registers a battle-formation hook for the player. The current implemented hook is Death Guard Nurgle's Gift plague selection, updated from the 11th Edition faction-pack `RULES UPDATES` section.
+
+Phase 17G exposes the finite decision type `select_faction_rule_setup_option`. The pending request payload contains game ID, setup step `declare_battle_formations`, faction ID, source rule ID, hook ID, and state kind. Adapters answer by selecting one emitted option ID. Current Death Guard options are:
+
+- `death_guard:nurgles_gift:skullsquirm_blight`;
+- `death_guard:nurgles_gift:rattlejoint_ague`;
+- `death_guard:nurgles_gift:scabrous_soulrot`.
+
+Option payloads include `submission_kind: "death_guard_nurgles_gift_plague_selection"`, player ID, faction ID, source rule ID, hook ID, state kind, plague ID, and setup step. Adapters must not invent plague IDs, infer faction ownership from display text, mutate effect state, or apply the selected plague locally.
+
+Accepted Death Guard selections create a deterministic `FactionRuleState` with state kind `death_guard_nurgles_gift_plague_selection` and emit `death_guard_nurgles_gift_plague_selected`. Later phase/query hosts consume that state with live battlefield evidence: Death Guard models project Contagion Range from live placed Death Guard models only, Contagion Range is capped at 12" after modifiers, Skullsquirm Blight applies only to melee Hit rolls, Rattlejoint Ague worsens armour-save options by 1, and Scabrous Soulrot worsens Move, Leadership, and Objective Control as the rules require. Adapters must render these as engine-derived values, not calculate them from static catalog text.
+
+Malformed, stale, wrong-actor, wrong-step, wrong-faction, duplicate-selection, unsupported-option, and option-payload drift submissions reject before the pending queue is popped and before a `DecisionRecord`, `FactionRuleState`, or event is created.
+
+Faction-rule setup choices are public table setup information in the current Phase 17G rules scope. If a future faction rule hides setup selections, pending requests, option lists, decision records, faction-rule states, events, projections, and event deltas must be viewer-scoped and must not leak hidden opponent information through option counts, source context, selected state kind, selected payload, or derived engine values.
+
+Required Phase 17G setup faction-rule tests:
+
+- valid faction-rule setup selection through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- wrong actor, wrong faction, duplicate selection, malformed payload, and stale option drift reject before mutation;
+- deterministic JSON-safe decision, faction-rule-state, event, lifecycle, and replay payload round-trip;
+- live placed model liveness gates later faction-rule consumers;
+- viewer-scoped projection/event redaction for any future hidden faction-rule setup selections.
 
 ## Phase 16E Setup Completion Gate
 

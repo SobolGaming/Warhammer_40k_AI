@@ -129,6 +129,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.stratagems import (
     CORE_COUNTEROFFENSIVE_HANDLER_ID,
@@ -183,6 +184,9 @@ class FightPhaseHandler:
     fight_activation_ability_hooks: FightActivationAbilityHookRegistry = field(
         default_factory=FightActivationAbilityHookRegistry.empty
     )
+    runtime_modifier_registry: RuntimeModifierRegistry = field(
+        default_factory=RuntimeModifierRegistry.empty
+    )
 
     def __post_init__(self) -> None:
         if (
@@ -199,6 +203,10 @@ class FightPhaseHandler:
         if type(self.fight_activation_ability_hooks) is not FightActivationAbilityHookRegistry:
             raise GameLifecycleError(
                 "FightPhaseHandler fight_activation_ability_hooks must be a registry."
+            )
+        if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
+            raise GameLifecycleError(
+                "FightPhaseHandler runtime_modifier_registry must be a registry."
             )
 
     @property
@@ -410,6 +418,7 @@ def _advance_fight_attack_sequence(
         attack_sequence=fight_state.attack_sequence,
         already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
         stratagem_index=handler.stratagem_index,
+        runtime_modifier_registry=handler.runtime_modifier_registry,
     )
     updated_state = fight_state.with_attack_sequence_update(
         attack_sequence=attack_sequence,

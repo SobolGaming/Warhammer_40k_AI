@@ -18,6 +18,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
     PhaseHandler,
 )
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.sticky_objective_control import (
     PhaseEndObjectiveControlContext,
     PhaseEndObjectiveControlHookRegistry,
@@ -42,12 +43,18 @@ class BattleRoundFlow:
         *,
         phase_handlers: Mapping[BattlePhase, PhaseHandler],
         phase_end_objective_control_hooks: PhaseEndObjectiveControlHookRegistry | None = None,
+        runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     ) -> None:
         self._phase_handlers = dict(phase_handlers)
         self._phase_end_objective_control_hooks = (
             PhaseEndObjectiveControlHookRegistry.empty()
             if phase_end_objective_control_hooks is None
             else phase_end_objective_control_hooks
+        )
+        self._runtime_modifier_registry = (
+            RuntimeModifierRegistry.empty()
+            if runtime_modifier_registry is None
+            else runtime_modifier_registry
         )
         if (
             type(self._phase_end_objective_control_hooks)
@@ -56,6 +63,8 @@ class BattleRoundFlow:
             raise GameLifecycleError(
                 "BattleRoundFlow requires a phase-end objective-control hook registry."
             )
+        if type(self._runtime_modifier_registry) is not RuntimeModifierRegistry:
+            raise GameLifecycleError("BattleRoundFlow requires a runtime modifier registry.")
 
     def advance(
         self,
@@ -78,6 +87,7 @@ class BattleRoundFlow:
             state=state,
             decisions=decisions,
             registry=self._phase_end_objective_control_hooks,
+            runtime_modifier_registry=self._runtime_modifier_registry,
         )
         status = handler.begin_phase(
             state=state,
@@ -102,7 +112,9 @@ class BattleRoundFlow:
             decisions=decisions,
             registry=self._phase_end_objective_control_hooks,
         )
-        completed_phase = state.advance_to_next_battle_phase()
+        completed_phase = state.advance_to_next_battle_phase(
+            runtime_modifier_registry=self._runtime_modifier_registry
+        )
         decisions.event_log.append(
             "battle_phase_completed",
             {
@@ -224,6 +236,7 @@ def _emit_phase_start_objective_proximity_snapshot_if_available(
     state: GameState,
     decisions: DecisionController,
     registry: PhaseEndObjectiveControlHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> None:
     if type(registry) is not PhaseEndObjectiveControlHookRegistry:
         raise GameLifecycleError("Objective proximity snapshot requires a registry.")
@@ -252,6 +265,7 @@ def _emit_phase_start_objective_proximity_snapshot_if_available(
             timing=ObjectiveControlTiming.PHASE_END,
             phase=current_phase,
             ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     )
     objective_ids_by_unit: dict[str, set[str]] = {}

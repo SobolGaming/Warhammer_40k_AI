@@ -95,6 +95,7 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
     rules_unit_view_from_armies,
 )
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.shooting_end_surge_hooks import (
     ShootingEndSurgeContext,
     ShootingEndSurgeGrant,
@@ -878,6 +879,9 @@ class ShootingPhaseHandler:
     shooting_end_surge_hooks: ShootingEndSurgeHookRegistry = field(
         default_factory=ShootingEndSurgeHookRegistry.empty
     )
+    runtime_modifier_registry: RuntimeModifierRegistry = field(
+        default_factory=RuntimeModifierRegistry.empty
+    )
 
     def __post_init__(self) -> None:
         if (
@@ -900,6 +904,10 @@ class ShootingPhaseHandler:
         if type(self.shooting_end_surge_hooks) is not ShootingEndSurgeHookRegistry:
             raise GameLifecycleError(
                 "ShootingPhaseHandler shooting_end_surge_hooks must be a registry."
+            )
+        if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
+            raise GameLifecycleError(
+                "ShootingPhaseHandler runtime_modifier_registry must be a registry."
             )
 
     @property
@@ -925,6 +933,7 @@ class ShootingPhaseHandler:
                 attack_sequence=shooting_state.attack_sequence,
                 already_allocated_model_ids=shooting_state.allocated_model_ids_this_phase,
                 stratagem_index=self.stratagem_index,
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
             shooting_state = shooting_state.with_attack_sequence_update(
                 attack_sequence=attack_sequence,
@@ -1060,6 +1069,7 @@ class ShootingPhaseHandler:
             attack_sequence=out_of_phase_state.attack_sequence,
             already_allocated_model_ids=out_of_phase_state.allocated_model_ids,
             stratagem_index=self.stratagem_index,
+            runtime_modifier_registry=self.runtime_modifier_registry,
         )
         state.out_of_phase_shooting_state = out_of_phase_state.with_attack_sequence_update(
             attack_sequence=attack_sequence,

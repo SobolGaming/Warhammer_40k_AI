@@ -145,6 +145,12 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.runtime_modifiers import (
+    HitRollModifierContext,
+    RuntimeModifierRegistry,
+    SaveOptionModifierContext,
+    UnitCharacteristicModifierContext,
+)
 from warhammer40k_core.engine.saves import (
     SaveKind,
     SaveOption,
@@ -2244,6 +2250,16 @@ def attack_sequence_step_from_token(token: object) -> AttackSequenceStep:
         raise GameLifecycleError(f"Unsupported AttackSequenceStep token: {token}.") from exc
 
 
+def _runtime_modifier_registry(
+    registry: RuntimeModifierRegistry | None,
+) -> RuntimeModifierRegistry:
+    if registry is None:
+        return RuntimeModifierRegistry.empty()
+    if type(registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError("Attack sequence runtime modifier registry is invalid.")
+    return registry
+
+
 def wound_roll_target_number(*, strength: int, toughness: int) -> int:
     valid_strength = _validate_positive_int("strength", strength)
     valid_toughness = _validate_positive_int("toughness", toughness)
@@ -2292,8 +2308,10 @@ def resolve_attack_sequence_until_blocked(
     hooks: AttackSequenceHooks | None = None,
     dice_manager: DiceRollManager | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     active_hooks = AttackSequenceHooks.empty() if hooks is None else hooks
+    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
     allocated_model_ids = already_allocated_model_ids
     current = attack_sequence
     manager = (
@@ -2329,6 +2347,7 @@ def resolve_attack_sequence_until_blocked(
                 attack_sequence=current,
                 hooks=active_hooks,
                 stratagem_index=stratagem_index,
+                runtime_modifier_registry=runtime_modifiers,
             )
             if status is not None:
                 return next_current, allocated_model_ids, status
@@ -2355,6 +2374,7 @@ def resolve_attack_sequence_until_blocked(
             allocated_model_ids=allocated_model_ids,
             hooks=active_hooks,
             stratagem_index=stratagem_index,
+            runtime_modifier_registry=runtime_modifiers,
         )
         if status is not None:
             return next_current, allocated_model_ids, status
@@ -3776,6 +3796,7 @@ def _continue_grouped_damage_after_interruption(
     status: LifecycleStatus | None,
     hooks: AttackSequenceHooks,
     dice_manager: DiceRollManager | None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     pending = attack_sequence.pending_grouped_damage
     if pending is None:
@@ -3792,6 +3813,7 @@ def _continue_grouped_damage_after_interruption(
         if dice_manager is None
         else dice_manager
     )
+    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
     return _resolve_grouped_damage_from(
         state=state,
         decisions=decisions,
@@ -3801,6 +3823,7 @@ def _continue_grouped_damage_after_interruption(
             updated_pending.advanced_after_current_die()
         ),
         hooks=hooks,
+        runtime_modifier_registry=runtime_modifiers,
     )
 
 
@@ -4405,6 +4428,7 @@ def _resolve_grouped_current_pool(
     allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks,
     stratagem_index: StratagemCatalogIndex | None,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if attack_sequence.attack_index != 0:
         raise GameLifecycleError("Pooled attack resolution must enter pools at attack_index 0.")
@@ -4436,6 +4460,7 @@ def _resolve_grouped_current_pool(
         attack_sequence=attack_sequence,
         hooks=hooks,
         stratagem_index=stratagem_index,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     if status is not None:
         return attack_sequence, allocated_model_ids, status
@@ -4474,6 +4499,7 @@ def _resolve_grouped_current_pool(
         allocated_model_ids=allocated_model_ids,
         hooks=hooks,
         stratagem_index=stratagem_index,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
 
 
@@ -4485,6 +4511,7 @@ def _grouped_wounded_contexts_for_pool(
     attack_sequence: AttackSequence,
     hooks: AttackSequenceHooks,
     stratagem_index: StratagemCatalogIndex | None,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[
     tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
     LifecycleStatus | None,
@@ -4513,6 +4540,7 @@ def _grouped_wounded_contexts_for_pool(
                 attack_sequence=current,
                 hooks=hooks,
                 stratagem_index=stratagem_index,
+                runtime_modifier_registry=runtime_modifier_registry,
             )
             if status is not None:
                 return (), status
@@ -4627,9 +4655,11 @@ def _continue_grouped_allocation_for_wound_contexts(
     hooks: AttackSequenceHooks,
     priority_group_ids: tuple[str, ...] = (),
     stratagem_index: StratagemCatalogIndex | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if not wounded_contexts:
         raise GameLifecycleError("Grouped allocation requires wounded contexts.")
+    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
     pool = attack_sequence.current_pool()
     grouped_attack_context = _grouped_attack_context_payload(
         attack_sequence=attack_sequence,
@@ -4750,6 +4780,7 @@ def _continue_grouped_allocation_for_wound_contexts(
         wounded_contexts=wounded_contexts,
         allocation_group=_first_allocation_group("Grouped allocation order", ordered_groups),
         stratagem_index=stratagem_index,
+        runtime_modifier_registry=runtime_modifiers,
     )
     if status is not None:
         return attack_sequence, allocated_model_ids, status
@@ -4767,6 +4798,7 @@ def _continue_grouped_allocation_for_wound_contexts(
         attack_sequence=attack_sequence.with_pending_grouped_damage(pending),
         hooks=hooks,
         stratagem_index=stratagem_index,
+        runtime_modifier_registry=runtime_modifiers,
     )
 
 
@@ -4783,9 +4815,11 @@ def _continue_after_grouped_allocation_order(
     allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks,
     stratagem_index: StratagemCatalogIndex | None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if not attack_contexts:
         raise GameLifecycleError("Grouped allocation order requires attack contexts.")
+    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
     ordered_groups = _validate_ordered_allocation_group_tuple(
         "Grouped allocation order allocation_groups",
         allocation_groups,
@@ -4816,6 +4850,7 @@ def _continue_after_grouped_allocation_order(
         wounded_contexts=wounded_contexts,
         allocation_group=_first_allocation_group("Grouped allocation order", ordered_groups),
         stratagem_index=stratagem_index,
+        runtime_modifier_registry=runtime_modifiers,
     )
     if status is not None:
         return attack_sequence, allocated_model_ids, status
@@ -4833,6 +4868,7 @@ def _continue_after_grouped_allocation_order(
         attack_sequence=attack_sequence.with_pending_grouped_damage(pending),
         hooks=hooks,
         stratagem_index=stratagem_index,
+        runtime_modifier_registry=runtime_modifiers,
     )
 
 
@@ -4846,9 +4882,11 @@ def _resolve_grouped_damage_from(
     hooks: AttackSequenceHooks,
     selected_model_id: str | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     if attack_sequence.pending_grouped_damage is None:
         raise GameLifecycleError("Grouped damage resume requires pending grouped damage.")
+    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
     pool = attack_sequence.current_pool()
     current_pending = attack_sequence.pending_grouped_damage
     while current_pending.next_index < len(current_pending.sorted_save_dice):
@@ -4951,6 +4989,7 @@ def _resolve_grouped_damage_from(
             attack_sequence=save_attack_sequence,
             attack_context=attack_context,
             allocated_model_id=current_model_id,
+            runtime_modifier_registry=runtime_modifiers,
         )
         if save_options:
             damage_attack_context = {
@@ -5225,6 +5264,7 @@ def _roll_grouped_saves(
     wounded_contexts: tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
     allocation_group: AllocationGroup,
     stratagem_index: StratagemCatalogIndex | None,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[tuple[SaveDieEntryPayload, ...], LifecycleStatus | None]:
     results: list[SaveDieEntryPayload] = []
     for wounded_sequence, attack_context in wounded_contexts:
@@ -5238,6 +5278,7 @@ def _roll_grouped_saves(
             attack_sequence=wounded_sequence,
             attack_context=attack_context,
             allocated_model_id=current_model_id,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         save_roll_option = mandatory_save_option(save_options)
         if save_roll_option is None:
@@ -5363,6 +5404,7 @@ def _save_options_for_allocation(
     attack_sequence: AttackSequence,
     attack_context: AttackResolutionContextPayload,
     allocated_model_id: str,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[SaveOption, ...]:
     pool = attack_sequence.current_pool()
     cover_result = _cover_for_allocated_model(
@@ -5397,11 +5439,18 @@ def _save_options_for_allocation(
         )
         is DevastatingWoundsResolution.NO_SAVES
     )
-    save_options = save_options_for_model(
-        model=model_by_id(state=state, model_instance_id=allocated_model_id),
-        armor_penetration=pool.weapon_profile.armor_penetration.final,
-        cover_result=cover_result,
-        no_saves_allowed=no_saves_allowed,
+    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
+    save_options = runtime_modifiers.modified_save_options(
+        SaveOptionModifierContext(
+            state=state,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            save_options=save_options_for_model(
+                model=model_by_id(state=state, model_instance_id=allocated_model_id),
+                armor_penetration=pool.weapon_profile.armor_penetration.final,
+                cover_result=cover_result,
+                no_saves_allowed=no_saves_allowed,
+            ),
+        )
     )
     return _save_options_with_effect_invulnerable(
         state=state,
@@ -6544,6 +6593,7 @@ def _roll_hit_and_wound(
     attack_sequence: AttackSequence,
     hooks: AttackSequenceHooks,
     stratagem_index: StratagemCatalogIndex | None,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[AttackResolutionContextPayload | None, LifecycleStatus | None]:
     pool = attack_sequence.current_pool()
     attack_context_id = attack_sequence.attack_context_id()
@@ -6554,6 +6604,8 @@ def _roll_hit_and_wound(
             pool=pool,
             attacker_player_id=attack_sequence.attacker_player_id,
             attack_context_id=attack_context_id,
+            source_phase=attack_sequence.source_phase,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         status = _request_command_reroll_for_attack_roll_if_available(
             state=state,
@@ -6617,6 +6669,7 @@ def _roll_hit_and_wound(
     toughness = _target_unit_toughness(
         state=state,
         target_unit_instance_id=pool.target_unit_instance_id,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     if (
         attack_sequence.generated_hit_index == 0
@@ -7040,6 +7093,10 @@ def _command_reroll_opportunity_boundary_state_payload(state: GameState) -> Json
             JsonValue,
             [record.to_payload() for record in state.stratagem_use_records],
         ),
+        faction_rule_states=cast(
+            JsonValue,
+            [record.to_payload() for record in state.faction_rule_states],
+        ),
     )
 
 
@@ -7108,6 +7165,8 @@ def _roll_hit(
     pool: RangedAttackPool,
     attacker_player_id: str,
     attack_context_id: str,
+    source_phase: BattlePhase,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> HitRoll:
     skill = (
         _hit_skill(pool.weapon_profile)
@@ -7121,9 +7180,20 @@ def _roll_hit(
     )
     if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT):
         return HitRoll.auto_hit(target_number=skill)
-    modifier = pool.hit_roll_modifier + _persisting_hit_roll_modifier(
-        state=state,
-        target_unit_instance_id=pool.target_unit_instance_id,
+    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
+    modifier = (
+        pool.hit_roll_modifier
+        + _persisting_hit_roll_modifier(
+            state=state,
+            target_unit_instance_id=pool.target_unit_instance_id,
+        )
+        + runtime_modifiers.hit_roll_modifier(
+            HitRollModifierContext(
+                state=state,
+                attacker_model_instance_id=pool.attacker_model_instance_id,
+                source_phase=source_phase,
+            )
+        )
     )
     roll_state = _roll_or_reuse_state(
         manager,
@@ -7921,11 +7991,17 @@ def _hit_skill(profile: WeaponProfile) -> int:
     return _validate_d6_target("Weapon skill target", profile.skill.final)
 
 
-def _target_unit_toughness(*, state: GameState, target_unit_instance_id: str) -> int:
+def _target_unit_toughness(
+    *,
+    state: GameState,
+    target_unit_instance_id: str,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+) -> int:
     allocation_context = allocation_context_for_unit(
         state=state,
         target_unit_instance_id=target_unit_instance_id,
     )
+    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
     alive_model_ids = allocation_context.alive_model_ids
     if (
         allocation_context.attached_unit_bodyguard_model_ids
@@ -7936,14 +8012,35 @@ def _target_unit_toughness(*, state: GameState, target_unit_instance_id: str) ->
             if allocation_context.attached_unit_bodyguard_model_ids
             else alive_model_ids
         )
-        return _highest_toughness_for_models(state=state, model_instance_ids=model_ids)
+        base_toughness = _highest_toughness_for_models(
+            state=state,
+            model_instance_ids=model_ids,
+        )
+        return runtime_modifiers.modified_unit_characteristic(
+            UnitCharacteristicModifierContext(
+                state=state,
+                unit_instance_id=target_unit_instance_id,
+                characteristic=Characteristic.TOUGHNESS,
+                base_value=base_toughness,
+                current_value=base_toughness,
+            )
+        )
     toughness_values = _toughness_values_for_models(
         state=state,
         model_instance_ids=alive_model_ids,
     )
     if len(toughness_values) != 1:
         raise GameLifecycleError("Mixed Toughness target units are deferred to Phase 14H/16D.")
-    return next(iter(toughness_values))
+    base_toughness = next(iter(toughness_values))
+    return runtime_modifiers.modified_unit_characteristic(
+        UnitCharacteristicModifierContext(
+            state=state,
+            unit_instance_id=target_unit_instance_id,
+            characteristic=Characteristic.TOUGHNESS,
+            base_value=base_toughness,
+            current_value=base_toughness,
+        )
+    )
 
 
 def _highest_toughness_for_models(

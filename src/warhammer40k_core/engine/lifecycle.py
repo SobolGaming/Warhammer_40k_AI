@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
@@ -18,6 +18,9 @@ from warhammer40k_core.engine.attack_sequence import (
     current_legal_damage_allocation_model_ids,
     invalid_destroyed_transport_disembark_proposal_status,
     is_destroyed_transport_disembark_proposal_request,
+)
+from warhammer40k_core.engine.battle_formation_hooks import (
+    SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
@@ -311,6 +314,7 @@ _SETUP_DECISION_TYPES = frozenset(
         SELECT_PREBATTLE_ACTION_DECISION_TYPE,
         SUBMIT_SCOUT_MOVE_DECISION_TYPE,
         SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE,
+        SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
     )
 )
 
@@ -451,6 +455,11 @@ class GameLifecycle:
             phase_handlers=self._phase_handlers(),
             phase_end_objective_control_hooks=(
                 self._runtime_content_bundle.phase_end_objective_control_hook_registry
+                if self._runtime_content_bundle is not None
+                else None
+            ),
+            runtime_modifier_registry=(
+                self._runtime_content_bundle.runtime_modifier_registry
                 if self._runtime_content_bundle is not None
                 else None
             ),
@@ -890,6 +899,19 @@ class GameLifecycle:
                 config=self._require_config(),
                 request=pending_request,
                 result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE
+        ):
+            invalid_status = _invalid_finite_decision_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                invalid_reason="invalid_faction_rule_setup_option_result",
             )
             if invalid_status is not None:
                 return invalid_status
@@ -1583,6 +1605,11 @@ class GameLifecycle:
                 if lifecycle._runtime_content_bundle is not None
                 else None
             ),
+            runtime_modifier_registry=(
+                lifecycle._runtime_content_bundle.runtime_modifier_registry
+                if lifecycle._runtime_content_bundle is not None
+                else None
+            ),
         )
         return lifecycle
 
@@ -1653,6 +1680,10 @@ class GameLifecycle:
             config=self._config,
             armies=armies,
         )
+        self._setup_flow = replace(
+            self._setup_flow,
+            battle_formation_hooks=self._runtime_content_bundle.battle_formation_hook_registry,
+        )
         runtime_stratagem_index = _combined_runtime_stratagem_index(
             self._runtime_content_bundle,
             base_indexes=(
@@ -1673,6 +1704,7 @@ class GameLifecycle:
             ability_indexes_by_player_id=(
                 self._runtime_content_bundle.ability_indexes_by_player_id
             ),
+            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._movement_phase_handler = MovementPhaseHandler(
             ruleset_descriptor=self._movement_phase_handler.ruleset_descriptor,
@@ -1683,6 +1715,7 @@ class GameLifecycle:
             movement_end_surge_hooks=(
                 self._runtime_content_bundle.movement_end_surge_hook_registry
             ),
+            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._charge_phase_handler = ChargePhaseHandler(
             ruleset_descriptor=self._charge_phase_handler.ruleset_descriptor,
@@ -1699,6 +1732,7 @@ class GameLifecycle:
                 self._runtime_content_bundle.shooting_unit_selected_hook_registry
             ),
             shooting_end_surge_hooks=self._runtime_content_bundle.shooting_end_surge_hook_registry,
+            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._fight_phase_handler = FightPhaseHandler(
             ruleset_descriptor=self._fight_phase_handler.ruleset_descriptor,
@@ -1707,12 +1741,14 @@ class GameLifecycle:
             fight_activation_ability_hooks=(
                 self._runtime_content_bundle.fight_activation_ability_hook_registry
             ),
+            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._battle_round_flow = BattleRoundFlow(
             phase_handlers=self._phase_handlers(),
             phase_end_objective_control_hooks=(
                 self._runtime_content_bundle.phase_end_objective_control_hook_registry
             ),
+            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._runtime_content_activation_input_hash = _runtime_content_activation_input_hash(
             config=self._config,
@@ -1804,6 +1840,10 @@ class GameLifecycle:
                 stratagem_use_records=cast(
                     JsonValue,
                     [record.to_payload() for record in state.stratagem_use_records],
+                ),
+                faction_rule_states=cast(
+                    JsonValue,
+                    [record.to_payload() for record in state.faction_rule_states],
                 ),
             ),
             event_count=len(records),

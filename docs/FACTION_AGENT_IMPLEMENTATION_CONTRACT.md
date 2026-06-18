@@ -49,6 +49,8 @@ Use existing `RuntimeContentContribution` surfaces:
 - ability handler bindings;
 - Stratagem handler bindings;
 - event subscriptions and event handler bindings;
+- Battle-formation hook bindings for source-backed setup-time faction or army
+  rule choices;
 - Battle-shock hook bindings for rules whose trigger is Battle-shock modifier
   or outcome resolution;
 - Fall Back eligibility hook bindings for rules whose effect is that a Fall Back
@@ -64,6 +66,16 @@ Use existing `RuntimeContentContribution` surfaces:
 - Fight activation ability hook bindings for optional rules whose timing is
   when a unit is selected to fight and whose immediate effect is a scoped
   engine-owned melee targeting permission;
+- unit characteristic modifier bindings for source-backed modifiers to model or
+  unit characteristics consumed by engine queries;
+- Hit roll modifier bindings for source-backed modifiers consumed by the attack
+  sequence hit-roll step;
+- save option modifier bindings for source-backed changes to available save
+  options consumed by the attack sequence save step;
+- movement budget modifier bindings for source-backed Move characteristic or
+  movement budget modifiers consumed by Movement phase path validation;
+- objective-control modifier bindings for source-backed Objective Control
+  characteristic modifiers consumed by objective-control scoring;
 - RuleIR runtime bindings;
 - faction named handlers.
 
@@ -79,6 +91,31 @@ row loads the hook through `GameLifecycle` without manual handler injection.
 Hook handlers must mutate authoritative state only through engine-owned
 services and must emit deterministic replay-safe events or explicit unsupported
 diagnostics.
+
+Battle-formation hook bindings are an approved runtime contribution surface
+only for source-backed setup-time choices whose result creates later
+engine-consumed faction state. Each hook binding must use a `source_id` from the
+generated Phase 17F execution rows for the implemented rule, and tests must
+prove that the selected runtime manifest row loads the hook through
+`GameLifecycle` without manual handler injection. Accepted choices must be
+recorded through engine-owned `DecisionRequest` / `DecisionResult` handling,
+must emit deterministic replay-safe payloads, and must not mutate downstream
+phase state directly.
+
+Runtime modifier bindings are approved runtime contribution surfaces only for
+source-backed modifiers that can be expressed as a typed value adjustment at an
+existing engine query point. Each modifier binding must use a source-linked
+`modifier_id` and `source_id`, and tests must prove both bundle/lifecycle
+loading and at least one real consumer path for the modified engine area.
+Handlers must return typed values only: unit characteristic modifiers return the
+modified characteristic value, Hit roll modifiers return an integer roll
+modifier, save option modifiers return the modified save-option tuple, movement
+budget modifiers return the modified movement budget in inches, and
+objective-control modifiers return the modified OC value. Faction modules must
+not roll dice, move models, mutate battlefield/objective state, spend CP, or
+rewrite attack sequence state from these handlers; the engine-owned consumer
+continues to perform validation, mutation, event emission, and replay-safe
+payload generation.
 
 Fall Back eligibility hook bindings are an approved runtime contribution surface
 only for source-backed rules that modify the consequences of a completed Fall
@@ -196,6 +233,8 @@ Required:
 - Use source IDs from generated manifest and execution rows.
 - Remove the generated placeholder marker from implemented files.
 - Register named handlers or RuleIR bindings only where semantics are supported.
+- Register Battle-formation hook bindings only for source-backed setup-time
+  choices, and link them to generated Phase 17F execution row IDs.
 - Register Battle-shock hook bindings only for Battle-shock timing semantics,
   and link them to generated Phase 17F execution row IDs.
 - Register Fall Back eligibility hook bindings only for source-backed rules
@@ -220,6 +259,11 @@ Required:
 - Register Fight activation ability hook bindings only for optional
   selected-to-fight rules, and link them to generated Phase 17F execution row
   IDs or enhancement descriptor row IDs until exact enhancement subrows exist.
+- Register runtime modifier bindings only for source-backed modifiers consumed
+  by existing engine query points: unit characteristics, Hit rolls, save
+  options, movement budgets, or Objective Control. Link each binding to a
+  generated Phase 17F execution row ID, prove lifecycle bundle loading, and add
+  at least one real consumer-path regression for every modified engine area.
 - Return typed unsupported results with source-linked reasons for unsupported semantics.
 - Add replay and audit assertions for state-changing behavior.
 - Do not edit runtime loader, lifecycle, bundle, or manifest machinery in

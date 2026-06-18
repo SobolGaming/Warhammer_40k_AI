@@ -61,6 +61,10 @@ from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_rule_states import (
+    FactionRuleState,
+    FactionRuleStatePayload,
+)
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightPhaseStatePayload
 from warhammer40k_core.engine.mission_setup import MissionSetup, MissionSetupPayload
 from warhammer40k_core.engine.missions import (
@@ -118,6 +122,7 @@ from warhammer40k_core.engine.reserves import (
     reserve_origin_from_token,
     resolve_unarrived_reserve_destruction,
 )
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
     FinalScoringResult,
     PrimaryObjectiveTurnStartState,
@@ -245,6 +250,7 @@ class GameStatePayload(TypedDict):
     command_point_ledgers: list[CommandPointLedgerPayload]
     victory_point_ledgers: list[VictoryPointLedgerPayload]
     stratagem_use_records: list[StratagemUseRecordPayload]
+    faction_rule_states: list[FactionRuleStatePayload]
     army_definitions: list[ArmyDefinitionPayload]
     starting_strength_records: list[StartingStrengthRecordPayload]
     battlefield_state: BattlefieldRuntimeStatePayload | None
@@ -321,6 +327,10 @@ def _new_victory_point_ledgers() -> list[VictoryPointLedger]:
 
 
 def _new_stratagem_use_records() -> list[StratagemUseRecord]:
+    return []
+
+
+def _new_faction_rule_states() -> list[FactionRuleState]:
     return []
 
 
@@ -803,6 +813,7 @@ class GameState:
     stratagem_use_records: list[StratagemUseRecord] = field(
         default_factory=_new_stratagem_use_records
     )
+    faction_rule_states: list[FactionRuleState] = field(default_factory=_new_faction_rule_states)
     army_definitions: list[ArmyDefinition] = field(default_factory=_new_army_definitions)
     starting_strength_records: list[StartingStrengthRecord] = field(
         default_factory=_new_starting_strength_records
@@ -954,6 +965,10 @@ class GameState:
         )
         self.stratagem_use_records = _validate_stratagem_use_records(
             self.stratagem_use_records,
+            player_ids=self.player_ids,
+        )
+        self.faction_rule_states = _validate_faction_rule_states(
+            self.faction_rule_states,
             player_ids=self.player_ids,
         )
         self.army_definitions = _validate_army_definitions(
@@ -1362,7 +1377,11 @@ class GameState:
         self._record_primary_objective_turn_start_boundary_if_available()
         self._expire_persisting_effects_at_current_phase_start()
 
-    def advance_to_next_battle_phase(self) -> BattlePhase:
+    def advance_to_next_battle_phase(
+        self,
+        *,
+        runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    ) -> BattlePhase:
         if self.stage is not GameLifecycleStage.BATTLE:
             raise GameLifecycleError("GameState can advance battle phases only during battle.")
         if self.battle_phase_index is None:
@@ -1381,6 +1400,7 @@ class GameState:
         phase_end_record = self._record_objective_control_boundary(
             completed_phase=completed_phase,
             timing=ObjectiveControlTiming.PHASE_END,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         self._score_objective_control_boundary(phase_end_record)
         if self.battle_phase_index + 1 < len(self.battle_phase_sequence):
@@ -1412,6 +1432,7 @@ class GameState:
         turn_end_record = self._record_objective_control_boundary(
             completed_phase=completed_phase,
             timing=ObjectiveControlTiming.TURN_END,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         self._score_objective_control_boundary(turn_end_record)
         if completed_phase is BattlePhase.COMMAND:
@@ -1453,7 +1474,9 @@ class GameState:
         if battle_round_ended:
             self._expire_persisting_effects_at_current_battle_round_start()
         self._expire_persisting_effects_at_current_turn_start()
-        self._record_primary_objective_turn_start_boundary_if_available()
+        self._record_primary_objective_turn_start_boundary_if_available(
+            runtime_modifier_registry=runtime_modifier_registry
+        )
         self._expire_persisting_effects_at_current_phase_start()
         return completed_phase
 
@@ -1493,6 +1516,36 @@ class GameState:
         self.army_definitions.append(army_definition)
         self.army_definitions.sort(key=lambda stored: stored.player_id)
         self._record_starting_strength_records_for_army(army_definition)
+
+    def record_faction_rule_state(self, state: FactionRuleState) -> None:
+        if type(state) is not FactionRuleState:
+            raise GameLifecycleError("GameState faction rule state must be FactionRuleState.")
+        if state.player_id not in self.player_ids:
+            raise GameLifecycleError("FactionRuleState player_id is not in this game.")
+        if any(stored.state_id == state.state_id for stored in self.faction_rule_states):
+            raise GameLifecycleError("FactionRuleState already exists for state_id.")
+        self.faction_rule_states.append(state)
+        self.faction_rule_states = _validate_faction_rule_states(
+            self.faction_rule_states,
+            player_ids=self.player_ids,
+        )
+
+    def faction_rule_states_for_player(
+        self,
+        *,
+        player_id: str,
+        state_kind: str | None = None,
+    ) -> tuple[FactionRuleState, ...]:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        requested_kind = None
+        if state_kind is not None:
+            requested_kind = _validate_identifier("FactionRuleState state_kind", state_kind)
+        return tuple(
+            state
+            for state in self.faction_rule_states
+            if state.player_id == requested_player_id
+            and (requested_kind is None or state.state_kind == requested_kind)
+        )
 
     def add_unit_to_army(
         self,
@@ -3607,6 +3660,7 @@ class GameState:
             "command_point_ledgers": [ledger.to_payload() for ledger in self.command_point_ledgers],
             "victory_point_ledgers": [ledger.to_payload() for ledger in self.victory_point_ledgers],
             "stratagem_use_records": [record.to_payload() for record in self.stratagem_use_records],
+            "faction_rule_states": [state.to_payload() for state in self.faction_rule_states],
             "army_definitions": [army.to_payload() for army in self.army_definitions],
             "starting_strength_records": [
                 record.to_payload() for record in self.starting_strength_records
@@ -3877,6 +3931,9 @@ class GameState:
                 StratagemUseRecord.from_payload(record)
                 for record in payload["stratagem_use_records"]
             ],
+            faction_rule_states=[
+                FactionRuleState.from_payload(state) for state in payload["faction_rule_states"]
+            ],
             army_definitions=[
                 _army_definition_from_payload(army) for army in payload["army_definitions"]
             ],
@@ -4107,6 +4164,7 @@ class GameState:
         *,
         completed_phase: BattlePhase,
         timing: ObjectiveControlTiming,
+        runtime_modifier_registry: RuntimeModifierRegistry | None,
     ) -> ObjectiveControlRecord:
         if self.mission_setup is None:
             raise GameLifecycleError("Objective control updates require MissionSetup.")
@@ -4120,6 +4178,7 @@ class GameState:
                 timing=timing,
                 phase=completed_phase,
                 ruleset_descriptor=self._ruleset_descriptor_for_runtime_policy(),
+                runtime_modifier_registry=runtime_modifier_registry,
             )
         )
         retained_record = apply_sticky_objective_control(
@@ -4148,7 +4207,11 @@ class GameState:
             key=lambda state: state.state_id,
         )
 
-    def _record_primary_objective_turn_start_boundary_if_available(self) -> None:
+    def _record_primary_objective_turn_start_boundary_if_available(
+        self,
+        *,
+        runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    ) -> None:
         if self.mission_setup is None or self.battlefield_state is None:
             return
         if self.active_player_id is None:
@@ -4162,6 +4225,7 @@ class GameState:
                 timing=ObjectiveControlTiming.PHASE_END,
                 phase=current_phase,
                 ruleset_descriptor=self._ruleset_descriptor_for_runtime_policy(),
+                runtime_modifier_registry=runtime_modifier_registry,
             )
         )
         controlled_objective_ids = tuple(
@@ -4875,6 +4939,29 @@ def _validate_stratagem_use_records(
         seen.add(value.use_id)
         validated.append(value)
     return sorted(validated, key=lambda record: record.use_id)
+
+
+def _validate_faction_rule_states(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[FactionRuleState]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState faction_rule_states must be a list.")
+    validated: list[FactionRuleState] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not FactionRuleState:
+            raise GameLifecycleError(
+                "GameState faction_rule_states must contain FactionRuleState values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("FactionRuleState player_id is not in this game.")
+        if value.state_id in seen:
+            raise GameLifecycleError("GameState faction_rule_states must be unique.")
+        seen.add(value.state_id)
+        validated.append(value)
+    return sorted(validated, key=lambda state: state.state_id)
 
 
 def _validate_starting_strength_records(

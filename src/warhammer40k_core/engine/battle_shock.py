@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
@@ -23,12 +23,19 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_leadership_characteristic_for_unit,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+    UnitCharacteristicModifierContext,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import (
     BelowHalfStrengthContext,
     BelowHalfStrengthContextPayload,
     StartingStrengthRecord,
 )
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
 
 BATTLE_SHOCK_ROLL_TYPE = "battle_shock_roll"
 
@@ -499,9 +506,11 @@ def collect_battle_shock_test_requests(
     army: ArmyDefinition,
     battlefield_state: BattlefieldRuntimeState,
     starting_strength_records: tuple[StartingStrengthRecord, ...],
+    state: GameState | None = None,
     forced_below_starting_strength_unit_ids: tuple[str, ...] = (),
     allow_duplicate_below_half_tests: bool = False,
     ability_index: AbilityCatalogIndex | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[BattleShockTestRequest, ...]:
     requested_game_id = _validate_identifier("game_id", game_id)
     requested_round = _validate_positive_int("battle_round", battle_round)
@@ -526,6 +535,7 @@ def collect_battle_shock_test_requests(
     )
     if type(allow_duplicate_below_half_tests) is not bool:
         raise GameLifecycleError("allow_duplicate_below_half_tests must be a bool.")
+    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
 
     requests: list[BattleShockTestRequest] = []
     for unit in army.units:
@@ -556,6 +566,8 @@ def collect_battle_shock_test_requests(
                     current_model_ids=current_model_ids,
                     reason=BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED,
                     ability_index=catalog_ability_index,
+                    state=state,
+                    runtime_modifier_registry=runtime_modifiers,
                 )
             )
             forced_test_added = True
@@ -572,6 +584,8 @@ def collect_battle_shock_test_requests(
                     current_model_ids=current_model_ids,
                     reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
                     ability_index=catalog_ability_index,
+                    state=state,
+                    runtime_modifier_registry=runtime_modifiers,
                 )
             )
     return tuple(
@@ -659,6 +673,8 @@ def _battle_shock_request_for_context(
     current_model_ids: tuple[str, ...],
     reason: BattleShockTestReason,
     ability_index: AbilityCatalogIndex,
+    state: GameState | None,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> BattleShockTestRequest:
     return BattleShockTestRequest.for_unit(
         request_id=(
@@ -673,6 +689,8 @@ def _battle_shock_request_for_context(
             unit,
             current_model_ids=current_model_ids,
             ability_index=ability_index,
+            state=state,
+            runtime_modifier_registry=runtime_modifier_registry,
         ),
         below_half_strength_context=context,
     )
@@ -683,6 +701,8 @@ def _best_leadership(
     *,
     current_model_ids: tuple[str, ...],
     ability_index: AbilityCatalogIndex,
+    state: GameState | None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> int:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Leadership lookup requires a UnitInstance.")
@@ -697,7 +717,13 @@ def _best_leadership(
         current_model_instance_ids=current_model_ids,
     )
     if catalog_value is not None:
-        return catalog_value
+        base_leadership = catalog_value
+        return _modified_leadership_target(
+            state=state,
+            runtime_modifier_registry=runtime_modifier_registry,
+            unit_instance_id=unit.unit_instance_id,
+            base_leadership=base_leadership,
+        )
     leadership_values = tuple(
         _model_leadership(model)
         for model in unit.own_models
@@ -705,7 +731,44 @@ def _best_leadership(
     )
     if not leadership_values:
         raise GameLifecycleError("Battle-shock Leadership lookup found no models.")
-    return min(leadership_values)
+    base_leadership = min(leadership_values)
+    return _modified_leadership_target(
+        state=state,
+        runtime_modifier_registry=runtime_modifier_registry,
+        unit_instance_id=unit.unit_instance_id,
+        base_leadership=base_leadership,
+    )
+
+
+def _modified_leadership_target(
+    *,
+    state: GameState | None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None,
+    unit_instance_id: str,
+    base_leadership: int,
+) -> int:
+    if state is None:
+        return base_leadership
+    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
+    return runtime_modifiers.modified_unit_characteristic(
+        UnitCharacteristicModifierContext(
+            state=state,
+            unit_instance_id=unit_instance_id,
+            characteristic=Characteristic.LEADERSHIP,
+            base_value=base_leadership,
+            current_value=base_leadership,
+        )
+    )
+
+
+def _runtime_modifier_registry(
+    registry: RuntimeModifierRegistry | None,
+) -> RuntimeModifierRegistry:
+    if registry is None:
+        return RuntimeModifierRegistry.empty()
+    if type(registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError("Battle-shock runtime modifier registry is invalid.")
+    return registry
 
 
 def _battle_shock_ability_index(

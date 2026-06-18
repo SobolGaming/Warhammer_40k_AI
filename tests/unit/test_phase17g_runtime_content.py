@@ -104,6 +104,10 @@ from warhammer40k_core.engine.list_validation import (
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.runtime_modifiers import (
+    HitRollModifierBinding,
+    HitRollModifierContext,
+)
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
     StratagemAvailabilityKind,
@@ -680,6 +684,11 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
     assert summary["fall_back_hook_ids"] == []
     assert summary["enhancement_effect_binding_ids"] == []
     assert summary["fight_activation_ability_hook_ids"] == []
+    assert summary["unit_characteristic_modifier_ids"] == []
+    assert summary["hit_roll_modifier_ids"] == []
+    assert summary["save_option_modifier_ids"] == []
+    assert summary["movement_budget_modifier_ids"] == []
+    assert summary["objective_control_modifier_ids"] == []
     assert summary["contribution_ids"] == ["runtime-content:module-default"]
     assert len(summary["bundle_summary_hash"]) == 64
     assert "object at 0x" not in encoded
@@ -747,6 +756,15 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
         handler=fight_activation_ability_handler,
     )
 
+    def hit_roll_modifier_handler(_context: HitRollModifierContext) -> int:
+        return 0
+
+    hit_roll_modifier_binding = HitRollModifierBinding(
+        modifier_id="combined:hit-roll-modifier",
+        source_id="combined:hit-roll-source",
+        handler=hit_roll_modifier_handler,
+    )
+
     combined = combine_runtime_content_contributions(
         contribution_id="combined:manifest",
         contributions=(
@@ -757,6 +775,7 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
                 fall_back_hook_bindings=(fall_back_binding,),
                 enhancement_effect_bindings=(enhancement_effect_binding,),
                 fight_activation_ability_hook_bindings=(fight_activation_ability_binding,),
+                hit_roll_modifier_bindings=(hit_roll_modifier_binding,),
             ),
             RuntimeContentContribution(
                 contribution_id="combined:stratagems",
@@ -775,6 +794,7 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
     assert combined.fall_back_hook_bindings == (fall_back_binding,)
     assert combined.enhancement_effect_bindings == (enhancement_effect_binding,)
     assert combined.fight_activation_ability_hook_bindings == (fight_activation_ability_binding,)
+    assert combined.hit_roll_modifier_bindings == (hit_roll_modifier_binding,)
     assert tuple(combined.faction_named_handlers) == ("combined:named-handler",)
 
     with pytest.raises(GameLifecycleError, match="ability record IDs must be unique"):
@@ -832,6 +852,17 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
                 RuntimeContentContribution(
                     fight_activation_ability_hook_bindings=(fight_activation_ability_binding,)
                 ),
+            ),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Hit roll modifier binding IDs must be unique",
+    ):
+        combine_runtime_content_contributions(
+            contribution_id="combined:duplicate-hit-roll-modifiers",
+            contributions=(
+                RuntimeContentContribution(hit_roll_modifier_bindings=(hit_roll_modifier_binding,)),
+                RuntimeContentContribution(hit_roll_modifier_bindings=(hit_roll_modifier_binding,)),
             ),
         )
     with pytest.raises(GameLifecycleError, match="faction handler IDs must be unique"):
