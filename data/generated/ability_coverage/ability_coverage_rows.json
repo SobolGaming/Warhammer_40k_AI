@@ -186,5 +186,53 @@
     "source_kind": "wargear",
     "source_wargear_id": "000001115:instrument-of-chaos",
     "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "warhammer_40000_11th:death_guard:army_rule:nurgles_gift",
+    "ability_name": "Nurgle's Gift",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/death-guard/faction/warhammer_40000_11th:death_guard:army_rule:nurgles_gift/none",
+    "datasheet_id": "death-guard",
+    "datasheet_name": "Death Guard",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:death_guard:army_rule:nurgles_gift",
+      "warhammer_40000_11th:death_guard:army_rule:nurgles_gift:armour-save-option",
+      "warhammer_40000_11th:death_guard:army_rule:nurgles_gift:leadership",
+      "warhammer_40000_11th:death_guard:army_rule:nurgles_gift:melee-hit-roll",
+      "warhammer_40000_11th:death_guard:army_rule:nurgles_gift:movement-budget",
+      "warhammer_40000_11th:death_guard:army_rule:nurgles_gift:objective-control",
+      "warhammer_40000_11th:death_guard:army_rule:nurgles_gift:toughness"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.nurgles_gift"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne",
+    "ability_name": "Blessings of Khorne",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/world-eaters/faction/warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne/none",
+    "datasheet_id": "world-eaters",
+    "datasheet_name": "World Eaters",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne",
+      "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration",
+      "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage",
+      "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll",
+      "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.blessings_of_khorne"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
   }
 ]

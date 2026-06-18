@@ -1266,6 +1266,7 @@ def _apply_melee_declaration_decision(
         dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
         sequence_id=sequence_id,
         state=state,
+        runtime_modifier_registry=handler.runtime_modifier_registry,
     )
     fight_state = _require_fight_state(state)
     state.fight_phase_state = fight_state.with_attack_sequence_update(

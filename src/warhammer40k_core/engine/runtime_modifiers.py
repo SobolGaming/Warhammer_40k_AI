@@ -5,6 +5,8 @@ from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Self, cast
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.saves import SaveOption
 
@@ -23,6 +25,11 @@ type SaveOptionModifierHandler = Callable[
 ]
 type MovementBudgetModifierHandler = Callable[["MovementBudgetModifierContext"], float]
 type ObjectiveControlModifierHandler = Callable[["ObjectiveControlModifierContext"], int]
+type ChargeRollModifierHandler = Callable[
+    ["ChargeRollModifierContext"],
+    tuple[RollModifier, ...],
+]
+type WeaponProfileModifierHandler = Callable[["WeaponProfileModifierContext"], WeaponProfile]
 
 
 @dataclass(frozen=True, slots=True)
@@ -176,6 +183,72 @@ class ObjectiveControlModifierContext:
 
 
 @dataclass(frozen=True, slots=True)
+class ChargeRollModifierContext:
+    state: GameState
+    unit_instance_id: str
+    current_roll_modifiers: tuple[RollModifier, ...]
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(self.state) is not GameState:
+            raise GameLifecycleError("Charge roll modifier state must be GameState.")
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier("unit_instance_id", self.unit_instance_id),
+        )
+        object.__setattr__(
+            self,
+            "current_roll_modifiers",
+            _validate_roll_modifier_tuple(
+                "current_roll_modifiers",
+                self.current_roll_modifiers,
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class WeaponProfileModifierContext:
+    state: GameState
+    source_phase: BattlePhase
+    attacking_unit_instance_id: str
+    attacker_model_instance_id: str
+    target_unit_instance_id: str
+    weapon_profile: WeaponProfile
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(self.state) is not GameState:
+            raise GameLifecycleError("Weapon profile modifier state must be GameState.")
+        object.__setattr__(self, "source_phase", _battle_phase_from_token(self.source_phase))
+        object.__setattr__(
+            self,
+            "attacking_unit_instance_id",
+            _validate_identifier(
+                "attacking_unit_instance_id",
+                self.attacking_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "attacker_model_instance_id",
+            _validate_identifier(
+                "attacker_model_instance_id",
+                self.attacker_model_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier("target_unit_instance_id", self.target_unit_instance_id),
+        )
+        if type(self.weapon_profile) is not WeaponProfile:
+            raise GameLifecycleError("Weapon profile modifier profile must be WeaponProfile.")
+
+
+@dataclass(frozen=True, slots=True)
 class UnitCharacteristicModifierBinding:
     modifier_id: str
     source_id: str
@@ -251,12 +324,44 @@ class ObjectiveControlModifierBinding:
 
 
 @dataclass(frozen=True, slots=True)
+class ChargeRollModifierBinding:
+    modifier_id: str
+    source_id: str
+    handler: ChargeRollModifierHandler
+
+    def __post_init__(self) -> None:
+        _validate_modifier_binding(
+            field_prefix="charge roll modifier",
+            modifier_id=self.modifier_id,
+            source_id=self.source_id,
+            handler=self.handler,
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class WeaponProfileModifierBinding:
+    modifier_id: str
+    source_id: str
+    handler: WeaponProfileModifierHandler
+
+    def __post_init__(self) -> None:
+        _validate_modifier_binding(
+            field_prefix="weapon profile modifier",
+            modifier_id=self.modifier_id,
+            source_id=self.source_id,
+            handler=self.handler,
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeModifierRegistry:
     unit_characteristic_modifier_bindings: tuple[UnitCharacteristicModifierBinding, ...] = ()
     hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = ()
     save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = ()
     movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = ()
     objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = ()
+    charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = ()
+    weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -304,6 +409,24 @@ class RuntimeModifierRegistry:
                 ObjectiveControlModifierBinding,
             ),
         )
+        object.__setattr__(
+            self,
+            "charge_roll_modifier_bindings",
+            _validate_bindings(
+                "RuntimeModifierRegistry charge_roll_modifier_bindings",
+                self.charge_roll_modifier_bindings,
+                ChargeRollModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "weapon_profile_modifier_bindings",
+            _validate_bindings(
+                "RuntimeModifierRegistry weapon_profile_modifier_bindings",
+                self.weapon_profile_modifier_bindings,
+                WeaponProfileModifierBinding,
+            ),
+        )
 
     @classmethod
     def empty(cls) -> Self:
@@ -321,6 +444,8 @@ class RuntimeModifierRegistry:
         save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = (),
         movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = (),
         objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = (),
+        charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = (),
+        weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = (),
     ) -> Self:
         return cls(
             unit_characteristic_modifier_bindings=unit_characteristic_modifier_bindings,
@@ -328,6 +453,8 @@ class RuntimeModifierRegistry:
             save_option_modifier_bindings=save_option_modifier_bindings,
             movement_budget_modifier_bindings=movement_budget_modifier_bindings,
             objective_control_modifier_bindings=objective_control_modifier_bindings,
+            charge_roll_modifier_bindings=charge_roll_modifier_bindings,
+            weapon_profile_modifier_bindings=weapon_profile_modifier_bindings,
         )
 
     def all_unit_characteristic_bindings(self) -> tuple[UnitCharacteristicModifierBinding, ...]:
@@ -344,6 +471,12 @@ class RuntimeModifierRegistry:
 
     def all_objective_control_bindings(self) -> tuple[ObjectiveControlModifierBinding, ...]:
         return self.objective_control_modifier_bindings
+
+    def all_charge_roll_bindings(self) -> tuple[ChargeRollModifierBinding, ...]:
+        return self.charge_roll_modifier_bindings
+
+    def all_weapon_profile_bindings(self) -> tuple[WeaponProfileModifierBinding, ...]:
+        return self.weapon_profile_modifier_bindings
 
     def modified_unit_characteristic(self, context: UnitCharacteristicModifierContext) -> int:
         if type(context) is not UnitCharacteristicModifierContext:
@@ -403,6 +536,34 @@ class RuntimeModifierRegistry:
             )
         return current
 
+    def charge_roll_modifiers(
+        self,
+        context: ChargeRollModifierContext,
+    ) -> tuple[RollModifier, ...]:
+        if type(context) is not ChargeRollModifierContext:
+            raise GameLifecycleError("Charge roll modifiers require a context.")
+        current = context.current_roll_modifiers
+        for binding in self.charge_roll_modifier_bindings:
+            current = _validate_roll_modifier_tuple(
+                f"{binding.modifier_id} returned charge roll modifiers",
+                binding.handler(replace(context, current_roll_modifiers=current)),
+            )
+        return current
+
+    def modified_weapon_profile(
+        self,
+        context: WeaponProfileModifierContext,
+    ) -> WeaponProfile:
+        if type(context) is not WeaponProfileModifierContext:
+            raise GameLifecycleError("Weapon profile modifiers require a context.")
+        current = context.weapon_profile
+        for binding in self.weapon_profile_modifier_bindings:
+            current = _validate_weapon_profile(
+                f"{binding.modifier_id} returned weapon profile",
+                binding.handler(replace(context, weapon_profile=current)),
+            )
+        return current
+
 
 def _validate_bindings[T](
     field_name: str,
@@ -421,7 +582,9 @@ def _validate_bindings[T](
             | HitRollModifierBinding
             | SaveOptionModifierBinding
             | MovementBudgetModifierBinding
-            | ObjectiveControlModifierBinding,
+            | ObjectiveControlModifierBinding
+            | ChargeRollModifierBinding
+            | WeaponProfileModifierBinding,
             binding,
         ).modifier_id
         if modifier_id in seen:
@@ -438,13 +601,17 @@ def _modifier_id_for_binding(binding: object) -> str:
         SaveOptionModifierBinding,
         MovementBudgetModifierBinding,
         ObjectiveControlModifierBinding,
+        ChargeRollModifierBinding,
+        WeaponProfileModifierBinding,
     }:
         return cast(
             UnitCharacteristicModifierBinding
             | HitRollModifierBinding
             | SaveOptionModifierBinding
             | MovementBudgetModifierBinding
-            | ObjectiveControlModifierBinding,
+            | ObjectiveControlModifierBinding
+            | ChargeRollModifierBinding
+            | WeaponProfileModifierBinding,
             binding,
         ).modifier_id
     raise GameLifecycleError("Runtime modifier binding has an unsupported type.")
@@ -472,6 +639,27 @@ def _validate_save_option_tuple(field_name: str, value: object) -> tuple[SaveOpt
             raise GameLifecycleError(f"{field_name} must contain SaveOption values.")
         options.append(option)
     return tuple(options)
+
+
+def _validate_roll_modifier_tuple(field_name: str, value: object) -> tuple[RollModifier, ...]:
+    if type(value) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    modifiers: list[RollModifier] = []
+    seen: set[str] = set()
+    for modifier in cast(tuple[object, ...], value):
+        if type(modifier) is not RollModifier:
+            raise GameLifecycleError(f"{field_name} must contain RollModifier values.")
+        if modifier.modifier_id in seen:
+            raise GameLifecycleError(f"{field_name} must not duplicate modifier IDs.")
+        seen.add(modifier.modifier_id)
+        modifiers.append(modifier)
+    return tuple(modifiers)
+
+
+def _validate_weapon_profile(field_name: str, value: object) -> WeaponProfile:
+    if type(value) is not WeaponProfile:
+        raise GameLifecycleError(f"{field_name} must be a WeaponProfile.")
+    return value
 
 
 def _characteristic_from_token(token: object) -> Characteristic:

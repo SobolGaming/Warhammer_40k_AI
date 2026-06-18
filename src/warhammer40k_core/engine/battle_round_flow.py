@@ -3,7 +3,14 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.battle_round_hooks import (
+    SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
+    BattleRoundStartHookRegistry,
+    BattleRoundStartRequestContext,
+    BattleRoundStartResultContext,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
@@ -42,10 +49,16 @@ class BattleRoundFlow:
         self,
         *,
         phase_handlers: Mapping[BattlePhase, PhaseHandler],
+        battle_round_start_hooks: BattleRoundStartHookRegistry | None = None,
         phase_end_objective_control_hooks: PhaseEndObjectiveControlHookRegistry | None = None,
         runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     ) -> None:
         self._phase_handlers = dict(phase_handlers)
+        self._battle_round_start_hooks = (
+            BattleRoundStartHookRegistry.empty()
+            if battle_round_start_hooks is None
+            else battle_round_start_hooks
+        )
         self._phase_end_objective_control_hooks = (
             PhaseEndObjectiveControlHookRegistry.empty()
             if phase_end_objective_control_hooks is None
@@ -56,6 +69,8 @@ class BattleRoundFlow:
             if runtime_modifier_registry is None
             else runtime_modifier_registry
         )
+        if type(self._battle_round_start_hooks) is not BattleRoundStartHookRegistry:
+            raise GameLifecycleError("BattleRoundFlow requires a battle-round start hook registry.")
         if (
             type(self._phase_end_objective_control_hooks)
             is not PhaseEndObjectiveControlHookRegistry
@@ -83,6 +98,34 @@ class BattleRoundFlow:
         if handler is None:
             raise GameLifecycleError("BattleRoundFlow missing handler for current battle phase.")
         _emit_start_timing_windows(state=state, decisions=decisions)
+        start_request = (
+            self._battle_round_start_hooks.next_request_for(
+                BattleRoundStartRequestContext(state=state, decisions=decisions)
+            )
+            if _is_start_of_battle_round(state)
+            else None
+        )
+        if start_request is not None:
+            decisions.request_decision(start_request)
+            decisions.event_log.append(
+                "battle_round_start_faction_rule_requested",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "request_id": start_request.request_id,
+                    "decision_type": start_request.decision_type,
+                    "actor_id": start_request.actor_id,
+                },
+            )
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=start_request,
+                payload={
+                    "battle_round": state.battle_round,
+                    "phase_body_status": "battle_round_start_faction_rule_required",
+                    "request_id": start_request.request_id,
+                },
+            )
         _emit_phase_start_objective_proximity_snapshot_if_available(
             state=state,
             decisions=decisions,
@@ -159,12 +202,42 @@ class BattleRoundFlow:
             },
         )
 
+    def apply_decision(
+        self,
+        *,
+        state: GameState,
+        result: DecisionResult,
+        decisions: DecisionController,
+    ) -> None:
+        if result.decision_type != SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE:
+            raise GameLifecycleError("BattleRoundFlow received unsupported decision_type.")
+        if self._battle_round_start_hooks.apply_result(
+            BattleRoundStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=decisions.record_for_result(result).request,
+                result=result,
+            )
+        ):
+            return
+        raise GameLifecycleError("Faction rule battle-round decision was not handled.")
+
 
 def _current_battle_phase_payload(state: GameState) -> str | None:
     current_phase = state.current_battle_phase
     if current_phase is None:
         return None
     return current_phase.value
+
+
+def _is_start_of_battle_round(state: GameState) -> bool:
+    return (
+        state.stage is GameLifecycleStage.BATTLE
+        and state.current_battle_phase is BattlePhase.COMMAND
+        and state.battle_phase_index == 0
+        and bool(state.turn_order)
+        and state.active_player_id == state.turn_order[0]
+    )
 
 
 def _state_is_complete(state: GameState) -> bool:

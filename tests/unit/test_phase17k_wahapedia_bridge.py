@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tools.generate_ability_support_matrix import ability_support_matrix_rows
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
@@ -61,6 +62,12 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.charge_declaration import ChargeRollRequest, ChargeRollResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
+    army_rule as death_guard_army_rule,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
+    army_rule as world_eaters_army_rule,
+)
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ListValidationError,
@@ -80,7 +87,6 @@ from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, RuleIRPayload, parameter_payload
 from warhammer40k_core.rules.source_reference_generation import build_source_reference_catalog
 from warhammer40k_core.rules.wahapedia_bridge import (
-    CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE,
     EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID,
     ModelHeightOverride,
@@ -115,24 +121,6 @@ _REQUIRED_TABLES = (
     "Datasheets_unit_composition",
     "Datasheets_wargear",
     "Factions",
-)
-_BLOODLETTERS_HEIGHT_OVERRIDES = (
-    ModelHeightOverride(
-        datasheet_id="000001114",
-        model_name="Bloodreaper",
-        height=1.5,
-        height_units=GeometrySourceUnits.INCHES,
-        height_source_id="geometry-review:chaos-daemons:bloodletters:bloodreaper:height",
-        height_document_reference="Chaos Daemons Faction Pack p.28-29",
-    ),
-    ModelHeightOverride(
-        datasheet_id="000001114",
-        model_name="Bloodletters",
-        height=1.5,
-        height_units=GeometrySourceUnits.INCHES,
-        height_source_id="geometry-review:chaos-daemons:bloodletters:bloodletters:height",
-        height_document_reference="Chaos Daemons Faction Pack p.28-29",
-    ),
 )
 
 
@@ -593,10 +581,7 @@ def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() ->
 
 
 def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
-    rows = ability_coverage_rows_from_catalog(
-        _daemon_wargear_coverage_package().army_catalog,
-        datasheet_ids=_daemon_wargear_coverage_datasheet_ids(),
-    )
+    rows = ability_support_matrix_rows()
     snapshot = json.loads(
         (
             Path(__file__).resolve().parents[2]
@@ -652,10 +637,38 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         for row in rows_by_name["The Shadow of Chaos"]
     )
     assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Nurgle's Gift"]
+    )
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Blessings of Khorne"]
+    )
+    assert all(
         row.runtime_consumer_ids
         == ("warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",)
         for row in rows_by_name["The Shadow of Chaos"]
     )
+    assert tuple(row.datasheet_name for row in rows_by_name["Nurgle's Gift"]) == ("Death Guard",)
+    assert tuple(row.datasheet_name for row in rows_by_name["Blessings of Khorne"]) == (
+        "World Eaters",
+    )
+    assert set(rows_by_name["Nurgle's Gift"][0].runtime_consumer_ids) == {
+        death_guard_army_rule.HOOK_ID,
+        f"{death_guard_army_rule.HOOK_ID}:armour-save-option",
+        f"{death_guard_army_rule.HOOK_ID}:leadership",
+        f"{death_guard_army_rule.HOOK_ID}:melee-hit-roll",
+        f"{death_guard_army_rule.HOOK_ID}:movement-budget",
+        f"{death_guard_army_rule.HOOK_ID}:objective-control",
+        f"{death_guard_army_rule.HOOK_ID}:toughness",
+    }
+    assert set(rows_by_name["Blessings of Khorne"][0].runtime_consumer_ids) == {
+        world_eaters_army_rule.HOOK_ID,
+        world_eaters_army_rule.RAGE_FUELLED_INVIGORATION_HOOK_ID,
+        world_eaters_army_rule.TOTAL_CARNAGE_HOOK_ID,
+        world_eaters_army_rule.UNBRIDLED_BLOODLUST_CHARGE_MODIFIER_ID,
+        f"{world_eaters_army_rule.HOOK_ID}:weapon-profile-keywords",
+    }
     assert categories_by_name["Leadership Characteristic"].ability_names == ("Daemonic Icon",)
     assert categories_by_name["Leadership Characteristic"].datasheet_names == (
         "Bloodcrushers",
@@ -694,6 +707,14 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",
     )
     assert categories_by_name["Chaos Daemons Army Rule"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["Death Guard Army Rule"].ability_names == ("Nurgle's Gift",)
+    assert categories_by_name["Death Guard Army Rule"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["World Eaters Army Rule"].ability_names == ("Blessings of Khorne",)
+    assert categories_by_name["World Eaters Army Rule"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
     )
     assert categories_by_name["Unknown Abilities"].ability_names == (
@@ -1157,18 +1178,6 @@ def _bloodcrushers_package() -> CanonicalCatalogPackage:
     )
 
 
-def _daemon_wargear_coverage_package() -> CanonicalCatalogPackage:
-    return build_canonical_catalog_package(
-        package_id=_catalog_package_id(),
-        catalog_version=_catalog_version(),
-        source_artifacts=_daemon_wargear_coverage_bridge_artifacts(),
-    )
-
-
-def _daemon_wargear_coverage_datasheet_ids() -> tuple[str, ...]:
-    return ("000001114", "000001115")
-
-
 def _bloodcrushers_unit(
     *,
     package: CanonicalCatalogPackage,
@@ -1390,17 +1399,6 @@ def _bloodcrushers_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
         source_artifacts=_wahapedia_source_artifacts(),
         bridge_package_id=_bridge_package_id(),
         datasheet_ids=("000001115",),
-    )
-
-
-def _daemon_wargear_coverage_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
-    return build_wahapedia_canonical_bridge_artifacts(
-        source_artifacts=_wahapedia_source_artifacts(),
-        bridge_package_id=_bridge_package_id(),
-        datasheet_ids=_daemon_wargear_coverage_datasheet_ids(),
-        height_overrides=(
-            CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES + _BLOODLETTERS_HEIGHT_OVERRIDES
-        ),
     )
 
 

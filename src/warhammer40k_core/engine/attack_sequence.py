@@ -2736,6 +2736,7 @@ def _continue_pending_destroyed_transport_disembark(
     reaction_status = _destruction_reaction_status_if_needed(
         state=state,
         decisions=decisions,
+        manager=manager,
         attack_sequence=sequence_without_pending,
         attack_context=pending.attack_context,
         damage=pending.damage_application,
@@ -4205,6 +4206,7 @@ def _continue_deadly_demise_after_mortal_wound_feel_no_pain(
     reaction_status = _destruction_reaction_status_if_needed(
         state=state,
         decisions=decisions,
+        manager=manager,
         attack_sequence=attack_sequence,
         attack_context=attack_context,
         damage=damage,
@@ -5625,6 +5627,7 @@ def _apply_damage_after_feel_no_pain(
     reaction_status = _destruction_reaction_status_if_needed(
         state=state,
         decisions=decisions,
+        manager=manager,
         attack_sequence=attack_sequence,
         attack_context=attack_context,
         damage=damage,
@@ -5659,6 +5662,7 @@ def _destruction_reaction_status_if_needed(
     *,
     state: GameState,
     decisions: DecisionController,
+    manager: DiceRollManager,
     attack_sequence: AttackSequence,
     attack_context: AttackResolutionContextPayload,
     damage: DamageApplication | None,
@@ -5693,7 +5697,17 @@ def _destruction_reaction_status_if_needed(
             continuation=continuation,
         )
     )
-    optional_sources = tuple(source for source in sources if source.optional)
+    optional_sources = _optional_destruction_reaction_sources_after_trigger_rolls(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        attack_sequence=attack_sequence,
+        attack_context=attack_context,
+        damage=damage,
+        destroyed_emission=destroyed_emission,
+        sources=tuple(source for source in sources if source.optional),
+        destroyed_model_controller_player_id=controller_player_id,
+    )
     if not optional_sources:
         return None
     request = build_destruction_reaction_request(
@@ -5725,6 +5739,197 @@ def _destruction_reaction_status_if_needed(
             "model_instance_id": damage.model_instance_id,
         },
     )
+
+
+def _optional_destruction_reaction_sources_after_trigger_rolls(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    manager: DiceRollManager,
+    attack_sequence: AttackSequence,
+    attack_context: AttackResolutionContextPayload,
+    damage: DamageApplication,
+    destroyed_emission: DestroyedModelEmission,
+    sources: tuple[DestructionReactionSource, ...],
+    destroyed_model_controller_player_id: str,
+) -> tuple[DestructionReactionSource, ...]:
+    if type(manager) is not DiceRollManager:
+        raise GameLifecycleError("Destruction reaction trigger rolls require DiceRollManager.")
+    active_sources: list[DestructionReactionSource] = []
+    for source in sources:
+        descriptor = _optional_destruction_reaction_trigger_descriptor(source)
+        if descriptor is None:
+            active_sources.append(source)
+            continue
+        if not _optional_destruction_reaction_trigger_conditions_met(
+            state=state,
+            attack_sequence=attack_sequence,
+            damage=damage,
+            descriptor=descriptor,
+        ):
+            decisions.event_log.append(
+                "destruction_reaction_trigger_not_applicable",
+                {
+                    "sequence_id": attack_sequence.sequence_id,
+                    "attack_context_id": attack_sequence.attack_context_id(),
+                    "model_instance_id": damage.model_instance_id,
+                    "target_unit_instance_id": damage.target_unit_instance_id,
+                    "model_destroyed_event_id": destroyed_emission.model_destroyed_event_id,
+                    "selected_source": source.to_payload(),
+                    "descriptor": descriptor,
+                },
+            )
+            continue
+        threshold = _destruction_reaction_trigger_threshold(descriptor)
+        roll_state = manager.roll(
+            DiceRollSpec(
+                expression=DiceExpression(quantity=1, sides=6),
+                reason="Destruction reaction trigger",
+                roll_type=_optional_destruction_reaction_trigger_roll_type(descriptor),
+                actor_id=destroyed_model_controller_player_id,
+            )
+        )
+        triggered = roll_state.current_total >= threshold
+        decisions.event_log.append(
+            "destruction_reaction_trigger_rolled",
+            {
+                "sequence_id": attack_sequence.sequence_id,
+                "attack_context_id": attack_sequence.attack_context_id(),
+                "model_instance_id": damage.model_instance_id,
+                "target_unit_instance_id": damage.target_unit_instance_id,
+                "model_destroyed_event_id": destroyed_emission.model_destroyed_event_id,
+                "selected_source": source.to_payload(),
+                "descriptor": descriptor,
+                "trigger_roll": roll_state.to_payload(),
+                "trigger_roll_threshold": threshold,
+                "triggered": triggered,
+                "attacker_player_id": attack_context["attacker_player_id"],
+                "defender_player_id": attack_context["defender_player_id"],
+            },
+        )
+        if triggered:
+            active_sources.append(source)
+    return tuple(active_sources)
+
+
+def _optional_destruction_reaction_trigger_descriptor(
+    source: DestructionReactionSource,
+) -> dict[str, JsonValue] | None:
+    if type(source) is not DestructionReactionSource:
+        raise GameLifecycleError("Destruction reaction trigger source drift.")
+    if not source.optional:
+        raise GameLifecycleError("Optional destruction reaction trigger received mandatory source.")
+    if source.payload is None:
+        return None
+    payload = _payload_object(source.payload)
+    if "trigger_roll_threshold" not in payload:
+        return None
+    return payload
+
+
+def _optional_destruction_reaction_trigger_conditions_met(
+    *,
+    state: GameState,
+    attack_sequence: AttackSequence,
+    damage: DamageApplication,
+    descriptor: dict[str, JsonValue],
+) -> bool:
+    if not _optional_destruction_reaction_trigger_battle_round_is_current(
+        state=state,
+        descriptor=descriptor,
+    ):
+        return False
+    if not _optional_destruction_reaction_active_effect_requirement_is_met(
+        state=state,
+        descriptor=descriptor,
+    ):
+        return False
+    if (
+        descriptor.get("requires_destroyed_by_melee_attack") is True
+        and attack_sequence.source_phase is not BattlePhase.FIGHT
+    ):
+        return False
+    if descriptor.get("requires_not_fought_this_phase") is True:
+        fight_state = state.fight_phase_state
+        if (
+            fight_state is not None
+            and damage.target_unit_instance_id
+            in fight_state.fight_order_state.selected_to_fight_unit_ids
+        ):
+            return False
+    return True
+
+
+def _optional_destruction_reaction_trigger_battle_round_is_current(
+    *,
+    state: GameState,
+    descriptor: dict[str, JsonValue],
+) -> bool:
+    if "battle_round" not in descriptor:
+        return True
+    return _payload_positive_int(descriptor, key="battle_round") == state.battle_round
+
+
+def _optional_destruction_reaction_active_effect_requirement_is_met(
+    *,
+    state: GameState,
+    descriptor: dict[str, JsonValue],
+) -> bool:
+    raw_requirement = descriptor.get("requires_active_persisting_effect")
+    if raw_requirement is None:
+        return True
+    requirement = _payload_object(raw_requirement)
+    required_owner_id = _optional_payload_string(requirement, key="owner_player_id")
+    required_source_rule_id = _optional_payload_string(requirement, key="source_rule_id")
+    required_effect_kind = _optional_payload_string(requirement, key="effect_kind")
+    required_target_unit_id = _optional_payload_string(requirement, key="target_unit_instance_id")
+    required_battle_round = (
+        _payload_positive_int(requirement, key="battle_round")
+        if "battle_round" in requirement
+        else None
+    )
+    required_selected_id = _optional_payload_string(requirement, key="selected_blessing_id")
+    for effect in state.persisting_effects:
+        if required_owner_id is not None and effect.owner_player_id != required_owner_id:
+            continue
+        if required_source_rule_id is not None and effect.source_rule_id != required_source_rule_id:
+            continue
+        if required_target_unit_id is not None and not effect.applies_to_unit(
+            required_target_unit_id
+        ):
+            continue
+        payload = _payload_object(effect.effect_payload)
+        if required_effect_kind is not None and payload.get("effect_kind") != required_effect_kind:
+            continue
+        if required_battle_round is not None and payload.get("battle_round") != (
+            required_battle_round
+        ):
+            continue
+        if required_selected_id is not None and required_selected_id not in _payload_string_list(
+            payload,
+            key="selected_blessing_ids",
+        ):
+            continue
+        return True
+    return False
+
+
+def _destruction_reaction_trigger_threshold(descriptor: dict[str, JsonValue]) -> int:
+    threshold = _payload_positive_int(descriptor, key="trigger_roll_threshold")
+    if threshold > 6:
+        raise GameLifecycleError("Destruction reaction trigger threshold must be on a D6.")
+    return threshold
+
+
+def _optional_destruction_reaction_trigger_roll_type(
+    descriptor: dict[str, JsonValue],
+) -> str:
+    raw_roll_type = descriptor.get("trigger_roll_type")
+    if raw_roll_type is None:
+        return "destruction_reaction_trigger"
+    if type(raw_roll_type) is not str or not raw_roll_type.strip():
+        raise GameLifecycleError("Destruction reaction trigger_roll_type must be a string.")
+    return raw_roll_type
 
 
 def _resolve_mandatory_destruction_reactions_before_removal(
@@ -6092,6 +6297,7 @@ def _resolve_deadly_demise_secondary_destroyed_models(
         reaction_status = _destruction_reaction_status_if_needed(
             state=state,
             decisions=decisions,
+            manager=manager,
             attack_sequence=attack_sequence,
             attack_context=attack_context,
             damage=secondary_damage,
@@ -6258,6 +6464,7 @@ def _continue_deadly_demise_after_secondary_destruction_reaction(
     reaction_status = _destruction_reaction_status_if_needed(
         state=state,
         decisions=decisions,
+        manager=manager,
         attack_sequence=attack_sequence,
         attack_context=attack_context,
         damage=damage,
@@ -9164,6 +9371,26 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     if type(value) is not str:
         raise GameLifecycleError(f"Attack sequence payload {key} must be a string.")
     return value
+
+
+def _optional_payload_string(payload: dict[str, JsonValue], *, key: str) -> str | None:
+    if key not in payload:
+        return None
+    return _payload_string(payload, key=key)
+
+
+def _payload_string_list(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
+    if key not in payload:
+        raise GameLifecycleError(f"Attack sequence payload missing {key}.")
+    value = payload[key]
+    if not isinstance(value, list):
+        raise GameLifecycleError(f"Attack sequence payload {key} must be a list.")
+    strings: list[str] = []
+    for item in value:
+        if type(item) is not str:
+            raise GameLifecycleError(f"Attack sequence payload {key} must contain strings.")
+        strings.append(item)
+    return tuple(strings)
 
 
 def _payload_bool(payload: dict[str, JsonValue], *, key: str) -> bool:

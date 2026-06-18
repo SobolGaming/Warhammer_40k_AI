@@ -23,6 +23,9 @@ from warhammer40k_core.engine.battle_formation_hooks import (
     SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
+from warhammer40k_core.engine.battle_round_hooks import (
+    SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
+)
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.charge_declaration_hooks import (
     SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
@@ -317,6 +320,7 @@ _SETUP_DECISION_TYPES = frozenset(
         SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
     )
 )
+_BATTLE_ROUND_DECISION_TYPES = frozenset((SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,))
 
 
 def _new_decision_controller() -> DecisionController:
@@ -453,6 +457,11 @@ class GameLifecycle:
         self.state = GameState.from_config(config)
         self._battle_round_flow = BattleRoundFlow(
             phase_handlers=self._phase_handlers(),
+            battle_round_start_hooks=(
+                self._runtime_content_bundle.battle_round_start_hook_registry
+                if self._runtime_content_bundle is not None
+                else None
+            ),
             phase_end_objective_control_hooks=(
                 self._runtime_content_bundle.phase_end_objective_control_hook_registry
                 if self._runtime_content_bundle is not None
@@ -918,6 +927,20 @@ class GameLifecycle:
         if (
             type(result) is DecisionResult
             and pending_request is not None
+            and pending_request.decision_type
+            == SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE
+        ):
+            invalid_status = _invalid_finite_decision_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                invalid_reason="invalid_faction_rule_battle_round_option_result",
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
             and pending_request.decision_type in _COMMAND_DECISION_TYPES
         ):
             invalid_status = _invalid_finite_decision_status(
@@ -1024,6 +1047,13 @@ class GameLifecycle:
                 result=result,
                 decisions=self.decision_controller,
                 config=self._require_config(),
+            )
+            return self.advance_until_decision_or_terminal()
+        if record.request.decision_type in _BATTLE_ROUND_DECISION_TYPES:
+            self._require_battle_round_flow().apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
             )
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _COMMAND_DECISION_TYPES:
@@ -1600,6 +1630,11 @@ class GameLifecycle:
         lifecycle._refresh_runtime_content_bundle_if_armies_mustered()
         lifecycle._battle_round_flow = BattleRoundFlow(
             phase_handlers=lifecycle._phase_handlers(),
+            battle_round_start_hooks=(
+                lifecycle._runtime_content_bundle.battle_round_start_hook_registry
+                if lifecycle._runtime_content_bundle is not None
+                else None
+            ),
             phase_end_objective_control_hooks=(
                 lifecycle._runtime_content_bundle.phase_end_objective_control_hook_registry
                 if lifecycle._runtime_content_bundle is not None
@@ -1723,6 +1758,7 @@ class GameLifecycle:
             ability_indexes_by_player_id=(
                 self._runtime_content_bundle.ability_indexes_by_player_id
             ),
+            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._shooting_phase_handler = ShootingPhaseHandler(
             ruleset_descriptor=self._shooting_phase_handler.ruleset_descriptor,
@@ -1745,6 +1781,7 @@ class GameLifecycle:
         )
         self._battle_round_flow = BattleRoundFlow(
             phase_handlers=self._phase_handlers(),
+            battle_round_start_hooks=self._runtime_content_bundle.battle_round_start_hook_registry,
             phase_end_objective_control_hooks=(
                 self._runtime_content_bundle.phase_end_objective_control_hook_registry
             ),

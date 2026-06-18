@@ -956,6 +956,31 @@ Required Phase 17G setup faction-rule tests:
 - live placed model liveness gates later faction-rule consumers;
 - viewer-scoped projection/event redaction for any future hidden faction-rule setup selections.
 
+## Phase 17G Battle-Round Faction-Rule Decisions
+
+Phase 17G also adds opt-in battle-round start decisions for faction runtime content. These decisions are emitted only when the mustered army's faction runtime contribution registers a battle-round start hook for the player and the game is at the start of a battle round before the first player's Command phase proceeds. The current implemented hook is World Eaters Blessings of Khorne, updated from the 11th Edition faction-pack `RULES UPDATES` section.
+
+Phase 17G exposes the finite decision type `select_faction_rule_battle_round_option`. The pending request payload contains game ID, battle round, phase `command`, faction ID, source rule ID, hook ID, effect kind, Blessings roll state, dice values, base dice count, spent Bloodshed points, target unit IDs, and rule-update source IDs. Adapters answer by selecting one emitted option ID and must not reroll dice, invent blessing IDs, spend Bloodshed points locally, or apply effects locally.
+
+Current World Eaters option IDs use the form `world_eaters:blessings:<blessing_id>` for one blessing, `world_eaters:blessings:<blessing_id>+<blessing_id>` for two legal blessings with disjoint dice allocations, and `world_eaters:blessings:none` when the player selects no blessing. Option payloads include `submission_kind: "select_world_eaters_blessings"`, player ID, battle round, faction ID, source rule ID, hook ID, effect kind, selected blessing IDs and labels, dice values, consumed dice indices by blessing ID, spent Bloodshed points, and rule-update source IDs.
+
+Accepted World Eaters selections create a deterministic `PersistingEffect` with effect kind `world_eaters_blessings_of_khorne` through the end of the current battle round and emit `world_eaters_blessings_of_khorne_selected`. Later phase/query hosts consume that effect through generic runtime surfaces: Unbridled Bloodlust grants +1 to Charge rolls per the 11th Edition update, Rage-fuelled Invigoration offers a fight-activation ability for 6" Pile-in/Consolidation moves, Martial Excellence/Warp Blades/Decapitating Strikes modify melee weapon profile keywords, and Total Carnage registers optional fight-on-death destruction reactions with the engine-owned 4+ trigger roll. Total Carnage destruction-reaction descriptors are self-invalidating: the attack-sequence trigger gate requires the descriptor battle round to match current state and requires the current active Blessings `PersistingEffect` to still contain Total Carnage.
+
+The 11th Edition Icon of Khorne update is represented as Bloodshed points. When a World Eaters unit destroys an enemy unit, the engine grants the next Blessings roll one additional D6 only if the destroying unit had a live Icon of Khorne bearer when the enemy unit destruction completed. Bloodshed points are spent into the next Blessings request and then consumed by that request payload; adapters must render this as engine-derived state, not calculate it from static selected wargear.
+
+Malformed, stale, wrong-actor, wrong-faction, duplicate-selection, unsupported-option, and option-payload drift submissions reject before the pending queue is popped and before a `DecisionRecord`, persisting effect, destruction-reaction source, or event is created.
+
+Faction-rule battle-round choices are public table information in the current Phase 17G rules scope. If a future faction rule hides battle-round selections, pending requests, option lists, decision records, persisting effects, events, projections, and event deltas must be viewer-scoped and must not leak hidden opponent information through option counts, source context, selected payload, dice values, Bloodshed counts, or derived engine values.
+
+Required Phase 17G battle-round faction-rule tests:
+
+- valid battle-round faction-rule selection through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- no-selection choices record that the battle-round hook was resolved and are not requested again in the same round;
+- deterministic JSON-safe decision, persisting-effect, event, lifecycle, and replay payload round-trip;
+- live model-borne wargear evidence gates Bloodshed point awards;
+- at least one real consumer path proves each newly wired engine area;
+- viewer-scoped projection/event redaction for any future hidden battle-round faction-rule selections.
+
 ## Phase 16E Setup Completion Gate
 
 Phase 16E does not add a new adapter-submitted decision type. Setup completion is an engine-owned lifecycle gate that runs only after setup decisions and proposal requests have drained and the ruleset setup sequence reaches its final step. Adapters must not submit a synthetic "start battle" result, force `GameState.enter_battle()`, mutate `setup_step_index`, or bypass `GameLifecycle.advance(...)`.

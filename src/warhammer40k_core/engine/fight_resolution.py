@@ -44,6 +44,10 @@ from warhammer40k_core.engine.movement_proposals import (
     proposal_kind_from_token,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+    WeaponProfileModifierContext,
+)
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.unit_coherency import (
     MovementRollbackRecord,
@@ -1431,9 +1435,11 @@ def melee_attack_sequence_from_proposal(
     dice_manager: DiceRollManager,
     sequence_id: str,
     state: GameState | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> AttackSequence:
     unit = _unit_by_id(scenario=scenario, unit_instance_id=proposal.unit_instance_id)
     available = _available_melee_weapons_by_key(unit=unit, army_catalog=army_catalog)
+    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
     pools: list[RangedAttackPool] = []
     for declaration_index, declaration in enumerate(proposal.declarations):
         profile = available[declaration.weapon_key]
@@ -1462,9 +1468,17 @@ def melee_attack_sequence_from_proposal(
             if declared_total != resolved_attacks:
                 raise GameLifecycleError("Melee split attack total drifted after validation.")
         for allocation in declaration.target_allocations:
+            pool_profile = _modified_melee_weapon_profile(
+                state=state,
+                runtime_modifier_registry=runtime_modifiers,
+                attacking_unit_instance_id=proposal.unit_instance_id,
+                attacker_model_instance_id=declaration.attacker_model_instance_id,
+                target_unit_instance_id=allocation.target_unit_instance_id,
+                profile=profile,
+            )
             cleave_bonus = _cleave_attack_bonus_for_target(
                 scenario=scenario,
-                profile=profile,
+                profile=pool_profile,
                 single_target=single_target,
                 target_unit_instance_id=allocation.target_unit_instance_id,
             )
@@ -1474,7 +1488,7 @@ def melee_attack_sequence_from_proposal(
                 else _require_declared_melee_attacks(allocation)
             )
             targeting_rule_ids = _melee_targeting_rule_ids(
-                profile=profile,
+                profile=pool_profile,
                 cleave_bonus=cleave_bonus,
                 unit_made_charge_move=_unit_made_charge_move(
                     state=state,
@@ -1506,7 +1520,7 @@ def melee_attack_sequence_from_proposal(
                         target_unit_instance_id=allocation.target_unit_instance_id,
                         shooting_type=ShootingType.NORMAL,
                     ),
-                    weapon_profile=profile,
+                    weapon_profile=pool_profile,
                     attacks=attacks,
                     target_visible_model_ids=target_model_ids,
                     target_in_range_model_ids=target_model_ids,
@@ -1551,6 +1565,39 @@ def _epic_challenge_profile_if_applicable(
             keywords=tuple(sorted((*profile.keywords, WeaponKeyword.PRECISION))),
         )
     return profile
+
+
+def _modified_melee_weapon_profile(
+    *,
+    state: GameState | None,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    attacking_unit_instance_id: str,
+    attacker_model_instance_id: str,
+    target_unit_instance_id: str,
+    profile: WeaponProfile,
+) -> WeaponProfile:
+    if state is None:
+        return profile
+    return runtime_modifier_registry.modified_weapon_profile(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.FIGHT,
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            attacker_model_instance_id=attacker_model_instance_id,
+            target_unit_instance_id=target_unit_instance_id,
+            weapon_profile=profile,
+        )
+    )
+
+
+def _runtime_modifier_registry(
+    runtime_modifier_registry: RuntimeModifierRegistry | None,
+) -> RuntimeModifierRegistry:
+    if runtime_modifier_registry is None:
+        return RuntimeModifierRegistry.empty()
+    if type(runtime_modifier_registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError("Fight resolution runtime modifiers must be a registry.")
+    return runtime_modifier_registry
 
 
 def _pile_in_rule_validation(

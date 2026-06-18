@@ -6,17 +6,29 @@ from datetime import date
 from pathlib import Path
 from typing import cast
 
+from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
 from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
 from warhammer40k_core.engine.ability_coverage import (
     AbilityCoverageAbilityDatasheetPairPayload,
     AbilityCoverageCategoryRowPayload,
+    AbilityCoverageRow,
+    AbilityCoverageSupportStage,
     ability_coverage_category_rows,
     ability_coverage_category_rows_payload,
     ability_coverage_rows_from_catalog,
     ability_coverage_rows_payload,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
+    army_rule as death_guard_army_rule,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
+    army_rule as world_eaters_army_rule,
+)
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_detachments_2026_27,
+)
 from warhammer40k_core.rules.wahapedia_bridge import (
     CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     ModelHeightOverride,
@@ -77,6 +89,22 @@ def main() -> None:
     source_json_dir = _resolve_repo_path(args.source_json_dir)
     output_dir = _resolve_repo_path(args.output_dir)
     docs_path = _resolve_repo_path(args.docs_path)
+    rows = ability_support_matrix_rows(source_json_dir=source_json_dir)
+    category_rows = ability_coverage_category_rows(rows)
+    row_payloads = ability_coverage_rows_payload(rows)
+    category_payloads = ability_coverage_category_rows_payload(category_rows)
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    _write_json(output_dir / "ability_coverage_rows.json", row_payloads)
+    _write_json(output_dir / "ability_support_category_rows.json", category_payloads)
+    docs_path.write_text(_support_matrix_markdown(category_payloads), encoding="utf-8")
+
+
+def ability_support_matrix_rows(
+    *,
+    source_json_dir: Path = DEFAULT_SOURCE_JSON_DIR,
+) -> tuple[AbilityCoverageRow, ...]:
+    source_json_dir = _resolve_repo_path(source_json_dir)
     artifacts = _load_source_artifacts(source_json_dir)
     bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=artifacts,
@@ -95,14 +123,7 @@ def main() -> None:
         package.army_catalog,
         datasheet_ids=DAEMON_WARGEAR_DATASHEET_IDS,
     )
-    category_rows = ability_coverage_category_rows(rows)
-    row_payloads = ability_coverage_rows_payload(rows)
-    category_payloads = ability_coverage_category_rows_payload(category_rows)
-
-    output_dir.mkdir(parents=True, exist_ok=True)
-    _write_json(output_dir / "ability_coverage_rows.json", row_payloads)
-    _write_json(output_dir / "ability_support_category_rows.json", category_payloads)
-    docs_path.write_text(_support_matrix_markdown(category_payloads), encoding="utf-8")
+    return (*rows, *_runtime_faction_army_rule_rows())
 
 
 def _parse_args() -> argparse.Namespace:
@@ -140,6 +161,99 @@ def _write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, sort_keys=True, indent=2) + "\n", encoding="utf-8")
 
 
+def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
+    return (
+        _implemented_faction_army_rule_row(
+            faction_id=death_guard_army_rule.DEATH_GUARD_FACTION_ID,
+            ability_id=death_guard_army_rule.HOOK_ID,
+            ability_name="Nurgle's Gift",
+            semantic_category="faction.army_rule.nurgles_gift",
+            runtime_consumer_ids=_death_guard_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
+            faction_id=world_eaters_army_rule.WORLD_EATERS_FACTION_ID,
+            ability_id=world_eaters_army_rule.HOOK_ID,
+            ability_name="Blessings of Khorne",
+            semantic_category="faction.army_rule.blessings_of_khorne",
+            runtime_consumer_ids=_world_eaters_runtime_consumer_ids(),
+        ),
+    )
+
+
+def _implemented_faction_army_rule_row(
+    *,
+    faction_id: str,
+    ability_id: str,
+    ability_name: str,
+    semantic_category: str,
+    runtime_consumer_ids: tuple[str, ...],
+) -> AbilityCoverageRow:
+    faction_row = _source_faction_row(faction_id)
+    return AbilityCoverageRow(
+        catalog_id="runtime-content-warhammer-40000-11th",
+        datasheet_id=faction_row.faction_id,
+        datasheet_name=faction_row.name,
+        ability_id=ability_id,
+        ability_name=ability_name,
+        source_kind=CatalogAbilitySourceKind.FACTION,
+        source_wargear_id=None,
+        catalog_support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        support_stage=AbilityCoverageSupportStage.ENGINE_CONSUMED,
+        semantic_categories=(semantic_category,),
+        runtime_consumer_ids=runtime_consumer_ids,
+    )
+
+
+def _source_faction_row(faction_id: str) -> faction_detachments_2026_27.SourceFactionRow:
+    for row in faction_detachments_2026_27.faction_rows():
+        if row.faction_id == faction_id:
+            return row
+    raise ValueError("Ability support matrix runtime row references unknown faction.")
+
+
+def _death_guard_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = death_guard_army_rule.runtime_contribution()
+    unit_characteristic_modifier_ids = tuple(
+        binding.modifier_id for binding in contribution.unit_characteristic_modifier_bindings
+    )
+    return tuple(
+        sorted(
+            {
+                *(binding.hook_id for binding in contribution.battle_formation_hook_bindings),
+                *unit_characteristic_modifier_ids,
+                *(binding.modifier_id for binding in contribution.hit_roll_modifier_bindings),
+                *(binding.modifier_id for binding in contribution.save_option_modifier_bindings),
+                *(
+                    binding.modifier_id
+                    for binding in contribution.movement_budget_modifier_bindings
+                ),
+                *(
+                    binding.modifier_id
+                    for binding in contribution.objective_control_modifier_bindings
+                ),
+            }
+        )
+    )
+
+
+def _world_eaters_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = world_eaters_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                world_eaters_army_rule.TOTAL_CARNAGE_HOOK_ID,
+                *(binding.hook_id for binding in contribution.battle_round_start_hook_bindings),
+                *(binding.modifier_id for binding in contribution.charge_roll_modifier_bindings),
+                *(
+                    binding.hook_id
+                    for binding in contribution.fight_activation_ability_hook_bindings
+                ),
+                *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
+            }
+        )
+    )
+
+
 def _support_matrix_markdown(
     category_rows: list[AbilityCoverageCategoryRowPayload],
 ) -> str:
@@ -171,8 +285,9 @@ def _support_matrix_markdown(
             "execute through the generic IR handler."
         ),
         (
-            "- `engine_consumed`: a structured descriptor or supported generic IR is consumed by "
-            "a phase/query host through a named runtime consumer."
+            "- `engine_consumed`: a structured descriptor, supported generic IR, or "
+            "implementation-backed runtime content is consumed by a phase/query host through a "
+            "named runtime consumer."
         ),
         "",
         "Current coverage categories:",
@@ -212,8 +327,9 @@ def _support_matrix_markdown(
             (
                 "Broad CORE V1-to-CORE V2 category forecasting is intentionally deferred until "
                 "current-edition faction-pack modifications are complete. Until then, this report "
-                "only marks support from the current canonical rows, typed IR or descriptor "
-                "consumers, and tests proving the behavior."
+                "only marks support from the current canonical rows, typed IR, descriptor "
+                "consumers, explicitly declared runtime-content rows, and tests proving the "
+                "behavior."
             ),
             "",
         )
