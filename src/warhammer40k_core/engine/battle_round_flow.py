@@ -11,6 +11,7 @@ from warhammer40k_core.engine.battle_round_hooks import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
@@ -35,6 +36,10 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindow,
     TimingWindowDescriptor,
 )
+from warhammer40k_core.engine.unit_destroyed_hooks import (
+    UnitDestroyedContext,
+    UnitDestroyedHookRegistry,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.reaction_queue import ReactionQueue
@@ -51,6 +56,7 @@ class BattleRoundFlow:
         phase_handlers: Mapping[BattlePhase, PhaseHandler],
         battle_round_start_hooks: BattleRoundStartHookRegistry | None = None,
         phase_end_objective_control_hooks: PhaseEndObjectiveControlHookRegistry | None = None,
+        unit_destroyed_hooks: UnitDestroyedHookRegistry | None = None,
         runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     ) -> None:
         self._phase_handlers = dict(phase_handlers)
@@ -63,6 +69,11 @@ class BattleRoundFlow:
             PhaseEndObjectiveControlHookRegistry.empty()
             if phase_end_objective_control_hooks is None
             else phase_end_objective_control_hooks
+        )
+        self._unit_destroyed_hooks = (
+            UnitDestroyedHookRegistry.empty()
+            if unit_destroyed_hooks is None
+            else unit_destroyed_hooks
         )
         self._runtime_modifier_registry = (
             RuntimeModifierRegistry.empty()
@@ -78,6 +89,8 @@ class BattleRoundFlow:
             raise GameLifecycleError(
                 "BattleRoundFlow requires a phase-end objective-control hook registry."
             )
+        if type(self._unit_destroyed_hooks) is not UnitDestroyedHookRegistry:
+            raise GameLifecycleError("BattleRoundFlow requires a unit-destroyed hook registry.")
         if type(self._runtime_modifier_registry) is not RuntimeModifierRegistry:
             raise GameLifecycleError("BattleRoundFlow requires a runtime modifier registry.")
 
@@ -154,6 +167,11 @@ class BattleRoundFlow:
             state=state,
             decisions=decisions,
             registry=self._phase_end_objective_control_hooks,
+        )
+        _apply_phase_end_unit_destroyed_hooks(
+            state=state,
+            decisions=decisions,
+            registry=self._unit_destroyed_hooks,
         )
         completed_phase = state.advance_to_next_battle_phase(
             runtime_modifier_registry=self._runtime_modifier_registry
@@ -449,6 +467,108 @@ def _apply_phase_end_objective_control_hooks(
         )
 
 
+def _apply_phase_end_unit_destroyed_hooks(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    registry: UnitDestroyedHookRegistry,
+) -> None:
+    if type(registry) is not UnitDestroyedHookRegistry:
+        raise GameLifecycleError("Unit-destroyed hooks require a registry.")
+    if not registry.all_bindings():
+        return
+    completed_phase = state.current_battle_phase
+    if completed_phase is None:
+        raise GameLifecycleError("Unit-destroyed hooks require a current phase.")
+    for event_id, payload in _unit_destruction_completion_events_for_phase(
+        state=state,
+        decisions=decisions,
+        completed_phase=completed_phase,
+    ):
+        destroying_player_id = _payload_string(payload, key="destroying_player_id")
+        destroyed_unit_id = _payload_string(payload, key="target_unit_instance_id")
+        destroyed_player_id = _player_id_for_unit(state=state, unit_instance_id=destroyed_unit_id)
+        if destroying_player_id == destroyed_player_id:
+            continue
+        registry.resolve(
+            UnitDestroyedContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=completed_phase,
+                model_destroyed_event_id=event_id,
+                model_destroyed_payload=payload,
+                destroying_player_id=destroying_player_id,
+                destroyed_unit_instance_id=destroyed_unit_id,
+                destroyed_player_id=destroyed_player_id,
+            )
+        )
+
+
+def _unit_destruction_completion_events_for_phase(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    completed_phase: BattlePhase,
+) -> tuple[tuple[str, dict[str, JsonValue]], ...]:
+    if state.battlefield_state is None:
+        return ()
+    removed_model_ids = set(state.battlefield_state.removed_model_ids)
+    events_by_unit: dict[str, list[tuple[int, str, dict[str, JsonValue]]]] = {}
+    for event_order, record in enumerate(decisions.event_log.records):
+        if record.event_type != "model_destroyed":
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError("model_destroyed event payload must be an object.")
+        event_payload = validate_json_value(payload)
+        if not isinstance(event_payload, dict):
+            raise GameLifecycleError("model_destroyed event payload must be an object.")
+        if event_payload.get("game_id") != state.game_id:
+            continue
+        if event_payload.get("battle_round") != state.battle_round:
+            continue
+        if event_payload.get("active_player_id") != state.active_player_id:
+            continue
+        if event_payload.get("phase") != completed_phase.value:
+            continue
+        target_unit_id = _payload_string(event_payload, key="target_unit_instance_id")
+        events_by_unit.setdefault(target_unit_id, []).append(
+            (event_order, record.event_id, dict(event_payload))
+        )
+    completions: list[tuple[int, str, dict[str, JsonValue]]] = []
+    for target_unit_id, events in events_by_unit.items():
+        model_ids = _model_instance_ids_for_unit(state=state, unit_instance_id=target_unit_id)
+        if not model_ids:
+            continue
+        if not model_ids <= removed_model_ids:
+            continue
+        completions.append(sorted(events, key=lambda item: item[0])[-1])
+    return tuple((event_id, payload) for _order, event_id, payload in sorted(completions))
+
+
+def _player_id_for_unit(*, state: GameState, unit_instance_id: str) -> str:
+    requested_unit = _validate_identifier("unit_instance_id", unit_instance_id)
+    for army in state.army_definitions:
+        if any(unit.unit_instance_id == requested_unit for unit in army.units):
+            return army.player_id
+    raise GameLifecycleError("Unit owner lookup failed for unit-destroyed hook.")
+
+
+def _model_instance_ids_for_unit(*, state: GameState, unit_instance_id: str) -> set[str]:
+    requested_unit = _validate_identifier("unit_instance_id", unit_instance_id)
+    for army in state.army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id == requested_unit:
+                return {model.model_instance_id for model in unit.own_models}
+    raise GameLifecycleError("Model lookup failed for unit-destroyed hook.")
+
+
+def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
+    if key not in payload:
+        raise GameLifecycleError(f"Unit-destroyed event payload missing {key}.")
+    return _validate_identifier(key, payload[key])
+
+
 def _emit_timing_window_if_missing(
     *,
     state: GameState,
@@ -530,3 +650,12 @@ def _active_player_id(state: GameState) -> str:
     if state.active_player_id is None:
         raise GameLifecycleError("BattleRoundFlow requires an active player.")
     return state.active_player_id
+
+
+def _validate_identifier(field_name: str, value: object) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError(f"{field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"{field_name} must not be empty.")
+    return stripped

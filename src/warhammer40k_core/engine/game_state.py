@@ -61,6 +61,12 @@ from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_resources import (
+    FactionResourceLedger,
+    FactionResourceLedgerPayload,
+    FactionResourceResult,
+    initial_faction_resource_ledgers,
+)
 from warhammer40k_core.engine.faction_rule_states import (
     FactionRuleState,
     FactionRuleStatePayload,
@@ -258,6 +264,7 @@ class GameStatePayload(TypedDict):
     command_step_state: CommandStepStatePayload | None
     command_point_ledgers: list[CommandPointLedgerPayload]
     victory_point_ledgers: list[VictoryPointLedgerPayload]
+    faction_resource_ledgers: list[FactionResourceLedgerPayload]
     stratagem_use_records: list[StratagemUseRecordPayload]
     faction_rule_states: list[FactionRuleStatePayload]
     army_definitions: list[ArmyDefinitionPayload]
@@ -333,6 +340,10 @@ def _new_command_point_ledgers() -> list[CommandPointLedger]:
 
 
 def _new_victory_point_ledgers() -> list[VictoryPointLedger]:
+    return []
+
+
+def _new_faction_resource_ledgers() -> list[FactionResourceLedger]:
     return []
 
 
@@ -897,6 +908,9 @@ class GameState:
     victory_point_ledgers: list[VictoryPointLedger] = field(
         default_factory=_new_victory_point_ledgers
     )
+    faction_resource_ledgers: list[FactionResourceLedger] = field(
+        default_factory=_new_faction_resource_ledgers
+    )
     stratagem_use_records: list[StratagemUseRecord] = field(
         default_factory=_new_stratagem_use_records
     )
@@ -1051,6 +1065,10 @@ class GameState:
         )
         self.victory_point_ledgers = _validate_victory_point_ledgers(
             self.victory_point_ledgers,
+            player_ids=self.player_ids,
+        )
+        self.faction_resource_ledgers = _validate_faction_resource_ledgers(
+            self.faction_resource_ledgers,
             player_ids=self.player_ids,
         )
         self.stratagem_use_records = _validate_stratagem_use_records(
@@ -1275,6 +1293,7 @@ class GameState:
             tactical_secondary_draw_count=config.tactical_secondary_draw_count,
             command_point_ledgers=initial_command_point_ledgers(config.player_ids),
             victory_point_ledgers=initial_victory_point_ledgers(config.player_ids),
+            faction_resource_ledgers=initial_faction_resource_ledgers(config.player_ids),
             mission_setup=config.mission_setup,
         )
 
@@ -1970,6 +1989,64 @@ class GameState:
 
     def command_point_total(self, player_id: str) -> int:
         return self.command_point_ledger_for_player(player_id).command_points
+
+    def faction_resource_ledger_for_player(self, player_id: str) -> FactionResourceLedger:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        for ledger in self.faction_resource_ledgers:
+            if ledger.player_id == requested_player_id:
+                return ledger
+        raise GameLifecycleError("FactionResourceLedger player_id was not found.")
+
+    def faction_resource_total(self, *, player_id: str, resource_kind: str) -> int:
+        return self.faction_resource_ledger_for_player(player_id).total(resource_kind)
+
+    def gain_faction_resource(
+        self,
+        *,
+        player_id: str,
+        resource_kind: str,
+        amount: int,
+        source_id: str,
+    ) -> FactionResourceResult:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        ledger = self.faction_resource_ledger_for_player(requested_player_id)
+        updated, result = ledger.gain(
+            battle_round=self.battle_round,
+            resource_kind=resource_kind,
+            amount=amount,
+            source_id=source_id,
+        )
+        if updated is not ledger:
+            self.faction_resource_ledgers = [
+                updated if stored.player_id == requested_player_id else stored
+                for stored in self.faction_resource_ledgers
+            ]
+            self.faction_resource_ledgers.sort(key=lambda stored: stored.player_id)
+        return result
+
+    def spend_faction_resource(
+        self,
+        *,
+        player_id: str,
+        resource_kind: str,
+        amount: int,
+        source_id: str,
+    ) -> FactionResourceResult:
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        ledger = self.faction_resource_ledger_for_player(requested_player_id)
+        updated, result = ledger.spend(
+            battle_round=self.battle_round,
+            resource_kind=resource_kind,
+            amount=amount,
+            source_id=source_id,
+        )
+        if updated is not ledger:
+            self.faction_resource_ledgers = [
+                updated if stored.player_id == requested_player_id else stored
+                for stored in self.faction_resource_ledgers
+            ]
+            self.faction_resource_ledgers.sort(key=lambda stored: stored.player_id)
+        return result
 
     def gain_command_points(
         self,
@@ -3821,6 +3898,9 @@ class GameState:
             ),
             "command_point_ledgers": [ledger.to_payload() for ledger in self.command_point_ledgers],
             "victory_point_ledgers": [ledger.to_payload() for ledger in self.victory_point_ledgers],
+            "faction_resource_ledgers": [
+                ledger.to_payload() for ledger in self.faction_resource_ledgers
+            ],
             "stratagem_use_records": [record.to_payload() for record in self.stratagem_use_records],
             "faction_rule_states": [state.to_payload() for state in self.faction_rule_states],
             "army_definitions": [army.to_payload() for army in self.army_definitions],
@@ -3972,6 +4052,9 @@ class GameState:
         payload["command_point_ledgers"] = [
             cast(JsonValue, ledger.to_payload()) for ledger in self.command_point_ledgers
         ]
+        payload["faction_resource_ledgers"] = [
+            cast(JsonValue, ledger.to_payload()) for ledger in self.faction_resource_ledgers
+        ]
         payload["stratagem_use_records"] = [
             cast(JsonValue, record.to_payload()) for record in self.stratagem_use_records
         ]
@@ -4091,6 +4174,10 @@ class GameState:
             victory_point_ledgers=[
                 VictoryPointLedger.from_payload(ledger)
                 for ledger in payload["victory_point_ledgers"]
+            ],
+            faction_resource_ledgers=[
+                FactionResourceLedger.from_payload(ledger)
+                for ledger in payload["faction_resource_ledgers"]
             ],
             stratagem_use_records=[
                 StratagemUseRecord.from_payload(record)
@@ -5108,6 +5195,33 @@ def _validate_victory_point_ledgers(
         validated.append(value)
     if set(seen) != set(player_ids):
         raise GameLifecycleError("GameState victory_point_ledgers must include every player.")
+    return sorted(validated, key=lambda ledger: ledger.player_id)
+
+
+def _validate_faction_resource_ledgers(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[FactionResourceLedger]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState faction_resource_ledgers must be a list.")
+    if not values:
+        return initial_faction_resource_ledgers(player_ids)
+    validated: list[FactionResourceLedger] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not FactionResourceLedger:
+            raise GameLifecycleError(
+                "GameState faction_resource_ledgers must contain FactionResourceLedger values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("FactionResourceLedger player_id is not in this game.")
+        if value.player_id in seen:
+            raise GameLifecycleError("GameState faction_resource_ledgers must be unique.")
+        seen.add(value.player_id)
+        validated.append(value)
+    if set(seen) != set(player_ids):
+        raise GameLifecycleError("GameState faction_resource_ledgers must include every player.")
     return sorted(validated, key=lambda ledger: ledger.player_id)
 
 

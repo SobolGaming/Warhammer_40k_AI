@@ -367,10 +367,20 @@ class DiceRollManager:
         allowed_selections: Iterable[Iterable[int]] | None = None,
         permission: RerollPermission | None = None,
         extra_payload: dict[str, JsonValue] | None = None,
+        ignored_reroll_forbidden_rule_ids: tuple[str, ...] = (),
     ) -> DecisionRequest:
         if state.original_result.spec.roll_type == "roll_off":
             raise DecisionError("Roll-off dice cannot be rerolled.")
-        if state.original_result.spec.reroll_forbidden_rule_ids:
+        ignored_forbidden_ids = _validate_string_tuple(
+            "ignored_reroll_forbidden_rule_ids",
+            ignored_reroll_forbidden_rule_ids,
+        )
+        remaining_forbidden_ids = tuple(
+            rule_id
+            for rule_id in state.original_result.spec.reroll_forbidden_rule_ids
+            if rule_id not in ignored_forbidden_ids
+        )
+        if remaining_forbidden_ids:
             raise DecisionError("Dice roll has source rules that forbid rerolls.")
         if permission is not None:
             if allowed_selections is not None:
@@ -914,6 +924,24 @@ def _validate_raw_reroll_selections(
     if validated != expected:
         raise DecisionError("Raw reroll allowed_selections must offer only the whole roll.")
     return validated
+
+
+def _validate_string_tuple(field_name: str, values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise DecisionError(f"{field_name} must be a tuple.")
+    validated: list[str] = []
+    seen: set[str] = set()
+    for raw_value in cast(tuple[object, ...], values):
+        if type(raw_value) is not str:
+            raise DecisionError(f"{field_name} values must be strings.")
+        value = raw_value.strip()
+        if not value:
+            raise DecisionError(f"{field_name} values must not be empty.")
+        if value in seen:
+            raise DecisionError(f"{field_name} values must not contain duplicates.")
+        seen.add(value)
+        validated.append(value)
+    return tuple(validated)
 
 
 def _validate_unique_index_selections(

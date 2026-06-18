@@ -435,12 +435,25 @@ the approved blocker.
 | Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
+Runtime addendum: `Power from Pain` now has a deterministic faction-resource
+ledger for Pain tokens, gains one token at the Drukhari player's Command phase
+start, gains one token when an enemy unit is destroyed, and gains one token when
+an enemy unit fails a Battle-shock test. Lithe Agility is integrated through the
+existing source-backed Movement and Charge grant decisions: accepting the grant
+spends one Pain token, records a phase-scoped empowerment effect on the selected
+rules unit, and unlocks the corresponding Advance or Charge `select_dice_reroll`
+request. Hatred Eternal hit-reroll empowerment remains blocked on a
+source-backed selected-to-shoot/fight grant surface, so the generated army-rule
+status table still tracks unsupported Drukhari runtime semantics outside the
+implemented token and Lithe Agility path.
+
 Mustering addendum: `Corsairs and Travelling Players` is implemented in the shared
 `army_mustering` and `list_validation` path. DRUKHARI armies can include
 non-DRUKHARI HARLEQUINS and ANHRATHE units up to the Incursion, Strike Force,
 or Onslaught battle-size cap, and those allied units cannot be selected as
 WARLORD or receive Enhancements. The generated execution-status row above
-remains blocked for non-mustering runtime semantics.
+remains blocked for Drukhari semantics outside the implemented mustering and
+Power from Pain runtime subset.
 
 ### Tyranids Execution Status
 

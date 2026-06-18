@@ -258,6 +258,26 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "warhammer_40000_11th:drukhari:army_rule:power_from_pain",
+    "ability_name": "Power from Pain",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/drukhari/faction/warhammer_40000_11th:drukhari:army_rule:power_from_pain/none",
+    "datasheet_id": "drukhari",
+    "datasheet_name": "Drukhari",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:drukhari:army_rule:scaffold",
+      "warhammer_40000_11th:drukhari:army_rule:power_from_pain"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.power_from_pain"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "phase17g:drukhari:corsairs-and-travelling-players",
     "ability_name": "Corsairs and Travelling Players",
     "catalog_id": "runtime-content-warhammer-40000-11th",

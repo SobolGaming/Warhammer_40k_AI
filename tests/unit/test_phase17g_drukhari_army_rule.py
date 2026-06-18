@@ -1,0 +1,1754 @@
+from __future__ import annotations
+
+from collections.abc import Callable
+from dataclasses import replace
+from pathlib import Path
+from typing import cast
+
+import pytest
+from tests.unit.test_phase11c_command_phase import (
+    _battle_state,  # pyright: ignore[reportPrivateUsage]
+)
+
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+)
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollSpec,
+    RerollComponentSelectionPolicy,
+    RerollPermission,
+)
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.engine.advance_hooks import (
+    SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
+    AdvanceMoveContext,
+)
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battle_shock import (
+    BATTLE_SHOCK_ROLL_TYPE,
+    BattleShockResult,
+    BattleShockTestReason,
+    BattleShockTestRequest,
+)
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockOutcomeContext
+from warhammer40k_core.engine.charge_declaration_hooks import (
+    SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
+    ChargeDeclarationContext,
+)
+from warhammer40k_core.engine.command_phase_start_hooks import (
+    CommandPhaseStartContext,
+    CommandPhaseStartHandler,
+    CommandPhaseStartHookBinding,
+    CommandPhaseStartHookRegistry,
+)
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.drukhari import (
+    army_rule,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.drukhari.power_from_pain import (
+    HATRED_ETERNAL_ABILITY_KEY,
+    LITHE_AGILITY_ABILITY_KEY,
+    PAIN_TOKEN_RESOURCE_KIND,
+    SOURCE_RULE_ID,
+    drukhari_rules_unit_can_empower_for_ability,
+    lithe_agility_advance_reroll_permission,
+    lithe_agility_charge_reroll_permission,
+    pain_ability_keys_for_rules_unit,
+    pain_tokens_available,
+    power_from_pain_empowerment_payload,
+    power_from_pain_reroll_permission_effect_payload,
+    power_from_pain_target_unit_ids,
+    spend_pain_token,
+    unit_is_empowered_through_pain_for_ability,
+)
+from warhammer40k_core.engine.faction_resources import (
+    FACTION_RESOURCE_SPEND_EFFECT_KIND,
+    FactionResourceLedger,
+    FactionResourceResult,
+    FactionResourceStatus,
+    FactionResourceTransaction,
+    FactionResourceTransactionKind,
+    apply_faction_resource_spend_effect,
+    faction_resource_result_enriched_payload,
+    faction_resource_spend_effect_payload,
+    faction_resource_status_from_token,
+    faction_resource_transaction_kind_from_token,
+    initial_faction_resource_ledgers,
+)
+from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.phases.charge import (
+    ChargingUnitSelection,
+    _charge_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
+    _record_charge_declaration_grant_effects,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.phases.command import CommandPhaseHandler
+from warhammer40k_core.engine.phases.movement import (
+    _advance_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
+    _record_movement_action_grant_effects,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.source_backed_rerolls import (
+    SOURCE_BACKED_REROLL_PERMISSION_EFFECT_KIND,
+    source_backed_reroll_permission_effect_payload,
+    source_backed_reroll_permission_for_unit,
+    source_payload_from_reroll_effect_payload,
+)
+from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
+from warhammer40k_core.engine.unit_destroyed_hooks import (
+    UnitDestroyedContext,
+    UnitDestroyedHandler,
+    UnitDestroyedHookBinding,
+    UnitDestroyedHookRegistry,
+)
+from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
+
+
+def test_power_from_pain_command_start_gains_pain_token() -> None:
+    state = _battle_state()
+    _mark_player_as_drukhari(state, player_id="player-a")
+    decisions = DecisionController()
+    handler = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        command_phase_start_hooks=CommandPhaseStartHookRegistry.from_bindings(
+            army_rule.runtime_contribution().command_phase_start_hook_bindings
+        ),
+    )
+
+    completed = handler.begin_phase(state=state, decisions=decisions)
+
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    assert pain_tokens_available(state, player_id="player-a") == 1
+    payload = _last_event_payload(decisions, "drukhari_pain_token_gained")
+    assert payload["trigger"] == "command_phase_start"
+    assert payload["player_id"] == "player-a"
+
+
+def test_power_from_pain_failed_enemy_battle_shock_gains_pain_token() -> None:
+    state = _battle_state()
+    _mark_player_as_drukhari(state, player_id="player-a")
+    target_unit = _unit_for_player(state, player_id="player-b")
+    decisions = DecisionController()
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    request = BattleShockTestRequest(
+        request_id="drukhari-test-battle-shock",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-b",
+        unit_instance_id=target_unit.unit_instance_id,
+        reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
+        leadership_target=7,
+        below_half_strength_context=BelowHalfStrengthContext(
+            player_id="player-b",
+            unit_instance_id=target_unit.unit_instance_id,
+            starting_model_count=5,
+            current_model_count=2,
+            single_model_starting_wounds=None,
+            single_model_wounds_remaining=None,
+        ),
+        spec=DiceRollSpec(
+            expression=DiceExpression(quantity=2, sides=6),
+            reason=f"Battle-shock test for {target_unit.unit_instance_id}",
+            roll_type=BATTLE_SHOCK_ROLL_TYPE,
+            actor_id=target_unit.unit_instance_id,
+        ),
+    )
+    roll_state = manager.roll_fixed(request.spec, [1, 1])
+    result = BattleShockResult.from_roll_state(
+        result_id="drukhari-test-battle-shock:result",
+        request=request,
+        roll_state=roll_state,
+    )
+
+    army_rule.resolve_battle_shock_outcome(
+        BattleShockOutcomeContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=manager,
+            result=result,
+            active_player_id="player-b",
+            phase=BattlePhase.COMMAND,
+            auto_passed=False,
+            phase_start_battle_shocked_unit_ids=(),
+        )
+    )
+
+    assert pain_tokens_available(state, player_id="player-a") == 1
+    payload = _last_event_payload(decisions, "drukhari_pain_token_gained")
+    assert payload["trigger"] == "enemy_battle_shock_failed"
+    assert payload["enemy_player_id"] == "player-b"
+    assert payload["enemy_unit_instance_id"] == target_unit.unit_instance_id
+
+
+def test_power_from_pain_enemy_unit_destroyed_gains_one_pain_token() -> None:
+    state = _battle_state()
+    _mark_player_as_drukhari(state, player_id="player-a")
+    target_unit = _unit_for_player(state, player_id="player-b")
+    decisions = DecisionController()
+    destroyed_event = decisions.event_log.append(
+        "model_destroyed",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": BattlePhase.SHOOTING.value,
+            "destroying_player_id": "player-a",
+            "target_unit_instance_id": target_unit.unit_instance_id,
+            "model_instance_id": target_unit.own_models[-1].model_instance_id,
+        },
+    )
+
+    army_rule.resolve_enemy_unit_destroyed(
+        UnitDestroyedContext(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.SHOOTING,
+            model_destroyed_event_id=destroyed_event.event_id,
+            model_destroyed_payload=cast(dict[str, JsonValue], destroyed_event.payload),
+            destroying_player_id="player-a",
+            destroyed_unit_instance_id=target_unit.unit_instance_id,
+            destroyed_player_id="player-b",
+        )
+    )
+
+    assert pain_tokens_available(state, player_id="player-a") == 1
+    payload = _last_event_payload(decisions, "drukhari_pain_token_gained")
+    assert payload["trigger"] == "enemy_unit_destroyed"
+    assert payload["model_destroyed_event_id"] == destroyed_event.event_id
+
+
+def test_pain_token_ledger_payload_round_trips_after_spend() -> None:
+    state = _battle_state()
+    _mark_player_as_drukhari(state, player_id="player-a")
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=2,
+        source_id="drukhari-test:gain",
+    )
+
+    spend_payload = spend_pain_token(
+        state,
+        player_id="player-a",
+        source_id="drukhari-test:spend",
+    )
+    restored = GameState.from_payload(state.to_payload())
+
+    assert pain_tokens_available(state, player_id="player-a") == 1
+    assert pain_tokens_available(restored, player_id="player-a") == 1
+    assert cast(dict[str, JsonValue], spend_payload)["status"] == "applied"
+
+
+def test_lithe_agility_advance_grant_spends_pain_token_and_empowers_unit() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_lithe_agility_ability(),),
+    )
+    unit = _unit_for_player(state, player_id="player-a")
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:lithe-advance-token",
+    )
+
+    grant = army_rule.lithe_agility_advance_grant(
+        AdvanceMoveContext(
+            state=state,
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            movement_phase_action="advance",
+            movement_request_id="drukhari-test:advance-request",
+            movement_result_id="drukhari-test:advance-result",
+        )
+    )
+
+    assert grant is not None
+    effects = _record_movement_action_grant_effects(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+        result=DecisionResult(
+            result_id="drukhari-test:lithe-advance-grant-result",
+            request_id="drukhari-test:lithe-advance-grant-request",
+            decision_type=SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
+            actor_id="player-a",
+            selected_option_id=grant.hook_id,
+            payload=validate_json_value(grant.to_payload()),
+        ),
+        grant=grant,
+    )
+
+    assert pain_tokens_available(state, player_id="player-a") == 0
+    assert len(effects) == 2
+    assert unit_is_empowered_through_pain_for_ability(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+        pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
+    )
+
+
+def test_lithe_agility_charge_grant_spends_pain_token_and_unlocks_charge_reroll() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.CHARGE)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_lithe_agility_ability(),),
+    )
+    unit = _unit_for_player(state, player_id="player-a")
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:lithe-charge-token",
+    )
+    selection = ChargingUnitSelection(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+        request_id="drukhari-test:charge-selection-request",
+        result_id="drukhari-test:charge-selection-result",
+    )
+
+    grant = army_rule.lithe_agility_charge_declaration_grant(
+        ChargeDeclarationContext(
+            state=state,
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            selection_request_id=selection.request_id,
+            selection_result_id=selection.result_id,
+        )
+    )
+
+    assert grant is not None
+    _record_charge_declaration_grant_effects(
+        state=state,
+        result=DecisionResult(
+            result_id="drukhari-test:lithe-charge-grant-result",
+            request_id="drukhari-test:lithe-charge-grant-request",
+            decision_type=SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
+            actor_id="player-a",
+            selected_option_id=grant.hook_id,
+            payload=validate_json_value(grant.to_payload()),
+        ),
+        selection=selection,
+        grant=grant,
+    )
+
+    permission = _charge_reroll_permission_for_unit(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+    )
+
+    assert pain_tokens_available(state, player_id="player-a") == 0
+    assert permission is not None
+    assert permission.source_id.startswith(SOURCE_RULE_ID)
+
+
+def test_drukhari_advance_roll_permission_requires_lithe_agility_empowerment() -> None:
+    state = _battle_state()
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_lithe_agility_ability(),),
+    )
+    unit = _unit_for_player(state, player_id="player-a")
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:advance-token",
+    )
+
+    assert (
+        _advance_reroll_permission_for_unit(
+            state=state,
+            unit=unit,
+            unit_instance_id=unit.unit_instance_id,
+            player_id="player-a",
+            keywords=unit.keywords,
+        )
+        is None
+    )
+
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="drukhari-test:lithe-advance-empowered",
+            source_rule_id=SOURCE_RULE_ID,
+            owner_player_id="player-a",
+            target_unit_instance_ids=(unit.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.MOVEMENT,
+            expiration=EffectExpiration.end_phase(
+                battle_round=state.battle_round,
+                phase=BattlePhaseKind.MOVEMENT,
+                player_id="player-a",
+            ),
+            effect_payload=power_from_pain_reroll_permission_effect_payload(
+                unit_instance_id=unit.unit_instance_id,
+                target_unit_instance_ids=(unit.unit_instance_id,),
+                trigger="advance",
+                phase=BattlePhaseKind.MOVEMENT,
+                pain_ability_keys=(LITHE_AGILITY_ABILITY_KEY,),
+                permission=lithe_agility_advance_reroll_permission(
+                    state=state,
+                    player_id="player-a",
+                    unit_instance_id=unit.unit_instance_id,
+                ),
+                source_context={"test_context": "advance_permission"},
+            ),
+        )
+    )
+    permission = _advance_reroll_permission_for_unit(
+        state=state,
+        unit=unit,
+        unit_instance_id=unit.unit_instance_id,
+        player_id="player-a",
+        keywords=unit.keywords,
+    )
+
+    assert permission is not None
+    assert permission.source_id.startswith(SOURCE_RULE_ID)
+
+
+def test_lithe_agility_advance_grant_requires_drukhari_rules_unit() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_lithe_agility_ability(),),
+        faction_keywords=("HARLEQUINS",),
+    )
+    unit = _unit_for_player(state, player_id="player-a")
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:lithe-non-drukhari-token",
+    )
+
+    grant = army_rule.lithe_agility_advance_grant(
+        AdvanceMoveContext(
+            state=state,
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            movement_phase_action="advance",
+            movement_request_id="drukhari-test:non-drukhari-advance-request",
+            movement_result_id="drukhari-test:non-drukhari-advance-result",
+        )
+    )
+
+    assert grant is None
+
+
+def test_faction_resource_ledger_validates_transactions_and_effect_payloads() -> None:
+    ledgers = initial_faction_resource_ledgers(("player-a", "player-b"))
+    assert [ledger.player_id for ledger in ledgers] == ["player-a", "player-b"]
+
+    ledger = FactionResourceLedger.empty_for_player("player-a")
+    ledger, gain = ledger.gain(
+        battle_round=1,
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=2,
+        source_id="drukhari-test:resource-gain",
+    )
+    assert gain.status is FactionResourceStatus.APPLIED
+    assert ledger.total(PAIN_TOKEN_RESOURCE_KIND) == 2
+
+    same_ledger, insufficient = ledger.spend(
+        battle_round=1,
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=3,
+        source_id="drukhari-test:resource-insufficient",
+    )
+    assert same_ledger is ledger
+    assert insufficient.status is FactionResourceStatus.INSUFFICIENT
+
+    ledger, spend = ledger.spend(
+        battle_round=1,
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:resource-spend",
+    )
+    assert spend.status is FactionResourceStatus.APPLIED
+    assert ledger.total(PAIN_TOKEN_RESOURCE_KIND) == 1
+    assert FactionResourceLedger.from_payload(ledger.to_payload()) == ledger
+    assert spend.transaction is not None
+    assert (
+        FactionResourceTransaction.from_payload(spend.transaction.to_payload()) == spend.transaction
+    )
+    assert (
+        faction_resource_transaction_kind_from_token(FactionResourceTransactionKind.GAIN)
+        is FactionResourceTransactionKind.GAIN
+    )
+    assert (
+        faction_resource_status_from_token(FactionResourceStatus.APPLIED)
+        is FactionResourceStatus.APPLIED
+    )
+
+    state = _battle_state()
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:state-resource-gain",
+    )
+    spend_effect = faction_resource_spend_effect_payload(
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        reason="drukhari-test-resource-spend",
+    )
+    assert (
+        apply_faction_resource_spend_effect(
+            state=state,
+            player_id="player-a",
+            source_id="drukhari-test:state-resource-spend",
+            effect_payload=[],
+        )
+        is None
+    )
+    assert (
+        apply_faction_resource_spend_effect(
+            state=state,
+            player_id="player-a",
+            source_id="drukhari-test:state-resource-spend",
+            effect_payload={"effect_kind": "different_effect"},
+        )
+        is None
+    )
+    applied = apply_faction_resource_spend_effect(
+        state=state,
+        player_id="player-a",
+        source_id="drukhari-test:state-resource-spend",
+        effect_payload=spend_effect,
+    )
+    assert applied is not None
+    enriched = faction_resource_result_enriched_payload(
+        effect_payload=spend_effect,
+        result=applied,
+    )
+    assert cast(dict[str, JsonValue], enriched)["faction_resource_result"] == applied.to_payload()
+    assert (
+        faction_resource_result_enriched_payload(
+            effect_payload=spend_effect,
+            result=None,
+        )
+        == spend_effect
+    )
+    assert (
+        FactionResourceLedger(
+            player_id="player-a",
+            resources=cast(dict[str, int], None),
+        ).resources
+        == {}
+    )
+
+    invalid_transaction = FactionResourceTransaction(
+        transaction_id="drukhari-test:transaction",
+        player_id="player-a",
+        battle_round=1,
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        transaction_kind=FactionResourceTransactionKind.GAIN,
+        amount=1,
+        source_id="drukhari-test:transaction-source",
+    )
+
+    invalid_cases: tuple[Callable[[], object], ...] = (
+        lambda: faction_resource_transaction_kind_from_token(1),
+        lambda: faction_resource_transaction_kind_from_token("unsupported"),
+        lambda: faction_resource_status_from_token(1),
+        lambda: faction_resource_status_from_token("unsupported"),
+        lambda: FactionResourceResult(
+            player_id="player-a",
+            battle_round=1,
+            resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+            transaction_kind=FactionResourceTransactionKind.GAIN,
+            requested_amount=2,
+            applied_amount=1,
+            status=FactionResourceStatus.APPLIED,
+            source_id="drukhari-test:applied-drift",
+            transaction=invalid_transaction,
+        ),
+        lambda: FactionResourceResult(
+            player_id="player-a",
+            battle_round=1,
+            resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+            transaction_kind=FactionResourceTransactionKind.GAIN,
+            requested_amount=1,
+            applied_amount=1,
+            status=FactionResourceStatus.APPLIED,
+            source_id="drukhari-test:missing-transaction",
+        ),
+        lambda: FactionResourceResult(
+            player_id="player-a",
+            battle_round=1,
+            resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+            transaction_kind=FactionResourceTransactionKind.GAIN,
+            requested_amount=1,
+            applied_amount=1,
+            status=FactionResourceStatus.APPLIED,
+            source_id="drukhari-test:bad-transaction",
+            transaction=cast(FactionResourceTransaction, object()),
+        ),
+        lambda: FactionResourceResult(
+            player_id="player-a",
+            battle_round=1,
+            resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+            transaction_kind=FactionResourceTransactionKind.GAIN,
+            requested_amount=1,
+            applied_amount=1,
+            status=FactionResourceStatus.APPLIED,
+            source_id="drukhari-test:applied-with-reason",
+            transaction=invalid_transaction,
+            insufficient_reason="should-not-exist",
+        ),
+        lambda: FactionResourceResult(
+            player_id="player-a",
+            battle_round=1,
+            resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+            transaction_kind=FactionResourceTransactionKind.SPEND,
+            requested_amount=1,
+            applied_amount=1,
+            status=FactionResourceStatus.INSUFFICIENT,
+            source_id="drukhari-test:insufficient-applied",
+            insufficient_reason="insufficient_resource",
+        ),
+        lambda: FactionResourceResult(
+            player_id="player-a",
+            battle_round=1,
+            resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+            transaction_kind=FactionResourceTransactionKind.SPEND,
+            requested_amount=1,
+            applied_amount=0,
+            status=FactionResourceStatus.INSUFFICIENT,
+            source_id="drukhari-test:insufficient-transaction",
+            transaction=invalid_transaction,
+            insufficient_reason="insufficient_resource",
+        ),
+        lambda: FactionResourceResult(
+            player_id="player-a",
+            battle_round=1,
+            resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+            transaction_kind=FactionResourceTransactionKind.SPEND,
+            requested_amount=1,
+            applied_amount=0,
+            status=FactionResourceStatus.INSUFFICIENT,
+            source_id="drukhari-test:insufficient-no-reason",
+        ),
+        lambda: FactionResourceLedger(
+            player_id="player-a",
+            resources=cast(dict[str, int], []),
+        ),
+        lambda: FactionResourceLedger(
+            player_id="player-a",
+            resources=cast(dict[str, int], {1: 1}),
+        ),
+        lambda: FactionResourceLedger(
+            player_id="player-a",
+            resources={" ": 1},
+        ),
+        lambda: FactionResourceLedger(
+            player_id="player-a",
+            resources={" pain ": 1, "pain": 2},
+        ),
+        lambda: FactionResourceLedger(
+            player_id="player-a",
+            resources={"pain": -1},
+        ),
+        lambda: FactionResourceLedger(
+            player_id="player-a",
+            resources=cast(dict[str, int], {"pain": "one"}),
+        ),
+        lambda: FactionResourceTransaction(
+            transaction_id="drukhari-test:bad-amount-type",
+            player_id="player-a",
+            battle_round=1,
+            resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+            transaction_kind=FactionResourceTransactionKind.GAIN,
+            amount=cast(int, "one"),
+            source_id="drukhari-test:bad-amount-type-source",
+        ),
+        lambda: FactionResourceLedger(
+            player_id="player-a",
+            transactions=cast(tuple[FactionResourceTransaction, ...], []),
+        ),
+        lambda: FactionResourceLedger(
+            player_id="player-a",
+            transactions=cast(tuple[FactionResourceTransaction, ...], ("bad",)),
+        ),
+        lambda: FactionResourceLedger(
+            player_id="player-b",
+            transactions=(invalid_transaction,),
+        ),
+        lambda: FactionResourceLedger(
+            player_id="player-a",
+            transactions=(invalid_transaction, invalid_transaction),
+        ),
+        lambda: faction_resource_spend_effect_payload(
+            resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+            amount=0,
+            reason="drukhari-test-invalid-amount",
+        ),
+        lambda: apply_faction_resource_spend_effect(
+            state=object(),
+            player_id="player-a",
+            source_id="drukhari-test:wrong-state",
+            effect_payload=spend_effect,
+        ),
+        lambda: apply_faction_resource_spend_effect(
+            state=_battle_state(),
+            player_id="player-a",
+            source_id="drukhari-test:no-token",
+            effect_payload=spend_effect,
+        ),
+        lambda: apply_faction_resource_spend_effect(
+            state=_battle_state(),
+            player_id="player-a",
+            source_id="drukhari-test:bad-amount",
+            effect_payload={
+                "effect_kind": FACTION_RESOURCE_SPEND_EFFECT_KIND,
+                "resource_kind": PAIN_TOKEN_RESOURCE_KIND,
+                "amount": "one",
+                "reason": "drukhari-test",
+            },
+        ),
+        lambda: faction_resource_result_enriched_payload(
+            effect_payload=[],
+            result=applied,
+        ),
+    )
+    for invalid_case in invalid_cases:
+        with pytest.raises(GameLifecycleError):
+            invalid_case()
+
+
+def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registries() -> None:
+    state = _battle_state()
+    decisions = DecisionController()
+    command_calls: list[str] = []
+    command_context = CommandPhaseStartContext(
+        state=state,
+        decisions=decisions,
+        active_player_id="player-a",
+    )
+    command_binding = CommandPhaseStartHookBinding(
+        hook_id="drukhari-test:command-hook",
+        source_id="drukhari-test:command-source",
+        handler=lambda context: command_calls.append(context.active_player_id),
+    )
+    command_registry = CommandPhaseStartHookRegistry.from_bindings((command_binding,))
+
+    assert command_registry.all_bindings() == (command_binding,)
+    command_registry.resolve(command_context)
+    assert command_calls == ["player-a"]
+    assert CommandPhaseStartHookRegistry.empty().all_bindings() == ()
+
+    command_invalid_cases: tuple[Callable[[], object], ...] = (
+        lambda: CommandPhaseStartContext(
+            state=cast(GameState, object()),
+            decisions=decisions,
+            active_player_id="player-a",
+        ),
+        lambda: CommandPhaseStartContext(
+            state=state,
+            decisions=cast(DecisionController, object()),
+            active_player_id="player-a",
+        ),
+        lambda: CommandPhaseStartContext(
+            state=state,
+            decisions=decisions,
+            active_player_id="player-b",
+        ),
+        lambda: CommandPhaseStartHookBinding(
+            hook_id=cast(str, 1),
+            source_id="drukhari-test:command-source",
+            handler=lambda context: command_calls.append(context.active_player_id),
+        ),
+        lambda: CommandPhaseStartHookBinding(
+            hook_id=" ",
+            source_id="drukhari-test:command-source",
+            handler=lambda context: command_calls.append(context.active_player_id),
+        ),
+        lambda: CommandPhaseStartHookBinding(
+            hook_id="drukhari-test:bad-handler",
+            source_id="drukhari-test:command-source",
+            handler=cast(CommandPhaseStartHandler, object()),
+        ),
+        lambda: CommandPhaseStartHookRegistry(
+            bindings=cast(tuple[CommandPhaseStartHookBinding, ...], []),
+        ),
+        lambda: CommandPhaseStartHookRegistry(
+            bindings=cast(tuple[CommandPhaseStartHookBinding, ...], ("bad",)),
+        ),
+        lambda: CommandPhaseStartHookRegistry.from_bindings((command_binding, command_binding)),
+        lambda: command_registry.resolve(cast(CommandPhaseStartContext, object())),
+    )
+    for command_invalid_case in command_invalid_cases:
+        with pytest.raises(GameLifecycleError):
+            command_invalid_case()
+
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    with pytest.raises(GameLifecycleError):
+        CommandPhaseStartContext(
+            state=state,
+            decisions=decisions,
+            active_player_id="player-a",
+        )
+    _set_current_battle_phase(state, BattlePhase.COMMAND)
+
+    target_unit = _unit_for_player(state, player_id="player-b")
+    destroyed_event = decisions.event_log.append(
+        "model_destroyed",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": BattlePhase.SHOOTING.value,
+            "destroying_player_id": "player-a",
+            "target_unit_instance_id": target_unit.unit_instance_id,
+            "model_instance_id": target_unit.own_models[-1].model_instance_id,
+        },
+    )
+    unit_destroyed_calls: list[str] = []
+    unit_destroyed_context = UnitDestroyedContext(
+        state=state,
+        decisions=decisions,
+        completed_phase=cast(BattlePhase, BattlePhase.SHOOTING.value),
+        model_destroyed_event_id=destroyed_event.event_id,
+        model_destroyed_payload=cast(dict[str, JsonValue], destroyed_event.payload),
+        destroying_player_id="player-a",
+        destroyed_unit_instance_id=target_unit.unit_instance_id,
+        destroyed_player_id="player-b",
+    )
+    unit_binding = UnitDestroyedHookBinding(
+        hook_id="drukhari-test:unit-destroyed-hook",
+        source_id="drukhari-test:unit-destroyed-source",
+        handler=lambda context: unit_destroyed_calls.append(context.destroyed_player_id),
+    )
+    unit_registry = UnitDestroyedHookRegistry.from_bindings((unit_binding,))
+
+    assert unit_destroyed_context.completed_phase is BattlePhase.SHOOTING
+    unit_registry.resolve(unit_destroyed_context)
+    assert unit_destroyed_calls == ["player-b"]
+    assert UnitDestroyedHookRegistry.empty().all_bindings() == ()
+
+    unit_invalid_cases: tuple[Callable[[], object], ...] = (
+        lambda: UnitDestroyedContext(
+            state=cast(GameState, object()),
+            decisions=decisions,
+            completed_phase=BattlePhase.SHOOTING,
+            model_destroyed_event_id=destroyed_event.event_id,
+            model_destroyed_payload=cast(dict[str, JsonValue], destroyed_event.payload),
+            destroying_player_id="player-a",
+            destroyed_unit_instance_id=target_unit.unit_instance_id,
+            destroyed_player_id="player-b",
+        ),
+        lambda: UnitDestroyedContext(
+            state=state,
+            decisions=cast(DecisionController, object()),
+            completed_phase=BattlePhase.SHOOTING,
+            model_destroyed_event_id=destroyed_event.event_id,
+            model_destroyed_payload=cast(dict[str, JsonValue], destroyed_event.payload),
+            destroying_player_id="player-a",
+            destroyed_unit_instance_id=target_unit.unit_instance_id,
+            destroyed_player_id="player-b",
+        ),
+        lambda: UnitDestroyedContext(
+            state=state,
+            decisions=decisions,
+            completed_phase=cast(BattlePhase, []),
+            model_destroyed_event_id=destroyed_event.event_id,
+            model_destroyed_payload=cast(dict[str, JsonValue], destroyed_event.payload),
+            destroying_player_id="player-a",
+            destroyed_unit_instance_id=target_unit.unit_instance_id,
+            destroyed_player_id="player-b",
+        ),
+        lambda: UnitDestroyedContext(
+            state=state,
+            decisions=decisions,
+            completed_phase=cast(BattlePhase, "unsupported"),
+            model_destroyed_event_id=destroyed_event.event_id,
+            model_destroyed_payload=cast(dict[str, JsonValue], destroyed_event.payload),
+            destroying_player_id="player-a",
+            destroyed_unit_instance_id=target_unit.unit_instance_id,
+            destroyed_player_id="player-b",
+        ),
+        lambda: UnitDestroyedContext(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.SHOOTING,
+            model_destroyed_event_id=destroyed_event.event_id,
+            model_destroyed_payload=cast(dict[str, JsonValue], []),
+            destroying_player_id="player-a",
+            destroyed_unit_instance_id=target_unit.unit_instance_id,
+            destroyed_player_id="player-b",
+        ),
+        lambda: UnitDestroyedContext(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.SHOOTING,
+            model_destroyed_event_id=destroyed_event.event_id,
+            model_destroyed_payload=cast(dict[str, JsonValue], destroyed_event.payload),
+            destroying_player_id="player-a",
+            destroyed_unit_instance_id=target_unit.unit_instance_id,
+            destroyed_player_id="player-a",
+        ),
+        lambda: UnitDestroyedHookBinding(
+            hook_id=cast(str, 1),
+            source_id="drukhari-test:unit-source",
+            handler=lambda context: unit_destroyed_calls.append(context.destroyed_player_id),
+        ),
+        lambda: UnitDestroyedHookBinding(
+            hook_id=" ",
+            source_id="drukhari-test:unit-source",
+            handler=lambda context: unit_destroyed_calls.append(context.destroyed_player_id),
+        ),
+        lambda: UnitDestroyedHookBinding(
+            hook_id="drukhari-test:bad-unit-handler",
+            source_id="drukhari-test:unit-source",
+            handler=cast(UnitDestroyedHandler, object()),
+        ),
+        lambda: UnitDestroyedHookRegistry(
+            bindings=cast(tuple[UnitDestroyedHookBinding, ...], []),
+        ),
+        lambda: UnitDestroyedHookRegistry(
+            bindings=cast(tuple[UnitDestroyedHookBinding, ...], ("bad",)),
+        ),
+        lambda: UnitDestroyedHookRegistry.from_bindings((unit_binding, unit_binding)),
+        lambda: unit_registry.resolve(cast(UnitDestroyedContext, object())),
+    )
+    for unit_invalid_case in unit_invalid_cases:
+        with pytest.raises(GameLifecycleError):
+            unit_invalid_case()
+
+
+def test_source_backed_reroll_payloads_and_lookup_are_fail_fast() -> None:
+    state = _battle_state()
+    unit = _unit_for_player(state, player_id="player-a")
+    permission = lithe_agility_advance_reroll_permission(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+    )
+    payload = source_backed_reroll_permission_effect_payload(
+        target_unit_instance_ids=(unit.unit_instance_id,),
+        permission=permission,
+        source_payload={"effect_kind": "drukhari-test-source"},
+    )
+
+    assert source_payload_from_reroll_effect_payload(payload) == {
+        "effect_kind": "drukhari-test-source"
+    }
+    state.record_persisting_effect(
+        _persisting_effect(
+            effect_id="drukhari-test:source-backed-other-owner",
+            unit_instance_id=unit.unit_instance_id,
+            owner_player_id="player-b",
+            effect_payload=payload,
+        )
+    )
+    state.record_persisting_effect(
+        _persisting_effect(
+            effect_id="drukhari-test:source-backed-non-object",
+            unit_instance_id=unit.unit_instance_id,
+            owner_player_id="player-a",
+            effect_payload=[],
+        )
+    )
+    wrong_timing_permission = RerollPermission(
+        source_id="drukhari-test:wrong-timing-permission",
+        timing_window="after_charge_roll",
+        owning_player_id="player-a",
+        eligible_roll_type="advance_roll",
+        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+    )
+    state.record_persisting_effect(
+        _persisting_effect(
+            effect_id="drukhari-test:source-backed-wrong-timing",
+            unit_instance_id=unit.unit_instance_id,
+            owner_player_id="player-a",
+            effect_payload=source_backed_reroll_permission_effect_payload(
+                target_unit_instance_ids=(unit.unit_instance_id,),
+                permission=wrong_timing_permission,
+                source_payload={"effect_kind": "drukhari-test-source"},
+            ),
+        )
+    )
+    state.record_persisting_effect(
+        _persisting_effect(
+            effect_id="drukhari-test:source-backed-valid",
+            unit_instance_id=unit.unit_instance_id,
+            owner_player_id="player-a",
+            effect_payload=payload,
+        )
+    )
+    assert (
+        source_backed_reroll_permission_for_unit(
+            state=state,
+            player_id="player-a",
+            unit_instance_id=unit.unit_instance_id,
+            roll_type="charge_roll",
+            timing_window="after_advance_roll",
+        )
+        is None
+    )
+    assert (
+        source_backed_reroll_permission_for_unit(
+            state=state,
+            player_id="player-a",
+            unit_instance_id=unit.unit_instance_id,
+            roll_type="advance_roll",
+            timing_window="after_advance_roll",
+        )
+        == permission
+    )
+
+    invalid_payload_cases: tuple[Callable[[], object], ...] = (
+        lambda: source_backed_reroll_permission_effect_payload(
+            target_unit_instance_ids=(unit.unit_instance_id,),
+            permission=cast(RerollPermission, object()),
+            source_payload={},
+        ),
+        lambda: source_backed_reroll_permission_effect_payload(
+            target_unit_instance_ids=cast(tuple[str, ...], []),
+            permission=permission,
+            source_payload={},
+        ),
+        lambda: source_backed_reroll_permission_effect_payload(
+            target_unit_instance_ids=(),
+            permission=permission,
+            source_payload={},
+        ),
+        lambda: source_backed_reroll_permission_effect_payload(
+            target_unit_instance_ids=(unit.unit_instance_id, unit.unit_instance_id),
+            permission=permission,
+            source_payload={},
+        ),
+        lambda: source_payload_from_reroll_effect_payload([]),
+        lambda: source_payload_from_reroll_effect_payload({"effect_kind": "wrong"}),
+        lambda: source_payload_from_reroll_effect_payload(
+            {
+                "effect_kind": SOURCE_BACKED_REROLL_PERMISSION_EFFECT_KIND,
+                "source_payload": [],
+            }
+        ),
+        lambda: source_backed_reroll_permission_for_unit(
+            state=state,
+            player_id=cast(str, 1),
+            unit_instance_id=unit.unit_instance_id,
+            roll_type="advance_roll",
+            timing_window="after_advance_roll",
+        ),
+        lambda: source_backed_reroll_permission_for_unit(
+            state=state,
+            player_id=" ",
+            unit_instance_id=unit.unit_instance_id,
+            roll_type="advance_roll",
+            timing_window="after_advance_roll",
+        ),
+        lambda: source_backed_reroll_permission_for_unit(
+            state=object(),
+            player_id="player-a",
+            unit_instance_id=unit.unit_instance_id,
+            roll_type="advance_roll",
+            timing_window="after_advance_roll",
+        ),
+    )
+    for invalid_case in invalid_payload_cases:
+        with pytest.raises(GameLifecycleError):
+            invalid_case()
+
+    malformed_permission_state = _battle_state()
+    malformed_permission_unit = _unit_for_player(malformed_permission_state, player_id="player-a")
+    malformed_permission_state.record_persisting_effect(
+        _persisting_effect(
+            effect_id="drukhari-test:source-backed-missing-permission",
+            unit_instance_id=malformed_permission_unit.unit_instance_id,
+            owner_player_id="player-a",
+            effect_payload={
+                "effect_kind": SOURCE_BACKED_REROLL_PERMISSION_EFFECT_KIND,
+                "source_payload": {"effect_kind": "drukhari-test-source"},
+            },
+        )
+    )
+    with pytest.raises(GameLifecycleError):
+        source_backed_reroll_permission_for_unit(
+            state=malformed_permission_state,
+            player_id="player-a",
+            unit_instance_id=malformed_permission_unit.unit_instance_id,
+            roll_type="advance_roll",
+            timing_window="after_advance_roll",
+        )
+
+    owner_drift_state = _battle_state()
+    owner_drift_unit = _unit_for_player(owner_drift_state, player_id="player-a")
+    owner_drift_permission = RerollPermission(
+        source_id="drukhari-test:owner-drift-permission",
+        timing_window="after_advance_roll",
+        owning_player_id="player-b",
+        eligible_roll_type="advance_roll",
+        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+    )
+    owner_drift_state.record_persisting_effect(
+        _persisting_effect(
+            effect_id="drukhari-test:source-backed-owner-drift",
+            unit_instance_id=owner_drift_unit.unit_instance_id,
+            owner_player_id="player-a",
+            effect_payload=source_backed_reroll_permission_effect_payload(
+                target_unit_instance_ids=(owner_drift_unit.unit_instance_id,),
+                permission=owner_drift_permission,
+                source_payload={"effect_kind": "drukhari-test-source"},
+            ),
+        )
+    )
+    with pytest.raises(GameLifecycleError):
+        source_backed_reroll_permission_for_unit(
+            state=owner_drift_state,
+            player_id="player-a",
+            unit_instance_id=owner_drift_unit.unit_instance_id,
+            roll_type="advance_roll",
+            timing_window="after_advance_roll",
+        )
+
+    duplicate_state = _battle_state()
+    duplicate_unit = _unit_for_player(duplicate_state, player_id="player-a")
+    duplicate_payload = source_backed_reroll_permission_effect_payload(
+        target_unit_instance_ids=(duplicate_unit.unit_instance_id,),
+        permission=lithe_agility_charge_reroll_permission(
+            state=duplicate_state,
+            player_id="player-a",
+            unit_instance_id=duplicate_unit.unit_instance_id,
+        ),
+        source_payload={"effect_kind": "drukhari-test-source"},
+    )
+    duplicate_state.record_persisting_effect(
+        _persisting_effect(
+            effect_id="drukhari-test:source-backed-duplicate-a",
+            unit_instance_id=duplicate_unit.unit_instance_id,
+            owner_player_id="player-a",
+            effect_payload=duplicate_payload,
+        )
+    )
+    duplicate_state.record_persisting_effect(
+        _persisting_effect(
+            effect_id="drukhari-test:source-backed-duplicate-b",
+            unit_instance_id=duplicate_unit.unit_instance_id,
+            owner_player_id="player-a",
+            effect_payload=duplicate_payload,
+        )
+    )
+    with pytest.raises(GameLifecycleError):
+        source_backed_reroll_permission_for_unit(
+            state=duplicate_state,
+            player_id="player-a",
+            unit_instance_id=duplicate_unit.unit_instance_id,
+            roll_type="charge_roll",
+            timing_window="after_charge_roll",
+        )
+
+
+def test_power_from_pain_helpers_validate_eligibility_and_payloads() -> None:
+    state = _battle_state()
+    unit = _unit_for_player(state, player_id="player-a")
+
+    wrong_state_cases: tuple[Callable[[], object], ...] = (
+        lambda: pain_tokens_available(object(), player_id="player-a"),
+        lambda: spend_pain_token(object(), player_id="player-a", source_id="drukhari-test"),
+        lambda: power_from_pain_target_unit_ids(object(), unit_instance_id=unit.unit_instance_id),
+        lambda: drukhari_rules_unit_can_empower_for_ability(
+            object(),
+            player_id="player-a",
+            unit_instance_id=unit.unit_instance_id,
+            pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
+        ),
+        lambda: pain_ability_keys_for_rules_unit(object(), unit_instance_id=unit.unit_instance_id),
+        lambda: unit_is_empowered_through_pain_for_ability(
+            object(),
+            player_id="player-a",
+            unit_instance_id=unit.unit_instance_id,
+            pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
+        ),
+        lambda: lithe_agility_advance_reroll_permission(
+            state=object(),
+            player_id="player-a",
+            unit_instance_id=unit.unit_instance_id,
+        ),
+    )
+    for wrong_state_case in wrong_state_cases:
+        with pytest.raises(GameLifecycleError):
+            wrong_state_case()
+
+    with pytest.raises(GameLifecycleError):
+        spend_pain_token(state, player_id="player-a", source_id="drukhari-test:no-token")
+    with pytest.raises(GameLifecycleError):
+        drukhari_rules_unit_can_empower_for_ability(
+            state,
+            player_id="missing-player",
+            unit_instance_id=unit.unit_instance_id,
+            pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
+        )
+
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_lithe_agility_ability(), _hatred_eternal_ability()),
+    )
+    assert power_from_pain_target_unit_ids(state, unit_instance_id=unit.unit_instance_id) == (
+        unit.unit_instance_id,
+    )
+    assert set(
+        pain_ability_keys_for_rules_unit(
+            state,
+            unit_instance_id=unit.unit_instance_id,
+        )
+    ) == {LITHE_AGILITY_ABILITY_KEY, HATRED_ETERNAL_ABILITY_KEY}
+    assert drukhari_rules_unit_can_empower_for_ability(
+        state,
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+        pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
+    )
+
+    player_b_unit = _unit_for_player(state, player_id="player-b")
+    with pytest.raises(GameLifecycleError):
+        drukhari_rules_unit_can_empower_for_ability(
+            state,
+            player_id="player-a",
+            unit_instance_id=player_b_unit.unit_instance_id,
+            pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
+        )
+    assert not drukhari_rules_unit_can_empower_for_ability(
+        state,
+        player_id="player-b",
+        unit_instance_id=player_b_unit.unit_instance_id,
+        pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
+    )
+
+    empowered_payload = power_from_pain_empowerment_payload(
+        unit_instance_id=unit.unit_instance_id,
+        target_unit_instance_ids=(unit.unit_instance_id,),
+        trigger="advance",
+        phase=BattlePhaseKind.MOVEMENT,
+        pain_ability_keys=(LITHE_AGILITY_ABILITY_KEY,),
+        source_context={"test": "empowered"},
+    )
+    state.record_persisting_effect(
+        _persisting_effect(
+            effect_id="drukhari-test:pain-empowered-direct",
+            unit_instance_id=unit.unit_instance_id,
+            owner_player_id="player-a",
+            effect_payload=empowered_payload,
+        )
+    )
+    assert unit_is_empowered_through_pain_for_ability(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+        pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
+    )
+    assert not drukhari_rules_unit_can_empower_for_ability(
+        state,
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+        pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
+    )
+
+    malformed_state = _battle_state()
+    malformed_unit = _unit_for_player(malformed_state, player_id="player-a")
+    malformed_state.record_persisting_effect(
+        _persisting_effect(
+            effect_id="drukhari-test:malformed-pain-effect",
+            unit_instance_id=malformed_unit.unit_instance_id,
+            owner_player_id="player-a",
+            effect_payload=[],
+        )
+    )
+    with pytest.raises(GameLifecycleError):
+        unit_is_empowered_through_pain_for_ability(
+            state=malformed_state,
+            player_id="player-a",
+            unit_instance_id=malformed_unit.unit_instance_id,
+            pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
+        )
+
+    malformed_keys_state = _battle_state()
+    malformed_keys_unit = _unit_for_player(malformed_keys_state, player_id="player-a")
+    malformed_keys_state.record_persisting_effect(
+        _persisting_effect(
+            effect_id="drukhari-test:malformed-pain-keys",
+            unit_instance_id=malformed_keys_unit.unit_instance_id,
+            owner_player_id="player-a",
+            effect_payload={
+                "effect_kind": "drukhari_power_from_pain_empowered",
+                "pain_ability_keys": "lithe_agility",
+            },
+        )
+    )
+    with pytest.raises(GameLifecycleError):
+        unit_is_empowered_through_pain_for_ability(
+            state=malformed_keys_state,
+            player_id="player-a",
+            unit_instance_id=malformed_keys_unit.unit_instance_id,
+            pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
+        )
+
+    non_power_state = _battle_state()
+    non_power_unit = _unit_for_player(non_power_state, player_id="player-a")
+    non_power_state.record_persisting_effect(
+        _persisting_effect(
+            effect_id="drukhari-test:source-backed-other-rule",
+            unit_instance_id=non_power_unit.unit_instance_id,
+            owner_player_id="player-a",
+            effect_payload=source_backed_reroll_permission_effect_payload(
+                target_unit_instance_ids=(non_power_unit.unit_instance_id,),
+                permission=lithe_agility_advance_reroll_permission(
+                    state=non_power_state,
+                    player_id="player-a",
+                    unit_instance_id=non_power_unit.unit_instance_id,
+                ),
+                source_payload={"effect_kind": "different_rule"},
+            ),
+        )
+    )
+    assert not unit_is_empowered_through_pain_for_ability(
+        state=non_power_state,
+        player_id="player-a",
+        unit_instance_id=non_power_unit.unit_instance_id,
+        pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
+    )
+
+    invalid_payload_cases: tuple[Callable[[], object], ...] = (
+        lambda: power_from_pain_empowerment_payload(
+            unit_instance_id=unit.unit_instance_id,
+            target_unit_instance_ids=cast(tuple[str, ...], []),
+            trigger="advance",
+            phase=BattlePhaseKind.MOVEMENT,
+            pain_ability_keys=(LITHE_AGILITY_ABILITY_KEY,),
+            source_context={},
+        ),
+        lambda: power_from_pain_empowerment_payload(
+            unit_instance_id=unit.unit_instance_id,
+            target_unit_instance_ids=(),
+            trigger="advance",
+            phase=BattlePhaseKind.MOVEMENT,
+            pain_ability_keys=(LITHE_AGILITY_ABILITY_KEY,),
+            source_context={},
+        ),
+        lambda: power_from_pain_empowerment_payload(
+            unit_instance_id=unit.unit_instance_id,
+            target_unit_instance_ids=(unit.unit_instance_id, unit.unit_instance_id),
+            trigger="advance",
+            phase=BattlePhaseKind.MOVEMENT,
+            pain_ability_keys=(LITHE_AGILITY_ABILITY_KEY,),
+            source_context={},
+        ),
+        lambda: power_from_pain_empowerment_payload(
+            unit_instance_id=unit.unit_instance_id,
+            target_unit_instance_ids=(unit.unit_instance_id,),
+            trigger="advance",
+            phase=BattlePhaseKind.MOVEMENT,
+            pain_ability_keys=cast(tuple[str, ...], []),
+            source_context={},
+        ),
+        lambda: power_from_pain_empowerment_payload(
+            unit_instance_id=unit.unit_instance_id,
+            target_unit_instance_ids=(unit.unit_instance_id,),
+            trigger="advance",
+            phase=BattlePhaseKind.MOVEMENT,
+            pain_ability_keys=(),
+            source_context={},
+        ),
+        lambda: power_from_pain_empowerment_payload(
+            unit_instance_id=unit.unit_instance_id,
+            target_unit_instance_ids=(unit.unit_instance_id,),
+            trigger="advance",
+            phase=BattlePhaseKind.MOVEMENT,
+            pain_ability_keys=(LITHE_AGILITY_ABILITY_KEY, LITHE_AGILITY_ABILITY_KEY),
+            source_context={},
+        ),
+        lambda: power_from_pain_empowerment_payload(
+            unit_instance_id=unit.unit_instance_id,
+            target_unit_instance_ids=(unit.unit_instance_id,),
+            trigger="advance",
+            phase=BattlePhaseKind.MOVEMENT,
+            pain_ability_keys=("unsupported",),
+            source_context={},
+        ),
+    )
+    for invalid_payload_case in invalid_payload_cases:
+        with pytest.raises(GameLifecycleError):
+            invalid_payload_case()
+
+
+def test_power_from_pain_runtime_hooks_validate_skips_and_duplicate_events() -> None:
+    state = _battle_state()
+    decisions = DecisionController()
+    unit = _unit_for_player(state, player_id="player-a")
+    target_unit = _unit_for_player(state, player_id="player-b")
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+
+    invalid_context_cases: tuple[Callable[[], object], ...] = (
+        lambda: army_rule.lithe_agility_advance_grant(cast(AdvanceMoveContext, object())),
+        lambda: army_rule.lithe_agility_charge_declaration_grant(
+            cast(ChargeDeclarationContext, object())
+        ),
+        lambda: army_rule.resolve_command_phase_start(cast(CommandPhaseStartContext, object())),
+        lambda: army_rule.resolve_battle_shock_outcome(cast(BattleShockOutcomeContext, object())),
+        lambda: army_rule.resolve_enemy_unit_destroyed(cast(UnitDestroyedContext, object())),
+    )
+    for invalid_context_case in invalid_context_cases:
+        with pytest.raises(GameLifecycleError):
+            invalid_context_case()
+
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_lithe_agility_ability(),),
+    )
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:normal-move-token",
+    )
+    assert (
+        army_rule.lithe_agility_advance_grant(
+            AdvanceMoveContext(
+                state=state,
+                player_id="player-a",
+                battle_round=state.battle_round,
+                unit_instance_id=unit.unit_instance_id,
+                movement_phase_action="normal_move",
+                movement_request_id="drukhari-test:normal-move-request",
+                movement_result_id="drukhari-test:normal-move-result",
+            )
+        )
+        is None
+    )
+
+    no_token_state = _battle_state()
+    _set_current_battle_phase(no_token_state, BattlePhase.CHARGE)
+    _mark_player_as_drukhari(
+        no_token_state,
+        player_id="player-a",
+        datasheet_abilities=(_lithe_agility_ability(),),
+    )
+    no_token_unit = _unit_for_player(no_token_state, player_id="player-a")
+    assert (
+        army_rule.lithe_agility_charge_declaration_grant(
+            ChargeDeclarationContext(
+                state=no_token_state,
+                player_id="player-a",
+                battle_round=no_token_state.battle_round,
+                unit_instance_id=no_token_unit.unit_instance_id,
+                selection_request_id="drukhari-test:no-token-charge-request",
+                selection_result_id="drukhari-test:no-token-charge-result",
+            )
+        )
+        is None
+    )
+
+    non_drukhari_command_state = _battle_state()
+    non_drukhari_decisions = DecisionController()
+    army_rule.resolve_command_phase_start(
+        CommandPhaseStartContext(
+            state=non_drukhari_command_state,
+            decisions=non_drukhari_decisions,
+            active_player_id="player-a",
+        )
+    )
+    assert pain_tokens_available(non_drukhari_command_state, player_id="player-a") == 0
+    assert non_drukhari_decisions.event_log.records == ()
+
+    passed_result = _battle_shock_result_for_unit(
+        state=state,
+        manager=manager,
+        player_id="player-b",
+        unit_instance_id=target_unit.unit_instance_id,
+        result_id="drukhari-test:passed-battle-shock",
+        fixed_rolls=(6, 6),
+    )
+    army_rule.resolve_battle_shock_outcome(
+        BattleShockOutcomeContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=manager,
+            result=passed_result,
+            active_player_id="player-b",
+            phase=BattlePhase.COMMAND,
+            auto_passed=False,
+            phase_start_battle_shocked_unit_ids=(),
+        )
+    )
+    assert pain_tokens_available(state, player_id="player-a") == 1
+
+    failed_result = _battle_shock_result_for_unit(
+        state=state,
+        manager=manager,
+        player_id="player-b",
+        unit_instance_id=target_unit.unit_instance_id,
+        result_id="drukhari-test:duplicate-battle-shock",
+        fixed_rolls=(1, 1),
+    )
+    failed_context = BattleShockOutcomeContext(
+        state=state,
+        decisions=decisions,
+        dice_manager=manager,
+        result=failed_result,
+        active_player_id="player-b",
+        phase=BattlePhase.COMMAND,
+        auto_passed=False,
+        phase_start_battle_shocked_unit_ids=(),
+    )
+    army_rule.resolve_battle_shock_outcome(failed_context)
+    army_rule.resolve_battle_shock_outcome(failed_context)
+    assert pain_tokens_available(state, player_id="player-a") == 2
+
+    same_player_result = _battle_shock_result_for_unit(
+        state=state,
+        manager=manager,
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+        result_id="drukhari-test:same-player-battle-shock",
+        fixed_rolls=(1, 1),
+    )
+    army_rule.resolve_battle_shock_outcome(
+        BattleShockOutcomeContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=manager,
+            result=same_player_result,
+            active_player_id="player-a",
+            phase=BattlePhase.COMMAND,
+            auto_passed=False,
+            phase_start_battle_shocked_unit_ids=(),
+        )
+    )
+    assert pain_tokens_available(state, player_id="player-a") == 2
+
+    non_drukhari_destroyed_state = _battle_state()
+    non_drukhari_destroyed_decisions = DecisionController()
+    non_drukhari_target = _unit_for_player(non_drukhari_destroyed_state, player_id="player-b")
+    non_drukhari_event = non_drukhari_destroyed_decisions.event_log.append(
+        "model_destroyed",
+        {
+            "game_id": non_drukhari_destroyed_state.game_id,
+            "battle_round": non_drukhari_destroyed_state.battle_round,
+            "active_player_id": non_drukhari_destroyed_state.active_player_id,
+            "phase": BattlePhase.SHOOTING.value,
+            "destroying_player_id": "player-a",
+            "target_unit_instance_id": non_drukhari_target.unit_instance_id,
+            "model_instance_id": non_drukhari_target.own_models[-1].model_instance_id,
+        },
+    )
+    army_rule.resolve_enemy_unit_destroyed(
+        UnitDestroyedContext(
+            state=non_drukhari_destroyed_state,
+            decisions=non_drukhari_destroyed_decisions,
+            completed_phase=BattlePhase.SHOOTING,
+            model_destroyed_event_id=non_drukhari_event.event_id,
+            model_destroyed_payload=cast(dict[str, JsonValue], non_drukhari_event.payload),
+            destroying_player_id="player-a",
+            destroyed_unit_instance_id=non_drukhari_target.unit_instance_id,
+            destroyed_player_id="player-b",
+        )
+    )
+    assert pain_tokens_available(non_drukhari_destroyed_state, player_id="player-a") == 0
+
+    destroyed_state = _battle_state()
+    _mark_player_as_drukhari(destroyed_state, player_id="player-a")
+    destroyed_decisions = DecisionController()
+    destroyed_target = _unit_for_player(destroyed_state, player_id="player-b")
+    destroyed_event = destroyed_decisions.event_log.append(
+        "model_destroyed",
+        {
+            "game_id": destroyed_state.game_id,
+            "battle_round": destroyed_state.battle_round,
+            "active_player_id": destroyed_state.active_player_id,
+            "phase": BattlePhase.SHOOTING.value,
+            "destroying_player_id": "player-a",
+            "target_unit_instance_id": destroyed_target.unit_instance_id,
+            "model_instance_id": destroyed_target.own_models[-1].model_instance_id,
+        },
+    )
+    destroyed_context = UnitDestroyedContext(
+        state=destroyed_state,
+        decisions=destroyed_decisions,
+        completed_phase=BattlePhase.SHOOTING,
+        model_destroyed_event_id=destroyed_event.event_id,
+        model_destroyed_payload=cast(dict[str, JsonValue], destroyed_event.payload),
+        destroying_player_id="player-a",
+        destroyed_unit_instance_id=destroyed_target.unit_instance_id,
+        destroyed_player_id="player-b",
+    )
+    army_rule.resolve_enemy_unit_destroyed(destroyed_context)
+    army_rule.resolve_enemy_unit_destroyed(destroyed_context)
+    assert pain_tokens_available(destroyed_state, player_id="player-a") == 1
+
+
+def test_generic_phase_modules_do_not_import_drukhari_faction_code() -> None:
+    root = Path(__file__).parents[2]
+    for relative_path in (
+        "src/warhammer40k_core/engine/phases/movement.py",
+        "src/warhammer40k_core/engine/phases/charge.py",
+    ):
+        source = (root / relative_path).read_text(encoding="utf-8")
+        assert "drukhari_power_from_pain" not in source
+        assert "warhammer_40000_11th.drukhari" not in source
+
+
+def _mark_player_as_drukhari(
+    state: GameState,
+    *,
+    player_id: str,
+    datasheet_abilities: tuple[DatasheetAbilityDescriptor, ...] = (),
+    faction_keywords: tuple[str, ...] = ("DRUKHARI",),
+) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != player_id:
+            updated_armies.append(army)
+            continue
+        updated_armies.append(
+            replace(
+                army,
+                detachment_selection=replace(
+                    army.detachment_selection,
+                    faction_id="drukhari",
+                ),
+                units=tuple(
+                    replace(
+                        unit,
+                        faction_keywords=faction_keywords,
+                        datasheet_abilities=datasheet_abilities or unit.datasheet_abilities,
+                    )
+                    for unit in army.units
+                ),
+            )
+        )
+    state.army_definitions = updated_armies
+
+
+def _unit_for_player(state: GameState, *, player_id: str) -> UnitInstance:
+    army = state.army_definition_for_player(player_id)
+    if army is None:
+        raise AssertionError(f"Missing army for {player_id}.")
+    return army.units[0]
+
+
+def _set_current_battle_phase(state: GameState, phase: BattlePhase) -> None:
+    state.battle_phase_index = state.battle_phase_sequence.index(phase)
+
+
+def _lithe_agility_ability() -> DatasheetAbilityDescriptor:
+    return DatasheetAbilityDescriptor(
+        ability_id="drukhari-test-lithe-agility",
+        name="Lithe Agility (Pain)",
+        source_id="drukhari-test:lithe-agility",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="When empowered, this unit can re-roll Advance and Charge rolls.",
+    )
+
+
+def _hatred_eternal_ability() -> DatasheetAbilityDescriptor:
+    return DatasheetAbilityDescriptor(
+        ability_id="drukhari-test-hatred-eternal",
+        name="Hatred Eternal (Pain)",
+        source_id="drukhari-test:hatred-eternal",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="When empowered, this unit can re-roll hit rolls.",
+    )
+
+
+def _battle_shock_result_for_unit(
+    *,
+    state: GameState,
+    manager: DiceRollManager,
+    player_id: str,
+    unit_instance_id: str,
+    result_id: str,
+    fixed_rolls: tuple[int, int],
+) -> BattleShockResult:
+    request = BattleShockTestRequest(
+        request_id=f"{result_id}:request",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id=player_id,
+        unit_instance_id=unit_instance_id,
+        reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
+        leadership_target=7,
+        below_half_strength_context=BelowHalfStrengthContext(
+            player_id=player_id,
+            unit_instance_id=unit_instance_id,
+            starting_model_count=5,
+            current_model_count=2,
+            single_model_starting_wounds=None,
+            single_model_wounds_remaining=None,
+        ),
+        spec=DiceRollSpec(
+            expression=DiceExpression(quantity=2, sides=6),
+            reason=f"Battle-shock test for {unit_instance_id}",
+            roll_type=BATTLE_SHOCK_ROLL_TYPE,
+            actor_id=unit_instance_id,
+        ),
+    )
+    return BattleShockResult.from_roll_state(
+        result_id=f"{result_id}:result",
+        request=request,
+        roll_state=manager.roll_fixed(request.spec, list(fixed_rolls)),
+    )
+
+
+def _persisting_effect(
+    *,
+    effect_id: str,
+    unit_instance_id: str,
+    owner_player_id: str,
+    effect_payload: JsonValue,
+    source_rule_id: str = SOURCE_RULE_ID,
+) -> PersistingEffect:
+    return PersistingEffect(
+        effect_id=effect_id,
+        source_rule_id=source_rule_id,
+        owner_player_id=owner_player_id,
+        target_unit_instance_ids=(unit_instance_id,),
+        started_battle_round=1,
+        started_phase=BattlePhaseKind.MOVEMENT,
+        expiration=EffectExpiration.end_phase(
+            battle_round=1,
+            phase=BattlePhaseKind.MOVEMENT,
+            player_id=owner_player_id,
+        ),
+        effect_payload=effect_payload,
+    )
+
+
+def _last_event_payload(decisions: DecisionController, event_type: str) -> dict[str, JsonValue]:
+    for record in reversed(decisions.event_log.records):
+        if record.event_type != event_type:
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            raise TypeError(f"{event_type} payload is not an object.")
+        return payload
+    raise AssertionError(f"Missing event {event_type}.")

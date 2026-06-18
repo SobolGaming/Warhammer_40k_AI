@@ -669,6 +669,7 @@ _CATEGORY_NAMES: Mapping[str, str] = {
     "core.reserve.deep_strike": "Deep Strike Reserve Arrival",
     "faction.army_rule.blessings_of_khorne": "World Eaters Army Rule",
     "faction.army_rule.corsairs_and_travelling_players": "Drukhari Army Rule",
+    "faction.army_rule.power_from_pain": "Drukhari Army Rule",
     "faction.army_rule.thrill_seekers": "Emperor's Children Army Rule",
     "faction.army_rule.nurgles_gift": "Death Guard Army Rule",
     "faction.army_rule.shadow_of_chaos": "Chaos Daemons Army Rule",

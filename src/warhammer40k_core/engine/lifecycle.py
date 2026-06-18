@@ -266,6 +266,7 @@ _CHARGE_DECISION_TYPES = frozenset(
     (
         SELECT_CHARGING_UNIT_DECISION_TYPE,
         SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
+        DICE_REROLL_DECISION_TYPE,
     )
 )
 _COMMAND_DECISION_TYPES = frozenset(
@@ -1209,6 +1210,18 @@ class GameLifecycle:
             if charge_status is not None:
                 return charge_status
             return self.advance_until_decision_or_terminal()
+        if (
+            record.request.decision_type == DICE_REROLL_DECISION_TYPE
+            and state.current_battle_phase is BattlePhase.CHARGE
+        ):
+            charge_status = self._charge_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if charge_status is not None:
+                return charge_status
+            return self.advance_until_decision_or_terminal()
         if is_destroyed_transport_disembark_proposal_request(record.request):
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
             if _destroyed_transport_request_is_fight_owned(
@@ -1746,6 +1759,9 @@ class GameLifecycle:
         self._command_phase_handler = CommandPhaseHandler(
             stratagem_index=runtime_stratagem_index,
             battle_shock_hooks=self._runtime_content_bundle.battle_shock_hook_registry,
+            command_phase_start_hooks=(
+                self._runtime_content_bundle.command_phase_start_hook_registry
+            ),
             ability_indexes_by_player_id=(
                 self._runtime_content_bundle.ability_indexes_by_player_id
             ),
@@ -1804,6 +1820,7 @@ class GameLifecycle:
             phase_end_objective_control_hooks=(
                 self._runtime_content_bundle.phase_end_objective_control_hook_registry
             ),
+            unit_destroyed_hooks=self._runtime_content_bundle.unit_destroyed_hook_registry,
             runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._runtime_content_activation_input_hash = _runtime_content_activation_input_hash(
