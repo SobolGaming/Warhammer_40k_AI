@@ -682,6 +682,9 @@ class GameLifecycle:
                     result=result,
                     decisions=self.decision_controller,
                     ruleset_descriptor=self._require_config().ruleset_descriptor,
+                    charge_target_restriction_hooks=(
+                        self._require_runtime_content_bundle().charge_target_restriction_hook_registry
+                    ),
                 )
             else:
                 malformed_status = self._movement_phase_handler.invalid_proposal_submission_status(
@@ -788,6 +791,9 @@ class GameLifecycle:
                 request=pending_request,
                 result=result,
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
+                charge_target_restriction_hooks=(
+                    self._require_runtime_content_bundle().charge_target_restriction_hook_registry
+                ),
             )
             if invalid_status is not None:
                 return invalid_status
@@ -1745,6 +1751,9 @@ class GameLifecycle:
             ruleset_descriptor=self._movement_phase_handler.ruleset_descriptor,
             parameterized_proposals=self._movement_phase_handler.parameterized_proposals,
             stratagem_index=runtime_stratagem_index,
+            advance_eligibility_hooks=(
+                self._runtime_content_bundle.advance_eligibility_hook_registry
+            ),
             advance_move_hooks=self._runtime_content_bundle.advance_move_hook_registry,
             fall_back_hooks=self._runtime_content_bundle.fall_back_hook_registry,
             movement_end_surge_hooks=(
@@ -1755,6 +1764,9 @@ class GameLifecycle:
         self._charge_phase_handler = ChargePhaseHandler(
             ruleset_descriptor=self._charge_phase_handler.ruleset_descriptor,
             charge_declaration_hooks=self._runtime_content_bundle.charge_declaration_hook_registry,
+            charge_target_restriction_hooks=(
+                self._runtime_content_bundle.charge_target_restriction_hook_registry
+            ),
             ability_indexes_by_player_id=(
                 self._runtime_content_bundle.ability_indexes_by_player_id
             ),
@@ -1766,6 +1778,9 @@ class GameLifecycle:
             stratagem_index=runtime_stratagem_index,
             shooting_unit_selected_hooks=(
                 self._runtime_content_bundle.shooting_unit_selected_hook_registry
+            ),
+            shooting_target_restriction_hooks=(
+                self._runtime_content_bundle.shooting_target_restriction_hook_registry
             ),
             shooting_end_surge_hooks=self._runtime_content_bundle.shooting_end_surge_hook_registry,
             runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,

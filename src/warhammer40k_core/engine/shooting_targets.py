@@ -64,6 +64,7 @@ class ShootingTargetViolationCode(StrEnum):
     LONE_OPERATIVE = "lone_operative"
     LOCKED_IN_COMBAT = "locked_in_combat"
     HUNTER_TARGET_KEYWORD_MISMATCH = "hunter_target_keyword_mismatch"
+    RUNTIME_TARGET_RESTRICTION = "runtime_target_restriction"
 
 
 class ShootingTargetCandidatePayload(TypedDict):

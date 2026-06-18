@@ -668,6 +668,7 @@ _CATEGORY_NAMES: Mapping[str, str] = {
     "core.descriptor": "Core Ability Descriptor",
     "core.reserve.deep_strike": "Deep Strike Reserve Arrival",
     "faction.army_rule.blessings_of_khorne": "World Eaters Army Rule",
+    "faction.army_rule.thrill_seekers": "Emperor's Children Army Rule",
     "faction.army_rule.nurgles_gift": "Death Guard Army Rule",
     "faction.army_rule.shadow_of_chaos": "Chaos Daemons Army Rule",
     "unknown.ability_text": "Unknown Abilities",
