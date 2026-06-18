@@ -14,6 +14,7 @@ from warhammer40k_core.core.weapon_profiles import (
     AbilityKind,
     AbilityParameter,
     AbilityTiming,
+    AntiKeywordMatchMode,
     AttackProfile,
     DamageProfile,
     RangeProfile,
@@ -109,6 +110,12 @@ def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
         AbilityDescriptor.melta(2),
         AbilityDescriptor.rapid_fire(1),
         AbilityDescriptor.anti_keyword("Infantry", 4),
+        AbilityDescriptor.anti_keyword("Vehicle/Monster", 5),
+        AbilityDescriptor.anti_keyword(
+            "Psyker",
+            2,
+            match_mode=AntiKeywordMatchMode.MISSING_KEYWORD,
+        ),
         AbilityDescriptor.sustained_hits(2, target_keywords=("INFANTRY/BEASTS",)),
         AbilityDescriptor.heavy(),
     )
@@ -131,9 +138,18 @@ def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
         {"name": "keyword", "value": "INFANTRY"},
         {"name": "threshold", "value": 4},
     ]
-    assert payloads[8]["target_keywords"] == ["INFANTRY", "BEASTS"]
-    assert payloads[9]["condition"] == AbilityCondition.STATIONARY_OR_POLICY_DEFINED.value
-    assert payloads[9]["timing"] == AbilityTiming.MOVEMENT_CONDITIONED.value
+    assert payloads[8]["parameters"] == [
+        {"name": "keyword", "value": "VEHICLE/MONSTER"},
+        {"name": "threshold", "value": 5},
+    ]
+    assert payloads[9]["parameters"] == [
+        {"name": "keyword", "value": "PSYKER"},
+        {"name": "match_mode", "value": AntiKeywordMatchMode.MISSING_KEYWORD.value},
+        {"name": "threshold", "value": 2},
+    ]
+    assert payloads[10]["target_keywords"] == ["INFANTRY", "BEASTS"]
+    assert payloads[11]["condition"] == AbilityCondition.STATIONARY_OR_POLICY_DEFINED.value
+    assert payloads[11]["timing"] == AbilityTiming.MOVEMENT_CONDITIONED.value
     assert "<" not in blob
     assert "object at 0x" not in blob
     assert tuple(AbilityDescriptor.from_payload(payload) for payload in payloads) == abilities

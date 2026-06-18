@@ -46,6 +46,7 @@ from warhammer40k_core.engine.army_mustering import (
 )
 from warhammer40k_core.engine.attack_sequence import (
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
     SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackModifierStackSet,
     AttackResolutionContextPayload,
@@ -108,6 +109,7 @@ from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionDecision,
     DestructionReactionKind,
     DestructionReactionSource,
+    FeelNoPainAttackCondition,
     FeelNoPainDecision,
     FeelNoPainResolution,
     FeelNoPainRoll,
@@ -3133,6 +3135,7 @@ def test_phase14h_pending_grouped_damage_payload_validates_fail_fast() -> None:
         "target_unit_instance_id": defender.unit_instance_id,
         "weapon_profile_id": weapon_profile.profile_id,
         "selected_weapon_ability_ids": [],
+        "is_psychic_attack": False,
         "damage_profile": weapon_profile.damage_profile.to_payload(),
         "hit_roll": hit_roll.to_payload(),
         "wound_roll": wound_roll.to_payload(),
@@ -6383,6 +6386,103 @@ def test_phase14e_benefit_of_cover_worsens_ballistic_skill_before_hit_roll() -> 
     assert payload["successful"] is False
 
 
+def test_psychic_attack_can_ignore_detrimental_skill_and_hit_roll_modifiers() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    state.record_persisting_effect(_phase13f_cover_effect(defender.unit_instance_id))
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="psychic-modifier-ignore-rifle",
+        keywords=(WeaponKeyword.PSYCHIC,),
+    )
+    sequence_id = "psychic-modifier-ignore"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    dice_manager = DiceRollManager(
+        sequence_id,
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=(
+            _fixed_roll_result(roll_id=f"{sequence_id}:hit", spec=hit_spec, value=3),
+            _fixed_roll_result(roll_id=f"{sequence_id}:wound", spec=wound_spec, value=1),
+        ),
+    )
+    attack_sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            replace(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+                hit_roll_modifier=-1,
+            ),
+        ),
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=attack_sequence,
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+    )
+    assert status is not None
+    request = _decision_request(status)
+    assert request.decision_type == SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE
+    assert cast(dict[str, object], request.payload)["skill_modifier"] == 1
+    assert cast(dict[str, object], request.payload)["hit_roll_modifier"] == -1
+    assert {option.option_id for option in request.options} >= {
+        "keep-all-modifiers",
+        "ignore-detrimental-modifiers",
+    }
+
+    lifecycle.decision_controller.submit_result(
+        DecisionResult.for_request(
+            result_id="psychic-modifier-ignore-selection",
+            request=request,
+            selected_option_id="ignore-detrimental-modifiers",
+        )
+    )
+    completed_sequence, _allocated_ids, follow_up_status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=cast(AttackSequence, remaining_sequence),
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+    )
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    payload = cast(dict[str, object], hit_payload["payload"])
+
+    assert completed_sequence is None
+    assert follow_up_status is None
+    assert payload["is_psychic_attack"] is True
+    assert payload["target_number"] == 3
+    assert payload["modifier"] == 0
+    assert payload["successful"] is True
+
+
 def test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_roll() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -9168,6 +9268,114 @@ def test_phase13c_forced_single_source_feel_no_pain_reduces_failed_save_damage()
     assert status is None
     assert fnp_payload["ignored_wounds"] == 1
     assert application["requested_damage"] == 1
+    assert updated_model.wounds_remaining == defender_model.wounds_remaining - 1
+
+
+def test_psychic_attack_classification_enables_psychic_only_feel_no_pain() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    source = FeelNoPainSource(
+        source_id="psychic-only-fnp",
+        threshold=5,
+        attack_condition=FeelNoPainAttackCondition.PSYCHIC_ATTACK,
+    )
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=defender_model.model_instance_id,
+        sources=(source,),
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="psychic-only-fnp-rifle",
+        keywords=(WeaponKeyword.PSYCHIC,),
+        damage_profile=DamageProfile.fixed(2),
+    )
+    attack_context_id = "psychic-only-fnp:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+    wound_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Wound roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.wound",
+        actor_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    fnp_spec_1 = feel_no_pain_roll_spec(
+        source=source,
+        player_id="player-b",
+        model_instance_id=defender_model.model_instance_id,
+        wound_index=1,
+    )
+    fnp_spec_2 = feel_no_pain_roll_spec(
+        source=source,
+        player_id="player-b",
+        model_instance_id=defender_model.model_instance_id,
+        wound_index=2,
+    )
+
+    completed_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="psychic-only-fnp",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "psychic-only-fnp",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id="psychic-only-fnp-hit", spec=hit_spec, value=6),
+                _fixed_roll_result(roll_id="psychic-only-fnp-wound", spec=wound_spec, value=6),
+                _fixed_roll_result(roll_id="psychic-only-fnp-save", spec=save_spec, value=1),
+                _fixed_roll_result(roll_id="psychic-only-fnp-1", spec=fnp_spec_1, value=5),
+                _fixed_roll_result(roll_id="psychic-only-fnp-2", spec=fnp_spec_2, value=2),
+            ),
+        ),
+    )
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    damage_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.DAMAGE,
+    )
+    damage_event_payload = cast(dict[str, object], damage_payload["payload"])
+    fnp_payload = cast(dict[str, object], damage_event_payload["feel_no_pain"])
+    source_payload = cast(dict[str, object], fnp_payload["source"])
+    updated_model = model_by_id(state=state, model_instance_id=defender_model.model_instance_id)
+
+    assert completed_sequence is None
+    assert status is None
+    assert cast(dict[str, object], hit_payload["payload"])["is_psychic_attack"] is True
+    assert source_payload["attack_condition"] == FeelNoPainAttackCondition.PSYCHIC_ATTACK.value
     assert updated_model.wounds_remaining == defender_model.wounds_remaining - 1
 
 
@@ -14498,6 +14706,81 @@ def test_weapon_declaration_payload_round_trips_and_preserves_selection_evidence
     assert pool.target_in_range_model_ids == ("army-beta:enemy:model-001",)
 
 
+def test_one_shot_weapon_use_is_battle_scoped_and_blocks_redeclaration() -> None:
+    one_shot_profile = replace(
+        _weapon_profile_by_wargear(
+            wargear_id="core-bolt-rifle",
+            weapon_profile_id="core-bolt-rifle:standard",
+        ),
+        profile_id="one-shot-bolt-rifle",
+        name="One-shot bolt rifle",
+        attack_profile=AttackProfile.fixed(1),
+        keywords=(WeaponKeyword.ONE_SHOT,),
+    )
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="one-shot-redeclaration",
+        catalog=_catalog_with_replaced_bolt_profiles((one_shot_profile,)),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    used_model = attacker.own_models[0]
+    used_wargear_id = attacker.wargear_selections[0].wargear_ids[0]
+    state.record_one_shot_weapon_selected(
+        model_instance_id=used_model.model_instance_id,
+        wargear_id=used_wargear_id,
+        weapon_profile_id=one_shot_profile.profile_id,
+        source_phase=BattlePhase.SHOOTING,
+        selection_id="one-shot-pre-used-selection",
+    )
+
+    encoded_state = cast(GameStatePayload, json.loads(json.dumps(state.to_payload())))
+    restored_state = GameState.from_payload(encoded_state)
+    assert not restored_state.one_shot_weapon_available(
+        model_instance_id=used_model.model_instance_id,
+        wargear_id=used_wargear_id,
+        weapon_profile_id=one_shot_profile.profile_id,
+    )
+
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=attacker.unit_instance_id,
+        selection_result_id="one-shot-select-unit",
+    )
+    request_payload = cast(dict[str, object], declaration_request.payload)
+    proposal_request = cast(dict[str, object], request_payload["proposal_request"])
+    weapons = cast(list[dict[str, object]], proposal_request["available_weapons"])
+
+    assert all(
+        weapon["model_instance_id"] != used_model.model_instance_id
+        for weapon in weapons
+        if weapon["weapon_profile_id"] == one_shot_profile.profile_id
+    )
+
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=units["enemy"].unit_instance_id,
+        weapon_profile_id=one_shot_profile.profile_id,
+    )
+    stale_payload = proposal.to_payload()
+    stale_payload["declarations"][0]["attacker_model_instance_id"] = used_model.model_instance_id
+    invalid_status = _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=stale_payload,
+        result_id="one-shot-stale-redeclaration",
+    )
+    invalid_payload = cast(dict[str, object], invalid_status.payload)
+    validation = cast(dict[str, object], invalid_payload["proposal_validation"])
+    violation = cast(list[dict[str, object]], validation["violations"])[0]
+
+    assert invalid_status.status_kind is LifecycleStatusKind.INVALID
+    assert violation["violation_code"] == "weapon_declaration_unavailable"
+    assert lifecycle.decision_controller.queue.peek_next() == declaration_request
+
+
 def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution() -> None:
     anti_vehicle = AbilityDescriptor.anti_keyword("Vehicle", 4)
     anti_infantry = AbilityDescriptor.anti_keyword("Infantry", 2)
@@ -15856,6 +16139,7 @@ def _destroyed_transport_attack_context_for_test(
         "target_unit_instance_id": transport.unit_instance_id,
         "weapon_profile_id": weapon_profile.profile_id,
         "selected_weapon_ability_ids": [],
+        "is_psychic_attack": False,
         "damage_profile": DamageProfile.fixed(
             transport.own_models[0].wounds_remaining
         ).to_payload(),

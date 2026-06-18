@@ -78,7 +78,7 @@ from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, Terrain
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
-    from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.game_state import GameState, OneShotWeaponUseRecord
 
 PILE_IN_ACTION = "pile_in"
 CONSOLIDATE_ACTION = "consolidate"
@@ -1289,7 +1289,11 @@ def available_melee_weapons_payloads(
                 ),
             }
         )
-        for weapon in _available_melee_weapons_for_unit(unit=unit, army_catalog=army_catalog)
+        for weapon in _available_melee_weapons_for_unit(
+            unit=unit,
+            army_catalog=army_catalog,
+            state=state,
+        )
     )
 
 
@@ -1328,6 +1332,7 @@ def validate_melee_declaration_rules(
     available = _available_melee_weapons_by_key(
         unit=unit,
         army_catalog=army_catalog,
+        state=state,
     )
     required_primary_model_ids = _required_primary_melee_model_ids(
         scenario=scenario,
@@ -1438,7 +1443,11 @@ def melee_attack_sequence_from_proposal(
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> AttackSequence:
     unit = _unit_by_id(scenario=scenario, unit_instance_id=proposal.unit_instance_id)
-    available = _available_melee_weapons_by_key(unit=unit, army_catalog=army_catalog)
+    available = _available_melee_weapons_by_key(
+        unit=unit,
+        army_catalog=army_catalog,
+        state=state,
+    )
     runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
     pools: list[RangedAttackPool] = []
     for declaration_index, declaration in enumerate(proposal.declarations):
@@ -1535,6 +1544,39 @@ def melee_attack_sequence_from_proposal(
         attacking_unit_instance_id=proposal.unit_instance_id,
         attack_pools=tuple(pools),
     )
+
+
+def record_one_shot_melee_weapon_uses(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    proposal: MeleeDeclarationProposal,
+    army_catalog: ArmyCatalog,
+    result_id: str,
+) -> tuple[OneShotWeaponUseRecord, ...]:
+    unit = _unit_by_id(scenario=scenario, unit_instance_id=proposal.unit_instance_id)
+    available = _available_melee_weapons_by_key(
+        unit=unit,
+        army_catalog=army_catalog,
+        state=None,
+    )
+    records: list[OneShotWeaponUseRecord] = []
+    for declaration_index, declaration in enumerate(proposal.declarations, start=1):
+        profile = available.get(declaration.weapon_key)
+        if profile is None:
+            raise GameLifecycleError("Accepted melee declaration references an unknown weapon.")
+        if not has_weapon_keyword(profile, WeaponKeyword.ONE_SHOT):
+            continue
+        records.append(
+            state.record_one_shot_weapon_selected(
+                model_instance_id=declaration.attacker_model_instance_id,
+                wargear_id=declaration.wargear_id,
+                weapon_profile_id=declaration.weapon_profile_id,
+                source_phase=BattlePhase.FIGHT,
+                selection_id=f"{result_id}:one-shot-melee-{declaration_index:03d}",
+            )
+        )
+    return tuple(records)
 
 
 def _epic_challenge_profile_if_applicable(
@@ -2646,6 +2688,7 @@ def _available_melee_weapons_by_key(
     *,
     unit: UnitInstance,
     army_catalog: ArmyCatalog,
+    state: GameState | None = None,
 ) -> dict[tuple[str, str, str], WeaponProfile]:
     return {
         (
@@ -2653,7 +2696,11 @@ def _available_melee_weapons_by_key(
             weapon["wargear_id"],
             weapon["weapon_profile"].profile_id,
         ): weapon["weapon_profile"]
-        for weapon in _available_melee_weapons_for_unit(unit=unit, army_catalog=army_catalog)
+        for weapon in _available_melee_weapons_for_unit(
+            unit=unit,
+            army_catalog=army_catalog,
+            state=state,
+        )
     }
 
 
@@ -2667,6 +2714,7 @@ def _available_melee_weapons_for_unit(
     *,
     unit: UnitInstance,
     army_catalog: ArmyCatalog,
+    state: GameState | None = None,
 ) -> tuple[_AvailableMeleeWeapon, ...]:
     weapons: list[_AvailableMeleeWeapon] = []
     for model in unit.own_models:
@@ -2679,6 +2727,16 @@ def _available_melee_weapons_for_unit(
                 wargear = _wargear_by_id(army_catalog=army_catalog, wargear_id=wargear_id)
                 for profile in wargear.weapon_profiles:
                     if profile.range_profile.kind is not RangeProfileKind.MELEE:
+                        continue
+                    if (
+                        state is not None
+                        and has_weapon_keyword(profile, WeaponKeyword.ONE_SHOT)
+                        and not state.one_shot_weapon_available(
+                            model_instance_id=model.model_instance_id,
+                            wargear_id=wargear_id,
+                            weapon_profile_id=profile.profile_id,
+                        )
+                    ):
                         continue
                     weapons.append(
                         {

@@ -70,6 +70,11 @@ class DevastatingWoundsEffect(StrEnum):
     NO_SAVES = "no_saves"
 
 
+class AntiKeywordMatchMode(StrEnum):
+    HAS_KEYWORD = "has_keyword"
+    MISSING_KEYWORD = "missing_keyword"
+
+
 class RangeProfileKind(StrEnum):
     DISTANCE = "distance"
     MELEE = "melee"
@@ -264,17 +269,41 @@ class AbilityDescriptor:
         )
 
     @classmethod
-    def anti_keyword(cls, keyword: str, threshold: int) -> Self:
-        canonical_keyword = _canonical_rule_keyword(keyword)
+    def anti_keyword(
+        cls,
+        keyword: str,
+        threshold: int,
+        *,
+        match_mode: AntiKeywordMatchMode = AntiKeywordMatchMode.HAS_KEYWORD,
+    ) -> Self:
+        canonical_keywords = _canonical_rule_keyword_group(keyword)
+        resolved_match_mode = anti_keyword_match_mode_from_token(match_mode)
         _validate_d6_critical_threshold("Anti keyword threshold", threshold)
+        ability_id_prefix = (
+            "anti-keyword"
+            if resolved_match_mode is AntiKeywordMatchMode.HAS_KEYWORD
+            else "anti-non-keyword"
+        )
+        name_prefix = (
+            "Anti" if resolved_match_mode is AntiKeywordMatchMode.HAS_KEYWORD else "Anti-Non"
+        )
+        keyword_name = "/".join(
+            canonical_keyword.replace("_", " ").title() for canonical_keyword in canonical_keywords
+        )
+        parameters = [
+            AbilityParameter(name="keyword", value="/".join(canonical_keywords)),
+            AbilityParameter(name="threshold", value=threshold),
+        ]
+        if resolved_match_mode is not AntiKeywordMatchMode.HAS_KEYWORD:
+            parameters.append(AbilityParameter(name="match_mode", value=resolved_match_mode.value))
         return cls(
-            ability_id=f"anti-keyword:{canonical_keyword.lower()}:{threshold}",
-            name=f"Anti-{canonical_keyword.replace('_', ' ').title()} {threshold}+",
-            ability_kind=AbilityKind.ANTI_KEYWORD,
-            parameters=(
-                AbilityParameter(name="keyword", value=canonical_keyword),
-                AbilityParameter(name="threshold", value=threshold),
+            ability_id=(
+                f"{ability_id_prefix}:{'/'.join(keyword.lower() for keyword in canonical_keywords)}"
+                f":{threshold}"
             ),
+            name=f"{name_prefix}-{keyword_name} {threshold}+",
+            ability_kind=AbilityKind.ANTI_KEYWORD,
+            parameters=tuple(parameters),
             timing=AbilityTiming.ATTACK_SEQUENCE,
         )
 
@@ -622,6 +651,17 @@ def devastating_wounds_effect_from_token(token: object) -> DevastatingWoundsEffe
         return DevastatingWoundsEffect(token)
     except ValueError as exc:
         raise WeaponProfileError(f"Unsupported DevastatingWoundsEffect token: {token}.") from exc
+
+
+def anti_keyword_match_mode_from_token(token: object) -> AntiKeywordMatchMode:
+    if type(token) is AntiKeywordMatchMode:
+        return token
+    if type(token) is not str:
+        raise WeaponProfileError("AntiKeywordMatchMode token must be a string.")
+    try:
+        return AntiKeywordMatchMode(token)
+    except ValueError as exc:
+        raise WeaponProfileError(f"Unsupported AntiKeywordMatchMode token: {token}.") from exc
 
 
 def range_profile_kind_from_token(token: object) -> RangeProfileKind:
@@ -978,16 +1018,24 @@ def _validate_single_positive_int_parameter(
 
 
 def _validate_anti_keyword_parameters(parameters: tuple[AbilityParameter, ...]) -> None:
-    if len(parameters) != 2:
-        raise WeaponProfileError("anti_keyword ability must include keyword and threshold.")
+    if len(parameters) not in {2, 3}:
+        raise WeaponProfileError(
+            "anti_keyword ability must include keyword and threshold, "
+            "and may include optional match_mode."
+        )
     by_name = {parameter.name: parameter for parameter in parameters}
-    if set(by_name) != {"keyword", "threshold"}:
-        raise WeaponProfileError("anti_keyword ability must include keyword and threshold.")
+    if set(by_name) not in ({"keyword", "threshold"}, {"keyword", "threshold", "match_mode"}):
+        raise WeaponProfileError(
+            "anti_keyword ability must include keyword and threshold, "
+            "and may include optional match_mode."
+        )
     keyword = by_name["keyword"].value
     if type(keyword) is not str:
         raise WeaponProfileError("anti_keyword keyword parameter must be a string.")
-    if _canonical_rule_keyword(keyword) != keyword:
+    if "/".join(_canonical_rule_keyword_group(keyword)) != keyword:
         raise WeaponProfileError("anti_keyword keyword parameter must be canonical.")
+    if "match_mode" in by_name:
+        anti_keyword_match_mode_from_token(by_name["match_mode"].value)
     _validate_d6_critical_threshold(
         "anti_keyword threshold parameter",
         by_name["threshold"].value,
@@ -1007,6 +1055,20 @@ def _canonical_rule_keyword(keyword: object) -> str:
     if not stripped:
         raise WeaponProfileError("Rule keyword must not be empty.")
     return stripped.upper().replace(" ", "_").replace("-", "_")
+
+
+def _canonical_rule_keyword_group(keyword: object) -> tuple[str, ...]:
+    if type(keyword) is not str:
+        raise WeaponProfileError("Rule keyword must be a string.")
+    keywords: list[str] = []
+    seen: set[str] = set()
+    for part in keyword.split("/"):
+        canonical = _canonical_rule_keyword(part)
+        if canonical in seen:
+            raise WeaponProfileError("Rule keyword group must not contain duplicates.")
+        seen.add(canonical)
+        keywords.append(canonical)
+    return tuple(keywords)
 
 
 def _validate_d6_critical_threshold(field_name: str, value: object) -> int:
