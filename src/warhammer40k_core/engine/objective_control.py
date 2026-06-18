@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
@@ -24,6 +24,10 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.runtime_modifiers import (
+    ObjectiveControlModifierContext,
+    RuntimeModifierRegistry,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
@@ -398,6 +402,9 @@ class ObjectiveControlContext:
     terrain_objectives: tuple[Objective, ...] = ()
     terrain_features: tuple[TerrainFeatureDefinition, ...] = ()
     state: GameState | None = None
+    runtime_modifier_registry: RuntimeModifierRegistry = field(
+        default_factory=RuntimeModifierRegistry.empty
+    )
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -461,6 +468,10 @@ class ObjectiveControlContext:
             raise GameLifecycleError("Terrain objective control requires a RulesetDescriptor.")
         if self.state is not None and type(self.state) is not GameState:
             raise GameLifecycleError("ObjectiveControlContext state must be GameState.")
+        if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
+            raise GameLifecycleError(
+                "ObjectiveControlContext runtime_modifier_registry must be a registry."
+            )
 
     @classmethod
     def from_game_state(
@@ -471,6 +482,7 @@ class ObjectiveControlContext:
         phase: BattlePhase | str,
         ruleset_descriptor: RulesetDescriptor | None = None,
         terrain_objectives: tuple[Objective, ...] = (),
+        runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     ) -> Self:
         from warhammer40k_core.engine.game_state import GameState
 
@@ -508,6 +520,11 @@ class ObjectiveControlContext:
             terrain_objectives=resolved_terrain_objectives,
             terrain_features=terrain_features,
             state=state,
+            runtime_modifier_registry=(
+                RuntimeModifierRegistry.empty()
+                if runtime_modifier_registry is None
+                else runtime_modifier_registry
+            ),
         )
 
 
@@ -600,6 +617,7 @@ def resolve_objective_control(context: ObjectiveControlContext) -> ObjectiveCont
                 model_instance=model_instance_by_id[geometry_model.model_id],
                 battle_shocked_unit_ids=context.battle_shocked_unit_ids,
                 state=context.state,
+                runtime_modifier_registry=context.runtime_modifier_registry,
             )
             for geometry_model in spatial_index.models_controlling_objective_marker(marker)
             if model_instance_by_id[geometry_model.model_id].is_alive
@@ -706,6 +724,7 @@ def _objective_control_contribution(
     model_instance: ModelInstance,
     battle_shocked_unit_ids: tuple[str, ...],
     state: GameState | None,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> ObjectiveControlContribution:
     context = DistanceMeasurementContext.from_objective_marker_to_model(
         marker_id=marker.objective_marker_id,
@@ -719,12 +738,16 @@ def _objective_control_contribution(
         battle_shocked=False,
         state=state,
         unit_instance_id=placement.unit_instance_id,
+        runtime_modifier_registry=runtime_modifier_registry,
+        model_instance_id=placement.model_instance_id,
     )
     effective_objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
         battle_shocked=battle_shocked,
         state=state,
         unit_instance_id=placement.unit_instance_id,
+        runtime_modifier_registry=runtime_modifier_registry,
+        model_instance_id=placement.model_instance_id,
     )
     return ObjectiveControlContribution(
         player_id=placement.player_id,
@@ -779,6 +802,7 @@ def _terrain_objective_result(
                 model_instance=model_instance_by_id[geometry_model.model_id],
                 battle_shocked_unit_ids=context.battle_shocked_unit_ids,
                 state=context.state,
+                runtime_modifier_registry=context.runtime_modifier_registry,
             ),
         )
         if contribution is not None
@@ -798,6 +822,7 @@ def _terrain_objective_contribution(
     model_instance: ModelInstance,
     battle_shocked_unit_ids: tuple[str, ...],
     state: GameState | None,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> ObjectiveControlContribution | None:
     horizontal_distance = shapely_backend.base_footprint_distance_to_bounds(
         geometry_model.base,
@@ -815,12 +840,16 @@ def _terrain_objective_contribution(
         battle_shocked=False,
         state=state,
         unit_instance_id=placement.unit_instance_id,
+        runtime_modifier_registry=runtime_modifier_registry,
+        model_instance_id=placement.model_instance_id,
     )
     effective_objective_control_characteristic = model_objective_control_characteristic(
         model_instance,
         battle_shocked=battle_shocked,
         state=state,
         unit_instance_id=placement.unit_instance_id,
+        runtime_modifier_registry=runtime_modifier_registry,
+        model_instance_id=placement.model_instance_id,
     )
     return ObjectiveControlContribution(
         player_id=placement.player_id,
@@ -976,11 +1005,9 @@ def model_objective_control_characteristic(
     battle_shocked: bool,
     state: GameState | None = None,
     unit_instance_id: str | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    model_instance_id: str | None = None,
 ) -> CharacteristicValue:
-    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
-        army_rule,
-    )
-
     if type(model) is not ModelInstance:
         raise GameLifecycleError("Objective control requires a ModelInstance.")
     if type(battle_shocked) is not bool:
@@ -995,13 +1022,19 @@ def model_objective_control_characteristic(
             if state is None:
                 return characteristic
             if unit_instance_id is None:
-                raise GameLifecycleError(
-                    "Objective control Death Guard modifier requires unit_instance_id."
+                raise GameLifecycleError("Objective control modifier requires unit_instance_id.")
+            resolved_model_id = (
+                model.model_instance_id if model_instance_id is None else model_instance_id
+            )
+            runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
+            modified = runtime_modifiers.modified_objective_control(
+                ObjectiveControlModifierContext(
+                    state=state,
+                    unit_instance_id=unit_instance_id,
+                    model_instance_id=resolved_model_id,
+                    base_objective_control=characteristic.final,
+                    current_objective_control=characteristic.final,
                 )
-            modified = army_rule.nurgles_gift_modified_objective_control(
-                state=state,
-                unit_instance_id=unit_instance_id,
-                base_objective_control=characteristic.final,
             )
             if modified == characteristic.final:
                 return characteristic
@@ -1010,12 +1043,20 @@ def model_objective_control_characteristic(
                 raw=characteristic.raw,
                 base=characteristic.base,
                 final=modified,
-                applied_modifier_ids=tuple(
-                    dict.fromkeys((*characteristic.applied_modifier_ids, army_rule.SOURCE_RULE_ID))
-                ),
+                applied_modifier_ids=characteristic.applied_modifier_ids,
                 value_kind=characteristic.value_kind,
             )
     raise GameLifecycleError("ModelInstance is missing Objective Control.")
+
+
+def _runtime_modifier_registry(
+    registry: RuntimeModifierRegistry | None,
+) -> RuntimeModifierRegistry:
+    if registry is None:
+        return RuntimeModifierRegistry.empty()
+    if type(registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError("Objective control runtime modifier registry is invalid.")
+    return registry
 
 
 def _validate_result_status(result: ObjectiveControlResult) -> None:

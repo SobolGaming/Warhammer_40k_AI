@@ -39,6 +39,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
@@ -75,6 +76,9 @@ class CommandPhaseHandler:
     battle_shock_hooks: BattleShockHookRegistry = field(
         default_factory=BattleShockHookRegistry.empty
     )
+    runtime_modifier_registry: RuntimeModifierRegistry = field(
+        default_factory=RuntimeModifierRegistry.empty
+    )
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = field(
         default_factory=_empty_ability_indexes
     )
@@ -84,6 +88,10 @@ class CommandPhaseHandler:
             raise GameLifecycleError("CommandPhaseHandler stratagem_index must be an index.")
         if type(self.battle_shock_hooks) is not BattleShockHookRegistry:
             raise GameLifecycleError("CommandPhaseHandler battle_shock_hooks must be a registry.")
+        if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
+            raise GameLifecycleError(
+                "CommandPhaseHandler runtime_modifier_registry must be a registry."
+            )
         object.__setattr__(
             self,
             "ability_indexes_by_player_id",
@@ -150,6 +158,7 @@ class CommandPhaseHandler:
                 state=state,
                 decisions=decisions,
                 battle_shock_hooks=self.battle_shock_hooks,
+                runtime_modifier_registry=self.runtime_modifier_registry,
                 ability_index=_ability_index_for_player(
                     self.ability_indexes_by_player_id,
                     player_id=active_player_id,
@@ -868,6 +877,7 @@ def _resolve_battle_shock_step(
     state: GameState,
     decisions: DecisionController,
     battle_shock_hooks: BattleShockHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
     ability_index: AbilityCatalogIndex,
 ) -> None:
     active_player_id = _active_player_id(state)
@@ -889,6 +899,7 @@ def _resolve_battle_shock_step(
         starting_strength_records=tuple(state.starting_strength_records),
         state=state,
         ability_index=ability_index,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     result_payloads: list[JsonValue] = []

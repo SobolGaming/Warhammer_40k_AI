@@ -122,6 +122,7 @@ from warhammer40k_core.engine.reserves import (
     reserve_origin_from_token,
     resolve_unarrived_reserve_destruction,
 )
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
     FinalScoringResult,
     PrimaryObjectiveTurnStartState,
@@ -1376,7 +1377,11 @@ class GameState:
         self._record_primary_objective_turn_start_boundary_if_available()
         self._expire_persisting_effects_at_current_phase_start()
 
-    def advance_to_next_battle_phase(self) -> BattlePhase:
+    def advance_to_next_battle_phase(
+        self,
+        *,
+        runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    ) -> BattlePhase:
         if self.stage is not GameLifecycleStage.BATTLE:
             raise GameLifecycleError("GameState can advance battle phases only during battle.")
         if self.battle_phase_index is None:
@@ -1395,6 +1400,7 @@ class GameState:
         phase_end_record = self._record_objective_control_boundary(
             completed_phase=completed_phase,
             timing=ObjectiveControlTiming.PHASE_END,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         self._score_objective_control_boundary(phase_end_record)
         if self.battle_phase_index + 1 < len(self.battle_phase_sequence):
@@ -1426,6 +1432,7 @@ class GameState:
         turn_end_record = self._record_objective_control_boundary(
             completed_phase=completed_phase,
             timing=ObjectiveControlTiming.TURN_END,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         self._score_objective_control_boundary(turn_end_record)
         if completed_phase is BattlePhase.COMMAND:
@@ -1467,7 +1474,9 @@ class GameState:
         if battle_round_ended:
             self._expire_persisting_effects_at_current_battle_round_start()
         self._expire_persisting_effects_at_current_turn_start()
-        self._record_primary_objective_turn_start_boundary_if_available()
+        self._record_primary_objective_turn_start_boundary_if_available(
+            runtime_modifier_registry=runtime_modifier_registry
+        )
         self._expire_persisting_effects_at_current_phase_start()
         return completed_phase
 
@@ -4155,6 +4164,7 @@ class GameState:
         *,
         completed_phase: BattlePhase,
         timing: ObjectiveControlTiming,
+        runtime_modifier_registry: RuntimeModifierRegistry | None,
     ) -> ObjectiveControlRecord:
         if self.mission_setup is None:
             raise GameLifecycleError("Objective control updates require MissionSetup.")
@@ -4168,6 +4178,7 @@ class GameState:
                 timing=timing,
                 phase=completed_phase,
                 ruleset_descriptor=self._ruleset_descriptor_for_runtime_policy(),
+                runtime_modifier_registry=runtime_modifier_registry,
             )
         )
         retained_record = apply_sticky_objective_control(
@@ -4196,7 +4207,11 @@ class GameState:
             key=lambda state: state.state_id,
         )
 
-    def _record_primary_objective_turn_start_boundary_if_available(self) -> None:
+    def _record_primary_objective_turn_start_boundary_if_available(
+        self,
+        *,
+        runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    ) -> None:
         if self.mission_setup is None or self.battlefield_state is None:
             return
         if self.active_player_id is None:
@@ -4210,6 +4225,7 @@ class GameState:
                 timing=ObjectiveControlTiming.PHASE_END,
                 phase=current_phase,
                 ruleset_descriptor=self._ruleset_descriptor_for_runtime_policy(),
+                runtime_modifier_registry=runtime_modifier_registry,
             )
         )
         controlled_objective_ids = tuple(

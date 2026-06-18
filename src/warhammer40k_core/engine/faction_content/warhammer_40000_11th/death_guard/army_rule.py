@@ -5,6 +5,7 @@ from dataclasses import replace
 from enum import StrEnum
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_formation_hooks import (
     SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
@@ -23,6 +24,18 @@ from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContri
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.rules_units import rules_unit_owner_player_id
+from warhammer40k_core.engine.runtime_modifiers import (
+    HitRollModifierBinding,
+    HitRollModifierContext,
+    MovementBudgetModifierBinding,
+    MovementBudgetModifierContext,
+    ObjectiveControlModifierBinding,
+    ObjectiveControlModifierContext,
+    SaveOptionModifierBinding,
+    SaveOptionModifierContext,
+    UnitCharacteristicModifierBinding,
+    UnitCharacteristicModifierContext,
+)
 from warhammer40k_core.engine.saves import SaveKind, SaveOption
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry import shapely_backend
@@ -62,6 +75,46 @@ def runtime_contribution() -> RuntimeContentContribution:
                 source_id=SOURCE_RULE_ID,
                 request_handler=plague_selection_request,
                 result_handler=apply_plague_selection_result,
+            ),
+        ),
+        unit_characteristic_modifier_bindings=(
+            UnitCharacteristicModifierBinding(
+                modifier_id=f"{HOOK_ID}:toughness",
+                source_id=SOURCE_RULE_ID,
+                handler=nurgles_gift_toughness_modifier,
+            ),
+            UnitCharacteristicModifierBinding(
+                modifier_id=f"{HOOK_ID}:leadership",
+                source_id=SOURCE_RULE_ID,
+                handler=nurgles_gift_leadership_modifier,
+            ),
+        ),
+        hit_roll_modifier_bindings=(
+            HitRollModifierBinding(
+                modifier_id=f"{HOOK_ID}:melee-hit-roll",
+                source_id=SOURCE_RULE_ID,
+                handler=nurgles_gift_hit_roll_modifier_handler,
+            ),
+        ),
+        save_option_modifier_bindings=(
+            SaveOptionModifierBinding(
+                modifier_id=f"{HOOK_ID}:armour-save-option",
+                source_id=SOURCE_RULE_ID,
+                handler=nurgles_gift_save_option_modifier,
+            ),
+        ),
+        movement_budget_modifier_bindings=(
+            MovementBudgetModifierBinding(
+                modifier_id=f"{HOOK_ID}:movement-budget",
+                source_id=SOURCE_RULE_ID,
+                handler=nurgles_gift_movement_budget_modifier,
+            ),
+        ),
+        objective_control_modifier_bindings=(
+            ObjectiveControlModifierBinding(
+                modifier_id=f"{HOOK_ID}:objective-control",
+                source_id=SOURCE_RULE_ID,
+                handler=nurgles_gift_objective_control_modifier,
             ),
         ),
     )
@@ -201,6 +254,18 @@ def nurgles_gift_modified_toughness(
     return base_toughness
 
 
+def nurgles_gift_toughness_modifier(context: UnitCharacteristicModifierContext) -> int:
+    if type(context) is not UnitCharacteristicModifierContext:
+        raise GameLifecycleError("Nurgle's Gift toughness modifier requires context.")
+    if context.characteristic is not Characteristic.TOUGHNESS:
+        return context.current_value
+    return nurgles_gift_modified_toughness(
+        state=context.state,
+        target_unit_instance_id=context.unit_instance_id,
+        base_toughness=context.current_value,
+    )
+
+
 def nurgles_gift_hit_roll_modifier(
     *,
     state: GameState,
@@ -221,6 +286,16 @@ def nurgles_gift_hit_roll_modifier(
         ):
             return -1
     return 0
+
+
+def nurgles_gift_hit_roll_modifier_handler(context: HitRollModifierContext) -> int:
+    if type(context) is not HitRollModifierContext:
+        raise GameLifecycleError("Nurgle's Gift hit roll modifier requires context.")
+    return nurgles_gift_hit_roll_modifier(
+        state=context.state,
+        attacker_model_instance_id=context.attacker_model_instance_id,
+        source_phase=context.source_phase,
+    )
 
 
 def nurgles_gift_modified_save_options(
@@ -255,6 +330,18 @@ def nurgles_gift_modified_save_options(
     return tuple(modified)
 
 
+def nurgles_gift_save_option_modifier(
+    context: SaveOptionModifierContext,
+) -> tuple[SaveOption, ...]:
+    if type(context) is not SaveOptionModifierContext:
+        raise GameLifecycleError("Nurgle's Gift save option modifier requires context.")
+    return nurgles_gift_modified_save_options(
+        state=context.state,
+        target_unit_instance_id=context.target_unit_instance_id,
+        save_options=context.save_options,
+    )
+
+
 def nurgles_gift_modified_leadership_target(
     *,
     state: GameState,
@@ -272,6 +359,18 @@ def nurgles_gift_modified_leadership_target(
     ):
         return base_leadership + 1
     return base_leadership
+
+
+def nurgles_gift_leadership_modifier(context: UnitCharacteristicModifierContext) -> int:
+    if type(context) is not UnitCharacteristicModifierContext:
+        raise GameLifecycleError("Nurgle's Gift Leadership modifier requires context.")
+    if context.characteristic is not Characteristic.LEADERSHIP:
+        return context.current_value
+    return nurgles_gift_modified_leadership_target(
+        state=context.state,
+        unit_instance_id=context.unit_instance_id,
+        base_leadership=context.current_value,
+    )
 
 
 def nurgles_gift_modified_objective_control(
@@ -293,6 +392,16 @@ def nurgles_gift_modified_objective_control(
     return base_objective_control
 
 
+def nurgles_gift_objective_control_modifier(context: ObjectiveControlModifierContext) -> int:
+    if type(context) is not ObjectiveControlModifierContext:
+        raise GameLifecycleError("Nurgle's Gift Objective Control modifier requires context.")
+    return nurgles_gift_modified_objective_control(
+        state=context.state,
+        unit_instance_id=context.unit_instance_id,
+        base_objective_control=context.current_objective_control,
+    )
+
+
 def nurgles_gift_modified_movement_inches(
     *,
     state: GameState,
@@ -311,6 +420,16 @@ def nurgles_gift_modified_movement_inches(
     ):
         return max(0.0, movement - 1.0)
     return movement
+
+
+def nurgles_gift_movement_budget_modifier(context: MovementBudgetModifierContext) -> float:
+    if type(context) is not MovementBudgetModifierContext:
+        raise GameLifecycleError("Nurgle's Gift Movement modifier requires context.")
+    return nurgles_gift_modified_movement_inches(
+        state=context.state,
+        unit_instance_id=context.unit_instance_id,
+        base_movement_inches=context.current_movement_inches,
+    )
 
 
 def afflicting_death_guard_player_ids(

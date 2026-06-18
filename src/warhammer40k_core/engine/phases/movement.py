@@ -128,6 +128,10 @@ from warhammer40k_core.engine.reserves import (
     apply_reinforcement_placement_to_battlefield,
     resolve_reserve_arrival,
 )
+from warhammer40k_core.engine.runtime_modifiers import (
+    MovementBudgetModifierContext,
+    RuntimeModifierRegistry,
+)
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.stratagems import (
     CORE_FIRE_OVERWATCH_HANDLER_ID,
@@ -2359,6 +2363,9 @@ class MovementPhaseHandler:
     movement_end_surge_hooks: MovementEndSurgeHookRegistry = field(
         default_factory=MovementEndSurgeHookRegistry.empty
     )
+    runtime_modifier_registry: RuntimeModifierRegistry = field(
+        default_factory=RuntimeModifierRegistry.empty
+    )
 
     def __post_init__(self) -> None:
         if (
@@ -2381,6 +2388,10 @@ class MovementPhaseHandler:
         if type(self.movement_end_surge_hooks) is not MovementEndSurgeHookRegistry:
             raise GameLifecycleError(
                 "MovementPhaseHandler movement_end_surge_hooks must be a registry."
+            )
+        if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
+            raise GameLifecycleError(
+                "MovementPhaseHandler runtime_modifier_registry must be a registry."
             )
 
     @property
@@ -2573,6 +2584,7 @@ class MovementPhaseHandler:
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 fall_back_hooks=self.fall_back_hooks,
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE:
             return _apply_movement_action_decision(
@@ -2583,6 +2595,7 @@ class MovementPhaseHandler:
                 reaction_queue=reaction_queue,
                 stratagem_index=self.stratagem_index,
                 advance_move_hooks=self.advance_move_hooks,
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE:
             return _apply_advance_move_grant_decision(
@@ -2593,6 +2606,7 @@ class MovementPhaseHandler:
                 reaction_queue=reaction_queue,
                 stratagem_index=self.stratagem_index,
                 advance_move_hooks=self.advance_move_hooks,
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
             return _apply_movement_proposal_decision(
@@ -2604,6 +2618,7 @@ class MovementPhaseHandler:
                 stratagem_index=self.stratagem_index,
                 advance_move_hooks=self.advance_move_hooks,
                 fall_back_hooks=self.fall_back_hooks,
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE:
             return _apply_reinforcement_unit_selection_decision(
@@ -4921,6 +4936,7 @@ def _apply_movement_action_decision(  # noqa: RET503
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
     advance_move_hooks: AdvanceMoveHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -5216,6 +5232,7 @@ def _apply_advance_move_grant_decision(
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
     advance_move_hooks: AdvanceMoveHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -5758,6 +5775,7 @@ def _apply_movement_proposal_decision(
     stratagem_index: StratagemCatalogIndex | None,
     advance_move_hooks: AdvanceMoveHookRegistry,
     fall_back_hooks: FallBackEligibilityHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -5818,6 +5836,7 @@ def _apply_movement_proposal_decision(
                 player_id=active_player_id,
                 unit_instance_id=proposal_request.unit_instance_id,
             ),
+            runtime_modifier_registry=runtime_modifier_registry,
             temporary_movement_keywords=_temporary_movement_keywords_for_unit(
                 state=state,
                 player_id=active_player_id,
@@ -5922,6 +5941,7 @@ def _apply_movement_proposal_decision(
                 player_id=active_player_id,
                 unit_instance_id=proposal_request.unit_instance_id,
             ),
+            runtime_modifier_registry=runtime_modifier_registry,
             temporary_movement_keywords=_temporary_movement_keywords_for_unit(
                 state=state,
                 player_id=active_player_id,
@@ -6032,6 +6052,7 @@ def _apply_movement_proposal_decision(
                 player_id=active_player_id,
                 unit_instance_id=proposal_request.unit_instance_id,
             ),
+            runtime_modifier_registry=runtime_modifier_registry,
             temporary_movement_keywords=_temporary_movement_keywords_for_unit(
                 state=state,
                 player_id=active_player_id,
@@ -6548,6 +6569,7 @@ def _apply_desperate_escape_model_selection_decision(
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     fall_back_hooks: FallBackEligibilityHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -7650,6 +7672,7 @@ def resolve_normal_move(
     terrain: tuple[TerrainVolume, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
     movement_bonus_inches: int = 0,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     temporary_movement_keywords: tuple[str, ...] = (),
 ) -> NormalMoveResolution:
     resolved = _resolve_unit_move(
@@ -7673,6 +7696,7 @@ def resolve_normal_move(
         action_label="Normal Move",
         rollback_on_endpoint_coherency=True,
         hover_mode_states=hover_mode_states,
+        runtime_modifier_registry=runtime_modifier_registry,
         temporary_movement_keywords=temporary_movement_keywords,
     )
     return NormalMoveResolution(
@@ -7700,6 +7724,7 @@ def resolve_advance_move(
     terrain: tuple[TerrainVolume, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
     movement_bonus_inches: int = 0,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     temporary_movement_keywords: tuple[str, ...] = (),
 ) -> AdvanceMoveResolution:
     if type(advance_roll) is not AdvanceRollResult:
@@ -7725,6 +7750,7 @@ def resolve_advance_move(
         action_label="Advance",
         rollback_on_endpoint_coherency=True,
         hover_mode_states=hover_mode_states,
+        runtime_modifier_registry=runtime_modifier_registry,
         temporary_movement_keywords=temporary_movement_keywords,
     )
     movement_payload = {
@@ -7759,6 +7785,7 @@ def resolve_fall_back_move(
     terrain: tuple[TerrainVolume, ...] = (),
     objective_markers: tuple[ObjectiveMarker, ...] = (),
     movement_bonus_inches: int = 0,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     temporary_movement_keywords: tuple[str, ...] = (),
 ) -> FallBackActionResult:
     forced_source_ids = _validate_identifier_tuple(
@@ -7770,6 +7797,7 @@ def resolve_fall_back_move(
             scenario=scenario,
             unit_placement=unit_placement,
             state=state,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         if path_witness is None
         else path_witness
@@ -7795,6 +7823,7 @@ def resolve_fall_back_move(
         action_label="Fall Back",
         rollback_on_endpoint_coherency=False,
         hover_mode_states=hover_mode_states,
+        runtime_modifier_registry=runtime_modifier_registry,
         temporary_movement_keywords=temporary_movement_keywords,
     )
     desperate_escape_requirements = _desperate_escape_requirements_for_fall_back(
@@ -7847,6 +7876,7 @@ def _resolve_unit_move(
     action_label: str,
     rollback_on_endpoint_coherency: bool,
     hover_mode_states: tuple[HoverModeState, ...],
+    runtime_modifier_registry: RuntimeModifierRegistry | None,
     temporary_movement_keywords: tuple[str, ...],
 ) -> _ResolvedUnitMove:
     if type(scenario) is not BattlefieldScenario:
@@ -7891,6 +7921,7 @@ def _resolve_unit_move(
             movement_bonus_inches=movement_bonus_inches,
             movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         if path_witness is None
         else path_witness
@@ -7921,6 +7952,8 @@ def _resolve_unit_move(
             aircraft_policy=aircraft_policy,
             state=state,
             unit_instance_id=unit_placement.unit_instance_id,
+            model_instance_id=placement.model_instance_id,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         movement_inches = _model_default_movement_distance_inches(
             model=model,
@@ -7928,9 +7961,11 @@ def _resolve_unit_move(
             ruleset_descriptor=ruleset_descriptor,
             state=state,
             unit_instance_id=unit_placement.unit_instance_id,
+            model_instance_id=placement.model_instance_id,
             movement_bonus_inches=movement_bonus_inches,
             movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         movement_distance_budget_inches = _model_movement_budget_inches(
             model=model,
@@ -7938,9 +7973,11 @@ def _resolve_unit_move(
             ruleset_descriptor=ruleset_descriptor,
             state=state,
             unit_instance_id=unit_placement.unit_instance_id,
+            model_instance_id=placement.model_instance_id,
             movement_bonus_inches=movement_bonus_inches,
             movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         movement_distance_modifier_inches = _movement_distance_modifier_inches(
             aircraft_policy=aircraft_policy,
@@ -8115,6 +8152,7 @@ def _default_move_witness(
     movement_bonus_inches: int,
     movement_mode: MovementMode,
     movement_phase_action: MovementPhaseActionKind,
+    runtime_modifier_registry: RuntimeModifierRegistry | None,
 ) -> PathWitness:
     model_paths: list[tuple[str, Pose, Pose]] = []
     for placement in unit_placement.model_placements:
@@ -8125,9 +8163,11 @@ def _default_move_witness(
             ruleset_descriptor=ruleset_descriptor,
             state=state,
             unit_instance_id=unit_placement.unit_instance_id,
+            model_instance_id=placement.model_instance_id,
             movement_bonus_inches=movement_bonus_inches,
             movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         model_paths.append(
             (
@@ -8148,23 +8188,19 @@ def _default_fall_back_witness(
     scenario: BattlefieldScenario,
     unit_placement: UnitPlacement,
     state: GameState | None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None,
 ) -> PathWitness:
-    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
-        army_rule,
-    )
-
     model_paths: list[tuple[str, Pose, Pose]] = []
     for placement in unit_placement.model_placements:
         model = scenario.model_instance_for_placement(placement)
         base_movement_inches = float(_model_movement_inches(model))
-        movement_inches = (
-            base_movement_inches
-            if state is None
-            else army_rule.nurgles_gift_modified_movement_inches(
-                state=state,
-                unit_instance_id=unit_placement.unit_instance_id,
-                base_movement_inches=base_movement_inches,
-            )
+        movement_inches = _modified_movement_inches(
+            state=state,
+            unit_instance_id=unit_placement.unit_instance_id,
+            model_instance_id=placement.model_instance_id,
+            base_movement_inches=base_movement_inches,
+            current_movement_inches=base_movement_inches,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         model_paths.append(
             (
@@ -9128,11 +9164,9 @@ def _model_base_movement_inches(
     aircraft_policy: AircraftMovementPolicy,
     state: GameState | None = None,
     unit_instance_id: str | None = None,
+    model_instance_id: str | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> float:
-    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
-        army_rule,
-    )
-
     if type(model) is not ModelInstance:
         raise GameLifecycleError("Movement model must be a ModelInstance.")
     if type(aircraft_policy) is not AircraftMovementPolicy:
@@ -9141,14 +9175,13 @@ def _model_base_movement_inches(
         base_movement = 20.0
     else:
         base_movement = float(_model_movement_inches(model))
-    if state is None:
-        return base_movement
-    if unit_instance_id is None:
-        raise GameLifecycleError("Death Guard Movement modifier requires unit_instance_id.")
-    return army_rule.nurgles_gift_modified_movement_inches(
+    return _modified_movement_inches(
         state=state,
         unit_instance_id=unit_instance_id,
+        model_instance_id=model_instance_id,
         base_movement_inches=base_movement,
+        current_movement_inches=base_movement,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
 
 
@@ -9162,6 +9195,8 @@ def _model_movement_budget_inches(
     movement_phase_action: MovementPhaseActionKind,
     state: GameState | None = None,
     unit_instance_id: str | None = None,
+    model_instance_id: str | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> float | None:
     if type(movement_phase_action) is not MovementPhaseActionKind:
         raise GameLifecycleError("movement_phase_action must be a MovementPhaseActionKind.")
@@ -9171,6 +9206,8 @@ def _model_movement_budget_inches(
             aircraft_policy=aircraft_policy,
             state=state,
             unit_instance_id=unit_instance_id,
+            model_instance_id=model_instance_id,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         + float(movement_bonus_inches)
         + _movement_distance_modifier_inches(
@@ -9280,6 +9317,8 @@ def _model_default_movement_distance_inches(
     movement_phase_action: MovementPhaseActionKind,
     state: GameState | None = None,
     unit_instance_id: str | None = None,
+    model_instance_id: str | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> float:
     movement_budget = _model_movement_budget_inches(
         model=model,
@@ -9287,13 +9326,51 @@ def _model_default_movement_distance_inches(
         ruleset_descriptor=ruleset_descriptor,
         state=state,
         unit_instance_id=unit_instance_id,
+        model_instance_id=model_instance_id,
         movement_bonus_inches=movement_bonus_inches,
         movement_mode=movement_mode,
         movement_phase_action=movement_phase_action,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     if movement_budget is None:
         raise GameLifecycleError("Default movement distance requires a finite movement budget.")
     return movement_budget
+
+
+def _modified_movement_inches(
+    *,
+    state: GameState | None,
+    unit_instance_id: str | None,
+    model_instance_id: str | None,
+    base_movement_inches: float,
+    current_movement_inches: float,
+    runtime_modifier_registry: RuntimeModifierRegistry | None,
+) -> float:
+    if state is None:
+        return current_movement_inches
+    if unit_instance_id is None:
+        raise GameLifecycleError("Movement modifier requires unit_instance_id.")
+    if model_instance_id is None:
+        raise GameLifecycleError("Movement modifier requires model_instance_id.")
+    return _runtime_modifier_registry(runtime_modifier_registry).modified_movement_inches(
+        MovementBudgetModifierContext(
+            state=state,
+            unit_instance_id=unit_instance_id,
+            model_instance_id=model_instance_id,
+            base_movement_inches=base_movement_inches,
+            current_movement_inches=current_movement_inches,
+        )
+    )
+
+
+def _runtime_modifier_registry(
+    registry: RuntimeModifierRegistry | None,
+) -> RuntimeModifierRegistry:
+    if registry is None:
+        return RuntimeModifierRegistry.empty()
+    if type(registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError("Runtime modifier registry must be a RuntimeModifierRegistry.")
+    return registry
 
 
 def _default_move_end_pose(

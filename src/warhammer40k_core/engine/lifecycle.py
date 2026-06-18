@@ -458,6 +458,11 @@ class GameLifecycle:
                 if self._runtime_content_bundle is not None
                 else None
             ),
+            runtime_modifier_registry=(
+                self._runtime_content_bundle.runtime_modifier_registry
+                if self._runtime_content_bundle is not None
+                else None
+            ),
         )
         current_setup_step = self.state.current_setup_step
         if current_setup_step is None:
@@ -1600,6 +1605,11 @@ class GameLifecycle:
                 if lifecycle._runtime_content_bundle is not None
                 else None
             ),
+            runtime_modifier_registry=(
+                lifecycle._runtime_content_bundle.runtime_modifier_registry
+                if lifecycle._runtime_content_bundle is not None
+                else None
+            ),
         )
         return lifecycle
 
@@ -1694,6 +1704,7 @@ class GameLifecycle:
             ability_indexes_by_player_id=(
                 self._runtime_content_bundle.ability_indexes_by_player_id
             ),
+            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._movement_phase_handler = MovementPhaseHandler(
             ruleset_descriptor=self._movement_phase_handler.ruleset_descriptor,
@@ -1704,6 +1715,7 @@ class GameLifecycle:
             movement_end_surge_hooks=(
                 self._runtime_content_bundle.movement_end_surge_hook_registry
             ),
+            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._charge_phase_handler = ChargePhaseHandler(
             ruleset_descriptor=self._charge_phase_handler.ruleset_descriptor,
@@ -1720,6 +1732,7 @@ class GameLifecycle:
                 self._runtime_content_bundle.shooting_unit_selected_hook_registry
             ),
             shooting_end_surge_hooks=self._runtime_content_bundle.shooting_end_surge_hook_registry,
+            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._fight_phase_handler = FightPhaseHandler(
             ruleset_descriptor=self._fight_phase_handler.ruleset_descriptor,
@@ -1728,12 +1741,14 @@ class GameLifecycle:
             fight_activation_ability_hooks=(
                 self._runtime_content_bundle.fight_activation_ability_hook_registry
             ),
+            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._battle_round_flow = BattleRoundFlow(
             phase_handlers=self._phase_handlers(),
             phase_end_objective_control_hooks=(
                 self._runtime_content_bundle.phase_end_objective_control_hook_registry
             ),
+            runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._runtime_content_activation_input_hash = _runtime_content_activation_input_hash(
             config=self._config,

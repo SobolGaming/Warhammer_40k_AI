@@ -66,6 +66,14 @@ from warhammer40k_core.engine.rule_execution import (
     RuleExecutionRegistry,
     RuleRuntimeBinding,
 )
+from warhammer40k_core.engine.runtime_modifiers import (
+    HitRollModifierBinding,
+    MovementBudgetModifierBinding,
+    ObjectiveControlModifierBinding,
+    RuntimeModifierRegistry,
+    SaveOptionModifierBinding,
+    UnitCharacteristicModifierBinding,
+)
 from warhammer40k_core.engine.shooting_end_surge_hooks import (
     ShootingEndSurgeHookBinding,
     ShootingEndSurgeHookRegistry,
@@ -111,6 +119,11 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     enhancement_effect_binding_ids: list[str]
     fight_activation_ability_hook_ids: list[str]
     phase_end_objective_control_hook_ids: list[str]
+    unit_characteristic_modifier_ids: list[str]
+    hit_roll_modifier_ids: list[str]
+    save_option_modifier_ids: list[str]
+    movement_budget_modifier_ids: list[str]
+    objective_control_modifier_ids: list[str]
     faction_execution_record_ids: list[str]
     selected_execution_record_ids: list[str]
     bundle_summary_hash: str
@@ -144,6 +157,11 @@ class RuntimeContentContribution:
     enhancement_effect_bindings: tuple[EnhancementEffectBinding, ...] = ()
     fight_activation_ability_hook_bindings: tuple[FightActivationAbilityHookBinding, ...] = ()
     phase_end_objective_control_hook_bindings: tuple[PhaseEndObjectiveControlHookBinding, ...] = ()
+    unit_characteristic_modifier_bindings: tuple[UnitCharacteristicModifierBinding, ...] = ()
+    hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = ()
+    save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = ()
+    movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = ()
+    objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = ()
     faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = field(
         default_factory=_empty_named_handlers
     )
@@ -318,6 +336,51 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "unit_characteristic_modifier_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution unit_characteristic_modifier_bindings",
+                self.unit_characteristic_modifier_bindings,
+                UnitCharacteristicModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "hit_roll_modifier_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution hit_roll_modifier_bindings",
+                self.hit_roll_modifier_bindings,
+                HitRollModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "save_option_modifier_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution save_option_modifier_bindings",
+                self.save_option_modifier_bindings,
+                SaveOptionModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "movement_budget_modifier_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution movement_budget_modifier_bindings",
+                self.movement_budget_modifier_bindings,
+                MovementBudgetModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "objective_control_modifier_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution objective_control_modifier_bindings",
+                self.objective_control_modifier_bindings,
+                ObjectiveControlModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "faction_named_handlers",
             _validate_named_handlers(self.faction_named_handlers),
         )
@@ -345,6 +408,11 @@ class RuntimeContentContribution:
             phase_end_objective_control_hook_bindings=(
                 self.phase_end_objective_control_hook_bindings
             ),
+            unit_characteristic_modifier_bindings=self.unit_characteristic_modifier_bindings,
+            hit_roll_modifier_bindings=self.hit_roll_modifier_bindings,
+            save_option_modifier_bindings=self.save_option_modifier_bindings,
+            movement_budget_modifier_bindings=self.movement_budget_modifier_bindings,
+            objective_control_modifier_bindings=self.objective_control_modifier_bindings,
             faction_named_handlers=self.faction_named_handlers,
         )
 
@@ -519,6 +587,51 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.hook_id,
         ),
+        unit_characteristic_modifier_bindings=_combine_unique_values(
+            "unit characteristic modifier binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.unit_characteristic_modifier_bindings
+            ),
+            lambda binding: binding.modifier_id,
+        ),
+        hit_roll_modifier_bindings=_combine_unique_values(
+            "Hit roll modifier binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.hit_roll_modifier_bindings
+            ),
+            lambda binding: binding.modifier_id,
+        ),
+        save_option_modifier_bindings=_combine_unique_values(
+            "save option modifier binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.save_option_modifier_bindings
+            ),
+            lambda binding: binding.modifier_id,
+        ),
+        movement_budget_modifier_bindings=_combine_unique_values(
+            "movement budget modifier binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.movement_budget_modifier_bindings
+            ),
+            lambda binding: binding.modifier_id,
+        ),
+        objective_control_modifier_bindings=_combine_unique_values(
+            "Objective Control modifier binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.objective_control_modifier_bindings
+            ),
+            lambda binding: binding.modifier_id,
+        ),
         faction_named_handlers=_merged_named_handlers(validated_contributions),
     )
 
@@ -544,6 +657,7 @@ class RuntimeContentBundle:
     enhancement_effect_registry: EnhancementEffectRegistry
     fight_activation_ability_hook_registry: FightActivationAbilityHookRegistry
     phase_end_objective_control_hook_registry: PhaseEndObjectiveControlHookRegistry
+    runtime_modifier_registry: RuntimeModifierRegistry
     contribution_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -613,6 +727,8 @@ class RuntimeContentBundle:
             raise GameLifecycleError(
                 "RuntimeContentBundle requires PhaseEndObjectiveControlHookRegistry."
             )
+        if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires RuntimeModifierRegistry.")
         object.__setattr__(
             self,
             "contribution_ids",
@@ -803,6 +919,33 @@ class RuntimeContentBundle:
                 )
             )
         )
+        runtime_modifier_registry = RuntimeModifierRegistry.from_bindings(
+            unit_characteristic_modifier_bindings=tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.unit_characteristic_modifier_bindings
+            ),
+            hit_roll_modifier_bindings=tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.hit_roll_modifier_bindings
+            ),
+            save_option_modifier_bindings=tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.save_option_modifier_bindings
+            ),
+            movement_budget_modifier_bindings=tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.movement_budget_modifier_bindings
+            ),
+            objective_control_modifier_bindings=tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.objective_control_modifier_bindings
+            ),
+        )
         return cls(
             activation=activation,
             ability_indexes_by_player_id=_ability_indexes_by_player_id(
@@ -831,6 +974,7 @@ class RuntimeContentBundle:
             enhancement_effect_registry=enhancement_effect_registry,
             fight_activation_ability_hook_registry=fight_activation_ability_hook_registry,
             phase_end_objective_control_hook_registry=(phase_end_objective_control_hook_registry),
+            runtime_modifier_registry=runtime_modifier_registry,
             contribution_ids=contribution_ids,
         )
 
@@ -896,6 +1040,26 @@ class RuntimeContentBundle:
             "phase_end_objective_control_hook_ids": [
                 binding.hook_id
                 for binding in self.phase_end_objective_control_hook_registry.all_bindings()
+            ],
+            "unit_characteristic_modifier_ids": [
+                binding.modifier_id
+                for binding in self.runtime_modifier_registry.all_unit_characteristic_bindings()
+            ],
+            "hit_roll_modifier_ids": [
+                binding.modifier_id
+                for binding in self.runtime_modifier_registry.all_hit_roll_bindings()
+            ],
+            "save_option_modifier_ids": [
+                binding.modifier_id
+                for binding in self.runtime_modifier_registry.all_save_option_bindings()
+            ],
+            "movement_budget_modifier_ids": [
+                binding.modifier_id
+                for binding in self.runtime_modifier_registry.all_movement_budget_bindings()
+            ],
+            "objective_control_modifier_ids": [
+                binding.modifier_id
+                for binding in self.runtime_modifier_registry.all_objective_control_bindings()
             ],
             "faction_execution_record_ids": [
                 record.execution_id for record in self.faction_rule_execution_registry.all_records()

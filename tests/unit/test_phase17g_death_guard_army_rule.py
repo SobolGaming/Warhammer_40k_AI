@@ -14,18 +14,25 @@ from tests.unit.test_phase11c_command_phase import (
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
 from warhammer40k_core.core.detachment import DetachmentDefinition
+from warhammer40k_core.core.dice import DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
 )
 from warhammer40k_core.engine.attack_sequence import (
+    AttackSequence,
+    AttackSequenceStep,
     _target_unit_toughness,  # pyright: ignore[reportPrivateUsage]
+    attack_sequence_hit_roll_spec,
+    attack_sequence_wound_roll_spec,
+    resolve_attack_sequence_until_blocked,
 )
 from warhammer40k_core.engine.battle_formation_hooks import (
     SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
@@ -38,8 +45,11 @@ from warhammer40k_core.engine.battle_shock import (
     BattleShockTestReason,
     collect_battle_shock_test_requests,
 )
+from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, UnitPlacement
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
@@ -54,6 +64,11 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.objective_control import (
+    ObjectiveControlContext,
+    ObjectiveControlTiming,
+    resolve_objective_control,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -61,8 +76,31 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
     SetupStep,
 )
-from warhammer40k_core.engine.saves import SaveKind, save_options_for_model
+from warhammer40k_core.engine.phases.movement import resolve_normal_move
+from warhammer40k_core.engine.runtime_modifiers import (
+    HitRollModifierBinding,
+    HitRollModifierContext,
+    MovementBudgetModifierBinding,
+    MovementBudgetModifierContext,
+    ObjectiveControlModifierBinding,
+    ObjectiveControlModifierContext,
+    RuntimeModifierRegistry,
+    SaveOptionModifierBinding,
+    SaveOptionModifierContext,
+    UnitCharacteristicModifierBinding,
+    UnitCharacteristicModifierContext,
+)
+from warhammer40k_core.engine.saves import (
+    SaveKind,
+    SaveOption,
+    save_options_for_model,
+    saving_throw_roll_spec,
+)
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
+from warhammer40k_core.geometry.pathing import PathWitness
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 DEATH_GUARD_TEST_DATASHEET_ID = "phase17g-death-guard-plague-marine"
@@ -78,9 +116,16 @@ def test_lifecycle_requests_death_guard_plague_selection_and_records_state() -> 
     assert request is not None
     assert request.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE
     assert request.actor_id == "player-a"
+    summary_payload = _runtime_content_bundle(lifecycle).to_summary_payload()
+    assert army_rule.HOOK_ID in summary_payload["battle_formation_hook_ids"]
+    assert f"{army_rule.HOOK_ID}:toughness" in summary_payload["unit_characteristic_modifier_ids"]
+    assert f"{army_rule.HOOK_ID}:leadership" in summary_payload["unit_characteristic_modifier_ids"]
+    assert f"{army_rule.HOOK_ID}:melee-hit-roll" in summary_payload["hit_roll_modifier_ids"]
+    assert f"{army_rule.HOOK_ID}:armour-save-option" in summary_payload["save_option_modifier_ids"]
+    assert f"{army_rule.HOOK_ID}:movement-budget" in summary_payload["movement_budget_modifier_ids"]
     assert (
-        army_rule.HOOK_ID
-        in _runtime_content_bundle(lifecycle).to_summary_payload()["battle_formation_hook_ids"]
+        f"{army_rule.HOOK_ID}:objective-control"
+        in summary_payload["objective_control_modifier_ids"]
     )
 
     selected = lifecycle.submit_decision(
@@ -255,6 +300,408 @@ def test_battle_formation_hook_registry_enforces_single_request_and_handler() ->
     )
     with pytest.raises(GameLifecycleError, match="handled by multiple hooks"):
         multiple_handlers.apply_result(result_context)
+
+
+def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() -> None:
+    state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SKULLSQUIRM_BLIGHT)
+    unit = _unit_by_id(state, DEATH_GUARD_UNIT_ID)
+    model_id = unit.own_models[0].model_instance_id
+    save_option = SaveOption(
+        save_kind=SaveKind.ARMOUR,
+        target_number=3,
+        characteristic_target_number=3,
+        armor_penetration=0,
+    )
+    call_order: list[str] = []
+
+    def unit_characteristic_first(context: UnitCharacteristicModifierContext) -> int:
+        call_order.append("unit-characteristic:first")
+        assert context.base_value == 4
+        assert context.current_value == 4
+        return context.current_value - 1
+
+    def unit_characteristic_second(context: UnitCharacteristicModifierContext) -> int:
+        call_order.append("unit-characteristic:second")
+        assert context.base_value == 4
+        assert context.current_value == 3
+        return context.current_value * 2
+
+    def hit_roll_first(context: HitRollModifierContext) -> int:
+        call_order.append("hit-roll:first")
+        assert context.attacker_model_instance_id == model_id
+        return 1
+
+    def hit_roll_second(context: HitRollModifierContext) -> int:
+        call_order.append("hit-roll:second")
+        assert context.source_phase is BattlePhase.FIGHT
+        return -3
+
+    def save_option_first(context: SaveOptionModifierContext) -> tuple[SaveOption, ...]:
+        call_order.append("save-option:first")
+        option = context.save_options[0]
+        return (
+            replace(
+                option,
+                target_number=option.target_number + 1,
+                source_rule_ids=(*option.source_rule_ids, "runtime:first-save"),
+            ),
+        )
+
+    def save_option_second(context: SaveOptionModifierContext) -> tuple[SaveOption, ...]:
+        call_order.append("save-option:second")
+        option = context.save_options[0]
+        assert option.target_number == 4
+        return (
+            replace(
+                option,
+                target_number=option.target_number + 1,
+                source_rule_ids=(*option.source_rule_ids, "runtime:second-save"),
+            ),
+        )
+
+    def movement_first(context: MovementBudgetModifierContext) -> float:
+        call_order.append("movement:first")
+        assert context.current_movement_inches == 6.0
+        return 5.0
+
+    def movement_second(context: MovementBudgetModifierContext) -> float:
+        call_order.append("movement:second")
+        assert context.current_movement_inches == 5.0
+        return 4.5
+
+    def objective_control_first(context: ObjectiveControlModifierContext) -> int:
+        call_order.append("objective-control:first")
+        assert context.current_objective_control == 3
+        return 2
+
+    def objective_control_second(context: ObjectiveControlModifierContext) -> int:
+        call_order.append("objective-control:second")
+        assert context.current_objective_control == 2
+        return 1
+
+    registry = RuntimeModifierRegistry.from_bindings(
+        unit_characteristic_modifier_bindings=(
+            UnitCharacteristicModifierBinding(
+                modifier_id="runtime:unit-characteristic-second",
+                source_id="runtime:source-unit-characteristic-second",
+                handler=unit_characteristic_second,
+            ),
+            UnitCharacteristicModifierBinding(
+                modifier_id="runtime:unit-characteristic-first",
+                source_id="runtime:source-unit-characteristic-first",
+                handler=unit_characteristic_first,
+            ),
+        ),
+        hit_roll_modifier_bindings=(
+            HitRollModifierBinding(
+                modifier_id="runtime:hit-roll-second",
+                source_id="runtime:source-hit-roll-second",
+                handler=hit_roll_second,
+            ),
+            HitRollModifierBinding(
+                modifier_id="runtime:hit-roll-first",
+                source_id="runtime:source-hit-roll-first",
+                handler=hit_roll_first,
+            ),
+        ),
+        save_option_modifier_bindings=(
+            SaveOptionModifierBinding(
+                modifier_id="runtime:save-option-second",
+                source_id="runtime:source-save-option-second",
+                handler=save_option_second,
+            ),
+            SaveOptionModifierBinding(
+                modifier_id="runtime:save-option-first",
+                source_id="runtime:source-save-option-first",
+                handler=save_option_first,
+            ),
+        ),
+        movement_budget_modifier_bindings=(
+            MovementBudgetModifierBinding(
+                modifier_id="runtime:movement-second",
+                source_id="runtime:source-movement-second",
+                handler=movement_second,
+            ),
+            MovementBudgetModifierBinding(
+                modifier_id="runtime:movement-first",
+                source_id="runtime:source-movement-first",
+                handler=movement_first,
+            ),
+        ),
+        objective_control_modifier_bindings=(
+            ObjectiveControlModifierBinding(
+                modifier_id="runtime:objective-control-second",
+                source_id="runtime:source-objective-control-second",
+                handler=objective_control_second,
+            ),
+            ObjectiveControlModifierBinding(
+                modifier_id="runtime:objective-control-first",
+                source_id="runtime:source-objective-control-first",
+                handler=objective_control_first,
+            ),
+        ),
+    )
+
+    assert [binding.modifier_id for binding in registry.all_hit_roll_bindings()] == [
+        "runtime:hit-roll-first",
+        "runtime:hit-roll-second",
+    ]
+    assert (
+        registry.modified_unit_characteristic(
+            UnitCharacteristicModifierContext(
+                state=state,
+                unit_instance_id=unit.unit_instance_id,
+                characteristic=cast(Characteristic, Characteristic.TOUGHNESS.value),
+                base_value=4,
+                current_value=4,
+            )
+        )
+        == 6
+    )
+    assert (
+        registry.hit_roll_modifier(
+            HitRollModifierContext(
+                state=state,
+                attacker_model_instance_id=model_id,
+                source_phase=cast(BattlePhase, BattlePhase.FIGHT.value),
+            )
+        )
+        == -2
+    )
+    assert registry.modified_save_options(
+        SaveOptionModifierContext(
+            state=state,
+            target_unit_instance_id=unit.unit_instance_id,
+            save_options=(save_option,),
+        )
+    ) == (
+        replace(
+            save_option,
+            target_number=5,
+            source_rule_ids=("runtime:first-save", "runtime:second-save"),
+        ),
+    )
+    assert (
+        registry.modified_movement_inches(
+            MovementBudgetModifierContext(
+                state=state,
+                unit_instance_id=unit.unit_instance_id,
+                model_instance_id=model_id,
+                base_movement_inches=6,
+                current_movement_inches=6,
+            )
+        )
+        == 4.5
+    )
+    assert (
+        registry.modified_objective_control(
+            ObjectiveControlModifierContext(
+                state=state,
+                unit_instance_id=unit.unit_instance_id,
+                model_instance_id=model_id,
+                base_objective_control=3,
+                current_objective_control=3,
+            )
+        )
+        == 1
+    )
+    assert call_order == [
+        "unit-characteristic:first",
+        "unit-characteristic:second",
+        "hit-roll:first",
+        "hit-roll:second",
+        "save-option:first",
+        "save-option:second",
+        "movement:first",
+        "movement:second",
+        "objective-control:first",
+        "objective-control:second",
+    ]
+
+
+def test_runtime_modifier_registry_rejects_duplicate_ids_and_bad_handler_results() -> None:
+    state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SKULLSQUIRM_BLIGHT)
+    unit = _unit_by_id(state, DEATH_GUARD_UNIT_ID)
+    model_id = unit.own_models[0].model_instance_id
+
+    valid_binding = HitRollModifierBinding(
+        modifier_id="runtime:duplicate-hit-roll",
+        source_id="runtime:duplicate-source",
+        handler=lambda _context: 0,
+    )
+    with pytest.raises(GameLifecycleError, match="modifier IDs must be unique"):
+        RuntimeModifierRegistry.from_bindings(
+            hit_roll_modifier_bindings=(valid_binding, valid_binding)
+        )
+
+    bad_binding = MovementBudgetModifierBinding(
+        modifier_id="runtime:bad-movement",
+        source_id="runtime:bad-movement-source",
+        handler=lambda _context: -1.0,
+    )
+    bad_registry = RuntimeModifierRegistry.from_bindings(
+        movement_budget_modifier_bindings=(bad_binding,)
+    )
+    with pytest.raises(GameLifecycleError, match="runtime:bad-movement returned movement"):
+        bad_registry.modified_movement_inches(
+            MovementBudgetModifierContext(
+                state=state,
+                unit_instance_id=unit.unit_instance_id,
+                model_instance_id=model_id,
+                base_movement_inches=6,
+                current_movement_inches=6,
+            )
+        )
+
+
+def test_runtime_modifier_registry_rejects_invalid_context_and_binding_shapes() -> None:
+    state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SKULLSQUIRM_BLIGHT)
+    unit = _unit_by_id(state, DEATH_GUARD_UNIT_ID)
+    model_id = unit.own_models[0].model_instance_id
+    invalid_state = cast(GameState, object())
+    registry = RuntimeModifierRegistry.empty()
+
+    with pytest.raises(GameLifecycleError, match="Unit characteristic modifier state"):
+        UnitCharacteristicModifierContext(
+            state=invalid_state,
+            unit_instance_id=unit.unit_instance_id,
+            characteristic=Characteristic.TOUGHNESS,
+            base_value=4,
+            current_value=4,
+        )
+    with pytest.raises(GameLifecycleError, match="Hit roll modifier state"):
+        HitRollModifierContext(
+            state=invalid_state,
+            attacker_model_instance_id=model_id,
+            source_phase=BattlePhase.FIGHT,
+        )
+    with pytest.raises(GameLifecycleError, match="Save option modifier state"):
+        SaveOptionModifierContext(
+            state=invalid_state,
+            target_unit_instance_id=unit.unit_instance_id,
+            save_options=(),
+        )
+    with pytest.raises(GameLifecycleError, match="Movement budget modifier state"):
+        MovementBudgetModifierContext(
+            state=invalid_state,
+            unit_instance_id=unit.unit_instance_id,
+            model_instance_id=model_id,
+            base_movement_inches=6,
+            current_movement_inches=6,
+        )
+    with pytest.raises(GameLifecycleError, match="Objective Control modifier state"):
+        ObjectiveControlModifierContext(
+            state=invalid_state,
+            unit_instance_id=unit.unit_instance_id,
+            model_instance_id=model_id,
+            base_objective_control=2,
+            current_objective_control=2,
+        )
+
+    with pytest.raises(GameLifecycleError, match="Unit characteristic modifiers require"):
+        registry.modified_unit_characteristic(cast(UnitCharacteristicModifierContext, object()))
+    with pytest.raises(GameLifecycleError, match="Hit roll modifiers require"):
+        registry.hit_roll_modifier(cast(HitRollModifierContext, object()))
+    with pytest.raises(GameLifecycleError, match="Save option modifiers require"):
+        registry.modified_save_options(cast(SaveOptionModifierContext, object()))
+    with pytest.raises(GameLifecycleError, match="Movement budget modifiers require"):
+        registry.modified_movement_inches(cast(MovementBudgetModifierContext, object()))
+    with pytest.raises(GameLifecycleError, match="Objective Control modifiers require"):
+        registry.modified_objective_control(cast(ObjectiveControlModifierContext, object()))
+
+    with pytest.raises(GameLifecycleError, match="must be a tuple"):
+        RuntimeModifierRegistry(
+            hit_roll_modifier_bindings=cast(tuple[HitRollModifierBinding, ...], [])
+        )
+    with pytest.raises(GameLifecycleError, match="must contain HitRollModifierBinding"):
+        RuntimeModifierRegistry(
+            hit_roll_modifier_bindings=cast(tuple[HitRollModifierBinding, ...], (object(),))
+        )
+    with pytest.raises(GameLifecycleError, match="handler must be callable"):
+        HitRollModifierBinding(
+            modifier_id="runtime:bad-handler",
+            source_id="runtime:bad-handler-source",
+            handler=cast(Callable[[HitRollModifierContext], int], object()),
+        )
+    with pytest.raises(GameLifecycleError, match="modifier_id must not be empty"):
+        HitRollModifierBinding(
+            modifier_id=" ",
+            source_id="runtime:bad-id-source",
+            handler=lambda _context: 0,
+        )
+
+    with pytest.raises(GameLifecycleError, match="save_options must be a tuple"):
+        SaveOptionModifierContext(
+            state=state,
+            target_unit_instance_id=unit.unit_instance_id,
+            save_options=cast(tuple[SaveOption, ...], []),
+        )
+    with pytest.raises(GameLifecycleError, match="save_options must contain SaveOption"):
+        SaveOptionModifierContext(
+            state=state,
+            target_unit_instance_id=unit.unit_instance_id,
+            save_options=cast(tuple[SaveOption, ...], (object(),)),
+        )
+    with pytest.raises(GameLifecycleError, match="must be a Characteristic"):
+        UnitCharacteristicModifierContext(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+            characteristic=cast(Characteristic, object()),
+            base_value=4,
+            current_value=4,
+        )
+    with pytest.raises(GameLifecycleError, match="Unsupported runtime modifier characteristic"):
+        UnitCharacteristicModifierContext(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+            characteristic=cast(Characteristic, "invalid-characteristic"),
+            base_value=4,
+            current_value=4,
+        )
+    with pytest.raises(GameLifecycleError, match="must be a BattlePhase"):
+        HitRollModifierContext(
+            state=state,
+            attacker_model_instance_id=model_id,
+            source_phase=cast(BattlePhase, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="Unsupported runtime modifier BattlePhase"):
+        HitRollModifierContext(
+            state=state,
+            attacker_model_instance_id=model_id,
+            source_phase=cast(BattlePhase, "invalid-phase"),
+        )
+    with pytest.raises(GameLifecycleError, match="base_movement_inches must be numeric"):
+        MovementBudgetModifierContext(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+            model_instance_id=model_id,
+            base_movement_inches=cast(float, object()),
+            current_movement_inches=6,
+        )
+    with pytest.raises(GameLifecycleError, match="base_value must not be negative"):
+        UnitCharacteristicModifierContext(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+            characteristic=Characteristic.TOUGHNESS,
+            base_value=-1,
+            current_value=4,
+        )
+    with pytest.raises(GameLifecycleError, match="current_value must be an int"):
+        UnitCharacteristicModifierContext(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+            characteristic=Characteristic.TOUGHNESS,
+            base_value=4,
+            current_value=cast(int, 1.25),
+        )
+    with pytest.raises(GameLifecycleError, match="unit_instance_id must be a string"):
+        UnitCharacteristicModifierContext(
+            state=state,
+            unit_instance_id=cast(str, object()),
+            characteristic=Characteristic.TOUGHNESS,
+            base_value=4,
+            current_value=4,
+        )
 
 
 def test_battle_formation_hook_registry_rejects_invalid_shapes() -> None:
@@ -432,7 +879,14 @@ def test_nurgles_gift_requires_live_placed_death_guard_model_in_contagion_range(
 def test_nurgles_gift_afflicted_units_have_minus_one_toughness() -> None:
     state = _death_guard_battle_state(army_rule.NurglesGiftPlague.RATTLEJOINT_AGUE)
 
-    assert _target_unit_toughness(state=state, target_unit_instance_id=ENEMY_UNIT_ID) == 3
+    assert (
+        _target_unit_toughness(
+            state=state,
+            target_unit_instance_id=ENEMY_UNIT_ID,
+            runtime_modifier_registry=_death_guard_runtime_modifier_registry(),
+        )
+        == 3
+    )
     assert (
         army_rule.nurgles_gift_modified_toughness(
             state=state,
@@ -485,6 +939,127 @@ def test_rattlejoint_ague_worsens_afflicted_armour_save_option() -> None:
     assert army_rule.SOURCE_RULE_ID in modified_armour.source_rule_ids
 
 
+def test_scabrous_soulrot_movement_consumer_rejects_path_over_modified_budget() -> None:
+    state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SCABROUS_SOULROT)
+    scenario = _scenario_from_state(state)
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(ENEMY_UNIT_ID)
+
+    resolution = resolve_normal_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        state=state,
+        path_witness=_full_unit_straight_line_witness(
+            unit_placement=unit_placement,
+            delta_x=6.0,
+            delta_y=0.0,
+        ),
+        runtime_modifier_registry=_death_guard_runtime_modifier_registry(),
+    )
+
+    violation_codes = {
+        violation.violation_code
+        for result in resolution.path_validation_results
+        for violation in result.violations
+    }
+    model_movements = cast(list[dict[str, object]], resolution.movement_payload["model_movements"])
+
+    assert not resolution.is_valid
+    assert "movement_distance_exceeded" in violation_codes
+    assert {movement["movement_inches"] for movement in model_movements} == {5.0}
+    assert {movement["base_movement_inches"] for movement in model_movements} == {5.0}
+
+
+def test_scabrous_soulrot_objective_control_consumer_uses_reduced_oc() -> None:
+    state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SCABROUS_SOULROT)
+
+    record = resolve_objective_control(
+        ObjectiveControlContext.from_game_state(
+            state,
+            timing=ObjectiveControlTiming.PHASE_END,
+            phase=BattlePhase.COMMAND,
+            runtime_modifier_registry=_death_guard_runtime_modifier_registry(),
+        )
+    )
+
+    enemy_contributions = tuple(
+        contribution
+        for result in record.results
+        for contribution in result.contributors
+        if contribution.unit_instance_id == ENEMY_UNIT_ID
+    )
+
+    assert enemy_contributions
+    assert {contribution.objective_control for contribution in enemy_contributions} == {1}
+    assert {contribution.effective_objective_control for contribution in enemy_contributions} == {1}
+
+
+def test_skullsquirm_blight_attack_sequence_consumes_melee_hit_modifier_only() -> None:
+    state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SKULLSQUIRM_BLIGHT)
+    attacker = _unit_by_id(state, ENEMY_UNIT_ID)
+    defender = _unit_by_id(state, DEATH_GUARD_UNIT_ID)
+
+    melee_hit = _single_attack_hit_payload(
+        state=state,
+        attacker=attacker,
+        defender=defender,
+        source_phase=BattlePhase.FIGHT,
+        sequence_id="phase17g-skullsquirm-melee-hit",
+        hit_roll=3,
+    )
+    shooting_hit = _single_attack_hit_payload(
+        state=state,
+        attacker=attacker,
+        defender=defender,
+        source_phase=BattlePhase.SHOOTING,
+        sequence_id="phase17g-skullsquirm-shooting-hit",
+        hit_roll=3,
+    )
+
+    assert melee_hit["modifier"] == -1
+    assert melee_hit["capped_modifier"] == -1
+    assert melee_hit["final_roll"] == 2
+    assert melee_hit["successful"] is False
+    assert shooting_hit["modifier"] == 0
+    assert shooting_hit["capped_modifier"] == 0
+    assert shooting_hit["final_roll"] == 3
+    assert shooting_hit["successful"] is True
+
+
+def test_rattlejoint_ague_attack_sequence_worsens_armour_save_option() -> None:
+    state = _death_guard_battle_state(army_rule.NurglesGiftPlague.RATTLEJOINT_AGUE)
+    attacker = _unit_by_id(state, DEATH_GUARD_UNIT_ID)
+    defender = _unit_by_id(state, ENEMY_UNIT_ID)
+    defender_model = defender.own_models[2]
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_removed_models(
+        tuple(
+            model.model_instance_id
+            for model in defender.own_models
+            if model.model_instance_id != defender_model.model_instance_id
+        )
+    )
+
+    save_payload = _single_attack_save_payload(
+        state=state,
+        attacker=attacker,
+        defender=defender,
+        defender_model_id=defender_model.model_instance_id,
+        sequence_id="phase17g-rattlejoint-save",
+        save_roll=3,
+    )
+    option = cast(dict[str, object], save_payload["option"])
+    save_options = cast(list[dict[str, object]], save_payload["save_options"])
+
+    assert save_payload["save_kind"] == SaveKind.ARMOUR.value
+    assert save_payload["target_number"] == 4
+    assert save_payload["unmodified_roll"] == 3
+    assert save_payload["final_roll"] == 3
+    assert save_payload["successful"] is False
+    assert option["target_number"] == 4
+    assert save_options[0]["target_number"] == 4
+
+
 def test_scabrous_soulrot_worsens_afflicted_move_leadership_and_oc() -> None:
     state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SCABROUS_SOULROT)
     enemy_unit = _unit_by_id(state, ENEMY_UNIT_ID)
@@ -528,6 +1103,7 @@ def test_scabrous_soulrot_worsens_afflicted_move_leadership_and_oc() -> None:
         starting_strength_records=tuple(state.starting_strength_records),
         state=state,
         ability_index=AbilityCatalogIndex.from_records(()),
+        runtime_modifier_registry=_death_guard_runtime_modifier_registry(),
     )
 
     assert len(requests) == 1
@@ -535,6 +1111,263 @@ def test_scabrous_soulrot_worsens_afflicted_move_leadership_and_oc() -> None:
     assert requests[0].leadership_target == (
         enemy_model.characteristic(Characteristic.LEADERSHIP).final + 1
     )
+
+
+def _scenario_from_state(state: GameState) -> BattlefieldScenario:
+    if state.battlefield_state is None:
+        raise AssertionError("Death Guard test state requires battlefield_state.")
+    return BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+
+
+def _full_unit_straight_line_witness(
+    *,
+    unit_placement: UnitPlacement,
+    delta_x: float,
+    delta_y: float,
+) -> PathWitness:
+    model_paths: list[tuple[str, Pose, Pose]] = []
+    for placement in unit_placement.model_placements:
+        model_paths.append(
+            (
+                placement.model_instance_id,
+                placement.pose,
+                Pose.at(
+                    x=placement.pose.position.x + delta_x,
+                    y=placement.pose.position.y + delta_y,
+                    z=placement.pose.position.z,
+                    facing_degrees=placement.pose.facing.degrees,
+                ),
+            )
+        )
+    return PathWitness.for_straight_line_endpoints(tuple(model_paths))
+
+
+def _death_guard_runtime_modifier_registry() -> RuntimeModifierRegistry:
+    contribution = army_rule.runtime_contribution()
+    return RuntimeModifierRegistry.from_bindings(
+        unit_characteristic_modifier_bindings=contribution.unit_characteristic_modifier_bindings,
+        hit_roll_modifier_bindings=contribution.hit_roll_modifier_bindings,
+        save_option_modifier_bindings=contribution.save_option_modifier_bindings,
+        movement_budget_modifier_bindings=contribution.movement_budget_modifier_bindings,
+        objective_control_modifier_bindings=contribution.objective_control_modifier_bindings,
+    )
+
+
+def _single_attack_hit_payload(
+    *,
+    state: GameState,
+    attacker: UnitInstance,
+    defender: UnitInstance,
+    source_phase: BattlePhase,
+    sequence_id: str,
+    hit_roll: int,
+) -> dict[str, object]:
+    weapon_profile = replace(
+        _first_weapon_profile_for_unit(attacker),
+        profile_id=f"{sequence_id}:weapon",
+    )
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    decisions = DecisionController()
+    resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        attack_sequence=AttackSequence.start(
+            sequence_id=sequence_id,
+            attacker_player_id=attacker_player_id(attacker),
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            source_phase=source_phase,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=decisions.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:hit",
+                    spec=attack_sequence_hit_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id=attacker_player_id(attacker),
+                    ),
+                    value=hit_roll,
+                ),
+            ),
+        ),
+        runtime_modifier_registry=_death_guard_runtime_modifier_registry(),
+    )
+    hit_event = _attack_step_payload(
+        _event_payloads(decisions, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    return cast(dict[str, object], hit_event["payload"])
+
+
+def _single_attack_save_payload(
+    *,
+    state: GameState,
+    attacker: UnitInstance,
+    defender: UnitInstance,
+    defender_model_id: str,
+    sequence_id: str,
+    save_roll: int,
+) -> dict[str, object]:
+    weapon_profile = replace(
+        _first_weapon_profile_for_unit(attacker),
+        profile_id=f"{sequence_id}:weapon",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+    )
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    decisions = DecisionController()
+    resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        attack_sequence=AttackSequence.start(
+            sequence_id=sequence_id,
+            attacker_player_id=attacker_player_id(attacker),
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    target_model_ids=(defender_model_id,),
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=decisions.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:hit",
+                    spec=attack_sequence_hit_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id=attacker_player_id(attacker),
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:wound",
+                    spec=attack_sequence_wound_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id=attacker_player_id(attacker),
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:save",
+                    spec=saving_throw_roll_spec(
+                        save_kind=SaveKind.ARMOUR,
+                        player_id=defender_player_id(defender),
+                        allocated_model_id=defender_model_id,
+                        attack_context_id=attack_context_id,
+                    ),
+                    value=save_roll,
+                ),
+            ),
+        ),
+        runtime_modifier_registry=_death_guard_runtime_modifier_registry(),
+    )
+    save_event = _attack_step_payload(
+        _event_payloads(decisions, "attack_sequence_step"),
+        AttackSequenceStep.SAVE,
+    )
+    return cast(dict[str, object], save_event["payload"])
+
+
+def _attack_pool_for_test(
+    *,
+    attacker: UnitInstance,
+    defender: UnitInstance,
+    weapon_profile: WeaponProfile,
+    target_model_ids: tuple[str, ...] | None = None,
+) -> RangedAttackPool:
+    defender_model_ids = (
+        tuple(model.model_instance_id for model in defender.own_models)
+        if target_model_ids is None
+        else target_model_ids
+    )
+    return RangedAttackPool(
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        wargear_id=attacker.wargear_selections[0].wargear_ids[0],
+        weapon_profile_id=weapon_profile.profile_id,
+        weapon_profile=weapon_profile,
+        target_unit_instance_id=defender.unit_instance_id,
+        shooting_type=ShootingType.NORMAL,
+        attacks=1,
+        target_visible_model_ids=defender_model_ids,
+        target_in_range_model_ids=defender_model_ids,
+    )
+
+
+def _first_weapon_profile_for_unit(unit: UnitInstance) -> WeaponProfile:
+    wargear_id = unit.wargear_selections[0].wargear_ids[0]
+    for wargear in _death_guard_catalog().wargear:
+        if wargear.wargear_id == wargear_id:
+            return wargear.weapon_profiles[0]
+    raise AssertionError(f"Missing test wargear {wargear_id}.")
+
+
+def _fixed_roll_result(
+    *,
+    roll_id: str,
+    spec: DiceRollSpec,
+    value: int,
+) -> DiceRollResult:
+    return DiceRollResult.from_values(
+        roll_id=roll_id,
+        spec=spec,
+        values=(value,),
+        source="fixed",
+    )
+
+
+def _event_payloads(
+    decisions: DecisionController,
+    event_type: str,
+) -> tuple[dict[str, object], ...]:
+    return tuple(
+        cast(dict[str, object], event.payload)
+        for event in decisions.event_log.records
+        if event.event_type == event_type
+    )
+
+
+def _attack_step_payload(
+    events: tuple[dict[str, object], ...],
+    step: AttackSequenceStep,
+) -> dict[str, object]:
+    for event in events:
+        if event["step"] == step.value:
+            return event
+    raise AssertionError(f"Missing attack sequence step {step.value}.")
+
+
+def attacker_player_id(unit: UnitInstance) -> str:
+    if unit.unit_instance_id.startswith("army-alpha:"):
+        return "player-a"
+    if unit.unit_instance_id.startswith("army-beta:"):
+        return "player-b"
+    raise AssertionError(f"Unknown attacker unit owner for {unit.unit_instance_id}.")
+
+
+def defender_player_id(unit: UnitInstance) -> str:
+    return attacker_player_id(unit)
 
 
 def _death_guard_battle_state(plague: army_rule.NurglesGiftPlague) -> GameState:
