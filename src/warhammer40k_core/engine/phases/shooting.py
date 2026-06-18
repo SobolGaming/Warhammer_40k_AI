@@ -3259,6 +3259,7 @@ def _attack_pools_or_validation(
             target_within_half_range=target_within_half_range,
             terrain_features=terrain_features,
             player_id=player_id,
+            out_of_phase_state=out_of_phase_state,
         )
         if _out_of_phase_uses_fire_overwatch(out_of_phase_state):
             targeting_rule_ids = (*targeting_rule_ids, FIRE_OVERWATCH_RULE_ID)
@@ -3587,6 +3588,7 @@ def _apply_phase13d_weapon_modifiers(
     target_within_half_range: bool,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     player_id: str | None = None,
+    out_of_phase_state: OutOfPhaseShootingState | None = None,
 ) -> tuple[int, tuple[str, ...], int]:
     attacks = base_attacks
     hit_roll_modifier = base_hit_roll_modifier
@@ -3613,10 +3615,16 @@ def _apply_phase13d_weapon_modifiers(
     if melta_bonus > 0:
         targeting_rule_ids.append(melta_rule_id(melta_bonus))
 
-    if has_weapon_keyword(weapon_profile, WeaponKeyword.HEAVY) and _rules_unit_remained_stationary(
+    if has_weapon_keyword(
+        weapon_profile,
+        WeaponKeyword.HEAVY,
+    ) and _heavy_hit_roll_modifier_applies(
         state=state,
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
         rules_unit=rules_unit,
         player_id=player_id,
+        out_of_phase_state=out_of_phase_state,
     ):
         hit_roll_modifier += 1
         targeting_rule_ids.append(heavy_rule_id())
@@ -3792,7 +3800,14 @@ def _rules_unit_remained_stationary(
     player_id: str | None = None,
 ) -> bool:
     actor_id = _active_player_id(state) if player_id is None else player_id
-    for unit_id in _rules_unit_state_unit_ids(rules_unit):
+    unit_ids = _rules_unit_state_unit_ids(rules_unit)
+    if _rules_unit_set_up_this_turn(
+        state=state,
+        unit_ids=unit_ids,
+        player_id=actor_id,
+    ):
+        return False
+    for unit_id in unit_ids:
         advanced_state = state.advanced_unit_state_for_unit(
             player_id=actor_id,
             battle_round=state.battle_round,
@@ -3811,11 +3826,108 @@ def _rules_unit_remained_stationary(
     if movement_state is None:
         return True
     movement_unit_ids = set(movement_state.moved_unit_ids)
-    if not movement_unit_ids.intersection(_rules_unit_state_unit_ids(rules_unit)):
+    if not movement_unit_ids.intersection(unit_ids):
         return True
     for record in movement_state.movement_distance_records:
-        if record.unit_instance_id in _rules_unit_state_unit_ids(rules_unit):
+        if record.unit_instance_id in unit_ids:
             return record.maximum_model_distance_inches <= 3.0
+    return False
+
+
+def _heavy_hit_roll_modifier_applies(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    rules_unit: RulesUnitView,
+    player_id: str | None,
+    out_of_phase_state: OutOfPhaseShootingState | None,
+) -> bool:
+    actor_id = _active_player_id(state) if player_id is None else player_id
+    if out_of_phase_state is not None:
+        return False
+    if state.current_battle_phase is not BattlePhase.SHOOTING:
+        return False
+    if _active_player_id(state) != actor_id:
+        return False
+    if _rules_unit_within_enemy_engagement_range(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        rules_unit=rules_unit,
+        player_id=actor_id,
+    ):
+        return False
+    return _rules_unit_remained_stationary(
+        state=state,
+        rules_unit=rules_unit,
+        player_id=actor_id,
+    )
+
+
+def _rules_unit_set_up_this_turn(
+    *,
+    state: GameState,
+    unit_ids: tuple[str, ...],
+    player_id: str,
+) -> bool:
+    for unit_id in unit_ids:
+        reserve_state = state.reserve_state_for_unit(unit_id)
+        if (
+            reserve_state is not None
+            and reserve_state.player_id == player_id
+            and reserve_state.arrived_battle_round == state.battle_round
+        ):
+            return True
+        disembarked_state = state.disembarked_unit_state_for_unit(
+            player_id=player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit_id,
+        )
+        if disembarked_state is not None and not disembarked_state.can_choose_remain_stationary:
+            return True
+    return False
+
+
+def _rules_unit_within_enemy_engagement_range(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    rules_unit: RulesUnitView,
+    player_id: str,
+) -> bool:
+    unit_placements = _unit_placements_for_rules_unit_or_none(
+        scenario=scenario,
+        rules_unit=rules_unit,
+    )
+    if unit_placements is None:
+        return False
+    policy = ruleset_descriptor.engagement_policy
+    friendly_models = tuple(
+        geometry_model_for_placement(
+            model=scenario.model_instance_for_placement(model_placement),
+            placement=model_placement,
+        )
+        for unit_placement in unit_placements
+        for model_placement in unit_placement.model_placements
+    )
+    for placed_army in scenario.battlefield_state.placed_armies:
+        if placed_army.player_id == player_id:
+            continue
+        for enemy_unit_placement in placed_army.unit_placements:
+            for enemy_model_placement in enemy_unit_placement.model_placements:
+                enemy_model = geometry_model_for_placement(
+                    model=scenario.model_instance_for_placement(enemy_model_placement),
+                    placement=enemy_model_placement,
+                )
+                if any(
+                    friendly_model.is_within_engagement_range(
+                        enemy_model,
+                        horizontal_inches=policy.horizontal_inches,
+                        vertical_inches=policy.vertical_inches,
+                    )
+                    for friendly_model in friendly_models
+                ):
+                    return True
     return False
 
 

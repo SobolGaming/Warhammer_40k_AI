@@ -190,8 +190,10 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseState,
     ShootingTypeSelection,
     ShootingUnitSelection,
+    request_out_of_phase_shooting_declaration,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.saves import (
     PlungingFireModifier,
     PlungingFireModifierResult,
@@ -222,6 +224,7 @@ from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratage
 from warhammer40k_core.engine.stratagems import STRATAGEM_WINDOW_DECLINED_EVENT_TYPE
 from warhammer40k_core.engine.transports import (
     TRANSPORT_HAZARD_MORTAL_WOUNDS_EVENT_TYPE,
+    DisembarkedUnitState,
     DisembarkModeKind,
     FiringDeckSelection,
     FiringDeckWeaponSelection,
@@ -950,6 +953,227 @@ def test_phase13d_heavy_applies_after_small_move_but_not_after_more_than_three_i
         targeting_rule_ids = cast(list[str], pool_payload["targeting_rule_ids"])
         assert pool_payload["hit_roll_modifier"] == expected_modifier
         assert (HEAVY_RULE_ID in targeting_rule_ids) is (expected_modifier == 1)
+
+
+def test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting() -> None:
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    heavy_profile = replace(
+        base_profile,
+        profile_id="phase13d-out-of-phase-heavy-rifle",
+        name="Phase 13D out-of-phase Heavy rifle",
+        keywords=(WeaponKeyword.HEAVY,),
+        abilities=(AbilityDescriptor.heavy(),),
+    )
+    catalog = _catalog_with_extra_bolt_profile(heavy_profile)
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        catalog=catalog,
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    state.active_player_id = "player-b"
+    declaration_request = _decision_request(
+        request_out_of_phase_shooting_declaration(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            army_catalog=catalog,
+            player_id="player-a",
+            unit_instance_id=attacker.unit_instance_id,
+            parent_phase=BattlePhase.MOVEMENT,
+            source_rule_id=FIRE_OVERWATCH_RULE_ID,
+            source_decision_request_id="phase13d-heavy-fire-overwatch-request",
+            source_decision_result_id="phase13d-heavy-fire-overwatch-result",
+            source_context={
+                "triggering_enemy_unit_instance_id": defender.unit_instance_id,
+            },
+            target_unit_ids=(defender.unit_instance_id,),
+        )
+    )
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=defender.unit_instance_id,
+        weapon_profile_id=heavy_profile.profile_id,
+    )
+
+    _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=proposal.to_payload(),
+        result_id="phase13d-declare-out-of-phase-heavy",
+    )
+
+    accepted_payload = _last_event_payload(lifecycle, "out_of_phase_shooting_declaration_accepted")
+    pool_payload = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
+    targeting_rule_ids = cast(list[str], pool_payload["targeting_rule_ids"])
+    assert pool_payload["hit_roll_modifier"] == 0
+    assert HEAVY_RULE_ID not in targeting_rule_ids
+    assert FIRE_OVERWATCH_RULE_ID in targeting_rule_ids
+
+
+def test_phase13d_heavy_does_not_apply_to_unit_set_up_this_turn() -> None:
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    heavy_profile = replace(
+        base_profile,
+        profile_id="phase13d-set-up-heavy-rifle",
+        name="Phase 13D set up Heavy rifle",
+        keywords=(WeaponKeyword.HEAVY,),
+        abilities=(AbilityDescriptor.heavy(),),
+    )
+    catalog = _catalog_with_extra_bolt_profile(heavy_profile)
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        catalog=catalog,
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    arrived_reserve_state = ReserveState.declared_before_battle(
+        player_id="player-a",
+        unit_instance_id=attacker.unit_instance_id,
+        reserve_kind=ReserveKind.RESERVES,
+    ).mark_arrived(
+        battle_round=1,
+        phase=BattlePhase.MOVEMENT,
+        large_model_exception_used=False,
+        post_arrival_restrictions=(),
+    )
+    state.record_reserve_state(arrived_reserve_state)
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=attacker.unit_instance_id,
+        selection_result_id="phase13d-select-set-up-heavy",
+    )
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=units["enemy"].unit_instance_id,
+        weapon_profile_id=heavy_profile.profile_id,
+    )
+
+    _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=proposal.to_payload(),
+        result_id="phase13d-declare-set-up-heavy",
+    )
+
+    accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
+    pool_payload = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
+    targeting_rule_ids = cast(list[str], pool_payload["targeting_rule_ids"])
+    assert pool_payload["hit_roll_modifier"] == 0
+    assert HEAVY_RULE_ID not in targeting_rule_ids
+
+
+def test_phase13d_heavy_does_not_apply_to_disembarked_unit_set_up_this_turn() -> None:
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    heavy_profile = replace(
+        base_profile,
+        profile_id="phase13d-disembarked-heavy-rifle",
+        name="Phase 13D disembarked Heavy rifle",
+        keywords=(WeaponKeyword.HEAVY,),
+        abilities=(AbilityDescriptor.heavy(),),
+    )
+    catalog = _catalog_with_extra_bolt_profile(heavy_profile)
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        catalog=catalog,
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    state.record_disembarked_unit_state(
+        DisembarkedUnitState.for_mode(
+            player_id="player-a",
+            battle_round=1,
+            unit_instance_id=attacker.unit_instance_id,
+            transport_unit_instance_id="army-alpha:transport-unit",
+            disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+            transport_movement_status=TransportMovementStatus.REMAIN_STATIONARY,
+        )
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=attacker.unit_instance_id,
+        selection_result_id="phase13d-select-disembarked-heavy",
+    )
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=units["enemy"].unit_instance_id,
+        weapon_profile_id=heavy_profile.profile_id,
+    )
+
+    _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=proposal.to_payload(),
+        result_id="phase13d-declare-disembarked-heavy",
+    )
+
+    accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
+    pool_payload = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
+    targeting_rule_ids = cast(list[str], pool_payload["targeting_rule_ids"])
+    assert pool_payload["hit_roll_modifier"] == 0
+    assert HEAVY_RULE_ID not in targeting_rule_ids
+
+
+def test_phase13d_heavy_does_not_apply_to_engaged_unit() -> None:
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    heavy_pistol_profile = replace(
+        base_profile,
+        profile_id="phase13d-engaged-heavy-pistol",
+        name="Phase 13D engaged Heavy pistol",
+        keywords=(WeaponKeyword.HEAVY, WeaponKeyword.PISTOL),
+        abilities=(AbilityDescriptor.heavy(),),
+    )
+    catalog = _catalog_with_extra_bolt_profile(heavy_pistol_profile)
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_pose=Pose.at(11.0, 35.0),
+        catalog=catalog,
+    )
+    attacker = units["intercessor-1"]
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=attacker.unit_instance_id,
+        selection_result_id="phase13d-select-engaged-heavy",
+        shooting_type=ShootingType.CLOSE_QUARTERS,
+    )
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=units["enemy"].unit_instance_id,
+        weapon_profile_id=heavy_pistol_profile.profile_id,
+    )
+
+    _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=proposal.to_payload(),
+        result_id="phase13d-declare-engaged-heavy",
+    )
+
+    accepted_payload = _last_event_payload(lifecycle, "shooting_declaration_accepted")
+    pool_payload = cast(list[dict[str, object]], accepted_payload["attack_pools"])[0]
+    targeting_rule_ids = cast(list[str], pool_payload["targeting_rule_ids"])
+    assert pool_payload["hit_roll_modifier"] == 0
+    assert HEAVY_RULE_ID not in targeting_rule_ids
 
 
 def test_phase13d_torrent_anti_and_devastating_wounds_are_attack_sequence_effects() -> None:
