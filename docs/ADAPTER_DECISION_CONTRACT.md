@@ -296,7 +296,12 @@ and carry the selected grant payload into the later `submit_movement_proposal`
 request when that action uses one. The engine still validates the movement
 proposal, mutates battlefield state, and consumes structured grant effects.
 Stale, malformed, wrong-context, or unavailable grant submissions are rejected
-before grant/spend mutation.
+before grant/spend mutation. Drukhari `Power from Pain: Lithe Agility` uses this
+same grant surface for Advance moves: accepting the engine-emitted option spends
+one Pain token through the faction-resource ledger, records a phase-scoped
+empowerment effect, and may then emit the normal `select_dice_reroll` request
+for the Advance roll. Adapters must not decrement Pain tokens or grant the
+reroll locally.
 
 Phase 17G Movement-end surge rules use the same finite/proposal split as other
 physical movement. After an enemy unit completes a Normal Move, Advance, or
@@ -737,11 +742,11 @@ Phase 15A implements Charge phase eligibility, declaration, optional source-back
 Phase 15A exposes this active-player decision:
 
 - `select_charging_unit`: finite active-player choice. Option IDs are either the selected `unit_instance_id` or `complete_charge_phase`. Unit option payloads include `submission_kind: "select_charging_unit"`, game, round, phase, active player, selected unit ID, target candidates, and the current eligibility context. The completion option uses `submission_kind: "complete_charge_phase"` and includes deterministic `skipped_unit_ids` for all currently legal active-player charging units.
-- `select_charge_declaration_grant`: finite active-player choice emitted after `select_charging_unit` and before the Charge roll when runtime content exposes legal declaration grants. Option IDs are deterministic source hook IDs, plus `decline_charge_declaration_grant`. Accepted options may record engine-owned source spend and unit effects; adapters must not spend resources, invent grant IDs, or mutate defensive restrictions locally.
+- `select_charge_declaration_grant`: finite active-player choice emitted after `select_charging_unit` and before the Charge roll when runtime content exposes legal declaration grants. Option IDs are deterministic source hook IDs, plus `decline_charge_declaration_grant`. Accepted options may record engine-owned source spend and unit effects; adapters must not spend resources, invent grant IDs, or mutate defensive restrictions locally. Drukhari `Power from Pain: Lithe Agility` uses this surface to spend one Pain token and record Charge-phase empowerment before the Charge roll.
 
 Charge eligibility target candidates are engine-enumerated from battlefield state and the active ruleset's `charge_policy`. Phase 15A rejects chargers that Advanced, Fell Back, are within Engagement Range, are off the battlefield, already declared a Charge this phase, or have no enemy unit within the descriptor-sourced declaration range, currently 12", unless a future source-backed rule explicitly marks that unit as allowed to declare a charge.
 
-Selecting a charging unit records the finite `DecisionRecord`, emits `charging_unit_selected`, and either emits a `select_charge_declaration_grant` request or rolls 2D6 through the deterministic dice manager with `roll_type: "charge_roll"`. There is no Phase 15A adapter-visible target declaration payload. The generated charge-roll `DiceRollSpec` includes `reroll_forbidden_rule_ids` with `phase15a:charge-roll-command-reroll-forbidden`, so Phase 15A Charge rolls must not emit a Command Re-roll request even though the source-backed 11th Edition Stratagem catalog contains Charge as an eligible roll class.
+Selecting a charging unit records the finite `DecisionRecord`, emits `charging_unit_selected`, and either emits a `select_charge_declaration_grant` request or rolls 2D6 through the deterministic dice manager with `roll_type: "charge_roll"`. There is no Phase 15A adapter-visible target declaration payload. The generated charge-roll `DiceRollSpec` includes `reroll_forbidden_rule_ids` with `phase15a:charge-roll-command-reroll-forbidden`, so Phase 15A Charge rolls must not emit a Command Re-roll request even though the source-backed 11th Edition Stratagem catalog contains Charge as an eligible roll class. Source-backed non-Command rerolls, such as Drukhari Lithe Agility after an accepted Power from Pain declaration grant, may still emit `select_dice_reroll`; the request payload carries the source permission and the engine ignores only the Command Re-roll forbidden marker for that source-backed reroll.
 
 The `charge_roll_resolved` payload includes:
 

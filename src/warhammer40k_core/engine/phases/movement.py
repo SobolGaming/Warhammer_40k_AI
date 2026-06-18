@@ -85,6 +85,10 @@ from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_resources import (
+    apply_faction_resource_spend_effect,
+    faction_resource_result_enriched_payload,
+)
 from warhammer40k_core.engine.fall_back_hooks import (
     FallBackEligibilityContext,
     FallBackEligibilityGrant,
@@ -135,6 +139,9 @@ from warhammer40k_core.engine.reserves import (
 from warhammer40k_core.engine.runtime_modifiers import (
     MovementBudgetModifierContext,
     RuntimeModifierRegistry,
+)
+from warhammer40k_core.engine.source_backed_rerolls import (
+    source_backed_reroll_permission_for_unit,
 )
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.stratagems import (
@@ -5378,6 +5385,12 @@ def _record_movement_action_grant_effects(
 ) -> tuple[PersistingEffect, ...]:
     effects: list[PersistingEffect] = []
     if grant.decision_effect_payload is not None:
+        resource_spend_result = apply_faction_resource_spend_effect(
+            state=state,
+            player_id=player_id,
+            source_id=f"{grant.source_id}:{result.request_id}:{result.result_id}:spend",
+            effect_payload=grant.decision_effect_payload,
+        )
         spend_effect = PersistingEffect(
             effect_id=f"{grant.hook_id}:{result.request_id}:{result.result_id}:decision",
             source_rule_id=grant.source_id,
@@ -5386,7 +5399,10 @@ def _record_movement_action_grant_effects(
             started_battle_round=state.battle_round,
             started_phase=BattlePhaseKind.MOVEMENT,
             expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
-            effect_payload=grant.decision_effect_payload,
+            effect_payload=faction_resource_result_enriched_payload(
+                effect_payload=grant.decision_effect_payload,
+                result=resource_spend_result,
+            ),
         )
         state.record_persisting_effect(spend_effect)
         effects.append(spend_effect)
@@ -5395,7 +5411,10 @@ def _record_movement_action_grant_effects(
             effect_id=f"{grant.hook_id}:{result.request_id}:{result.result_id}:unit",
             source_rule_id=grant.source_id,
             owner_player_id=player_id,
-            target_unit_instance_ids=(unit_instance_id,),
+            target_unit_instance_ids=_movement_action_grant_unit_effect_target_ids(
+                unit_instance_id=unit_instance_id,
+                effect_payload=grant.unit_effect_payload,
+            ),
             started_battle_round=state.battle_round,
             started_phase=BattlePhaseKind.MOVEMENT,
             expiration=_movement_action_grant_effect_expiration(
@@ -5408,6 +5427,28 @@ def _record_movement_action_grant_effects(
         state.record_persisting_effect(unit_effect)
         effects.append(unit_effect)
     return tuple(effects)
+
+
+def _movement_action_grant_unit_effect_target_ids(
+    *,
+    unit_instance_id: str,
+    effect_payload: JsonValue,
+) -> tuple[str, ...]:
+    if not isinstance(effect_payload, dict):
+        return (_validate_identifier("unit_instance_id", unit_instance_id),)
+    raw_target_ids = effect_payload.get("target_unit_instance_ids")
+    if raw_target_ids is None:
+        return (_validate_identifier("unit_instance_id", unit_instance_id),)
+    if not isinstance(raw_target_ids, list):
+        raise GameLifecycleError("Movement action grant target_unit_instance_ids must be a list.")
+    target_ids = tuple(
+        _validate_identifier("target_unit_instance_ids", raw_id) for raw_id in raw_target_ids
+    )
+    if not target_ids:
+        raise GameLifecycleError("Movement action grant target_unit_instance_ids is empty.")
+    if len(set(target_ids)) != len(target_ids):
+        raise GameLifecycleError("Movement action grant target_unit_instance_ids are duplicated.")
+    return target_ids
 
 
 def _movement_action_grant_effect_expiration(
@@ -7482,6 +7523,8 @@ def _advance_roll_request_for_action(
         player_id=unit_placement.player_id,
         unit_instance_id=unit_placement.unit_instance_id,
         reroll_permission=_advance_reroll_permission_for_unit(
+            state=state,
+            unit=unit,
             unit_instance_id=unit_placement.unit_instance_id,
             player_id=unit_placement.player_id,
             keywords=unit.keywords,
@@ -7582,19 +7625,27 @@ def _dice_roll_manager_for_state(
 
 def _advance_reroll_permission_for_unit(
     *,
+    state: GameState,
+    unit: UnitInstance,
     unit_instance_id: str,
     player_id: str,
     keywords: tuple[str, ...],
 ) -> RerollPermission | None:
     keyword_set = {_canonical_keyword(keyword) for keyword in keywords}
-    if _ADVANCE_REROLL_KEYWORD not in keyword_set:
-        return None
-    return RerollPermission(
-        source_id=f"{unit_instance_id}:advance-reroll",
-        timing_window="after_roll_before_modifiers",
-        owning_player_id=player_id,
-        eligible_roll_type="advance_roll",
-        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+    if _ADVANCE_REROLL_KEYWORD in keyword_set:
+        return RerollPermission(
+            source_id=f"{unit_instance_id}:advance-reroll",
+            timing_window="after_roll_before_modifiers",
+            owning_player_id=player_id,
+            eligible_roll_type="advance_roll",
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        )
+    return source_backed_reroll_permission_for_unit(
+        state=state,
+        player_id=player_id,
+        unit_instance_id=unit_instance_id,
+        roll_type="advance_roll",
+        timing_window="after_advance_roll",
     )
 
 

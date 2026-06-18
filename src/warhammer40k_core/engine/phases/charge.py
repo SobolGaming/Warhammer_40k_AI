@@ -5,6 +5,11 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
+from warhammer40k_core.core.dice import (
+    DiceRollState,
+    DiceRollStatePayload,
+    RerollPermission,
+)
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     MovementMode,
@@ -28,10 +33,12 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.charge_declaration import (
     CHARGE_MOVE_PENDING_STATUS,
+    CHARGE_ROLL_COMMAND_REROLL_FORBIDDEN_RULE_ID,
     ChargeDistanceState,
     ChargeDistanceStatePayload,
     ChargeEligibilityContext,
     ChargeRollRequest,
+    ChargeRollRequestPayload,
     ChargeRollResult,
     ChargeTargetCandidate,
     phase15a_charge_roll_payload,
@@ -51,9 +58,13 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_resources import (
+    apply_faction_resource_spend_effect,
+    faction_resource_result_enriched_payload,
+)
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -71,6 +82,9 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     RuntimeModifierRegistry,
+)
+from warhammer40k_core.engine.source_backed_rerolls import (
+    source_backed_reroll_permission_for_unit,
 )
 from warhammer40k_core.engine.target_restriction_hooks import (
     ChargeTargetRestrictionContext,
@@ -952,6 +966,14 @@ class ChargePhaseHandler:
                 runtime_modifier_registry=self.runtime_modifier_registry,
                 charge_target_restriction_hooks=self.charge_target_restriction_hooks,
             )
+        if result.decision_type == DICE_REROLL_DECISION_TYPE:
+            return _apply_charge_roll_reroll_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                charge_target_restriction_hooks=self.charge_target_restriction_hooks,
+            )
         if result.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
             return _apply_charge_move_proposal_decision(
                 state=state,
@@ -1537,6 +1559,12 @@ def _record_charge_declaration_grant_effects(
 ) -> tuple[PersistingEffect, ...]:
     effects: list[PersistingEffect] = []
     if grant.decision_effect_payload is not None:
+        resource_spend_result = apply_faction_resource_spend_effect(
+            state=state,
+            player_id=selection.player_id,
+            source_id=f"{grant.source_id}:{result.request_id}:{result.result_id}:spend",
+            effect_payload=grant.decision_effect_payload,
+        )
         spend_effect = PersistingEffect(
             effect_id=f"{result.result_id}:{grant.hook_id}:decision",
             source_rule_id=grant.source_id,
@@ -1545,7 +1573,10 @@ def _record_charge_declaration_grant_effects(
             started_battle_round=state.battle_round,
             started_phase=BattlePhaseKind.CHARGE,
             expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
-            effect_payload=grant.decision_effect_payload,
+            effect_payload=faction_resource_result_enriched_payload(
+                effect_payload=grant.decision_effect_payload,
+                result=resource_spend_result,
+            ),
         )
         state.record_persisting_effect(spend_effect)
         effects.append(spend_effect)
@@ -1557,7 +1588,10 @@ def _record_charge_declaration_grant_effects(
         effect_id=f"{result.result_id}:{grant.hook_id}:unit",
         source_rule_id=grant.source_id,
         owner_player_id=selection.player_id,
-        target_unit_instance_ids=(selection.unit_instance_id,),
+        target_unit_instance_ids=_charge_declaration_grant_unit_effect_target_ids(
+            unit_instance_id=selection.unit_instance_id,
+            effect_payload=grant.unit_effect_payload,
+        ),
         started_battle_round=state.battle_round,
         started_phase=BattlePhaseKind.CHARGE,
         expiration=_charge_declaration_grant_unit_effect_expiration(
@@ -1570,6 +1604,32 @@ def _record_charge_declaration_grant_effects(
     state.record_persisting_effect(unit_effect)
     effects.append(unit_effect)
     return tuple(effects)
+
+
+def _charge_declaration_grant_unit_effect_target_ids(
+    *,
+    unit_instance_id: str,
+    effect_payload: JsonValue,
+) -> tuple[str, ...]:
+    if not isinstance(effect_payload, dict):
+        return (_validate_identifier("unit_instance_id", unit_instance_id),)
+    raw_target_ids = effect_payload.get("target_unit_instance_ids")
+    if raw_target_ids is None:
+        return (_validate_identifier("unit_instance_id", unit_instance_id),)
+    if not isinstance(raw_target_ids, list):
+        raise GameLifecycleError(
+            "Charge declaration grant target_unit_instance_ids must be a list."
+        )
+    target_ids = tuple(
+        _validate_identifier("target_unit_instance_ids", raw_id) for raw_id in raw_target_ids
+    )
+    if not target_ids:
+        raise GameLifecycleError("Charge declaration grant target_unit_instance_ids is empty.")
+    if len(set(target_ids)) != len(target_ids):
+        raise GameLifecycleError(
+            "Charge declaration grant target_unit_instance_ids are duplicated."
+        )
+    return target_ids
 
 
 def _charge_declaration_grant_unit_effect_expiration(
@@ -1631,6 +1691,52 @@ def _resolve_charge_roll(
     roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
         roll_request.spec
     )
+    reroll_permission = _charge_reroll_permission_for_unit(
+        state=state,
+        player_id=selection.player_id,
+        unit_instance_id=selection.unit_instance_id,
+    )
+    if reroll_permission is not None:
+        reroll_request = _charge_roll_reroll_request(
+            state=state,
+            decisions=decisions,
+            roll_request=roll_request,
+            roll_state=roll_state,
+            permission=reroll_permission,
+        )
+        decisions.request_decision(reroll_request)
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=reroll_request,
+            payload={
+                "phase": BattlePhase.CHARGE.value,
+                "phase_body_status": "charge_roll_reroll_pending",
+                "battle_round": state.battle_round,
+                "active_player_id": selection.player_id,
+                "unit_instance_id": selection.unit_instance_id,
+            },
+        )
+    return _resolve_charge_roll_state(
+        state=state,
+        selection=selection,
+        decisions=decisions,
+        roll_request=roll_request,
+        roll_state=roll_state,
+        ruleset_descriptor=ruleset_descriptor,
+        charge_target_restriction_hooks=charge_target_restriction_hooks,
+    )
+
+
+def _resolve_charge_roll_state(
+    *,
+    state: GameState,
+    selection: ChargingUnitSelection,
+    decisions: DecisionController,
+    roll_request: ChargeRollRequest,
+    roll_state: DiceRollState,
+    ruleset_descriptor: RulesetDescriptor,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
+) -> LifecycleStatus | None:
     reachable_distances = _reachable_charge_target_distances(
         state=state,
         unit_instance_id=selection.unit_instance_id,
@@ -1666,6 +1772,99 @@ def _resolve_charge_roll(
         decisions=decisions,
         charge_state=charge_state,
         roll_result=roll_result,
+    )
+
+
+def _charge_roll_reroll_request(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    roll_request: ChargeRollRequest,
+    roll_state: DiceRollState,
+    permission: RerollPermission,
+) -> DecisionRequest:
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    return manager.build_reroll_request(
+        roll_state,
+        request_id=state.next_decision_request_id(),
+        actor_id=roll_request.player_id,
+        permission=permission,
+        ignored_reroll_forbidden_rule_ids=(CHARGE_ROLL_COMMAND_REROLL_FORBIDDEN_RULE_ID,),
+        extra_payload={
+            "charge_context": {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.CHARGE.value,
+                "unit_instance_id": roll_request.unit_instance_id,
+                "charge_roll_request": validate_json_value(roll_request.to_payload()),
+                "charge_roll_state": validate_json_value(roll_state.to_payload()),
+            }
+        },
+    )
+
+
+def _apply_charge_roll_reroll_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
+) -> LifecycleStatus | None:
+    charge_state = state.charge_phase_state
+    if charge_state is None or charge_state.active_selection is None:
+        raise GameLifecycleError("Charge reroll requires active charge selection.")
+    selection = charge_state.active_selection
+    if result.actor_id != selection.player_id:
+        raise GameLifecycleError("Charge reroll actor must match charging player.")
+    record = decisions.record_for_result(result)
+    request_payload = _decision_payload_object(record.request.payload)
+    context_payload = _payload_object(request_payload, key="charge_context")
+    unit_instance_id = _payload_string(context_payload, key="unit_instance_id")
+    if unit_instance_id != selection.unit_instance_id:
+        raise GameLifecycleError("Charge reroll unit must match active charge selection.")
+    roll_request_payload = _payload_object(context_payload, key="charge_roll_request")
+    initial_roll_payload = _payload_object(context_payload, key="charge_roll_state")
+    roll_request = ChargeRollRequest.from_payload(
+        cast(ChargeRollRequestPayload, roll_request_payload)
+    )
+    if roll_request.unit_instance_id != selection.unit_instance_id:
+        raise GameLifecycleError("Charge reroll request unit drift.")
+    initial_roll_state = DiceRollState.from_payload(
+        cast(DiceRollStatePayload, initial_roll_payload)
+    )
+    rerolled_state = DiceRollManager(
+        state.game_id,
+        event_log=decisions.event_log,
+    ).resolve_reroll(
+        initial_roll_state,
+        request=record.request,
+        result=result,
+        record_decision=False,
+    )
+    return _resolve_charge_roll_state(
+        state=state,
+        selection=selection,
+        decisions=decisions,
+        roll_request=roll_request,
+        roll_state=rerolled_state,
+        ruleset_descriptor=ruleset_descriptor,
+        charge_target_restriction_hooks=charge_target_restriction_hooks,
+    )
+
+
+def _charge_reroll_permission_for_unit(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+) -> RerollPermission | None:
+    return source_backed_reroll_permission_for_unit(
+        state=state,
+        player_id=player_id,
+        unit_instance_id=unit_instance_id,
+        roll_type="charge_roll",
+        timing_window="after_charge_roll",
     )
 
 
@@ -3369,6 +3568,13 @@ def _payload_string(payload: dict[str, object], *, key: str) -> str:
     if type(value) is not str:
         raise GameLifecycleError(f"Payload field {key} must be a string.")
     return _validate_identifier(key, value)
+
+
+def _payload_object(payload: dict[str, object], *, key: str) -> dict[str, object]:
+    value = payload.get(key)
+    if not isinstance(value, dict):
+        raise GameLifecycleError(f"Payload field {key} must be an object.")
+    return cast(dict[str, object], value)
 
 
 def _payload_identifier_list(payload: dict[str, object], *, key: str) -> tuple[str, ...]:

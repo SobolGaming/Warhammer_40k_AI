@@ -23,11 +23,15 @@ class ListValidationError(ValueError):
 
 
 class BattleSize(StrEnum):
+    INCURSION = "incursion"
     STRIKE_FORCE = "strike_force"
+    ONSLAUGHT = "onslaught"
 
 
 DAEMONIC_PACT_FACTION_KEYWORD = "LEGIONES DAEMONICA"
 DAEMONIC_PACT_BASE_FACTION_KEYWORDS = frozenset({"CHAOS KNIGHTS", "HERETIC ASTARTES"})
+DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_FACTION_KEYWORD = "DRUKHARI"
+DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_ALLY_KEYWORDS = frozenset({"HARLEQUINS", "ANHRATHE"})
 
 
 class BattleSizeMusteringPolicyPayload(TypedDict):
@@ -140,6 +144,19 @@ class BattleSizeMusteringPolicy:
             )
 
     @classmethod
+    def incursion(cls) -> Self:
+        return cls(
+            battle_size=BattleSize.INCURSION,
+            points_limit=1000,
+            battlefield_width_inches=44.0,
+            battlefield_depth_inches=30.0,
+            detachment_point_limit=2,
+            enhancement_limit=4,
+            unit_limit=3,
+            battleline_unit_limit=6,
+        )
+
+    @classmethod
     def strike_force(cls) -> Self:
         return cls(
             battle_size=BattleSize.STRIKE_FORCE,
@@ -147,6 +164,19 @@ class BattleSizeMusteringPolicy:
             battlefield_width_inches=60.0,
             battlefield_depth_inches=44.0,
             detachment_point_limit=3,
+            enhancement_limit=4,
+            unit_limit=3,
+            battleline_unit_limit=6,
+        )
+
+    @classmethod
+    def onslaught(cls) -> Self:
+        return cls(
+            battle_size=BattleSize.ONSLAUGHT,
+            points_limit=3000,
+            battlefield_width_inches=90.0,
+            battlefield_depth_inches=44.0,
+            detachment_point_limit=4,
             enhancement_limit=4,
             unit_limit=3,
             battleline_unit_limit=6,
@@ -531,7 +561,13 @@ def validate_unit_selection_for_army(
         datasheet=datasheet,
         faction=faction,
     )
-    if not shares_selected_faction and not daemonic_pact_allowed:
+    drukhari_corsairs_allowed = (
+        drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction(
+            datasheet=datasheet,
+            faction=faction,
+        )
+    )
+    if not shares_selected_faction and not daemonic_pact_allowed and not drukhari_corsairs_allowed:
         raise ListValidationError("UnitMusterSelection datasheet is not legal for faction.")
     _selected_faction, detachments = validate_detachment_selection(
         catalog=catalog,
@@ -541,7 +577,11 @@ def validate_unit_selection_for_army(
     allowed_datasheet_ids = {
         datasheet_id for detachment in detachments for datasheet_id in detachment.unit_datasheet_ids
     }
-    if datasheet.datasheet_id not in allowed_datasheet_ids and not daemonic_pact_allowed:
+    if (
+        datasheet.datasheet_id not in allowed_datasheet_ids
+        and not daemonic_pact_allowed
+        and not drukhari_corsairs_allowed
+    ):
         raise ListValidationError(
             "UnitMusterSelection datasheet is not provided by selected detachments."
         )
@@ -561,6 +601,35 @@ def daemonic_pact_datasheet_allowed_for_faction(
         return False
     faction_keywords = {_canonical_keyword(keyword) for keyword in faction.faction_keywords}
     return bool(faction_keywords & DAEMONIC_PACT_BASE_FACTION_KEYWORDS)
+
+
+def drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction(
+    *,
+    datasheet: DatasheetDefinition,
+    faction: FactionDefinition,
+) -> bool:
+    if type(datasheet) is not DatasheetDefinition:
+        raise ListValidationError(
+            "Corsairs and Travelling Players datasheet must be a DatasheetDefinition."
+        )
+    if type(faction) is not FactionDefinition:
+        raise ListValidationError(
+            "Corsairs and Travelling Players faction must be a FactionDefinition."
+        )
+    if not _faction_has_keyword(
+        faction,
+        DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_FACTION_KEYWORD,
+    ):
+        return False
+    if _datasheet_has_faction_keyword(
+        datasheet,
+        DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_FACTION_KEYWORD,
+    ):
+        return False
+    return _datasheet_has_any_keyword(
+        datasheet,
+        DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_ALLY_KEYWORDS,
+    )
 
 
 def resolve_model_profile_selections(
@@ -639,6 +708,29 @@ def _datasheet_has_faction_keyword(
     return any(
         _canonical_keyword(stored) == canonical for stored in datasheet.keywords.faction_keywords
     )
+
+
+def _datasheet_has_any_keyword(
+    datasheet: DatasheetDefinition,
+    keywords: frozenset[str],
+) -> bool:
+    requested_keywords = {_canonical_keyword(keyword) for keyword in keywords}
+    stored_keywords = {
+        _canonical_keyword(stored)
+        for stored in (
+            *datasheet.keywords.keywords,
+            *datasheet.keywords.faction_keywords,
+        )
+    }
+    return bool(requested_keywords & stored_keywords)
+
+
+def _faction_has_keyword(
+    faction: FactionDefinition,
+    keyword: str,
+) -> bool:
+    canonical = _canonical_keyword(keyword)
+    return any(_canonical_keyword(stored) == canonical for stored in faction.faction_keywords)
 
 
 def _canonical_keyword(value: str) -> str:
@@ -903,8 +995,12 @@ def battle_size_from_token(token: object) -> BattleSize:
 
 def battle_size_mustering_policy(battle_size: BattleSize) -> BattleSizeMusteringPolicy:
     resolved_battle_size = battle_size_from_token(battle_size)
+    if resolved_battle_size is BattleSize.INCURSION:
+        return BattleSizeMusteringPolicy.incursion()
     if resolved_battle_size is BattleSize.STRIKE_FORCE:
         return BattleSizeMusteringPolicy.strike_force()
+    if resolved_battle_size is BattleSize.ONSLAUGHT:
+        return BattleSizeMusteringPolicy.onslaught()
     raise ListValidationError(f"Unsupported BattleSize: {resolved_battle_size.value}.")
 
 

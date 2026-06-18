@@ -22,6 +22,9 @@ from warhammer40k_core.engine.ability_coverage import (
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
     army_rule as death_guard_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.drukhari import (
+    army_rule as drukhari_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
     army_rule as emperors_children_army_rule,
 )
@@ -253,6 +256,23 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             ability_name="Thrill Seekers",
             semantic_category="faction.army_rule.thrill_seekers",
             runtime_consumer_ids=_emperors_children_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
+            faction_id="drukhari",
+            ability_id=drukhari_army_rule.HOOK_ID,
+            ability_name="Power from Pain",
+            semantic_category="faction.army_rule.power_from_pain",
+            runtime_consumer_ids=(
+                drukhari_army_rule.CONTRIBUTION_ID,
+                drukhari_army_rule.HOOK_ID,
+            ),
+        ),
+        _implemented_faction_army_rule_row(
+            faction_id="drukhari",
+            ability_id="phase17g:drukhari:corsairs-and-travelling-players",
+            ability_name="Corsairs and Travelling Players",
+            semantic_category="faction.army_rule.corsairs_and_travelling_players",
+            runtime_consumer_ids=("army-mustering:drukhari-corsairs-and-travelling-players",),
         ),
     )
 
@@ -559,6 +579,33 @@ def _structured_support_sections_markdown() -> list[str]:
                     "Focused faction runtime tests",
                     "Full",
                     "Includes movement, charge, and shooting target restrictions.",
+                ),
+                SupportSectionRow(
+                    "Drukhari - Power from Pain",
+                    "Named army-rule handler plus faction-resource ledger",
+                    "README, faction integration note, adapter contract, and generated matrix",
+                    "Focused faction runtime tests",
+                    "Partial",
+                    (
+                        "Implements Pain token gain at own Command phase start, enemy "
+                        "unit destruction, and enemy Battle-shock failure, plus optional "
+                        "Lithe Agility empowerment for Advance and Charge rerolls. "
+                        "Hatred Eternal attack hit-reroll empowerment still requires a "
+                        "source-backed selected-to-shoot/fight grant surface."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Drukhari - Corsairs and Travelling Players",
+                    "Shared mustering/list-validation host",
+                    "README, faction integration note, and generated matrix",
+                    "Focused mustering tests",
+                    "Full",
+                    (
+                        "Allows non-DRUKHARI HARLEQUINS and ANHRATHE allies under "
+                        "Incursion, Strike Force, and Onslaught caps; forbids allied "
+                        "Warlords and Enhancements. No player-facing decision or phase "
+                        "runtime hook is introduced."
+                    ),
                 ),
             ),
         )

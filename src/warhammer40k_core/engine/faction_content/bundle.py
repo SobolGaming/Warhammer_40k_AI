@@ -37,6 +37,10 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
     ChargeDeclarationHookBinding,
     ChargeDeclarationHookRegistry,
 )
+from warhammer40k_core.engine.command_phase_start_hooks import (
+    CommandPhaseStartHookBinding,
+    CommandPhaseStartHookRegistry,
+)
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectBinding,
     EnhancementEffectRegistry,
@@ -104,6 +108,10 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionHookBinding,
     ShootingTargetRestrictionHookRegistry,
 )
+from warhammer40k_core.engine.unit_destroyed_hooks import (
+    UnitDestroyedHookBinding,
+    UnitDestroyedHookRegistry,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
 )
@@ -126,6 +134,8 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     event_subscriptions: list[dict[str, JsonValue]]
     battle_formation_hook_ids: list[str]
     battle_round_start_hook_ids: list[str]
+    command_phase_start_hook_ids: list[str]
+    unit_destroyed_hook_ids: list[str]
     battle_shock_hook_ids: list[str]
     advance_eligibility_hook_ids: list[str]
     advance_move_hook_ids: list[str]
@@ -170,6 +180,8 @@ class RuntimeContentContribution:
     event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = ()
     battle_formation_hook_bindings: tuple[BattleFormationHookBinding, ...] = ()
     battle_round_start_hook_bindings: tuple[BattleRoundStartHookBinding, ...] = ()
+    command_phase_start_hook_bindings: tuple[CommandPhaseStartHookBinding, ...] = ()
+    unit_destroyed_hook_bindings: tuple[UnitDestroyedHookBinding, ...] = ()
     battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = ()
     advance_eligibility_hook_bindings: tuple[AdvanceEligibilityHookBinding, ...] = ()
     advance_move_hook_bindings: tuple[AdvanceMoveHookBinding, ...] = ()
@@ -289,11 +301,29 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "command_phase_start_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution command_phase_start_hook_bindings",
+                self.command_phase_start_hook_bindings,
+                CommandPhaseStartHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "battle_shock_hook_bindings",
             _validate_tuple(
                 "RuntimeContentContribution battle_shock_hook_bindings",
                 self.battle_shock_hook_bindings,
                 BattleShockHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "unit_destroyed_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution unit_destroyed_hook_bindings",
+                self.unit_destroyed_hook_bindings,
+                UnitDestroyedHookBinding,
             ),
         )
         object.__setattr__(
@@ -485,6 +515,8 @@ class RuntimeContentContribution:
             event_handler_bindings=self.event_handler_bindings,
             battle_formation_hook_bindings=self.battle_formation_hook_bindings,
             battle_round_start_hook_bindings=self.battle_round_start_hook_bindings,
+            command_phase_start_hook_bindings=self.command_phase_start_hook_bindings,
+            unit_destroyed_hook_bindings=self.unit_destroyed_hook_bindings,
             battle_shock_hook_bindings=self.battle_shock_hook_bindings,
             advance_eligibility_hook_bindings=self.advance_eligibility_hook_bindings,
             advance_move_hook_bindings=self.advance_move_hook_bindings,
@@ -599,6 +631,24 @@ def combine_runtime_content_contributions(
                 binding
                 for contribution in validated_contributions
                 for binding in contribution.battle_round_start_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
+        command_phase_start_hook_bindings=_combine_unique_values(
+            "Command-phase start hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.command_phase_start_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
+        unit_destroyed_hook_bindings=_combine_unique_values(
+            "Unit-destroyed hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.unit_destroyed_hook_bindings
             ),
             lambda binding: binding.hook_id,
         ),
@@ -798,6 +848,8 @@ class RuntimeContentBundle:
     event_index: RuntimeContentEventIndex
     battle_formation_hook_registry: BattleFormationHookRegistry
     battle_round_start_hook_registry: BattleRoundStartHookRegistry
+    command_phase_start_hook_registry: CommandPhaseStartHookRegistry
+    unit_destroyed_hook_registry: UnitDestroyedHookRegistry
     battle_shock_hook_registry: BattleShockHookRegistry
     advance_eligibility_hook_registry: AdvanceEligibilityHookRegistry
     advance_move_hook_registry: AdvanceMoveHookRegistry
@@ -849,6 +901,10 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires BattleFormationHookRegistry.")
         if type(self.battle_round_start_hook_registry) is not BattleRoundStartHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires BattleRoundStartHookRegistry.")
+        if type(self.command_phase_start_hook_registry) is not CommandPhaseStartHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires CommandPhaseStartHookRegistry.")
+        if type(self.unit_destroyed_hook_registry) is not UnitDestroyedHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires UnitDestroyedHookRegistry.")
         if type(self.battle_shock_hook_registry) is not BattleShockHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires BattleShockHookRegistry.")
         if type(self.advance_eligibility_hook_registry) is not AdvanceEligibilityHookRegistry:
@@ -1028,6 +1084,20 @@ class RuntimeContentBundle:
                 for binding in contribution.battle_round_start_hook_bindings
             )
         )
+        command_phase_start_hook_registry = CommandPhaseStartHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.command_phase_start_hook_bindings
+            )
+        )
+        unit_destroyed_hook_registry = UnitDestroyedHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.unit_destroyed_hook_bindings
+            )
+        )
         battle_shock_hook_registry = BattleShockHookRegistry.from_bindings(
             tuple(
                 binding
@@ -1179,6 +1249,8 @@ class RuntimeContentBundle:
             event_index=event_index,
             battle_formation_hook_registry=battle_formation_hook_registry,
             battle_round_start_hook_registry=battle_round_start_hook_registry,
+            command_phase_start_hook_registry=command_phase_start_hook_registry,
+            unit_destroyed_hook_registry=unit_destroyed_hook_registry,
             battle_shock_hook_registry=battle_shock_hook_registry,
             advance_eligibility_hook_registry=advance_eligibility_hook_registry,
             advance_move_hook_registry=advance_move_hook_registry,
@@ -1228,6 +1300,12 @@ class RuntimeContentBundle:
             ],
             "battle_round_start_hook_ids": [
                 binding.hook_id for binding in self.battle_round_start_hook_registry.all_bindings()
+            ],
+            "command_phase_start_hook_ids": [
+                binding.hook_id for binding in self.command_phase_start_hook_registry.all_bindings()
+            ],
+            "unit_destroyed_hook_ids": [
+                binding.hook_id for binding in self.unit_destroyed_hook_registry.all_bindings()
             ],
             "battle_shock_hook_ids": [
                 binding.hook_id for binding in self.battle_shock_hook_registry.all_bindings()

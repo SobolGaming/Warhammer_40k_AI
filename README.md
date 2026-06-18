@@ -168,6 +168,15 @@ Current status:
   support includes selected Chaos Daemons, Aeldari, and Death Guard Phase 17G
   slices; broad datasheet, wargear, weapon, and remaining faction execution
   remains later Phase 17 work.
+- Matched-play mustering supports Incursion, Strike Force, and Onslaught battle
+  sizes, including the Drukhari `Corsairs and Travelling Players` ally rule for
+  HARLEQUINS and ANHRATHE units.
+- Drukhari `Power from Pain` runtime support includes a deterministic Pain token
+  ledger, token gain at the owning Command phase start, enemy Battle-shock
+  failures, and enemy unit destruction, plus Lithe Agility empowerment for
+  Advance and Charge rerolls through the shared grant and dice-reroll decision
+  path. Hatred Eternal hit-reroll empowerment is tracked as a remaining
+  selected-to-shoot/fight grant integration.
 - Local CLI/human decision entry, viewer-safe catalog/live unit-model projection,
   and trigger opportunity-window intent support are documented in
   [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) and

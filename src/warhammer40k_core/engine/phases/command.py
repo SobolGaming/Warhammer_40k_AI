@@ -15,6 +15,10 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockModifierContext,
     BattleShockOutcomeContext,
 )
+from warhammer40k_core.engine.command_phase_start_hooks import (
+    CommandPhaseStartContext,
+    CommandPhaseStartHookRegistry,
+)
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointSourceKind,
@@ -79,6 +83,9 @@ class CommandPhaseHandler:
     battle_shock_hooks: BattleShockHookRegistry = field(
         default_factory=BattleShockHookRegistry.empty
     )
+    command_phase_start_hooks: CommandPhaseStartHookRegistry = field(
+        default_factory=CommandPhaseStartHookRegistry.empty
+    )
     runtime_modifier_registry: RuntimeModifierRegistry = field(
         default_factory=RuntimeModifierRegistry.empty
     )
@@ -91,6 +98,10 @@ class CommandPhaseHandler:
             raise GameLifecycleError("CommandPhaseHandler stratagem_index must be an index.")
         if type(self.battle_shock_hooks) is not BattleShockHookRegistry:
             raise GameLifecycleError("CommandPhaseHandler battle_shock_hooks must be a registry.")
+        if type(self.command_phase_start_hooks) is not CommandPhaseStartHookRegistry:
+            raise GameLifecycleError(
+                "CommandPhaseHandler command_phase_start_hooks must be a registry."
+            )
         if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
             raise GameLifecycleError(
                 "CommandPhaseHandler runtime_modifier_registry must be a registry."
@@ -127,7 +138,11 @@ class CommandPhaseHandler:
 
         command_state = _ensure_command_step_state(state, active_player_id=active_player_id)
         if not command_state.command_points_granted:
-            _resolve_command_step_start(state=state, decisions=decisions)
+            _resolve_command_step_start(
+                state=state,
+                decisions=decisions,
+                command_phase_start_hooks=self.command_phase_start_hooks,
+            )
             command_state = _command_step_state(state)
         if not command_state.scoring_hooks_resolved:
             _resolve_command_phase_scoring_hooks(state=state, decisions=decisions)
@@ -617,6 +632,7 @@ def _resolve_command_step_start(
     *,
     state: GameState,
     decisions: DecisionController,
+    command_phase_start_hooks: CommandPhaseStartHookRegistry,
 ) -> None:
     active_player_id = _active_player_id(state)
     cleared_battle_shocked_unit_ids = state.clear_battle_shock_for_player(active_player_id)
@@ -636,6 +652,13 @@ def _resolve_command_step_start(
         gain_payload = validate_json_value(gain.to_payload())
         gain_payloads.append(gain_payload)
         decisions.event_log.append("command_points_gained", gain_payload)
+    command_phase_start_hooks.resolve(
+        CommandPhaseStartContext(
+            state=state,
+            decisions=decisions,
+            active_player_id=active_player_id,
+        )
+    )
     state.command_step_state = _command_step_state(state).with_command_points_granted()
     decisions.event_log.append(
         "command_step_started",

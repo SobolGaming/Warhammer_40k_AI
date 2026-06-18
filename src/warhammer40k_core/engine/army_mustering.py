@@ -25,6 +25,7 @@ from warhammer40k_core.engine.list_validation import (
     battle_size_from_token,
     battle_size_mustering_policy,
     daemonic_pact_datasheet_allowed_for_faction,
+    drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction,
     validate_detachment_selection,
     validate_unit_selection_for_army,
 )
@@ -43,8 +44,20 @@ class ArmyMusteringError(ValueError):
 DAEMONIC_PACT_SOURCE_ID = "phase17g:chaos-daemons:daemonic-pact"
 DAEMONIC_PACT_FACTION_KEYWORD = "LEGIONES DAEMONICA"
 DAEMONIC_PACT_BASE_KEYWORDS = frozenset({"CHAOS KNIGHTS", "HERETIC ASTARTES"})
-DAEMONIC_PACT_POINTS_CAP_BY_BATTLE_SIZE = {BattleSize.STRIKE_FORCE: 500}
+DAEMONIC_PACT_POINTS_CAP_BY_BATTLE_SIZE = {
+    BattleSize.INCURSION: 250,
+    BattleSize.STRIKE_FORCE: 500,
+    BattleSize.ONSLAUGHT: 750,
+}
 DAEMONIC_PACT_GOD_KEYWORDS = ("KHORNE", "TZEENTCH", "NURGLE", "SLAANESH")
+DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_SOURCE_ID = (
+    "phase17g:drukhari:corsairs-and-travelling-players"
+)
+DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_POINTS_CAP_BY_BATTLE_SIZE = {
+    BattleSize.INCURSION: 250,
+    BattleSize.STRIKE_FORCE: 500,
+    BattleSize.ONSLAUGHT: 750,
+}
 
 
 class ArmyMusterRequestPayload(TypedDict):
@@ -1054,7 +1067,7 @@ def validate_roster_legality(
     )
     _append_warlord_violations(
         request=request,
-        faction_keywords=faction.faction_keywords,
+        faction=faction,
         datasheets_by_selection_id=datasheets_by_selection_id,
         violations=violations,
     )
@@ -1071,6 +1084,12 @@ def validate_roster_legality(
         violations=violations,
     )
     _append_daemonic_pact_violations(
+        request=request,
+        faction=faction,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        violations=violations,
+    )
+    _append_drukhari_corsairs_and_travelling_players_violations(
         request=request,
         faction=faction,
         datasheets_by_selection_id=datasheets_by_selection_id,
@@ -1131,7 +1150,7 @@ def _append_unit_point_violations(
         violations.append(
             RosterLegalityViolation(
                 violation_code="points_limit_exceeded",
-                message="Roster exceeds Strike Force points limit.",
+                message="Roster exceeds the battle-size points limit.",
                 source_id="phase16d:points-limit",
             )
         )
@@ -1181,7 +1200,7 @@ def _append_unit_limit_violations(
 def _append_warlord_violations(
     *,
     request: ArmyMusterRequest,
-    faction_keywords: tuple[str, ...],
+    faction: FactionDefinition,
     datasheets_by_selection_id: dict[str, DatasheetDefinition],
     violations: list[RosterLegalityViolation],
 ) -> None:
@@ -1214,7 +1233,7 @@ def _append_warlord_violations(
                 source_id=request.warlord_selection.source_id,
             )
         )
-    if _is_daemonic_pact_datasheet(datasheet, faction_keywords):
+    if _is_daemonic_pact_datasheet(datasheet, faction.faction_keywords):
         violations.append(
             RosterLegalityViolation(
                 violation_code="daemonic_pact_warlord_forbidden",
@@ -1223,7 +1242,22 @@ def _append_warlord_violations(
                 source_id=DAEMONIC_PACT_SOURCE_ID,
             )
         )
-    elif not set(datasheet.keywords.faction_keywords).intersection(faction_keywords):
+    elif drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction(
+        datasheet=datasheet,
+        faction=faction,
+    ):
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="warlord_drukhari_corsairs_and_travelling_players_forbidden",
+                message=(
+                    "Corsairs and Travelling Players HARLEQUINS or ANHRATHE units cannot "
+                    "be selected as Warlord."
+                ),
+                unit_selection_id=request.warlord_selection.unit_selection_id,
+                source_id=DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_SOURCE_ID,
+            )
+        )
+    elif not set(datasheet.keywords.faction_keywords).intersection(faction.faction_keywords):
         violations.append(
             RosterLegalityViolation(
                 violation_code="warlord_faction_keyword_required",
@@ -1573,6 +1607,93 @@ def _append_daemonic_pact_god_ratio_violations(
                 ),
                 unit_selection_id=sorted(non_battleline_selection_ids)[0],
                 source_id=f"{DAEMONIC_PACT_SOURCE_ID}:{_canonical_keyword(god_keyword).lower()}",
+            )
+        )
+
+
+def _append_drukhari_corsairs_and_travelling_players_violations(
+    *,
+    request: ArmyMusterRequest,
+    faction: FactionDefinition,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    allied_selection_ids = tuple(
+        sorted(
+            selection_id
+            for selection_id, datasheet in datasheets_by_selection_id.items()
+            if drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction(
+                datasheet=datasheet,
+                faction=faction,
+            )
+        )
+    )
+    if not allied_selection_ids:
+        return
+    _append_drukhari_corsairs_and_travelling_players_points_violation(
+        request=request,
+        allied_selection_ids=allied_selection_ids,
+        violations=violations,
+    )
+    _append_drukhari_corsairs_and_travelling_players_enhancement_violations(
+        request=request,
+        allied_selection_ids=allied_selection_ids,
+        violations=violations,
+    )
+
+
+def _append_drukhari_corsairs_and_travelling_players_points_violation(
+    *,
+    request: ArmyMusterRequest,
+    allied_selection_ids: tuple[str, ...],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    points_by_selection_id = {point.unit_selection_id: point for point in request.unit_points}
+    cap = DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_POINTS_CAP_BY_BATTLE_SIZE.get(
+        request.battle_size
+    )
+    if cap is None:
+        raise ArmyMusteringError(
+            "Corsairs and Travelling Players points cap is unavailable for battle size."
+        )
+    total = sum(
+        points_by_selection_id[selection_id].points
+        for selection_id in allied_selection_ids
+        if selection_id in points_by_selection_id
+    )
+    if total > cap:
+        violations.append(
+            RosterLegalityViolation(
+                violation_code=("drukhari_corsairs_and_travelling_players_points_limit_exceeded"),
+                message=(
+                    "Corsairs and Travelling Players HARLEQUINS and ANHRATHE units "
+                    "exceed the battle-size limit."
+                ),
+                unit_selection_id=allied_selection_ids[0],
+                source_id=DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_SOURCE_ID,
+            )
+        )
+
+
+def _append_drukhari_corsairs_and_travelling_players_enhancement_violations(
+    *,
+    request: ArmyMusterRequest,
+    allied_selection_ids: tuple[str, ...],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    allied_selection_id_set = set(allied_selection_ids)
+    for assignment in request.enhancement_assignments:
+        if assignment.target_unit_selection_id not in allied_selection_id_set:
+            continue
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="drukhari_corsairs_and_travelling_players_enhancement_forbidden",
+                message=(
+                    "Corsairs and Travelling Players HARLEQUINS or ANHRATHE units cannot "
+                    "receive Enhancements."
+                ),
+                unit_selection_id=assignment.target_unit_selection_id,
+                source_id=assignment.source_id,
             )
         )
 
