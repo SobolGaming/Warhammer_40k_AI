@@ -2123,7 +2123,9 @@ Initial Core Rules weapon ability coverage:
 - Sustained Hits X;
 - Extra Attacks;
 - Hunter X;
-- Anti-KEYWORD X+.
+- Anti-KEYWORD X+, including slash-separated keyword groups and Anti-Non keyword gates;
+- Psychic attack classification and modifier-ignore selection;
+- One Shot battle-scoped weapon selection tracking.
 
 Initial shooting-coupled Core Stratagem coverage:
 
@@ -2173,7 +2175,14 @@ Invariants:
   context;
 - `[LANCE]` adds 1 to the Wound roll for each attack made with that weapon only
   if the attacking model's unit made a Charge move this turn;
-- Anti modifies Critical Wound thresholds based on target keywords;
+- Anti modifies Critical Wound thresholds based on target keywords, including
+  slash-separated keyword groups and `ANTI-NON-X` missing-keyword gates;
+- `[PSYCHIC]` weapons classify their attacks as psychic attacks and emit the
+  finite `select_psychic_attack_modifier_ignores` decision before the Hit roll
+  when current BS/WS or Hit-roll modifiers can be kept or ignored;
+- `[ONE SHOT]` records the first selected model/wargear/profile weapon use for
+  the battle and removes already-used weapons from later Shooting or Fight
+  declaration options, including returned destroyed models;
 - `[HUNTER X]` weapons can only target units that match at least one listed
   keyword in X, including composite keyword lists such as `MONSTER` or
   `VEHICLE`;
@@ -2200,6 +2209,10 @@ Required tests:
   Select-Weapons-step source-instance selection in Shooting declarations, carry
   the selected descriptor into attack-pool and attack-step payloads, and use
   only the selected keyword gate/Critical Wound threshold;
+- Psychic modifier-ignore selections route through the shared lifecycle and
+  reject stale or drifted attack contexts before the Hit roll;
+- One Shot weapon-use records round-trip through game-state payloads and stale
+  redeclarations reject before queue pop;
 - duplicate numbered weapon abilities such as `[SUSTAINED HITS 1]` versus
   `[SUSTAINED HITS 2]` and non-Anti keyworded duplicate families require future
   lifecycle tests before those families are marked complete;
@@ -2710,12 +2723,14 @@ Invariants:
 - keyword-gated weapon abilities apply only to target units with at least one listed keyword;
 - `[HUNTER X]` is target eligibility, not an attack modifier: the weapon can
   only be declared into units matching at least one listed keyword;
-- future ability-runtime families such as `STEALTH`, `[PSYCHIC]`,
-  `[ONE SHOT]`, `HOVER`, Super-heavy Walker, and `MOBILE` remain future
-  runtime work until an owning phase adds source-backed hosts, adapter-contract
-  updates for player-facing choices, and focused regressions; Phase 14I records
-  their source-backed contracts or explicit unsupported descriptors, but does
-  not mark those runtime effects complete;
+- future ability-runtime families such as `STEALTH`, `HOVER`, Super-heavy
+  Walker, and `MOBILE` remain future runtime work until an owning phase adds
+  source-backed hosts, adapter-contract updates for player-facing choices, and
+  focused regressions; `[PSYCHIC]` modifier-ignore/classification and `[ONE
+  SHOT]` weapon-use tracking now have phase-owned hosts and regressions, while
+  Phase 14I still records only source-backed contracts or explicit unsupported
+  descriptors for unrelated future families and does not mark those future
+  runtime effects complete;
 - core abilities listed in the 11th Edition Core Rules are either implemented with source-backed tests or explicitly unsupported with reason.
 
 Required tests:
@@ -2737,10 +2752,11 @@ Required tests:
   future coverage;
 - Hunter X target declaration accepts at least one listed keyword match and
   rejects target units with none;
-- future ability-runtime families such as `STEALTH`, `[PSYCHIC]`,
-  `[ONE SHOT]`, `HOVER`, Super-heavy Walker, and `MOBILE` require focused
-  implementation tests, replay coverage, and adapter-contract updates in their
-  owning phases before runtime completion can be claimed;
+- future ability-runtime families such as `STEALTH`, `HOVER`, Super-heavy
+  Walker, and `MOBILE` require focused implementation tests, replay coverage,
+  and adapter-contract updates in their owning phases before runtime completion
+  can be claimed; `[PSYCHIC]` and `[ONE SHOT]` have focused coverage for their
+  current attack-sequence/declaration responsibilities;
 - every supported core ability has focused tests and an unsupported-descriptor audit row where not yet implemented.
 
 ## Phase 14J: mission and catalog replacement

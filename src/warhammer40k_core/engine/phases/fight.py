@@ -17,6 +17,7 @@ from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
     ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
     SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackSequence,
     apply_allocation_order_decision,
@@ -35,6 +36,7 @@ from warhammer40k_core.engine.attack_sequence import (
     selected_attack_weapon_group_from_result,
     selected_resolve_target_from_result,
     unresolved_target_unit_ids,
+    validate_psychic_attack_modifier_ignore_decision,
 )
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.damage_allocation import (
@@ -112,6 +114,7 @@ from warhammer40k_core.engine.fight_resolution import (
     melee_attack_sequence_from_proposal,
     melee_declaration_proposal_from_payload,
     melee_target_unit_ids,
+    record_one_shot_melee_weapon_uses,
     resolve_fight_movement,
     validate_melee_declaration_rules,
 )
@@ -1268,6 +1271,13 @@ def _apply_melee_declaration_decision(
         state=state,
         runtime_modifier_registry=handler.runtime_modifier_registry,
     )
+    one_shot_records = record_one_shot_melee_weapon_uses(
+        state=state,
+        scenario=_battlefield_scenario(state),
+        proposal=proposal,
+        army_catalog=_army_catalog_for_handler(handler),
+        result_id=result.result_id,
+    )
     fight_state = _require_fight_state(state)
     state.fight_phase_state = fight_state.with_attack_sequence_update(
         attack_sequence=attack_sequence,
@@ -1286,6 +1296,7 @@ def _apply_melee_declaration_decision(
                 "proposal_request": proposal_request.to_payload(),
                 "proposal": proposal.to_payload(),
                 "attack_sequence_id": attack_sequence.sequence_id,
+                "one_shot_weapon_use_records": [record.to_payload() for record in one_shot_records],
             }
         ),
     )
@@ -1331,7 +1342,19 @@ def _apply_fight_attack_sequence_decision(
     fight_state = _require_fight_state(state)
     if fight_state.attack_sequence is None:
         raise GameLifecycleError("Fight attack sequence decision requires attack_sequence.")
-    if result.decision_type == SELECT_ALLOCATION_ORDER_DECISION_TYPE:
+    updated_sequence: AttackSequence | None
+    allocated_model_ids: tuple[str, ...]
+    status: LifecycleStatus | None
+    if result.decision_type == SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE:
+        validate_psychic_attack_modifier_ignore_decision(
+            decisions=decisions,
+            attack_sequence=fight_state.attack_sequence,
+            result=result,
+        )
+        updated_sequence = fight_state.attack_sequence
+        allocated_model_ids = fight_state.allocated_model_ids_this_phase
+        status = None
+    elif result.decision_type == SELECT_ALLOCATION_ORDER_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_allocation_order_decision(
             state=state,
             decisions=decisions,

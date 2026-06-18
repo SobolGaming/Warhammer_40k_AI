@@ -232,6 +232,15 @@ class DedicatedTransportSetupConsequencePayload(TypedDict):
     source_id: str
 
 
+class OneShotWeaponUseRecordPayload(TypedDict):
+    model_instance_id: str
+    wargear_id: str
+    weapon_profile_id: str
+    battle_round: int
+    source_phase: str
+    selection_id: str
+
+
 class GameStatePayload(TypedDict):
     game_id: str
     ruleset_descriptor_hash: str
@@ -263,6 +272,7 @@ class GameStatePayload(TypedDict):
     feel_no_pain_sources_by_model_id: dict[str, list[FeelNoPainSourcePayload]]
     feel_no_pain_decline_allowed_model_ids: list[str]
     destruction_reaction_sources_by_model_id: dict[str, list[DestructionReactionSourcePayload]]
+    one_shot_weapon_use_records: list[OneShotWeaponUseRecordPayload]
     reserve_states: list[ReserveStatePayload]
     hover_mode_states: list[HoverModeStatePayload]
     transport_cargo_states: list[TransportCargoStatePayload]
@@ -447,6 +457,10 @@ def _new_destruction_reaction_sources_by_model_id() -> dict[
     tuple[DestructionReactionSource, ...],
 ]:
     return {}
+
+
+def _new_one_shot_weapon_use_records() -> list[OneShotWeaponUseRecord]:
+    return []
 
 
 @dataclass(frozen=True, slots=True)
@@ -788,6 +802,79 @@ class DedicatedTransportSetupConsequence:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class OneShotWeaponUseRecord:
+    model_instance_id: str
+    wargear_id: str
+    weapon_profile_id: str
+    battle_round: int
+    source_phase: BattlePhase
+    selection_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "model_instance_id",
+            _validate_identifier(
+                "OneShotWeaponUseRecord model_instance_id",
+                self.model_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "wargear_id",
+            _validate_identifier("OneShotWeaponUseRecord wargear_id", self.wargear_id),
+        )
+        object.__setattr__(
+            self,
+            "weapon_profile_id",
+            _validate_identifier(
+                "OneShotWeaponUseRecord weapon_profile_id",
+                self.weapon_profile_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("OneShotWeaponUseRecord battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "source_phase",
+            battle_phase_kind_from_token(self.source_phase),
+        )
+        object.__setattr__(
+            self,
+            "selection_id",
+            _validate_identifier("OneShotWeaponUseRecord selection_id", self.selection_id),
+        )
+
+    @property
+    def weapon_key(self) -> tuple[str, str, str]:
+        return (self.model_instance_id, self.wargear_id, self.weapon_profile_id)
+
+    def to_payload(self) -> OneShotWeaponUseRecordPayload:
+        return {
+            "model_instance_id": self.model_instance_id,
+            "wargear_id": self.wargear_id,
+            "weapon_profile_id": self.weapon_profile_id,
+            "battle_round": self.battle_round,
+            "source_phase": self.source_phase.value,
+            "selection_id": self.selection_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: OneShotWeaponUseRecordPayload) -> Self:
+        return cls(
+            model_instance_id=payload["model_instance_id"],
+            wargear_id=payload["wargear_id"],
+            weapon_profile_id=payload["weapon_profile_id"],
+            battle_round=payload["battle_round"],
+            source_phase=battle_phase_kind_from_token(payload["source_phase"]),
+            selection_id=payload["selection_id"],
+        )
+
+
 @dataclass(slots=True)
 class GameState:
     game_id: str
@@ -835,6 +922,9 @@ class GameState:
         str,
         tuple[DestructionReactionSource, ...],
     ] = field(default_factory=_new_destruction_reaction_sources_by_model_id)
+    one_shot_weapon_use_records: list[OneShotWeaponUseRecord] = field(
+        default_factory=_new_one_shot_weapon_use_records
+    )
     reserve_states: list[ReserveState] = field(default_factory=_new_reserve_states)
     hover_mode_states: list[HoverModeState] = field(default_factory=_new_hover_mode_states)
     transport_cargo_states: list[TransportCargoState] = field(
@@ -1011,6 +1101,10 @@ class GameState:
                 self.destruction_reaction_sources_by_model_id,
                 army_definitions=self.army_definitions,
             )
+        )
+        self.one_shot_weapon_use_records = _validate_one_shot_weapon_use_records(
+            self.one_shot_weapon_use_records,
+            army_definitions=self.army_definitions,
         )
         self.reserve_states = _validate_reserve_states(
             self.reserve_states,
@@ -1295,6 +1389,74 @@ class GameState:
     ) -> bool:
         model_id = _validate_identifier("model_instance_id", model_instance_id)
         return model_id in self.feel_no_pain_decline_allowed_model_ids
+
+    def one_shot_weapon_available(
+        self,
+        *,
+        model_instance_id: str,
+        wargear_id: str,
+        weapon_profile_id: str,
+    ) -> bool:
+        model_id = _validate_identifier("model_instance_id", model_instance_id)
+        key = (
+            model_id,
+            _validate_identifier("wargear_id", wargear_id),
+            _validate_identifier("weapon_profile_id", weapon_profile_id),
+        )
+        return key not in {record.weapon_key for record in self.one_shot_weapon_use_records}
+
+    def one_shot_weapon_use_record(
+        self,
+        *,
+        model_instance_id: str,
+        wargear_id: str,
+        weapon_profile_id: str,
+    ) -> OneShotWeaponUseRecord | None:
+        key = (
+            _validate_identifier("model_instance_id", model_instance_id),
+            _validate_identifier("wargear_id", wargear_id),
+            _validate_identifier("weapon_profile_id", weapon_profile_id),
+        )
+        for record in self.one_shot_weapon_use_records:
+            if record.weapon_key == key:
+                return record
+        return None
+
+    def record_one_shot_weapon_selected(
+        self,
+        *,
+        model_instance_id: str,
+        wargear_id: str,
+        weapon_profile_id: str,
+        source_phase: BattlePhase,
+        selection_id: str,
+    ) -> OneShotWeaponUseRecord:
+        model_id = _validate_model_instance_id_for_state(
+            state=self,
+            model_instance_id=model_instance_id,
+        )
+        record = OneShotWeaponUseRecord(
+            model_instance_id=model_id,
+            wargear_id=wargear_id,
+            weapon_profile_id=weapon_profile_id,
+            battle_round=self.battle_round,
+            source_phase=source_phase,
+            selection_id=selection_id,
+        )
+        if (
+            self.one_shot_weapon_use_record(
+                model_instance_id=record.model_instance_id,
+                wargear_id=record.wargear_id,
+                weapon_profile_id=record.weapon_profile_id,
+            )
+            is not None
+        ):
+            raise GameLifecycleError("One Shot weapon has already been selected this battle.")
+        self.one_shot_weapon_use_records = _validate_one_shot_weapon_use_records(
+            [*self.one_shot_weapon_use_records, record],
+            army_definitions=self.army_definitions,
+        )
+        return record
 
     def record_model_destruction_reaction_sources(
         self,
@@ -3703,6 +3865,9 @@ class GameState:
                 model_id: [source.to_payload() for source in sources]
                 for model_id, sources in self.destruction_reaction_sources_by_model_id.items()
             },
+            "one_shot_weapon_use_records": [
+                record.to_payload() for record in self.one_shot_weapon_use_records
+            ],
             "reserve_states": [state.to_payload() for state in self.reserve_states],
             "hover_mode_states": [state.to_payload() for state in self.hover_mode_states],
             "transport_cargo_states": [state.to_payload() for state in self.transport_cargo_states],
@@ -3989,6 +4154,10 @@ class GameState:
                 )
                 for model_id, sources in payload["destruction_reaction_sources_by_model_id"].items()
             },
+            one_shot_weapon_use_records=[
+                OneShotWeaponUseRecord.from_payload(record)
+                for record in payload["one_shot_weapon_use_records"]
+            ],
             reserve_states=[
                 ReserveState.from_payload(state) for state in payload["reserve_states"]
             ],
@@ -4784,6 +4953,30 @@ def _validate_destruction_reaction_sources_by_model_id(
             )
         validated[model_id] = source_tuple
     return dict(sorted(validated.items()))
+
+
+def _validate_one_shot_weapon_use_records(
+    values: object,
+    *,
+    army_definitions: list[ArmyDefinition],
+) -> list[OneShotWeaponUseRecord]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState one-shot weapon use records must be a list.")
+    known_model_ids = _model_instance_ids(army_definitions)
+    records: list[OneShotWeaponUseRecord] = []
+    seen: set[tuple[str, str, str]] = set()
+    for value in cast(list[object], values):
+        if type(value) is not OneShotWeaponUseRecord:
+            raise GameLifecycleError(
+                "GameState one-shot weapon use records must contain OneShotWeaponUseRecord values."
+            )
+        if known_model_ids and value.model_instance_id not in known_model_ids:
+            raise GameLifecycleError("One-shot weapon use model is unknown.")
+        if value.weapon_key in seen:
+            raise GameLifecycleError("One-shot weapon use records must not duplicate weapons.")
+        seen.add(value.weapon_key)
+        records.append(value)
+    return sorted(records, key=lambda record: record.weapon_key)
 
 
 def _validate_feel_no_pain_decline_allowed_model_ids(

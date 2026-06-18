@@ -9,6 +9,7 @@ from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AbilityKind,
+    AntiKeywordMatchMode,
     AttackProfile,
     DamageProfile,
     RangeProfile,
@@ -206,6 +207,59 @@ def test_phase13d_anti_keyword_threshold_matches_canonical_target_keywords() -> 
     )
     assert anti_keyword_critical_threshold(profile=profile, target_keywords=("MONSTER",)) == 5
     assert anti_keyword_critical_threshold(profile=profile, target_keywords=("vehicle",)) is None
+
+
+def test_phase13d_anti_keyword_supports_slash_keywords_and_non_matching_targets() -> None:
+    slash_profile = _profile(
+        keywords=(),
+        abilities=(AbilityDescriptor.anti_keyword("Vehicle/Monster", 4),),
+    )
+    non_keyword_profile = _profile(
+        keywords=(),
+        abilities=(
+            AbilityDescriptor.anti_keyword(
+                "Psyker",
+                2,
+                match_mode=AntiKeywordMatchMode.MISSING_KEYWORD,
+            ),
+        ),
+    )
+
+    assert (
+        anti_keyword_critical_threshold(
+            profile=slash_profile,
+            target_keywords=("VEHICLE",),
+        )
+        == 4
+    )
+    assert (
+        anti_keyword_critical_threshold(
+            profile=slash_profile,
+            target_keywords=("MONSTER",),
+        )
+        == 4
+    )
+    assert (
+        anti_keyword_critical_threshold(
+            profile=slash_profile,
+            target_keywords=("INFANTRY",),
+        )
+        is None
+    )
+    assert (
+        anti_keyword_critical_threshold(
+            profile=non_keyword_profile,
+            target_keywords=("PSYKER",),
+        )
+        is None
+    )
+    assert (
+        anti_keyword_critical_threshold(
+            profile=non_keyword_profile,
+            target_keywords=("INFANTRY",),
+        )
+        == 2
+    )
 
 
 def test_phase14i_duplicate_anti_keyword_abilities_require_selected_descriptor() -> None:

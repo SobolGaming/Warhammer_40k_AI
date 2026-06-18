@@ -6,9 +6,11 @@ from typing import cast
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AbilityKind,
+    AntiKeywordMatchMode,
     DevastatingWoundsEffect,
     WeaponKeyword,
     WeaponProfile,
+    anti_keyword_match_mode_from_token,
     devastating_wounds_effect_from_token,
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -34,7 +36,9 @@ INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID = (
 LANCE_RULE_ID = "weapon-ability:lance"
 LETHAL_HITS_RULE_ID = "weapon-ability:lethal-hits"
 MELTA_RULE_ID = "weapon-ability:melta"
+ONE_SHOT_RULE_ID = "weapon-ability:one-shot"
 PRECISION_RULE_ID = "weapon-ability:precision"
+PSYCHIC_RULE_ID = "weapon-ability:psychic"
 RAPID_FIRE_RULE_ID = "weapon-ability:rapid-fire"
 SNAP_SHOOTING_RULE_ID = "core:snap-shooting"
 SUSTAINED_HITS_RULE_ID = "weapon-ability:sustained-hits"
@@ -71,6 +75,10 @@ def has_close_quarters_weapon_keyword(profile: WeaponProfile) -> bool:
     return (
         WeaponKeyword.PISTOL in profile.keywords or WeaponKeyword.CLOSE_QUARTERS in profile.keywords
     )
+
+
+def is_psychic_weapon_profile(profile: WeaponProfile) -> bool:
+    return has_weapon_keyword(profile, WeaponKeyword.PSYCHIC)
 
 
 def weapon_ability_int_value(
@@ -260,34 +268,14 @@ def anti_keyword_critical_threshold(
     selected_ability_id: str | None = None,
 ) -> int | None:
     _validate_weapon_profile(profile)
-    target_keyword_set = _target_keyword_set(target_keywords)
-    matching_descriptors: list[AbilityDescriptor] = []
-    for ability in profile.abilities:
-        if ability.ability_kind is not AbilityKind.ANTI_KEYWORD:
-            continue
-        if not _target_keyword_gate_matches(
-            ability.target_keywords,
+    _target_keyword_set(target_keywords)
+    matching_descriptors = list(
+        _matching_ability_descriptors(
+            profile,
+            AbilityKind.ANTI_KEYWORD,
             target_keywords=target_keywords,
-        ):
-            continue
-        keyword = _ability_parameter_by_name(
-            profile=profile,
-            ability_kind=AbilityKind.ANTI_KEYWORD,
-            parameter_name="keyword",
-            ability_id=ability.ability_id,
         )
-        threshold = _ability_parameter_by_name(
-            profile=profile,
-            ability_kind=AbilityKind.ANTI_KEYWORD,
-            parameter_name="threshold",
-            ability_id=ability.ability_id,
-        )
-        if type(keyword) is not str:
-            raise GameLifecycleError("Anti ability keyword parameter must be a string.")
-        if type(threshold) is not int:
-            raise GameLifecycleError("Anti ability threshold parameter must be an integer.")
-        if _canonical_keyword(keyword) in target_keyword_set:
-            matching_descriptors.append(ability)
+    )
     if not matching_descriptors:
         return None
     if len(matching_descriptors) > 1 or selected_ability_id is not None:
@@ -297,11 +285,9 @@ def anti_keyword_critical_threshold(
         )
     else:
         selected_descriptor = matching_descriptors[0]
-    threshold = _ability_parameter_by_name(
-        profile=profile,
-        ability_kind=AbilityKind.ANTI_KEYWORD,
+    threshold = _ability_parameter_by_name_from_descriptor(
+        descriptor=selected_descriptor,
         parameter_name="threshold",
-        ability_id=selected_descriptor.ability_id,
     )
     if type(threshold) is not int:
         raise GameLifecycleError("Anti ability threshold parameter must be an integer.")
@@ -427,6 +413,20 @@ def _matching_ability_descriptors(
     *,
     target_keywords: tuple[str, ...],
 ) -> tuple[AbilityDescriptor, ...]:
+    if ability_kind is AbilityKind.ANTI_KEYWORD:
+        target_keyword_set = _target_keyword_set(target_keywords)
+        return tuple(
+            descriptor
+            for descriptor in _ability_descriptors(profile, ability_kind)
+            if _target_keyword_gate_matches(
+                descriptor.target_keywords,
+                target_keywords=target_keywords,
+            )
+            and _anti_keyword_descriptor_matches(
+                descriptor=descriptor,
+                target_keyword_set=target_keyword_set,
+            )
+        )
     return tuple(
         descriptor
         for descriptor in _ability_descriptors(profile, ability_kind)
@@ -453,24 +453,77 @@ def _selected_duplicate_ability_descriptor(
     raise GameLifecycleError("Selected weapon ability descriptor does not match this target.")
 
 
-def _ability_parameter_by_name(
+def _ability_parameter_by_name_from_descriptor(
     *,
-    profile: WeaponProfile,
-    ability_kind: AbilityKind,
+    descriptor: AbilityDescriptor,
     parameter_name: str,
-    ability_id: str,
 ) -> object:
-    matching = tuple(
-        ability
-        for ability in profile.abilities
-        if ability.ability_kind is ability_kind and ability.ability_id == ability_id
-    )
-    if len(matching) != 1:
+    if type(descriptor) is not AbilityDescriptor:
         raise GameLifecycleError("Weapon ability parameter lookup requires one descriptor.")
-    for parameter in matching[0].parameters:
-        if parameter.name == parameter_name:
+    requested_name = _validate_identifier("parameter_name", parameter_name)
+    for parameter in descriptor.parameters:
+        if parameter.name == requested_name:
             return parameter.value
     raise GameLifecycleError("Weapon ability descriptor is missing a required parameter.")
+
+
+def _optional_ability_parameter_by_name_from_descriptor(
+    *,
+    descriptor: AbilityDescriptor,
+    parameter_name: str,
+) -> object | None:
+    if type(descriptor) is not AbilityDescriptor:
+        raise GameLifecycleError("Weapon ability parameter lookup requires one descriptor.")
+    requested_name = _validate_identifier("parameter_name", parameter_name)
+    for parameter in descriptor.parameters:
+        if parameter.name == requested_name:
+            return parameter.value
+    return None
+
+
+def _anti_keyword_descriptor_matches(
+    *,
+    descriptor: AbilityDescriptor,
+    target_keyword_set: frozenset[str],
+) -> bool:
+    if descriptor.ability_kind is not AbilityKind.ANTI_KEYWORD:
+        raise GameLifecycleError("Anti keyword matching requires an Anti descriptor.")
+    keywords = _anti_keyword_descriptor_keywords(descriptor)
+    has_matching_keyword = bool(set(keywords) & target_keyword_set)
+    match_mode = _anti_keyword_descriptor_match_mode(descriptor)
+    if match_mode is AntiKeywordMatchMode.HAS_KEYWORD:
+        return has_matching_keyword
+    if match_mode is AntiKeywordMatchMode.MISSING_KEYWORD:
+        return not has_matching_keyword
+    raise GameLifecycleError("Unsupported Anti keyword match mode.")
+
+
+def _anti_keyword_descriptor_keywords(descriptor: AbilityDescriptor) -> tuple[str, ...]:
+    keyword = _ability_parameter_by_name_from_descriptor(
+        descriptor=descriptor,
+        parameter_name="keyword",
+    )
+    if type(keyword) is not str:
+        raise GameLifecycleError("Anti ability keyword parameter must be a string.")
+    keywords: list[str] = []
+    seen: set[str] = set()
+    for part in keyword.split("/"):
+        canonical = _canonical_keyword(part)
+        if canonical in seen:
+            raise GameLifecycleError("Anti ability keyword parameter must not duplicate keywords.")
+        seen.add(canonical)
+        keywords.append(canonical)
+    return tuple(keywords)
+
+
+def _anti_keyword_descriptor_match_mode(descriptor: AbilityDescriptor) -> AntiKeywordMatchMode:
+    mode = _optional_ability_parameter_by_name_from_descriptor(
+        descriptor=descriptor,
+        parameter_name="match_mode",
+    )
+    if mode is None:
+        return AntiKeywordMatchMode.HAS_KEYWORD
+    return anti_keyword_match_mode_from_token(mode)
 
 
 def _target_keyword_gate_matches(

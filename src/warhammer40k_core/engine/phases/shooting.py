@@ -22,6 +22,7 @@ from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
     ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
     SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackSequence,
     AttackSequencePayload,
@@ -42,6 +43,7 @@ from warhammer40k_core.engine.attack_sequence import (
     selected_attack_weapon_group_from_result,
     selected_resolve_target_from_result,
     unresolved_target_unit_ids,
+    validate_psychic_attack_modifier_ignore_decision,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -169,7 +171,7 @@ from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
 if TYPE_CHECKING:
-    from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.game_state import GameState, OneShotWeaponUseRecord
     from warhammer40k_core.engine.reaction_queue import ReactionQueue
     from warhammer40k_core.engine.stratagems import (
         StratagemCatalogIndex,
@@ -2493,6 +2495,12 @@ def _apply_shooting_declaration_decision(
         result_id=result.result_id,
         shooting_target_restriction_hooks=shooting_target_restriction_hooks,
     )
+    one_shot_records = _record_one_shot_weapon_uses_for_attack_pools(
+        state=state,
+        attack_pools=attack_pools,
+        source_phase=BattlePhase.SHOOTING,
+        result_id=result.result_id,
+    )
     attack_sequence = AttackSequence.start(
         sequence_id=f"attack-sequence:{result.result_id}",
         attacker_player_id=_active_player_id(state),
@@ -2527,6 +2535,7 @@ def _apply_shooting_declaration_decision(
                 "proposal_request_id": proposal.proposal_request_id,
                 "visibility_cache_key": proposal.visibility_cache_key,
                 "attack_pools": [pool.to_payload() for pool in attack_pools],
+                "one_shot_weapon_use_records": [record.to_payload() for record in one_shot_records],
                 "ineligible_unit_instance_ids": list(ineligible_unit_ids),
                 "phase_body_status": "declaration_accepted",
             }
@@ -2565,6 +2574,12 @@ def _apply_out_of_phase_shooting_declaration_decision(
     )
     if ineligible_unit_ids:
         raise GameLifecycleError("Out-of-phase shooting cannot mark extra units as shot.")
+    one_shot_records = _record_one_shot_weapon_uses_for_attack_pools(
+        state=state,
+        attack_pools=attack_pools,
+        source_phase=out_of_phase_state.parent_phase,
+        result_id=result.result_id,
+    )
     attack_sequence = AttackSequence.start(
         sequence_id=f"out-of-phase-attack-sequence:{result.result_id}",
         attacker_player_id=out_of_phase_state.player_id,
@@ -2599,10 +2614,39 @@ def _apply_out_of_phase_shooting_declaration_decision(
                 "proposal_request_id": proposal.proposal_request_id,
                 "visibility_cache_key": proposal.visibility_cache_key,
                 "attack_pools": [pool.to_payload() for pool in attack_pools],
+                "one_shot_weapon_use_records": [record.to_payload() for record in one_shot_records],
             }
         ),
     )
     return True
+
+
+def _record_one_shot_weapon_uses_for_attack_pools(
+    *,
+    state: GameState,
+    attack_pools: tuple[RangedAttackPool, ...],
+    source_phase: BattlePhase,
+    result_id: str,
+) -> tuple[OneShotWeaponUseRecord, ...]:
+    records: list[OneShotWeaponUseRecord] = []
+    for pool_index, pool in enumerate(attack_pools, start=1):
+        if not has_weapon_keyword(pool.weapon_profile, WeaponKeyword.ONE_SHOT):
+            continue
+        model_instance_id = (
+            pool.attacker_model_instance_id
+            if pool.firing_deck_source_model_instance_id is None
+            else pool.firing_deck_source_model_instance_id
+        )
+        records.append(
+            state.record_one_shot_weapon_selected(
+                model_instance_id=model_instance_id,
+                wargear_id=pool.wargear_id,
+                weapon_profile_id=pool.weapon_profile_id,
+                source_phase=source_phase,
+                selection_id=f"{result_id}:one-shot-pool-{pool_index:03d}",
+            )
+        )
+    return tuple(records)
 
 
 def apply_hidden_status_loss_after_ranged_attacks(
@@ -2765,7 +2809,19 @@ def _apply_attack_sequence_decision_to_sequence(
     already_allocated_model_ids: tuple[str, ...],
     stratagem_index: StratagemCatalogIndex,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
-    if result.decision_type == SELECT_ALLOCATION_ORDER_DECISION_TYPE:
+    updated_sequence: AttackSequence | None
+    allocated_model_ids: tuple[str, ...]
+    status: LifecycleStatus | None
+    if result.decision_type == SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE:
+        validate_psychic_attack_modifier_ignore_decision(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            result=result,
+        )
+        updated_sequence = attack_sequence
+        allocated_model_ids = already_allocated_model_ids
+        status = None
+    elif result.decision_type == SELECT_ALLOCATION_ORDER_DECISION_TYPE:
         updated_sequence, allocated_model_ids, status = apply_allocation_order_decision(
             state=state,
             decisions=decisions,
@@ -4287,15 +4343,24 @@ def _available_own_weapons_for_model(
         unit=unit,
         army_catalog=army_catalog,
     ):
+        weapon_profile = weapon_profile_with_ranged_keyword_effects(
+            weapon["weapon_profile"],
+            effects,
+            owner_player_id=owner_player_id,
+        )
+        if has_weapon_keyword(weapon_profile, WeaponKeyword.ONE_SHOT) and not (
+            state.one_shot_weapon_available(
+                model_instance_id=weapon["model_instance_id"],
+                wargear_id=weapon["wargear_id"],
+                weapon_profile_id=weapon_profile.profile_id,
+            )
+        ):
+            continue
         weapons.append(
             {
                 "model_instance_id": weapon["model_instance_id"],
                 "wargear_id": weapon["wargear_id"],
-                "weapon_profile": weapon_profile_with_ranged_keyword_effects(
-                    weapon["weapon_profile"],
-                    effects,
-                    owner_player_id=owner_player_id,
-                ),
+                "weapon_profile": weapon_profile,
             }
         )
     return tuple(weapons)
@@ -4367,7 +4432,7 @@ def _legal_shooting_unit_ids(
     shooting_state: ShootingPhaseState,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
-    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> tuple[str, ...]:
     scenario = _battlefield_scenario(state)
     active_player_id = _active_player_id(state)

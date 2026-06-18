@@ -79,6 +79,7 @@ from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
     DestructionReactionSource,
     DestructionReactionSourcePayload,
+    FeelNoPainAttackCondition,
     FeelNoPainDecision,
     FeelNoPainResolution,
     FeelNoPainResolutionPayload,
@@ -200,6 +201,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     anti_keyword_critical_threshold,
     devastating_wounds_resolution,
     has_weapon_keyword,
+    is_psychic_weapon_profile,
     lethal_hits_applies,
     melta_damage_bonus,
     sustained_hits_generated_hits,
@@ -221,6 +223,7 @@ if TYPE_CHECKING:
 
 ATTACK_ALLOCATION_DECISION_TYPES = frozenset(
     (
+        "select_psychic_attack_modifier_ignores",
         SELECT_ALLOCATION_ORDER_DECISION_TYPE,
         SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
@@ -230,6 +233,11 @@ ATTACK_ALLOCATION_DECISION_TYPES = frozenset(
 )
 SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE = "select_resolve_target_unit"
 SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE = "select_attack_weapon_group"
+SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE = "select_psychic_attack_modifier_ignores"
+KEEP_ALL_MODIFIERS_OPTION_ID = "keep-all-modifiers"
+IGNORE_DETRIMENTAL_MODIFIERS_OPTION_ID = "ignore-detrimental-modifiers"
+IGNORE_BENEFICIAL_MODIFIERS_OPTION_ID = "ignore-beneficial-modifiers"
+IGNORE_ALL_MODIFIERS_OPTION_ID = "ignore-all-modifiers"
 ATTACK_RESOLUTION_SELECTION_DECISION_TYPES = frozenset(
     (
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
@@ -365,6 +373,48 @@ class WoundRollPayload(TypedDict):
     skipped: bool
 
 
+@dataclass(frozen=True, slots=True)
+class PsychicAttackModifierIgnoreSelection:
+    option_id: str
+    skill_modifier: int
+    hit_roll_modifier: int
+    effective_skill_modifier: int
+    effective_hit_roll_modifier: int
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "option_id",
+            _validate_identifier("Psychic modifier option_id", self.option_id),
+        )
+        object.__setattr__(
+            self,
+            "skill_modifier",
+            _validate_int("Psychic modifier skill_modifier", self.skill_modifier),
+        )
+        object.__setattr__(
+            self,
+            "hit_roll_modifier",
+            _validate_int("Psychic modifier hit_roll_modifier", self.hit_roll_modifier),
+        )
+        object.__setattr__(
+            self,
+            "effective_skill_modifier",
+            _validate_int(
+                "Psychic modifier effective_skill_modifier",
+                self.effective_skill_modifier,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "effective_hit_roll_modifier",
+            _validate_int(
+                "Psychic modifier effective_hit_roll_modifier",
+                self.effective_hit_roll_modifier,
+            ),
+        )
+
+
 class AttackSequencePayload(TypedDict):
     sequence_id: str
     source_phase: NotRequired[str]
@@ -396,6 +446,7 @@ class AttackResolutionContextPayload(TypedDict):
     attacker_model_instance_id: str
     target_unit_instance_id: str
     weapon_profile_id: str
+    is_psychic_attack: bool
     selected_weapon_ability_ids: list[str]
     damage_profile: DamageProfilePayload
     hit_roll: HitRollPayload
@@ -5478,7 +5529,11 @@ def _resolve_lost_wound_stage(
     manager: DiceRollManager,
 ) -> tuple[AttackSequence | None, tuple[str, ...], LifecycleStatus | None]:
     wounds = _validate_positive_int("requested_wounds", requested_wounds)
-    sources = _state_feel_no_pain_sources(state=state, model_instance_id=model_instance_id)
+    sources = _feel_no_pain_sources_for_attack(
+        state=state,
+        model_instance_id=model_instance_id,
+        attack_context=attack_context,
+    )
     decline_allowed = _state_feel_no_pain_decline_allowed(
         state=state,
         model_instance_id=model_instance_id,
@@ -6804,7 +6859,37 @@ def _roll_hit_and_wound(
 ) -> tuple[AttackResolutionContextPayload | None, LifecycleStatus | None]:
     pool = attack_sequence.current_pool()
     attack_context_id = attack_sequence.attack_context_id()
+    is_psychic_attack = is_psychic_weapon_profile(pool.weapon_profile)
     if attack_sequence.generated_hit_index == 0:
+        psychic_modifier_selection = _psychic_attack_modifier_ignore_selection_for_attack(
+            decisions=decisions,
+            attack_context_id=attack_context_id,
+        )
+        if psychic_modifier_selection is None:
+            request = _psychic_attack_modifier_ignore_request(
+                state=state,
+                pool=pool,
+                attacker_player_id=attack_sequence.attacker_player_id,
+                attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+                attack_context_id=attack_context_id,
+                source_phase=attack_sequence.source_phase,
+                runtime_modifier_registry=runtime_modifier_registry,
+            )
+            if request is not None:
+                decisions.request_decision(request)
+                return (
+                    None,
+                    LifecycleStatus.waiting_for_decision(
+                        stage=GameLifecycleStage.BATTLE,
+                        decision_request=request,
+                        payload={
+                            "phase": attack_sequence.source_phase.value,
+                            "phase_body_status": "psychic_attack_modifier_ignore_pending",
+                            "attack_context_id": attack_context_id,
+                            "weapon_profile_id": pool.weapon_profile_id,
+                        },
+                    ),
+                )
         hit_roll = _roll_hit(
             state=state,
             manager=manager,
@@ -6813,6 +6898,7 @@ def _roll_hit_and_wound(
             attack_context_id=attack_context_id,
             source_phase=attack_sequence.source_phase,
             runtime_modifier_registry=runtime_modifier_registry,
+            psychic_modifier_selection=psychic_modifier_selection,
         )
         status = _request_command_reroll_for_attack_roll_if_available(
             state=state,
@@ -6838,6 +6924,7 @@ def _roll_hit_and_wound(
                     {
                         **hit_roll.to_payload(),
                         "weapon_profile_id": pool.weapon_profile_id,
+                        "is_psychic_attack": is_psychic_attack,
                         "selected_weapon_ability_ids": list(pool.selected_weapon_ability_ids),
                     }
                 ),
@@ -6857,6 +6944,7 @@ def _roll_hit_and_wound(
                         {
                             **hit_roll.to_payload(),
                             "weapon_profile_id": pool.weapon_profile_id,
+                            "is_psychic_attack": is_psychic_attack,
                             "selected_weapon_ability_ids": list(pool.selected_weapon_ability_ids),
                         }
                     ),
@@ -6935,6 +7023,7 @@ def _roll_hit_and_wound(
                 {
                     **wound_roll.to_payload(),
                     "weapon_profile_id": pool.weapon_profile_id,
+                    "is_psychic_attack": is_psychic_attack,
                     "selected_weapon_ability_ids": list(pool.selected_weapon_ability_ids),
                 }
             ),
@@ -6954,6 +7043,7 @@ def _roll_hit_and_wound(
                     {
                         **wound_roll.to_payload(),
                         "weapon_profile_id": pool.weapon_profile_id,
+                        "is_psychic_attack": is_psychic_attack,
                         "selected_weapon_ability_ids": list(pool.selected_weapon_ability_ids),
                     }
                 ),
@@ -6975,6 +7065,7 @@ def _roll_hit_and_wound(
         "attacker_model_instance_id": pool.attacker_model_instance_id,
         "target_unit_instance_id": pool.target_unit_instance_id,
         "weapon_profile_id": pool.weapon_profile_id,
+        "is_psychic_attack": is_psychic_attack,
         "selected_weapon_ability_ids": list(pool.selected_weapon_ability_ids),
         "damage_profile": pool.weapon_profile.damage_profile.to_payload(),
         "hit_roll": hit_roll.to_payload(),
@@ -7365,6 +7456,188 @@ def _append_replay_resume_unique_event_once(
     return decisions.event_log.append(event_type, event_payload)
 
 
+def _psychic_attack_modifier_ignore_request(
+    *,
+    state: GameState,
+    pool: RangedAttackPool,
+    attacker_player_id: str,
+    attacking_unit_instance_id: str,
+    attack_context_id: str,
+    source_phase: BattlePhase,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+) -> DecisionRequest | None:
+    if not is_psychic_weapon_profile(pool.weapon_profile):
+        return None
+    skill_modifier = _hit_skill_modifier(state=state, pool=pool)
+    hit_roll_modifier = _hit_roll_modifier(
+        state=state,
+        pool=pool,
+        source_phase=source_phase,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
+    if skill_modifier == 0 and hit_roll_modifier == 0:
+        return None
+    options = _psychic_attack_modifier_ignore_options(
+        attack_context_id=attack_context_id,
+        weapon_profile_id=pool.weapon_profile_id,
+        skill_modifier=skill_modifier,
+        hit_roll_modifier=hit_roll_modifier,
+    )
+    if len(options) <= 1:
+        return None
+    request_id = state.next_decision_request_id()
+    return DecisionRequest(
+        request_id=request_id,
+        decision_type=SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
+        actor_id=attacker_player_id,
+        payload=validate_json_value(
+            {
+                "submission_kind": SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
+                "attack_context_id": attack_context_id,
+                "attacking_unit_instance_id": attacking_unit_instance_id,
+                "attacker_model_instance_id": pool.attacker_model_instance_id,
+                "target_unit_instance_id": pool.target_unit_instance_id,
+                "weapon_profile_id": pool.weapon_profile_id,
+                "source_phase": source_phase.value,
+                "skill_modifier": skill_modifier,
+                "hit_roll_modifier": hit_roll_modifier,
+            }
+        ),
+        options=options,
+    )
+
+
+def _psychic_attack_modifier_ignore_options(
+    *,
+    attack_context_id: str,
+    weapon_profile_id: str,
+    skill_modifier: int,
+    hit_roll_modifier: int,
+) -> tuple[DecisionOption, ...]:
+    candidates: list[tuple[str, str, int, int]] = [
+        (
+            KEEP_ALL_MODIFIERS_OPTION_ID,
+            "Keep all modifiers",
+            skill_modifier,
+            hit_roll_modifier,
+        )
+    ]
+    if _has_detrimental_psychic_modifier(
+        skill_modifier=skill_modifier,
+        hit_roll_modifier=hit_roll_modifier,
+    ):
+        candidates.append(
+            (
+                IGNORE_DETRIMENTAL_MODIFIERS_OPTION_ID,
+                "Ignore detrimental modifiers",
+                0 if skill_modifier > 0 else skill_modifier,
+                0 if hit_roll_modifier < 0 else hit_roll_modifier,
+            )
+        )
+    if _has_beneficial_psychic_modifier(
+        skill_modifier=skill_modifier,
+        hit_roll_modifier=hit_roll_modifier,
+    ):
+        candidates.append(
+            (
+                IGNORE_BENEFICIAL_MODIFIERS_OPTION_ID,
+                "Ignore beneficial modifiers",
+                0 if skill_modifier < 0 else skill_modifier,
+                0 if hit_roll_modifier > 0 else hit_roll_modifier,
+            )
+        )
+    candidates.append((IGNORE_ALL_MODIFIERS_OPTION_ID, "Ignore all modifiers", 0, 0))
+    options: list[DecisionOption] = []
+    seen_effective_values: set[tuple[int, int]] = set()
+    for option_id, label, effective_skill_modifier, effective_hit_roll_modifier in candidates:
+        effective_key = (effective_skill_modifier, effective_hit_roll_modifier)
+        if effective_key in seen_effective_values:
+            continue
+        seen_effective_values.add(effective_key)
+        options.append(
+            DecisionOption(
+                option_id=option_id,
+                label=label,
+                payload=validate_json_value(
+                    {
+                        "submission_kind": (SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE),
+                        "attack_context_id": attack_context_id,
+                        "weapon_profile_id": weapon_profile_id,
+                        "option_id": option_id,
+                        "skill_modifier": skill_modifier,
+                        "hit_roll_modifier": hit_roll_modifier,
+                        "effective_skill_modifier": effective_skill_modifier,
+                        "effective_hit_roll_modifier": effective_hit_roll_modifier,
+                        "ignored_skill_modifier": (skill_modifier - effective_skill_modifier),
+                        "ignored_hit_roll_modifier": (
+                            hit_roll_modifier - effective_hit_roll_modifier
+                        ),
+                    }
+                ),
+            )
+        )
+    return tuple(options)
+
+
+def _psychic_attack_modifier_ignore_selection_for_attack(
+    *,
+    decisions: DecisionController,
+    attack_context_id: str,
+) -> PsychicAttackModifierIgnoreSelection | None:
+    requested_attack_context_id = _validate_identifier("attack_context_id", attack_context_id)
+    for record in reversed(decisions.records):
+        if record.request.decision_type != SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE:
+            continue
+        request_payload = _payload_object(record.request.payload)
+        if _payload_string(request_payload, key="attack_context_id") != requested_attack_context_id:
+            continue
+        payload = _payload_object(record.result.payload)
+        return PsychicAttackModifierIgnoreSelection(
+            option_id=_payload_string(payload, key="option_id"),
+            skill_modifier=_payload_int(payload, key="skill_modifier"),
+            hit_roll_modifier=_payload_int(payload, key="hit_roll_modifier"),
+            effective_skill_modifier=_payload_int(payload, key="effective_skill_modifier"),
+            effective_hit_roll_modifier=_payload_int(
+                payload,
+                key="effective_hit_roll_modifier",
+            ),
+        )
+    return None
+
+
+def validate_psychic_attack_modifier_ignore_decision(
+    *,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    result: DecisionResult,
+) -> None:
+    record = decisions.record_for_result(result)
+    if record.request.decision_type != SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE:
+        raise GameLifecycleError("Psychic modifier ignore decision has wrong request type.")
+    request_payload = _payload_object(record.request.payload)
+    attack_context_id = _payload_string(request_payload, key="attack_context_id")
+    if attack_context_id != attack_sequence.attack_context_id():
+        raise GameLifecycleError("Psychic modifier ignore decision attack context drift.")
+    payload = _payload_object(result.payload)
+    selection = PsychicAttackModifierIgnoreSelection(
+        option_id=_payload_string(payload, key="option_id"),
+        skill_modifier=_payload_int(payload, key="skill_modifier"),
+        hit_roll_modifier=_payload_int(payload, key="hit_roll_modifier"),
+        effective_skill_modifier=_payload_int(payload, key="effective_skill_modifier"),
+        effective_hit_roll_modifier=_payload_int(payload, key="effective_hit_roll_modifier"),
+    )
+    if selection.option_id != result.selected_option_id:
+        raise GameLifecycleError("Psychic modifier ignore decision option drift.")
+
+
+def _has_detrimental_psychic_modifier(*, skill_modifier: int, hit_roll_modifier: int) -> bool:
+    return skill_modifier > 0 or hit_roll_modifier < 0
+
+
+def _has_beneficial_psychic_modifier(*, skill_modifier: int, hit_roll_modifier: int) -> bool:
+    return skill_modifier < 0 or hit_roll_modifier > 0
+
+
 def _roll_hit(
     *,
     state: GameState,
@@ -7374,12 +7647,24 @@ def _roll_hit(
     attack_context_id: str,
     source_phase: BattlePhase,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    psychic_modifier_selection: PsychicAttackModifierIgnoreSelection | None = None,
 ) -> HitRoll:
-    skill = (
-        _hit_skill(pool.weapon_profile)
-        + _benefit_of_cover_ballistic_skill_penalty(state=state, pool=pool)
-        - _plunging_fire_ballistic_skill_improvement(pool=pool)
+    skill_modifier = _hit_skill_modifier(state=state, pool=pool)
+    modifier = _hit_roll_modifier(
+        state=state,
+        pool=pool,
+        source_phase=source_phase,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
+    if psychic_modifier_selection is not None:
+        if (
+            psychic_modifier_selection.skill_modifier != skill_modifier
+            or psychic_modifier_selection.hit_roll_modifier != modifier
+        ):
+            raise GameLifecycleError("Psychic modifier ignore selection context drift.")
+        skill_modifier = psychic_modifier_selection.effective_skill_modifier
+        modifier = psychic_modifier_selection.effective_hit_roll_modifier
+    skill = _hit_skill(pool.weapon_profile) + skill_modifier
     skill = max(2, min(skill, 6))
     is_snap_shooting = (
         FIRE_OVERWATCH_RULE_ID in pool.targeting_rule_ids
@@ -7387,21 +7672,6 @@ def _roll_hit(
     )
     if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT):
         return HitRoll.auto_hit(target_number=skill)
-    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
-    modifier = (
-        pool.hit_roll_modifier
-        + _persisting_hit_roll_modifier(
-            state=state,
-            target_unit_instance_id=pool.target_unit_instance_id,
-        )
-        + runtime_modifiers.hit_roll_modifier(
-            HitRollModifierContext(
-                state=state,
-                attacker_model_instance_id=pool.attacker_model_instance_id,
-                source_phase=source_phase,
-            )
-        )
-    )
     roll_state = _roll_or_reuse_state(
         manager,
         attack_sequence_hit_roll_spec(
@@ -7751,6 +8021,37 @@ def _benefit_of_cover_ballistic_skill_penalty(
     ):
         return 1
     return 0
+
+
+def _hit_skill_modifier(*, state: GameState, pool: RangedAttackPool) -> int:
+    return _benefit_of_cover_ballistic_skill_penalty(
+        state=state,
+        pool=pool,
+    ) - _plunging_fire_ballistic_skill_improvement(pool=pool)
+
+
+def _hit_roll_modifier(
+    *,
+    state: GameState,
+    pool: RangedAttackPool,
+    source_phase: BattlePhase,
+    runtime_modifier_registry: RuntimeModifierRegistry | None,
+) -> int:
+    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
+    return (
+        pool.hit_roll_modifier
+        + _persisting_hit_roll_modifier(
+            state=state,
+            target_unit_instance_id=pool.target_unit_instance_id,
+        )
+        + runtime_modifiers.hit_roll_modifier(
+            HitRollModifierContext(
+                state=state,
+                attacker_model_instance_id=pool.attacker_model_instance_id,
+                source_phase=source_phase,
+            )
+        )
+    )
 
 
 def _plunging_fire_ballistic_skill_improvement(*, pool: RangedAttackPool) -> int:
@@ -9300,6 +9601,40 @@ def _state_feel_no_pain_sources(
     return sources
 
 
+def _feel_no_pain_sources_for_attack(
+    *,
+    state: GameState,
+    model_instance_id: str,
+    attack_context: AttackResolutionContextPayload,
+) -> tuple[FeelNoPainSource, ...]:
+    sources = _state_feel_no_pain_sources(state=state, model_instance_id=model_instance_id)
+    return tuple(
+        source
+        for source in sources
+        if _feel_no_pain_source_applies_to_attack(
+            source=source,
+            attack_context=attack_context,
+        )
+    )
+
+
+def _feel_no_pain_source_applies_to_attack(
+    *,
+    source: FeelNoPainSource,
+    attack_context: AttackResolutionContextPayload,
+) -> bool:
+    if type(source) is not FeelNoPainSource:
+        raise GameLifecycleError("Feel No Pain source filtering requires a source.")
+    if source.attack_condition is None:
+        return True
+    if source.attack_condition is FeelNoPainAttackCondition.PSYCHIC_ATTACK:
+        is_psychic_attack = attack_context["is_psychic_attack"]
+        if type(is_psychic_attack) is not bool:
+            raise GameLifecycleError("Attack context is_psychic_attack must be a bool.")
+        return is_psychic_attack
+    raise GameLifecycleError("Unsupported Feel No Pain attack condition.")
+
+
 def _state_destruction_reaction_sources(
     *,
     state: GameState,
@@ -9377,6 +9712,15 @@ def _optional_payload_string(payload: dict[str, JsonValue], *, key: str) -> str 
     if key not in payload:
         return None
     return _payload_string(payload, key=key)
+
+
+def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
+    if key not in payload:
+        raise GameLifecycleError(f"Attack sequence payload missing {key}.")
+    value = payload[key]
+    if type(value) is not int:
+        raise GameLifecycleError(f"Attack sequence payload {key} must be an integer.")
+    return value
 
 
 def _payload_string_list(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
@@ -9509,6 +9853,12 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"{field_name} must not be empty.")
     return stripped
+
+
+def _validate_int(field_name: str, value: object) -> int:
+    if type(value) is not int:
+        raise GameLifecycleError(f"{field_name} must be an integer.")
+    return value
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

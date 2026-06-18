@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from enum import StrEnum
 from itertools import permutations, product
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
@@ -36,6 +36,12 @@ SELECT_PRECISION_ALLOCATION_DECISION_TYPE = "select_precision_allocation"
 SELECT_FEEL_NO_PAIN_DECISION_TYPE = "select_feel_no_pain"
 SELECT_DESTRUCTION_REACTION_DECISION_TYPE = "select_destruction_reaction"
 MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND = "mortal_wound"
+
+
+class FeelNoPainAttackCondition(StrEnum):
+    PSYCHIC_ATTACK = "psychic_attack"
+
+
 DECLINE_DESTRUCTION_REACTION_OPTION_ID = "decline_destruction_reaction"
 
 
@@ -158,6 +164,7 @@ class MortalWoundApplicationPayload(TypedDict):
 class FeelNoPainSourcePayload(TypedDict):
     source_id: str
     threshold: int
+    attack_condition: NotRequired[str]
 
 
 class DestructionReactionSourcePayload(TypedDict):
@@ -1376,6 +1383,7 @@ class MortalWoundRoutingResult:
 class FeelNoPainSource:
     source_id: str
     threshold: int
+    attack_condition: FeelNoPainAttackCondition | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1388,13 +1396,30 @@ class FeelNoPainSource:
             "threshold",
             _validate_d6_target("FeelNoPainSource threshold", self.threshold),
         )
+        object.__setattr__(
+            self,
+            "attack_condition",
+            feel_no_pain_attack_condition_from_token(self.attack_condition),
+        )
 
     def to_payload(self) -> FeelNoPainSourcePayload:
-        return {"source_id": self.source_id, "threshold": self.threshold}
+        payload: FeelNoPainSourcePayload = {
+            "source_id": self.source_id,
+            "threshold": self.threshold,
+        }
+        if self.attack_condition is not None:
+            payload["attack_condition"] = self.attack_condition.value
+        return payload
 
     @classmethod
     def from_payload(cls, payload: FeelNoPainSourcePayload) -> Self:
-        return cls(source_id=payload["source_id"], threshold=payload["threshold"])
+        return cls(
+            source_id=payload["source_id"],
+            threshold=payload["threshold"],
+            attack_condition=feel_no_pain_attack_condition_from_token(
+                payload.get("attack_condition")
+            ),
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -1721,6 +1746,21 @@ def destruction_reaction_kind_from_token(token: object) -> DestructionReactionKi
         return DestructionReactionKind(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported DestructionReactionKind token: {token}.") from exc
+
+
+def feel_no_pain_attack_condition_from_token(
+    token: object | None,
+) -> FeelNoPainAttackCondition | None:
+    if token is None:
+        return None
+    if type(token) is FeelNoPainAttackCondition:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("FeelNoPainAttackCondition token must be a string.")
+    try:
+        return FeelNoPainAttackCondition(token)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Unsupported FeelNoPainAttackCondition token: {token}.") from exc
 
 
 def allocation_context_for_unit(
@@ -2933,7 +2973,11 @@ def _state_feel_no_pain_sources(
 ) -> tuple[FeelNoPainSource, ...]:
     lookup = state.feel_no_pain_sources_for_model
     sources = lookup(model_instance_id=model_instance_id)
-    return _validate_feel_no_pain_sources(sources)
+    return tuple(
+        source
+        for source in _validate_feel_no_pain_sources(sources)
+        if source.attack_condition is None
+    )
 
 
 def _state_feel_no_pain_decline_allowed(
