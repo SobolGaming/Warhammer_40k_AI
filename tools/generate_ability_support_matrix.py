@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import cast
@@ -85,6 +86,16 @@ BLOODLETTERS_HEIGHT_OVERRIDES = (
         height_document_reference="Chaos Daemons Faction Pack p.28-29",
     ),
 )
+
+
+@dataclass(frozen=True)
+class SupportSectionRow:
+    subject: str
+    engine: str
+    documentation: str
+    tests: str
+    overall: str
+    notes: str
 
 
 def main() -> None:
@@ -344,6 +355,7 @@ def _support_matrix_markdown(
             )
             + " |"
         )
+    lines.extend(_structured_support_sections_markdown())
     lines.extend(
         (
             "",
@@ -365,6 +377,370 @@ def _support_matrix_markdown(
         )
     )
     return "\n".join(lines)
+
+
+def _structured_support_sections_markdown() -> list[str]:
+    lines = [
+        "",
+        "## Structured Support Sections",
+        "",
+        (
+            "These sections organize the support matrix by the rule families adapters and "
+            "engine owners usually reason about. `Full` means the current CORE V2 scope has "
+            "engine/runtime support, documentation or contract coverage when adapter-visible, "
+            "and focused tests. `Partial` means at least one known rule edge, generated "
+            "source-row path, or runtime host remains incomplete."
+        ),
+    ]
+    lines.extend(
+        _support_section_markdown(
+            "Core Keyword Abilities",
+            (
+                "Core keyword ability rows are still primarily surfaced through source-backed "
+                "category rows above. This table records the current section ownership without "
+                "claiming complete generated source coverage for every Core Rules keyword."
+            ),
+            (
+                SupportSectionRow(
+                    "Deep Strike",
+                    "Reserve declaration and placement hosts",
+                    "Adapter contract and architecture",
+                    "Focused reserve/deployment tests",
+                    "Full",
+                    "Current generated rows are `engine_consumed`.",
+                ),
+                SupportSectionRow(
+                    "Other Core Rules keyword abilities",
+                    "Mixed phase-owned hosts or explicit unsupported descriptors",
+                    "Architecture and source-row unsupported audits",
+                    "Coverage varies by keyword",
+                    "Partial",
+                    "Keep expanded per-keyword rows separate from wargear keyword abilities.",
+                ),
+            ),
+        )
+    )
+    lines.extend(
+        _support_section_markdown(
+            "Wargear Keyword Abilities",
+            (
+                "Weapon and wargear keyword abilities are normalized into `WeaponKeyword` values "
+                "or structured `AbilityDescriptor` records. Runtime code consumes these "
+                "structured fields and does not parse raw rule text."
+            ),
+            _wargear_keyword_support_rows(),
+        )
+    )
+    lines.extend(
+        _support_section_markdown(
+            "Core Stratagems",
+            (
+                "Core Stratagem rows are source-backed and route through the shared "
+                "Stratagem contract."
+            ),
+            (
+                SupportSectionRow(
+                    "Command Re-roll, Insane Bravery, New Orders, Rapid Ingress",
+                    "Named handlers",
+                    "Adapter contract and architecture",
+                    "Focused decision/CP/replay tests",
+                    "Full",
+                    "Core Command/Movement Stratagem slice.",
+                ),
+                SupportSectionRow(
+                    "Fire Overwatch, Smokescreen, Explosives",
+                    "Named handlers",
+                    "Adapter contract and architecture",
+                    "Focused Shooting and reaction-window tests",
+                    "Full",
+                    "Shooting-coupled Core Stratagem slice.",
+                ),
+                SupportSectionRow(
+                    "Heroic Intervention, Counteroffensive, Crushing Impact, Epic Challenge",
+                    "Named handlers",
+                    "Adapter contract and architecture",
+                    "Focused Charge/Fight Stratagem tests",
+                    "Full",
+                    "Charge/Fight Core Stratagem slice.",
+                ),
+            ),
+        )
+    )
+    lines.extend(
+        _support_section_markdown(
+            "Faction Army Rules",
+            "Faction army rules are grouped by faction-specific runtime consumers.",
+            (
+                SupportSectionRow(
+                    "Chaos Daemons - The Shadow of Chaos",
+                    "Named army-rule handler",
+                    "Architecture and generated matrix",
+                    "Focused faction runtime tests",
+                    "Full",
+                    "Current generated rows are `engine_consumed`.",
+                ),
+                SupportSectionRow(
+                    "Death Guard - Nurgle's Gift",
+                    "Named army-rule handler",
+                    "Architecture and generated matrix",
+                    "Focused faction runtime tests",
+                    "Full",
+                    "Includes contagion modifiers for supported characteristics and rolls.",
+                ),
+                SupportSectionRow(
+                    "World Eaters - Blessings of Khorne",
+                    "Named army-rule handler",
+                    "Architecture and generated matrix",
+                    "Focused faction runtime tests",
+                    "Full",
+                    "Includes battle-round selection and supported blessing effects.",
+                ),
+                SupportSectionRow(
+                    "Emperor's Children - Thrill Seekers",
+                    "Named army-rule handler",
+                    "Architecture and generated matrix",
+                    "Focused faction runtime tests",
+                    "Full",
+                    "Includes movement, charge, and shooting target restrictions.",
+                ),
+            ),
+        )
+    )
+    lines.extend(
+        _support_section_markdown(
+            "Detachment Rules",
+            "Detachment rules should be nested under each faction as source coverage expands.",
+            (
+                SupportSectionRow(
+                    "Faction-pack detachment rules",
+                    "Coverage/report rows exist; semantic handlers vary",
+                    "Architecture and coverage reports",
+                    "Faction-specific tests where implemented",
+                    "Partial",
+                    "Future generator work should split this table by faction and detachment.",
+                ),
+            ),
+        )
+    )
+    lines.extend(
+        _support_section_markdown(
+            "Faction Stratagems",
+            (
+                "Faction Stratagems are distinct from Core Stratagems and should remain "
+                "faction-scoped."
+            ),
+            (
+                SupportSectionRow(
+                    "Faction-pack Stratagems",
+                    "Coverage/report rows exist; semantic handlers vary",
+                    "Architecture and coverage reports",
+                    "Faction-specific tests where implemented",
+                    "Partial",
+                    (
+                        "Future generator work should group rows by faction, detachment, "
+                        "and Stratagem."
+                    ),
+                ),
+            ),
+        )
+    )
+    lines.extend(
+        _support_section_markdown(
+            "Enhancements",
+            "Enhancement support should be tracked under each faction and detachment.",
+            (
+                SupportSectionRow(
+                    "Faction-pack Enhancements",
+                    "Coverage/report rows exist; semantic handlers vary",
+                    "Architecture and coverage reports",
+                    "Faction-specific tests where implemented",
+                    "Partial",
+                    (
+                        "Future generator work should group rows by faction, detachment, "
+                        "and enhancement."
+                    ),
+                ),
+            ),
+        )
+    )
+    lines.extend(
+        _support_section_markdown(
+            "Datasheet Abilities",
+            "Datasheet abilities remain separate from core, wargear, faction, and detachment rows.",
+            (
+                SupportSectionRow(
+                    "Known datasheet ability text",
+                    "Descriptors or generated IR where available",
+                    "Generated matrix and coverage reports",
+                    "Focused tests where implemented",
+                    "Partial",
+                    "Current unparsed rows remain under Unknown Abilities until classified.",
+                ),
+            ),
+        )
+    )
+    return lines
+
+
+def _support_section_markdown(
+    title: str,
+    description: str,
+    rows: tuple[SupportSectionRow, ...],
+) -> list[str]:
+    lines = [
+        "",
+        f"## {title}",
+        "",
+        description,
+        "",
+        "| Subject | Engine support | Documentation | Tests | Overall | Notes |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
+    for row in rows:
+        lines.append(
+            "| "
+            + " | ".join(
+                (
+                    _markdown_text(row.subject),
+                    _markdown_text(row.engine),
+                    _markdown_text(row.documentation),
+                    _markdown_text(row.tests),
+                    _markdown_text(row.overall),
+                    _markdown_text(row.notes),
+                )
+            )
+            + " |"
+        )
+    return lines
+
+
+def _wargear_keyword_support_rows() -> tuple[SupportSectionRow, ...]:
+    return (
+        _full_wargear_row(
+            "[ANTI-X Y+] / [ANTI-NON-X Y+]",
+            "Critical Wound thresholds from structured descriptors",
+            "Includes slash-separated keyword groups and missing-keyword gates.",
+        ),
+        _full_wargear_row(
+            "[ASSAULT]",
+            "Advance shooting eligibility and Assault-only declaration filtering",
+            "Consumes movement-state evidence.",
+        ),
+        _full_wargear_row(
+            "[BLAST]",
+            "Attack-count bonus from target model count",
+            "Uses shared attack-count resolution.",
+        ),
+        _full_wargear_row(
+            "[CLEAVE X]",
+            "Structured attack-generation helper",
+            "Preserves source descriptor data.",
+        ),
+        _full_wargear_row(
+            "[CLOSE-QUARTERS] / [PISTOL]",
+            "Engagement-aware ranged declaration and targeting rules",
+            "`[PISTOL]` is treated as an alias.",
+        ),
+        _full_wargear_row(
+            "[DEVASTATING WOUNDS]",
+            "Critical Wound to mortal-wound damage routing",
+            "Runs through grouped damage and mortal-wound hosts.",
+        ),
+        _full_wargear_row(
+            "[EXTRA ATTACKS]",
+            "Additional melee declaration path",
+            "Does not replace the model's primary melee weapon.",
+        ),
+        _full_wargear_row(
+            "[HAZARDOUS]",
+            "Post-attack Hazardous roll and mortal-wound routing",
+            "Uses shared damage-allocation/FNP path.",
+        ),
+        SupportSectionRow(
+            "[HEAVY]",
+            "Movement-evidence Hit-roll modifier slice",
+            "Architecture notes remaining official gates",
+            "Focused movement/modifier tests",
+            "Partial",
+            "Own-Shooting-phase, unengaged, and setup-this-turn denial gates remain future work.",
+        ),
+        _full_wargear_row(
+            "[HUNTER X]",
+            "Target eligibility gate",
+            "Matches at least one listed target keyword.",
+        ),
+        _full_wargear_row(
+            "[IGNORES COVER]",
+            "Removes Benefit of Cover for the attack",
+            "Applies across terrain, Stealth, Smokescreen, Indirect Fire, and other cover sources.",
+        ),
+        _full_wargear_row(
+            "[INDIRECT FIRE]",
+            "Indirect targeting restrictions and modifiers",
+            "Includes no-visible-target and no-reroll restrictions.",
+        ),
+        _full_wargear_row(
+            "[LANCE]",
+            "Charge-conditioned Wound-roll modifier",
+            "Consumes charge-state evidence.",
+        ),
+        _full_wargear_row(
+            "[LETHAL HITS]",
+            "Critical Hit optional auto-wound decision",
+            "Routes through the shared attack sequence.",
+        ),
+        _full_wargear_row(
+            "[MELTA X]",
+            "Range-conditioned Damage bonus",
+            "Uses measured target range evidence.",
+        ),
+        _full_wargear_row(
+            "[ONE SHOT]",
+            "Battle-scoped weapon-use records in Shooting and Fight",
+            "Returned destroyed models cannot reuse an already selected weapon.",
+        ),
+        _full_wargear_row(
+            "[PRECISION]",
+            "Attacker allocation-priority decision",
+            "Uses visible eligible Character allocation groups.",
+        ),
+        _full_wargear_row(
+            "[PSYCHIC]",
+            "Psychic attack classification and modifier-ignore decision",
+            "Psychic-only downstream rules consume `is_psychic_attack`.",
+        ),
+        _full_wargear_row(
+            "[RAPID FIRE X]",
+            "Range-conditioned attack-count bonus",
+            "Uses measured target range evidence.",
+        ),
+        _full_wargear_row(
+            "[SUSTAINED HITS X]",
+            "Generated hits from Critical Hits",
+            "Generated-hit wound contexts remain deterministic.",
+        ),
+        _full_wargear_row(
+            "[TORRENT]",
+            "Automatic Hit resolution",
+            "Bypasses Hit rolls while preserving later attack sequence steps.",
+        ),
+        _full_wargear_row(
+            "[TWIN-LINKED]",
+            "Wound-roll reroll permission",
+            "Consumes shared reroll semantics.",
+        ),
+    )
+
+
+def _full_wargear_row(subject: str, engine: str, notes: str) -> SupportSectionRow:
+    return SupportSectionRow(
+        subject=subject,
+        engine=engine,
+        documentation="Architecture plus adapter contract/catalog when player-facing",
+        tests="Focused unit and lifecycle tests",
+        overall="Full",
+        notes=notes,
+    )
 
 
 def _inline_code_list(values: list[str]) -> str:

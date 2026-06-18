@@ -27,6 +27,101 @@ Current coverage categories:
 | Unknown Abilities | `descriptor_only` | None | 2 | `datasheet`: 2 | Brass Stampede (Bloodcrushers)<br>Bane of Cowards (Bloodletters) | `unknown.ability_text` |
 | World Eaters Army Rule | `engine_consumed` | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords` | 1 | `faction`: 1 | Blessings of Khorne (World Eaters) | `faction.army_rule.blessings_of_khorne` |
 
+## Structured Support Sections
+
+These sections organize the support matrix by the rule families adapters and engine owners usually reason about. `Full` means the current CORE V2 scope has engine/runtime support, documentation or contract coverage when adapter-visible, and focused tests. `Partial` means at least one known rule edge, generated source-row path, or runtime host remains incomplete.
+
+## Core Keyword Abilities
+
+Core keyword ability rows are still primarily surfaced through source-backed category rows above. This table records the current section ownership without claiming complete generated source coverage for every Core Rules keyword.
+
+| Subject | Engine support | Documentation | Tests | Overall | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Deep Strike | Reserve declaration and placement hosts | Adapter contract and architecture | Focused reserve/deployment tests | Full | Current generated rows are `engine_consumed`. |
+| Other Core Rules keyword abilities | Mixed phase-owned hosts or explicit unsupported descriptors | Architecture and source-row unsupported audits | Coverage varies by keyword | Partial | Keep expanded per-keyword rows separate from wargear keyword abilities. |
+
+## Wargear Keyword Abilities
+
+Weapon and wargear keyword abilities are normalized into `WeaponKeyword` values or structured `AbilityDescriptor` records. Runtime code consumes these structured fields and does not parse raw rule text.
+
+| Subject | Engine support | Documentation | Tests | Overall | Notes |
+| --- | --- | --- | --- | --- | --- |
+| [ANTI-X Y+] / [ANTI-NON-X Y+] | Critical Wound thresholds from structured descriptors | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Includes slash-separated keyword groups and missing-keyword gates. |
+| [ASSAULT] | Advance shooting eligibility and Assault-only declaration filtering | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Consumes movement-state evidence. |
+| [BLAST] | Attack-count bonus from target model count | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Uses shared attack-count resolution. |
+| [CLEAVE X] | Structured attack-generation helper | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Preserves source descriptor data. |
+| [CLOSE-QUARTERS] / [PISTOL] | Engagement-aware ranged declaration and targeting rules | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | `[PISTOL]` is treated as an alias. |
+| [DEVASTATING WOUNDS] | Critical Wound to mortal-wound damage routing | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Runs through grouped damage and mortal-wound hosts. |
+| [EXTRA ATTACKS] | Additional melee declaration path | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Does not replace the model's primary melee weapon. |
+| [HAZARDOUS] | Post-attack Hazardous roll and mortal-wound routing | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Uses shared damage-allocation/FNP path. |
+| [HEAVY] | Movement-evidence Hit-roll modifier slice | Architecture notes remaining official gates | Focused movement/modifier tests | Partial | Own-Shooting-phase, unengaged, and setup-this-turn denial gates remain future work. |
+| [HUNTER X] | Target eligibility gate | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Matches at least one listed target keyword. |
+| [IGNORES COVER] | Removes Benefit of Cover for the attack | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Applies across terrain, Stealth, Smokescreen, Indirect Fire, and other cover sources. |
+| [INDIRECT FIRE] | Indirect targeting restrictions and modifiers | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Includes no-visible-target and no-reroll restrictions. |
+| [LANCE] | Charge-conditioned Wound-roll modifier | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Consumes charge-state evidence. |
+| [LETHAL HITS] | Critical Hit optional auto-wound decision | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Routes through the shared attack sequence. |
+| [MELTA X] | Range-conditioned Damage bonus | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Uses measured target range evidence. |
+| [ONE SHOT] | Battle-scoped weapon-use records in Shooting and Fight | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Returned destroyed models cannot reuse an already selected weapon. |
+| [PRECISION] | Attacker allocation-priority decision | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Uses visible eligible Character allocation groups. |
+| [PSYCHIC] | Psychic attack classification and modifier-ignore decision | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Psychic-only downstream rules consume `is_psychic_attack`. |
+| [RAPID FIRE X] | Range-conditioned attack-count bonus | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Uses measured target range evidence. |
+| [SUSTAINED HITS X] | Generated hits from Critical Hits | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Generated-hit wound contexts remain deterministic. |
+| [TORRENT] | Automatic Hit resolution | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Bypasses Hit rolls while preserving later attack sequence steps. |
+| [TWIN-LINKED] | Wound-roll reroll permission | Architecture plus adapter contract/catalog when player-facing | Focused unit and lifecycle tests | Full | Consumes shared reroll semantics. |
+
+## Core Stratagems
+
+Core Stratagem rows are source-backed and route through the shared Stratagem contract.
+
+| Subject | Engine support | Documentation | Tests | Overall | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Command Re-roll, Insane Bravery, New Orders, Rapid Ingress | Named handlers | Adapter contract and architecture | Focused decision/CP/replay tests | Full | Core Command/Movement Stratagem slice. |
+| Fire Overwatch, Smokescreen, Explosives | Named handlers | Adapter contract and architecture | Focused Shooting and reaction-window tests | Full | Shooting-coupled Core Stratagem slice. |
+| Heroic Intervention, Counteroffensive, Crushing Impact, Epic Challenge | Named handlers | Adapter contract and architecture | Focused Charge/Fight Stratagem tests | Full | Charge/Fight Core Stratagem slice. |
+
+## Faction Army Rules
+
+Faction army rules are grouped by faction-specific runtime consumers.
+
+| Subject | Engine support | Documentation | Tests | Overall | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Chaos Daemons - The Shadow of Chaos | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Current generated rows are `engine_consumed`. |
+| Death Guard - Nurgle's Gift | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes contagion modifiers for supported characteristics and rolls. |
+| World Eaters - Blessings of Khorne | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes battle-round selection and supported blessing effects. |
+| Emperor's Children - Thrill Seekers | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes movement, charge, and shooting target restrictions. |
+
+## Detachment Rules
+
+Detachment rules should be nested under each faction as source coverage expands.
+
+| Subject | Engine support | Documentation | Tests | Overall | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Faction-pack detachment rules | Coverage/report rows exist; semantic handlers vary | Architecture and coverage reports | Faction-specific tests where implemented | Partial | Future generator work should split this table by faction and detachment. |
+
+## Faction Stratagems
+
+Faction Stratagems are distinct from Core Stratagems and should remain faction-scoped.
+
+| Subject | Engine support | Documentation | Tests | Overall | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Faction-pack Stratagems | Coverage/report rows exist; semantic handlers vary | Architecture and coverage reports | Faction-specific tests where implemented | Partial | Future generator work should group rows by faction, detachment, and Stratagem. |
+
+## Enhancements
+
+Enhancement support should be tracked under each faction and detachment.
+
+| Subject | Engine support | Documentation | Tests | Overall | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Faction-pack Enhancements | Coverage/report rows exist; semantic handlers vary | Architecture and coverage reports | Faction-specific tests where implemented | Partial | Future generator work should group rows by faction, detachment, and enhancement. |
+
+## Datasheet Abilities
+
+Datasheet abilities remain separate from core, wargear, faction, and detachment rows.
+
+| Subject | Engine support | Documentation | Tests | Overall | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Known datasheet ability text | Descriptors or generated IR where available | Generated matrix and coverage reports | Focused tests where implemented | Partial | Current unparsed rows remain under Unknown Abilities until classified. |
+
 Unknown Abilities are descriptors that are present in the canonical catalog but are not yet parsed into a supported IR template or tied to a runtime consumer. Parsed-but-unconsumed IR remains separated by its semantic category and support stage instead of being collapsed into Unknown Abilities.
 
 Broad CORE V1-to-CORE V2 category forecasting is intentionally deferred until current-edition faction-pack modifications are complete. Until then, this report only marks support from the current canonical rows, typed IR, descriptor consumers, explicitly declared runtime-content rows, and tests proving the behavior.
