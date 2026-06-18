@@ -5834,6 +5834,16 @@ def _optional_destruction_reaction_trigger_conditions_met(
     damage: DamageApplication,
     descriptor: dict[str, JsonValue],
 ) -> bool:
+    if not _optional_destruction_reaction_trigger_battle_round_is_current(
+        state=state,
+        descriptor=descriptor,
+    ):
+        return False
+    if not _optional_destruction_reaction_active_effect_requirement_is_met(
+        state=state,
+        descriptor=descriptor,
+    ):
+        return False
     if (
         descriptor.get("requires_destroyed_by_melee_attack") is True
         and attack_sequence.source_phase is not BattlePhase.FIGHT
@@ -5848,6 +5858,60 @@ def _optional_destruction_reaction_trigger_conditions_met(
         ):
             return False
     return True
+
+
+def _optional_destruction_reaction_trigger_battle_round_is_current(
+    *,
+    state: GameState,
+    descriptor: dict[str, JsonValue],
+) -> bool:
+    if "battle_round" not in descriptor:
+        return True
+    return _payload_positive_int(descriptor, key="battle_round") == state.battle_round
+
+
+def _optional_destruction_reaction_active_effect_requirement_is_met(
+    *,
+    state: GameState,
+    descriptor: dict[str, JsonValue],
+) -> bool:
+    raw_requirement = descriptor.get("requires_active_persisting_effect")
+    if raw_requirement is None:
+        return True
+    requirement = _payload_object(raw_requirement)
+    required_owner_id = _optional_payload_string(requirement, key="owner_player_id")
+    required_source_rule_id = _optional_payload_string(requirement, key="source_rule_id")
+    required_effect_kind = _optional_payload_string(requirement, key="effect_kind")
+    required_target_unit_id = _optional_payload_string(requirement, key="target_unit_instance_id")
+    required_battle_round = (
+        _payload_positive_int(requirement, key="battle_round")
+        if "battle_round" in requirement
+        else None
+    )
+    required_selected_id = _optional_payload_string(requirement, key="selected_blessing_id")
+    for effect in state.persisting_effects:
+        if required_owner_id is not None and effect.owner_player_id != required_owner_id:
+            continue
+        if required_source_rule_id is not None and effect.source_rule_id != required_source_rule_id:
+            continue
+        if required_target_unit_id is not None and not effect.applies_to_unit(
+            required_target_unit_id
+        ):
+            continue
+        payload = _payload_object(effect.effect_payload)
+        if required_effect_kind is not None and payload.get("effect_kind") != required_effect_kind:
+            continue
+        if required_battle_round is not None and payload.get("battle_round") != (
+            required_battle_round
+        ):
+            continue
+        if required_selected_id is not None and required_selected_id not in _payload_string_list(
+            payload,
+            key="selected_blessing_ids",
+        ):
+            continue
+        return True
+    return False
 
 
 def _destruction_reaction_trigger_threshold(descriptor: dict[str, JsonValue]) -> int:
@@ -9307,6 +9371,26 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     if type(value) is not str:
         raise GameLifecycleError(f"Attack sequence payload {key} must be a string.")
     return value
+
+
+def _optional_payload_string(payload: dict[str, JsonValue], *, key: str) -> str | None:
+    if key not in payload:
+        return None
+    return _payload_string(payload, key=key)
+
+
+def _payload_string_list(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
+    if key not in payload:
+        raise GameLifecycleError(f"Attack sequence payload missing {key}.")
+    value = payload[key]
+    if not isinstance(value, list):
+        raise GameLifecycleError(f"Attack sequence payload {key} must be a list.")
+    strings: list[str] = []
+    for item in value:
+        if type(item) is not str:
+            raise GameLifecycleError(f"Attack sequence payload {key} must contain strings.")
+        strings.append(item)
+    return tuple(strings)
 
 
 def _payload_bool(payload: dict[str, JsonValue], *, key: str) -> bool:

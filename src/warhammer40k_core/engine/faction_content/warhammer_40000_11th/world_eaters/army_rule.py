@@ -653,6 +653,14 @@ def _record_total_carnage_sources(*, state: GameState, army: ArmyDefinition) -> 
                     "player_id": army.player_id,
                     "unit_instance_id": unit.unit_instance_id,
                     "model_instance_id": model.model_instance_id,
+                    "requires_active_persisting_effect": {
+                        "effect_kind": BLESSINGS_OF_KHORNE_EFFECT_KIND,
+                        "source_rule_id": SOURCE_RULE_ID,
+                        "owner_player_id": army.player_id,
+                        "target_unit_instance_id": unit.unit_instance_id,
+                        "battle_round": state.battle_round,
+                        "selected_blessing_id": BlessingOfKhorne.TOTAL_CARNAGE.value,
+                    },
                 },
             )
             state.record_model_destruction_reaction_sources(

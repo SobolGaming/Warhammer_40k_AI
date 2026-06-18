@@ -26,6 +26,7 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionEffectKind,
 )
 from warhammer40k_core.core.detachment import DetachmentDefinition
+from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.core.wargear import Wargear
@@ -37,6 +38,12 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.attack_sequence import (
+    AttackSequence,
+    attack_sequence_hit_roll_spec,
+    attack_sequence_wound_roll_spec,
+    resolve_attack_sequence_until_blocked,
+)
 from warhammer40k_core.engine.battle_round_hooks import (
     SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
     BattleRoundStartHookBinding,
@@ -51,6 +58,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.charge_declaration import ChargeRollResult, ChargeRollResultPayload
+from warhammer40k_core.engine.damage_allocation import SELECT_DESTRUCTION_REACTION_DECISION_TYPE
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -92,7 +100,10 @@ from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
 )
+from warhammer40k_core.engine.saves import SaveKind, saving_throw_roll_spec
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
@@ -863,35 +874,8 @@ def test_bloodshed_points_require_world_eaters_and_battlefield() -> None:
 def test_total_carnage_selection_registers_optional_triggered_fight_on_death() -> None:
     state = _battle_ready_state()
     decisions = DecisionController()
-    options = army_rule.blessings_selection_options(
-        player_id="player-a",
-        battle_round=state.battle_round,
-        dice_values=(3, 3, 1, 1, 1, 1, 1, 1),
-        bloodshed_points=0,
-    )
-    request = DecisionRequest(
-        request_id=state.next_decision_request_id(),
-        decision_type=SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
-        actor_id="player-a",
-        payload=validate_json_value({"hook_id": army_rule.HOOK_ID}),
-        options=options,
-    )
-    result = DecisionResult.for_request(
-        result_id="phase17g-total-carnage-result",
-        request=request,
-        selected_option_id="world_eaters:blessings:total_carnage",
-    )
+    _record_total_carnage_selection(state=state, decisions=decisions)
 
-    handled = army_rule.apply_blessings_selection_result(
-        BattleRoundStartResultContext(
-            state=state,
-            decisions=decisions,
-            request=request,
-            result=result,
-        )
-    )
-
-    assert handled
     assert army_rule.active_blessings_for_player(state, player_id="player-a") == (
         army_rule.BlessingOfKhorne.TOTAL_CARNAGE,
     )
@@ -908,6 +892,243 @@ def test_total_carnage_selection_registers_optional_triggered_fight_on_death() -
         assert payload["trigger_roll_threshold"] == army_rule.TOTAL_CARNAGE_TRIGGER_THRESHOLD
         assert payload["requires_destroyed_by_melee_attack"] is True
         assert payload["requires_not_fought_this_phase"] is True
+        requirement = cast(dict[str, JsonValue], payload["requires_active_persisting_effect"])
+        assert requirement["effect_kind"] == army_rule.BLESSINGS_OF_KHORNE_EFFECT_KIND
+        assert requirement["selected_blessing_id"] == army_rule.BlessingOfKhorne.TOTAL_CARNAGE.value
+
+
+def test_total_carnage_current_round_source_opens_reaction_window() -> None:
+    lifecycle = _battle_ready_lifecycle()
+    state = _require_state(lifecycle)
+    decisions = lifecycle.decision_controller
+    _record_total_carnage_selection(state=state, decisions=decisions)
+    defender = _unit_by_id(state, WORLD_EATERS_UNIT_ID)
+    defender_model = defender.own_models[0]
+    source = state.destruction_reaction_sources_for_model(
+        model_instance_id=defender_model.model_instance_id
+    )[0]
+
+    _advance_to_player_b_fight(state, battle_round=1)
+
+    assert state.battle_round == 1
+    assert state.active_player_id == "player-b"
+    assert state.current_battle_phase is BattlePhase.FIGHT
+    _remove_models(
+        state,
+        tuple(
+            model.model_instance_id
+            for model in defender.own_models
+            if model.model_instance_id != defender_model.model_instance_id
+        ),
+    )
+    attacker = _unit_by_id(state, ENEMY_UNIT_ID)
+    weapon_profile = replace(
+        _melee_profile(),
+        profile_id="phase17g-current-total-carnage-killing-blow",
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 20),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence_id = "phase17g-current-total-carnage"
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-b",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        source_phase=BattlePhase.FIGHT,
+        attack_pools=(
+            _attack_pool_for_world_eaters_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-b",
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-b",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-a",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    trigger_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason="Destruction reaction trigger",
+        roll_type="world_eaters_total_carnage",
+        actor_id="player-a",
+    )
+
+    _remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_world_eaters_config().ruleset_descriptor,
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase17g-current-total-carnage",
+            event_log=decisions.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase17g-current-total-carnage-hit",
+                    spec=hit_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase17g-current-total-carnage-wound",
+                    spec=wound_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase17g-current-total-carnage-save",
+                    spec=save_spec,
+                    value=1,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase17g-current-total-carnage-trigger",
+                    spec=trigger_spec,
+                    value=army_rule.TOTAL_CARNAGE_TRIGGER_THRESHOLD,
+                ),
+            ),
+        ),
+    )
+
+    assert allocated_ids == (defender_model.model_instance_id,)
+    assert status is not None
+    request = status.decision_request
+    assert request is not None
+    assert request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
+    assert request.actor_id == "player-a"
+    assert {option.option_id for option in request.options} >= {source.source_id}
+    rolled = _event_payloads(decisions, "destruction_reaction_trigger_rolled")
+    opened = _event_payloads(decisions, "destruction_reaction_window_opened")
+    assert len(rolled) == 1
+    assert len(opened) == 1
+    assert rolled[0]["triggered"] is True
+    assert cast(dict[str, JsonValue], rolled[0]["selected_source"])["source_id"] == source.source_id
+    assert _event_payloads(decisions, "destruction_reaction_trigger_not_applicable") == ()
+
+
+def test_total_carnage_stale_source_does_not_trigger_after_blessing_expires() -> None:
+    lifecycle = _battle_ready_lifecycle()
+    state = _require_state(lifecycle)
+    decisions = lifecycle.decision_controller
+    _record_total_carnage_selection(state=state, decisions=decisions)
+    defender = _unit_by_id(state, WORLD_EATERS_UNIT_ID)
+    defender_model = defender.own_models[0]
+    assert state.destruction_reaction_sources_for_model(
+        model_instance_id=defender_model.model_instance_id
+    )
+
+    _advance_to_player_b_fight(state, battle_round=2)
+
+    assert state.battle_round == 2
+    assert state.active_player_id == "player-b"
+    assert state.current_battle_phase is BattlePhase.FIGHT
+    assert not any(
+        effect.source_rule_id == army_rule.SOURCE_RULE_ID for effect in state.persisting_effects
+    )
+    assert state.destruction_reaction_sources_for_model(
+        model_instance_id=defender_model.model_instance_id
+    )
+
+    _remove_models(
+        state,
+        tuple(
+            model.model_instance_id
+            for model in defender.own_models
+            if model.model_instance_id != defender_model.model_instance_id
+        ),
+    )
+    attacker = _unit_by_id(state, ENEMY_UNIT_ID)
+    weapon_profile = replace(
+        _melee_profile(),
+        profile_id="phase17g-stale-total-carnage-killing-blow",
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 20),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence_id = "phase17g-stale-total-carnage"
+    sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-b",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        source_phase=BattlePhase.FIGHT,
+        attack_pools=(
+            _attack_pool_for_world_eaters_test(
+                attacker=attacker,
+                defender=defender,
+                weapon_profile=weapon_profile,
+                attacks=1,
+            ),
+        ),
+    )
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-b",
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-b",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-a",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+
+    remaining_sequence, allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=_world_eaters_config().ruleset_descriptor,
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase17g-stale-total-carnage",
+            event_log=decisions.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase17g-stale-total-carnage-hit",
+                    spec=hit_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase17g-stale-total-carnage-wound",
+                    spec=wound_spec,
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id="phase17g-stale-total-carnage-save",
+                    spec=save_spec,
+                    value=1,
+                ),
+            ),
+        ),
+    )
+
+    not_applicable = _event_payloads(decisions, "destruction_reaction_trigger_not_applicable")
+    assert remaining_sequence is None
+    assert allocated_ids == (defender_model.model_instance_id,)
+    assert status is None
+    assert decisions.queue.pending_requests == ()
+    assert _event_payloads(decisions, "destruction_reaction_trigger_rolled") == ()
+    assert _event_payloads(decisions, "destruction_reaction_window_opened") == ()
+    assert len(not_applicable) == 1
+    selected_source = cast(dict[str, JsonValue], not_applicable[0]["selected_source"])
+    descriptor = cast(dict[str, JsonValue], not_applicable[0]["descriptor"])
+    assert cast(str, selected_source["source_id"]).startswith(army_rule.TOTAL_CARNAGE_HOOK_ID)
+    assert descriptor["battle_round"] == 1
 
 
 def test_world_eaters_army_rule_fail_fast_edges_are_explicit() -> None:
@@ -1177,6 +1398,49 @@ def _battle_ready_state() -> GameState:
     return _require_state(_battle_ready_lifecycle())
 
 
+def _record_total_carnage_selection(*, state: GameState, decisions: DecisionController) -> None:
+    options = army_rule.blessings_selection_options(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        dice_values=(3, 3, 1, 1, 1, 1, 1, 1),
+        bloodshed_points=0,
+    )
+    request = DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
+        actor_id="player-a",
+        payload=validate_json_value({"hook_id": army_rule.HOOK_ID}),
+        options=options,
+    )
+    result = DecisionResult.for_request(
+        result_id="phase17g-total-carnage-result",
+        request=request,
+        selected_option_id="world_eaters:blessings:total_carnage",
+    )
+    handled = army_rule.apply_blessings_selection_result(
+        BattleRoundStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+    if not handled:
+        raise AssertionError("Total Carnage selection must be handled")
+
+
+def _advance_to_player_b_fight(state: GameState, *, battle_round: int) -> None:
+    for _attempt in range(20):
+        if (
+            state.battle_round == battle_round
+            and state.active_player_id == "player-b"
+            and state.current_battle_phase is BattlePhase.FIGHT
+        ):
+            return
+        state.advance_to_next_battle_phase()
+    raise AssertionError(f"state did not reach round {battle_round} player-b Fight phase")
+
+
 def _cloned_battle_ready_state() -> GameState:
     return GameState.from_payload(_battle_ready_state().to_payload())
 
@@ -1439,6 +1703,41 @@ def _compact_unit_poses(*, origin: Pose, model_count: int) -> tuple[Pose, ...]:
     )
 
 
+def _attack_pool_for_world_eaters_test(
+    *,
+    attacker: UnitInstance,
+    defender: UnitInstance,
+    weapon_profile: WeaponProfile,
+    attacks: int,
+) -> RangedAttackPool:
+    defender_model_ids = tuple(model.model_instance_id for model in defender.own_models)
+    return RangedAttackPool(
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        wargear_id=attacker.wargear_selections[0].wargear_ids[0],
+        weapon_profile_id=weapon_profile.profile_id,
+        weapon_profile=weapon_profile,
+        target_unit_instance_id=defender.unit_instance_id,
+        shooting_type=ShootingType.NORMAL,
+        attacks=attacks,
+        target_visible_model_ids=defender_model_ids,
+        target_in_range_model_ids=defender_model_ids,
+    )
+
+
+def _fixed_roll_result(
+    *,
+    roll_id: str,
+    spec: DiceRollSpec,
+    value: int,
+) -> DiceRollResult:
+    return DiceRollResult.from_values(
+        roll_id=roll_id,
+        spec=spec,
+        values=(value,),
+        source="fixed",
+    )
+
+
 def _charge_roll_result_from_event(
     decisions: DecisionController,
     event_type: str,
@@ -1449,6 +1748,17 @@ def _charge_roll_result_from_event(
         payload = cast(dict[str, object], event.payload)
         return ChargeRollResult.from_payload(cast(ChargeRollResultPayload, payload["roll_result"]))
     raise AssertionError(f"missing event type {event_type}")
+
+
+def _event_payloads(
+    decisions: DecisionController,
+    event_type: str,
+) -> tuple[dict[str, JsonValue], ...]:
+    return tuple(
+        cast(dict[str, JsonValue], event.payload)
+        for event in decisions.event_log.records
+        if event.event_type == event_type
+    )
 
 
 def _icon_bearer_model_id(state: GameState) -> str:
