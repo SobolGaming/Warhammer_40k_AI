@@ -69,6 +69,10 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FightActivationAbilityHookBinding,
     FightActivationAbilityHookRegistry,
 )
+from warhammer40k_core.engine.fight_unit_selected_hooks import (
+    FightUnitSelectedGrantBinding,
+    FightUnitSelectedGrantRegistry,
+)
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeHookBinding,
     MovementEndSurgeHookRegistry,
@@ -151,6 +155,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     shooting_end_surge_hook_ids: list[str]
     enhancement_effect_binding_ids: list[str]
     fight_activation_ability_hook_ids: list[str]
+    fight_unit_selected_grant_hook_ids: list[str]
     phase_end_objective_control_hook_ids: list[str]
     unit_characteristic_modifier_ids: list[str]
     hit_roll_modifier_ids: list[str]
@@ -207,6 +212,7 @@ class RuntimeContentContribution:
     shooting_end_surge_hook_bindings: tuple[ShootingEndSurgeHookBinding, ...] = ()
     enhancement_effect_bindings: tuple[EnhancementEffectBinding, ...] = ()
     fight_activation_ability_hook_bindings: tuple[FightActivationAbilityHookBinding, ...] = ()
+    fight_unit_selected_grant_hook_bindings: tuple[FightUnitSelectedGrantBinding, ...] = ()
     phase_end_objective_control_hook_bindings: tuple[PhaseEndObjectiveControlHookBinding, ...] = ()
     unit_characteristic_modifier_bindings: tuple[UnitCharacteristicModifierBinding, ...] = ()
     hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = ()
@@ -443,6 +449,15 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "fight_unit_selected_grant_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution fight_unit_selected_grant_hook_bindings",
+                self.fight_unit_selected_grant_hook_bindings,
+                FightUnitSelectedGrantBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "phase_end_objective_control_hook_bindings",
             _validate_tuple(
                 "RuntimeContentContribution phase_end_objective_control_hook_bindings",
@@ -550,6 +565,7 @@ class RuntimeContentContribution:
             shooting_end_surge_hook_bindings=self.shooting_end_surge_hook_bindings,
             enhancement_effect_bindings=self.enhancement_effect_bindings,
             fight_activation_ability_hook_bindings=self.fight_activation_ability_hook_bindings,
+            fight_unit_selected_grant_hook_bindings=(self.fight_unit_selected_grant_hook_bindings),
             phase_end_objective_control_hook_bindings=(
                 self.phase_end_objective_control_hook_bindings
             ),
@@ -788,6 +804,15 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.hook_id,
         ),
+        fight_unit_selected_grant_hook_bindings=_combine_unique_values(
+            "fight-unit-selected grant hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.fight_unit_selected_grant_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
         phase_end_objective_control_hook_bindings=_combine_unique_values(
             "phase-end objective-control hook binding",
             tuple(
@@ -891,6 +916,7 @@ class RuntimeContentBundle:
     shooting_end_surge_hook_registry: ShootingEndSurgeHookRegistry
     enhancement_effect_registry: EnhancementEffectRegistry
     fight_activation_ability_hook_registry: FightActivationAbilityHookRegistry
+    fight_unit_selected_grant_hook_registry: FightUnitSelectedGrantRegistry
     phase_end_objective_control_hook_registry: PhaseEndObjectiveControlHookRegistry
     runtime_modifier_registry: RuntimeModifierRegistry
     contribution_ids: tuple[str, ...] = ()
@@ -985,6 +1011,10 @@ class RuntimeContentBundle:
         ):
             raise GameLifecycleError(
                 "RuntimeContentBundle requires FightActivationAbilityHookRegistry."
+            )
+        if type(self.fight_unit_selected_grant_hook_registry) is not FightUnitSelectedGrantRegistry:
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires FightUnitSelectedGrantRegistry."
             )
         if (
             type(self.phase_end_objective_control_hook_registry)
@@ -1229,6 +1259,13 @@ class RuntimeContentBundle:
                 for binding in contribution.fight_activation_ability_hook_bindings
             )
         )
+        fight_unit_selected_grant_hook_registry = FightUnitSelectedGrantRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.fight_unit_selected_grant_hook_bindings
+            )
+        )
         phase_end_objective_control_hook_registry = (
             PhaseEndObjectiveControlHookRegistry.from_bindings(
                 tuple(
@@ -1309,6 +1346,7 @@ class RuntimeContentBundle:
             shooting_end_surge_hook_registry=shooting_end_surge_hook_registry,
             enhancement_effect_registry=enhancement_effect_registry,
             fight_activation_ability_hook_registry=fight_activation_ability_hook_registry,
+            fight_unit_selected_grant_hook_registry=fight_unit_selected_grant_hook_registry,
             phase_end_objective_control_hook_registry=(phase_end_objective_control_hook_registry),
             runtime_modifier_registry=runtime_modifier_registry,
             contribution_ids=contribution_ids,
@@ -1396,6 +1434,10 @@ class RuntimeContentBundle:
             "fight_activation_ability_hook_ids": [
                 binding.hook_id
                 for binding in self.fight_activation_ability_hook_registry.all_bindings()
+            ],
+            "fight_unit_selected_grant_hook_ids": [
+                binding.hook_id
+                for binding in self.fight_unit_selected_grant_hook_registry.all_bindings()
             ],
             "phase_end_objective_control_hook_ids": [
                 binding.hook_id

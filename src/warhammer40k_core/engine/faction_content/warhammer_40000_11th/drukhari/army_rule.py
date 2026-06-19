@@ -38,6 +38,11 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.drukhari.powe
     power_from_pain_target_unit_ids,
 )
 from warhammer40k_core.engine.faction_resources import FactionResourceStatus
+from warhammer40k_core.engine.fight_unit_selected_hooks import (
+    FightUnitSelectedContext,
+    FightUnitSelectedGrant,
+    FightUnitSelectedGrantBinding,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedContext,
@@ -54,6 +59,7 @@ HOOK_ID = "warhammer_40000_11th:drukhari:army_rule:power_from_pain"
 LITHE_AGILITY_ADVANCE_HOOK_ID = f"{HOOK_ID}:lithe-agility-advance"
 LITHE_AGILITY_CHARGE_HOOK_ID = f"{HOOK_ID}:lithe-agility-charge"
 HATRED_ETERNAL_SHOOTING_HOOK_ID = f"{HOOK_ID}:hatred-eternal-shooting"
+HATRED_ETERNAL_FIGHT_HOOK_ID = f"{HOOK_ID}:hatred-eternal-fight"
 
 
 def runtime_contribution() -> RuntimeContentContribution:
@@ -78,6 +84,13 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=HATRED_ETERNAL_SHOOTING_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 handler=hatred_eternal_shooting_unit_selected_grant,
+            ),
+        ),
+        fight_unit_selected_grant_hook_bindings=(
+            FightUnitSelectedGrantBinding(
+                hook_id=HATRED_ETERNAL_FIGHT_HOOK_ID,
+                source_id=SOURCE_RULE_ID,
+                handler=hatred_eternal_fight_unit_selected_grant,
             ),
         ),
         command_phase_start_hook_bindings=(
@@ -143,6 +156,55 @@ def hatred_eternal_shooting_unit_selected_grant(
             source_context={
                 "selection_request_id": context.request_id,
                 "selection_result_id": context.result_id,
+            },
+        ),
+        unit_effect_expiration="end_phase",
+    )
+
+
+def hatred_eternal_fight_unit_selected_grant(
+    context: FightUnitSelectedContext,
+) -> FightUnitSelectedGrant | None:
+    if type(context) is not FightUnitSelectedContext:
+        raise GameLifecycleError("Power from Pain Hatred Eternal requires selected fight context.")
+    if not _hatred_eternal_empowerment_available(
+        state=context.state,
+        player_id=context.player_id,
+        unit_instance_id=context.unit_instance_id,
+    ):
+        return None
+    return FightUnitSelectedGrant(
+        hook_id=HATRED_ETERNAL_FIGHT_HOOK_ID,
+        source_id=SOURCE_RULE_ID,
+        label="Power from Pain: Hatred Eternal",
+        replay_payload={
+            "trigger": "selected_to_fight",
+            "unit_instance_id": context.unit_instance_id,
+            "activation_request_id": context.request_id,
+            "activation_result_id": context.result_id,
+            "fight_type": context.fight_type,
+            "ordering_band": context.ordering_band,
+        },
+        decision_effect_payload=pain_token_spend_effect_payload(),
+        unit_effect_payload=power_from_pain_reroll_permission_effect_payload(
+            unit_instance_id=context.unit_instance_id,
+            target_unit_instance_ids=power_from_pain_target_unit_ids(
+                context.state,
+                unit_instance_id=context.unit_instance_id,
+            ),
+            trigger="selected_to_fight",
+            phase=BattlePhaseKind.FIGHT,
+            pain_ability_keys=(HATRED_ETERNAL_ABILITY_KEY,),
+            permission=hatred_eternal_hit_reroll_permission(
+                state=context.state,
+                player_id=context.player_id,
+                unit_instance_id=context.unit_instance_id,
+            ),
+            source_context={
+                "activation_request_id": context.request_id,
+                "activation_result_id": context.result_id,
+                "fight_type": context.fight_type,
+                "ordering_band": context.ordering_band,
             },
         ),
         unit_effect_expiration="end_phase",

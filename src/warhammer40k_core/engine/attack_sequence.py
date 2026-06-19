@@ -7256,7 +7256,7 @@ def _request_source_backed_hit_reroll_if_available(
 ) -> LifecycleStatus | None:
     if roll_state is None:
         return None
-    if source_phase is not BattlePhase.SHOOTING:
+    if source_phase not in {BattlePhase.SHOOTING, BattlePhase.FIGHT}:
         return None
     if roll_state.rerolls:
         return None

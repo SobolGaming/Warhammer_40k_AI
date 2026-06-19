@@ -15,6 +15,11 @@ from tests.unit.test_phase13b_shooting_declarations import (
     _shooting_lifecycle,  # pyright: ignore[reportPrivateUsage]
     _weapon_profile_by_wargear,  # pyright: ignore[reportPrivateUsage]
 )
+from tests.unit.test_phase15c_fight_order import (
+    _advance_to_fight_order_request,  # pyright: ignore[reportPrivateUsage]
+    _fight_lifecycle,  # pyright: ignore[reportPrivateUsage]
+    _submit_minimal_melee_declaration,  # pyright: ignore[reportPrivateUsage]
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -102,6 +107,18 @@ from warhammer40k_core.engine.faction_resources import (
     faction_resource_transaction_kind_from_token,
     initial_faction_resource_ledgers,
 )
+from warhammer40k_core.engine.fight_order import fight_activation_option_id
+from warhammer40k_core.engine.fight_resolution import (
+    SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+    MeleeDeclarationProposalRequest,
+)
+from warhammer40k_core.engine.fight_unit_selected_hooks import (
+    SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
+    FightUnitSelectedContext,
+    FightUnitSelectedGrant,
+    FightUnitSelectedGrantBinding,
+    FightUnitSelectedGrantRegistry,
+)
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.phase import (
@@ -155,6 +172,7 @@ from warhammer40k_core.engine.unit_destroyed_hooks import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
+from warhammer40k_core.geometry.pose import Pose
 
 
 def test_power_from_pain_command_start_gains_pain_token() -> None:
@@ -592,6 +610,183 @@ def test_selected_to_shoot_grant_registry_validates_handler_contract() -> None:
                 ShootingUnitSelectedGrantBinding(
                     hook_id="drukhari-test:source",
                     source_id="drukhari-test:source-rule",
+                    handler=source_drift,
+                ),
+            )
+        ).grants_for(context)
+
+
+def test_selected_to_fight_grant_registry_validates_handler_contract() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    unit = _unit_for_player(state, player_id="player-a")
+    context = FightUnitSelectedContext(
+        state=state,
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+        fight_type="normal",
+        ordering_band="remaining_combats",
+        request_id="drukhari-test:fight-registry-request",
+        result_id="drukhari-test:fight-registry-result",
+    )
+
+    with pytest.raises(GameLifecycleError, match="state must be a GameState"):
+        FightUnitSelectedContext(
+            state=cast(GameState, object()),
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            fight_type="normal",
+            ordering_band="remaining_combats",
+            request_id="drukhari-test:fight-registry-request",
+            result_id="drukhari-test:fight-registry-result",
+        )
+    shooting_state = _battle_state()
+    _set_current_battle_phase(shooting_state, BattlePhase.SHOOTING)
+    with pytest.raises(GameLifecycleError, match="requires the Fight phase"):
+        FightUnitSelectedContext(
+            state=shooting_state,
+            player_id="player-a",
+            battle_round=shooting_state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            fight_type="normal",
+            ordering_band="remaining_combats",
+            request_id="drukhari-test:fight-registry-request",
+            result_id="drukhari-test:fight-registry-result",
+        )
+    with pytest.raises(GameLifecycleError, match="handler must be callable"):
+        FightUnitSelectedGrantBinding(
+            hook_id="drukhari-test:fight-not-callable",
+            source_id="drukhari-test:fight-not-callable-source",
+            handler=cast(
+                Callable[[FightUnitSelectedContext], FightUnitSelectedGrant | None],
+                object(),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="grant hooks require a context"):
+        FightUnitSelectedGrantRegistry.empty().grants_for(cast(FightUnitSelectedContext, object()))
+    with pytest.raises(GameLifecycleError, match="bindings must be a tuple"):
+        FightUnitSelectedGrantRegistry(bindings=cast(tuple[FightUnitSelectedGrantBinding, ...], []))
+    with pytest.raises(GameLifecycleError, match="must contain FightUnitSelectedGrantBinding"):
+        FightUnitSelectedGrantRegistry.from_bindings(
+            cast(tuple[FightUnitSelectedGrantBinding, ...], (object(),))
+        )
+
+    def no_grant(_: FightUnitSelectedContext) -> None:
+        return None
+
+    empty_binding = FightUnitSelectedGrantBinding(
+        hook_id="drukhari-test:fight-registry-none",
+        source_id="drukhari-test:fight-registry-source",
+        handler=no_grant,
+    )
+    assert FightUnitSelectedGrantRegistry.from_bindings((empty_binding,)).grants_for(context) == ()
+
+    with pytest.raises(GameLifecycleError, match="hook IDs must be unique"):
+        FightUnitSelectedGrantRegistry.from_bindings((empty_binding, empty_binding))
+    with pytest.raises(GameLifecycleError, match="expiration requires an effect"):
+        FightUnitSelectedGrant(
+            hook_id="drukhari-test:fight-bad-expiration",
+            source_id="drukhari-test:fight-bad-expiration-source",
+            label="Bad expiration",
+            unit_effect_expiration="end_phase",
+        )
+    with pytest.raises(GameLifecycleError, match="effect requires expiration"):
+        FightUnitSelectedGrant(
+            hook_id="drukhari-test:fight-bad-effect",
+            source_id="drukhari-test:fight-bad-effect-source",
+            label="Bad effect",
+            unit_effect_payload={"effect_kind": "drukhari-test:effect"},
+        )
+    with pytest.raises(GameLifecycleError, match="end_phase or end_turn"):
+        FightUnitSelectedGrant(
+            hook_id="drukhari-test:fight-bad-expiration-token",
+            source_id="drukhari-test:fight-bad-expiration-token-source",
+            label="Bad expiration token",
+            unit_effect_payload={"effect_kind": "drukhari-test:effect"},
+            unit_effect_expiration="end_battle_round",
+        )
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        FightUnitSelectedGrant(
+            hook_id=cast(str, 1),
+            source_id="drukhari-test:fight-bad-hook-source",
+            label="Bad hook",
+        )
+    with pytest.raises(GameLifecycleError, match="must not be empty"):
+        FightUnitSelectedGrant(
+            hook_id=" ",
+            source_id="drukhari-test:fight-empty-hook-source",
+            label="Empty hook",
+        )
+    with pytest.raises(GameLifecycleError, match="must be an int"):
+        FightUnitSelectedContext(
+            state=state,
+            player_id="player-a",
+            battle_round=cast(int, "1"),
+            unit_instance_id=unit.unit_instance_id,
+            fight_type="normal",
+            ordering_band="remaining_combats",
+            request_id="drukhari-test:fight-registry-request",
+            result_id="drukhari-test:fight-registry-result",
+        )
+    with pytest.raises(GameLifecycleError, match="must be positive"):
+        FightUnitSelectedContext(
+            state=state,
+            player_id="player-a",
+            battle_round=0,
+            unit_instance_id=unit.unit_instance_id,
+            fight_type="normal",
+            ordering_band="remaining_combats",
+            request_id="drukhari-test:fight-registry-request",
+            result_id="drukhari-test:fight-registry-result",
+        )
+
+    def wrong_type(_: FightUnitSelectedContext) -> FightUnitSelectedGrant:
+        return cast(FightUnitSelectedGrant, object())
+
+    with pytest.raises(GameLifecycleError, match="handlers must return grants or None"):
+        FightUnitSelectedGrantRegistry.from_bindings(
+            (
+                FightUnitSelectedGrantBinding(
+                    hook_id="drukhari-test:fight-wrong-type",
+                    source_id="drukhari-test:fight-wrong-type-source",
+                    handler=wrong_type,
+                ),
+            )
+        ).grants_for(context)
+
+    def hook_drift(_: FightUnitSelectedContext) -> FightUnitSelectedGrant:
+        return FightUnitSelectedGrant(
+            hook_id="drukhari-test:fight-drifted-hook",
+            source_id="drukhari-test:fight-hook-source",
+            label="Hook drift",
+        )
+
+    with pytest.raises(GameLifecycleError, match="hook_id drift"):
+        FightUnitSelectedGrantRegistry.from_bindings(
+            (
+                FightUnitSelectedGrantBinding(
+                    hook_id="drukhari-test:fight-hook",
+                    source_id="drukhari-test:fight-hook-source",
+                    handler=hook_drift,
+                ),
+            )
+        ).grants_for(context)
+
+    def source_drift(_: FightUnitSelectedContext) -> FightUnitSelectedGrant:
+        return FightUnitSelectedGrant(
+            hook_id="drukhari-test:fight-source",
+            source_id="drukhari-test:fight-drifted-source",
+            label="Source drift",
+        )
+
+    with pytest.raises(GameLifecycleError, match="source_id drift"):
+        FightUnitSelectedGrantRegistry.from_bindings(
+            (
+                FightUnitSelectedGrantBinding(
+                    hook_id="drukhari-test:fight-source",
+                    source_id="drukhari-test:fight-source-rule",
                     handler=source_drift,
                 ),
             )
@@ -1480,6 +1675,212 @@ def test_shooting_dice_reroll_branch_rejects_non_source_backed_hit_payload() -> 
             result=result,
             decisions=decisions,
         )
+
+
+def test_hatred_eternal_selected_to_fight_grant_spends_pain_token_and_unlocks_hit_reroll() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id="drukhari-test-hatred-fight-grant",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    state = _lifecycle_state(lifecycle)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_hatred_eternal_ability(),),
+    )
+    unit = units["attacker"]
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:hatred-fight-token",
+    )
+    _refresh_lifecycle_runtime_content(lifecycle)
+
+    activation_request = _advance_to_fight_order_request(lifecycle)
+    grant_request = _decision_request_from_status(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="drukhari-test:hatred-fight-select",
+                request=activation_request,
+                selected_option_id=fight_activation_option_id(
+                    unit_instance_id=unit.unit_instance_id,
+                    fight_type=RulesetDescriptor.warhammer_40000_eleventh().fight_policy.fight_types[
+                        0
+                    ],
+                ),
+            )
+        )
+    )
+    assert grant_request.decision_type == SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE
+    assert grant_request.option_by_id(army_rule.HATRED_ETERNAL_FIGHT_HOOK_ID).option_id == (
+        army_rule.HATRED_ETERNAL_FIGHT_HOOK_ID
+    )
+
+    melee_request = _decision_request_from_status(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="drukhari-test:hatred-fight-grant",
+                request=grant_request,
+                selected_option_id=army_rule.HATRED_ETERNAL_FIGHT_HOOK_ID,
+            )
+        )
+    )
+
+    assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    assert pain_tokens_available(state, player_id="player-a") == 0
+    permission = source_backed_reroll_permission_for_unit(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+        roll_type="attack_sequence.hit",
+        timing_window="attack_sequence.hit",
+    )
+    assert permission is not None
+    assert permission.source_id.startswith(SOURCE_RULE_ID)
+    grant_payload = _event_payloads(lifecycle, "fight_unit_selected_grant_decision_resolved")[0]
+    selected_grants = cast(list[dict[str, object]], grant_payload["selected_fight_unit_grants"])
+    source_payload = source_payload_from_reroll_effect_payload(
+        cast(
+            dict[str, JsonValue],
+            cast(list[dict[str, object]], grant_payload["persisting_effects"])[1]["effect_payload"],
+        )
+    )
+    assert selected_grants[0]["hook_id"] == army_rule.HATRED_ETERNAL_FIGHT_HOOK_ID
+    assert source_payload["trigger"] == "selected_to_fight"
+    assert source_payload["phase"] == BattlePhaseKind.FIGHT.value
+
+
+def test_hatred_eternal_accepted_fight_hit_reroll_resumes_attack_sequence() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id="drukhari-test-hatred-fight-consumer",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    state = _lifecycle_state(lifecycle)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_hatred_eternal_ability(),),
+    )
+    unit = units["attacker"]
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:hatred-fight-consumer-token",
+    )
+    _refresh_lifecycle_runtime_content(lifecycle)
+
+    activation_request = _advance_to_fight_order_request(lifecycle)
+    grant_request = _decision_request_from_status(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="drukhari-test:hatred-fight-consumer-select",
+                request=activation_request,
+                selected_option_id=fight_activation_option_id(
+                    unit_instance_id=unit.unit_instance_id,
+                    fight_type=RulesetDescriptor.warhammer_40000_eleventh().fight_policy.fight_types[
+                        0
+                    ],
+                ),
+            )
+        )
+    )
+    melee_request = _decision_request_from_status(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="drukhari-test:hatred-fight-consumer-grant",
+                request=grant_request,
+                selected_option_id=army_rule.HATRED_ETERNAL_FIGHT_HOOK_ID,
+            )
+        )
+    )
+    proposal_request = MeleeDeclarationProposalRequest.from_decision_request(melee_request)
+    weapon_payload = _first_primary_melee_weapon_payload(proposal_request)
+    weapon_profile_id = cast(str, weapon_payload["weapon_profile_id"])
+    declaration_result_id = "drukhari-test:hatred-fight-consumer-declaration"
+    sequence_id = (
+        f"melee-sequence:{state.game_id}:round-{state.battle_round:02d}:"
+        f"{unit.unit_instance_id}:{declaration_result_id}"
+    )
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    fixed_rolls = DiceRollManager(state.game_id, event_log=lifecycle.decision_controller.event_log)
+    fixed_rolls.roll_fixed(
+        attack_sequence_hit_roll_spec(
+            weapon_profile_id=weapon_profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id="player-a",
+        ),
+        [1],
+    )
+    fixed_rolls.roll_fixed(
+        attack_sequence_wound_roll_spec(
+            weapon_profile_id=weapon_profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id="player-a",
+        ),
+        [6],
+    )
+
+    reroll_request = _decision_request_from_status(
+        _submit_minimal_melee_declaration(
+            lifecycle,
+            request=melee_request,
+            result_id=declaration_result_id,
+        )
+    )
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    reroll_request_payload = cast(dict[str, object], reroll_request.payload)
+    attack_context_payload = cast(dict[str, object], reroll_request_payload["attack_context"])
+    assert attack_context_payload["phase"] == BattlePhase.FIGHT.value
+    initial_hit_state = DiceRollState.from_payload(
+        cast(DiceRollStatePayload, attack_context_payload["hit_roll_state"])
+    )
+    assert initial_hit_state.current_total == 1
+
+    accepted_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="drukhari-test:hatred-fight-consumer-accept-reroll",
+            request=reroll_request,
+            selected_option_id="reroll:0",
+        )
+    )
+
+    assert accepted_status.status_kind is not LifecycleStatusKind.INVALID
+    reroll_payloads = _event_payloads(lifecycle, "dice_reroll_resolved")
+    assert len(reroll_payloads) == 1
+    rerolled_state = DiceRollState.from_payload(cast(DiceRollStatePayload, reroll_payloads[0]))
+    assert rerolled_state.original_result.roll_id == initial_hit_state.original_result.roll_id
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    resolved_hit = cast(dict[str, object], hit_payload["payload"])
+    assert resolved_hit["successful"] is True
+    assert resolved_hit["unmodified_roll"] == rerolled_state.current_total
+    assert cast(dict[str, object], resolved_hit["roll_state"]) == rerolled_state.to_payload()
+    wound_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.WOUND,
+    )
+    resolved_wound = cast(dict[str, object], wound_payload["payload"])
+    assert resolved_wound["successful"] is True
 
 
 def test_hatred_eternal_hit_reroll_request_ignores_ineligible_contexts() -> None:
@@ -2983,6 +3384,19 @@ def _attack_step_payload(
         if event["step"] == step.value:
             return event
     raise AssertionError(f"Missing attack sequence step {step.value}.")
+
+
+def _first_primary_melee_weapon_payload(
+    proposal_request: MeleeDeclarationProposalRequest,
+) -> dict[str, object]:
+    for weapon in proposal_request.available_weapons:
+        weapon_payload = cast(dict[str, object], weapon)
+        if weapon_payload["is_extra_attacks"] is True:
+            continue
+        engaged_target_ids = cast(list[str], weapon_payload["engaged_target_unit_instance_ids"])
+        if engaged_target_ids:
+            return weapon_payload
+    raise AssertionError("Missing primary engaged melee weapon.")
 
 
 def _lithe_agility_ability() -> DatasheetAbilityDescriptor:
