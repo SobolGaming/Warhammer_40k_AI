@@ -609,13 +609,13 @@ def _structured_support_sections_markdown() -> list[str]:
                     "Named army-rule handler plus faction-resource ledger",
                     "README, faction integration note, adapter contract, and generated matrix",
                     "Focused faction runtime tests",
-                    "Partial",
+                    "Full",
                     (
                         "Implements Pain token gain at own Command phase start, enemy "
                         "unit destruction, and enemy Battle-shock failure, plus optional "
-                        "Lithe Agility empowerment for Advance and Charge rerolls. "
-                        "Hatred Eternal attack hit-reroll empowerment still requires a "
-                        "source-backed selected-to-shoot/fight grant surface."
+                        "Lithe Agility empowerment for Advance and Charge rerolls and "
+                        "Hatred Eternal selected-to-shoot/selected-to-fight empowerment "
+                        "for attack hit rerolls."
                     ),
                 ),
                 SupportSectionRow(
