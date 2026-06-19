@@ -147,6 +147,25 @@ def lithe_agility_charge_reroll_permission(
     )
 
 
+def hatred_eternal_hit_reroll_permission(
+    *,
+    state: object,
+    player_id: str,
+    unit_instance_id: str,
+) -> RerollPermission:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    return RerollPermission(
+        source_id=(
+            f"{SOURCE_RULE_ID}:hit-reroll:"
+            f"round-{_battle_round_for_state(state):02d}:{requested_unit_id}"
+        ),
+        timing_window="attack_sequence.hit",
+        owning_player_id=_validate_identifier("player_id", player_id),
+        eligible_roll_type="attack_sequence.hit",
+        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+    )
+
+
 def power_from_pain_reroll_permission_effect_payload(
     *,
     unit_instance_id: str,

@@ -109,7 +109,7 @@ from warhammer40k_core.engine.damage_allocation import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.event_log import (
     EventRecord,
     JsonValue,
@@ -167,6 +167,9 @@ from warhammer40k_core.engine.shooting_targets import (
     PLUNGING_FIRE_RULE_ID,
     shooting_dynamic_model_blockers,
     shooting_visibility_cache_key,
+)
+from warhammer40k_core.engine.source_backed_rerolls import (
+    source_backed_reroll_permission_for_unit,
 )
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
@@ -6900,6 +6903,17 @@ def _roll_hit_and_wound(
             runtime_modifier_registry=runtime_modifier_registry,
             psychic_modifier_selection=psychic_modifier_selection,
         )
+        status = _request_source_backed_hit_reroll_if_available(
+            state=state,
+            decisions=decisions,
+            roll_state=hit_roll.roll_state,
+            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            attack_context_id=attack_context_id,
+            source_phase=attack_sequence.source_phase,
+            weapon_profile_id=pool.weapon_profile_id,
+        )
+        if status is not None:
+            return None, status
         status = _request_command_reroll_for_attack_roll_if_available(
             state=state,
             decisions=decisions,
@@ -7133,6 +7147,8 @@ def _request_command_reroll_for_attack_roll_if_available(
     stratagem_index: StratagemCatalogIndex | None,
     phase_body_status: str,
 ) -> LifecycleStatus | None:
+    if roll_state is not None and roll_state.rerolls:
+        return None
     if roll_state is None or stratagem_index is None:
         return None
     actor_id = roll_state.original_result.spec.actor_id
@@ -7226,6 +7242,103 @@ def _request_command_reroll_for_attack_roll_if_available(
             "pending_request_id": request.request_id,
         },
     )
+
+
+def _request_source_backed_hit_reroll_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    roll_state: DiceRollState | None,
+    attacking_unit_instance_id: str,
+    attack_context_id: str,
+    source_phase: BattlePhase,
+    weapon_profile_id: str,
+) -> LifecycleStatus | None:
+    if roll_state is None:
+        return None
+    if source_phase not in {BattlePhase.SHOOTING, BattlePhase.FIGHT}:
+        return None
+    if roll_state.rerolls:
+        return None
+    if roll_state.original_result.spec.reroll_forbidden_rule_ids:
+        return None
+    actor_id = roll_state.original_result.spec.actor_id
+    if actor_id is None:
+        return None
+    permission = source_backed_reroll_permission_for_unit(
+        state=state,
+        player_id=actor_id,
+        unit_instance_id=attacking_unit_instance_id,
+        roll_type=roll_state.original_result.spec.roll_type,
+        timing_window="attack_sequence.hit",
+    )
+    if permission is None:
+        return None
+    if _source_backed_reroll_already_answered(
+        decisions=decisions,
+        roll_id=roll_state.original_result.roll_id,
+        source_id=permission.source_id,
+    ):
+        return None
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    request = manager.build_reroll_request(
+        roll_state,
+        request_id=state.next_decision_request_id(),
+        actor_id=actor_id,
+        permission=permission,
+        extra_payload={
+            "source_rule_id": permission.source_id,
+            "attack_context": {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": source_phase.value,
+                "unit_instance_id": attacking_unit_instance_id,
+                "attack_context_id": attack_context_id,
+                "weapon_profile_id": weapon_profile_id,
+                "hit_roll_state": validate_json_value(roll_state.to_payload()),
+            },
+        },
+    )
+    decisions.request_decision(request)
+    return LifecycleStatus.waiting_for_decision(
+        stage=state.stage,
+        decision_request=request,
+        payload={
+            "phase": source_phase.value,
+            "phase_body_status": "attack_hit_source_backed_reroll_pending",
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "player_id": actor_id,
+            "roll_id": roll_state.original_result.roll_id,
+            "roll_type": roll_state.original_result.spec.roll_type,
+            "affected_unit_instance_id": attacking_unit_instance_id,
+            "attack_context_id": attack_context_id,
+            "pending_request_id": request.request_id,
+        },
+    )
+
+
+def _source_backed_reroll_already_answered(
+    *,
+    decisions: DecisionController,
+    roll_id: str,
+    source_id: str,
+) -> bool:
+    requested_roll_id = _validate_identifier("roll_id", roll_id)
+    requested_source_id = _validate_identifier("source_id", source_id)
+    for record in decisions.records:
+        if record.request.decision_type != DICE_REROLL_DECISION_TYPE:
+            continue
+        if not isinstance(record.request.payload, dict):
+            raise GameLifecycleError("Dice reroll request payload must be an object.")
+        if record.request.payload.get("roll_id") != requested_roll_id:
+            continue
+        permission_payload = record.request.payload.get("permission")
+        if not isinstance(permission_payload, dict):
+            continue
+        if permission_payload.get("source_id") == requested_source_id:
+            return True
+    return False
 
 
 def _command_reroll_opportunity_window(

@@ -5,8 +5,10 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.dice import DiceRollState, DiceRollStatePayload
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
     FightOrderingBandKind,
     FightPhaseStepKind,
     FightPolicyDescriptor,
@@ -54,9 +56,13 @@ from warhammer40k_core.engine.decision_request import (
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_resources import (
+    apply_faction_resource_spend_effect,
+    faction_resource_result_enriched_payload,
+)
 from warhammer40k_core.engine.fight_activation_abilities import (
     DECLINE_FIGHT_ACTIVATION_ABILITY_OPTION_ID,
     FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
@@ -117,6 +123,14 @@ from warhammer40k_core.engine.fight_resolution import (
     record_one_shot_melee_weapon_uses,
     resolve_fight_movement,
     validate_melee_declaration_rules,
+)
+from warhammer40k_core.engine.fight_unit_selected_hooks import (
+    DECLINE_FIGHT_UNIT_GRANT_OPTION_ID,
+    SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
+    FightUnitSelectedContext,
+    FightUnitSelectedGrant,
+    FightUnitSelectedGrantPayload,
+    FightUnitSelectedGrantRegistry,
 )
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -187,6 +201,9 @@ class FightPhaseHandler:
     fight_activation_ability_hooks: FightActivationAbilityHookRegistry = field(
         default_factory=FightActivationAbilityHookRegistry.empty
     )
+    fight_unit_selected_grant_hooks: FightUnitSelectedGrantRegistry = field(
+        default_factory=FightUnitSelectedGrantRegistry.empty
+    )
     runtime_modifier_registry: RuntimeModifierRegistry = field(
         default_factory=RuntimeModifierRegistry.empty
     )
@@ -207,6 +224,10 @@ class FightPhaseHandler:
             raise GameLifecycleError(
                 "FightPhaseHandler fight_activation_ability_hooks must be a registry."
             )
+        if type(self.fight_unit_selected_grant_hooks) is not FightUnitSelectedGrantRegistry:
+            raise GameLifecycleError(
+                "FightPhaseHandler fight_unit_selected_grant_hooks must be a registry."
+            )
         if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
             raise GameLifecycleError(
                 "FightPhaseHandler runtime_modifier_registry must be a registry."
@@ -215,6 +236,60 @@ class FightPhaseHandler:
     @property
     def phase(self) -> BattlePhase:
         return BattlePhase.FIGHT
+
+    def invalid_fight_unit_selected_grant_status(
+        self,
+        *,
+        state: GameState,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        invalid_status = _invalid_finite_decision_status(
+            state=state,
+            request=request,
+            result=result,
+            invalid_reason="invalid_fight_unit_grant_result",
+        )
+        if invalid_status is not None:
+            return invalid_status
+        if request.decision_type != SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE:
+            raise GameLifecycleError(
+                "Fight unit grant prevalidation received unsupported decision_type."
+            )
+        fight_state = state.fight_phase_state
+        if fight_state is None or fight_state.active_activation is None:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Fight unit grant has no active activation.",
+                payload={
+                    "invalid_reason": "invalid_fight_unit_grant_result",
+                    "field": "active_activation",
+                },
+            )
+        payload = _decision_payload_object(result.payload)
+        try:
+            _validate_fight_unit_selected_grant_payload_context(
+                payload=payload,
+                activation=fight_state.active_activation,
+            )
+            if result.selected_option_id != DECLINE_FIGHT_UNIT_GRANT_OPTION_ID:
+                selected_grants = _selected_fight_unit_grants_from_payload(payload)
+                _validate_selected_fight_unit_grants(
+                    state=state,
+                    activation=fight_state.active_activation,
+                    registry=self.fight_unit_selected_grant_hooks,
+                    selected_grants=selected_grants,
+                )
+        except (GameLifecycleError, KeyError, TypeError) as exc:
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message=str(exc),
+                payload={
+                    "invalid_reason": "invalid_fight_unit_grant_result",
+                    "field": "payload",
+                },
+            )
+        return None
 
     def begin_phase(
         self,
@@ -307,11 +382,19 @@ class FightPhaseHandler:
             )
         if result.decision_type == FIGHT_ACTIVATION_DECISION_TYPE:
             return _apply_fight_activation_decision(
+                handler=self,
                 state=state,
                 result=result,
                 decisions=decisions,
                 reaction_queue=reaction_queue,
                 policy=_fight_policy_for_handler(self),
+            )
+        if result.decision_type == SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE:
+            return _apply_fight_unit_selected_grant_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
+                registry=self.fight_unit_selected_grant_hooks,
             )
         if result.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE:
             return _apply_fight_activation_ability_decision(
@@ -325,6 +408,12 @@ class FightPhaseHandler:
                 result=result,
                 decisions=decisions,
                 policy=_fight_policy_for_handler(self),
+            )
+        if result.decision_type == DICE_REROLL_DECISION_TYPE:
+            return _apply_fight_dice_reroll_decision(
+                state=state,
+                result=result,
+                decisions=decisions,
             )
         raise GameLifecycleError("Fight phase received unsupported decision type.")
 
@@ -1918,6 +2007,13 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     return value
 
 
+def _payload_object(payload: dict[str, JsonValue], *, key: str) -> dict[str, JsonValue]:
+    value = payload.get(key)
+    if not isinstance(value, dict):
+        raise GameLifecycleError(f"{key} must be an object.")
+    return value
+
+
 @dataclass(frozen=True, slots=True)
 class _FightRequestContext:
     fight_state: FightPhaseState
@@ -2414,6 +2510,7 @@ def _fights_first_contexts_available(
 
 def _apply_fight_activation_decision(
     *,
+    handler: FightPhaseHandler,
     state: GameState,
     result: DecisionResult,
     decisions: DecisionController,
@@ -2470,6 +2567,410 @@ def _apply_fight_activation_decision(
         ),
     )
     del reaction_queue, policy
+    return _request_fight_unit_selected_grant_decision_if_available(
+        state=state,
+        decisions=decisions,
+        activation=selection,
+        registry=handler.fight_unit_selected_grant_hooks,
+    )
+
+
+def _request_fight_unit_selected_grant_decision_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    activation: FightActivationSelection,
+    registry: FightUnitSelectedGrantRegistry,
+) -> LifecycleStatus | None:
+    context = _fight_unit_selected_context(state=state, activation=activation)
+    grants = registry.grants_for(context)
+    if not grants:
+        return None
+    request = DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
+        actor_id=activation.player_id,
+        payload=validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.FIGHT.value,
+                "active_player_id": state.active_player_id,
+                "player_id": activation.player_id,
+                "unit_instance_id": activation.unit_instance_id,
+                "activation_request_id": activation.request_id,
+                "activation_result_id": activation.result_id,
+            }
+        ),
+        options=_fight_unit_selected_grant_options(activation=activation, grants=grants),
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "fight_unit_selected_grant_decision_requested",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.FIGHT.value,
+                "active_player_id": state.active_player_id,
+                "player_id": activation.player_id,
+                "unit_instance_id": activation.unit_instance_id,
+                "activation_selection": activation.to_payload(),
+                "available_fight_unit_grants": [grant.to_payload() for grant in grants],
+                "phase_body_status": "fight_unit_selected_grant_decision_pending",
+            }
+        ),
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.FIGHT.value,
+            "phase_body_status": "fight_unit_selected_grant_decision_pending",
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "player_id": activation.player_id,
+            "unit_instance_id": activation.unit_instance_id,
+        },
+    )
+
+
+def _fight_unit_selected_grant_options(
+    *,
+    activation: FightActivationSelection,
+    grants: tuple[FightUnitSelectedGrant, ...],
+) -> tuple[DecisionOption, ...]:
+    options: list[DecisionOption] = [
+        DecisionOption(
+            option_id=DECLINE_FIGHT_UNIT_GRANT_OPTION_ID,
+            label="Decline fight unit grant",
+            payload=validate_json_value(
+                {
+                    "submission_kind": SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
+                    "unit_instance_id": activation.unit_instance_id,
+                    "activation_request_id": activation.request_id,
+                    "activation_result_id": activation.result_id,
+                    "selected_fight_unit_grants": [],
+                }
+            ),
+        )
+    ]
+    for grant in grants:
+        options.append(
+            DecisionOption(
+                option_id=grant.hook_id,
+                label=grant.label,
+                payload=validate_json_value(
+                    {
+                        "submission_kind": SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
+                        "unit_instance_id": activation.unit_instance_id,
+                        "activation_request_id": activation.request_id,
+                        "activation_result_id": activation.result_id,
+                        "selected_fight_unit_grants": [grant.to_payload()],
+                    }
+                ),
+            )
+        )
+    return tuple(options)
+
+
+def _apply_fight_unit_selected_grant_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    registry: FightUnitSelectedGrantRegistry,
+) -> LifecycleStatus | None:
+    _validate_fight_phase_state(state)
+    fight_state = _require_fight_state(state)
+    activation = fight_state.active_activation
+    if activation is None:
+        raise GameLifecycleError("Fight unit grant requires an active activation.")
+    if result.actor_id != activation.player_id:
+        raise GameLifecycleError("Fight unit grant actor must match activation player.")
+    payload = _decision_payload_object(result.payload)
+    _validate_fight_unit_selected_grant_payload_context(payload=payload, activation=activation)
+    if result.selected_option_id == DECLINE_FIGHT_UNIT_GRANT_OPTION_ID:
+        selected_grants: tuple[FightUnitSelectedGrant, ...] = ()
+    else:
+        selected_grants = _selected_fight_unit_grants_from_payload(payload)
+        _validate_selected_fight_unit_grants(
+            state=state,
+            activation=activation,
+            registry=registry,
+            selected_grants=selected_grants,
+        )
+    persisting_effects = tuple(
+        effect
+        for grant in selected_grants
+        for effect in _record_fight_unit_selected_grant_effects(
+            state=state,
+            result=result,
+            activation=activation,
+            grant=grant,
+        )
+    )
+    decisions.event_log.append(
+        "fight_unit_selected_grant_decision_resolved",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.FIGHT.value,
+                "active_player_id": state.active_player_id,
+                "player_id": activation.player_id,
+                "unit_instance_id": activation.unit_instance_id,
+                "request_id": result.request_id,
+                "result_id": result.result_id,
+                "selected_option_id": result.selected_option_id,
+                "selected_fight_unit_grants": [grant.to_payload() for grant in selected_grants],
+                "persisting_effects": [effect.to_payload() for effect in persisting_effects],
+                "phase_body_status": "fight_unit_selected_grant_decision_resolved",
+            }
+        ),
+    )
+    return None
+
+
+def _selected_fight_unit_grants_from_payload(
+    payload: dict[str, JsonValue],
+) -> tuple[FightUnitSelectedGrant, ...]:
+    raw_grants = payload.get("selected_fight_unit_grants")
+    if not isinstance(raw_grants, list):
+        raise GameLifecycleError("Fight unit grant payload missing selected grants.")
+    raw_grant_payloads = cast(list[object], raw_grants)
+    grants: list[FightUnitSelectedGrant] = []
+    for raw_grant in raw_grant_payloads:
+        if not isinstance(raw_grant, dict):
+            raise GameLifecycleError("Fight unit selected grants must be objects.")
+        grants.append(
+            FightUnitSelectedGrant.from_payload(cast(FightUnitSelectedGrantPayload, raw_grant))
+        )
+    return tuple(sorted(grants, key=lambda grant: grant.hook_id))
+
+
+def _validate_selected_fight_unit_grants(
+    *,
+    state: GameState,
+    activation: FightActivationSelection,
+    registry: FightUnitSelectedGrantRegistry,
+    selected_grants: tuple[FightUnitSelectedGrant, ...],
+) -> None:
+    if not selected_grants:
+        raise GameLifecycleError("Fight unit grant selection requires a selected grant.")
+    available_payloads = {
+        grant.hook_id: grant.to_payload()
+        for grant in registry.grants_for(
+            _fight_unit_selected_context(state=state, activation=activation)
+        )
+    }
+    for grant in selected_grants:
+        expected = available_payloads.get(grant.hook_id)
+        if expected is None:
+            raise GameLifecycleError("Selected fight unit grant is not available.")
+        if grant.to_payload() != expected:
+            raise GameLifecycleError("Selected fight unit grant payload drift.")
+
+
+def _record_fight_unit_selected_grant_effects(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    activation: FightActivationSelection,
+    grant: FightUnitSelectedGrant,
+) -> tuple[PersistingEffect, ...]:
+    effects: list[PersistingEffect] = []
+    if grant.decision_effect_payload is not None:
+        resource_spend_result = apply_faction_resource_spend_effect(
+            state=state,
+            player_id=activation.player_id,
+            source_id=f"{grant.source_id}:{result.request_id}:{result.result_id}:spend",
+            effect_payload=grant.decision_effect_payload,
+        )
+        spend_effect = PersistingEffect(
+            effect_id=f"{result.result_id}:{grant.hook_id}:decision",
+            source_rule_id=grant.source_id,
+            owner_player_id=activation.player_id,
+            target_unit_instance_ids=(activation.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.FIGHT,
+            expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
+            effect_payload=faction_resource_result_enriched_payload(
+                effect_payload=grant.decision_effect_payload,
+                result=resource_spend_result,
+            ),
+        )
+        state.record_persisting_effect(spend_effect)
+        effects.append(spend_effect)
+    if grant.unit_effect_payload is None:
+        if not effects:
+            raise GameLifecycleError("Fight unit selected grant has no effect to record.")
+        return tuple(effects)
+    unit_effect = PersistingEffect(
+        effect_id=f"{result.result_id}:{grant.hook_id}:unit",
+        source_rule_id=grant.source_id,
+        owner_player_id=activation.player_id,
+        target_unit_instance_ids=_fight_unit_selected_grant_unit_effect_target_ids(
+            unit_instance_id=activation.unit_instance_id,
+            effect_payload=grant.unit_effect_payload,
+        ),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhaseKind.FIGHT,
+        expiration=_fight_unit_selected_grant_effect_expiration(
+            state=state,
+            activation=activation,
+            grant=grant,
+        ),
+        effect_payload=grant.unit_effect_payload,
+    )
+    state.record_persisting_effect(unit_effect)
+    effects.append(unit_effect)
+    return tuple(effects)
+
+
+def _fight_unit_selected_context(
+    *,
+    state: GameState,
+    activation: FightActivationSelection,
+) -> FightUnitSelectedContext:
+    return FightUnitSelectedContext(
+        state=state,
+        player_id=activation.player_id,
+        battle_round=activation.battle_round,
+        unit_instance_id=activation.unit_instance_id,
+        fight_type=activation.fight_type.value,
+        ordering_band=activation.ordering_band.value,
+        request_id=activation.request_id,
+        result_id=activation.result_id,
+    )
+
+
+def _validate_fight_unit_selected_grant_payload_context(
+    *,
+    payload: dict[str, JsonValue],
+    activation: FightActivationSelection,
+) -> None:
+    if _payload_string(payload, key="submission_kind") != SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE:
+        raise GameLifecycleError("Fight unit grant payload has invalid submission_kind.")
+    if _payload_string(payload, key="unit_instance_id") != activation.unit_instance_id:
+        raise GameLifecycleError("Fight unit grant unit drift.")
+    if (
+        _payload_string(payload, key="activation_request_id") != activation.request_id
+        or _payload_string(payload, key="activation_result_id") != activation.result_id
+    ):
+        raise GameLifecycleError("Fight unit grant activation decision drift.")
+
+
+def _fight_unit_selected_grant_unit_effect_target_ids(
+    *,
+    unit_instance_id: str,
+    effect_payload: JsonValue,
+) -> tuple[str, ...]:
+    if not isinstance(effect_payload, dict):
+        return (_validate_identifier("unit_instance_id", unit_instance_id),)
+    raw_target_ids = effect_payload.get("target_unit_instance_ids")
+    if raw_target_ids is None:
+        return (_validate_identifier("unit_instance_id", unit_instance_id),)
+    if not isinstance(raw_target_ids, list):
+        raise GameLifecycleError("Fight unit grant target_unit_instance_ids must be a list.")
+    target_ids = tuple(
+        _validate_identifier("target_unit_instance_ids", raw_id) for raw_id in raw_target_ids
+    )
+    if not target_ids:
+        raise GameLifecycleError("Fight unit grant target_unit_instance_ids is empty.")
+    if len(set(target_ids)) != len(target_ids):
+        raise GameLifecycleError("Fight unit grant target_unit_instance_ids are duplicated.")
+    return target_ids
+
+
+def _fight_unit_selected_grant_effect_expiration(
+    *,
+    state: GameState,
+    activation: FightActivationSelection,
+    grant: FightUnitSelectedGrant,
+) -> EffectExpiration:
+    expiration = grant.unit_effect_expiration
+    if expiration == "end_phase":
+        return EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=BattlePhaseKind.FIGHT,
+            player_id=_active_player_id(state),
+        )
+    if expiration == "end_turn":
+        return EffectExpiration.end_turn(
+            battle_round=state.battle_round,
+            player_id=activation.player_id,
+        )
+    raise GameLifecycleError("Fight unit grant has unsupported expiration.")
+
+
+def _apply_fight_dice_reroll_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> LifecycleStatus | None:
+    _validate_fight_phase_state(state)
+    fight_state = _require_fight_state(state)
+    attack_sequence = fight_state.attack_sequence
+    if attack_sequence is None:
+        raise GameLifecycleError("Fight dice reroll requires an active attack sequence.")
+    if attack_sequence.source_phase is not BattlePhase.FIGHT:
+        raise GameLifecycleError("Fight dice reroll context must be for the Fight phase.")
+    if result.actor_id != attack_sequence.attacker_player_id:
+        raise GameLifecycleError("Fight dice reroll actor must match attacking player.")
+    record = decisions.record_for_result(result)
+    request_payload = _decision_payload_object(record.request.payload)
+    if _payload_string(request_payload, key="roll_type") != "attack_sequence.hit":
+        raise GameLifecycleError("Fight dice reroll must target a hit roll.")
+    source_rule_id = _payload_string(request_payload, key="source_rule_id")
+    permission_payload = _payload_object(request_payload, key="permission")
+    if _payload_string(permission_payload, key="source_id") != source_rule_id:
+        raise GameLifecycleError("Fight dice reroll source context drift.")
+    if _payload_string(permission_payload, key="timing_window") != "attack_sequence.hit":
+        raise GameLifecycleError("Fight dice reroll timing window must be attack_sequence.hit.")
+    if _payload_string(permission_payload, key="eligible_roll_type") != "attack_sequence.hit":
+        raise GameLifecycleError("Fight dice reroll permission must target hit rolls.")
+    if (
+        _payload_string(permission_payload, key="owning_player_id")
+        != attack_sequence.attacker_player_id
+    ):
+        raise GameLifecycleError("Fight dice reroll permission player drift.")
+    attack_context = _payload_object(request_payload, key="attack_context")
+    if _payload_string(attack_context, key="phase") != BattlePhase.FIGHT.value:
+        raise GameLifecycleError("Fight dice reroll context must be for the Fight phase.")
+    if (
+        _payload_string(attack_context, key="unit_instance_id")
+        != attack_sequence.attacking_unit_instance_id
+    ):
+        raise GameLifecycleError("Fight dice reroll unit must match active attack sequence.")
+    if (
+        _payload_string(attack_context, key="attack_context_id")
+        != attack_sequence.attack_context_id()
+    ):
+        raise GameLifecycleError("Fight dice reroll attack context drift.")
+    if (
+        _payload_string(attack_context, key="weapon_profile_id")
+        != attack_sequence.current_pool().weapon_profile_id
+    ):
+        raise GameLifecycleError("Fight dice reroll weapon profile drift.")
+    initial_roll_payload = _payload_object(attack_context, key="hit_roll_state")
+    initial_roll_state = DiceRollState.from_payload(
+        cast(DiceRollStatePayload, initial_roll_payload)
+    )
+    if initial_roll_state.original_result.spec.roll_type != "attack_sequence.hit":
+        raise GameLifecycleError("Fight dice reroll initial roll must be a hit roll.")
+    if initial_roll_state.original_result.spec.actor_id != attack_sequence.attacker_player_id:
+        raise GameLifecycleError("Fight dice reroll initial roll actor drift.")
+    DiceRollManager(
+        state.game_id,
+        event_log=decisions.event_log,
+    ).resolve_reroll(
+        initial_roll_state,
+        request=record.request,
+        result=result,
+        record_decision=False,
+    )
     return None
 
 

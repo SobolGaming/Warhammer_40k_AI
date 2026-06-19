@@ -77,6 +77,9 @@ from warhammer40k_core.engine.fight_order import (
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
 )
+from warhammer40k_core.engine.fight_unit_selected_hooks import (
+    SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
+)
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameConfigPayload,
@@ -178,6 +181,9 @@ from warhammer40k_core.engine.sequencing import (
     apply_sequencing_decision_from_request,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE, SetupFlow
+from warhammer40k_core.engine.shooting_unit_selected_hooks import (
+    SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
+)
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
@@ -249,6 +255,7 @@ _TRIGGERED_MOVEMENT_DECISION_TYPES = frozenset((SELECT_TRIGGERED_MOVEMENT_DECISI
 _SHOOTING_DECISION_TYPES = frozenset(
     (
         SELECT_SHOOTING_UNIT_DECISION_TYPE,
+        SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
         SELECT_SHOOTING_TYPE_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
@@ -278,6 +285,7 @@ _COMMAND_DECISION_TYPES = frozenset(
 _FIGHT_DECISION_TYPES = frozenset(
     (
         FIGHT_ACTIVATION_DECISION_TYPE,
+        SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
         FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
         SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
         MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -289,6 +297,7 @@ _FIGHT_DECISION_TYPES = frozenset(
         SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+        DICE_REROLL_DECISION_TYPE,
     )
 )
 _REACTION_FRAME_DECISION_TYPES = frozenset(
@@ -707,6 +716,32 @@ class GameLifecycle:
         ):
             result.validate_for_request(pending_request)
             invalid_status = self._shooting_phase_handler.invalid_shooting_type_selection_status(
+                state=state,
+                request=pending_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE
+        ):
+            invalid_status = (
+                self._shooting_phase_handler.invalid_shooting_unit_selected_grant_status(
+                    state=state,
+                    request=pending_request,
+                    result=result,
+                )
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE
+        ):
+            invalid_status = self._fight_phase_handler.invalid_fight_unit_selected_grant_status(
                 state=state,
                 request=pending_request,
                 result=result,
@@ -1221,6 +1256,31 @@ class GameLifecycle:
             )
             if charge_status is not None:
                 return charge_status
+            return self.advance_until_decision_or_terminal()
+        if (
+            record.request.decision_type == DICE_REROLL_DECISION_TYPE
+            and state.current_battle_phase is BattlePhase.SHOOTING
+        ):
+            shooting_status = self._shooting_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if shooting_status is not None:
+                return shooting_status
+            return self.advance_until_decision_or_terminal()
+        if (
+            record.request.decision_type == DICE_REROLL_DECISION_TYPE
+            and state.current_battle_phase is BattlePhase.FIGHT
+        ):
+            fight_status = self._fight_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+                reaction_queue=self.reaction_queue,
+            )
+            if fight_status is not None:
+                return fight_status
             return self.advance_until_decision_or_terminal()
         if is_destroyed_transport_disembark_proposal_request(record.request):
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
@@ -1799,6 +1859,9 @@ class GameLifecycle:
             shooting_unit_selected_hooks=(
                 self._runtime_content_bundle.shooting_unit_selected_hook_registry
             ),
+            shooting_unit_selected_grant_hooks=(
+                self._runtime_content_bundle.shooting_unit_selected_grant_hook_registry
+            ),
             shooting_target_restriction_hooks=(
                 self._runtime_content_bundle.shooting_target_restriction_hook_registry
             ),
@@ -1811,6 +1874,9 @@ class GameLifecycle:
             stratagem_index=runtime_stratagem_index,
             fight_activation_ability_hooks=(
                 self._runtime_content_bundle.fight_activation_ability_hook_registry
+            ),
+            fight_unit_selected_grant_hooks=(
+                self._runtime_content_bundle.fight_unit_selected_grant_hook_registry
             ),
             runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )

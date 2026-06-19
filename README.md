@@ -174,9 +174,9 @@ Current status:
 - Drukhari `Power from Pain` runtime support includes a deterministic Pain token
   ledger, token gain at the owning Command phase start, enemy Battle-shock
   failures, and enemy unit destruction, plus Lithe Agility empowerment for
-  Advance and Charge rerolls through the shared grant and dice-reroll decision
-  path. Hatred Eternal hit-reroll empowerment is tracked as a remaining
-  selected-to-shoot/fight grant integration.
+  Advance and Charge rerolls and Hatred Eternal selected-to-shoot and
+  selected-to-fight hit-reroll empowerment through shared grant and dice-reroll
+  decision paths.
 - Local CLI/human decision entry, viewer-safe catalog/live unit-model projection,
   and trigger opportunity-window intent support are documented in
   [docs/ADAPTER_DECISION_CONTRACT.md](docs/ADAPTER_DECISION_CONTRACT.md) and
