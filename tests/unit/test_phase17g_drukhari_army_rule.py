@@ -9,8 +9,15 @@ import pytest
 from tests.unit.test_phase11c_command_phase import (
     _battle_state,  # pyright: ignore[reportPrivateUsage]
 )
+from tests.unit.test_phase13b_shooting_declarations import (
+    _catalog_with_replaced_bolt_profiles,  # pyright: ignore[reportPrivateUsage]
+    _proposal_from_request,  # pyright: ignore[reportPrivateUsage]
+    _shooting_lifecycle,  # pyright: ignore[reportPrivateUsage]
+    _weapon_profile_by_wargear,  # pyright: ignore[reportPrivateUsage]
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
@@ -19,19 +26,25 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollSpec,
+    DiceRollState,
+    DiceRollStatePayload,
     RerollComponentSelectionPolicy,
     RerollPermission,
 )
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import AttackProfile
 from warhammer40k_core.engine.advance_hooks import (
     SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
     AdvanceMoveContext,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence import (
+    AttackSequence,
+    AttackSequenceStep,
     _request_source_backed_hit_reroll_if_available,  # pyright: ignore[reportPrivateUsage]
     _source_backed_reroll_already_answered,  # pyright: ignore[reportPrivateUsage]
     attack_sequence_hit_roll_spec,
+    attack_sequence_wound_roll_spec,
 )
 from warhammer40k_core.engine.battle_shock import (
     BATTLE_SHOCK_ROLL_TYPE,
@@ -90,7 +103,13 @@ from warhammer40k_core.engine.faction_resources import (
     initial_faction_resource_ledgers,
 )
 from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.phases.charge import (
     ChargingUnitSelection,
     _charge_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
@@ -102,12 +121,16 @@ from warhammer40k_core.engine.phases.movement import (
     _record_movement_action_grant_effects,  # pyright: ignore[reportPrivateUsage]
 )
 from warhammer40k_core.engine.phases.shooting import (
+    SELECT_SHOOTING_TYPE_DECISION_TYPE,
+    SELECT_SHOOTING_UNIT_DECISION_TYPE,
+    SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
     ShootingPhaseHandler,
     ShootingPhaseState,
     ShootingUnitSelection,
     _record_shooting_unit_selected_grant_effects,  # pyright: ignore[reportPrivateUsage]
     _request_shooting_unit_selected_grant_decision_if_available,  # pyright: ignore[reportPrivateUsage]
 )
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID,
     SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
@@ -131,6 +154,7 @@ from warhammer40k_core.engine.unit_destroyed_hooks import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
+from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 
 
 def test_power_from_pain_command_start_gains_pain_token() -> None:
@@ -1208,6 +1232,254 @@ def test_hatred_eternal_hit_reroll_uses_attack_sequence_dice_reroll_request() ->
     )
 
     assert repeated_status is None
+
+
+def test_hatred_eternal_accepted_hit_reroll_resumes_attack_sequence_with_rerolled_hit() -> None:
+    base_profile = _weapon_profile_by_wargear(
+        wargear_id="core-bolt-rifle",
+        weapon_profile_id="core-bolt-rifle:standard",
+    )
+    hatred_profile = replace(
+        base_profile,
+        profile_id="drukhari-test-hatred-eternal-rifle",
+        name="Hatred Eternal regression rifle",
+        attack_profile=AttackProfile.fixed(1),
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 2),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 12),
+        keywords=(),
+        abilities=(),
+    )
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        game_id="drukhari-test-hatred-eternal-consumer",
+        catalog=_catalog_with_replaced_bolt_profiles((hatred_profile,)),
+    )
+    state = _lifecycle_state(lifecycle)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_hatred_eternal_ability(),),
+    )
+    unit = _unit_for_player(state, player_id="player-a")
+    target_unit = units["enemy"]
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:hatred-consumer-token",
+    )
+    _refresh_lifecycle_runtime_content(lifecycle)
+
+    selection_request = _decision_request_from_status(
+        lifecycle.advance_until_decision_or_terminal()
+    )
+    assert selection_request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE
+    grant_request = _decision_request_from_status(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="drukhari-test:hatred-consumer-select-unit",
+                request=selection_request,
+                selected_option_id=unit.unit_instance_id,
+            )
+        )
+    )
+    assert grant_request.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE
+    type_request = _decision_request_from_status(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="drukhari-test:hatred-consumer-accept-grant",
+                request=grant_request,
+                selected_option_id=army_rule.HATRED_ETERNAL_SHOOTING_HOOK_ID,
+            )
+        )
+    )
+    assert type_request.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE
+    assert pain_tokens_available(state, player_id="player-a") == 0
+
+    declaration_request = _decision_request_from_status(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="drukhari-test:hatred-consumer-shooting-type",
+                request=type_request,
+                selected_option_id="normal",
+            )
+        )
+    )
+    assert declaration_request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=target_unit.unit_instance_id,
+        weapon_profile_id=hatred_profile.profile_id,
+    )
+    declaration_result_id = "drukhari-test:hatred-consumer-declaration"
+    sequence_id = f"attack-sequence:{declaration_result_id}"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    fixed_rolls = DiceRollManager(state.game_id, event_log=lifecycle.decision_controller.event_log)
+    fixed_rolls.roll_fixed(
+        attack_sequence_hit_roll_spec(
+            weapon_profile_id=hatred_profile.profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id="player-a",
+        ),
+        [1],
+    )
+    fixed_rolls.roll_fixed(
+        attack_sequence_wound_roll_spec(
+            weapon_profile_id=hatred_profile.profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id="player-a",
+        ),
+        [6],
+    )
+
+    reroll_request = _decision_request_from_status(
+        lifecycle.submit_decision(
+            DecisionResult(
+                result_id=declaration_result_id,
+                request_id=declaration_request.request_id,
+                decision_type=declaration_request.decision_type,
+                actor_id=declaration_request.actor_id,
+                selected_option_id="submit_parameterized_payload",
+                payload=validate_json_value(proposal.to_payload()),
+            )
+        )
+    )
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    reroll_request_payload = cast(dict[str, object], reroll_request.payload)
+    attack_context_payload = cast(dict[str, object], reroll_request_payload["attack_context"])
+    initial_hit_state = DiceRollState.from_payload(
+        cast(DiceRollStatePayload, attack_context_payload["hit_roll_state"])
+    )
+    assert initial_hit_state.current_total == 1
+
+    accepted_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="drukhari-test:hatred-consumer-accept-reroll",
+            request=reroll_request,
+            selected_option_id="reroll:0",
+        )
+    )
+
+    assert accepted_status.status_kind is not LifecycleStatusKind.INVALID
+    reroll_payloads = _event_payloads(lifecycle, "dice_reroll_resolved")
+    assert len(reroll_payloads) == 1
+    rerolled_state = DiceRollState.from_payload(cast(DiceRollStatePayload, reroll_payloads[0]))
+    assert rerolled_state.original_result.roll_id == initial_hit_state.original_result.roll_id
+    assert rerolled_state.current_total >= 2
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    resolved_hit = cast(dict[str, object], hit_payload["payload"])
+    assert resolved_hit["successful"] is True
+    assert resolved_hit["unmodified_roll"] == rerolled_state.current_total
+    assert cast(dict[str, object], resolved_hit["roll_state"]) == rerolled_state.to_payload()
+    wound_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.WOUND,
+    )
+    resolved_wound = cast(dict[str, object], wound_payload["payload"])
+    assert resolved_wound["successful"] is True
+
+
+def test_shooting_dice_reroll_branch_rejects_non_source_backed_hit_payload() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    attacker = _unit_for_player(state, player_id="player-a")
+    defender = _unit_for_player(state, player_id="player-b")
+    wargear_id = attacker.wargear_selections[0].wargear_ids[0]
+    weapon_profile = _weapon_profile_by_wargear(
+        wargear_id=wargear_id,
+        weapon_profile_id=None,
+    )
+    target_model_ids = tuple(model.model_instance_id for model in defender.own_models)
+    attack_pool = RangedAttackPool(
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        wargear_id=wargear_id,
+        weapon_profile_id=weapon_profile.profile_id,
+        weapon_profile=weapon_profile,
+        target_unit_instance_id=defender.unit_instance_id,
+        shooting_type=ShootingType.NORMAL,
+        attacks=1,
+        target_visible_model_ids=target_model_ids,
+        target_in_range_model_ids=target_model_ids,
+    )
+    attack_sequence = AttackSequence.start(
+        sequence_id="drukhari-test:scoped-reroll-sequence",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(attack_pool,),
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=(attack_pool,),
+        attack_sequence=attack_sequence,
+    )
+    decisions = DecisionController()
+    request = DecisionRequest(
+        request_id="drukhari-test:scoped-reroll-request",
+        decision_type=DICE_REROLL_DECISION_TYPE,
+        actor_id="player-a",
+        payload={
+            "roll_id": "drukhari-test:scoped-wound-roll",
+            "roll_type": "attack_sequence.wound",
+            "current_values": [1],
+            "allowed_selections": [[0]],
+            "source_rule_id": SOURCE_RULE_ID,
+            "permission": {
+                "source_id": SOURCE_RULE_ID,
+                "timing_window": "attack_sequence.wound",
+                "owning_player_id": "player-a",
+                "eligible_roll_type": "attack_sequence.wound",
+                "component_selection_policy": "whole_roll",
+                "allowed_component_selections": None,
+            },
+            "attack_context": {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.SHOOTING.value,
+                "unit_instance_id": attacker.unit_instance_id,
+                "attack_context_id": attack_sequence.attack_context_id(),
+                "weapon_profile_id": weapon_profile.profile_id,
+                "hit_roll_state": validate_json_value(
+                    DiceRollManager(state.game_id)
+                    .roll_fixed(
+                        attack_sequence_hit_roll_spec(
+                            weapon_profile_id=weapon_profile.profile_id,
+                            attack_context_id=attack_sequence.attack_context_id(),
+                            attacker_player_id="player-a",
+                        ),
+                        [1],
+                    )
+                    .to_payload()
+                ),
+            },
+        },
+        options=(
+            DecisionOption(
+                option_id="reroll:0",
+                label="Reroll die 0",
+                payload={"selected_indices": [0]},
+            ),
+        ),
+    )
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="drukhari-test:scoped-reroll-result",
+        request=request,
+        selected_option_id="reroll:0",
+    )
+    decisions.submit_result(result)
+
+    with pytest.raises(GameLifecycleError, match="must target a hit roll"):
+        _shooting_phase_handler(ShootingUnitSelectedGrantRegistry.empty()).apply_decision(
+            state=state,
+            result=result,
+            decisions=decisions,
+        )
 
 
 def test_hatred_eternal_hit_reroll_request_ignores_ineligible_contexts() -> None:
@@ -2674,6 +2946,43 @@ def _shooting_phase_handler(
         army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
         shooting_unit_selected_grant_hooks=registry,
     )
+
+
+def _lifecycle_state(lifecycle: GameLifecycle) -> GameState:
+    if lifecycle.state is None:
+        raise AssertionError("Lifecycle state is missing.")
+    return lifecycle.state
+
+
+def _refresh_lifecycle_runtime_content(lifecycle: GameLifecycle) -> None:
+    lifecycle._refresh_runtime_content_bundle_if_armies_mustered()  # pyright: ignore[reportPrivateUsage]
+
+
+def _decision_request_from_status(status: LifecycleStatus) -> DecisionRequest:
+    if status.status_kind is not LifecycleStatusKind.WAITING_FOR_DECISION:
+        raise AssertionError(f"Expected waiting status, got {status.status_kind}.")
+    request = status.decision_request
+    if type(request) is not DecisionRequest:
+        raise AssertionError("Expected a decision request.")
+    return request
+
+
+def _event_payloads(lifecycle: GameLifecycle, event_type: str) -> tuple[dict[str, object], ...]:
+    return tuple(
+        cast(dict[str, object], event.payload)
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == event_type
+    )
+
+
+def _attack_step_payload(
+    events: tuple[dict[str, object], ...],
+    step: AttackSequenceStep,
+) -> dict[str, object]:
+    for event in events:
+        if event["step"] == step.value:
+            return event
+    raise AssertionError(f"Missing attack sequence step {step.value}.")
 
 
 def _lithe_agility_ability() -> DatasheetAbilityDescriptor:

@@ -2837,18 +2837,57 @@ def _apply_shooting_dice_reroll_decision(
     decisions: DecisionController,
 ) -> LifecycleStatus | None:
     _validate_shooting_phase_state(state)
-    selection = _active_shooting_unit_selection(state)
-    if result.actor_id != selection.player_id:
-        raise GameLifecycleError("Shooting dice reroll actor must match selected unit player.")
+    shooting_state = _ensure_shooting_phase_state(state=state)
+    attack_sequence = shooting_state.attack_sequence
+    if attack_sequence is None:
+        raise GameLifecycleError("Shooting dice reroll requires an active attack sequence.")
+    if attack_sequence.source_phase is not BattlePhase.SHOOTING:
+        raise GameLifecycleError("Shooting dice reroll context must be for the Shooting phase.")
+    if result.actor_id != attack_sequence.attacker_player_id:
+        raise GameLifecycleError("Shooting dice reroll actor must match attacking player.")
     record = decisions.record_for_result(result)
     request_payload = _decision_payload_object(record.request.payload)
+    if _payload_string(request_payload, key="roll_type") != "attack_sequence.hit":
+        raise GameLifecycleError("Shooting dice reroll must target a hit roll.")
+    source_rule_id = _payload_string(request_payload, key="source_rule_id")
+    permission_payload = _payload_object(request_payload, key="permission")
+    if _payload_string(permission_payload, key="source_id") != source_rule_id:
+        raise GameLifecycleError("Shooting dice reroll source context drift.")
+    if _payload_string(permission_payload, key="timing_window") != "attack_sequence.hit":
+        raise GameLifecycleError("Shooting dice reroll timing window must be attack_sequence.hit.")
+    if _payload_string(permission_payload, key="eligible_roll_type") != "attack_sequence.hit":
+        raise GameLifecycleError("Shooting dice reroll permission must target hit rolls.")
+    if (
+        _payload_string(permission_payload, key="owning_player_id")
+        != attack_sequence.attacker_player_id
+    ):
+        raise GameLifecycleError("Shooting dice reroll permission player drift.")
     attack_context = _payload_object(request_payload, key="attack_context")
-    if _payload_string(attack_context, key="unit_instance_id") != selection.unit_instance_id:
-        raise GameLifecycleError("Shooting dice reroll unit must match active selection.")
+    if _payload_string(attack_context, key="phase") != BattlePhase.SHOOTING.value:
+        raise GameLifecycleError("Shooting dice reroll context must be for the Shooting phase.")
+    if (
+        _payload_string(attack_context, key="unit_instance_id")
+        != attack_sequence.attacking_unit_instance_id
+    ):
+        raise GameLifecycleError("Shooting dice reroll unit must match active attack sequence.")
+    if (
+        _payload_string(attack_context, key="attack_context_id")
+        != attack_sequence.attack_context_id()
+    ):
+        raise GameLifecycleError("Shooting dice reroll attack context drift.")
+    if (
+        _payload_string(attack_context, key="weapon_profile_id")
+        != attack_sequence.current_pool().weapon_profile_id
+    ):
+        raise GameLifecycleError("Shooting dice reroll weapon profile drift.")
     initial_roll_payload = _payload_object(attack_context, key="hit_roll_state")
     initial_roll_state = DiceRollState.from_payload(
         cast(DiceRollStatePayload, initial_roll_payload)
     )
+    if initial_roll_state.original_result.spec.roll_type != "attack_sequence.hit":
+        raise GameLifecycleError("Shooting dice reroll initial roll must be a hit roll.")
+    if initial_roll_state.original_result.spec.actor_id != attack_sequence.attacker_player_id:
+        raise GameLifecycleError("Shooting dice reroll initial roll actor drift.")
     DiceRollManager(
         state.game_id,
         event_log=decisions.event_log,

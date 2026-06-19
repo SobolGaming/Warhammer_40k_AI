@@ -1240,6 +1240,18 @@ class GameLifecycle:
             if charge_status is not None:
                 return charge_status
             return self.advance_until_decision_or_terminal()
+        if (
+            record.request.decision_type == DICE_REROLL_DECISION_TYPE
+            and state.current_battle_phase is BattlePhase.SHOOTING
+        ):
+            shooting_status = self._shooting_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if shooting_status is not None:
+                return shooting_status
+            return self.advance_until_decision_or_terminal()
         if is_destroyed_transport_disembark_proposal_request(record.request):
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
             if _destroyed_transport_request_is_fight_owned(
