@@ -123,8 +123,8 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
         tests="Focused hook, lifecycle, and hidden-target detection tests",
         overall="Full",
         notes=(
-            "Runtime grants the 6 inch detection-range effect and expires it after the "
-            "source shoots."
+            "Runtime grants the +6 inch detection-range effect over the 11th Edition "
+            "15 inch Hidden baseline and expires it after the source shoots."
         ),
     ),
     (
@@ -499,6 +499,30 @@ def _structured_support_sections_markdown() -> list[str]:
     )
     lines.extend(
         _support_section_markdown(
+            "Core Terrain And Visibility",
+            (
+                "Terrain visibility behavior is source-backed through the ruleset descriptor "
+                "and consumed by Shooting target selection and declaration validation."
+            ),
+            (
+                SupportSectionRow(
+                    "Hidden and Detection Range",
+                    "Terrain visibility policy plus Shooting target detection gate",
+                    "Architecture and adapter contract",
+                    "Ruleset descriptor, Shooting target, and Path of the Outcast tests",
+                    "Full",
+                    (
+                        "The 11th Edition descriptor enables Hidden with a 15 inch detection "
+                        "range, terrain-area and keyword requirements, and hidden-status loss "
+                        "after ranged attacks; detection modifiers are consumed from "
+                        "engine-owned persisting effects."
+                    ),
+                ),
+            ),
+        )
+    )
+    lines.extend(
+        _support_section_markdown(
             "Wargear Keyword Abilities",
             (
                 "Weapon and wargear keyword abilities are normalized into `WeaponKeyword` values "
@@ -585,13 +609,13 @@ def _structured_support_sections_markdown() -> list[str]:
                     "Named army-rule handler plus faction-resource ledger",
                     "README, faction integration note, adapter contract, and generated matrix",
                     "Focused faction runtime tests",
-                    "Partial",
+                    "Full",
                     (
                         "Implements Pain token gain at own Command phase start, enemy "
                         "unit destruction, and enemy Battle-shock failure, plus optional "
-                        "Lithe Agility empowerment for Advance and Charge rerolls. "
-                        "Hatred Eternal attack hit-reroll empowerment still requires a "
-                        "source-backed selected-to-shoot/fight grant surface."
+                        "Lithe Agility empowerment for Advance and Charge rerolls and "
+                        "Hatred Eternal selected-to-shoot/selected-to-fight empowerment "
+                        "for attack hit rerolls."
                     ),
                 ),
                 SupportSectionRow(
@@ -620,6 +644,18 @@ def _structured_support_sections_markdown() -> list[str]:
             ),
             (
                 SupportSectionRow(
+                    "Aeldari - Path of the Outcast Stratagems",
+                    "Named post-shooting Stratagem handlers",
+                    "Adapter contract, architecture, and generated matrix",
+                    "Focused CP, targeting, Battle-shock, detection, and movement tests",
+                    "Full",
+                    (
+                        "Includes Eldritch Suppression, Casting Back the Veil, and Nomads of "
+                        "the Hidden Way through the shared `use_stratagem` and triggered "
+                        "movement paths."
+                    ),
+                ),
+                SupportSectionRow(
                     "Faction-pack Stratagems",
                     "Coverage/report rows exist; semantic handlers vary",
                     "Architecture and coverage reports",
@@ -638,6 +674,17 @@ def _structured_support_sections_markdown() -> list[str]:
             "Enhancements",
             "Enhancement support should be tracked under each faction and detachment.",
             (
+                SupportSectionRow(
+                    "Aeldari - Path of the Outcast Upgrades",
+                    "Enhancement effect bindings",
+                    "Architecture and generated matrix",
+                    "Focused eligibility, hidden-preservation, and CHARACTER AP tests",
+                    "Full",
+                    (
+                        "Includes Camouflaged Snipers preserving Hidden after ranged attacks "
+                        "and Assassins' Eye applying +1 AP against CHARACTER targets."
+                    ),
+                ),
                 SupportSectionRow(
                     "Faction-pack Enhancements",
                     "Coverage/report rows exist; semantic handlers vary",
