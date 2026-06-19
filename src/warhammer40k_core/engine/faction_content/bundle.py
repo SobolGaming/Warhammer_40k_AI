@@ -93,6 +93,8 @@ from warhammer40k_core.engine.shooting_end_surge_hooks import (
     ShootingEndSurgeHookRegistry,
 )
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
+    ShootingUnitSelectedGrantBinding,
+    ShootingUnitSelectedGrantRegistry,
     ShootingUnitSelectedHookBinding,
     ShootingUnitSelectedHookRegistry,
 )
@@ -145,6 +147,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     shooting_target_restriction_hook_ids: list[str]
     charge_target_restriction_hook_ids: list[str]
     shooting_unit_selected_hook_ids: list[str]
+    shooting_unit_selected_grant_hook_ids: list[str]
     shooting_end_surge_hook_ids: list[str]
     enhancement_effect_binding_ids: list[str]
     fight_activation_ability_hook_ids: list[str]
@@ -197,6 +200,10 @@ class RuntimeContentContribution:
         ...,
     ] = ()
     shooting_unit_selected_hook_bindings: tuple[ShootingUnitSelectedHookBinding, ...] = ()
+    shooting_unit_selected_grant_hook_bindings: tuple[
+        ShootingUnitSelectedGrantBinding,
+        ...,
+    ] = ()
     shooting_end_surge_hook_bindings: tuple[ShootingEndSurgeHookBinding, ...] = ()
     enhancement_effect_bindings: tuple[EnhancementEffectBinding, ...] = ()
     fight_activation_ability_hook_bindings: tuple[FightActivationAbilityHookBinding, ...] = ()
@@ -409,6 +416,15 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "shooting_unit_selected_grant_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution shooting_unit_selected_grant_hook_bindings",
+                self.shooting_unit_selected_grant_hook_bindings,
+                ShootingUnitSelectedGrantBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "enhancement_effect_bindings",
             _validate_tuple(
                 "RuntimeContentContribution enhancement_effect_bindings",
@@ -528,6 +544,9 @@ class RuntimeContentContribution:
             ),
             charge_target_restriction_hook_bindings=(self.charge_target_restriction_hook_bindings),
             shooting_unit_selected_hook_bindings=self.shooting_unit_selected_hook_bindings,
+            shooting_unit_selected_grant_hook_bindings=(
+                self.shooting_unit_selected_grant_hook_bindings
+            ),
             shooting_end_surge_hook_bindings=self.shooting_end_surge_hook_bindings,
             enhancement_effect_bindings=self.enhancement_effect_bindings,
             fight_activation_ability_hook_bindings=self.fight_activation_ability_hook_bindings,
@@ -742,6 +761,15 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.hook_id,
         ),
+        shooting_unit_selected_grant_hook_bindings=_combine_unique_values(
+            "shooting-unit-selected grant hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.shooting_unit_selected_grant_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
         enhancement_effect_bindings=_combine_unique_values(
             "enhancement effect binding",
             tuple(
@@ -859,6 +887,7 @@ class RuntimeContentBundle:
     shooting_target_restriction_hook_registry: ShootingTargetRestrictionHookRegistry
     charge_target_restriction_hook_registry: ChargeTargetRestrictionHookRegistry
     shooting_unit_selected_hook_registry: ShootingUnitSelectedHookRegistry
+    shooting_unit_selected_grant_hook_registry: ShootingUnitSelectedGrantRegistry
     shooting_end_surge_hook_registry: ShootingEndSurgeHookRegistry
     enhancement_effect_registry: EnhancementEffectRegistry
     fight_activation_ability_hook_registry: FightActivationAbilityHookRegistry
@@ -938,6 +967,13 @@ class RuntimeContentBundle:
         if type(self.shooting_unit_selected_hook_registry) is not ShootingUnitSelectedHookRegistry:
             raise GameLifecycleError(
                 "RuntimeContentBundle requires ShootingUnitSelectedHookRegistry."
+            )
+        if (
+            type(self.shooting_unit_selected_grant_hook_registry)
+            is not ShootingUnitSelectedGrantRegistry
+        ):
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires ShootingUnitSelectedGrantRegistry."
             )
         if type(self.shooting_end_surge_hook_registry) is not ShootingEndSurgeHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires ShootingEndSurgeHookRegistry.")
@@ -1170,6 +1206,15 @@ class RuntimeContentBundle:
                 for binding in contribution.shooting_unit_selected_hook_bindings
             )
         )
+        shooting_unit_selected_grant_hook_registry = (
+            ShootingUnitSelectedGrantRegistry.from_bindings(
+                tuple(
+                    binding
+                    for contribution in validated_contributions
+                    for binding in contribution.shooting_unit_selected_grant_hook_bindings
+                )
+            )
+        )
         enhancement_effect_registry = EnhancementEffectRegistry.from_bindings(
             tuple(
                 binding
@@ -1260,6 +1305,7 @@ class RuntimeContentBundle:
             shooting_target_restriction_hook_registry=shooting_target_restriction_hook_registry,
             charge_target_restriction_hook_registry=charge_target_restriction_hook_registry,
             shooting_unit_selected_hook_registry=shooting_unit_selected_hook_registry,
+            shooting_unit_selected_grant_hook_registry=(shooting_unit_selected_grant_hook_registry),
             shooting_end_surge_hook_registry=shooting_end_surge_hook_registry,
             enhancement_effect_registry=enhancement_effect_registry,
             fight_activation_ability_hook_registry=fight_activation_ability_hook_registry,
@@ -1336,6 +1382,10 @@ class RuntimeContentBundle:
             "shooting_unit_selected_hook_ids": [
                 binding.hook_id
                 for binding in self.shooting_unit_selected_hook_registry.all_bindings()
+            ],
+            "shooting_unit_selected_grant_hook_ids": [
+                binding.hook_id
+                for binding in self.shooting_unit_selected_grant_hook_registry.all_bindings()
             ],
             "shooting_end_surge_hook_ids": [
                 binding.hook_id for binding in self.shooting_end_surge_hook_registry.all_bindings()

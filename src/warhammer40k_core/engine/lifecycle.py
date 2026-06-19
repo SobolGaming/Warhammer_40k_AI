@@ -178,6 +178,9 @@ from warhammer40k_core.engine.sequencing import (
     apply_sequencing_decision_from_request,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE, SetupFlow
+from warhammer40k_core.engine.shooting_unit_selected_hooks import (
+    SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
+)
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
@@ -249,6 +252,7 @@ _TRIGGERED_MOVEMENT_DECISION_TYPES = frozenset((SELECT_TRIGGERED_MOVEMENT_DECISI
 _SHOOTING_DECISION_TYPES = frozenset(
     (
         SELECT_SHOOTING_UNIT_DECISION_TYPE,
+        SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
         SELECT_SHOOTING_TYPE_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
         SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
@@ -710,6 +714,20 @@ class GameLifecycle:
                 state=state,
                 request=pending_request,
                 result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE
+        ):
+            invalid_status = (
+                self._shooting_phase_handler.invalid_shooting_unit_selected_grant_status(
+                    state=state,
+                    request=pending_request,
+                    result=result,
+                )
             )
             if invalid_status is not None:
                 return invalid_status
@@ -1798,6 +1816,9 @@ class GameLifecycle:
             stratagem_index=runtime_stratagem_index,
             shooting_unit_selected_hooks=(
                 self._runtime_content_bundle.shooting_unit_selected_hook_registry
+            ),
+            shooting_unit_selected_grant_hooks=(
+                self._runtime_content_bundle.shooting_unit_selected_grant_hook_registry
             ),
             shooting_target_restriction_hooks=(
                 self._runtime_content_bundle.shooting_target_restriction_hook_registry

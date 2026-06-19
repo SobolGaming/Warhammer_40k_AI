@@ -10,6 +10,7 @@ from tests.unit.test_phase11c_command_phase import (
     _battle_state,  # pyright: ignore[reportPrivateUsage]
 )
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
@@ -21,12 +22,17 @@ from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
     RerollPermission,
 )
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.engine.advance_hooks import (
     SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
     AdvanceMoveContext,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_sequence import (
+    _request_source_backed_hit_reroll_if_available,  # pyright: ignore[reportPrivateUsage]
+    _source_backed_reroll_already_answered,  # pyright: ignore[reportPrivateUsage]
+    attack_sequence_hit_roll_spec,
+)
 from warhammer40k_core.engine.battle_shock import (
     BATTLE_SHOCK_ROLL_TYPE,
     BattleShockResult,
@@ -45,8 +51,9 @@ from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartHookRegistry,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.drukhari import (
@@ -93,6 +100,21 @@ from warhammer40k_core.engine.phases.command import CommandPhaseHandler
 from warhammer40k_core.engine.phases.movement import (
     _advance_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
     _record_movement_action_grant_effects,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.phases.shooting import (
+    ShootingPhaseHandler,
+    ShootingPhaseState,
+    ShootingUnitSelection,
+    _record_shooting_unit_selected_grant_effects,  # pyright: ignore[reportPrivateUsage]
+    _request_shooting_unit_selected_grant_decision_if_available,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.shooting_unit_selected_hooks import (
+    DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID,
+    SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
+    ShootingUnitSelectedContext,
+    ShootingUnitSelectedGrant,
+    ShootingUnitSelectedGrantBinding,
+    ShootingUnitSelectedGrantRegistry,
 )
 from warhammer40k_core.engine.source_backed_rerolls import (
     SOURCE_BACKED_REROLL_PERMISSION_EFFECT_KIND,
@@ -358,6 +380,990 @@ def test_lithe_agility_charge_grant_spends_pain_token_and_unlocks_charge_reroll(
     assert pain_tokens_available(state, player_id="player-a") == 0
     assert permission is not None
     assert permission.source_id.startswith(SOURCE_RULE_ID)
+
+
+def test_hatred_eternal_selected_to_shoot_requests_player_facing_grant() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_hatred_eternal_ability(),),
+    )
+    unit = _unit_for_player(state, player_id="player-a")
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:hatred-selected-token",
+    )
+    decisions = DecisionController()
+    selection = ShootingUnitSelection(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+        request_id="drukhari-test:shooting-selection-request",
+        result_id="drukhari-test:shooting-selection-result",
+    )
+    registry = ShootingUnitSelectedGrantRegistry.from_bindings(
+        army_rule.runtime_contribution().shooting_unit_selected_grant_hook_bindings
+    )
+
+    status = _request_shooting_unit_selected_grant_decision_if_available(
+        state=state,
+        decisions=decisions,
+        selection=selection,
+        registry=registry,
+    )
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = status.decision_request
+    assert request is not None
+    assert request.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE
+    assert {option.option_id for option in request.options} == {
+        DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID,
+        army_rule.HATRED_ETERNAL_SHOOTING_HOOK_ID,
+    }
+
+
+def test_empty_selected_to_shoot_grant_registry_does_not_request_decision() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    unit = _unit_for_player(state, player_id="player-a")
+    decisions = DecisionController()
+    selection = ShootingUnitSelection(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+        request_id="drukhari-test:empty-shooting-selection-request",
+        result_id="drukhari-test:empty-shooting-selection-result",
+    )
+
+    status = _request_shooting_unit_selected_grant_decision_if_available(
+        state=state,
+        decisions=decisions,
+        selection=selection,
+        registry=ShootingUnitSelectedGrantRegistry.empty(),
+    )
+
+    assert status is None
+    assert decisions.queue.pending_requests == ()
+
+
+def test_selected_to_shoot_grant_registry_validates_handler_contract() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    unit = _unit_for_player(state, player_id="player-a")
+    context = ShootingUnitSelectedContext(
+        state=state,
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+        request_id="drukhari-test:registry-request",
+        result_id="drukhari-test:registry-result",
+    )
+
+    with pytest.raises(GameLifecycleError, match="handler must be callable"):
+        ShootingUnitSelectedGrantBinding(
+            hook_id="drukhari-test:not-callable",
+            source_id="drukhari-test:not-callable-source",
+            handler=cast(
+                Callable[[ShootingUnitSelectedContext], ShootingUnitSelectedGrant | None],
+                object(),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="grant hooks require a context"):
+        ShootingUnitSelectedGrantRegistry.empty().grants_for(
+            cast(ShootingUnitSelectedContext, object())
+        )
+    with pytest.raises(GameLifecycleError, match="bindings must be a tuple"):
+        ShootingUnitSelectedGrantRegistry(
+            bindings=cast(tuple[ShootingUnitSelectedGrantBinding, ...], [])
+        )
+    with pytest.raises(GameLifecycleError, match="must contain ShootingUnitSelectedGrantBinding"):
+        ShootingUnitSelectedGrantRegistry.from_bindings(
+            cast(tuple[ShootingUnitSelectedGrantBinding, ...], (object(),))
+        )
+
+    def no_grant(_: ShootingUnitSelectedContext) -> None:
+        return None
+
+    empty_binding = ShootingUnitSelectedGrantBinding(
+        hook_id="drukhari-test:registry-none",
+        source_id="drukhari-test:registry-source",
+        handler=no_grant,
+    )
+    assert (
+        ShootingUnitSelectedGrantRegistry.from_bindings((empty_binding,)).grants_for(context) == ()
+    )
+
+    with pytest.raises(GameLifecycleError, match="hook IDs must be unique"):
+        ShootingUnitSelectedGrantRegistry.from_bindings((empty_binding, empty_binding))
+    with pytest.raises(GameLifecycleError, match="expiration requires an effect"):
+        ShootingUnitSelectedGrant(
+            hook_id="drukhari-test:bad-expiration",
+            source_id="drukhari-test:bad-expiration-source",
+            label="Bad expiration",
+            unit_effect_expiration="end_phase",
+        )
+    with pytest.raises(GameLifecycleError, match="effect requires expiration"):
+        ShootingUnitSelectedGrant(
+            hook_id="drukhari-test:bad-effect",
+            source_id="drukhari-test:bad-effect-source",
+            label="Bad effect",
+            unit_effect_payload={"effect_kind": "drukhari-test:effect"},
+        )
+    with pytest.raises(GameLifecycleError, match="end_phase or end_turn"):
+        ShootingUnitSelectedGrant(
+            hook_id="drukhari-test:bad-expiration-token",
+            source_id="drukhari-test:bad-expiration-token-source",
+            label="Bad expiration token",
+            unit_effect_payload={"effect_kind": "drukhari-test:effect"},
+            unit_effect_expiration="end_battle_round",
+        )
+
+    def wrong_type(_: ShootingUnitSelectedContext) -> ShootingUnitSelectedGrant:
+        return cast(ShootingUnitSelectedGrant, object())
+
+    with pytest.raises(GameLifecycleError, match="handlers must return grants or None"):
+        ShootingUnitSelectedGrantRegistry.from_bindings(
+            (
+                ShootingUnitSelectedGrantBinding(
+                    hook_id="drukhari-test:wrong-type",
+                    source_id="drukhari-test:wrong-type-source",
+                    handler=wrong_type,
+                ),
+            )
+        ).grants_for(context)
+
+    def hook_drift(_: ShootingUnitSelectedContext) -> ShootingUnitSelectedGrant:
+        return ShootingUnitSelectedGrant(
+            hook_id="drukhari-test:drifted-hook",
+            source_id="drukhari-test:hook-source",
+            label="Hook drift",
+        )
+
+    with pytest.raises(GameLifecycleError, match="hook_id drift"):
+        ShootingUnitSelectedGrantRegistry.from_bindings(
+            (
+                ShootingUnitSelectedGrantBinding(
+                    hook_id="drukhari-test:hook",
+                    source_id="drukhari-test:hook-source",
+                    handler=hook_drift,
+                ),
+            )
+        ).grants_for(context)
+
+    def source_drift(_: ShootingUnitSelectedContext) -> ShootingUnitSelectedGrant:
+        return ShootingUnitSelectedGrant(
+            hook_id="drukhari-test:source",
+            source_id="drukhari-test:drifted-source",
+            label="Source drift",
+        )
+
+    with pytest.raises(GameLifecycleError, match="source_id drift"):
+        ShootingUnitSelectedGrantRegistry.from_bindings(
+            (
+                ShootingUnitSelectedGrantBinding(
+                    hook_id="drukhari-test:source",
+                    source_id="drukhari-test:source-rule",
+                    handler=source_drift,
+                ),
+            )
+        ).grants_for(context)
+
+
+def test_hatred_eternal_grant_spends_pain_token_and_unlocks_hit_reroll() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_hatred_eternal_ability(),),
+    )
+    unit = _unit_for_player(state, player_id="player-a")
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:hatred-token",
+    )
+
+    decisions = DecisionController()
+    selection = ShootingUnitSelection(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+        request_id="drukhari-test:hatred-selection-request",
+        result_id="drukhari-test:hatred-selection-result",
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+    ).with_unit_selection(selection)
+    registry = ShootingUnitSelectedGrantRegistry.from_bindings(
+        army_rule.runtime_contribution().shooting_unit_selected_grant_hook_bindings
+    )
+    handler = _shooting_phase_handler(registry)
+    status = _request_shooting_unit_selected_grant_decision_if_available(
+        state=state,
+        decisions=decisions,
+        selection=selection,
+        registry=registry,
+    )
+    assert status is not None
+    request = status.decision_request
+    assert request is not None
+    result = DecisionResult.for_request(
+        result_id="drukhari-test:hatred-grant-result",
+        request=request,
+        selected_option_id=army_rule.HATRED_ETERNAL_SHOOTING_HOOK_ID,
+    )
+
+    invalid = handler.invalid_shooting_unit_selected_grant_status(
+        state=state,
+        request=request,
+        result=result,
+    )
+    assert invalid is None
+    assert handler.apply_decision(state=state, result=result, decisions=decisions) is None
+    permission = source_backed_reroll_permission_for_unit(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+        roll_type="attack_sequence.hit",
+        timing_window="attack_sequence.hit",
+    )
+
+    assert pain_tokens_available(state, player_id="player-a") == 0
+    assert permission is not None
+    assert permission.source_id.startswith(SOURCE_RULE_ID)
+    assert unit_is_empowered_through_pain_for_ability(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+        pain_ability_key=HATRED_ETERNAL_ABILITY_KEY,
+    )
+    resolved_events = [
+        record
+        for record in decisions.event_log.records
+        if record.event_type == "shooting_unit_selected_grant_decision_resolved"
+    ]
+    assert len(resolved_events) == 1
+
+
+def test_hatred_eternal_grant_prevalidation_rejects_payload_drift() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_hatred_eternal_ability(),),
+    )
+    unit = _unit_for_player(state, player_id="player-a")
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:hatred-drift-token",
+    )
+    decisions = DecisionController()
+    selection = ShootingUnitSelection(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+        request_id="drukhari-test:hatred-drift-selection-request",
+        result_id="drukhari-test:hatred-drift-selection-result",
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+    ).with_unit_selection(selection)
+    registry = ShootingUnitSelectedGrantRegistry.from_bindings(
+        army_rule.runtime_contribution().shooting_unit_selected_grant_hook_bindings
+    )
+    status = _request_shooting_unit_selected_grant_decision_if_available(
+        state=state,
+        decisions=decisions,
+        selection=selection,
+        registry=registry,
+    )
+    assert status is not None
+    request = status.decision_request
+    assert request is not None
+    result = DecisionResult.for_request(
+        result_id="drukhari-test:hatred-drift-grant-result",
+        request=request,
+        selected_option_id=army_rule.HATRED_ETERNAL_SHOOTING_HOOK_ID,
+    )
+    result_payload = result.payload
+    assert isinstance(result_payload, dict)
+    selected_grants = result_payload["selected_shooting_unit_grants"]
+    assert isinstance(selected_grants, list)
+    selected_grant = selected_grants[0]
+    assert isinstance(selected_grant, dict)
+    drifted_grant = dict(selected_grant)
+    drifted_grant["label"] = "Drifted Hatred Eternal"
+    drifted_payload = dict(result_payload)
+    drifted_payload["selected_shooting_unit_grants"] = [drifted_grant]
+    drifted_result = DecisionResult(
+        result_id=result.result_id,
+        request_id=result.request_id,
+        decision_type=result.decision_type,
+        actor_id=result.actor_id,
+        selected_option_id=result.selected_option_id,
+        payload=validate_json_value(drifted_payload),
+    )
+    invalid = _shooting_phase_handler(registry).invalid_shooting_unit_selected_grant_status(
+        state=state,
+        request=request,
+        result=drifted_result,
+    )
+
+    assert invalid is not None
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert pain_tokens_available(state, player_id="player-a") == 1
+
+
+def test_hatred_eternal_grant_prevalidation_rejects_context_and_shape_drift() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_hatred_eternal_ability(),),
+    )
+    unit = _unit_for_player(state, player_id="player-a")
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:hatred-shape-token",
+    )
+    decisions = DecisionController()
+    selection = ShootingUnitSelection(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+        request_id="drukhari-test:hatred-shape-selection-request",
+        result_id="drukhari-test:hatred-shape-selection-result",
+    )
+    selected_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+    ).with_unit_selection(selection)
+    state.shooting_phase_state = selected_state
+    registry = ShootingUnitSelectedGrantRegistry.from_bindings(
+        army_rule.runtime_contribution().shooting_unit_selected_grant_hook_bindings
+    )
+    handler = _shooting_phase_handler(registry)
+    status = _request_shooting_unit_selected_grant_decision_if_available(
+        state=state,
+        decisions=decisions,
+        selection=selection,
+        registry=registry,
+    )
+    assert status is not None
+    request = status.decision_request
+    assert request is not None
+    result = DecisionResult.for_request(
+        result_id="drukhari-test:hatred-shape-grant-result",
+        request=request,
+        selected_option_id=army_rule.HATRED_ETERNAL_SHOOTING_HOOK_ID,
+    )
+    result_payload = result.payload
+    assert isinstance(result_payload, dict)
+    selected_grants = result_payload["selected_shooting_unit_grants"]
+    assert isinstance(selected_grants, list)
+    selected_grant = selected_grants[0]
+    assert isinstance(selected_grant, dict)
+
+    wrong_type_request = DecisionRequest(
+        request_id=request.request_id,
+        decision_type="drukhari-test:wrong-decision-type",
+        actor_id=request.actor_id,
+        payload=request.payload,
+        options=request.options,
+    )
+    with pytest.raises(GameLifecycleError, match="unsupported decision_type"):
+        handler.invalid_shooting_unit_selected_grant_status(
+            state=state,
+            request=wrong_type_request,
+            result=result,
+        )
+
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+    )
+    invalid = handler.invalid_shooting_unit_selected_grant_status(
+        state=state,
+        request=request,
+        result=result,
+    )
+    assert invalid is not None
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    state.shooting_phase_state = selected_state
+
+    wrong_actor = DecisionResult(
+        result_id=result.result_id,
+        request_id=result.request_id,
+        decision_type=result.decision_type,
+        actor_id="player-b",
+        selected_option_id=result.selected_option_id,
+        payload=result.payload,
+    )
+    with pytest.raises(GameLifecycleError, match="actor must be the active player"):
+        handler.apply_decision(state=state, result=wrong_actor, decisions=decisions)
+
+    for drifted_payload in (
+        {**result_payload, "unit_instance_id": "drukhari-test:wrong-unit"},
+        {**result_payload, "source_decision_request_id": "drukhari-test:wrong-request"},
+        {
+            key: value
+            for key, value in result_payload.items()
+            if key != "selected_shooting_unit_grants"
+        },
+        {**result_payload, "selected_shooting_unit_grants": [None]},
+        {**result_payload, "selected_shooting_unit_grants": []},
+        {
+            **result_payload,
+            "selected_shooting_unit_grants": [
+                {**selected_grant, "hook_id": "drukhari-test:unavailable-grant"}
+            ],
+        },
+    ):
+        drifted = DecisionResult(
+            result_id=result.result_id,
+            request_id=result.request_id,
+            decision_type=result.decision_type,
+            actor_id=result.actor_id,
+            selected_option_id=result.selected_option_id,
+            payload=validate_json_value(drifted_payload),
+        )
+        invalid = handler.invalid_shooting_unit_selected_grant_status(
+            state=state,
+            request=request,
+            result=drifted,
+        )
+        assert invalid is not None
+        assert invalid.status_kind is LifecycleStatusKind.INVALID
+
+    assert pain_tokens_available(state, player_id="player-a") == 1
+
+
+def test_hatred_eternal_grant_decline_spends_no_pain_token() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_hatred_eternal_ability(),),
+    )
+    unit = _unit_for_player(state, player_id="player-a")
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:hatred-decline-token",
+    )
+    decisions = DecisionController()
+    selection = ShootingUnitSelection(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+        request_id="drukhari-test:hatred-decline-selection-request",
+        result_id="drukhari-test:hatred-decline-selection-result",
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+    ).with_unit_selection(selection)
+    registry = ShootingUnitSelectedGrantRegistry.from_bindings(
+        army_rule.runtime_contribution().shooting_unit_selected_grant_hook_bindings
+    )
+    handler = _shooting_phase_handler(registry)
+    status = _request_shooting_unit_selected_grant_decision_if_available(
+        state=state,
+        decisions=decisions,
+        selection=selection,
+        registry=registry,
+    )
+    assert status is not None
+    request = status.decision_request
+    assert request is not None
+    result = DecisionResult.for_request(
+        result_id="drukhari-test:hatred-decline-grant-result",
+        request=request,
+        selected_option_id=DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID,
+    )
+
+    invalid = handler.invalid_shooting_unit_selected_grant_status(
+        state=state,
+        request=request,
+        result=result,
+    )
+    assert invalid is None
+    assert handler.apply_decision(state=state, result=result, decisions=decisions) is None
+    assert pain_tokens_available(state, player_id="player-a") == 1
+    assert (
+        source_backed_reroll_permission_for_unit(
+            state=state,
+            player_id="player-a",
+            unit_instance_id=unit.unit_instance_id,
+            roll_type="attack_sequence.hit",
+            timing_window="attack_sequence.hit",
+        )
+        is None
+    )
+
+
+def test_hatred_eternal_decline_rejects_selected_grant_payload() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_hatred_eternal_ability(),),
+    )
+    unit = _unit_for_player(state, player_id="player-a")
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:hatred-decline-drift-token",
+    )
+    decisions = DecisionController()
+    selection = ShootingUnitSelection(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+        request_id="drukhari-test:hatred-decline-drift-selection-request",
+        result_id="drukhari-test:hatred-decline-drift-selection-result",
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+    ).with_unit_selection(selection)
+    registry = ShootingUnitSelectedGrantRegistry.from_bindings(
+        army_rule.runtime_contribution().shooting_unit_selected_grant_hook_bindings
+    )
+    status = _request_shooting_unit_selected_grant_decision_if_available(
+        state=state,
+        decisions=decisions,
+        selection=selection,
+        registry=registry,
+    )
+    assert status is not None
+    request = status.decision_request
+    assert request is not None
+    grant_payload = request.option_by_id(army_rule.HATRED_ETERNAL_SHOOTING_HOOK_ID).payload
+    assert isinstance(grant_payload, dict)
+    selected_grants = grant_payload["selected_shooting_unit_grants"]
+    assert isinstance(selected_grants, list)
+    decline = DecisionResult.for_request(
+        result_id="drukhari-test:hatred-decline-drift-result",
+        request=request,
+        selected_option_id=DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID,
+    )
+    decline_payload = decline.payload
+    assert isinstance(decline_payload, dict)
+    drifted_payload = dict(decline_payload)
+    drifted_payload["selected_shooting_unit_grants"] = selected_grants
+    drifted_decline = DecisionResult(
+        result_id=decline.result_id,
+        request_id=decline.request_id,
+        decision_type=decline.decision_type,
+        actor_id=decline.actor_id,
+        selected_option_id=decline.selected_option_id,
+        payload=validate_json_value(drifted_payload),
+    )
+    invalid = _shooting_phase_handler(registry).invalid_shooting_unit_selected_grant_status(
+        state=state,
+        request=request,
+        result=drifted_decline,
+    )
+
+    assert invalid is not None
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert pain_tokens_available(state, player_id="player-a") == 1
+
+
+def test_selected_to_shoot_grant_effect_recording_validates_unit_effect_payload() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    unit = _unit_for_player(state, player_id="player-a")
+    target_unit = _unit_for_player(state, player_id="player-b")
+    selection = ShootingUnitSelection(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+        request_id="drukhari-test:effect-selection-request",
+        result_id="drukhari-test:effect-selection-result",
+    )
+
+    def record_grant(
+        *,
+        grant_id: str,
+        unit_effect_payload: JsonValue,
+        unit_effect_expiration: str,
+    ) -> PersistingEffect:
+        effects = _record_shooting_unit_selected_grant_effects(
+            state=state,
+            result=DecisionResult(
+                result_id=f"drukhari-test:{grant_id}-result",
+                request_id=f"drukhari-test:{grant_id}-request",
+                decision_type=SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
+                actor_id="player-a",
+                selected_option_id=f"drukhari-test:{grant_id}",
+                payload={"submission_kind": SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE},
+            ),
+            selection=selection,
+            grant=ShootingUnitSelectedGrant(
+                hook_id=f"drukhari-test:{grant_id}",
+                source_id=f"drukhari-test:{grant_id}-source",
+                label=f"Grant {grant_id}",
+                unit_effect_payload=unit_effect_payload,
+                unit_effect_expiration=unit_effect_expiration,
+            ),
+        )
+        assert len(effects) == 1
+        return effects[0]
+
+    string_payload_effect = record_grant(
+        grant_id="string-effect",
+        unit_effect_payload="drukhari-test:string-effect",
+        unit_effect_expiration="end_phase",
+    )
+    assert string_payload_effect.target_unit_instance_ids == (unit.unit_instance_id,)
+
+    targetless_payload_effect = record_grant(
+        grant_id="targetless-effect",
+        unit_effect_payload={"effect_kind": "drukhari-test:targetless-effect"},
+        unit_effect_expiration="end_phase",
+    )
+    assert targetless_payload_effect.target_unit_instance_ids == (unit.unit_instance_id,)
+
+    end_turn_effect = record_grant(
+        grant_id="end-turn-effect",
+        unit_effect_payload={
+            "effect_kind": "drukhari-test:end-turn-effect",
+            "target_unit_instance_ids": [target_unit.unit_instance_id],
+        },
+        unit_effect_expiration="end_turn",
+    )
+    assert end_turn_effect.target_unit_instance_ids == (target_unit.unit_instance_id,)
+    assert end_turn_effect.expiration.expiration_kind.value == "end_turn"
+
+    bad_cases: tuple[tuple[JsonValue, str], ...] = (
+        (
+            validate_json_value(
+                {
+                    "effect_kind": "drukhari-test:bad-target-type",
+                    "target_unit_instance_ids": unit.unit_instance_id,
+                }
+            ),
+            "must be a list",
+        ),
+        (
+            validate_json_value(
+                {
+                    "effect_kind": "drukhari-test:empty-targets",
+                    "target_unit_instance_ids": [],
+                }
+            ),
+            "is empty",
+        ),
+        (
+            validate_json_value(
+                {
+                    "effect_kind": "drukhari-test:duplicate-targets",
+                    "target_unit_instance_ids": [unit.unit_instance_id, unit.unit_instance_id],
+                }
+            ),
+            "are duplicated",
+        ),
+    )
+    for bad_payload, message in bad_cases:
+        with pytest.raises(GameLifecycleError, match=message):
+            record_grant(
+                grant_id=f"bad-{message.replace(' ', '-')}",
+                unit_effect_payload=bad_payload,
+                unit_effect_expiration="end_phase",
+            )
+
+    with pytest.raises(GameLifecycleError, match="no effect to record"):
+        _record_shooting_unit_selected_grant_effects(
+            state=state,
+            result=DecisionResult(
+                result_id="drukhari-test:no-effect-result",
+                request_id="drukhari-test:no-effect-request",
+                decision_type=SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
+                actor_id="player-a",
+                selected_option_id="drukhari-test:no-effect",
+                payload={"submission_kind": SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE},
+            ),
+            selection=selection,
+            grant=ShootingUnitSelectedGrant(
+                hook_id="drukhari-test:no-effect",
+                source_id="drukhari-test:no-effect-source",
+                label="No effect",
+            ),
+        )
+
+
+def test_hatred_eternal_hit_reroll_uses_attack_sequence_dice_reroll_request() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    _mark_player_as_drukhari(
+        state,
+        player_id="player-a",
+        datasheet_abilities=(_hatred_eternal_ability(),),
+    )
+    unit = _unit_for_player(state, player_id="player-a")
+    state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=PAIN_TOKEN_RESOURCE_KIND,
+        amount=1,
+        source_id="drukhari-test:hatred-attack-token",
+    )
+    grant = army_rule.hatred_eternal_shooting_unit_selected_grant(
+        ShootingUnitSelectedContext(
+            state=state,
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            request_id="drukhari-test:hatred-attack-selection-request",
+            result_id="drukhari-test:hatred-attack-selection-result",
+        )
+    )
+    assert grant is not None
+    _record_shooting_unit_selected_grant_effects(
+        state=state,
+        result=DecisionResult(
+            result_id="drukhari-test:hatred-attack-grant-result",
+            request_id="drukhari-test:hatred-attack-grant-request",
+            decision_type=SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
+            actor_id="player-a",
+            selected_option_id=grant.hook_id,
+            payload=validate_json_value(grant.to_payload()),
+        ),
+        selection=ShootingUnitSelection(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            request_id="drukhari-test:hatred-attack-selection-request",
+            result_id="drukhari-test:hatred-attack-selection-result",
+        ),
+        grant=grant,
+    )
+    decisions = DecisionController()
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    roll_state = manager.roll_fixed(
+        attack_sequence_hit_roll_spec(
+            weapon_profile_id="drukhari-test-splinter-rifle",
+            attack_context_id="drukhari-test:attack-context",
+            attacker_player_id="player-a",
+        ),
+        [2],
+    )
+
+    status = _request_source_backed_hit_reroll_if_available(
+        state=state,
+        decisions=decisions,
+        roll_state=roll_state,
+        attacking_unit_instance_id=unit.unit_instance_id,
+        attack_context_id="drukhari-test:attack-context",
+        source_phase=BattlePhase.SHOOTING,
+        weapon_profile_id="drukhari-test-splinter-rifle",
+    )
+
+    assert status is not None
+    request = status.decision_request
+    assert request is not None
+    assert request.decision_type == DICE_REROLL_DECISION_TYPE
+    payload = request.payload
+    assert isinstance(payload, dict)
+    permission_payload = payload["permission"]
+    assert isinstance(permission_payload, dict)
+    source_id = permission_payload["source_id"]
+    assert isinstance(source_id, str)
+    assert source_id.startswith(SOURCE_RULE_ID)
+
+    decline = DecisionResult.for_request(
+        result_id="drukhari-test:hatred-reroll-decline",
+        request=request,
+        selected_option_id="decline",
+    )
+    decisions.submit_result(decline)
+    repeated_status = _request_source_backed_hit_reroll_if_available(
+        state=state,
+        decisions=decisions,
+        roll_state=roll_state,
+        attacking_unit_instance_id=unit.unit_instance_id,
+        attack_context_id="drukhari-test:attack-context",
+        source_phase=BattlePhase.SHOOTING,
+        weapon_profile_id="drukhari-test-splinter-rifle",
+    )
+
+    assert repeated_status is None
+
+
+def test_hatred_eternal_hit_reroll_request_ignores_ineligible_contexts() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    unit = _unit_for_player(state, player_id="player-a")
+    decisions = DecisionController()
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    roll_state = manager.roll_fixed(
+        attack_sequence_hit_roll_spec(
+            weapon_profile_id="drukhari-test-splinter-rifle",
+            attack_context_id="drukhari-test:ineligible-attack-context",
+            attacker_player_id="player-a",
+        ),
+        [2],
+    )
+
+    assert (
+        _request_source_backed_hit_reroll_if_available(
+            state=state,
+            decisions=decisions,
+            roll_state=None,
+            attacking_unit_instance_id=unit.unit_instance_id,
+            attack_context_id="drukhari-test:ineligible-attack-context",
+            source_phase=BattlePhase.SHOOTING,
+            weapon_profile_id="drukhari-test-splinter-rifle",
+        )
+        is None
+    )
+    assert (
+        _request_source_backed_hit_reroll_if_available(
+            state=state,
+            decisions=decisions,
+            roll_state=roll_state,
+            attacking_unit_instance_id=unit.unit_instance_id,
+            attack_context_id="drukhari-test:ineligible-attack-context",
+            source_phase=BattlePhase.FIGHT,
+            weapon_profile_id="drukhari-test-splinter-rifle",
+        )
+        is None
+    )
+    assert (
+        _request_source_backed_hit_reroll_if_available(
+            state=state,
+            decisions=decisions,
+            roll_state=roll_state,
+            attacking_unit_instance_id=unit.unit_instance_id,
+            attack_context_id="drukhari-test:ineligible-attack-context",
+            source_phase=BattlePhase.SHOOTING,
+            weapon_profile_id="drukhari-test-splinter-rifle",
+        )
+        is None
+    )
+
+    forbidden_spec = replace(
+        roll_state.original_result.spec,
+        reroll_forbidden_rule_ids=("drukhari-test:forbidden-hit-reroll",),
+    )
+    forbidden_state = replace(
+        roll_state,
+        original_result=replace(roll_state.original_result, spec=forbidden_spec),
+    )
+    assert (
+        _request_source_backed_hit_reroll_if_available(
+            state=state,
+            decisions=decisions,
+            roll_state=forbidden_state,
+            attacking_unit_instance_id=unit.unit_instance_id,
+            attack_context_id="drukhari-test:ineligible-attack-context",
+            source_phase=BattlePhase.SHOOTING,
+            weapon_profile_id="drukhari-test-splinter-rifle",
+        )
+        is None
+    )
+
+    no_actor_spec = replace(roll_state.original_result.spec, actor_id=None)
+    no_actor_state = replace(
+        roll_state,
+        original_result=replace(roll_state.original_result, spec=no_actor_spec),
+    )
+    assert (
+        _request_source_backed_hit_reroll_if_available(
+            state=state,
+            decisions=decisions,
+            roll_state=no_actor_state,
+            attacking_unit_instance_id=unit.unit_instance_id,
+            attack_context_id="drukhari-test:ineligible-attack-context",
+            source_phase=BattlePhase.SHOOTING,
+            weapon_profile_id="drukhari-test-splinter-rifle",
+        )
+        is None
+    )
+
+
+def test_source_backed_hit_reroll_replay_guard_is_fail_fast_for_malformed_payload() -> None:
+    decisions = DecisionController()
+    malformed_request = DecisionRequest(
+        request_id="drukhari-test:malformed-reroll-request",
+        decision_type=DICE_REROLL_DECISION_TYPE,
+        actor_id="player-a",
+        payload=None,
+        options=(
+            DecisionOption(
+                option_id="decline",
+                label="Decline",
+                payload={"submission_kind": "decline"},
+            ),
+        ),
+    )
+    decisions.request_decision(malformed_request)
+    decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="drukhari-test:malformed-reroll-result",
+            request=malformed_request,
+            selected_option_id="decline",
+        )
+    )
+
+    with pytest.raises(GameLifecycleError, match="payload must be an object"):
+        _source_backed_reroll_already_answered(
+            decisions=decisions,
+            roll_id="drukhari-test:roll",
+            source_id=SOURCE_RULE_ID,
+        )
+
+    decisions = DecisionController()
+    non_matching_request = DecisionRequest(
+        request_id="drukhari-test:non-matching-reroll-request",
+        decision_type=DICE_REROLL_DECISION_TYPE,
+        actor_id="player-a",
+        payload={
+            "roll_id": "drukhari-test:roll",
+            "permission": None,
+        },
+        options=(
+            DecisionOption(
+                option_id="decline",
+                label="Decline",
+                payload={"submission_kind": "decline"},
+            ),
+        ),
+    )
+    decisions.request_decision(non_matching_request)
+    decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="drukhari-test:non-matching-reroll-result",
+            request=non_matching_request,
+            selected_option_id="decline",
+        )
+    )
+
+    assert not _source_backed_reroll_already_answered(
+        decisions=decisions,
+        roll_id="drukhari-test:roll",
+        source_id=SOURCE_RULE_ID,
+    )
 
 
 def test_drukhari_advance_roll_permission_requires_lithe_agility_empowerment() -> None:
@@ -1656,6 +2662,18 @@ def _unit_for_player(state: GameState, *, player_id: str) -> UnitInstance:
 
 def _set_current_battle_phase(state: GameState, phase: BattlePhase) -> None:
     state.battle_phase_index = state.battle_phase_sequence.index(phase)
+
+
+def _shooting_phase_handler(
+    registry: ShootingUnitSelectedGrantRegistry,
+) -> ShootingPhaseHandler:
+    return ShootingPhaseHandler(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="core-v2-phase17g-drukhari-test"
+        ),
+        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+        shooting_unit_selected_grant_hooks=registry,
+    )
 
 
 def _lithe_agility_ability() -> DatasheetAbilityDescriptor:

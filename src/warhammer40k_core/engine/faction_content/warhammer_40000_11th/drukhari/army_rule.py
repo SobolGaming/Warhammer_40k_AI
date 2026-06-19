@@ -24,10 +24,12 @@ from warhammer40k_core.engine.event_log import EventRecord, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.drukhari.power_from_pain import (
     DRUKHARI_FACTION_ID,
+    HATRED_ETERNAL_ABILITY_KEY,
     LITHE_AGILITY_ABILITY_KEY,
     PAIN_TOKEN_RESOURCE_KIND,
     SOURCE_RULE_ID,
     drukhari_rules_unit_can_empower_for_ability,
+    hatred_eternal_hit_reroll_permission,
     lithe_agility_advance_reroll_permission,
     lithe_agility_charge_reroll_permission,
     pain_token_spend_effect_payload,
@@ -37,6 +39,11 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.drukhari.powe
 )
 from warhammer40k_core.engine.faction_resources import FactionResourceStatus
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.shooting_unit_selected_hooks import (
+    ShootingUnitSelectedContext,
+    ShootingUnitSelectedGrant,
+    ShootingUnitSelectedGrantBinding,
+)
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     UnitDestroyedContext,
     UnitDestroyedHookBinding,
@@ -46,6 +53,7 @@ CONTRIBUTION_ID = "warhammer_40000_11th:drukhari:army_rule:scaffold"
 HOOK_ID = "warhammer_40000_11th:drukhari:army_rule:power_from_pain"
 LITHE_AGILITY_ADVANCE_HOOK_ID = f"{HOOK_ID}:lithe-agility-advance"
 LITHE_AGILITY_CHARGE_HOOK_ID = f"{HOOK_ID}:lithe-agility-charge"
+HATRED_ETERNAL_SHOOTING_HOOK_ID = f"{HOOK_ID}:hatred-eternal-shooting"
 
 
 def runtime_contribution() -> RuntimeContentContribution:
@@ -63,6 +71,13 @@ def runtime_contribution() -> RuntimeContentContribution:
                 hook_id=LITHE_AGILITY_CHARGE_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 handler=lithe_agility_charge_declaration_grant,
+            ),
+        ),
+        shooting_unit_selected_grant_hook_bindings=(
+            ShootingUnitSelectedGrantBinding(
+                hook_id=HATRED_ETERNAL_SHOOTING_HOOK_ID,
+                source_id=SOURCE_RULE_ID,
+                handler=hatred_eternal_shooting_unit_selected_grant,
             ),
         ),
         command_phase_start_hook_bindings=(
@@ -86,6 +101,51 @@ def runtime_contribution() -> RuntimeContentContribution:
                 handler=resolve_enemy_unit_destroyed,
             ),
         ),
+    )
+
+
+def hatred_eternal_shooting_unit_selected_grant(
+    context: ShootingUnitSelectedContext,
+) -> ShootingUnitSelectedGrant | None:
+    if type(context) is not ShootingUnitSelectedContext:
+        raise GameLifecycleError("Power from Pain Hatred Eternal requires selected unit context.")
+    if not _hatred_eternal_empowerment_available(
+        state=context.state,
+        player_id=context.player_id,
+        unit_instance_id=context.unit_instance_id,
+    ):
+        return None
+    return ShootingUnitSelectedGrant(
+        hook_id=HATRED_ETERNAL_SHOOTING_HOOK_ID,
+        source_id=SOURCE_RULE_ID,
+        label="Power from Pain: Hatred Eternal",
+        replay_payload={
+            "trigger": "selected_to_shoot",
+            "unit_instance_id": context.unit_instance_id,
+            "selection_request_id": context.request_id,
+            "selection_result_id": context.result_id,
+        },
+        decision_effect_payload=pain_token_spend_effect_payload(),
+        unit_effect_payload=power_from_pain_reroll_permission_effect_payload(
+            unit_instance_id=context.unit_instance_id,
+            target_unit_instance_ids=power_from_pain_target_unit_ids(
+                context.state,
+                unit_instance_id=context.unit_instance_id,
+            ),
+            trigger="selected_to_shoot",
+            phase=BattlePhaseKind.SHOOTING,
+            pain_ability_keys=(HATRED_ETERNAL_ABILITY_KEY,),
+            permission=hatred_eternal_hit_reroll_permission(
+                state=context.state,
+                player_id=context.player_id,
+                unit_instance_id=context.unit_instance_id,
+            ),
+            source_context={
+                "selection_request_id": context.request_id,
+                "selection_result_id": context.result_id,
+            },
+        ),
+        unit_effect_expiration="end_phase",
     )
 
 
@@ -193,6 +253,22 @@ def _lithe_agility_empowerment_available(
         player_id=player_id,
         unit_instance_id=unit_instance_id,
         pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
+    )
+
+
+def _hatred_eternal_empowerment_available(
+    *,
+    state: object,
+    player_id: str,
+    unit_instance_id: str,
+) -> bool:
+    if pain_tokens_available(state, player_id=player_id) <= 0:
+        return False
+    return drukhari_rules_unit_can_empower_for_ability(
+        state,
+        player_id=player_id,
+        unit_instance_id=unit_instance_id,
+        pain_ability_key=HATRED_ETERNAL_ABILITY_KEY,
     )
 
 
