@@ -42,6 +42,14 @@ Core keyword ability rows are still primarily surfaced through source-backed cat
 | Deep Strike | Reserve declaration and placement hosts | Adapter contract and architecture | Focused reserve/deployment tests | Full | Current generated rows are `engine_consumed`. |
 | Other Core Rules keyword abilities | Mixed phase-owned hosts or explicit unsupported descriptors | Architecture and source-row unsupported audits | Coverage varies by keyword | Partial | Keep expanded per-keyword rows separate from wargear keyword abilities. |
 
+## Core Terrain And Visibility
+
+Terrain visibility behavior is source-backed through the ruleset descriptor and consumed by Shooting target selection and declaration validation.
+
+| Subject | Engine support | Documentation | Tests | Overall | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Hidden and Detection Range | Terrain visibility policy plus Shooting target detection gate | Architecture and adapter contract | Ruleset descriptor, Shooting target, and Path of the Outcast tests | Full | The 11th Edition descriptor enables Hidden with a 15 inch detection range, terrain-area and keyword requirements, and hidden-status loss after ranged attacks; detection modifiers are consumed from engine-owned persisting effects. |
+
 ## Wargear Keyword Abilities
 
 Weapon and wargear keyword abilities are normalized into `WeaponKeyword` values or structured `AbilityDescriptor` records. Runtime code consumes these structured fields and does not parse raw rule text.
@@ -91,7 +99,7 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | Death Guard - Nurgle's Gift | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes contagion modifiers for supported characteristics and rolls. |
 | World Eaters - Blessings of Khorne | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes battle-round selection and supported blessing effects. |
 | Emperor's Children - Thrill Seekers | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes movement, charge, and shooting target restrictions. |
-| Drukhari - Power from Pain | Named army-rule handler plus faction-resource ledger | README, faction integration note, adapter contract, and generated matrix | Focused faction runtime tests | Full | Implements Pain token gain at own Command phase start, enemy unit destruction, and enemy Battle-shock failure, plus optional Lithe Agility empowerment for Advance and Charge rerolls and Hatred Eternal selected-to-shoot/selected-to-fight empowerment for attack hit rerolls. |
+| Drukhari - Power from Pain | Named army-rule handler plus faction-resource ledger | README, faction integration note, adapter contract, and generated matrix | Focused faction runtime tests | Partial | Implements Pain token gain at own Command phase start, enemy unit destruction, and enemy Battle-shock failure, plus optional Lithe Agility empowerment for Advance and Charge rerolls. Hatred Eternal attack hit-reroll empowerment still requires a source-backed selected-to-shoot/fight grant surface. |
 | Drukhari - Corsairs and Travelling Players | Shared mustering/list-validation host | README, faction integration note, and generated matrix | Focused mustering tests | Full | Allows non-DRUKHARI HARLEQUINS and ANHRATHE allies under Incursion, Strike Force, and Onslaught caps; forbids allied Warlords and Enhancements. No player-facing decision or phase runtime hook is introduced. |
 
 ## Detachment Rules
@@ -114,7 +122,7 @@ Detachment rule support is source-row complete, but semantic engine support is o
 | Orks | War Horde | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
 | Aeldari | Armoured Warhost | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
 | Aeldari | Fateful Performance | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
-| Aeldari | Path of the Outcast | Far-reaching Doom shooting-unit-selected hook | Source row, execution record, and generated matrix | Focused hook, lifecycle, and hidden-target detection tests | Full | Runtime grants the 6 inch detection-range effect and expires it after the source shoots. |
+| Aeldari | Path of the Outcast | Far-reaching Doom shooting-unit-selected hook | Source row, execution record, and generated matrix | Focused hook, lifecycle, and hidden-target detection tests | Full | Runtime grants the +6 inch detection-range effect over the 11th Edition 15 inch Hidden baseline and expires it after the source shoots. |
 | Aeldari | Twilight Flickers | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
 | Aeldari | Aspect Host | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
 | Aeldari | Corsair Coterie | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
@@ -373,6 +381,7 @@ Faction Stratagems are distinct from Core Stratagems and should remain faction-s
 
 | Subject | Engine support | Documentation | Tests | Overall | Notes |
 | --- | --- | --- | --- | --- | --- |
+| Aeldari - Path of the Outcast Stratagems | Named post-shooting Stratagem handlers | Adapter contract, architecture, and generated matrix | Focused CP, targeting, Battle-shock, detection, and movement tests | Full | Includes Eldritch Suppression, Casting Back the Veil, and Nomads of the Hidden Way through the shared `use_stratagem` and triggered movement paths. |
 | Faction-pack Stratagems | Coverage/report rows exist; semantic handlers vary | Architecture and coverage reports | Faction-specific tests where implemented | Partial | Future generator work should group rows by faction, detachment, and Stratagem. |
 
 ## Enhancements
@@ -381,6 +390,7 @@ Enhancement support should be tracked under each faction and detachment.
 
 | Subject | Engine support | Documentation | Tests | Overall | Notes |
 | --- | --- | --- | --- | --- | --- |
+| Aeldari - Path of the Outcast Upgrades | Enhancement effect bindings | Architecture and generated matrix | Focused eligibility, hidden-preservation, and CHARACTER AP tests | Full | Includes Camouflaged Snipers preserving Hidden after ranged attacks and Assassins' Eye applying +1 AP against CHARACTER targets. |
 | Faction-pack Enhancements | Coverage/report rows exist; semantic handlers vary | Architecture and coverage reports | Faction-specific tests where implemented | Partial | Future generator work should group rows by faction, detachment, and enhancement. |
 
 ## Datasheet Abilities

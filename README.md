@@ -166,8 +166,12 @@ Current status:
   rule IR, generic rule execution, and adapter decision submission is in place.
 - Faction semantic execution is active incremental work. Current runtime
   support includes selected Chaos Daemons, Aeldari, and Death Guard Phase 17G
-  slices; broad datasheet, wargear, weapon, and remaining faction execution
-  remains later Phase 17 work.
+  slices. Aeldari Path of the Outcast supports Far-reaching Doom,
+  Camouflaged Snipers, Assassins' Eye, Eldritch Suppression, Casting Back the
+  Veil, and Nomads of the Hidden Way through the shared Shooting, Stratagem,
+  Battle-shock, Hidden/detection, and triggered-movement paths; broad
+  datasheet, wargear, weapon, and remaining faction execution remains later
+  Phase 17 work.
 - Matched-play mustering supports Incursion, Strike Force, and Onslaught battle
   sizes, including the Drukhari `Corsairs and Travelling Players` ally rule for
   HARLEQUINS and ANHRATHE units.

@@ -425,6 +425,16 @@ the approved blocker.
 | Stratagem descriptors | 15 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
+Runtime addendum: `Path of the Outcast` is implemented as a Phase 17G semantic
+slice. Far-reaching Doom grants the +6 inch detection-range effect over the
+11th Edition Hidden baseline until the selected RANGERS/SHROUD RUNNERS unit has
+shot. Camouflaged Snipers preserves Hidden after ranged attacks, Assassins' Eye
+adds AP against CHARACTER targets, Eldritch Suppression forces source-linked
+Battle-shock, Casting Back the Veil applies the persistent detection-range
+bonus to a hit enemy unit, and Nomads of the Hidden Way records its charge and
+TRANSPORT embark restrictions before emitting the shared triggered-movement
+decision path.
+
 ### Drukhari Execution Status
 
 | Covered item family | Rows | Execution status | Engine result | Source block |

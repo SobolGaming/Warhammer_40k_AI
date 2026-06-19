@@ -578,7 +578,7 @@ def test_casting_back_the_veil_applies_detection_effect_to_hit_enemy() -> None:
 
 
 def test_detection_range_effect_makes_hidden_target_legal_for_shooting() -> None:
-    state, _army, rangers, _shroud_runners, _enemy = _path_state()
+    state, _army, rangers, _shroud_runners, _enemy = _path_state(enemy_x=18.0)
     state.record_persisting_effect(
         _hidden_effect(effect_id="hidden:enemy", target_id=_ENEMY_UNIT_ID)
     )
@@ -586,7 +586,7 @@ def test_detection_range_effect_makes_hidden_target_legal_for_shooting() -> None
         armies=tuple(state.army_definitions),
         battlefield_state=_battlefield_state(state),
     )
-    ruleset = _ruleset_with_hidden_detection()
+    ruleset = RulesetDescriptor.warhammer_40000_eleventh()
     profile = _test_weapon_profile(ap=0)
 
     without_bonus = shooting_target_candidate_for_model(
@@ -641,7 +641,7 @@ def test_detection_range_effect_makes_hidden_target_legal_for_shooting() -> None
 
 
 def test_far_reaching_doom_detection_effect_makes_hidden_target_legal_until_source_shoots() -> None:
-    state, _army, rangers, _shroud_runners, _enemy = _path_state()
+    state, _army, rangers, _shroud_runners, _enemy = _path_state(enemy_x=18.0)
     state.record_persisting_effect(
         _hidden_effect(effect_id="hidden:enemy", target_id=_ENEMY_UNIT_ID)
     )
@@ -663,7 +663,7 @@ def test_far_reaching_doom_detection_effect_makes_hidden_target_legal_until_sour
 
     candidate = shooting_target_candidate_for_model(
         scenario=scenario,
-        ruleset_descriptor=_ruleset_with_hidden_detection(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         attacker_unit=rangers,
         attacker_model_instance_id=rangers.own_models[0].model_instance_id,
         weapon_profile=_test_weapon_profile(ap=0),
@@ -1181,6 +1181,7 @@ def _battlefield_state(state: GameState) -> BattlefieldRuntimeState:
 def _path_state(
     *,
     enhancement_assignments: tuple[EnhancementAssignment, ...] = (),
+    enemy_x: float = 12.0,
 ) -> tuple[GameState, ArmyDefinition, UnitInstance, UnitInstance, UnitInstance]:
     ruleset = RulesetDescriptor.warhammer_40000_eleventh()
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
@@ -1262,7 +1263,7 @@ def _path_state(
                 PlacedArmy(
                     army_id="army-b",
                     player_id="player-b",
-                    unit_placements=(_unit_placement("army-b", "player-b", enemy, x=12.0),),
+                    unit_placements=(_unit_placement("army-b", "player-b", enemy, x=enemy_x),),
                 ),
             ),
         ),

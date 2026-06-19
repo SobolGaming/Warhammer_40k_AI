@@ -115,9 +115,15 @@ def test_eleventh_migration_baseline_has_explicit_policy_data() -> None:
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     normal_move = descriptor.movement_policy.policy_for_mode(MovementMode.NORMAL)
     take_to_the_skies = descriptor.movement_policy.policy_for_mode(MovementMode.FLY_TAKE_TO_SKIES)
+    terrain_visibility_policy = descriptor.terrain_visibility_policy
 
     assert descriptor.engagement_policy.horizontal_inches == 2.0
     assert descriptor.engagement_policy.vertical_inches == 5.0
+    assert terrain_visibility_policy.hidden_supported
+    assert terrain_visibility_policy.hidden_detection_range_inches == 15.0
+    assert terrain_visibility_policy.hidden_requires_keywords == ("BEAST", "INFANTRY", "SWARM")
+    assert terrain_visibility_policy.hidden_requires_terrain_area_occupancy
+    assert terrain_visibility_policy.hidden_lost_after_shooting
     assert not normal_move.may_transit_enemy_engagement
     assert descriptor.objective_policy.supported_anchor_kinds == (
         ObjectiveAnchorKind.POINT,
