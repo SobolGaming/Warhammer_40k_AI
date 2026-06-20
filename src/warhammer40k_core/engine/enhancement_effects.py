@@ -41,6 +41,15 @@ class EnhancementPersistingEffectGrantPayload(TypedDict):
     replay_payload: JsonValue
 
 
+class EnhancementUnitKeywordGrantPayload(TypedDict):
+    effect_id: str
+    source_id: str
+    enhancement_id: str
+    target_unit_instance_id: str
+    keyword: str
+    replay_payload: JsonValue
+
+
 type EnhancementEffectHandler = Callable[
     ["EnhancementEffectContext"],
     tuple[object, ...],
@@ -171,6 +180,42 @@ class EnhancementPersistingEffectGrant:
 
 
 @dataclass(frozen=True, slots=True)
+class EnhancementUnitKeywordGrant:
+    effect_id: str
+    source_id: str
+    enhancement_id: str
+    target_unit_instance_id: str
+    keyword: str
+    replay_payload: JsonValue = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "effect_id", _validate_identifier("effect_id", self.effect_id))
+        object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
+        object.__setattr__(
+            self,
+            "enhancement_id",
+            _validate_identifier("enhancement_id", self.enhancement_id),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier("target_unit_instance_id", self.target_unit_instance_id),
+        )
+        object.__setattr__(self, "keyword", _validate_identifier("keyword", self.keyword))
+        object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
+
+    def to_payload(self) -> EnhancementUnitKeywordGrantPayload:
+        return {
+            "effect_id": self.effect_id,
+            "source_id": self.source_id,
+            "enhancement_id": self.enhancement_id,
+            "target_unit_instance_id": self.target_unit_instance_id,
+            "keyword": self.keyword,
+            "replay_payload": self.replay_payload,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class EnhancementEffectBinding:
     effect_id: str
     source_id: str
@@ -190,7 +235,9 @@ class EnhancementEffectBinding:
 
 
 def _enhancement_effect_sort_key(
-    effect: EnhancementCharacteristicModifier | EnhancementPersistingEffectGrant,
+    effect: EnhancementCharacteristicModifier
+    | EnhancementPersistingEffectGrant
+    | EnhancementUnitKeywordGrant,
 ) -> str:
     return effect.effect_id
 
@@ -219,7 +266,11 @@ class EnhancementEffectRegistry:
     ) -> tuple[object, ...]:
         if type(context) is not EnhancementEffectContext:
             raise GameLifecycleError("Enhancement effects require a context.")
-        effects: list[EnhancementCharacteristicModifier | EnhancementPersistingEffectGrant] = []
+        effects: list[
+            EnhancementCharacteristicModifier
+            | EnhancementPersistingEffectGrant
+            | EnhancementUnitKeywordGrant
+        ] = []
         for binding in self.bindings:
             if binding.enhancement_id != context.assignment.enhancement_id:
                 continue
@@ -229,10 +280,18 @@ class EnhancementEffectRegistry:
             for effect in binding_effects:
                 if type(effect) is EnhancementCharacteristicModifier:
                     supported_effect: (
-                        EnhancementCharacteristicModifier | EnhancementPersistingEffectGrant
+                        EnhancementCharacteristicModifier
+                        | EnhancementPersistingEffectGrant
+                        | EnhancementUnitKeywordGrant
                     ) = effect
-                elif type(effect) is EnhancementPersistingEffectGrant:
-                    supported_effect = effect
+                elif type(effect) in (
+                    EnhancementPersistingEffectGrant,
+                    EnhancementUnitKeywordGrant,
+                ):
+                    supported_effect = cast(
+                        EnhancementPersistingEffectGrant | EnhancementUnitKeywordGrant,
+                        effect,
+                    )
                 else:
                     raise GameLifecycleError(
                         "Enhancement effect handlers must return supported enhancement effects."
@@ -299,6 +358,14 @@ def apply_enhancement_effects(
                         state.record_persisting_effect(effect.persisting_effect)
                         event_payloads.append(cast(dict[str, JsonValue], effect.to_payload()))
                     continue
+                if type(effect) is EnhancementUnitKeywordGrant:
+                    updated_army, payload = _apply_unit_keyword_grant(
+                        army=updated_army,
+                        effect=effect,
+                    )
+                    if payload is not None:
+                        event_payloads.append(payload)
+                    continue
                 raise GameLifecycleError("Enhancement effect application received unknown effect.")
         updated_armies.append(updated_army)
 
@@ -351,6 +418,44 @@ def _apply_characteristic_modifier(
         "army_id": army.army_id,
         "model_modifiers": model_payloads,
     }
+
+
+def _apply_unit_keyword_grant(
+    *,
+    army: ArmyDefinition,
+    effect: EnhancementUnitKeywordGrant,
+) -> tuple[ArmyDefinition, dict[str, JsonValue] | None]:
+    updated_units: list[UnitInstance] = []
+    target_seen = False
+    payload: dict[str, JsonValue] | None = None
+    requested_keyword = _canonical_keyword(effect.keyword)
+    for unit in army.units:
+        if unit.unit_instance_id != effect.target_unit_instance_id:
+            updated_units.append(unit)
+            continue
+        target_seen = True
+        existing = {_canonical_keyword(keyword) for keyword in unit.keywords}
+        if requested_keyword in existing:
+            updated_units.append(unit)
+            continue
+        updated_keywords = tuple(sorted((*unit.keywords, effect.keyword)))
+        updated_units.append(replace(unit, keywords=updated_keywords))
+        payload = {
+            **cast(dict[str, JsonValue], effect.to_payload()),
+            "player_id": army.player_id,
+            "army_id": army.army_id,
+            "before_keywords": list(unit.keywords),
+            "after_keywords": list(updated_keywords),
+        }
+    if not target_seen:
+        raise GameLifecycleError("Enhancement keyword grant target unit is not in the army.")
+    if payload is None:
+        return army, None
+    updated_army = replace(
+        army,
+        units=tuple(sorted(updated_units, key=lambda stored: stored.unit_instance_id)),
+    )
+    return updated_army, payload
 
 
 def _apply_model_characteristic_modifier(
@@ -441,3 +546,7 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"Enhancement effect {field_name} must not be empty.")
     return stripped
+
+
+def _canonical_keyword(value: str) -> str:
+    return value.strip().replace("_", " ").replace("-", " ").upper()

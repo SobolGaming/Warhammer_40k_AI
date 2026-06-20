@@ -951,9 +951,9 @@ Required Phase 16C adapter-contract tests:
 
 ## Phase 17G Setup Faction-Rule Decisions
 
-Phase 17G adds opt-in setup decisions for faction runtime content during Declare Battle Formations. These decisions are emitted only when the mustered army's faction runtime contribution registers a battle-formation hook for the player. The current implemented hook is Death Guard Nurgle's Gift plague selection, updated from the 11th Edition faction-pack `RULES UPDATES` section.
+Phase 17G adds opt-in setup decisions for faction runtime content during Declare Battle Formations. These decisions are emitted only when the mustered army's faction runtime contribution registers a battle-formation hook for the player. The current implemented hooks are Death Guard Nurgle's Gift plague selection, updated from the 11th Edition faction-pack `RULES UPDATES` section, and Aeldari Corsair Coterie Archraider model selection.
 
-Phase 17G exposes the finite decision type `select_faction_rule_setup_option`. The pending request payload contains game ID, setup step `declare_battle_formations`, faction ID, source rule ID, hook ID, and state kind. Adapters answer by selecting one emitted option ID. Current Death Guard options are:
+Phase 17G exposes the finite decision type `select_faction_rule_setup_option`. The pending request payload contains game ID, setup step `declare_battle_formations`, faction ID, source rule ID, hook ID, state kind, and hook-specific target fields such as enhancement ID or target unit ID. Adapters answer by selecting one emitted option ID. Current Death Guard options are:
 
 - `death_guard:nurgles_gift:skullsquirm_blight`;
 - `death_guard:nurgles_gift:rattlejoint_ague`;
@@ -961,7 +961,11 @@ Phase 17G exposes the finite decision type `select_faction_rule_setup_option`. T
 
 Option payloads include `submission_kind: "death_guard_nurgles_gift_plague_selection"`, player ID, faction ID, source rule ID, hook ID, state kind, plague ID, and setup step. Adapters must not invent plague IDs, infer faction ownership from display text, mutate effect state, or apply the selected plague locally.
 
+Current Aeldari Corsair Coterie Archraider options use the form `aeldari:corsair-coterie:archraider:<unit_instance_id>:<model_instance_id>`. Option payloads include `submission_kind: "aeldari_corsair_coterie_archraider_model_selection"`, player ID, source rule ID, hook ID, enhancement ID, assignment source ID, target unit ID, and selected model ID. Adapters must not invent model IDs or mark a Lord of Deceit bearer locally.
+
 Accepted Death Guard selections create a deterministic `FactionRuleState` with state kind `death_guard_nurgles_gift_plague_selection` and emit `death_guard_nurgles_gift_plague_selected`. Later phase/query hosts consume that state with live battlefield evidence: Death Guard models project Contagion Range from live placed Death Guard models only, Contagion Range is capped at 12" after modifiers, Skullsquirm Blight applies only to melee Hit rolls, Rattlejoint Ague worsens armour-save options by 1, and Scabrous Soulrot worsens Move, Leadership, and Objective Control as the rules require. Adapters must render these as engine-derived values, not calculate them from static catalog text.
+
+Accepted Archraider selections create a deterministic `FactionRuleState` with state kind `aeldari_corsair_coterie_archraider_model` and emit `aeldari_corsair_coterie_archraider_model_selected`. Later Stratagem-cost hosts consume that selected live model to decide whether Lord of Deceit can offer an opponent-facing +1CP cost choice. Adapters must render the selected model as engine state and must not calculate the aura or modifier locally.
 
 Malformed, stale, wrong-actor, wrong-step, wrong-faction, duplicate-selection, unsupported-option, and option-payload drift submissions reject before the pending queue is popped and before a `DecisionRecord`, `FactionRuleState`, or event is created.
 
@@ -970,10 +974,61 @@ Faction-rule setup choices are public table setup information in the current Pha
 Required Phase 17G setup faction-rule tests:
 
 - valid faction-rule setup selection through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- valid Corsair Archraider model selection creates replay-safe selected-model state;
 - wrong actor, wrong faction, duplicate selection, malformed payload, and stale option drift reject before mutation;
 - deterministic JSON-safe decision, faction-rule-state, event, lifecycle, and replay payload round-trip;
 - live placed model liveness gates later faction-rule consumers;
 - viewer-scoped projection/event redaction for any future hidden faction-rule setup selections.
+
+## Phase 17G Turn-End Faction-Rule Decisions
+
+Phase 17G adds opt-in turn-end decisions for faction runtime content. These decisions are emitted only when the mustered army's faction runtime contribution registers a turn-end hook and the completed phase matches the hook's timing. The current implemented hook is Aeldari Corsair Coterie Webway Pathstone at the end of the opponent's Fight phase.
+
+Phase 17G exposes the finite decision type `select_faction_rule_turn_end_option`. The pending request payload contains game ID, battle round, active player ID, completed phase, source rule ID, hook ID, enhancement ID, and target unit ID. Adapters answer by selecting one emitted option ID. Current Webway Pathstone options use:
+
+- `aeldari:corsair-coterie:webway-pathstone:<unit_instance_id>:use`;
+- `aeldari:corsair-coterie:webway-pathstone:<unit_instance_id>:decline`.
+
+Option payloads include `submission_kind: "aeldari_corsair_coterie_webway_pathstone_turn_end"`, player ID, source rule ID, hook ID, enhancement ID, target unit ID, and `use_ability`. Adapters must not remove the unit from the battlefield, create a reserve state, or decide reserve eligibility locally.
+
+Accepted use selections validate that the unit is still on the battlefield, not already in reserves, and not within Engagement Range, then remove it from the battlefield and create a Strategic Reserves `ReserveState` with Webway Pathstone source evidence. Accepted decline selections emit a replay-safe decline event and do not mutate battlefield or reserve state. The hook records a used event once per battle for the enhanced unit and does not offer another decision after use.
+
+Malformed, stale, wrong-actor, wrong-phase, wrong-hook, unsupported-option, option-payload drift, already-used, already-in-reserves, unplaced, or Engagement Range submissions reject before unauthorized mutation.
+
+Turn-end faction-rule choices are public table information in the current Phase 17G rules scope. If a future faction rule hides turn-end choices, pending requests, option lists, decision records, reserve states, events, projections, and event deltas must be viewer-scoped and must not leak hidden opponent information through option counts, source context, selected payload, reserve eligibility, or derived engine values.
+
+Required Phase 17G turn-end faction-rule tests:
+
+- valid Webway Pathstone use and decline choices through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- once-per-battle and once-per-turn request gating;
+- Strategic Reserves state and battlefield removal are replay-safe and source-backed;
+- malformed, stale, wrong-context, and ineligible submissions reject before unauthorized mutation;
+- viewer-scoped projection/event redaction for any future hidden turn-end faction-rule selections.
+
+## Phase 17G Stratagem-Cost Modifier Decisions
+
+Phase 17G adds opt-in Stratagem-cost modifier decisions for faction runtime content. These decisions are emitted only after a player submits a Stratagem use or Stratagem target proposal and before the original Stratagem spends CP or mutates game state. The current implemented hook is Aeldari Corsair Coterie Archraider Lord of Deceit.
+
+Phase 17G exposes the finite decision type `select_stratagem_cost_modifier_option`. The pending request payload contains game ID, battle round, active player ID, phase, source rule ID, hook ID, modifier ID, enhancement ID, Stratagem ID, Stratagem player ID, target unit ID, eligible model IDs, source decision request ID, source decision result ID, and a replay-safe copy of the source decision result. Adapters answer by selecting one emitted option ID. Current Lord of Deceit options use:
+
+- `aeldari:corsair-coterie:archraider:<source_decision_result_id>:<target_unit_instance_id>:use`;
+- `aeldari:corsair-coterie:archraider:<source_decision_result_id>:<target_unit_instance_id>:decline`.
+
+Option payloads include `submission_kind: "aeldari_corsair_coterie_lord_of_deceit_cost_choice"`, player ID, source rule ID, hook ID, modifier ID, enhancement ID, target unit ID, source decision request ID, source decision result ID, and `use_ability`. Adapters must not spend CP, alter a Stratagem's cost, or resolve the original Stratagem locally while this decision is pending.
+
+Accepted use selections record a source-result-scoped Lord of Deceit event. The lifecycle then reconstructs and revalidates the original Stratagem decision against the same engine validation path with the Stratagem-cost modifier registry active. If still valid, the original Stratagem spends the modified CP cost, records modifier provenance on the `StratagemUseRecord`, mutates through the normal Stratagem handler, and resumes the original reaction frame. Accepted decline selections record a decline event and resume the original Stratagem without the +1CP modifier.
+
+Malformed, stale, wrong-actor, wrong-hook, unsupported-option, source-request drift, source-result drift, option-payload drift, already-used-this-turn, no eligible selected Archraider model within 12", or wrong-target-owner submissions reject before the original Stratagem mutates.
+
+Stratagem-cost modifier choices are public table information in the current Phase 17G rules scope. If a future cost modifier is hidden, pending requests, source decision result copies, option lists, decision records, Stratagem use records, events, projections, and event deltas must be viewer-scoped and must not leak hidden opponent information through option counts, target IDs, source context, cost provenance, selected payload, or derived engine values.
+
+Required Phase 17G Stratagem-cost modifier tests:
+
+- valid Lord of Deceit use and decline choices through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- source decision result round-trip and original reaction-frame resume;
+- modified CP spend and `StratagemUseRecord` provenance after accepted use;
+- malformed, stale, wrong-context, drifted, already-used, and ineligible submissions reject before unauthorized mutation;
+- viewer-scoped projection/event redaction for any future hidden Stratagem-cost modifier selections.
 
 ## Phase 17G Battle-Round Faction-Rule Decisions
 

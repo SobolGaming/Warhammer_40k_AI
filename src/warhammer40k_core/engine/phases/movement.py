@@ -144,6 +144,7 @@ from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_for_unit,
 )
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 from warhammer40k_core.engine.stratagems import (
     CORE_FIRE_OVERWATCH_HANDLER_ID,
     CORE_RAPID_INGRESS_HANDLER_ID,
@@ -213,6 +214,10 @@ from warhammer40k_core.engine.unit_coherency import (
     unit_placement_coherency_result,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.unit_move_completed_hooks import (
+    UnitMoveCompletedMortalWoundHookRegistry,
+    resolve_unit_move_completed_mortal_wound_hooks,
+)
 from warhammer40k_core.engine.unit_rule_effects import movement_bonus_inches_from_effects
 from warhammer40k_core.geometry.pathing import (
     PathConstraintViolation,
@@ -2377,6 +2382,12 @@ class MovementPhaseHandler:
     movement_end_surge_hooks: MovementEndSurgeHookRegistry = field(
         default_factory=MovementEndSurgeHookRegistry.empty
     )
+    unit_move_completed_mortal_wound_hooks: UnitMoveCompletedMortalWoundHookRegistry = field(
+        default_factory=UnitMoveCompletedMortalWoundHookRegistry.empty
+    )
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry = field(
+        default_factory=StratagemCostModifierRegistry.empty
+    )
     runtime_modifier_registry: RuntimeModifierRegistry = field(
         default_factory=RuntimeModifierRegistry.empty
     )
@@ -2406,6 +2417,17 @@ class MovementPhaseHandler:
         if type(self.movement_end_surge_hooks) is not MovementEndSurgeHookRegistry:
             raise GameLifecycleError(
                 "MovementPhaseHandler movement_end_surge_hooks must be a registry."
+            )
+        if (
+            type(self.unit_move_completed_mortal_wound_hooks)
+            is not UnitMoveCompletedMortalWoundHookRegistry
+        ):
+            raise GameLifecycleError(
+                "MovementPhaseHandler unit_move_completed_mortal_wound_hooks must be a registry."
+            )
+        if type(self.stratagem_cost_modifier_registry) is not StratagemCostModifierRegistry:
+            raise GameLifecycleError(
+                "MovementPhaseHandler stratagem_cost_modifier_registry must be a registry."
             )
         if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
             raise GameLifecycleError(
@@ -2439,6 +2461,7 @@ class MovementPhaseHandler:
                 decisions=decisions,
                 active_selection=active_selection,
                 stratagem_index=self.stratagem_index,
+                stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
             )
             if stratagem_status is not None:
                 return stratagem_status
@@ -2454,6 +2477,23 @@ class MovementPhaseHandler:
             scenario,
             accounted_unplaced_model_ids=state.unavailable_model_ids(),
         )
+
+        move_completed_status = resolve_unit_move_completed_mortal_wound_hooks(
+            state=state,
+            decisions=decisions,
+            registry=self.unit_move_completed_mortal_wound_hooks,
+            ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            runtime_modifier_registry=self.runtime_modifier_registry,
+            completed_phase=BattlePhase.MOVEMENT,
+            event_type="movement_activation_completed",
+            movement_actions=(
+                MovementPhaseActionKind.NORMAL_MOVE.value,
+                MovementPhaseActionKind.ADVANCE.value,
+                MovementPhaseActionKind.FALL_BACK.value,
+            ),
+        )
+        if move_completed_status is not None:
+            return move_completed_status
 
         surge_status = _request_movement_end_surge_if_available(
             state=state,
@@ -3074,6 +3114,7 @@ def _request_selected_to_move_stratagem_if_available(
     decisions: DecisionController,
     active_selection: MovementUnitSelection,
     stratagem_index: StratagemCatalogIndex,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry,
 ) -> LifecycleStatus | None:
     if type(active_selection) is not MovementUnitSelection:
         raise GameLifecycleError("Selected-to-move Stratagem window requires active selection.")
@@ -3094,6 +3135,7 @@ def _request_selected_to_move_stratagem_if_available(
         state=state,
         index=stratagem_index,
         context=context,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
     if not options:
         return None

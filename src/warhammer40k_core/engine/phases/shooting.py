@@ -132,6 +132,7 @@ from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedGrantRegistry,
     ShootingUnitSelectedHookRegistry,
 )
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
     ShootingTargetRestrictionHookRegistry,
@@ -908,6 +909,9 @@ class ShootingPhaseHandler:
     shooting_end_surge_hooks: ShootingEndSurgeHookRegistry = field(
         default_factory=ShootingEndSurgeHookRegistry.empty
     )
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry = field(
+        default_factory=StratagemCostModifierRegistry.empty
+    )
     runtime_modifier_registry: RuntimeModifierRegistry = field(
         default_factory=RuntimeModifierRegistry.empty
     )
@@ -943,6 +947,10 @@ class ShootingPhaseHandler:
         if type(self.shooting_end_surge_hooks) is not ShootingEndSurgeHookRegistry:
             raise GameLifecycleError(
                 "ShootingPhaseHandler shooting_end_surge_hooks must be a registry."
+            )
+        if type(self.stratagem_cost_modifier_registry) is not StratagemCostModifierRegistry:
+            raise GameLifecycleError(
+                "ShootingPhaseHandler stratagem_cost_modifier_registry must be a registry."
             )
         if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
             raise GameLifecycleError(
@@ -986,6 +994,7 @@ class ShootingPhaseHandler:
                     state=state,
                     decisions=decisions,
                     stratagem_index=self.stratagem_index,
+                    stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
                     completed_sequence=completed_candidate,
                 )
                 if stratagem_status is not None:
@@ -1464,6 +1473,7 @@ def _request_friendly_unit_has_shot_stratagem_if_available(
     state: GameState,
     decisions: DecisionController,
     stratagem_index: StratagemCatalogIndex,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry,
     completed_sequence: AttackSequence,
 ) -> LifecycleStatus | None:
     from warhammer40k_core.engine.stratagems import (
@@ -1517,6 +1527,7 @@ def _request_friendly_unit_has_shot_stratagem_if_available(
         state=state,
         index=stratagem_index,
         context=context,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
     if not options:
         return None
