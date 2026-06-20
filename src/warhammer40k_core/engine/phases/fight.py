@@ -5,7 +5,6 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.dice import DiceRollState, DiceRollStatePayload
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
@@ -30,6 +29,7 @@ from warhammer40k_core.engine.attack_sequence import (
     apply_feel_no_pain_decision,
     apply_precision_allocation_decision,
     apply_resolve_target_unit_decision,
+    apply_source_backed_attack_dice_reroll_decision,
     build_select_attack_weapon_group_request,
     build_select_resolve_target_unit_request,
     gathered_attack_groups_for_target,
@@ -471,6 +471,15 @@ def _advance_fight_phase_body(
             )
             return None
         state.fight_phase_state = selected_context.fight_state
+        stratagem_status = _request_active_fight_phase_stratagem_if_available(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            fight_state=selected_context.fight_state,
+            contexts=selected_context.contexts,
+        )
+        if stratagem_status is not None:
+            return stratagem_status
         return _request_fight_activation(
             state=state,
             decisions=decisions,
@@ -2007,13 +2016,6 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     return value
 
 
-def _payload_object(payload: dict[str, JsonValue], *, key: str) -> dict[str, JsonValue]:
-    value = payload.get(key)
-    if not isinstance(value, dict):
-        raise GameLifecycleError(f"{key} must be an object.")
-    return value
-
-
 @dataclass(frozen=True, slots=True)
 class _FightRequestContext:
     fight_state: FightPhaseState
@@ -2374,6 +2376,118 @@ def _advance_to_next_fight_request(
         current = current.with_next_band()
         checked_player_ids = set()
     raise GameLifecycleError("Fight phase exceeded deterministic ordering guard.")
+
+
+def _request_active_fight_phase_stratagem_if_available(
+    *,
+    handler: FightPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    fight_state: FightPhaseState,
+    contexts: tuple[FightEligibilityContext, ...],
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.stratagems import (
+        create_stratagem_use_decision_request,
+        stratagem_decline_option,
+        stratagem_use_options_from_index,
+    )
+
+    if type(fight_state) is not FightPhaseState:
+        raise GameLifecycleError("Active fight stratagem trigger requires fight state.")
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=fight_state.fight_order_state.next_player_id,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+        timing_window_id=_active_fight_phase_stratagem_timing_window_id(fight_state),
+        trigger_payload={
+            "ordering_band": fight_state.current_ordering_band.value,
+            "next_player_id": fight_state.fight_order_state.next_player_id,
+            "eligible_unit_instance_ids": [context.unit_instance_id for context in contexts],
+            "selected_to_fight_unit_instance_ids": list(
+                fight_state.fight_order_state.selected_to_fight_unit_ids
+            ),
+        },
+    )
+    if stratagem_window_declined_for_context(decisions=decisions, context=context):
+        return None
+    if _stratagem_used_for_context(decisions=decisions, context=context):
+        return None
+    options = stratagem_use_options_from_index(
+        state=state,
+        index=handler.stratagem_index,
+        context=context,
+    )
+    if not options:
+        return None
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(*options, stratagem_decline_option()),
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "active_fight_phase_stratagem_window_opened",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": fight_state.active_player_id,
+                "phase": BattlePhase.FIGHT.value,
+                "player_id": fight_state.fight_order_state.next_player_id,
+                "stratagem_context": context.to_payload(),
+                "request_id": request.request_id,
+                "phase_body_status": "active_fight_phase_stratagem_pending",
+            }
+        ),
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.FIGHT.value,
+            "battle_round": state.battle_round,
+            "active_player_id": fight_state.active_player_id,
+            "player_id": fight_state.fight_order_state.next_player_id,
+            "phase_body_status": "active_fight_phase_stratagem_pending",
+            "pending_request_id": request.request_id,
+        },
+    )
+
+
+def _active_fight_phase_stratagem_timing_window_id(fight_state: FightPhaseState) -> str:
+    if type(fight_state) is not FightPhaseState:
+        raise GameLifecycleError("Active fight stratagem timing requires fight state.")
+    return (
+        f"active-fight-stratagem:round-{fight_state.battle_round}:"
+        f"player-{fight_state.fight_order_state.next_player_id}:"
+        f"band-{fight_state.current_ordering_band.value}:"
+        f"selected-{len(fight_state.fight_order_state.selected_to_fight_unit_ids)}"
+    )
+
+
+def _stratagem_used_for_context(
+    *,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+) -> bool:
+    context_payload = context.to_payload()
+    for record in decisions.event_log.records:
+        if record.event_type != "stratagem_used":
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError("Stratagem use event payload must be an object.")
+        payload_object = cast(dict[str, object], payload)
+        if (
+            payload_object.get("game_id") == context_payload.get("game_id")
+            and payload_object.get("player_id") == context_payload.get("player_id")
+            and payload_object.get("battle_round") == context_payload.get("battle_round")
+            and payload_object.get("phase") == context_payload.get("phase")
+            and payload_object.get("active_player_id") == context_payload.get("active_player_id")
+            and payload_object.get("timing_window_id") == context_payload.get("timing_window_id")
+        ):
+            return True
+    return False
 
 
 def _request_fight_activation(
@@ -2915,61 +3029,13 @@ def _apply_fight_dice_reroll_decision(
     attack_sequence = fight_state.attack_sequence
     if attack_sequence is None:
         raise GameLifecycleError("Fight dice reroll requires an active attack sequence.")
-    if attack_sequence.source_phase is not BattlePhase.FIGHT:
-        raise GameLifecycleError("Fight dice reroll context must be for the Fight phase.")
-    if result.actor_id != attack_sequence.attacker_player_id:
-        raise GameLifecycleError("Fight dice reroll actor must match attacking player.")
-    record = decisions.record_for_result(result)
-    request_payload = _decision_payload_object(record.request.payload)
-    if _payload_string(request_payload, key="roll_type") != "attack_sequence.hit":
-        raise GameLifecycleError("Fight dice reroll must target a hit roll.")
-    source_rule_id = _payload_string(request_payload, key="source_rule_id")
-    permission_payload = _payload_object(request_payload, key="permission")
-    if _payload_string(permission_payload, key="source_id") != source_rule_id:
-        raise GameLifecycleError("Fight dice reroll source context drift.")
-    if _payload_string(permission_payload, key="timing_window") != "attack_sequence.hit":
-        raise GameLifecycleError("Fight dice reroll timing window must be attack_sequence.hit.")
-    if _payload_string(permission_payload, key="eligible_roll_type") != "attack_sequence.hit":
-        raise GameLifecycleError("Fight dice reroll permission must target hit rolls.")
-    if (
-        _payload_string(permission_payload, key="owning_player_id")
-        != attack_sequence.attacker_player_id
-    ):
-        raise GameLifecycleError("Fight dice reroll permission player drift.")
-    attack_context = _payload_object(request_payload, key="attack_context")
-    if _payload_string(attack_context, key="phase") != BattlePhase.FIGHT.value:
-        raise GameLifecycleError("Fight dice reroll context must be for the Fight phase.")
-    if (
-        _payload_string(attack_context, key="unit_instance_id")
-        != attack_sequence.attacking_unit_instance_id
-    ):
-        raise GameLifecycleError("Fight dice reroll unit must match active attack sequence.")
-    if (
-        _payload_string(attack_context, key="attack_context_id")
-        != attack_sequence.attack_context_id()
-    ):
-        raise GameLifecycleError("Fight dice reroll attack context drift.")
-    if (
-        _payload_string(attack_context, key="weapon_profile_id")
-        != attack_sequence.current_pool().weapon_profile_id
-    ):
-        raise GameLifecycleError("Fight dice reroll weapon profile drift.")
-    initial_roll_payload = _payload_object(attack_context, key="hit_roll_state")
-    initial_roll_state = DiceRollState.from_payload(
-        cast(DiceRollStatePayload, initial_roll_payload)
-    )
-    if initial_roll_state.original_result.spec.roll_type != "attack_sequence.hit":
-        raise GameLifecycleError("Fight dice reroll initial roll must be a hit roll.")
-    if initial_roll_state.original_result.spec.actor_id != attack_sequence.attacker_player_id:
-        raise GameLifecycleError("Fight dice reroll initial roll actor drift.")
-    DiceRollManager(
-        state.game_id,
-        event_log=decisions.event_log,
-    ).resolve_reroll(
-        initial_roll_state,
-        request=record.request,
+    apply_source_backed_attack_dice_reroll_decision(
+        state=state,
         result=result,
-        record_decision=False,
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        expected_phase=BattlePhase.FIGHT,
+        phase_label="Fight",
     )
     return None
 

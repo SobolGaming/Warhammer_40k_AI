@@ -169,6 +169,8 @@ from warhammer40k_core.engine.shooting_targets import (
     shooting_visibility_cache_key,
 )
 from warhammer40k_core.engine.source_backed_rerolls import (
+    SourceBackedRerollPermissionContext,
+    source_backed_reroll_permission_context_for_unit,
     source_backed_reroll_permission_for_unit,
 )
 from warhammer40k_core.engine.timing_windows import (
@@ -210,7 +212,11 @@ from warhammer40k_core.engine.weapon_abilities import (
     sustained_hits_generated_hits,
 )
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool, RangedAttackPoolPayload
-from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
+from warhammer40k_core.geometry.measurement import (
+    DistanceMeasurementContext,
+    objective_marker_controls_model,
+)
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.visibility import (
     BenefitOfCoverResult,
     CoverSourceReason,
@@ -247,6 +253,10 @@ ATTACK_RESOLUTION_SELECTION_DECISION_TYPES = frozenset(
         SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
     )
 )
+SOURCE_BACKED_ATTACK_REROLL_ROLL_STATE_KEYS = {
+    "attack_sequence.hit": "hit_roll_state",
+    "attack_sequence.wound": "wound_roll_state",
+}
 DAMAGE_ALLOCATION_RULE_ID = "core_rules_damage_allocation"
 DEADLY_DEMISE_SOURCE_KIND = "deadly_demise"
 HAZARDOUS_SOURCE_KIND = "hazardous"
@@ -7003,6 +7013,21 @@ def _roll_hit_and_wound(
             attack_context_id=attack_context_id,
             wound_modifier=_wound_roll_modifier(pool),
         )
+        status = _request_source_backed_wound_reroll_if_available(
+            state=state,
+            decisions=decisions,
+            roll_state=wound_roll.roll_state,
+            pool=pool,
+            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            attacker_keywords=rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            ).keywords,
+            attack_context_id=attack_context_id,
+            source_phase=attack_sequence.source_phase,
+        )
+        if status is not None:
+            return None, status
         status = _request_command_reroll_for_attack_roll_if_available(
             state=state,
             decisions=decisions,
@@ -7316,6 +7341,293 @@ def _request_source_backed_hit_reroll_if_available(
             "pending_request_id": request.request_id,
         },
     )
+
+
+def apply_source_backed_attack_dice_reroll_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    expected_phase: BattlePhase,
+    phase_label: str,
+) -> None:
+    if type(attack_sequence) is not AttackSequence:
+        raise GameLifecycleError(f"{phase_label} dice reroll requires an active attack sequence.")
+    if attack_sequence.source_phase is not expected_phase:
+        raise GameLifecycleError(f"{phase_label} dice reroll context must be for the phase.")
+    if result.actor_id != attack_sequence.attacker_player_id:
+        raise GameLifecycleError(f"{phase_label} dice reroll actor must match attacking player.")
+    record = decisions.record_for_result(result)
+    request_payload = _payload_object(record.request.payload)
+    roll_type = _payload_string(request_payload, key="roll_type")
+    roll_state_key = SOURCE_BACKED_ATTACK_REROLL_ROLL_STATE_KEYS.get(roll_type)
+    if roll_state_key is None:
+        raise GameLifecycleError(
+            f"{phase_label} dice reroll must target an attack hit or wound roll."
+        )
+    source_rule_id = _payload_string(request_payload, key="source_rule_id")
+    permission_payload = _nested_payload_object(request_payload, key="permission")
+    if _payload_string(permission_payload, key="source_id") != source_rule_id:
+        raise GameLifecycleError(f"{phase_label} dice reroll source context drift.")
+    if _payload_string(permission_payload, key="timing_window") != roll_type:
+        raise GameLifecycleError(f"{phase_label} dice reroll timing window drift.")
+    if _payload_string(permission_payload, key="eligible_roll_type") != roll_type:
+        raise GameLifecycleError(f"{phase_label} dice reroll permission roll type drift.")
+    if (
+        _payload_string(permission_payload, key="owning_player_id")
+        != attack_sequence.attacker_player_id
+    ):
+        raise GameLifecycleError(f"{phase_label} dice reroll permission player drift.")
+    attack_context = _nested_payload_object(request_payload, key="attack_context")
+    if _payload_string(attack_context, key="phase") != expected_phase.value:
+        raise GameLifecycleError(f"{phase_label} dice reroll context must be for the phase.")
+    if (
+        _payload_string(attack_context, key="unit_instance_id")
+        != attack_sequence.attacking_unit_instance_id
+    ):
+        raise GameLifecycleError(
+            f"{phase_label} dice reroll unit must match active attack sequence."
+        )
+    attack_context_id = _payload_string(attack_context, key="attack_context_id")
+    if not _source_backed_attack_context_id_matches_active_pool(
+        attack_sequence=attack_sequence,
+        attack_context_id=attack_context_id,
+    ):
+        raise GameLifecycleError(f"{phase_label} dice reroll attack context drift.")
+    current_pool = attack_sequence.current_pool()
+    if _payload_string(attack_context, key="weapon_profile_id") != current_pool.weapon_profile_id:
+        raise GameLifecycleError(f"{phase_label} dice reroll weapon profile drift.")
+    if (
+        roll_type == "attack_sequence.wound"
+        and _payload_string(attack_context, key="target_unit_instance_id")
+        != current_pool.target_unit_instance_id
+    ):
+        raise GameLifecycleError(f"{phase_label} dice reroll target unit drift.")
+    initial_roll_payload = _nested_payload_object(attack_context, key=roll_state_key)
+    initial_roll_state = DiceRollState.from_payload(
+        cast(DiceRollStatePayload, initial_roll_payload)
+    )
+    if initial_roll_state.original_result.spec.roll_type != roll_type:
+        raise GameLifecycleError(f"{phase_label} dice reroll initial roll type drift.")
+    if initial_roll_state.original_result.spec.actor_id != attack_sequence.attacker_player_id:
+        raise GameLifecycleError(f"{phase_label} dice reroll initial roll actor drift.")
+    DiceRollManager(
+        state.game_id,
+        event_log=decisions.event_log,
+    ).resolve_reroll(
+        initial_roll_state,
+        request=record.request,
+        result=result,
+        record_decision=False,
+    )
+
+
+def _source_backed_attack_context_id_matches_active_pool(
+    *,
+    attack_sequence: AttackSequence,
+    attack_context_id: str,
+) -> bool:
+    current_pool = attack_sequence.current_pool()
+    pool_prefix = f"{attack_sequence.sequence_id}:pool-{attack_sequence.pool_index + 1:03d}:"
+    for attack_index in range(current_pool.attacks):
+        base_context_id = f"{pool_prefix}attack-{attack_index + 1:03d}"
+        if attack_context_id == base_context_id:
+            return True
+        generated_prefix = f"{base_context_id}:generated-hit-"
+        if not attack_context_id.startswith(generated_prefix):
+            continue
+        generated_hit_number = attack_context_id.removeprefix(generated_prefix)
+        if generated_hit_number.isdecimal() and int(generated_hit_number) >= 2:
+            return True
+    return False
+
+
+def _request_source_backed_wound_reroll_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    roll_state: DiceRollState | None,
+    pool: RangedAttackPool,
+    attacking_unit_instance_id: str,
+    attacker_keywords: tuple[str, ...],
+    attack_context_id: str,
+    source_phase: BattlePhase,
+) -> LifecycleStatus | None:
+    if roll_state is None:
+        return None
+    if source_phase not in {BattlePhase.SHOOTING, BattlePhase.FIGHT}:
+        return None
+    if roll_state.rerolls:
+        return None
+    if roll_state.original_result.spec.reroll_forbidden_rule_ids:
+        return None
+    actor_id = roll_state.original_result.spec.actor_id
+    if actor_id is None:
+        return None
+    permission_context = source_backed_reroll_permission_context_for_unit(
+        state=state,
+        player_id=actor_id,
+        unit_instance_id=attacking_unit_instance_id,
+        roll_type=roll_state.original_result.spec.roll_type,
+        timing_window="attack_sequence.wound",
+    )
+    if permission_context is None:
+        return None
+    permission = _source_backed_wound_permission_for_attack(
+        state=state,
+        permission_context=permission_context,
+        roll_state=roll_state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+        attacker_keywords=attacker_keywords,
+    )
+    if permission is None:
+        return None
+    if _source_backed_reroll_already_answered(
+        decisions=decisions,
+        roll_id=roll_state.original_result.roll_id,
+        source_id=permission.source_id,
+    ):
+        return None
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    request = manager.build_reroll_request(
+        roll_state,
+        request_id=state.next_decision_request_id(),
+        actor_id=actor_id,
+        permission=permission,
+        extra_payload={
+            "source_rule_id": permission.source_id,
+            "attack_context": {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": source_phase.value,
+                "unit_instance_id": attacking_unit_instance_id,
+                "target_unit_instance_id": pool.target_unit_instance_id,
+                "attack_context_id": attack_context_id,
+                "weapon_profile_id": pool.weapon_profile_id,
+                "wound_roll_state": validate_json_value(roll_state.to_payload()),
+                "source_payload": validate_json_value(permission_context.source_payload),
+            },
+        },
+    )
+    decisions.request_decision(request)
+    return LifecycleStatus.waiting_for_decision(
+        stage=state.stage,
+        decision_request=request,
+        payload={
+            "phase": source_phase.value,
+            "phase_body_status": "attack_wound_source_backed_reroll_pending",
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "player_id": actor_id,
+            "roll_id": roll_state.original_result.roll_id,
+            "roll_type": roll_state.original_result.spec.roll_type,
+            "affected_unit_instance_id": attacking_unit_instance_id,
+            "target_unit_instance_id": pool.target_unit_instance_id,
+            "attack_context_id": attack_context_id,
+            "pending_request_id": request.request_id,
+        },
+    )
+
+
+def _source_backed_wound_permission_for_attack(
+    *,
+    state: GameState,
+    permission_context: SourceBackedRerollPermissionContext,
+    roll_state: DiceRollState,
+    target_unit_instance_id: str,
+    attacker_keywords: tuple[str, ...],
+) -> RerollPermission | None:
+    source_payload = permission_context.source_payload
+    conditional = source_payload.get("conditional_wound_reroll")
+    if conditional is None:
+        return permission_context.permission
+    if not isinstance(conditional, dict):
+        raise GameLifecycleError("Conditional wound reroll payload must be an object.")
+    if _conditional_wound_full_reroll_applies(
+        state=state,
+        conditional=conditional,
+        target_unit_instance_id=target_unit_instance_id,
+        attacker_keywords=attacker_keywords,
+    ):
+        return replace(
+            permission_context.permission,
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+            allowed_component_selections=None,
+        )
+    reroll_values = conditional.get("reroll_unmodified_values")
+    if not isinstance(reroll_values, list) or not all(
+        type(value) is int for value in reroll_values
+    ):
+        raise GameLifecycleError("Conditional wound reroll requires integer reroll values.")
+    if roll_state.current_total not in cast(list[int], reroll_values):
+        return None
+    return replace(
+        permission_context.permission,
+        component_selection_policy=RerollComponentSelectionPolicy.COMPONENT_SELECTION,
+        allowed_component_selections=((0,),),
+    )
+
+
+def _conditional_wound_full_reroll_applies(
+    *,
+    state: GameState,
+    conditional: dict[str, JsonValue],
+    target_unit_instance_id: str,
+    attacker_keywords: tuple[str, ...],
+) -> bool:
+    if conditional.get("full_reroll_if_target_within_objective_range") is not True:
+        return False
+    required_keyword = conditional.get("full_reroll_required_attacker_keyword")
+    if required_keyword is not None:
+        if type(required_keyword) is not str:
+            raise GameLifecycleError("Conditional wound reroll required keyword must be a string.")
+        canonical_required = _canonical_keyword(required_keyword)
+        if canonical_required not in {_canonical_keyword(keyword) for keyword in attacker_keywords}:
+            return False
+    return _target_unit_within_any_objective_marker_range(
+        state=state,
+        target_unit_instance_id=target_unit_instance_id,
+    )
+
+
+def _target_unit_within_any_objective_marker_range(
+    *,
+    state: GameState,
+    target_unit_instance_id: str,
+) -> bool:
+    if state.mission_setup is None or state.battlefield_state is None:
+        return False
+    try:
+        unit_placement = state.battlefield_state.unit_placement_by_id(target_unit_instance_id)
+    except PlacementError:
+        return False
+    target_models = tuple(
+        geometry_model_for_placement(
+            model=model_by_id(state=state, model_instance_id=placement.model_instance_id),
+            placement=placement,
+        )
+        for placement in unit_placement.model_placements
+    )
+    return any(
+        objective_marker_controls_model(
+            marker_pose=Pose.at(marker.x_inches, marker.y_inches, marker.z_inches),
+            model=target_model,
+            marker_id=marker.objective_marker_id,
+            horizontal_inches=marker.control_horizontal_inches,
+            vertical_inches=marker.control_vertical_inches,
+            marker_diameter_inches=marker.marker_diameter_inches,
+        )
+        for marker in (
+            mission_marker.to_objective_marker()
+            for mission_marker in state.mission_setup.objective_markers
+        )
+        for target_model in target_models
+    )
+
+
+def _canonical_keyword(keyword: str) -> str:
+    return keyword.replace("_", " ").replace("-", " ").upper()
 
 
 def _source_backed_reroll_already_answered(
@@ -9521,6 +9833,12 @@ def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
     if not isinstance(payload, dict):
         raise GameLifecycleError("Attack sequence payload must be an object.")
     return payload
+
+
+def _nested_payload_object(payload: dict[str, JsonValue], *, key: str) -> dict[str, JsonValue]:
+    if key not in payload:
+        raise GameLifecycleError(f"Attack sequence payload missing {key}.")
+    return _payload_object(payload[key])
 
 
 def _precision_selected_group_id(payload: JsonValue) -> str | None:

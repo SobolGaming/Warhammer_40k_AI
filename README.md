@@ -171,10 +171,12 @@ Current status:
   Veil, and Nomads of the Hidden Way through the shared Shooting, Stratagem,
   Battle-shock, Hidden/detection, and triggered-movement paths. Aeldari
   Corsair Coterie supports Veterans of the Void, Relentless Raiders, Void
-  Thieves, Infamy, Webway Pathstone, Archraider, and Voidstone through shared
-  mustering, objective-control, movement/charge-completion, reserves, setup,
-  turn-end, Stratagem-cost, and runtime-modifier paths; broad datasheet,
-  wargear, weapon, and remaining faction execution remains later Phase 17 work.
+  Thieves, Infamy, Webway Pathstone, Archraider, Voidstone, and all six named
+  Stratagems through shared mustering, objective-control, movement/charge-
+  completion, reserves, setup, turn-end, Stratagem-cost, attack-reroll,
+  triggered-movement, targeting-restriction, and runtime-modifier paths; broad
+  datasheet, wargear, weapon, and remaining faction execution remains later
+  Phase 17 work.
 - Matched-play mustering supports Incursion, Strike Force, and Onslaught battle
   sizes, including the Drukhari `Corsairs and Travelling Players` ally rule for
   HARLEQUINS and ANHRATHE units.

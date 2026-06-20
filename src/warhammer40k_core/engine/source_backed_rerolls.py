@@ -1,12 +1,35 @@
 from __future__ import annotations
 
-from typing import cast
+from dataclasses import dataclass
+from typing import Self, cast
 
 from warhammer40k_core.core.dice import RerollPermission, RerollPermissionPayload
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 SOURCE_BACKED_REROLL_PERMISSION_EFFECT_KIND = "source_backed_reroll_permission"
+
+
+@dataclass(frozen=True, slots=True)
+class SourceBackedRerollPermissionContext:
+    permission: RerollPermission
+    source_payload: dict[str, JsonValue]
+
+    def __post_init__(self) -> None:
+        if type(self.permission) is not RerollPermission:
+            raise GameLifecycleError("Source-backed reroll context requires permission.")
+        object.__setattr__(
+            self,
+            "source_payload",
+            _validate_source_payload(self.source_payload),
+        )
+
+    @classmethod
+    def from_effect_payload(cls, payload: dict[str, JsonValue]) -> Self:
+        return cls(
+            permission=_reroll_permission_from_effect_payload(payload),
+            source_payload=source_payload_from_reroll_effect_payload(payload),
+        )
 
 
 def source_backed_reroll_permission_effect_payload(
@@ -37,6 +60,24 @@ def source_backed_reroll_permission_for_unit(
     roll_type: str,
     timing_window: str,
 ) -> RerollPermission | None:
+    context = source_backed_reroll_permission_context_for_unit(
+        state=state,
+        player_id=player_id,
+        unit_instance_id=unit_instance_id,
+        roll_type=roll_type,
+        timing_window=timing_window,
+    )
+    return None if context is None else context.permission
+
+
+def source_backed_reroll_permission_context_for_unit(
+    *,
+    state: object,
+    player_id: str,
+    unit_instance_id: str,
+    roll_type: str,
+    timing_window: str,
+) -> SourceBackedRerollPermissionContext | None:
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
@@ -45,7 +86,7 @@ def source_backed_reroll_permission_for_unit(
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     requested_roll_type = _validate_identifier("roll_type", roll_type)
     requested_timing_window = _validate_identifier("timing_window", timing_window)
-    permissions: list[RerollPermission] = []
+    permissions: list[SourceBackedRerollPermissionContext] = []
     for effect in state.persisting_effects_for_unit(requested_unit_id):
         if effect.owner_player_id != requested_player_id:
             continue
@@ -54,14 +95,14 @@ def source_backed_reroll_permission_for_unit(
             continue
         if payload.get("effect_kind") != SOURCE_BACKED_REROLL_PERMISSION_EFFECT_KIND:
             continue
-        permission = _reroll_permission_from_effect_payload(payload)
-        if permission.owning_player_id != requested_player_id:
+        permission_context = SourceBackedRerollPermissionContext.from_effect_payload(payload)
+        if permission_context.permission.owning_player_id != requested_player_id:
             raise GameLifecycleError("Source-backed reroll owner drift.")
-        if permission.eligible_roll_type != requested_roll_type:
+        if permission_context.permission.eligible_roll_type != requested_roll_type:
             continue
-        if permission.timing_window != requested_timing_window:
+        if permission_context.permission.timing_window != requested_timing_window:
             continue
-        permissions.append(permission)
+        permissions.append(permission_context)
     if len(permissions) > 1:
         raise GameLifecycleError("Multiple source-backed reroll permissions are available.")
     return permissions[0] if permissions else None
@@ -75,6 +116,13 @@ def source_payload_from_reroll_effect_payload(effect_payload: JsonValue) -> dict
     if not isinstance(source_payload, dict):
         raise GameLifecycleError("Source-backed reroll source_payload must be an object.")
     return source_payload
+
+
+def _validate_source_payload(payload: object) -> dict[str, JsonValue]:
+    validated = validate_json_value(payload)
+    if not isinstance(validated, dict):
+        raise GameLifecycleError("Source-backed reroll context requires source payload.")
+    return validated
 
 
 def _reroll_permission_from_effect_payload(

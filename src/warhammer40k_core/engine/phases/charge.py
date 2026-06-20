@@ -120,6 +120,7 @@ SELECT_CHARGING_UNIT_DECISION_TYPE = "select_charging_unit"
 COMPLETE_CHARGE_PHASE_OPTION_ID = "complete_charge_phase"
 CHARGE_MOVE_ACTION = "charge_move"
 FIGHTS_FIRST_CHARGE_EFFECT_KIND = "charge_grants_fights_first"
+CHARGE_AFTER_FALL_BACK_EFFECT_KIND = "charge_after_fall_back_allowed"
 _COMPLETE_CHARGE_PHASE_STATUS = "charge_phase_complete"
 _CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS = "charge_move_proposal_required"
 _CHARGE_MOVE_INVALID_STATUS = "charge_move_invalid"
@@ -2393,6 +2394,10 @@ def _charge_unit_ineligibility_reason(
         fell_back_state is not None
         and ruleset_descriptor.charge_policy.forbids_fall_back
         and not fell_back_state.can_declare_charge
+        and not _charge_after_fall_back_allowed_by_effects(
+            state=state,
+            unit_instance_id=requested_unit_id,
+        )
     ):
         return "charge_unit_fell_back"
     if not _aircraft_policy_for_charge_unit(
@@ -2428,6 +2433,20 @@ def _charge_forbidden_by_effects(*, state: GameState, unit_instance_id: str) -> 
         if not isinstance(payload, dict):
             continue
         if payload.get("charge_forbidden") is True:
+            return True
+    return False
+
+
+def _charge_after_fall_back_allowed_by_effects(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> bool:
+    for effect in state.persisting_effects_for_unit(unit_instance_id):
+        payload = effect.effect_payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("effect_kind") == CHARGE_AFTER_FALL_BACK_EFFECT_KIND:
             return True
     return False
 

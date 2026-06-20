@@ -428,16 +428,49 @@ Phase 17G also adds Shooting post-resolution Stratagem windows to the finite
 the Shooting engine may emit an optional active-player request with trigger kind
 `just_after_friendly_unit_has_shot`. The trigger payload includes
 `shot_unit_instance_id`, `hit_target_unit_instance_ids`,
-`destroyed_target_unit_instance_ids`, `attack_sequence_id`, and
-`attack_sequence_completed_event_id`. Path of the Outcast Stratagem options use
-the just-shot unit as the target binding. Stratagems whose effect chooses an
-enemy hit by those attacks carry `effect_selection` with
+`destroyed_target_unit_instance_ids`, `destroyed_enemy_unit_instance_ids`,
+`attack_sequence_id`, and `attack_sequence_completed_event_id`.
+`destroyed_target_unit_instance_ids` means one or more models in that unit were
+destroyed by the attacks; `destroyed_enemy_unit_instance_ids` is the narrower
+all-models-destroyed unit set used by effects such as Corsair Coterie Into the
+Breach. Path of the Outcast and Corsair Coterie Stratagem options use the
+just-shot unit as the target binding. Stratagems whose effect chooses an enemy
+hit by those attacks carry `effect_selection` with
 `effect_selection_kind: "hit_enemy_unit"` and
 `hit_enemy_unit_instance_id`; adapters must submit one emitted option and must
 not invent or substitute hit targets. Accepted handlers may record Battle-shock
 results, detection-range persisting effects, or emit a nested triggered-movement
 selection/proposal request. That follow-up movement request remains engine-owned
 and must be answered through `GameLifecycle.submit_decision(...)`.
+
+Corsair Coterie adds additional `use_stratagem` timing windows without creating
+new adapter submission types. Active Shooting and Fight phase windows use trigger
+kind `during_phase` and are emitted before the next ordinary unit-selection or
+fight-activation request when legal options exist. Shooting payloads include
+`selected_unit_instance_ids`, `shot_unit_instance_ids`, and
+`skipped_unit_instance_ids`; Fight payloads include `ordering_band`,
+`next_player_id`, `eligible_unit_instance_ids`, and
+`selected_to_fight_unit_instance_ids`. After a friendly unit Falls Back, Movement
+may emit trigger kind `just_after_friendly_unit_falls_back` with
+`fell_back_unit_instance_id`, `engaged_enemy_unit_instance_ids`,
+`movement_activation_completed_event_id`, source request ID, and source result
+ID. Lethal Ruse options for ANHRATHE targets include `effect_selection_kind:
+"engaged_enemy_unit"` and `engaged_enemy_unit_instance_id`; adapters must choose
+one emitted engaged enemy option and must not infer engagement from positions.
+
+Shooting defensive Corsair windows use the same finite Stratagem contract. Just
+after an enemy unit selects targets, the reacting player may receive trigger kind
+`after_unit_selected_as_target` with `selected_target_unit_instance_ids`,
+attacking unit/player IDs, and the attack sequence ID. After an enemy unit has
+shot, the reacting player may receive trigger kind
+`just_after_enemy_unit_has_shot` with `shot_unit_instance_id`,
+`hit_target_unit_instance_ids`, `destroyed_target_unit_instance_ids`,
+`destroyed_enemy_unit_instance_ids`, shooting player ID, attack sequence ID, and
+completion event ID. Accepted handlers may record source-backed wound-reroll
+permissions, phase-scoped weapon-profile modifiers, charge-after-Fall-Back
+effects, target-range restrictions, or nested triggered movement requests.
+Adapters must not apply AP, Stealth, target-range limits, charge permissions,
+mortal wounds, or surge/triggered moves locally.
 
 Accepted `StratagemUseRecord` payloads include `active_player_id`, `targeted_unit_instance_ids`, `affected_unit_instance_ids`, and `effect_selection`. The active-player ID is part of the phase-instance key for matched-play same-Stratagem and same-target restrictions. `targeted_unit_instance_ids` is the sorted canonical rules-unit list used for the 11th Edition "same unit targeted" restriction and is scoped to the player using the Stratagem. `affected_unit_instance_ids` records every canonical rules unit affected by the handler, including non-target enemy units hit by an effect. Non-attached units use their own unit instance ID. Units that are part of an attached unit use the attached-unit ID, so a Leader/Support component and Bodyguard component share one phase restriction key. Targetless Stratagems record empty target lists unless their official TARGET field binds a unit.
 

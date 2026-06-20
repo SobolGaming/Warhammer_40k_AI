@@ -9,6 +9,11 @@ from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_movement_proposal,
 )
+from tests.unit.test_phase15c_fight_order import (
+    _advance_to_fight_order_request,  # pyright: ignore[reportPrivateUsage]
+    _fight_lifecycle,  # pyright: ignore[reportPrivateUsage]
+    _submit_minimal_melee_declaration,  # pyright: ignore[reportPrivateUsage]
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -18,10 +23,25 @@ from warhammer40k_core.core.datasheet import (
     DatasheetKeywordSet,
 )
 from warhammer40k_core.core.detachment import DetachmentDefinition, EnhancementDefinition
-from warhammer40k_core.core.dice import DiceExpression
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollState,
+    DiceRollStatePayload,
+    RerollComponentSelectionPolicy,
+)
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset import RulesetId
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
+    AbilityKind,
+    AbilityParameter,
+    AttackProfile,
+    DamageProfile,
+    RangeProfile,
+    WeaponKeyword,
+    WeaponProfile,
+)
 from warhammer40k_core.engine.advance_hooks import (
     DECLINE_MOVEMENT_ACTION_GRANT_OPTION_ID,
     SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE,
@@ -35,6 +55,11 @@ from warhammer40k_core.engine.army_mustering import (
     muster_army,
     validate_roster_legality,
 )
+from warhammer40k_core.engine.attack_sequence import (
+    AttackSequenceStep,
+    attack_sequence_hit_roll_spec,
+    attack_sequence_wound_roll_spec,
+)
 from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationRequestContext,
     BattleFormationResultContext,
@@ -46,23 +71,41 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
+from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectContext,
     EnhancementEffectRegistry,
     apply_enhancement_effects,
 )
-from warhammer40k_core.engine.event_log import EventRecord, JsonValue
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
+from warhammer40k_core.engine.faction_content.stratagem_handlers import (
+    StratagemHandlerContext,
+    StratagemHandlerRegistry,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari.detachments.corsair_coterie import (  # noqa: E501
     enhancements,
     manifest,
     rule,
+    stratagems,
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
+from warhammer40k_core.engine.fight_activation_abilities import (
+    DECLINE_FIGHT_ACTIVATION_ABILITY_OPTION_ID,
+    FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
+)
+from warhammer40k_core.engine.fight_order import (
+    FIGHT_ACTIVATION_DECISION_TYPE,
+    FightPhaseState,
+    FightsFirstRegistry,
+    fight_activation_option_id,
+)
+from warhammer40k_core.engine.fight_resolution import MeleeDeclarationProposalRequest
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -89,12 +132,17 @@ from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     MovementPhaseActionKind,
 )
+from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
     RuntimeModifierRegistry,
     SaveOptionModifierContext,
+    WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.saves import SaveKind, SaveOption
+from warhammer40k_core.engine.source_backed_rerolls import (
+    source_backed_reroll_permission_context_for_unit,
+)
 from warhammer40k_core.engine.sticky_objective_control import PhaseEndObjectiveControlContext
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
@@ -112,6 +160,16 @@ from warhammer40k_core.engine.stratagem_cost_modifiers import (
     StratagemCostModifierRegistry,
 )
 from warhammer40k_core.engine.stratagems import (
+    DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+    DESTROYED_ENEMY_UNIT_CONTEXT_KEY,
+    DESTROYED_TARGET_UNIT_CONTEXT_KEY,
+    ENGAGED_ENEMY_UNIT_CONTEXT_KEY,
+    ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+    ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY,
+    HIT_TARGET_UNIT_CONTEXT_KEY,
+    JUST_FELL_BACK_UNIT_CONTEXT_KEY,
+    JUST_SHOT_UNIT_CONTEXT_KEY,
+    SELECTED_TARGET_UNIT_CONTEXT_KEY,
     STRATAGEM_DECISION_TYPE,
     StratagemCatalogRecord,
     StratagemCategory,
@@ -121,8 +179,11 @@ from warhammer40k_core.engine.stratagems import (
     StratagemTargetKind,
     StratagemTargetSpec,
     StratagemTimingDescriptor,
+    StratagemUseRecord,
+    apply_stratagem_decision,
     request_stratagem_use,
 )
+from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionContext
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
@@ -231,6 +292,30 @@ def test_corsair_coterie_runtime_contribution_registers_rule_and_enhancement_hoo
     assert {binding.hook_id for binding in contribution.turn_end_hook_bindings} == {
         enhancements.WEBWAY_PATHSTONE_TURN_END_HOOK_ID,
     }
+    assert {record.definition.stratagem_id for record in contribution.stratagem_records} == {
+        stratagems.PIRATES_DUE_STRATAGEM_ID,
+        stratagems.LETHAL_RUSE_STRATAGEM_ID,
+        stratagems.OUTCAST_AMBUSH_STRATAGEM_ID,
+        stratagems.INTO_THE_BREACH_STRATAGEM_ID,
+        stratagems.CLOAK_AND_SHADOW_STRATAGEM_ID,
+        stratagems.VENGEFUL_SORROW_STRATAGEM_ID,
+    }
+    assert {binding.handler_id for binding in contribution.stratagem_handler_bindings} == {
+        stratagems.PIRATES_DUE_HANDLER_ID,
+        stratagems.LETHAL_RUSE_HANDLER_ID,
+        stratagems.OUTCAST_AMBUSH_HANDLER_ID,
+        stratagems.INTO_THE_BREACH_HANDLER_ID,
+        stratagems.CLOAK_AND_SHADOW_HANDLER_ID,
+        stratagems.VENGEFUL_SORROW_HANDLER_ID,
+    }
+    assert {binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings} == {
+        stratagems.OUTCAST_AMBUSH_WEAPON_PROFILE_MODIFIER_ID,
+    }
+    assert {
+        binding.hook_id for binding in contribution.shooting_target_restriction_hook_bindings
+    } == {
+        stratagems.CLOAK_AND_SHADOW_TARGET_RESTRICTION_HOOK_ID,
+    }
 
 
 def test_corsair_coterie_runtime_bundle_exposes_new_hook_registries_and_summary() -> None:
@@ -301,6 +386,1309 @@ def test_corsair_coterie_runtime_bundle_exposes_new_hook_registries_and_summary(
     ]
     assert summary["stratagem_cost_modifier_ids"] == [enhancements.ARCHRAIDER_COST_MODIFIER_ID]
     assert summary["bundle_summary_hash"]
+
+
+def test_pirates_due_records_source_backed_wound_reroll_permission() -> None:
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.FIGHT,
+        active_player_id="player-a",
+    )
+    context = _corsair_stratagem_handler_context(
+        state=state,
+        stratagem_id=stratagems.PIRATES_DUE_STRATAGEM_ID,
+        handler_id=stratagems.PIRATES_DUE_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.FIGHT,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+    )
+
+    result = stratagems.apply_pirates_due(context)
+
+    assert result.reason is None
+    permission_context = source_backed_reroll_permission_context_for_unit(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=_CORSAIR_UNIT_ID,
+        roll_type="attack_sequence.wound",
+        timing_window="attack_sequence.wound",
+    )
+    assert permission_context is not None
+    assert (
+        permission_context.permission.component_selection_policy
+        is RerollComponentSelectionPolicy.COMPONENT_SELECTION
+    )
+    assert permission_context.permission.allowed_component_selections == ((0,),)
+    assert permission_context.source_payload["effect_kind"] == stratagems.PIRATES_DUE_EFFECT_KIND
+    conditional = permission_context.source_payload["conditional_wound_reroll"]
+    assert isinstance(conditional, dict)
+    assert conditional["reroll_unmodified_values"] == [1]
+    assert conditional["full_reroll_if_target_within_objective_range"] is True
+
+
+def test_pirates_due_lifecycle_accepts_fight_wound_reroll_and_resumes_attack() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("corsairs",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "corsairs": Pose.at(94.0, 95.0),
+            "enemy": Pose.at(95.0, 95.0),
+        },
+        game_id="phase17g-corsair-pirates-due-wound-reroll-0",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    state = _lifecycle_state(lifecycle)
+    _mark_player_as_corsair_coterie(state, player_id="player-a")
+    state.gain_command_points(
+        player_id="player-a",
+        amount=1,
+        source_id="phase17g-corsair-pirates-due-cp",
+        source_kind=CommandPointSourceKind.OTHER,
+        cap_exempt=True,
+    )
+    _refresh_lifecycle_runtime_content(lifecycle)
+    unit = units["corsairs"]
+
+    stratagem_request = _advance_to_fight_order_request(lifecycle)
+    assert stratagem_request.decision_type == STRATAGEM_DECISION_TYPE
+    pirates_due_option = _stratagem_option(stratagem_request, stratagems.PIRATES_DUE_STRATAGEM_ID)
+    activation_request = _decision_request(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="phase17g-corsair-pirates-due-use",
+                request=stratagem_request,
+                selected_option_id=pirates_due_option.option_id,
+            )
+        )
+    )
+    assert activation_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+    ability_request = _decision_request(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="phase17g-corsair-pirates-due-select-fight",
+                request=activation_request,
+                selected_option_id=fight_activation_option_id(
+                    unit_instance_id=unit.unit_instance_id,
+                    fight_type=RulesetDescriptor.warhammer_40000_eleventh().fight_policy.fight_types[
+                        0
+                    ],
+                ),
+            )
+        )
+    )
+    assert ability_request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE
+    melee_request = _decision_request(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="phase17g-corsair-pirates-due-decline-ability",
+                request=ability_request,
+                selected_option_id=DECLINE_FIGHT_ACTIVATION_ABILITY_OPTION_ID,
+            )
+        )
+    )
+    proposal_request = MeleeDeclarationProposalRequest.from_decision_request(melee_request)
+    weapon_payload = _first_primary_melee_weapon_payload(proposal_request)
+    weapon_profile_id = cast(str, weapon_payload["weapon_profile_id"])
+    declaration_result_id = "phase17g-corsair-pirates-due-melee"
+    sequence_id = (
+        f"melee-sequence:{state.game_id}:round-{state.battle_round:02d}:"
+        f"{unit.unit_instance_id}:{declaration_result_id}"
+    )
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    fixed_rolls = DiceRollManager(state.game_id, event_log=lifecycle.decision_controller.event_log)
+    fixed_rolls.roll_fixed(
+        attack_sequence_hit_roll_spec(
+            weapon_profile_id=weapon_profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id="player-a",
+        ),
+        [6],
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    fixed_rolls.roll_fixed(wound_spec, [1])
+
+    reroll_request = _decision_request(
+        _submit_minimal_melee_declaration(
+            lifecycle,
+            request=melee_request,
+            result_id=declaration_result_id,
+        )
+    )
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    reroll_request_payload = cast(dict[str, object], reroll_request.payload)
+    assert reroll_request_payload["roll_type"] == "attack_sequence.wound"
+    permission_payload = cast(dict[str, object], reroll_request_payload["permission"])
+    assert permission_payload["timing_window"] == "attack_sequence.wound"
+    assert permission_payload["eligible_roll_type"] == "attack_sequence.wound"
+    assert permission_payload["component_selection_policy"] == "whole_roll"
+    assert permission_payload["allowed_component_selections"] is None
+    attack_context_payload = cast(dict[str, object], reroll_request_payload["attack_context"])
+    assert attack_context_payload["phase"] == BattlePhase.FIGHT.value
+    wound_roll_state = cast(dict[str, object], attack_context_payload["wound_roll_state"])
+    assert wound_roll_state["current_values"] == [1]
+
+    accepted_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-corsair-pirates-due-accept-wound-reroll",
+            request=reroll_request,
+            selected_option_id="reroll:0",
+        )
+    )
+
+    assert accepted_status.status_kind is not LifecycleStatusKind.INVALID
+    reroll_payloads = _lifecycle_event_payloads(lifecycle, "dice_reroll_resolved")
+    assert len(reroll_payloads) == 1
+    rerolled_state = DiceRollState.from_payload(cast(DiceRollStatePayload, reroll_payloads[0]))
+    wound_original_result = cast(dict[str, object], wound_roll_state["original_result"])
+    assert rerolled_state.original_result.roll_id == wound_original_result["roll_id"]
+    wound_payload = _attack_step_payload(
+        _lifecycle_event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.WOUND,
+    )
+    resolved_wound = cast(dict[str, object], wound_payload["payload"])
+    assert resolved_wound["successful"] is True
+    assert cast(dict[str, object], resolved_wound["roll_state"]) == rerolled_state.to_payload()
+    downstream_status = _drain_until_downstream_attack_resolution(
+        lifecycle,
+        accepted_status,
+        result_id_prefix="phase17g-corsair-pirates-due-downstream",
+    )
+    assert downstream_status.status_kind is not LifecycleStatusKind.INVALID
+    downstream_steps = {
+        cast(str, payload["step"])
+        for payload in _lifecycle_event_payloads(lifecycle, "attack_sequence_step")
+    }
+    assert downstream_steps & {
+        AttackSequenceStep.ALLOCATE.value,
+        AttackSequenceStep.SAVE.value,
+        AttackSequenceStep.DAMAGE.value,
+    }
+
+
+def test_lethal_ruse_records_charge_after_fall_back_and_resolves_anhrathe_mortal_rolls() -> None:
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-a",
+        corsair_x=30.0,
+        enemy_x=31.0,
+    )
+    context = _corsair_stratagem_handler_context(
+        state=state,
+        stratagem_id=stratagems.LETHAL_RUSE_STRATAGEM_ID,
+        handler_id=stratagems.LETHAL_RUSE_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.MOVEMENT,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+        trigger_payload={
+            JUST_FELL_BACK_UNIT_CONTEXT_KEY: _CORSAIR_UNIT_ID,
+            ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY: [_ENEMY_UNIT_ID],
+            "movement_activation_completed_event_id": "event-lethal-ruse-fall-back",
+        },
+        effect_selection={
+            "effect_selection_kind": ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+            ENGAGED_ENEMY_UNIT_CONTEXT_KEY: _ENEMY_UNIT_ID,
+        },
+    )
+
+    result = stratagems.apply_lethal_ruse(context)
+
+    assert result.reason is None
+    effects = state.persisting_effects_for_unit(_CORSAIR_UNIT_ID)
+    assert len(effects) == 1
+    effect_payload = _json_object(effects[0].effect_payload)
+    assert effect_payload["effect_kind"] == "charge_after_fall_back_allowed"
+    replay_payload = _json_object(result.replay_payload)
+    mortal_payload = _json_object(replay_payload["mortal_wound_resolution"])
+    assert mortal_payload["enemy_unit_instance_id"] == _ENEMY_UNIT_ID
+    rolls = mortal_payload["rolls"]
+    assert isinstance(rolls, list)
+    assert len(cast(list[object], rolls)) == 6
+
+
+def test_outcast_ambush_records_effect_and_modifies_ranged_weapon_profile() -> None:
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-a",
+        corsair_keywords=("RANGERS", "INFANTRY"),
+    )
+    context = _corsair_stratagem_handler_context(
+        state=state,
+        stratagem_id=stratagems.OUTCAST_AMBUSH_STRATAGEM_ID,
+        handler_id=stratagems.OUTCAST_AMBUSH_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+    )
+
+    result = stratagems.apply_outcast_ambush(context)
+
+    assert result.reason is None
+    modified = stratagems.outcast_ambush_weapon_profile_modifier(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.SHOOTING,
+            attacking_unit_instance_id=_CORSAIR_UNIT_ID,
+            attacker_model_instance_id=f"{_CORSAIR_UNIT_ID}:model-001",
+            target_unit_instance_id=_ENEMY_UNIT_ID,
+            weapon_profile=_corsair_test_weapon_profile(ap=-1),
+        )
+    )
+    assert modified.armor_penetration.final == -2
+    assert WeaponKeyword.IGNORES_COVER in modified.keywords
+    assert WeaponKeyword.RAPID_FIRE in modified.keywords
+    assert any(ability.ability_kind is AbilityKind.RAPID_FIRE for ability in modified.abilities)
+
+
+def test_into_the_breach_requires_destroyed_enemy_unit_and_requests_d6_plus_one_move() -> None:
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-a",
+    )
+    context = _corsair_stratagem_handler_context(
+        state=state,
+        stratagem_id=stratagems.INTO_THE_BREACH_STRATAGEM_ID,
+        handler_id=stratagems.INTO_THE_BREACH_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+        trigger_payload={
+            JUST_SHOT_UNIT_CONTEXT_KEY: _CORSAIR_UNIT_ID,
+            HIT_TARGET_UNIT_CONTEXT_KEY: [_ENEMY_UNIT_ID],
+            DESTROYED_TARGET_UNIT_CONTEXT_KEY: [_ENEMY_UNIT_ID],
+            DESTROYED_ENEMY_UNIT_CONTEXT_KEY: [_ENEMY_UNIT_ID],
+            "attack_sequence_completed_event_id": "event-into-the-breach-shot",
+        },
+    )
+
+    result = stratagems.apply_into_the_breach(context)
+
+    assert result.reason is None
+    request = context.decisions.queue.peek_next()
+    assert request.decision_type == "select_triggered_movement"
+    replay_payload = _json_object(result.replay_payload)
+    distance_roll = _json_object(replay_payload["distance_roll"])
+    assert replay_payload["triggered_movement_request_id"] == request.request_id
+    assert 2 <= cast(int, distance_roll["current_total"]) + 1 <= 7
+
+    model_destroyed_only_context = _corsair_stratagem_handler_context(
+        state=state,
+        stratagem_id=stratagems.INTO_THE_BREACH_STRATAGEM_ID,
+        handler_id=stratagems.INTO_THE_BREACH_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+        trigger_payload={
+            JUST_SHOT_UNIT_CONTEXT_KEY: _CORSAIR_UNIT_ID,
+            HIT_TARGET_UNIT_CONTEXT_KEY: [_ENEMY_UNIT_ID],
+            DESTROYED_TARGET_UNIT_CONTEXT_KEY: [_ENEMY_UNIT_ID],
+            "attack_sequence_completed_event_id": "event-into-the-breach-model-only",
+        },
+    )
+    assert stratagems.validate_into_the_breach(model_destroyed_only_context).reason == (
+        "no_enemy_unit_destroyed"
+    )
+
+
+def test_cloak_and_shadow_records_stealth_effect_and_blocks_distant_attacking_models() -> None:
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        corsair_x=30.0,
+        enemy_x=55.0,
+    )
+    context = _corsair_stratagem_handler_context(
+        state=state,
+        player_id="player-a",
+        stratagem_id=stratagems.CLOAK_AND_SHADOW_STRATAGEM_ID,
+        handler_id=stratagems.CLOAK_AND_SHADOW_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
+        trigger_payload={
+            SELECTED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID],
+            "attacking_unit_instance_id": _ENEMY_UNIT_ID,
+            "attack_sequence_id": "attack-sequence-cloak",
+        },
+    )
+
+    result = stratagems.apply_cloak_and_shadow(context)
+
+    assert result.reason is None
+    effect_payload = _json_object(
+        state.persisting_effects_for_unit(_CORSAIR_UNIT_ID)[0].effect_payload
+    )
+    assert effect_payload["effect_kind"] == SMOKESCREEN_EFFECT_KIND
+    assert effect_payload["source_effect_kind"] == stratagems.CLOAK_AND_SHADOW_EFFECT_KIND
+    restriction = stratagems.cloak_and_shadow_target_restriction(
+        ShootingTargetRestrictionContext(
+            state=state,
+            player_id="player-b",
+            battle_round=state.battle_round,
+            attacking_unit_instance_id=_ENEMY_UNIT_ID,
+            attacker_model_instance_id=f"{_ENEMY_UNIT_ID}:model-001",
+            target_unit_instance_id=_CORSAIR_UNIT_ID,
+        )
+    )
+    assert restriction is not None
+    assert restriction.violation_code == "cloak_and_shadow_range"
+
+
+def test_vengeful_sorrow_uses_destroyed_model_context_and_requests_surge_move() -> None:
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        corsair_x=30.0,
+        enemy_x=55.0,
+    )
+    context = _corsair_stratagem_handler_context(
+        state=state,
+        player_id="player-a",
+        stratagem_id=stratagems.VENGEFUL_SORROW_STRATAGEM_ID,
+        handler_id=stratagems.VENGEFUL_SORROW_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_SHOT,
+        trigger_payload={
+            JUST_SHOT_UNIT_CONTEXT_KEY: _ENEMY_UNIT_ID,
+            HIT_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID],
+            DESTROYED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID],
+            "shooting_player_id": "player-b",
+            "attack_sequence_completed_event_id": "event-vengeful-sorrow-shot",
+        },
+    )
+
+    result = stratagems.apply_vengeful_sorrow(context)
+
+    assert result.reason is None
+    request = context.decisions.queue.peek_next()
+    assert request.decision_type == "select_triggered_movement"
+    replay_payload = _json_object(result.replay_payload)
+    assert replay_payload["triggered_movement_request_id"] == request.request_id
+    assert replay_payload["effect_kind"] == "vengeful_sorrow"
+
+
+def test_corsair_stratagem_validators_reject_ineligible_targets_and_phase_state() -> None:
+    fight_state, _fight_corsair_army, _fight_enemy_army = _corsair_state(
+        phase=BattlePhase.FIGHT,
+        active_player_id="player-a",
+    )
+    started_fight_state = FightPhaseState.start(
+        battle_round=fight_state.battle_round,
+        active_player_id="player-a",
+        policy=RulesetDescriptor.warhammer_40000_eleventh().fight_policy,
+        engaged_at_fight_step_start_unit_ids=(_CORSAIR_UNIT_ID, _ENEMY_UNIT_ID),
+        fights_first_registry=FightsFirstRegistry(),
+    )
+    fight_state.fight_phase_state = replace(
+        started_fight_state,
+        fight_order_state=replace(
+            started_fight_state.fight_order_state,
+            selected_to_fight_unit_ids=(_CORSAIR_UNIT_ID,),
+        ),
+    )
+    pirates_context = _corsair_stratagem_handler_context(
+        state=fight_state,
+        stratagem_id=stratagems.PIRATES_DUE_STRATAGEM_ID,
+        handler_id=stratagems.PIRATES_DUE_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.FIGHT,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+    )
+
+    assert stratagems.validate_pirates_due(pirates_context).reason == (
+        "target_already_selected_to_fight"
+    )
+    assert (
+        stratagems.validate_pirates_due(
+            replace(
+                pirates_context,
+                definition=replace(pirates_context.definition, stratagem_id="wrong-stratagem"),
+            )
+        ).reason
+        == "wrong_stratagem"
+    )
+    assert (
+        stratagems.validate_pirates_due(
+            replace(
+                pirates_context,
+                definition=replace(pirates_context.definition, handler_id="wrong-handler"),
+            )
+        ).reason
+        == "wrong_handler"
+    )
+    assert (
+        stratagems.validate_pirates_due(
+            replace(
+                pirates_context,
+                eligibility_context=replace(
+                    pirates_context.eligibility_context,
+                    trigger_kind=TimingTriggerKind.START_PHASE,
+                ),
+            )
+        ).reason
+        == "wrong_timing"
+    )
+    assert (
+        stratagems.validate_pirates_due(
+            replace(
+                pirates_context,
+                eligibility_context=replace(
+                    pirates_context.eligibility_context,
+                    phase=BattlePhase.SHOOTING,
+                ),
+            )
+        ).reason
+        == "wrong_phase"
+    )
+
+    enemy_context = _corsair_stratagem_handler_context(
+        state=fight_state,
+        player_id="player-b",
+        stratagem_id=stratagems.PIRATES_DUE_STRATAGEM_ID,
+        handler_id=stratagems.PIRATES_DUE_HANDLER_ID,
+        target_unit_id=_ENEMY_UNIT_ID,
+        phase=BattlePhase.FIGHT,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+    )
+    assert stratagems.validate_pirates_due(enemy_context).reason == "detachment_missing"
+
+    outcast_state, _outcast_corsair_army, _outcast_enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-a",
+    )
+    outcast_context = _corsair_stratagem_handler_context(
+        state=outcast_state,
+        stratagem_id=stratagems.OUTCAST_AMBUSH_STRATAGEM_ID,
+        handler_id=stratagems.OUTCAST_AMBUSH_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+    )
+    assert stratagems.validate_outcast_ambush(outcast_context).reason == (
+        "target_missing_rangers_or_shroud_runners"
+    )
+
+    selected_shooting_state, _selected_corsair_army, _selected_enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-a",
+        corsair_keywords=("RANGERS", "INFANTRY"),
+    )
+    selected_shooting_state.shooting_phase_state = ShootingPhaseState(
+        battle_round=selected_shooting_state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(_CORSAIR_UNIT_ID,),
+    )
+    selected_context = _corsair_stratagem_handler_context(
+        state=selected_shooting_state,
+        stratagem_id=stratagems.OUTCAST_AMBUSH_STRATAGEM_ID,
+        handler_id=stratagems.OUTCAST_AMBUSH_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+    )
+    assert stratagems.validate_outcast_ambush(selected_context).reason == (
+        "target_already_selected_to_shoot"
+    )
+
+    breach_state, _breach_corsair_army, _breach_enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-a",
+    )
+    breach_context = _corsair_stratagem_handler_context(
+        state=breach_state,
+        stratagem_id=stratagems.INTO_THE_BREACH_STRATAGEM_ID,
+        handler_id=stratagems.INTO_THE_BREACH_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+        trigger_payload={
+            JUST_SHOT_UNIT_CONTEXT_KEY: _VOIDSTONE_UNIT_ID,
+            DESTROYED_ENEMY_UNIT_CONTEXT_KEY: [_ENEMY_UNIT_ID],
+        },
+    )
+    assert stratagems.validate_into_the_breach(breach_context).reason == ("target_not_just_shot")
+
+    non_anhrathe_state, _non_anhrathe_corsair_army, _non_anhrathe_enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-a",
+        corsair_keywords=("INFANTRY",),
+    )
+    non_anhrathe_breach_context = _corsair_stratagem_handler_context(
+        state=non_anhrathe_state,
+        stratagem_id=stratagems.INTO_THE_BREACH_STRATAGEM_ID,
+        handler_id=stratagems.INTO_THE_BREACH_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+        trigger_payload={
+            JUST_SHOT_UNIT_CONTEXT_KEY: _CORSAIR_UNIT_ID,
+            DESTROYED_ENEMY_UNIT_CONTEXT_KEY: [_ENEMY_UNIT_ID],
+        },
+    )
+    assert stratagems.validate_into_the_breach(non_anhrathe_breach_context).reason == (
+        "target_not_anhrathe"
+    )
+
+    non_infantry_state, _non_infantry_corsair_army, _non_infantry_enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        corsair_keywords=("ANHRATHE",),
+    )
+    cloak_context = _corsair_stratagem_handler_context(
+        state=non_infantry_state,
+        player_id="player-a",
+        stratagem_id=stratagems.CLOAK_AND_SHADOW_STRATAGEM_ID,
+        handler_id=stratagems.CLOAK_AND_SHADOW_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
+        trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
+    )
+    assert stratagems.validate_cloak_and_shadow(cloak_context).reason == "target_not_infantry"
+
+    vengeful_context = _corsair_stratagem_handler_context(
+        state=non_infantry_state,
+        player_id="player-a",
+        stratagem_id=stratagems.VENGEFUL_SORROW_STRATAGEM_ID,
+        handler_id=stratagems.VENGEFUL_SORROW_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_SHOT,
+        trigger_payload={DESTROYED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
+    )
+    assert stratagems.validate_vengeful_sorrow(vengeful_context).reason == "target_not_infantry"
+
+    eligible_vengeful_state, _eligible_corsair_army, _eligible_enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        corsair_x=30.0,
+        enemy_x=55.0,
+    )
+    missing_destroyed_context = _corsair_stratagem_handler_context(
+        state=eligible_vengeful_state,
+        player_id="player-a",
+        stratagem_id=stratagems.VENGEFUL_SORROW_STRATAGEM_ID,
+        handler_id=stratagems.VENGEFUL_SORROW_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_SHOT,
+        trigger_payload={DESTROYED_TARGET_UNIT_CONTEXT_KEY: [_VOIDSTONE_UNIT_ID]},
+    )
+    assert stratagems.validate_vengeful_sorrow(missing_destroyed_context).reason == (
+        "target_models_not_destroyed"
+    )
+    eligible_vengeful_state.battle_shocked_unit_ids.append(_CORSAIR_UNIT_ID)
+    battle_shocked_context = replace(
+        missing_destroyed_context,
+        eligibility_context=replace(
+            missing_destroyed_context.eligibility_context,
+            trigger_payload={DESTROYED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
+        ),
+    )
+    assert stratagems.validate_vengeful_sorrow(battle_shocked_context).reason == (
+        "target_battle_shocked"
+    )
+
+    engaged_state, _engaged_corsair_army, _engaged_enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        corsair_x=30.0,
+        enemy_x=30.5,
+    )
+    engaged_context = _corsair_stratagem_handler_context(
+        state=engaged_state,
+        player_id="player-a",
+        stratagem_id=stratagems.VENGEFUL_SORROW_STRATAGEM_ID,
+        handler_id=stratagems.VENGEFUL_SORROW_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_SHOT,
+        trigger_payload={DESTROYED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
+    )
+    assert stratagems.validate_vengeful_sorrow(engaged_context).reason == (
+        "target_within_engagement_range"
+    )
+
+
+def test_lethal_ruse_handles_non_anhrathe_and_rejects_invalid_enemy_selection() -> None:
+    non_anhrathe_state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-a",
+        corsair_keywords=("INFANTRY",),
+    )
+    non_anhrathe_context = _corsair_stratagem_handler_context(
+        state=non_anhrathe_state,
+        stratagem_id=stratagems.LETHAL_RUSE_STRATAGEM_ID,
+        handler_id=stratagems.LETHAL_RUSE_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.MOVEMENT,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+        trigger_payload={JUST_FELL_BACK_UNIT_CONTEXT_KEY: _CORSAIR_UNIT_ID},
+    )
+
+    result = stratagems.apply_lethal_ruse(non_anhrathe_context)
+
+    assert result.reason is None
+    assert result.replay_payload is not None
+    replay_payload = _json_object(result.replay_payload)
+    assert replay_payload["mortal_wound_resolution"] is None
+
+    wrong_target_context = _corsair_stratagem_handler_context(
+        state=non_anhrathe_state,
+        stratagem_id=stratagems.LETHAL_RUSE_STRATAGEM_ID,
+        handler_id=stratagems.LETHAL_RUSE_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.MOVEMENT,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+        trigger_payload={JUST_FELL_BACK_UNIT_CONTEXT_KEY: _VOIDSTONE_UNIT_ID},
+    )
+    assert stratagems.validate_lethal_ruse(wrong_target_context).reason == (
+        "target_not_fell_back_unit"
+    )
+
+    selected_not_engaged_state, _selected_corsair_army, _selected_enemy_army = _corsair_state(
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-a",
+        corsair_x=30.0,
+        enemy_x=31.0,
+    )
+    selected_not_engaged_context = _corsair_stratagem_handler_context(
+        state=selected_not_engaged_state,
+        stratagem_id=stratagems.LETHAL_RUSE_STRATAGEM_ID,
+        handler_id=stratagems.LETHAL_RUSE_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.MOVEMENT,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+        trigger_payload={
+            JUST_FELL_BACK_UNIT_CONTEXT_KEY: _CORSAIR_UNIT_ID,
+            ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY: [_ENEMY_UNIT_ID],
+        },
+        effect_selection={
+            "effect_selection_kind": ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+            ENGAGED_ENEMY_UNIT_CONTEXT_KEY: _VOIDSTONE_UNIT_ID,
+        },
+    )
+    assert stratagems.validate_lethal_ruse(selected_not_engaged_context).reason == (
+        "selected_enemy_not_start_engaged"
+    )
+
+    friendly_selected_context = _corsair_stratagem_handler_context(
+        state=selected_not_engaged_state,
+        stratagem_id=stratagems.LETHAL_RUSE_STRATAGEM_ID,
+        handler_id=stratagems.LETHAL_RUSE_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.MOVEMENT,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+        trigger_payload={
+            JUST_FELL_BACK_UNIT_CONTEXT_KEY: _CORSAIR_UNIT_ID,
+            ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY: [_VOIDSTONE_UNIT_ID],
+        },
+        effect_selection={
+            "effect_selection_kind": ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+            ENGAGED_ENEMY_UNIT_CONTEXT_KEY: _VOIDSTONE_UNIT_ID,
+        },
+    )
+    assert stratagems.validate_lethal_ruse(friendly_selected_context).reason == (
+        "selected_unit_not_enemy"
+    )
+
+
+def test_lethal_ruse_request_option_carries_engaged_enemy_effect_selection() -> None:
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-a",
+        corsair_x=30.0,
+        enemy_x=31.0,
+    )
+    state.gain_command_points(
+        player_id="player-a",
+        amount=3,
+        source_id="phase17g-corsair-lethal-ruse-request-cp",
+        source_kind=CommandPointSourceKind.OTHER,
+        cap_exempt=True,
+    )
+    decisions = DecisionController()
+    record = _corsair_stratagem_record(stratagems.LETHAL_RUSE_STRATAGEM_ID)
+    status = request_stratagem_use(
+        state=state,
+        decisions=decisions,
+        catalog_records=(record,),
+        context=StratagemEligibilityContext.from_state(
+            state=state,
+            player_id="player-a",
+            trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+            trigger_payload={
+                JUST_FELL_BACK_UNIT_CONTEXT_KEY: _CORSAIR_UNIT_ID,
+                ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY: [_ENEMY_UNIT_ID],
+            },
+        ),
+    )
+    request = _decision_request(status)
+
+    assert request.decision_type == STRATAGEM_DECISION_TYPE
+    assert len(request.options) == 1
+    option = request.options[0]
+    assert option.option_id == (
+        "use-stratagem:aeldari:corsair-coterie:lethal-ruse:target:"
+        "army-a:corsairs:effect:engaged_enemy_unit:army-b:enemy-raiders"
+    )
+    option_payload = _json_object(option.payload)
+    effect_selection = _json_object(option_payload["effect_selection"])
+    assert effect_selection == {
+        "effect_selection_kind": ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+        ENGAGED_ENEMY_UNIT_CONTEXT_KEY: _ENEMY_UNIT_ID,
+    }
+
+    use_record = apply_stratagem_decision(
+        state=state,
+        result=DecisionResult.for_request(
+            result_id="phase17g-corsair-lethal-ruse-request-result",
+            request=request,
+            selected_option_id=option.option_id,
+        ),
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+        stratagem_handler_registry=StratagemHandlerRegistry.from_bindings(
+            manifest.runtime_contribution().stratagem_handler_bindings
+        ),
+    )
+
+    assert use_record.effect_selection == effect_selection
+    assert use_record.affected_unit_instance_ids == (_CORSAIR_UNIT_ID, _ENEMY_UNIT_ID)
+    assert any(
+        effect.effect_payload
+        == {
+            "effect_kind": "charge_after_fall_back_allowed",
+            "source_effect_kind": stratagems.LETHAL_RUSE_EFFECT_KIND,
+            "stratagem_id": stratagems.LETHAL_RUSE_STRATAGEM_ID,
+            "stratagem_use_id": use_record.use_id,
+        }
+        for effect in state.persisting_effects_for_unit(_CORSAIR_UNIT_ID)
+    )
+
+
+def test_lethal_ruse_rejects_malformed_engaged_enemy_effect_selection_payloads() -> None:
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-a",
+        corsair_x=30.0,
+        enemy_x=31.0,
+    )
+    state.gain_command_points(
+        player_id="player-a",
+        amount=3,
+        source_id="phase17g-corsair-lethal-ruse-invalid-selection-cp",
+        source_kind=CommandPointSourceKind.OTHER,
+        cap_exempt=True,
+    )
+    decisions = DecisionController()
+    status = request_stratagem_use(
+        state=state,
+        decisions=decisions,
+        catalog_records=(_corsair_stratagem_record(stratagems.LETHAL_RUSE_STRATAGEM_ID),),
+        context=StratagemEligibilityContext.from_state(
+            state=state,
+            player_id="player-a",
+            trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+            trigger_payload={
+                JUST_FELL_BACK_UNIT_CONTEXT_KEY: _CORSAIR_UNIT_ID,
+                ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY: [_ENEMY_UNIT_ID],
+            },
+        ),
+    )
+    request = _decision_request(status)
+    option = request.options[0]
+    option_payload = _json_object(option.payload)
+
+    for result_id, effect_selection, reason in (
+        (
+            "phase17g-corsair-lethal-ruse-missing-engaged-enemy",
+            {"effect_selection_kind": ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND},
+            f"{ENGAGED_ENEMY_UNIT_CONTEXT_KEY}_required",
+        ),
+        (
+            "phase17g-corsair-lethal-ruse-wrong-effect-kind",
+            {
+                "effect_selection_kind": "wrong-kind",
+                ENGAGED_ENEMY_UNIT_CONTEXT_KEY: _ENEMY_UNIT_ID,
+            },
+            "effect_selection_kind_mismatch",
+        ),
+        (
+            "phase17g-corsair-lethal-ruse-enemy-not-in-context",
+            {
+                "effect_selection_kind": ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+                ENGAGED_ENEMY_UNIT_CONTEXT_KEY: "army-b:other-enemy",
+            },
+            "engaged_enemy_unit_not_in_trigger_context",
+        ),
+    ):
+        with pytest.raises(GameLifecycleError, match=reason):
+            apply_stratagem_decision(
+                state=state,
+                result=DecisionResult(
+                    result_id=result_id,
+                    request_id=request.request_id,
+                    decision_type=request.decision_type,
+                    actor_id=request.actor_id,
+                    selected_option_id=option.option_id,
+                    payload=validate_json_value(
+                        {**option_payload, "effect_selection": effect_selection}
+                    ),
+                ),
+                decisions=decisions,
+                ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+                army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+                stratagem_handler_registry=StratagemHandlerRegistry.from_bindings(
+                    manifest.runtime_contribution().stratagem_handler_bindings
+                ),
+            )
+
+
+def test_outcast_ambush_modifier_noops_and_stacks_existing_rapid_fire() -> None:
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-a",
+        corsair_keywords=("RANGERS", "INFANTRY"),
+    )
+    base_profile = _corsair_test_weapon_profile(ap=0)
+    base_context = WeaponProfileModifierContext(
+        state=state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=_CORSAIR_UNIT_ID,
+        attacker_model_instance_id=f"{_CORSAIR_UNIT_ID}:model-001",
+        target_unit_instance_id=_ENEMY_UNIT_ID,
+        weapon_profile=base_profile,
+    )
+
+    assert stratagems.outcast_ambush_weapon_profile_modifier(base_context) == base_profile
+    with pytest.raises(GameLifecycleError, match="weapon profile modifier context"):
+        stratagems.outcast_ambush_weapon_profile_modifier(
+            cast(WeaponProfileModifierContext, object())
+        )
+
+    stratagems.apply_outcast_ambush(
+        _corsair_stratagem_handler_context(
+            state=state,
+            stratagem_id=stratagems.OUTCAST_AMBUSH_STRATAGEM_ID,
+            handler_id=stratagems.OUTCAST_AMBUSH_HANDLER_ID,
+            target_unit_id=_CORSAIR_UNIT_ID,
+            phase=BattlePhase.SHOOTING,
+            trigger_kind=TimingTriggerKind.DURING_PHASE,
+        )
+    )
+    assert (
+        stratagems.outcast_ambush_weapon_profile_modifier(
+            replace(base_context, source_phase=BattlePhase.FIGHT)
+        )
+        == base_profile
+    )
+
+    rapid_fire_profile = replace(
+        base_profile,
+        abilities=(AbilityDescriptor.rapid_fire(2),),
+        keywords=(WeaponKeyword.RAPID_FIRE,),
+    )
+    modified = stratagems.outcast_ambush_weapon_profile_modifier(
+        replace(base_context, weapon_profile=rapid_fire_profile)
+    )
+    rapid_fire_ability = next(
+        ability for ability in modified.abilities if ability.ability_kind is AbilityKind.RAPID_FIRE
+    )
+
+    assert rapid_fire_ability.parameters[0].value == 3
+    assert modified.armor_penetration.final == -1
+    assert stratagems.OUTCAST_AMBUSH_WEAPON_PROFILE_MODIFIER_ID in modified.source_ids
+
+
+def test_cloak_and_shadow_restriction_noops_when_close_or_unmodified_and_stays_strict() -> None:
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        corsair_x=30.0,
+        enemy_x=40.0,
+    )
+    base_restriction_context = ShootingTargetRestrictionContext(
+        state=state,
+        player_id="player-b",
+        battle_round=state.battle_round,
+        attacking_unit_instance_id=_ENEMY_UNIT_ID,
+        attacker_model_instance_id=f"{_ENEMY_UNIT_ID}:model-001",
+        target_unit_instance_id=_CORSAIR_UNIT_ID,
+    )
+
+    assert stratagems.cloak_and_shadow_target_restriction(base_restriction_context) is None
+    with pytest.raises(GameLifecycleError, match="shooting target context"):
+        stratagems.cloak_and_shadow_target_restriction(
+            cast(ShootingTargetRestrictionContext, object())
+        )
+
+    apply_context = _corsair_stratagem_handler_context(
+        state=state,
+        player_id="player-a",
+        stratagem_id=stratagems.CLOAK_AND_SHADOW_STRATAGEM_ID,
+        handler_id=stratagems.CLOAK_AND_SHADOW_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
+        trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
+    )
+    assert stratagems.apply_cloak_and_shadow(apply_context).reason is None
+    assert stratagems.cloak_and_shadow_target_restriction(base_restriction_context) is None
+
+    with pytest.raises(GameLifecycleError, match="requires attacker model"):
+        stratagems.cloak_and_shadow_target_restriction(
+            replace(base_restriction_context, attacker_model_instance_id=None)
+        )
+
+    state.battlefield_state = None
+    with pytest.raises(GameLifecycleError, match="requires battlefield state"):
+        stratagems.cloak_and_shadow_target_restriction(base_restriction_context)
+
+
+def test_corsair_stratagem_guardrails_raise_on_drifted_internal_context() -> None:
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-a",
+    )
+    context = _corsair_stratagem_handler_context(
+        state=state,
+        stratagem_id=stratagems.LETHAL_RUSE_STRATAGEM_ID,
+        handler_id=stratagems.LETHAL_RUSE_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.MOVEMENT,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+        trigger_payload={JUST_FELL_BACK_UNIT_CONTEXT_KEY: _CORSAIR_UNIT_ID},
+    )
+    validate_corsair_stratagem = vars(stratagems)["_validate_corsair_stratagem"]
+    active_player_id = vars(stratagems)["_active_player_id"]
+    target_unit_id = vars(stratagems)["_target_unit_id"]
+    trigger_payload = vars(stratagems)["_trigger_payload"]
+    fell_back_unit_id = vars(stratagems)["_fell_back_unit_id"]
+    shot_unit_id = vars(stratagems)["_shot_unit_id"]
+    engaged_enemy_unit_id = vars(stratagems)["_engaged_enemy_unit_id"]
+    engaged_enemy_unit_ids = vars(stratagems)["_engaged_enemy_unit_ids"]
+    trigger_event_id = vars(stratagems)["_trigger_event_id"]
+    improved_ap = vars(stratagems)["_improved_ap"]
+    abilities_with_rapid_fire_one = vars(stratagems)["_abilities_with_rapid_fire_one"]
+    ability_integer_value = vars(stratagems)["_ability_integer_value"]
+    unit_has_effect = vars(stratagems)["_unit_has_effect"]
+    army_for_player = vars(stratagems)["_army_for_player"]
+    unit_in_army = vars(stratagems)["_unit_in_army"]
+    unit_by_id_for_state = vars(stratagems)["_unit_by_id_for_state"]
+    unit_owner = vars(stratagems)["_unit_owner"]
+    model_instance_by_id = vars(stratagems)["_model_instance_by_id"]
+    geometry_model_by_model_id = vars(stratagems)["_geometry_model_by_model_id"]
+    armies_for_state = vars(stratagems)["_armies_for_state"]
+    validate_identifier = vars(stratagems)["_validate_identifier"]
+
+    assert stratagems.apply_pirates_due(context).reason == "wrong_stratagem"
+    assert (
+        stratagems.apply_lethal_ruse(
+            replace(
+                context,
+                eligibility_context=replace(
+                    context.eligibility_context,
+                    active_player_id="player-b",
+                ),
+            )
+        ).reason
+        == "wrong_active_player"
+    )
+    assert stratagems.apply_outcast_ambush(context).reason == "wrong_stratagem"
+    assert stratagems.apply_into_the_breach(context).reason == "wrong_stratagem"
+    assert stratagems.apply_cloak_and_shadow(context).reason == "wrong_stratagem"
+    assert stratagems.apply_vengeful_sorrow(context).reason == "wrong_stratagem"
+
+    with pytest.raises(GameLifecycleError, match="requires a Stratagem handler context"):
+        validate_corsair_stratagem(
+            object(),
+            stratagem_id=stratagems.LETHAL_RUSE_STRATAGEM_ID,
+            handler_id=stratagems.LETHAL_RUSE_HANDLER_ID,
+            trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+            phase=BattlePhase.MOVEMENT,
+            require_active_player=True,
+        )
+
+    no_active_state, _no_active_corsair_army, _no_active_enemy_army = _corsair_state(
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-a",
+    )
+    no_active_state.active_player_id = None
+    with pytest.raises(GameLifecycleError, match="requires an active player"):
+        active_player_id(replace(context, state=no_active_state))
+
+    with pytest.raises(GameLifecycleError, match="requires a target unit"):
+        target_unit_id(
+            replace(
+                context,
+                target_binding=StratagemTargetBinding(
+                    target_kind=StratagemTargetKind.NONE,
+                    target_player_id=None,
+                    target_unit_instance_id=None,
+                ),
+            )
+        )
+
+    with pytest.raises(GameLifecycleError, match="requires trigger context payload"):
+        trigger_payload(
+            replace(
+                context,
+                eligibility_context=replace(context.eligibility_context, trigger_payload="bad"),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="Fall Back context is missing unit id"):
+        fell_back_unit_id(
+            replace(
+                context,
+                eligibility_context=replace(context.eligibility_context, trigger_payload={}),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="shot context is missing unit id"):
+        shot_unit_id(
+            replace(
+                context,
+                eligibility_context=replace(context.eligibility_context, trigger_payload={}),
+            )
+        )
+
+    with pytest.raises(GameLifecycleError, match="requires engaged enemy effect selection"):
+        engaged_enemy_unit_id(
+            replace(
+                context,
+                use_record=replace(context.use_record, effect_selection=None),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="effect selection kind drift"):
+        engaged_enemy_unit_id(
+            replace(
+                context,
+                use_record=replace(
+                    context.use_record,
+                    effect_selection={"effect_selection_kind": "wrong-kind"},
+                ),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="effect selection is missing enemy unit"):
+        engaged_enemy_unit_id(
+            replace(
+                context,
+                use_record=replace(
+                    context.use_record,
+                    effect_selection={
+                        "effect_selection_kind": ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+                    },
+                ),
+            )
+        )
+    assert (
+        engaged_enemy_unit_ids(
+            replace(
+                context,
+                eligibility_context=replace(
+                    context.eligibility_context,
+                    trigger_payload={ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY: "bad"},
+                ),
+            )
+        )
+        == ()
+    )
+    assert trigger_event_id(context) == context.use_record.use_id
+
+    with pytest.raises(GameLifecycleError, match="AP modifier requires a CharacteristicValue"):
+        improved_ap(object())
+
+    non_rapid_fire_abilities = abilities_with_rapid_fire_one((AbilityDescriptor.lethal_hits(),))
+    assert {ability.ability_kind for ability in non_rapid_fire_abilities} == {
+        AbilityKind.LETHAL_HITS,
+        AbilityKind.RAPID_FIRE,
+    }
+    invalid_rapid_fire = _invalid_ability_descriptor(parameters=())
+    with pytest.raises(GameLifecycleError, match="requires one value parameter"):
+        ability_integer_value(invalid_rapid_fire)
+    invalid_rapid_fire = _invalid_ability_descriptor(parameters=(AbilityParameter("other", 1),))
+    with pytest.raises(GameLifecycleError, match="parameter drift"):
+        ability_integer_value(invalid_rapid_fire)
+    invalid_rapid_fire = _invalid_ability_descriptor(parameters=(AbilityParameter("value", "one"),))
+    with pytest.raises(GameLifecycleError, match="value must be an integer"):
+        ability_integer_value(invalid_rapid_fire)
+
+    with pytest.raises(GameLifecycleError, match="effect lookup requires GameState"):
+        unit_has_effect(object(), unit_instance_id=_CORSAIR_UNIT_ID, effect_kind="effect")
+    with pytest.raises(GameLifecycleError, match="player army is unknown"):
+        army_for_player(
+            replace(context, use_record=replace(context.use_record, player_id="unknown"))
+        )
+    with pytest.raises(GameLifecycleError, match="target unit is not in the selected army"):
+        unit_in_army(army=_enemy_army, unit_instance_id=_CORSAIR_UNIT_ID)
+    with pytest.raises(GameLifecycleError, match="unit lookup requires GameState"):
+        unit_by_id_for_state(object(), unit_instance_id=_CORSAIR_UNIT_ID)
+    with pytest.raises(GameLifecycleError, match="unit is unknown"):
+        unit_by_id_for_state(state, unit_instance_id="unknown-unit")
+    with pytest.raises(GameLifecycleError, match="unit owner is unknown"):
+        unit_owner(context, unit_instance_id="unknown-unit")
+    with pytest.raises(GameLifecycleError, match="model is unknown"):
+        model_instance_by_id(state, "unknown-model")
+    with pytest.raises(GameLifecycleError, match="geometry lookup requires GameState"):
+        geometry_model_by_model_id(object(), model_instance_id=f"{_CORSAIR_UNIT_ID}:model-001")
+    no_battlefield_state, _no_battlefield_corsair_army, _no_battlefield_enemy_army = _corsair_state(
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-a",
+    )
+    no_battlefield_state.battlefield_state = None
+    with pytest.raises(GameLifecycleError, match="geometry lookup requires battlefield state"):
+        geometry_model_by_model_id(
+            no_battlefield_state,
+            model_instance_id=f"{_CORSAIR_UNIT_ID}:model-001",
+        )
+    with pytest.raises(GameLifecycleError, match="model is not placed"):
+        geometry_model_by_model_id(state, model_instance_id="unknown-model")
+    with pytest.raises(GameLifecycleError, match="army lookup requires GameState"):
+        armies_for_state(object())
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        validate_identifier("test", object())
+    with pytest.raises(GameLifecycleError, match="must not be empty"):
+        validate_identifier("test", " ")
+
+    non_aeldari_state, non_aeldari_army, _non_aeldari_enemy_army = _corsair_state(
+        phase=BattlePhase.FIGHT,
+        active_player_id="player-a",
+    )
+    non_aeldari_unit = replace(
+        _unit_by_id(non_aeldari_state, _CORSAIR_UNIT_ID),
+        faction_keywords=("OPFOR",),
+    )
+    non_aeldari_state.army_definitions[0] = replace(
+        non_aeldari_army,
+        units=(non_aeldari_unit, *non_aeldari_army.units[1:]),
+    )
+    assert (
+        stratagems.validate_pirates_due(
+            _corsair_stratagem_handler_context(
+                state=non_aeldari_state,
+                stratagem_id=stratagems.PIRATES_DUE_STRATAGEM_ID,
+                handler_id=stratagems.PIRATES_DUE_HANDLER_ID,
+                target_unit_id=_CORSAIR_UNIT_ID,
+                phase=BattlePhase.FIGHT,
+                trigger_kind=TimingTriggerKind.DURING_PHASE,
+            )
+        ).reason
+        == "target_not_aeldari"
+    )
+
+    far_from_objective_state, _far_corsair_army, _far_enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        corsair_x=55.0,
+        enemy_x=5.0,
+    )
+    assert (
+        stratagems.validate_cloak_and_shadow(
+            _corsair_stratagem_handler_context(
+                state=far_from_objective_state,
+                stratagem_id=stratagems.CLOAK_AND_SHADOW_STRATAGEM_ID,
+                handler_id=stratagems.CLOAK_AND_SHADOW_HANDLER_ID,
+                target_unit_id=_CORSAIR_UNIT_ID,
+                phase=BattlePhase.SHOOTING,
+                trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
+                trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
+            )
+        ).reason
+        == "target_not_within_controlled_objective"
+    )
+
+    no_mission_state, _no_mission_corsair_army, _no_mission_enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+    )
+    no_mission_state.mission_setup = None
+    with pytest.raises(GameLifecycleError, match="objective checks require mission setup"):
+        stratagems.validate_cloak_and_shadow(
+            _corsair_stratagem_handler_context(
+                state=no_mission_state,
+                stratagem_id=stratagems.CLOAK_AND_SHADOW_STRATAGEM_ID,
+                handler_id=stratagems.CLOAK_AND_SHADOW_HANDLER_ID,
+                target_unit_id=_CORSAIR_UNIT_ID,
+                phase=BattlePhase.SHOOTING,
+                trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
+                trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
+            )
+        )
+
+    unplaced_target_state, _unplaced_corsair_army, _unplaced_enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        corsair_x=30.0,
+        enemy_x=55.0,
+    )
+    apply_result = stratagems.apply_cloak_and_shadow(
+        _corsair_stratagem_handler_context(
+            state=unplaced_target_state,
+            stratagem_id=stratagems.CLOAK_AND_SHADOW_STRATAGEM_ID,
+            handler_id=stratagems.CLOAK_AND_SHADOW_HANDLER_ID,
+            target_unit_id=_CORSAIR_UNIT_ID,
+            phase=BattlePhase.SHOOTING,
+            trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
+            trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
+        )
+    )
+    assert apply_result.reason is None
+    _remove_unit_placement(unplaced_target_state, _CORSAIR_UNIT_ID)
+    with pytest.raises(GameLifecycleError, match="target unit is not placed"):
+        stratagems.cloak_and_shadow_target_restriction(
+            ShootingTargetRestrictionContext(
+                state=unplaced_target_state,
+                player_id="player-b",
+                battle_round=unplaced_target_state.battle_round,
+                attacking_unit_instance_id=_ENEMY_UNIT_ID,
+                attacker_model_instance_id=f"{_ENEMY_UNIT_ID}:model-001",
+                target_unit_instance_id=_CORSAIR_UNIT_ID,
+            )
+        )
+
+    unplaced_engagement_state, _unplaced_engagement_corsair, _unplaced_engagement_enemy = (
+        _corsair_state(
+            phase=BattlePhase.SHOOTING,
+            active_player_id="player-b",
+        )
+    )
+    _remove_unit_placement(unplaced_engagement_state, _CORSAIR_UNIT_ID)
+    with pytest.raises(GameLifecycleError, match="target unit is not placed"):
+        stratagems.validate_vengeful_sorrow(
+            _corsair_stratagem_handler_context(
+                state=unplaced_engagement_state,
+                stratagem_id=stratagems.VENGEFUL_SORROW_STRATAGEM_ID,
+                handler_id=stratagems.VENGEFUL_SORROW_HANDLER_ID,
+                target_unit_id=_CORSAIR_UNIT_ID,
+                phase=BattlePhase.SHOOTING,
+                trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_SHOT,
+                trigger_payload={DESTROYED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
+            )
+        )
+
+    no_engagement_state, _no_engagement_corsair_army, _no_engagement_enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+    )
+    no_engagement_state.battlefield_state = None
+    with pytest.raises(GameLifecycleError, match="engagement checks require battlefield state"):
+        stratagems.validate_vengeful_sorrow(
+            _corsair_stratagem_handler_context(
+                state=no_engagement_state,
+                stratagem_id=stratagems.VENGEFUL_SORROW_STRATAGEM_ID,
+                handler_id=stratagems.VENGEFUL_SORROW_HANDLER_ID,
+                target_unit_id=_CORSAIR_UNIT_ID,
+                phase=BattlePhase.SHOOTING,
+                trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_SHOT,
+                trigger_payload={DESTROYED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
+            )
+        )
 
 
 def test_runtime_content_bundle_guardrails_validate_corsair_hook_registries() -> None:
@@ -2973,6 +4361,130 @@ def _bad_unit_move_completed_handler(
     return cast(tuple[UnitMoveCompletedMortalWoundEffect, ...], [])
 
 
+def _corsair_stratagem_handler_context(
+    *,
+    state: GameState,
+    stratagem_id: str,
+    handler_id: str,
+    target_unit_id: str,
+    phase: BattlePhase,
+    trigger_kind: TimingTriggerKind,
+    player_id: str = "player-a",
+    trigger_payload: JsonValue = None,
+    effect_selection: JsonValue = None,
+) -> StratagemHandlerContext:
+    definition = _corsair_stratagem_definition(stratagem_id)
+    target_binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id=player_id,
+        target_unit_instance_id=target_unit_id,
+    )
+    use_id = f"phase17g-corsair:{stratagem_id}:use"
+    result = DecisionResult(
+        result_id=f"{use_id}:result",
+        request_id=f"{use_id}:request",
+        decision_type=STRATAGEM_DECISION_TYPE,
+        actor_id=player_id,
+        selected_option_id=f"{use_id}:option",
+        payload=None,
+    )
+    eligibility_context = StratagemEligibilityContext(
+        game_id=state.game_id,
+        player_id=player_id,
+        battle_round=state.battle_round,
+        phase=phase,
+        active_player_id=state.active_player_id,
+        trigger_kind=trigger_kind,
+        timing_window_id=f"{use_id}:window",
+        trigger_payload=trigger_payload,
+    )
+    affected_unit_ids = {target_unit_id}
+    if isinstance(effect_selection, dict):
+        selected_enemy = effect_selection.get(ENGAGED_ENEMY_UNIT_CONTEXT_KEY)
+        if type(selected_enemy) is str:
+            affected_unit_ids.add(selected_enemy)
+    use_record = StratagemUseRecord(
+        use_id=use_id,
+        player_id=player_id,
+        stratagem_id=stratagem_id,
+        source_id=definition.source_id,
+        battle_round=state.battle_round,
+        phase=phase,
+        active_player_id=state.active_player_id,
+        timing_window_id=eligibility_context.timing_window_id,
+        request_id=result.request_id,
+        result_id=result.result_id,
+        selected_option_id=result.selected_option_id,
+        target_binding=target_binding,
+        targeted_unit_instance_ids=(target_unit_id,),
+        affected_unit_instance_ids=tuple(sorted(affected_unit_ids)),
+        command_point_cost=1,
+        command_point_transaction_id=f"{use_id}:cp",
+        handler_id=handler_id,
+        effect_selection=effect_selection,
+        effect_payload=definition.effect_payload,
+    )
+    return StratagemHandlerContext(
+        state=state,
+        decisions=DecisionController(),
+        result=result,
+        eligibility_context=eligibility_context,
+        definition=definition,
+        target_binding=target_binding,
+        use_record=use_record,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+    )
+
+
+def _corsair_stratagem_definition(stratagem_id: str) -> StratagemDefinition:
+    for record in manifest.runtime_contribution().stratagem_records:
+        if record.definition.stratagem_id == stratagem_id:
+            return record.definition
+    raise AssertionError(f"Missing Corsair stratagem definition: {stratagem_id}")
+
+
+def _corsair_stratagem_record(stratagem_id: str) -> StratagemCatalogRecord:
+    for record in manifest.runtime_contribution().stratagem_records:
+        if record.definition.stratagem_id == stratagem_id:
+            return record
+    raise AssertionError(f"Missing Corsair stratagem record: {stratagem_id}")
+
+
+def _corsair_test_weapon_profile(*, ap: int) -> WeaponProfile:
+    return WeaponProfile(
+        profile_id="phase17g-corsair-test-shuriken-rifle",
+        name="Corsair test shuriken rifle",
+        range_profile=RangeProfile.distance(24),
+        attack_profile=AttackProfile.fixed(1),
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, ap),
+        damage_profile=DamageProfile.fixed(1),
+    )
+
+
+def _invalid_ability_descriptor(
+    *,
+    parameters: tuple[AbilityParameter, ...],
+) -> AbilityDescriptor:
+    descriptor = object.__new__(AbilityDescriptor)
+    object.__setattr__(descriptor, "ability_id", "rapid-fire:invalid")
+    object.__setattr__(descriptor, "name", "Rapid Fire Invalid")
+    object.__setattr__(descriptor, "ability_kind", AbilityKind.RAPID_FIRE)
+    object.__setattr__(descriptor, "parameters", parameters)
+    object.__setattr__(descriptor, "target_keywords", ())
+    object.__setattr__(descriptor, "timing", None)
+    object.__setattr__(descriptor, "condition", None)
+    return descriptor
+
+
+def _json_object(value: object) -> dict[str, object]:
+    if not isinstance(value, dict):
+        raise TypeError("Expected JSON object.")
+    return cast(dict[str, object], value)
+
+
 def _corsair_lifecycle_for_state(*, config: GameConfig, state: GameState) -> GameLifecycle:
     lifecycle = GameLifecycle()
     lifecycle.start(config)
@@ -3107,6 +4619,134 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
     return request
 
 
+def _lifecycle_state(lifecycle: GameLifecycle) -> GameState:
+    if lifecycle.state is None:
+        raise AssertionError("Lifecycle state is missing.")
+    return lifecycle.state
+
+
+def _refresh_lifecycle_runtime_content(lifecycle: GameLifecycle) -> None:
+    refresh = cast(
+        Callable[[], None],
+        object.__getattribute__(
+            lifecycle,
+            "_refresh_runtime_content_bundle_if_armies_mustered",
+        ),
+    )
+    refresh()
+
+
+def _lifecycle_event_payloads(
+    lifecycle: GameLifecycle,
+    event_type: str,
+) -> tuple[dict[str, JsonValue], ...]:
+    return tuple(
+        cast(dict[str, JsonValue], event.payload)
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == event_type
+    )
+
+
+def _attack_step_payload(
+    events: tuple[dict[str, JsonValue], ...],
+    step: AttackSequenceStep,
+) -> dict[str, JsonValue]:
+    for event in events:
+        if event["step"] == step.value:
+            return event
+    raise AssertionError(f"Missing attack sequence step {step.value}.")
+
+
+def _drain_until_downstream_attack_resolution(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+    *,
+    result_id_prefix: str,
+) -> LifecycleStatus:
+    current = status
+    downstream_steps = {
+        AttackSequenceStep.ALLOCATE.value,
+        AttackSequenceStep.SAVE.value,
+        AttackSequenceStep.DAMAGE.value,
+    }
+    for index in range(128):
+        if {
+            cast(str, payload["step"])
+            for payload in _lifecycle_event_payloads(lifecycle, "attack_sequence_step")
+        } & downstream_steps:
+            return current
+        if (
+            current.status_kind is not LifecycleStatusKind.WAITING_FOR_DECISION
+            or current.decision_request is None
+        ):
+            return current
+        request = current.decision_request
+        if request.is_parameterized_submission_request():
+            raise AssertionError(f"Unexpected parameterized decision {request.decision_type}.")
+        if request.decision_type == DICE_REROLL_DECISION_TYPE:
+            option_id = "decline"
+        elif request.decision_type == STRATAGEM_DECISION_TYPE:
+            option_id = DECLINE_STRATAGEM_WINDOW_OPTION_ID
+        else:
+            option_id = request.options[0].option_id
+        current = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"{result_id_prefix}-{index:03d}",
+                request=request,
+                selected_option_id=option_id,
+            )
+        )
+    raise AssertionError("Attack sequence did not reach allocation, save, or damage resolution.")
+
+
+def _stratagem_option(request: DecisionRequest, stratagem_id: str) -> DecisionOption:
+    option_prefix = f"use-stratagem:{stratagem_id}:"
+    for option in request.options:
+        if option.option_id.startswith(option_prefix):
+            return option
+    raise AssertionError(f"Missing Stratagem option {stratagem_id}.")
+
+
+def _first_primary_melee_weapon_payload(
+    proposal_request: MeleeDeclarationProposalRequest,
+) -> dict[str, object]:
+    for weapon in proposal_request.available_weapons:
+        weapon_payload = cast(dict[str, object], weapon)
+        if weapon_payload["is_extra_attacks"] is True:
+            continue
+        engaged_target_ids = cast(list[str], weapon_payload["engaged_target_unit_instance_ids"])
+        if engaged_target_ids:
+            return weapon_payload
+    raise AssertionError("Missing primary engaged melee weapon.")
+
+
+def _mark_player_as_corsair_coterie(state: GameState, *, player_id: str) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != player_id:
+            updated_armies.append(army)
+            continue
+        updated_armies.append(
+            replace(
+                army,
+                detachment_selection=replace(
+                    army.detachment_selection,
+                    faction_id="aeldari",
+                    detachment_ids=("corsair-coterie",),
+                ),
+                units=tuple(
+                    replace(
+                        unit,
+                        keywords=("ANHRATHE", "INFANTRY"),
+                        faction_keywords=("AELDARI",),
+                    )
+                    for unit in army.units
+                ),
+            )
+        )
+    state.army_definitions = updated_armies
+
+
 def _event_records(decisions: DecisionController, event_type: str) -> tuple[EventRecord, ...]:
     return tuple(
         record for record in decisions.event_log.records if record.event_type == event_type
@@ -3161,6 +4801,7 @@ def _corsair_state(
     enhancement_assignments: tuple[EnhancementAssignment, ...] = (),
     phase: BattlePhase = BattlePhase.MOVEMENT,
     active_player_id: str = "player-a",
+    corsair_keywords: tuple[str, ...] = ("ANHRATHE", "INFANTRY"),
     corsair_x: float = 10.0,
     archraider_x: float = 15.0,
     voidstone_x: float = 20.0,
@@ -3173,7 +4814,7 @@ def _corsair_state(
         unit_instance_id=_CORSAIR_UNIT_ID,
         datasheet_id="aeldari-corsairs",
         name="Corsairs",
-        keywords=("ANHRATHE", "INFANTRY"),
+        keywords=corsair_keywords,
         faction_keywords=("AELDARI",),
         objective_control=3,
     )
@@ -3679,3 +5320,23 @@ def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
             if unit.unit_instance_id == unit_instance_id:
                 return unit
     raise AssertionError(f"missing unit {unit_instance_id}")
+
+
+def _remove_unit_placement(state: GameState, unit_instance_id: str) -> None:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("Expected battlefield state.")
+    state.battlefield_state = replace(
+        battlefield,
+        placed_armies=tuple(
+            replace(
+                placed_army,
+                unit_placements=tuple(
+                    placement
+                    for placement in placed_army.unit_placements
+                    if placement.unit_instance_id != unit_instance_id
+                ),
+            )
+            for placed_army in battlefield.placed_armies
+        ),
+    )

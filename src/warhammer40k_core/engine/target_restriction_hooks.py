@@ -26,6 +26,7 @@ class ShootingTargetRestrictionContext:
     battle_round: int
     attacking_unit_instance_id: str
     target_unit_instance_id: str
+    attacker_model_instance_id: str | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -50,6 +51,14 @@ class ShootingTargetRestrictionContext:
             self,
             "target_unit_instance_id",
             _validate_identifier("target_unit_instance_id", self.target_unit_instance_id),
+        )
+        object.__setattr__(
+            self,
+            "attacker_model_instance_id",
+            _validate_optional_identifier(
+                "attacker_model_instance_id",
+                self.attacker_model_instance_id,
+            ),
         )
 
 
@@ -310,6 +319,12 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"Target restriction hook {field_name} must not be empty.")
     return stripped
+
+
+def _validate_optional_identifier(field_name: str, value: object) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(field_name, value)
 
 
 def _validate_message(value: object) -> str:
