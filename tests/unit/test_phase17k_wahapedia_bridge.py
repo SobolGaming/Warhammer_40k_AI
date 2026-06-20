@@ -631,6 +631,23 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "| Chaos Daemons - Cavalcade of Chaos Upgrades |" in generated_markdown
     assert "Apocalyptic Steeds +1 Movement" in generated_markdown
     assert "Soul-Shattering Charge 3 inch melee targeting" in generated_markdown
+    assert "Current coverage categories:" not in generated_markdown
+    assert "## Runtime Hook Inventory" in generated_markdown
+    assert "| `catalog-ir:charge-roll-modifier` | Instrument of Chaos |" in generated_markdown
+    assert "| `core:command-reroll` | Command Re-roll |" in generated_markdown
+    assert "| `generic:ingress-move` | From Beyond the Veil |" in generated_markdown
+    assert (
+        "| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:"
+        "relentless_raiders` | Relentless Raiders |"
+    ) in generated_markdown
+    assert (
+        "| `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:"
+        "warp_riders` | Warp-Riders |"
+    ) in generated_markdown
+    assert (
+        "| `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:"
+        "soul_shattering_charge_upgrade` | Soul-Shattering Charge Upgrade |"
+    ) in generated_markdown
     assert tuple(row.datasheet_name for row in rows_by_name["Instrument of Chaos"]) == (
         "Bloodletters",
         "Bloodcrushers",

@@ -14,21 +14,6 @@ Support stages:
 - `generic_ir_executable`: rule text compiled to supported generic IR and can execute through the generic IR handler.
 - `engine_consumed`: a structured descriptor, supported generic IR, or implementation-backed runtime content is consumed by a phase/query host through a named runtime consumer.
 
-Current coverage categories:
-
-| Category | Support status | Runtime consumers | Rows | Source kinds | Ability/datasheet pairs | Semantic category |
-| --- | --- | --- | ---: | --- | --- | --- |
-| Chaos Daemons Army Rule | `engine_consumed` | `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos` | 2 | `faction`: 2 | The Shadow of Chaos (Bloodcrushers)<br>The Shadow of Chaos (Bloodletters) | `faction.army_rule.shadow_of_chaos` |
-| Charge Roll Modifier | `engine_consumed` | `catalog-ir:charge-roll-modifier` | 2 | `wargear`: 2 | Instrument of Chaos (Bloodcrushers)<br>Instrument of Chaos (Bloodletters) | `wargear.roll_modifier.charge.this_unit` |
-| Death Guard Army Rule | `engine_consumed` | `warhammer_40000_11th:death_guard:army_rule:nurgles_gift`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:armour-save-option`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:leadership`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:melee-hit-roll`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:movement-budget`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:objective-control`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:toughness` | 1 | `faction`: 1 | Nurgle's Gift (Death Guard) | `faction.army_rule.nurgles_gift` |
-| Deep Strike Reserve Arrival | `engine_consumed` | `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike` | 2 | `core`: 2 | Deep Strike (Bloodcrushers)<br>Deep Strike (Bloodletters) | `core.reserve.deep_strike` |
-| Drukhari Army Rule | `engine_consumed` | `army-mustering:drukhari-corsairs-and-travelling-players` | 1 | `faction`: 1 | Corsairs and Travelling Players (Drukhari) | `faction.army_rule.corsairs_and_travelling_players` |
-| Drukhari Army Rule | `engine_consumed` | `warhammer_40000_11th:drukhari:army_rule:power_from_pain`, `warhammer_40000_11th:drukhari:army_rule:scaffold` | 1 | `faction`: 1 | Power from Pain (Drukhari) | `faction.army_rule.power_from_pain` |
-| Emperor's Children Army Rule | `engine_consumed` | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction` | 1 | `faction`: 1 | Thrill Seekers (Emperor's Children) | `faction.army_rule.thrill_seekers` |
-| Leadership Characteristic | `engine_consumed` | `catalog-ir:leadership-characteristic-query` | 2 | `wargear`: 2 | Daemonic Icon (Bloodcrushers)<br>Daemonic Icon (Bloodletters) | `wargear.characteristic_set.leadership.this_unit` |
-| Unknown Abilities | `descriptor_only` | None | 2 | `datasheet`: 2 | Brass Stampede (Bloodcrushers)<br>Bane of Cowards (Bloodletters) | `unknown.ability_text` |
-| World Eaters Army Rule | `engine_consumed` | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords` | 1 | `faction`: 1 | Blessings of Khorne (World Eaters) | `faction.army_rule.blessings_of_khorne` |
-
 ## Structured Support Sections
 
 These sections organize the support matrix by the rule families adapters and engine owners usually reason about. `Full` means the current CORE V2 scope has engine/runtime support, documentation or contract coverage when adapter-visible, and focused tests. `Partial` means at least one known rule edge, generated source-row path, or runtime host remains incomplete. `None` means the source row and generated scaffold exist, but no semantic engine rule path is present.
@@ -408,3 +393,93 @@ Datasheet abilities remain separate from core, wargear, faction, and detachment 
 Unknown Abilities are descriptors that are present in the canonical catalog but are not yet parsed into a supported IR template or tied to a runtime consumer. Parsed-but-unconsumed IR remains separated by its semantic category and support stage instead of being collapsed into Unknown Abilities.
 
 Broad CORE V1-to-CORE V2 category forecasting is intentionally deferred until current-edition faction-pack modifications are complete. Until then, this report only marks support from the current canonical rows, typed IR, descriptor consumers, explicitly declared runtime-content rows, and tests proving the behavior.
+
+## Runtime Hook Inventory
+
+This bottom inventory lists the hook, modifier, effect, handler, and runtime consumer IDs currently surfaced by generated category rows, Core Stratagem records, or registered runtime-content contributions.
+
+| Hook / consumer | Abilities / rules |
+| --- | --- |
+| `army-mustering:drukhari-corsairs-and-travelling-players` | Corsairs and Travelling Players |
+| `catalog-ir:charge-roll-modifier` | Instrument of Chaos |
+| `catalog-ir:leadership-characteristic-query` | Daemonic Icon |
+| `core:command-reroll` | Command Re-roll |
+| `core:counteroffensive` | Counteroffensive |
+| `core:crushing-impact` | Crushing Impact |
+| `core:epic-challenge` | Epic Challenge |
+| `core:explosives` | Explosives |
+| `core:fire-overwatch` | Fire Overwatch |
+| `core:heroic-intervention` | Heroic Intervention |
+| `core:insane-bravery` | Insane Bravery |
+| `core:new-orders` | New Orders |
+| `core:rapid-ingress` | Rapid Ingress |
+| `core:smokescreen` | Smokescreen |
+| `descriptor:movement:deep-strike-placement` | Deep Strike |
+| `descriptor:reserve-declaration:deep-strike` | Deep Strike |
+| `generic:force-desperate-escape` | Inescapable Manifestations |
+| `generic:ingress-move` | From Beyond the Veil |
+| `phase17g:aeldari:corsair-coterie:stratagems:cloak-and-shadow:target-restriction` | Cloak and Shadow |
+| `phase17g:aeldari:corsair-coterie:stratagems:outcast-ambush:weapon-profile` | Outcast Ambush |
+| `warhammer_40000_11th:aeldari:army_rule:fade_back` | Battle Focus - Fade Back |
+| `warhammer_40000_11th:aeldari:army_rule:flitting_shadows` | Battle Focus - Flitting Shadows |
+| `warhammer_40000_11th:aeldari:army_rule:opportunity_seized` | Battle Focus - Opportunity Seized |
+| `warhammer_40000_11th:aeldari:army_rule:star_engines` | Battle Focus - Star Engines |
+| `warhammer_40000_11th:aeldari:army_rule:sudden_strike` | Battle Focus - Sudden Strike |
+| `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind` | Battle Focus - Swift as the Wind |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider` | Archraider |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:lord_of_deceit` | Archraider |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:lord_of_deceit_choice` | Archraider |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:select_model` | Archraider |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:cloak_and_shadow` | Cloak and Shadow |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:infamy` | Infamy |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:infamy:objective_control` | Infamy |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:into_the_breach` | Into the Breach |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:lethal_ruse` | Lethal Ruse |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:outcast_ambush` | Outcast Ambush |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:pirates_due` | Pirates' Due |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:relentless_raiders` | Relentless Raiders |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:vengeful_sorrow` | Vengeful Sorrow |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:void_thieves` | Void Thieves |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:voidstone` | Voidstone |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:voidstone:save_option` | Voidstone |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone` | Webway Pathstone |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone:deep_strike` | Webway Pathstone |
+| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone:turn_end_reserves` | Webway Pathstone |
+| `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:assassins_eye_upgrade` | Assassins' Eye |
+| `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:camouflaged_snipers_upgrade` | Camouflaged Snipers |
+| `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:casting_back_the_veil` | Casting Back the Veil |
+| `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:eldritch_suppression` | Eldritch Suppression |
+| `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:nomads_of_the_hidden_way` | Nomads of the Hidden Way |
+| `warhammer_40000_11th:aeldari:path_of_the_outcast:far_reaching_doom:selected_shooting_unit` | Far-reaching Doom |
+| `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos` | The Shadow of Chaos |
+| `warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted` | Blood Tainted |
+| `warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall` | Murdercall |
+| `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:apocalyptic_steeds_upgrade` | Apocalyptic Steeds Upgrade |
+| `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:soul_shattering_charge_upgrade` | Soul-Shattering Charge Upgrade |
+| `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche` | Unholy Avalanche |
+| `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:warp_riders` | Warp-Riders |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift` | Nurgle's Gift |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:armour-save-option` | Nurgle's Gift |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:leadership` | Nurgle's Gift |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:melee-hit-roll` | Nurgle's Gift |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:movement-budget` | Nurgle's Gift |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:objective-control` | Nurgle's Gift |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:toughness` | Nurgle's Gift |
+| `warhammer_40000_11th:drukhari:army_rule:power_from_pain` | Power from Pain |
+| `warhammer_40000_11th:drukhari:army_rule:power_from_pain:battle-shock-failed` | Power from Pain |
+| `warhammer_40000_11th:drukhari:army_rule:power_from_pain:command-phase-start` | Power from Pain |
+| `warhammer_40000_11th:drukhari:army_rule:power_from_pain:enemy-unit-destroyed` | Power from Pain |
+| `warhammer_40000_11th:drukhari:army_rule:power_from_pain:hatred-eternal-fight` | Power from Pain - Hatred Eternal |
+| `warhammer_40000_11th:drukhari:army_rule:power_from_pain:hatred-eternal-shooting` | Power from Pain - Hatred Eternal |
+| `warhammer_40000_11th:drukhari:army_rule:power_from_pain:lithe-agility-advance` | Power from Pain - Lithe Agility |
+| `warhammer_40000_11th:drukhari:army_rule:power_from_pain:lithe-agility-charge` | Power from Pain - Lithe Agility |
+| `warhammer_40000_11th:drukhari:army_rule:scaffold` | Power from Pain |
+| `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility` | Thrill Seekers |
+| `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction` | Thrill Seekers |
+| `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility` | Thrill Seekers |
+| `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction` | Thrill Seekers |
+| `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne` | Blessings of Khorne |
+| `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration` | Blessings of Khorne - Rage-fuelled Invigoration |
+| `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage` | Blessings of Khorne - Total Carnage |
+| `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll` | Blessings of Khorne - Unbridled Bloodlust |
+| `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords` | Blessings of Khorne |
