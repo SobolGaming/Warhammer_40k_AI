@@ -9,7 +9,10 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from tools.generate_ability_support_matrix import ability_support_matrix_rows
+from tools.generate_ability_support_matrix import (
+    ability_support_matrix_rows,
+    support_matrix_markdown,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
@@ -604,6 +607,12 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
             / "ability_support_category_rows.json"
         ).read_text(encoding="utf-8")
     )
+    markdown_snapshot = (
+        Path(__file__).resolve().parents[2] / "docs" / "ABILITY_SUPPORT_MATRIX_V2.md"
+    ).read_text(encoding="utf-8")
+    generated_markdown = support_matrix_markdown(
+        ability_coverage_category_rows_payload(category_rows)
+    )
     rows_by_name: dict[str, list[AbilityCoverageRow]] = {}
     for row in rows:
         rows_by_name.setdefault(row.ability_name, []).append(row)
@@ -611,6 +620,17 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
 
     assert ability_coverage_rows_payload(rows) == snapshot
     assert ability_coverage_category_rows_payload(category_rows) == category_snapshot
+    assert generated_markdown == markdown_snapshot
+    assert "| Aeldari | Corsair Coterie |" in generated_markdown
+    assert "| Aeldari - Corsair Coterie Stratagems |" in generated_markdown
+    assert "| Aeldari - Corsair Coterie Enhancements |" in generated_markdown
+    assert "| Chaos Daemons | Cavalcade of Chaos |" in generated_markdown
+    assert "three named Stratagem records, and two Enhancement bindings" in generated_markdown
+    assert "| Chaos Daemons - Cavalcade of Chaos Stratagems |" in generated_markdown
+    assert "Warp-Riders, From Beyond the Veil, and Inescapable Manifestations" in generated_markdown
+    assert "| Chaos Daemons - Cavalcade of Chaos Upgrades |" in generated_markdown
+    assert "Apocalyptic Steeds +1 Movement" in generated_markdown
+    assert "Soul-Shattering Charge 3 inch melee targeting" in generated_markdown
     assert tuple(row.datasheet_name for row in rows_by_name["Instrument of Chaos"]) == (
         "Bloodletters",
         "Bloodcrushers",

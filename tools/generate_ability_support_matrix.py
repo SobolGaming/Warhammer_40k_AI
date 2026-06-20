@@ -128,6 +128,29 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
         ),
     ),
     (
+        "aeldari",
+        "corsair-coterie",
+    ): SupportSectionRow(
+        subject="Corsair Coterie",
+        engine=(
+            "Relentless Raiders movement/charge completion mortal-wound hook, Void Thieves "
+            "sticky objective-control hook, four enhancements, and six named Stratagem handlers"
+        ),
+        documentation="Adapter contract, architecture, and generated matrix",
+        tests=(
+            "Focused mustering, objective-control, movement-completion, turn-end, "
+            "Stratagem-cost, runtime-modifier, Stratagem effect, targeting-restriction, "
+            "and triggered-movement tests"
+        ),
+        overall="Full",
+        notes=(
+            "Includes Veterans of the Void mustering, objective-control ownership checks after "
+            "sticky states, D6 2+ into D3 mortal wounds for enemies ending Normal/Advance/"
+            "Fall Back/Charge moves on controlled objectives, Anhrathe sticky control, and "
+            "Corsair Coterie Stratagem support."
+        ),
+    ),
+    (
         "chaos-daemons",
         "blood-legion",
     ): SupportSectionRow(
@@ -146,12 +169,18 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
         "cavalcade-of-chaos",
     ): SupportSectionRow(
         subject="Cavalcade of Chaos",
-        engine="Unholy Avalanche Fall Back eligibility hook",
+        engine=(
+            "Unholy Avalanche Fall Back eligibility hook, three named Stratagem records, "
+            "and two Enhancement bindings"
+        ),
         documentation="Source row, execution record, and generated matrix",
-        tests="Focused Fall Back, Shoot, Charge, and handler-drift tests",
+        tests=("Focused Fall Back, Shoot, Charge, Stratagem, Enhancement, and handler-drift tests"),
         overall="Full",
         notes=(
-            "Mounted Legiones Daemonica units retain Shoot and Charge permissions after Fall Back."
+            "Includes MOUNTED LEGIONES DAEMONICA Shoot and Charge permissions after Fall Back, "
+            "Warp-Riders MOBILE, From Beyond the Veil ingress, Inescapable Manifestations "
+            "Desperate Escape, Apocalyptic Steeds +1 Movement, and Soul-Shattering Charge "
+            "melee targeting."
         ),
     ),
 }
@@ -170,7 +199,7 @@ def main() -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     _write_json(output_dir / "ability_coverage_rows.json", row_payloads)
     _write_json(output_dir / "ability_support_category_rows.json", category_payloads)
-    docs_path.write_text(_support_matrix_markdown(category_payloads), encoding="utf-8")
+    docs_path.write_text(support_matrix_markdown(category_payloads), encoding="utf-8")
 
 
 def ability_support_matrix_rows(
@@ -371,7 +400,7 @@ def _emperors_children_runtime_consumer_ids() -> tuple[str, ...]:
     )
 
 
-def _support_matrix_markdown(
+def support_matrix_markdown(
     category_rows: list[AbilityCoverageCategoryRowPayload],
 ) -> str:
     lines = [
@@ -642,61 +671,14 @@ def _structured_support_sections_markdown() -> list[str]:
                 "Faction Stratagems are distinct from Core Stratagems and should remain "
                 "faction-scoped."
             ),
-            (
-                SupportSectionRow(
-                    "Aeldari - Path of the Outcast Stratagems",
-                    "Named post-shooting Stratagem handlers",
-                    "Adapter contract, architecture, and generated matrix",
-                    "Focused CP, targeting, Battle-shock, detection, and movement tests",
-                    "Full",
-                    (
-                        "Includes Eldritch Suppression, Casting Back the Veil, and Nomads of "
-                        "the Hidden Way through the shared `use_stratagem` and triggered "
-                        "movement paths."
-                    ),
-                ),
-                SupportSectionRow(
-                    "Faction-pack Stratagems",
-                    "Coverage/report rows exist; semantic handlers vary",
-                    "Architecture and coverage reports",
-                    "Faction-specific tests where implemented",
-                    "Partial",
-                    (
-                        "Future generator work should group rows by faction, detachment, "
-                        "and Stratagem."
-                    ),
-                ),
-            ),
+            _faction_stratagem_support_rows(),
         )
     )
     lines.extend(
         _support_section_markdown(
             "Enhancements",
             "Enhancement support should be tracked under each faction and detachment.",
-            (
-                SupportSectionRow(
-                    "Aeldari - Path of the Outcast Upgrades",
-                    "Enhancement effect bindings",
-                    "Architecture and generated matrix",
-                    "Focused eligibility, hidden-preservation, and CHARACTER AP tests",
-                    "Full",
-                    (
-                        "Includes Camouflaged Snipers preserving Hidden after ranged attacks "
-                        "and Assassins' Eye applying +1 AP against CHARACTER targets."
-                    ),
-                ),
-                SupportSectionRow(
-                    "Faction-pack Enhancements",
-                    "Coverage/report rows exist; semantic handlers vary",
-                    "Architecture and coverage reports",
-                    "Faction-specific tests where implemented",
-                    "Partial",
-                    (
-                        "Future generator work should group rows by faction, detachment, "
-                        "and enhancement."
-                    ),
-                ),
-            ),
+            _enhancement_support_rows(),
         )
     )
     lines.extend(
@@ -716,6 +698,122 @@ def _structured_support_sections_markdown() -> list[str]:
         )
     )
     return lines
+
+
+def _faction_stratagem_support_rows() -> tuple[SupportSectionRow, ...]:
+    return (
+        SupportSectionRow(
+            "Aeldari - Path of the Outcast Stratagems",
+            "Named post-shooting Stratagem handlers",
+            "Adapter contract, architecture, and generated matrix",
+            "Focused CP, targeting, Battle-shock, detection, and movement tests",
+            "Full",
+            (
+                "Includes Eldritch Suppression, Casting Back the Veil, and Nomads of "
+                "the Hidden Way through the shared `use_stratagem` and triggered "
+                "movement paths."
+            ),
+        ),
+        SupportSectionRow(
+            "Aeldari - Corsair Coterie Stratagems",
+            (
+                "Named Movement, Shooting, and Fight phase Stratagem handlers plus "
+                "source-backed attack reroll, triggered movement, target restriction, "
+                "and weapon-profile hooks"
+            ),
+            "Adapter contract, architecture, and generated matrix",
+            (
+                "Focused timing, targeting, source-backed wound reroll, AP/weapon-keyword "
+                "modifier, mortal-wound, triggered-movement, and target-restriction tests"
+            ),
+            "Full",
+            (
+                "Includes Pirates' Due, Lethal Ruse, Outcast Ambush, Into the Breach, "
+                "Cloak and Shadow, and Vengeful Sorrow through the shared `use_stratagem`, "
+                "attack sequence, charge eligibility, and triggered movement paths."
+            ),
+        ),
+        SupportSectionRow(
+            "Chaos Daemons - Cavalcade of Chaos Stratagems",
+            (
+                "Named Warp-Riders handler plus generic ingress and Desperate Escape "
+                "Stratagem records"
+            ),
+            "Adapter contract, architecture, and generated matrix",
+            (
+                "Focused Movement timing, CP, Strategic Reserves ingress, Desperate Escape, "
+                "and handler-drift tests"
+            ),
+            "Full",
+            (
+                "Includes Warp-Riders, From Beyond the Veil, and Inescapable Manifestations "
+                "through the shared `use_stratagem`, persisting-effect, Strategic Reserves "
+                "placement, and forced Desperate Escape paths."
+            ),
+        ),
+        SupportSectionRow(
+            "Faction-pack Stratagems",
+            "Coverage/report rows exist; semantic handlers vary",
+            "Architecture and coverage reports",
+            "Faction-specific tests where implemented",
+            "Partial",
+            ("Future generator work should group rows by faction, detachment, and Stratagem."),
+        ),
+    )
+
+
+def _enhancement_support_rows() -> tuple[SupportSectionRow, ...]:
+    return (
+        SupportSectionRow(
+            "Aeldari - Path of the Outcast Upgrades",
+            "Enhancement effect bindings",
+            "Architecture and generated matrix",
+            "Focused eligibility, hidden-preservation, and CHARACTER AP tests",
+            "Full",
+            (
+                "Includes Camouflaged Snipers preserving Hidden after ranged attacks "
+                "and Assassins' Eye applying +1 AP against CHARACTER targets."
+            ),
+        ),
+        SupportSectionRow(
+            "Aeldari - Corsair Coterie Enhancements",
+            (
+                "Enhancement effect, setup, turn-end, Stratagem-cost choice, Objective "
+                "Control, and save-option bindings"
+            ),
+            "Adapter contract, architecture, and generated matrix",
+            "Focused Veterans, Infamy, Webway Pathstone, Archraider, and Voidstone tests",
+            "Full",
+            (
+                "Includes Infamy OC reduction aura, Webway Pathstone Deep Strike and "
+                "once-per-battle end-opponent-turn Strategic Reserves choice, Archraider "
+                "selected model setup plus optional Lord of Deceit +1CP modifier, and "
+                "Voidstone 5+ invulnerable save."
+            ),
+        ),
+        SupportSectionRow(
+            "Chaos Daemons - Cavalcade of Chaos Upgrades",
+            "Enhancement movement modifier and selected-to-fight ability bindings",
+            "Adapter contract, architecture, and generated matrix",
+            (
+                "Focused roster eligibility, lifecycle movement, melee targeting, "
+                "and source-drift tests"
+            ),
+            "Full",
+            (
+                "Includes Apocalyptic Steeds +1 Movement for LEGIONES DAEMONICA MOUNTED "
+                "units and Soul-Shattering Charge 3 inch melee targeting after a charge."
+            ),
+        ),
+        SupportSectionRow(
+            "Faction-pack Enhancements",
+            "Coverage/report rows exist; semantic handlers vary",
+            "Architecture and coverage reports",
+            "Faction-specific tests where implemented",
+            "Partial",
+            ("Future generator work should group rows by faction, detachment, and enhancement."),
+        ),
+    )
 
 
 def _support_section_markdown(
