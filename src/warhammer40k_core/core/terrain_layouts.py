@@ -60,7 +60,6 @@ class TerrainFeaturePresetPayload(TypedDict):
     footprint_template_id: str
     footprint_width_inches: float
     footprint_depth_inches: float
-    display_geometry: TerrainDisplayGeometryPayload
     walls: list[TerrainWallTemplatePayload]
     floors: list[TerrainFloorTemplatePayload]
     source_id: str
@@ -444,7 +443,6 @@ class TerrainFeaturePreset:
     footprint_template_id: str
     footprint_width_inches: float
     footprint_depth_inches: float
-    display_geometry: TerrainDisplayGeometry
     walls: tuple[TerrainWallTemplate, ...] = ()
     floors: tuple[TerrainFloorTemplate, ...] = ()
     source_id: str = "chapter_approved_2026_27"
@@ -490,15 +488,6 @@ class TerrainFeaturePreset:
         )
         object.__setattr__(
             self,
-            "display_geometry",
-            _validate_display_geometry(
-                "TerrainFeaturePreset display_geometry",
-                self.display_geometry,
-                feature_bounds=self.bounds(),
-            ),
-        )
-        object.__setattr__(
-            self,
             "walls",
             _validate_wall_templates("TerrainFeaturePreset walls", self.walls),
         )
@@ -526,7 +515,6 @@ class TerrainFeaturePreset:
             "footprint_template_id": self.footprint_template_id,
             "footprint_width_inches": self.footprint_width_inches,
             "footprint_depth_inches": self.footprint_depth_inches,
-            "display_geometry": self.display_geometry.to_payload(),
             "walls": [wall.to_payload() for wall in self.walls],
             "floors": [floor.to_payload() for floor in self.floors],
             "source_id": self.source_id,
@@ -543,7 +531,6 @@ class TerrainFeaturePreset:
             footprint_template_id=raw_payload["footprint_template_id"],
             footprint_width_inches=raw_payload["footprint_width_inches"],
             footprint_depth_inches=raw_payload["footprint_depth_inches"],
-            display_geometry=TerrainDisplayGeometry.from_payload(raw_payload["display_geometry"]),
             walls=tuple(
                 TerrainWallTemplate.from_payload(wall_payload)
                 for wall_payload in raw_payload["walls"]

@@ -24,6 +24,7 @@ from warhammer40k_core.core.missions import (
     ObjectiveTerrainAreaDefinition,
     objective_marker_role_from_token,
 )
+from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
 from warhammer40k_core.core.terrain_areas import (
     PlacedTerrainArea,
     SymmetryAxis,
@@ -35,6 +36,12 @@ from warhammer40k_core.core.terrain_areas import (
     terrain_area_local_transform_from_token,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayPoint
+from warhammer40k_core.core.terrain_layouts import (
+    TerrainFeatureAreaPlacement,
+    TerrainFeaturePreset,
+    TerrainFloorTemplate,
+    TerrainWallTemplate,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2026_27 as chapter_approved,
 )
@@ -57,7 +64,7 @@ IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
-TERRAIN_AREA_FEATURE_KIND = "terrain_area"
+TERRAIN_AREA_FEATURE_KIND = TerrainFeatureKind.RUINS.value
 LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES = 9.0
 LAYOUT_C_ARC_SEGMENTS = 16
 type DeploymentZoneLayoutTemplateId = Literal[
@@ -2220,6 +2227,13 @@ def terrain_area_footprint_templates() -> tuple[TerrainAreaFootprintTemplate, ..
     )
 
 
+def terrain_feature_presets() -> tuple[TerrainFeaturePreset, ...]:
+    return tuple(
+        _terrain_feature_preset_from_footprint_template(template)
+        for template in terrain_area_footprint_templates()
+    )
+
+
 def deployment_zone_layout_template_shapes() -> tuple[
     tuple[DeploymentZoneLayoutTemplateId, DeploymentZoneShape],
     ...,
@@ -2266,7 +2280,10 @@ def _extracted_layout_definition(
         ),
         battlefield_regions=_extracted_regions(layout_id=layout_id),
         terrain_areas=terrain_areas,
-        terrain_feature_placements=(),
+        terrain_feature_placements=_terrain_feature_area_placements(
+            layout_id=layout_id,
+            terrain_areas=terrain_areas,
+        ),
         objective_role_counts=layout_source.objective_role_counts,
         source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_source.source_layout_id}",
         objective_terrain_areas=_extracted_objective_terrain_area_definitions(
@@ -2967,6 +2984,27 @@ def _extracted_terrain_areas(
     )
 
 
+def _terrain_feature_area_placements(
+    *,
+    layout_id: str,
+    terrain_areas: tuple[PlacedTerrainArea, ...],
+) -> tuple[TerrainFeatureAreaPlacement, ...]:
+    layout_source = _extracted_layout_source(layout_id)
+    return tuple(
+        TerrainFeatureAreaPlacement(
+            feature_id=area.terrain_area_id,
+            terrain_area_id=area.terrain_area_id,
+            terrain_feature_preset_id=_terrain_feature_preset_id(area.footprint_template_id),
+            source_id=(
+                f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_source.source_layout_id}:"
+                f"terrain-feature-placement:"
+                f"{area.terrain_area_id.removeprefix(f'{layout_id}-')}"
+            ),
+        )
+        for area in terrain_areas
+    )
+
+
 def _placed_terrain_areas_from_specs(
     *,
     layout_id: str,
@@ -3013,6 +3051,61 @@ def _placed_terrain_areas_from_specs(
         for source_suffix, target_suffix in mirrored_pairs
     )
     return tuple(sorted((*explicit_areas, *mirrored), key=lambda area: area.terrain_area_id))
+
+
+def _terrain_feature_preset_from_footprint_template(
+    template: TerrainAreaFootprintTemplate,
+) -> TerrainFeaturePreset:
+    if type(template) is not TerrainAreaFootprintTemplate:
+        raise MissionPackError("Terrain feature preset source must be a footprint template.")
+    width = template.bounding_width_inches
+    depth = template.bounding_depth_inches
+    interior_width = min(0.5, max(0.12, width - 2.0))
+    interior_depth = min(0.5, max(0.12, depth - 2.0))
+    wall_thickness = 0.12
+    return TerrainFeaturePreset(
+        terrain_feature_preset_id=_terrain_feature_preset_id(template.footprint_template_id),
+        feature_kind=TerrainFeatureKind.RUINS,
+        footprint_template_id=template.footprint_template_id,
+        footprint_width_inches=width,
+        footprint_depth_inches=depth,
+        walls=(
+            TerrainWallTemplate(
+                wall_id="center-wall",
+                center_x_inches=0.0,
+                center_y_inches=0.0,
+                bottom_z_inches=0.0,
+                width_inches=interior_width,
+                depth_inches=wall_thickness,
+                height_inches=3.0,
+            ),
+        ),
+        floors=(
+            TerrainFloorTemplate(
+                floor_id="ground-floor",
+                center_x_inches=0.0,
+                center_y_inches=0.0,
+                bottom_z_inches=0.0,
+                width_inches=interior_width,
+                depth_inches=interior_depth,
+                thickness_inches=0.12,
+            ),
+            TerrainFloorTemplate(
+                floor_id="upper-floor",
+                center_x_inches=0.0,
+                center_y_inches=0.0,
+                bottom_z_inches=3.0,
+                width_inches=interior_width,
+                depth_inches=interior_depth,
+                thickness_inches=0.12,
+            ),
+        ),
+        source_id=f"{template.source_id}:terrain-feature-preset:ruins",
+    )
+
+
+def _terrain_feature_preset_id(footprint_template_id: str) -> str:
+    return f"event-companion-ruins-{footprint_template_id.lower().replace('_', '-')}"
 
 
 def _terrain_area_local_transforms_by_area_id(
@@ -3513,6 +3606,7 @@ def _import_hash() -> str:
         "terrain_area_footprint_templates": [
             template.to_payload() for template in terrain_area_footprint_templates()
         ],
+        "terrain_feature_presets": [preset.to_payload() for preset in terrain_feature_presets()],
         "battlefield_layout_definitions": [
             layout.to_payload() for layout in battlefield_layout_definitions()
         ],

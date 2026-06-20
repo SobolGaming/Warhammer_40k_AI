@@ -328,6 +328,20 @@ class TerrainWallDefinition:
         if not isinstance(payload, dict):
             raise GeometryError("Terrain wall payload must be a mapping.")
         raw_payload = cast(TerrainWallDefinitionPayload, payload)
+        _require_payload_keys(
+            "Terrain wall payload",
+            raw_payload,
+            (
+                "wall_id",
+                "center_x_inches",
+                "center_y_inches",
+                "bottom_z_inches",
+                "width_inches",
+                "depth_inches",
+                "height_inches",
+                "rotation_degrees",
+            ),
+        )
         return cls(
             wall_id=raw_payload["wall_id"],
             center_x_inches=raw_payload["center_x_inches"],
@@ -464,6 +478,20 @@ class TerrainFloorDefinition:
         if not isinstance(payload, dict):
             raise GeometryError("Terrain floor payload must be a mapping.")
         raw_payload = cast(TerrainFloorDefinitionPayload, payload)
+        _require_payload_keys(
+            "Terrain floor payload",
+            raw_payload,
+            (
+                "floor_id",
+                "center_x_inches",
+                "center_y_inches",
+                "bottom_z_inches",
+                "width_inches",
+                "depth_inches",
+                "thickness_inches",
+                "rotation_degrees",
+            ),
+        )
         return cls(
             floor_id=raw_payload["floor_id"],
             center_x_inches=raw_payload["center_x_inches"],
@@ -582,6 +610,21 @@ class TerrainSupportSurface:
         if not isinstance(payload, dict):
             raise GeometryError("Terrain support surface payload must be a mapping.")
         raw_payload = cast(TerrainSupportSurfacePayload, payload)
+        _require_payload_keys(
+            "Terrain support surface payload",
+            raw_payload,
+            (
+                "surface_id",
+                "terrain_feature_id",
+                "z_inches",
+                "center_x_inches",
+                "center_y_inches",
+                "width_inches",
+                "depth_inches",
+                "rotation_degrees",
+                "no_overhang_required",
+            ),
+        )
         return cls(
             surface_id=raw_payload["surface_id"],
             terrain_feature_id=raw_payload["terrain_feature_id"],
@@ -784,6 +827,20 @@ def terrain_feature_kind_from_token(token: object) -> TerrainFeatureKind:
 
 
 def terrain_volume_from_payload(payload: TerrainVolumePayload) -> TerrainVolume:
+    _require_payload_keys(
+        "TerrainVolume payload",
+        payload,
+        (
+            "kind",
+            "terrain_id",
+            "bottom_center",
+            "width",
+            "depth",
+            "height",
+            "rotation_degrees",
+            "blocks_line_of_sight",
+        ),
+    )
     kind = payload["kind"]
     if type(kind) is not str:
         raise GeometryError("TerrainVolume payload kind must be a string.")
@@ -865,6 +922,18 @@ def rotate_local_point(
         origin_x + (x * cosine) - (y * sine),
         origin_y + (x * sine) + (y * cosine),
     )
+
+
+def _require_payload_keys(
+    field_name: str,
+    payload: object,
+    required_keys: tuple[str, ...],
+) -> None:
+    if not isinstance(payload, dict):
+        raise GeometryError(f"{field_name} must be a mapping.")
+    missing_keys = tuple(key for key in required_keys if key not in payload)
+    if missing_keys:
+        raise GeometryError(f"{field_name} missing required fields: {', '.join(missing_keys)}.")
 
 
 def _validate_terrain_id(value: object) -> str:

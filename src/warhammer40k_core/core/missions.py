@@ -19,6 +19,10 @@ from warhammer40k_core.core.deployment_zones import (
     DeploymentZoneShape,
 )
 from warhammer40k_core.core.objectives import Objective, ObjectiveMarker
+from warhammer40k_core.core.ruleset_descriptor import (
+    RulesetDescriptorError,
+    terrain_feature_kind_from_token,
+)
 from warhammer40k_core.core.terrain_areas import (
     PlacedTerrainArea,
     PlacedTerrainAreaPayload,
@@ -2945,6 +2949,11 @@ def _validate_battlefield_layout_references(
             ),
             terrain_feature_preset_ids,
         )
+        _validate_terrain_feature_area_placements_match_sources(
+            layout=layout,
+            terrain_layout=terrain_layout,
+            terrain_feature_presets=terrain_feature_presets,
+        )
 
 
 def _validate_terrain_feature_presets_match_footprint_templates(
@@ -2973,6 +2982,43 @@ def _validate_terrain_feature_presets_match_footprint_templates(
             raise MissionPackError(
                 "TerrainFeaturePreset footprint dimensions must match its terrain area "
                 "footprint template."
+            )
+
+
+def _validate_terrain_feature_area_placements_match_sources(
+    *,
+    layout: BattlefieldLayoutDefinition,
+    terrain_layout: TerrainLayoutTemplate,
+    terrain_feature_presets: tuple[TerrainFeaturePreset, ...],
+) -> None:
+    static_feature_ids = set(terrain_layout.terrain_feature_ids())
+    placed_feature_ids = {placement.feature_id for placement in layout.terrain_feature_placements}
+    colliding_ids = static_feature_ids & placed_feature_ids
+    if colliding_ids:
+        raise MissionPackError(
+            "BattlefieldLayoutDefinition terrain_feature_placements must not collide with "
+            f"static terrain feature IDs: {', '.join(sorted(colliding_ids))}."
+        )
+    terrain_areas_by_id = {area.terrain_area_id: area for area in layout.terrain_areas}
+    presets_by_id = {preset.terrain_feature_preset_id: preset for preset in terrain_feature_presets}
+    for placement in layout.terrain_feature_placements:
+        terrain_area = terrain_areas_by_id[placement.terrain_area_id]
+        preset = presets_by_id[placement.terrain_feature_preset_id]
+        if preset.footprint_template_id != terrain_area.footprint_template_id:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition terrain_feature_placements preset footprint "
+                "must match the referenced terrain area."
+            )
+        try:
+            area_feature_kind = terrain_feature_kind_from_token(terrain_area.terrain_feature_kind)
+        except RulesetDescriptorError as exc:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition terrain_area terrain_feature_kind is unsupported."
+            ) from exc
+        if preset.feature_kind is not area_feature_kind:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition terrain_feature_placements preset feature kind "
+                "must match the referenced terrain area."
             )
 
 
