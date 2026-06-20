@@ -21,6 +21,7 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_coverage_rows_from_catalog,
     ability_coverage_rows_payload,
 )
+from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_ir_registered_hook_ids
 from warhammer40k_core.engine.faction_content.bundle import (
     DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID,
     RuntimeContentContribution,
@@ -638,6 +639,8 @@ def _runtime_hook_inventory_rows(
     category_rows: list[AbilityCoverageCategoryRowPayload],
 ) -> tuple[RuntimeHookInventoryRow, ...]:
     inventory: dict[str, set[str]] = {}
+    for hook_id in catalog_rule_ir_registered_hook_ids():
+        inventory.setdefault(hook_id, set())
     for row in category_rows:
         for consumer_id in row["runtime_consumer_ids"]:
             for label in _category_runtime_consumer_labels(
@@ -1066,6 +1069,8 @@ def _add_inventory_entry(
 
 
 def _hook_ability_or_rule_labels_text(labels: tuple[str, ...]) -> str:
+    if not labels:
+        return "No current generated rows"
     return "<br>".join(_markdown_text(label) for label in labels)
 
 

@@ -46,7 +46,10 @@ from warhammer40k_core.rules.rule_templates import (
 RULE_PARSER_VERSION = "phase17c-rule-parser-v1"
 
 _PHASES = "command|movement|shooting|charge|fight"
-_ROLL_TYPES = "advance|battle-shock|charge|damage|hazardous|hit|leadership|save|wound"
+_ROLL_TYPES = (
+    "advance|battle-shock|charge|critical hit|critical wound|damage|feel no pain|hazardous|"
+    "hit|invulnerable save|leadership|save|wound"
+)
 _START_END_PHASE_RE = re.compile(
     rf"\bat\s+the\s+(?P<edge>start|end)\s+of\s+"
     rf"(?:(?P<owner>your|the opponent's|opponent's|the)\s+)?(?P<phase>{_PHASES})\s+phase\b",
@@ -59,6 +62,11 @@ _IN_PHASE_RE = re.compile(
 )
 _DESTROYED_UNIT_RE = re.compile(r"\bwhen\s+this\s+unit\s+is\s+destroyed\b", re.IGNORECASE)
 _DESTROYED_MODEL_RE = re.compile(r"\bwhen\s+.*\bmodel\s+is\s+destroyed\b", re.IGNORECASE)
+_CHARGE_MOVE_END_RE = re.compile(
+    r"\b(?:each\s+time|when)\s+(?P<subject>that\s+unit|this\s+unit|a\s+unit)\s+ends\s+"
+    r"a\s+charge\s+move\b",
+    re.IGNORECASE,
+)
 _SETUP_RE = re.compile(r"\b(?:deployment|before\s+the\s+battle|set\s+up)\b", re.IGNORECASE)
 _DICE_TRIGGER_RE = re.compile(
     rf"\b(?:after|when|each\s+time)\s+.*\b(?P<roll>{_ROLL_TYPES})\s+roll", re.IGNORECASE
@@ -67,6 +75,10 @@ _ONCE_PER_RE = re.compile(
     r"\bonce\s+per\s+(?P<scope>phase|turn|battle|battle round)\b", re.IGNORECASE
 )
 _AURA_RE = re.compile(r"(?:\bAura\b|^\s*Aura\s*:)", re.IGNORECASE)
+_LEADING_UNIT_RE = re.compile(
+    r"\bwhile\s+this\s+model\s+is\s+leading\s+a\s+unit\b",
+    re.IGNORECASE,
+)
 _TARGET_RE = re.compile(
     r"\b(?:select\s+)?(?:one\s+)?(?P<allegiance>friendly|enemy)\s+"
     r"(?:(?P<keyword>[A-Z][A-Z0-9_-]*(?:\s+[A-Z0-9_-]+){0,3})\s+)?"
@@ -78,6 +90,10 @@ _BEARER_APOSTROPHE_RE = r"(?:'|\u2019)?"
 _BEARERS_UNIT_RE = re.compile(
     rf"\b(?:models\s+in\s+)?(?:the\s+)?bearer{_BEARER_APOSTROPHE_RE}s\s+unit\b|"
     rf"\bmade\s+for\s+(?:the\s+)?bearer{_BEARER_APOSTROPHE_RE}s\s+unit\b",
+    re.IGNORECASE,
+)
+_BEARER_MODEL_RE = re.compile(
+    r"\b(?:the\s+)?bearer\b|\bmade\s+for\s+(?:the\s+)?bearer\b",
     re.IGNORECASE,
 )
 _THAT_UNIT_RE = re.compile(r"\b(?:that|selected|target)\s+unit\b", re.IGNORECASE)
@@ -108,8 +124,8 @@ _REROLL_RE = re.compile(
     rf"\b(?:re-roll|reroll)\s+(?P<roll>{_ROLL_TYPES})\s+rolls?\b", re.IGNORECASE
 )
 _CHARACTERISTIC_NAMES = (
-    "Armor Penetration|AP|Attacks|Ballistic Skill|BS|Damage|Detection Range|Leadership|"
-    "Move|Movement|Objective Control|OC|Range|Save|Strength|Toughness|Weapon Skill|"
+    "Armor Penetration|AP|Attacks|Ballistic Skill|BS|Damage|Detection Range|Invulnerable Save|"
+    "Leadership|Move|Movement|Objective Control|OC|Range|Save|Strength|Toughness|Weapon Skill|"
     "Wounds|WS"
 )
 _CHARACTERISTIC_RE = re.compile(
@@ -150,7 +166,15 @@ _WEAPON_KEYWORD_PATTERN = "|".join(
 )
 _WEAPON_ABILITY_RE = re.compile(
     rf"\b(?:ranged\s+|melee\s+)?weapons?.{{0,100}}\b(?:gain|gains|have|has)\s+"
-    rf"(?P<ability>{_WEAPON_KEYWORD_PATTERN})\b",
+    rf"(?:the\s+)?\[?(?P<ability>{_WEAPON_KEYWORD_PATTERN})\]?"
+    rf"(?:\s+ability)?\b",
+    re.IGNORECASE,
+)
+_NAMED_WEAPON_ABILITY_RE = re.compile(
+    rf"\b(?P<weapon_name>[A-Z][A-Za-z0-9 '\u2019:-]+?)\s+equipped\s+by\s+models\s+"
+    rf"in\s+(?:that|this|the\s+selected)\s+unit\s+(?:gain|gains|have|has)\s+"
+    rf"(?:the\s+)?\[?(?P<ability>{_WEAPON_KEYWORD_PATTERN})\]?"
+    rf"(?:\s+ability)?\b",
     re.IGNORECASE,
 )
 _PLACEMENT_PERMISSION_RE = re.compile(r"\bcan\s+be\s+set\s+up\b", re.IGNORECASE)
@@ -230,6 +254,7 @@ _CHARACTERISTIC_BY_LABEL = {
     "bs": Characteristic.BALLISTIC_SKILL,
     "damage": Characteristic.DAMAGE,
     "detection range": Characteristic.DETECTION_RANGE,
+    "invulnerable save": Characteristic.INVULNERABLE_SAVE,
     "leadership": Characteristic.LEADERSHIP,
     "move": Characteristic.MOVEMENT,
     "movement": Characteristic.MOVEMENT,
@@ -342,6 +367,7 @@ def _compile_clause(
     conditions = _dedupe_conditions(
         (
             *_parse_aura_conditions(clause_text),
+            *_parse_leading_unit_conditions(clause_text),
             *_parse_frequency_conditions(clause_text),
             *_parse_keyword_conditions(clause_text),
             *_parse_distance_conditions(clause_text, parsed_text),
@@ -442,6 +468,20 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
             kind=RuleTriggerKind.MODEL_DESTROYED,
             source_span=_span_from_match(clause_text, model_destroyed_match),
         )
+    charge_move_end_match = _CHARGE_MOVE_END_RE.search(clause_text.text)
+    if charge_move_end_match is not None:
+        return RuleTrigger(
+            kind=RuleTriggerKind.TIMING_WINDOW,
+            source_span=_span_from_match(clause_text, charge_move_end_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("edge", "after"),
+                    ("phase", "charge"),
+                    ("timing_window", "charge_move_end"),
+                    ("subject", _lower_group(charge_move_end_match, "subject")),
+                )
+            ),
+        )
     dice_trigger_match = _DICE_TRIGGER_RE.search(clause_text.text)
     if dice_trigger_match is not None:
         return RuleTrigger(
@@ -468,6 +508,19 @@ def _parse_aura_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...
             kind=RuleConditionKind.AURA,
             source_span=_span_from_match(clause_text, match),
             parameters=parameters_from_pairs((("source", "aura"),)),
+        ),
+    )
+
+
+def _parse_leading_unit_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
+    match = _LEADING_UNIT_RE.search(clause_text.text)
+    if match is None:
+        return ()
+    return (
+        RuleCondition(
+            kind=RuleConditionKind.TARGET_CONSTRAINT,
+            source_span=_span_from_match(clause_text, match),
+            parameters=parameters_from_pairs((("relationship", "this_model_leading_unit"),)),
         ),
     )
 
@@ -554,6 +607,11 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
     if match is not None:
         return RuleTargetSpec(
             kind=RuleTargetKind.THIS_UNIT, source_span=_span_from_match(clause_text, match)
+        )
+    match = _BEARER_MODEL_RE.search(clause_text.text)
+    if match is not None:
+        return RuleTargetSpec(
+            kind=RuleTargetKind.THIS_MODEL, source_span=_span_from_match(clause_text, match)
         )
     match = _THAT_UNIT_RE.search(clause_text.text)
     if match is not None:
@@ -740,7 +798,27 @@ def _parse_grant_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSp
 
 def _parse_weapon_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
+    for match in _NAMED_WEAPON_ABILITY_RE.finditer(clause_text.text):
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.GRANT_WEAPON_ABILITY,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("weapon_ability", _ability_token(match.group("ability"))),
+                        ("weapon_name", _weapon_name_token(match.group("weapon_name"))),
+                        ("target_scope", "models_in_selected_unit"),
+                    )
+                ),
+            )
+        )
     for match in _WEAPON_ABILITY_RE.finditer(clause_text.text):
+        if _span_matches_existing_effect(
+            clause_text=clause_text,
+            match=match,
+            effects=tuple(effects),
+        ):
+            continue
         effects.append(
             RuleEffectSpec(
                 kind=RuleEffectKind.GRANT_WEAPON_ABILITY,
@@ -1039,6 +1117,11 @@ def _keyword_token(value: str) -> str:
 
 
 def _ability_token(value: str) -> str:
+    stripped = value.strip(" []().,;:")
+    return " ".join(stripped.split())
+
+
+def _weapon_name_token(value: str) -> str:
     stripped = value.strip(" []().,;:")
     return " ".join(stripped.split())
 

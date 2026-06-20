@@ -60,8 +60,22 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+    CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
+    CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+    CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+    CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID,
+    CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+    CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
     catalog_charge_roll_modifiers_for_unit,
     catalog_rule_ir_consumers_for_rule,
+    catalog_rule_ir_hook_ids_for_rule,
+    catalog_rule_ir_registered_hook_ids,
 )
 from warhammer40k_core.engine.charge_declaration import ChargeRollRequest, ChargeRollResult
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -90,7 +104,19 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
-from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, RuleIRPayload, parameter_payload
+from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
+    RuleEffectKind,
+    RuleEffectSpec,
+    RuleIR,
+    RuleIRPayload,
+    RuleParameterValue,
+    RuleTargetKind,
+    RuleTargetSpec,
+    parameter_payload,
+    parameters_from_pairs,
+)
 from warhammer40k_core.rules.source_reference_generation import build_source_reference_catalog
 from warhammer40k_core.rules.wahapedia_bridge import (
     EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE,
@@ -634,6 +660,20 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "Current coverage categories:" not in generated_markdown
     assert "## Runtime Hook Inventory" in generated_markdown
     assert "| `catalog-ir:charge-roll-modifier` | Instrument of Chaos |" in generated_markdown
+    assert "| `catalog-ir:hit-roll-modifier` | No current generated rows |" in generated_markdown
+    assert "| `catalog-ir:wound-roll-modifier` | No current generated rows |" in generated_markdown
+    assert (
+        "| `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |"
+    ) in generated_markdown
+    assert (
+        "| `catalog-ir:weapon-keyword-grant:lethal-hits` | No current generated rows |"
+    ) in generated_markdown
+    assert (
+        "| `catalog-ir:can-advance-and-charge` | No current generated rows |"
+    ) in generated_markdown
+    assert (
+        "| `catalog-ir:can-be-placed-in-reserves` | No current generated rows |"
+    ) in generated_markdown
     assert "| `core:command-reroll` | Command Re-roll |" in generated_markdown
     assert "| `generic:ingress-move` | From Beyond the Veil |" in generated_markdown
     assert (
@@ -941,6 +981,65 @@ def test_phase17k_ability_coverage_api_fails_fast_and_classifies_unsupported_ir(
         _ability_coverage_category_row(
             support_stages=cast(tuple[AbilityCoverageSupportStage, ...], ("bad",))
         )
+
+
+def test_phase17k_catalog_ir_future_hooks_classify_supported_rule_ir_without_consuming() -> None:
+    registered_hook_ids = set(catalog_rule_ir_registered_hook_ids())
+    rule_ir = _catalog_rule_ir(
+        (
+            _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="hit", delta=1),
+            _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="wound", delta=1),
+            _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="invulnerable_save", delta=1),
+            _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="critical_hit", delta=-1),
+            _effect(
+                RuleEffectKind.MODIFY_CHARACTERISTIC,
+                characteristic=Characteristic.TOUGHNESS.value,
+                delta=-1,
+            ),
+            _effect(
+                RuleEffectKind.MODIFY_CHARACTERISTIC,
+                characteristic=Characteristic.OBJECTIVE_CONTROL.value,
+                delta=-1,
+            ),
+            _effect(RuleEffectKind.GRANT_WEAPON_ABILITY, weapon_ability="Lethal Hits"),
+            _effect(RuleEffectKind.GRANT_ABILITY, ability="can_advance_and_charge"),
+            _effect(RuleEffectKind.PLACEMENT_PERMISSION, placement_kind="turn_end_reserves"),
+        ),
+        target_kind=RuleTargetKind.ENEMY_UNIT,
+    )
+
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) >= {
+        CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
+        "catalog-ir:toughness-characteristic-modifier",
+        "catalog-ir:objective-control-characteristic-modifier",
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:lethal-hits",
+        CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+        CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+    }
+    assert registered_hook_ids >= {
+        CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID,
+        CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+        CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
+        "catalog-ir:movement-characteristic-query",
+        "catalog-ir:toughness-characteristic-query",
+        "catalog-ir:objective-control-characteristic-query",
+        "catalog-ir:wounds-characteristic-query",
+        "catalog-ir:attacks-characteristic-query",
+        "catalog-ir:armor-penetration-characteristic-query",
+        "catalog-ir:ballistic-skill-characteristic-query",
+        "catalog-ir:weapon-skill-characteristic-query",
+        "catalog-ir:strength-characteristic-query",
+        "catalog-ir:damage-characteristic-query",
+        "catalog-ir:range-characteristic-query",
+        "catalog-ir:weapon-keyword-grant:devastating-wounds",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
 
 
 def test_phase17k_bridge_datasheet_source_ids_include_pdf_correction_source_id() -> None:
@@ -1368,6 +1467,37 @@ def _model_bearing_wargear(
         if wargear_id in model.wargear_ids:
             return model
     raise AssertionError(f"Missing bearer for wargear: {wargear_id}.")
+
+
+def _catalog_rule_ir(
+    effects: tuple[RuleEffectSpec, ...],
+    *,
+    target_kind: RuleTargetKind,
+) -> RuleIR:
+    span = TextSpan(text="catalog hook test", start=0, end=17)
+    return RuleIR(
+        rule_id="test-catalog-hook-rule",
+        source_id="test-catalog-hook-source",
+        normalized_text=span.text,
+        parser_version="test-catalog-hook-parser",
+        clauses=(
+            RuleClause(
+                clause_id="test-catalog-hook-clause",
+                source_span=span,
+                target=RuleTargetSpec(kind=target_kind, source_span=span),
+                effects=effects,
+            ),
+        ),
+    )
+
+
+def _effect(kind: RuleEffectKind, **parameters: RuleParameterValue) -> RuleEffectSpec:
+    span = TextSpan(text="catalog hook test", start=0, end=17)
+    return RuleEffectSpec(
+        kind=kind,
+        source_span=span,
+        parameters=parameters_from_pairs(tuple(parameters.items())),
+    )
 
 
 def _ability_coverage_row(

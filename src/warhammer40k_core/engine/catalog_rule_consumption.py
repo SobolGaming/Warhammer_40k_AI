@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from dataclasses import dataclass
+from types import MappingProxyType
 from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_tokens
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -25,6 +28,84 @@ from warhammer40k_core.rules.rule_ir import (
 
 CATALOG_IR_CHARGE_ROLL_CONSUMER_ID = "catalog-ir:charge-roll-modifier"
 CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID = "catalog-ir:leadership-characteristic-query"
+CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:hit-roll-modifier"
+CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:wound-roll-modifier"
+CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:save-roll-modifier"
+CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID = (
+    "catalog-ir:invulnerable-save-roll-modifier"
+)
+CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID = "catalog-ir:feel-no-pain-roll"
+CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-hit-value-modifier"
+CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-wound-value-modifier"
+CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID = "catalog-ir:weapon-keyword-grant"
+CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-advance-and-charge"
+CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-fallback-and-charge"
+CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID = (
+    "catalog-ir:can-advance-and-shoot-and-charge"
+)
+CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID = "catalog-ir:can-be-placed-in-reserves"
+
+_CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
+    {
+        "charge": CATALOG_IR_CHARGE_ROLL_CONSUMER_ID,
+        "charge_roll": CATALOG_IR_CHARGE_ROLL_CONSUMER_ID,
+        "hit": CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+        "hit_roll": CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+        "wound": CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+        "wound_roll": CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+        "save": CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+        "save_roll": CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+        "invulnerable_save": CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+        "invulnerable_save_roll": CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+        "feel_no_pain": CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID,
+        "feel_no_pain_roll": CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID,
+        "critical_hit": CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
+        "critical_hit_value": CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
+        "critical_wound": CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
+        "critical_wound_value": CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
+    }
+)
+_CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
+    {
+        "can_advance_and_charge": CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+        "can_fallback_and_charge": CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+        "can_fall_back_and_charge": CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+        "can_advance_and_shoot_and_charge": (
+            CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID
+        ),
+        "can_be_placed_in_reserves": CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+        "turn_end_reserves": CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+    }
+)
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogRuleIrHookDefinition:
+    hook_id: str
+
+    def __post_init__(self) -> None:
+        if type(self.hook_id) is not str or not self.hook_id.strip():
+            raise GameLifecycleError("Catalog IR hook definition hook_id must be a non-empty str.")
+        if self.hook_id != self.hook_id.strip():
+            raise GameLifecycleError("Catalog IR hook definition hook_id must be stripped.")
+
+
+def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefinition, ...]:
+    hook_ids = {
+        *_CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS.values(),
+        *_CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.values(),
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+    }
+    for characteristic in Characteristic:
+        hook_ids.add(_catalog_ir_characteristic_query_consumer_id(characteristic))
+        hook_ids.add(_catalog_ir_characteristic_modifier_consumer_id(characteristic))
+    for keyword in canonical_weapon_keyword_tokens():
+        hook_ids.add(_catalog_ir_weapon_keyword_grant_consumer_id(keyword))
+    return tuple(CatalogRuleIrHookDefinition(hook_id=hook_id) for hook_id in sorted(hook_ids))
+
+
+def catalog_rule_ir_registered_hook_ids() -> tuple[str, ...]:
+    return tuple(definition.hook_id for definition in catalog_rule_ir_registered_hook_definitions())
 
 
 def catalog_charge_roll_modifiers_for_unit(
@@ -113,6 +194,18 @@ def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
             if _effect_is_leadership_set(effect):
                 consumer_ids.add(CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID)
     return tuple(sorted(consumer_ids))
+
+
+def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
+    if type(rule_ir) is not RuleIR:
+        raise GameLifecycleError("Catalog rule consumer classification requires RuleIR.")
+    hook_ids: set[str] = set()
+    for clause in rule_ir.clauses:
+        for effect in clause.effects:
+            if _effect_is_charge_roll_modifier(effect):
+                hook_ids.add(CATALOG_IR_CHARGE_ROLL_CONSUMER_ID)
+            hook_ids.update(_catalog_ir_hook_ids_for_effect(effect))
+    return tuple(sorted(hook_ids))
 
 
 def _unit_scoped_generic_records(
@@ -207,6 +300,102 @@ def _effect_is_leadership_set(effect: RuleEffectSpec) -> bool:
         return False
     parameters = parameter_payload(effect.parameters)
     return parameters.get("characteristic") == Characteristic.LEADERSHIP.value
+
+
+def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    parameters = parameter_payload(effect.parameters)
+    if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
+        return _catalog_ir_roll_modifier_hook_ids(parameters)
+    if effect.kind is RuleEffectKind.SET_CHARACTERISTIC:
+        characteristic = _characteristic_parameter(parameters, key="characteristic")
+        return (_catalog_ir_characteristic_query_consumer_id(characteristic),)
+    if effect.kind is RuleEffectKind.MODIFY_CHARACTERISTIC:
+        characteristic = _characteristic_parameter(parameters, key="characteristic")
+        return (_catalog_ir_characteristic_modifier_consumer_id(characteristic),)
+    if effect.kind is RuleEffectKind.MODIFY_MOVE_DISTANCE:
+        return (_catalog_ir_characteristic_modifier_consumer_id(Characteristic.MOVEMENT),)
+    if effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY:
+        keyword = _string_parameter(parameters, key="weapon_ability")
+        return (
+            CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+            _catalog_ir_weapon_keyword_grant_consumer_id(keyword),
+        )
+    if effect.kind in {
+        RuleEffectKind.GRANT_ABILITY,
+        RuleEffectKind.PLACEMENT_PERMISSION,
+    }:
+        return _catalog_ir_rule_exception_hook_ids(effect.kind, parameters)
+    return ()
+
+
+def _catalog_ir_roll_modifier_hook_ids(parameters: Mapping[str, object]) -> tuple[str, ...]:
+    roll_type = _string_parameter(parameters, key="roll_type")
+    consumer_id = _CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS.get(_catalog_ir_lookup_token(roll_type))
+    if consumer_id is None:
+        return ()
+    return (consumer_id,)
+
+
+def _catalog_ir_rule_exception_hook_ids(
+    effect_kind: RuleEffectKind,
+    parameters: Mapping[str, object],
+) -> tuple[str, ...]:
+    if effect_kind is RuleEffectKind.GRANT_ABILITY:
+        ability = _string_parameter(parameters, key="ability")
+        consumer_id = _CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.get(_catalog_ir_lookup_token(ability))
+        if consumer_id is None:
+            return ()
+        return (consumer_id,)
+    placement_kind = parameters.get("placement_kind")
+    if type(placement_kind) is not str:
+        return ()
+    consumer_id = _CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.get(
+        _catalog_ir_lookup_token(placement_kind)
+    )
+    if consumer_id is None:
+        return ()
+    return (consumer_id,)
+
+
+def _catalog_ir_characteristic_query_consumer_id(characteristic: Characteristic) -> str:
+    return f"catalog-ir:{_catalog_ir_token(characteristic.value)}-characteristic-query"
+
+
+def _catalog_ir_characteristic_modifier_consumer_id(characteristic: Characteristic) -> str:
+    return f"catalog-ir:{_catalog_ir_token(characteristic.value)}-characteristic-modifier"
+
+
+def _catalog_ir_weapon_keyword_grant_consumer_id(keyword: str) -> str:
+    return f"catalog-ir:weapon-keyword-grant:{_catalog_ir_token(keyword)}"
+
+
+def _characteristic_parameter(
+    parameters: Mapping[str, object],
+    *,
+    key: str,
+) -> Characteristic:
+    value = _string_parameter(parameters, key=key)
+    try:
+        return Characteristic(value)
+    except ValueError as exc:
+        raise GameLifecycleError("Catalog rule characteristic parameter is invalid.") from exc
+
+
+def _string_parameter(parameters: Mapping[str, object], *, key: str) -> str:
+    value = parameters.get(key)
+    if type(value) is not str or not value.strip():
+        raise GameLifecycleError(f"Catalog rule parameter {key} must be a non-empty string.")
+    return value.strip()
+
+
+def _catalog_ir_token(value: str) -> str:
+    return value.strip().lower().replace("_", "-").replace(" ", "-")
+
+
+def _catalog_ir_lookup_token(value: str) -> str:
+    return value.strip().lower().replace("-", "_").replace(" ", "_")
 
 
 def _int_parameter(parameters: Mapping[str, object], *, key: str) -> int:

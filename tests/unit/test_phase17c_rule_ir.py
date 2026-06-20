@@ -297,6 +297,54 @@ def test_phase17c_optional_wargear_ability_text_compiles_to_bearer_unit_ir() -> 
     }
 
 
+def test_phase17c_bearer_model_text_is_distinct_from_bearers_unit() -> None:
+    bearer = _compiled("The bearer has a Toughness characteristic of 5.").rule_ir
+    bearer_unit = _compiled("The bearer's unit has a Toughness characteristic of 5.").rule_ir
+
+    assert bearer.is_supported
+    assert bearer.clauses[0].target is not None
+    assert bearer.clauses[0].target.kind is RuleTargetKind.THIS_MODEL
+    assert bearer_unit.is_supported
+    assert bearer_unit.clauses[0].target is not None
+    assert bearer_unit.clauses[0].target.kind is RuleTargetKind.THIS_UNIT
+
+
+def test_phase17c_skullmaster_fury_compiles_to_charge_move_weapon_keyword_grant() -> None:
+    rule_ir = _compiled(
+        "While this model is leading a unit, each time that unit ends a Charge move, "
+        "until the end of the turn, Juggernaut's bladed horns equipped by models in "
+        "that unit have the [DEVASTATING WOUNDS] ability."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    weapon_effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY
+    )
+
+    assert rule_ir.is_supported
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "after",
+        "phase": "charge",
+        "subject": "that_unit",
+        "timing_window": "charge_move_end",
+    }
+    assert any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters) == {"relationship": "this_model_leading_unit"}
+        for condition in clause.conditions
+    )
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.SELECTED_UNIT
+    assert clause.duration is not None
+    assert parameter_payload(clause.duration.parameters) == {"endpoint": "turn"}
+    assert parameter_payload(weapon_effect.parameters) == {
+        "target_scope": "models_in_selected_unit",
+        "weapon_ability": "Devastating Wounds",
+        "weapon_name": "Juggernaut's bladed horns",
+    }
+
+
 @pytest.mark.parametrize(
     ("raw_text", "expected_allegiance"),
     [
