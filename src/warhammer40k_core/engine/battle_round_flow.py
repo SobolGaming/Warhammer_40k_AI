@@ -175,6 +175,17 @@ class BattleRoundFlow:
             return status
 
         _emit_end_timing_windows(state=state, decisions=decisions)
+        _apply_phase_end_objective_control_hooks(
+            state=state,
+            decisions=decisions,
+            registry=self._phase_end_objective_control_hooks,
+            runtime_modifier_registry=self._runtime_modifier_registry,
+        )
+        _apply_phase_end_unit_destroyed_hooks(
+            state=state,
+            decisions=decisions,
+            registry=self._unit_destroyed_hooks,
+        )
         turn_end_request = self._turn_end_hooks.next_request_for(
             TurnEndRequestContext(
                 state=state,
@@ -206,17 +217,6 @@ class BattleRoundFlow:
                     "request_id": turn_end_request.request_id,
                 },
             )
-        _apply_phase_end_objective_control_hooks(
-            state=state,
-            decisions=decisions,
-            registry=self._phase_end_objective_control_hooks,
-            runtime_modifier_registry=self._runtime_modifier_registry,
-        )
-        _apply_phase_end_unit_destroyed_hooks(
-            state=state,
-            decisions=decisions,
-            registry=self._unit_destroyed_hooks,
-        )
         completed_phase = state.advance_to_next_battle_phase(
             runtime_modifier_registry=self._runtime_modifier_registry
         )
@@ -511,6 +511,8 @@ def _apply_phase_end_objective_control_hooks(
         runtime_modifier_registry=runtime_modifier_registry,
     )
     for sticky_state in registry.states_for(context):
+        if _sticky_objective_control_state_exists(state=state, state_id=sticky_state.state_id):
+            continue
         state.record_sticky_objective_control_state(sticky_state)
         decisions.event_log.append(
             "sticky_objective_control_state_recorded",
@@ -522,6 +524,14 @@ def _apply_phase_end_objective_control_hooks(
                 "sticky_objective_control_state": sticky_state.to_payload(),
             },
         )
+
+
+def _sticky_objective_control_state_exists(*, state: GameState, state_id: str) -> bool:
+    requested_state_id = _validate_identifier("sticky_objective_control_state_id", state_id)
+    return any(
+        sticky_state.state_id == requested_state_id
+        for sticky_state in state.sticky_objective_control_states
+    )
 
 
 def _apply_phase_end_unit_destroyed_hooks(

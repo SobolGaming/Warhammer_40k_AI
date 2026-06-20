@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.movement_submission_helpers import (
+    straight_line_witness_for_unit,
+    submit_movement_proposal,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -16,7 +21,11 @@ from warhammer40k_core.core.detachment import DetachmentDefinition, EnhancementD
 from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset import RulesetId
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.engine.advance_hooks import (
+    DECLINE_MOVEMENT_ACTION_GRANT_OPTION_ID,
+    SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE,
+)
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
@@ -36,6 +45,7 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacedArmy,
     UnitPlacement,
 )
+from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -44,7 +54,7 @@ from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectRegistry,
     apply_enhancement_effects,
 )
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari.detachments.corsair_coterie import (  # noqa: E501
@@ -53,7 +63,13 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari.detac
     rule,
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
-from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.game_state import (
+    GameConfig,
+    GameState,
+    SecondaryMissionChoice,
+    SecondaryMissionMode,
+)
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ModelProfileSelection,
@@ -64,7 +80,14 @@ from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
     GameLifecycleStage,
+    LifecycleStatus,
+    LifecycleStatusKind,
     SetupStep,
+)
+from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_ACTION_DECISION_TYPE,
+    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
@@ -90,12 +113,15 @@ from warhammer40k_core.engine.stratagem_cost_modifiers import (
 )
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
+    StratagemCatalogRecord,
     StratagemCategory,
     StratagemDefinition,
     StratagemEligibilityContext,
     StratagemTargetBinding,
     StratagemTargetKind,
+    StratagemTargetSpec,
     StratagemTimingDescriptor,
+    request_stratagem_use,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
@@ -108,6 +134,7 @@ from warhammer40k_core.engine.turn_end_hooks import (
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_IGNORED_EVENT,
+    UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_PENDING_EVENT,
     UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_RESOLVED_EVENT,
     UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_ROLLED_EVENT,
     UnitMoveCompletedContext,
@@ -116,6 +143,7 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedMortalWoundHookRegistry,
     resolve_unit_move_completed_mortal_wound_hooks,
 )
+from warhammer40k_core.engine.unit_state import starting_strength_records_for_units
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
@@ -125,6 +153,7 @@ _ARCHRAIDER_UNIT_ID = "army-a:archraider"
 _VOIDSTONE_UNIT_ID = "army-a:voidstone-bearers"
 _WEBWAY_UNIT_ID = "army-a:webway-bearers"
 _ENEMY_UNIT_ID = "army-b:enemy-raiders"
+_LIFECYCLE_ENEMY_UNIT_ID = "army-b:corsairs"
 
 
 def test_veterans_of_the_void_allows_four_unique_corsair_enhancements() -> None:
@@ -1150,6 +1179,217 @@ def test_archraider_lord_of_deceit_decline_and_drift_paths_do_not_modify_cost() 
         effect_selection=None,
     )
     assert enhancements.archraider_command_point_cost_choice_request(untargeted_context) is None
+
+
+def test_webway_pathstone_lifecycle_records_void_thieves_before_turn_end_reserves() -> None:
+    assignments = (_assignment(enhancements.WEBWAY_PATHSTONE_ENHANCEMENT_ID, "webway-bearers"),)
+    config = _corsair_game_config(enhancement_assignments=assignments)
+    state, _corsair_army, _enemy_army = _corsair_state(
+        enhancement_assignments=assignments,
+        phase=BattlePhase.FIGHT,
+        active_player_id="player-b",
+        webway_x=30.0,
+        enemy_x=42.0,
+    )
+    lifecycle = _corsair_lifecycle_for_state(config=config, state=state)
+
+    status = lifecycle.advance_until_decision_or_terminal()
+    request = _decision_request(status)
+
+    assert request.decision_type == SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE
+    assert len(state.sticky_objective_control_states) == 1
+    sticky_state = state.sticky_objective_control_states[0]
+    assert sticky_state.source_rule_id == rule.SOURCE_RULE_ID
+    assert sticky_state.originating_unit_instance_id == _WEBWAY_UNIT_ID
+    assert _event_index(
+        lifecycle.decision_controller,
+        "sticky_objective_control_state_recorded",
+    ) < _event_index(lifecycle.decision_controller, "turn_end_faction_rule_requested")
+
+    resolved_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-corsair-webway-lifecycle-use",
+            request=request,
+            selected_option_id=(f"aeldari:corsair-coterie:webway-pathstone:{_WEBWAY_UNIT_ID}:use"),
+        )
+    )
+
+    reserve_state = state.reserve_state_for_unit(_WEBWAY_UNIT_ID)
+    assert reserve_state is not None
+    assert reserve_state.source_rule_ids == (enhancements.SOURCE_RULE_ID,)
+    assert state.battlefield_state is not None
+    assert all(
+        unit_placement.unit_instance_id != _WEBWAY_UNIT_ID
+        for placed_army in state.battlefield_state.placed_armies
+        for unit_placement in placed_army.unit_placements
+    )
+    assert len(state.sticky_objective_control_states) == 1
+    assert (
+        len(_event_records(lifecycle.decision_controller, "turn_end_faction_rule_requested")) == 1
+    )
+    if resolved_status.decision_request is not None:
+        assert (
+            resolved_status.decision_request.decision_type
+            != SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE
+        )
+
+
+def test_archraider_lord_of_deceit_lifecycle_pauses_and_resumes_stratagem_cost() -> None:
+    assignments = (_assignment(enhancements.ARCHRAIDER_ENHANCEMENT_ID, "archraider"),)
+    config = _corsair_game_config(enhancement_assignments=assignments)
+    state, _corsair_army, _enemy_army = _corsair_state(
+        enhancement_assignments=assignments,
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        archraider_x=10.0,
+        enemy_x=18.0,
+    )
+    state.gain_command_points(
+        player_id="player-b",
+        amount=3,
+        source_id="phase17g-corsair-lord-of-deceit-test-cp",
+        source_kind=CommandPointSourceKind.OTHER,
+        cap_exempt=True,
+    )
+    lifecycle = _corsair_lifecycle_for_state(config=config, state=state)
+    _record_archraider_model_selection(state)
+    definition = replace(
+        _test_stratagem_definition(),
+        target_spec=StratagemTargetSpec(target_kind=StratagemTargetKind.FRIENDLY_UNIT),
+    )
+    catalog_record = StratagemCatalogRecord(
+        record_id="phase17g-corsair-lifecycle-enemy-self-buff",
+        definition=definition,
+    )
+
+    status = request_stratagem_use(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        catalog_records=(catalog_record,),
+        context=StratagemEligibilityContext.from_state(
+            state=state,
+            player_id="player-b",
+            trigger_kind=TimingTriggerKind.START_PHASE,
+        ),
+    )
+    stratagem_request = _decision_request(status)
+    assert stratagem_request.decision_type == STRATAGEM_DECISION_TYPE
+    assert state.command_point_total("player-b") == 3
+
+    cost_choice_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-corsair-lifecycle-enemy-stratagem",
+            request=stratagem_request,
+            selected_option_id=f"use-stratagem:enemy-self-buff:target:{_LIFECYCLE_ENEMY_UNIT_ID}",
+        )
+    )
+    cost_choice_request = _decision_request(cost_choice_status)
+    assert cost_choice_request.decision_type == SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE
+    assert state.command_point_total("player-b") == 3
+
+    resolved_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-corsair-lifecycle-lord-of-deceit-use",
+            request=cost_choice_request,
+            selected_option_id=(
+                "aeldari:corsair-coterie:archraider:"
+                "phase17g-corsair-lifecycle-enemy-stratagem:"
+                f"{_LIFECYCLE_ENEMY_UNIT_ID}:use"
+            ),
+        )
+    )
+
+    assert resolved_status.status_kind is not LifecycleStatusKind.INVALID
+    assert state.command_point_total("player-b") == 1
+    assert len(state.stratagem_use_records) == 1
+    use_record = state.stratagem_use_records[0]
+    assert use_record.command_point_cost == 2
+    assert use_record.command_point_modifier_ids == (enhancements.ARCHRAIDER_COST_MODIFIER_ID,)
+    assert use_record.command_point_modifier_source_ids == (enhancements.SOURCE_RULE_ID,)
+    assert any(
+        record.event_type == enhancements.ARCHRAIDER_COST_MODIFIER_USED_EVENT
+        for record in lifecycle.decision_controller.event_log.records
+    )
+
+
+def test_relentless_raiders_lifecycle_resolves_move_completed_mortal_wounds_once() -> None:
+    config = _corsair_game_config()
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-b",
+        corsair_x=27.0,
+        webway_x=28.0,
+        enemy_x=35.0,
+    )
+    lifecycle = _corsair_lifecycle_for_state(config=config, state=state)
+
+    status = lifecycle.advance_until_decision_or_terminal()
+    unit_request = _decision_request(status)
+    assert unit_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    action_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-corsair-relentless-select-enemy",
+            request=unit_request,
+            selected_option_id=_LIFECYCLE_ENEMY_UNIT_ID,
+        )
+    )
+    action_request = _decision_request(action_status)
+    assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
+
+    proposal_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-corsair-relentless-normal-action",
+            request=action_request,
+            selected_option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        )
+    )
+    proposal_request = _decision_request(proposal_status)
+    if proposal_request.decision_type == SELECT_MOVEMENT_ACTION_GRANT_DECISION_TYPE:
+        proposal_status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="phase17g-corsair-relentless-normal-grant-decline",
+                request=proposal_request,
+                selected_option_id=DECLINE_MOVEMENT_ACTION_GRANT_OPTION_ID,
+            )
+        )
+        proposal_request = _decision_request(proposal_status)
+
+    submit_movement_proposal(
+        lifecycle,
+        request=proposal_request,
+        result_id="phase17g-corsair-relentless-normal-proposal",
+        unit_instance_id=_LIFECYCLE_ENEMY_UNIT_ID,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id=_LIFECYCLE_ENEMY_UNIT_ID,
+            dx=-3.0,
+        ),
+    )
+
+    rolled_payloads = _event_payloads(
+        lifecycle.decision_controller,
+        UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_ROLLED_EVENT,
+    )
+    assert len(rolled_payloads) == 1
+    rolled_payload = rolled_payloads[0]
+    trigger_event_id = _json_payload_string(rolled_payload, "trigger_event_id")
+    movement_record = _event_record_by_id(lifecycle.decision_controller, trigger_event_id)
+    assert movement_record.event_type == "movement_activation_completed"
+    assert rolled_payload["hook_id"] == rule.RELENTLESS_RAIDERS_HOOK_ID
+    assert rolled_payload["source_rule_id"] == rule.SOURCE_RULE_ID
+    assert rolled_payload["target_unit_instance_id"] == _LIFECYCLE_ENEMY_UNIT_ID
+    assert rolled_payload["movement_action"] == MovementPhaseActionKind.NORMAL_MOVE.value
+
+    processed_count_before = _unit_move_completed_mortal_wound_processed_event_count(
+        lifecycle.decision_controller
+    )
+    lifecycle.advance_until_decision_or_terminal()
+    assert (
+        _unit_move_completed_mortal_wound_processed_event_count(lifecycle.decision_controller)
+        == processed_count_before
+    )
 
 
 def test_corsair_event_filter_helpers_and_rule_guardrails_are_strict() -> None:
@@ -2733,6 +2973,189 @@ def _bad_unit_move_completed_handler(
     return cast(tuple[UnitMoveCompletedMortalWoundEffect, ...], [])
 
 
+def _corsair_lifecycle_for_state(*, config: GameConfig, state: GameState) -> GameLifecycle:
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    _use_source_backed_lifecycle_armies(config=config, state=state)
+    lifecycle.state = state
+    refresh_runtime_content_bundle = cast(
+        Callable[[], None],
+        object.__getattribute__(
+            lifecycle,
+            "_refresh_runtime_content_bundle_if_armies_mustered",
+        ),
+    )
+    refresh_runtime_content_bundle()
+    return lifecycle
+
+
+def _use_source_backed_lifecycle_armies(*, config: GameConfig, state: GameState) -> None:
+    positions_by_unit_id = _unit_x_positions_by_id(state)
+    if _ENEMY_UNIT_ID in positions_by_unit_id:
+        positions_by_unit_id[_LIFECYCLE_ENEMY_UNIT_ID] = positions_by_unit_id[_ENEMY_UNIT_ID]
+    source_armies = tuple(
+        _source_backed_lifecycle_army(muster_army(catalog=config.army_catalog, request=request))
+        for request in config.army_muster_requests
+    )
+    state.army_definitions = list(source_armies)
+    state.starting_strength_records = [
+        record
+        for army in source_armies
+        for record in starting_strength_records_for_units(
+            player_id=army.player_id,
+            units=army.units,
+        )
+    ]
+    state.starting_strength_records.sort(key=lambda record: record.unit_instance_id)
+    _record_lifecycle_secondary_choices(state)
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("Lifecycle Corsair fixture requires battlefield state.")
+    state.battlefield_state = BattlefieldRuntimeState(
+        battlefield_id=battlefield.battlefield_id,
+        battlefield_width_inches=battlefield.battlefield_width_inches,
+        battlefield_depth_inches=battlefield.battlefield_depth_inches,
+        placed_armies=tuple(
+            _source_backed_lifecycle_placed_army(
+                army,
+                positions_by_unit_id=positions_by_unit_id,
+            )
+            for army in source_armies
+        ),
+        removed_model_ids=battlefield.removed_model_ids,
+    )
+
+
+def _record_lifecycle_secondary_choices(state: GameState) -> None:
+    for player_id in state.player_ids:
+        if state.secondary_mission_choice_for_player(player_id) is not None:
+            continue
+        state.record_secondary_mission_choice(
+            SecondaryMissionChoice(
+                player_id=player_id,
+                mode=SecondaryMissionMode.FIXED,
+                fixed_mission_ids=("area-denial", "assassination"),
+            )
+        )
+
+
+def _source_backed_lifecycle_army(army: ArmyDefinition) -> ArmyDefinition:
+    keep_unit_ids = (
+        {
+            _CORSAIR_UNIT_ID,
+            _ARCHRAIDER_UNIT_ID,
+            _VOIDSTONE_UNIT_ID,
+            _WEBWAY_UNIT_ID,
+        }
+        if army.player_id == "player-a"
+        else {_LIFECYCLE_ENEMY_UNIT_ID}
+    )
+    return replace(
+        army,
+        units=tuple(
+            replace(unit, own_models=(unit.own_models[0],))
+            for unit in army.units
+            if unit.unit_instance_id in keep_unit_ids
+        ),
+        attached_units=(),
+    )
+
+
+def _source_backed_lifecycle_placed_army(
+    army: ArmyDefinition,
+    *,
+    positions_by_unit_id: dict[str, float],
+) -> PlacedArmy:
+    return PlacedArmy(
+        army_id=army.army_id,
+        player_id=army.player_id,
+        unit_placements=tuple(
+            _unit_placement(
+                army.army_id,
+                army.player_id,
+                unit,
+                x=positions_by_unit_id.get(unit.unit_instance_id, _fallback_unit_x(unit)),
+            )
+            for unit in army.units
+        ),
+    )
+
+
+def _unit_x_positions_by_id(state: GameState) -> dict[str, float]:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("Lifecycle Corsair fixture requires battlefield state.")
+    positions: dict[str, float] = {}
+    for placed_army in battlefield.placed_armies:
+        for unit_placement in placed_army.unit_placements:
+            positions[unit_placement.unit_instance_id] = unit_placement.model_placements[
+                0
+            ].pose.position.x
+    return positions
+
+
+def _fallback_unit_x(unit: UnitInstance) -> float:
+    if unit.unit_instance_id.startswith("army-a:"):
+        return 5.0
+    return 50.0
+
+
+def _decision_request(status: LifecycleStatus) -> DecisionRequest:
+    request = status.decision_request
+    if request is None:
+        raise AssertionError(f"Expected lifecycle decision request, got {status.status_kind}.")
+    return request
+
+
+def _event_records(decisions: DecisionController, event_type: str) -> tuple[EventRecord, ...]:
+    return tuple(
+        record for record in decisions.event_log.records if record.event_type == event_type
+    )
+
+
+def _event_payloads(
+    decisions: DecisionController,
+    event_type: str,
+) -> tuple[dict[str, JsonValue], ...]:
+    payloads: list[dict[str, JsonValue]] = []
+    for record in _event_records(decisions, event_type):
+        if not isinstance(record.payload, dict):
+            raise TypeError(f"{event_type} payload must be an object.")
+        payloads.append(record.payload)
+    return tuple(payloads)
+
+
+def _event_index(decisions: DecisionController, event_type: str) -> int:
+    for index, record in enumerate(decisions.event_log.records):
+        if record.event_type == event_type:
+            return index
+    raise AssertionError(f"Missing event {event_type}.")
+
+
+def _event_record_by_id(decisions: DecisionController, event_id: str) -> EventRecord:
+    for record in decisions.event_log.records:
+        if record.event_id == event_id:
+            return record
+    raise AssertionError(f"Missing event record {event_id}.")
+
+
+def _json_payload_string(payload: dict[str, JsonValue], key: str) -> str:
+    value = payload.get(key)
+    if type(value) is not str:
+        raise AssertionError(f"{key} must be a string.")
+    return value
+
+
+def _unit_move_completed_mortal_wound_processed_event_count(
+    decisions: DecisionController,
+) -> int:
+    return len(
+        _event_records(decisions, UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_PENDING_EVENT)
+        + _event_records(decisions, UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_RESOLVED_EVENT)
+        + _event_records(decisions, UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_IGNORED_EVENT)
+    )
+
+
 def _corsair_state(
     *,
     enhancement_assignments: tuple[EnhancementAssignment, ...] = (),
@@ -3194,6 +3617,9 @@ def _mission_setup() -> MissionSetup:
 
 
 def _record_archraider_model_selection(state: GameState) -> None:
+    selected_model_instance_id = (
+        _unit_by_id(state, _ARCHRAIDER_UNIT_ID).own_models[0].model_instance_id
+    )
     state.record_faction_rule_state(
         FactionRuleState(
             state_id=f"{enhancements.ARCHRAIDER_SETUP_HOOK_ID}:{_ARCHRAIDER_UNIT_ID}:selected",
@@ -3207,7 +3633,7 @@ def _record_archraider_model_selection(state: GameState) -> None:
             payload={
                 "effect_kind": enhancements.ARCHRAIDER_EFFECT_KIND,
                 "target_unit_instance_id": _ARCHRAIDER_UNIT_ID,
-                "selected_model_instance_id": f"{_ARCHRAIDER_UNIT_ID}:model-001",
+                "selected_model_instance_id": selected_model_instance_id,
             },
         )
     )

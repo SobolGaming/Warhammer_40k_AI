@@ -984,6 +984,8 @@ Required Phase 17G setup faction-rule tests:
 
 Phase 17G adds opt-in turn-end decisions for faction runtime content. These decisions are emitted only when the mustered army's faction runtime contribution registers a turn-end hook and the completed phase matches the hook's timing. The current implemented hook is Aeldari Corsair Coterie Webway Pathstone at the end of the opponent's Fight phase.
 
+Phase-end objective-control hooks and phase-end cleanup resolve before turn-end faction-rule decisions are emitted. Adapters must therefore treat turn-end repositioning choices as occurring after engine-owned phase-end objective-control state has already been recorded for that phase.
+
 Phase 17G exposes the finite decision type `select_faction_rule_turn_end_option`. The pending request payload contains game ID, battle round, active player ID, completed phase, source rule ID, hook ID, enhancement ID, and target unit ID. Adapters answer by selecting one emitted option ID. Current Webway Pathstone options use:
 
 - `aeldari:corsair-coterie:webway-pathstone:<unit_instance_id>:use`;
