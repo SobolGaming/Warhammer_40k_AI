@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -19,6 +21,11 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_coverage_rows_from_catalog,
     ability_coverage_rows_payload,
 )
+from warhammer40k_core.engine.faction_content.bundle import (
+    DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID,
+    RuntimeContentContribution,
+)
+from warhammer40k_core.engine.faction_content.manifest import RuntimeContentSupportStatus
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
     army_rule as death_guard_army_rule,
 )
@@ -28,8 +35,14 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.drukhari impo
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
     army_rule as emperors_children_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.generated_manifest import (
+    generated_runtime_content_rows,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
     army_rule as world_eaters_army_rule,
+)
+from warhammer40k_core.engine.stratagem_catalog import (
+    eleventh_edition_core_stratagem_catalog_records,
 )
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
@@ -112,6 +125,12 @@ class DetachmentRuleSupportRow:
     notes: str
 
 
+@dataclass(frozen=True)
+class RuntimeHookInventoryRow:
+    hook_id: str
+    ability_or_rule_labels: tuple[str, ...]
+
+
 _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
     (
         "aeldari",
@@ -125,6 +144,29 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
         notes=(
             "Runtime grants the +6 inch detection-range effect over the 11th Edition "
             "15 inch Hidden baseline and expires it after the source shoots."
+        ),
+    ),
+    (
+        "aeldari",
+        "corsair-coterie",
+    ): SupportSectionRow(
+        subject="Corsair Coterie",
+        engine=(
+            "Relentless Raiders movement/charge completion mortal-wound hook, Void Thieves "
+            "sticky objective-control hook, four enhancements, and six named Stratagem handlers"
+        ),
+        documentation="Adapter contract, architecture, and generated matrix",
+        tests=(
+            "Focused mustering, objective-control, movement-completion, turn-end, "
+            "Stratagem-cost, runtime-modifier, Stratagem effect, targeting-restriction, "
+            "and triggered-movement tests"
+        ),
+        overall="Full",
+        notes=(
+            "Includes Veterans of the Void mustering, objective-control ownership checks after "
+            "sticky states, D6 2+ into D3 mortal wounds for enemies ending Normal/Advance/"
+            "Fall Back/Charge moves on controlled objectives, Anhrathe sticky control, and "
+            "Corsair Coterie Stratagem support."
         ),
     ),
     (
@@ -146,13 +188,143 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
         "cavalcade-of-chaos",
     ): SupportSectionRow(
         subject="Cavalcade of Chaos",
-        engine="Unholy Avalanche Fall Back eligibility hook",
+        engine=(
+            "Unholy Avalanche Fall Back eligibility hook, three named Stratagem records, "
+            "and two Enhancement bindings"
+        ),
         documentation="Source row, execution record, and generated matrix",
-        tests="Focused Fall Back, Shoot, Charge, and handler-drift tests",
+        tests=("Focused Fall Back, Shoot, Charge, Stratagem, Enhancement, and handler-drift tests"),
         overall="Full",
         notes=(
-            "Mounted Legiones Daemonica units retain Shoot and Charge permissions after Fall Back."
+            "Includes MOUNTED LEGIONES DAEMONICA Shoot and Charge permissions after Fall Back, "
+            "Warp-Riders MOBILE, From Beyond the Veil ingress, Inescapable Manifestations "
+            "Desperate Escape, Apocalyptic Steeds +1 Movement, and Soul-Shattering Charge "
+            "melee targeting."
         ),
+    ),
+}
+
+_RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
+    "phase17f:phase17e:aeldari:army-rule": "Battle Focus",
+    "phase17f:phase17e:aeldari:path-of-the-outcast:enhancements": (
+        "Path of the Outcast Enhancements"
+    ),
+    "phase17f:phase17e:aeldari:path-of-the-outcast:far-reaching-doom": ("Far-reaching Doom"),
+    "phase17f:phase17e:chaos-daemons:army-rule": "The Shadow of Chaos",
+    "phase17f:phase17e:chaos-daemons:blood-legion:rule": "Blood Legion",
+    "phase17f:phase17e:chaos-daemons:cavalcade-of-chaos:enhancements": (
+        "Cavalcade of Chaos Upgrades"
+    ),
+    "phase17f:phase17e:chaos-daemons:cavalcade-of-chaos:rule": "Unholy Avalanche",
+    "phase17f:phase17e:chaos-daemons:cavalcade-of-chaos:stratagems": (
+        "Cavalcade of Chaos Stratagems"
+    ),
+    "phase17f:phase17e:death-guard:army-rule": "Nurgle's Gift",
+    "phase17f:phase17e:drukhari:army-rule": "Power from Pain",
+    "phase17f:phase17e:emperors-children:army-rule": "Thrill Seekers",
+    "phase17f:phase17e:world-eaters:army-rule": "Blessings of Khorne",
+    "phase17g:aeldari:corsair-coterie:enhancements": "Corsair Coterie Enhancements",
+    "phase17g:aeldari:corsair-coterie:relentless-raiders": "Corsair Coterie",
+    "phase17g:aeldari:corsair-coterie:stratagems": "Corsair Coterie Stratagems",
+}
+
+_RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
+    "phase17g:aeldari:corsair-coterie:stratagems:cloak-and-shadow:target-restriction": (
+        "Cloak and Shadow"
+    ),
+    "phase17g:aeldari:corsair-coterie:stratagems:outcast-ambush:weapon-profile": ("Outcast Ambush"),
+    "warhammer_40000_11th:aeldari:army_rule:fade_back": "Battle Focus - Fade Back",
+    "warhammer_40000_11th:aeldari:army_rule:flitting_shadows": ("Battle Focus - Flitting Shadows"),
+    "warhammer_40000_11th:aeldari:army_rule:opportunity_seized": (
+        "Battle Focus - Opportunity Seized"
+    ),
+    "warhammer_40000_11th:aeldari:army_rule:star_engines": ("Battle Focus - Star Engines"),
+    "warhammer_40000_11th:aeldari:army_rule:sudden_strike": ("Battle Focus - Sudden Strike"),
+    "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind": (
+        "Battle Focus - Swift as the Wind"
+    ),
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider": ("Archraider"),
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:lord_of_deceit": (
+        "Archraider"
+    ),
+    (
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:lord_of_deceit_choice"
+    ): "Archraider",
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:select_model": (
+        "Archraider"
+    ),
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:infamy": "Infamy",
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:infamy:objective_control": ("Infamy"),
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:relentless_raiders": (
+        "Relentless Raiders"
+    ),
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:void_thieves": ("Void Thieves"),
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:voidstone": "Voidstone",
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:voidstone:save_option": ("Voidstone"),
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone": (
+        "Webway Pathstone"
+    ),
+    (
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone:deep_strike"
+    ): "Webway Pathstone",
+    (
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone:turn_end_reserves"
+    ): "Webway Pathstone",
+    "warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:assassins_eye_upgrade": (
+        "Assassins' Eye"
+    ),
+    (
+        "warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:camouflaged_snipers_upgrade"
+    ): "Camouflaged Snipers",
+    "warhammer_40000_11th:aeldari:path_of_the_outcast:far_reaching_doom:selected_shooting_unit": (
+        "Far-reaching Doom"
+    ),
+    "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted": ("Blood Tainted"),
+    "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall": ("Murdercall"),
+    (
+        "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:"
+        "apocalyptic_steeds_upgrade"
+    ): "Apocalyptic Steeds Upgrade",
+    (
+        "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:"
+        "soul_shattering_charge_upgrade"
+    ): "Soul-Shattering Charge Upgrade",
+    "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche": (
+        "Unholy Avalanche"
+    ),
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:battle-shock-failed": (
+        "Power from Pain"
+    ),
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:command-phase-start": (
+        "Power from Pain"
+    ),
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:enemy-unit-destroyed": (
+        "Power from Pain"
+    ),
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:hatred-eternal-fight": (
+        "Power from Pain - Hatred Eternal"
+    ),
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:hatred-eternal-shooting": (
+        "Power from Pain - Hatred Eternal"
+    ),
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:lithe-agility-advance": (
+        "Power from Pain - Lithe Agility"
+    ),
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:lithe-agility-charge": (
+        "Power from Pain - Lithe Agility"
+    ),
+    "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration": (
+        "Blessings of Khorne - Rage-fuelled Invigoration"
+    ),
+    "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage": (
+        "Blessings of Khorne - Total Carnage"
+    ),
+    (
+        "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:"
+        "unbridled_bloodlust:charge_roll"
+    ): "Blessings of Khorne - Unbridled Bloodlust",
+    "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords": (
+        "Blessings of Khorne"
     ),
 }
 
@@ -170,7 +342,7 @@ def main() -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     _write_json(output_dir / "ability_coverage_rows.json", row_payloads)
     _write_json(output_dir / "ability_support_category_rows.json", category_payloads)
-    docs_path.write_text(_support_matrix_markdown(category_payloads), encoding="utf-8")
+    docs_path.write_text(support_matrix_markdown(category_payloads), encoding="utf-8")
 
 
 def ability_support_matrix_rows(
@@ -371,7 +543,7 @@ def _emperors_children_runtime_consumer_ids() -> tuple[str, ...]:
     )
 
 
-def _support_matrix_markdown(
+def support_matrix_markdown(
     category_rows: list[AbilityCoverageCategoryRowPayload],
 ) -> str:
     lines = [
@@ -406,31 +578,7 @@ def _support_matrix_markdown(
             "implementation-backed runtime content is consumed by a phase/query host through a "
             "named runtime consumer."
         ),
-        "",
-        "Current coverage categories:",
-        "",
-        (
-            "| Category | Support status | Runtime consumers | Rows | Source kinds | "
-            "Ability/datasheet pairs | Semantic category |"
-        ),
-        "| --- | --- | --- | ---: | --- | --- | --- |",
     ]
-    for row in category_rows:
-        lines.append(
-            "| "
-            + " | ".join(
-                (
-                    _markdown_text(row["category_name"]),
-                    _inline_code_list(row["support_stages"]),
-                    _inline_code_list(row["runtime_consumer_ids"]),
-                    str(row["coverage_row_count"]),
-                    _source_kind_counts_text(row["source_kind_counts"]),
-                    _ability_datasheet_pairs_text(row["ability_datasheet_pairs"]),
-                    f"`{_markdown_text(row['category_id'])}`",
-                )
-            )
-            + " |"
-        )
     lines.extend(_structured_support_sections_markdown())
     lines.extend(
         (
@@ -449,10 +597,503 @@ def _support_matrix_markdown(
                 "consumers, explicitly declared runtime-content rows, and tests proving the "
                 "behavior."
             ),
-            "",
         )
     )
+    lines.extend(_runtime_hook_inventory_markdown(category_rows))
+    lines.append("")
     return "\n".join(lines)
+
+
+def _runtime_hook_inventory_markdown(
+    category_rows: list[AbilityCoverageCategoryRowPayload],
+) -> list[str]:
+    lines = [
+        "",
+        "## Runtime Hook Inventory",
+        "",
+        (
+            "This bottom inventory lists the hook, modifier, effect, handler, and runtime "
+            "consumer IDs currently surfaced by generated category rows, Core Stratagem "
+            "records, or registered runtime-content contributions."
+        ),
+        "",
+        "| Hook / consumer | Abilities / rules |",
+        "| --- | --- |",
+    ]
+    for row in _runtime_hook_inventory_rows(category_rows):
+        lines.append(
+            "| "
+            + " | ".join(
+                (
+                    f"`{_markdown_text(row.hook_id)}`",
+                    _hook_ability_or_rule_labels_text(row.ability_or_rule_labels),
+                )
+            )
+            + " |"
+        )
+    return lines
+
+
+def _runtime_hook_inventory_rows(
+    category_rows: list[AbilityCoverageCategoryRowPayload],
+) -> tuple[RuntimeHookInventoryRow, ...]:
+    inventory: dict[str, set[str]] = {}
+    for row in category_rows:
+        for consumer_id in row["runtime_consumer_ids"]:
+            for label in _category_runtime_consumer_labels(
+                row,
+                consumer_id=consumer_id,
+            ):
+                _add_inventory_entry(inventory, hook_id=consumer_id, label=label)
+
+    labels_by_id = _runtime_content_labels_by_id()
+    for record in eleventh_edition_core_stratagem_catalog_records():
+        _add_inventory_entry(
+            inventory,
+            hook_id=record.definition.handler_id,
+            label=record.definition.name,
+        )
+    for contribution in _runtime_content_contributions():
+        _add_runtime_content_inventory_entries(
+            inventory=inventory,
+            contribution=contribution,
+            labels_by_id=labels_by_id,
+        )
+
+    return tuple(
+        RuntimeHookInventoryRow(
+            hook_id=hook_id,
+            ability_or_rule_labels=tuple(sorted(labels)),
+        )
+        for hook_id, labels in sorted(inventory.items())
+    )
+
+
+def _category_runtime_consumer_labels(
+    row: AbilityCoverageCategoryRowPayload,
+    *,
+    consumer_id: str,
+) -> tuple[str, ...]:
+    label_override = _RUNTIME_ID_LABEL_OVERRIDES.get(consumer_id)
+    if label_override is not None:
+        return (label_override,)
+    ability_names = tuple(row["ability_names"])
+    if ability_names:
+        return ability_names
+    return (row["category_name"],)
+
+
+def _runtime_content_labels_by_id() -> dict[str, set[str]]:
+    labels_by_id: dict[str, set[str]] = {}
+    for contribution in _runtime_content_contributions():
+        for ability_record in contribution.ability_records:
+            _add_inventory_entry(
+                labels_by_id,
+                hook_id=ability_record.definition.handler_id,
+                label=ability_record.definition.name,
+            )
+        for stratagem_record in contribution.stratagem_records:
+            _add_inventory_entry(
+                labels_by_id,
+                hook_id=stratagem_record.definition.handler_id,
+                label=stratagem_record.definition.name,
+            )
+        for binding in contribution.enhancement_effect_bindings:
+            _add_inventory_entry(
+                labels_by_id,
+                hook_id=binding.effect_id,
+                label=_enhancement_label(binding.enhancement_id),
+            )
+    return labels_by_id
+
+
+def _runtime_content_contributions() -> tuple[RuntimeContentContribution, ...]:
+    module_paths = tuple(
+        sorted(
+            {
+                row.module_path
+                for row in generated_runtime_content_rows()
+                if row.support_status is RuntimeContentSupportStatus.SUPPORTED
+                and row.module_path is not None
+            }
+        )
+    )
+    contributions: list[RuntimeContentContribution] = []
+    for module_path in module_paths:
+        module = importlib.import_module(module_path)
+        factory_candidate = module.__dict__.get("runtime_contribution")
+        if not callable(factory_candidate):
+            raise TypeError("Runtime content module must expose runtime_contribution().")
+        factory = cast(Callable[[], RuntimeContentContribution], factory_candidate)
+        contribution = factory()
+        if type(contribution) is not RuntimeContentContribution:
+            raise TypeError("Runtime content module returned invalid RuntimeContentContribution.")
+        if contribution.contribution_id == DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID:
+            contribution = contribution.with_contribution_id(module.__name__)
+        contributions.append(contribution)
+    return tuple(contributions)
+
+
+def _add_runtime_content_inventory_entries(
+    *,
+    inventory: dict[str, set[str]],
+    contribution: RuntimeContentContribution,
+    labels_by_id: Mapping[str, set[str]],
+) -> None:
+    for ability_record in contribution.ability_records:
+        _add_inventory_entry(
+            inventory,
+            hook_id=ability_record.definition.handler_id,
+            label=ability_record.definition.name,
+        )
+    for stratagem_record in contribution.stratagem_records:
+        _add_inventory_entry(
+            inventory,
+            hook_id=stratagem_record.definition.handler_id,
+            label=stratagem_record.definition.name,
+        )
+    _add_handler_bindings(
+        inventory,
+        (binding.handler_id for binding in contribution.ability_handler_bindings),
+        labels_by_id,
+    )
+    _add_handler_bindings(
+        inventory,
+        (binding.handler_id for binding in contribution.stratagem_handler_bindings),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.trigger_kind.value, binding.source_rule_id)
+            for binding in contribution.event_subscriptions
+        ),
+        labels_by_id,
+    )
+    _add_handler_bindings(
+        inventory,
+        (binding.handler_id for binding in contribution.event_handler_bindings),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.battle_formation_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.battle_round_start_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        ((binding.hook_id, binding.source_id) for binding in contribution.turn_end_hook_bindings),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.command_phase_start_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.unit_destroyed_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.battle_shock_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.advance_eligibility_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.advance_move_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        ((binding.hook_id, binding.source_id) for binding in contribution.fall_back_hook_bindings),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.movement_end_surge_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.unit_move_completed_mortal_wound_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.charge_declaration_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.shooting_target_restriction_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.charge_target_restriction_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.shooting_unit_selected_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.shooting_unit_selected_grant_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.shooting_end_surge_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.effect_id, binding.source_id)
+            for binding in contribution.enhancement_effect_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.fight_activation_ability_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.fight_unit_selected_grant_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.phase_end_objective_control_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.stratagem_cost_choice_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.modifier_id, binding.source_id)
+            for binding in contribution.stratagem_cost_modifier_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.modifier_id, binding.source_id)
+            for binding in contribution.unit_characteristic_modifier_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.modifier_id, binding.source_id)
+            for binding in contribution.hit_roll_modifier_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.modifier_id, binding.source_id)
+            for binding in contribution.save_option_modifier_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.modifier_id, binding.source_id)
+            for binding in contribution.movement_budget_modifier_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.modifier_id, binding.source_id)
+            for binding in contribution.objective_control_modifier_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.modifier_id, binding.source_id)
+            for binding in contribution.charge_roll_modifier_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.modifier_id, binding.source_id)
+            for binding in contribution.weapon_profile_modifier_bindings
+        ),
+        labels_by_id,
+    )
+
+
+def _add_hook_bindings(
+    inventory: dict[str, set[str]],
+    bindings: Iterable[tuple[str, str]],
+    labels_by_id: Mapping[str, set[str]],
+) -> None:
+    for binding_id, source_id in bindings:
+        for label in _runtime_binding_labels(
+            identifier=binding_id,
+            source_id=source_id,
+            labels_by_id=labels_by_id,
+        ):
+            _add_inventory_entry(inventory, hook_id=binding_id, label=label)
+
+
+def _add_handler_bindings(
+    inventory: dict[str, set[str]],
+    handler_ids: Iterable[str],
+    labels_by_id: Mapping[str, set[str]],
+) -> None:
+    for handler_id in handler_ids:
+        labels = labels_by_id.get(handler_id)
+        if labels is None:
+            labels = {_label_from_identifier(handler_id)}
+        for label in labels:
+            _add_inventory_entry(inventory, hook_id=handler_id, label=label)
+
+
+def _runtime_binding_labels(
+    *,
+    identifier: str,
+    source_id: str,
+    labels_by_id: Mapping[str, set[str]],
+) -> tuple[str, ...]:
+    label_override = _RUNTIME_ID_LABEL_OVERRIDES.get(identifier)
+    if label_override is not None:
+        return (label_override,)
+    labels = labels_by_id.get(identifier)
+    if labels is not None:
+        return tuple(sorted(labels))
+    source_label = _RUNTIME_SOURCE_LABEL_OVERRIDES.get(source_id)
+    if source_label is not None:
+        return (source_label,)
+    return (_label_from_identifier(identifier),)
+
+
+def _add_inventory_entry(
+    inventory: dict[str, set[str]],
+    *,
+    hook_id: str,
+    label: str,
+) -> None:
+    inventory.setdefault(hook_id, set()).add(label)
+
+
+def _hook_ability_or_rule_labels_text(labels: tuple[str, ...]) -> str:
+    return "<br>".join(_markdown_text(label) for label in labels)
+
+
+def _enhancement_label(enhancement_id: str) -> str:
+    label = _RUNTIME_ID_LABEL_OVERRIDES.get(enhancement_id)
+    if label is not None:
+        return label
+    return _label_from_identifier(enhancement_id)
+
+
+def _label_from_identifier(identifier: str) -> str:
+    token = identifier.split(":")[-1].replace("_", "-")
+    words = tuple(word for word in token.split("-") if word)
+    if not words:
+        return identifier
+    return " ".join(_title_word(word) for word in words)
+
+
+def _title_word(word: str) -> str:
+    upper_tokens = {
+        "ap": "AP",
+        "cp": "CP",
+        "d3": "D3",
+        "d6": "D6",
+        "ir": "IR",
+        "oc": "OC",
+    }
+    return upper_tokens.get(word, word.capitalize())
 
 
 def _structured_support_sections_markdown() -> list[str]:
@@ -642,61 +1283,14 @@ def _structured_support_sections_markdown() -> list[str]:
                 "Faction Stratagems are distinct from Core Stratagems and should remain "
                 "faction-scoped."
             ),
-            (
-                SupportSectionRow(
-                    "Aeldari - Path of the Outcast Stratagems",
-                    "Named post-shooting Stratagem handlers",
-                    "Adapter contract, architecture, and generated matrix",
-                    "Focused CP, targeting, Battle-shock, detection, and movement tests",
-                    "Full",
-                    (
-                        "Includes Eldritch Suppression, Casting Back the Veil, and Nomads of "
-                        "the Hidden Way through the shared `use_stratagem` and triggered "
-                        "movement paths."
-                    ),
-                ),
-                SupportSectionRow(
-                    "Faction-pack Stratagems",
-                    "Coverage/report rows exist; semantic handlers vary",
-                    "Architecture and coverage reports",
-                    "Faction-specific tests where implemented",
-                    "Partial",
-                    (
-                        "Future generator work should group rows by faction, detachment, "
-                        "and Stratagem."
-                    ),
-                ),
-            ),
+            _faction_stratagem_support_rows(),
         )
     )
     lines.extend(
         _support_section_markdown(
             "Enhancements",
             "Enhancement support should be tracked under each faction and detachment.",
-            (
-                SupportSectionRow(
-                    "Aeldari - Path of the Outcast Upgrades",
-                    "Enhancement effect bindings",
-                    "Architecture and generated matrix",
-                    "Focused eligibility, hidden-preservation, and CHARACTER AP tests",
-                    "Full",
-                    (
-                        "Includes Camouflaged Snipers preserving Hidden after ranged attacks "
-                        "and Assassins' Eye applying +1 AP against CHARACTER targets."
-                    ),
-                ),
-                SupportSectionRow(
-                    "Faction-pack Enhancements",
-                    "Coverage/report rows exist; semantic handlers vary",
-                    "Architecture and coverage reports",
-                    "Faction-specific tests where implemented",
-                    "Partial",
-                    (
-                        "Future generator work should group rows by faction, detachment, "
-                        "and enhancement."
-                    ),
-                ),
-            ),
+            _enhancement_support_rows(),
         )
     )
     lines.extend(
@@ -716,6 +1310,122 @@ def _structured_support_sections_markdown() -> list[str]:
         )
     )
     return lines
+
+
+def _faction_stratagem_support_rows() -> tuple[SupportSectionRow, ...]:
+    return (
+        SupportSectionRow(
+            "Aeldari - Path of the Outcast Stratagems",
+            "Named post-shooting Stratagem handlers",
+            "Adapter contract, architecture, and generated matrix",
+            "Focused CP, targeting, Battle-shock, detection, and movement tests",
+            "Full",
+            (
+                "Includes Eldritch Suppression, Casting Back the Veil, and Nomads of "
+                "the Hidden Way through the shared `use_stratagem` and triggered "
+                "movement paths."
+            ),
+        ),
+        SupportSectionRow(
+            "Aeldari - Corsair Coterie Stratagems",
+            (
+                "Named Movement, Shooting, and Fight phase Stratagem handlers plus "
+                "source-backed attack reroll, triggered movement, target restriction, "
+                "and weapon-profile hooks"
+            ),
+            "Adapter contract, architecture, and generated matrix",
+            (
+                "Focused timing, targeting, source-backed wound reroll, AP/weapon-keyword "
+                "modifier, mortal-wound, triggered-movement, and target-restriction tests"
+            ),
+            "Full",
+            (
+                "Includes Pirates' Due, Lethal Ruse, Outcast Ambush, Into the Breach, "
+                "Cloak and Shadow, and Vengeful Sorrow through the shared `use_stratagem`, "
+                "attack sequence, charge eligibility, and triggered movement paths."
+            ),
+        ),
+        SupportSectionRow(
+            "Chaos Daemons - Cavalcade of Chaos Stratagems",
+            (
+                "Named Warp-Riders handler plus generic ingress and Desperate Escape "
+                "Stratagem records"
+            ),
+            "Adapter contract, architecture, and generated matrix",
+            (
+                "Focused Movement timing, CP, Strategic Reserves ingress, Desperate Escape, "
+                "and handler-drift tests"
+            ),
+            "Full",
+            (
+                "Includes Warp-Riders, From Beyond the Veil, and Inescapable Manifestations "
+                "through the shared `use_stratagem`, persisting-effect, Strategic Reserves "
+                "placement, and forced Desperate Escape paths."
+            ),
+        ),
+        SupportSectionRow(
+            "Faction-pack Stratagems",
+            "Coverage/report rows exist; semantic handlers vary",
+            "Architecture and coverage reports",
+            "Faction-specific tests where implemented",
+            "Partial",
+            ("Future generator work should group rows by faction, detachment, and Stratagem."),
+        ),
+    )
+
+
+def _enhancement_support_rows() -> tuple[SupportSectionRow, ...]:
+    return (
+        SupportSectionRow(
+            "Aeldari - Path of the Outcast Upgrades",
+            "Enhancement effect bindings",
+            "Architecture and generated matrix",
+            "Focused eligibility, hidden-preservation, and CHARACTER AP tests",
+            "Full",
+            (
+                "Includes Camouflaged Snipers preserving Hidden after ranged attacks "
+                "and Assassins' Eye applying +1 AP against CHARACTER targets."
+            ),
+        ),
+        SupportSectionRow(
+            "Aeldari - Corsair Coterie Enhancements",
+            (
+                "Enhancement effect, setup, turn-end, Stratagem-cost choice, Objective "
+                "Control, and save-option bindings"
+            ),
+            "Adapter contract, architecture, and generated matrix",
+            "Focused Veterans, Infamy, Webway Pathstone, Archraider, and Voidstone tests",
+            "Full",
+            (
+                "Includes Infamy OC reduction aura, Webway Pathstone Deep Strike and "
+                "once-per-battle end-opponent-turn Strategic Reserves choice, Archraider "
+                "selected model setup plus optional Lord of Deceit +1CP modifier, and "
+                "Voidstone 5+ invulnerable save."
+            ),
+        ),
+        SupportSectionRow(
+            "Chaos Daemons - Cavalcade of Chaos Upgrades",
+            "Enhancement movement modifier and selected-to-fight ability bindings",
+            "Adapter contract, architecture, and generated matrix",
+            (
+                "Focused roster eligibility, lifecycle movement, melee targeting, "
+                "and source-drift tests"
+            ),
+            "Full",
+            (
+                "Includes Apocalyptic Steeds +1 Movement for LEGIONES DAEMONICA MOUNTED "
+                "units and Soul-Shattering Charge 3 inch melee targeting after a charge."
+            ),
+        ),
+        SupportSectionRow(
+            "Faction-pack Enhancements",
+            "Coverage/report rows exist; semantic handlers vary",
+            "Architecture and coverage reports",
+            "Faction-specific tests where implemented",
+            "Partial",
+            ("Future generator work should group rows by faction, detachment, and enhancement."),
+        ),
+    )
 
 
 def _support_section_markdown(
