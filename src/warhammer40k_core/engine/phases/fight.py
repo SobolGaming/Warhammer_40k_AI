@@ -471,6 +471,15 @@ def _advance_fight_phase_body(
             )
             return None
         state.fight_phase_state = selected_context.fight_state
+        stratagem_status = _request_active_fight_phase_stratagem_if_available(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            fight_state=selected_context.fight_state,
+            contexts=selected_context.contexts,
+        )
+        if stratagem_status is not None:
+            return stratagem_status
         return _request_fight_activation(
             state=state,
             decisions=decisions,
@@ -2374,6 +2383,118 @@ def _advance_to_next_fight_request(
         current = current.with_next_band()
         checked_player_ids = set()
     raise GameLifecycleError("Fight phase exceeded deterministic ordering guard.")
+
+
+def _request_active_fight_phase_stratagem_if_available(
+    *,
+    handler: FightPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    fight_state: FightPhaseState,
+    contexts: tuple[FightEligibilityContext, ...],
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.stratagems import (
+        create_stratagem_use_decision_request,
+        stratagem_decline_option,
+        stratagem_use_options_from_index,
+    )
+
+    if type(fight_state) is not FightPhaseState:
+        raise GameLifecycleError("Active fight stratagem trigger requires fight state.")
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=fight_state.fight_order_state.next_player_id,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+        timing_window_id=_active_fight_phase_stratagem_timing_window_id(fight_state),
+        trigger_payload={
+            "ordering_band": fight_state.current_ordering_band.value,
+            "next_player_id": fight_state.fight_order_state.next_player_id,
+            "eligible_unit_instance_ids": [context.unit_instance_id for context in contexts],
+            "selected_to_fight_unit_instance_ids": list(
+                fight_state.fight_order_state.selected_to_fight_unit_ids
+            ),
+        },
+    )
+    if stratagem_window_declined_for_context(decisions=decisions, context=context):
+        return None
+    if _stratagem_used_for_context(decisions=decisions, context=context):
+        return None
+    options = stratagem_use_options_from_index(
+        state=state,
+        index=handler.stratagem_index,
+        context=context,
+    )
+    if not options:
+        return None
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(*options, stratagem_decline_option()),
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "active_fight_phase_stratagem_window_opened",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": fight_state.active_player_id,
+                "phase": BattlePhase.FIGHT.value,
+                "player_id": fight_state.fight_order_state.next_player_id,
+                "stratagem_context": context.to_payload(),
+                "request_id": request.request_id,
+                "phase_body_status": "active_fight_phase_stratagem_pending",
+            }
+        ),
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.FIGHT.value,
+            "battle_round": state.battle_round,
+            "active_player_id": fight_state.active_player_id,
+            "player_id": fight_state.fight_order_state.next_player_id,
+            "phase_body_status": "active_fight_phase_stratagem_pending",
+            "pending_request_id": request.request_id,
+        },
+    )
+
+
+def _active_fight_phase_stratagem_timing_window_id(fight_state: FightPhaseState) -> str:
+    if type(fight_state) is not FightPhaseState:
+        raise GameLifecycleError("Active fight stratagem timing requires fight state.")
+    return (
+        f"active-fight-stratagem:round-{fight_state.battle_round}:"
+        f"player-{fight_state.fight_order_state.next_player_id}:"
+        f"band-{fight_state.current_ordering_band.value}:"
+        f"selected-{len(fight_state.fight_order_state.selected_to_fight_unit_ids)}"
+    )
+
+
+def _stratagem_used_for_context(
+    *,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+) -> bool:
+    context_payload = context.to_payload()
+    for record in decisions.event_log.records:
+        if record.event_type != "stratagem_used":
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError("Stratagem use event payload must be an object.")
+        payload_object = cast(dict[str, object], payload)
+        if (
+            payload_object.get("game_id") == context_payload.get("game_id")
+            and payload_object.get("player_id") == context_payload.get("player_id")
+            and payload_object.get("battle_round") == context_payload.get("battle_round")
+            and payload_object.get("phase") == context_payload.get("phase")
+            and payload_object.get("active_player_id") == context_payload.get("active_player_id")
+            and payload_object.get("timing_window_id") == context_payload.get("timing_window_id")
+        ):
+            return True
+    return False
 
 
 def _request_fight_activation(

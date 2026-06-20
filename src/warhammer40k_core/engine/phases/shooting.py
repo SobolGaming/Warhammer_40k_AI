@@ -108,7 +108,10 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
     rules_unit_view_from_armies,
 )
-from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+    WeaponProfileModifierContext,
+)
 from warhammer40k_core.engine.shooting_end_surge_hooks import (
     ShootingEndSurgeContext,
     ShootingEndSurgeGrant,
@@ -973,6 +976,15 @@ class ShootingPhaseHandler:
         shooting_state = _ensure_shooting_phase_state(state=state)
         if shooting_state.attack_sequence is not None:
             completed_candidate = shooting_state.attack_sequence
+            target_stratagem_status = _request_after_unit_selected_as_target_stratagem_if_available(
+                state=state,
+                decisions=decisions,
+                stratagem_index=self.stratagem_index,
+                stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
+                attack_sequence=shooting_state.attack_sequence,
+            )
+            if target_stratagem_status is not None:
+                return target_stratagem_status
             attack_sequence, allocated_model_ids, status = resolve_attack_sequence_until_blocked(
                 state=state,
                 decisions=decisions,
@@ -999,6 +1011,15 @@ class ShootingPhaseHandler:
                 )
                 if stratagem_status is not None:
                     return stratagem_status
+                enemy_stratagem_status = _request_enemy_unit_has_shot_stratagem_if_available(
+                    state=state,
+                    decisions=decisions,
+                    stratagem_index=self.stratagem_index,
+                    stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
+                    completed_sequence=completed_candidate,
+                )
+                if enemy_stratagem_status is not None:
+                    return enemy_stratagem_status
                 surge_status = _request_shooting_end_surge_if_available(
                     state=state,
                     decisions=decisions,
@@ -1049,6 +1070,16 @@ class ShootingPhaseHandler:
                 army_catalog=_army_catalog_for_handler(self),
                 shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
             )
+
+        active_stratagem_status = _request_active_shooting_phase_stratagem_if_available(
+            state=state,
+            decisions=decisions,
+            shooting_state=shooting_state,
+            stratagem_index=self.stratagem_index,
+            stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
+        )
+        if active_stratagem_status is not None:
+            return active_stratagem_status
 
         legal_unit_ids = _legal_shooting_unit_ids(
             state=state,
@@ -1202,6 +1233,7 @@ class ShootingPhaseHandler:
             ruleset_descriptor=_ruleset_descriptor_for_handler(self),
             army_catalog=_army_catalog_for_handler(self),
             shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
+            runtime_modifier_registry=self.runtime_modifier_registry,
         )
         if not rule_validation.is_valid:
             return _reject_invalid_declaration(
@@ -1434,6 +1466,7 @@ class ShootingPhaseHandler:
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 army_catalog=_army_catalog_for_handler(self),
                 shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
+                runtime_modifier_registry=self.runtime_modifier_registry,
             )
             return None
         if result.decision_type in ATTACK_RESOLUTION_SELECTION_DECISION_TYPES:
@@ -1468,6 +1501,178 @@ class ShootingPhaseHandler:
         raise GameLifecycleError("ShootingPhaseHandler received unsupported decision_type.")
 
 
+def _request_active_shooting_phase_stratagem_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    shooting_state: ShootingPhaseState,
+    stratagem_index: StratagemCatalogIndex,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry,
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.stratagems import (
+        StratagemEligibilityContext,
+        create_stratagem_use_decision_request,
+        stratagem_decline_option,
+        stratagem_use_options_from_index,
+        stratagem_window_declined_for_context,
+    )
+    from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+
+    if type(shooting_state) is not ShootingPhaseState:
+        raise GameLifecycleError("Active shooting stratagem trigger requires shooting state.")
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=shooting_state.active_player_id,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+        timing_window_id=_active_shooting_phase_stratagem_timing_window_id(shooting_state),
+        trigger_payload={
+            "selected_unit_instance_ids": list(shooting_state.selected_unit_ids),
+            "shot_unit_instance_ids": list(shooting_state.shot_unit_ids),
+            "skipped_unit_instance_ids": list(shooting_state.skipped_unit_ids),
+        },
+    )
+    if stratagem_window_declined_for_context(decisions=decisions, context=context):
+        return None
+    if _stratagem_used_for_context(decisions=decisions, context=context):
+        return None
+    options = stratagem_use_options_from_index(
+        state=state,
+        index=stratagem_index,
+        context=context,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+    )
+    if not options:
+        return None
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(*options, stratagem_decline_option()),
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "active_shooting_phase_stratagem_window_opened",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.SHOOTING.value,
+                "player_id": shooting_state.active_player_id,
+                "stratagem_context": context.to_payload(),
+                "request_id": request.request_id,
+                "phase_body_status": "active_shooting_phase_stratagem_pending",
+            }
+        ),
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=state.stage,
+        decision_request=request,
+        payload={
+            "phase": BattlePhase.SHOOTING.value,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "player_id": shooting_state.active_player_id,
+            "phase_body_status": "active_shooting_phase_stratagem_pending",
+            "pending_request_id": request.request_id,
+        },
+    )
+
+
+def _request_after_unit_selected_as_target_stratagem_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    stratagem_index: StratagemCatalogIndex,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry,
+    attack_sequence: AttackSequence,
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.stratagems import (
+        SELECTED_TARGET_UNIT_CONTEXT_KEY,
+        StratagemEligibilityContext,
+        create_stratagem_use_decision_request,
+        stratagem_decline_option,
+        stratagem_use_options_from_index,
+        stratagem_window_declined_for_context,
+    )
+    from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+
+    if type(attack_sequence) is not AttackSequence:
+        raise GameLifecycleError("Selected-as-target trigger requires an AttackSequence.")
+    target_unit_ids = _target_unit_ids_for_attack_sequence(attack_sequence)
+    if not target_unit_ids:
+        return None
+    attacking_player_id = attack_sequence.attacker_player_id
+    for reacting_player_id in sorted(
+        player_id for player_id in state.player_ids if player_id != attacking_player_id
+    ):
+        context = StratagemEligibilityContext.from_state(
+            state=state,
+            player_id=reacting_player_id,
+            trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
+            timing_window_id=_selected_as_target_timing_window_id(
+                sequence_id=attack_sequence.sequence_id,
+                player_id=reacting_player_id,
+            ),
+            trigger_payload={
+                SELECTED_TARGET_UNIT_CONTEXT_KEY: list(target_unit_ids),
+                "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+                "attacking_player_id": attacking_player_id,
+                "attack_sequence_id": attack_sequence.sequence_id,
+            },
+        )
+        if stratagem_window_declined_for_context(decisions=decisions, context=context):
+            continue
+        if _stratagem_used_for_context(decisions=decisions, context=context):
+            continue
+        options = stratagem_use_options_from_index(
+            state=state,
+            index=stratagem_index,
+            context=context,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+        )
+        if not options:
+            continue
+        request = create_stratagem_use_decision_request(
+            state=state,
+            context=context,
+            options=(*options, stratagem_decline_option()),
+        )
+        decisions.request_decision(request)
+        decisions.event_log.append(
+            "unit_selected_as_target_stratagem_window_opened",
+            validate_json_value(
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": state.active_player_id,
+                    "phase": BattlePhase.SHOOTING.value,
+                    "player_id": reacting_player_id,
+                    "attacking_player_id": attacking_player_id,
+                    "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+                    "selected_target_unit_instance_ids": list(target_unit_ids),
+                    "attack_sequence_id": attack_sequence.sequence_id,
+                    "stratagem_context": context.to_payload(),
+                    "request_id": request.request_id,
+                    "phase_body_status": "unit_selected_as_target_stratagem_pending",
+                }
+            ),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=state.stage,
+            decision_request=request,
+            payload={
+                "phase": BattlePhase.SHOOTING.value,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "player_id": reacting_player_id,
+                "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
+                "phase_body_status": "unit_selected_as_target_stratagem_pending",
+                "pending_request_id": request.request_id,
+            },
+        )
+    return None
+
+
 def _request_friendly_unit_has_shot_stratagem_if_available(
     *,
     state: GameState,
@@ -1477,6 +1682,7 @@ def _request_friendly_unit_has_shot_stratagem_if_available(
     completed_sequence: AttackSequence,
 ) -> LifecycleStatus | None:
     from warhammer40k_core.engine.stratagems import (
+        DESTROYED_ENEMY_UNIT_CONTEXT_KEY,
         DESTROYED_TARGET_UNIT_CONTEXT_KEY,
         HIT_TARGET_UNIT_CONTEXT_KEY,
         JUST_SHOT_UNIT_CONTEXT_KEY,
@@ -1511,6 +1717,13 @@ def _request_friendly_unit_has_shot_stratagem_if_available(
             ),
             DESTROYED_TARGET_UNIT_CONTEXT_KEY: list(
                 _destroyed_target_unit_ids_for_sequence(
+                    decisions=decisions,
+                    sequence=completed_sequence,
+                )
+            ),
+            DESTROYED_ENEMY_UNIT_CONTEXT_KEY: list(
+                _destroyed_enemy_unit_ids_for_sequence(
+                    state=state,
                     decisions=decisions,
                     sequence=completed_sequence,
                 )
@@ -1566,6 +1779,123 @@ def _request_friendly_unit_has_shot_stratagem_if_available(
             "pending_request_id": request.request_id,
         },
     )
+
+
+def _request_enemy_unit_has_shot_stratagem_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    stratagem_index: StratagemCatalogIndex,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry,
+    completed_sequence: AttackSequence,
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.stratagems import (
+        DESTROYED_ENEMY_UNIT_CONTEXT_KEY,
+        DESTROYED_TARGET_UNIT_CONTEXT_KEY,
+        HIT_TARGET_UNIT_CONTEXT_KEY,
+        JUST_SHOT_UNIT_CONTEXT_KEY,
+        StratagemEligibilityContext,
+        create_stratagem_use_decision_request,
+        stratagem_decline_option,
+        stratagem_use_options_from_index,
+        stratagem_window_declined_for_context,
+    )
+    from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+
+    if type(completed_sequence) is not AttackSequence:
+        raise GameLifecycleError("Enemy-unit-has-shot trigger requires an AttackSequence.")
+    completed_event_id = _attack_sequence_completed_event_id(
+        decisions=decisions,
+        sequence=completed_sequence,
+    )
+    if completed_event_id is None:
+        raise GameLifecycleError("Completed shooting sequence missing completion event.")
+    shooting_player_id = completed_sequence.attacker_player_id
+    hit_target_ids = _successful_hit_target_unit_ids_for_sequence(
+        decisions=decisions,
+        sequence=completed_sequence,
+    )
+    destroyed_target_ids = _destroyed_target_unit_ids_for_sequence(
+        decisions=decisions,
+        sequence=completed_sequence,
+    )
+    destroyed_enemy_unit_ids = _destroyed_enemy_unit_ids_for_sequence(
+        state=state,
+        decisions=decisions,
+        sequence=completed_sequence,
+    )
+    for reacting_player_id in sorted(
+        player_id for player_id in state.player_ids if player_id != shooting_player_id
+    ):
+        context = StratagemEligibilityContext.from_state(
+            state=state,
+            player_id=reacting_player_id,
+            trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_SHOT,
+            timing_window_id=_enemy_unit_has_shot_timing_window_id(
+                trigger_event_id=completed_event_id,
+                player_id=reacting_player_id,
+            ),
+            trigger_payload={
+                JUST_SHOT_UNIT_CONTEXT_KEY: completed_sequence.attacking_unit_instance_id,
+                HIT_TARGET_UNIT_CONTEXT_KEY: list(hit_target_ids),
+                DESTROYED_TARGET_UNIT_CONTEXT_KEY: list(destroyed_target_ids),
+                DESTROYED_ENEMY_UNIT_CONTEXT_KEY: list(destroyed_enemy_unit_ids),
+                "shooting_player_id": shooting_player_id,
+                "attack_sequence_id": completed_sequence.sequence_id,
+                "attack_sequence_completed_event_id": completed_event_id,
+            },
+        )
+        if stratagem_window_declined_for_context(decisions=decisions, context=context):
+            continue
+        if _stratagem_used_for_context(decisions=decisions, context=context):
+            continue
+        options = stratagem_use_options_from_index(
+            state=state,
+            index=stratagem_index,
+            context=context,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+        )
+        if not options:
+            continue
+        request = create_stratagem_use_decision_request(
+            state=state,
+            context=context,
+            options=(*options, stratagem_decline_option()),
+        )
+        decisions.request_decision(request)
+        decisions.event_log.append(
+            "enemy_unit_has_shot_stratagem_window_opened",
+            validate_json_value(
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": state.active_player_id,
+                    "phase": BattlePhase.SHOOTING.value,
+                    "player_id": reacting_player_id,
+                    "shooting_player_id": shooting_player_id,
+                    "shooting_unit_instance_id": completed_sequence.attacking_unit_instance_id,
+                    "attack_sequence_id": completed_sequence.sequence_id,
+                    "trigger_event_id": completed_event_id,
+                    "stratagem_context": context.to_payload(),
+                    "request_id": request.request_id,
+                    "phase_body_status": "enemy_unit_has_shot_stratagem_pending",
+                }
+            ),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=state.stage,
+            decision_request=request,
+            payload={
+                "phase": BattlePhase.SHOOTING.value,
+                "battle_round": state.battle_round,
+                "active_player_id": _active_player_id(state),
+                "player_id": reacting_player_id,
+                "shooting_unit_instance_id": completed_sequence.attacking_unit_instance_id,
+                "phase_body_status": "enemy_unit_has_shot_stratagem_pending",
+                "pending_request_id": request.request_id,
+            },
+        )
+    return None
 
 
 def _request_shooting_end_surge_if_available(
@@ -1752,6 +2082,40 @@ def _friendly_unit_has_shot_timing_window_id(trigger_event_id: str) -> str:
     return f"friendly-unit-has-shot:{_validate_identifier('trigger_event_id', trigger_event_id)}"
 
 
+def _active_shooting_phase_stratagem_timing_window_id(
+    shooting_state: ShootingPhaseState,
+) -> str:
+    if type(shooting_state) is not ShootingPhaseState:
+        raise GameLifecycleError("Active shooting stratagem timing requires shooting state.")
+    return (
+        f"active-shooting-stratagem:round-{shooting_state.battle_round}:"
+        f"player-{shooting_state.active_player_id}:selected-{len(shooting_state.selected_unit_ids)}:"
+        f"shot-{len(shooting_state.shot_unit_ids)}:skipped-{len(shooting_state.skipped_unit_ids)}"
+    )
+
+
+def _selected_as_target_timing_window_id(*, sequence_id: str, player_id: str) -> str:
+    return (
+        "selected-as-target:"
+        f"{_validate_identifier('sequence_id', sequence_id)}:"
+        f"player-{_validate_identifier('player_id', player_id)}"
+    )
+
+
+def _enemy_unit_has_shot_timing_window_id(*, trigger_event_id: str, player_id: str) -> str:
+    return (
+        "enemy-unit-has-shot:"
+        f"{_validate_identifier('trigger_event_id', trigger_event_id)}:"
+        f"player-{_validate_identifier('player_id', player_id)}"
+    )
+
+
+def _target_unit_ids_for_attack_sequence(attack_sequence: AttackSequence) -> tuple[str, ...]:
+    if type(attack_sequence) is not AttackSequence:
+        raise GameLifecycleError("Attack sequence target ids require an AttackSequence.")
+    return tuple(sorted({pool.target_unit_instance_id for pool in attack_sequence.attack_pools}))
+
+
 def _stratagem_used_for_context(
     *,
     decisions: DecisionController,
@@ -1826,6 +2190,22 @@ def _destroyed_target_unit_ids_for_sequence(
             raise GameLifecycleError("Model destroyed payload requires target unit id.")
         target_ids.add(_validate_identifier("target_unit_instance_id", target_unit_id))
     return tuple(sorted(target_ids))
+
+
+def _destroyed_enemy_unit_ids_for_sequence(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    sequence: AttackSequence,
+) -> tuple[str, ...]:
+    return tuple(
+        unit_id
+        for unit_id in _destroyed_target_unit_ids_for_sequence(
+            decisions=decisions,
+            sequence=sequence,
+        )
+        if not rules_unit_view_by_id(state=state, unit_instance_id=unit_id).alive_models()
+    )
 
 
 def _shooting_end_surge_event_already_processed(
@@ -2004,6 +2384,7 @@ def _request_shooting_declaration(
                     attacking_unit_instance_id=attacker_unit.unit_instance_id,
                     target_unit_instance_id=candidate.target_unit_instance_id,
                     registry=shooting_target_restriction_hooks,
+                    attacker_model_instance_id=candidate.observer_model_id,
                 )
                 for candidate in shooting_target_candidates_for_unit(
                     scenario=scenario,
@@ -2979,6 +3360,7 @@ def _apply_shooting_declaration_decision(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> None:
     if _apply_out_of_phase_shooting_declaration_decision(
         state=state,
@@ -2987,6 +3369,7 @@ def _apply_shooting_declaration_decision(
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        runtime_modifier_registry=runtime_modifier_registry,
     ):
         return
     _validate_shooting_phase_state(state)
@@ -3002,6 +3385,7 @@ def _apply_shooting_declaration_decision(
         decisions=decisions,
         result_id=result.result_id,
         shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     one_shot_records = _record_one_shot_weapon_uses_for_attack_pools(
         state=state,
@@ -3059,6 +3443,7 @@ def _apply_out_of_phase_shooting_declaration_decision(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> bool:
     out_of_phase_state = state.out_of_phase_shooting_state
     if out_of_phase_state is None:
@@ -3079,6 +3464,7 @@ def _apply_out_of_phase_shooting_declaration_decision(
         shooting_player_id=out_of_phase_state.player_id,
         out_of_phase_state=out_of_phase_state,
         shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     if ineligible_unit_ids:
         raise GameLifecycleError("Out-of-phase shooting cannot mark extra units as shot.")
@@ -3405,6 +3791,7 @@ def _validate_declaration_submission(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> ShootingProposalValidationResult:
     out_of_phase_state = state.out_of_phase_shooting_state
     if (
@@ -3419,6 +3806,7 @@ def _validate_declaration_submission(
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
             shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
     shooting_state = state.shooting_phase_state
     if shooting_state is None or shooting_state.active_selection is None:
@@ -3461,6 +3849,7 @@ def _validate_declaration_submission(
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     if isinstance(attack_validation, ShootingProposalValidationResult):
         return attack_validation
@@ -3475,6 +3864,7 @@ def _validate_out_of_phase_declaration_submission(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> ShootingProposalValidationResult:
     if proposal.player_id != out_of_phase_state.player_id:
         return ShootingProposalValidationResult.invalid(
@@ -3511,6 +3901,7 @@ def _validate_out_of_phase_declaration_submission(
         shooting_player_id=out_of_phase_state.player_id,
         out_of_phase_state=out_of_phase_state,
         shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     if isinstance(attack_validation, ShootingProposalValidationResult):
         return attack_validation
@@ -3526,6 +3917,7 @@ def _attack_pools_for_proposal(
     decisions: DecisionController,
     result_id: str,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
     shooting_player_id: str | None = None,
     out_of_phase_state: OutOfPhaseShootingState | None = None,
 ) -> tuple[tuple[RangedAttackPool, ...], tuple[str, ...]]:
@@ -3539,6 +3931,7 @@ def _attack_pools_for_proposal(
         shooting_player_id=shooting_player_id,
         out_of_phase_state=out_of_phase_state,
         shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     if isinstance(result, ShootingProposalValidationResult):
         raise GameLifecycleError("Accepted shooting declaration failed revalidation.")
@@ -3561,6 +3954,7 @@ def _attack_pools_or_validation(
     shooting_player_id: str | None = None,
     out_of_phase_state: OutOfPhaseShootingState | None = None,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> _AttackPoolValidationResult:
     player_id = proposal.player_id if shooting_player_id is None else shooting_player_id
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=proposal.unit_instance_id)
@@ -3678,6 +4072,7 @@ def _attack_pools_or_validation(
             attacking_unit_instance_id=source_unit.unit_instance_id,
             target_unit_instance_id=declaration.target_unit_instance_id,
             registry=shooting_target_restriction_hooks,
+            attacker_model_instance_id=declaration.attacker_model_instance_id,
         )
         if not candidate.is_legal:
             violation = candidate.violation_code
@@ -3698,6 +4093,14 @@ def _attack_pools_or_validation(
             state.persisting_effects_for_unit(source_unit.unit_instance_id),
             owner_player_id=player_id,
             target_keywords=target_rules_unit.keywords,
+        )
+        weapon_profile = _modified_shooting_weapon_profile(
+            state=state,
+            runtime_modifier_registry=_runtime_modifier_registry(runtime_modifier_registry),
+            attacking_unit_instance_id=source_unit.unit_instance_id,
+            attacker_model_instance_id=declaration.attacker_model_instance_id,
+            target_unit_instance_id=declaration.target_unit_instance_id,
+            profile=weapon_profile,
         )
         ability_selection_validation = _validate_duplicate_weapon_ability_selection(
             proposal=proposal,
@@ -3883,6 +4286,7 @@ def _shooting_candidate_with_target_restrictions(
     attacking_unit_instance_id: str,
     target_unit_instance_id: str,
     registry: ShootingTargetRestrictionHookRegistry | None,
+    attacker_model_instance_id: str | None = None,
 ) -> ShootingTargetCandidate:
     if type(candidate) is not ShootingTargetCandidate:
         raise GameLifecycleError("Shooting target restriction requires a target candidate.")
@@ -3899,6 +4303,7 @@ def _shooting_candidate_with_target_restrictions(
             battle_round=state.battle_round,
             attacking_unit_instance_id=attacking_unit_instance_id,
             target_unit_instance_id=target_unit_instance_id,
+            attacker_model_instance_id=attacker_model_instance_id,
         )
     )
     if not restrictions:
@@ -3918,6 +4323,37 @@ def _shooting_candidate_with_target_restrictions(
         hit_roll_modifier=candidate.hit_roll_modifier,
         targeting_rule_ids=(*candidate.targeting_rule_ids, restriction.hook_id),
     )
+
+
+def _modified_shooting_weapon_profile(
+    *,
+    state: GameState,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    attacking_unit_instance_id: str,
+    attacker_model_instance_id: str,
+    target_unit_instance_id: str,
+    profile: WeaponProfile,
+) -> WeaponProfile:
+    return runtime_modifier_registry.modified_weapon_profile(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.SHOOTING,
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            attacker_model_instance_id=attacker_model_instance_id,
+            target_unit_instance_id=target_unit_instance_id,
+            weapon_profile=profile,
+        )
+    )
+
+
+def _runtime_modifier_registry(
+    runtime_modifier_registry: RuntimeModifierRegistry | None,
+) -> RuntimeModifierRegistry:
+    if runtime_modifier_registry is None:
+        return RuntimeModifierRegistry.empty()
+    if type(runtime_modifier_registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError("Runtime modifier registry must be a registry.")
+    return runtime_modifier_registry
 
 
 def _out_of_phase_allowed_target_unit_ids(
@@ -5420,6 +5856,7 @@ def _cached_shooting_target_candidate_for_model(
                 attacking_unit_instance_id=attacker_unit.unit_instance_id,
                 target_unit_instance_id=target_unit_id,
                 registry=shooting_target_restriction_hooks,
+                attacker_model_instance_id=weapon["model_instance_id"],
             )
         cache[cache_key] = candidate
     return cache[cache_key]

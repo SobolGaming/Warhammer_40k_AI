@@ -148,11 +148,13 @@ from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModif
 from warhammer40k_core.engine.stratagems import (
     CORE_FIRE_OVERWATCH_HANDLER_ID,
     CORE_RAPID_INGRESS_HANDLER_ID,
+    ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY,
     FALL_BACK_MODE_CONTEXT_KEY,
     FALL_BACK_UNIT_CONTEXT_KEY,
     FORCED_FALL_BACK_DESPERATE_ESCAPE_EFFECT_KIND,
     GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
     GENERIC_INGRESS_MOVE_HANDLER_ID,
+    JUST_FELL_BACK_UNIT_CONTEXT_KEY,
     SELECTED_TO_MOVE_UNIT_CONTEXT_KEY,
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
@@ -2495,6 +2497,15 @@ class MovementPhaseHandler:
         if move_completed_status is not None:
             return move_completed_status
 
+        fell_back_stratagem_status = _request_friendly_unit_fell_back_stratagem_if_available(
+            state=state,
+            decisions=decisions,
+            stratagem_index=self.stratagem_index,
+            stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
+        )
+        if fell_back_stratagem_status is not None:
+            return fell_back_stratagem_status
+
         surge_status = _request_movement_end_surge_if_available(
             state=state,
             decisions=decisions,
@@ -3240,6 +3251,147 @@ def _request_selected_to_fall_back_stratagem_if_available(
             },
         )
     return None
+
+
+def _request_friendly_unit_fell_back_stratagem_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    stratagem_index: StratagemCatalogIndex,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry,
+) -> LifecycleStatus | None:
+    for record in decisions.event_log.records:
+        if record.event_type != "movement_activation_completed":
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError("Movement activation completed payload must be an object.")
+        if payload.get("game_id") != state.game_id:
+            continue
+        if payload.get("battle_round") != state.battle_round:
+            continue
+        if payload.get("phase") != BattlePhase.MOVEMENT.value:
+            continue
+        if payload.get("active_player_id") != _active_player_id(state):
+            continue
+        if payload.get("movement_phase_action") != MovementPhaseActionKind.FALL_BACK.value:
+            continue
+        context = _friendly_unit_fell_back_context_from_event(
+            state=state,
+            event_id=record.event_id,
+            payload=payload,
+        )
+        if stratagem_window_declined_for_context(decisions=decisions, context=context):
+            continue
+        if _stratagem_used_for_context(decisions=decisions, context=context):
+            continue
+        options = stratagem_use_options_from_index(
+            state=state,
+            index=stratagem_index,
+            context=context,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+        )
+        if not options:
+            continue
+        request = create_stratagem_use_decision_request(
+            state=state,
+            context=context,
+            options=(*options, stratagem_decline_option()),
+        )
+        decisions.request_decision(request)
+        decisions.event_log.append(
+            "friendly_unit_fell_back_stratagem_window_opened",
+            validate_json_value(
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": state.active_player_id,
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "player_id": context.player_id,
+                    "fell_back_unit_instance_id": _payload_string(
+                        payload,
+                        key="unit_instance_id",
+                    ),
+                    "trigger_event_id": record.event_id,
+                    "stratagem_context": context.to_payload(),
+                    "request_id": request.request_id,
+                    "phase_body_status": "friendly_unit_fell_back_stratagem_pending",
+                }
+            ),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=state.stage,
+            decision_request=request,
+            payload={
+                "phase": BattlePhase.MOVEMENT.value,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "player_id": context.player_id,
+                "phase_body_status": "friendly_unit_fell_back_stratagem_pending",
+                "pending_request_id": request.request_id,
+            },
+        )
+    return None
+
+
+def _friendly_unit_fell_back_context_from_event(
+    *,
+    state: GameState,
+    event_id: str,
+    payload: dict[str, JsonValue],
+) -> StratagemEligibilityContext:
+    unit_id = _payload_string(payload, key="unit_instance_id")
+    player_id = _payload_string(payload, key="active_player_id")
+    engaged_enemy_ids = _identifier_list_from_json_object(
+        payload,
+        key="start_engaged_enemy_unit_instance_ids",
+        field_name="start engaged enemy unit id",
+    )
+    return StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=player_id,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+        timing_window_id=_friendly_unit_fell_back_timing_window_id(event_id),
+        trigger_payload={
+            JUST_FELL_BACK_UNIT_CONTEXT_KEY: unit_id,
+            ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY: list(engaged_enemy_ids),
+            "movement_activation_completed_event_id": _validate_identifier(
+                "movement_activation_completed_event_id",
+                event_id,
+            ),
+            "request_id": _payload_string(payload, key="request_id"),
+            "result_id": _payload_string(payload, key="result_id"),
+        },
+    )
+
+
+def _friendly_unit_fell_back_timing_window_id(trigger_event_id: str) -> str:
+    return f"friendly-unit-fell-back:{_validate_identifier('trigger_event_id', trigger_event_id)}"
+
+
+def _stratagem_used_for_context(
+    *,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+) -> bool:
+    context_payload = context.to_payload()
+    for record in decisions.event_log.records:
+        if record.event_type != "stratagem_used":
+            continue
+        payload = record.payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError("Stratagem use event payload must be an object.")
+        payload_object = cast(dict[str, object], payload)
+        if (
+            payload_object.get("game_id") == context_payload.get("game_id")
+            and payload_object.get("player_id") == context_payload.get("player_id")
+            and payload_object.get("battle_round") == context_payload.get("battle_round")
+            and payload_object.get("phase") == context_payload.get("phase")
+            and payload_object.get("active_player_id") == context_payload.get("active_player_id")
+            and payload_object.get("timing_window_id") == context_payload.get("timing_window_id")
+        ):
+            return True
+    return False
 
 
 def _selected_to_fall_back_trigger_payload(
@@ -6813,6 +6965,11 @@ def _apply_fall_back_result(
         before=unit_placement,
         destroyed_model_ids=destroyed_model_ids,
     )
+    start_engaged_enemy_unit_ids = _enemy_engaged_unit_ids_for_unit_placement(
+        scenario=scenario,
+        unit_placement=unit_placement,
+        ruleset_descriptor=ruleset_descriptor,
+    )
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Fall Back requires battlefield_state.")
@@ -6868,6 +7025,7 @@ def _apply_fall_back_result(
         movement_payload={
             **fall_back_result.movement_payload,
             "destroyed_model_ids": list(destroyed_model_ids),
+            "start_engaged_enemy_unit_instance_ids": list(start_engaged_enemy_unit_ids),
             "fall_back_eligibility_grants": [
                 validate_json_value(grant.to_payload()) for grant in permission_grants
             ],
@@ -8545,6 +8703,44 @@ def _enemy_engagement_model_ids_for_unit(
     return tuple(sorted(enemy_model_ids)), tuple(sorted(enemy_aircraft_model_ids))
 
 
+def _enemy_engaged_unit_ids_for_unit_placement(
+    *,
+    scenario: BattlefieldScenario,
+    unit_placement: UnitPlacement,
+    ruleset_descriptor: RulesetDescriptor,
+) -> tuple[str, ...]:
+    if type(scenario) is not BattlefieldScenario:
+        raise GameLifecycleError("Enemy engaged unit query requires a scenario.")
+    if type(unit_placement) is not UnitPlacement:
+        raise GameLifecycleError("Enemy engaged unit query requires a unit placement.")
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Enemy engaged unit query requires ruleset descriptor.")
+    friendly_models = _geometry_models_for_unit_placement(
+        scenario=scenario,
+        unit_placement=unit_placement,
+    )
+    engaged_unit_ids: set[str] = set()
+    for placed_army in scenario.battlefield_state.placed_armies:
+        if placed_army.player_id == unit_placement.player_id:
+            continue
+        for enemy_unit_placement in placed_army.unit_placements:
+            enemy_models = _geometry_models_for_unit_placement(
+                scenario=scenario,
+                unit_placement=enemy_unit_placement,
+            )
+            if any(
+                friendly_model.is_within_engagement_range(
+                    enemy_model,
+                    horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
+                    vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
+                )
+                for friendly_model in friendly_models
+                for enemy_model in enemy_models
+            ):
+                engaged_unit_ids.add(enemy_unit_placement.unit_instance_id)
+    return tuple(sorted(engaged_unit_ids))
+
+
 def _hover_mode_state_for_unit(
     *,
     hover_mode_states: tuple[HoverModeState, ...],
@@ -9694,6 +9890,20 @@ def _payload_object(payload: dict[str, JsonValue], *, key: str) -> dict[str, Jso
 
 def _payload_json_object(payload: dict[str, JsonValue], *, key: str) -> dict[str, JsonValue]:
     return _payload_object(payload, key=key)
+
+
+def _identifier_list_from_json_object(
+    payload: dict[str, JsonValue],
+    *,
+    key: str,
+    field_name: str,
+) -> tuple[str, ...]:
+    value = payload.get(key)
+    if value is None:
+        return ()
+    if not isinstance(value, list):
+        raise GameLifecycleError(f"Payload key must be a list: {key}.")
+    return tuple(sorted(_validate_identifier(field_name, item) for item in value))
 
 
 def _payload_positive_int(payload: dict[str, JsonValue], *, key: str) -> int:
