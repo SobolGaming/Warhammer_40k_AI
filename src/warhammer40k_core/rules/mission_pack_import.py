@@ -113,6 +113,7 @@ def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
         deployment_maps=deployment_maps,
         terrain_layout_templates=terrain_layouts,
         terrain_area_footprint_templates=(event_source_data.terrain_area_footprint_templates()),
+        terrain_feature_presets=(),
         battlefield_layouts=typed_battlefield_layouts,
         mission_deck=MissionDeckDefinition(
             mission_deck_id="chapter-approved-2026-27-strike-force",
@@ -215,6 +216,7 @@ def warhammer_event_companion_2026_06_mission_pack() -> MissionPackDefinition:
         deployment_maps=deployment_maps,
         terrain_layout_templates=terrain_layouts,
         terrain_area_footprint_templates=(event_source_data.terrain_area_footprint_templates()),
+        terrain_feature_presets=(),
         battlefield_layouts=event_source_data.battlefield_layout_definitions(),
         mission_deck=MissionDeckDefinition(
             mission_deck_id="warhammer-event-companion-v1-strike-force",

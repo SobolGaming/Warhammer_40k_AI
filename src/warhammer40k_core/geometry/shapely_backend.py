@@ -119,11 +119,16 @@ def footprint_for_terrain(terrain: TerrainVolume) -> _Geometry:
     valid_terrain = _validate_terrain("terrain", terrain)
     half_width = valid_terrain.width / 2.0
     half_depth = valid_terrain.depth / 2.0
-    return _box(
+    rectangle = _box(
         valid_terrain.bottom_center.x - half_width,
         valid_terrain.bottom_center.y - half_depth,
         valid_terrain.bottom_center.x + half_width,
         valid_terrain.bottom_center.y + half_depth,
+    )
+    return _affinity_module().rotate(
+        rectangle,
+        angle=valid_terrain.rotation_degrees,
+        origin=(valid_terrain.bottom_center.x, valid_terrain.bottom_center.y),
     )
 
 
@@ -259,20 +264,12 @@ def segment_intersects_terrain_footprint(
     if segment_top < terrain_bottom or segment_bottom > terrain_top:
         return False
 
-    intersection_interval = _segment_rectangle_intersection_interval(
+    return _segment_intersects_footprint_with_vertical_interval(
         valid_start,
         valid_end,
-        valid_terrain.horizontal_bounds(),
+        footprint_for_terrain(valid_terrain),
+        (terrain_bottom, terrain_top),
     )
-    if intersection_interval is None:
-        return False
-
-    start_t, end_t = intersection_interval
-    start_z = _interpolate(valid_start.z, valid_end.z, start_t)
-    end_z = _interpolate(valid_start.z, valid_end.z, end_t)
-    crossing_bottom = min(start_z, end_z)
-    crossing_top = max(start_z, end_z)
-    return crossing_top >= terrain_bottom and crossing_bottom <= terrain_top
 
 
 def segment_intersects_model_footprint(
@@ -379,41 +376,6 @@ def _vertical_gap(
     first_bottom, first_top = first_interval
     second_bottom, second_top = second_interval
     return first_top < second_bottom or second_top < first_bottom
-
-
-def _segment_rectangle_intersection_interval(
-    start: Point3,
-    end: Point3,
-    bounds: tuple[float, float, float, float],
-) -> tuple[float, float] | None:
-    min_x, min_y, max_x, max_y = bounds
-    dx = end.x - start.x
-    dy = end.y - start.y
-    start_t = 0.0
-    end_t = 1.0
-
-    for edge_delta, edge_distance in (
-        (-dx, start.x - min_x),
-        (dx, max_x - start.x),
-        (-dy, start.y - min_y),
-        (dy, max_y - start.y),
-    ):
-        if abs(edge_delta) <= _EPSILON:
-            if edge_distance < 0.0:
-                return None
-            continue
-
-        edge_t = edge_distance / edge_delta
-        if edge_delta < 0.0:
-            if edge_t > end_t:
-                return None
-            start_t = max(start_t, edge_t)
-        else:
-            if edge_t < start_t:
-                return None
-            end_t = min(end_t, edge_t)
-
-    return (start_t, end_t)
 
 
 def _segment_intersects_footprint_with_vertical_interval(

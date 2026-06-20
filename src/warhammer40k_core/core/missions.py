@@ -29,6 +29,10 @@ from warhammer40k_core.core.terrain_areas import (
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayPoint
 from warhammer40k_core.core.terrain_layouts import (
+    TerrainFeatureAreaPlacement,
+    TerrainFeatureAreaPlacementPayload,
+    TerrainFeaturePreset,
+    TerrainFeaturePresetPayload,
     TerrainLayoutTemplate,
     TerrainLayoutTemplatePayload,
 )
@@ -130,6 +134,7 @@ class BattlefieldLayoutDefinitionPayload(TypedDict):
     deployment_zones: list[DeploymentZonePayload]
     battlefield_regions: list[BattlefieldRegionPayload]
     terrain_areas: list[PlacedTerrainAreaPayload]
+    terrain_feature_placements: list[TerrainFeatureAreaPlacementPayload]
     objective_role_counts: list[ObjectiveMarkerRoleCountPayload]
     objective_terrain_areas: list[ObjectiveTerrainAreaDefinitionPayload]
     source_id: str
@@ -254,6 +259,7 @@ class MissionPackDefinitionPayload(TypedDict):
     deployment_maps: list[DeploymentMapDefinitionPayload]
     terrain_layout_templates: list[TerrainLayoutTemplatePayload]
     terrain_area_footprint_templates: list[TerrainAreaFootprintTemplatePayload]
+    terrain_feature_presets: list[TerrainFeaturePresetPayload]
     battlefield_layouts: list[BattlefieldLayoutDefinitionPayload]
     mission_deck: MissionDeckDefinitionPayload
     primary_missions: list[PrimaryMissionDefinitionPayload]
@@ -646,6 +652,7 @@ class BattlefieldLayoutDefinition:
     deployment_zones: tuple[DeploymentZone, ...]
     battlefield_regions: tuple[BattlefieldRegion, ...]
     terrain_areas: tuple[PlacedTerrainArea, ...]
+    terrain_feature_placements: tuple[TerrainFeatureAreaPlacement, ...]
     objective_role_counts: tuple[tuple[ObjectiveMarkerRole, int], ...]
     source_id: str
     objective_terrain_areas: tuple[ObjectiveTerrainAreaDefinition, ...] = ()
@@ -730,6 +737,9 @@ class BattlefieldLayoutDefinition:
         )
         regions = _validate_battlefield_regions(self.battlefield_regions)
         terrain_areas = _validate_placed_terrain_areas(self.terrain_areas)
+        terrain_feature_placements = _validate_terrain_feature_area_placements(
+            self.terrain_feature_placements
+        )
         objective_role_counts = _validate_objective_role_counts(self.objective_role_counts)
         objective_terrain_areas = _validate_objective_terrain_area_tuple(
             self.objective_terrain_areas
@@ -759,6 +769,10 @@ class BattlefieldLayoutDefinition:
             objective_markers=markers,
             terrain_areas=terrain_areas,
         )
+        _validate_terrain_feature_area_placement_references(
+            terrain_feature_placements=terrain_feature_placements,
+            terrain_areas=terrain_areas,
+        )
         _validate_battlefield_layout_region_invariants(
             objective_markers=markers,
             deployment_zones=zones,
@@ -771,6 +785,7 @@ class BattlefieldLayoutDefinition:
         object.__setattr__(self, "deployment_zones", zones)
         object.__setattr__(self, "battlefield_regions", regions)
         object.__setattr__(self, "terrain_areas", terrain_areas)
+        object.__setattr__(self, "terrain_feature_placements", terrain_feature_placements)
         object.__setattr__(self, "objective_role_counts", objective_role_counts)
         object.__setattr__(self, "objective_terrain_areas", objective_terrain_areas)
         object.__setattr__(
@@ -795,6 +810,9 @@ class BattlefieldLayoutDefinition:
             "deployment_zones": [zone.to_payload() for zone in self.deployment_zones],
             "battlefield_regions": [region.to_payload() for region in self.battlefield_regions],
             "terrain_areas": [terrain_area.to_payload() for terrain_area in self.terrain_areas],
+            "terrain_feature_placements": [
+                placement.to_payload() for placement in self.terrain_feature_placements
+            ],
             "objective_role_counts": [
                 {"objective_role": role.value, "count": count}
                 for role, count in self.objective_role_counts
@@ -835,6 +853,10 @@ class BattlefieldLayoutDefinition:
             ),
             terrain_areas=tuple(
                 PlacedTerrainArea.from_payload(area) for area in raw_payload["terrain_areas"]
+            ),
+            terrain_feature_placements=tuple(
+                TerrainFeatureAreaPlacement.from_payload(placement)
+                for placement in raw_payload["terrain_feature_placements"]
             ),
             objective_role_counts=tuple(
                 (
@@ -1946,6 +1968,7 @@ class MissionPackDefinition:
     deployment_maps: tuple[DeploymentMapDefinition, ...]
     terrain_layout_templates: tuple[TerrainLayoutTemplate, ...]
     terrain_area_footprint_templates: tuple[TerrainAreaFootprintTemplate, ...]
+    terrain_feature_presets: tuple[TerrainFeaturePreset, ...]
     battlefield_layouts: tuple[BattlefieldLayoutDefinition, ...]
     mission_deck: MissionDeckDefinition
     primary_missions: tuple[PrimaryMissionDefinition, ...]
@@ -1996,6 +2019,7 @@ class MissionPackDefinition:
         terrain_area_footprint_templates = _validate_terrain_area_footprint_templates(
             self.terrain_area_footprint_templates
         )
+        terrain_feature_presets = _validate_terrain_feature_presets(self.terrain_feature_presets)
         battlefield_layouts = _validate_battlefield_layouts(self.battlefield_layouts)
         if type(self.mission_deck) is not MissionDeckDefinition:
             raise MissionPackError("MissionPackDefinition mission_deck must be a deck.")
@@ -2035,6 +2059,7 @@ class MissionPackDefinition:
             deployment_maps=deployment_maps,
             terrain_layouts=terrain_layouts,
             terrain_area_footprint_templates=terrain_area_footprint_templates,
+            terrain_feature_presets=terrain_feature_presets,
         )
         object.__setattr__(self, "deployment_maps", deployment_maps)
         object.__setattr__(self, "terrain_layout_templates", terrain_layouts)
@@ -2043,6 +2068,7 @@ class MissionPackDefinition:
             "terrain_area_footprint_templates",
             terrain_area_footprint_templates,
         )
+        object.__setattr__(self, "terrain_feature_presets", terrain_feature_presets)
         object.__setattr__(self, "battlefield_layouts", battlefield_layouts)
         object.__setattr__(self, "primary_missions", primary_missions)
         object.__setattr__(self, "secondary_missions", secondary_missions)
@@ -2158,6 +2184,9 @@ class MissionPackDefinition:
             "terrain_area_footprint_templates": [
                 template.to_payload() for template in self.terrain_area_footprint_templates
             ],
+            "terrain_feature_presets": [
+                preset.to_payload() for preset in self.terrain_feature_presets
+            ],
             "battlefield_layouts": [layout.to_payload() for layout in self.battlefield_layouts],
             "mission_deck": self.mission_deck.to_payload(),
             "primary_missions": [mission.to_payload() for mission in self.primary_missions],
@@ -2195,6 +2224,10 @@ class MissionPackDefinition:
             terrain_area_footprint_templates=tuple(
                 TerrainAreaFootprintTemplate.from_payload(template)
                 for template in payload["terrain_area_footprint_templates"]
+            ),
+            terrain_feature_presets=tuple(
+                TerrainFeaturePreset.from_payload(preset)
+                for preset in payload["terrain_feature_presets"]
             ),
             battlefield_layouts=tuple(
                 BattlefieldLayoutDefinition.from_payload(layout)
@@ -2356,6 +2389,38 @@ def _validate_placed_terrain_areas(values: object) -> tuple[PlacedTerrainArea, .
     return tuple(sorted(terrain_areas, key=lambda area: area.terrain_area_id))
 
 
+def _validate_terrain_feature_area_placements(
+    values: object,
+) -> tuple[TerrainFeatureAreaPlacement, ...]:
+    if type(values) is not tuple:
+        raise MissionPackError(
+            "BattlefieldLayoutDefinition terrain_feature_placements must be a tuple."
+        )
+    placements: list[TerrainFeatureAreaPlacement] = []
+    seen_feature_ids: set[str] = set()
+    seen_area_ids: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not TerrainFeatureAreaPlacement:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition terrain_feature_placements must contain "
+                "TerrainFeatureAreaPlacement values."
+            )
+        if value.feature_id in seen_feature_ids:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition terrain_feature_placements must not duplicate "
+                "feature IDs."
+            )
+        if value.terrain_area_id in seen_area_ids:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition terrain_feature_placements must not duplicate "
+                "terrain area IDs."
+            )
+        seen_feature_ids.add(value.feature_id)
+        seen_area_ids.add(value.terrain_area_id)
+        placements.append(value)
+    return tuple(sorted(placements, key=lambda placement: placement.feature_id))
+
+
 def _validate_objective_terrain_area_tuple(
     values: object,
 ) -> tuple[ObjectiveTerrainAreaDefinition, ...]:
@@ -2421,6 +2486,20 @@ def _validate_objective_terrain_area_references(
                     "belong to at most one objective."
                 )
             seen_terrain_area_ids.add(terrain_area_id)
+
+
+def _validate_terrain_feature_area_placement_references(
+    *,
+    terrain_feature_placements: tuple[TerrainFeatureAreaPlacement, ...],
+    terrain_areas: tuple[PlacedTerrainArea, ...],
+) -> None:
+    terrain_area_ids = {terrain_area.terrain_area_id for terrain_area in terrain_areas}
+    for placement in terrain_feature_placements:
+        if placement.terrain_area_id not in terrain_area_ids:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition terrain_feature_placements references unknown "
+                "terrain area."
+            )
 
 
 def _validate_objective_role_counts(
@@ -2522,6 +2601,26 @@ def _validate_terrain_area_footprint_templates(
         seen.add(value.footprint_template_id)
         entries.append(value)
     return tuple(sorted(entries, key=lambda item: item.footprint_template_id))
+
+
+def _validate_terrain_feature_presets(values: object) -> tuple[TerrainFeaturePreset, ...]:
+    if type(values) is not tuple:
+        raise MissionPackError("MissionPackDefinition terrain_feature_presets must be a tuple.")
+    entries: list[TerrainFeaturePreset] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not TerrainFeaturePreset:
+            raise MissionPackError(
+                "MissionPackDefinition terrain_feature_presets must contain "
+                "TerrainFeaturePreset values."
+            )
+        if value.terrain_feature_preset_id in seen:
+            raise MissionPackError(
+                "MissionPackDefinition terrain_feature_presets must not duplicate IDs."
+            )
+        seen.add(value.terrain_feature_preset_id)
+        entries.append(value)
+    return tuple(sorted(entries, key=lambda item: item.terrain_feature_preset_id))
 
 
 def _validate_battlefield_layouts(
@@ -2794,6 +2893,7 @@ def _validate_battlefield_layout_references(
     deployment_maps: tuple[DeploymentMapDefinition, ...],
     terrain_layouts: tuple[TerrainLayoutTemplate, ...],
     terrain_area_footprint_templates: tuple[TerrainAreaFootprintTemplate, ...],
+    terrain_feature_presets: tuple[TerrainFeaturePreset, ...],
 ) -> None:
     deployment_maps_by_id = {
         deployment_map.deployment_map_id: deployment_map for deployment_map in deployment_maps
@@ -2801,6 +2901,13 @@ def _validate_battlefield_layout_references(
     terrain_layouts_by_id = {layout.terrain_layout_id: layout for layout in terrain_layouts}
     terrain_area_templates_by_id = {
         template.footprint_template_id: template for template in terrain_area_footprint_templates
+    }
+    _validate_terrain_feature_presets_match_footprint_templates(
+        terrain_feature_presets=terrain_feature_presets,
+        templates_by_id=terrain_area_templates_by_id,
+    )
+    terrain_feature_preset_ids = {
+        preset.terrain_feature_preset_id for preset in terrain_feature_presets
     }
     for layout in battlefield_layouts:
         deployment_map = deployment_maps_by_id.get(layout.deployment_map_id)
@@ -2830,6 +2937,43 @@ def _validate_battlefield_layout_references(
             terrain_areas=layout.terrain_areas,
             templates_by_id=terrain_area_templates_by_id,
         )
+        _validate_known_ids(
+            "BattlefieldLayoutDefinition terrain_feature_placements terrain_feature_preset_id",
+            tuple(
+                placement.terrain_feature_preset_id
+                for placement in layout.terrain_feature_placements
+            ),
+            terrain_feature_preset_ids,
+        )
+
+
+def _validate_terrain_feature_presets_match_footprint_templates(
+    *,
+    terrain_feature_presets: tuple[TerrainFeaturePreset, ...],
+    templates_by_id: dict[str, TerrainAreaFootprintTemplate],
+) -> None:
+    for preset in terrain_feature_presets:
+        template = templates_by_id.get(preset.footprint_template_id)
+        if template is None:
+            raise MissionPackError(
+                "TerrainFeaturePreset footprint_template_id references unknown terrain area "
+                "footprint template."
+            )
+        if not math.isclose(
+            preset.footprint_width_inches,
+            template.bounding_width_inches,
+            rel_tol=0.0,
+            abs_tol=_GEOMETRY_EPSILON,
+        ) or not math.isclose(
+            preset.footprint_depth_inches,
+            template.bounding_depth_inches,
+            rel_tol=0.0,
+            abs_tol=_GEOMETRY_EPSILON,
+        ):
+            raise MissionPackError(
+                "TerrainFeaturePreset footprint dimensions must match its terrain area "
+                "footprint template."
+            )
 
 
 def _validate_placed_terrain_areas_match_templates(

@@ -19,8 +19,16 @@ from warhammer40k_core.core.missions import (
     ObjectiveTerrainAreaDefinition,
     ObjectiveTerrainAreaDefinitionPayload,
 )
-from warhammer40k_core.core.terrain_areas import PlacedTerrainArea, PlacedTerrainAreaPayload
+from warhammer40k_core.core.terrain_areas import (
+    PlacedTerrainArea,
+    PlacedTerrainAreaPayload,
+    TerrainAreaLocalTransform,
+    polygon_bounds,
+)
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry, TerrainDisplayPoint
 from warhammer40k_core.core.terrain_layouts import (
+    TerrainFeatureAreaPlacement,
+    TerrainFeaturePreset,
     TerrainFeatureTemplate,
     TerrainFloorTemplate,
     TerrainLayoutTemplate,
@@ -327,7 +335,18 @@ class MissionSetup:
                 () if battlefield_layout is None else battlefield_layout.battlefield_regions
             ),
             terrain_areas=(() if battlefield_layout is None else battlefield_layout.terrain_areas),
-            terrain_features=instantiate_terrain_layout_template(terrain_layout),
+            terrain_features=instantiate_terrain_layout_template(
+                terrain_layout,
+                terrain_areas=(
+                    () if battlefield_layout is None else battlefield_layout.terrain_areas
+                ),
+                terrain_feature_presets=mission_pack.terrain_feature_presets,
+                terrain_feature_placements=(
+                    ()
+                    if battlefield_layout is None
+                    else battlefield_layout.terrain_feature_placements
+                ),
+            ),
             objective_terrain_areas=(
                 () if battlefield_layout is None else battlefield_layout.objective_terrain_areas
             ),
@@ -407,18 +426,203 @@ class MissionSetup:
 
 def instantiate_terrain_layout_template(
     terrain_layout: TerrainLayoutTemplate,
+    *,
+    terrain_areas: tuple[PlacedTerrainArea, ...] = (),
+    terrain_feature_presets: tuple[TerrainFeaturePreset, ...] = (),
+    terrain_feature_placements: tuple[TerrainFeatureAreaPlacement, ...] = (),
 ) -> tuple[TerrainFeatureDefinition, ...]:
     if type(terrain_layout) is not TerrainLayoutTemplate:
         raise MissionSetupError("terrain_layout must be a TerrainLayoutTemplate.")
-    return tuple(
-        sorted(
-            (
-                _terrain_feature_from_template(feature)
-                for feature in terrain_layout.terrain_features
-            ),
-            key=lambda feature: feature.feature_id,
+    area_features = _terrain_features_from_area_placements(
+        terrain_areas=terrain_areas,
+        terrain_feature_presets=terrain_feature_presets,
+        terrain_feature_placements=terrain_feature_placements,
+    )
+    return _validate_terrain_features(
+        tuple(
+            sorted(
+                (
+                    *(
+                        _terrain_feature_from_template(feature)
+                        for feature in terrain_layout.terrain_features
+                    ),
+                    *area_features,
+                ),
+                key=lambda feature: feature.feature_id,
+            )
         )
     )
+
+
+def _terrain_features_from_area_placements(
+    *,
+    terrain_areas: tuple[PlacedTerrainArea, ...],
+    terrain_feature_presets: tuple[TerrainFeaturePreset, ...],
+    terrain_feature_placements: tuple[TerrainFeatureAreaPlacement, ...],
+) -> tuple[TerrainFeatureDefinition, ...]:
+    areas = _validate_terrain_areas(terrain_areas)
+    presets = _validate_terrain_feature_presets(terrain_feature_presets)
+    placements = _validate_terrain_feature_area_placements(terrain_feature_placements)
+    areas_by_id = {area.terrain_area_id: area for area in areas}
+    presets_by_id = {preset.terrain_feature_preset_id: preset for preset in presets}
+    features: list[TerrainFeatureDefinition] = []
+    for placement in placements:
+        area = areas_by_id.get(placement.terrain_area_id)
+        if area is None:
+            raise MissionSetupError("Terrain feature area placement references unknown area.")
+        preset = presets_by_id.get(placement.terrain_feature_preset_id)
+        if preset is None:
+            raise MissionSetupError("Terrain feature area placement references unknown preset.")
+        if preset.footprint_template_id != area.footprint_template_id:
+            raise MissionSetupError(
+                "Terrain feature area placement preset footprint does not match terrain area."
+            )
+        features.append(
+            _terrain_feature_from_area_placement(
+                area=area,
+                preset=preset,
+                placement=placement,
+            )
+        )
+    return tuple(sorted(features, key=lambda feature: feature.feature_id))
+
+
+def _terrain_feature_from_area_placement(
+    *,
+    area: PlacedTerrainArea,
+    preset: TerrainFeaturePreset,
+    placement: TerrainFeatureAreaPlacement,
+) -> TerrainFeatureDefinition:
+    display_geometry = _placed_display_geometry(area=area, preset=preset)
+    min_x, min_y, max_x, max_y = polygon_bounds(display_geometry.footprint_polygon)
+    return TerrainFeatureDefinition(
+        feature_id=placement.feature_id,
+        feature_kind=preset.feature_kind,
+        footprint_center_x_inches=(min_x + max_x) / 2.0,
+        footprint_center_y_inches=(min_y + max_y) / 2.0,
+        footprint_width_inches=max_x - min_x,
+        footprint_depth_inches=max_y - min_y,
+        display_geometry=display_geometry,
+        walls=tuple(
+            _placed_terrain_wall_from_template(area=area, preset=preset, wall=wall)
+            for wall in preset.walls
+        ),
+        floors=tuple(
+            _placed_terrain_floor_from_template(area=area, preset=preset, floor=floor)
+            for floor in preset.floors
+        ),
+        source_id=placement.source_id,
+    )
+
+
+def _placed_display_geometry(
+    *,
+    area: PlacedTerrainArea,
+    preset: TerrainFeaturePreset,
+) -> TerrainDisplayGeometry:
+    anchor_x = _local_transform_anchor_x(preset)
+    return TerrainDisplayGeometry(
+        display_template_id=preset.terrain_feature_preset_id,
+        footprint_polygon=tuple(
+            _place_local_display_point(
+                point,
+                area=area,
+                local_transform_anchor_x_inches=anchor_x,
+            )
+            for point in preset.display_geometry.footprint_polygon
+        ),
+    )
+
+
+def _placed_terrain_wall_from_template(
+    *,
+    area: PlacedTerrainArea,
+    preset: TerrainFeaturePreset,
+    wall: TerrainWallTemplate,
+) -> TerrainWallDefinition:
+    anchor_x = _local_transform_anchor_x(preset)
+    center = _place_local_display_point(
+        TerrainDisplayPoint(wall.center_x_inches, wall.center_y_inches),
+        area=area,
+        local_transform_anchor_x_inches=anchor_x,
+    )
+    return TerrainWallDefinition(
+        wall_id=wall.wall_id,
+        center_x_inches=center.x_inches,
+        center_y_inches=center.y_inches,
+        bottom_z_inches=wall.bottom_z_inches,
+        width_inches=wall.width_inches,
+        depth_inches=wall.depth_inches,
+        height_inches=wall.height_inches,
+        rotation_degrees=_place_local_rotation(wall.rotation_degrees, area=area),
+    )
+
+
+def _placed_terrain_floor_from_template(
+    *,
+    area: PlacedTerrainArea,
+    preset: TerrainFeaturePreset,
+    floor: TerrainFloorTemplate,
+) -> TerrainFloorDefinition:
+    anchor_x = _local_transform_anchor_x(preset)
+    center = _place_local_display_point(
+        TerrainDisplayPoint(floor.center_x_inches, floor.center_y_inches),
+        area=area,
+        local_transform_anchor_x_inches=anchor_x,
+    )
+    return TerrainFloorDefinition(
+        floor_id=floor.floor_id,
+        center_x_inches=center.x_inches,
+        center_y_inches=center.y_inches,
+        bottom_z_inches=floor.bottom_z_inches,
+        width_inches=floor.width_inches,
+        depth_inches=floor.depth_inches,
+        thickness_inches=floor.thickness_inches,
+        rotation_degrees=_place_local_rotation(floor.rotation_degrees, area=area),
+    )
+
+
+def _place_local_display_point(
+    point: TerrainDisplayPoint,
+    *,
+    area: PlacedTerrainArea,
+    local_transform_anchor_x_inches: float,
+) -> TerrainDisplayPoint:
+    if type(point) is not TerrainDisplayPoint:
+        raise MissionSetupError("local terrain feature point must be a TerrainDisplayPoint.")
+    x_inches = point.x_inches
+    if area.local_transform is TerrainAreaLocalTransform.MIRROR_Y_AXIS:
+        x_inches = (2.0 * local_transform_anchor_x_inches) - x_inches
+    elif area.local_transform is not TerrainAreaLocalTransform.IDENTITY:
+        raise MissionSetupError("Unsupported terrain area local transform for feature placement.")
+    radians = math.radians(area.rotation_degrees)
+    cosine = math.cos(radians)
+    sine = math.sin(radians)
+    return TerrainDisplayPoint(
+        x_inches=area.center_x_inches + (x_inches * cosine) - (point.y_inches * sine),
+        y_inches=area.center_y_inches + (x_inches * sine) + (point.y_inches * cosine),
+    )
+
+
+def _place_local_rotation(
+    local_rotation_degrees: float,
+    *,
+    area: PlacedTerrainArea,
+) -> float:
+    local_rotation = _validate_finite_number(
+        "local terrain feature rotation", local_rotation_degrees
+    )
+    if area.local_transform is TerrainAreaLocalTransform.MIRROR_Y_AXIS:
+        local_rotation = 180.0 - local_rotation
+    elif area.local_transform is not TerrainAreaLocalTransform.IDENTITY:
+        raise MissionSetupError("Unsupported terrain area local transform for feature rotation.")
+    return (area.rotation_degrees + local_rotation) % 360.0
+
+
+def _local_transform_anchor_x(preset: TerrainFeaturePreset) -> float:
+    if type(preset) is not TerrainFeaturePreset:
+        raise MissionSetupError("terrain feature preset must be a TerrainFeaturePreset.")
+    return preset.display_geometry.footprint_polygon[0].x_inches
 
 
 def _terrain_feature_from_template(
@@ -451,6 +655,7 @@ def _terrain_wall_from_template(wall: TerrainWallTemplate) -> TerrainWallDefinit
         width_inches=wall.width_inches,
         depth_inches=wall.depth_inches,
         height_inches=wall.height_inches,
+        rotation_degrees=wall.rotation_degrees,
     )
 
 
@@ -465,6 +670,7 @@ def _terrain_floor_from_template(floor: TerrainFloorTemplate) -> TerrainFloorDef
         width_inches=floor.width_inches,
         depth_inches=floor.depth_inches,
         thickness_inches=floor.thickness_inches,
+        rotation_degrees=floor.rotation_degrees,
     )
 
 
@@ -764,6 +970,48 @@ def _validate_terrain_areas(values: object) -> tuple[PlacedTerrainArea, ...]:
     return tuple(sorted(terrain_areas, key=lambda area: area.terrain_area_id))
 
 
+def _validate_terrain_feature_presets(values: object) -> tuple[TerrainFeaturePreset, ...]:
+    if type(values) is not tuple:
+        raise MissionSetupError("terrain_feature_presets must be a tuple.")
+    presets: list[TerrainFeaturePreset] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not TerrainFeaturePreset:
+            raise MissionSetupError(
+                "terrain_feature_presets must contain TerrainFeaturePreset values."
+            )
+        if value.terrain_feature_preset_id in seen:
+            raise MissionSetupError("terrain_feature_presets must not contain duplicates.")
+        seen.add(value.terrain_feature_preset_id)
+        presets.append(value)
+    return tuple(sorted(presets, key=lambda preset: preset.terrain_feature_preset_id))
+
+
+def _validate_terrain_feature_area_placements(
+    values: object,
+) -> tuple[TerrainFeatureAreaPlacement, ...]:
+    if type(values) is not tuple:
+        raise MissionSetupError("terrain_feature_placements must be a tuple.")
+    placements: list[TerrainFeatureAreaPlacement] = []
+    seen_feature_ids: set[str] = set()
+    seen_area_ids: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not TerrainFeatureAreaPlacement:
+            raise MissionSetupError(
+                "terrain_feature_placements must contain TerrainFeatureAreaPlacement values."
+            )
+        if value.feature_id in seen_feature_ids:
+            raise MissionSetupError("terrain_feature_placements must not duplicate feature IDs.")
+        if value.terrain_area_id in seen_area_ids:
+            raise MissionSetupError(
+                "terrain_feature_placements must not duplicate terrain area IDs."
+            )
+        seen_feature_ids.add(value.feature_id)
+        seen_area_ids.add(value.terrain_area_id)
+        placements.append(value)
+    return tuple(sorted(placements, key=lambda placement: placement.feature_id))
+
+
 def _validate_objective_terrain_areas(
     values: object,
 ) -> tuple[ObjectiveTerrainAreaDefinition, ...]:
@@ -906,12 +1154,17 @@ def _validate_optional_identifier(field_name: str, value: object | None) -> str 
     return _validate_identifier(field_name, value)
 
 
-def _validate_positive_number(field_name: str, value: object) -> float:
+def _validate_finite_number(field_name: str, value: object) -> float:
     if not isinstance(value, int | float) or type(value) is bool:
         raise MissionSetupError(f"{field_name} must be a number.")
     number = float(value)
     if not math.isfinite(number):
         raise MissionSetupError(f"{field_name} must be finite.")
+    return number
+
+
+def _validate_positive_number(field_name: str, value: object) -> float:
+    number = _validate_finite_number(field_name, value)
     if number <= 0.0:
         raise MissionSetupError(f"{field_name} must be greater than 0.")
     return number

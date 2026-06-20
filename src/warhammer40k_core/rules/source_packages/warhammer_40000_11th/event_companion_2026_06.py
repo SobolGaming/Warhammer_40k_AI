@@ -2266,6 +2266,7 @@ def _extracted_layout_definition(
         ),
         battlefield_regions=_extracted_regions(layout_id=layout_id),
         terrain_areas=terrain_areas,
+        terrain_feature_placements=(),
         objective_role_counts=layout_source.objective_role_counts,
         source_id=f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_source.source_layout_id}",
         objective_terrain_areas=_extracted_objective_terrain_area_definitions(

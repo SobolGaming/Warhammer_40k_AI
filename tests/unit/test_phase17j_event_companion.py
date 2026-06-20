@@ -1830,6 +1830,7 @@ def test_phase17j_layout_region_invariants_fail_closed() -> None:
                 for region in layout.battlefield_regions
             ),
             terrain_areas=layout.terrain_areas,
+            terrain_feature_placements=layout.terrain_feature_placements,
             objective_role_counts=layout.objective_role_counts,
             source_id=layout.source_id,
         )
@@ -1943,6 +1944,7 @@ def test_phase17j_territories_must_contain_their_deployment_zones() -> None:
                 for region in layout.battlefield_regions
             ),
             terrain_areas=layout.terrain_areas,
+            terrain_feature_placements=layout.terrain_feature_placements,
             objective_role_counts=layout.objective_role_counts,
             source_id=layout.source_id,
         )
