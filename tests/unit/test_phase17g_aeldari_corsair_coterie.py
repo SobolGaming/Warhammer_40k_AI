@@ -9,6 +9,11 @@ from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_movement_proposal,
 )
+from tests.unit.test_phase15c_fight_order import (
+    _advance_to_fight_order_request,  # pyright: ignore[reportPrivateUsage]
+    _fight_lifecycle,  # pyright: ignore[reportPrivateUsage]
+    _submit_minimal_melee_declaration,  # pyright: ignore[reportPrivateUsage]
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -18,7 +23,12 @@ from warhammer40k_core.core.datasheet import (
     DatasheetKeywordSet,
 )
 from warhammer40k_core.core.detachment import DetachmentDefinition, EnhancementDefinition
-from warhammer40k_core.core.dice import DiceExpression, RerollComponentSelectionPolicy
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollState,
+    DiceRollStatePayload,
+    RerollComponentSelectionPolicy,
+)
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset import RulesetId
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
@@ -45,6 +55,11 @@ from warhammer40k_core.engine.army_mustering import (
     muster_army,
     validate_roster_legality,
 )
+from warhammer40k_core.engine.attack_sequence import (
+    AttackSequenceStep,
+    attack_sequence_hit_roll_spec,
+    attack_sequence_wound_roll_spec,
+)
 from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationRequestContext,
     BattleFormationResultContext,
@@ -60,6 +75,7 @@ from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_K
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectContext,
     EnhancementEffectRegistry,
@@ -79,7 +95,17 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari.detac
     stratagems,
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
-from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
+from warhammer40k_core.engine.fight_activation_abilities import (
+    DECLINE_FIGHT_ACTIVATION_ABILITY_OPTION_ID,
+    FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
+)
+from warhammer40k_core.engine.fight_order import (
+    FIGHT_ACTIVATION_DECISION_TYPE,
+    FightPhaseState,
+    FightsFirstRegistry,
+    fight_activation_option_id,
+)
+from warhammer40k_core.engine.fight_resolution import MeleeDeclarationProposalRequest
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -134,6 +160,7 @@ from warhammer40k_core.engine.stratagem_cost_modifiers import (
     StratagemCostModifierRegistry,
 )
 from warhammer40k_core.engine.stratagems import (
+    DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     DESTROYED_ENEMY_UNIT_CONTEXT_KEY,
     DESTROYED_TARGET_UNIT_CONTEXT_KEY,
     ENGAGED_ENEMY_UNIT_CONTEXT_KEY,
@@ -396,6 +423,151 @@ def test_pirates_due_records_source_backed_wound_reroll_permission() -> None:
     assert isinstance(conditional, dict)
     assert conditional["reroll_unmodified_values"] == [1]
     assert conditional["full_reroll_if_target_within_objective_range"] is True
+
+
+def test_pirates_due_lifecycle_accepts_fight_wound_reroll_and_resumes_attack() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("corsairs",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "corsairs": Pose.at(94.0, 95.0),
+            "enemy": Pose.at(95.0, 95.0),
+        },
+        game_id="phase17g-corsair-pirates-due-wound-reroll-0",
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    state = _lifecycle_state(lifecycle)
+    _mark_player_as_corsair_coterie(state, player_id="player-a")
+    state.gain_command_points(
+        player_id="player-a",
+        amount=1,
+        source_id="phase17g-corsair-pirates-due-cp",
+        source_kind=CommandPointSourceKind.OTHER,
+        cap_exempt=True,
+    )
+    _refresh_lifecycle_runtime_content(lifecycle)
+    unit = units["corsairs"]
+
+    stratagem_request = _advance_to_fight_order_request(lifecycle)
+    assert stratagem_request.decision_type == STRATAGEM_DECISION_TYPE
+    pirates_due_option = _stratagem_option(stratagem_request, stratagems.PIRATES_DUE_STRATAGEM_ID)
+    activation_request = _decision_request(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="phase17g-corsair-pirates-due-use",
+                request=stratagem_request,
+                selected_option_id=pirates_due_option.option_id,
+            )
+        )
+    )
+    assert activation_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+    ability_request = _decision_request(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="phase17g-corsair-pirates-due-select-fight",
+                request=activation_request,
+                selected_option_id=fight_activation_option_id(
+                    unit_instance_id=unit.unit_instance_id,
+                    fight_type=RulesetDescriptor.warhammer_40000_eleventh().fight_policy.fight_types[
+                        0
+                    ],
+                ),
+            )
+        )
+    )
+    assert ability_request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE
+    melee_request = _decision_request(
+        lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id="phase17g-corsair-pirates-due-decline-ability",
+                request=ability_request,
+                selected_option_id=DECLINE_FIGHT_ACTIVATION_ABILITY_OPTION_ID,
+            )
+        )
+    )
+    proposal_request = MeleeDeclarationProposalRequest.from_decision_request(melee_request)
+    weapon_payload = _first_primary_melee_weapon_payload(proposal_request)
+    weapon_profile_id = cast(str, weapon_payload["weapon_profile_id"])
+    declaration_result_id = "phase17g-corsair-pirates-due-melee"
+    sequence_id = (
+        f"melee-sequence:{state.game_id}:round-{state.battle_round:02d}:"
+        f"{unit.unit_instance_id}:{declaration_result_id}"
+    )
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    fixed_rolls = DiceRollManager(state.game_id, event_log=lifecycle.decision_controller.event_log)
+    fixed_rolls.roll_fixed(
+        attack_sequence_hit_roll_spec(
+            weapon_profile_id=weapon_profile_id,
+            attack_context_id=attack_context_id,
+            attacker_player_id="player-a",
+        ),
+        [6],
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    fixed_rolls.roll_fixed(wound_spec, [1])
+
+    reroll_request = _decision_request(
+        _submit_minimal_melee_declaration(
+            lifecycle,
+            request=melee_request,
+            result_id=declaration_result_id,
+        )
+    )
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    reroll_request_payload = cast(dict[str, object], reroll_request.payload)
+    assert reroll_request_payload["roll_type"] == "attack_sequence.wound"
+    permission_payload = cast(dict[str, object], reroll_request_payload["permission"])
+    assert permission_payload["timing_window"] == "attack_sequence.wound"
+    assert permission_payload["eligible_roll_type"] == "attack_sequence.wound"
+    assert permission_payload["component_selection_policy"] == "whole_roll"
+    assert permission_payload["allowed_component_selections"] is None
+    attack_context_payload = cast(dict[str, object], reroll_request_payload["attack_context"])
+    assert attack_context_payload["phase"] == BattlePhase.FIGHT.value
+    wound_roll_state = cast(dict[str, object], attack_context_payload["wound_roll_state"])
+    assert wound_roll_state["current_values"] == [1]
+
+    accepted_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17g-corsair-pirates-due-accept-wound-reroll",
+            request=reroll_request,
+            selected_option_id="reroll:0",
+        )
+    )
+
+    assert accepted_status.status_kind is not LifecycleStatusKind.INVALID
+    reroll_payloads = _lifecycle_event_payloads(lifecycle, "dice_reroll_resolved")
+    assert len(reroll_payloads) == 1
+    rerolled_state = DiceRollState.from_payload(cast(DiceRollStatePayload, reroll_payloads[0]))
+    wound_original_result = cast(dict[str, object], wound_roll_state["original_result"])
+    assert rerolled_state.original_result.roll_id == wound_original_result["roll_id"]
+    wound_payload = _attack_step_payload(
+        _lifecycle_event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.WOUND,
+    )
+    resolved_wound = cast(dict[str, object], wound_payload["payload"])
+    assert resolved_wound["successful"] is True
+    assert cast(dict[str, object], resolved_wound["roll_state"]) == rerolled_state.to_payload()
+    downstream_status = _drain_until_downstream_attack_resolution(
+        lifecycle,
+        accepted_status,
+        result_id_prefix="phase17g-corsair-pirates-due-downstream",
+    )
+    assert downstream_status.status_kind is not LifecycleStatusKind.INVALID
+    downstream_steps = {
+        cast(str, payload["step"])
+        for payload in _lifecycle_event_payloads(lifecycle, "attack_sequence_step")
+    }
+    assert downstream_steps & {
+        AttackSequenceStep.ALLOCATE.value,
+        AttackSequenceStep.SAVE.value,
+        AttackSequenceStep.DAMAGE.value,
+    }
 
 
 def test_lethal_ruse_records_charge_after_fall_back_and_resolves_anhrathe_mortal_rolls() -> None:
@@ -4445,6 +4617,134 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
     if request is None:
         raise AssertionError(f"Expected lifecycle decision request, got {status.status_kind}.")
     return request
+
+
+def _lifecycle_state(lifecycle: GameLifecycle) -> GameState:
+    if lifecycle.state is None:
+        raise AssertionError("Lifecycle state is missing.")
+    return lifecycle.state
+
+
+def _refresh_lifecycle_runtime_content(lifecycle: GameLifecycle) -> None:
+    refresh = cast(
+        Callable[[], None],
+        object.__getattribute__(
+            lifecycle,
+            "_refresh_runtime_content_bundle_if_armies_mustered",
+        ),
+    )
+    refresh()
+
+
+def _lifecycle_event_payloads(
+    lifecycle: GameLifecycle,
+    event_type: str,
+) -> tuple[dict[str, JsonValue], ...]:
+    return tuple(
+        cast(dict[str, JsonValue], event.payload)
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == event_type
+    )
+
+
+def _attack_step_payload(
+    events: tuple[dict[str, JsonValue], ...],
+    step: AttackSequenceStep,
+) -> dict[str, JsonValue]:
+    for event in events:
+        if event["step"] == step.value:
+            return event
+    raise AssertionError(f"Missing attack sequence step {step.value}.")
+
+
+def _drain_until_downstream_attack_resolution(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+    *,
+    result_id_prefix: str,
+) -> LifecycleStatus:
+    current = status
+    downstream_steps = {
+        AttackSequenceStep.ALLOCATE.value,
+        AttackSequenceStep.SAVE.value,
+        AttackSequenceStep.DAMAGE.value,
+    }
+    for index in range(128):
+        if {
+            cast(str, payload["step"])
+            for payload in _lifecycle_event_payloads(lifecycle, "attack_sequence_step")
+        } & downstream_steps:
+            return current
+        if (
+            current.status_kind is not LifecycleStatusKind.WAITING_FOR_DECISION
+            or current.decision_request is None
+        ):
+            return current
+        request = current.decision_request
+        if request.is_parameterized_submission_request():
+            raise AssertionError(f"Unexpected parameterized decision {request.decision_type}.")
+        if request.decision_type == DICE_REROLL_DECISION_TYPE:
+            option_id = "decline"
+        elif request.decision_type == STRATAGEM_DECISION_TYPE:
+            option_id = DECLINE_STRATAGEM_WINDOW_OPTION_ID
+        else:
+            option_id = request.options[0].option_id
+        current = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"{result_id_prefix}-{index:03d}",
+                request=request,
+                selected_option_id=option_id,
+            )
+        )
+    raise AssertionError("Attack sequence did not reach allocation, save, or damage resolution.")
+
+
+def _stratagem_option(request: DecisionRequest, stratagem_id: str) -> DecisionOption:
+    option_prefix = f"use-stratagem:{stratagem_id}:"
+    for option in request.options:
+        if option.option_id.startswith(option_prefix):
+            return option
+    raise AssertionError(f"Missing Stratagem option {stratagem_id}.")
+
+
+def _first_primary_melee_weapon_payload(
+    proposal_request: MeleeDeclarationProposalRequest,
+) -> dict[str, object]:
+    for weapon in proposal_request.available_weapons:
+        weapon_payload = cast(dict[str, object], weapon)
+        if weapon_payload["is_extra_attacks"] is True:
+            continue
+        engaged_target_ids = cast(list[str], weapon_payload["engaged_target_unit_instance_ids"])
+        if engaged_target_ids:
+            return weapon_payload
+    raise AssertionError("Missing primary engaged melee weapon.")
+
+
+def _mark_player_as_corsair_coterie(state: GameState, *, player_id: str) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != player_id:
+            updated_armies.append(army)
+            continue
+        updated_armies.append(
+            replace(
+                army,
+                detachment_selection=replace(
+                    army.detachment_selection,
+                    faction_id="aeldari",
+                    detachment_ids=("corsair-coterie",),
+                ),
+                units=tuple(
+                    replace(
+                        unit,
+                        keywords=("ANHRATHE", "INFANTRY"),
+                        faction_keywords=("AELDARI",),
+                    )
+                    for unit in army.units
+                ),
+            )
+        )
+    state.army_definitions = updated_armies
 
 
 def _event_records(decisions: DecisionController, event_type: str) -> tuple[EventRecord, ...]:

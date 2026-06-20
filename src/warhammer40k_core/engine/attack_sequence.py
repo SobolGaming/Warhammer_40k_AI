@@ -253,6 +253,10 @@ ATTACK_RESOLUTION_SELECTION_DECISION_TYPES = frozenset(
         SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
     )
 )
+SOURCE_BACKED_ATTACK_REROLL_ROLL_STATE_KEYS = {
+    "attack_sequence.hit": "hit_roll_state",
+    "attack_sequence.wound": "wound_roll_state",
+}
 DAMAGE_ALLOCATION_RULE_ID = "core_rules_damage_allocation"
 DEADLY_DEMISE_SOURCE_KIND = "deadly_demise"
 HAZARDOUS_SOURCE_KIND = "hazardous"
@@ -7339,6 +7343,106 @@ def _request_source_backed_hit_reroll_if_available(
     )
 
 
+def apply_source_backed_attack_dice_reroll_decision(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    expected_phase: BattlePhase,
+    phase_label: str,
+) -> None:
+    if type(attack_sequence) is not AttackSequence:
+        raise GameLifecycleError(f"{phase_label} dice reroll requires an active attack sequence.")
+    if attack_sequence.source_phase is not expected_phase:
+        raise GameLifecycleError(f"{phase_label} dice reroll context must be for the phase.")
+    if result.actor_id != attack_sequence.attacker_player_id:
+        raise GameLifecycleError(f"{phase_label} dice reroll actor must match attacking player.")
+    record = decisions.record_for_result(result)
+    request_payload = _payload_object(record.request.payload)
+    roll_type = _payload_string(request_payload, key="roll_type")
+    roll_state_key = SOURCE_BACKED_ATTACK_REROLL_ROLL_STATE_KEYS.get(roll_type)
+    if roll_state_key is None:
+        raise GameLifecycleError(
+            f"{phase_label} dice reroll must target an attack hit or wound roll."
+        )
+    source_rule_id = _payload_string(request_payload, key="source_rule_id")
+    permission_payload = _nested_payload_object(request_payload, key="permission")
+    if _payload_string(permission_payload, key="source_id") != source_rule_id:
+        raise GameLifecycleError(f"{phase_label} dice reroll source context drift.")
+    if _payload_string(permission_payload, key="timing_window") != roll_type:
+        raise GameLifecycleError(f"{phase_label} dice reroll timing window drift.")
+    if _payload_string(permission_payload, key="eligible_roll_type") != roll_type:
+        raise GameLifecycleError(f"{phase_label} dice reroll permission roll type drift.")
+    if (
+        _payload_string(permission_payload, key="owning_player_id")
+        != attack_sequence.attacker_player_id
+    ):
+        raise GameLifecycleError(f"{phase_label} dice reroll permission player drift.")
+    attack_context = _nested_payload_object(request_payload, key="attack_context")
+    if _payload_string(attack_context, key="phase") != expected_phase.value:
+        raise GameLifecycleError(f"{phase_label} dice reroll context must be for the phase.")
+    if (
+        _payload_string(attack_context, key="unit_instance_id")
+        != attack_sequence.attacking_unit_instance_id
+    ):
+        raise GameLifecycleError(
+            f"{phase_label} dice reroll unit must match active attack sequence."
+        )
+    attack_context_id = _payload_string(attack_context, key="attack_context_id")
+    if not _source_backed_attack_context_id_matches_active_pool(
+        attack_sequence=attack_sequence,
+        attack_context_id=attack_context_id,
+    ):
+        raise GameLifecycleError(f"{phase_label} dice reroll attack context drift.")
+    current_pool = attack_sequence.current_pool()
+    if _payload_string(attack_context, key="weapon_profile_id") != current_pool.weapon_profile_id:
+        raise GameLifecycleError(f"{phase_label} dice reroll weapon profile drift.")
+    if (
+        roll_type == "attack_sequence.wound"
+        and _payload_string(attack_context, key="target_unit_instance_id")
+        != current_pool.target_unit_instance_id
+    ):
+        raise GameLifecycleError(f"{phase_label} dice reroll target unit drift.")
+    initial_roll_payload = _nested_payload_object(attack_context, key=roll_state_key)
+    initial_roll_state = DiceRollState.from_payload(
+        cast(DiceRollStatePayload, initial_roll_payload)
+    )
+    if initial_roll_state.original_result.spec.roll_type != roll_type:
+        raise GameLifecycleError(f"{phase_label} dice reroll initial roll type drift.")
+    if initial_roll_state.original_result.spec.actor_id != attack_sequence.attacker_player_id:
+        raise GameLifecycleError(f"{phase_label} dice reroll initial roll actor drift.")
+    DiceRollManager(
+        state.game_id,
+        event_log=decisions.event_log,
+    ).resolve_reroll(
+        initial_roll_state,
+        request=record.request,
+        result=result,
+        record_decision=False,
+    )
+
+
+def _source_backed_attack_context_id_matches_active_pool(
+    *,
+    attack_sequence: AttackSequence,
+    attack_context_id: str,
+) -> bool:
+    current_pool = attack_sequence.current_pool()
+    pool_prefix = f"{attack_sequence.sequence_id}:pool-{attack_sequence.pool_index + 1:03d}:"
+    for attack_index in range(current_pool.attacks):
+        base_context_id = f"{pool_prefix}attack-{attack_index + 1:03d}"
+        if attack_context_id == base_context_id:
+            return True
+        generated_prefix = f"{base_context_id}:generated-hit-"
+        if not attack_context_id.startswith(generated_prefix):
+            continue
+        generated_hit_number = attack_context_id.removeprefix(generated_prefix)
+        if generated_hit_number.isdecimal() and int(generated_hit_number) >= 2:
+            return True
+    return False
+
+
 def _request_source_backed_wound_reroll_if_available(
     *,
     state: GameState,
@@ -9729,6 +9833,12 @@ def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
     if not isinstance(payload, dict):
         raise GameLifecycleError("Attack sequence payload must be an object.")
     return payload
+
+
+def _nested_payload_object(payload: dict[str, JsonValue], *, key: str) -> dict[str, JsonValue]:
+    if key not in payload:
+        raise GameLifecycleError(f"Attack sequence payload missing {key}.")
+    return _payload_object(payload[key])
 
 
 def _precision_selected_group_id(payload: JsonValue) -> str | None:

@@ -5,7 +5,6 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.dice import DiceRollState, DiceRollStatePayload
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
@@ -30,6 +29,7 @@ from warhammer40k_core.engine.attack_sequence import (
     apply_feel_no_pain_decision,
     apply_precision_allocation_decision,
     apply_resolve_target_unit_decision,
+    apply_source_backed_attack_dice_reroll_decision,
     build_select_attack_weapon_group_request,
     build_select_resolve_target_unit_request,
     gathered_attack_groups_for_target,
@@ -2016,13 +2016,6 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     return value
 
 
-def _payload_object(payload: dict[str, JsonValue], *, key: str) -> dict[str, JsonValue]:
-    value = payload.get(key)
-    if not isinstance(value, dict):
-        raise GameLifecycleError(f"{key} must be an object.")
-    return value
-
-
 @dataclass(frozen=True, slots=True)
 class _FightRequestContext:
     fight_state: FightPhaseState
@@ -3036,61 +3029,13 @@ def _apply_fight_dice_reroll_decision(
     attack_sequence = fight_state.attack_sequence
     if attack_sequence is None:
         raise GameLifecycleError("Fight dice reroll requires an active attack sequence.")
-    if attack_sequence.source_phase is not BattlePhase.FIGHT:
-        raise GameLifecycleError("Fight dice reroll context must be for the Fight phase.")
-    if result.actor_id != attack_sequence.attacker_player_id:
-        raise GameLifecycleError("Fight dice reroll actor must match attacking player.")
-    record = decisions.record_for_result(result)
-    request_payload = _decision_payload_object(record.request.payload)
-    if _payload_string(request_payload, key="roll_type") != "attack_sequence.hit":
-        raise GameLifecycleError("Fight dice reroll must target a hit roll.")
-    source_rule_id = _payload_string(request_payload, key="source_rule_id")
-    permission_payload = _payload_object(request_payload, key="permission")
-    if _payload_string(permission_payload, key="source_id") != source_rule_id:
-        raise GameLifecycleError("Fight dice reroll source context drift.")
-    if _payload_string(permission_payload, key="timing_window") != "attack_sequence.hit":
-        raise GameLifecycleError("Fight dice reroll timing window must be attack_sequence.hit.")
-    if _payload_string(permission_payload, key="eligible_roll_type") != "attack_sequence.hit":
-        raise GameLifecycleError("Fight dice reroll permission must target hit rolls.")
-    if (
-        _payload_string(permission_payload, key="owning_player_id")
-        != attack_sequence.attacker_player_id
-    ):
-        raise GameLifecycleError("Fight dice reroll permission player drift.")
-    attack_context = _payload_object(request_payload, key="attack_context")
-    if _payload_string(attack_context, key="phase") != BattlePhase.FIGHT.value:
-        raise GameLifecycleError("Fight dice reroll context must be for the Fight phase.")
-    if (
-        _payload_string(attack_context, key="unit_instance_id")
-        != attack_sequence.attacking_unit_instance_id
-    ):
-        raise GameLifecycleError("Fight dice reroll unit must match active attack sequence.")
-    if (
-        _payload_string(attack_context, key="attack_context_id")
-        != attack_sequence.attack_context_id()
-    ):
-        raise GameLifecycleError("Fight dice reroll attack context drift.")
-    if (
-        _payload_string(attack_context, key="weapon_profile_id")
-        != attack_sequence.current_pool().weapon_profile_id
-    ):
-        raise GameLifecycleError("Fight dice reroll weapon profile drift.")
-    initial_roll_payload = _payload_object(attack_context, key="hit_roll_state")
-    initial_roll_state = DiceRollState.from_payload(
-        cast(DiceRollStatePayload, initial_roll_payload)
-    )
-    if initial_roll_state.original_result.spec.roll_type != "attack_sequence.hit":
-        raise GameLifecycleError("Fight dice reroll initial roll must be a hit roll.")
-    if initial_roll_state.original_result.spec.actor_id != attack_sequence.attacker_player_id:
-        raise GameLifecycleError("Fight dice reroll initial roll actor drift.")
-    DiceRollManager(
-        state.game_id,
-        event_log=decisions.event_log,
-    ).resolve_reroll(
-        initial_roll_state,
-        request=record.request,
+    apply_source_backed_attack_dice_reroll_decision(
+        state=state,
         result=result,
-        record_decision=False,
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        expected_phase=BattlePhase.FIGHT,
+        phase_label="Fight",
     )
     return None
 

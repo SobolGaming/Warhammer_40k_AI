@@ -1577,7 +1577,7 @@ def test_hatred_eternal_accepted_hit_reroll_resumes_attack_sequence_with_rerolle
     assert resolved_wound["successful"] is True
 
 
-def test_shooting_dice_reroll_branch_rejects_non_source_backed_hit_payload() -> None:
+def test_shooting_dice_reroll_branch_accepts_source_backed_wound_payload() -> None:
     state = _battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     attacker = _unit_for_player(state, player_id="player-a")
@@ -1614,24 +1614,29 @@ def test_shooting_dice_reroll_branch_rejects_non_source_backed_hit_payload() -> 
         attack_sequence=attack_sequence,
     )
     decisions = DecisionController()
-    request = DecisionRequest(
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    wound_roll_state = manager.roll_fixed(
+        attack_sequence_wound_roll_spec(
+            weapon_profile_id=weapon_profile.profile_id,
+            attack_context_id=attack_sequence.attack_context_id(),
+            attacker_player_id="player-a",
+        ),
+        [1],
+    )
+    permission = RerollPermission(
+        source_id=SOURCE_RULE_ID,
+        timing_window="attack_sequence.wound",
+        owning_player_id="player-a",
+        eligible_roll_type="attack_sequence.wound",
+        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+    )
+    request = manager.build_reroll_request(
+        wound_roll_state,
         request_id="drukhari-test:scoped-reroll-request",
-        decision_type=DICE_REROLL_DECISION_TYPE,
         actor_id="player-a",
-        payload={
-            "roll_id": "drukhari-test:scoped-wound-roll",
-            "roll_type": "attack_sequence.wound",
-            "current_values": [1],
-            "allowed_selections": [[0]],
+        permission=permission,
+        extra_payload={
             "source_rule_id": SOURCE_RULE_ID,
-            "permission": {
-                "source_id": SOURCE_RULE_ID,
-                "timing_window": "attack_sequence.wound",
-                "owning_player_id": "player-a",
-                "eligible_roll_type": "attack_sequence.wound",
-                "component_selection_policy": "whole_roll",
-                "allowed_component_selections": None,
-            },
             "attack_context": {
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
@@ -1639,27 +1644,10 @@ def test_shooting_dice_reroll_branch_rejects_non_source_backed_hit_payload() -> 
                 "unit_instance_id": attacker.unit_instance_id,
                 "attack_context_id": attack_sequence.attack_context_id(),
                 "weapon_profile_id": weapon_profile.profile_id,
-                "hit_roll_state": validate_json_value(
-                    DiceRollManager(state.game_id)
-                    .roll_fixed(
-                        attack_sequence_hit_roll_spec(
-                            weapon_profile_id=weapon_profile.profile_id,
-                            attack_context_id=attack_sequence.attack_context_id(),
-                            attacker_player_id="player-a",
-                        ),
-                        [1],
-                    )
-                    .to_payload()
-                ),
+                "target_unit_instance_id": defender.unit_instance_id,
+                "wound_roll_state": validate_json_value(wound_roll_state.to_payload()),
             },
         },
-        options=(
-            DecisionOption(
-                option_id="reroll:0",
-                label="Reroll die 0",
-                payload={"selected_indices": [0]},
-            ),
-        ),
     )
     decisions.request_decision(request)
     result = DecisionResult.for_request(
@@ -1669,11 +1657,45 @@ def test_shooting_dice_reroll_branch_rejects_non_source_backed_hit_payload() -> 
     )
     decisions.submit_result(result)
 
-    with pytest.raises(GameLifecycleError, match="must target a hit roll"):
+    assert (
         _shooting_phase_handler(ShootingUnitSelectedGrantRegistry.empty()).apply_decision(
             state=state,
             result=result,
             decisions=decisions,
+        )
+        is None
+    )
+    reroll_payloads = tuple(
+        cast(dict[str, object], event.payload)
+        for event in decisions.event_log.records
+        if event.event_type == "dice_reroll_resolved"
+    )
+    assert len(reroll_payloads) == 1
+    rerolled_state = DiceRollState.from_payload(cast(DiceRollStatePayload, reroll_payloads[0]))
+    assert rerolled_state.original_result.roll_id == wound_roll_state.original_result.roll_id
+
+    malformed_decisions = DecisionController()
+    request_payload = cast(dict[str, object], request.payload)
+    attack_context = dict(cast(dict[str, object], request_payload["attack_context"]))
+    del attack_context["wound_roll_state"]
+    malformed_request = replace(
+        request,
+        request_id="drukhari-test:scoped-malformed-reroll-request",
+        payload=validate_json_value({**request_payload, "attack_context": attack_context}),
+    )
+    malformed_decisions.request_decision(malformed_request)
+    malformed_result = DecisionResult.for_request(
+        result_id="drukhari-test:scoped-malformed-reroll-result",
+        request=malformed_request,
+        selected_option_id="reroll:0",
+    )
+    malformed_decisions.submit_result(malformed_result)
+
+    with pytest.raises(GameLifecycleError, match="payload missing wound_roll_state"):
+        _shooting_phase_handler(ShootingUnitSelectedGrantRegistry.empty()).apply_decision(
+            state=state,
+            result=malformed_result,
+            decisions=malformed_decisions,
         )
 
 
