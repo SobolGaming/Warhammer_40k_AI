@@ -27,6 +27,7 @@ class TerrainWallTemplatePayload(TypedDict):
     width_inches: float
     depth_inches: float
     height_inches: float
+    rotation_degrees: float
 
 
 class TerrainFloorTemplatePayload(TypedDict):
@@ -37,6 +38,7 @@ class TerrainFloorTemplatePayload(TypedDict):
     width_inches: float
     depth_inches: float
     thickness_inches: float
+    rotation_degrees: float
 
 
 class TerrainFeatureTemplatePayload(TypedDict):
@@ -49,6 +51,24 @@ class TerrainFeatureTemplatePayload(TypedDict):
     display_geometry: TerrainDisplayGeometryPayload
     walls: list[TerrainWallTemplatePayload]
     floors: list[TerrainFloorTemplatePayload]
+    source_id: str
+
+
+class TerrainFeaturePresetPayload(TypedDict):
+    terrain_feature_preset_id: str
+    feature_kind: str
+    footprint_template_id: str
+    footprint_width_inches: float
+    footprint_depth_inches: float
+    walls: list[TerrainWallTemplatePayload]
+    floors: list[TerrainFloorTemplatePayload]
+    source_id: str
+
+
+class TerrainFeatureAreaPlacementPayload(TypedDict):
+    feature_id: str
+    terrain_area_id: str
+    terrain_feature_preset_id: str
     source_id: str
 
 
@@ -70,6 +90,7 @@ class TerrainWallTemplate:
     width_inches: float
     depth_inches: float
     height_inches: float
+    rotation_degrees: float = 0.0
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -114,15 +135,22 @@ class TerrainWallTemplate:
             "height_inches",
             _validate_positive_number("TerrainWallTemplate height_inches", self.height_inches),
         )
+        object.__setattr__(
+            self,
+            "rotation_degrees",
+            _validate_finite_number(
+                "TerrainWallTemplate rotation_degrees",
+                self.rotation_degrees,
+            ),
+        )
 
     def bounds(self) -> tuple[float, float, float, float]:
-        half_width = self.width_inches / 2.0
-        half_depth = self.depth_inches / 2.0
-        return (
-            self.center_x_inches - half_width,
-            self.center_y_inches - half_depth,
-            self.center_x_inches + half_width,
-            self.center_y_inches + half_depth,
+        return _rotated_rectangle_bounds(
+            center_x_inches=self.center_x_inches,
+            center_y_inches=self.center_y_inches,
+            width_inches=self.width_inches,
+            depth_inches=self.depth_inches,
+            rotation_degrees=self.rotation_degrees,
         )
 
     def to_payload(self) -> TerrainWallTemplatePayload:
@@ -134,6 +162,7 @@ class TerrainWallTemplate:
             "width_inches": self.width_inches,
             "depth_inches": self.depth_inches,
             "height_inches": self.height_inches,
+            "rotation_degrees": self.rotation_degrees,
         }
 
     @classmethod
@@ -149,6 +178,7 @@ class TerrainWallTemplate:
             width_inches=raw_payload["width_inches"],
             depth_inches=raw_payload["depth_inches"],
             height_inches=raw_payload["height_inches"],
+            rotation_degrees=raw_payload["rotation_degrees"],
         )
 
 
@@ -161,6 +191,7 @@ class TerrainFloorTemplate:
     width_inches: float
     depth_inches: float
     thickness_inches: float
+    rotation_degrees: float = 0.0
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -208,15 +239,22 @@ class TerrainFloorTemplate:
                 self.thickness_inches,
             ),
         )
+        object.__setattr__(
+            self,
+            "rotation_degrees",
+            _validate_finite_number(
+                "TerrainFloorTemplate rotation_degrees",
+                self.rotation_degrees,
+            ),
+        )
 
     def bounds(self) -> tuple[float, float, float, float]:
-        half_width = self.width_inches / 2.0
-        half_depth = self.depth_inches / 2.0
-        return (
-            self.center_x_inches - half_width,
-            self.center_y_inches - half_depth,
-            self.center_x_inches + half_width,
-            self.center_y_inches + half_depth,
+        return _rotated_rectangle_bounds(
+            center_x_inches=self.center_x_inches,
+            center_y_inches=self.center_y_inches,
+            width_inches=self.width_inches,
+            depth_inches=self.depth_inches,
+            rotation_degrees=self.rotation_degrees,
         )
 
     def to_payload(self) -> TerrainFloorTemplatePayload:
@@ -228,6 +266,7 @@ class TerrainFloorTemplate:
             "width_inches": self.width_inches,
             "depth_inches": self.depth_inches,
             "thickness_inches": self.thickness_inches,
+            "rotation_degrees": self.rotation_degrees,
         }
 
     @classmethod
@@ -243,6 +282,7 @@ class TerrainFloorTemplate:
             width_inches=raw_payload["width_inches"],
             depth_inches=raw_payload["depth_inches"],
             thickness_inches=raw_payload["thickness_inches"],
+            rotation_degrees=raw_payload["rotation_degrees"],
         )
 
 
@@ -397,6 +437,188 @@ class TerrainFeatureTemplate:
 
 
 @dataclass(frozen=True, slots=True)
+class TerrainFeaturePreset:
+    terrain_feature_preset_id: str
+    feature_kind: TerrainFeatureKind
+    footprint_template_id: str
+    footprint_width_inches: float
+    footprint_depth_inches: float
+    walls: tuple[TerrainWallTemplate, ...] = ()
+    floors: tuple[TerrainFloorTemplate, ...] = ()
+    source_id: str = "chapter_approved_2026_27"
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "terrain_feature_preset_id",
+            _validate_unprefixed_identifier(
+                "TerrainFeaturePreset terrain_feature_preset_id",
+                self.terrain_feature_preset_id,
+                reserved_prefix="terrain-feature-preset:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "feature_kind",
+            _terrain_feature_kind_from_token(self.feature_kind),
+        )
+        object.__setattr__(
+            self,
+            "footprint_template_id",
+            _validate_identifier(
+                "TerrainFeaturePreset footprint_template_id",
+                self.footprint_template_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "footprint_width_inches",
+            _validate_positive_number(
+                "TerrainFeaturePreset footprint_width_inches",
+                self.footprint_width_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "footprint_depth_inches",
+            _validate_positive_number(
+                "TerrainFeaturePreset footprint_depth_inches",
+                self.footprint_depth_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "walls",
+            _validate_wall_templates("TerrainFeaturePreset walls", self.walls),
+        )
+        object.__setattr__(
+            self,
+            "floors",
+            _validate_floor_templates("TerrainFeaturePreset floors", self.floors),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("TerrainFeaturePreset source_id", self.source_id),
+        )
+        self._validate_parts_within_footprint()
+
+    def bounds(self) -> tuple[float, float, float, float]:
+        half_width = self.footprint_width_inches / 2.0
+        half_depth = self.footprint_depth_inches / 2.0
+        return (-half_width, -half_depth, half_width, half_depth)
+
+    def to_payload(self) -> TerrainFeaturePresetPayload:
+        return {
+            "terrain_feature_preset_id": self.terrain_feature_preset_id,
+            "feature_kind": self.feature_kind.value,
+            "footprint_template_id": self.footprint_template_id,
+            "footprint_width_inches": self.footprint_width_inches,
+            "footprint_depth_inches": self.footprint_depth_inches,
+            "walls": [wall.to_payload() for wall in self.walls],
+            "floors": [floor.to_payload() for floor in self.floors],
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: object) -> Self:
+        if not isinstance(payload, dict):
+            raise TerrainLayoutError("Terrain feature preset payload must be a mapping.")
+        raw_payload = cast(TerrainFeaturePresetPayload, payload)
+        return cls(
+            terrain_feature_preset_id=raw_payload["terrain_feature_preset_id"],
+            feature_kind=_terrain_feature_kind_from_token(raw_payload["feature_kind"]),
+            footprint_template_id=raw_payload["footprint_template_id"],
+            footprint_width_inches=raw_payload["footprint_width_inches"],
+            footprint_depth_inches=raw_payload["footprint_depth_inches"],
+            walls=tuple(
+                TerrainWallTemplate.from_payload(wall_payload)
+                for wall_payload in raw_payload["walls"]
+            ),
+            floors=tuple(
+                TerrainFloorTemplate.from_payload(floor_payload)
+                for floor_payload in raw_payload["floors"]
+            ),
+            source_id=raw_payload["source_id"],
+        )
+
+    def _validate_parts_within_footprint(self) -> None:
+        feature_bounds = self.bounds()
+        for wall in self.walls:
+            _validate_part_bounds_within_feature(
+                part_id=wall.wall_id,
+                part_bounds=wall.bounds(),
+                feature_bounds=feature_bounds,
+            )
+        for floor in self.floors:
+            _validate_part_bounds_within_feature(
+                part_id=floor.floor_id,
+                part_bounds=floor.bounds(),
+                feature_bounds=feature_bounds,
+            )
+
+
+@dataclass(frozen=True, slots=True)
+class TerrainFeatureAreaPlacement:
+    feature_id: str
+    terrain_area_id: str
+    terrain_feature_preset_id: str
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "feature_id",
+            _validate_unprefixed_identifier(
+                "TerrainFeatureAreaPlacement feature_id",
+                self.feature_id,
+                reserved_prefix="terrain:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "terrain_area_id",
+            _validate_identifier(
+                "TerrainFeatureAreaPlacement terrain_area_id",
+                self.terrain_area_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "terrain_feature_preset_id",
+            _validate_identifier(
+                "TerrainFeatureAreaPlacement terrain_feature_preset_id",
+                self.terrain_feature_preset_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("TerrainFeatureAreaPlacement source_id", self.source_id),
+        )
+
+    def to_payload(self) -> TerrainFeatureAreaPlacementPayload:
+        return {
+            "feature_id": self.feature_id,
+            "terrain_area_id": self.terrain_area_id,
+            "terrain_feature_preset_id": self.terrain_feature_preset_id,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: object) -> Self:
+        if not isinstance(payload, dict):
+            raise TerrainLayoutError("Terrain feature area placement payload must be a mapping.")
+        raw_payload = cast(TerrainFeatureAreaPlacementPayload, payload)
+        return cls(
+            feature_id=raw_payload["feature_id"],
+            terrain_area_id=raw_payload["terrain_area_id"],
+            terrain_feature_preset_id=raw_payload["terrain_feature_preset_id"],
+            source_id=raw_payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class TerrainLayoutTemplate:
     terrain_layout_id: str
     name: str
@@ -539,6 +761,63 @@ def _validate_floor_templates(
         seen.add(value.floor_id)
         floors.append(value)
     return tuple(sorted(floors, key=lambda floor: floor.floor_id))
+
+
+def _rotated_rectangle_bounds(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+    rotation_degrees: float,
+) -> tuple[float, float, float, float]:
+    center_x = _validate_finite_number("rotated rectangle center_x_inches", center_x_inches)
+    center_y = _validate_finite_number("rotated rectangle center_y_inches", center_y_inches)
+    width = _validate_positive_number("rotated rectangle width_inches", width_inches)
+    depth = _validate_positive_number("rotated rectangle depth_inches", depth_inches)
+    rotation = _validate_finite_number("rotated rectangle rotation_degrees", rotation_degrees)
+    half_width = width / 2.0
+    half_depth = depth / 2.0
+    corners = tuple(
+        _rotate_local_point(
+            x_inches=x,
+            y_inches=y,
+            rotation_degrees=rotation,
+            origin_x_inches=center_x,
+            origin_y_inches=center_y,
+        )
+        for x, y in (
+            (-half_width, -half_depth),
+            (half_width, -half_depth),
+            (half_width, half_depth),
+            (-half_width, half_depth),
+        )
+    )
+    x_values = tuple(point[0] for point in corners)
+    y_values = tuple(point[1] for point in corners)
+    return (min(x_values), min(y_values), max(x_values), max(y_values))
+
+
+def _rotate_local_point(
+    *,
+    x_inches: float,
+    y_inches: float,
+    rotation_degrees: float,
+    origin_x_inches: float,
+    origin_y_inches: float,
+) -> tuple[float, float]:
+    x = _validate_finite_number("rotate local point x_inches", x_inches)
+    y = _validate_finite_number("rotate local point y_inches", y_inches)
+    rotation = _validate_finite_number("rotate local point rotation_degrees", rotation_degrees)
+    origin_x = _validate_finite_number("rotate local point origin_x_inches", origin_x_inches)
+    origin_y = _validate_finite_number("rotate local point origin_y_inches", origin_y_inches)
+    radians = math.radians(rotation)
+    cosine = math.cos(radians)
+    sine = math.sin(radians)
+    return (
+        origin_x + (x * cosine) - (y * sine),
+        origin_y + (x * sine) + (y * cosine),
+    )
 
 
 def _validate_display_geometry(

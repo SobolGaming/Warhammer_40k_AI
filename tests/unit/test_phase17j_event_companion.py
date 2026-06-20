@@ -196,6 +196,7 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
     assert len(layout_ids) == 45
     assert len(mission_pack.battlefield_layouts) == 6
     assert len(mission_pack.terrain_area_footprint_templates) == 5
+    assert len(mission_pack.terrain_feature_presets) == 5
     assert len(deployment_map_ids) == 45
     assert len(mission_pack.mission_pool_entries) == 45
     assert pool_layout_ids == layout_ids
@@ -220,7 +221,7 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
         terrain_layout_id = entry.terrain_layout_ids[0]
         if terrain_layout_id in extracted_layout_ids:
             assert setup.battlefield_layout_id == entry.terrain_layout_ids[0]
-            assert setup.terrain_features == ()
+            assert len(setup.terrain_features) == 16
             assert len(setup.terrain_areas) == 16
             assert len(setup.battlefield_regions) == 5
         else:
@@ -1190,7 +1191,8 @@ def test_phase17j_take_and_hold_layout_a_encodes_terrain_areas_and_regions() -> 
     assert layout.defender_edge == "south"
     assert terrain_layout.terrain_features == ()
     assert setup.battlefield_layout_id == layout.battlefield_layout_id
-    assert setup.terrain_features == ()
+    assert len(layout.terrain_feature_placements) == 16
+    assert len(setup.terrain_features) == 16
     assert len(setup.terrain_areas) == 16
     assert len(setup.battlefield_regions) == 5
     assert setup.objective_markers == layout.objective_markers
@@ -1303,7 +1305,7 @@ def test_phase17j_mission_setup_components_resolve_matching_battlefield_layout()
     )
 
     assert setup.battlefield_layout_id == layout.battlefield_layout_id
-    assert setup.terrain_features == ()
+    assert len(setup.terrain_features) == 16
     assert len(setup.terrain_areas) == 16
     assert len(setup.battlefield_regions) == 5
 
@@ -1328,7 +1330,8 @@ def test_phase17j_take_and_hold_layout_b_encodes_terrain_areas_and_regions() -> 
     assert layout.defender_edge == "east"
     assert terrain_layout.terrain_features == ()
     assert setup.battlefield_layout_id == layout.battlefield_layout_id
-    assert setup.terrain_features == ()
+    assert len(layout.terrain_feature_placements) == 16
+    assert len(setup.terrain_features) == 16
     assert len(setup.terrain_areas) == 16
     assert len(setup.battlefield_regions) == 5
     assert setup.objective_markers == layout.objective_markers
@@ -1456,8 +1459,9 @@ def test_phase17j_take_and_hold_layout_c_encodes_cutout_deployments_and_terrain_
     assert terrain_layout.terrain_features == ()
     assert setup.battlefield_layout_id == layout.battlefield_layout_id
     assert direct_setup.battlefield_layout_id == layout.battlefield_layout_id
-    assert setup.terrain_features == ()
-    assert direct_setup.terrain_features == ()
+    assert len(layout.terrain_feature_placements) == 16
+    assert len(setup.terrain_features) == 16
+    assert len(direct_setup.terrain_features) == 16
     assert len(setup.terrain_areas) == 16
     assert len(direct_setup.terrain_areas) == 16
     assert len(setup.battlefield_regions) == 5
@@ -1654,8 +1658,9 @@ def test_phase17j_disruption_vs_reconnaissance_layouts_encode_geometry(
     assert terrain_layout.terrain_features == ()
     assert setup.battlefield_layout_id == layout.battlefield_layout_id
     assert direct_setup.battlefield_layout_id == layout.battlefield_layout_id
-    assert setup.terrain_features == ()
-    assert direct_setup.terrain_features == ()
+    assert len(layout.terrain_feature_placements) == 16
+    assert len(setup.terrain_features) == 16
+    assert len(direct_setup.terrain_features) == 16
     assert len(setup.terrain_areas) == 16
     assert len(direct_setup.terrain_areas) == 16
     assert len(setup.battlefield_regions) == 5
@@ -1830,6 +1835,7 @@ def test_phase17j_layout_region_invariants_fail_closed() -> None:
                 for region in layout.battlefield_regions
             ),
             terrain_areas=layout.terrain_areas,
+            terrain_feature_placements=layout.terrain_feature_placements,
             objective_role_counts=layout.objective_role_counts,
             source_id=layout.source_id,
         )
@@ -1943,6 +1949,7 @@ def test_phase17j_territories_must_contain_their_deployment_zones() -> None:
                 for region in layout.battlefield_regions
             ),
             terrain_areas=layout.terrain_areas,
+            terrain_feature_placements=layout.terrain_feature_placements,
             objective_role_counts=layout.objective_role_counts,
             source_id=layout.source_id,
         )

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Self, TypedDict, cast
 
@@ -34,6 +35,7 @@ class TerrainVolumePayload(TypedDict):
     width: float
     depth: float
     height: float
+    rotation_degrees: float
     blocks_line_of_sight: bool
 
 
@@ -45,6 +47,7 @@ class TerrainWallDefinitionPayload(TypedDict):
     width_inches: float
     depth_inches: float
     height_inches: float
+    rotation_degrees: float
 
 
 class TerrainFloorDefinitionPayload(TypedDict):
@@ -55,6 +58,7 @@ class TerrainFloorDefinitionPayload(TypedDict):
     width_inches: float
     depth_inches: float
     thickness_inches: float
+    rotation_degrees: float
 
 
 class TerrainSupportSurfacePayload(TypedDict):
@@ -65,6 +69,7 @@ class TerrainSupportSurfacePayload(TypedDict):
     center_y_inches: float
     width_inches: float
     depth_inches: float
+    rotation_degrees: float
     no_overhang_required: bool
 
 
@@ -99,6 +104,7 @@ class TerrainVolume:
     width: float
     depth: float
     height: float
+    rotation_degrees: float = 0.0
     blocks_line_of_sight: bool = False
 
     def __post_init__(self) -> None:
@@ -115,6 +121,14 @@ class TerrainVolume:
             "height",
             _validate_positive_number("TerrainVolume height", self.height),
         )
+        object.__setattr__(
+            self,
+            "rotation_degrees",
+            _validate_finite_coordinate(
+                "TerrainVolume rotation_degrees",
+                self.rotation_degrees,
+            ),
+        )
         if type(self.blocks_line_of_sight) is not bool:
             raise GeometryError("TerrainVolume blocks_line_of_sight must be a bool.")
 
@@ -129,13 +143,12 @@ class TerrainVolume:
         return self.bottom_center.z + self.height
 
     def horizontal_bounds(self) -> tuple[float, float, float, float]:
-        half_width = self.width / 2.0
-        half_depth = self.depth / 2.0
-        return (
-            self.bottom_center.x - half_width,
-            self.bottom_center.y - half_depth,
-            self.bottom_center.x + half_width,
-            self.bottom_center.y + half_depth,
+        return rotated_rectangle_bounds(
+            center_x_inches=self.bottom_center.x,
+            center_y_inches=self.bottom_center.y,
+            width_inches=self.width,
+            depth_inches=self.depth,
+            rotation_degrees=self.rotation_degrees,
         )
 
     def intersects_model(self, model: Model) -> bool:
@@ -154,6 +167,7 @@ class TerrainVolume:
             "width": self.width,
             "depth": self.depth,
             "height": self.height,
+            "rotation_degrees": self.rotation_degrees,
             "blocks_line_of_sight": self.blocks_line_of_sight,
         }
 
@@ -179,6 +193,7 @@ class ObstacleVolume(TerrainVolume):
             "width": self.width,
             "depth": self.depth,
             "height": self.height,
+            "rotation_degrees": self.rotation_degrees,
             "blocks_line_of_sight": self.blocks_line_of_sight,
         }
 
@@ -199,6 +214,7 @@ class TerrainWallDefinition:
     width_inches: float
     depth_inches: float
     height_inches: float
+    rotation_degrees: float = 0.0
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -258,15 +274,22 @@ class TerrainWallDefinition:
                 self.height_inches,
             ),
         )
+        object.__setattr__(
+            self,
+            "rotation_degrees",
+            _validate_finite_coordinate(
+                "TerrainWallDefinition rotation_degrees",
+                self.rotation_degrees,
+            ),
+        )
 
     def bounds(self) -> tuple[float, float, float, float]:
-        half_width = self.width_inches / 2.0
-        half_depth = self.depth_inches / 2.0
-        return (
-            self.center_x_inches - half_width,
-            self.center_y_inches - half_depth,
-            self.center_x_inches + half_width,
-            self.center_y_inches + half_depth,
+        return rotated_rectangle_bounds(
+            center_x_inches=self.center_x_inches,
+            center_y_inches=self.center_y_inches,
+            width_inches=self.width_inches,
+            depth_inches=self.depth_inches,
+            rotation_degrees=self.rotation_degrees,
         )
 
     def to_terrain_volume(self, *, feature_id: str) -> ObstacleVolume:
@@ -285,6 +308,7 @@ class TerrainWallDefinition:
             width=self.width_inches,
             depth=self.depth_inches,
             height=self.height_inches,
+            rotation_degrees=self.rotation_degrees,
         )
 
     def to_payload(self) -> TerrainWallDefinitionPayload:
@@ -296,6 +320,7 @@ class TerrainWallDefinition:
             "width_inches": self.width_inches,
             "depth_inches": self.depth_inches,
             "height_inches": self.height_inches,
+            "rotation_degrees": self.rotation_degrees,
         }
 
     @classmethod
@@ -303,6 +328,20 @@ class TerrainWallDefinition:
         if not isinstance(payload, dict):
             raise GeometryError("Terrain wall payload must be a mapping.")
         raw_payload = cast(TerrainWallDefinitionPayload, payload)
+        _require_payload_keys(
+            "Terrain wall payload",
+            raw_payload,
+            (
+                "wall_id",
+                "center_x_inches",
+                "center_y_inches",
+                "bottom_z_inches",
+                "width_inches",
+                "depth_inches",
+                "height_inches",
+                "rotation_degrees",
+            ),
+        )
         return cls(
             wall_id=raw_payload["wall_id"],
             center_x_inches=raw_payload["center_x_inches"],
@@ -311,6 +350,7 @@ class TerrainWallDefinition:
             width_inches=raw_payload["width_inches"],
             depth_inches=raw_payload["depth_inches"],
             height_inches=raw_payload["height_inches"],
+            rotation_degrees=raw_payload["rotation_degrees"],
         )
 
 
@@ -323,6 +363,7 @@ class TerrainFloorDefinition:
     width_inches: float
     depth_inches: float
     thickness_inches: float
+    rotation_degrees: float = 0.0
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -382,15 +423,22 @@ class TerrainFloorDefinition:
                 self.thickness_inches,
             ),
         )
+        object.__setattr__(
+            self,
+            "rotation_degrees",
+            _validate_finite_coordinate(
+                "TerrainFloorDefinition rotation_degrees",
+                self.rotation_degrees,
+            ),
+        )
 
     def bounds(self) -> tuple[float, float, float, float]:
-        half_width = self.width_inches / 2.0
-        half_depth = self.depth_inches / 2.0
-        return (
-            self.center_x_inches - half_width,
-            self.center_y_inches - half_depth,
-            self.center_x_inches + half_width,
-            self.center_y_inches + half_depth,
+        return rotated_rectangle_bounds(
+            center_x_inches=self.center_x_inches,
+            center_y_inches=self.center_y_inches,
+            width_inches=self.width_inches,
+            depth_inches=self.depth_inches,
+            rotation_degrees=self.rotation_degrees,
         )
 
     def to_terrain_volume(self, *, feature_id: str) -> TerrainVolume:
@@ -409,6 +457,7 @@ class TerrainFloorDefinition:
             width=self.width_inches,
             depth=self.depth_inches,
             height=self.thickness_inches,
+            rotation_degrees=self.rotation_degrees,
             blocks_line_of_sight=False,
         )
 
@@ -421,6 +470,7 @@ class TerrainFloorDefinition:
             "width_inches": self.width_inches,
             "depth_inches": self.depth_inches,
             "thickness_inches": self.thickness_inches,
+            "rotation_degrees": self.rotation_degrees,
         }
 
     @classmethod
@@ -428,6 +478,20 @@ class TerrainFloorDefinition:
         if not isinstance(payload, dict):
             raise GeometryError("Terrain floor payload must be a mapping.")
         raw_payload = cast(TerrainFloorDefinitionPayload, payload)
+        _require_payload_keys(
+            "Terrain floor payload",
+            raw_payload,
+            (
+                "floor_id",
+                "center_x_inches",
+                "center_y_inches",
+                "bottom_z_inches",
+                "width_inches",
+                "depth_inches",
+                "thickness_inches",
+                "rotation_degrees",
+            ),
+        )
         return cls(
             floor_id=raw_payload["floor_id"],
             center_x_inches=raw_payload["center_x_inches"],
@@ -436,6 +500,7 @@ class TerrainFloorDefinition:
             width_inches=raw_payload["width_inches"],
             depth_inches=raw_payload["depth_inches"],
             thickness_inches=raw_payload["thickness_inches"],
+            rotation_degrees=raw_payload["rotation_degrees"],
         )
 
 
@@ -448,6 +513,7 @@ class TerrainSupportSurface:
     center_y_inches: float
     width_inches: float
     depth_inches: float
+    rotation_degrees: float
     no_overhang_required: bool
 
     def __post_init__(self) -> None:
@@ -506,17 +572,24 @@ class TerrainSupportSurface:
                 self.depth_inches,
             ),
         )
+        object.__setattr__(
+            self,
+            "rotation_degrees",
+            _validate_finite_coordinate(
+                "TerrainSupportSurface rotation_degrees",
+                self.rotation_degrees,
+            ),
+        )
         if type(self.no_overhang_required) is not bool:
             raise GeometryError("TerrainSupportSurface no_overhang_required must be a bool.")
 
     def bounds(self) -> tuple[float, float, float, float]:
-        half_width = self.width_inches / 2.0
-        half_depth = self.depth_inches / 2.0
-        return (
-            self.center_x_inches - half_width,
-            self.center_y_inches - half_depth,
-            self.center_x_inches + half_width,
-            self.center_y_inches + half_depth,
+        return rotated_rectangle_bounds(
+            center_x_inches=self.center_x_inches,
+            center_y_inches=self.center_y_inches,
+            width_inches=self.width_inches,
+            depth_inches=self.depth_inches,
+            rotation_degrees=self.rotation_degrees,
         )
 
     def to_payload(self) -> TerrainSupportSurfacePayload:
@@ -528,6 +601,7 @@ class TerrainSupportSurface:
             "center_y_inches": self.center_y_inches,
             "width_inches": self.width_inches,
             "depth_inches": self.depth_inches,
+            "rotation_degrees": self.rotation_degrees,
             "no_overhang_required": self.no_overhang_required,
         }
 
@@ -536,6 +610,21 @@ class TerrainSupportSurface:
         if not isinstance(payload, dict):
             raise GeometryError("Terrain support surface payload must be a mapping.")
         raw_payload = cast(TerrainSupportSurfacePayload, payload)
+        _require_payload_keys(
+            "Terrain support surface payload",
+            raw_payload,
+            (
+                "surface_id",
+                "terrain_feature_id",
+                "z_inches",
+                "center_x_inches",
+                "center_y_inches",
+                "width_inches",
+                "depth_inches",
+                "rotation_degrees",
+                "no_overhang_required",
+            ),
+        )
         return cls(
             surface_id=raw_payload["surface_id"],
             terrain_feature_id=raw_payload["terrain_feature_id"],
@@ -544,6 +633,7 @@ class TerrainSupportSurface:
             center_y_inches=raw_payload["center_y_inches"],
             width_inches=raw_payload["width_inches"],
             depth_inches=raw_payload["depth_inches"],
+            rotation_degrees=raw_payload["rotation_degrees"],
             no_overhang_required=raw_payload["no_overhang_required"],
         )
 
@@ -654,6 +744,7 @@ class TerrainFeatureDefinition:
                 center_y_inches=floor.center_y_inches,
                 width_inches=floor.width_inches,
                 depth_inches=floor.depth_inches,
+                rotation_degrees=floor.rotation_degrees,
                 no_overhang_required=no_overhang_required,
             )
             for floor in self.floors
@@ -736,6 +827,20 @@ def terrain_feature_kind_from_token(token: object) -> TerrainFeatureKind:
 
 
 def terrain_volume_from_payload(payload: TerrainVolumePayload) -> TerrainVolume:
+    _require_payload_keys(
+        "TerrainVolume payload",
+        payload,
+        (
+            "kind",
+            "terrain_id",
+            "bottom_center",
+            "width",
+            "depth",
+            "height",
+            "rotation_degrees",
+            "blocks_line_of_sight",
+        ),
+    )
     kind = payload["kind"]
     if type(kind) is not str:
         raise GeometryError("TerrainVolume payload kind must be a string.")
@@ -746,6 +851,7 @@ def terrain_volume_from_payload(payload: TerrainVolumePayload) -> TerrainVolume:
             width=payload["width"],
             depth=payload["depth"],
             height=payload["height"],
+            rotation_degrees=payload["rotation_degrees"],
             blocks_line_of_sight=payload["blocks_line_of_sight"],
         )
     if kind == "obstacle":
@@ -755,9 +861,79 @@ def terrain_volume_from_payload(payload: TerrainVolumePayload) -> TerrainVolume:
             width=payload["width"],
             depth=payload["depth"],
             height=payload["height"],
+            rotation_degrees=payload["rotation_degrees"],
             blocks_line_of_sight=payload["blocks_line_of_sight"],
         )
     raise GeometryError(f"Unsupported TerrainVolume payload kind: {kind}.")
+
+
+def rotated_rectangle_bounds(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+    rotation_degrees: float,
+) -> tuple[float, float, float, float]:
+    center_x = _validate_finite_coordinate("rotated rectangle center_x_inches", center_x_inches)
+    center_y = _validate_finite_coordinate("rotated rectangle center_y_inches", center_y_inches)
+    width = _validate_positive_number("rotated rectangle width_inches", width_inches)
+    depth = _validate_positive_number("rotated rectangle depth_inches", depth_inches)
+    rotation = _validate_finite_coordinate("rotated rectangle rotation_degrees", rotation_degrees)
+    half_width = width / 2.0
+    half_depth = depth / 2.0
+    corners = tuple(
+        rotate_local_point(
+            x_inches=x,
+            y_inches=y,
+            rotation_degrees=rotation,
+            origin_x_inches=center_x,
+            origin_y_inches=center_y,
+        )
+        for x, y in (
+            (-half_width, -half_depth),
+            (half_width, -half_depth),
+            (half_width, half_depth),
+            (-half_width, half_depth),
+        )
+    )
+    x_values = tuple(point[0] for point in corners)
+    y_values = tuple(point[1] for point in corners)
+    return (min(x_values), min(y_values), max(x_values), max(y_values))
+
+
+def rotate_local_point(
+    *,
+    x_inches: float,
+    y_inches: float,
+    rotation_degrees: float,
+    origin_x_inches: float,
+    origin_y_inches: float,
+) -> tuple[float, float]:
+    x = _validate_finite_coordinate("rotate local point x_inches", x_inches)
+    y = _validate_finite_coordinate("rotate local point y_inches", y_inches)
+    rotation = _validate_finite_coordinate("rotate local point rotation_degrees", rotation_degrees)
+    origin_x = _validate_finite_coordinate("rotate local point origin_x_inches", origin_x_inches)
+    origin_y = _validate_finite_coordinate("rotate local point origin_y_inches", origin_y_inches)
+    radians = math.radians(rotation)
+    cosine = math.cos(radians)
+    sine = math.sin(radians)
+    return (
+        origin_x + (x * cosine) - (y * sine),
+        origin_y + (x * sine) + (y * cosine),
+    )
+
+
+def _require_payload_keys(
+    field_name: str,
+    payload: object,
+    required_keys: tuple[str, ...],
+) -> None:
+    if not isinstance(payload, dict):
+        raise GeometryError(f"{field_name} must be a mapping.")
+    missing_keys = tuple(key for key in required_keys if key not in payload)
+    if missing_keys:
+        raise GeometryError(f"{field_name} missing required fields: {', '.join(missing_keys)}.")
 
 
 def _validate_terrain_id(value: object) -> str:
