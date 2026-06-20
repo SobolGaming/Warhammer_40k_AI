@@ -3441,6 +3441,7 @@ class GameState:
         unit_instance_id: str,
         reserve_origin: ReserveOrigin = ReserveOrigin.DURING_BATTLE_OTHER,
         destruction_deadline_policy: ReserveDestructionTimingPolicy | None = None,
+        source_rule_ids: tuple[str, ...] | None = None,
         required_arrival_battle_round: int | None = None,
         required_arrival_phase: BattlePhase | str | None = None,
         required_arrival_source_rule_id: str | None = None,
@@ -3502,6 +3503,7 @@ class GameState:
             embarked_unit_instance_ids=(
                 () if cargo_state is None else cargo_state.embarked_unit_instance_ids
             ),
+            source_rule_ids=source_rule_ids,
             required_arrival_battle_round=required_arrival_battle_round,
             required_arrival_phase=required_arrival_phase,
             required_arrival_source_rule_id=required_arrival_source_rule_id,

@@ -36,6 +36,12 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindow,
     TimingWindowDescriptor,
 )
+from warhammer40k_core.engine.turn_end_hooks import (
+    SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
+    TurnEndHookRegistry,
+    TurnEndRequestContext,
+    TurnEndResultContext,
+)
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     UnitDestroyedContext,
     UnitDestroyedHookRegistry,
@@ -55,6 +61,7 @@ class BattleRoundFlow:
         *,
         phase_handlers: Mapping[BattlePhase, PhaseHandler],
         battle_round_start_hooks: BattleRoundStartHookRegistry | None = None,
+        turn_end_hooks: TurnEndHookRegistry | None = None,
         phase_end_objective_control_hooks: PhaseEndObjectiveControlHookRegistry | None = None,
         unit_destroyed_hooks: UnitDestroyedHookRegistry | None = None,
         runtime_modifier_registry: RuntimeModifierRegistry | None = None,
@@ -64,6 +71,9 @@ class BattleRoundFlow:
             BattleRoundStartHookRegistry.empty()
             if battle_round_start_hooks is None
             else battle_round_start_hooks
+        )
+        self._turn_end_hooks = (
+            TurnEndHookRegistry.empty() if turn_end_hooks is None else turn_end_hooks
         )
         self._phase_end_objective_control_hooks = (
             PhaseEndObjectiveControlHookRegistry.empty()
@@ -82,6 +92,8 @@ class BattleRoundFlow:
         )
         if type(self._battle_round_start_hooks) is not BattleRoundStartHookRegistry:
             raise GameLifecycleError("BattleRoundFlow requires a battle-round start hook registry.")
+        if type(self._turn_end_hooks) is not TurnEndHookRegistry:
+            raise GameLifecycleError("BattleRoundFlow requires a turn-end hook registry.")
         if (
             type(self._phase_end_objective_control_hooks)
             is not PhaseEndObjectiveControlHookRegistry
@@ -167,12 +179,44 @@ class BattleRoundFlow:
             state=state,
             decisions=decisions,
             registry=self._phase_end_objective_control_hooks,
+            runtime_modifier_registry=self._runtime_modifier_registry,
         )
         _apply_phase_end_unit_destroyed_hooks(
             state=state,
             decisions=decisions,
             registry=self._unit_destroyed_hooks,
         )
+        turn_end_request = self._turn_end_hooks.next_request_for(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=current_phase,
+            )
+        )
+        if turn_end_request is not None:
+            decisions.request_decision(turn_end_request)
+            decisions.event_log.append(
+                "turn_end_faction_rule_requested",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": _active_player_id(state),
+                    "phase": current_phase.value,
+                    "request_id": turn_end_request.request_id,
+                    "decision_type": turn_end_request.decision_type,
+                    "actor_id": turn_end_request.actor_id,
+                },
+            )
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=turn_end_request,
+                payload={
+                    "battle_round": state.battle_round,
+                    "phase": current_phase.value,
+                    "phase_body_status": "turn_end_faction_rule_required",
+                    "request_id": turn_end_request.request_id,
+                },
+            )
         completed_phase = state.advance_to_next_battle_phase(
             runtime_modifier_registry=self._runtime_modifier_registry
         )
@@ -228,7 +272,18 @@ class BattleRoundFlow:
         decisions: DecisionController,
     ) -> None:
         if result.decision_type != SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE:
-            raise GameLifecycleError("BattleRoundFlow received unsupported decision_type.")
+            if result.decision_type != SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE:
+                raise GameLifecycleError("BattleRoundFlow received unsupported decision_type.")
+            if self._turn_end_hooks.apply_result(
+                TurnEndResultContext(
+                    state=state,
+                    decisions=decisions,
+                    request=decisions.record_for_result(result).request,
+                    result=result,
+                )
+            ):
+                return
+            raise GameLifecycleError("Faction rule turn-end decision was not handled.")
         if self._battle_round_start_hooks.apply_result(
             BattleRoundStartResultContext(
                 state=state,
@@ -440,6 +495,7 @@ def _apply_phase_end_objective_control_hooks(
     state: GameState,
     decisions: DecisionController,
     registry: PhaseEndObjectiveControlHookRegistry,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> None:
     if type(registry) is not PhaseEndObjectiveControlHookRegistry:
         raise GameLifecycleError("Phase-end objective-control hooks require a registry.")
@@ -452,8 +508,11 @@ def _apply_phase_end_objective_control_hooks(
         state=state,
         event_log=decisions.event_log,
         completed_phase=completed_phase,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     for sticky_state in registry.states_for(context):
+        if _sticky_objective_control_state_exists(state=state, state_id=sticky_state.state_id):
+            continue
         state.record_sticky_objective_control_state(sticky_state)
         decisions.event_log.append(
             "sticky_objective_control_state_recorded",
@@ -465,6 +524,14 @@ def _apply_phase_end_objective_control_hooks(
                 "sticky_objective_control_state": sticky_state.to_payload(),
             },
         )
+
+
+def _sticky_objective_control_state_exists(*, state: GameState, state_id: str) -> bool:
+    requested_state_id = _validate_identifier("sticky_objective_control_state_id", state_id)
+    return any(
+        sticky_state.state_id == requested_state_id
+        for sticky_state in state.sticky_objective_control_states
+    )
 
 
 def _apply_phase_end_unit_destroyed_hooks(

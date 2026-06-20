@@ -214,6 +214,7 @@ def _current_objective_control_record(
             timing=ObjectiveControlTiming.PHASE_END,
             phase=context.completed_phase,
             ruleset_descriptor=context.state.runtime_ruleset_descriptor(),
+            runtime_modifier_registry=context.runtime_modifier_registry,
         )
     )
 

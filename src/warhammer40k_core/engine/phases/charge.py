@@ -97,6 +97,10 @@ from warhammer40k_core.engine.unit_coherency import (
     resolve_unit_movement_endpoint_coherency,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_move_completed_hooks import (
+    UnitMoveCompletedMortalWoundHookRegistry,
+    resolve_unit_move_completed_mortal_wound_hooks,
+)
 from warhammer40k_core.geometry.pathing import (
     PathValidationResult,
     PathWitness,
@@ -790,6 +794,9 @@ class ChargePhaseHandler:
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry = field(
         default_factory=ChargeTargetRestrictionHookRegistry.empty
     )
+    unit_move_completed_mortal_wound_hooks: UnitMoveCompletedMortalWoundHookRegistry = field(
+        default_factory=UnitMoveCompletedMortalWoundHookRegistry.empty
+    )
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = field(
         default_factory=_empty_ability_indexes
     )
@@ -812,6 +819,13 @@ class ChargePhaseHandler:
         if type(self.charge_target_restriction_hooks) is not ChargeTargetRestrictionHookRegistry:
             raise GameLifecycleError(
                 "ChargePhaseHandler charge_target_restriction_hooks must be a registry."
+            )
+        if (
+            type(self.unit_move_completed_mortal_wound_hooks)
+            is not UnitMoveCompletedMortalWoundHookRegistry
+        ):
+            raise GameLifecycleError(
+                "ChargePhaseHandler unit_move_completed_mortal_wound_hooks must be a registry."
             )
         object.__setattr__(
             self,
@@ -847,6 +861,18 @@ class ChargePhaseHandler:
             )
         if charge_state.active_selection is not None:
             raise GameLifecycleError("Charge active_selection requires pending charge movement.")
+        move_completed_status = resolve_unit_move_completed_mortal_wound_hooks(
+            state=state,
+            decisions=decisions,
+            registry=self.unit_move_completed_mortal_wound_hooks,
+            ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            runtime_modifier_registry=self.runtime_modifier_registry,
+            completed_phase=BattlePhase.CHARGE,
+            event_type="charge_move_completed",
+            movement_actions=(CHARGE_MOVE_ACTION,),
+        )
+        if move_completed_status is not None:
+            return move_completed_status
         if charge_state.phase_complete:
             decisions.event_log.append(
                 "charge_phase_completed",

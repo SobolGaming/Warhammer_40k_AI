@@ -126,6 +126,11 @@ from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardStatus,
 )
 from warhammer40k_core.engine.shooting_targets import shooting_target_candidate_for_model
+from warhammer40k_core.engine.stratagem_cost_modifiers import (
+    StratagemCostModificationResult,
+    StratagemCostModifierContext,
+    StratagemCostModifierRegistry,
+)
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
     timing_trigger_kind_from_token,
@@ -242,6 +247,8 @@ class StratagemUseRecordPayload(TypedDict):
     targeted_unit_instance_ids: list[str]
     affected_unit_instance_ids: list[str]
     command_point_cost: int
+    command_point_modifier_ids: NotRequired[list[str]]
+    command_point_modifier_source_ids: NotRequired[list[str]]
     command_point_transaction_id: str | None
     handler_id: str
     effect_selection: JsonValue
@@ -1129,6 +1136,8 @@ class StratagemUseRecord:
     command_point_cost: int
     command_point_transaction_id: str | None
     handler_id: str
+    command_point_modifier_ids: tuple[str, ...] = ()
+    command_point_modifier_source_ids: tuple[str, ...] = ()
     effect_selection: JsonValue = None
     effect_payload: JsonValue = None
 
@@ -1209,6 +1218,22 @@ class StratagemUseRecord:
         )
         object.__setattr__(
             self,
+            "command_point_modifier_ids",
+            _validate_identifier_tuple(
+                "StratagemUseRecord command_point_modifier_ids",
+                self.command_point_modifier_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "command_point_modifier_source_ids",
+            _validate_identifier_tuple(
+                "StratagemUseRecord command_point_modifier_source_ids",
+                self.command_point_modifier_source_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
             "command_point_transaction_id",
             _validate_optional_identifier(
                 "StratagemUseRecord command_point_transaction_id",
@@ -1240,6 +1265,8 @@ class StratagemUseRecord:
             "targeted_unit_instance_ids": list(self.targeted_unit_instance_ids),
             "affected_unit_instance_ids": list(self.affected_unit_instance_ids),
             "command_point_cost": self.command_point_cost,
+            "command_point_modifier_ids": list(self.command_point_modifier_ids),
+            "command_point_modifier_source_ids": list(self.command_point_modifier_source_ids),
             "command_point_transaction_id": self.command_point_transaction_id,
             "handler_id": self.handler_id,
             "effect_selection": self.effect_selection,
@@ -1264,6 +1291,10 @@ class StratagemUseRecord:
             targeted_unit_instance_ids=tuple(payload["targeted_unit_instance_ids"]),
             affected_unit_instance_ids=tuple(payload["affected_unit_instance_ids"]),
             command_point_cost=payload["command_point_cost"],
+            command_point_modifier_ids=tuple(payload.get("command_point_modifier_ids", ())),
+            command_point_modifier_source_ids=tuple(
+                payload.get("command_point_modifier_source_ids", ())
+            ),
             command_point_transaction_id=payload["command_point_transaction_id"],
             handler_id=payload["handler_id"],
             effect_selection=payload["effect_selection"],
@@ -1300,10 +1331,16 @@ def request_stratagem_use_from_index(
     decisions: DecisionController,
     index: StratagemCatalogIndex,
     context: StratagemEligibilityContext,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
 ) -> LifecycleStatus:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Stratagem use requires a DecisionController.")
-    options = stratagem_use_options_from_index(state=state, index=index, context=context)
+    options = stratagem_use_options_from_index(
+        state=state,
+        index=index,
+        context=context,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+    )
     return _request_stratagem_use_with_options(
         state=state,
         decisions=decisions,
@@ -1501,6 +1538,7 @@ def stratagem_use_options_from_index(
     state: GameState,
     index: StratagemCatalogIndex,
     context: StratagemEligibilityContext,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
 ) -> tuple[DecisionOption, ...]:
     if type(index) is not StratagemCatalogIndex:
         raise GameLifecycleError("Stratagem options require a StratagemCatalogIndex.")
@@ -1510,6 +1548,7 @@ def stratagem_use_options_from_index(
         state=state,
         records=index.records_for(context.trigger_kind),
         context=context,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
 
 
@@ -1519,6 +1558,7 @@ def stratagem_use_options_for_handler_from_index(
     index: StratagemCatalogIndex,
     context: StratagemEligibilityContext,
     handler_id: str,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
 ) -> tuple[DecisionOption, ...]:
     if type(index) is not StratagemCatalogIndex:
         raise GameLifecycleError("Stratagem options require a StratagemCatalogIndex.")
@@ -1533,6 +1573,7 @@ def stratagem_use_options_for_handler_from_index(
             if record.definition.handler_id == requested_handler_id
         ),
         context=context,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
 
 
@@ -1551,6 +1592,7 @@ def _stratagem_use_options_for_records(
     state: GameState,
     records: tuple[StratagemCatalogRecord, ...],
     context: StratagemEligibilityContext,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
 ) -> tuple[DecisionOption, ...]:
     if type(context) is not StratagemEligibilityContext:
         raise GameLifecycleError("Stratagem options require an eligibility context.")
@@ -1591,6 +1633,7 @@ def _stratagem_use_options_for_records(
                         context=context,
                         target_binding=binding,
                         effect_selection=effect_selection,
+                        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
                     )
                     is not None
                 ):
@@ -1763,6 +1806,8 @@ def invalid_stratagem_use_status(
     state: GameState,
     request: DecisionRequest,
     result: DecisionResult,
+    decisions: DecisionController | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
 ) -> LifecycleStatus | None:
     selection = _stratagem_selection_from_result_payload(result.payload)
     if selection is None:
@@ -1782,6 +1827,10 @@ def invalid_stratagem_use_status(
         context=context,
         target_binding=target_binding,
         effect_selection=effect_selection,
+        decisions=decisions,
+        source_decision_request_id=result.request_id,
+        source_decision_result_id=result.result_id,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
     if violation is not None:
         return _invalid(state, "Stratagem decision is no longer legal.", violation)
@@ -1796,6 +1845,7 @@ def apply_stratagem_decision(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     stratagem_handler_registry: StratagemHandlerRegistry | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
 ) -> StratagemUseRecord:
     if type(result) is not DecisionResult:
         raise GameLifecycleError("Stratagem application requires a DecisionResult.")
@@ -1814,6 +1864,7 @@ def apply_stratagem_decision(
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         stratagem_handler_registry=stratagem_handler_registry,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
 
 
@@ -1829,6 +1880,7 @@ def _apply_stratagem_use(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     stratagem_handler_registry: StratagemHandlerRegistry | None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None,
 ) -> StratagemUseRecord:
     definition = catalog_record.definition
     if _stratagem_handler_is_unsupported(definition):
@@ -1841,14 +1893,26 @@ def _apply_stratagem_use(
         effect_selection=effect_selection,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        decisions=decisions,
+        source_decision_request_id=result.request_id,
+        source_decision_result_id=result.result_id,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
     if violation is not None:
         raise GameLifecycleError(f"Prevalidated stratagem is no longer legal: {violation}.")
     use_id = _next_stratagem_use_id(state=state, player_id=context.player_id)
-    command_point_cost = _selected_command_point_cost(
+    command_point_modification = _selected_command_point_cost_result(
+        state=state,
         definition=definition,
+        context=context,
+        target_binding=target_binding,
         effect_selection=effect_selection,
+        decisions=decisions,
+        source_decision_request_id=result.request_id,
+        source_decision_result_id=result.result_id,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
+    command_point_cost = command_point_modification.command_point_cost
     try:
         targeted_unit_ids = _stratagem_targeted_unit_ids(
             state=state,
@@ -1885,6 +1949,8 @@ def _apply_stratagem_use(
         command_point_cost=command_point_cost,
         command_point_transaction_id=None,
         handler_id=definition.handler_id,
+        command_point_modifier_ids=command_point_modification.modifier_ids,
+        command_point_modifier_source_ids=command_point_modification.source_ids,
         effect_selection=effect_selection,
         effect_payload=definition.effect_payload,
     )
@@ -1946,6 +2012,8 @@ def invalid_stratagem_target_proposal_status(
     result: DecisionResult,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    decisions: DecisionController | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
 ) -> LifecycleStatus | None:
     if result.selected_option_id != PARAMETERIZED_DECISION_OPTION_ID:
         return _invalid(state, "Stratagem target proposal selected invalid option.", "malformed")
@@ -1972,6 +2040,10 @@ def invalid_stratagem_target_proposal_status(
         effect_selection=submitted_proposal.effect_selection,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
+        decisions=decisions,
+        source_decision_request_id=result.request_id,
+        source_decision_result_id=result.result_id,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
     if violation is not None:
         return _invalid(state, "Stratagem target proposal is not legal.", violation)
@@ -1986,6 +2058,7 @@ def apply_stratagem_target_proposal(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     stratagem_handler_registry: StratagemHandlerRegistry | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
 ) -> StratagemUseRecord:
     proposal = _proposal_from_result_payload(result.payload)
     if proposal is None or proposal.target_binding is None:
@@ -2009,6 +2082,7 @@ def apply_stratagem_target_proposal(
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         stratagem_handler_registry=stratagem_handler_registry,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
 
 
@@ -2426,6 +2500,46 @@ def _require_stratagem_selection(
     return selection
 
 
+def stratagem_selection_from_decision_result(
+    result: DecisionResult,
+) -> (
+    tuple[
+        StratagemEligibilityContext,
+        StratagemCatalogRecord,
+        StratagemTargetBinding,
+        JsonValue,
+    ]
+    | None
+):
+    if type(result) is not DecisionResult:
+        raise GameLifecycleError("Stratagem selection lookup requires DecisionResult.")
+    return _stratagem_selection_from_result_payload(result.payload)
+
+
+def stratagem_selection_from_target_proposal_result(
+    result: DecisionResult,
+) -> (
+    tuple[
+        StratagemEligibilityContext,
+        StratagemCatalogRecord,
+        StratagemTargetBinding,
+        JsonValue,
+    ]
+    | None
+):
+    if type(result) is not DecisionResult:
+        raise GameLifecycleError("Stratagem proposal selection lookup requires DecisionResult.")
+    proposal = _proposal_from_result_payload(result.payload)
+    if proposal is None or proposal.target_binding is None:
+        return None
+    return (
+        proposal.context,
+        proposal.catalog_record,
+        proposal.target_binding,
+        proposal.effect_selection,
+    )
+
+
 def _record_is_available_for_context(
     *,
     state: GameState,
@@ -2452,6 +2566,10 @@ def _stratagem_unavailable_reason(
     effect_selection: JsonValue = None,
     ruleset_descriptor: RulesetDescriptor | None = None,
     army_catalog: ArmyCatalog | None = None,
+    decisions: DecisionController | None = None,
+    source_decision_request_id: str | None = None,
+    source_decision_result_id: str | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
 ) -> str | None:
     if state.stage is not GameLifecycleStage.BATTLE:
         return "not_battle_stage"
@@ -2472,8 +2590,15 @@ def _stratagem_unavailable_reason(
     if effect_selection_error is not None:
         return effect_selection_error
     command_point_cost = _selected_command_point_cost(
+        state=state,
         definition=record.definition,
+        context=context,
+        target_binding=target_binding,
         effect_selection=effect_selection,
+        decisions=decisions,
+        source_decision_request_id=source_decision_request_id,
+        source_decision_result_id=source_decision_result_id,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
     )
     if state.command_point_total(context.player_id) < command_point_cost:
         return "insufficient_command_points"
@@ -2605,14 +2730,67 @@ def _effect_selection_error(
 
 def _selected_command_point_cost(
     *,
+    state: GameState,
     definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
     effect_selection: JsonValue,
+    decisions: DecisionController | None = None,
+    source_decision_request_id: str | None = None,
+    source_decision_result_id: str | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
 ) -> int:
-    if definition.handler_id != CORE_HEROIC_INTERVENTION_HANDLER_ID:
-        return definition.command_point_cost
-    return definition.command_point_cost + _heroic_intervention_mode_additional_cost(
+    return _selected_command_point_cost_result(
+        state=state,
         definition=definition,
+        context=context,
+        target_binding=target_binding,
         effect_selection=effect_selection,
+        decisions=decisions,
+        source_decision_request_id=source_decision_request_id,
+        source_decision_result_id=source_decision_result_id,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+    ).command_point_cost
+
+
+def _selected_command_point_cost_result(
+    *,
+    state: GameState,
+    definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+    effect_selection: JsonValue,
+    decisions: DecisionController | None = None,
+    source_decision_request_id: str | None = None,
+    source_decision_result_id: str | None = None,
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
+) -> StratagemCostModificationResult:
+    base_cost: int
+    if definition.handler_id != CORE_HEROIC_INTERVENTION_HANDLER_ID:
+        base_cost = definition.command_point_cost
+    else:
+        base_cost = definition.command_point_cost + _heroic_intervention_mode_additional_cost(
+            definition=definition,
+            effect_selection=effect_selection,
+        )
+    registry = (
+        StratagemCostModifierRegistry.empty()
+        if stratagem_cost_modifier_registry is None
+        else stratagem_cost_modifier_registry
+    )
+    return registry.modified_command_point_cost_with_sources(
+        StratagemCostModifierContext(
+            state=state,
+            definition=definition,
+            eligibility_context=context,
+            target_binding=target_binding,
+            effect_selection=effect_selection,
+            base_command_point_cost=base_cost,
+            current_command_point_cost=base_cost,
+            decisions=decisions,
+            source_decision_request_id=source_decision_request_id,
+            source_decision_result_id=source_decision_result_id,
+        )
     )
 
 

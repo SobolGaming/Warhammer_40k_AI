@@ -107,6 +107,14 @@ from warhammer40k_core.engine.sticky_objective_control import (
     PhaseEndObjectiveControlHookRegistry,
 )
 from warhammer40k_core.engine.stratagem_catalog import build_player_stratagem_index
+from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
+    StratagemCostChoiceHookBinding,
+    StratagemCostChoiceHookRegistry,
+)
+from warhammer40k_core.engine.stratagem_cost_modifiers import (
+    StratagemCostModifierBinding,
+    StratagemCostModifierRegistry,
+)
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex, StratagemCatalogRecord
 from warhammer40k_core.engine.target_restriction_hooks import (
     ChargeTargetRestrictionHookBinding,
@@ -114,9 +122,14 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionHookBinding,
     ShootingTargetRestrictionHookRegistry,
 )
+from warhammer40k_core.engine.turn_end_hooks import TurnEndHookBinding, TurnEndHookRegistry
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     UnitDestroyedHookBinding,
     UnitDestroyedHookRegistry,
+)
+from warhammer40k_core.engine.unit_move_completed_hooks import (
+    UnitMoveCompletedMortalWoundHookBinding,
+    UnitMoveCompletedMortalWoundHookRegistry,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
@@ -140,6 +153,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     event_subscriptions: list[dict[str, JsonValue]]
     battle_formation_hook_ids: list[str]
     battle_round_start_hook_ids: list[str]
+    turn_end_hook_ids: list[str]
     command_phase_start_hook_ids: list[str]
     unit_destroyed_hook_ids: list[str]
     battle_shock_hook_ids: list[str]
@@ -147,6 +161,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     advance_move_hook_ids: list[str]
     fall_back_hook_ids: list[str]
     movement_end_surge_hook_ids: list[str]
+    unit_move_completed_mortal_wound_hook_ids: list[str]
     charge_declaration_hook_ids: list[str]
     shooting_target_restriction_hook_ids: list[str]
     charge_target_restriction_hook_ids: list[str]
@@ -157,6 +172,8 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     fight_activation_ability_hook_ids: list[str]
     fight_unit_selected_grant_hook_ids: list[str]
     phase_end_objective_control_hook_ids: list[str]
+    stratagem_cost_choice_hook_ids: list[str]
+    stratagem_cost_modifier_ids: list[str]
     unit_characteristic_modifier_ids: list[str]
     hit_roll_modifier_ids: list[str]
     save_option_modifier_ids: list[str]
@@ -188,6 +205,7 @@ class RuntimeContentContribution:
     event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = ()
     battle_formation_hook_bindings: tuple[BattleFormationHookBinding, ...] = ()
     battle_round_start_hook_bindings: tuple[BattleRoundStartHookBinding, ...] = ()
+    turn_end_hook_bindings: tuple[TurnEndHookBinding, ...] = ()
     command_phase_start_hook_bindings: tuple[CommandPhaseStartHookBinding, ...] = ()
     unit_destroyed_hook_bindings: tuple[UnitDestroyedHookBinding, ...] = ()
     battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = ()
@@ -195,6 +213,10 @@ class RuntimeContentContribution:
     advance_move_hook_bindings: tuple[AdvanceMoveHookBinding, ...] = ()
     fall_back_hook_bindings: tuple[FallBackEligibilityHookBinding, ...] = ()
     movement_end_surge_hook_bindings: tuple[MovementEndSurgeHookBinding, ...] = ()
+    unit_move_completed_mortal_wound_hook_bindings: tuple[
+        UnitMoveCompletedMortalWoundHookBinding,
+        ...,
+    ] = ()
     charge_declaration_hook_bindings: tuple[ChargeDeclarationHookBinding, ...] = ()
     shooting_target_restriction_hook_bindings: tuple[
         ShootingTargetRestrictionHookBinding,
@@ -214,6 +236,8 @@ class RuntimeContentContribution:
     fight_activation_ability_hook_bindings: tuple[FightActivationAbilityHookBinding, ...] = ()
     fight_unit_selected_grant_hook_bindings: tuple[FightUnitSelectedGrantBinding, ...] = ()
     phase_end_objective_control_hook_bindings: tuple[PhaseEndObjectiveControlHookBinding, ...] = ()
+    stratagem_cost_choice_hook_bindings: tuple[StratagemCostChoiceHookBinding, ...] = ()
+    stratagem_cost_modifier_bindings: tuple[StratagemCostModifierBinding, ...] = ()
     unit_characteristic_modifier_bindings: tuple[UnitCharacteristicModifierBinding, ...] = ()
     hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = ()
     save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = ()
@@ -314,6 +338,15 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "turn_end_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution turn_end_hook_bindings",
+                self.turn_end_hook_bindings,
+                TurnEndHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "command_phase_start_hook_bindings",
             _validate_tuple(
                 "RuntimeContentContribution command_phase_start_hook_bindings",
@@ -373,6 +406,15 @@ class RuntimeContentContribution:
                 "RuntimeContentContribution movement_end_surge_hook_bindings",
                 self.movement_end_surge_hook_bindings,
                 MovementEndSurgeHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "unit_move_completed_mortal_wound_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution unit_move_completed_mortal_wound_hook_bindings",
+                self.unit_move_completed_mortal_wound_hook_bindings,
+                UnitMoveCompletedMortalWoundHookBinding,
             ),
         )
         object.__setattr__(
@@ -467,6 +509,24 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "stratagem_cost_choice_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution stratagem_cost_choice_hook_bindings",
+                self.stratagem_cost_choice_hook_bindings,
+                StratagemCostChoiceHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "stratagem_cost_modifier_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution stratagem_cost_modifier_bindings",
+                self.stratagem_cost_modifier_bindings,
+                StratagemCostModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "unit_characteristic_modifier_bindings",
             _validate_tuple(
                 "RuntimeContentContribution unit_characteristic_modifier_bindings",
@@ -546,6 +606,7 @@ class RuntimeContentContribution:
             event_handler_bindings=self.event_handler_bindings,
             battle_formation_hook_bindings=self.battle_formation_hook_bindings,
             battle_round_start_hook_bindings=self.battle_round_start_hook_bindings,
+            turn_end_hook_bindings=self.turn_end_hook_bindings,
             command_phase_start_hook_bindings=self.command_phase_start_hook_bindings,
             unit_destroyed_hook_bindings=self.unit_destroyed_hook_bindings,
             battle_shock_hook_bindings=self.battle_shock_hook_bindings,
@@ -553,6 +614,9 @@ class RuntimeContentContribution:
             advance_move_hook_bindings=self.advance_move_hook_bindings,
             fall_back_hook_bindings=self.fall_back_hook_bindings,
             movement_end_surge_hook_bindings=self.movement_end_surge_hook_bindings,
+            unit_move_completed_mortal_wound_hook_bindings=(
+                self.unit_move_completed_mortal_wound_hook_bindings
+            ),
             charge_declaration_hook_bindings=self.charge_declaration_hook_bindings,
             shooting_target_restriction_hook_bindings=(
                 self.shooting_target_restriction_hook_bindings
@@ -569,6 +633,8 @@ class RuntimeContentContribution:
             phase_end_objective_control_hook_bindings=(
                 self.phase_end_objective_control_hook_bindings
             ),
+            stratagem_cost_choice_hook_bindings=self.stratagem_cost_choice_hook_bindings,
+            stratagem_cost_modifier_bindings=self.stratagem_cost_modifier_bindings,
             unit_characteristic_modifier_bindings=self.unit_characteristic_modifier_bindings,
             hit_roll_modifier_bindings=self.hit_roll_modifier_bindings,
             save_option_modifier_bindings=self.save_option_modifier_bindings,
@@ -669,6 +735,15 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.hook_id,
         ),
+        turn_end_hook_bindings=_combine_unique_values(
+            "turn-end hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.turn_end_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
         command_phase_start_hook_bindings=_combine_unique_values(
             "Command-phase start hook binding",
             tuple(
@@ -729,6 +804,15 @@ def combine_runtime_content_contributions(
                 binding
                 for contribution in validated_contributions
                 for binding in contribution.movement_end_surge_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
+        unit_move_completed_mortal_wound_hook_bindings=_combine_unique_values(
+            "unit move completed mortal wound hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.unit_move_completed_mortal_wound_hook_bindings
             ),
             lambda binding: binding.hook_id,
         ),
@@ -822,6 +906,24 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.hook_id,
         ),
+        stratagem_cost_choice_hook_bindings=_combine_unique_values(
+            "Stratagem cost choice hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.stratagem_cost_choice_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
+        stratagem_cost_modifier_bindings=_combine_unique_values(
+            "Stratagem cost modifier binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.stratagem_cost_modifier_bindings
+            ),
+            lambda binding: binding.modifier_id,
+        ),
         unit_characteristic_modifier_bindings=_combine_unique_values(
             "unit characteristic modifier binding",
             tuple(
@@ -901,6 +1003,7 @@ class RuntimeContentBundle:
     event_index: RuntimeContentEventIndex
     battle_formation_hook_registry: BattleFormationHookRegistry
     battle_round_start_hook_registry: BattleRoundStartHookRegistry
+    turn_end_hook_registry: TurnEndHookRegistry
     command_phase_start_hook_registry: CommandPhaseStartHookRegistry
     unit_destroyed_hook_registry: UnitDestroyedHookRegistry
     battle_shock_hook_registry: BattleShockHookRegistry
@@ -908,6 +1011,7 @@ class RuntimeContentBundle:
     advance_move_hook_registry: AdvanceMoveHookRegistry
     fall_back_hook_registry: FallBackEligibilityHookRegistry
     movement_end_surge_hook_registry: MovementEndSurgeHookRegistry
+    unit_move_completed_mortal_wound_hook_registry: UnitMoveCompletedMortalWoundHookRegistry
     charge_declaration_hook_registry: ChargeDeclarationHookRegistry
     shooting_target_restriction_hook_registry: ShootingTargetRestrictionHookRegistry
     charge_target_restriction_hook_registry: ChargeTargetRestrictionHookRegistry
@@ -918,6 +1022,8 @@ class RuntimeContentBundle:
     fight_activation_ability_hook_registry: FightActivationAbilityHookRegistry
     fight_unit_selected_grant_hook_registry: FightUnitSelectedGrantRegistry
     phase_end_objective_control_hook_registry: PhaseEndObjectiveControlHookRegistry
+    stratagem_cost_choice_hook_registry: StratagemCostChoiceHookRegistry
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry
     runtime_modifier_registry: RuntimeModifierRegistry
     contribution_ids: tuple[str, ...] = ()
 
@@ -956,6 +1062,8 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires BattleFormationHookRegistry.")
         if type(self.battle_round_start_hook_registry) is not BattleRoundStartHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires BattleRoundStartHookRegistry.")
+        if type(self.turn_end_hook_registry) is not TurnEndHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires TurnEndHookRegistry.")
         if type(self.command_phase_start_hook_registry) is not CommandPhaseStartHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires CommandPhaseStartHookRegistry.")
         if type(self.unit_destroyed_hook_registry) is not UnitDestroyedHookRegistry:
@@ -974,6 +1082,13 @@ class RuntimeContentBundle:
             )
         if type(self.movement_end_surge_hook_registry) is not MovementEndSurgeHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires MovementEndSurgeHookRegistry.")
+        if (
+            type(self.unit_move_completed_mortal_wound_hook_registry)
+            is not UnitMoveCompletedMortalWoundHookRegistry
+        ):
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires UnitMoveCompletedMortalWoundHookRegistry."
+            )
         if type(self.charge_declaration_hook_registry) is not ChargeDeclarationHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires ChargeDeclarationHookRegistry.")
         if (
@@ -1023,6 +1138,12 @@ class RuntimeContentBundle:
             raise GameLifecycleError(
                 "RuntimeContentBundle requires PhaseEndObjectiveControlHookRegistry."
             )
+        if type(self.stratagem_cost_choice_hook_registry) is not StratagemCostChoiceHookRegistry:
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires StratagemCostChoiceHookRegistry."
+            )
+        if type(self.stratagem_cost_modifier_registry) is not StratagemCostModifierRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires StratagemCostModifierRegistry.")
         if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires RuntimeModifierRegistry.")
         object.__setattr__(
@@ -1150,6 +1271,13 @@ class RuntimeContentBundle:
                 for binding in contribution.battle_round_start_hook_bindings
             )
         )
+        turn_end_hook_registry = TurnEndHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.turn_end_hook_bindings
+            )
+        )
         command_phase_start_hook_registry = CommandPhaseStartHookRegistry.from_bindings(
             tuple(
                 binding
@@ -1197,6 +1325,15 @@ class RuntimeContentBundle:
                 binding
                 for contribution in validated_contributions
                 for binding in contribution.movement_end_surge_hook_bindings
+            )
+        )
+        unit_move_completed_mortal_wound_hook_registry = (
+            UnitMoveCompletedMortalWoundHookRegistry.from_bindings(
+                tuple(
+                    binding
+                    for contribution in validated_contributions
+                    for binding in contribution.unit_move_completed_mortal_wound_hook_bindings
+                )
             )
         )
         charge_declaration_hook_registry = ChargeDeclarationHookRegistry.from_bindings(
@@ -1275,6 +1412,20 @@ class RuntimeContentBundle:
                 )
             )
         )
+        stratagem_cost_choice_hook_registry = StratagemCostChoiceHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.stratagem_cost_choice_hook_bindings
+            )
+        )
+        stratagem_cost_modifier_registry = StratagemCostModifierRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.stratagem_cost_modifier_bindings
+            )
+        )
         runtime_modifier_registry = RuntimeModifierRegistry.from_bindings(
             unit_characteristic_modifier_bindings=tuple(
                 binding
@@ -1331,6 +1482,7 @@ class RuntimeContentBundle:
             event_index=event_index,
             battle_formation_hook_registry=battle_formation_hook_registry,
             battle_round_start_hook_registry=battle_round_start_hook_registry,
+            turn_end_hook_registry=turn_end_hook_registry,
             command_phase_start_hook_registry=command_phase_start_hook_registry,
             unit_destroyed_hook_registry=unit_destroyed_hook_registry,
             battle_shock_hook_registry=battle_shock_hook_registry,
@@ -1338,6 +1490,9 @@ class RuntimeContentBundle:
             advance_move_hook_registry=advance_move_hook_registry,
             fall_back_hook_registry=fall_back_hook_registry,
             movement_end_surge_hook_registry=movement_end_surge_hook_registry,
+            unit_move_completed_mortal_wound_hook_registry=(
+                unit_move_completed_mortal_wound_hook_registry
+            ),
             charge_declaration_hook_registry=charge_declaration_hook_registry,
             shooting_target_restriction_hook_registry=shooting_target_restriction_hook_registry,
             charge_target_restriction_hook_registry=charge_target_restriction_hook_registry,
@@ -1348,6 +1503,8 @@ class RuntimeContentBundle:
             fight_activation_ability_hook_registry=fight_activation_ability_hook_registry,
             fight_unit_selected_grant_hook_registry=fight_unit_selected_grant_hook_registry,
             phase_end_objective_control_hook_registry=(phase_end_objective_control_hook_registry),
+            stratagem_cost_choice_hook_registry=stratagem_cost_choice_hook_registry,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             runtime_modifier_registry=runtime_modifier_registry,
             contribution_ids=contribution_ids,
         )
@@ -1385,6 +1542,9 @@ class RuntimeContentBundle:
             "battle_round_start_hook_ids": [
                 binding.hook_id for binding in self.battle_round_start_hook_registry.all_bindings()
             ],
+            "turn_end_hook_ids": [
+                binding.hook_id for binding in self.turn_end_hook_registry.all_bindings()
+            ],
             "command_phase_start_hook_ids": [
                 binding.hook_id for binding in self.command_phase_start_hook_registry.all_bindings()
             ],
@@ -1405,6 +1565,10 @@ class RuntimeContentBundle:
             ],
             "movement_end_surge_hook_ids": [
                 binding.hook_id for binding in self.movement_end_surge_hook_registry.all_bindings()
+            ],
+            "unit_move_completed_mortal_wound_hook_ids": [
+                binding.hook_id
+                for binding in (self.unit_move_completed_mortal_wound_hook_registry.all_bindings())
             ],
             "charge_declaration_hook_ids": [
                 binding.hook_id for binding in self.charge_declaration_hook_registry.all_bindings()
@@ -1442,6 +1606,14 @@ class RuntimeContentBundle:
             "phase_end_objective_control_hook_ids": [
                 binding.hook_id
                 for binding in self.phase_end_objective_control_hook_registry.all_bindings()
+            ],
+            "stratagem_cost_choice_hook_ids": [
+                binding.hook_id
+                for binding in self.stratagem_cost_choice_hook_registry.all_bindings()
+            ],
+            "stratagem_cost_modifier_ids": [
+                binding.modifier_id
+                for binding in self.stratagem_cost_modifier_registry.all_bindings()
             ],
             "unit_characteristic_modifier_ids": [
                 binding.modifier_id

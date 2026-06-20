@@ -184,12 +184,20 @@ from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE,
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
 )
+from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
+    SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
+    StratagemCostChoiceRequestContext,
+    StratagemCostChoiceResultContext,
+    stratagem_cost_choice_source_result,
+)
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     STRATAGEM_WINDOW_DECLINED_EVENT_TYPE,
     StratagemCatalogIndex,
     StratagemCatalogRecord,
+    StratagemEligibilityContext,
+    StratagemTargetBinding,
     apply_command_reroll_decision,
     apply_explosives_mortal_wound_feel_no_pain_decision,
     apply_heroic_intervention_charge_move,
@@ -205,6 +213,8 @@ from warhammer40k_core.engine.stratagems import (
     is_heroic_intervention_charge_move_request,
     is_stratagem_placement_proposal_request,
     is_stratagem_window_decline_result,
+    stratagem_selection_from_decision_result,
+    stratagem_selection_from_target_proposal_result,
     stratagem_window_decline_allowed,
     stratagem_window_decline_event_payload,
 )
@@ -218,7 +228,14 @@ from warhammer40k_core.engine.triggered_movement import (
     invalid_triggered_movement_proposal_status,
     is_triggered_movement_proposal_request,
 )
+from warhammer40k_core.engine.turn_end_hooks import (
+    SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
+)
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
+from warhammer40k_core.engine.unit_move_completed_hooks import (
+    apply_unit_move_completed_mortal_wound_feel_no_pain_decision,
+    is_unit_move_completed_mortal_wound_feel_no_pain_request,
+)
 
 
 class GameLifecyclePayload(TypedDict):
@@ -306,6 +323,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         FIGHT_INTERRUPT_DECISION_TYPE,
         STRATAGEM_DECISION_TYPE,
         STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+        SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
         MOVEMENT_PROPOSAL_DECISION_TYPE,
         PLACEMENT_PROPOSAL_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
@@ -334,7 +352,12 @@ _SETUP_DECISION_TYPES = frozenset(
         SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
     )
 )
-_BATTLE_ROUND_DECISION_TYPES = frozenset((SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,))
+_BATTLE_ROUND_DECISION_TYPES = frozenset(
+    (
+        SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
+        SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
+    )
+)
 
 
 def _new_decision_controller() -> DecisionController:
@@ -473,6 +496,11 @@ class GameLifecycle:
             phase_handlers=self._phase_handlers(),
             battle_round_start_hooks=(
                 self._runtime_content_bundle.battle_round_start_hook_registry
+                if self._runtime_content_bundle is not None
+                else None
+            ),
+            turn_end_hooks=(
+                self._runtime_content_bundle.turn_end_hook_registry
                 if self._runtime_content_bundle is not None
                 else None
             ),
@@ -987,6 +1015,19 @@ class GameLifecycle:
         if (
             type(result) is DecisionResult
             and pending_request is not None
+            and pending_request.decision_type == SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE
+        ):
+            invalid_status = _invalid_finite_decision_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                invalid_reason="invalid_stratagem_cost_modifier_option_result",
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
             and pending_request.decision_type in _COMMAND_DECISION_TYPES
         ):
             invalid_status = _invalid_finite_decision_status(
@@ -1046,6 +1087,9 @@ class GameLifecycle:
                     state=state,
                     request=pending_request,
                     result=result,
+                    stratagem_cost_modifier_registry=(
+                        self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+                    ),
                 )
                 if invalid_status is not None:
                     return invalid_status
@@ -1073,6 +1117,10 @@ class GameLifecycle:
                     result=result,
                     ruleset_descriptor=self._require_config().ruleset_descriptor,
                     army_catalog=self._require_config().army_catalog,
+                    decisions=self.decision_controller,
+                    stratagem_cost_modifier_registry=(
+                        self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+                    ),
                 )
                 if invalid_status is not None:
                     return invalid_status
@@ -1102,6 +1150,11 @@ class GameLifecycle:
                 decisions=self.decision_controller,
             )
             return self.advance_until_decision_or_terminal()
+        if record.request.decision_type == SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE:
+            return self._apply_stratagem_cost_choice_and_resume(
+                request=record.request,
+                result=result,
+            )
         if record.request.decision_type in _COMMAND_DECISION_TYPES:
             self._command_phase_handler.apply_decision(
                 state=state,
@@ -1401,6 +1454,17 @@ class GameLifecycle:
             record.request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
             and is_mortal_wound_feel_no_pain_request(record.request)
         ):
+            if is_unit_move_completed_mortal_wound_feel_no_pain_request(record.request):
+                move_completed_status = (
+                    apply_unit_move_completed_mortal_wound_feel_no_pain_decision(
+                        state=state,
+                        result=result,
+                        decisions=self.decision_controller,
+                    )
+                )
+                if move_completed_status is not None:
+                    return move_completed_status
+                return self.advance_until_decision_or_terminal()
             source_context = mortal_wound_feel_no_pain_source_context(record.request)
             if (
                 isinstance(source_context, dict)
@@ -1574,6 +1638,13 @@ class GameLifecycle:
                         decisions=self.decision_controller,
                     )
                 return self.advance_until_decision_or_terminal()
+            cost_choice_status = self._request_stratagem_cost_choice_if_available(
+                source_request=record.request,
+                source_result=result,
+                selection=stratagem_selection_from_decision_result(result),
+            )
+            if cost_choice_status is not None:
+                return cost_choice_status
             apply_stratagem_decision(
                 state=state,
                 result=result,
@@ -1581,6 +1652,9 @@ class GameLifecycle:
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
                 army_catalog=self._require_config().army_catalog,
                 stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
+                stratagem_cost_modifier_registry=(
+                    self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+                ),
             )
             if self._result_resolves_active_reaction_frame(result):
                 follow_up_request = self._pending_decision_request()
@@ -1615,6 +1689,13 @@ class GameLifecycle:
                         decisions=self.decision_controller,
                     )
                 return self.advance_until_decision_or_terminal()
+            cost_choice_status = self._request_stratagem_cost_choice_if_available(
+                source_request=record.request,
+                source_result=result,
+                selection=stratagem_selection_from_target_proposal_result(result),
+            )
+            if cost_choice_status is not None:
+                return cost_choice_status
             apply_stratagem_target_proposal(
                 state=state,
                 result=result,
@@ -1622,6 +1703,9 @@ class GameLifecycle:
                 ruleset_descriptor=self._require_config().ruleset_descriptor,
                 army_catalog=self._require_config().army_catalog,
                 stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
+                stratagem_cost_modifier_registry=(
+                    self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+                ),
             )
             advanced_status = self.advance_until_decision_or_terminal()
             if resolves_reaction_frame:
@@ -1715,6 +1799,11 @@ class GameLifecycle:
             phase_handlers=lifecycle._phase_handlers(),
             battle_round_start_hooks=(
                 lifecycle._runtime_content_bundle.battle_round_start_hook_registry
+                if lifecycle._runtime_content_bundle is not None
+                else None
+            ),
+            turn_end_hooks=(
+                lifecycle._runtime_content_bundle.turn_end_hook_registry
                 if lifecycle._runtime_content_bundle is not None
                 else None
             ),
@@ -1839,6 +1928,12 @@ class GameLifecycle:
             movement_end_surge_hooks=(
                 self._runtime_content_bundle.movement_end_surge_hook_registry
             ),
+            unit_move_completed_mortal_wound_hooks=(
+                self._runtime_content_bundle.unit_move_completed_mortal_wound_hook_registry
+            ),
+            stratagem_cost_modifier_registry=(
+                self._runtime_content_bundle.stratagem_cost_modifier_registry
+            ),
             runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._charge_phase_handler = ChargePhaseHandler(
@@ -1846,6 +1941,9 @@ class GameLifecycle:
             charge_declaration_hooks=self._runtime_content_bundle.charge_declaration_hook_registry,
             charge_target_restriction_hooks=(
                 self._runtime_content_bundle.charge_target_restriction_hook_registry
+            ),
+            unit_move_completed_mortal_wound_hooks=(
+                self._runtime_content_bundle.unit_move_completed_mortal_wound_hook_registry
             ),
             ability_indexes_by_player_id=(
                 self._runtime_content_bundle.ability_indexes_by_player_id
@@ -1866,6 +1964,9 @@ class GameLifecycle:
                 self._runtime_content_bundle.shooting_target_restriction_hook_registry
             ),
             shooting_end_surge_hooks=self._runtime_content_bundle.shooting_end_surge_hook_registry,
+            stratagem_cost_modifier_registry=(
+                self._runtime_content_bundle.stratagem_cost_modifier_registry
+            ),
             runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._fight_phase_handler = FightPhaseHandler(
@@ -1883,6 +1984,7 @@ class GameLifecycle:
         self._battle_round_flow = BattleRoundFlow(
             phase_handlers=self._phase_handlers(),
             battle_round_start_hooks=self._runtime_content_bundle.battle_round_start_hook_registry,
+            turn_end_hooks=self._runtime_content_bundle.turn_end_hook_registry,
             phase_end_objective_control_hooks=(
                 self._runtime_content_bundle.phase_end_objective_control_hook_registry
             ),
@@ -1898,6 +2000,179 @@ class GameLifecycle:
             Mapping[str, JsonValue],
             validate_json_value(summary),
         )
+
+    def _request_stratagem_cost_choice_if_available(
+        self,
+        *,
+        source_request: DecisionRequest,
+        source_result: DecisionResult,
+        selection: tuple[
+            StratagemEligibilityContext,
+            StratagemCatalogRecord,
+            StratagemTargetBinding,
+            JsonValue,
+        ]
+        | None,
+    ) -> LifecycleStatus | None:
+        if selection is None:
+            raise GameLifecycleError("Prevalidated stratagem result is missing selection.")
+        context, catalog_record, target_binding, effect_selection = selection
+        cost_choice_hooks = (
+            self._require_runtime_content_bundle().stratagem_cost_choice_hook_registry
+        )
+        request = cost_choice_hooks.next_request_for(
+            StratagemCostChoiceRequestContext(
+                state=self._require_state(),
+                decisions=self.decision_controller,
+                source_request=source_request,
+                source_result=source_result,
+                definition=catalog_record.definition,
+                eligibility_context=context,
+                target_binding=target_binding,
+                effect_selection=effect_selection,
+            )
+        )
+        if request is None:
+            return None
+        if request.decision_type != SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE:
+            raise GameLifecycleError("Stratagem cost choice hook returned decision_type drift.")
+        self.decision_controller.request_decision(request)
+        if self._result_resolves_active_reaction_frame(source_result):
+            self.reaction_queue.continue_reaction(
+                result=source_result,
+                next_request_id=request.request_id,
+                decisions=self.decision_controller,
+            )
+        return LifecycleStatus.waiting_for_decision(
+            stage=self._require_state().stage,
+            decision_request=request,
+            payload={
+                "game_id": self._require_state().game_id,
+                "pending_request_id": request.request_id,
+                "source_decision_request_id": source_request.request_id,
+                "source_decision_result_id": source_result.result_id,
+            },
+        )
+
+    def _apply_stratagem_cost_choice_and_resume(
+        self,
+        *,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        source_result = stratagem_cost_choice_source_result(request)
+        source_record = self.decision_controller.record_for_result(source_result)
+        if source_record.request.decision_type == STRATAGEM_DECISION_TYPE:
+            selection = stratagem_selection_from_decision_result(source_result)
+        elif source_record.request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+            selection = stratagem_selection_from_target_proposal_result(source_result)
+        else:
+            raise GameLifecycleError("Stratagem cost choice source decision_type drift.")
+        if selection is None:
+            raise GameLifecycleError("Stratagem cost choice source selection is malformed.")
+        context, catalog_record, target_binding, effect_selection = selection
+        cost_choice_hooks = (
+            self._require_runtime_content_bundle().stratagem_cost_choice_hook_registry
+        )
+        handled = cost_choice_hooks.apply_result(
+            StratagemCostChoiceResultContext(
+                state=state,
+                decisions=self.decision_controller,
+                request=request,
+                result=result,
+                source_request=source_record.request,
+                source_result=source_result,
+                definition=catalog_record.definition,
+                eligibility_context=context,
+                target_binding=target_binding,
+                effect_selection=effect_selection,
+            )
+        )
+        if not handled:
+            raise GameLifecycleError("Stratagem cost choice result was not handled.")
+        if source_record.request.decision_type == STRATAGEM_DECISION_TYPE:
+            invalid_status = invalid_stratagem_use_status(
+                state=state,
+                request=source_record.request,
+                result=source_result,
+                decisions=self.decision_controller,
+                stratagem_cost_modifier_registry=(
+                    self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+                ),
+            )
+            if invalid_status is not None:
+                return invalid_status
+            apply_stratagem_decision(
+                state=state,
+                result=source_result,
+                decisions=self.decision_controller,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+                army_catalog=self._require_config().army_catalog,
+                stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
+                stratagem_cost_modifier_registry=(
+                    self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+                ),
+            )
+            if self._result_resolves_active_reaction_frame(result):
+                follow_up_request = self._pending_decision_request()
+                if follow_up_request is not None and is_command_reroll_decision_request(
+                    follow_up_request
+                ):
+                    self.reaction_queue.continue_reaction(
+                        result=result,
+                        next_request_id=follow_up_request.request_id,
+                        decisions=self.decision_controller,
+                    )
+                else:
+                    self.reaction_queue.resolve_reaction(
+                        result=result,
+                        decisions=self.decision_controller,
+                    )
+            return self.advance_until_decision_or_terminal()
+        invalid_status = invalid_stratagem_target_proposal_status(
+            state=state,
+            request=source_record.request,
+            result=source_result,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+            army_catalog=self._require_config().army_catalog,
+            decisions=self.decision_controller,
+            stratagem_cost_modifier_registry=(
+                self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+            ),
+        )
+        if invalid_status is not None:
+            return invalid_status
+        apply_stratagem_target_proposal(
+            state=state,
+            result=source_result,
+            decisions=self.decision_controller,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+            army_catalog=self._require_config().army_catalog,
+            stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
+            stratagem_cost_modifier_registry=(
+                self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+            ),
+        )
+        advanced_status = self.advance_until_decision_or_terminal()
+        if self._result_resolves_active_reaction_frame(result):
+            if self._fight_interrupt_activation_is_active():
+                self._continue_or_resolve_fight_reaction(
+                    result=result,
+                    status=advanced_status,
+                )
+            elif advanced_status.decision_request is not None:
+                self.reaction_queue.continue_reaction(
+                    result=result,
+                    next_request_id=advanced_status.decision_request.request_id,
+                    decisions=self.decision_controller,
+                )
+            else:
+                self.reaction_queue.resolve_reaction(
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+        return advanced_status
 
     def _result_resolves_active_reaction_frame(self, result: DecisionResult) -> bool:
         if type(result) is not DecisionResult:

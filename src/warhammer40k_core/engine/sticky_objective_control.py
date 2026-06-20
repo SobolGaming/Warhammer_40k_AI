@@ -12,6 +12,7 @@ from warhammer40k_core.engine.objective_control import (
     ObjectiveControlStatus,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -43,6 +44,7 @@ class PhaseEndObjectiveControlContext:
     state: GameState
     event_log: EventLog
     completed_phase: BattlePhase
+    runtime_modifier_registry: RuntimeModifierRegistry
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -60,6 +62,10 @@ class PhaseEndObjectiveControlContext:
         )
         if self.state.current_battle_phase is not self.completed_phase:
             raise GameLifecycleError("PhaseEndObjectiveControlContext phase drift.")
+        if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
+            raise GameLifecycleError(
+                "PhaseEndObjectiveControlContext runtime_modifier_registry must be a registry."
+            )
 
 
 @dataclass(frozen=True, slots=True)

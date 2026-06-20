@@ -58,6 +58,14 @@ DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_POINTS_CAP_BY_BATTLE_SIZE = {
     BattleSize.STRIKE_FORCE: 500,
     BattleSize.ONSLAUGHT: 750,
 }
+AELDARI_FACTION_ID = "aeldari"
+CORSAIR_COTERIE_DETACHMENT_ID = "corsair-coterie"
+CORSAIR_COTERIE_ENHANCEMENT_IDS = frozenset(
+    {"archraider", "infamy", "voidstone", "webway-pathstone"}
+)
+ANHRATHE_KEYWORD = "ANHRATHE"
+CHARACTER_KEYWORD = "CHARACTER"
+INFANTRY_KEYWORD = "INFANTRY"
 
 
 class ArmyMusterRequestPayload(TypedDict):
@@ -1277,7 +1285,11 @@ def _append_enhancement_violations(
     enhancement_limit: int,
     violations: list[RosterLegalityViolation],
 ) -> None:
-    if len(request.detachment_selection.enhancement_ids) > enhancement_limit:
+    effective_enhancement_limit = _effective_enhancement_limit(
+        request=request,
+        enhancement_limit=enhancement_limit,
+    )
+    if len(request.detachment_selection.enhancement_ids) > effective_enhancement_limit:
         violations.append(
             RosterLegalityViolation(
                 violation_code="enhancement_limit_exceeded",
@@ -1345,8 +1357,22 @@ def _append_enhancement_violations(
                 )
             )
             continue
+        is_corsair_coterie_enhancement = (
+            enhancement is not None
+            and _request_uses_corsair_coterie(request)
+            and _is_corsair_coterie_enhancement_id(enhancement.enhancement_id)
+        )
         is_upgrade = enhancement is not None and _enhancement_is_upgrade(enhancement)
-        if is_upgrade and _datasheet_has_keyword(datasheet, "CHARACTER"):
+        if is_corsair_coterie_enhancement:
+            if enhancement is None:
+                raise ArmyMusteringError("Corsair Coterie Enhancement is missing.")
+            _append_corsair_coterie_enhancement_target_violations(
+                enhancement=enhancement,
+                datasheet=datasheet,
+                assignment=assignment,
+                violations=violations,
+            )
+        elif is_upgrade and _datasheet_has_keyword(datasheet, "CHARACTER"):
             violations.append(
                 RosterLegalityViolation(
                     violation_code="upgrade_character_forbidden",
@@ -1355,7 +1381,7 @@ def _append_enhancement_violations(
                     source_id=assignment.source_id,
                 )
             )
-        if not is_upgrade and not _datasheet_has_keyword(datasheet, "CHARACTER"):
+        elif not is_upgrade and not _datasheet_has_keyword(datasheet, "CHARACTER"):
             violations.append(
                 RosterLegalityViolation(
                     violation_code="enhancement_character_required",
@@ -1389,6 +1415,18 @@ def _append_enhancement_violations(
         enhancement = catalog_enhancement_by_id.get(enhancement_id)
         if enhancement is None:
             continue
+        if _request_uses_corsair_coterie(request) and _is_corsair_coterie_enhancement_id(
+            enhancement_id
+        ):
+            if assignment_count > 1:
+                violations.append(
+                    RosterLegalityViolation(
+                        violation_code="enhancement_repeated_assignment_forbidden",
+                        message="A Corsair Enhancement can be assigned to only one unit.",
+                        source_id=enhancement.source_id,
+                    )
+                )
+            continue
         if _enhancement_is_upgrade(enhancement):
             if assignment_count > 3:
                 violations.append(
@@ -1417,6 +1455,56 @@ def _append_enhancement_violations(
                     source_id="phase16d:attached-squad-enhancement-limit",
                 )
             )
+
+
+def _effective_enhancement_limit(
+    *,
+    request: ArmyMusterRequest,
+    enhancement_limit: int,
+) -> int:
+    if not _request_uses_corsair_coterie(request):
+        return enhancement_limit
+    return max(enhancement_limit, len(CORSAIR_COTERIE_ENHANCEMENT_IDS))
+
+
+def _append_corsair_coterie_enhancement_target_violations(
+    *,
+    enhancement: EnhancementDefinition,
+    datasheet: DatasheetDefinition,
+    assignment: EnhancementAssignment,
+    violations: list[RosterLegalityViolation],
+) -> None:
+    if not _datasheet_has_keyword(datasheet, ANHRATHE_KEYWORD):
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="corsair_coterie_anhrathe_required",
+                message="Corsair Enhancements can be assigned only to ANHRATHE units.",
+                unit_selection_id=assignment.target_unit_selection_id,
+                source_id=enhancement.source_id,
+            )
+        )
+    if enhancement.enhancement_id == "archraider" and not _datasheet_has_keyword(
+        datasheet, CHARACTER_KEYWORD
+    ):
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="corsair_coterie_archraider_character_required",
+                message="Archraider can be assigned only to ANHRATHE CHARACTER units.",
+                unit_selection_id=assignment.target_unit_selection_id,
+                source_id=enhancement.source_id,
+            )
+        )
+    if enhancement.enhancement_id == "voidstone" and not _datasheet_has_keyword(
+        datasheet, INFANTRY_KEYWORD
+    ):
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="corsair_coterie_voidstone_infantry_required",
+                message="Voidstone can be assigned only to ANHRATHE INFANTRY units.",
+                unit_selection_id=assignment.target_unit_selection_id,
+                source_id=enhancement.source_id,
+            )
+        )
 
 
 def _append_enhancement_target_requirement_violations(
@@ -1948,6 +2036,17 @@ def _is_daemonic_pact_datasheet(
 
 def _enhancement_is_upgrade(enhancement: EnhancementDefinition) -> bool:
     return EnhancementSubtype.UPGRADE in enhancement.subtypes
+
+
+def _request_uses_corsair_coterie(request: ArmyMusterRequest) -> bool:
+    return (
+        request.detachment_selection.faction_id == AELDARI_FACTION_ID
+        and CORSAIR_COTERIE_DETACHMENT_ID in request.detachment_selection.detachment_ids
+    )
+
+
+def _is_corsair_coterie_enhancement_id(enhancement_id: str) -> bool:
+    return enhancement_id in CORSAIR_COTERIE_ENHANCEMENT_IDS
 
 
 def _canonical_keyword(keyword: str) -> str:
