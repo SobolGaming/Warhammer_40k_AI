@@ -364,6 +364,53 @@ def test_phase17c_skullmaster_fury_compiles_to_charge_move_weapon_keyword_grant(
     }
 
 
+def test_phase17c_hunters_from_the_warp_compiles_to_turn_end_reserve_choice() -> None:
+    rule_ir = _compiled(
+        "At the end of your opponent's turn, if this unit is not within Engagement Range "
+        "of one or more enemy units, you can remove it from the battlefield and place it "
+        "into Strategic Reserves."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    reserve_effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.PLACEMENT_PERMISSION
+    )
+
+    assert rule_ir.is_supported
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "end",
+        "owner": "opponent",
+        "phase": "turn",
+        "timing_window": "turn_end",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert any(
+        condition.kind is RuleConditionKind.DISTANCE_PREDICATE
+        and parameter_payload(condition.parameters)
+        == {
+            "distance_inches": None,
+            "negated": True,
+            "object_allegiance": "enemy",
+            "object_kind": "unit",
+            "object_quantity": "one_or_more",
+            "predicate": "within_engagement_range",
+            "qualifier": None,
+            "range_kind": "engagement_range",
+            "subject": "this_unit",
+        }
+        for condition in clause.conditions
+    )
+    assert parameter_payload(reserve_effect.parameters) == {
+        "action": "remove_from_battlefield_to_strategic_reserves",
+        "allowed": True,
+        "optional": True,
+        "placement_kind": "turn_end_reserves",
+        "reserve_kind": "strategic_reserves",
+    }
+
+
 @pytest.mark.parametrize(
     ("raw_text", "expected_allegiance"),
     [

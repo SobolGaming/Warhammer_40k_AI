@@ -29,6 +29,7 @@ from warhammer40k_core.rules.rule_ir import (
     RuleIR,
     RuleIRError,
     RuleIRPayload,
+    RuleTriggerKind,
     parameter_payload,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -197,6 +198,9 @@ def _catalog_ability_source_kind(source_kind: CatalogAbilitySourceKind) -> Abili
 
 
 def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
+    turn_timing = _catalog_turn_timing_descriptor(rule_ir)
+    if turn_timing is not None:
+        return turn_timing
     if any(
         effect.kind is RuleEffectKind.SET_CHARACTERISTIC
         for clause in rule_ir.clauses
@@ -222,11 +226,44 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
     return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE)
 
 
+def _catalog_turn_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor | None:
+    if not any(
+        _effect_is_turn_end_reserve_permission(effect)
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+    ):
+        return None
+    for clause in rule_ir.clauses:
+        trigger = clause.trigger
+        if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+            continue
+        parameters = parameter_payload(trigger.parameters)
+        if parameters.get("phase") != "turn":
+            continue
+        edge = parameters.get("edge")
+        if edge == "end":
+            return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.END_TURN)
+        if edge == "start":
+            return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.START_TURN)
+    return None
+
+
 def _effect_is_feel_no_pain_grant(effect: RuleEffectSpec) -> bool:
     if effect.kind is not RuleEffectKind.GRANT_ABILITY:
         return False
     parameters = parameter_payload(effect.parameters)
     return parameters.get("ability") == "Feel No Pain"
+
+
+def _effect_is_turn_end_reserve_permission(effect: RuleEffectSpec) -> bool:
+    if effect.kind is not RuleEffectKind.PLACEMENT_PERMISSION:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return (
+        parameters.get("placement_kind") == "turn_end_reserves"
+        and parameters.get("reserve_kind") == "strategic_reserves"
+        and parameters.get("action") == "remove_from_battlefield_to_strategic_reserves"
+    )
 
 
 def _catalog_when_descriptor(descriptor: DatasheetAbilityDescriptor) -> str:

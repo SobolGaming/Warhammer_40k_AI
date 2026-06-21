@@ -4,6 +4,83 @@
     "ability_name": "Deep Strike",
     "catalog_id": "chaos-daemons-bridge-catalog",
     "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/core/000008343/none",
+    "datasheet_id": "000001112",
+    "datasheet_name": "Flesh Hounds",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001112:hunters-from-the-warp",
+    "ability_name": "Hunters from the Warp",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/datasheet/000001112:hunters-from-the-warp/none",
+    "datasheet_id": "000001112",
+    "datasheet_name": "Flesh Hounds",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:can-be-placed-in-reserves"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.placement_permission.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008433",
+    "ability_name": "The Shadow of Chaos",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/faction/000008433/none",
+    "datasheet_id": "000001112",
+    "datasheet_name": "Flesh Hounds",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.shadow_of_chaos"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001112:collar-of-khorne",
+    "ability_name": "Collar of Khorne",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/wargear/000001112:collar-of-khorne/000001112:collar-of-khorne",
+    "datasheet_id": "000001112",
+    "datasheet_name": "Flesh Hounds",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:feel-no-pain-source"
+    ],
+    "semantic_categories": [
+      "wargear.feel_no_pain.source.this_model"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000001112:collar-of-khorne",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/core/000008343/none",
     "datasheet_id": "000001114",
     "datasheet_name": "Bloodletters",
@@ -23,18 +100,20 @@
     "ability_id": "000001114:bane-of-cowards",
     "ability_name": "Bane of Cowards",
     "catalog_id": "chaos-daemons-bridge-catalog",
-    "catalog_support": "descriptor_only",
+    "catalog_support": "unsupported",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none",
     "datasheet_id": "000001114",
     "datasheet_name": "Bloodletters",
-    "diagnostic_reasons": [],
+    "diagnostic_reasons": [
+      "unsupported_language"
+    ],
     "runtime_consumer_ids": [],
     "semantic_categories": [
       "unknown.ability_text"
     ],
     "source_kind": "datasheet",
     "source_wargear_id": null,
-    "support_stage": "descriptor_only"
+    "support_stage": "ir_compiled_unsupported"
   },
   {
     "ability_id": "000008433",
@@ -117,18 +196,20 @@
     "ability_id": "000001115:brass-stampede",
     "ability_name": "Brass Stampede",
     "catalog_id": "chaos-daemons-bridge-catalog",
-    "catalog_support": "descriptor_only",
+    "catalog_support": "unsupported",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none",
     "datasheet_id": "000001115",
     "datasheet_name": "Bloodcrushers",
-    "diagnostic_reasons": [],
+    "diagnostic_reasons": [
+      "unsupported_language"
+    ],
     "runtime_consumer_ids": [],
     "semantic_categories": [
       "unknown.ability_text"
     ],
     "source_kind": "datasheet",
     "source_wargear_id": null,
-    "support_stage": "descriptor_only"
+    "support_stage": "ir_compiled_unsupported"
   },
   {
     "ability_id": "000008433",

@@ -257,6 +257,8 @@ def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
                 consumer_ids.add(CATALOG_IR_CHARGE_ROLL_CONSUMER_ID)
             if _effect_is_leadership_set(effect):
                 consumer_ids.add(CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID)
+            if _effect_is_turn_end_reserve_permission(effect):
+                consumer_ids.add(CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID)
     return tuple(sorted(consumer_ids))
 
 
@@ -416,6 +418,19 @@ def _effect_is_feel_no_pain_grant(effect: RuleEffectSpec) -> bool:
         return False
     parameters = parameter_payload(effect.parameters)
     return parameters.get("ability") == "Feel No Pain"
+
+
+def _effect_is_turn_end_reserve_permission(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.PLACEMENT_PERMISSION:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return (
+        parameters.get("placement_kind") == "turn_end_reserves"
+        and parameters.get("reserve_kind") == "strategic_reserves"
+        and parameters.get("action") == "remove_from_battlefield_to_strategic_reserves"
+    )
 
 
 def _feel_no_pain_source_from_effect(

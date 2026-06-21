@@ -50,14 +50,27 @@ _ROLL_TYPES = (
     "advance|battle-shock|charge|critical hit|critical wound|damage|feel no pain|hazardous|"
     "hit|invulnerable save|leadership|save|wound"
 )
+_TIMING_OWNER_PATTERN = (
+    r"your\s+opponent(?:'|\u2019)s|the\s+opponent(?:'|\u2019)s|"
+    r"opponent(?:'|\u2019)s|your|the"
+)
 _START_END_PHASE_RE = re.compile(
     rf"\bat\s+the\s+(?P<edge>start|end)\s+of\s+"
-    rf"(?:(?P<owner>your|the opponent's|opponent's|the)\s+)?(?P<phase>{_PHASES})\s+phase\b",
+    rf"(?:(?P<owner>{_TIMING_OWNER_PATTERN})\s+)?(?P<phase>{_PHASES})\s+phase\b",
+    re.IGNORECASE,
+)
+_START_END_TURN_RE = re.compile(
+    r"\bat\s+the\s+(?P<edge>start|end)\s+of\s+"
+    rf"(?P<owner>{_TIMING_OWNER_PATTERN})\s+turn\b",
     re.IGNORECASE,
 )
 _IN_PHASE_RE = re.compile(
-    rf"\b(?:in|during)\s+(?:(?P<owner>your|the opponent's|opponent's|the)\s+)?"
+    rf"\b(?:in|during)\s+(?:(?P<owner>{_TIMING_OWNER_PATTERN})\s+)?"
     rf"(?P<phase>{_PHASES})\s+phase\b",
+    re.IGNORECASE,
+)
+_IN_TURN_RE = re.compile(
+    rf"\b(?:in|during)\s+(?P<owner>{_TIMING_OWNER_PATTERN})\s+turn\b",
     re.IGNORECASE,
 )
 _DESTROYED_UNIT_RE = re.compile(r"\bwhen\s+this\s+unit\s+is\s+destroyed\b", re.IGNORECASE)
@@ -188,6 +201,24 @@ _PLACEMENT_RESTRICTION_RE = re.compile(
     r"\b(?:cannot|can't|can\s+only)\s+be\s+set\s+up\b",
     re.IGNORECASE,
 )
+_REMOVE_TO_STRATEGIC_RESERVES_RE = re.compile(
+    r"\b(?:you\s+can\s+)?remove\s+it\s+from\s+the\s+battlefield\s+and\s+"
+    r"place\s+it\s+into\s+Strategic\s+Reserves\b",
+    re.IGNORECASE,
+)
+_DISTANCE_RELATION_RE = re.compile(
+    r"\b(?:(?P<subject>this\s+unit|this\s+model|that\s+unit|selected\s+unit|"
+    r"target\s+unit)\s+is\s+)?"
+    r"(?P<negated>not\s+)?"
+    r"(?P<predicate>wholly\s+within|within)\s+"
+    r"(?P<range>Engagement\s+Range|Objective\s+Marker\s+Range|\d+(?:\.\d+)?\")\s+"
+    r"of\s+"
+    r"(?:(?P<quantity>one\s+or\s+more|any|a|an)\s+)?"
+    r"(?:(?P<allegiance>enemy|friendly)\s+)?"
+    r"(?:(?P<keyword>[A-Z][A-Z0-9_-]*(?:\s+[A-Z0-9_-]+){0,3})\s+)?"
+    r"(?P<object_kind>units?|models?|objective\s+markers?)\b",
+    re.IGNORECASE,
+)
 _RESIDUAL_TOKEN_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_+'-]*")
 _RESIDUAL_CONNECTOR_TOKENS = frozenset(
     {
@@ -211,6 +242,7 @@ _RESIDUAL_CONNECTOR_TOKENS = frozenset(
         "from",
         "has",
         "have",
+        "if",
         "in",
         "into",
         "is",
@@ -450,6 +482,20 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                 )
             ),
         )
+    for match in _START_END_TURN_RE.finditer(clause_text.text):
+        edge = _lower_group(match, "edge")
+        return RuleTrigger(
+            kind=RuleTriggerKind.TIMING_WINDOW,
+            source_span=_span_from_match(clause_text, match),
+            parameters=parameters_from_pairs(
+                (
+                    ("edge", edge),
+                    ("phase", "turn"),
+                    ("owner", _owner_token(match.group("owner"))),
+                    ("timing_window", f"turn_{edge}"),
+                )
+            ),
+        )
     for match in _IN_PHASE_RE.finditer(clause_text.text):
         return RuleTrigger(
             kind=RuleTriggerKind.TIMING_WINDOW,
@@ -459,6 +505,19 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                     ("edge", "during"),
                     ("phase", _lower_group(match, "phase")),
                     ("owner", _owner_token(match.group("owner"))),
+                )
+            ),
+        )
+    for match in _IN_TURN_RE.finditer(clause_text.text):
+        return RuleTrigger(
+            kind=RuleTriggerKind.TIMING_WINDOW,
+            source_span=_span_from_match(clause_text, match),
+            parameters=parameters_from_pairs(
+                (
+                    ("edge", "during"),
+                    ("phase", "turn"),
+                    ("owner", _owner_token(match.group("owner"))),
+                    ("timing_window", "turn_during"),
                 )
             ),
         )
@@ -567,15 +626,21 @@ def _parse_distance_conditions(
     for token in parsed_text.distance_predicates:
         if not _token_inside_clause(token, clause_text):
             continue
+        relation_match = _distance_relation_match_for_token(clause_text=clause_text, token=token)
         pairs: tuple[tuple[str, RuleParameterValue], ...] = (
             ("predicate", token.kind.value),
             ("distance_inches", token.distance_inches),
             ("qualifier", token.qualifier),
+            *_distance_relation_parameter_pairs(relation_match),
         )
         conditions.append(
             RuleCondition(
                 kind=RuleConditionKind.DISTANCE_PREDICATE,
-                source_span=token.span,
+                source_span=(
+                    token.span
+                    if relation_match is None
+                    else _span_from_match(clause_text, relation_match)
+                ),
                 parameters=parameters_from_pairs(pairs),
             )
         )
@@ -862,6 +927,22 @@ def _parse_weapon_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectS
 
 def _parse_placement_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
+    for match in _REMOVE_TO_STRATEGIC_RESERVES_RE.finditer(clause_text.text):
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.PLACEMENT_PERMISSION,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("allowed", True),
+                        ("optional", True),
+                        ("placement_kind", "turn_end_reserves"),
+                        ("reserve_kind", "strategic_reserves"),
+                        ("action", "remove_from_battlefield_to_strategic_reserves"),
+                    )
+                ),
+            )
+        )
     for match in _PLACEMENT_RESTRICTION_RE.finditer(clause_text.text):
         effects.append(
             RuleEffectSpec(
@@ -1112,6 +1193,44 @@ def json_key(value: RuleCondition | RuleEffectSpec) -> str:
     return repr(payload)
 
 
+def _distance_relation_match_for_token(
+    *,
+    clause_text: _ClauseText,
+    token: DistancePredicateToken,
+) -> re.Match[str] | None:
+    token_start = token.span.start - clause_text.span.start
+    token_end = token.span.end - clause_text.span.start
+    for match in _DISTANCE_RELATION_RE.finditer(clause_text.text):
+        if match.start("predicate") <= token_start and token_end <= match.end("range"):
+            return match
+    return None
+
+
+def _distance_relation_parameter_pairs(
+    match: re.Match[str] | None,
+) -> tuple[tuple[str, RuleParameterValue], ...]:
+    if match is None:
+        return ()
+    pairs: list[tuple[str, RuleParameterValue]] = [
+        ("negated", match.group("negated") is not None),
+        ("range_kind", _range_kind_token(match.group("range"))),
+        ("object_kind", _object_kind_token(match.group("object_kind"))),
+    ]
+    subject = match.group("subject")
+    if subject is not None:
+        pairs.append(("subject", _subject_token(subject)))
+    quantity = match.group("quantity")
+    if quantity is not None:
+        pairs.append(("object_quantity", _quantity_token(quantity)))
+    allegiance = match.group("allegiance")
+    if allegiance is not None:
+        pairs.append(("object_allegiance", allegiance.lower()))
+    keyword_text = match.group("keyword")
+    if keyword_text is not None:
+        pairs.append(("required_keyword", _keyword_token(keyword_text)))
+    return tuple(pairs)
+
+
 def _span_from_match(clause_text: _ClauseText, match: re.Match[str]) -> TextSpan:
     start = clause_text.start + match.start()
     end = clause_text.start + match.end()
@@ -1139,6 +1258,32 @@ def _owner_token(owner: str | None) -> str | None:
 
 def _roll_type(value: str) -> str:
     return value.lower().replace("-", "_").replace(" ", "_")
+
+
+def _subject_token(value: str) -> str:
+    return value.lower().replace(" ", "_").replace("-", "_")
+
+
+def _range_kind_token(value: str) -> str:
+    stripped = value.strip()
+    if stripped.endswith('"'):
+        return "numeric_range"
+    return stripped.lower().replace(" ", "_").replace("-", "_")
+
+
+def _object_kind_token(value: str) -> str:
+    normalized = value.lower().replace(" ", "_").replace("-", "_")
+    if normalized in {"units", "unit"}:
+        return "unit"
+    if normalized in {"models", "model"}:
+        return "model"
+    if normalized in {"objective_markers", "objective_marker"}:
+        return "objective_marker"
+    raise RuleIRError(f"Unsupported distance relation object kind: {value}.")
+
+
+def _quantity_token(value: str) -> str:
+    return value.lower().replace(" ", "_").replace("-", "_")
 
 
 def _keyword_token(value: str) -> str:

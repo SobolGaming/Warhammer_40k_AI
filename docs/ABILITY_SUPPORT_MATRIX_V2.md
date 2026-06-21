@@ -409,7 +409,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:ballistic-skill-characteristic-query` | No current generated rows |
 | `catalog-ir:can-advance-and-charge` | No current generated rows |
 | `catalog-ir:can-advance-and-shoot-and-charge` | No current generated rows |
-| `catalog-ir:can-be-placed-in-reserves` | No current generated rows |
+| `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |
 | `catalog-ir:can-fallback-and-charge` | No current generated rows |
 | `catalog-ir:charge-roll-modifier` | Instrument of Chaos |
 | `catalog-ir:critical-hit-value-modifier` | No current generated rows |
@@ -419,7 +419,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:detection-range-characteristic-modifier` | No current generated rows |
 | `catalog-ir:detection-range-characteristic-query` | No current generated rows |
 | `catalog-ir:feel-no-pain-roll` | No current generated rows |
-| `catalog-ir:feel-no-pain-source` | No current generated rows |
+| `catalog-ir:feel-no-pain-source` | Collar of Khorne |
 | `catalog-ir:hit-roll-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-query` | No current generated rows |

@@ -52,6 +52,7 @@ from warhammer40k_core.engine.turn_end_hooks import (
     TurnEndResultContext,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_proximity import unit_within_enemy_engagement_range
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
@@ -832,7 +833,7 @@ def _webway_pathstone_unit_can_enter_reserves(
         state.battlefield_state.unit_placement_by_id(unit_instance_id)
     except PlacementError:
         return False
-    return not _unit_within_enemy_engagement_range(state=state, unit_instance_id=unit_instance_id)
+    return not unit_within_enemy_engagement_range(state=state, unit_instance_id=unit_instance_id)
 
 
 def _unit_is_afflicted_by_infamy(
@@ -1117,30 +1118,6 @@ def _archraider_cost_choice_event_payload(
     }
 
 
-def _unit_within_enemy_engagement_range(
-    *,
-    state: object,
-    unit_instance_id: str,
-) -> bool:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Engagement range check requires GameState.")
-    owner = _owner_for_unit(tuple(state.army_definitions), unit_instance_id=unit_instance_id)
-    unit_models = _unit_geometry_models(state=state, unit_instance_id=unit_instance_id)
-    for army in state.army_definitions:
-        if army.player_id == owner:
-            continue
-        for enemy_unit in army.units:
-            enemy_models = _unit_geometry_models(
-                state=state,
-                unit_instance_id=enemy_unit.unit_instance_id,
-            )
-            if _any_models_within_engagement_range(unit_models, enemy_models):
-                return True
-    return False
-
-
 def _units_within_range(
     *,
     state: object,
@@ -1193,17 +1170,6 @@ def _any_models_within_range(
                 )
                 <= range_inches
             ):
-                return True
-    return False
-
-
-def _any_models_within_engagement_range(
-    first_models: tuple[GeometryModel, ...],
-    second_models: tuple[GeometryModel, ...],
-) -> bool:
-    for first_model in first_models:
-        for second_model in second_models:
-            if first_model.is_within_engagement_range(second_model):
                 return True
     return False
 

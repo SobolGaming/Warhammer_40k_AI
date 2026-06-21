@@ -16,6 +16,14 @@
         "datasheet_id": "000001114",
         "datasheet_name": "Bloodletters",
         "source_kind": "faction"
+      },
+      {
+        "ability_id": "000008433",
+        "ability_name": "The Shadow of Chaos",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/faction/000008433/none",
+        "datasheet_id": "000001112",
+        "datasheet_name": "Flesh Hounds",
+        "source_kind": "faction"
       }
     ],
     "ability_names": [
@@ -23,20 +31,22 @@
     ],
     "category_id": "faction.army_rule.shadow_of_chaos",
     "category_name": "Chaos Daemons Army Rule",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001115/faction/000008433/none",
-      "chaos-daemons-bridge-catalog/000001114/faction/000008433/none"
+      "chaos-daemons-bridge-catalog/000001114/faction/000008433/none",
+      "chaos-daemons-bridge-catalog/000001112/faction/000008433/none"
     ],
     "datasheet_names": [
       "Bloodcrushers",
-      "Bloodletters"
+      "Bloodletters",
+      "Flesh Hounds"
     ],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
     ],
     "source_kind_counts": {
-      "faction": 2
+      "faction": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -80,6 +90,39 @@
     ],
     "source_kind_counts": {
       "wargear": 2
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000001112:hunters-from-the-warp",
+        "ability_name": "Hunters from the Warp",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/datasheet/000001112:hunters-from-the-warp/none",
+        "datasheet_id": "000001112",
+        "datasheet_name": "Flesh Hounds",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Hunters from the Warp"
+    ],
+    "category_id": "datasheet.rule_ir.placement_permission.this_unit",
+    "category_name": "Datasheet Rule Ir Placement Permission This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001112/datasheet/000001112:hunters-from-the-warp/none"
+    ],
+    "datasheet_names": [
+      "Flesh Hounds"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:can-be-placed-in-reserves"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
     },
     "support_stages": [
       "engine_consumed"
@@ -141,6 +184,14 @@
         "datasheet_id": "000001114",
         "datasheet_name": "Bloodletters",
         "source_kind": "core"
+      },
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/core/000008343/none",
+        "datasheet_id": "000001112",
+        "datasheet_name": "Flesh Hounds",
+        "source_kind": "core"
       }
     ],
     "ability_names": [
@@ -148,21 +199,23 @@
     ],
     "category_id": "core.reserve.deep_strike",
     "category_name": "Deep Strike Reserve Arrival",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001115/core/000008343/none",
-      "chaos-daemons-bridge-catalog/000001114/core/000008343/none"
+      "chaos-daemons-bridge-catalog/000001114/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000001112/core/000008343/none"
     ],
     "datasheet_names": [
       "Bloodcrushers",
-      "Bloodletters"
+      "Bloodletters",
+      "Flesh Hounds"
     ],
     "runtime_consumer_ids": [
       "descriptor:movement:deep-strike-placement",
       "descriptor:reserve-declaration:deep-strike"
     ],
     "source_kind_counts": {
-      "core": 2
+      "core": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -274,6 +327,39 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000001112:collar-of-khorne",
+        "ability_name": "Collar of Khorne",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/wargear/000001112:collar-of-khorne/000001112:collar-of-khorne",
+        "datasheet_id": "000001112",
+        "datasheet_name": "Flesh Hounds",
+        "source_kind": "wargear"
+      }
+    ],
+    "ability_names": [
+      "Collar of Khorne"
+    ],
+    "category_id": "wargear.feel_no_pain.source.this_model",
+    "category_name": "Feel No Pain Source",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001112/wargear/000001112:collar-of-khorne/000001112:collar-of-khorne"
+    ],
+    "datasheet_names": [
+      "Flesh Hounds"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:feel-no-pain-source"
+    ],
+    "source_kind_counts": {
+      "wargear": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001115:daemonic-icon",
         "ability_name": "Daemonic Icon",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/wargear/000001115:daemonic-icon/000001115:daemonic-icon",
@@ -353,7 +439,7 @@
       "datasheet": 2
     },
     "support_stages": [
-      "descriptor_only"
+      "ir_compiled_unsupported"
     ]
   },
   {

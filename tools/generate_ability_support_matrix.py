@@ -71,7 +71,7 @@ DEFAULT_SOURCE_JSON_DIR = (
 DEFAULT_OUTPUT_DIR = Path("data") / "generated" / "ability_coverage"
 DEFAULT_DOCS_PATH = Path("docs") / "ABILITY_SUPPORT_MATRIX_V2.md"
 GENERATED_BY_COMMAND = "uv run python tools/generate_ability_support_matrix.py"
-DAEMON_WARGEAR_DATASHEET_IDS = ("000001114", "000001115")
+DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
 REQUIRED_TABLES = (
     "Abilities",
     "Datasheets",
@@ -101,6 +101,24 @@ BLOODLETTERS_HEIGHT_OVERRIDES = (
         height_units=GeometrySourceUnits.INCHES,
         height_source_id="geometry-review:chaos-daemons:bloodletters:bloodletters:height",
         height_document_reference="Chaos Daemons Faction Pack p.28-29",
+    ),
+)
+FLESH_HOUNDS_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000001112",
+        model_name="Gore Hound",
+        height=1.6,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:chaos-daemons:flesh-hounds:gore-hound:height",
+        height_document_reference="Chaos Daemons Faction Pack p.26",
+    ),
+    ModelHeightOverride(
+        datasheet_id="000001112",
+        model_name="Flesh Hounds",
+        height=1.6,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:chaos-daemons:flesh-hounds:height",
+        height_document_reference="Chaos Daemons Faction Pack p.26",
     ),
 )
 
@@ -357,7 +375,9 @@ def ability_support_matrix_rows(
         bridge_package_id=_bridge_package_id(),
         datasheet_ids=DAEMON_WARGEAR_DATASHEET_IDS,
         height_overrides=(
-            CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES + BLOODLETTERS_HEIGHT_OVERRIDES
+            CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES
+            + BLOODLETTERS_HEIGHT_OVERRIDES
+            + FLESH_HOUNDS_HEIGHT_OVERRIDES
         ),
     )
     package = build_canonical_catalog_package(
