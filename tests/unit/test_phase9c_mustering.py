@@ -8,7 +8,13 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
+    MUSTERING_WARLORD_FORBIDDEN,
+    MUSTERING_WARLORD_REQUIRED,
+    MUSTERING_WARLORD_RULE_KEY,
     BaseSizeDefinition,
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
     DatasheetDefinition,
     DatasheetKeywordSet,
 )
@@ -262,6 +268,117 @@ def _phase16d_catalog(
         enhancements=enhancements,
         stratagems=base_catalog.stratagems,
         source_ids=base_catalog.source_ids,
+    )
+
+
+def _supreme_commander_catalog(
+    *,
+    supreme_datasheet_ids: tuple[str, ...] = (
+        "test-supreme-commander-alpha",
+        "test-supreme-commander-beta",
+    ),
+    forbidden_datasheet_ids: tuple[str, ...] = (),
+) -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_character = base_catalog.datasheet_by_id("core-character-leader")
+    custom_datasheet_ids = (
+        "test-supreme-commander-alpha",
+        "test-supreme-commander-beta",
+        "test-regular-character",
+    )
+    custom_datasheets: list[DatasheetDefinition] = []
+    for datasheet_id in custom_datasheet_ids:
+        ability_overlays: list[DatasheetAbilityDescriptor] = []
+        if datasheet_id in supreme_datasheet_ids:
+            ability_overlays.append(
+                _warlord_mustering_ability(
+                    ability_id=f"{datasheet_id}:supreme-commander",
+                    name="SUPREME COMMANDER",
+                    value=MUSTERING_WARLORD_REQUIRED,
+                )
+            )
+        if datasheet_id in forbidden_datasheet_ids:
+            ability_overlays.append(
+                _warlord_mustering_ability(
+                    ability_id=f"{datasheet_id}:cannot-be-warlord",
+                    name="Cannot Be Warlord",
+                    value=MUSTERING_WARLORD_FORBIDDEN,
+                )
+            )
+        custom_datasheets.append(
+            replace(
+                base_character,
+                datasheet_id=datasheet_id,
+                name=datasheet_id.replace("-", " ").title(),
+                keywords=DatasheetKeywordSet(
+                    keywords=tuple(
+                        sorted(
+                            {
+                                *base_character.keywords.keywords,
+                                *(("Epic Hero",) if ability_overlays else ()),
+                            }
+                        )
+                    ),
+                    faction_keywords=base_character.keywords.faction_keywords,
+                ),
+                abilities=(*base_character.abilities, *ability_overlays),
+                attachment_eligibilities=(),
+                source_ids=(f"datasheet:{datasheet_id}",),
+            )
+        )
+    detachment = replace(
+        base_catalog.detachments[0],
+        unit_datasheet_ids=tuple(
+            sorted({*base_catalog.detachments[0].unit_datasheet_ids, *custom_datasheet_ids})
+        ),
+    )
+    return ArmyCatalog(
+        catalog_id="supreme-commander-catalog",
+        ruleset_id=base_catalog.ruleset_id,
+        source_package_id=base_catalog.source_package_id,
+        datasheets=(*base_catalog.datasheets, *custom_datasheets),
+        wargear=base_catalog.wargear,
+        factions=base_catalog.factions,
+        army_rules=base_catalog.army_rules,
+        detachments=(detachment,),
+        enhancements=base_catalog.enhancements,
+        stratagems=base_catalog.stratagems,
+        source_ids=base_catalog.source_ids,
+    )
+
+
+def _warlord_mustering_ability(
+    *,
+    ability_id: str,
+    name: str,
+    value: str,
+) -> DatasheetAbilityDescriptor:
+    return DatasheetAbilityDescriptor(
+        ability_id=ability_id,
+        name=name,
+        source_id=f"datasheet:{ability_id}",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description=f"{name} mustering descriptor.",
+        timing_tags=("mustering", "warlord"),
+        rule_ir_payload={MUSTERING_WARLORD_RULE_KEY: value},
+    )
+
+
+def _catalog_with_datasheet_ability(
+    catalog: ArmyCatalog,
+    *,
+    datasheet_id: str,
+    ability: DatasheetAbilityDescriptor,
+) -> ArmyCatalog:
+    return replace(
+        catalog,
+        datasheets=tuple(
+            replace(datasheet, abilities=(*datasheet.abilities, ability))
+            if datasheet.datasheet_id == datasheet_id
+            else datasheet
+            for datasheet in catalog.datasheets
+        ),
     )
 
 
@@ -1393,6 +1510,427 @@ def test_phase16d_strict_roster_reports_missing_source_data_and_unit_limits() ->
     } <= violation_codes
     with pytest.raises(ArmyMusteringError, match="RosterLegalityReport is invalid"):
         muster_army(catalog=catalog, request=request)
+
+
+def test_mustering_allows_multiple_supreme_commanders_when_one_is_warlord() -> None:
+    catalog = _supreme_commander_catalog()
+    request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="leader-one",
+                datasheet_id="test-supreme-commander-alpha",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="leader-two",
+                datasheet_id="test-supreme-commander-beta",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="leader-one",
+                points=100,
+                source_id="points:leader-one",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="leader-two",
+                points=100,
+                source_id="points:leader-two",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="leader-two",
+            source_id="warlord:leader-two",
+        ),
+        roster_legality_required=True,
+    )
+
+    army = muster_army(catalog=catalog, request=request)
+    keywords_by_unit_id = {unit.unit_instance_id: unit.keywords for unit in army.units}
+
+    assert army.roster_legality_report.is_legal
+    assert "WARLORD" not in keywords_by_unit_id["army-alpha:leader-one"]
+    assert "WARLORD" in keywords_by_unit_id["army-alpha:leader-two"]
+
+
+def test_mustering_requires_warlord_to_be_an_eligible_supreme_commander() -> None:
+    catalog = _supreme_commander_catalog(supreme_datasheet_ids=("test-supreme-commander-alpha",))
+    request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="supreme-commander",
+                datasheet_id="test-supreme-commander-alpha",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="regular-character",
+                datasheet_id="test-regular-character",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="supreme-commander",
+                points=100,
+                source_id="points:supreme-commander",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="regular-character",
+                points=100,
+                source_id="points:regular-character",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="regular-character",
+            source_id="warlord:regular-character",
+        ),
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+    army = muster_army(catalog=catalog, request=request)
+
+    assert "supreme_commander_warlord_required" in {
+        violation.violation_code for violation in report.violations
+    }
+    assert all("WARLORD" not in unit.keywords for unit in army.units)
+
+
+def test_mustering_warlord_forbidden_rule_takes_precedence_over_supreme_commander() -> None:
+    catalog = _supreme_commander_catalog(
+        forbidden_datasheet_ids=("test-supreme-commander-alpha",),
+    )
+    legal_request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="forbidden-supreme",
+                datasheet_id="test-supreme-commander-alpha",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="eligible-supreme",
+                datasheet_id="test-supreme-commander-beta",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="forbidden-supreme",
+                points=100,
+                source_id="points:forbidden-supreme",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="eligible-supreme",
+                points=100,
+                source_id="points:eligible-supreme",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="eligible-supreme",
+            source_id="warlord:eligible-supreme",
+        ),
+        roster_legality_required=True,
+    )
+    forbidden_request = replace(
+        legal_request,
+        warlord_selection=WarlordSelection(
+            unit_selection_id="forbidden-supreme",
+            source_id="warlord:forbidden-supreme",
+        ),
+        roster_legality_required=False,
+    )
+
+    legal_army = muster_army(catalog=catalog, request=legal_request)
+    forbidden_codes = {
+        violation.violation_code
+        for violation in validate_roster_legality(
+            catalog=catalog,
+            request=forbidden_request,
+        ).violations
+    }
+
+    assert legal_army.roster_legality_report.is_legal
+    assert "WARLORD" in legal_army.unit_by_id("army-alpha:eligible-supreme").keywords
+    assert {"supreme_commander_warlord_required", "warlord_forbidden"} <= forbidden_codes
+
+
+def test_mustering_reports_conflict_when_all_supreme_commanders_cannot_be_warlord() -> None:
+    catalog = _supreme_commander_catalog(
+        forbidden_datasheet_ids=(
+            "test-supreme-commander-alpha",
+            "test-supreme-commander-beta",
+        ),
+    )
+    request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="blocked-supreme-one",
+                datasheet_id="test-supreme-commander-alpha",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="blocked-supreme-two",
+                datasheet_id="test-supreme-commander-beta",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="regular-character",
+                datasheet_id="test-regular-character",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="blocked-supreme-one",
+                points=100,
+                source_id="points:blocked-supreme-one",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="blocked-supreme-two",
+                points=100,
+                source_id="points:blocked-supreme-two",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="regular-character",
+                points=100,
+                source_id="points:regular-character",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="regular-character",
+            source_id="warlord:regular-character",
+        ),
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+    army = muster_army(catalog=catalog, request=request)
+    violation_codes = {violation.violation_code for violation in report.violations}
+
+    assert "supreme_commander_warlord_conflict" in violation_codes
+    assert all("WARLORD" not in unit.keywords for unit in army.units)
+
+
+def test_mustering_reports_conflict_when_supreme_commander_is_not_a_character() -> None:
+    catalog = _supreme_commander_catalog(
+        supreme_datasheet_ids=("test-supreme-commander-alpha",),
+    )
+    catalog = replace(
+        catalog,
+        datasheets=tuple(
+            replace(
+                datasheet,
+                keywords=DatasheetKeywordSet(
+                    keywords=tuple(
+                        keyword
+                        for keyword in datasheet.keywords.keywords
+                        if keyword.upper() != "CHARACTER"
+                    ),
+                    faction_keywords=datasheet.keywords.faction_keywords,
+                ),
+            )
+            if datasheet.datasheet_id == "test-supreme-commander-alpha"
+            else datasheet
+            for datasheet in catalog.datasheets
+        ),
+    )
+    request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="non-character-supreme",
+                datasheet_id="test-supreme-commander-alpha",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="regular-character",
+                datasheet_id="test-regular-character",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="non-character-supreme",
+                points=100,
+                source_id="points:non-character-supreme",
+            ),
+            RosterUnitPointValue(
+                unit_selection_id="regular-character",
+                points=100,
+                source_id="points:regular-character",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="regular-character",
+            source_id="warlord:regular-character",
+        ),
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+
+    assert "supreme_commander_warlord_conflict" in {
+        violation.violation_code for violation in report.violations
+    }
+
+
+def test_mustering_rejects_unsupported_warlord_mustering_descriptor() -> None:
+    catalog = _supreme_commander_catalog(supreme_datasheet_ids=())
+    invalid_ability = _warlord_mustering_ability(
+        ability_id="test-regular-character:invalid-warlord-mustering",
+        name="Invalid Warlord Mustering",
+        value="unknown",
+    )
+    catalog = _catalog_with_datasheet_ability(
+        catalog,
+        datasheet_id="test-regular-character",
+        ability=invalid_ability,
+    )
+    request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="regular-character",
+                datasheet_id="test-regular-character",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="regular-character",
+                points=100,
+                source_id="points:regular-character",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="regular-character",
+            source_id="warlord:regular-character",
+        ),
+    )
+
+    with pytest.raises(
+        ArmyMusteringError, match="mustering_warlord descriptor value is unsupported"
+    ):
+        validate_roster_legality(catalog=catalog, request=request)
+
+
+def test_mustering_rejects_non_string_warlord_mustering_descriptor() -> None:
+    catalog = _supreme_commander_catalog(supreme_datasheet_ids=())
+    invalid_ability = DatasheetAbilityDescriptor(
+        ability_id="test-regular-character:non-string-warlord-mustering",
+        name="Invalid Warlord Mustering",
+        source_id="datasheet:test-regular-character:non-string-warlord-mustering",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="Malformed mustering descriptor.",
+        timing_tags=("mustering", "warlord"),
+        rule_ir_payload={MUSTERING_WARLORD_RULE_KEY: 1},
+    )
+    catalog = _catalog_with_datasheet_ability(
+        catalog,
+        datasheet_id="test-regular-character",
+        ability=invalid_ability,
+    )
+    request = _muster_request(
+        catalog,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="regular-character",
+                datasheet_id="test-regular-character",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+        ),
+        unit_points=(
+            RosterUnitPointValue(
+                unit_selection_id="regular-character",
+                points=100,
+                source_id="points:regular-character",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="regular-character",
+            source_id="warlord:regular-character",
+        ),
+    )
+
+    with pytest.raises(
+        ArmyMusteringError, match="mustering_warlord descriptor value must be a string"
+    ):
+        validate_roster_legality(catalog=catalog, request=request)
+
+
+def test_mustering_allied_supreme_commander_cannot_override_warlord_restriction() -> None:
+    catalog = _catalog_with_datasheet_ability(
+        _daemonic_pact_catalog(),
+        datasheet_id="phase17g-bloodthirster",
+        ability=_warlord_mustering_ability(
+            ability_id="phase17g-bloodthirster:supreme-commander",
+            name="SUPREME COMMANDER",
+            value=MUSTERING_WARLORD_REQUIRED,
+        ),
+    )
+    request = _daemonic_pact_request(
+        catalog,
+        unit_points=(
+            _unit_points("legionaries", 100),
+            _unit_points("bloodthirster", 250),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="legionaries",
+            source_id="phase17g:warlord",
+        ),
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+
+    assert "supreme_commander_warlord_conflict" in {
+        violation.violation_code for violation in report.violations
+    }
+
+
+def test_mustering_drukhari_allied_supreme_commander_cannot_override_warlord_restriction() -> None:
+    catalog = _catalog_with_datasheet_ability(
+        _drukhari_corsairs_and_travelling_players_catalog(),
+        datasheet_id="phase17g-harlequin-troupe-master",
+        ability=_warlord_mustering_ability(
+            ability_id="phase17g-harlequin-troupe-master:supreme-commander",
+            name="SUPREME COMMANDER",
+            value=MUSTERING_WARLORD_REQUIRED,
+        ),
+    )
+    request = _drukhari_corsairs_and_travelling_players_request(
+        catalog,
+        unit_points=(
+            _unit_points("archon", 100),
+            _unit_points("troupe-master", 250),
+            _unit_points("voidscarred", 0),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="archon",
+            source_id="phase17g:warlord",
+        ),
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+
+    assert "supreme_commander_warlord_conflict" in {
+        violation.violation_code for violation in report.violations
+    }
 
 
 def test_phase17g_daemonic_pact_allows_legiones_daemonica_allies() -> None:

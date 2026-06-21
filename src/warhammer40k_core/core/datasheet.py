@@ -72,6 +72,9 @@ REQUIRED_MODEL_CHARACTERISTICS = frozenset(
         Characteristic.BALLISTIC_SKILL,
     }
 )
+MUSTERING_WARLORD_RULE_KEY = "mustering_warlord"
+MUSTERING_WARLORD_REQUIRED = "required"
+MUSTERING_WARLORD_FORBIDDEN = "forbidden"
 
 
 class BaseSizeDefinitionPayload(TypedDict):

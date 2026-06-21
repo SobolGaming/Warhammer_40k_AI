@@ -8,6 +8,9 @@ import unicodedata
 from dataclasses import dataclass
 
 from warhammer40k_core.core.datasheet import (
+    MUSTERING_WARLORD_FORBIDDEN,
+    MUSTERING_WARLORD_REQUIRED,
+    MUSTERING_WARLORD_RULE_KEY,
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
     WargearOptionConditionKind,
@@ -478,32 +481,45 @@ def _bridge_abilities(
         if source_kind is CatalogAbilitySourceKind.WARGEAR:
             source_wargear_id = f"{datasheet_id}:{_slug(name)}"
         if source_kind in {CatalogAbilitySourceKind.DATASHEET, CatalogAbilitySourceKind.WARGEAR}:
-            compiled = compile_rule_source_text(
-                RuleSourceText.from_raw(
-                    source_id=_source_text_id(row=row, column_name="description"),
-                    raw_text=description,
+            source_text = RuleSourceText.from_raw(
+                source_id=_source_text_id(row=row, column_name="description"),
+                raw_text=description,
+            )
+            mustering_warlord_value = (
+                _mustering_warlord_value(
+                    normalized_description=source_text.normalized_text,
                 )
+                if source_kind is CatalogAbilitySourceKind.DATASHEET
+                else None
             )
-            rule_ir_diagnostics = json.dumps(
-                _rule_ir_diagnostics(compiled.rule_ir),
-                sort_keys=True,
-                separators=(",", ":"),
-            )
-            if compiled.rule_ir.is_supported:
+            if mustering_warlord_value is not None:
                 rule_ir_payload = json.dumps(
-                    compiled.rule_ir.to_payload(),
+                    {MUSTERING_WARLORD_RULE_KEY: mustering_warlord_value},
                     sort_keys=True,
                     separators=(",", ":"),
                 )
-                support = CatalogAbilitySupport.GENERIC_RULE_IR
             else:
-                if source_kind is CatalogAbilitySourceKind.WARGEAR:
+                compiled = compile_rule_source_text(source_text)
+                rule_ir_diagnostics = json.dumps(
+                    _rule_ir_diagnostics(compiled.rule_ir),
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
+                if compiled.rule_ir.is_supported:
                     rule_ir_payload = json.dumps(
                         compiled.rule_ir.to_payload(),
                         sort_keys=True,
                         separators=(",", ":"),
                     )
-                support = CatalogAbilitySupport.UNSUPPORTED
+                    support = CatalogAbilitySupport.GENERIC_RULE_IR
+                else:
+                    if source_kind is CatalogAbilitySourceKind.WARGEAR:
+                        rule_ir_payload = json.dumps(
+                            compiled.rule_ir.to_payload(),
+                            sort_keys=True,
+                            separators=(",", ":"),
+                        )
+                    support = CatalogAbilitySupport.UNSUPPORTED
         bridged_rows["Datasheets_abilities"].append(
             {
                 "datasheet_id": datasheet_id,
@@ -848,7 +864,18 @@ def _ability_source_kind(ability_type: str) -> CatalogAbilitySourceKind:
         return CatalogAbilitySourceKind.DATASHEET
     if normalized == "wargear":
         return CatalogAbilitySourceKind.WARGEAR
+    if normalized.startswith(("special", "fortification")):
+        return CatalogAbilitySourceKind.DATASHEET
     raise WahapediaBridgeError("Unsupported datasheet ability type.")
+
+
+def _mustering_warlord_value(*, normalized_description: str) -> str | None:
+    normalized = _validate_identifier("normalized_description", normalized_description).upper()
+    if "CANNOT BE YOUR WARLORD" in normalized:
+        return MUSTERING_WARLORD_FORBIDDEN
+    if "MUST BE YOUR WARLORD" in normalized:
+        return MUSTERING_WARLORD_REQUIRED
+    return None
 
 
 def _rule_ir_diagnostics(rule_ir: object) -> list[dict[str, object]]:

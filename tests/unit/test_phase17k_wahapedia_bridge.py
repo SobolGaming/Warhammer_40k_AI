@@ -17,6 +17,9 @@ from tools.generate_ability_support_matrix import (
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.datasheet import (
+    MUSTERING_WARLORD_FORBIDDEN,
+    MUSTERING_WARLORD_REQUIRED,
+    MUSTERING_WARLORD_RULE_KEY,
     AttachmentRole,
     BaseSizeKind,
     CatalogAbilitySourceKind,
@@ -1399,6 +1402,77 @@ def test_phase17k_bridge_normalizes_core_keyword_ability_timing_and_parameters()
     assert fields_by_name["Deadly Demise D3"]["parameter_tokens"] == "D3"
 
 
+def test_phase17k_bridge_tags_warlord_mustering_datasheet_abilities() -> None:
+    artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_warlord_mustering_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-supreme-commander", "test-warlord-forbidden"),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-supreme-commander",
+                model_name="Commander",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:supreme-height",
+                height_document_reference="test-doc:supreme-height",
+            ),
+            ModelHeightOverride(
+                datasheet_id="test-warlord-forbidden",
+                model_name="Forbidden",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:forbidden-height",
+                height_document_reference="test-doc:forbidden-height",
+            ),
+        ),
+    )
+    ability_fields_by_datasheet = {
+        row.runtime_fields_payload()["datasheet_id"]: row.runtime_fields_payload()
+        for row in _artifact_by_table(artifacts, "Datasheets_abilities").rows
+        if row.runtime_fields_payload()["name"] in {"SUPREME COMMANDER", "ENSLAVED STAR GOD"}
+    }
+    supreme_fields = ability_fields_by_datasheet["test-supreme-commander"]
+    forbidden_fields = ability_fields_by_datasheet["test-warlord-forbidden"]
+    plain_datasheet_fields = next(
+        row.runtime_fields_payload()
+        for row in _artifact_by_table(artifacts, "Datasheets_abilities").rows
+        if row.runtime_fields_payload()["name"] == "TACTICAL ACUMEN"
+    )
+    plain_rule_ir_payload = plain_datasheet_fields["rule_ir_payload"]
+
+    assert supreme_fields["source_kind"] == "datasheet"
+    assert forbidden_fields["source_kind"] == "datasheet"
+    assert plain_datasheet_fields["source_kind"] == "datasheet"
+    assert json.loads(supreme_fields["rule_ir_payload"]) == {
+        MUSTERING_WARLORD_RULE_KEY: MUSTERING_WARLORD_REQUIRED,
+    }
+    assert json.loads(forbidden_fields["rule_ir_payload"]) == {
+        MUSTERING_WARLORD_RULE_KEY: MUSTERING_WARLORD_FORBIDDEN,
+    }
+    assert not plain_rule_ir_payload or MUSTERING_WARLORD_RULE_KEY not in json.loads(
+        plain_rule_ir_payload
+    )
+
+
+def test_phase17k_bridge_rejects_unsupported_datasheet_ability_type() -> None:
+    with pytest.raises(WahapediaBridgeError, match="Unsupported datasheet ability type"):
+        build_wahapedia_canonical_bridge_artifacts(
+            source_artifacts=_unsupported_ability_type_source_artifacts(),
+            bridge_package_id=_bridge_package_id(),
+            datasheet_ids=("test-unsupported-ability-type",),
+            height_overrides=(
+                ModelHeightOverride(
+                    datasheet_id="test-unsupported-ability-type",
+                    model_name="Invalid",
+                    height=1.0,
+                    height_units=GeometrySourceUnits.INCHES,
+                    height_source_id="test-source:invalid-height",
+                    height_document_reference="test-doc:invalid-height",
+                ),
+            ),
+        )
+
+
 def test_phase17k_support_ability_marks_attachment_eligibility_role_as_support() -> None:
     bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=_support_attachment_source_artifacts(),
@@ -2278,6 +2352,164 @@ def _keyword_ability_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
         _artifact_from_csv(
             "Datasheets_unit_composition",
             "\n".join(("datasheet_id,line,description", "test-keyword-unit,1,1 Alpha")),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _warlord_mustering_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Test Army Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-supreme-commander,Supreme Commander,test-faction",
+                    "test-warlord-forbidden,Forbidden Warlord,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-supreme-commander,1,Faction,test-army-rule,"
+                        "Test Army Rule,Test rule text.,"
+                    ),
+                    (
+                        "test-supreme-commander,2,Special (right column),,"
+                        'SUPREME COMMANDER,"If this model is in your army, '
+                        'it must be your WARLORD.",'
+                    ),
+                    (
+                        "test-supreme-commander,3,Special (right column),,"
+                        "TACTICAL ACUMEN,This model can observe tactical options.,"
+                    ),
+                    (
+                        "test-warlord-forbidden,1,Faction,test-army-rule,"
+                        "Test Army Rule,Test rule text.,"
+                    ),
+                    (
+                        "test-warlord-forbidden,2,Fortification (left column),,"
+                        "ENSLAVED STAR GOD,This model cannot be your WARLORD.,"
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-supreme-commander,Character,,false",
+                    "test-supreme-commander,Epic Hero,,false",
+                    "test-supreme-commander,Test Faction,,true",
+                    "test-warlord-forbidden,Character,,false",
+                    "test-warlord-forbidden,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-supreme-commander,1,6,4,3,-,4,6,1,32mm",
+                    "test-warlord-forbidden,1,6,4,3,-,4,6,1,32mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    "test-supreme-commander,1,1 Commander",
+                    "test-warlord-forbidden,1,1 Forbidden",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _unsupported_ability_type_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Test Army Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-unsupported-ability-type,Unsupported Ability Type,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-unsupported-ability-type,1,Faction,test-army-rule,"
+                        "Test Army Rule,Test rule text.,"
+                    ),
+                    ("test-unsupported-ability-type,2,Unmapped,,Bad Ability,Test rule text.,"),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-unsupported-ability-type,Character,,false",
+                    "test-unsupported-ability-type,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-unsupported-ability-type,1,6,4,3,-,4,6,1,32mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    "test-unsupported-ability-type,1,1 Invalid",
+                )
+            ),
         ),
         _artifact_from_csv(
             "Factions",
