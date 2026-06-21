@@ -530,6 +530,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:shooting:lethal_hits` | Shadow Legion |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:shooting:sustained_hits_1` | Shadow Legion |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:weapon-profile` | Shadow Legion |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:gloam-rot:wound-roll` | Shadow Legion |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:murderers-cowl:advance-eligibility` | Shadow Legion |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:penumbral-puppetry:hit-roll` | Shadow Legion |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:shadows-caress:snap-target-restriction` | Shadow Legion |

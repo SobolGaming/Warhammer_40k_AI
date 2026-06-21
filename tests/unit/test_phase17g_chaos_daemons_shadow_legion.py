@@ -424,6 +424,8 @@ def test_shadow_legion_dark_pacts_grant_and_belakor_auto_pass_completion() -> No
     assert _event_count(decisions, "chaos_space_marines_dark_pact_resolved") == 1
     payload = _last_event_payload(decisions, "chaos_space_marines_dark_pact_resolved")
     assert payload["source_rule_id"] == rule.SOURCE_RULE_ID
+    assert payload["hook_id"] == rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
+    assert payload["hook_id"] != dark_pacts.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
     assert payload["leadership_auto_pass"] is True
     assert payload["leadership_roll"] is None
     assert payload["d3_result"] is None
@@ -533,6 +535,9 @@ def test_shadow_legion_dark_pacts_failed_leadership_routes_fnp_decision() -> Non
     assert source_context["source_kind"] == (
         dark_pacts.SHADOW_LEGION_DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND
     )
+    pending_payload = cast(dict[str, JsonValue], source_context["resolution_payload"])
+    assert pending_payload["hook_id"] == rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
+    assert pending_payload["hook_id"] != dark_pacts.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
     assert {option.option_id for option in request.options} == {
         source_a.source_id,
         source_b.source_id,
@@ -581,6 +586,8 @@ def test_shadow_legion_dark_pacts_failed_leadership_routes_fnp_decision() -> Non
     assert continuation_status is None
     payload = _last_event_payload(decisions, "chaos_space_marines_dark_pact_resolved")
     assert payload["source_rule_id"] == rule.SOURCE_RULE_ID
+    assert payload["hook_id"] == rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
+    assert payload["hook_id"] != dark_pacts.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
     assert payload["leadership_auto_pass"] is False
     assert payload["feel_no_pain_result_id"] == result.result_id
     application = cast(dict[str, JsonValue], payload["mortal_wound_application"])

@@ -1076,6 +1076,14 @@ def _add_runtime_content_inventory_entries(
         inventory,
         (
             (binding.modifier_id, binding.source_id)
+            for binding in contribution.wound_roll_modifier_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.modifier_id, binding.source_id)
             for binding in contribution.save_option_modifier_bindings
         ),
         labels_by_id,

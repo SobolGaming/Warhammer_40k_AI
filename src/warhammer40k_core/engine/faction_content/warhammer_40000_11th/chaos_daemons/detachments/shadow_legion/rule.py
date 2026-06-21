@@ -65,7 +65,7 @@ SHOOTING_LETHAL_HITS_HOOK_ID = f"{HOOK_ID}:disciples-of-belakor:shooting:lethal_
 SHOOTING_SUSTAINED_HITS_HOOK_ID = f"{HOOK_ID}:disciples-of-belakor:shooting:sustained_hits_1"
 FIGHT_LETHAL_HITS_HOOK_ID = f"{HOOK_ID}:disciples-of-belakor:fight:lethal_hits"
 FIGHT_SUSTAINED_HITS_HOOK_ID = f"{HOOK_ID}:disciples-of-belakor:fight:sustained_hits_1"
-ATTACK_SEQUENCE_COMPLETED_HOOK_ID = f"{HOOK_ID}:disciples-of-belakor:attack-sequence-completed"
+ATTACK_SEQUENCE_COMPLETED_HOOK_ID = dark_pacts.SHADOW_LEGION_ATTACK_SEQUENCE_COMPLETED_HOOK_ID
 MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID = f"{HOOK_ID}:disciples-of-belakor:mortal-wound-fnp"
 WEAPON_PROFILE_MODIFIER_ID = f"{HOOK_ID}:disciples-of-belakor:weapon-profile"
 

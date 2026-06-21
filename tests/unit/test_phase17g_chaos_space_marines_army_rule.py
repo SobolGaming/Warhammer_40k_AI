@@ -938,6 +938,9 @@ def test_dark_pacts_completion_hook_runs_once_through_shooting_phase_handler() -
     assert status.status_kind is LifecycleStatusKind.ADVANCED
     assert _event_count(decisions, "chaos_space_marines_dark_pact_resolved") == 1
     assert _event_count(decisions, "attack_sequence_completed") == 1
+    payload = _last_event_payload(decisions, "chaos_space_marines_dark_pact_resolved")
+    assert payload["source_rule_id"] == army_rule.SOURCE_RULE_ID
+    assert payload["hook_id"] == army_rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
     handler.begin_phase(state=state, decisions=decisions)
     assert _event_count(decisions, "chaos_space_marines_dark_pact_resolved") == 1
 

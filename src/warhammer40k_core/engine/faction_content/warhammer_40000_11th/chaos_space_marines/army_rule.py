@@ -93,6 +93,10 @@ FIGHT_SUSTAINED_HITS_HOOK_ID = f"{HOOK_ID}:fight:sustained_hits_1"
 ATTACK_SEQUENCE_COMPLETED_HOOK_ID = f"{HOOK_ID}:attack_sequence_completed"
 MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID = f"{HOOK_ID}:mortal_wound_feel_no_pain"
 WEAPON_PROFILE_MODIFIER_ID = f"{HOOK_ID}:weapon_profile_modifier"
+SHADOW_LEGION_ATTACK_SEQUENCE_COMPLETED_HOOK_ID = (
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:attack-sequence-completed"
+)
 
 
 class DarkPactKind(StrEnum):
@@ -764,7 +768,7 @@ def _dark_pact_resolution_payload(
                 "battle_round": context.state.battle_round,
                 "phase": context.source_phase.value,
                 "source_rule_id": effect.source_rule_id,
-                "hook_id": ATTACK_SEQUENCE_COMPLETED_HOOK_ID,
+                "hook_id": _dark_pact_completion_hook_id_for_rule(effect.source_rule_id),
                 "player_id": rules_unit.owner_player_id,
                 "unit_instance_id": rules_unit.unit_instance_id,
                 "target_unit_instance_ids": list(effect.target_unit_instance_ids),
@@ -846,6 +850,15 @@ def _dark_pact_mortal_wound_source_kind_for_rule(source_rule_id: str) -> str:
     if requested_source_rule_id == SHADOW_LEGION_SOURCE_RULE_ID:
         return SHADOW_LEGION_DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND
     raise GameLifecycleError("Dark Pacts mortal wound source rule is unsupported.")
+
+
+def _dark_pact_completion_hook_id_for_rule(source_rule_id: str) -> str:
+    requested_source_rule_id = _validate_identifier("source_rule_id", source_rule_id)
+    if requested_source_rule_id == SOURCE_RULE_ID:
+        return ATTACK_SEQUENCE_COMPLETED_HOOK_ID
+    if requested_source_rule_id == SHADOW_LEGION_SOURCE_RULE_ID:
+        return SHADOW_LEGION_ATTACK_SEQUENCE_COMPLETED_HOOK_ID
+    raise GameLifecycleError("Dark Pacts completion source rule is unsupported.")
 
 
 def _dark_pact_kind_from_token(token: object) -> DarkPactKind:
