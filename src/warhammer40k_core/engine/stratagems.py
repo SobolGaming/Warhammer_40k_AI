@@ -132,6 +132,9 @@ from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardStatus,
 )
 from warhammer40k_core.engine.shooting_targets import shooting_target_candidate_for_model
+from warhammer40k_core.engine.shooting_unit_selected_hooks import (
+    ShootingUnitSelectedGrantRegistry,
+)
 from warhammer40k_core.engine.stratagem_cost_modifiers import (
     StratagemCostModificationResult,
     StratagemCostModifierContext,
@@ -1887,6 +1890,7 @@ def apply_stratagem_decision(
     army_catalog: ArmyCatalog,
     stratagem_handler_registry: StratagemHandlerRegistry | None = None,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
+    shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None = None,
 ) -> StratagemUseRecord:
     if type(result) is not DecisionResult:
         raise GameLifecycleError("Stratagem application requires a DecisionResult.")
@@ -1906,6 +1910,7 @@ def apply_stratagem_decision(
         army_catalog=army_catalog,
         stratagem_handler_registry=stratagem_handler_registry,
         stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+        shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
     )
 
 
@@ -1922,6 +1927,7 @@ def _apply_stratagem_use(
     army_catalog: ArmyCatalog,
     stratagem_handler_registry: StratagemHandlerRegistry | None,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None,
+    shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None,
 ) -> StratagemUseRecord:
     definition = catalog_record.definition
     if _stratagem_handler_is_unsupported(definition):
@@ -2042,6 +2048,7 @@ def _apply_stratagem_use(
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         stratagem_handler_registry=stratagem_handler_registry,
+        shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
     )
     return use_record
 
@@ -2100,6 +2107,7 @@ def apply_stratagem_target_proposal(
     army_catalog: ArmyCatalog,
     stratagem_handler_registry: StratagemHandlerRegistry | None = None,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None = None,
+    shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None = None,
 ) -> StratagemUseRecord:
     proposal = _proposal_from_result_payload(result.payload)
     if proposal is None or proposal.target_binding is None:
@@ -2124,6 +2132,7 @@ def apply_stratagem_target_proposal(
         army_catalog=army_catalog,
         stratagem_handler_registry=stratagem_handler_registry,
         stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+        shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
     )
 
 
@@ -5390,6 +5399,7 @@ def _apply_supported_stratagem_handler(
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
     stratagem_handler_registry: StratagemHandlerRegistry | None,
+    shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None,
 ) -> None:
     if definition.handler_id == "record_only":
         return
@@ -5487,6 +5497,7 @@ def _apply_supported_stratagem_handler(
             use_record=use_record,
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
+            shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
         )
         return
     if definition.handler_id == CORE_GO_TO_GROUND_HANDLER_ID:
@@ -6165,6 +6176,7 @@ def _apply_fire_overwatch_handler(
     use_record: StratagemUseRecord,
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
+    shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None,
 ) -> None:
     if context.trigger_kind is not TimingTriggerKind.END_PHASE:
         raise GameLifecycleError("Fire Overwatch requires the end of opponent Movement phase.")
@@ -6193,6 +6205,7 @@ def _apply_fire_overwatch_handler(
             }
         ),
         target_unit_ids=(triggering_unit_id,),
+        shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
     )
     decisions.event_log.append(
         "fire_overwatch_shooting_requested",

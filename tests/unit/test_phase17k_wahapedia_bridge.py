@@ -89,6 +89,9 @@ from warhammer40k_core.engine.damage_allocation import FeelNoPainAttackCondition
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
+    army_rule as chaos_space_marines_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
     army_rule as death_guard_army_rule,
 )
@@ -946,6 +949,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert all(
         row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Dark Pacts"]
+    )
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
         for row in rows_by_name["Nurgle's Gift"]
     )
     assert all(
@@ -962,12 +969,24 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         for row in rows_by_name["The Shadow of Chaos"]
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Nurgle's Gift"]) == ("Death Guard",)
+    assert tuple(row.datasheet_name for row in rows_by_name["Dark Pacts"]) == (
+        "Chaos Space Marines",
+    )
     assert tuple(row.datasheet_name for row in rows_by_name["Blessings of Khorne"]) == (
         "World Eaters",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Thrill Seekers"]) == (
         "Emperor's Children",
     )
+    assert set(rows_by_name["Dark Pacts"][0].runtime_consumer_ids) == {
+        chaos_space_marines_army_rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID,
+        chaos_space_marines_army_rule.FIGHT_LETHAL_HITS_HOOK_ID,
+        chaos_space_marines_army_rule.FIGHT_SUSTAINED_HITS_HOOK_ID,
+        chaos_space_marines_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
+        chaos_space_marines_army_rule.SHOOTING_LETHAL_HITS_HOOK_ID,
+        chaos_space_marines_army_rule.SHOOTING_SUSTAINED_HITS_HOOK_ID,
+        chaos_space_marines_army_rule.WEAPON_PROFILE_MODIFIER_ID,
+    }
     assert set(rows_by_name["Nurgle's Gift"][0].runtime_consumer_ids) == {
         death_guard_army_rule.HOOK_ID,
         f"{death_guard_army_rule.HOOK_ID}:armour-save-option",
@@ -1048,6 +1067,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",
     )
     assert categories_by_name["Chaos Daemons Army Rule"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["Chaos Space Marines Army Rule"].ability_names == ("Dark Pacts",)
+    assert categories_by_name["Chaos Space Marines Army Rule"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
     )
     assert categories_by_name["Death Guard Army Rule"].ability_names == ("Nurgle's Gift",)

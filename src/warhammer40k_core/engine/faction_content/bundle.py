@@ -4,7 +4,7 @@ import hashlib
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
-from typing import TypedDict, cast
+from typing import cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.engine.abilities import (
@@ -21,6 +21,10 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
 )
 from warhammer40k_core.engine.advance_hooks import AdvanceMoveHookBinding, AdvanceMoveHookRegistry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_sequence_completion_hooks import (
+    AttackSequenceCompletedHookBinding,
+    AttackSequenceCompletedHookRegistry,
+)
 from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationHookBinding,
     BattleFormationHookRegistry,
@@ -50,6 +54,9 @@ from warhammer40k_core.engine.enhancement_effects import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
+from warhammer40k_core.engine.faction_content.bundle_payloads import (
+    RuntimeContentBundleSummaryPayload,
+)
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventHandlerBinding,
     RuntimeContentEventHandlerRegistry,
@@ -75,6 +82,10 @@ from warhammer40k_core.engine.fight_activation_abilities import (
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrantBinding,
     FightUnitSelectedGrantRegistry,
+)
+from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
+    MortalWoundFeelNoPainContinuationHookBinding,
+    MortalWoundFeelNoPainContinuationHookRegistry,
 )
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeHookBinding,
@@ -141,59 +152,18 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
     Phase17FExecutionRecord,
 )
 
-
-class RuntimeContentBundleSummaryPayload(TypedDict):
-    activation: dict[str, JsonValue]
-    selected_module_paths: list[str]
-    source_package_ids: list[str]
-    source_package_hashes: list[str]
-    contribution_ids: list[str]
-    ability_index_record_ids_by_player_id: dict[str, list[str]]
-    stratagem_index_record_ids_by_player_id: dict[str, list[str]]
-    ability_handler_ids: list[str]
-    stratagem_handler_ids: list[str]
-    rule_runtime_binding_ids: list[str]
-    event_subscriptions: list[dict[str, JsonValue]]
-    battle_formation_hook_ids: list[str]
-    battle_round_start_hook_ids: list[str]
-    turn_end_hook_ids: list[str]
-    command_phase_start_hook_ids: list[str]
-    unit_destroyed_hook_ids: list[str]
-    battle_shock_hook_ids: list[str]
-    advance_eligibility_hook_ids: list[str]
-    advance_move_hook_ids: list[str]
-    fall_back_hook_ids: list[str]
-    movement_end_surge_hook_ids: list[str]
-    unit_move_completed_mortal_wound_hook_ids: list[str]
-    charge_declaration_hook_ids: list[str]
-    shooting_target_restriction_hook_ids: list[str]
-    charge_target_restriction_hook_ids: list[str]
-    shooting_unit_selected_hook_ids: list[str]
-    shooting_unit_selected_grant_hook_ids: list[str]
-    shooting_end_surge_hook_ids: list[str]
-    enhancement_effect_binding_ids: list[str]
-    fight_activation_ability_hook_ids: list[str]
-    fight_unit_selected_grant_hook_ids: list[str]
-    phase_end_objective_control_hook_ids: list[str]
-    stratagem_cost_choice_hook_ids: list[str]
-    stratagem_cost_modifier_ids: list[str]
-    unit_characteristic_modifier_ids: list[str]
-    hit_roll_modifier_ids: list[str]
-    save_option_modifier_ids: list[str]
-    movement_budget_modifier_ids: list[str]
-    objective_control_modifier_ids: list[str]
-    charge_roll_modifier_ids: list[str]
-    weapon_profile_modifier_ids: list[str]
-    faction_execution_record_ids: list[str]
-    selected_execution_record_ids: list[str]
-    bundle_summary_hash: str
-
-
 DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID = "runtime-content:module-default"
 
 
 def _empty_named_handlers() -> Mapping[str, FactionRuleNamedHandler]:
     return MappingProxyType({})
+
+
+def _contribution_values[T](
+    contributions: tuple[RuntimeContentContribution, ...],
+    getter: Callable[[RuntimeContentContribution], tuple[T, ...]],
+) -> tuple[T, ...]:
+    return tuple(value for contribution in contributions for value in getter(contribution))
 
 
 @dataclass(frozen=True, slots=True)
@@ -220,6 +190,10 @@ class RuntimeContentContribution:
         UnitMoveCompletedMortalWoundHookBinding,
         ...,
     ] = ()
+    mortal_wound_feel_no_pain_hook_bindings: tuple[
+        MortalWoundFeelNoPainContinuationHookBinding,
+        ...,
+    ] = ()
     charge_declaration_hook_bindings: tuple[ChargeDeclarationHookBinding, ...] = ()
     shooting_target_restriction_hook_bindings: tuple[
         ShootingTargetRestrictionHookBinding,
@@ -232,6 +206,10 @@ class RuntimeContentContribution:
     shooting_unit_selected_hook_bindings: tuple[ShootingUnitSelectedHookBinding, ...] = ()
     shooting_unit_selected_grant_hook_bindings: tuple[
         ShootingUnitSelectedGrantBinding,
+        ...,
+    ] = ()
+    attack_sequence_completed_hook_bindings: tuple[
+        AttackSequenceCompletedHookBinding,
         ...,
     ] = ()
     shooting_end_surge_hook_bindings: tuple[ShootingEndSurgeHookBinding, ...] = ()
@@ -422,6 +400,15 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "mortal_wound_feel_no_pain_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution mortal_wound_feel_no_pain_hook_bindings",
+                self.mortal_wound_feel_no_pain_hook_bindings,
+                MortalWoundFeelNoPainContinuationHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "charge_declaration_hook_bindings",
             _validate_tuple(
                 "RuntimeContentContribution charge_declaration_hook_bindings",
@@ -472,6 +459,15 @@ class RuntimeContentContribution:
                 "RuntimeContentContribution shooting_unit_selected_grant_hook_bindings",
                 self.shooting_unit_selected_grant_hook_bindings,
                 ShootingUnitSelectedGrantBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "attack_sequence_completed_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution attack_sequence_completed_hook_bindings",
+                self.attack_sequence_completed_hook_bindings,
+                AttackSequenceCompletedHookBinding,
             ),
         )
         object.__setattr__(
@@ -620,6 +616,7 @@ class RuntimeContentContribution:
             unit_move_completed_mortal_wound_hook_bindings=(
                 self.unit_move_completed_mortal_wound_hook_bindings
             ),
+            mortal_wound_feel_no_pain_hook_bindings=(self.mortal_wound_feel_no_pain_hook_bindings),
             charge_declaration_hook_bindings=self.charge_declaration_hook_bindings,
             shooting_target_restriction_hook_bindings=(
                 self.shooting_target_restriction_hook_bindings
@@ -629,6 +626,7 @@ class RuntimeContentContribution:
             shooting_unit_selected_grant_hook_bindings=(
                 self.shooting_unit_selected_grant_hook_bindings
             ),
+            attack_sequence_completed_hook_bindings=(self.attack_sequence_completed_hook_bindings),
             shooting_end_surge_hook_bindings=self.shooting_end_surge_hook_bindings,
             enhancement_effect_bindings=self.enhancement_effect_bindings,
             fight_activation_ability_hook_bindings=self.fight_activation_ability_hook_bindings,
@@ -819,6 +817,15 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.hook_id,
         ),
+        mortal_wound_feel_no_pain_hook_bindings=_combine_unique_values(
+            "mortal wound Feel No Pain hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.mortal_wound_feel_no_pain_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
         charge_declaration_hook_bindings=_combine_unique_values(
             "charge declaration hook binding",
             tuple(
@@ -870,6 +877,15 @@ def combine_runtime_content_contributions(
                 binding
                 for contribution in validated_contributions
                 for binding in contribution.shooting_unit_selected_grant_hook_bindings
+            ),
+            lambda binding: binding.hook_id,
+        ),
+        attack_sequence_completed_hook_bindings=_combine_unique_values(
+            "attack-sequence-completed hook binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.attack_sequence_completed_hook_bindings
             ),
             lambda binding: binding.hook_id,
         ),
@@ -1015,11 +1031,13 @@ class RuntimeContentBundle:
     fall_back_hook_registry: FallBackEligibilityHookRegistry
     movement_end_surge_hook_registry: MovementEndSurgeHookRegistry
     unit_move_completed_mortal_wound_hook_registry: UnitMoveCompletedMortalWoundHookRegistry
+    mortal_wound_feel_no_pain_hook_registry: MortalWoundFeelNoPainContinuationHookRegistry
     charge_declaration_hook_registry: ChargeDeclarationHookRegistry
     shooting_target_restriction_hook_registry: ShootingTargetRestrictionHookRegistry
     charge_target_restriction_hook_registry: ChargeTargetRestrictionHookRegistry
     shooting_unit_selected_hook_registry: ShootingUnitSelectedHookRegistry
     shooting_unit_selected_grant_hook_registry: ShootingUnitSelectedGrantRegistry
+    attack_sequence_completed_hook_registry: AttackSequenceCompletedHookRegistry
     shooting_end_surge_hook_registry: ShootingEndSurgeHookRegistry
     enhancement_effect_registry: EnhancementEffectRegistry
     fight_activation_ability_hook_registry: FightActivationAbilityHookRegistry
@@ -1092,6 +1110,13 @@ class RuntimeContentBundle:
             raise GameLifecycleError(
                 "RuntimeContentBundle requires UnitMoveCompletedMortalWoundHookRegistry."
             )
+        if (
+            type(self.mortal_wound_feel_no_pain_hook_registry)
+            is not MortalWoundFeelNoPainContinuationHookRegistry
+        ):
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires MortalWoundFeelNoPainContinuationHookRegistry."
+            )
         if type(self.charge_declaration_hook_registry) is not ChargeDeclarationHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires ChargeDeclarationHookRegistry.")
         if (
@@ -1118,6 +1143,13 @@ class RuntimeContentBundle:
         ):
             raise GameLifecycleError(
                 "RuntimeContentBundle requires ShootingUnitSelectedGrantRegistry."
+            )
+        if (
+            type(self.attack_sequence_completed_hook_registry)
+            is not AttackSequenceCompletedHookRegistry
+        ):
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires AttackSequenceCompletedHookRegistry."
             )
         if type(self.shooting_end_surge_hook_registry) is not ShootingEndSurgeHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires ShootingEndSurgeHookRegistry.")
@@ -1343,34 +1375,40 @@ class RuntimeContentBundle:
         )
         unit_move_completed_mortal_wound_hook_registry = (
             UnitMoveCompletedMortalWoundHookRegistry.from_bindings(
-                tuple(
-                    binding
-                    for contribution in validated_contributions
-                    for binding in contribution.unit_move_completed_mortal_wound_hook_bindings
+                _contribution_values(
+                    validated_contributions,
+                    lambda contribution: (
+                        contribution.unit_move_completed_mortal_wound_hook_bindings
+                    ),
+                )
+            )
+        )
+        mortal_wound_feel_no_pain_hook_registry = (
+            MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+                _contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.mortal_wound_feel_no_pain_hook_bindings,
                 )
             )
         )
         charge_declaration_hook_registry = ChargeDeclarationHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.charge_declaration_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.charge_declaration_hook_bindings,
             )
         )
         shooting_target_restriction_hook_registry = (
             ShootingTargetRestrictionHookRegistry.from_bindings(
-                tuple(
-                    binding
-                    for contribution in validated_contributions
-                    for binding in contribution.shooting_target_restriction_hook_bindings
+                _contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.shooting_target_restriction_hook_bindings,
                 )
             )
         )
         charge_target_restriction_hook_registry = ChargeTargetRestrictionHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.charge_target_restriction_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.charge_target_restriction_hook_bindings,
             )
         )
         shooting_end_surge_hook_registry = ShootingEndSurgeHookRegistry.from_bindings(
@@ -1394,6 +1432,13 @@ class RuntimeContentBundle:
                     for contribution in validated_contributions
                     for binding in contribution.shooting_unit_selected_grant_hook_bindings
                 )
+            )
+        )
+        attack_sequence_completed_hook_registry = AttackSequenceCompletedHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.attack_sequence_completed_hook_bindings
             )
         )
         enhancement_effect_registry = EnhancementEffectRegistry.from_bindings(
@@ -1503,11 +1548,13 @@ class RuntimeContentBundle:
             unit_move_completed_mortal_wound_hook_registry=(
                 unit_move_completed_mortal_wound_hook_registry
             ),
+            mortal_wound_feel_no_pain_hook_registry=mortal_wound_feel_no_pain_hook_registry,
             charge_declaration_hook_registry=charge_declaration_hook_registry,
             shooting_target_restriction_hook_registry=shooting_target_restriction_hook_registry,
             charge_target_restriction_hook_registry=charge_target_restriction_hook_registry,
             shooting_unit_selected_hook_registry=shooting_unit_selected_hook_registry,
             shooting_unit_selected_grant_hook_registry=(shooting_unit_selected_grant_hook_registry),
+            attack_sequence_completed_hook_registry=attack_sequence_completed_hook_registry,
             shooting_end_surge_hook_registry=shooting_end_surge_hook_registry,
             enhancement_effect_registry=enhancement_effect_registry,
             fight_activation_ability_hook_registry=fight_activation_ability_hook_registry,
@@ -1580,6 +1627,10 @@ class RuntimeContentBundle:
                 binding.hook_id
                 for binding in (self.unit_move_completed_mortal_wound_hook_registry.all_bindings())
             ],
+            "mortal_wound_feel_no_pain_hook_ids": [
+                binding.hook_id
+                for binding in self.mortal_wound_feel_no_pain_hook_registry.all_bindings()
+            ],
             "charge_declaration_hook_ids": [
                 binding.hook_id for binding in self.charge_declaration_hook_registry.all_bindings()
             ],
@@ -1598,6 +1649,10 @@ class RuntimeContentBundle:
             "shooting_unit_selected_grant_hook_ids": [
                 binding.hook_id
                 for binding in self.shooting_unit_selected_grant_hook_registry.all_bindings()
+            ],
+            "attack_sequence_completed_hook_ids": [
+                binding.hook_id
+                for binding in self.attack_sequence_completed_hook_registry.all_bindings()
             ],
             "shooting_end_surge_hook_ids": [
                 binding.hook_id for binding in self.shooting_end_surge_hook_registry.all_bindings()

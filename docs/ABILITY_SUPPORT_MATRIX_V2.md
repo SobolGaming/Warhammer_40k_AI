@@ -81,6 +81,7 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | Subject | Engine support | Documentation | Tests | Overall | Notes |
 | --- | --- | --- | --- | --- | --- |
 | Chaos Daemons - The Shadow of Chaos | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Current generated rows are `engine_consumed`. |
+| Chaos Space Marines - Dark Pacts | Named army-rule handler | Adapter contract and generated matrix | Focused faction runtime tests | Full | Uses selected-to-shoot and selected-to-fight grant decisions for Lethal Hits or Sustained Hits 1, including out-of-phase shooting, then resolves the post-attack Leadership test, failed-test D3 mortal wounds, and any mortal-wound Feel No Pain continuation through engine hooks. |
 | Death Guard - Nurgle's Gift | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes contagion modifiers for supported characteristics and rolls. |
 | World Eaters - Blessings of Khorne | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes battle-round selection and supported blessing effects. |
 | Emperor's Children - Thrill Seekers | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes movement, charge, and shooting target restrictions. |
@@ -522,6 +523,13 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:soul_shattering_charge_upgrade` | Soul-Shattering Charge Upgrade |
 | `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche` | Unholy Avalanche |
 | `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:warp_riders` | Warp-Riders |
+| `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed` | Dark Pacts |
+| `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits` | Dark Pacts |
+| `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1` | Dark Pacts |
+| `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:mortal_wound_feel_no_pain` | Dark Pacts |
+| `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:lethal_hits` | Dark Pacts |
+| `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:sustained_hits_1` | Dark Pacts |
+| `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier` | Dark Pacts |
 | `warhammer_40000_11th:death_guard:army_rule:nurgles_gift` | Nurgle's Gift |
 | `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:armour-save-option` | Nurgle's Gift |
 | `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:leadership` | Nurgle's Gift |

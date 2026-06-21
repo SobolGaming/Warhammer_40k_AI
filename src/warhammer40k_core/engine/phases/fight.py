@@ -40,6 +40,11 @@ from warhammer40k_core.engine.attack_sequence import (
     unresolved_target_unit_ids,
     validate_psychic_attack_modifier_ignore_decision,
 )
+from warhammer40k_core.engine.attack_sequence_completion_hooks import (
+    AttackSequenceCompletedContext,
+    AttackSequenceCompletedHookRegistry,
+    attack_sequence_completed_event_id,
+)
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
@@ -204,6 +209,9 @@ class FightPhaseHandler:
     fight_unit_selected_grant_hooks: FightUnitSelectedGrantRegistry = field(
         default_factory=FightUnitSelectedGrantRegistry.empty
     )
+    attack_sequence_completed_hooks: AttackSequenceCompletedHookRegistry = field(
+        default_factory=AttackSequenceCompletedHookRegistry.empty
+    )
     runtime_modifier_registry: RuntimeModifierRegistry = field(
         default_factory=RuntimeModifierRegistry.empty
     )
@@ -227,6 +235,10 @@ class FightPhaseHandler:
         if type(self.fight_unit_selected_grant_hooks) is not FightUnitSelectedGrantRegistry:
             raise GameLifecycleError(
                 "FightPhaseHandler fight_unit_selected_grant_hooks must be a registry."
+            )
+        if type(self.attack_sequence_completed_hooks) is not AttackSequenceCompletedHookRegistry:
+            raise GameLifecycleError(
+                "FightPhaseHandler attack_sequence_completed_hooks must be a registry."
             )
         if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
             raise GameLifecycleError(
@@ -531,6 +543,22 @@ def _advance_fight_attack_sequence(
     activation = updated_state.active_activation
     if activation is None:
         raise GameLifecycleError("Completed melee attack sequence has no active activation.")
+    completion_hook_status = handler.attack_sequence_completed_hooks.resolve_completed_sequence(
+        AttackSequenceCompletedContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=handler.runtime_modifier_registry,
+            source_phase=BattlePhase.FIGHT,
+            attack_sequence=fight_state.attack_sequence,
+            attack_sequence_completed_event_id=attack_sequence_completed_event_id(
+                decisions=decisions,
+                attack_sequence=fight_state.attack_sequence,
+            ),
+        )
+    )
+    if completion_hook_status is not None:
+        return completion_hook_status
     decisions.event_log.append(
         "melee_attack_sequence_completed",
         validate_json_value(
