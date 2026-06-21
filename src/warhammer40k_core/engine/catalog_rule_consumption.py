@@ -1,15 +1,23 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import cast
+from dataclasses import dataclass
+from types import MappingProxyType
+from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_tokens
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
     AbilitySourceKind,
+)
+from warhammer40k_core.engine.damage_allocation import (
+    FeelNoPainAttackCondition,
+    FeelNoPainSource,
+    feel_no_pain_attack_condition_from_token,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
@@ -23,8 +31,91 @@ from warhammer40k_core.rules.rule_ir import (
     parameter_payload,
 )
 
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
+
 CATALOG_IR_CHARGE_ROLL_CONSUMER_ID = "catalog-ir:charge-roll-modifier"
 CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID = "catalog-ir:leadership-characteristic-query"
+CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:hit-roll-modifier"
+CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:wound-roll-modifier"
+CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:save-roll-modifier"
+CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID = (
+    "catalog-ir:invulnerable-save-roll-modifier"
+)
+CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID = "catalog-ir:feel-no-pain-roll"
+CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID = "catalog-ir:feel-no-pain-source"
+CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-hit-value-modifier"
+CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-wound-value-modifier"
+CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID = "catalog-ir:weapon-keyword-grant"
+CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-advance-and-charge"
+CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-fallback-and-charge"
+CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID = (
+    "catalog-ir:can-advance-and-shoot-and-charge"
+)
+CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID = "catalog-ir:can-be-placed-in-reserves"
+
+_CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
+    {
+        "charge": CATALOG_IR_CHARGE_ROLL_CONSUMER_ID,
+        "charge_roll": CATALOG_IR_CHARGE_ROLL_CONSUMER_ID,
+        "hit": CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+        "hit_roll": CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+        "wound": CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+        "wound_roll": CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+        "save": CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+        "save_roll": CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+        "invulnerable_save": CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+        "invulnerable_save_roll": CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+        "feel_no_pain": CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID,
+        "feel_no_pain_roll": CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID,
+        "critical_hit": CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
+        "critical_hit_value": CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
+        "critical_wound": CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
+        "critical_wound_value": CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
+    }
+)
+_CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
+    {
+        "can_advance_and_charge": CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+        "can_fallback_and_charge": CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+        "can_fall_back_and_charge": CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+        "can_advance_and_shoot_and_charge": (
+            CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID
+        ),
+        "can_be_placed_in_reserves": CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+        "turn_end_reserves": CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+    }
+)
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogRuleIrHookDefinition:
+    hook_id: str
+
+    def __post_init__(self) -> None:
+        if type(self.hook_id) is not str or not self.hook_id.strip():
+            raise GameLifecycleError("Catalog IR hook definition hook_id must be a non-empty str.")
+        if self.hook_id != self.hook_id.strip():
+            raise GameLifecycleError("Catalog IR hook definition hook_id must be stripped.")
+
+
+def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefinition, ...]:
+    hook_ids = {
+        *_CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS.values(),
+        *_CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.values(),
+        CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+    }
+    for characteristic in Characteristic:
+        hook_ids.add(_catalog_ir_characteristic_query_consumer_id(characteristic))
+        hook_ids.add(_catalog_ir_characteristic_modifier_consumer_id(characteristic))
+    for keyword in canonical_weapon_keyword_tokens():
+        hook_ids.add(_catalog_ir_weapon_keyword_grant_consumer_id(keyword))
+    return tuple(CatalogRuleIrHookDefinition(hook_id=hook_id) for hook_id in sorted(hook_ids))
+
+
+def catalog_rule_ir_registered_hook_ids() -> tuple[str, ...]:
+    return tuple(definition.hook_id for definition in catalog_rule_ir_registered_hook_definitions())
 
 
 def catalog_charge_roll_modifiers_for_unit(
@@ -100,11 +191,65 @@ def catalog_leadership_characteristic_for_unit(
     return resolved_value
 
 
+def record_catalog_feel_no_pain_sources_for_unit(
+    *,
+    state: GameState,
+    ability_index: AbilityCatalogIndex,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+) -> tuple[tuple[str, FeelNoPainSource], ...]:
+    _validate_game_state(state)
+    _validate_ability_index(ability_index)
+    _validate_unit(unit)
+    current_ids = _validate_current_model_instance_ids(current_model_instance_ids)
+    recorded_sources: list[tuple[str, FeelNoPainSource]] = []
+    for record in _unit_scoped_generic_records(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=current_ids,
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+    ):
+        if record.source_kind is not AbilitySourceKind.WARGEAR:
+            continue
+        bearer_ids = _record_current_wargear_bearer_model_ids(
+            record=record,
+            unit=unit,
+            current_model_instance_ids=current_ids,
+        )
+        if not bearer_ids:
+            continue
+        rule_ir = _rule_ir_from_record(record)
+        for clause in rule_ir.clauses:
+            if not _clause_targets_this_model(clause):
+                continue
+            for effect_index, effect in enumerate(clause.effects):
+                if not _effect_is_feel_no_pain_grant(effect):
+                    continue
+                source = _feel_no_pain_source_from_effect(
+                    record=record,
+                    clause=clause,
+                    effect_index=effect_index,
+                    effect=effect,
+                )
+                for bearer_id in bearer_ids:
+                    _record_model_feel_no_pain_source(
+                        state=state,
+                        model_instance_id=bearer_id,
+                        source=source,
+                    )
+                    recorded_sources.append((bearer_id, source))
+    return tuple(sorted(recorded_sources, key=lambda binding: (binding[0], binding[1].source_id)))
+
+
 def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
     if type(rule_ir) is not RuleIR:
         raise GameLifecycleError("Catalog rule consumer classification requires RuleIR.")
     consumer_ids: set[str] = set()
     for clause in rule_ir.clauses:
+        if _clause_targets_this_model(clause):
+            for effect in clause.effects:
+                if _effect_is_feel_no_pain_grant(effect):
+                    consumer_ids.add(CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID)
         if not _clause_targets_this_unit(clause):
             continue
         for effect in clause.effects:
@@ -112,7 +257,21 @@ def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
                 consumer_ids.add(CATALOG_IR_CHARGE_ROLL_CONSUMER_ID)
             if _effect_is_leadership_set(effect):
                 consumer_ids.add(CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID)
+            if _effect_is_turn_end_reserve_permission(effect):
+                consumer_ids.add(CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID)
     return tuple(sorted(consumer_ids))
+
+
+def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
+    if type(rule_ir) is not RuleIR:
+        raise GameLifecycleError("Catalog rule consumer classification requires RuleIR.")
+    hook_ids: set[str] = set()
+    for clause in rule_ir.clauses:
+        for effect in clause.effects:
+            if _effect_is_charge_roll_modifier(effect):
+                hook_ids.add(CATALOG_IR_CHARGE_ROLL_CONSUMER_ID)
+            hook_ids.update(_catalog_ir_hook_ids_for_effect(effect))
+    return tuple(sorted(hook_ids))
 
 
 def _unit_scoped_generic_records(
@@ -171,16 +330,53 @@ def _unit_has_current_wargear_bearer(
     current_model_instance_ids: tuple[str, ...],
     wargear_id: str,
 ) -> bool:
+    return bool(
+        _current_wargear_bearer_model_ids(
+            unit=unit,
+            current_model_instance_ids=current_model_instance_ids,
+            wargear_id=wargear_id,
+        )
+    )
+
+
+def _record_current_wargear_bearer_model_ids(
+    *,
+    record: AbilityCatalogRecord,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog rule consumer requires an AbilityCatalogRecord.")
+    if record.source_kind is not AbilitySourceKind.WARGEAR:
+        return ()
+    if record.wargear_id is None:
+        raise GameLifecycleError("Catalog wargear Feel No Pain source is missing wargear_id.")
+    return _current_wargear_bearer_model_ids(
+        unit=unit,
+        current_model_instance_ids=current_model_instance_ids,
+        wargear_id=record.wargear_id,
+    )
+
+
+def _current_wargear_bearer_model_ids(
+    *,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+    wargear_id: str,
+) -> tuple[str, ...]:
     current_ids = frozenset(current_model_instance_ids)
     known_model_ids = {model.model_instance_id for model in unit.own_models}
     unknown_ids = current_ids - known_model_ids
     if unknown_ids:
         raise GameLifecycleError("Catalog rule current model evidence contains unknown models.")
-    return any(
-        model.model_instance_id in current_ids
-        and model.is_alive
-        and wargear_id in model.wargear_ids
-        for model in unit.own_models
+    return tuple(
+        sorted(
+            model.model_instance_id
+            for model in unit.own_models
+            if model.model_instance_id in current_ids
+            and model.is_alive
+            and wargear_id in model.wargear_ids
+        )
     )
 
 
@@ -188,6 +384,12 @@ def _clause_targets_this_unit(clause: RuleClause) -> bool:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
     return clause.target is not None and clause.target.kind is RuleTargetKind.THIS_UNIT
+
+
+def _clause_targets_this_model(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    return clause.target is not None and clause.target.kind is RuleTargetKind.THIS_MODEL
 
 
 def _effect_is_charge_roll_modifier(effect: RuleEffectSpec) -> bool:
@@ -207,6 +409,184 @@ def _effect_is_leadership_set(effect: RuleEffectSpec) -> bool:
         return False
     parameters = parameter_payload(effect.parameters)
     return parameters.get("characteristic") == Characteristic.LEADERSHIP.value
+
+
+def _effect_is_feel_no_pain_grant(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.GRANT_ABILITY:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return parameters.get("ability") == "Feel No Pain"
+
+
+def _effect_is_turn_end_reserve_permission(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.PLACEMENT_PERMISSION:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return (
+        parameters.get("placement_kind") == "turn_end_reserves"
+        and parameters.get("reserve_kind") == "strategic_reserves"
+        and parameters.get("action") == "remove_from_battlefield_to_strategic_reserves"
+    )
+
+
+def _feel_no_pain_source_from_effect(
+    *,
+    record: AbilityCatalogRecord,
+    clause: RuleClause,
+    effect_index: int,
+    effect: RuleEffectSpec,
+) -> FeelNoPainSource:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog Feel No Pain source requires an ability record.")
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog Feel No Pain source requires a rule clause.")
+    if type(effect_index) is not int or effect_index < 0:
+        raise GameLifecycleError("Catalog Feel No Pain effect_index must be non-negative.")
+    if not _effect_is_feel_no_pain_grant(effect):
+        raise GameLifecycleError("Catalog Feel No Pain source requires a Feel No Pain grant.")
+    parameters = parameter_payload(effect.parameters)
+    return FeelNoPainSource(
+        source_id=f"{record.record_id}:{clause.clause_id}:effect-{effect_index:03d}",
+        threshold=_int_parameter(parameters, key="threshold"),
+        attack_condition=_feel_no_pain_attack_condition_parameter(parameters),
+    )
+
+
+def _feel_no_pain_attack_condition_parameter(
+    parameters: Mapping[str, object],
+) -> FeelNoPainAttackCondition | None:
+    value = parameters.get("attack_condition")
+    if value is None:
+        return None
+    if type(value) is not str or not value.strip():
+        raise GameLifecycleError(
+            "Catalog rule parameter attack_condition must be a non-empty string."
+        )
+    return feel_no_pain_attack_condition_from_token(value.strip())
+
+
+def _record_model_feel_no_pain_source(
+    *,
+    state: GameState,
+    model_instance_id: str,
+    source: FeelNoPainSource,
+) -> None:
+    existing_sources = state.feel_no_pain_sources_for_model(model_instance_id=model_instance_id)
+    for existing_source in existing_sources:
+        if existing_source.source_id != source.source_id:
+            continue
+        if existing_source != source:
+            raise GameLifecycleError("Catalog Feel No Pain source conflicts with existing state.")
+        return
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=model_instance_id,
+        sources=(*existing_sources, source),
+        decline_allowed=state.feel_no_pain_decline_allowed_for_model(
+            model_instance_id=model_instance_id
+        ),
+    )
+
+
+def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    parameters = parameter_payload(effect.parameters)
+    if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
+        return _catalog_ir_roll_modifier_hook_ids(parameters)
+    if effect.kind is RuleEffectKind.SET_CHARACTERISTIC:
+        characteristic = _characteristic_parameter(parameters, key="characteristic")
+        return (_catalog_ir_characteristic_query_consumer_id(characteristic),)
+    if effect.kind is RuleEffectKind.MODIFY_CHARACTERISTIC:
+        characteristic = _characteristic_parameter(parameters, key="characteristic")
+        return (_catalog_ir_characteristic_modifier_consumer_id(characteristic),)
+    if effect.kind is RuleEffectKind.MODIFY_MOVE_DISTANCE:
+        return (_catalog_ir_characteristic_modifier_consumer_id(Characteristic.MOVEMENT),)
+    if effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY:
+        keyword = _string_parameter(parameters, key="weapon_ability")
+        return (
+            CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+            _catalog_ir_weapon_keyword_grant_consumer_id(keyword),
+        )
+    if effect.kind is RuleEffectKind.GRANT_ABILITY and _effect_is_feel_no_pain_grant(effect):
+        return (CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,)
+    if effect.kind in {
+        RuleEffectKind.GRANT_ABILITY,
+        RuleEffectKind.PLACEMENT_PERMISSION,
+    }:
+        return _catalog_ir_rule_exception_hook_ids(effect.kind, parameters)
+    return ()
+
+
+def _catalog_ir_roll_modifier_hook_ids(parameters: Mapping[str, object]) -> tuple[str, ...]:
+    roll_type = _string_parameter(parameters, key="roll_type")
+    consumer_id = _CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS.get(_catalog_ir_lookup_token(roll_type))
+    if consumer_id is None:
+        return ()
+    return (consumer_id,)
+
+
+def _catalog_ir_rule_exception_hook_ids(
+    effect_kind: RuleEffectKind,
+    parameters: Mapping[str, object],
+) -> tuple[str, ...]:
+    if effect_kind is RuleEffectKind.GRANT_ABILITY:
+        ability = _string_parameter(parameters, key="ability")
+        consumer_id = _CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.get(_catalog_ir_lookup_token(ability))
+        if consumer_id is None:
+            return ()
+        return (consumer_id,)
+    placement_kind = parameters.get("placement_kind")
+    if type(placement_kind) is not str:
+        return ()
+    consumer_id = _CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.get(
+        _catalog_ir_lookup_token(placement_kind)
+    )
+    if consumer_id is None:
+        return ()
+    return (consumer_id,)
+
+
+def _catalog_ir_characteristic_query_consumer_id(characteristic: Characteristic) -> str:
+    return f"catalog-ir:{_catalog_ir_token(characteristic.value)}-characteristic-query"
+
+
+def _catalog_ir_characteristic_modifier_consumer_id(characteristic: Characteristic) -> str:
+    return f"catalog-ir:{_catalog_ir_token(characteristic.value)}-characteristic-modifier"
+
+
+def _catalog_ir_weapon_keyword_grant_consumer_id(keyword: str) -> str:
+    return f"catalog-ir:weapon-keyword-grant:{_catalog_ir_token(keyword)}"
+
+
+def _characteristic_parameter(
+    parameters: Mapping[str, object],
+    *,
+    key: str,
+) -> Characteristic:
+    value = _string_parameter(parameters, key=key)
+    try:
+        return Characteristic(value)
+    except ValueError as exc:
+        raise GameLifecycleError("Catalog rule characteristic parameter is invalid.") from exc
+
+
+def _string_parameter(parameters: Mapping[str, object], *, key: str) -> str:
+    value = parameters.get(key)
+    if type(value) is not str or not value.strip():
+        raise GameLifecycleError(f"Catalog rule parameter {key} must be a non-empty string.")
+    return value.strip()
+
+
+def _catalog_ir_token(value: str) -> str:
+    return value.strip().lower().replace("_", "-").replace(" ", "-")
+
+
+def _catalog_ir_lookup_token(value: str) -> str:
+    return value.strip().lower().replace("-", "_").replace(" ", "_")
 
 
 def _int_parameter(parameters: Mapping[str, object], *, key: str) -> int:
@@ -232,6 +612,14 @@ def _validate_ability_index(ability_index: AbilityCatalogIndex) -> AbilityCatalo
     if type(ability_index) is not AbilityCatalogIndex:
         raise GameLifecycleError("Catalog rule consumer requires an AbilityCatalogIndex.")
     return ability_index
+
+
+def _validate_game_state(state: GameState) -> GameState:
+    from warhammer40k_core.engine.game_state import GameState as GameStateType
+
+    if type(state) is not GameStateType:
+        raise GameLifecycleError("Catalog rule consumer requires a GameState.")
+    return state
 
 
 def _validate_unit(unit: UnitInstance) -> UnitInstance:

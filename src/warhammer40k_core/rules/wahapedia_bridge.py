@@ -435,7 +435,7 @@ def _bridge_wargear(
                 "range": _required_field(row, "range"),
                 "a": _required_field(row, "A"),
                 "skill_characteristic": _skill_characteristic(row),
-                "skill": f"{_required_field(row, 'BS_WS')}+",
+                "skill": _skill_value(row),
                 "s": _required_field(row, "S"),
                 "ap": _required_field(row, "AP"),
                 "d": _required_field(row, "D"),
@@ -477,16 +477,12 @@ def _bridge_abilities(
         support = CatalogAbilitySupport.DESCRIPTOR_ONLY
         if source_kind is CatalogAbilitySourceKind.WARGEAR:
             source_wargear_id = f"{datasheet_id}:{_slug(name)}"
+        if source_kind in {CatalogAbilitySourceKind.DATASHEET, CatalogAbilitySourceKind.WARGEAR}:
             compiled = compile_rule_source_text(
                 RuleSourceText.from_raw(
                     source_id=_source_text_id(row=row, column_name="description"),
                     raw_text=description,
                 )
-            )
-            rule_ir_payload = json.dumps(
-                compiled.rule_ir.to_payload(),
-                sort_keys=True,
-                separators=(",", ":"),
             )
             rule_ir_diagnostics = json.dumps(
                 _rule_ir_diagnostics(compiled.rule_ir),
@@ -494,8 +490,19 @@ def _bridge_abilities(
                 separators=(",", ":"),
             )
             if compiled.rule_ir.is_supported:
+                rule_ir_payload = json.dumps(
+                    compiled.rule_ir.to_payload(),
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
                 support = CatalogAbilitySupport.GENERIC_RULE_IR
             else:
+                if source_kind is CatalogAbilitySourceKind.WARGEAR:
+                    rule_ir_payload = json.dumps(
+                        compiled.rule_ir.to_payload(),
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    )
                 support = CatalogAbilitySupport.UNSUPPORTED
         bridged_rows["Datasheets_abilities"].append(
             {
@@ -556,6 +563,8 @@ def _bridge_options(
         context.rows_by_table, "Datasheets_options", "datasheet_id", datasheet_id
     ):
         description = _required_field(row, "description")
+        if description == "None":
+            continue
         match = _OPTION_RE.fullmatch(description)
         if match is None:
             raise WahapediaBridgeError("Unsupported wargear option row shape.")
@@ -986,6 +995,13 @@ def _skill_characteristic(row: NormalizedSourceRow) -> str:
     if weapon_type == "melee":
         return "weapon_skill"
     return "ballistic_skill"
+
+
+def _skill_value(row: NormalizedSourceRow) -> str:
+    raw_skill = _required_field(row, "BS_WS").strip()
+    if raw_skill.casefold() == "n/a":
+        return "-"
+    return f"{raw_skill}+"
 
 
 def _weapon_keywords(description: str) -> tuple[str, ...]:

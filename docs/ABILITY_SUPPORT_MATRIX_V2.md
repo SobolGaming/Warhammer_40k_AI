@@ -401,8 +401,72 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | Hook / consumer | Abilities / rules |
 | --- | --- |
 | `army-mustering:drukhari-corsairs-and-travelling-players` | Corsairs and Travelling Players |
+| `catalog-ir:armor-penetration-characteristic-modifier` | No current generated rows |
+| `catalog-ir:armor-penetration-characteristic-query` | No current generated rows |
+| `catalog-ir:attacks-characteristic-modifier` | No current generated rows |
+| `catalog-ir:attacks-characteristic-query` | No current generated rows |
+| `catalog-ir:ballistic-skill-characteristic-modifier` | No current generated rows |
+| `catalog-ir:ballistic-skill-characteristic-query` | No current generated rows |
+| `catalog-ir:can-advance-and-charge` | No current generated rows |
+| `catalog-ir:can-advance-and-shoot-and-charge` | No current generated rows |
+| `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |
+| `catalog-ir:can-fallback-and-charge` | No current generated rows |
 | `catalog-ir:charge-roll-modifier` | Instrument of Chaos |
+| `catalog-ir:critical-hit-value-modifier` | No current generated rows |
+| `catalog-ir:critical-wound-value-modifier` | No current generated rows |
+| `catalog-ir:damage-characteristic-modifier` | No current generated rows |
+| `catalog-ir:damage-characteristic-query` | No current generated rows |
+| `catalog-ir:detection-range-characteristic-modifier` | No current generated rows |
+| `catalog-ir:detection-range-characteristic-query` | No current generated rows |
+| `catalog-ir:feel-no-pain-roll` | No current generated rows |
+| `catalog-ir:feel-no-pain-source` | Collar of Khorne |
+| `catalog-ir:hit-roll-modifier` | No current generated rows |
+| `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
+| `catalog-ir:invulnerable-save-characteristic-query` | No current generated rows |
+| `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
+| `catalog-ir:leadership-characteristic-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon |
+| `catalog-ir:movement-characteristic-modifier` | No current generated rows |
+| `catalog-ir:movement-characteristic-query` | No current generated rows |
+| `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
+| `catalog-ir:objective-control-characteristic-query` | No current generated rows |
+| `catalog-ir:range-characteristic-modifier` | No current generated rows |
+| `catalog-ir:range-characteristic-query` | No current generated rows |
+| `catalog-ir:save-characteristic-modifier` | No current generated rows |
+| `catalog-ir:save-characteristic-query` | No current generated rows |
+| `catalog-ir:save-roll-modifier` | No current generated rows |
+| `catalog-ir:strength-characteristic-modifier` | No current generated rows |
+| `catalog-ir:strength-characteristic-query` | No current generated rows |
+| `catalog-ir:toughness-characteristic-modifier` | No current generated rows |
+| `catalog-ir:toughness-characteristic-query` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:assault` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:blast` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:cleave` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:close-quarters` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:devastating-wounds` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:extra-attacks` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:hazardous` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:heavy` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:hunter` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:ignores-cover` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:indirect-fire` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:lance` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:lethal-hits` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:melta` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:one-shot` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:pistol` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:precision` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:psychic` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:rapid-fire` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:sustained-hits` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:torrent` | No current generated rows |
+| `catalog-ir:weapon-keyword-grant:twin-linked` | No current generated rows |
+| `catalog-ir:weapon-skill-characteristic-modifier` | No current generated rows |
+| `catalog-ir:weapon-skill-characteristic-query` | No current generated rows |
+| `catalog-ir:wound-roll-modifier` | No current generated rows |
+| `catalog-ir:wounds-characteristic-modifier` | No current generated rows |
+| `catalog-ir:wounds-characteristic-query` | No current generated rows |
 | `core:command-reroll` | Command Re-roll |
 | `core:counteroffensive` | Counteroffensive |
 | `core:crushing-impact` | Crushing Impact |

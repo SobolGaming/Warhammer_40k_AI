@@ -31,6 +31,7 @@ from warhammer40k_core.core.model_geometry_catalog import (
     GeometryMeasurementKind,
     GeometrySourceUnits,
 )
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityExecutionContext,
@@ -60,10 +61,33 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+    CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
+    CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+    CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+    CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID,
+    CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
+    CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+    CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
     catalog_charge_roll_modifiers_for_unit,
     catalog_rule_ir_consumers_for_rule,
+    catalog_rule_ir_hook_ids_for_rule,
+    catalog_rule_ir_registered_hook_ids,
+    record_catalog_feel_no_pain_sources_for_unit,
+)
+from warhammer40k_core.engine.catalog_turn_end_reserves import (
+    CATALOG_TURN_END_RESERVES_USED_EVENT,
+    CatalogTurnEndReserveRuntime,
 )
 from warhammer40k_core.engine.charge_declaration import ChargeRollRequest, ChargeRollResult
+from warhammer40k_core.engine.damage_allocation import FeelNoPainAttackCondition
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
     army_rule as death_guard_army_rule,
@@ -74,6 +98,7 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_chil
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
     army_rule as world_eaters_army_rule,
 )
+from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ListValidationError,
@@ -82,15 +107,33 @@ from warhammer40k_core.engine.list_validation import (
     WargearSelection,
     resolve_wargear_selections,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.turn_end_hooks import (
+    SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
+    TurnEndHookRegistry,
+    TurnEndRequestContext,
+    TurnEndResultContext,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitFactory, UnitInstance
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
-from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, RuleIRPayload, parameter_payload
+from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
+    RuleEffectKind,
+    RuleEffectSpec,
+    RuleIR,
+    RuleIRPayload,
+    RuleParameterValue,
+    RuleTargetKind,
+    RuleTargetSpec,
+    parameter_payload,
+    parameters_from_pairs,
+)
 from warhammer40k_core.rules.source_reference_generation import build_source_reference_catalog
 from warhammer40k_core.rules.wahapedia_bridge import (
     EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE,
@@ -586,6 +629,201 @@ def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() ->
     assert destroyed_bearer_requests_with_index[0].leadership_target == 7
 
 
+def test_phase17k_collar_of_khorne_catalog_ir_records_bearer_psychic_fnp_source() -> None:
+    package = _flesh_hounds_package()
+    unit = _flesh_hounds_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
+    bearer = _model_bearing_wargear(unit, "test-flesh-hounds:collar-of-khorne")
+    destroyed_bearer_battlefield = battlefield.with_removed_models((bearer.model_instance_id,))
+    state = _battle_state_with_army(army=army, battlefield=battlefield)
+    destroyed_bearer_state = _battle_state_with_army(
+        army=army,
+        battlefield=destroyed_bearer_battlefield,
+    )
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    collar_record = records_by_name["Collar of Khorne"]
+    replay_payload = collar_record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    collar_rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+
+    recorded_sources = record_catalog_feel_no_pain_sources_for_unit(
+        state=state,
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=_current_model_ids(
+            battlefield=battlefield,
+            unit=unit,
+        ),
+    )
+    duplicate_recorded_sources = record_catalog_feel_no_pain_sources_for_unit(
+        state=state,
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=_current_model_ids(
+            battlefield=battlefield,
+            unit=unit,
+        ),
+    )
+    destroyed_bearer_sources = record_catalog_feel_no_pain_sources_for_unit(
+        state=destroyed_bearer_state,
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=_current_model_ids(
+            battlefield=destroyed_bearer_battlefield,
+            unit=unit,
+        ),
+    )
+    stored_sources = state.feel_no_pain_sources_for_model(
+        model_instance_id=bearer.model_instance_id
+    )
+
+    assert collar_record.definition.timing.trigger_kind is TimingTriggerKind.PASSIVE_QUERY
+    assert catalog_rule_ir_consumers_for_rule(collar_rule_ir) == (
+        CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(collar_rule_ir)) == {
+        CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
+    }
+    assert recorded_sources == duplicate_recorded_sources
+    assert len(recorded_sources) == 1
+    assert recorded_sources[0][0] == bearer.model_instance_id
+    assert stored_sources == (recorded_sources[0][1],)
+    assert stored_sources[0].threshold == 3
+    assert stored_sources[0].attack_condition is FeelNoPainAttackCondition.PSYCHIC_ATTACK
+    assert all(
+        state.feel_no_pain_sources_for_model(model_instance_id=model.model_instance_id) == ()
+        for model in unit.own_models
+        if model.model_instance_id != bearer.model_instance_id
+    )
+    assert destroyed_bearer_sources == ()
+    assert (
+        destroyed_bearer_state.feel_no_pain_sources_for_model(
+            model_instance_id=bearer.model_instance_id
+        )
+        == ()
+    )
+
+
+def test_phase17k_flesh_hounds_hunters_from_the_warp_uses_generic_turn_end_reserves() -> None:
+    package = _flesh_hounds_package()
+    unit = _flesh_hounds_unit(package=package)
+    enemy_unit = _flesh_hounds_unit(
+        package=package,
+        army_id="army-opponent",
+        unit_selection_id="enemy-flesh-hounds-1",
+    )
+    army = _flesh_hounds_army(package=package, unit=unit)
+    enemy_army = _flesh_hounds_army(
+        package=package,
+        unit=enemy_unit,
+        army_id="army-opponent",
+        player_id="player-opponent",
+    )
+    player_index = _player_ability_index(package=package, army=army)
+    enemy_index = _player_ability_index(package=package, army=enemy_army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    hunters_record = records_by_name["Hunters from the Warp"]
+    replay_payload = hunters_record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    hunters_rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    runtime = CatalogTurnEndReserveRuntime(
+        ability_indexes_by_player_id={
+            army.player_id: player_index,
+            enemy_army.player_id: enemy_index,
+        },
+        armies=(army, enemy_army),
+    )
+    registry = TurnEndHookRegistry.from_bindings(runtime.bindings())
+    engaged_state = _battle_state_with_armies(
+        armies=(army, enemy_army),
+        battlefield=_flesh_hounds_battlefield_state(
+            army=army,
+            unit=unit,
+            enemy_army=enemy_army,
+            enemy_unit=enemy_unit,
+            enemy_x=12.0,
+        ),
+        active_player_id=enemy_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+
+    assert hunters_record.definition.timing.trigger_kind is TimingTriggerKind.END_TURN
+    assert catalog_rule_ir_consumers_for_rule(hunters_rule_ir) == (
+        CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(hunters_rule_ir)) == {
+        CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+    }
+    assert (
+        registry.next_request_for(
+            TurnEndRequestContext(
+                state=engaged_state,
+                decisions=DecisionController(),
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+        is None
+    )
+
+    state = _battle_state_with_armies(
+        armies=(army, enemy_army),
+        battlefield=_flesh_hounds_battlefield_state(
+            army=army,
+            unit=unit,
+            enemy_army=enemy_army,
+            enemy_unit=enemy_unit,
+            enemy_x=30.0,
+        ),
+        active_player_id=enemy_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    decisions = DecisionController()
+    request = registry.next_request_for(
+        TurnEndRequestContext(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.FIGHT,
+        )
+    )
+    assert request is not None
+    use_option = next(option for option in request.options if option.option_id.endswith(":use"))
+    result = DecisionResult.for_request(
+        result_id="result-flesh-hounds-hunters-use",
+        request=request,
+        selected_option_id=use_option.option_id,
+    )
+
+    handled = registry.apply_result(
+        TurnEndResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+
+    reserve_state = state.reserve_state_for_unit(unit.unit_instance_id)
+    assert request.decision_type == SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE
+    assert request.actor_id == army.player_id
+    assert handled is True
+    assert reserve_state is not None
+    assert reserve_state.source_rule_ids == (hunters_record.definition.source_id,)
+    assert state.battlefield_state is not None
+    assert all(
+        unit_placement.unit_instance_id != unit.unit_instance_id
+        for placed_army in state.battlefield_state.placed_armies
+        for unit_placement in placed_army.unit_placements
+    )
+    used_events = tuple(
+        record
+        for record in decisions.event_log.records
+        if record.event_type == CATALOG_TURN_END_RESERVES_USED_EVENT
+    )
+    assert len(used_events) == 1
+
+
 def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     rows = ability_support_matrix_rows()
     snapshot = json.loads(
@@ -634,6 +872,21 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "Current coverage categories:" not in generated_markdown
     assert "## Runtime Hook Inventory" in generated_markdown
     assert "| `catalog-ir:charge-roll-modifier` | Instrument of Chaos |" in generated_markdown
+    assert "| `catalog-ir:hit-roll-modifier` | No current generated rows |" in generated_markdown
+    assert "| `catalog-ir:wound-roll-modifier` | No current generated rows |" in generated_markdown
+    assert (
+        "| `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |"
+    ) in generated_markdown
+    assert "| `catalog-ir:feel-no-pain-source` | Collar of Khorne |" in generated_markdown
+    assert (
+        "| `catalog-ir:weapon-keyword-grant:lethal-hits` | No current generated rows |"
+    ) in generated_markdown
+    assert (
+        "| `catalog-ir:can-advance-and-charge` | No current generated rows |"
+    ) in generated_markdown
+    assert (
+        "| `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |"
+    ) in generated_markdown
     assert "| `core:command-reroll` | Command Re-roll |" in generated_markdown
     assert "| `generic:ingress-move` | From Beyond the Veil |" in generated_markdown
     assert (
@@ -657,8 +910,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Bloodcrushers",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Deep Strike"]) == (
+        "Flesh Hounds",
         "Bloodletters",
         "Bloodcrushers",
+    )
+    assert tuple(row.datasheet_name for row in rows_by_name["Collar of Khorne"]) == (
+        "Flesh Hounds",
+    )
+    assert tuple(row.datasheet_name for row in rows_by_name["Hunters from the Warp"]) == (
+        "Flesh Hounds",
     )
     assert all(
         row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
@@ -671,6 +931,14 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert all(
         row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
         for row in rows_by_name["Deep Strike"]
+    )
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Collar of Khorne"]
+    )
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Hunters from the Warp"]
     )
     assert all(
         row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
@@ -755,6 +1023,26 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert categories_by_name["Deep Strike Reserve Arrival"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
     )
+    assert categories_by_name["Feel No Pain Source"].ability_names == ("Collar of Khorne",)
+    assert categories_by_name["Feel No Pain Source"].datasheet_names == ("Flesh Hounds",)
+    assert categories_by_name["Feel No Pain Source"].runtime_consumer_ids == (
+        "catalog-ir:feel-no-pain-source",
+    )
+    assert categories_by_name["Feel No Pain Source"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["Datasheet Rule Ir Placement Permission This Unit"].ability_names == (
+        "Hunters from the Warp",
+    )
+    assert categories_by_name[
+        "Datasheet Rule Ir Placement Permission This Unit"
+    ].datasheet_names == ("Flesh Hounds",)
+    assert categories_by_name[
+        "Datasheet Rule Ir Placement Permission This Unit"
+    ].runtime_consumer_ids == ("catalog-ir:can-be-placed-in-reserves",)
+    assert categories_by_name[
+        "Datasheet Rule Ir Placement Permission This Unit"
+    ].support_stages == (AbilityCoverageSupportStage.ENGINE_CONSUMED,)
     assert categories_by_name["Chaos Daemons Army Rule"].ability_names == ("The Shadow of Chaos",)
     assert categories_by_name["Chaos Daemons Army Rule"].runtime_consumer_ids == (
         "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",
@@ -780,7 +1068,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert categories_by_name["Unknown Abilities"].runtime_consumer_ids == ()
     assert categories_by_name["Unknown Abilities"].support_stages == (
-        AbilityCoverageSupportStage.DESCRIPTOR_ONLY,
+        AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED,
     )
 
 
@@ -941,6 +1229,68 @@ def test_phase17k_ability_coverage_api_fails_fast_and_classifies_unsupported_ir(
         _ability_coverage_category_row(
             support_stages=cast(tuple[AbilityCoverageSupportStage, ...], ("bad",))
         )
+
+
+def test_phase17k_catalog_ir_future_hooks_classify_supported_rule_ir_without_consuming() -> None:
+    registered_hook_ids = set(catalog_rule_ir_registered_hook_ids())
+    rule_ir = _catalog_rule_ir(
+        (
+            _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="hit", delta=1),
+            _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="wound", delta=1),
+            _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="invulnerable_save", delta=1),
+            _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="critical_hit", delta=-1),
+            _effect(
+                RuleEffectKind.MODIFY_CHARACTERISTIC,
+                characteristic=Characteristic.TOUGHNESS.value,
+                delta=-1,
+            ),
+            _effect(
+                RuleEffectKind.MODIFY_CHARACTERISTIC,
+                characteristic=Characteristic.OBJECTIVE_CONTROL.value,
+                delta=-1,
+            ),
+            _effect(RuleEffectKind.GRANT_WEAPON_ABILITY, weapon_ability="Lethal Hits"),
+            _effect(RuleEffectKind.GRANT_ABILITY, ability="can_advance_and_charge"),
+            _effect(RuleEffectKind.GRANT_ABILITY, ability="Feel No Pain", threshold=3),
+            _effect(RuleEffectKind.PLACEMENT_PERMISSION, placement_kind="turn_end_reserves"),
+        ),
+        target_kind=RuleTargetKind.ENEMY_UNIT,
+    )
+
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) >= {
+        CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
+        "catalog-ir:toughness-characteristic-modifier",
+        "catalog-ir:objective-control-characteristic-modifier",
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:lethal-hits",
+        CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+        CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+        CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
+    }
+    assert registered_hook_ids >= {
+        CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID,
+        CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
+        CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+        CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
+        "catalog-ir:movement-characteristic-query",
+        "catalog-ir:toughness-characteristic-query",
+        "catalog-ir:objective-control-characteristic-query",
+        "catalog-ir:wounds-characteristic-query",
+        "catalog-ir:attacks-characteristic-query",
+        "catalog-ir:armor-penetration-characteristic-query",
+        "catalog-ir:ballistic-skill-characteristic-query",
+        "catalog-ir:weapon-skill-characteristic-query",
+        "catalog-ir:strength-characteristic-query",
+        "catalog-ir:damage-characteristic-query",
+        "catalog-ir:range-characteristic-query",
+        "catalog-ir:weapon-keyword-grant:devastating-wounds",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
 
 
 def test_phase17k_bridge_datasheet_source_ids_include_pdf_correction_source_id() -> None:
@@ -1235,6 +1585,14 @@ def _bloodcrushers_package() -> CanonicalCatalogPackage:
     )
 
 
+def _flesh_hounds_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_flesh_hounds_bridge_artifacts(),
+    )
+
+
 def _bloodcrushers_unit(
     *,
     package: CanonicalCatalogPackage,
@@ -1258,6 +1616,41 @@ def _bloodcrushers_unit(
                 ModelProfileSelection(
                     model_profile_id="000001115:bloodhunter",
                     model_count=1,
+                ),
+            ),
+            wargear_selections=(
+                WargearSelection(
+                    option_id=option.option_id,
+                    model_profile_id=option.model_profile_id,
+                    wargear_ids=(selected_wargear_id,),
+                ),
+            ),
+        ),
+        datasheet=datasheet,
+    )
+
+
+def _flesh_hounds_unit(
+    *,
+    package: CanonicalCatalogPackage,
+    army_id: str = "army-daemons",
+    unit_selection_id: str = "flesh-hounds-1",
+) -> UnitInstance:
+    datasheet = package.army_catalog.datasheet_by_id("test-flesh-hounds")
+    selected_wargear_id = "test-flesh-hounds:collar-of-khorne"
+    option = _wargear_option_for_wargear(datasheet, selected_wargear_id)
+    return UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id=army_id,
+        selection=UnitMusterSelection(
+            unit_selection_id=unit_selection_id,
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="test-flesh-hounds:flesh-hounds",
+                    model_count=5,
                 ),
             ),
             wargear_selections=(
@@ -1301,6 +1694,27 @@ def _bloodcrushers_army(
     )
 
 
+def _flesh_hounds_army(
+    *,
+    package: CanonicalCatalogPackage,
+    unit: UnitInstance,
+    army_id: str = "army-daemons",
+    player_id: str = "player-daemons",
+) -> ArmyDefinition:
+    return ArmyDefinition(
+        army_id=army_id,
+        player_id=player_id,
+        catalog_id=package.army_catalog.catalog_id,
+        source_package_id=package.army_catalog.source_package_id,
+        ruleset_id=package.army_catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id=package.army_catalog.factions[0].faction_id,
+            detachment_ids=("phase17k-daemons",),
+        ),
+        units=(unit,),
+    )
+
+
 def _player_ability_index(
     *,
     package: CanonicalCatalogPackage,
@@ -1311,6 +1725,60 @@ def _player_ability_index(
         army=army,
         catalog=package.army_catalog,
     )
+
+
+def _battle_state_with_army(
+    *,
+    army: ArmyDefinition,
+    battlefield: BattlefieldRuntimeState,
+) -> GameState:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    state = GameState(
+        game_id="phase17k-game",
+        ruleset_descriptor_hash=descriptor.descriptor_hash,
+        stage=GameLifecycleStage.BATTLE,
+        setup_sequence=tuple(descriptor.setup_sequence.steps),
+        battle_phase_sequence=tuple(descriptor.battle_phase_sequence.phases),
+        setup_step_index=None,
+        battle_phase_index=0,
+        battle_round=1,
+        active_player_id=army.player_id,
+        player_ids=(army.player_id, "player-opponent"),
+        turn_order=(army.player_id, "player-opponent"),
+        tactical_secondary_draw_count=2,
+    )
+    state.record_army_definition(army)
+    state.battlefield_state = battlefield
+    return state
+
+
+def _battle_state_with_armies(
+    *,
+    armies: tuple[ArmyDefinition, ...],
+    battlefield: BattlefieldRuntimeState,
+    active_player_id: str,
+    phase: BattlePhase,
+) -> GameState:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    battle_phase_sequence = tuple(descriptor.battle_phase_sequence.phases)
+    state = GameState(
+        game_id="phase17k-game",
+        ruleset_descriptor_hash=descriptor.descriptor_hash,
+        stage=GameLifecycleStage.BATTLE,
+        setup_sequence=tuple(descriptor.setup_sequence.steps),
+        battle_phase_sequence=battle_phase_sequence,
+        setup_step_index=None,
+        battle_phase_index=battle_phase_sequence.index(phase),
+        battle_round=1,
+        active_player_id=active_player_id,
+        player_ids=tuple(army.player_id for army in armies),
+        turn_order=tuple(army.player_id for army in armies),
+        tactical_secondary_draw_count=2,
+    )
+    for army in armies:
+        state.record_army_definition(army)
+    state.battlefield_state = battlefield
+    return state
 
 
 def _bloodcrushers_battlefield_state(
@@ -1349,6 +1817,67 @@ def _bloodcrushers_battlefield_state(
     )
 
 
+def _flesh_hounds_battlefield_state(
+    *,
+    army: ArmyDefinition,
+    unit: UnitInstance,
+    enemy_army: ArmyDefinition,
+    enemy_unit: UnitInstance,
+    enemy_x: float,
+) -> BattlefieldRuntimeState:
+    friendly_placements = tuple(
+        ModelPlacement(
+            army_id=army.army_id,
+            player_id=army.player_id,
+            unit_instance_id=unit.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            pose=Pose.at(12.0 + (index * 2.0), 12.0),
+        )
+        for index, model in enumerate(unit.own_models)
+    )
+    enemy_placements = tuple(
+        ModelPlacement(
+            army_id=enemy_army.army_id,
+            player_id=enemy_army.player_id,
+            unit_instance_id=enemy_unit.unit_instance_id,
+            model_instance_id=model.model_instance_id,
+            pose=Pose.at(enemy_x + (index * 2.0), 12.0),
+        )
+        for index, model in enumerate(enemy_unit.own_models)
+    )
+    return BattlefieldRuntimeState(
+        battlefield_id="phase17k-flesh-hounds-battlefield",
+        battlefield_width_inches=60.0,
+        battlefield_depth_inches=44.0,
+        placed_armies=(
+            PlacedArmy(
+                army_id=army.army_id,
+                player_id=army.player_id,
+                unit_placements=(
+                    UnitPlacement(
+                        army_id=army.army_id,
+                        player_id=army.player_id,
+                        unit_instance_id=unit.unit_instance_id,
+                        model_placements=friendly_placements,
+                    ),
+                ),
+            ),
+            PlacedArmy(
+                army_id=enemy_army.army_id,
+                player_id=enemy_army.player_id,
+                unit_placements=(
+                    UnitPlacement(
+                        army_id=enemy_army.army_id,
+                        player_id=enemy_army.player_id,
+                        unit_instance_id=enemy_unit.unit_instance_id,
+                        model_placements=enemy_placements,
+                    ),
+                ),
+            ),
+        ),
+    )
+
+
 def _current_model_ids(
     *,
     battlefield: BattlefieldRuntimeState,
@@ -1368,6 +1897,37 @@ def _model_bearing_wargear(
         if wargear_id in model.wargear_ids:
             return model
     raise AssertionError(f"Missing bearer for wargear: {wargear_id}.")
+
+
+def _catalog_rule_ir(
+    effects: tuple[RuleEffectSpec, ...],
+    *,
+    target_kind: RuleTargetKind,
+) -> RuleIR:
+    span = TextSpan(text="catalog hook test", start=0, end=17)
+    return RuleIR(
+        rule_id="test-catalog-hook-rule",
+        source_id="test-catalog-hook-source",
+        normalized_text=span.text,
+        parser_version="test-catalog-hook-parser",
+        clauses=(
+            RuleClause(
+                clause_id="test-catalog-hook-clause",
+                source_span=span,
+                target=RuleTargetSpec(kind=target_kind, source_span=span),
+                effects=effects,
+            ),
+        ),
+    )
+
+
+def _effect(kind: RuleEffectKind, **parameters: RuleParameterValue) -> RuleEffectSpec:
+    span = TextSpan(text="catalog hook test", start=0, end=17)
+    return RuleEffectSpec(
+        kind=kind,
+        source_span=span,
+        parameters=parameters_from_pairs(tuple(parameters.items())),
+    )
 
 
 def _ability_coverage_row(
@@ -1456,6 +2016,112 @@ def _bloodcrushers_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
         source_artifacts=_wahapedia_source_artifacts(),
         bridge_package_id=_bridge_package_id(),
         datasheet_ids=("000001115",),
+    )
+
+
+def _flesh_hounds_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_flesh_hounds_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-flesh-hounds",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-flesh-hounds",
+                model_name="Flesh Hounds",
+                height=1.6,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:flesh-hounds:height",
+                height_document_reference="Chaos Daemons Faction Pack p.26",
+            ),
+        ),
+    )
+
+
+def _flesh_hounds_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-shadow,test-faction,The Shadow of Chaos,Army rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-flesh-hounds,Flesh Hounds,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    "test-flesh-hounds,1,Faction,test-shadow,,,",
+                    (
+                        "test-flesh-hounds,2,Wargear,,Spare Charm,"
+                        "Add 1 to Charge rolls made for the bearer's unit.,"
+                    ),
+                    (
+                        "test-flesh-hounds,3,Wargear,,Collar of Khorne,"
+                        "The bearer has the Feel No Pain 3+ ability against Psychic Attacks.,"
+                    ),
+                    (
+                        "test-flesh-hounds,4,Datasheet,,Hunters from the Warp,"
+                        "\"At the end of your opponent's turn, if this unit is not within "
+                        "Engagement Range of one or more enemy units, you can remove it "
+                        'from the battlefield and place it into Strategic Reserves.",'
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-flesh-hounds,Beasts,,false",
+                    "test-flesh-hounds,Chaos,,false",
+                    "test-flesh-hounds,Daemon,,false",
+                    "test-flesh-hounds,Khorne,,false",
+                    "test-flesh-hounds,Legiones Daemonica,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-flesh-hounds,1,12,4,6,5,2,7,1,60mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_options",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    (
+                        "test-flesh-hounds,1,1 Flesh Hound that is not equipped with a "
+                        "Spare Charm can be equipped with 1 Collar of Khorne."
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(("datasheet_id,line,description", "test-flesh-hounds,1,5 Flesh Hounds")),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
     )
 
 

@@ -269,6 +269,7 @@ class GameStatePayload(TypedDict):
     faction_rule_states: list[FactionRuleStatePayload]
     army_definitions: list[ArmyDefinitionPayload]
     starting_strength_records: list[StartingStrengthRecordPayload]
+    starting_attached_unit_records: list[StartingAttachedUnitRecordPayload]
     battlefield_state: BattlefieldRuntimeStatePayload | None
     mission_setup: MissionSetupPayload | None
     movement_phase_state: MovementPhaseStatePayload | None
@@ -309,6 +310,138 @@ class GameStatePayload(TypedDict):
     tactical_secondary_achievement_contexts: list[TacticalSecondaryAchievementContextPayload]
     tactical_secondary_discard_cp_reward_window_ids: list[str]
     tactical_secondary_replacement_player_ids: list[str]
+
+
+class StartingAttachedUnitRecordPayload(TypedDict):
+    player_id: str
+    attached_unit_instance_id: str
+    bodyguard_unit_instance_id: str
+    leader_unit_instance_ids: list[str]
+    support_unit_instance_ids: list[str]
+    component_unit_instance_ids: list[str]
+    source_id: str
+
+
+@dataclass(frozen=True, slots=True)
+class StartingAttachedUnitRecord:
+    player_id: str
+    attached_unit_instance_id: str
+    bodyguard_unit_instance_id: str
+    leader_unit_instance_ids: tuple[str, ...]
+    support_unit_instance_ids: tuple[str, ...]
+    component_unit_instance_ids: tuple[str, ...]
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("StartingAttachedUnitRecord player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "attached_unit_instance_id",
+            _validate_identifier(
+                "StartingAttachedUnitRecord attached_unit_instance_id",
+                self.attached_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "bodyguard_unit_instance_id",
+            _validate_identifier(
+                "StartingAttachedUnitRecord bodyguard_unit_instance_id",
+                self.bodyguard_unit_instance_id,
+            ),
+        )
+        leader_ids = _validate_identifier_tuple(
+            "StartingAttachedUnitRecord leader_unit_instance_ids",
+            self.leader_unit_instance_ids,
+            min_length=0,
+            sort_values=True,
+        )
+        support_ids = _validate_identifier_tuple(
+            "StartingAttachedUnitRecord support_unit_instance_ids",
+            self.support_unit_instance_ids,
+            min_length=0,
+            sort_values=True,
+        )
+        if not leader_ids and not support_ids:
+            raise GameLifecycleError(
+                "StartingAttachedUnitRecord requires a leader or support unit."
+            )
+        component_ids = _validate_identifier_tuple(
+            "StartingAttachedUnitRecord component_unit_instance_ids",
+            self.component_unit_instance_ids,
+            min_length=2,
+            sort_values=True,
+        )
+        expected_component_ids = tuple(
+            sorted((self.bodyguard_unit_instance_id, *leader_ids, *support_ids))
+        )
+        if component_ids != expected_component_ids:
+            raise GameLifecycleError(
+                "StartingAttachedUnitRecord component_unit_instance_ids must match components."
+            )
+        object.__setattr__(self, "leader_unit_instance_ids", leader_ids)
+        object.__setattr__(self, "support_unit_instance_ids", support_ids)
+        object.__setattr__(self, "component_unit_instance_ids", component_ids)
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("StartingAttachedUnitRecord source_id", self.source_id),
+        )
+
+    @classmethod
+    def from_formation(
+        cls,
+        *,
+        player_id: str,
+        attached_unit: AttachedUnitFormation,
+    ) -> Self:
+        if type(attached_unit) is not AttachedUnitFormation:
+            raise GameLifecycleError(
+                "StartingAttachedUnitRecord derivation requires an AttachedUnitFormation."
+            )
+        return cls(
+            player_id=player_id,
+            attached_unit_instance_id=attached_unit.attached_unit_instance_id,
+            bodyguard_unit_instance_id=attached_unit.bodyguard_unit_instance_id,
+            leader_unit_instance_ids=attached_unit.leader_unit_instance_ids,
+            support_unit_instance_ids=attached_unit.support_unit_instance_ids,
+            component_unit_instance_ids=attached_unit.component_unit_instance_ids,
+            source_id=attached_unit.source_id,
+        )
+
+    def leader_or_support_unit_instance_ids(self) -> tuple[str, ...]:
+        return tuple(sorted((*self.leader_unit_instance_ids, *self.support_unit_instance_ids)))
+
+    def to_payload(self) -> StartingAttachedUnitRecordPayload:
+        return {
+            "player_id": self.player_id,
+            "attached_unit_instance_id": self.attached_unit_instance_id,
+            "bodyguard_unit_instance_id": self.bodyguard_unit_instance_id,
+            "leader_unit_instance_ids": list(self.leader_unit_instance_ids),
+            "support_unit_instance_ids": list(self.support_unit_instance_ids),
+            "component_unit_instance_ids": list(self.component_unit_instance_ids),
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: StartingAttachedUnitRecordPayload) -> Self:
+        return cls(
+            player_id=payload["player_id"],
+            attached_unit_instance_id=payload["attached_unit_instance_id"],
+            bodyguard_unit_instance_id=payload["bodyguard_unit_instance_id"],
+            leader_unit_instance_ids=tuple(payload["leader_unit_instance_ids"]),
+            support_unit_instance_ids=tuple(payload["support_unit_instance_ids"]),
+            component_unit_instance_ids=tuple(payload["component_unit_instance_ids"]),
+            source_id=payload["source_id"],
+        )
+
+
+def _new_starting_attached_unit_records() -> list[StartingAttachedUnitRecord]:
+    return []
 
 
 def _new_secondary_mission_choices() -> list[SecondaryMissionChoice]:
@@ -919,6 +1052,9 @@ class GameState:
     starting_strength_records: list[StartingStrengthRecord] = field(
         default_factory=_new_starting_strength_records
     )
+    starting_attached_unit_records: list[StartingAttachedUnitRecord] = field(
+        default_factory=_new_starting_attached_unit_records
+    )
     battlefield_state: BattlefieldRuntimeState | None = None
     mission_setup: MissionSetup | None = None
     movement_phase_state: MovementPhaseState | None = None
@@ -1085,6 +1221,11 @@ class GameState:
         )
         self.starting_strength_records = _validate_starting_strength_records(
             self.starting_strength_records,
+            army_definitions=self.army_definitions,
+            player_ids=self.player_ids,
+        )
+        self.starting_attached_unit_records = _validate_starting_attached_unit_records(
+            self.starting_attached_unit_records,
             army_definitions=self.army_definitions,
             player_ids=self.player_ids,
         )
@@ -1697,6 +1838,7 @@ class GameState:
         self.army_definitions.append(army_definition)
         self.army_definitions.sort(key=lambda stored: stored.player_id)
         self._record_starting_strength_records_for_army(army_definition)
+        self._record_starting_attached_unit_records_for_army(army_definition)
 
     def record_faction_rule_state(self, state: FactionRuleState) -> None:
         if type(state) is not FactionRuleState:
@@ -2739,6 +2881,26 @@ class GameState:
                 return record
         raise GameLifecycleError("StartingStrengthRecord unit_instance_id was not found.")
 
+    def unit_instance_id_for_model(self, model_instance_id: str) -> str:
+        requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
+        for army_definition in self.army_definitions:
+            for unit in army_definition.units:
+                if any(model.model_instance_id == requested_model_id for model in unit.own_models):
+                    return unit.unit_instance_id
+        raise GameLifecycleError("GameState model_instance_id was not found.")
+
+    def unit_started_battle_as_attached_leader_or_support(
+        self,
+        unit_instance_id: str,
+    ) -> bool:
+        requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+        if requested_unit_id not in _physical_unit_ids(self.army_definitions):
+            raise GameLifecycleError("Starting attached-unit query unit_instance_id is unknown.")
+        return any(
+            requested_unit_id in record.leader_or_support_unit_instance_ids()
+            for record in self.starting_attached_unit_records
+        )
+
     def recover_starting_strength_after_attached_unit_split(
         self,
         *,
@@ -2773,9 +2935,26 @@ class GameState:
             )
         if attached_record.player_id != requested_player_id:
             raise GameLifecycleError("Attached-unit split attached record player_id drift.")
+        starting_attached_record = None
+        for attached_unit_record in self.starting_attached_unit_records:
+            if attached_unit_record.attached_unit_instance_id == requested_attached_unit_id:
+                starting_attached_record = attached_unit_record
+                break
+        if (
+            starting_attached_record is not None
+            and starting_attached_record.player_id != requested_player_id
+        ):
+            raise GameLifecycleError("Attached-unit split attached-unit record player_id drift.")
+        recovery_unit_ids = (
+            starting_attached_record.component_unit_instance_ids
+            if starting_attached_record is not None
+            else surviving_ids
+        )
+        if any(unit_id not in recovery_unit_ids for unit_id in surviving_ids):
+            raise GameLifecycleError("Attached-unit split survivor is not an attached component.")
         unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
         recovered_records: list[StartingStrengthRecord] = []
-        for unit_id in surviving_ids:
+        for unit_id in recovery_unit_ids:
             owner = unit_owner_by_id.get(unit_id)
             if owner is None:
                 raise GameLifecycleError("Attached-unit split survivor unit is unknown.")
@@ -2792,7 +2971,7 @@ class GameState:
             surviving_unit_instance_ids=surviving_ids,
         )
         self._remove_attached_unit_formation(attached_unit_instance_id=requested_attached_unit_id)
-        replaced_ids = {*surviving_ids, requested_attached_unit_id}
+        replaced_ids = {*recovery_unit_ids, requested_attached_unit_id}
         self.starting_strength_records = [
             record
             for record in self.starting_strength_records
@@ -3909,6 +4088,9 @@ class GameState:
             "starting_strength_records": [
                 record.to_payload() for record in self.starting_strength_records
             ],
+            "starting_attached_unit_records": [
+                record.to_payload() for record in self.starting_attached_unit_records
+            ],
             "battlefield_state": (
                 None if self.battlefield_state is None else self.battlefield_state.to_payload()
             ),
@@ -4195,6 +4377,10 @@ class GameState:
                 StartingStrengthRecord.from_payload(record)
                 for record in payload["starting_strength_records"]
             ],
+            starting_attached_unit_records=[
+                StartingAttachedUnitRecord.from_payload(record)
+                for record in payload["starting_attached_unit_records"]
+            ],
             battlefield_state=(
                 None
                 if payload["battlefield_state"] is None
@@ -4408,6 +4594,23 @@ class GameState:
                 raise GameLifecycleError("StartingStrengthRecord already exists for unit.")
             self.starting_strength_records.append(record)
         self.starting_strength_records.sort(key=lambda record: record.unit_instance_id)
+
+    def _record_starting_attached_unit_records_for_army(
+        self,
+        army_definition: ArmyDefinition,
+    ) -> None:
+        records = _starting_attached_unit_records_for_army(army_definition)
+        existing_unit_ids = {
+            record.attached_unit_instance_id for record in self.starting_attached_unit_records
+        }
+        for record in records:
+            if record.attached_unit_instance_id in existing_unit_ids:
+                raise GameLifecycleError("StartingAttachedUnitRecord already exists for unit.")
+            existing_unit_ids.add(record.attached_unit_instance_id)
+            self.starting_attached_unit_records.append(record)
+        self.starting_attached_unit_records.sort(
+            key=lambda record: record.attached_unit_instance_id
+        )
 
     def _unit_by_id(self, unit_instance_id: str) -> UnitInstance:
         requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
@@ -5311,6 +5514,64 @@ def _validate_starting_strength_records(
     return sorted(validated, key=lambda record: record.unit_instance_id)
 
 
+def _validate_starting_attached_unit_records(
+    values: object,
+    *,
+    army_definitions: list[ArmyDefinition],
+    player_ids: tuple[str, ...],
+) -> list[StartingAttachedUnitRecord]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState starting_attached_unit_records must be a list.")
+    if not values and army_definitions:
+        derived: list[StartingAttachedUnitRecord] = []
+        for army_definition in army_definitions:
+            derived.extend(_starting_attached_unit_records_for_army(army_definition))
+        return sorted(derived, key=lambda record: record.attached_unit_instance_id)
+
+    expected_by_id = {
+        record.attached_unit_instance_id: record
+        for army_definition in army_definitions
+        for record in _starting_attached_unit_records_for_army(army_definition)
+    }
+    physical_owner_by_id = _unit_owner_by_id(army_definitions)
+    validated: list[StartingAttachedUnitRecord] = []
+    seen_attached_unit_ids: set[str] = set()
+    seen_component_unit_ids: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not StartingAttachedUnitRecord:
+            raise GameLifecycleError(
+                "GameState starting_attached_unit_records must contain "
+                "StartingAttachedUnitRecord values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("StartingAttachedUnitRecord player_id is not in this game.")
+        if value.attached_unit_instance_id in seen_attached_unit_ids:
+            raise GameLifecycleError("GameState starting_attached_unit_records must be unique.")
+        seen_attached_unit_ids.add(value.attached_unit_instance_id)
+        for component_unit_id in value.component_unit_instance_ids:
+            owner = physical_owner_by_id.get(component_unit_id)
+            if owner is None:
+                raise GameLifecycleError("StartingAttachedUnitRecord component unit is unknown.")
+            if owner != value.player_id:
+                raise GameLifecycleError("StartingAttachedUnitRecord component player_id drift.")
+            if component_unit_id in seen_component_unit_ids:
+                raise GameLifecycleError(
+                    "StartingAttachedUnitRecord component units must not overlap."
+                )
+            seen_component_unit_ids.add(component_unit_id)
+        validated.append(value)
+    by_id = {record.attached_unit_instance_id: record for record in validated}
+    for expected_id, expected_record in expected_by_id.items():
+        record = by_id.get(expected_id)
+        if record is None:
+            raise GameLifecycleError(
+                "GameState starting_attached_unit_records must include active attached units."
+            )
+        if record != expected_record:
+            raise GameLifecycleError("StartingAttachedUnitRecord active formation drift.")
+    return sorted(validated, key=lambda record: record.attached_unit_instance_id)
+
+
 def _starting_strength_records_for_army(
     army_definition: ArmyDefinition,
 ) -> tuple[StartingStrengthRecord, ...]:
@@ -5336,6 +5597,27 @@ def _starting_strength_records_for_army(
             )
         )
     return tuple(sorted(records, key=lambda record: record.unit_instance_id))
+
+
+def _starting_attached_unit_records_for_army(
+    army_definition: ArmyDefinition,
+) -> tuple[StartingAttachedUnitRecord, ...]:
+    if type(army_definition) is not ArmyDefinition:
+        raise GameLifecycleError(
+            "StartingAttachedUnitRecord derivation requires an ArmyDefinition."
+        )
+    return tuple(
+        sorted(
+            (
+                StartingAttachedUnitRecord.from_formation(
+                    player_id=army_definition.player_id,
+                    attached_unit=attached_unit,
+                )
+                for attached_unit in army_definition.attached_units
+            ),
+            key=lambda record: record.attached_unit_instance_id,
+        )
+    )
 
 
 def _starting_strength_record_for_attached_unit(
@@ -6259,6 +6541,10 @@ def _known_rules_unit_ids(
     return {unit.unit_instance_id for army in army_definitions for unit in army.units} | {
         record.unit_instance_id for record in starting_strength_records
     }
+
+
+def _physical_unit_ids(army_definitions: list[ArmyDefinition]) -> set[str]:
+    return {unit.unit_instance_id for army in army_definitions for unit in army.units}
 
 
 def _validate_secondary_mission_card_states(

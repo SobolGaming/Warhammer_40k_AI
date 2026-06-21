@@ -297,6 +297,120 @@ def test_phase17c_optional_wargear_ability_text_compiles_to_bearer_unit_ir() -> 
     }
 
 
+def test_phase17c_bearer_model_text_is_distinct_from_bearers_unit() -> None:
+    bearer = _compiled("The bearer has a Toughness characteristic of 5.").rule_ir
+    bearer_unit = _compiled("The bearer's unit has a Toughness characteristic of 5.").rule_ir
+
+    assert bearer.is_supported
+    assert bearer.clauses[0].target is not None
+    assert bearer.clauses[0].target.kind is RuleTargetKind.THIS_MODEL
+    assert bearer_unit.is_supported
+    assert bearer_unit.clauses[0].target is not None
+    assert bearer_unit.clauses[0].target.kind is RuleTargetKind.THIS_UNIT
+
+
+def test_phase17c_bearer_feel_no_pain_qualifier_compiles_to_model_source_ir() -> None:
+    rule_ir = _compiled(
+        "The bearer has the Feel No Pain 3+ ability against Psychic Attacks."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.GRANT_ABILITY
+    )
+
+    assert rule_ir.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert parameter_payload(effect.parameters) == {
+        "ability": "Feel No Pain",
+        "attack_condition": "psychic_attack",
+        "threshold": 3,
+    }
+
+
+def test_phase17c_skullmaster_fury_compiles_to_charge_move_weapon_keyword_grant() -> None:
+    rule_ir = _compiled(
+        "While this model is leading a unit, each time that unit ends a Charge move, "
+        "until the end of the turn, Juggernaut's bladed horns equipped by models in "
+        "that unit have the [DEVASTATING WOUNDS] ability."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    weapon_effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY
+    )
+
+    assert rule_ir.is_supported
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "after",
+        "phase": "charge",
+        "subject": "that_unit",
+        "timing_window": "charge_move_end",
+    }
+    assert any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters) == {"relationship": "this_model_leading_unit"}
+        for condition in clause.conditions
+    )
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.SELECTED_UNIT
+    assert clause.duration is not None
+    assert parameter_payload(clause.duration.parameters) == {"endpoint": "turn"}
+    assert parameter_payload(weapon_effect.parameters) == {
+        "target_scope": "models_in_selected_unit",
+        "weapon_ability": "Devastating Wounds",
+        "weapon_name": "Juggernaut's bladed horns",
+    }
+
+
+def test_phase17c_hunters_from_the_warp_compiles_to_turn_end_reserve_choice() -> None:
+    rule_ir = _compiled(
+        "At the end of your opponent's turn, if this unit is not within Engagement Range "
+        "of one or more enemy units, you can remove it from the battlefield and place it "
+        "into Strategic Reserves."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    reserve_effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.PLACEMENT_PERMISSION
+    )
+
+    assert rule_ir.is_supported
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "end",
+        "owner": "opponent",
+        "phase": "turn",
+        "timing_window": "turn_end",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert any(
+        condition.kind is RuleConditionKind.DISTANCE_PREDICATE
+        and parameter_payload(condition.parameters)
+        == {
+            "distance_inches": None,
+            "negated": True,
+            "object_allegiance": "enemy",
+            "object_kind": "unit",
+            "object_quantity": "one_or_more",
+            "predicate": "within_engagement_range",
+            "qualifier": None,
+            "range_kind": "engagement_range",
+            "subject": "this_unit",
+        }
+        for condition in clause.conditions
+    )
+    assert parameter_payload(reserve_effect.parameters) == {
+        "action": "remove_from_battlefield_to_strategic_reserves",
+        "allowed": True,
+        "optional": True,
+        "placement_kind": "turn_end_reserves",
+        "reserve_kind": "strategic_reserves",
+    }
+
+
 @pytest.mark.parametrize(
     ("raw_text", "expected_allegiance"),
     [

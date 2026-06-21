@@ -46,19 +46,40 @@ from warhammer40k_core.rules.rule_templates import (
 RULE_PARSER_VERSION = "phase17c-rule-parser-v1"
 
 _PHASES = "command|movement|shooting|charge|fight"
-_ROLL_TYPES = "advance|battle-shock|charge|damage|hazardous|hit|leadership|save|wound"
+_ROLL_TYPES = (
+    "advance|battle-shock|charge|critical hit|critical wound|damage|feel no pain|hazardous|"
+    "hit|invulnerable save|leadership|save|wound"
+)
+_TIMING_OWNER_PATTERN = (
+    r"your\s+opponent(?:'|\u2019)s|the\s+opponent(?:'|\u2019)s|"
+    r"opponent(?:'|\u2019)s|your|the"
+)
 _START_END_PHASE_RE = re.compile(
     rf"\bat\s+the\s+(?P<edge>start|end)\s+of\s+"
-    rf"(?:(?P<owner>your|the opponent's|opponent's|the)\s+)?(?P<phase>{_PHASES})\s+phase\b",
+    rf"(?:(?P<owner>{_TIMING_OWNER_PATTERN})\s+)?(?P<phase>{_PHASES})\s+phase\b",
+    re.IGNORECASE,
+)
+_START_END_TURN_RE = re.compile(
+    r"\bat\s+the\s+(?P<edge>start|end)\s+of\s+"
+    rf"(?P<owner>{_TIMING_OWNER_PATTERN})\s+turn\b",
     re.IGNORECASE,
 )
 _IN_PHASE_RE = re.compile(
-    rf"\b(?:in|during)\s+(?:(?P<owner>your|the opponent's|opponent's|the)\s+)?"
+    rf"\b(?:in|during)\s+(?:(?P<owner>{_TIMING_OWNER_PATTERN})\s+)?"
     rf"(?P<phase>{_PHASES})\s+phase\b",
+    re.IGNORECASE,
+)
+_IN_TURN_RE = re.compile(
+    rf"\b(?:in|during)\s+(?P<owner>{_TIMING_OWNER_PATTERN})\s+turn\b",
     re.IGNORECASE,
 )
 _DESTROYED_UNIT_RE = re.compile(r"\bwhen\s+this\s+unit\s+is\s+destroyed\b", re.IGNORECASE)
 _DESTROYED_MODEL_RE = re.compile(r"\bwhen\s+.*\bmodel\s+is\s+destroyed\b", re.IGNORECASE)
+_CHARGE_MOVE_END_RE = re.compile(
+    r"\b(?:each\s+time|when)\s+(?P<subject>that\s+unit|this\s+unit|a\s+unit)\s+ends\s+"
+    r"a\s+charge\s+move\b",
+    re.IGNORECASE,
+)
 _SETUP_RE = re.compile(r"\b(?:deployment|before\s+the\s+battle|set\s+up)\b", re.IGNORECASE)
 _DICE_TRIGGER_RE = re.compile(
     rf"\b(?:after|when|each\s+time)\s+.*\b(?P<roll>{_ROLL_TYPES})\s+roll", re.IGNORECASE
@@ -67,6 +88,10 @@ _ONCE_PER_RE = re.compile(
     r"\bonce\s+per\s+(?P<scope>phase|turn|battle|battle round)\b", re.IGNORECASE
 )
 _AURA_RE = re.compile(r"(?:\bAura\b|^\s*Aura\s*:)", re.IGNORECASE)
+_LEADING_UNIT_RE = re.compile(
+    r"\bwhile\s+this\s+model\s+is\s+leading\s+a\s+unit\b",
+    re.IGNORECASE,
+)
 _TARGET_RE = re.compile(
     r"\b(?:select\s+)?(?:one\s+)?(?P<allegiance>friendly|enemy)\s+"
     r"(?:(?P<keyword>[A-Z][A-Z0-9_-]*(?:\s+[A-Z0-9_-]+){0,3})\s+)?"
@@ -78,6 +103,10 @@ _BEARER_APOSTROPHE_RE = r"(?:'|\u2019)?"
 _BEARERS_UNIT_RE = re.compile(
     rf"\b(?:models\s+in\s+)?(?:the\s+)?bearer{_BEARER_APOSTROPHE_RE}s\s+unit\b|"
     rf"\bmade\s+for\s+(?:the\s+)?bearer{_BEARER_APOSTROPHE_RE}s\s+unit\b",
+    re.IGNORECASE,
+)
+_BEARER_MODEL_RE = re.compile(
+    r"\b(?:the\s+)?bearer\b|\bmade\s+for\s+(?:the\s+)?bearer\b",
     re.IGNORECASE,
 )
 _THAT_UNIT_RE = re.compile(r"\b(?:that|selected|target)\s+unit\b", re.IGNORECASE)
@@ -108,8 +137,8 @@ _REROLL_RE = re.compile(
     rf"\b(?:re-roll|reroll)\s+(?P<roll>{_ROLL_TYPES})\s+rolls?\b", re.IGNORECASE
 )
 _CHARACTERISTIC_NAMES = (
-    "Armor Penetration|AP|Attacks|Ballistic Skill|BS|Damage|Detection Range|Leadership|"
-    "Move|Movement|Objective Control|OC|Range|Save|Strength|Toughness|Weapon Skill|"
+    "Armor Penetration|AP|Attacks|Ballistic Skill|BS|Damage|Detection Range|Invulnerable Save|"
+    "Leadership|Move|Movement|Objective Control|OC|Range|Save|Strength|Toughness|Weapon Skill|"
     "Wounds|WS"
 )
 _CHARACTERISTIC_RE = re.compile(
@@ -144,18 +173,50 @@ _GRANT_ABILITY_RE = re.compile(
     r"\b(?:gains?|have|has)\s+(?P<ability>[A-Z][A-Za-z0-9 -]*(?:\s+\d+)?)\s+until\b",
     re.IGNORECASE,
 )
+_FEEL_NO_PAIN_ABILITY_RE = re.compile(
+    r"\b(?:gains?|have|has)\s+(?:the\s+)?Feel\s+No\s+Pain\s+"
+    r"(?P<threshold>[2-6])\+\s+ability"
+    r"(?:\s+against\s+(?P<attack_condition>Psychic\s+Attacks?))?\b",
+    re.IGNORECASE,
+)
 _WEAPON_KEYWORD_PATTERN = "|".join(
     re.escape(keyword)
     for keyword in sorted(canonical_weapon_keyword_tokens(), key=len, reverse=True)
 )
 _WEAPON_ABILITY_RE = re.compile(
     rf"\b(?:ranged\s+|melee\s+)?weapons?.{{0,100}}\b(?:gain|gains|have|has)\s+"
-    rf"(?P<ability>{_WEAPON_KEYWORD_PATTERN})\b",
+    rf"(?:the\s+)?\[?(?P<ability>{_WEAPON_KEYWORD_PATTERN})\]?"
+    rf"(?:\s+ability)?\b",
+    re.IGNORECASE,
+)
+_NAMED_WEAPON_ABILITY_RE = re.compile(
+    rf"\b(?P<weapon_name>[A-Z][A-Za-z0-9 '\u2019:-]+?)\s+equipped\s+by\s+models\s+"
+    rf"in\s+(?:that|this|the\s+selected)\s+unit\s+(?:gain|gains|have|has)\s+"
+    rf"(?:the\s+)?\[?(?P<ability>{_WEAPON_KEYWORD_PATTERN})\]?"
+    rf"(?:\s+ability)?\b",
     re.IGNORECASE,
 )
 _PLACEMENT_PERMISSION_RE = re.compile(r"\bcan\s+be\s+set\s+up\b", re.IGNORECASE)
 _PLACEMENT_RESTRICTION_RE = re.compile(
     r"\b(?:cannot|can't|can\s+only)\s+be\s+set\s+up\b",
+    re.IGNORECASE,
+)
+_REMOVE_TO_STRATEGIC_RESERVES_RE = re.compile(
+    r"\b(?:you\s+can\s+)?remove\s+it\s+from\s+the\s+battlefield\s+and\s+"
+    r"place\s+it\s+into\s+Strategic\s+Reserves\b",
+    re.IGNORECASE,
+)
+_DISTANCE_RELATION_RE = re.compile(
+    r"\b(?:(?P<subject>this\s+unit|this\s+model|that\s+unit|selected\s+unit|"
+    r"target\s+unit)\s+is\s+)?"
+    r"(?P<negated>not\s+)?"
+    r"(?P<predicate>wholly\s+within|within)\s+"
+    r"(?P<range>Engagement\s+Range|Objective\s+Marker\s+Range|\d+(?:\.\d+)?\")\s+"
+    r"of\s+"
+    r"(?:(?P<quantity>one\s+or\s+more|any|a|an)\s+)?"
+    r"(?:(?P<allegiance>enemy|friendly)\s+)?"
+    r"(?:(?P<keyword>[A-Z][A-Z0-9_-]*(?:\s+[A-Z0-9_-]+){0,3})\s+)?"
+    r"(?P<object_kind>units?|models?|objective\s+markers?)\b",
     re.IGNORECASE,
 )
 _RESIDUAL_TOKEN_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_+'-]*")
@@ -181,6 +242,7 @@ _RESIDUAL_CONNECTOR_TOKENS = frozenset(
         "from",
         "has",
         "have",
+        "if",
         "in",
         "into",
         "is",
@@ -230,6 +292,7 @@ _CHARACTERISTIC_BY_LABEL = {
     "bs": Characteristic.BALLISTIC_SKILL,
     "damage": Characteristic.DAMAGE,
     "detection range": Characteristic.DETECTION_RANGE,
+    "invulnerable save": Characteristic.INVULNERABLE_SAVE,
     "leadership": Characteristic.LEADERSHIP,
     "move": Characteristic.MOVEMENT,
     "movement": Characteristic.MOVEMENT,
@@ -342,6 +405,7 @@ def _compile_clause(
     conditions = _dedupe_conditions(
         (
             *_parse_aura_conditions(clause_text),
+            *_parse_leading_unit_conditions(clause_text),
             *_parse_frequency_conditions(clause_text),
             *_parse_keyword_conditions(clause_text),
             *_parse_distance_conditions(clause_text, parsed_text),
@@ -418,6 +482,20 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                 )
             ),
         )
+    for match in _START_END_TURN_RE.finditer(clause_text.text):
+        edge = _lower_group(match, "edge")
+        return RuleTrigger(
+            kind=RuleTriggerKind.TIMING_WINDOW,
+            source_span=_span_from_match(clause_text, match),
+            parameters=parameters_from_pairs(
+                (
+                    ("edge", edge),
+                    ("phase", "turn"),
+                    ("owner", _owner_token(match.group("owner"))),
+                    ("timing_window", f"turn_{edge}"),
+                )
+            ),
+        )
     for match in _IN_PHASE_RE.finditer(clause_text.text):
         return RuleTrigger(
             kind=RuleTriggerKind.TIMING_WINDOW,
@@ -427,6 +505,19 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                     ("edge", "during"),
                     ("phase", _lower_group(match, "phase")),
                     ("owner", _owner_token(match.group("owner"))),
+                )
+            ),
+        )
+    for match in _IN_TURN_RE.finditer(clause_text.text):
+        return RuleTrigger(
+            kind=RuleTriggerKind.TIMING_WINDOW,
+            source_span=_span_from_match(clause_text, match),
+            parameters=parameters_from_pairs(
+                (
+                    ("edge", "during"),
+                    ("phase", "turn"),
+                    ("owner", _owner_token(match.group("owner"))),
+                    ("timing_window", "turn_during"),
                 )
             ),
         )
@@ -441,6 +532,20 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
         return RuleTrigger(
             kind=RuleTriggerKind.MODEL_DESTROYED,
             source_span=_span_from_match(clause_text, model_destroyed_match),
+        )
+    charge_move_end_match = _CHARGE_MOVE_END_RE.search(clause_text.text)
+    if charge_move_end_match is not None:
+        return RuleTrigger(
+            kind=RuleTriggerKind.TIMING_WINDOW,
+            source_span=_span_from_match(clause_text, charge_move_end_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("edge", "after"),
+                    ("phase", "charge"),
+                    ("timing_window", "charge_move_end"),
+                    ("subject", _lower_group(charge_move_end_match, "subject")),
+                )
+            ),
         )
     dice_trigger_match = _DICE_TRIGGER_RE.search(clause_text.text)
     if dice_trigger_match is not None:
@@ -468,6 +573,19 @@ def _parse_aura_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...
             kind=RuleConditionKind.AURA,
             source_span=_span_from_match(clause_text, match),
             parameters=parameters_from_pairs((("source", "aura"),)),
+        ),
+    )
+
+
+def _parse_leading_unit_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
+    match = _LEADING_UNIT_RE.search(clause_text.text)
+    if match is None:
+        return ()
+    return (
+        RuleCondition(
+            kind=RuleConditionKind.TARGET_CONSTRAINT,
+            source_span=_span_from_match(clause_text, match),
+            parameters=parameters_from_pairs((("relationship", "this_model_leading_unit"),)),
         ),
     )
 
@@ -508,15 +626,21 @@ def _parse_distance_conditions(
     for token in parsed_text.distance_predicates:
         if not _token_inside_clause(token, clause_text):
             continue
+        relation_match = _distance_relation_match_for_token(clause_text=clause_text, token=token)
         pairs: tuple[tuple[str, RuleParameterValue], ...] = (
             ("predicate", token.kind.value),
             ("distance_inches", token.distance_inches),
             ("qualifier", token.qualifier),
+            *_distance_relation_parameter_pairs(relation_match),
         )
         conditions.append(
             RuleCondition(
                 kind=RuleConditionKind.DISTANCE_PREDICATE,
-                source_span=token.span,
+                source_span=(
+                    token.span
+                    if relation_match is None
+                    else _span_from_match(clause_text, relation_match)
+                ),
                 parameters=parameters_from_pairs(pairs),
             )
         )
@@ -554,6 +678,11 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
     if match is not None:
         return RuleTargetSpec(
             kind=RuleTargetKind.THIS_UNIT, source_span=_span_from_match(clause_text, match)
+        )
+    match = _BEARER_MODEL_RE.search(clause_text.text)
+    if match is not None:
+        return RuleTargetSpec(
+            kind=RuleTargetKind.THIS_MODEL, source_span=_span_from_match(clause_text, match)
         )
     match = _THAT_UNIT_RE.search(clause_text.text)
     if match is not None:
@@ -724,7 +853,30 @@ def _parse_resource_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, .
 
 def _parse_grant_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
+    for match in _FEEL_NO_PAIN_ABILITY_RE.finditer(clause_text.text):
+        parameter_pairs: list[tuple[str, RuleParameterValue]] = [
+            ("ability", "Feel No Pain"),
+            ("threshold", int(match.group("threshold"))),
+        ]
+        attack_condition = match.group("attack_condition")
+        if attack_condition is not None:
+            parameter_pairs.append(
+                ("attack_condition", _feel_no_pain_attack_condition_token(attack_condition))
+            )
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.GRANT_ABILITY,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(tuple(parameter_pairs)),
+            )
+        )
     for match in _GRANT_ABILITY_RE.finditer(clause_text.text):
+        if _span_matches_existing_effect(
+            clause_text=clause_text,
+            match=match,
+            effects=tuple(effects),
+        ):
+            continue
         ability = _ability_token(match.group("ability"))
         if _is_weapon_keyword(ability):
             continue
@@ -740,7 +892,27 @@ def _parse_grant_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSp
 
 def _parse_weapon_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
+    for match in _NAMED_WEAPON_ABILITY_RE.finditer(clause_text.text):
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.GRANT_WEAPON_ABILITY,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("weapon_ability", _ability_token(match.group("ability"))),
+                        ("weapon_name", _weapon_name_token(match.group("weapon_name"))),
+                        ("target_scope", "models_in_selected_unit"),
+                    )
+                ),
+            )
+        )
     for match in _WEAPON_ABILITY_RE.finditer(clause_text.text):
+        if _span_matches_existing_effect(
+            clause_text=clause_text,
+            match=match,
+            effects=tuple(effects),
+        ):
+            continue
         effects.append(
             RuleEffectSpec(
                 kind=RuleEffectKind.GRANT_WEAPON_ABILITY,
@@ -755,6 +927,22 @@ def _parse_weapon_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectS
 
 def _parse_placement_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
+    for match in _REMOVE_TO_STRATEGIC_RESERVES_RE.finditer(clause_text.text):
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.PLACEMENT_PERMISSION,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("allowed", True),
+                        ("optional", True),
+                        ("placement_kind", "turn_end_reserves"),
+                        ("reserve_kind", "strategic_reserves"),
+                        ("action", "remove_from_battlefield_to_strategic_reserves"),
+                    )
+                ),
+            )
+        )
     for match in _PLACEMENT_RESTRICTION_RE.finditer(clause_text.text):
         effects.append(
             RuleEffectSpec(
@@ -1005,6 +1193,44 @@ def json_key(value: RuleCondition | RuleEffectSpec) -> str:
     return repr(payload)
 
 
+def _distance_relation_match_for_token(
+    *,
+    clause_text: _ClauseText,
+    token: DistancePredicateToken,
+) -> re.Match[str] | None:
+    token_start = token.span.start - clause_text.span.start
+    token_end = token.span.end - clause_text.span.start
+    for match in _DISTANCE_RELATION_RE.finditer(clause_text.text):
+        if match.start("predicate") <= token_start and token_end <= match.end("range"):
+            return match
+    return None
+
+
+def _distance_relation_parameter_pairs(
+    match: re.Match[str] | None,
+) -> tuple[tuple[str, RuleParameterValue], ...]:
+    if match is None:
+        return ()
+    pairs: list[tuple[str, RuleParameterValue]] = [
+        ("negated", match.group("negated") is not None),
+        ("range_kind", _range_kind_token(match.group("range"))),
+        ("object_kind", _object_kind_token(match.group("object_kind"))),
+    ]
+    subject = match.group("subject")
+    if subject is not None:
+        pairs.append(("subject", _subject_token(subject)))
+    quantity = match.group("quantity")
+    if quantity is not None:
+        pairs.append(("object_quantity", _quantity_token(quantity)))
+    allegiance = match.group("allegiance")
+    if allegiance is not None:
+        pairs.append(("object_allegiance", allegiance.lower()))
+    keyword_text = match.group("keyword")
+    if keyword_text is not None:
+        pairs.append(("required_keyword", _keyword_token(keyword_text)))
+    return tuple(pairs)
+
+
 def _span_from_match(clause_text: _ClauseText, match: re.Match[str]) -> TextSpan:
     start = clause_text.start + match.start()
     end = clause_text.start + match.end()
@@ -1034,11 +1260,49 @@ def _roll_type(value: str) -> str:
     return value.lower().replace("-", "_").replace(" ", "_")
 
 
+def _subject_token(value: str) -> str:
+    return value.lower().replace(" ", "_").replace("-", "_")
+
+
+def _range_kind_token(value: str) -> str:
+    stripped = value.strip()
+    if stripped.endswith('"'):
+        return "numeric_range"
+    return stripped.lower().replace(" ", "_").replace("-", "_")
+
+
+def _object_kind_token(value: str) -> str:
+    normalized = value.lower().replace(" ", "_").replace("-", "_")
+    if normalized in {"units", "unit"}:
+        return "unit"
+    if normalized in {"models", "model"}:
+        return "model"
+    if normalized in {"objective_markers", "objective_marker"}:
+        return "objective_marker"
+    raise RuleIRError(f"Unsupported distance relation object kind: {value}.")
+
+
+def _quantity_token(value: str) -> str:
+    return value.lower().replace(" ", "_").replace("-", "_")
+
+
 def _keyword_token(value: str) -> str:
     return value.strip().upper().replace(" ", "_").replace("-", "_")
 
 
 def _ability_token(value: str) -> str:
+    stripped = value.strip(" []().,;:")
+    return " ".join(stripped.split())
+
+
+def _feel_no_pain_attack_condition_token(value: str) -> str:
+    normalized = value.strip().lower().replace("-", " ")
+    if normalized in {"psychic attack", "psychic attacks"}:
+        return "psychic_attack"
+    raise RuleIRError(f"Unsupported Feel No Pain attack qualifier: {value}.")
+
+
+def _weapon_name_token(value: str) -> str:
     stripped = value.strip(" []().,;:")
     return " ".join(stripped.split())
 

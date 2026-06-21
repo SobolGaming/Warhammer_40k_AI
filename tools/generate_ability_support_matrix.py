@@ -21,6 +21,7 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_coverage_rows_from_catalog,
     ability_coverage_rows_payload,
 )
+from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_ir_registered_hook_ids
 from warhammer40k_core.engine.faction_content.bundle import (
     DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID,
     RuntimeContentContribution,
@@ -70,7 +71,7 @@ DEFAULT_SOURCE_JSON_DIR = (
 DEFAULT_OUTPUT_DIR = Path("data") / "generated" / "ability_coverage"
 DEFAULT_DOCS_PATH = Path("docs") / "ABILITY_SUPPORT_MATRIX_V2.md"
 GENERATED_BY_COMMAND = "uv run python tools/generate_ability_support_matrix.py"
-DAEMON_WARGEAR_DATASHEET_IDS = ("000001114", "000001115")
+DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
 REQUIRED_TABLES = (
     "Abilities",
     "Datasheets",
@@ -100,6 +101,24 @@ BLOODLETTERS_HEIGHT_OVERRIDES = (
         height_units=GeometrySourceUnits.INCHES,
         height_source_id="geometry-review:chaos-daemons:bloodletters:bloodletters:height",
         height_document_reference="Chaos Daemons Faction Pack p.28-29",
+    ),
+)
+FLESH_HOUNDS_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000001112",
+        model_name="Gore Hound",
+        height=1.6,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:chaos-daemons:flesh-hounds:gore-hound:height",
+        height_document_reference="Chaos Daemons Faction Pack p.26",
+    ),
+    ModelHeightOverride(
+        datasheet_id="000001112",
+        model_name="Flesh Hounds",
+        height=1.6,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:chaos-daemons:flesh-hounds:height",
+        height_document_reference="Chaos Daemons Faction Pack p.26",
     ),
 )
 
@@ -356,7 +375,9 @@ def ability_support_matrix_rows(
         bridge_package_id=_bridge_package_id(),
         datasheet_ids=DAEMON_WARGEAR_DATASHEET_IDS,
         height_overrides=(
-            CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES + BLOODLETTERS_HEIGHT_OVERRIDES
+            CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES
+            + BLOODLETTERS_HEIGHT_OVERRIDES
+            + FLESH_HOUNDS_HEIGHT_OVERRIDES
         ),
     )
     package = build_canonical_catalog_package(
@@ -638,6 +659,8 @@ def _runtime_hook_inventory_rows(
     category_rows: list[AbilityCoverageCategoryRowPayload],
 ) -> tuple[RuntimeHookInventoryRow, ...]:
     inventory: dict[str, set[str]] = {}
+    for hook_id in catalog_rule_ir_registered_hook_ids():
+        inventory.setdefault(hook_id, set())
     for row in category_rows:
         for consumer_id in row["runtime_consumer_ids"]:
             for label in _category_runtime_consumer_labels(
@@ -1066,6 +1089,8 @@ def _add_inventory_entry(
 
 
 def _hook_ability_or_rule_labels_text(labels: tuple[str, ...]) -> str:
+    if not labels:
+        return "No current generated rows"
     return "<br>".join(_markdown_text(label) for label in labels)
 
 

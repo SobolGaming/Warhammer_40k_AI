@@ -516,9 +516,7 @@ def _semantic_categories(
         return _descriptor_semantic_categories(ability)
     categories: set[str] = set()
     for clause in rule_ir.clauses:
-        target = "unscoped"
-        if clause.target is not None and clause.target.kind is RuleTargetKind.THIS_UNIT:
-            target = "this_unit"
+        target = _semantic_target_token(clause.target.kind if clause.target is not None else None)
         for effect in clause.effects:
             parameters = parameter_payload(effect.parameters)
             if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
@@ -529,6 +527,11 @@ def _semantic_categories(
                 categories.add(
                     f"{ability.source_kind.value}.characteristic_set.{characteristic}.{target}"
                 )
+            elif (
+                effect.kind is RuleEffectKind.GRANT_ABILITY
+                and parameters.get("ability") == "Feel No Pain"
+            ):
+                categories.add(f"{ability.source_kind.value}.feel_no_pain.source.{target}")
             else:
                 categories.add(f"{ability.source_kind.value}.rule_ir.{effect.kind.value}.{target}")
         if clause.unsupported_reason is not None:
@@ -538,6 +541,24 @@ def _semantic_categories(
     if not categories:
         categories.add(f"{ability.source_kind.value}.rule_ir.no_effects")
     return tuple(sorted(categories))
+
+
+def _semantic_target_token(target_kind: RuleTargetKind | None) -> str:
+    if target_kind is None:
+        return "unscoped"
+    if type(target_kind) is not RuleTargetKind:
+        raise GameLifecycleError("Ability coverage target kind must be RuleTargetKind.")
+    if target_kind in {
+        RuleTargetKind.AURA_UNITS,
+        RuleTargetKind.ENEMY_UNIT,
+        RuleTargetKind.FRIENDLY_UNIT,
+        RuleTargetKind.SELECTED_UNIT,
+        RuleTargetKind.THIS_MODEL,
+        RuleTargetKind.THIS_UNIT,
+        RuleTargetKind.WEAPON,
+    }:
+        return target_kind.value
+    return "unscoped"
 
 
 def _descriptor_semantic_categories(
@@ -676,6 +697,7 @@ _CATEGORY_NAMES: Mapping[str, str] = {
     "unknown.ability_text": "Unknown Abilities",
     "faction.descriptor": "Faction Descriptor",
     "wargear.characteristic_set.leadership.this_unit": "Leadership Characteristic",
+    "wargear.feel_no_pain.source.this_model": "Feel No Pain Source",
     "wargear.roll_modifier.charge.this_unit": "Charge Roll Modifier",
 }
 

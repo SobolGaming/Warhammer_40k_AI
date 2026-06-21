@@ -33,6 +33,9 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
     BattleShockHookRegistry,
 )
+from warhammer40k_core.engine.catalog_turn_end_reserves import (
+    catalog_turn_end_reserve_hook_bindings,
+)
 from warhammer40k_core.engine.charge_declaration_hooks import (
     ChargeDeclarationHookBinding,
     ChargeDeclarationHookRegistry,
@@ -1242,6 +1245,11 @@ class RuntimeContentBundle:
             "contribution_ids",
             tuple(contribution.contribution_id for contribution in validated_contributions),
         )
+        ability_indexes_by_player_id = _ability_indexes_by_player_id(
+            armies=validated_armies,
+            catalog=catalog,
+            records=ability_records,
+        )
         event_handler_registry = RuntimeContentEventHandlerRegistry.from_bindings(
             tuple(
                 binding
@@ -1272,10 +1280,16 @@ class RuntimeContentBundle:
             )
         )
         turn_end_hook_registry = TurnEndHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.turn_end_hook_bindings
+            (
+                *catalog_turn_end_reserve_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
+                *(
+                    binding
+                    for contribution in validated_contributions
+                    for binding in contribution.turn_end_hook_bindings
+                ),
             )
         )
         command_phase_start_hook_registry = CommandPhaseStartHookRegistry.from_bindings(
@@ -1465,11 +1479,7 @@ class RuntimeContentBundle:
         )
         return cls(
             activation=activation,
-            ability_indexes_by_player_id=_ability_indexes_by_player_id(
-                armies=validated_armies,
-                catalog=catalog,
-                records=ability_records,
-            ),
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
             stratagem_indexes_by_player_id=_stratagem_indexes_by_player_id(
                 armies=validated_armies,
                 catalog=catalog,

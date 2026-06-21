@@ -88,6 +88,7 @@ TARGET_SCOPED_EFFECT_KINDS = (
 AURA_ALLEGIANCE_ANY = "any"
 AURA_ALLEGIANCE_ENEMY = "enemy"
 AURA_ALLEGIANCE_FRIENDLY = "friendly"
+TARGET_CONSTRAINT_THIS_MODEL_LEADING_UNIT = "this_model_leading_unit"
 
 
 class RuleExecutionStatus(StrEnum):
@@ -1211,6 +1212,9 @@ def _clause_semantic_unavailable_reason(
     context: RuleExecutionContext,
     simulated_command_ledgers: dict[str, CommandPointLedger],
 ) -> str | None:
+    condition_reason = _condition_unavailable_reason(clause=clause, context=context)
+    if condition_reason is not None:
+        return condition_reason
     target_reason = _effect_clause_target_unavailable_reason(clause=clause, context=context)
     if target_reason is not None:
         return target_reason
@@ -1226,6 +1230,52 @@ def _clause_semantic_unavailable_reason(
         )
         if effect_reason is not None:
             return effect_reason
+    return None
+
+
+def _condition_unavailable_reason(
+    *,
+    clause: RuleClause,
+    context: RuleExecutionContext,
+) -> str | None:
+    for condition in clause.conditions:
+        if condition.kind is not RuleConditionKind.TARGET_CONSTRAINT:
+            continue
+        unavailable = _target_constraint_unavailable_reason(
+            condition=condition,
+            context=context,
+        )
+        if unavailable is not None:
+            return unavailable
+    return None
+
+
+def _target_constraint_unavailable_reason(
+    *,
+    condition: RuleCondition,
+    context: RuleExecutionContext,
+) -> str | None:
+    parameters = parameter_payload(condition.parameters)
+    relationship = parameters.get("relationship")
+    if type(relationship) is not str:
+        raise GameLifecycleError("Target constraint condition requires a relationship.")
+    if relationship != TARGET_CONSTRAINT_THIS_MODEL_LEADING_UNIT:
+        return f"unsupported_target_constraint:{relationship}"
+    state = context.state
+    if state is None:
+        return "missing_input:game_state"
+    source_unit_id = context.source_unit_instance_id
+    if source_unit_id is None:
+        source_model_id = context.source_model_instance_id
+        if source_model_id is None:
+            return "missing_input:source_unit_instance_id"
+        source_unit_id = state.unit_instance_id_for_model(source_model_id)
+    elif context.source_model_instance_id is not None:
+        model_unit_id = state.unit_instance_id_for_model(context.source_model_instance_id)
+        if model_unit_id != source_unit_id:
+            return "source_model_unit_mismatch"
+    if not state.unit_started_battle_as_attached_leader_or_support(source_unit_id):
+        return f"condition_not_met:{TARGET_CONSTRAINT_THIS_MODEL_LEADING_UNIT}"
     return None
 
 
