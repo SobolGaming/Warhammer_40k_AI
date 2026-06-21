@@ -89,6 +89,8 @@ from warhammer40k_core.engine.runtime_modifiers import (
     SaveOptionModifierContext,
     UnitCharacteristicModifierBinding,
     UnitCharacteristicModifierContext,
+    WoundRollModifierBinding,
+    WoundRollModifierContext,
 )
 from warhammer40k_core.engine.saves import (
     SaveKind,
@@ -336,6 +338,17 @@ def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() 
         assert context.source_phase is BattlePhase.FIGHT
         return -3
 
+    def wound_roll_first(context: WoundRollModifierContext) -> int:
+        call_order.append("wound-roll:first")
+        assert context.strength == 5
+        assert context.toughness == 4
+        return 1
+
+    def wound_roll_second(context: WoundRollModifierContext) -> int:
+        call_order.append("wound-roll:second")
+        assert context.target_unit_instance_id == ENEMY_UNIT_ID
+        return -2
+
     def save_option_first(context: SaveOptionModifierContext) -> tuple[SaveOption, ...]:
         call_order.append("save-option:first")
         option = context.save_options[0]
@@ -404,6 +417,18 @@ def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() 
                 handler=hit_roll_first,
             ),
         ),
+        wound_roll_modifier_bindings=(
+            WoundRollModifierBinding(
+                modifier_id="runtime:wound-roll-second",
+                source_id="runtime:source-wound-roll-second",
+                handler=wound_roll_second,
+            ),
+            WoundRollModifierBinding(
+                modifier_id="runtime:wound-roll-first",
+                source_id="runtime:source-wound-roll-first",
+                handler=wound_roll_first,
+            ),
+        ),
         save_option_modifier_bindings=(
             SaveOptionModifierBinding(
                 modifier_id="runtime:save-option-second",
@@ -446,6 +471,10 @@ def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() 
         "runtime:hit-roll-first",
         "runtime:hit-roll-second",
     ]
+    assert [binding.modifier_id for binding in registry.all_wound_roll_bindings()] == [
+        "runtime:wound-roll-first",
+        "runtime:wound-roll-second",
+    ]
     assert (
         registry.modified_unit_characteristic(
             UnitCharacteristicModifierContext(
@@ -462,11 +491,29 @@ def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() 
         registry.hit_roll_modifier(
             HitRollModifierContext(
                 state=state,
+                attacking_unit_instance_id=unit.unit_instance_id,
                 attacker_model_instance_id=model_id,
+                target_unit_instance_id=ENEMY_UNIT_ID,
+                weapon_profile=_first_weapon_profile_for_unit(unit),
                 source_phase=cast(BattlePhase, BattlePhase.FIGHT.value),
             )
         )
         == -2
+    )
+    assert (
+        registry.wound_roll_modifier(
+            WoundRollModifierContext(
+                state=state,
+                source_phase=BattlePhase.SHOOTING,
+                attacking_unit_instance_id=unit.unit_instance_id,
+                attacker_model_instance_id=model_id,
+                target_unit_instance_id=ENEMY_UNIT_ID,
+                weapon_profile=_first_weapon_profile_for_unit(unit),
+                strength=5,
+                toughness=4,
+            )
+        )
+        == -1
     )
     assert registry.modified_save_options(
         SaveOptionModifierContext(
@@ -510,6 +557,8 @@ def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() 
         "unit-characteristic:second",
         "hit-roll:first",
         "hit-roll:second",
+        "wound-roll:first",
+        "wound-roll:second",
         "save-option:first",
         "save-option:second",
         "movement:first",
@@ -572,8 +621,22 @@ def test_runtime_modifier_registry_rejects_invalid_context_and_binding_shapes() 
     with pytest.raises(GameLifecycleError, match="Hit roll modifier state"):
         HitRollModifierContext(
             state=invalid_state,
+            attacking_unit_instance_id=unit.unit_instance_id,
             attacker_model_instance_id=model_id,
+            target_unit_instance_id=ENEMY_UNIT_ID,
+            weapon_profile=_first_weapon_profile_for_unit(unit),
             source_phase=BattlePhase.FIGHT,
+        )
+    with pytest.raises(GameLifecycleError, match="Wound roll modifier state"):
+        WoundRollModifierContext(
+            state=invalid_state,
+            source_phase=BattlePhase.SHOOTING,
+            attacking_unit_instance_id=unit.unit_instance_id,
+            attacker_model_instance_id=model_id,
+            target_unit_instance_id=ENEMY_UNIT_ID,
+            weapon_profile=_first_weapon_profile_for_unit(unit),
+            strength=5,
+            toughness=4,
         )
     with pytest.raises(GameLifecycleError, match="Save option modifier state"):
         SaveOptionModifierContext(
@@ -602,6 +665,8 @@ def test_runtime_modifier_registry_rejects_invalid_context_and_binding_shapes() 
         registry.modified_unit_characteristic(cast(UnitCharacteristicModifierContext, object()))
     with pytest.raises(GameLifecycleError, match="Hit roll modifiers require"):
         registry.hit_roll_modifier(cast(HitRollModifierContext, object()))
+    with pytest.raises(GameLifecycleError, match="Wound roll modifiers require"):
+        registry.wound_roll_modifier(cast(WoundRollModifierContext, object()))
     with pytest.raises(GameLifecycleError, match="Save option modifiers require"):
         registry.modified_save_options(cast(SaveOptionModifierContext, object()))
     with pytest.raises(GameLifecycleError, match="Movement budget modifiers require"):
@@ -661,13 +726,19 @@ def test_runtime_modifier_registry_rejects_invalid_context_and_binding_shapes() 
     with pytest.raises(GameLifecycleError, match="must be a BattlePhase"):
         HitRollModifierContext(
             state=state,
+            attacking_unit_instance_id=unit.unit_instance_id,
             attacker_model_instance_id=model_id,
+            target_unit_instance_id=ENEMY_UNIT_ID,
+            weapon_profile=_first_weapon_profile_for_unit(unit),
             source_phase=cast(BattlePhase, object()),
         )
     with pytest.raises(GameLifecycleError, match="Unsupported runtime modifier BattlePhase"):
         HitRollModifierContext(
             state=state,
+            attacking_unit_instance_id=unit.unit_instance_id,
             attacker_model_instance_id=model_id,
+            target_unit_instance_id=ENEMY_UNIT_ID,
+            weapon_profile=_first_weapon_profile_for_unit(unit),
             source_phase=cast(BattlePhase, "invalid-phase"),
         )
     with pytest.raises(GameLifecycleError, match="base_movement_inches must be numeric"):

@@ -308,7 +308,7 @@ Detachment rule support is source-row complete, but semantic engine support is o
 | Chaos Daemons | Legion of Excess | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
 | Chaos Daemons | Plague Legion | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
 | Chaos Daemons | Scintillating Legion | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
-| Chaos Daemons | Shadow Legion | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
+| Chaos Daemons | Shadow Legion | Mustering restrictions and keyword grants, Murderer's Cowl Advance eligibility, Penumbral Puppetry hit modifiers, Gloam Rot wound modifiers, Shadow's Caress snap-target restriction, and Disciples of Be'lakor Dark Pacts hooks | Adapter contract, decision catalog, README, and generated matrix | Focused mustering, runtime hook, modifier, target-restriction, out-of-phase shooting, Be'lakor auto-pass, and Feel No Pain routing tests | Full | Includes Shadow Legion/Undivided/Deep Strike keyword grants, Thralls of the First Prince roster caps and exclusions, Dark Pacts selected-to-shoot/fight grants for Undivided units, Be'lakor Leadership auto-pass, and Shadow-source D3 mortal-wound Feel No Pain continuation. |
 | Astra Militarum | Abhuman Auxiliaries | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
 | Astra Militarum | Bridgehead Strike | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
 | Astra Militarum | Designation Force | Generated scaffold only | Source row and generated module scaffold | Source-row/catalog coverage | None | No semantic detachment-rule hook is implemented. |
@@ -523,6 +523,17 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:soul_shattering_charge_upgrade` | Soul-Shattering Charge Upgrade |
 | `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche` | Unholy Avalanche |
 | `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:warp_riders` | Warp-Riders |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:attack-sequence-completed` | Shadow Legion |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:fight:lethal_hits` | Shadow Legion |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:fight:sustained_hits_1` | Shadow Legion |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:mortal-wound-fnp` | Shadow Legion |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:shooting:lethal_hits` | Shadow Legion |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:shooting:sustained_hits_1` | Shadow Legion |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:weapon-profile` | Shadow Legion |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:gloam-rot:wound-roll` | Shadow Legion |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:murderers-cowl:advance-eligibility` | Shadow Legion |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:penumbral-puppetry:hit-roll` | Shadow Legion |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:shadows-caress:snap-target-restriction` | Shadow Legion |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed` | Dark Pacts |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits` | Dark Pacts |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1` | Dark Pacts |

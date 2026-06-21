@@ -32,6 +32,28 @@ DAEMONIC_PACT_FACTION_KEYWORD = "LEGIONES DAEMONICA"
 DAEMONIC_PACT_BASE_FACTION_KEYWORDS = frozenset({"CHAOS KNIGHTS", "HERETIC ASTARTES"})
 DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_FACTION_KEYWORD = "DRUKHARI"
 DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_ALLY_KEYWORDS = frozenset({"HARLEQUINS", "ANHRATHE"})
+SHADOW_LEGION_FACTION_KEYWORD = "LEGIONES DAEMONICA"
+SHADOW_LEGION_DETACHMENT_ID = "shadow-legion"
+SHADOW_LEGION_HERETIC_ASTARTES_FACTION_KEYWORD = "HERETIC ASTARTES"
+SHADOW_LEGION_DAMNED_KEYWORD = "DAMNED"
+SHADOW_LEGION_ALLOWED_HERETIC_ASTARTES_NAMES = frozenset(
+    {
+        "CHAOSLORD",
+        "CHAOSLORDINTERMINATORARMOUR",
+        "CHAOSLORDWITHJUMPPACK",
+        "CHAOSTERMINATORSQUAD",
+        "CHOSEN",
+        "DARKAPOSTLE",
+        "HAVOCS",
+        "LEGIONARIES",
+        "MASTEROFPOSSESSION",
+        "POSSESSED",
+        "RAPTORS",
+        "SORCERER",
+        "SORCERERINTERMINATORARMOUR",
+        "WARPTALONS",
+    }
+)
 
 
 class BattleSizeMusteringPolicyPayload(TypedDict):
@@ -567,7 +589,17 @@ def validate_unit_selection_for_army(
             faction=faction,
         )
     )
-    if not shares_selected_faction and not daemonic_pact_allowed and not drukhari_corsairs_allowed:
+    shadow_legion_thralls_allowed = shadow_legion_thralls_datasheet_has_faction_access(
+        datasheet=datasheet,
+        faction=faction,
+        detachment_selection=detachment_selection,
+    )
+    if (
+        not shares_selected_faction
+        and not daemonic_pact_allowed
+        and not drukhari_corsairs_allowed
+        and not shadow_legion_thralls_allowed
+    ):
         raise ListValidationError("UnitMusterSelection datasheet is not legal for faction.")
     _selected_faction, detachments = validate_detachment_selection(
         catalog=catalog,
@@ -581,6 +613,7 @@ def validate_unit_selection_for_army(
         datasheet.datasheet_id not in allowed_datasheet_ids
         and not daemonic_pact_allowed
         and not drukhari_corsairs_allowed
+        and not shadow_legion_thralls_allowed
     ):
         raise ListValidationError(
             "UnitMusterSelection datasheet is not provided by selected detachments."
@@ -630,6 +663,60 @@ def drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction(
         datasheet,
         DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_ALLY_KEYWORDS,
     )
+
+
+def shadow_legion_thralls_datasheet_allowed_for_faction(
+    *,
+    datasheet: DatasheetDefinition,
+    faction: FactionDefinition,
+    detachment_selection: DetachmentSelection,
+) -> bool:
+    if type(datasheet) is not DatasheetDefinition:
+        raise ListValidationError("Shadow Legion datasheet must be a DatasheetDefinition.")
+    if type(faction) is not FactionDefinition:
+        raise ListValidationError("Shadow Legion faction must be a FactionDefinition.")
+    if type(detachment_selection) is not DetachmentSelection:
+        raise ListValidationError("Shadow Legion detachment selection is invalid.")
+    if not _faction_has_keyword(faction, SHADOW_LEGION_FACTION_KEYWORD):
+        return False
+    if SHADOW_LEGION_DETACHMENT_ID not in detachment_selection.detachment_ids:
+        return False
+    if not _datasheet_has_faction_keyword(
+        datasheet,
+        SHADOW_LEGION_HERETIC_ASTARTES_FACTION_KEYWORD,
+    ):
+        return False
+    return _shadow_legion_heretic_astartes_datasheet_allowed(datasheet)
+
+
+def shadow_legion_thralls_datasheet_has_faction_access(
+    *,
+    datasheet: DatasheetDefinition,
+    faction: FactionDefinition,
+    detachment_selection: DetachmentSelection,
+) -> bool:
+    if type(datasheet) is not DatasheetDefinition:
+        raise ListValidationError("Shadow Legion datasheet must be a DatasheetDefinition.")
+    if type(faction) is not FactionDefinition:
+        raise ListValidationError("Shadow Legion faction must be a FactionDefinition.")
+    if type(detachment_selection) is not DetachmentSelection:
+        raise ListValidationError("Shadow Legion detachment selection is invalid.")
+    if not _faction_has_keyword(faction, SHADOW_LEGION_FACTION_KEYWORD):
+        return False
+    if SHADOW_LEGION_DETACHMENT_ID not in detachment_selection.detachment_ids:
+        return False
+    return _datasheet_has_faction_keyword(
+        datasheet,
+        SHADOW_LEGION_HERETIC_ASTARTES_FACTION_KEYWORD,
+    )
+
+
+def _shadow_legion_heretic_astartes_datasheet_allowed(
+    datasheet: DatasheetDefinition,
+) -> bool:
+    if _datasheet_has_any_keyword(datasheet, frozenset({SHADOW_LEGION_DAMNED_KEYWORD})):
+        return True
+    return _canonical_name(datasheet.name) in SHADOW_LEGION_ALLOWED_HERETIC_ASTARTES_NAMES
 
 
 def resolve_model_profile_selections(
@@ -735,6 +822,10 @@ def _faction_has_keyword(
 
 def _canonical_keyword(value: str) -> str:
     return value.strip().replace("_", " ").replace("-", " ").upper()
+
+
+def _canonical_name(value: str) -> str:
+    return "".join(character for character in value.upper() if character.isalnum())
 
 
 def _catalog_faction_by_id(catalog: ArmyCatalog, faction_id: str) -> FactionDefinition:

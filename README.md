@@ -166,7 +166,12 @@ Current status:
   rule IR, generic rule execution, and adapter decision submission is in place.
 - Faction semantic execution is active incremental work. Current runtime
   support includes selected Chaos Daemons, Chaos Space Marines, Aeldari,
-  Death Guard, and World Eaters Phase 17G slices. Chaos Space Marines Dark
+  Death Guard, and World Eaters Phase 17G slices. Chaos Daemons Shadow Legion
+  supports Thralls of the First Prince mustering restrictions and keyword
+  grants, Murderer's Cowl, Penumbral Puppetry, Gloam Rot, Shadow's Caress, and
+  Disciples of Be'lakor Dark Pacts through shared advance, target-restriction,
+  runtime-modifier, selected-unit grant, attack-completion, out-of-phase
+  shooting, and Feel No Pain continuation paths. Chaos Space Marines Dark
   Pacts uses shared selected-to-shoot and selected-to-fight grant decisions,
   out-of-phase selected-to-shoot grant routing, attack-sequence weapon keyword
   modifiers, and post-attack Leadership-test D3 mortal-wound routing including

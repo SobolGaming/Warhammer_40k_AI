@@ -2515,6 +2515,7 @@ def _request_shooting_declaration(
                     target_unit_instance_id=candidate.target_unit_instance_id,
                     registry=shooting_target_restriction_hooks,
                     attacker_model_instance_id=candidate.observer_model_id,
+                    shooting_type=forced_shooting_type or selected_shooting_type,
                 )
                 for candidate in shooting_target_candidates_for_unit(
                     scenario=scenario,
@@ -4223,6 +4224,7 @@ def _attack_pools_or_validation(
             target_unit_instance_id=declaration.target_unit_instance_id,
             registry=shooting_target_restriction_hooks,
             attacker_model_instance_id=declaration.attacker_model_instance_id,
+            shooting_type=declaration.shooting_type,
         )
         if not candidate.is_legal:
             violation = candidate.violation_code
@@ -4437,6 +4439,7 @@ def _shooting_candidate_with_target_restrictions(
     target_unit_instance_id: str,
     registry: ShootingTargetRestrictionHookRegistry | None,
     attacker_model_instance_id: str | None = None,
+    shooting_type: ShootingType | None = None,
 ) -> ShootingTargetCandidate:
     if type(candidate) is not ShootingTargetCandidate:
         raise GameLifecycleError("Shooting target restriction requires a target candidate.")
@@ -4454,6 +4457,7 @@ def _shooting_candidate_with_target_restrictions(
             attacking_unit_instance_id=attacking_unit_instance_id,
             target_unit_instance_id=target_unit_instance_id,
             attacker_model_instance_id=attacker_model_instance_id,
+            shooting_type=shooting_type,
         )
     )
     if not restrictions:
@@ -6007,6 +6011,7 @@ def _cached_shooting_target_candidate_for_model(
                 target_unit_instance_id=target_unit_id,
                 registry=shooting_target_restriction_hooks,
                 attacker_model_instance_id=weapon["model_instance_id"],
+                shooting_type=None,
             )
         cache[cache_key] = candidate
     return cache[cache_key]

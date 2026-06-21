@@ -19,6 +19,7 @@ type UnitCharacteristicModifierHandler = Callable[
     int,
 ]
 type HitRollModifierHandler = Callable[["HitRollModifierContext"], int]
+type WoundRollModifierHandler = Callable[["WoundRollModifierContext"], int]
 type SaveOptionModifierHandler = Callable[
     ["SaveOptionModifierContext"],
     tuple[SaveOption, ...],
@@ -70,7 +71,10 @@ class UnitCharacteristicModifierContext:
 @dataclass(frozen=True, slots=True)
 class HitRollModifierContext:
     state: GameState
+    attacking_unit_instance_id: str
     attacker_model_instance_id: str
+    target_unit_instance_id: str
+    weapon_profile: WeaponProfile
     source_phase: BattlePhase
 
     def __post_init__(self) -> None:
@@ -80,10 +84,69 @@ class HitRollModifierContext:
             raise GameLifecycleError("Hit roll modifier state must be GameState.")
         object.__setattr__(
             self,
+            "attacking_unit_instance_id",
+            _validate_identifier(
+                "attacking_unit_instance_id",
+                self.attacking_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
             "attacker_model_instance_id",
             _validate_identifier("attacker_model_instance_id", self.attacker_model_instance_id),
         )
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier("target_unit_instance_id", self.target_unit_instance_id),
+        )
+        if type(self.weapon_profile) is not WeaponProfile:
+            raise GameLifecycleError("Hit roll modifier profile must be WeaponProfile.")
         object.__setattr__(self, "source_phase", _battle_phase_from_token(self.source_phase))
+
+
+@dataclass(frozen=True, slots=True)
+class WoundRollModifierContext:
+    state: GameState
+    source_phase: BattlePhase
+    attacking_unit_instance_id: str
+    attacker_model_instance_id: str
+    target_unit_instance_id: str
+    weapon_profile: WeaponProfile
+    strength: int
+    toughness: int
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(self.state) is not GameState:
+            raise GameLifecycleError("Wound roll modifier state must be GameState.")
+        object.__setattr__(self, "source_phase", _battle_phase_from_token(self.source_phase))
+        object.__setattr__(
+            self,
+            "attacking_unit_instance_id",
+            _validate_identifier(
+                "attacking_unit_instance_id",
+                self.attacking_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "attacker_model_instance_id",
+            _validate_identifier(
+                "attacker_model_instance_id",
+                self.attacker_model_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier("target_unit_instance_id", self.target_unit_instance_id),
+        )
+        if type(self.weapon_profile) is not WeaponProfile:
+            raise GameLifecycleError("Wound roll modifier profile must be WeaponProfile.")
+        object.__setattr__(self, "strength", _validate_positive_int("strength", self.strength))
+        object.__setattr__(self, "toughness", _validate_positive_int("toughness", self.toughness))
 
 
 @dataclass(frozen=True, slots=True)
@@ -279,6 +342,21 @@ class HitRollModifierBinding:
 
 
 @dataclass(frozen=True, slots=True)
+class WoundRollModifierBinding:
+    modifier_id: str
+    source_id: str
+    handler: WoundRollModifierHandler
+
+    def __post_init__(self) -> None:
+        _validate_modifier_binding(
+            field_prefix="Wound roll modifier",
+            modifier_id=self.modifier_id,
+            source_id=self.source_id,
+            handler=self.handler,
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class SaveOptionModifierBinding:
     modifier_id: str
     source_id: str
@@ -357,6 +435,7 @@ class WeaponProfileModifierBinding:
 class RuntimeModifierRegistry:
     unit_characteristic_modifier_bindings: tuple[UnitCharacteristicModifierBinding, ...] = ()
     hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = ()
+    wound_roll_modifier_bindings: tuple[WoundRollModifierBinding, ...] = ()
     save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = ()
     movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = ()
     objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = ()
@@ -380,6 +459,15 @@ class RuntimeModifierRegistry:
                 "RuntimeModifierRegistry hit_roll_modifier_bindings",
                 self.hit_roll_modifier_bindings,
                 HitRollModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "wound_roll_modifier_bindings",
+            _validate_bindings(
+                "RuntimeModifierRegistry wound_roll_modifier_bindings",
+                self.wound_roll_modifier_bindings,
+                WoundRollModifierBinding,
             ),
         )
         object.__setattr__(
@@ -441,6 +529,7 @@ class RuntimeModifierRegistry:
             ...,
         ] = (),
         hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = (),
+        wound_roll_modifier_bindings: tuple[WoundRollModifierBinding, ...] = (),
         save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = (),
         movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = (),
         objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = (),
@@ -450,6 +539,7 @@ class RuntimeModifierRegistry:
         return cls(
             unit_characteristic_modifier_bindings=unit_characteristic_modifier_bindings,
             hit_roll_modifier_bindings=hit_roll_modifier_bindings,
+            wound_roll_modifier_bindings=wound_roll_modifier_bindings,
             save_option_modifier_bindings=save_option_modifier_bindings,
             movement_budget_modifier_bindings=movement_budget_modifier_bindings,
             objective_control_modifier_bindings=objective_control_modifier_bindings,
@@ -462,6 +552,9 @@ class RuntimeModifierRegistry:
 
     def all_hit_roll_bindings(self) -> tuple[HitRollModifierBinding, ...]:
         return self.hit_roll_modifier_bindings
+
+    def all_wound_roll_bindings(self) -> tuple[WoundRollModifierBinding, ...]:
+        return self.wound_roll_modifier_bindings
 
     def all_save_option_bindings(self) -> tuple[SaveOptionModifierBinding, ...]:
         return self.save_option_modifier_bindings
@@ -494,6 +587,17 @@ class RuntimeModifierRegistry:
             raise GameLifecycleError("Hit roll modifiers require a context.")
         total = 0
         for binding in self.hit_roll_modifier_bindings:
+            total += _validate_int(
+                f"{binding.modifier_id} returned modifier",
+                binding.handler(context),
+            )
+        return total
+
+    def wound_roll_modifier(self, context: WoundRollModifierContext) -> int:
+        if type(context) is not WoundRollModifierContext:
+            raise GameLifecycleError("Wound roll modifiers require a context.")
+        total = 0
+        for binding in self.wound_roll_modifier_bindings:
             total += _validate_int(
                 f"{binding.modifier_id} returned modifier",
                 binding.handler(context),
@@ -580,6 +684,7 @@ def _validate_bindings[T](
         modifier_id = cast(
             UnitCharacteristicModifierBinding
             | HitRollModifierBinding
+            | WoundRollModifierBinding
             | SaveOptionModifierBinding
             | MovementBudgetModifierBinding
             | ObjectiveControlModifierBinding
@@ -598,6 +703,7 @@ def _modifier_id_for_binding(binding: object) -> str:
     if type(binding) in {
         UnitCharacteristicModifierBinding,
         HitRollModifierBinding,
+        WoundRollModifierBinding,
         SaveOptionModifierBinding,
         MovementBudgetModifierBinding,
         ObjectiveControlModifierBinding,
@@ -607,6 +713,7 @@ def _modifier_id_for_binding(binding: object) -> str:
         return cast(
             UnitCharacteristicModifierBinding
             | HitRollModifierBinding
+            | WoundRollModifierBinding
             | SaveOptionModifierBinding
             | MovementBudgetModifierBinding
             | ObjectiveControlModifierBinding
@@ -697,6 +804,13 @@ def _validate_non_negative_int(field_name: str, value: object) -> int:
     integer = _validate_int(field_name, value)
     if integer < 0:
         raise GameLifecycleError(f"{field_name} must not be negative.")
+    return integer
+
+
+def _validate_positive_int(field_name: str, value: object) -> int:
+    integer = _validate_int(field_name, value)
+    if integer <= 0:
+        raise GameLifecycleError(f"{field_name} must be positive.")
     return integer
 
 

@@ -252,6 +252,7 @@ def test_scaffold_contributions_have_stable_ids_and_placeholders_are_empty() -> 
             or contribution.phase_end_objective_control_hook_bindings
             or contribution.unit_characteristic_modifier_bindings
             or contribution.hit_roll_modifier_bindings
+            or contribution.wound_roll_modifier_bindings
             or contribution.save_option_modifier_bindings
             or contribution.movement_budget_modifier_bindings
             or contribution.objective_control_modifier_bindings

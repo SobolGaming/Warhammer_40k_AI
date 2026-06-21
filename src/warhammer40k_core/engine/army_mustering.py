@@ -26,6 +26,7 @@ from warhammer40k_core.engine.list_validation import (
     battle_size_mustering_policy,
     daemonic_pact_datasheet_allowed_for_faction,
     drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction,
+    shadow_legion_thralls_datasheet_allowed_for_faction,
     validate_detachment_selection,
     validate_unit_selection_for_army,
 )
@@ -66,6 +67,29 @@ CORSAIR_COTERIE_ENHANCEMENT_IDS = frozenset(
 ANHRATHE_KEYWORD = "ANHRATHE"
 CHARACTER_KEYWORD = "CHARACTER"
 INFANTRY_KEYWORD = "INFANTRY"
+SHADOW_LEGION_SOURCE_ID = "phase17g:chaos-daemons:shadow-legion:thralls-of-the-first-prince"
+SHADOW_LEGION_FACTION_ID = "chaos-daemons"
+SHADOW_LEGION_DETACHMENT_ID = "shadow-legion"
+SHADOW_LEGION_KEYWORD = "SHADOW LEGION"
+SHADOW_LEGION_UNDIVIDED_KEYWORD = "UNDIVIDED"
+SHADOW_LEGION_DEEP_STRIKE_KEYWORD = "DEEP STRIKE"
+SHADOW_LEGION_LEGIONES_DAEMONICA_KEYWORD = "LEGIONES DAEMONICA"
+SHADOW_LEGION_HERETIC_ASTARTES_KEYWORD = "HERETIC ASTARTES"
+SHADOW_LEGION_DAMNED_KEYWORD = "DAMNED"
+SHADOW_LEGION_POINTS_CAP_BY_BATTLE_SIZE = {
+    BattleSize.INCURSION: 500,
+    BattleSize.STRIKE_FORCE: 1000,
+    BattleSize.ONSLAUGHT: 1500,
+}
+SHADOW_LEGION_FORBIDDEN_DAEMON_PRINCE_NAMES = frozenset(
+    {
+        "DAEMONPRINCE",
+        "DAEMONPRINCEWITHWINGS",
+        "DAEMONPRINCEOFCHAOS",
+        "DAEMONPRINCEOFCHAOSWITHWINGS",
+    }
+)
+SHADOW_LEGION_BELAKOR_NAME = "BELAKOR"
 
 
 class ArmyMusterRequestPayload(TypedDict):
@@ -987,6 +1011,10 @@ def muster_army(
         units=resolved_units,
         roster_legality_report=roster_legality_report,
     )
+    resolved_units = _apply_shadow_legion_keyword_grants(
+        request=request,
+        units=resolved_units,
+    )
     return ArmyDefinition(
         army_id=request.army_id,
         player_id=request.player_id,
@@ -1098,6 +1126,12 @@ def validate_roster_legality(
         violations=violations,
     )
     _append_drukhari_corsairs_and_travelling_players_violations(
+        request=request,
+        faction=faction,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        violations=violations,
+    )
+    _append_shadow_legion_violations(
         request=request,
         faction=faction,
         datasheets_by_selection_id=datasheets_by_selection_id,
@@ -1786,6 +1820,110 @@ def _append_drukhari_corsairs_and_travelling_players_enhancement_violations(
         )
 
 
+def _append_shadow_legion_violations(
+    *,
+    request: ArmyMusterRequest,
+    faction: FactionDefinition,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    if not _request_uses_shadow_legion(request):
+        return
+    _append_shadow_legion_forbidden_unit_violations(
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        violations=violations,
+    )
+    heretic_astartes_selection_ids = tuple(
+        sorted(
+            selection_id
+            for selection_id, datasheet in datasheets_by_selection_id.items()
+            if _datasheet_has_faction_keyword(
+                datasheet,
+                SHADOW_LEGION_HERETIC_ASTARTES_KEYWORD,
+            )
+        )
+    )
+    for selection_id in heretic_astartes_selection_ids:
+        datasheet = datasheets_by_selection_id[selection_id]
+        if shadow_legion_thralls_datasheet_allowed_for_faction(
+            datasheet=datasheet,
+            faction=faction,
+            detachment_selection=request.detachment_selection,
+        ):
+            continue
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="shadow_legion_thralls_heretic_astartes_unit_forbidden",
+                message="Shadow Legion cannot include this Heretic Astartes datasheet.",
+                unit_selection_id=selection_id,
+                source_id=SHADOW_LEGION_SOURCE_ID,
+            )
+        )
+    _append_shadow_legion_thralls_points_violation(
+        request=request,
+        heretic_astartes_selection_ids=heretic_astartes_selection_ids,
+        violations=violations,
+    )
+
+
+def _append_shadow_legion_forbidden_unit_violations(
+    *,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    for selection_id, datasheet in sorted(datasheets_by_selection_id.items()):
+        if _datasheet_is_belakor(datasheet):
+            continue
+        if not _datasheet_is_shadow_legion_forbidden_unit(datasheet):
+            continue
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="shadow_legion_forbidden_daemon_prince_or_epic_hero",
+                message=(
+                    "Shadow Legion cannot include Daemon Prince, Daemon Prince with Wings, "
+                    "or Epic Hero units other than Be'lakor."
+                ),
+                unit_selection_id=selection_id,
+                source_id=SHADOW_LEGION_SOURCE_ID,
+            )
+        )
+
+
+def _append_shadow_legion_thralls_points_violation(
+    *,
+    request: ArmyMusterRequest,
+    heretic_astartes_selection_ids: tuple[str, ...],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    if not heretic_astartes_selection_ids:
+        return
+    points_by_selection_id = {point.unit_selection_id: point for point in request.unit_points}
+    cap = SHADOW_LEGION_POINTS_CAP_BY_BATTLE_SIZE.get(request.battle_size)
+    if cap is None:
+        raise ArmyMusteringError("Shadow Legion Thralls points cap is unavailable.")
+    total = sum(
+        points_by_selection_id[selection_id].points
+        for selection_id in heretic_astartes_selection_ids
+        if selection_id in points_by_selection_id
+    )
+    if total > cap:
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="shadow_legion_thralls_points_limit_exceeded",
+                message="Shadow Legion Heretic Astartes units exceed the battle-size limit.",
+                unit_selection_id=heretic_astartes_selection_ids[0],
+                source_id=SHADOW_LEGION_SOURCE_ID,
+            )
+        )
+
+
+def _datasheet_is_shadow_legion_forbidden_unit(datasheet: DatasheetDefinition) -> bool:
+    canonical_name = _canonical_name(datasheet.name)
+    if canonical_name in SHADOW_LEGION_FORBIDDEN_DAEMON_PRINCE_NAMES:
+        return True
+    return _datasheet_has_keyword(datasheet, "EPIC HERO")
+
+
 def _append_dedicated_transport_manifest_violations(
     *,
     request: ArmyMusterRequest,
@@ -1952,6 +2090,37 @@ def _apply_warlord_keyword_if_selected(
     )
 
 
+def _apply_shadow_legion_keyword_grants(
+    *,
+    request: ArmyMusterRequest,
+    units: tuple[UnitInstance, ...],
+) -> tuple[UnitInstance, ...]:
+    if not _request_uses_shadow_legion(request):
+        return units
+    granted_units: list[UnitInstance] = []
+    for unit in units:
+        added_keywords: list[str] = []
+        if _unit_has_faction_keyword(unit, SHADOW_LEGION_LEGIONES_DAEMONICA_KEYWORD):
+            added_keywords.append(SHADOW_LEGION_KEYWORD)
+        if _unit_is_belakor(unit) or _unit_has_faction_keyword(
+            unit,
+            SHADOW_LEGION_HERETIC_ASTARTES_KEYWORD,
+        ):
+            added_keywords.extend((SHADOW_LEGION_KEYWORD, SHADOW_LEGION_UNDIVIDED_KEYWORD))
+        if _unit_has_faction_keyword(unit, SHADOW_LEGION_HERETIC_ASTARTES_KEYWORD):
+            added_keywords.append(SHADOW_LEGION_DEEP_STRIKE_KEYWORD)
+        if not added_keywords:
+            granted_units.append(unit)
+            continue
+        granted_units.append(
+            replace(
+                unit,
+                keywords=tuple(sorted(dict.fromkeys((*unit.keywords, *added_keywords)))),
+            )
+        )
+    return tuple(granted_units)
+
+
 def _attached_group_by_selection_id(
     request: ArmyMusterRequest,
 ) -> dict[str, tuple[str, ...]]:
@@ -2049,8 +2218,38 @@ def _is_corsair_coterie_enhancement_id(enhancement_id: str) -> bool:
     return enhancement_id in CORSAIR_COTERIE_ENHANCEMENT_IDS
 
 
+def _request_uses_shadow_legion(request: ArmyMusterRequest) -> bool:
+    return (
+        request.detachment_selection.faction_id == SHADOW_LEGION_FACTION_ID
+        and SHADOW_LEGION_DETACHMENT_ID in request.detachment_selection.detachment_ids
+    )
+
+
+def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
+    requested_keyword = _canonical_keyword(keyword)
+    return requested_keyword in {
+        _canonical_keyword(stored_keyword) for stored_keyword in unit.faction_keywords
+    }
+
+
+def _unit_is_belakor(unit: UnitInstance) -> bool:
+    return _canonical_name(unit.name) == SHADOW_LEGION_BELAKOR_NAME
+
+
+def _datasheet_is_belakor(datasheet: DatasheetDefinition) -> bool:
+    return _canonical_name(datasheet.name) == SHADOW_LEGION_BELAKOR_NAME
+
+
 def _canonical_keyword(keyword: str) -> str:
     return _validate_identifier("keyword", keyword).upper().replace("_", " ")
+
+
+def _canonical_name(value: str) -> str:
+    return "".join(
+        character
+        for character in _validate_identifier("name", value).upper()
+        if character.isalnum()
+    )
 
 
 def _roster_violation_sort_key(

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.shooting_types import ShootingType, shooting_type_from_token
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -27,6 +28,7 @@ class ShootingTargetRestrictionContext:
     attacking_unit_instance_id: str
     target_unit_instance_id: str
     attacker_model_instance_id: str | None = None
+    shooting_type: ShootingType | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -59,6 +61,11 @@ class ShootingTargetRestrictionContext:
                 "attacker_model_instance_id",
                 self.attacker_model_instance_id,
             ),
+        )
+        object.__setattr__(
+            self,
+            "shooting_type",
+            _validate_optional_shooting_type(self.shooting_type),
         )
 
 
@@ -325,6 +332,12 @@ def _validate_optional_identifier(field_name: str, value: object) -> str | None:
     if value is None:
         return None
     return _validate_identifier(field_name, value)
+
+
+def _validate_optional_shooting_type(value: object) -> ShootingType | None:
+    if value is None:
+        return None
+    return shooting_type_from_token(value)
 
 
 def _validate_message(value: object) -> str:

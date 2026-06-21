@@ -44,6 +44,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     stratagem_cost_modifier_ids: list[str]
     unit_characteristic_modifier_ids: list[str]
     hit_roll_modifier_ids: list[str]
+    wound_roll_modifier_ids: list[str]
     save_option_modifier_ids: list[str]
     movement_budget_modifier_ids: list[str]
     objective_control_modifier_ids: list[str]

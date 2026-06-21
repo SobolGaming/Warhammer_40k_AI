@@ -107,6 +107,8 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierBinding,
     HitRollModifierContext,
+    WoundRollModifierBinding,
+    WoundRollModifierContext,
 )
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
@@ -686,6 +688,7 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
     assert summary["fight_activation_ability_hook_ids"] == []
     assert summary["unit_characteristic_modifier_ids"] == []
     assert summary["hit_roll_modifier_ids"] == []
+    assert summary["wound_roll_modifier_ids"] == []
     assert summary["save_option_modifier_ids"] == []
     assert summary["movement_budget_modifier_ids"] == []
     assert summary["objective_control_modifier_ids"] == []
@@ -765,6 +768,15 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
         handler=hit_roll_modifier_handler,
     )
 
+    def wound_roll_modifier_handler(_context: WoundRollModifierContext) -> int:
+        return 0
+
+    wound_roll_modifier_binding = WoundRollModifierBinding(
+        modifier_id="combined:wound-roll-modifier",
+        source_id="combined:wound-roll-source",
+        handler=wound_roll_modifier_handler,
+    )
+
     combined = combine_runtime_content_contributions(
         contribution_id="combined:manifest",
         contributions=(
@@ -776,6 +788,7 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
                 enhancement_effect_bindings=(enhancement_effect_binding,),
                 fight_activation_ability_hook_bindings=(fight_activation_ability_binding,),
                 hit_roll_modifier_bindings=(hit_roll_modifier_binding,),
+                wound_roll_modifier_bindings=(wound_roll_modifier_binding,),
             ),
             RuntimeContentContribution(
                 contribution_id="combined:stratagems",
@@ -795,6 +808,7 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
     assert combined.enhancement_effect_bindings == (enhancement_effect_binding,)
     assert combined.fight_activation_ability_hook_bindings == (fight_activation_ability_binding,)
     assert combined.hit_roll_modifier_bindings == (hit_roll_modifier_binding,)
+    assert combined.wound_roll_modifier_bindings == (wound_roll_modifier_binding,)
     assert tuple(combined.faction_named_handlers) == ("combined:named-handler",)
 
     with pytest.raises(GameLifecycleError, match="ability record IDs must be unique"):
@@ -863,6 +877,21 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
             contributions=(
                 RuntimeContentContribution(hit_roll_modifier_bindings=(hit_roll_modifier_binding,)),
                 RuntimeContentContribution(hit_roll_modifier_bindings=(hit_roll_modifier_binding,)),
+            ),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Wound roll modifier binding IDs must be unique",
+    ):
+        combine_runtime_content_contributions(
+            contribution_id="combined:duplicate-wound-roll-modifiers",
+            contributions=(
+                RuntimeContentContribution(
+                    wound_roll_modifier_bindings=(wound_roll_modifier_binding,)
+                ),
+                RuntimeContentContribution(
+                    wound_roll_modifier_bindings=(wound_roll_modifier_binding,)
+                ),
             ),
         )
     with pytest.raises(GameLifecycleError, match="faction handler IDs must be unique"):
