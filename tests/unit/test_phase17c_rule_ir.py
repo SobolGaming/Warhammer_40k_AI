@@ -309,6 +309,25 @@ def test_phase17c_bearer_model_text_is_distinct_from_bearers_unit() -> None:
     assert bearer_unit.clauses[0].target.kind is RuleTargetKind.THIS_UNIT
 
 
+def test_phase17c_bearer_feel_no_pain_qualifier_compiles_to_model_source_ir() -> None:
+    rule_ir = _compiled(
+        "The bearer has the Feel No Pain 3+ ability against Psychic Attacks."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.GRANT_ABILITY
+    )
+
+    assert rule_ir.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert parameter_payload(effect.parameters) == {
+        "ability": "Feel No Pain",
+        "attack_condition": "psychic_attack",
+        "threshold": 3,
+    }
+
+
 def test_phase17c_skullmaster_fury_compiles_to_charge_move_weapon_keyword_grant() -> None:
     rule_ir = _compiled(
         "While this model is leading a unit, each time that unit ends a Charge move, "

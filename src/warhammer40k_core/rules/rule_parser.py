@@ -160,6 +160,12 @@ _GRANT_ABILITY_RE = re.compile(
     r"\b(?:gains?|have|has)\s+(?P<ability>[A-Z][A-Za-z0-9 -]*(?:\s+\d+)?)\s+until\b",
     re.IGNORECASE,
 )
+_FEEL_NO_PAIN_ABILITY_RE = re.compile(
+    r"\b(?:gains?|have|has)\s+(?:the\s+)?Feel\s+No\s+Pain\s+"
+    r"(?P<threshold>[2-6])\+\s+ability"
+    r"(?:\s+against\s+(?P<attack_condition>Psychic\s+Attacks?))?\b",
+    re.IGNORECASE,
+)
 _WEAPON_KEYWORD_PATTERN = "|".join(
     re.escape(keyword)
     for keyword in sorted(canonical_weapon_keyword_tokens(), key=len, reverse=True)
@@ -782,7 +788,30 @@ def _parse_resource_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, .
 
 def _parse_grant_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
+    for match in _FEEL_NO_PAIN_ABILITY_RE.finditer(clause_text.text):
+        parameter_pairs: list[tuple[str, RuleParameterValue]] = [
+            ("ability", "Feel No Pain"),
+            ("threshold", int(match.group("threshold"))),
+        ]
+        attack_condition = match.group("attack_condition")
+        if attack_condition is not None:
+            parameter_pairs.append(
+                ("attack_condition", _feel_no_pain_attack_condition_token(attack_condition))
+            )
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.GRANT_ABILITY,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(tuple(parameter_pairs)),
+            )
+        )
     for match in _GRANT_ABILITY_RE.finditer(clause_text.text):
+        if _span_matches_existing_effect(
+            clause_text=clause_text,
+            match=match,
+            effects=tuple(effects),
+        ):
+            continue
         ability = _ability_token(match.group("ability"))
         if _is_weapon_keyword(ability):
             continue
@@ -1119,6 +1148,13 @@ def _keyword_token(value: str) -> str:
 def _ability_token(value: str) -> str:
     stripped = value.strip(" []().,;:")
     return " ".join(stripped.split())
+
+
+def _feel_no_pain_attack_condition_token(value: str) -> str:
+    normalized = value.strip().lower().replace("-", " ")
+    if normalized in {"psychic attack", "psychic attacks"}:
+        return "psychic_attack"
+    raise RuleIRError(f"Unsupported Feel No Pain attack qualifier: {value}.")
 
 
 def _weapon_name_token(value: str) -> str:

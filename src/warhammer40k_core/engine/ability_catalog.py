@@ -23,7 +23,14 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
-from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, RuleIRError, RuleIRPayload
+from warhammer40k_core.rules.rule_ir import (
+    RuleEffectKind,
+    RuleEffectSpec,
+    RuleIR,
+    RuleIRError,
+    RuleIRPayload,
+    parameter_payload,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_abilities as source_data,
 )
@@ -197,6 +204,12 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
     if any(
+        _effect_is_feel_no_pain_grant(effect)
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+    ):
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
+    if any(
         effect.kind
         in {
             RuleEffectKind.MODIFY_DICE_ROLL,
@@ -207,6 +220,13 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL)
     return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE)
+
+
+def _effect_is_feel_no_pain_grant(effect: RuleEffectSpec) -> bool:
+    if effect.kind is not RuleEffectKind.GRANT_ABILITY:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return parameters.get("ability") == "Feel No Pain"
 
 
 def _catalog_when_descriptor(descriptor: DatasheetAbilityDescriptor) -> str:

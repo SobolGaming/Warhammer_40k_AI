@@ -527,6 +527,11 @@ def _semantic_categories(
                 categories.add(
                     f"{ability.source_kind.value}.characteristic_set.{characteristic}.{target}"
                 )
+            elif (
+                effect.kind is RuleEffectKind.GRANT_ABILITY
+                and parameters.get("ability") == "Feel No Pain"
+            ):
+                categories.add(f"{ability.source_kind.value}.feel_no_pain.source.{target}")
             else:
                 categories.add(f"{ability.source_kind.value}.rule_ir.{effect.kind.value}.{target}")
         if clause.unsupported_reason is not None:
@@ -692,6 +697,7 @@ _CATEGORY_NAMES: Mapping[str, str] = {
     "unknown.ability_text": "Unknown Abilities",
     "faction.descriptor": "Faction Descriptor",
     "wargear.characteristic_set.leadership.this_unit": "Leadership Characteristic",
+    "wargear.feel_no_pain.source.this_model": "Feel No Pain Source",
     "wargear.roll_modifier.charge.this_unit": "Charge Roll Modifier",
 }
 
