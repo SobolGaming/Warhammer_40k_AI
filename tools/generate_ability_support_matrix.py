@@ -22,6 +22,7 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_coverage_rows_from_catalog,
     ability_coverage_rows_payload,
 )
+from warhammer40k_core.engine.army_mustering import SPACE_MARINE_CHAPTERS_SOURCE_ID
 from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_ir_registered_hook_ids
 from warhammer40k_core.engine.faction_content.bundle import (
     DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID,
@@ -42,6 +43,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_chil
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.generated_manifest import (
     generated_runtime_content_rows,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines import (
+    army_rule as space_marines_army_rule,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
     army_rule as world_eaters_army_rule,
@@ -271,6 +275,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     "phase17f:phase17e:death-guard:army-rule": "Nurgle's Gift",
     "phase17f:phase17e:drukhari:army-rule": "Power from Pain",
     "phase17f:phase17e:emperors-children:army-rule": "Thrill Seekers",
+    "phase17g:space-marines:army-rule": "Oath of Moment",
     "phase17f:phase17e:world-eaters:army-rule": "Blessings of Khorne",
     "phase17g:aeldari:corsair-coterie:enhancements": "Corsair Coterie Enhancements",
     "phase17g:aeldari:corsair-coterie:relentless-raiders": "Corsair Coterie",
@@ -292,6 +297,7 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind": (
         "Battle Focus - Swift as the Wind"
     ),
+    SPACE_MARINE_CHAPTERS_SOURCE_ID: "Space Marine Chapters",
     "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider": ("Archraider"),
     "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:lord_of_deceit": (
         "Archraider"
@@ -488,6 +494,13 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             runtime_consumer_ids=_emperors_children_runtime_consumer_ids(),
         ),
         _implemented_faction_army_rule_row(
+            faction_id=space_marines_army_rule.SPACE_MARINES_FACTION_ID,
+            ability_id=space_marines_army_rule.HOOK_ID,
+            ability_name="Oath of Moment",
+            semantic_category="faction.army_rule.oath_of_moment",
+            runtime_consumer_ids=_space_marines_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
             faction_id="drukhari",
             ability_id=drukhari_army_rule.HOOK_ID,
             ability_name="Power from Pain",
@@ -623,6 +636,19 @@ def _emperors_children_runtime_consumer_ids() -> tuple[str, ...]:
                     binding.hook_id
                     for binding in contribution.charge_target_restriction_hook_bindings
                 ),
+            }
+        )
+    )
+
+
+def _space_marines_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = space_marines_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                SPACE_MARINE_CHAPTERS_SOURCE_ID,
+                *(binding.hook_id for binding in contribution.command_phase_start_hook_bindings),
+                *(binding.modifier_id for binding in contribution.wound_roll_modifier_bindings),
             }
         )
     )
@@ -1370,6 +1396,22 @@ def _structured_support_sections_markdown() -> list[str]:
                     "Focused faction runtime tests",
                     "Full",
                     "Includes movement, charge, and shooting target restrictions.",
+                ),
+                SupportSectionRow(
+                    "Space Marines - Oath of Moment and Space Marine Chapters",
+                    "Named army-rule handler plus shared mustering/list-validation host",
+                    (
+                        "README, adapter contract, decision catalog, architecture, "
+                        "and generated matrix"
+                    ),
+                    "Focused command-phase, reroll, wound-modifier, and mustering tests",
+                    "Full",
+                    (
+                        "Implements Command phase Oath target selection, target-scoped "
+                        "Hit-roll rerolls, Codex Space Marines Detachment Wound-roll "
+                        "bonus gating, and Black Templars, Space Wolves, and Deathwatch "
+                        "roster restrictions."
+                    ),
                 ),
                 SupportSectionRow(
                     "Drukhari - Power from Pain",

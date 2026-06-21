@@ -59,6 +59,7 @@ def source_backed_reroll_permission_for_unit(
     unit_instance_id: str,
     roll_type: str,
     timing_window: str,
+    target_unit_instance_id: str | None = None,
 ) -> RerollPermission | None:
     context = source_backed_reroll_permission_context_for_unit(
         state=state,
@@ -66,6 +67,7 @@ def source_backed_reroll_permission_for_unit(
         unit_instance_id=unit_instance_id,
         roll_type=roll_type,
         timing_window=timing_window,
+        target_unit_instance_id=target_unit_instance_id,
     )
     return None if context is None else context.permission
 
@@ -77,6 +79,7 @@ def source_backed_reroll_permission_context_for_unit(
     unit_instance_id: str,
     roll_type: str,
     timing_window: str,
+    target_unit_instance_id: str | None = None,
 ) -> SourceBackedRerollPermissionContext | None:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -86,6 +89,11 @@ def source_backed_reroll_permission_context_for_unit(
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     requested_roll_type = _validate_identifier("roll_type", roll_type)
     requested_timing_window = _validate_identifier("timing_window", timing_window)
+    requested_target_unit_id = (
+        None
+        if target_unit_instance_id is None
+        else _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    )
     permissions: list[SourceBackedRerollPermissionContext] = []
     for effect in state.persisting_effects_for_unit(requested_unit_id):
         if effect.owner_player_id != requested_player_id:
@@ -101,6 +109,11 @@ def source_backed_reroll_permission_context_for_unit(
         if permission_context.permission.eligible_roll_type != requested_roll_type:
             continue
         if permission_context.permission.timing_window != requested_timing_window:
+            continue
+        if not _source_payload_target_matches(
+            permission_context.source_payload,
+            target_unit_instance_id=requested_target_unit_id,
+        ):
             continue
         permissions.append(permission_context)
     if len(permissions) > 1:
@@ -138,6 +151,19 @@ def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
     if not isinstance(payload, dict):
         raise GameLifecycleError("Source-backed reroll payload must be an object.")
     return payload
+
+
+def _source_payload_target_matches(
+    source_payload: dict[str, JsonValue],
+    *,
+    target_unit_instance_id: str | None,
+) -> bool:
+    conditional_target = source_payload.get("target_unit_instance_id")
+    if conditional_target is None:
+        return True
+    if type(conditional_target) is not str or not conditional_target.strip():
+        raise GameLifecycleError("Source-backed reroll target_unit_instance_id must be a string.")
+    return target_unit_instance_id == conditional_target
 
 
 def _validate_identifier(field_name: str, value: object) -> str:

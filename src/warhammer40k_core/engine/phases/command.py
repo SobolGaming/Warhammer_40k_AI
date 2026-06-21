@@ -16,8 +16,11 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockOutcomeContext,
 )
 from warhammer40k_core.engine.command_phase_start_hooks import (
+    SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
     CommandPhaseStartContext,
     CommandPhaseStartHookRegistry,
+    CommandPhaseStartRequestContext,
+    CommandPhaseStartResultContext,
 )
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
@@ -66,6 +69,7 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_start_engagement import (
     record_turn_start_engagement_snapshot,
 )
+from warhammer40k_core.engine.unit_factory import UnitInstance
 
 TACTICAL_SECONDARY_DRAW_DECISION_TYPE = "draw_tactical_secondary_missions"
 TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE = "replace_tactical_secondary_mission"
@@ -138,11 +142,13 @@ class CommandPhaseHandler:
 
         command_state = _ensure_command_step_state(state, active_player_id=active_player_id)
         if not command_state.command_points_granted:
-            _resolve_command_step_start(
+            command_start_status = _resolve_command_step_start(
                 state=state,
                 decisions=decisions,
                 command_phase_start_hooks=self.command_phase_start_hooks,
             )
+            if command_start_status is not None:
+                return command_start_status
             command_state = _command_step_state(state)
         if not command_state.scoring_hooks_resolved:
             _resolve_command_phase_scoring_hooks(state=state, decisions=decisions)
@@ -226,6 +232,21 @@ class CommandPhaseHandler:
                 decisions=decisions,
             )
             return
+        if result.decision_type == SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE:
+            active_player_id = _active_player_id(state)
+            record = decisions.record_for_result(result)
+            handled = self.command_phase_start_hooks.apply_result(
+                CommandPhaseStartResultContext(
+                    state=state,
+                    decisions=decisions,
+                    request=record.request,
+                    result=result,
+                    active_player_id=active_player_id,
+                )
+            )
+            if not handled:
+                raise GameLifecycleError("Command-phase start faction rule result was not handled.")
+            return
         raise GameLifecycleError("CommandPhaseHandler received an unsupported decision_type.")
 
 
@@ -237,6 +258,12 @@ def invalid_command_phase_decision_status(
 ) -> LifecycleStatus | None:
     if request.decision_type == TACTICAL_SECONDARY_DRAW_DECISION_TYPE:
         return None
+    if request.decision_type == SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE:
+        return _invalid_command_phase_start_faction_rule_status(
+            state=state,
+            request=request,
+            result=result,
+        )
     if request.decision_type != TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE:
         raise GameLifecycleError("Command phase validator received unsupported decision_type.")
     payload = _decision_payload_object(result.payload)
@@ -485,6 +512,19 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     return stripped
 
 
+def _unit_owner_and_instance_by_id(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> tuple[str | None, UnitInstance | None]:
+    requested_unit_id = _validate_player_id("unit_instance_id", unit_instance_id)
+    for army in state.army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id == requested_unit_id:
+                return army.player_id, unit
+    return None, None
+
+
 def _active_tactical_secondary_cards(
     *,
     state: GameState,
@@ -603,6 +643,100 @@ def _tactical_secondary_replacement_drift_reason(
     return None
 
 
+def _invalid_command_phase_start_faction_rule_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    payload = _decision_payload_object(result.payload)
+    drift_reason = _command_phase_start_faction_rule_drift_reason(
+        state=state,
+        request=request,
+        result=result,
+        payload=payload,
+    )
+    if drift_reason is None:
+        return None
+    return LifecycleStatus.invalid(
+        stage=state.stage,
+        message="Command phase start faction rule option drifted.",
+        payload={
+            "game_id": state.game_id,
+            "player_id": result.actor_id,
+            "battle_round": state.battle_round,
+            "phase": (
+                None if state.current_battle_phase is None else state.current_battle_phase.value
+            ),
+            "invalid_reason": drift_reason,
+        },
+    )
+
+
+def _command_phase_start_faction_rule_drift_reason(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    payload: dict[str, JsonValue],
+) -> str | None:
+    if result.actor_id is None:
+        return "actor_missing"
+    if request.actor_id != result.actor_id:
+        return "actor_player_drift"
+    if _payload_string(payload, key="game_id") != state.game_id:
+        return "game_id_drift"
+    if _payload_int(payload, key="battle_round") != state.battle_round:
+        return "battle_round_drift"
+    if _payload_string(payload, key="phase") != BattlePhase.COMMAND.value:
+        return "payload_phase_drift"
+    if state.current_battle_phase is not BattlePhase.COMMAND:
+        return "phase_drift"
+    if result.actor_id != _active_player_id(state):
+        return "player_not_active"
+    request_payload = _decision_payload_object(request.payload)
+    if _payload_string(request_payload, key="game_id") != state.game_id:
+        return "request_game_id_drift"
+    if _payload_int(request_payload, key="battle_round") != state.battle_round:
+        return "request_battle_round_drift"
+    if _payload_string(request_payload, key="phase") != BattlePhase.COMMAND.value:
+        return "request_phase_drift"
+    if _payload_string(request_payload, key="active_player_id") != result.actor_id:
+        return "request_active_player_drift"
+    command_state = state.command_step_state
+    if command_state is None:
+        return "command_step_state_missing"
+    if command_state.active_player_id != result.actor_id:
+        return "command_step_active_player_drift"
+    if command_state.battle_round != state.battle_round:
+        return "command_step_battle_round_drift"
+    if not command_state.command_points_granted:
+        return "command_points_not_granted"
+    if command_state.scoring_hooks_resolved:
+        return "command_phase_start_window_closed"
+    target_unit_id = payload.get("target_unit_instance_id")
+    target_owner_id = payload.get("target_owner_player_id")
+    if target_unit_id is None and target_owner_id is None:
+        return None
+    if type(target_unit_id) is not str or not target_unit_id.strip():
+        return "target_unit_instance_id_invalid"
+    if type(target_owner_id) is not str or not target_owner_id.strip():
+        return "target_owner_player_id_invalid"
+    owner_id, target_unit = _unit_owner_and_instance_by_id(
+        state=state,
+        unit_instance_id=target_unit_id,
+    )
+    if owner_id is None or target_unit is None:
+        return "target_unit_missing"
+    if owner_id != target_owner_id:
+        return "target_owner_drift"
+    if owner_id == result.actor_id:
+        return "target_not_opponent"
+    if not target_unit.alive_own_models():
+        return "target_unit_destroyed"
+    return None
+
+
 def _ensure_command_step_state(
     state: GameState,
     *,
@@ -633,7 +767,7 @@ def _resolve_command_step_start(
     state: GameState,
     decisions: DecisionController,
     command_phase_start_hooks: CommandPhaseStartHookRegistry,
-) -> None:
+) -> LifecycleStatus | None:
     active_player_id = _active_player_id(state)
     cleared_battle_shocked_unit_ids = state.clear_battle_shock_for_player(active_player_id)
     gain_payloads: list[JsonValue] = []
@@ -669,6 +803,36 @@ def _resolve_command_step_start(
             "phase": BattlePhase.COMMAND.value,
             "command_point_gains": gain_payloads,
             "cleared_battle_shocked_unit_ids": list(cleared_battle_shocked_unit_ids),
+        },
+    )
+    faction_rule_request = command_phase_start_hooks.next_request_for(
+        CommandPhaseStartRequestContext(
+            state=state,
+            decisions=decisions,
+            active_player_id=active_player_id,
+        )
+    )
+    if faction_rule_request is None:
+        return None
+    decisions.request_decision(faction_rule_request)
+    decisions.event_log.append(
+        "command_phase_start_faction_rule_requested",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": active_player_id,
+            "phase": BattlePhase.COMMAND.value,
+            "decision_type": faction_rule_request.decision_type,
+            "request_id": faction_rule_request.request_id,
+        },
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=faction_rule_request,
+        payload={
+            "phase": BattlePhase.COMMAND.value,
+            "active_player_id": active_player_id,
+            "phase_body_status": "command_phase_start_faction_rule_pending",
         },
     )
 

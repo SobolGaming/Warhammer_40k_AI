@@ -166,7 +166,7 @@ Current status:
   rule IR, generic rule execution, and adapter decision submission is in place.
 - Faction semantic execution is active incremental work. Current runtime
   support includes selected Chaos Daemons, Chaos Space Marines, Aeldari,
-  Death Guard, and World Eaters Phase 17G slices. Chaos Daemons Shadow Legion
+  Death Guard, World Eaters, and Space Marines Phase 17G slices. Chaos Daemons Shadow Legion
   supports Thralls of the First Prince mustering restrictions and keyword
   grants, Murderer's Cowl, Penumbral Puppetry, Gloam Rot, Shadow's Caress, and
   Disciples of Be'lakor Dark Pacts through shared advance, target-restriction,
@@ -184,9 +184,12 @@ Current status:
   Thieves, Infamy, Webway Pathstone, Archraider, Voidstone, and all six named
   Stratagems through shared mustering, objective-control, movement/charge-
   completion, reserves, setup, turn-end, Stratagem-cost, attack-reroll,
-  triggered-movement, targeting-restriction, and runtime-modifier paths; broad
-  datasheet, wargear, weapon, and remaining faction execution remains later
-  Phase 17 work.
+  triggered-movement, targeting-restriction, and runtime-modifier paths. Space
+  Marines Oath of Moment supports Command phase target selection, target-scoped
+  Hit-roll rerolls, the Codex Space Marines Detachment Wound-roll bonus gate,
+  and Black Templars, Space Wolves, and Deathwatch Chapter mustering
+  restrictions; broad datasheet, wargear, weapon, and remaining faction
+  execution remains later Phase 17 work.
 - Matched-play mustering supports Incursion, Strike Force, and Onslaught battle
   sizes, including the Drukhari `Corsairs and Travelling Players` ally rule for
   HARLEQUINS and ANHRATHE units.
