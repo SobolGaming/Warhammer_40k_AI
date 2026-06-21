@@ -1964,6 +1964,9 @@ class GameLifecycle:
                 self._runtime_content_bundle.shooting_target_restriction_hook_registry
             ),
             shooting_end_surge_hooks=self._runtime_content_bundle.shooting_end_surge_hook_registry,
+            attack_sequence_completed_hooks=(
+                self._runtime_content_bundle.attack_sequence_completed_hook_registry
+            ),
             stratagem_cost_modifier_registry=(
                 self._runtime_content_bundle.stratagem_cost_modifier_registry
             ),
@@ -1978,6 +1981,9 @@ class GameLifecycle:
             ),
             fight_unit_selected_grant_hooks=(
                 self._runtime_content_bundle.fight_unit_selected_grant_hook_registry
+            ),
+            attack_sequence_completed_hooks=(
+                self._runtime_content_bundle.attack_sequence_completed_hook_registry
             ),
             runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )

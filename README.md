@@ -165,8 +165,11 @@ Current status:
   reserves, transports, missions, replay, source ingestion, catalog generation,
   rule IR, generic rule execution, and adapter decision submission is in place.
 - Faction semantic execution is active incremental work. Current runtime
-  support includes selected Chaos Daemons, Aeldari, and Death Guard Phase 17G
-  slices. Aeldari Path of the Outcast supports Far-reaching Doom,
+  support includes selected Chaos Daemons, Chaos Space Marines, Aeldari,
+  Death Guard, and World Eaters Phase 17G slices. Chaos Space Marines Dark
+  Pacts uses shared selected-to-shoot and selected-to-fight grant decisions,
+  attack-sequence weapon keyword modifiers, and post-attack Leadership-test
+  consequence hooks. Aeldari Path of the Outcast supports Far-reaching Doom,
   Camouflaged Snipers, Assassins' Eye, Eldritch Suppression, Casting Back the
   Veil, and Nomads of the Hidden Way through the shared Shooting, Stratagem,
   Battle-shock, Hidden/detection, and triggered-movement paths. Aeldari

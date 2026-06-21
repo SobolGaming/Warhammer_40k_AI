@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import cast
 
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
+from warhammer40k_core.core.faction_aliases import CHAOS_SPACE_MARINES_FACTION_ID
 from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
 from warhammer40k_core.engine.ability_coverage import (
     AbilityCoverageAbilityDatasheetPairPayload,
@@ -27,6 +28,9 @@ from warhammer40k_core.engine.faction_content.bundle import (
     RuntimeContentContribution,
 )
 from warhammer40k_core.engine.faction_content.manifest import RuntimeContentSupportStatus
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
+    army_rule as chaos_space_marines_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard import (
     army_rule as death_guard_army_rule,
 )
@@ -238,6 +242,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     "phase17f:phase17e:chaos-daemons:cavalcade-of-chaos:stratagems": (
         "Cavalcade of Chaos Stratagems"
     ),
+    "phase17f:phase17e:chaos-space-marines:army-rule": "Dark Pacts",
     "phase17f:phase17e:death-guard:army-rule": "Nurgle's Gift",
     "phase17f:phase17e:drukhari:army-rule": "Power from Pain",
     "phase17f:phase17e:emperors-children:army-rule": "Thrill Seekers",
@@ -430,6 +435,13 @@ def _write_json(path: Path, payload: object) -> None:
 def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
     return (
         _implemented_faction_army_rule_row(
+            faction_id=CHAOS_SPACE_MARINES_FACTION_ID,
+            ability_id=chaos_space_marines_army_rule.HOOK_ID,
+            ability_name="Dark Pacts",
+            semantic_category="faction.army_rule.dark_pacts",
+            runtime_consumer_ids=_chaos_space_marines_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
             faction_id=death_guard_army_rule.DEATH_GUARD_FACTION_ID,
             ability_id=death_guard_army_rule.HOOK_ID,
             ability_name="Nurgle's Gift",
@@ -499,6 +511,29 @@ def _source_faction_row(faction_id: str) -> faction_detachments_2026_27.SourceFa
         if row.faction_id == faction_id:
             return row
     raise ValueError("Ability support matrix runtime row references unknown faction.")
+
+
+def _chaos_space_marines_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = chaos_space_marines_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                *(
+                    binding.hook_id
+                    for binding in contribution.shooting_unit_selected_grant_hook_bindings
+                ),
+                *(
+                    binding.hook_id
+                    for binding in contribution.fight_unit_selected_grant_hook_bindings
+                ),
+                *(
+                    binding.hook_id
+                    for binding in contribution.attack_sequence_completed_hook_bindings
+                ),
+                *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
+            }
+        )
+    )
 
 
 def _death_guard_runtime_consumer_ids() -> tuple[str, ...]:
@@ -956,6 +991,14 @@ def _add_runtime_content_inventory_entries(
         inventory,
         (
             (binding.hook_id, binding.source_id)
+            for binding in contribution.attack_sequence_completed_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
             for binding in contribution.phase_end_objective_control_hook_bindings
         ),
         labels_by_id,
@@ -1245,6 +1288,18 @@ def _structured_support_sections_markdown() -> list[str]:
                     "Focused faction runtime tests",
                     "Full",
                     "Current generated rows are `engine_consumed`.",
+                ),
+                SupportSectionRow(
+                    "Chaos Space Marines - Dark Pacts",
+                    "Named army-rule handler",
+                    "Adapter contract and generated matrix",
+                    "Focused faction runtime tests",
+                    "Full",
+                    (
+                        "Uses selected-to-shoot and selected-to-fight grant decisions for "
+                        "Lethal Hits or Sustained Hits 1, then resolves the post-attack "
+                        "Leadership test and failed-test D3 mortal wounds through engine hooks."
+                    ),
                 ),
                 SupportSectionRow(
                     "Death Guard - Nurgle's Gift",

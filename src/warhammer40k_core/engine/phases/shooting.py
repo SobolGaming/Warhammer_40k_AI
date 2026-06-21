@@ -50,6 +50,11 @@ from warhammer40k_core.engine.attack_sequence import (
     unresolved_target_unit_ids,
     validate_psychic_attack_modifier_ignore_decision,
 )
+from warhammer40k_core.engine.attack_sequence_completion_hooks import (
+    AttackSequenceCompletedContext,
+    AttackSequenceCompletedHookRegistry,
+    attack_sequence_completed_event_id,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     PlacementError,
@@ -911,6 +916,9 @@ class ShootingPhaseHandler:
     shooting_end_surge_hooks: ShootingEndSurgeHookRegistry = field(
         default_factory=ShootingEndSurgeHookRegistry.empty
     )
+    attack_sequence_completed_hooks: AttackSequenceCompletedHookRegistry = field(
+        default_factory=AttackSequenceCompletedHookRegistry.empty
+    )
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry = field(
         default_factory=StratagemCostModifierRegistry.empty
     )
@@ -949,6 +957,10 @@ class ShootingPhaseHandler:
         if type(self.shooting_end_surge_hooks) is not ShootingEndSurgeHookRegistry:
             raise GameLifecycleError(
                 "ShootingPhaseHandler shooting_end_surge_hooks must be a registry."
+            )
+        if type(self.attack_sequence_completed_hooks) is not AttackSequenceCompletedHookRegistry:
+            raise GameLifecycleError(
+                "ShootingPhaseHandler attack_sequence_completed_hooks must be a registry."
             )
         if type(self.stratagem_cost_modifier_registry) is not StratagemCostModifierRegistry:
             raise GameLifecycleError(
@@ -1001,6 +1013,29 @@ class ShootingPhaseHandler:
             if status is not None:
                 return status
             if attack_sequence is None:
+                completion_hook_status = (
+                    self.attack_sequence_completed_hooks.resolve_completed_sequence(
+                        AttackSequenceCompletedContext(
+                            state=state,
+                            decisions=decisions,
+                            dice_manager=DiceRollManager(
+                                state.game_id,
+                                event_log=decisions.event_log,
+                            ),
+                            runtime_modifier_registry=self.runtime_modifier_registry,
+                            source_phase=BattlePhase.SHOOTING,
+                            attack_sequence=completed_candidate,
+                            attack_sequence_completed_event_id=(
+                                attack_sequence_completed_event_id(
+                                    decisions=decisions,
+                                    attack_sequence=completed_candidate,
+                                )
+                            ),
+                        )
+                    )
+                )
+                if completion_hook_status is not None:
+                    return completion_hook_status
                 stratagem_status = _request_friendly_unit_has_shot_stratagem_if_available(
                     state=state,
                     decisions=decisions,

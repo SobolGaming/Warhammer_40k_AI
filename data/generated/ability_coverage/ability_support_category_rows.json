@@ -55,6 +55,44 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts",
+        "ability_name": "Dark Pacts",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/chaos-space-marines/faction/warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts/none",
+        "datasheet_id": "chaos-space-marines",
+        "datasheet_name": "Chaos Space Marines",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Dark Pacts"
+    ],
+    "category_id": "faction.army_rule.dark_pacts",
+    "category_name": "Chaos Space Marines Army Rule",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/chaos-space-marines/faction/warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts/none"
+    ],
+    "datasheet_names": [
+      "Chaos Space Marines"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed",
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits",
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1",
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:lethal_hits",
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:sustained_hits_1",
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001115:instrument-of-chaos",
         "ability_name": "Instrument of Chaos",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/wargear/000001115:instrument-of-chaos/000001115:instrument-of-chaos",
