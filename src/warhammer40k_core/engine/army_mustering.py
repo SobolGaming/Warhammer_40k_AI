@@ -5,8 +5,12 @@ from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
+    MUSTERING_WARLORD_FORBIDDEN,
+    MUSTERING_WARLORD_REQUIRED,
+    MUSTERING_WARLORD_RULE_KEY,
     AttachmentEligibility,
     AttachmentRole,
+    DatasheetAbilityDescriptor,
     DatasheetDefinition,
 )
 from warhammer40k_core.core.detachment import EnhancementDefinition, EnhancementSubtype
@@ -1275,6 +1279,16 @@ def _append_warlord_violations(
                 source_id=request.warlord_selection.source_id,
             )
         )
+    forbidden_source_id = _datasheet_warlord_forbidden_source_id(datasheet)
+    if forbidden_source_id is not None:
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="warlord_forbidden",
+                message="WarlordSelection target has a rule that says it cannot be Warlord.",
+                unit_selection_id=request.warlord_selection.unit_selection_id,
+                source_id=forbidden_source_id,
+            )
+        )
     if _is_daemonic_pact_datasheet(datasheet, faction.faction_keywords):
         violations.append(
             RosterLegalityViolation(
@@ -1308,6 +1322,112 @@ def _append_warlord_violations(
                 source_id=request.warlord_selection.source_id,
             )
         )
+    _append_supreme_commander_warlord_violations(
+        warlord_selection=request.warlord_selection,
+        faction=faction,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        violations=violations,
+    )
+
+
+def _append_supreme_commander_warlord_violations(
+    *,
+    warlord_selection: WarlordSelection,
+    faction: FactionDefinition,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    required_source_by_selection_id = {
+        selection_id: source_id
+        for selection_id, datasheet in datasheets_by_selection_id.items()
+        if (source_id := _datasheet_requires_warlord_source_id(datasheet)) is not None
+    }
+    if not required_source_by_selection_id:
+        return
+    eligible_required_selection_ids = tuple(
+        sorted(
+            selection_id
+            for selection_id in required_source_by_selection_id
+            if _datasheet_can_be_selected_warlord(
+                datasheet=datasheets_by_selection_id[selection_id],
+                faction=faction,
+            )
+        )
+    )
+    if not eligible_required_selection_ids:
+        first_required_selection_id = sorted(required_source_by_selection_id)[0]
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="supreme_commander_warlord_conflict",
+                message=(
+                    "Supreme Commander requires a Warlord from that set, but every such "
+                    "unit is blocked from being Warlord."
+                ),
+                unit_selection_id=first_required_selection_id,
+                source_id=required_source_by_selection_id[first_required_selection_id],
+            )
+        )
+        return
+    if warlord_selection.unit_selection_id in set(eligible_required_selection_ids):
+        return
+    first_eligible_selection_id = eligible_required_selection_ids[0]
+    violations.append(
+        RosterLegalityViolation(
+            violation_code="supreme_commander_warlord_required",
+            message=(
+                "When one or more eligible Supreme Commander units are in the army, "
+                "one of them must be selected as Warlord."
+            ),
+            unit_selection_id=warlord_selection.unit_selection_id,
+            source_id=required_source_by_selection_id[first_eligible_selection_id],
+        )
+    )
+
+
+def _datasheet_can_be_selected_warlord(
+    *,
+    datasheet: DatasheetDefinition,
+    faction: FactionDefinition,
+) -> bool:
+    if not _datasheet_has_keyword(datasheet, "CHARACTER"):
+        return False
+    if _datasheet_warlord_forbidden_source_id(datasheet) is not None:
+        return False
+    if _is_daemonic_pact_datasheet(datasheet, faction.faction_keywords):
+        return False
+    if drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction(
+        datasheet=datasheet,
+        faction=faction,
+    ):
+        return False
+    return bool(set(datasheet.keywords.faction_keywords).intersection(faction.faction_keywords))
+
+
+def _datasheet_requires_warlord_source_id(datasheet: DatasheetDefinition) -> str | None:
+    for ability in datasheet.abilities:
+        value = _ability_mustering_warlord_value(ability)
+        if value == MUSTERING_WARLORD_REQUIRED:
+            return ability.source_id
+    return None
+
+
+def _datasheet_warlord_forbidden_source_id(datasheet: DatasheetDefinition) -> str | None:
+    for ability in datasheet.abilities:
+        if _ability_mustering_warlord_value(ability) == MUSTERING_WARLORD_FORBIDDEN:
+            return ability.source_id
+    return None
+
+
+def _ability_mustering_warlord_value(ability: DatasheetAbilityDescriptor) -> str | None:
+    payload = ability.rule_ir_payload
+    if payload is None or MUSTERING_WARLORD_RULE_KEY not in payload:
+        return None
+    value = payload[MUSTERING_WARLORD_RULE_KEY]
+    if type(value) is not str:
+        raise ArmyMusteringError("mustering_warlord descriptor value must be a string.")
+    if value not in {MUSTERING_WARLORD_REQUIRED, MUSTERING_WARLORD_FORBIDDEN}:
+        raise ArmyMusteringError("mustering_warlord descriptor value is unsupported.")
+    return value
 
 
 def _append_enhancement_violations(
@@ -2076,8 +2196,7 @@ def _apply_warlord_keyword_if_selected(
     if request.warlord_selection is None:
         return units
     if any(
-        violation.violation_code.startswith("warlord_")
-        or violation.violation_code == "missing_warlord_selection"
+        _warlord_violation_blocks_keyword(violation)
         for violation in roster_legality_report.violations
     ):
         return units
@@ -2087,6 +2206,17 @@ def _apply_warlord_keyword_if_selected(
         if unit.unit_instance_id == target_unit_id
         else unit
         for unit in units
+    )
+
+
+def _warlord_violation_blocks_keyword(violation: RosterLegalityViolation) -> bool:
+    if type(violation) is not RosterLegalityViolation:
+        raise ArmyMusteringError("Warlord violation lookup requires a RosterLegalityViolation.")
+    return (
+        violation.violation_code == "missing_warlord_selection"
+        or violation.violation_code.startswith("warlord_")
+        or violation.violation_code.endswith("_warlord_forbidden")
+        or violation.violation_code.startswith("supreme_commander_warlord")
     )
 
 
