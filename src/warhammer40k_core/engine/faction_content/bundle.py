@@ -105,6 +105,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     SaveOptionModifierBinding,
     UnitCharacteristicModifierBinding,
     WeaponProfileModifierBinding,
+    WoundRollModifierBinding,
 )
 from warhammer40k_core.engine.shooting_end_surge_hooks import (
     ShootingEndSurgeHookBinding,
@@ -221,6 +222,7 @@ class RuntimeContentContribution:
     stratagem_cost_modifier_bindings: tuple[StratagemCostModifierBinding, ...] = ()
     unit_characteristic_modifier_bindings: tuple[UnitCharacteristicModifierBinding, ...] = ()
     hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = ()
+    wound_roll_modifier_bindings: tuple[WoundRollModifierBinding, ...] = ()
     save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = ()
     movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = ()
     objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = ()
@@ -544,6 +546,15 @@ class RuntimeContentContribution:
         )
         object.__setattr__(
             self,
+            "wound_roll_modifier_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution wound_roll_modifier_bindings",
+                self.wound_roll_modifier_bindings,
+                WoundRollModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
             "save_option_modifier_bindings",
             _validate_tuple(
                 "RuntimeContentContribution save_option_modifier_bindings",
@@ -638,6 +649,7 @@ class RuntimeContentContribution:
             stratagem_cost_modifier_bindings=self.stratagem_cost_modifier_bindings,
             unit_characteristic_modifier_bindings=self.unit_characteristic_modifier_bindings,
             hit_roll_modifier_bindings=self.hit_roll_modifier_bindings,
+            wound_roll_modifier_bindings=self.wound_roll_modifier_bindings,
             save_option_modifier_bindings=self.save_option_modifier_bindings,
             movement_budget_modifier_bindings=self.movement_budget_modifier_bindings,
             objective_control_modifier_bindings=self.objective_control_modifier_bindings,
@@ -958,6 +970,15 @@ def combine_runtime_content_contributions(
                 binding
                 for contribution in validated_contributions
                 for binding in contribution.hit_roll_modifier_bindings
+            ),
+            lambda binding: binding.modifier_id,
+        ),
+        wound_roll_modifier_bindings=_combine_unique_values(
+            "Wound roll modifier binding",
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.wound_roll_modifier_bindings
             ),
             lambda binding: binding.modifier_id,
         ),
@@ -1486,40 +1507,37 @@ class RuntimeContentBundle:
             )
         )
         runtime_modifier_registry = RuntimeModifierRegistry.from_bindings(
-            unit_characteristic_modifier_bindings=tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.unit_characteristic_modifier_bindings
+            unit_characteristic_modifier_bindings=_contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.unit_characteristic_modifier_bindings,
             ),
-            hit_roll_modifier_bindings=tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.hit_roll_modifier_bindings
+            hit_roll_modifier_bindings=_contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.hit_roll_modifier_bindings,
             ),
-            save_option_modifier_bindings=tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.save_option_modifier_bindings
+            wound_roll_modifier_bindings=_contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.wound_roll_modifier_bindings,
             ),
-            movement_budget_modifier_bindings=tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.movement_budget_modifier_bindings
+            save_option_modifier_bindings=_contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.save_option_modifier_bindings,
             ),
-            objective_control_modifier_bindings=tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.objective_control_modifier_bindings
+            movement_budget_modifier_bindings=_contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.movement_budget_modifier_bindings,
             ),
-            charge_roll_modifier_bindings=tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.charge_roll_modifier_bindings
+            objective_control_modifier_bindings=_contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.objective_control_modifier_bindings,
             ),
-            weapon_profile_modifier_bindings=tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.weapon_profile_modifier_bindings
+            charge_roll_modifier_bindings=_contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.charge_roll_modifier_bindings,
+            ),
+            weapon_profile_modifier_bindings=_contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.weapon_profile_modifier_bindings,
             ),
         )
         return cls(
@@ -1687,6 +1705,10 @@ class RuntimeContentBundle:
             "hit_roll_modifier_ids": [
                 binding.modifier_id
                 for binding in self.runtime_modifier_registry.all_hit_roll_bindings()
+            ],
+            "wound_roll_modifier_ids": [
+                binding.modifier_id
+                for binding in self.runtime_modifier_registry.all_wound_roll_bindings()
             ],
             "save_option_modifier_ids": [
                 binding.modifier_id

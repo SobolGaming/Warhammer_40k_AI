@@ -151,6 +151,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     SaveOptionModifierContext,
     UnitCharacteristicModifierContext,
+    WoundRollModifierContext,
 )
 from warhammer40k_core.engine.saves import (
     SaveKind,
@@ -7011,7 +7012,13 @@ def _roll_hit_and_wound(
             target_keywords=target_rules_unit.keywords,
             attacker_player_id=attack_sequence.attacker_player_id,
             attack_context_id=attack_context_id,
-            wound_modifier=_wound_roll_modifier(pool),
+            wound_modifier=_wound_roll_modifier(
+                state=state,
+                pool=pool,
+                source_phase=attack_sequence.source_phase,
+                toughness=toughness,
+                runtime_modifier_registry=runtime_modifier_registry,
+            ),
         )
         status = _request_source_backed_wound_reroll_if_available(
             state=state,
@@ -8201,12 +8208,34 @@ def _roll_wound(
     )
 
 
-def _wound_roll_modifier(pool: RangedAttackPool) -> int:
+def _wound_roll_modifier(
+    *,
+    state: GameState,
+    pool: RangedAttackPool,
+    source_phase: BattlePhase,
+    toughness: int,
+    runtime_modifier_registry: RuntimeModifierRegistry | None,
+) -> int:
     if type(pool) is not RangedAttackPool:
         raise GameLifecycleError("Wound roll modifier requires a RangedAttackPool.")
     modifier = 0
     if LANCE_RULE_ID in pool.targeting_rule_ids:
         modifier += 1
+    modifier += _runtime_modifier_registry(runtime_modifier_registry).wound_roll_modifier(
+        WoundRollModifierContext(
+            state=state,
+            source_phase=source_phase,
+            attacking_unit_instance_id=_unit_instance_id_for_model(
+                state=state,
+                model_instance_id=pool.attacker_model_instance_id,
+            ),
+            attacker_model_instance_id=pool.attacker_model_instance_id,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            weapon_profile=pool.weapon_profile,
+            strength=pool.weapon_profile.strength.final,
+            toughness=toughness,
+        )
+    )
     return modifier
 
 
@@ -8472,7 +8501,13 @@ def _hit_roll_modifier(
         + runtime_modifiers.hit_roll_modifier(
             HitRollModifierContext(
                 state=state,
+                attacking_unit_instance_id=_unit_instance_id_for_model(
+                    state=state,
+                    model_instance_id=pool.attacker_model_instance_id,
+                ),
                 attacker_model_instance_id=pool.attacker_model_instance_id,
+                target_unit_instance_id=pool.target_unit_instance_id,
+                weapon_profile=pool.weapon_profile,
                 source_phase=source_phase,
             )
         )
@@ -8487,6 +8522,15 @@ def _plunging_fire_ballistic_skill_improvement(*, pool: RangedAttackPool) -> int
 
 def _persisting_hit_roll_modifier(*, state: GameState, target_unit_instance_id: str) -> int:
     return unit_effect_hit_roll_modifier(state.persisting_effects_for_unit(target_unit_instance_id))
+
+
+def _unit_instance_id_for_model(*, state: GameState, model_instance_id: str) -> str:
+    requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
+    for army in state.army_definitions:
+        for unit in army.units:
+            if any(model.model_instance_id == requested_model_id for model in unit.own_models):
+                return unit.unit_instance_id
+    raise GameLifecycleError("Attack modifier model is not in any unit.")
 
 
 def _save_options_with_effect_invulnerable(

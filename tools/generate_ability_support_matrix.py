@@ -225,6 +225,30 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
             "melee targeting."
         ),
     ),
+    (
+        "chaos-daemons",
+        "shadow-legion",
+    ): SupportSectionRow(
+        subject="Shadow Legion",
+        engine=(
+            "Mustering restrictions and keyword grants, Murderer's Cowl Advance "
+            "eligibility, Penumbral Puppetry hit modifiers, Gloam Rot wound "
+            "modifiers, Shadow's Caress snap-target restriction, and Disciples "
+            "of Be'lakor Dark Pacts hooks"
+        ),
+        documentation="Adapter contract, decision catalog, README, and generated matrix",
+        tests=(
+            "Focused mustering, runtime hook, modifier, target-restriction, "
+            "out-of-phase shooting, Be'lakor auto-pass, and Feel No Pain routing tests"
+        ),
+        overall="Full",
+        notes=(
+            "Includes Shadow Legion/Undivided/Deep Strike keyword grants, Thralls of "
+            "the First Prince roster caps and exclusions, Dark Pacts selected-to-shoot/"
+            "fight grants for Undivided units, Be'lakor Leadership auto-pass, and "
+            "Shadow-source D3 mortal-wound Feel No Pain continuation."
+        ),
+    ),
 }
 
 _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
@@ -242,6 +266,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     "phase17f:phase17e:chaos-daemons:cavalcade-of-chaos:stratagems": (
         "Cavalcade of Chaos Stratagems"
     ),
+    "phase17f:phase17e:chaos-daemons:shadow-legion:rule": "Shadow Legion",
     "phase17f:phase17e:chaos-space-marines:army-rule": "Dark Pacts",
     "phase17f:phase17e:death-guard:army-rule": "Nurgle's Gift",
     "phase17f:phase17e:drukhari:army-rule": "Power from Pain",
