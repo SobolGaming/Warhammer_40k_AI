@@ -1033,7 +1033,7 @@ def test_hatred_eternal_grant_prevalidation_rejects_context_and_shape_drift() ->
         selected_option_id=result.selected_option_id,
         payload=result.payload,
     )
-    with pytest.raises(GameLifecycleError, match="actor must be the active player"):
+    with pytest.raises(GameLifecycleError, match="actor must be the selected unit player"):
         handler.apply_decision(state=state, result=wrong_actor, decisions=decisions)
 
     for drifted_payload in (

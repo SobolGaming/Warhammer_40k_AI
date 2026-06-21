@@ -530,6 +530,10 @@ def _chaos_space_marines_runtime_consumer_ids() -> tuple[str, ...]:
                     binding.hook_id
                     for binding in contribution.attack_sequence_completed_hook_bindings
                 ),
+                *(
+                    binding.hook_id
+                    for binding in contribution.mortal_wound_feel_no_pain_hook_bindings
+                ),
                 *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
             }
         )
@@ -919,6 +923,14 @@ def _add_runtime_content_inventory_entries(
         inventory,
         (
             (binding.hook_id, binding.source_id)
+            for binding in contribution.mortal_wound_feel_no_pain_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
             for binding in contribution.charge_declaration_hook_bindings
         ),
         labels_by_id,
@@ -1297,8 +1309,9 @@ def _structured_support_sections_markdown() -> list[str]:
                     "Full",
                     (
                         "Uses selected-to-shoot and selected-to-fight grant decisions for "
-                        "Lethal Hits or Sustained Hits 1, then resolves the post-attack "
-                        "Leadership test and failed-test D3 mortal wounds through engine hooks."
+                        "Lethal Hits or Sustained Hits 1, including out-of-phase shooting, then "
+                        "resolves the post-attack Leadership test, failed-test D3 mortal wounds, "
+                        "and any mortal-wound Feel No Pain continuation through engine hooks."
                     ),
                 ),
                 SupportSectionRow(

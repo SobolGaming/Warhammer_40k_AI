@@ -52,7 +52,7 @@ from warhammer40k_core.engine.deployment import (
     invalid_deployment_placement_status,
     is_deployment_placement_request,
 )
-from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.enhancement_effects import apply_enhancement_effects
 from warhammer40k_core.engine.event_log import (
     EventRecord,
@@ -97,6 +97,9 @@ from warhammer40k_core.engine.mission_decisions import (
     START_MISSION_ACTION_DECISION_TYPE,
     apply_mission_decision,
     invalid_mission_decision_status,
+)
+from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
+    MortalWoundFeelNoPainContinuationContext,
 )
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -1518,6 +1521,61 @@ class GameLifecycle:
                         if handled_status is not None:
                             return handled_status
                 return advanced_status
+            runtime_mortal_wound_registry = (
+                self._require_runtime_content_bundle().mortal_wound_feel_no_pain_hook_registry
+            )
+            if runtime_mortal_wound_registry.handles_source_context(source_context):
+                resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+                runtime_status = runtime_mortal_wound_registry.apply_decision(
+                    MortalWoundFeelNoPainContinuationContext(
+                        state=state,
+                        decisions=self.decision_controller,
+                        request=record.request,
+                        result=result,
+                        source_context=source_context,
+                        dice_manager=DiceRollManager(
+                            state.game_id,
+                            event_log=self.decision_controller.event_log,
+                        ),
+                        runtime_modifier_registry=(
+                            self._require_runtime_content_bundle().runtime_modifier_registry
+                        ),
+                    )
+                )
+                if runtime_status is not None:
+                    if resolves_reaction_frame:
+                        if _runtime_mortal_wound_source_context_phase(source_context) is (
+                            BattlePhase.FIGHT
+                        ):
+                            self._continue_or_resolve_fight_reaction(
+                                result=result,
+                                status=runtime_status,
+                            )
+                        else:
+                            handled_status = self._continue_or_resolve_out_of_phase_reaction(
+                                result=result,
+                                status=runtime_status,
+                            )
+                            if handled_status is not None:
+                                return handled_status
+                    return runtime_status
+                advanced_status = self.advance_until_decision_or_terminal()
+                if resolves_reaction_frame:
+                    if _runtime_mortal_wound_source_context_phase(source_context) is (
+                        BattlePhase.FIGHT
+                    ):
+                        self._continue_or_resolve_fight_reaction(
+                            result=result,
+                            status=advanced_status,
+                        )
+                    else:
+                        handled_status = self._continue_or_resolve_out_of_phase_reaction(
+                            result=result,
+                            status=advanced_status,
+                        )
+                        if handled_status is not None:
+                            return handled_status
+                return advanced_status
         if record.request.decision_type in _FIGHT_DECISION_TYPES and _fight_decision_owns_request(
             state=state,
             request=record.request,
@@ -1655,6 +1713,9 @@ class GameLifecycle:
                 stratagem_cost_modifier_registry=(
                     self._require_runtime_content_bundle().stratagem_cost_modifier_registry
                 ),
+                shooting_unit_selected_grant_hooks=(
+                    self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
+                ),
             )
             if self._result_resolves_active_reaction_frame(result):
                 follow_up_request = self._pending_decision_request()
@@ -1705,6 +1766,9 @@ class GameLifecycle:
                 stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
                 stratagem_cost_modifier_registry=(
                     self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+                ),
+                shooting_unit_selected_grant_hooks=(
+                    self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
                 ),
             )
             advanced_status = self.advance_until_decision_or_terminal()
@@ -2119,6 +2183,9 @@ class GameLifecycle:
                 stratagem_cost_modifier_registry=(
                     self._require_runtime_content_bundle().stratagem_cost_modifier_registry
                 ),
+                shooting_unit_selected_grant_hooks=(
+                    self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
+                ),
             )
             if self._result_resolves_active_reaction_frame(result):
                 follow_up_request = self._pending_decision_request()
@@ -2158,6 +2225,9 @@ class GameLifecycle:
             stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
             stratagem_cost_modifier_registry=(
                 self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+            ),
+            shooting_unit_selected_grant_hooks=(
+                self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
             ),
         )
         advanced_status = self.advance_until_decision_or_terminal()
@@ -2338,6 +2408,24 @@ def _payload_bool(field_name: str, value: object) -> bool:
     if type(value) is not bool:
         raise GameLifecycleError(f"{field_name} must be a bool.")
     return value
+
+
+def _runtime_mortal_wound_source_context_phase(source_context: JsonValue) -> BattlePhase:
+    if not isinstance(source_context, dict):
+        raise GameLifecycleError("Runtime mortal wound FNP source context must be an object.")
+    phase_value = source_context.get("phase")
+    if phase_value is None:
+        resolution_payload = source_context.get("resolution_payload")
+        if isinstance(resolution_payload, dict):
+            phase_value = resolution_payload.get("phase")
+    if type(phase_value) is not str:
+        raise GameLifecycleError("Runtime mortal wound FNP source context is missing phase.")
+    try:
+        return BattlePhase(phase_value)
+    except ValueError as exc:
+        raise GameLifecycleError(
+            f"Unsupported runtime mortal wound FNP phase: {phase_value}."
+        ) from exc
 
 
 def _runtime_content_audit_from_payload(value: object) -> Mapping[str, JsonValue] | None:

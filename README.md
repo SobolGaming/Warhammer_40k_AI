@@ -168,8 +168,10 @@ Current status:
   support includes selected Chaos Daemons, Chaos Space Marines, Aeldari,
   Death Guard, and World Eaters Phase 17G slices. Chaos Space Marines Dark
   Pacts uses shared selected-to-shoot and selected-to-fight grant decisions,
-  attack-sequence weapon keyword modifiers, and post-attack Leadership-test
-  consequence hooks. Aeldari Path of the Outcast supports Far-reaching Doom,
+  out-of-phase selected-to-shoot grant routing, attack-sequence weapon keyword
+  modifiers, and post-attack Leadership-test D3 mortal-wound routing including
+  Feel No Pain continuation decisions. Aeldari Path of the Outcast supports
+  Far-reaching Doom,
   Camouflaged Snipers, Assassins' Eye, Eldritch Suppression, Casting Back the
   Veil, and Nomads of the Hidden Way through the shared Shooting, Stratagem,
   Battle-shock, Hidden/detection, and triggered-movement paths. Aeldari

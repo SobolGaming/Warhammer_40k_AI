@@ -256,6 +256,8 @@ class OutOfPhaseShootingStatePayload(TypedDict):
     source_decision_result_id: str
     source_context: JsonValue
     selected_unit_instance_id: str
+    target_unit_ids: list[str] | None
+    grant_effect_ids: list[str]
     attack_pools: list[RangedAttackPoolPayload]
     attack_sequence: AttackSequencePayload | None
     allocated_model_ids: list[str]
@@ -754,6 +756,8 @@ class OutOfPhaseShootingState:
     source_decision_result_id: str
     source_context: JsonValue
     selected_unit_instance_id: str
+    target_unit_ids: tuple[str, ...] | None = None
+    grant_effect_ids: tuple[str, ...] = ()
     attack_pools: tuple[RangedAttackPool, ...] = ()
     attack_sequence: AttackSequence | None = None
     allocated_model_ids: tuple[str, ...] = ()
@@ -800,6 +804,23 @@ class OutOfPhaseShootingState:
                 self.selected_unit_instance_id,
             ),
         )
+        if self.target_unit_ids is not None:
+            object.__setattr__(
+                self,
+                "target_unit_ids",
+                _validate_identifier_tuple(
+                    "OutOfPhaseShootingState target_unit_ids",
+                    self.target_unit_ids,
+                ),
+            )
+        object.__setattr__(
+            self,
+            "grant_effect_ids",
+            _validate_identifier_tuple(
+                "OutOfPhaseShootingState grant_effect_ids",
+                self.grant_effect_ids,
+            ),
+        )
         object.__setattr__(self, "attack_pools", _validate_attack_pools(self.attack_pools))
         if self.attack_sequence is not None:
             if type(self.attack_sequence) is not AttackSequence:
@@ -834,8 +855,27 @@ class OutOfPhaseShootingState:
             source_decision_result_id=self.source_decision_result_id,
             source_context=self.source_context,
             selected_unit_instance_id=self.selected_unit_instance_id,
+            target_unit_ids=self.target_unit_ids,
+            grant_effect_ids=self.grant_effect_ids,
             attack_pools=attack_pools,
             attack_sequence=attack_sequence,
+            allocated_model_ids=self.allocated_model_ids,
+        )
+
+    def with_grant_effect_ids(self, grant_effect_ids: tuple[str, ...]) -> Self:
+        return type(self)(
+            battle_round=self.battle_round,
+            player_id=self.player_id,
+            parent_phase=self.parent_phase,
+            source_rule_id=self.source_rule_id,
+            source_decision_request_id=self.source_decision_request_id,
+            source_decision_result_id=self.source_decision_result_id,
+            source_context=self.source_context,
+            selected_unit_instance_id=self.selected_unit_instance_id,
+            target_unit_ids=self.target_unit_ids,
+            grant_effect_ids=grant_effect_ids,
+            attack_pools=self.attack_pools,
+            attack_sequence=self.attack_sequence,
             allocated_model_ids=self.allocated_model_ids,
         )
 
@@ -854,6 +894,8 @@ class OutOfPhaseShootingState:
             source_decision_result_id=self.source_decision_result_id,
             source_context=self.source_context,
             selected_unit_instance_id=self.selected_unit_instance_id,
+            target_unit_ids=self.target_unit_ids,
+            grant_effect_ids=self.grant_effect_ids,
             attack_pools=self.attack_pools,
             attack_sequence=attack_sequence,
             allocated_model_ids=allocated_model_ids,
@@ -869,6 +911,8 @@ class OutOfPhaseShootingState:
             "source_decision_result_id": self.source_decision_result_id,
             "source_context": self.source_context,
             "selected_unit_instance_id": self.selected_unit_instance_id,
+            "target_unit_ids": None if self.target_unit_ids is None else list(self.target_unit_ids),
+            "grant_effect_ids": list(self.grant_effect_ids),
             "attack_pools": [pool.to_payload() for pool in self.attack_pools],
             "attack_sequence": (
                 None if self.attack_sequence is None else self.attack_sequence.to_payload()
@@ -878,6 +922,7 @@ class OutOfPhaseShootingState:
 
     @classmethod
     def from_payload(cls, payload: OutOfPhaseShootingStatePayload) -> Self:
+        target_unit_ids = payload["target_unit_ids"]
         return cls(
             battle_round=payload["battle_round"],
             player_id=payload["player_id"],
@@ -887,6 +932,8 @@ class OutOfPhaseShootingState:
             source_decision_result_id=payload["source_decision_result_id"],
             source_context=payload["source_context"],
             selected_unit_instance_id=payload["selected_unit_instance_id"],
+            target_unit_ids=None if target_unit_ids is None else tuple(target_unit_ids),
+            grant_effect_ids=tuple(payload["grant_effect_ids"]),
             attack_pools=tuple(
                 RangedAttackPool.from_payload(pool) for pool in payload["attack_pools"]
             ),
@@ -1177,7 +1224,14 @@ class ShootingPhaseHandler:
         if out_of_phase_state is None:
             return None
         if out_of_phase_state.attack_sequence is None:
+            if out_of_phase_state.attack_pools:
+                return _complete_out_of_phase_shooting(
+                    state=state,
+                    decisions=decisions,
+                    completed_state=out_of_phase_state,
+                )
             return None
+        completed_candidate = out_of_phase_state.attack_sequence
         attack_sequence, allocated_model_ids, status = resolve_attack_sequence_until_blocked(
             state=state,
             decisions=decisions,
@@ -1196,25 +1250,26 @@ class ShootingPhaseHandler:
         completed_state = state.out_of_phase_shooting_state
         if completed_state.attack_sequence is not None:
             raise GameLifecycleError("Out-of-phase shooting completion state drift.")
-        decisions.event_log.append(
-            "out_of_phase_shooting_completed",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "player_id": completed_state.player_id,
-                "parent_phase": completed_state.parent_phase.value,
-                "source_rule_id": completed_state.source_rule_id,
-                "selected_unit_instance_id": completed_state.selected_unit_instance_id,
-            },
+        completion_hook_status = self.attack_sequence_completed_hooks.resolve_completed_sequence(
+            AttackSequenceCompletedContext(
+                state=state,
+                decisions=decisions,
+                dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+                runtime_modifier_registry=self.runtime_modifier_registry,
+                source_phase=completed_candidate.source_phase,
+                attack_sequence=completed_candidate,
+                attack_sequence_completed_event_id=attack_sequence_completed_event_id(
+                    decisions=decisions,
+                    attack_sequence=completed_candidate,
+                ),
+            )
         )
-        state.out_of_phase_shooting_state = None
-        return LifecycleStatus.advanced(
-            stage=GameLifecycleStage.BATTLE,
-            payload={
-                "phase": completed_state.parent_phase.value,
-                "phase_body_status": "out_of_phase_shooting_complete",
-                "source_rule_id": completed_state.source_rule_id,
-            },
+        if completion_hook_status is not None:
+            return completion_hook_status
+        return _complete_out_of_phase_shooting(
+            state=state,
+            decisions=decisions,
+            completed_state=completed_state,
         )
 
     def invalid_declaration_submission_status(
@@ -1481,6 +1536,9 @@ class ShootingPhaseHandler:
                 result=result,
                 decisions=decisions,
                 registry=self.shooting_unit_selected_grant_hooks,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                army_catalog=_army_catalog_for_handler(self),
+                shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
             )
         if result.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE:
             _apply_shooting_type_selection_decision(
@@ -1533,6 +1591,44 @@ class ShootingPhaseHandler:
                 stratagem_index=self.stratagem_index,
             )
         raise GameLifecycleError("ShootingPhaseHandler received unsupported decision_type.")
+
+
+def _complete_out_of_phase_shooting(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    completed_state: OutOfPhaseShootingState,
+) -> LifecycleStatus:
+    if type(completed_state) is not OutOfPhaseShootingState:
+        raise GameLifecycleError("Out-of-phase shooting completion requires state.")
+    if completed_state.attack_sequence is not None:
+        raise GameLifecycleError("Out-of-phase shooting completion requires no sequence.")
+    removed_grant_effects = (
+        state.remove_persisting_effects_by_id(completed_state.grant_effect_ids)
+        if completed_state.grant_effect_ids
+        else ()
+    )
+    decisions.event_log.append(
+        "out_of_phase_shooting_completed",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "player_id": completed_state.player_id,
+            "parent_phase": completed_state.parent_phase.value,
+            "source_rule_id": completed_state.source_rule_id,
+            "selected_unit_instance_id": completed_state.selected_unit_instance_id,
+            "removed_grant_effects": [effect.to_payload() for effect in removed_grant_effects],
+        },
+    )
+    state.out_of_phase_shooting_state = None
+    return LifecycleStatus.advanced(
+        stage=GameLifecycleStage.BATTLE,
+        payload={
+            "phase": completed_state.parent_phase.value,
+            "phase_body_status": "out_of_phase_shooting_complete",
+            "source_rule_id": completed_state.source_rule_id,
+        },
+    )
 
 
 def _request_active_shooting_phase_stratagem_if_available(
@@ -2539,6 +2635,7 @@ def request_out_of_phase_shooting_declaration(
     source_decision_result_id: str,
     source_context: JsonValue,
     target_unit_ids: tuple[str, ...] | None = None,
+    shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None = None,
 ) -> LifecycleStatus:
     if state.out_of_phase_shooting_state is not None:
         raise GameLifecycleError("Out-of-phase shooting state is already active.")
@@ -2562,7 +2659,20 @@ def request_out_of_phase_shooting_declaration(
         source_decision_result_id=source_decision_result_id,
         source_context=source_context,
         selected_unit_instance_id=selected_rules_unit_id,
+        target_unit_ids=target_unit_ids,
     )
+    grant_status = _request_shooting_unit_selected_grant_decision_if_available(
+        state=state,
+        decisions=decisions,
+        selection=selection,
+        registry=(
+            ShootingUnitSelectedGrantRegistry.empty()
+            if shooting_unit_selected_grant_hooks is None
+            else shooting_unit_selected_grant_hooks
+        ),
+    )
+    if grant_status is not None:
+        return grant_status
     return _request_shooting_declaration(
         state=state,
         decisions=decisions,
@@ -3028,12 +3138,15 @@ def _apply_shooting_unit_selected_grant_decision(
     result: DecisionResult,
     decisions: DecisionController,
     registry: ShootingUnitSelectedGrantRegistry,
+    ruleset_descriptor: RulesetDescriptor | None = None,
+    army_catalog: ArmyCatalog | None = None,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
 ) -> LifecycleStatus | None:
-    _validate_shooting_phase_state(state)
-    active_player_id = _active_player_id(state)
-    if result.actor_id != active_player_id:
-        raise GameLifecycleError("Shooting unit grant actor must be the active player.")
     selection = _active_shooting_unit_selection(state)
+    if state.out_of_phase_shooting_state is None:
+        _validate_shooting_phase_state(state)
+    if result.actor_id != selection.player_id:
+        raise GameLifecycleError("Shooting unit grant actor must be the selected unit player.")
     payload = _decision_payload_object(result.payload)
     _validate_shooting_unit_selected_grant_payload_context(payload=payload, selection=selection)
     if result.selected_option_id == DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID:
@@ -3074,6 +3187,44 @@ def _apply_shooting_unit_selected_grant_decision(
             }
         ),
     )
+    out_of_phase_state = state.out_of_phase_shooting_state
+    if (
+        out_of_phase_state is not None
+        and out_of_phase_state.selected_unit_instance_id == selection.unit_instance_id
+        and not out_of_phase_state.attack_pools
+        and out_of_phase_state.attack_sequence is None
+    ):
+        state.out_of_phase_shooting_state = out_of_phase_state.with_grant_effect_ids(
+            tuple(effect.effect_id for effect in persisting_effects)
+        )
+        if ruleset_descriptor is None or army_catalog is None:
+            return None
+        return _request_shooting_declaration(
+            state=state,
+            decisions=decisions,
+            active_selection=selection,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            phase=out_of_phase_state.parent_phase,
+            request_context=validate_json_value(
+                {
+                    "request_kind": "out_of_phase_shooting",
+                    "source_rule_id": out_of_phase_state.source_rule_id,
+                    "source_context": out_of_phase_state.source_context,
+                }
+            ),
+            target_unit_ids=out_of_phase_state.target_unit_ids,
+            forced_shooting_type=(
+                ShootingType.SNAP
+                if out_of_phase_state.source_rule_id == FIRE_OVERWATCH_RULE_ID
+                else None
+            ),
+            shooting_target_restriction_hooks=(
+                ShootingTargetRestrictionHookRegistry.empty()
+                if shooting_target_restriction_hooks is None
+                else shooting_target_restriction_hooks
+            ),
+        )
     return None
 
 
@@ -3192,9 +3343,22 @@ def _shooting_unit_selected_context(
 
 def _active_shooting_unit_selection(state: GameState) -> ShootingUnitSelection:
     shooting_state = state.shooting_phase_state
-    if shooting_state is None or shooting_state.active_selection is None:
-        raise GameLifecycleError("Shooting unit grant requires an active selection.")
-    return shooting_state.active_selection
+    if shooting_state is not None and shooting_state.active_selection is not None:
+        return shooting_state.active_selection
+    out_of_phase_state = state.out_of_phase_shooting_state
+    if (
+        out_of_phase_state is not None
+        and not out_of_phase_state.attack_pools
+        and out_of_phase_state.attack_sequence is None
+    ):
+        return ShootingUnitSelection(
+            player_id=out_of_phase_state.player_id,
+            battle_round=out_of_phase_state.battle_round,
+            unit_instance_id=out_of_phase_state.selected_unit_instance_id,
+            request_id=out_of_phase_state.source_decision_request_id,
+            result_id=out_of_phase_state.source_decision_result_id,
+        )
+    raise GameLifecycleError("Shooting unit grant requires an active selection.")
 
 
 def _validate_shooting_unit_selected_grant_payload_context(

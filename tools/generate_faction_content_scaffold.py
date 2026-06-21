@@ -24,6 +24,12 @@ AGENT_OWNED_DETACHMENT_FILENAMES = ("rule.py", "enhancements.py", "stratagems.py
 PLACEHOLDER_MARKER = (
     "# Generated scaffold placeholder. Remove this marker when implementing semantics."
 )
+CHAOS_SPACE_MARINES_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_space_marines.army_rule"
+IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
+    CHAOS_SPACE_MARINES_ARMY_RULE_MODULE_PATH: (
+        "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts"
+    ),
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -143,6 +149,9 @@ def scaffold_runtime_module_paths() -> tuple[str, ...]:
 
 
 def contribution_id_for_module_path(module_path: str) -> str:
+    implemented_contribution_id = IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH.get(module_path)
+    if implemented_contribution_id is not None:
+        return implemented_contribution_id
     prefix = f"{BASE_IMPORT_PATH}."
     if not module_path.startswith(prefix):
         raise ValueError("Scaffold module path must be inside the 11th Edition runtime package.")

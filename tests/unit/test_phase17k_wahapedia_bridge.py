@@ -982,6 +982,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         chaos_space_marines_army_rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID,
         chaos_space_marines_army_rule.FIGHT_LETHAL_HITS_HOOK_ID,
         chaos_space_marines_army_rule.FIGHT_SUSTAINED_HITS_HOOK_ID,
+        chaos_space_marines_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
         chaos_space_marines_army_rule.SHOOTING_LETHAL_HITS_HOOK_ID,
         chaos_space_marines_army_rule.SHOOTING_SUSTAINED_HITS_HOOK_ID,
         chaos_space_marines_army_rule.WEAPON_PROFILE_MODIFIER_ID,

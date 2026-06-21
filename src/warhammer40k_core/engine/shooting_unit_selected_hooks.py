@@ -59,8 +59,6 @@ class ShootingUnitSelectedContext:
 
         if type(self.state) is not GameState:
             raise GameLifecycleError("ShootingUnitSelectedContext state must be a GameState.")
-        if self.state.current_battle_phase is not BattlePhase.SHOOTING:
-            raise GameLifecycleError("ShootingUnitSelectedContext requires the Shooting phase.")
         object.__setattr__(self, "player_id", _validate_identifier("player_id", self.player_id))
         object.__setattr__(
             self,
@@ -82,6 +80,18 @@ class ShootingUnitSelectedContext:
             "result_id",
             _validate_identifier("result_id", self.result_id),
         )
+        if self.state.current_battle_phase is not BattlePhase.SHOOTING and not (
+            _state_has_matching_out_of_phase_shooting_selection(
+                state=self.state,
+                player_id=self.player_id,
+                battle_round=self.battle_round,
+                unit_instance_id=self.unit_instance_id,
+            )
+        ):
+            raise GameLifecycleError(
+                "ShootingUnitSelectedContext requires the Shooting phase or matching "
+                "out-of-phase shooting state."
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -362,6 +372,24 @@ def _validate_optional_expiration(field_name: str, value: object) -> str | None:
             f"Shooting-unit-selected hook {field_name} must be end_phase or end_turn."
         )
     return expiration
+
+
+def _state_has_matching_out_of_phase_shooting_selection(
+    *,
+    state: GameState,
+    player_id: str,
+    battle_round: int,
+    unit_instance_id: str,
+) -> bool:
+    out_of_phase_state = state.out_of_phase_shooting_state
+    return (
+        out_of_phase_state is not None
+        and out_of_phase_state.player_id == player_id
+        and out_of_phase_state.battle_round == battle_round
+        and out_of_phase_state.selected_unit_instance_id == unit_instance_id
+        and not out_of_phase_state.attack_pools
+        and out_of_phase_state.attack_sequence is None
+    )
 
 
 def _validate_identifier(field_name: str, value: object) -> str:

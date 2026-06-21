@@ -8,12 +8,15 @@ from tests.unit.test_phase11c_command_phase import (
     _battle_state,  # pyright: ignore[reportPrivateUsage]
 )
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.faction_aliases import (
     CHAOS_DAEMONS_FACTION_ID,
+    CHAOS_SPACE_MARINES_FACTION_ALIAS_SOURCE_ID,
     CHAOS_SPACE_MARINES_FACTION_ID,
     faction_alias_for_id,
+    faction_aliases,
     faction_reference_matches,
 )
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -21,6 +24,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     FightEligibilityKind,
     FightOrderingBandKind,
     FightTypeKind,
+    RulesetDescriptor,
 )
 from warhammer40k_core.core.weapon_profiles import (
     AttackProfile,
@@ -38,8 +42,14 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedHookRegistry,
     attack_sequence_completed_event_id,
 )
+from warhammer40k_core.engine.damage_allocation import (
+    FeelNoPainSource,
+    feel_no_pain_roll_spec,
+    is_mortal_wound_feel_no_pain_request,
+    mortal_wound_feel_no_pain_source_context,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -53,6 +63,12 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrantRegistry,
 )
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
+    MortalWoundFeelNoPainContinuationContext,
+    MortalWoundFeelNoPainContinuationHandler,
+    MortalWoundFeelNoPainContinuationHookBinding,
+    MortalWoundFeelNoPainContinuationHookRegistry,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -61,10 +77,13 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.shooting import (
+    SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+    ShootingPhaseHandler,
     ShootingPhaseState,
     ShootingUnitSelection,
     _apply_shooting_unit_selected_grant_decision,  # pyright: ignore[reportPrivateUsage]
     _request_shooting_unit_selected_grant_decision_if_available,  # pyright: ignore[reportPrivateUsage]
+    request_out_of_phase_shooting_declaration,
 )
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
@@ -72,9 +91,11 @@ from warhammer40k_core.engine.runtime_modifiers import (
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
+    SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
     ShootingUnitSelectedGrantRegistry,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 
 
@@ -84,6 +105,7 @@ def test_faction_aliases_include_common_faction_keyword_references() -> None:
     assert chaos_space_marines is not None
     assert chaos_space_marines.name == "Chaos Space Marines"
     assert "Heretic Astartes" in chaos_space_marines.reference_tokens()
+    assert chaos_space_marines.source_ids == (CHAOS_SPACE_MARINES_FACTION_ALIAS_SOURCE_ID,)
     assert faction_reference_matches(
         faction_id=CHAOS_SPACE_MARINES_FACTION_ID,
         reference="HERETIC ASTARTES",
@@ -92,6 +114,10 @@ def test_faction_aliases_include_common_faction_keyword_references() -> None:
         faction_id=CHAOS_DAEMONS_FACTION_ID,
         reference="Legiones Daemonica",
     )
+    assert all(definition.source_ids for definition in faction_aliases())
+    assert len(
+        {source_id for definition in faction_aliases() for source_id in definition.source_ids}
+    ) == len(faction_aliases())
 
 
 def test_attack_sequence_completed_hook_registry_is_ordered_and_fail_fast() -> None:
@@ -208,6 +234,7 @@ def test_attack_sequence_completed_hook_registry_is_ordered_and_fail_fast() -> N
 def test_dark_pacts_runtime_contribution_registers_engine_hooks() -> None:
     contribution = army_rule.runtime_contribution()
 
+    assert contribution.contribution_id == army_rule.CONTRIBUTION_ID
     assert {
         binding.hook_id for binding in contribution.shooting_unit_selected_grant_hook_bindings
     } == {
@@ -225,9 +252,212 @@ def test_dark_pacts_runtime_contribution_registers_engine_hooks() -> None:
         == army_rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
     )
     assert (
+        contribution.mortal_wound_feel_no_pain_hook_bindings[0].hook_id
+        == army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID
+    )
+    assert (
         contribution.weapon_profile_modifier_bindings[0].modifier_id
         == army_rule.WEAPON_PROFILE_MODIFIER_ID
     )
+
+
+def test_mortal_wound_feel_no_pain_continuation_registry_dispatches_by_source_kind() -> None:
+    calls: list[str] = []
+    expected_status = LifecycleStatus.advanced(
+        stage=GameLifecycleStage.BATTLE,
+        payload={"handler": "dark-pacts-test"},
+    )
+
+    def matching_handler(
+        context: MortalWoundFeelNoPainContinuationContext,
+    ) -> LifecycleStatus:
+        source_kind = cast(dict[str, JsonValue], context.source_context)["source_kind"]
+        if type(source_kind) is not str:
+            raise AssertionError("Expected source_kind string.")
+        calls.append(source_kind)
+        return expected_status
+
+    def none_handler(_: MortalWoundFeelNoPainContinuationContext) -> None:
+        return None
+
+    registry = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+        (
+            MortalWoundFeelNoPainContinuationHookBinding(
+                hook_id="dark-pacts-test:z",
+                source_id="dark-pacts-test:z-source",
+                source_kind="dark-pacts-test:z-kind",
+                handler=matching_handler,
+            ),
+            MortalWoundFeelNoPainContinuationHookBinding(
+                hook_id="dark-pacts-test:a",
+                source_id="dark-pacts-test:a-source",
+                source_kind="dark-pacts-test:a-kind",
+                handler=none_handler,
+            ),
+        )
+    )
+
+    assert tuple(binding.hook_id for binding in registry.all_bindings()) == (
+        "dark-pacts-test:a",
+        "dark-pacts-test:z",
+    )
+    assert registry.handles_source_context({"source_kind": " dark-pacts-test:z-kind "})
+    assert (
+        registry.apply_decision(
+            _mortal_wound_fnp_continuation_context(source_kind="dark-pacts-test:z-kind")
+        )
+        == expected_status
+    )
+    assert calls == ["dark-pacts-test:z-kind"]
+    assert (
+        registry.apply_decision(
+            _mortal_wound_fnp_continuation_context(source_kind="dark-pacts-test:a-kind")
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="source kind is not registered"):
+        registry.apply_decision(
+            _mortal_wound_fnp_continuation_context(source_kind="dark-pacts-test:missing-kind")
+        )
+
+
+def test_mortal_wound_feel_no_pain_continuation_hooks_are_fail_fast() -> None:
+    valid_binding = MortalWoundFeelNoPainContinuationHookBinding(
+        hook_id="dark-pacts-test:hook",
+        source_id="dark-pacts-test:source",
+        source_kind="dark-pacts-test:kind",
+        handler=lambda _: None,
+    )
+    context = _mortal_wound_fnp_continuation_context(source_kind="dark-pacts-test:kind")
+
+    with pytest.raises(GameLifecycleError, match="requires GameState"):
+        MortalWoundFeelNoPainContinuationContext(
+            state=cast(GameState, object()),
+            decisions=context.decisions,
+            request=context.request,
+            result=context.result,
+            source_context=context.source_context,
+            dice_manager=context.dice_manager,
+            runtime_modifier_registry=context.runtime_modifier_registry,
+        )
+    with pytest.raises(GameLifecycleError, match="requires DecisionController"):
+        MortalWoundFeelNoPainContinuationContext(
+            state=context.state,
+            decisions=cast(DecisionController, object()),
+            request=context.request,
+            result=context.result,
+            source_context=context.source_context,
+            dice_manager=context.dice_manager,
+            runtime_modifier_registry=context.runtime_modifier_registry,
+        )
+    with pytest.raises(GameLifecycleError, match="requires request"):
+        MortalWoundFeelNoPainContinuationContext(
+            state=context.state,
+            decisions=context.decisions,
+            request=cast(DecisionRequest, object()),
+            result=context.result,
+            source_context=context.source_context,
+            dice_manager=context.dice_manager,
+            runtime_modifier_registry=context.runtime_modifier_registry,
+        )
+    with pytest.raises(GameLifecycleError, match="requires result"):
+        MortalWoundFeelNoPainContinuationContext(
+            state=context.state,
+            decisions=context.decisions,
+            request=context.request,
+            result=cast(DecisionResult, object()),
+            source_context=context.source_context,
+            dice_manager=context.dice_manager,
+            runtime_modifier_registry=context.runtime_modifier_registry,
+        )
+    with pytest.raises(GameLifecycleError, match="requires dice manager"):
+        MortalWoundFeelNoPainContinuationContext(
+            state=context.state,
+            decisions=context.decisions,
+            request=context.request,
+            result=context.result,
+            source_context=context.source_context,
+            dice_manager=cast(DiceRollManager, object()),
+            runtime_modifier_registry=context.runtime_modifier_registry,
+        )
+    with pytest.raises(GameLifecycleError, match="requires runtime modifier registry"):
+        MortalWoundFeelNoPainContinuationContext(
+            state=context.state,
+            decisions=context.decisions,
+            request=context.request,
+            result=context.result,
+            source_context=context.source_context,
+            dice_manager=context.dice_manager,
+            runtime_modifier_registry=cast(RuntimeModifierRegistry, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="hook hook_id must be a string"):
+        MortalWoundFeelNoPainContinuationHookBinding(
+            hook_id=cast(str, 1),
+            source_id="dark-pacts-test:source",
+            source_kind="dark-pacts-test:kind",
+            handler=lambda _: None,
+        )
+    with pytest.raises(GameLifecycleError, match="hook source_id must not be empty"):
+        MortalWoundFeelNoPainContinuationHookBinding(
+            hook_id="dark-pacts-test:hook",
+            source_id=" ",
+            source_kind="dark-pacts-test:kind",
+            handler=lambda _: None,
+        )
+    with pytest.raises(GameLifecycleError, match="handler is not callable"):
+        MortalWoundFeelNoPainContinuationHookBinding(
+            hook_id="dark-pacts-test:hook",
+            source_id="dark-pacts-test:source",
+            source_kind="dark-pacts-test:kind",
+            handler=cast(MortalWoundFeelNoPainContinuationHandler, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="bindings must be a tuple"):
+        MortalWoundFeelNoPainContinuationHookRegistry(
+            bindings=cast(tuple[MortalWoundFeelNoPainContinuationHookBinding, ...], [])
+        )
+    with pytest.raises(GameLifecycleError, match="bindings must contain"):
+        MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+            cast(tuple[MortalWoundFeelNoPainContinuationHookBinding, ...], (object(),))
+        )
+    with pytest.raises(GameLifecycleError, match="hook IDs must be unique"):
+        MortalWoundFeelNoPainContinuationHookRegistry.from_bindings((valid_binding, valid_binding))
+    with pytest.raises(GameLifecycleError, match="source kinds must be unique"):
+        MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+            (
+                valid_binding,
+                MortalWoundFeelNoPainContinuationHookBinding(
+                    hook_id="dark-pacts-test:other-hook",
+                    source_id="dark-pacts-test:other-source",
+                    source_kind=valid_binding.source_kind,
+                    handler=lambda _: None,
+                ),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="source context must be an object"):
+        MortalWoundFeelNoPainContinuationHookRegistry.empty().handles_source_context(
+            "dark-pacts-test:kind"
+        )
+    with pytest.raises(GameLifecycleError, match="source context is missing source_kind"):
+        _mortal_wound_fnp_continuation_context(source_context={})
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+            (valid_binding,)
+        ).apply_decision(cast(MortalWoundFeelNoPainContinuationContext, object()))
+
+    def wrong_return(_: MortalWoundFeelNoPainContinuationContext) -> LifecycleStatus:
+        return cast(LifecycleStatus, object())
+
+    with pytest.raises(GameLifecycleError, match="handlers must return status or None"):
+        MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+            (
+                MortalWoundFeelNoPainContinuationHookBinding(
+                    hook_id="dark-pacts-test:wrong-return",
+                    source_id="dark-pacts-test:wrong-return-source",
+                    source_kind="dark-pacts-test:kind",
+                    handler=wrong_return,
+                ),
+            )
+        ).apply_decision(context)
 
 
 def test_dark_pacts_shooting_decision_records_effect_and_grants_lethal_hits() -> None:
@@ -302,6 +532,77 @@ def test_dark_pacts_shooting_decision_records_effect_and_grants_lethal_hits() ->
         )
     )
     assert WeaponKeyword.LETHAL_HITS in modified.keywords
+
+
+def test_dark_pacts_out_of_phase_shooting_requests_grant_before_declaration() -> None:
+    state = _csm_battle_state()
+    unit = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    decisions = DecisionController()
+    contribution = army_rule.runtime_contribution()
+    grant_registry = ShootingUnitSelectedGrantRegistry.from_bindings(
+        contribution.shooting_unit_selected_grant_hook_bindings
+    )
+
+    grant_status = request_out_of_phase_shooting_declaration(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="phase17g-csm-out-of-phase"
+        ),
+        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+        player_id="player-a",
+        unit_instance_id=unit.unit_instance_id,
+        parent_phase=BattlePhase.MOVEMENT,
+        source_rule_id=FIRE_OVERWATCH_RULE_ID,
+        source_decision_request_id="fire-overwatch-target-request",
+        source_decision_result_id="fire-overwatch-target-result",
+        source_context={
+            "source_kind": "fire_overwatch",
+            "triggering_enemy_unit_instance_id": target.unit_instance_id,
+        },
+        target_unit_ids=(target.unit_instance_id,),
+        shooting_unit_selected_grant_hooks=grant_registry,
+    )
+    request = _decision_request(grant_status.decision_request)
+
+    assert request.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE
+    assert state.out_of_phase_shooting_state is not None
+    assert state.out_of_phase_shooting_state.target_unit_ids == (target.unit_instance_id,)
+
+    result = DecisionResult.for_request(
+        result_id="fire-overwatch-dark-pact-result",
+        request=request,
+        selected_option_id=army_rule.SHOOTING_LETHAL_HITS_HOOK_ID,
+    )
+    decisions.submit_result(result)
+    declaration_status = ShootingPhaseHandler(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="phase17g-csm-out-of-phase"
+        ),
+        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+        shooting_unit_selected_grant_hooks=grant_registry,
+    ).apply_decision(
+        state=state,
+        result=result,
+        decisions=decisions,
+    )
+    declaration_request = _decision_request(
+        None if declaration_status is None else declaration_status.decision_request
+    )
+
+    assert declaration_request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
+    assert (
+        army_rule.active_dark_pact_for_unit(
+            state,
+            unit_instance_id=unit.unit_instance_id,
+            phase=BattlePhase.SHOOTING,
+        )
+        is army_rule.DarkPactKind.LETHAL_HITS
+    )
+    assert state.out_of_phase_shooting_state is not None
+    assert state.out_of_phase_shooting_state.grant_effect_ids
 
 
 def test_dark_pacts_fight_grant_and_melee_profile_add_sustained_hits() -> None:
@@ -435,6 +736,210 @@ def test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds() -> None:
     refreshed_unit = _unit_for_player(state, player_id="player-a")
     ending_wounds = sum(model.wounds_remaining for model in refreshed_unit.own_models)
     assert starting_wounds - ending_wounds == 3
+
+
+def test_dark_pacts_failed_leadership_mortal_wounds_route_feel_no_pain_choice() -> None:
+    state = _csm_battle_state()
+    unit = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    _record_dark_pact_effect(
+        state,
+        unit=unit,
+        phase=BattlePhase.SHOOTING,
+        pact=army_rule.DarkPactKind.LETHAL_HITS,
+    )
+    source_a = FeelNoPainSource(source_id="dark-pact-fnp-a", threshold=5)
+    source_b = FeelNoPainSource(source_id="dark-pact-fnp-b", threshold=6)
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=unit.own_models[0].model_instance_id,
+        sources=(source_a, source_b),
+    )
+    decisions = DecisionController()
+    attack_sequence = AttackSequence(
+        sequence_id="dark-pact-fnp-sequence",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=unit.unit_instance_id,
+        attack_pools=(
+            _attack_pool(
+                attacker=unit,
+                target=target,
+                weapon_profile=_weapon_profile(melee=False),
+            ),
+        ),
+        source_phase=BattlePhase.SHOOTING,
+        used_pool_indices=(0,),
+        pool_index=1,
+    )
+    completed_event = decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "attacker_player_id": "player-a",
+            "attacking_unit_instance_id": unit.unit_instance_id,
+        },
+    )
+    manager = DiceRollManager(
+        state.game_id,
+        event_log=decisions.event_log,
+        injected_results=(
+            DiceRollResult.from_values(
+                roll_id="dark-pact-fnp-leadership-roll",
+                spec=DiceRollSpec(
+                    expression=DiceExpression(quantity=2, sides=6),
+                    reason=f"Dark Pact Leadership test for {unit.unit_instance_id}",
+                    roll_type=army_rule.DARK_PACT_LEADERSHIP_ROLL_TYPE,
+                    actor_id=unit.unit_instance_id,
+                ),
+                values=(1, 1),
+                source="fixed",
+            ),
+            DiceRollResult.from_values(
+                roll_id="dark-pact-fnp-mortal-wounds-roll",
+                spec=DiceRollManager.d3_source_spec(
+                    reason=f"Dark Pact mortal wounds for {unit.unit_instance_id}",
+                    roll_type=army_rule.DARK_PACT_MORTAL_WOUNDS_ROLL_TYPE,
+                    actor_id=unit.unit_instance_id,
+                ),
+                values=(1,),
+                source="fixed",
+            ),
+        ),
+    )
+    starting_wounds = sum(model.wounds_remaining for model in unit.own_models)
+
+    status = army_rule.resolve_dark_pact_attack_sequence_completion(
+        AttackSequenceCompletedContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=manager,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            source_phase=BattlePhase.SHOOTING,
+            attack_sequence=attack_sequence,
+            attack_sequence_completed_event_id=completed_event.event_id,
+        )
+    )
+    request = _decision_request(None if status is None else status.decision_request)
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert is_mortal_wound_feel_no_pain_request(request)
+    source_context = mortal_wound_feel_no_pain_source_context(request)
+    assert isinstance(source_context, dict)
+    assert source_context["source_kind"] == army_rule.DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND
+    assert {option.option_id for option in request.options} == {
+        source_a.source_id,
+        source_b.source_id,
+    }
+    assert not _has_event(decisions, "chaos_space_marines_dark_pact_resolved")
+    assert (
+        sum(
+            model.wounds_remaining
+            for model in _unit_for_player(state, player_id="player-a").own_models
+        )
+        == starting_wounds
+    )
+
+    result = DecisionResult.for_request(
+        result_id="dark-pact-fnp-source-a",
+        request=request,
+        selected_option_id=source_a.source_id,
+    )
+    decisions.submit_result(result)
+    continuation_status = army_rule.apply_dark_pact_mortal_wound_feel_no_pain_decision(
+        MortalWoundFeelNoPainContinuationContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+            source_context=source_context,
+            dice_manager=DiceRollManager(
+                state.game_id,
+                event_log=decisions.event_log,
+                injected_results=(
+                    DiceRollResult.from_values(
+                        roll_id="dark-pact-fnp-roll",
+                        spec=feel_no_pain_roll_spec(
+                            source=source_a,
+                            player_id="player-a",
+                            model_instance_id=unit.own_models[0].model_instance_id,
+                            wound_index=1,
+                        ),
+                        values=(1,),
+                        source="fixed",
+                    ),
+                ),
+            ),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+    )
+
+    assert continuation_status is None
+    payload = _last_event_payload(decisions, "chaos_space_marines_dark_pact_resolved")
+    assert payload["feel_no_pain_result_id"] == result.result_id
+    application = cast(dict[str, JsonValue], payload["mortal_wound_application"])
+    assert application["mortal_wounds"] == 1
+    assert (
+        starting_wounds
+        - sum(
+            model.wounds_remaining
+            for model in _unit_for_player(state, player_id="player-a").own_models
+        )
+        == 1
+    )
+
+
+def test_dark_pacts_completion_hook_runs_once_through_shooting_phase_handler() -> None:
+    state = _csm_battle_state()
+    unit = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    _record_dark_pact_effect(
+        state,
+        unit=unit,
+        phase=BattlePhase.SHOOTING,
+        pact=army_rule.DarkPactKind.SUSTAINED_HITS_1,
+    )
+    decisions = DecisionController()
+    attack_pool = _attack_pool(
+        attacker=unit,
+        target=target,
+        weapon_profile=_weapon_profile(melee=False),
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(unit.unit_instance_id,),
+        shot_unit_ids=(unit.unit_instance_id,),
+        attack_pools=(attack_pool,),
+        attack_sequence=AttackSequence(
+            sequence_id="dark-pact-handler-completed-sequence",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=unit.unit_instance_id,
+            attack_pools=(attack_pool,),
+            source_phase=BattlePhase.SHOOTING,
+            used_pool_indices=(0,),
+            pool_index=1,
+        ),
+    )
+    contribution = army_rule.runtime_contribution()
+    handler = ShootingPhaseHandler(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="phase17g-csm-handler"
+        ),
+        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+        attack_sequence_completed_hooks=AttackSequenceCompletedHookRegistry.from_bindings(
+            contribution.attack_sequence_completed_hook_bindings
+        ),
+    )
+
+    status = handler.begin_phase(state=state, decisions=decisions)
+
+    assert status.status_kind is LifecycleStatusKind.ADVANCED
+    assert _event_count(decisions, "chaos_space_marines_dark_pact_resolved") == 1
+    assert _event_count(decisions, "attack_sequence_completed") == 1
+    handler.begin_phase(state=state, decisions=decisions)
+    assert _event_count(decisions, "chaos_space_marines_dark_pact_resolved") == 1
 
 
 def _csm_battle_state() -> GameState:
@@ -588,6 +1093,47 @@ def _decision_request(request: DecisionRequest | None) -> DecisionRequest:
     return request
 
 
+def _mortal_wound_fnp_continuation_context(
+    *,
+    source_kind: str = "dark-pacts-test:kind",
+    source_context: JsonValue | None = None,
+) -> MortalWoundFeelNoPainContinuationContext:
+    state = _csm_battle_state()
+    decisions = DecisionController()
+    default_source_context: dict[str, JsonValue] = {"source_kind": source_kind}
+    resolved_source_context: JsonValue = (
+        default_source_context if source_context is None else source_context
+    )
+    payload: dict[str, JsonValue] = {"source_context": resolved_source_context}
+    request = DecisionRequest(
+        request_id="dark-pacts-test:fnp-request",
+        decision_type="select_feel_no_pain",
+        actor_id="player-a",
+        payload=payload,
+        options=(
+            DecisionOption(
+                option_id="dark-pacts-test:fnp-source",
+                label="Dark Pacts Test FNP Source",
+                payload=payload,
+            ),
+        ),
+    )
+    result = DecisionResult.for_request(
+        result_id="dark-pacts-test:fnp-result",
+        request=request,
+        selected_option_id="dark-pacts-test:fnp-source",
+    )
+    return MortalWoundFeelNoPainContinuationContext(
+        state=state,
+        decisions=decisions,
+        request=request,
+        result=result,
+        source_context=resolved_source_context,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+
+
 def _last_event_payload(
     decisions: DecisionController,
     event_type: str,
@@ -596,3 +1142,11 @@ def _last_event_payload(
         if event.event_type == event_type:
             return cast(dict[str, JsonValue], event.payload)
     raise AssertionError(f"Missing event {event_type}.")
+
+
+def _has_event(decisions: DecisionController, event_type: str) -> bool:
+    return any(event.event_type == event_type for event in decisions.event_log.records)
+
+
+def _event_count(decisions: DecisionController, event_type: str) -> int:
+    return sum(1 for event in decisions.event_log.records if event.event_type == event_type)
