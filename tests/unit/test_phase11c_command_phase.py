@@ -1133,6 +1133,12 @@ def test_mustered_attached_unit_uses_attached_starting_strength_until_split() ->
     assert bodyguard_id not in record_ids
     assert leader_id not in record_ids
     assert support_id not in record_ids
+    assert state.unit_started_battle_as_attached_leader_or_support(leader_id)
+    assert state.unit_started_battle_as_attached_leader_or_support(support_id)
+    assert not state.unit_started_battle_as_attached_leader_or_support(bodyguard_id)
+    assert tuple(
+        record.attached_unit_instance_id for record in state.starting_attached_unit_records
+    ) == (attached_id,)
     assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
 
     recovered = state.recover_starting_strength_after_attached_unit_split(
@@ -1147,6 +1153,9 @@ def test_mustered_attached_unit_uses_attached_starting_strength_until_split() ->
         support_id,
     )
     assert not state.army_definitions[0].attached_units
+    assert state.unit_started_battle_as_attached_leader_or_support(leader_id)
+    assert state.unit_started_battle_as_attached_leader_or_support(support_id)
+    assert not state.unit_started_battle_as_attached_leader_or_support(bodyguard_id)
     assert state.starting_strength_record_for_unit(bodyguard_id).starting_model_count == 5
     assert state.starting_strength_record_for_unit(leader_id).single_model_starting_wounds == 5
     assert state.starting_strength_record_for_unit(support_id).single_model_starting_wounds == 4

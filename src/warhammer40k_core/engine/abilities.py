@@ -4,14 +4,14 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
 from types import MappingProxyType
-from typing import Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     RulesetDescriptorError,
     battle_phase_kind_from_token,
 )
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
@@ -22,6 +22,9 @@ CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID = "core:movement-keyword-gate"
 CORE_HAZARDOUS_HANDLER_ID = "core:hazardous"
 GENERIC_RULE_IR_ABILITY_HANDLER_ID = "generic:rule-ir"
 MOVEMENT_CAPABILITY_FLAGS_PAYLOAD_KEY = "movement_capability_flags"
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
 
 
 class AbilitySourceKind(StrEnum):
@@ -430,6 +433,8 @@ class AbilityExecutionContext:
     target_unit_instance_id: str | None = None
     source_keywords: tuple[str, ...] = ()
     trigger_payload: JsonValue = None
+    state: GameState | None = None
+    event_log: EventLog | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -509,6 +514,13 @@ class AbilityExecutionContext:
             ),
         )
         object.__setattr__(self, "trigger_payload", validate_json_value(self.trigger_payload))
+        if self.state is not None:
+            from warhammer40k_core.engine.game_state import GameState
+
+            if type(self.state) is not GameState:
+                raise GameLifecycleError("AbilityExecutionContext state must be a GameState.")
+        if self.event_log is not None and type(self.event_log) is not EventLog:
+            raise GameLifecycleError("AbilityExecutionContext event_log must be an EventLog.")
 
     @classmethod
     def passive_keyword_gate(cls, *, source_keywords: tuple[str, ...]) -> Self:
@@ -968,6 +980,8 @@ def _generic_rule_ir_ability_handler(
             ),
             source_keywords=context.source_keywords,
             trigger_payload=context.trigger_payload,
+            state=context.state,
+            event_log=context.event_log,
         ),
     )
     if result.status is RuleExecutionStatus.APPLIED:

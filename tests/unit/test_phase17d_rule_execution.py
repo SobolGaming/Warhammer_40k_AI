@@ -40,6 +40,7 @@ from warhammer40k_core.engine.effects import (
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     ModelProfileSelection,
     UnitMusterSelection,
@@ -669,9 +670,137 @@ def test_phase17d_ability_bridge_executes_compiled_rule_ir_payload() -> None:
     assert rule_execution["rule_ir_hash"] == compiled.rule_ir.ir_hash()
 
 
+def test_phase17d_leading_model_condition_survives_destroyed_bodyguard_split() -> None:
+    leader_state = _bodyguard_destroyed_split_state()
+    support_state = _bodyguard_destroyed_split_state()
+    bodyguard_state = _bodyguard_destroyed_split_state()
+    bodyguard_id = "army-alpha:bodyguard-unit"
+    leader_id = "army-alpha:leader-unit"
+    support_id = "army-alpha:support-unit"
+    compiled = _compiled(_skullmaster_fury_text())
+
+    leader_result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=leader_state,
+            source_model_instance_id=f"{leader_id}:core-character-leader:001",
+            target_unit_instance_ids=(leader_id,),
+            phase=BattlePhaseKind.CHARGE,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+    support_result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=support_state,
+            source_unit_instance_id=support_id,
+            target_unit_instance_ids=(support_id,),
+            phase=BattlePhaseKind.CHARGE,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+    bodyguard_result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=bodyguard_state,
+            source_unit_instance_id=bodyguard_id,
+            target_unit_instance_ids=(leader_id,),
+            phase=BattlePhaseKind.CHARGE,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert not leader_state.army_definitions[0].attached_units
+    assert leader_state.unit_started_battle_as_attached_leader_or_support(leader_id)
+    assert leader_state.unit_started_battle_as_attached_leader_or_support(support_id)
+    assert (
+        GameState.from_payload(leader_state.to_payload()).to_payload() == leader_state.to_payload()
+    )
+    assert leader_result.status is RuleExecutionStatus.APPLIED
+    assert support_result.status is RuleExecutionStatus.APPLIED
+    assert bodyguard_result.status is RuleExecutionStatus.INVALID
+    assert bodyguard_result.reason == "condition_not_met:this_model_leading_unit"
+
+
+def test_phase17d_leading_model_condition_fails_closed_without_state_or_source() -> None:
+    compiled = _compiled(_skullmaster_fury_text())
+
+    missing_state = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            source_unit_instance_id="army-alpha:leader-unit",
+            target_unit_instance_ids=("army-alpha:leader-unit",),
+            phase=BattlePhaseKind.CHARGE,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+    missing_source = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=_battle_state_with_attached_leader_support(),
+            target_unit_instance_ids=("army-alpha:leader-unit",),
+            phase=BattlePhaseKind.CHARGE,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert missing_state.status is RuleExecutionStatus.INVALID
+    assert missing_state.reason == "missing_input:game_state"
+    assert missing_source.status is RuleExecutionStatus.INVALID
+    assert missing_source.reason == "missing_input:source_unit_instance_id"
+
+
+def test_phase17d_ability_bridge_passes_state_for_leading_model_condition() -> None:
+    state = _bodyguard_destroyed_split_state()
+    leader_id = "army-alpha:leader-unit"
+    compiled = _compiled(_skullmaster_fury_text())
+    record = AbilityCatalogRecord(
+        record_id="phase17d:leading-ability-record",
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id="phase17d:skullmaster",
+        definition=AbilityDefinition(
+            ability_id="phase17d:leading-ability",
+            name="phase17d leading ability",
+            source_id="phase17d:leading-ability-source",
+            when_descriptor="phase17d:when",
+            effect_descriptor="phase17d:effect",
+            restrictions_descriptor="phase17d:restrictions",
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value({"rule_ir": compiled.rule_ir.to_payload()}),
+        ),
+    )
+
+    result = default_ability_handler_registry().execute(
+        record=record,
+        context=AbilityExecutionContext(
+            game_id="phase17d-game",
+            player_id="player-a",
+            battle_round=1,
+            phase=BattlePhaseKind.CHARGE,
+            active_player_id="player-a",
+            trigger_kind=TimingTriggerKind.ANY_PHASE,
+            source_unit_instance_id=leader_id,
+            target_unit_instance_id=leader_id,
+            source_keywords=(),
+            state=state,
+        ),
+    )
+
+    assert result.status is AbilityResolutionStatus.APPLIED
+
+
 def _compiled(raw_text: str) -> CompiledRuleSource:
     return compile_rule_source_text(
         RuleSourceText.from_raw(source_id=f"phase17d:{raw_text.lower()}", raw_text=raw_text)
+    )
+
+
+def _skullmaster_fury_text() -> str:
+    return (
+        "While this model is leading a unit, each time that unit ends a Charge move, "
+        "until the end of the turn, Juggernaut's bladed horns equipped by models in "
+        "that unit have the [DEVASTATING WOUNDS] ability."
     )
 
 
@@ -689,6 +818,7 @@ def _execution_context(
     state: GameState | None = None,
     event_log: EventLog | None = None,
     source_unit_instance_id: str | None = None,
+    source_model_instance_id: str | None = None,
     target_unit_instance_ids: tuple[str, ...] = (),
     trigger_payload: JsonValue = None,
     phase: BattlePhaseKind | None = BattlePhaseKind.COMMAND,
@@ -701,6 +831,7 @@ def _execution_context(
         active_player_id="player-a",
         timing_window_id="phase17d:test-window",
         source_unit_instance_id=source_unit_instance_id,
+        source_model_instance_id=source_model_instance_id,
         target_unit_instance_ids=target_unit_instance_ids,
         trigger_payload=trigger_payload,
         state=state,
@@ -739,6 +870,31 @@ def _battle_state_with_scenario() -> GameState:
     for army_definition in scenario.armies:
         state.record_army_definition(army_definition)
     state.battlefield_state = scenario.battlefield_state
+    return state
+
+
+def _battle_state_with_attached_leader_support() -> GameState:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    state = _battle_state()
+    state.record_army_definition(
+        muster_army(
+            catalog=catalog,
+            request=_attached_leader_support_muster_request(catalog),
+        )
+    )
+    return state
+
+
+def _bodyguard_destroyed_split_state() -> GameState:
+    state = _battle_state_with_attached_leader_support()
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-a",
+        attached_unit_instance_id="attached-unit:army-alpha:bodyguard-unit",
+        surviving_unit_instance_ids=(
+            "army-alpha:leader-unit",
+            "army-alpha:support-unit",
+        ),
+    )
     return state
 
 
@@ -860,6 +1016,62 @@ def _muster_request_with_unit_ids(
                 ),
             )
             for unit_selection_id in unit_selection_ids
+        ),
+    )
+
+
+def _attached_leader_support_muster_request(catalog: ArmyCatalog) -> ArmyMusterRequest:
+    return ArmyMusterRequest(
+        army_id="army-alpha",
+        player_id="player-a",
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_ids=("core-combined-arms",),
+        ),
+        unit_selections=(
+            UnitMusterSelection(
+                unit_selection_id="bodyguard-unit",
+                datasheet_id="core-intercessor-like-infantry",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-intercessor-like",
+                        model_count=5,
+                    ),
+                ),
+            ),
+            UnitMusterSelection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-character-leader",
+                        model_count=1,
+                    ),
+                ),
+            ),
+            UnitMusterSelection(
+                unit_selection_id="support-unit",
+                datasheet_id="core-character-support",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-character-support",
+                        model_count=1,
+                    ),
+                ),
+            ),
+        ),
+        attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+            AttachmentDeclaration(
+                source_unit_selection_id="support-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
         ),
     )
 
