@@ -55,6 +55,13 @@ APPROVED_RUNTIME_ONLY_SOURCE_ROW_IDS = frozenset(
         "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:warp-riders",
     )
 )
+FADE_TO_DARKNESS_SOURCE_ROW_ID = "enhancement:chaos-daemons:shadow-legion:000009980004"
+FADE_TO_DARKNESS_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+    "enhancement:fade_to_darkness:turn-end-reserves",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+    "enhancement:fade_to_darkness:unit-destroyed",
+)
 
 
 def test_phase17e_payload_is_deterministic_json_safe_and_round_trips() -> None:
@@ -329,6 +336,31 @@ def test_phase17e_exact_enhancement_and_stratagem_rows_cover_source_catalog() ->
             detachment_source_id=detachment_row.source_id,
             pdf_source_id=pdf_by_faction_id[stratagem_source_row.faction_id].source_id,
         )
+
+
+def test_phase17e_fade_to_darkness_exact_row_is_engine_consumed() -> None:
+    source_row = next(
+        row
+        for row in faction_subrule_source.enhancement_rows()
+        if row.source_row_id == FADE_TO_DARKNESS_SOURCE_ROW_ID
+    )
+    coverage_row = next(
+        row
+        for row in faction_coverage_source.coverage_rows()
+        if row.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
+        and row.faction_id == "chaos-daemons"
+        and row.detachment_id == "shadow-legion"
+        and row.rule_id == "000009980004"
+    )
+
+    assert source_row.name == "Fade to Darkness"
+    assert source_row.runtime_support_status.value == "engine_consumed"
+    assert source_row.runtime_consumer_ids == FADE_TO_DARKNESS_RUNTIME_CONSUMERS
+    assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+    assert coverage_row.runtime_support_status is not None
+    assert coverage_row.runtime_support_status.value == "engine_consumed"
+    assert coverage_row.runtime_consumer_ids == FADE_TO_DARKNESS_RUNTIME_CONSUMERS
+    assert coverage_row.handler_id == FADE_TO_DARKNESS_RUNTIME_CONSUMERS[0]
 
 
 def test_phase17e_coverage_report_groups_supported_and_approved_unsupported_rows() -> None:

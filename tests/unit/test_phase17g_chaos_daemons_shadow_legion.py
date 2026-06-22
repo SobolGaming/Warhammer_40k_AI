@@ -35,6 +35,7 @@ from warhammer40k_core.engine.advance_eligibility_hooks import AdvanceEligibilit
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
+    EnhancementAssignment,
     RosterUnitPointValue,
     WarlordSelection,
     muster_army,
@@ -58,6 +59,7 @@ from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.shadow_legion import (  # noqa: E501
+    enhancements,
     rule,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
@@ -75,7 +77,7 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookRegistry,
 )
-from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
 from warhammer40k_core.engine.phases.shooting import (
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
     ShootingPhaseHandler,
@@ -97,6 +99,12 @@ from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedGrantRegistry,
 )
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionContext
+from warhammer40k_core.engine.turn_end_hooks import (
+    SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
+    TurnEndRequestContext,
+    TurnEndResultContext,
+)
+from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
@@ -147,6 +155,19 @@ def test_shadow_legion_runtime_contribution_registers_engine_hooks() -> None:
     assert contribution.weapon_profile_modifier_bindings[0].modifier_id == (
         rule.WEAPON_PROFILE_MODIFIER_ID
     )
+
+
+def test_shadow_legion_fade_to_darkness_runtime_contribution_registers_exact_hooks() -> None:
+    contribution = enhancements.runtime_contribution()
+
+    assert contribution.contribution_id == enhancements.CONTRIBUTION_ID
+    assert not contribution.contribution_id.endswith(":scaffold")
+    assert contribution.unit_destroyed_hook_bindings[0].hook_id == (
+        enhancements.UNIT_DESTROYED_HOOK_ID
+    )
+    assert contribution.unit_destroyed_hook_bindings[0].source_id == enhancements.SOURCE_RULE_ID
+    assert contribution.turn_end_hook_bindings[0].hook_id == enhancements.TURN_END_HOOK_ID
+    assert contribution.turn_end_hook_bindings[0].source_id == enhancements.SOURCE_RULE_ID
 
 
 def test_shadow_legion_mustering_grants_keywords_and_deep_strike() -> None:
@@ -696,6 +717,174 @@ def test_shadow_legion_fight_grants_dark_pacts_for_undivided_units() -> None:
     }
 
 
+def test_fade_to_darkness_requires_current_fight_destroyed_enemy_marker() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided"))
+    unit = _unit_for_player(state, player_id="player-a")
+    _assign_fade_to_darkness(state, unit=unit)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+
+    assert (
+        enhancements.fade_to_darkness_turn_end_request(
+            TurnEndRequestContext(
+                state=state,
+                decisions=DecisionController(),
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+        is None
+    )
+
+
+def test_fade_to_darkness_turn_end_choice_moves_unit_to_strategic_reserves_once() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided"))
+    unit = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_fade_to_darkness(state, unit=unit)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    decisions = DecisionController()
+    _record_fade_to_darkness_destroyed_enemy(
+        state=state,
+        decisions=decisions,
+        attacker=unit,
+        target=target,
+    )
+
+    request = _decision_request(
+        enhancements.fade_to_darkness_turn_end_request(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+    )
+
+    assert request.decision_type == SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE
+    assert request.actor_id == "player-a"
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["source_rule_id"] == enhancements.SOURCE_RULE_ID
+    assert request_payload["hook_id"] == enhancements.TURN_END_HOOK_ID
+    assert request_payload["enhancement_id"] == enhancements.ENHANCEMENT_ID
+    assert request_payload["target_unit_instance_id"] == unit.unit_instance_id
+    assert request_payload["destroyed_enemy_unit_instance_ids"] == [target.unit_instance_id]
+    assert {option.option_id for option in request.options} == {
+        f"chaos-daemons:shadow-legion:fade-to-darkness:{unit.unit_instance_id}:use",
+        f"chaos-daemons:shadow-legion:fade-to-darkness:{unit.unit_instance_id}:decline",
+    }
+
+    result = DecisionResult.for_request(
+        result_id="result-fade-to-darkness-use",
+        request=request,
+        selected_option_id=(
+            f"chaos-daemons:shadow-legion:fade-to-darkness:{unit.unit_instance_id}:use"
+        ),
+    )
+    handled = enhancements.apply_fade_to_darkness_turn_end_result(
+        TurnEndResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+
+    assert handled is True
+    reserve_state = state.reserve_state_for_unit(unit.unit_instance_id)
+    assert reserve_state is not None
+    assert reserve_state.source_rule_ids == (enhancements.SOURCE_RULE_ID,)
+    assert state.battlefield_state is not None
+    assert all(
+        placement.unit_instance_id != unit.unit_instance_id
+        for placed_army in state.battlefield_state.placed_armies
+        for placement in placed_army.unit_placements
+    )
+    used_payload = _last_event_payload(decisions, enhancements.USED_EVENT)
+    assert used_payload["use_ability"] is True
+    assert used_payload["destroyed_enemy_unit_instance_ids"] == [target.unit_instance_id]
+    reserve_payload = cast(dict[str, JsonValue], used_payload["reserve_state"])
+    assert reserve_payload["unit_instance_id"] == unit.unit_instance_id
+    assert (
+        enhancements.fade_to_darkness_turn_end_request(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="no longer eligible"):
+        enhancements.apply_fade_to_darkness_turn_end_result(
+            TurnEndResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+            )
+        )
+
+
+def test_fade_to_darkness_turn_end_decline_records_no_reserve_mutation() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided"))
+    unit = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_fade_to_darkness(state, unit=unit)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    decisions = DecisionController()
+    _record_fade_to_darkness_destroyed_enemy(
+        state=state,
+        decisions=decisions,
+        attacker=unit,
+        target=target,
+    )
+    request = _decision_request(
+        enhancements.fade_to_darkness_turn_end_request(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+    )
+
+    result = DecisionResult.for_request(
+        result_id="result-fade-to-darkness-decline",
+        request=request,
+        selected_option_id=(
+            f"chaos-daemons:shadow-legion:fade-to-darkness:{unit.unit_instance_id}:decline"
+        ),
+    )
+    handled = enhancements.apply_fade_to_darkness_turn_end_result(
+        TurnEndResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+
+    assert handled is True
+    assert state.reserve_state_for_unit(unit.unit_instance_id) is None
+    assert state.battlefield_state is not None
+    assert (
+        state.battlefield_state.unit_placement_by_id(unit.unit_instance_id).unit_instance_id
+        == unit.unit_instance_id
+    )
+    declined_payload = _last_event_payload(decisions, enhancements.DECLINED_EVENT)
+    assert declined_payload["use_ability"] is False
+    assert declined_payload["destroyed_enemy_unit_instance_ids"] == [target.unit_instance_id]
+    assert (
+        enhancements.fade_to_darkness_turn_end_request(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+        is None
+    )
+
+
 def _shadow_legion_state(
     *,
     name: str = "Shadow Legion Unit",
@@ -768,6 +957,65 @@ def _record_shadow_dark_pact_effect(
                 selected_dark_pact=pact,
                 source_context={"source_rule_id": rule.SOURCE_RULE_ID},
             ),
+        )
+    )
+
+
+def _assign_fade_to_darkness(state: GameState, *, unit: UnitInstance) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != "player-a":
+            updated_armies.append(army)
+            continue
+        prefix = f"{army.army_id}:"
+        if not unit.unit_instance_id.startswith(prefix):
+            raise AssertionError(f"Unit {unit.unit_instance_id} is not owned by {army.army_id}.")
+        updated_armies.append(
+            replace(
+                army,
+                enhancement_assignments=(
+                    EnhancementAssignment(
+                        enhancement_id=enhancements.ENHANCEMENT_ID,
+                        target_unit_selection_id=unit.unit_instance_id.removeprefix(prefix),
+                        source_id=enhancements.SOURCE_RULE_ID,
+                    ),
+                ),
+            )
+        )
+    state.army_definitions = updated_armies
+
+
+def _record_fade_to_darkness_destroyed_enemy(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    attacker: UnitInstance,
+    target: UnitInstance,
+) -> None:
+    event = decisions.event_log.append(
+        "model_destroyed",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": BattlePhase.FIGHT.value,
+            "destroying_player_id": "player-a",
+            "attacking_unit_instance_id": attacker.unit_instance_id,
+            "attacker_model_instance_id": attacker.own_models[0].model_instance_id,
+            "target_unit_instance_id": target.unit_instance_id,
+            "model_instance_id": target.own_models[0].model_instance_id,
+        },
+    )
+    enhancements.record_fade_to_darkness_destroyed_enemy_unit(
+        UnitDestroyedContext(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.FIGHT,
+            model_destroyed_event_id=event.event_id,
+            model_destroyed_payload=cast(dict[str, JsonValue], event.payload),
+            destroying_player_id="player-a",
+            destroyed_unit_instance_id=target.unit_instance_id,
+            destroyed_player_id="player-b",
         )
     )
 

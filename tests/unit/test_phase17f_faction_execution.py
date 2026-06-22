@@ -38,6 +38,13 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
     Phase17FFactionExecutionError,
 )
 
+FADE_TO_DARKNESS_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+    "enhancement:fade_to_darkness:turn-end-reserves",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+    "enhancement:fade_to_darkness:unit-destroyed",
+)
+
 
 def test_phase17f_execution_package_covers_every_phase17e_coverage_row() -> None:
     coverage_package = faction_coverage_source.phase17e_coverage_package()
@@ -95,6 +102,24 @@ def test_phase17f_exact_enhancement_and_stratagem_execution_records_are_one_to_o
     assert all(record.rule_id is not None for record in exact_records)
     assert all(record.timing_descriptor is not None for record in exact_records)
     assert all(record.rule_category is not None for record in exact_records)
+
+
+def test_phase17f_fade_to_darkness_execution_record_is_named_handler() -> None:
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
+        and record.faction_id == "chaos-daemons"
+        and record.detachment_id == "shadow-legion"
+        and record.rule_id == "000009980004"
+    )
+
+    assert record.rule_name == "Fade to Darkness"
+    assert record.runtime_support_status == "engine_consumed"
+    assert record.runtime_consumer_ids == FADE_TO_DARKNESS_RUNTIME_CONSUMERS
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
+    assert record.handler_id == FADE_TO_DARKNESS_RUNTIME_CONSUMERS[0]
+    assert record.block_reason is None
 
 
 def test_phase17f_execution_payload_is_deterministic_json_safe_and_round_trips() -> None:

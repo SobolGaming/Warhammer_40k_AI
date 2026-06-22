@@ -1019,23 +1019,28 @@ Required Phase 17G setup faction-rule tests:
 
 ## Phase 17G Turn-End Faction-Rule Decisions
 
-Phase 17G adds opt-in turn-end decisions for faction runtime content and generic catalog IR consumers. These decisions are emitted only when the mustered army's runtime contribution or catalog IR index registers a turn-end hook and the completed phase matches the hook's timing. Current implemented support includes Aeldari Corsair Coterie Webway Pathstone and catalog IR `catalog-ir:can-be-placed-in-reserves` abilities such as Chaos Daemons Flesh Hounds' Hunters from the Warp at the end of the opponent's turn.
+Phase 17G adds opt-in turn-end decisions for faction runtime content and generic catalog IR consumers. These decisions are emitted only when the mustered army's runtime contribution or catalog IR index registers a turn-end hook and the completed phase matches the hook's timing. Current implemented support includes Aeldari Corsair Coterie Webway Pathstone, Chaos Daemons Shadow Legion Fade to Darkness, and catalog IR `catalog-ir:can-be-placed-in-reserves` abilities such as Chaos Daemons Flesh Hounds' Hunters from the Warp at the end of the opponent's turn.
 
 Phase-end objective-control hooks and phase-end cleanup resolve before turn-end faction-rule decisions are emitted. Adapters must therefore treat turn-end repositioning choices as occurring after engine-owned phase-end objective-control state has already been recorded for that phase.
 
-Phase 17G exposes the finite decision type `select_faction_rule_turn_end_option`. The pending request payload contains game ID, battle round, active player ID, completed phase, source rule ID, hook ID, and target unit ID. Source-specific payload fields include Webway Pathstone's enhancement ID, or catalog IR fields such as catalog record ID, ability ID, ability name, datasheet ID, source kind, and rule IR hash. Adapters answer by selecting one emitted option ID. Current Webway Pathstone options use:
+Phase 17G exposes the finite decision type `select_faction_rule_turn_end_option`. The pending request payload contains game ID, battle round, active player ID, completed phase, source rule ID, hook ID, and target unit ID. Source-specific payload fields include Webway Pathstone's enhancement ID, Fade to Darkness' enhancement ID and destroyed enemy unit IDs, or catalog IR fields such as catalog record ID, ability ID, ability name, datasheet ID, source kind, and rule IR hash. Adapters answer by selecting one emitted option ID. Current Webway Pathstone options use:
 
 - `aeldari:corsair-coterie:webway-pathstone:<unit_instance_id>:use`;
 - `aeldari:corsair-coterie:webway-pathstone:<unit_instance_id>:decline`.
+
+Current Fade to Darkness options use:
+
+- `chaos-daemons:shadow-legion:fade-to-darkness:<unit_instance_id>:use`;
+- `chaos-daemons:shadow-legion:fade-to-darkness:<unit_instance_id>:decline`.
 
 Current catalog IR turn-end reserve options use:
 
 - `catalog-ir:turn-end-reserves:<catalog_record_id>:<unit_instance_id>:use`;
 - `catalog-ir:turn-end-reserves:<catalog_record_id>:<unit_instance_id>:decline`.
 
-Webway option payloads include `submission_kind: "aeldari_corsair_coterie_webway_pathstone_turn_end"`, player ID, source rule ID, hook ID, enhancement ID, target unit ID, and `use_ability`. Catalog IR option payloads include `submission_kind: "catalog_ir_turn_end_reserves"`, player ID, source rule ID, hook ID, catalog record ID, ability ID, ability name, target unit ID, and `use_ability`. Adapters must not remove the unit from the battlefield, create a reserve state, or decide reserve eligibility locally.
+Webway option payloads include `submission_kind: "aeldari_corsair_coterie_webway_pathstone_turn_end"`, player ID, source rule ID, hook ID, enhancement ID, target unit ID, and `use_ability`. Fade to Darkness option payloads include `submission_kind: "chaos_daemons_shadow_legion_fade_to_darkness_turn_end"`, player ID, source rule ID, hook ID, enhancement ID, target unit ID, and `use_ability`; the request payload also carries `destroyed_enemy_unit_instance_ids` captured by the engine from current Fight phase unit-destroyed evidence. Catalog IR option payloads include `submission_kind: "catalog_ir_turn_end_reserves"`, player ID, source rule ID, hook ID, catalog record ID, ability ID, ability name, target unit ID, and `use_ability`. Adapters must not remove the unit from the battlefield, create a reserve state, decide reserve eligibility locally, or synthesize destroyed-enemy evidence for Fade to Darkness.
 
-Accepted use selections validate that the unit is still on the battlefield, not already in reserves, and not within Engagement Range when required by the source rule, then remove it from the battlefield and create a Strategic Reserves `ReserveState` with source evidence. Accepted decline selections emit a replay-safe decline event and do not mutate battlefield or reserve state. Webway Pathstone records a used event once per battle for the enhanced unit and does not offer another decision after use. Catalog IR Hunters from the Warp is not once-per-battle in the source text, so it may be offered again in a later eligible opponent turn after the unit returns and becomes eligible.
+Accepted use selections validate that the unit is still on the battlefield, not already in reserves, not within Engagement Range when required by the source rule, and, for Fade to Darkness, that the enhanced unit destroyed one or more enemy units in the current Fight phase, then remove it from the battlefield and create a Strategic Reserves `ReserveState` with source evidence. Accepted decline selections emit a replay-safe decline event and do not mutate battlefield or reserve state. Webway Pathstone records a used event once per battle for the enhanced unit and does not offer another decision after use. Fade to Darkness records a use or decline event for the current Fight phase and does not offer another decision for that unit in the same phase. Catalog IR Hunters from the Warp is not once-per-battle in the source text, so it may be offered again in a later eligible opponent turn after the unit returns and becomes eligible.
 
 Malformed, stale, wrong-actor, wrong-phase, wrong-hook, unsupported-option, option-payload drift, source-record drift, already-used when the source is once-per-battle, already-in-reserves, unplaced, or Engagement Range submissions reject before unauthorized mutation.
 
@@ -1044,8 +1049,10 @@ Turn-end faction-rule choices are public table information in the current Phase 
 Required Phase 17G turn-end faction-rule tests:
 
 - valid Webway Pathstone use and decline choices through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- valid Fade to Darkness use and decline choices through the shared turn-end `DecisionRequest` / `DecisionResult` hook path;
 - valid catalog IR Hunters from the Warp use choice through the shared turn-end hook path;
 - once-per-battle and once-per-turn request gating;
+- Fade to Darkness destroyed-enemy marker and Engagement Range request gating;
 - Strategic Reserves state and battlefield removal are replay-safe and source-backed;
 - malformed, stale, wrong-context, and ineligible submissions reject before unauthorized mutation;
 - viewer-scoped projection/event redaction for any future hidden turn-end faction-rule selections.
