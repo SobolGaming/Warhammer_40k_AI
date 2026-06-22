@@ -94,6 +94,58 @@ SHADOW_LEGION_FORBIDDEN_DAEMON_PRINCE_NAMES = frozenset(
     }
 )
 SHADOW_LEGION_BELAKOR_NAME = "BELAKOR"
+SPACE_MARINE_CHAPTERS_SOURCE_ID = "phase17g:space-marines:space-marine-chapters"
+SPACE_MARINES_FACTION_ID = "space-marines"
+ADEPTUS_ASTARTES_KEYWORD = "ADEPTUS ASTARTES"
+AGENTS_OF_THE_IMPERIUM_KEYWORD = "AGENTS OF THE IMPERIUM"
+BLACK_TEMPLARS_KEYWORD = "BLACK TEMPLARS"
+BLOOD_ANGELS_KEYWORD = "BLOOD ANGELS"
+DARK_ANGELS_KEYWORD = "DARK ANGELS"
+DEATHWATCH_KEYWORD = "DEATHWATCH"
+SPACE_WOLVES_KEYWORD = "SPACE WOLVES"
+SPACE_MARINE_CHAPTER_KEYWORDS = frozenset(
+    {
+        BLACK_TEMPLARS_KEYWORD,
+        BLOOD_ANGELS_KEYWORD,
+        DARK_ANGELS_KEYWORD,
+        DEATHWATCH_KEYWORD,
+        "IMPERIAL FISTS",
+        "IRON HANDS",
+        "RAVEN GUARD",
+        "SALAMANDERS",
+        SPACE_WOLVES_KEYWORD,
+        "ULTRAMARINES",
+        "WHITE SCARS",
+    }
+)
+BLACK_TEMPLARS_FORBIDDEN_NON_CHAPTER_NAMES = frozenset(
+    {
+        "GLADIATORLANCER",
+        "GLADIATORREAPER",
+        "GLADIATORVALIANT",
+        "IMPULSOR",
+        "REPULSOR",
+        "REPULSOREXECUTIONER",
+    }
+)
+SPACE_WOLVES_FORBIDDEN_UNIT_NAMES = frozenset({"APOTHECARY", "DEVASTATORSQUAD", "TACTICALSQUAD"})
+DEATHWATCH_ALLOWED_AGENTS_UNIT_NAMES = frozenset({"KILLTEAMCASSIUS"})
+DEATHWATCH_FORBIDDEN_UNIT_NAMES = frozenset(
+    {
+        "ASSAULTSQUAD",
+        "ASSAULTSQUADWITHJUMPPACKS",
+        "ATTACKBIKESQUAD",
+        "DEVASTATORSQUAD",
+        "LANDSPEEDERSTORM",
+        "RELICTERMINATORSQUAD",
+        "SCOUTBIKESQUAD",
+        "SCOUTSQUAD",
+        "SCOUTSNIPERSQUAD",
+        "TACTICALSQUAD",
+        "TERMINATORASSAULTSQUAD",
+        "TERMINATORSQUAD",
+    }
+)
 
 
 class ArmyMusterRequestPayload(TypedDict):
@@ -1091,6 +1143,16 @@ def validate_roster_legality(
                     source_id="phase16d:unit-selection",
                 )
             )
+            inspection_datasheet = (
+                _space_marine_chapter_inspection_datasheet_for_rejected_selection(
+                    catalog=catalog,
+                    request=request,
+                    faction=faction,
+                    selection=selection,
+                )
+            )
+            if inspection_datasheet is not None:
+                datasheets_by_selection_id[selection.unit_selection_id] = inspection_datasheet
 
     _append_unit_point_violations(
         catalog=catalog,
@@ -1136,6 +1198,12 @@ def validate_roster_legality(
         violations=violations,
     )
     _append_shadow_legion_violations(
+        request=request,
+        faction=faction,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        violations=violations,
+    )
+    _append_space_marine_chapter_violations(
         request=request,
         faction=faction,
         datasheets_by_selection_id=datasheets_by_selection_id,
@@ -2037,6 +2105,227 @@ def _append_shadow_legion_thralls_points_violation(
         )
 
 
+def _append_space_marine_chapter_violations(
+    *,
+    request: ArmyMusterRequest,
+    faction: FactionDefinition,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    if not _request_uses_space_marines_chapter_rules(request=request, faction=faction):
+        return
+    chapter_keywords_by_selection_id = {
+        selection_id: _space_marine_chapter_keywords_for_datasheet(datasheet)
+        for selection_id, datasheet in datasheets_by_selection_id.items()
+        if _datasheet_has_faction_keyword(datasheet, ADEPTUS_ASTARTES_KEYWORD)
+    }
+    _append_space_marine_multiple_chapter_violations(
+        chapter_keywords_by_selection_id=chapter_keywords_by_selection_id,
+        violations=violations,
+    )
+    selected_chapters = frozenset(
+        chapter for chapters in chapter_keywords_by_selection_id.values() for chapter in chapters
+    )
+    if BLACK_TEMPLARS_KEYWORD in selected_chapters:
+        _append_black_templars_chapter_violations(
+            datasheets_by_selection_id=datasheets_by_selection_id,
+            violations=violations,
+        )
+    if SPACE_WOLVES_KEYWORD in selected_chapters:
+        _append_space_wolves_chapter_violations(
+            datasheets_by_selection_id=datasheets_by_selection_id,
+            violations=violations,
+        )
+    if DEATHWATCH_KEYWORD in selected_chapters:
+        _append_deathwatch_chapter_violations(
+            chapter_keywords_by_selection_id=chapter_keywords_by_selection_id,
+            datasheets_by_selection_id=datasheets_by_selection_id,
+            violations=violations,
+        )
+
+
+def _append_space_marine_multiple_chapter_violations(
+    *,
+    chapter_keywords_by_selection_id: dict[str, frozenset[str]],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    selected_chapters = {
+        chapter for chapters in chapter_keywords_by_selection_id.values() for chapter in chapters
+    }
+    if len(selected_chapters) <= 1:
+        return
+    first_selection_id = sorted(
+        selection_id
+        for selection_id, chapters in chapter_keywords_by_selection_id.items()
+        if chapters
+    )[0]
+    violations.append(
+        RosterLegalityViolation(
+            violation_code="space_marines_multiple_chapters",
+            message=(
+                "An Adeptus Astartes army cannot include units drawn from more than one Chapter."
+            ),
+            unit_selection_id=first_selection_id,
+            source_id=SPACE_MARINE_CHAPTERS_SOURCE_ID,
+        )
+    )
+    for selection_id, chapters in sorted(chapter_keywords_by_selection_id.items()):
+        if len(chapters) <= 1:
+            continue
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="space_marines_unit_multiple_chapter_keywords",
+                message="A Space Marine datasheet cannot be drawn from more than one Chapter.",
+                unit_selection_id=selection_id,
+                source_id=SPACE_MARINE_CHAPTERS_SOURCE_ID,
+            )
+        )
+
+
+def _append_black_templars_chapter_violations(
+    *,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    for selection_id, datasheet in sorted(datasheets_by_selection_id.items()):
+        if _datasheet_has_faction_keyword(
+            datasheet, ADEPTUS_ASTARTES_KEYWORD
+        ) and _datasheet_has_keyword(datasheet, "PSYKER"):
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="space_marines_black_templars_psyker_forbidden",
+                    message="Black Templars armies cannot include Adeptus Astartes Psyker models.",
+                    unit_selection_id=selection_id,
+                    source_id=SPACE_MARINE_CHAPTERS_SOURCE_ID,
+                )
+            )
+        if _canonical_name(datasheet.name) not in BLACK_TEMPLARS_FORBIDDEN_NON_CHAPTER_NAMES:
+            continue
+        if _datasheet_has_faction_keyword(datasheet, BLACK_TEMPLARS_KEYWORD):
+            continue
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="space_marines_black_templars_vehicle_keyword_required",
+                message=(
+                    "Black Templars armies cannot include this vehicle unless it has the "
+                    "Black Templars keyword."
+                ),
+                unit_selection_id=selection_id,
+                source_id=SPACE_MARINE_CHAPTERS_SOURCE_ID,
+            )
+        )
+
+
+def _append_space_wolves_chapter_violations(
+    *,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    for selection_id, datasheet in sorted(datasheets_by_selection_id.items()):
+        if _canonical_name(datasheet.name) not in SPACE_WOLVES_FORBIDDEN_UNIT_NAMES:
+            continue
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="space_marines_space_wolves_unit_forbidden",
+                message="Space Wolves armies cannot include this unit.",
+                unit_selection_id=selection_id,
+                source_id=SPACE_MARINE_CHAPTERS_SOURCE_ID,
+            )
+        )
+
+
+def _append_deathwatch_chapter_violations(
+    *,
+    chapter_keywords_by_selection_id: dict[str, frozenset[str]],
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    for selection_id, datasheet in sorted(datasheets_by_selection_id.items()):
+        if _datasheet_has_faction_keyword(
+            datasheet, ADEPTUS_ASTARTES_KEYWORD
+        ) and DEATHWATCH_KEYWORD not in chapter_keywords_by_selection_id.get(
+            selection_id,
+            frozenset(),
+        ):
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="space_marines_deathwatch_other_chapter_forbidden",
+                    message=(
+                        "Deathwatch armies cannot include Adeptus Astartes units drawn "
+                        "from any other Chapter."
+                    ),
+                    unit_selection_id=selection_id,
+                    source_id=SPACE_MARINE_CHAPTERS_SOURCE_ID,
+                )
+            )
+        if (
+            _datasheet_has_faction_keyword(datasheet, AGENTS_OF_THE_IMPERIUM_KEYWORD)
+            and _datasheet_has_any_keyword(datasheet, frozenset({DEATHWATCH_KEYWORD}))
+            and _canonical_name(datasheet.name) not in DEATHWATCH_ALLOWED_AGENTS_UNIT_NAMES
+        ):
+            violations.append(
+                RosterLegalityViolation(
+                    violation_code="space_marines_deathwatch_agents_unit_forbidden",
+                    message=(
+                        "Deathwatch armies cannot include Agents of the Imperium "
+                        "Deathwatch units other than Kill Team Cassius."
+                    ),
+                    unit_selection_id=selection_id,
+                    source_id=SPACE_MARINE_CHAPTERS_SOURCE_ID,
+                )
+            )
+        if _canonical_name(datasheet.name) not in DEATHWATCH_FORBIDDEN_UNIT_NAMES:
+            continue
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="space_marines_deathwatch_unit_forbidden",
+                message="Deathwatch armies cannot include this unit.",
+                unit_selection_id=selection_id,
+                source_id=SPACE_MARINE_CHAPTERS_SOURCE_ID,
+            )
+        )
+
+
+def _request_uses_space_marines_chapter_rules(
+    *,
+    request: ArmyMusterRequest,
+    faction: FactionDefinition,
+) -> bool:
+    return request.detachment_selection.faction_id == SPACE_MARINES_FACTION_ID or (
+        _faction_has_keyword(faction, ADEPTUS_ASTARTES_KEYWORD)
+    )
+
+
+def _space_marine_chapter_inspection_datasheet_for_rejected_selection(
+    *,
+    catalog: ArmyCatalog,
+    request: ArmyMusterRequest,
+    faction: FactionDefinition,
+    selection: UnitMusterSelection,
+) -> DatasheetDefinition | None:
+    if not _request_uses_space_marines_chapter_rules(request=request, faction=faction):
+        return None
+    for datasheet in catalog.datasheets:
+        if datasheet.datasheet_id != selection.datasheet_id:
+            continue
+        if _datasheet_has_faction_keyword(
+            datasheet, AGENTS_OF_THE_IMPERIUM_KEYWORD
+        ) and _datasheet_has_any_keyword(datasheet, frozenset({DEATHWATCH_KEYWORD})):
+            return datasheet
+        return None
+    return None
+
+
+def _space_marine_chapter_keywords_for_datasheet(
+    datasheet: DatasheetDefinition,
+) -> frozenset[str]:
+    return frozenset(
+        chapter
+        for chapter in SPACE_MARINE_CHAPTER_KEYWORDS
+        if _datasheet_has_faction_keyword(datasheet, chapter)
+    )
+
+
 def _datasheet_is_shadow_legion_forbidden_unit(datasheet: DatasheetDefinition) -> bool:
     canonical_name = _canonical_name(datasheet.name)
     if canonical_name in SHADOW_LEGION_FORBIDDEN_DAEMON_PRINCE_NAMES:
@@ -2318,6 +2607,15 @@ def _datasheet_has_any_keyword(
         )
     }
     return bool(requested_keywords & stored_keywords)
+
+
+def _faction_has_keyword(faction: FactionDefinition, keyword: str) -> bool:
+    if type(faction) is not FactionDefinition:
+        raise ArmyMusteringError("Faction keyword lookup requires FactionDefinition.")
+    requested_keyword = _canonical_keyword(keyword)
+    return requested_keyword in {
+        _canonical_keyword(stored_keyword) for stored_keyword in faction.faction_keywords
+    }
 
 
 def _is_daemonic_pact_datasheet(

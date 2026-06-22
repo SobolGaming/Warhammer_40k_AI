@@ -348,7 +348,7 @@ Next / planned sequence:
 
 | Phase | Status | Purpose |
 |---|---:|---|
-| 17G | Planned | Faction army-rule, detachment-rule, enhancement-effect, and faction/detachment Stratagem semantic execution |
+| 17G | In progress | Incremental faction army-rule, detachment-rule, enhancement-effect, and faction/detachment Stratagem semantic execution |
 | 17H | Planned | Datasheet, wargear, weapon ability, generated source-row coverage, and execution for covered ability items |
 | 17I | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
 | 18B-18D | Planned | Replay inspection, local visual UI, and network play |
@@ -4385,6 +4385,14 @@ items. It does not cover broad datasheet, wargear, or weapon ability execution;
 that moves to Phase 17H. Faction and detachment rules with pre-battle timing
 must bind to the Event Companion setup sequence from Phase 17J when Warhammer
 Event mode is active. They may not introduce ad hoc pre-battle ordering.
+
+Current Phase 17G semantic slices include selected Chaos Daemons, Chaos Space
+Marines, Aeldari, Death Guard, World Eaters, Emperor's Children, Drukhari, and
+Space Marines runtime and mustering support. The Space Marines slice implements
+Oath of Moment as an engine-owned Command phase target selection with
+target-scoped Hit-roll reroll effects, Codex Space Marines Detachment Wound-roll
+modifier gating, and Space Marine Chapters roster legality diagnostics for Black
+Templars, Space Wolves, and Deathwatch restrictions.
 
 Invariants:
 

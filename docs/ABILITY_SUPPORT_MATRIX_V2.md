@@ -85,6 +85,7 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | Death Guard - Nurgle's Gift | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes contagion modifiers for supported characteristics and rolls. |
 | World Eaters - Blessings of Khorne | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes battle-round selection and supported blessing effects. |
 | Emperor's Children - Thrill Seekers | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes movement, charge, and shooting target restrictions. |
+| Space Marines - Oath of Moment and Space Marine Chapters | Named army-rule handler plus shared mustering/list-validation host | README, adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, reroll, wound-modifier, and mustering tests | Full | Implements Command phase Oath target selection, target-scoped Hit-roll rerolls, Codex Space Marines Detachment Wound-roll bonus gating, and Black Templars, Space Wolves, and Deathwatch roster restrictions. |
 | Drukhari - Power from Pain | Named army-rule handler plus faction-resource ledger | README, faction integration note, adapter contract, and generated matrix | Focused faction runtime tests | Full | Implements Pain token gain at own Command phase start, enemy unit destruction, and enemy Battle-shock failure, plus optional Lithe Agility empowerment for Advance and Charge rerolls and Hatred Eternal selected-to-shoot/selected-to-fight empowerment for attack hit rerolls. |
 | Drukhari - Corsairs and Travelling Players | Shared mustering/list-validation host | README, faction integration note, and generated matrix | Focused mustering tests | Full | Allows non-DRUKHARI HARLEQUINS and ANHRATHE allies under Incursion, Strike Force, and Onslaught caps; forbids allied Warlords and Enhancements. No player-facing decision or phase runtime hook is introduced. |
 
@@ -485,6 +486,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `generic:ingress-move` | From Beyond the Veil |
 | `phase17g:aeldari:corsair-coterie:stratagems:cloak-and-shadow:target-restriction` | Cloak and Shadow |
 | `phase17g:aeldari:corsair-coterie:stratagems:outcast-ambush:weapon-profile` | Outcast Ambush |
+| `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
 | `warhammer_40000_11th:aeldari:army_rule:fade_back` | Battle Focus - Fade Back |
 | `warhammer_40000_11th:aeldari:army_rule:flitting_shadows` | Battle Focus - Flitting Shadows |
 | `warhammer_40000_11th:aeldari:army_rule:opportunity_seized` | Battle Focus - Opportunity Seized |
@@ -561,6 +563,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction` | Thrill Seekers |
+| `warhammer_40000_11th:space_marines:army_rule:oath_of_moment` | Oath of Moment |
+| `warhammer_40000_11th:space_marines:army_rule:oath_of_moment:wound-roll` | Oath of Moment |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne` | Blessings of Khorne |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration` | Blessings of Khorne - Rage-fuelled Invigoration |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage` | Blessings of Khorne - Total Carnage |

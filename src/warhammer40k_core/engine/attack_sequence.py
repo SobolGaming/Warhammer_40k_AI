@@ -6919,6 +6919,7 @@ def _roll_hit_and_wound(
             decisions=decisions,
             roll_state=hit_roll.roll_state,
             attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            target_unit_instance_id=pool.target_unit_instance_id,
             attack_context_id=attack_context_id,
             source_phase=attack_sequence.source_phase,
             weapon_profile_id=pool.weapon_profile_id,
@@ -7282,6 +7283,7 @@ def _request_source_backed_hit_reroll_if_available(
     decisions: DecisionController,
     roll_state: DiceRollState | None,
     attacking_unit_instance_id: str,
+    target_unit_instance_id: str | None = None,
     attack_context_id: str,
     source_phase: BattlePhase,
     weapon_profile_id: str,
@@ -7303,6 +7305,7 @@ def _request_source_backed_hit_reroll_if_available(
         unit_instance_id=attacking_unit_instance_id,
         roll_type=roll_state.original_result.spec.roll_type,
         timing_window="attack_sequence.hit",
+        target_unit_instance_id=target_unit_instance_id,
     )
     if permission is None:
         return None
@@ -7405,12 +7408,20 @@ def apply_source_backed_attack_dice_reroll_decision(
     current_pool = attack_sequence.current_pool()
     if _payload_string(attack_context, key="weapon_profile_id") != current_pool.weapon_profile_id:
         raise GameLifecycleError(f"{phase_label} dice reroll weapon profile drift.")
-    if (
-        roll_type == "attack_sequence.wound"
-        and _payload_string(attack_context, key="target_unit_instance_id")
-        != current_pool.target_unit_instance_id
-    ):
-        raise GameLifecycleError(f"{phase_label} dice reroll target unit drift.")
+    if roll_type == "attack_sequence.hit":
+        current_permission_context = source_backed_reroll_permission_context_for_unit(
+            state=state,
+            player_id=attack_sequence.attacker_player_id,
+            unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            roll_type=roll_type,
+            timing_window=roll_type,
+            target_unit_instance_id=current_pool.target_unit_instance_id,
+        )
+        if (
+            current_permission_context is None
+            or current_permission_context.permission.source_id != source_rule_id
+        ):
+            raise GameLifecycleError(f"{phase_label} dice reroll source context drift.")
     initial_roll_payload = _nested_payload_object(attack_context, key=roll_state_key)
     initial_roll_state = DiceRollState.from_payload(
         cast(DiceRollStatePayload, initial_roll_payload)

@@ -1100,6 +1100,28 @@ Required Phase 17G battle-round faction-rule tests:
 - at least one real consumer path proves each newly wired engine area;
 - viewer-scoped projection/event redaction for any future hidden battle-round faction-rule selections.
 
+## Phase 17G Command-Start Faction-Rule Decisions
+
+Phase 17G also adds opt-in Command phase start decisions for faction runtime content. These decisions are emitted only when the mustered army's faction runtime contribution registers a Command phase start hook for the active player. Command-start faction-rule hooks run after the active player receives their Command point and after `command_step_started` is emitted, but before later Command step work such as scoring and Battle-shock decisions proceeds. The current implemented hook is Space Marines Oath of Moment, updated from the 11th Edition faction-pack `RULES UPDATES` section.
+
+Phase 17G exposes the finite decision type `select_faction_rule_command_phase_start_option`. The pending request payload contains game ID, battle round, phase `command`, active player ID, player ID, faction ID, source rule ID, hook ID, effect kind `space_marines_oath_of_moment_target`, selection kind `space_marines_oath_of_moment_target_selection`, eligible target unit IDs, and the battle round in which the target expires. Adapters answer by selecting one emitted option ID and must not invent target IDs, mutate target state, create reroll permissions, or apply wound modifiers locally.
+
+Current Space Marines option IDs use the form `space_marines:oath_of_moment:<target_unit_instance_id>`. Option payloads include the common request payload plus `target_owner_player_id`, `target_unit_instance_id`, and `target_unit_name`. The target list contains eligible live enemy units only. It is public table information in the current Phase 17G rules scope.
+
+Accepted Space Marines selections create a deterministic enemy target `PersistingEffect` through the start of the selecting player's next Command phase and emit `space_marines_oath_of_moment_target_selected`. The engine also creates target-scoped source-backed Hit-roll reroll effects for eligible ADEPTUS ASTARTES attacker units. Later attack-sequence hosts expose the Hit-roll reroll only when the attack targets the active Oath target. The Wound-roll +1 is not adapter-computed: it is supplied by the runtime wound modifier only when the attacker is an ADEPTUS ASTARTES unit, the target is the active Oath target, the army is using a Codex: Space Marines Detachment, and the army does not include BLOOD ANGELS, DARK ANGELS, DEATHWATCH, or SPACE WOLVES units.
+
+Malformed, stale, wrong-actor, wrong-game, wrong-round, wrong-phase, wrong-active-player, wrong-target-owner, self-target, missing target, destroyed target, duplicate target, unsupported-option, and option-payload drift submissions reject before the pending queue is popped and before a `DecisionRecord`, persisting effect, reroll permission, modifier state, or event is created.
+
+If a future Command-start faction rule hides target or option information, pending requests, option lists, decision records, persisting effects, events, projections, and event deltas must be viewer-scoped and must not leak hidden opponent information through option counts, target IDs, source context, selected payload, or derived engine values.
+
+Required Phase 17G Command-start faction-rule tests:
+
+- valid Command-start faction-rule selection through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- target-scoped Hit-roll reroll permission and Codex Space Marines Detachment Wound-roll modifier consumer;
+- malformed, stale, wrong-context, wrong-owner, self-target, destroyed-target, and drifted submissions reject before mutation;
+- deterministic JSON-safe decision, persisting-effect, event, lifecycle, and replay payload round-trip;
+- viewer-scoped projection/event redaction for any future hidden Command-start faction-rule selections.
+
 ## Phase 16E Setup Completion Gate
 
 Phase 16E does not add a new adapter-submitted decision type. Setup completion is an engine-owned lifecycle gate that runs only after setup decisions and proposal requests have drained and the ruleset setup sequence reaches its final step. Adapters must not submit a synthetic "start battle" result, force `GameState.enter_battle()`, mutate `setup_step_index`, or bypass `GameLifecycle.advance(...)`.

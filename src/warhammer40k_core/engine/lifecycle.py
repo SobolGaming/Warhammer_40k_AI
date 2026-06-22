@@ -31,6 +31,9 @@ from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, Plac
 from warhammer40k_core.engine.charge_declaration_hooks import (
     SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
 )
+from warhammer40k_core.engine.command_phase_start_hooks import (
+    SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+)
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
     SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
@@ -298,6 +301,7 @@ _CHARGE_DECISION_TYPES = frozenset(
 )
 _COMMAND_DECISION_TYPES = frozenset(
     (
+        SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
         TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
         TACTICAL_SECONDARY_REPLACEMENT_DECISION_TYPE,
     )

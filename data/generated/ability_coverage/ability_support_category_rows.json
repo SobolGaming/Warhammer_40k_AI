@@ -366,6 +366,41 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:space_marines:army_rule:oath_of_moment",
+        "ability_name": "Oath of Moment",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/space-marines/faction/warhammer_40000_11th:space_marines:army_rule:oath_of_moment/none",
+        "datasheet_id": "space-marines",
+        "datasheet_name": "Space Marines",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Oath of Moment"
+    ],
+    "category_id": "faction.army_rule.oath_of_moment",
+    "category_name": "Faction Army Rule Oath Of Moment",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/space-marines/faction/warhammer_40000_11th:space_marines:army_rule:oath_of_moment/none"
+    ],
+    "datasheet_names": [
+      "Space Marines"
+    ],
+    "runtime_consumer_ids": [
+      "phase17g:space-marines:space-marine-chapters",
+      "warhammer_40000_11th:space_marines:army_rule:oath_of_moment",
+      "warhammer_40000_11th:space_marines:army_rule:oath_of_moment:wound-roll"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001112:collar-of-khorne",
         "ability_name": "Collar of Khorne",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/wargear/000001112:collar-of-khorne/000001112:collar-of-khorne",
