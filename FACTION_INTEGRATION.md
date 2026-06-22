@@ -125,6 +125,13 @@ IDs, and support status. Source-only exact rows are named-handler-required;
 exact rows with existing runtime consumers are marked implemented. No aggregate
 faction-pack Enhancement or Stratagem row is used to hide missing detail, and no
 unapproved unsupported descriptor remains for Phase 17E matched-play coverage.
+The exact subrule source package also exposes checksum-covered
+`skipped_bridge_rows()` and `runtime_only_rows()` audit APIs. Current bridge
+input accounting captures 601 approved skipped bridge rows: 573 rows whose
+derived owner is not in the current source package and 28 Stratagem rows with
+missing bridge owner fields. Runtime-only exact rows are limited to an explicit
+11-row allowlist for existing named handlers without a bridge source-row match;
+new runtime-only rows fail generation until their provenance is approved.
 
 ## Phase 17F Execution Gate
 

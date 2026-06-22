@@ -4335,6 +4335,11 @@ Stratagem rows are generated from
 and rows with existing named runtime consumers are marked implemented. Datasheet
 intake remains the only approved unsupported Phase 17E source gap. No aggregate
 faction-pack Enhancement or Stratagem row is used to hide missing detail.
+The exact subrule source package also audits bridge input completeness: every
+bridge Enhancement or Stratagem source row must either emit an exact row or
+appear in `skipped_bridge_rows()` with an approved reason. Runtime-only exact
+rows for existing handlers without a bridge match must appear in
+`runtime_only_rows()` and pass the explicit provenance allowlist.
 
 Required tests:
 
@@ -4343,6 +4348,8 @@ Required tests:
 - exact Enhancement and detachment Stratagem rows are one-to-one with the exact
   source catalog rows and include rule ID, timing/category, source IDs, and
   support status;
+- bridge Enhancement and Stratagem input rows are either emitted or captured in
+  the approved skip audit, and runtime-only rows match the provenance allowlist;
 - unsupported rule report is generated and non-empty only with approved reasons.
 
 ## Phase 17F: faction coverage execution dispatch and status

@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections import Counter
 from dataclasses import replace
 from pathlib import Path, PurePosixPath
+from typing import cast
 from urllib.parse import urlparse
 
 import pytest
@@ -29,6 +31,30 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_covera
 ROOT = Path(__file__).resolve().parents[2]
 FACTION_PACK_MANIFEST = ROOT / "data" / "source_manifests" / "gw_11e_faction_packs.yaml"
 RAW_FACTION_PDF_DIR = ROOT / "data" / "raw" / "faction_packs"
+BRIDGE_JSON_DIR = (
+    ROOT
+    / "data"
+    / "source_snapshots"
+    / "wahapedia"
+    / ("1" + "0" + "th-edition")
+    / "2026-06-14"
+    / "json"
+)
+APPROVED_RUNTIME_ONLY_SOURCE_ROW_IDS = frozenset(
+    (
+        "enhancement:aeldari:corsair-coterie:infamy",
+        "enhancement:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:assassins-eye-upgrade",
+        "enhancement:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:camouflaged-snipers-upgrade",
+        "enhancement:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade",
+        "enhancement:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade",
+        "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:casting-back-the-veil",
+        "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:eldritch-suppression",
+        "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:nomads-of-the-hidden-way",
+        "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:from-beyond-the-veil",
+        "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:inescapable-manifestations",
+        "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:warp-riders",
+    )
+)
 
 
 def test_phase17e_payload_is_deterministic_json_safe_and_round_trips() -> None:
@@ -88,6 +114,70 @@ def test_phase17e_exact_subrule_source_payloads_are_deterministic_and_validated(
 
     with pytest.raises(ValueError, match="must be unique"):
         replace(stratagem, runtime_consumer_ids=("duplicate", "duplicate"))
+
+
+def test_phase17e_exact_subrule_source_audit_accounts_for_every_bridge_input_row() -> None:
+    skipped_rows = faction_subrule_source.skipped_bridge_rows()
+    runtime_only_rows = faction_subrule_source.runtime_only_rows()
+    identity = faction_subrule_source.source_package_identity_payload()
+    emitted_bridge_source_ids = {
+        source_id
+        for row in faction_subrule_source.enhancement_rows()
+        for source_id in row.source_ids
+        if ":bridge-source-row:" in source_id
+    }
+    emitted_bridge_source_ids.update(
+        source_id
+        for row in faction_subrule_source.stratagem_rows()
+        for source_id in row.source_ids
+        if ":bridge-source-row:" in source_id
+    )
+    skipped_bridge_source_ids = {
+        _bridge_source_id(row.table, row.bridge_source_row_id) for row in skipped_rows
+    }
+    bridge_input_source_ids = {
+        _bridge_source_id(table, source_row_id)
+        for table in ("Enhancements", "Stratagems")
+        for source_row_id in _bridge_source_row_ids(table)
+    }
+
+    assert identity["skipped_bridge_row_count"] == str(len(skipped_rows))
+    assert identity["runtime_only_row_count"] == str(len(runtime_only_rows))
+    assert len(skipped_rows) == 601
+    assert Counter(row.skip_reason for row in skipped_rows) == Counter(
+        {
+            "owner_not_in_current_source_package": 573,
+            "missing_owner_fields": 28,
+        }
+    )
+    assert emitted_bridge_source_ids.isdisjoint(skipped_bridge_source_ids)
+    assert emitted_bridge_source_ids.union(skipped_bridge_source_ids) == bridge_input_source_ids
+    assert all(
+        row.skip_reason in faction_subrule_source.APPROVED_SKIPPED_BRIDGE_REASONS
+        for row in skipped_rows
+    )
+    assert all(
+        (row.derived_faction_id, row.derived_detachment_id)
+        not in {
+            (detachment.faction_id, detachment.detachment_id)
+            for detachment in faction_detachment_source.detachment_rows()
+        }
+        for row in skipped_rows
+        if row.skip_reason == "owner_not_in_current_source_package"
+    )
+    assert all(
+        faction_subrule_source.SourceSkippedBridgeRow.from_payload(row.to_payload()) == row
+        for row in skipped_rows[:3]
+    )
+    assert {row.source_row_id for row in runtime_only_rows} == APPROVED_RUNTIME_ONLY_SOURCE_ROW_IDS
+    assert all(
+        row.provenance_reason in faction_subrule_source.APPROVED_RUNTIME_ONLY_PROVENANCE_REASONS
+        for row in runtime_only_rows
+    )
+    assert all(
+        faction_subrule_source.SourceRuntimeOnlyRow.from_payload(row.to_payload()) == row
+        for row in runtime_only_rows
+    )
 
 
 def test_phase17e_manifest_records_match_official_source_manifest() -> None:
@@ -311,6 +401,32 @@ def test_phase17e_local_raw_faction_pdfs_match_manifest_when_present() -> None:
         pdf_data = pdf_path.read_bytes()
         assert len(pdf_data) == record.bytes
         assert hashlib.sha256(pdf_data).hexdigest() == record.sha256
+
+
+def _bridge_source_row_ids(table: str) -> set[str]:
+    raw_payload = json.loads((BRIDGE_JSON_DIR / f"{table}.json").read_text(encoding="utf-8"))
+    if type(raw_payload) is not dict:
+        raise AssertionError("bridge source payload must be a JSON object")
+    payload = cast(dict[str, object], raw_payload)
+    raw_rows = payload["rows"]
+    if type(raw_rows) is not list:
+        raise AssertionError("bridge source payload rows must be a list")
+    source_row_ids: set[str] = set()
+    for raw_row in cast(list[object], raw_rows):
+        if type(raw_row) is not dict:
+            raise AssertionError("bridge source payload row must be a JSON object")
+        row = cast(dict[str, object], raw_row)
+        source_row_id = row["source_row_id"]
+        if type(source_row_id) is not str:
+            raise AssertionError("bridge source_row_id must be a string")
+        source_row_ids.add(source_row_id)
+    return source_row_ids
+
+
+def _bridge_source_id(table: str, source_row_id: str) -> str:
+    return (
+        f"gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:{table}:{source_row_id}"
+    )
 
 
 def _rows_by_kind(
