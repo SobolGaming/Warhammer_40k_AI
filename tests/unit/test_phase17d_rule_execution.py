@@ -509,6 +509,56 @@ def test_phase17d_any_aura_evaluation_affects_all_allegiances_in_range() -> None
     ]
 
 
+def test_phase17d_aura_keyword_gates_match_target_faction_keywords() -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-alpha:intercessor-unit-3"
+    excluded_unit_id = "army-beta:intercessor-unit-2"
+    compiled = _compiled(
+        "Daemon Lord of Khorne (Aura): While a friendly Khorne Legiones Daemonica "
+        'unit is within 6" of this model, each time a model in that unit makes a '
+        "melee attack, add 1 to the Hit roll."
+    )
+
+    state = _with_unit_keywords(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("CHARACTER",),
+        faction_keywords=("LEGIONES DAEMONICA", "KHORNE"),
+    )
+    state = _with_unit_keywords(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("INFANTRY",),
+        faction_keywords=("LEGIONES DAEMONICA", "KHORNE"),
+    )
+    state = _with_unit_keywords(
+        state,
+        unit_instance_id=excluded_unit_id,
+        keywords=("INFANTRY",),
+        faction_keywords=("LEGIONES DAEMONICA",),
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=target_unit_id,
+        pose=Pose.at(8.0, 6.0),
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=excluded_unit_id,
+        pose=Pose.at(8.0, 6.0),
+    )
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(state=state, source_unit_instance_id=source_unit_id),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [target_unit_id]
+    assert result.effect_payloads[0]["target_unit_instance_ids"] == [target_unit_id]
+
+
 def test_phase17d_unsupported_rule_ir_produces_typed_unsupported_status() -> None:
     compiled = _compiled("Roll a scatter die and consult the legacy table.")
 
@@ -1102,3 +1152,27 @@ def _with_unit_pose(
         ),
     )
     return battlefield_state.with_unit_placement(moved)
+
+
+def _with_unit_keywords(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    keywords: tuple[str, ...],
+    faction_keywords: tuple[str, ...],
+) -> GameState:
+    army_definitions: list[ArmyDefinition] = []
+    for army_definition in state.army_definitions:
+        army_definitions.append(
+            replace(
+                army_definition,
+                units=tuple(
+                    replace(unit, keywords=keywords, faction_keywords=faction_keywords)
+                    if unit.unit_instance_id == unit_instance_id
+                    else unit
+                    for unit in army_definition.units
+                ),
+            )
+        )
+    state.army_definitions = sorted(army_definitions, key=lambda army: army.player_id)
+    return state
