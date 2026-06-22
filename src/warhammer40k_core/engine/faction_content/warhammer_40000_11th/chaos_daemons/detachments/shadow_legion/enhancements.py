@@ -65,10 +65,10 @@ def record_fade_to_darkness_destroyed_enemy_unit(context: UnitDestroyedContext) 
         raise GameLifecycleError("Fade to Darkness requires a unit-destroyed context.")
     if context.completed_phase is not BattlePhase.FIGHT:
         return
-    attacking_unit_id = _payload_string(
-        context.model_destroyed_payload,
-        "attacking_unit_instance_id",
-    )
+    attacking_unit_value = context.model_destroyed_payload.get("attacking_unit_instance_id")
+    if type(attacking_unit_value) is not str or not attacking_unit_value.strip():
+        return
+    attacking_unit_id = _validate_identifier("attacking_unit_instance_id", attacking_unit_value)
     for army in _shadow_legion_armies(context.state):
         if army.player_id != context.destroying_player_id:
             continue

@@ -735,6 +735,93 @@ def test_fade_to_darkness_requires_current_fight_destroyed_enemy_marker() -> Non
     )
 
 
+def test_fade_to_darkness_ignores_unattributed_fight_enemy_destruction() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided"))
+    unit = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_fade_to_darkness(state, unit=unit)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    decisions = DecisionController()
+
+    _record_fade_to_darkness_destroyed_enemy(
+        state=state,
+        decisions=decisions,
+        attacker=None,
+        target=target,
+    )
+
+    assert _event_count(decisions, enhancements.ELIGIBLE_EVENT) == 0
+    assert (
+        enhancements.fade_to_darkness_turn_end_request(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+        is None
+    )
+
+
+def test_fade_to_darkness_ignores_non_assigned_attacker() -> None:
+    state = _shadow_legion_state(
+        unit_keywords=("Shadow Legion", "Undivided"),
+        player_a_unit_selection_ids=("intercessor-unit-1", "intercessor-unit-2"),
+    )
+    fade_unit = _unit_for_player_by_index(state, player_id="player-a", index=0)
+    non_fade_unit = _unit_for_player_by_index(state, player_id="player-a", index=1)
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_fade_to_darkness(state, unit=fade_unit)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    decisions = DecisionController()
+
+    _record_fade_to_darkness_destroyed_enemy(
+        state=state,
+        decisions=decisions,
+        attacker=non_fade_unit,
+        target=target,
+    )
+
+    assert _event_count(decisions, enhancements.ELIGIBLE_EVENT) == 0
+    assert (
+        enhancements.fade_to_darkness_turn_end_request(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+        is None
+    )
+
+
+def test_fade_to_darkness_records_one_marker_for_assigned_attacker() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided"))
+    unit = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_fade_to_darkness(state, unit=unit)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    decisions = DecisionController()
+
+    _record_fade_to_darkness_destroyed_enemy(
+        state=state,
+        decisions=decisions,
+        attacker=unit,
+        target=target,
+    )
+    _record_fade_to_darkness_destroyed_enemy(
+        state=state,
+        decisions=decisions,
+        attacker=unit,
+        target=target,
+    )
+
+    assert _event_count(decisions, enhancements.ELIGIBLE_EVENT) == 1
+    payload = _last_event_payload(decisions, enhancements.ELIGIBLE_EVENT)
+    assert payload["target_unit_instance_id"] == unit.unit_instance_id
+    assert payload["destroyed_enemy_unit_instance_id"] == target.unit_instance_id
+
+
 def test_fade_to_darkness_turn_end_choice_moves_unit_to_strategic_reserves_once() -> None:
     state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided"))
     unit = _unit_for_player(state, player_id="player-a")
@@ -890,8 +977,14 @@ def _shadow_legion_state(
     name: str = "Shadow Legion Unit",
     unit_keywords: tuple[str, ...] = ("Shadow Legion", "Undivided"),
     faction_keywords: tuple[str, ...] = ("Legiones Daemonica",),
+    player_a_unit_selection_ids: tuple[str, ...] = ("intercessor-unit-1",),
 ) -> GameState:
-    state = _battle_state()
+    state = _battle_state(
+        player_a_units=tuple(
+            _core_unit_selection(unit_selection_id)
+            for unit_selection_id in player_a_unit_selection_ids
+        )
+    )
     updated_armies: list[ArmyDefinition] = []
     for army in state.army_definitions:
         if army.player_id != "player-a":
@@ -918,6 +1011,19 @@ def _shadow_legion_state(
         )
     state.army_definitions = updated_armies
     return state
+
+
+def _core_unit_selection(unit_selection_id: str) -> UnitMusterSelection:
+    return UnitMusterSelection(
+        unit_selection_id=unit_selection_id,
+        datasheet_id="core-intercessor-like-infantry",
+        model_profile_selections=(
+            ModelProfileSelection(
+                model_profile_id="core-intercessor-like",
+                model_count=5,
+            ),
+        ),
+    )
 
 
 def _record_shadow_dark_pact_effect(
@@ -989,22 +1095,24 @@ def _record_fade_to_darkness_destroyed_enemy(
     *,
     state: GameState,
     decisions: DecisionController,
-    attacker: UnitInstance,
+    attacker: UnitInstance | None,
     target: UnitInstance,
 ) -> None:
+    payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "active_player_id": state.active_player_id,
+        "phase": BattlePhase.FIGHT.value,
+        "destroying_player_id": "player-a",
+        "target_unit_instance_id": target.unit_instance_id,
+        "model_instance_id": target.own_models[0].model_instance_id,
+    }
+    if attacker is not None:
+        payload["attacking_unit_instance_id"] = attacker.unit_instance_id
+        payload["attacker_model_instance_id"] = attacker.own_models[0].model_instance_id
     event = decisions.event_log.append(
         "model_destroyed",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": BattlePhase.FIGHT.value,
-            "destroying_player_id": "player-a",
-            "attacking_unit_instance_id": attacker.unit_instance_id,
-            "attacker_model_instance_id": attacker.own_models[0].model_instance_id,
-            "target_unit_instance_id": target.unit_instance_id,
-            "model_instance_id": target.own_models[0].model_instance_id,
-        },
+        payload,
     )
     enhancements.record_fade_to_darkness_destroyed_enemy_unit(
         UnitDestroyedContext(
@@ -1179,10 +1287,14 @@ def _unit_points(unit_selection_id: str, points: int) -> RosterUnitPointValue:
 
 
 def _unit_for_player(state: GameState, *, player_id: str) -> UnitInstance:
+    return _unit_for_player_by_index(state, player_id=player_id, index=0)
+
+
+def _unit_for_player_by_index(state: GameState, *, player_id: str, index: int) -> UnitInstance:
     army = state.army_definition_for_player(player_id)
     if army is None:
         raise AssertionError(f"Missing army for {player_id}.")
-    return army.units[0]
+    return army.units[index]
 
 
 def _refreshed_unit(state: GameState, unit: UnitInstance) -> UnitInstance:
