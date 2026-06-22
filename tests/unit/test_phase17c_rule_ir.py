@@ -480,6 +480,35 @@ def test_phase17c_aura_target_faction_keyword_sequence_compiles_to_keyword_gates
     }
 
 
+def test_phase17c_enemy_aura_target_keyword_compiles_to_keyword_gate() -> None:
+    rule_ir = _compiled(
+        'Ded Glowy Ammo (Aura): While an enemy Infantry unit is within 6" of this '
+        "model, subtract 1 from the Toughness characteristic of models in that unit."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    target = clause.target
+    keyword_gates = tuple(
+        condition
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.KEYWORD_GATE
+    )
+    effect = clause.effects[0]
+
+    assert rule_ir.is_supported
+    assert target is not None
+    assert target.kind is RuleTargetKind.AURA_UNITS
+    assert parameter_payload(target.parameters) == {
+        "allegiance": "enemy",
+        "eligible_target": "aura_units",
+        "required_keyword": "INFANTRY",
+    }
+    assert tuple(
+        parameter_payload(condition.parameters)["required_keyword"] for condition in keyword_gates
+    ) == ("INFANTRY",)
+    assert effect.kind is RuleEffectKind.MODIFY_CHARACTERISTIC
+    assert parameter_payload(effect.parameters) == {"characteristic": "toughness", "delta": -1}
+
+
 def test_phase17c_compiler_rejects_stale_or_duplicate_source_inputs() -> None:
     source = RuleSourceText.from_raw(source_id="phase17c:rule:stale", raw_text="Gain 1CP.")
 

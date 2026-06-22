@@ -559,6 +559,54 @@ def test_phase17d_aura_keyword_gates_match_target_faction_keywords() -> None:
     assert result.effect_payloads[0]["target_unit_instance_ids"] == [target_unit_id]
 
 
+def test_phase17d_enemy_aura_keyword_gate_applies_only_to_matching_enemy_units() -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    source_unit_id = "army-beta:intercessor-unit-2"
+    target_unit_id = "army-alpha:intercessor-unit-3"
+    excluded_unit_id = "army-alpha:intercessor-unit-1"
+    compiled = _compiled(
+        'Ded Glowy Ammo (Aura): While an enemy Infantry unit is within 6" of this '
+        "model, subtract 1 from the Toughness characteristic of models in that unit."
+    )
+
+    state = _with_unit_keywords(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("INFANTRY",),
+        faction_keywords=(),
+    )
+    state = _with_unit_keywords(
+        state,
+        unit_instance_id=excluded_unit_id,
+        keywords=("VEHICLE",),
+        faction_keywords=(),
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=source_unit_id,
+        pose=Pose.at(0.0, 0.0),
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=target_unit_id,
+        pose=Pose.at(2.0, 0.0),
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=excluded_unit_id,
+        pose=Pose.at(2.0, 1.0),
+    )
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(state=state, source_unit_instance_id=source_unit_id),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [target_unit_id]
+    assert result.effect_payloads[0]["target_unit_instance_ids"] == [target_unit_id]
+
+
 def test_phase17d_unsupported_rule_ir_produces_typed_unsupported_status() -> None:
     compiled = _compiled("Roll a scatter die and consult the legacy table.")
 
