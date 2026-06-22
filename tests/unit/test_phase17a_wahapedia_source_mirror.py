@@ -63,6 +63,8 @@ def test_phase17a_csv_normalization_strips_html_and_preserves_structured_text() 
     assert row.source_row_id == "ability-1:SM"
     assert row.source_package_id == _package_id()
     assert row.stable_source_id().endswith(":Abilities:ability-1:SM")
+    assert row.runtime_fields_payload()["name"] == "Angels' Fury"
+    assert name.sanitized_text == "Angels' Fury"
     assert name.normalized_text == "Angels' Fury"
     assert description.sanitized_text == (
         "roll d6 + 2 attacks within 12 inches.\n- feel no pain applies.\ndesigner note"

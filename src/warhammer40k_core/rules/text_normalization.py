@@ -120,7 +120,7 @@ class NormalizedRuleText:
 
 def normalize_rule_text(raw_text: object) -> str:
     text = _validate_raw_text(raw_text)
-    text = _normalize_unicode(text)
+    text = normalize_source_characters(text)
     text = _collapse_whitespace(text)
     text = _canonicalize_dice_expressions(text)
     text = _canonicalize_range_expressions(text)
@@ -130,7 +130,7 @@ def normalize_rule_text(raw_text: object) -> str:
 
 def normalize_structured_source_text(raw_text: object) -> str:
     text = _validate_raw_text(raw_text)
-    text = _normalize_unicode(text)
+    text = normalize_source_characters(text)
     blocks: list[str] = []
     for line in _LINEBREAK_RE.split(text):
         collapsed_line = _collapse_whitespace(line)
@@ -148,12 +148,18 @@ def normalize_structured_source_text(raw_text: object) -> str:
 
 def normalize_source_label(raw_text: object) -> str:
     text = _validate_raw_text(raw_text)
-    text = _normalize_unicode(text)
+    text = normalize_source_characters(text)
     return _collapse_whitespace(text)
 
 
 def canonical_keyword_forms() -> tuple[str, ...]:
     return _CANONICAL_KEYWORDS
+
+
+def normalize_source_characters(raw_text: object) -> str:
+    if type(raw_text) is not str:
+        raise TextNormalizationError("Source text must be a string.")
+    return _normalize_unicode(raw_text)
 
 
 def _validate_raw_text(raw_text: object) -> str:

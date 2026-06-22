@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from html.parser import HTMLParser
 from typing import Self, TypedDict
 
+from warhammer40k_core.rules.text_normalization import normalize_source_characters
+
 
 class SourceHtmlSanitizationError(ValueError):
     """Raised when source HTML cannot be sanitized at the ingest boundary."""
@@ -231,7 +233,7 @@ class _SourceHtmlParser(HTMLParser):
 
 
 def _cleanup_sanitized_text(text: str) -> str:
-    cleaned = text.replace("\r\n", "\n").replace("\r", "\n")
+    cleaned = normalize_source_characters(text).replace("\r\n", "\n").replace("\r", "\n")
     cleaned = _HORIZONTAL_WHITESPACE_RE.sub(" ", cleaned)
     cleaned = _NEWLINE_PADDING_RE.sub("\n", cleaned)
     cleaned = _EXCESS_NEWLINES_RE.sub("\n\n", cleaned)
