@@ -116,7 +116,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Death Guard | 9 | 28 | 42 | 0 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 24 | 36 | 0 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 26 | 36 | 0 | [chaos-knights](factions/chaos-knights.md) |
-| Chaos Daemons | 9 | 28 | 43 | 5 | [chaos-daemons](factions/chaos-daemons.md) |
+| Chaos Daemons | 9 | 28 | 43 | 6 | [chaos-daemons](factions/chaos-daemons.md) |
 | Astra Militarum | 11 | 36 | 54 | 0 | [astra-militarum](factions/astra-militarum.md) |
 | Adepta Sororitas | 8 | 20 | 30 | 0 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 28 | 42 | 0 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
@@ -265,6 +265,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:soul_shattering_charge_upgrade` | Soul-Shattering Charge Upgrade |
 | `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche` | Unholy Avalanche |
 | `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:warp_riders` | Warp-Riders |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:fade_to_darkness:turn-end-reserves` | Turn End Reserves |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:fade_to_darkness:unit-destroyed` | Unit Destroyed |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:attack-sequence-completed` | Shadow Legion |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:fight:lethal_hits` | Shadow Legion |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:fight:sustained_hits_1` | Shadow Legion |

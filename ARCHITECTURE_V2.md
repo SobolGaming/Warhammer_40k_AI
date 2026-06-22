@@ -4400,8 +4400,10 @@ Event mode is active. They may not introduce ad hoc pre-battle ordering.
 
 Current Phase 17G semantic slices include selected Chaos Daemons, Chaos Space
 Marines, Aeldari, Death Guard, World Eaters, Emperor's Children, Drukhari, and
-Space Marines runtime and mustering support. The Space Marines slice implements
-Oath of Moment as an engine-owned Command phase target selection with
+Space Marines runtime and mustering support. The Chaos Daemons Shadow Legion
+slice includes Fade to Darkness as a source-backed Fight-phase destroyed-enemy
+marker and turn-end Strategic Reserves choice. The Space Marines slice
+implements Oath of Moment as an engine-owned Command phase target selection with
 target-scoped Hit-roll reroll effects, Codex Space Marines Detachment Wound-roll
 modifier gating, and Space Marine Chapters roster legality diagnostics for Black
 Templars, Space Wolves, and Deathwatch restrictions.

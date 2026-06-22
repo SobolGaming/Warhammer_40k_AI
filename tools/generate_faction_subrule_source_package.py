@@ -341,25 +341,32 @@ def _overlay_runtime_enhancements(
     bridge_rows: tuple[GeneratedEnhancementRow, ...],
     runtime_rows: tuple[RuntimeEnhancementSeed, ...],
 ) -> tuple[tuple[GeneratedEnhancementRow, ...], tuple[GeneratedRuntimeOnlyRow, ...]]:
+    bridge_by_source_row_id = {row.source_row_id: row for row in bridge_rows}
     bridge_by_name = {_rule_name_key(row): row for row in bridge_rows}
     runtime_by_id = _merged_runtime_enhancement_rows(runtime_rows)
     output: list[GeneratedEnhancementRow] = []
     runtime_only_rows: list[GeneratedRuntimeOnlyRow] = []
     for runtime_row in runtime_by_id:
         owner_id = (runtime_row.faction_id, runtime_row.detachment_id)
-        bridge_row = bridge_by_name.pop(_rule_name_key(runtime_row), None)
+        bridge_row = bridge_by_source_row_id.get(_enhancement_source_row_id(runtime_row))
+        if bridge_row is not None:
+            bridge_by_name.pop(_rule_name_key(bridge_row), None)
+        else:
+            bridge_row = bridge_by_name.pop(_rule_name_key(runtime_row), None)
         source_ids = runtime_row.source_ids
         points: int | None = None
+        name = runtime_row.name
         if bridge_row is not None:
             source_ids = _sorted_unique((*bridge_row.source_ids, *runtime_row.source_ids))
             points = bridge_row.points
+            name = bridge_row.name
         generated_row = GeneratedEnhancementRow(
             faction_id=runtime_row.faction_id,
             faction_name=CURRENT_FACTION_NAMES_BY_ID[runtime_row.faction_id],
             detachment_id=runtime_row.detachment_id,
             detachment_name=CURRENT_DETACHMENT_NAMES_BY_OWNER_ID[owner_id],
             enhancement_id=runtime_row.enhancement_id,
-            name=runtime_row.name,
+            name=name,
             points=points,
             source_ids=source_ids,
             runtime_consumer_ids=runtime_row.runtime_consumer_ids,
@@ -476,7 +483,40 @@ def _runtime_enhancement_seeds(
                 runtime_consumer_ids=(fight_binding.hook_id,),
             )
         )
+    for turn_end_binding in contribution.turn_end_hook_bindings:
+        seed = _runtime_enhancement_seed_from_exact_source_id(
+            source_id=turn_end_binding.source_id,
+            runtime_consumer_id=turn_end_binding.hook_id,
+        )
+        if seed is not None:
+            rows.append(seed)
+    for unit_destroyed_binding in contribution.unit_destroyed_hook_bindings:
+        seed = _runtime_enhancement_seed_from_exact_source_id(
+            source_id=unit_destroyed_binding.source_id,
+            runtime_consumer_id=unit_destroyed_binding.hook_id,
+        )
+        if seed is not None:
+            rows.append(seed)
     return tuple(rows)
+
+
+def _runtime_enhancement_seed_from_exact_source_id(
+    *,
+    source_id: str,
+    runtime_consumer_id: str,
+) -> RuntimeEnhancementSeed | None:
+    parsed = _exact_enhancement_owner_and_rule_id_from_source_id(source_id)
+    if parsed is None:
+        return None
+    faction_id, detachment_id, enhancement_id = parsed
+    return RuntimeEnhancementSeed(
+        faction_id=faction_id,
+        detachment_id=detachment_id,
+        enhancement_id=enhancement_id,
+        name=_label_for_identifier(enhancement_id),
+        source_ids=(source_id,),
+        runtime_consumer_ids=(runtime_consumer_id,),
+    )
 
 
 def _runtime_stratagem_seeds(
@@ -561,7 +601,12 @@ def _source_rows(table: str) -> tuple[dict[str, Any], ...]:
     rows = payload["rows"]
     if type(rows) is not list:
         raise TypeError("Wahapedia bridge payload rows must be a list.")
-    return tuple(cast(dict[str, Any], row) for row in rows)
+    validated_rows: list[dict[str, Any]] = []
+    for row in cast(list[object], rows):
+        if type(row) is not dict:
+            raise TypeError("Wahapedia bridge payload rows must be objects.")
+        validated_rows.append(cast(dict[str, Any], row))
+    return tuple(validated_rows)
 
 
 def _faction_rows_by_bridge_id() -> dict[str, dict[str, str]]:
@@ -683,6 +728,25 @@ def _owner_id_or_none_from_runtime_source_id(source_id: str) -> tuple[str, str] 
     return None
 
 
+def _exact_enhancement_owner_and_rule_id_from_source_id(
+    source_id: str,
+) -> tuple[str, str, str] | None:
+    pieces = source_id.split(":")
+    for index, piece in enumerate(pieces):
+        if piece != "enhancement":
+            continue
+        if index + 3 >= len(pieces):
+            continue
+        owner_id = (pieces[index + 1], pieces[index + 2])
+        if owner_id not in CURRENT_SOURCE_OWNER_IDS:
+            continue
+        enhancement_id = ":".join(pieces[index + 3 :])
+        if not enhancement_id:
+            continue
+        return (owner_id[0], owner_id[1], enhancement_id)
+    return None
+
+
 def _runtime_timing_descriptor(record: StratagemCatalogRecord) -> str:
     timing = record.definition.timing
     phase = None if timing.phase is None else timing.phase.value
@@ -714,6 +778,10 @@ def _rule_name_key(
 
 def _runtime_enhancement_sort_key(row: RuntimeEnhancementSeed) -> str:
     return f"{row.faction_id}:{row.detachment_id}:{row.enhancement_id}"
+
+
+def _enhancement_source_row_id(row: RuntimeEnhancementSeed) -> str:
+    return f"enhancement:{row.faction_id}:{row.detachment_id}:{row.enhancement_id}"
 
 
 def _label_for_identifier(identifier: str) -> str:
