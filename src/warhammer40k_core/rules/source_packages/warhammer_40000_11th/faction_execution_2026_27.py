@@ -22,7 +22,7 @@ SOURCE_TITLE = "Warhammer 40,000 11th Edition Phase 17F Faction Execution"
 SOURCE_VERSION = "2026-27"
 SOURCE_DATE = "2026-06-11"
 UPSTREAM_IDENTITY = faction_coverage_2026_27.SOURCE_PACKAGE_ID
-IMPORTED_AT_SCHEMA_VERSION = "core-v2-phase17f-faction-execution-v1"
+IMPORTED_AT_SCHEMA_VERSION = "core-v2-phase17f-faction-execution-v2"
 
 
 class Phase17FFactionExecutionError(ValueError):
@@ -63,6 +63,11 @@ class Phase17FExecutionRecordPayload(TypedDict):
     source_ids: list[str]
     source_pdf_package_id: str
     rule_name: str
+    rule_id: str | None
+    timing_descriptor: str | None
+    rule_category: str | None
+    runtime_support_status: str | None
+    runtime_consumer_ids: list[str]
     handler_id: str | None
     rule_ir_hash: str | None
     phase17e_unsupported_reason: str | None
@@ -97,6 +102,11 @@ class Phase17FExecutionRecord:
     source_ids: tuple[str, ...]
     source_pdf_package_id: str
     rule_name: str
+    rule_id: str | None = None
+    timing_descriptor: str | None = None
+    rule_category: str | None = None
+    runtime_support_status: str | None = None
+    runtime_consumer_ids: tuple[str, ...] = ()
     detachment_id: str | None = None
     detachment_name: str | None = None
     handler_id: str | None = None
@@ -144,6 +154,35 @@ class Phase17FExecutionRecord:
             _validate_identifier("source_pdf_package_id", self.source_pdf_package_id),
         )
         object.__setattr__(self, "rule_name", _validate_non_empty_text("rule_name", self.rule_name))
+        if self.rule_id is not None:
+            object.__setattr__(self, "rule_id", _validate_identifier("rule_id", self.rule_id))
+        if self.timing_descriptor is not None:
+            object.__setattr__(
+                self,
+                "timing_descriptor",
+                _validate_non_empty_text("timing_descriptor", self.timing_descriptor),
+            )
+        if self.rule_category is not None:
+            object.__setattr__(
+                self,
+                "rule_category",
+                _validate_non_empty_text("rule_category", self.rule_category),
+            )
+        if self.runtime_support_status is not None:
+            object.__setattr__(
+                self,
+                "runtime_support_status",
+                _validate_identifier("runtime_support_status", self.runtime_support_status),
+            )
+        object.__setattr__(
+            self,
+            "runtime_consumer_ids",
+            _validate_identifier_tuple(
+                "runtime_consumer_ids",
+                self.runtime_consumer_ids,
+                allow_empty=True,
+            ),
+        )
         if self.detachment_id is not None:
             object.__setattr__(
                 self,
@@ -239,6 +278,11 @@ class Phase17FExecutionRecord:
             "source_ids": list(self.source_ids),
             "source_pdf_package_id": self.source_pdf_package_id,
             "rule_name": self.rule_name,
+            "rule_id": self.rule_id,
+            "timing_descriptor": self.timing_descriptor,
+            "rule_category": self.rule_category,
+            "runtime_support_status": self.runtime_support_status,
+            "runtime_consumer_ids": list(self.runtime_consumer_ids),
             "handler_id": self.handler_id,
             "rule_ir_hash": self.rule_ir_hash,
             "phase17e_unsupported_reason": self.phase17e_unsupported_reason,
@@ -261,6 +305,11 @@ class Phase17FExecutionRecord:
             source_ids=tuple(payload["source_ids"]),
             source_pdf_package_id=payload["source_pdf_package_id"],
             rule_name=payload["rule_name"],
+            rule_id=payload["rule_id"],
+            timing_descriptor=payload["timing_descriptor"],
+            rule_category=payload["rule_category"],
+            runtime_support_status=payload["runtime_support_status"],
+            runtime_consumer_ids=tuple(payload["runtime_consumer_ids"]),
             handler_id=payload["handler_id"],
             rule_ir_hash=payload["rule_ir_hash"],
             phase17e_unsupported_reason=payload["phase17e_unsupported_reason"],
@@ -403,6 +452,13 @@ def _execution_record(row: Phase17ECoverageRow) -> Phase17FExecutionRecord:
         source_ids=row.source_ids,
         source_pdf_package_id=row.source_pdf_package_id,
         rule_name=row.rule_name,
+        rule_id=row.rule_id,
+        timing_descriptor=row.timing_descriptor,
+        rule_category=row.rule_category,
+        runtime_support_status=(
+            None if row.runtime_support_status is None else row.runtime_support_status.value
+        ),
+        runtime_consumer_ids=row.runtime_consumer_ids,
         handler_id=row.handler_id,
         rule_ir_hash=row.rule_ir_hash,
         phase17e_unsupported_reason=phase17e_unsupported_reason,
@@ -509,10 +565,15 @@ def _validate_non_empty_text(field_name: str, value: object) -> str:
     return _validate_identifier(field_name, value)
 
 
-def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
+def _validate_identifier_tuple(
+    field_name: str,
+    values: tuple[str, ...],
+    *,
+    allow_empty: bool = False,
+) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise Phase17FFactionExecutionError(f"Phase17F {field_name} must be a tuple.")
-    if not values:
+    if not values and not allow_empty:
         raise Phase17FFactionExecutionError(f"Phase17F {field_name} must not be empty.")
     seen: set[str] = set()
     validated: list[str] = []

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -229,19 +230,14 @@ def test_faction_integration_execution_matrix_matches_phase17f_package() -> None
         section = _markdown_section(document, f"### {faction_row.name} Execution Status")
         records_by_family = records_by_faction[faction_row.name]
         for coverage_kind, family_label in _MATRIX_FAMILY_LABELS.items():
-            records = records_by_family[coverage_kind]
-            assert records
-            status_values = {record.execution_status.value for record in records}
-            source_blocks = {_source_block(record) for record in records}
-            engine_results = {_engine_result(record) for record in records}
-            assert len(status_values) == 1
-            assert len(source_blocks) == 1
-            assert len(engine_results) == 1
-            expected_row = (
-                f"| {family_label} | {len(records)} | `{status_values.pop()}` | "
-                f"`{engine_results.pop()}` | `{source_blocks.pop()}` |"
-            )
-            assert expected_row in section
+            records = records_by_family.get(coverage_kind, ())
+            for group in _execution_matrix_groups(records):
+                expected_row = (
+                    f"| {family_label} | {len(group.records)} | "
+                    f"`{group.execution_status}` | `{group.engine_result}` | "
+                    f"`{group.source_block}` |"
+                )
+                assert expected_row in section
 
 
 def test_faction_integration_requires_explicit_faq_classification_gate() -> None:
@@ -278,10 +274,18 @@ def test_faction_integration_links_agent_implementation_contract() -> None:
 _MATRIX_FAMILY_LABELS = {
     Phase17ECoverageKind.FACTION_ARMY_RULE: "Army rule",
     Phase17ECoverageKind.DETACHMENT_RULE: "Detachment rules",
-    Phase17ECoverageKind.DETACHMENT_ENHANCEMENT_DESCRIPTORS: "Enhancement descriptors",
-    Phase17ECoverageKind.DETACHMENT_STRATAGEM_DESCRIPTORS: "Stratagem descriptors",
+    Phase17ECoverageKind.DETACHMENT_ENHANCEMENT: "Enhancements",
+    Phase17ECoverageKind.DETACHMENT_STRATAGEM: "Stratagems",
     Phase17ECoverageKind.DATASHEET_INTAKE: "Datasheet intake",
 }
+
+
+@dataclass(frozen=True, slots=True)
+class ExecutionMatrixGroup:
+    execution_status: str
+    engine_result: str
+    source_block: str
+    records: tuple[Phase17FExecutionRecord, ...]
 
 
 def _execution_records_by_faction() -> dict[
@@ -308,6 +312,24 @@ def _source_block(record: Phase17FExecutionRecord) -> str:
             raise AssertionError("Phase17F source-gap record lacks Phase17E reason.")
         return f"approved_phase17e_source_gap:{record.phase17e_unsupported_reason}"
     return "none"
+
+
+def _execution_matrix_groups(
+    records: tuple[Phase17FExecutionRecord, ...],
+) -> tuple[ExecutionMatrixGroup, ...]:
+    grouped: dict[tuple[str, str, str], list[Phase17FExecutionRecord]] = {}
+    for record in records:
+        key = (record.execution_status.value, _engine_result(record), _source_block(record))
+        grouped.setdefault(key, []).append(record)
+    return tuple(
+        ExecutionMatrixGroup(
+            execution_status=execution_status,
+            engine_result=engine_result,
+            source_block=source_block,
+            records=tuple(records),
+        )
+        for (execution_status, engine_result, source_block), records in sorted(grouped.items())
+    )
 
 
 def _engine_result(record: Phase17FExecutionRecord) -> str:

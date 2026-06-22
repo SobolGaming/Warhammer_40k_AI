@@ -11,6 +11,7 @@ from typing import cast
 import pytest
 from tools.generate_ability_support_matrix import (
     ability_support_matrix_rows,
+    faction_support_markdown_files,
     support_matrix_markdown,
 )
 
@@ -854,9 +855,14 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     markdown_snapshot = (
         Path(__file__).resolve().parents[2] / "docs" / "ABILITY_SUPPORT_MATRIX_V2.md"
     ).read_text(encoding="utf-8")
+    faction_markdown_snapshot = {
+        path.name: path.read_text(encoding="utf-8")
+        for path in sorted((Path(__file__).resolve().parents[2] / "docs" / "factions").glob("*.md"))
+    }
     generated_markdown = support_matrix_markdown(
         ability_coverage_category_rows_payload(category_rows)
     )
+    generated_faction_markdown = faction_support_markdown_files()
     rows_by_name: dict[str, list[AbilityCoverageRow]] = {}
     for row in rows:
         rows_by_name.setdefault(row.ability_name, []).append(row)
@@ -865,16 +871,22 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert ability_coverage_rows_payload(rows) == snapshot
     assert ability_coverage_category_rows_payload(category_rows) == category_snapshot
     assert generated_markdown == markdown_snapshot
-    assert "| Aeldari | Corsair Coterie |" in generated_markdown
-    assert "| Aeldari - Corsair Coterie Stratagems |" in generated_markdown
-    assert "| Aeldari - Corsair Coterie Enhancements |" in generated_markdown
-    assert "| Chaos Daemons | Cavalcade of Chaos |" in generated_markdown
-    assert "three named Stratagem records, and two Enhancement bindings" in generated_markdown
-    assert "| Chaos Daemons - Cavalcade of Chaos Stratagems |" in generated_markdown
-    assert "Warp-Riders, From Beyond the Veil, and Inescapable Manifestations" in generated_markdown
-    assert "| Chaos Daemons - Cavalcade of Chaos Upgrades |" in generated_markdown
-    assert "Apocalyptic Steeds +1 Movement" in generated_markdown
-    assert "Soul-Shattering Charge 3 inch melee targeting" in generated_markdown
+    assert generated_faction_markdown == faction_markdown_snapshot
+    assert "## Factions" in generated_markdown
+    assert "[aeldari](factions/aeldari.md)" in generated_markdown
+    assert "Faction-pack Stratagems" not in generated_markdown
+    assert "Faction-pack Enhancements" not in generated_markdown
+    assert "| Aeldari | 15 | 51 | 75 | 15 | [aeldari](factions/aeldari.md) |" in (
+        generated_markdown
+    )
+    aeldari_markdown = generated_faction_markdown["aeldari.md"]
+    chaos_daemons_markdown = generated_faction_markdown["chaos-daemons.md"]
+    assert "| Corsair Coterie | Pirates' Due |" in aeldari_markdown
+    assert "| Corsair Coterie | Archraider |" in aeldari_markdown
+    assert "`implemented` / `engine_consumed`" in aeldari_markdown
+    assert "`named_handler_required` / `source_only`" in aeldari_markdown
+    assert "| Cavalcade of Chaos | Warp-Riders |" in chaos_daemons_markdown
+    assert "| Cavalcade of Chaos | Apocalyptic Steeds Upgrade |" in chaos_daemons_markdown
     assert "Current coverage categories:" not in generated_markdown
     assert "## Runtime Hook Inventory" in generated_markdown
     assert "| `catalog-ir:charge-roll-modifier` | Instrument of Chaos |" in generated_markdown

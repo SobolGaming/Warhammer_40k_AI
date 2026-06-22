@@ -218,10 +218,10 @@ these handlers.
 Enhancement effect bindings are an approved runtime contribution surface for
 source-backed Enhancement or Upgrade effects whose selected army-construction
 assignment creates a static engine-owned characteristic modifier. Each binding
-must use the generated Phase 17F execution row ID for the implemented
-enhancement descriptor family until exact enhancement subrows exist. Eligibility
-must be validated from Phase 16D `ArmyMusterRequest` / `ArmyDefinition` records
-and structured catalog target requirements. Binding handlers return typed
+must use the generated Phase 17F exact Enhancement execution row ID for the
+implemented Enhancement or Upgrade. Eligibility must be validated from Phase 16D
+`ArmyMusterRequest` / `ArmyDefinition` records and structured catalog target
+requirements. Binding handlers return typed
 modifier descriptors only; the lifecycle-owned enhancement effect service
 applies them to authoritative army definitions, keeps application idempotent,
 and emits deterministic replay-safe payloads. Faction modules must not mutate
@@ -231,11 +231,11 @@ directly.
 Fight activation ability hook bindings are an approved runtime contribution
 surface only for source-backed optional rules whose trigger is a unit being
 selected to fight. Each hook binding must use a `source_id` from the generated
-Phase 17F execution rows for the implemented rule or enhancement descriptor
-family until exact subrows exist, and tests must prove that the selected runtime
-manifest row loads the hook through `GameLifecycle` without manual handler
-injection. Hook handlers return typed ability options only; the Fight engine
-owns the finite use/decline `DecisionRequest`, records the authoritative
+Phase 17F execution rows for the implemented rule or exact Enhancement row, and
+tests must prove that the selected runtime manifest row loads the hook through
+`GameLifecycle` without manual handler injection. Hook handlers return typed
+ability options only; the Fight engine owns the finite use/decline
+`DecisionRequest`, records the authoritative
 `PersistingEffect`, and emits deterministic replay-safe payloads. Faction
 modules must not mutate Fight phase state, melee declarations, attack pools, or
 battlefield state directly.
@@ -302,11 +302,10 @@ Required:
   registers them before `use_stratagem` options are emitted.
 - Register enhancement effect bindings only for source-backed Enhancement or
   Upgrade effects selected through Phase 16D army-construction records, and link
-  them to generated Phase 17F enhancement descriptor row IDs until exact
-  enhancement subrows exist.
+  them to generated Phase 17F exact Enhancement execution row IDs.
 - Register Fight activation ability hook bindings only for optional
   selected-to-fight rules, and link them to generated Phase 17F execution row
-  IDs or enhancement descriptor row IDs until exact enhancement subrows exist.
+  IDs or exact Enhancement execution row IDs.
 - Register runtime modifier bindings only for source-backed modifiers consumed
   by existing engine query points: unit characteristics, Hit rolls, save
   options, movement budgets, or Objective Control. Link each binding to a

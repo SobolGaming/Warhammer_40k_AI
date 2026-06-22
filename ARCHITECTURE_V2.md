@@ -4315,7 +4315,10 @@ Status: complete.
 Invariants:
 
 - every faction has a source-linked army rule descriptor;
-- every detachment has source-linked detachment rule, enhancement, and Stratagem descriptors;
+- every detachment has a source-linked detachment rule descriptor;
+- every generated exact Enhancement and Stratagem source row has a coverage row
+  with stable rule ID, owner faction, owner detachment, timing/category metadata,
+  and support status;
 - language parser produces generic IR where possible;
 - unique imperative rules are isolated behind source-linked named handlers;
 - coverage report groups implemented, generic-supported, named-handler-required, and unsupported rules.
@@ -4326,18 +4329,27 @@ That package links every seeded faction and detachment row from
 `faction_detachments_2026_27.py` to the official faction-pack PDF manifest,
 validates the PDF filenames, byte counts, and SHA-256 digests, and emits
 deterministic coverage rows. Army rules and detachment rules are
-source-linked named-handler-required descriptors. Datasheet intake,
-enhancement descriptor subrows, and Stratagem descriptor subrows that are not
-present in the update PDFs are represented as approved unsupported diagnostics;
-they cannot execute by fallback and must be replaced by native generated source
-rows in later Phase 17 work.
+source-linked named-handler-required descriptors. Exact Enhancement and
+Stratagem rows are generated from
+`faction_subrules_2026_27.py`; source-only exact rows are named-handler-required,
+and rows with existing named runtime consumers are marked implemented. Datasheet
+intake remains the only approved unsupported Phase 17E source gap. No aggregate
+faction-pack Enhancement or Stratagem row is used to hide missing detail.
+The exact subrule source package also audits bridge input completeness: every
+bridge Enhancement or Stratagem source row must either emit an exact row or
+appear in `skipped_bridge_rows()` with an approved reason. Runtime-only exact
+rows for existing handlers without a bridge match must appear in
+`runtime_only_rows()` and pass the explicit provenance allowlist.
 
 Required tests:
 
 - faction army-rule coverage descriptors load for every faction;
 - detachment-rule coverage descriptors load for every detachment;
-- enhancement and detachment Stratagem descriptors are source-linked or blocked
-  by approved diagnostics;
+- exact Enhancement and detachment Stratagem rows are one-to-one with the exact
+  source catalog rows and include rule ID, timing/category, source IDs, and
+  support status;
+- bridge Enhancement and Stratagem input rows are either emitted or captured in
+  the approved skip audit, and runtime-only rows match the provenance allowlist;
 - unsupported rule report is generated and non-empty only with approved reasons.
 
 ## Phase 17F: faction coverage execution dispatch and status
@@ -4357,8 +4369,8 @@ Invariants:
 Phase 17F is implemented by
 `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_execution_2026_27.py`
 and `src/warhammer40k_core/engine/faction_rule_execution.py`. The source package
-maps all Phase 17E faction army-rule, detachment-rule, enhancement descriptor,
-Stratagem descriptor, and datasheet-intake coverage rows into execution records.
+maps all Phase 17E faction army-rule, detachment-rule, exact Enhancement, exact
+Stratagem, and datasheet-intake coverage rows into execution records.
 The engine dispatcher resolves every record through a typed execution result.
 Rows that still lack native structured semantics are explicitly unsupported with
 approved reasons; they do not execute by fallback and do not disappear as

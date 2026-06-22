@@ -26,6 +26,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27 as faction_execution_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
+    Phase17ECoverageKind,
     Phase17ECoverageStatus,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
@@ -55,6 +56,45 @@ def test_phase17f_execution_package_covers_every_phase17e_coverage_row() -> None
         assert execution_record.faction_id == coverage_row.faction_id
         assert execution_record.detachment_id == coverage_row.detachment_id
         assert execution_record.source_ids == coverage_row.source_ids
+        assert execution_record.rule_id == coverage_row.rule_id
+        assert execution_record.timing_descriptor == coverage_row.timing_descriptor
+        assert execution_record.rule_category == coverage_row.rule_category
+        assert execution_record.runtime_support_status == (
+            None
+            if coverage_row.runtime_support_status is None
+            else coverage_row.runtime_support_status.value
+        )
+        assert execution_record.runtime_consumer_ids == coverage_row.runtime_consumer_ids
+
+
+def test_phase17f_exact_enhancement_and_stratagem_execution_records_are_one_to_one() -> None:
+    execution_package = faction_execution_source.phase17f_execution_package()
+    exact_records = tuple(
+        record
+        for record in execution_package.execution_records
+        if record.coverage_kind
+        in {
+            Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
+            Phase17ECoverageKind.DETACHMENT_STRATAGEM,
+        }
+    )
+    exact_coverage_rows = tuple(
+        row
+        for row in faction_coverage_source.coverage_rows()
+        if row.coverage_kind
+        in {
+            Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
+            Phase17ECoverageKind.DETACHMENT_STRATAGEM,
+        }
+    )
+
+    assert len(exact_records) == len(exact_coverage_rows)
+    assert {record.coverage_descriptor_id for record in exact_records} == {
+        row.descriptor_id for row in exact_coverage_rows
+    }
+    assert all(record.rule_id is not None for record in exact_records)
+    assert all(record.timing_descriptor is not None for record in exact_records)
+    assert all(record.rule_category is not None for record in exact_records)
 
 
 def test_phase17f_execution_payload_is_deterministic_json_safe_and_round_trips() -> None:
@@ -105,7 +145,10 @@ def test_phase17f_execution_statuses_are_explicit_for_all_phase17e_rows() -> Non
     execution_status_counts = execution_package.status_counts()
 
     assert execution_status_counts[Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR.value] == 0
-    assert execution_status_counts[Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER.value] == 0
+    assert (
+        execution_status_counts[Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER.value]
+        == coverage_status_counts[Phase17ECoverageStatus.IMPLEMENTED.value]
+    )
     assert (
         execution_status_counts[Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED.value]
         == coverage_status_counts[Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED.value]
@@ -116,7 +159,10 @@ def test_phase17f_execution_statuses_are_explicit_for_all_phase17e_rows() -> Non
         ]
         == coverage_status_counts[Phase17ECoverageStatus.UNSUPPORTED.value]
     )
-    assert len(execution_package.blocked_records()) == len(execution_package.execution_records)
+    assert len(execution_package.blocked_records()) == (
+        len(execution_package.execution_records)
+        - execution_status_counts[Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER.value]
+    )
     assert execution_package.unapproved_blocked_records() == ()
     assert all(record.is_approved_blocked for record in execution_package.blocked_records())
 
@@ -130,7 +176,11 @@ def test_phase17f_registry_dispatches_every_record_without_missing_handlers() ->
         assert result.status is FactionRuleExecutionStatus.UNSUPPORTED
         assert result.source_ids == record.source_ids
         assert result.coverage_descriptor_id == record.coverage_descriptor_id
-        if record.execution_status is Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED:
+        if record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER:
+            assert result.reason == "named_handler_not_registered"
+        elif (
+            record.execution_status is Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
+        ):
             assert result.reason == "structured_rule_semantics_required"
         else:
             assert result.reason == (

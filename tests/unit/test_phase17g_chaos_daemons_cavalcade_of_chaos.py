@@ -282,7 +282,7 @@ def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> Non
     summary = bundle.to_summary_payload()
 
     assert stratagems.WARP_RIDERS_HANDLER_ID in summary["stratagem_handler_ids"]
-    assert stratagems.SOURCE_RULE_ID in summary["selected_execution_record_ids"]
+    assert stratagems.WARP_RIDERS_SOURCE_RULE_ID in summary["selected_execution_record_ids"]
     assert (
         stratagems.WARP_RIDERS_RECORD_ID
         in summary["stratagem_index_record_ids_by_player_id"]["player-a"]
@@ -568,7 +568,7 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
         FallBackModeKind.ORDERED_RETREAT.value
     )
     assert proposal_request.context["forced_desperate_escape_source_rule_ids"] == [
-        stratagems.SOURCE_RULE_ID
+        stratagems.INESCAPABLE_MANIFESTATIONS_SOURCE_RULE_ID
     ]
     assert _state(lifecycle).command_point_total("player-a") == command_points_before_use - 1
 
@@ -632,7 +632,9 @@ def test_cavalcade_apocalyptic_steeds_applies_movement_upgrade_through_lifecycle
     unit = army.unit_by_id(_CAVALCADE_UNIT_ID)
 
     assert enhancements.EFFECT_ID in summary["enhancement_effect_binding_ids"]
-    assert enhancements.SOURCE_RULE_ID in summary["selected_execution_record_ids"]
+    assert (
+        enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID in summary["selected_execution_record_ids"]
+    )
     assert all(
         enhancements.MODIFIER_ID
         in _characteristic_for_model(model, Characteristic.MOVEMENT).applied_modifier_ids
@@ -647,7 +649,7 @@ def test_cavalcade_apocalyptic_steeds_applies_movement_upgrade_through_lifecycle
     model_payloads = cast(list[JsonValue], effect_payload["model_modifiers"])
     first_model_payload = cast(dict[str, JsonValue], model_payloads[0])
     assert effect_payload["effect_id"] == enhancements.EFFECT_ID
-    assert effect_payload["source_id"] == enhancements.SOURCE_RULE_ID
+    assert effect_payload["source_id"] == enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID
     assert effect_payload["enhancement_id"] == enhancements.ENHANCEMENT_ID
     assert replay_payload["effect_kind"] == "apocalyptic_steeds_upgrade"
     assert replay_payload["enhancement_source_id"] == enhancements.ENHANCEMENT_SOURCE_ID
@@ -729,7 +731,10 @@ def test_cavalcade_soul_shattering_charge_extends_melee_targeting_through_lifecy
     assert (
         enhancements.SOUL_SHATTERING_CHARGE_HOOK_ID in summary["fight_activation_ability_hook_ids"]
     )
-    assert enhancements.SOURCE_RULE_ID in summary["selected_execution_record_ids"]
+    assert (
+        enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID
+        in summary["selected_execution_record_ids"]
+    )
 
     activation_request = _decision_request(
         _drain_fight_movement_requests(
@@ -798,7 +803,7 @@ def test_cavalcade_soul_shattering_charge_extends_melee_targeting_through_lifecy
     persisting_effect = cast(dict[str, JsonValue], used_event["persisting_effect"])
     effect_payload = cast(dict[str, JsonValue], persisting_effect["effect_payload"])
     assert ability_use["hook_id"] == enhancements.SOUL_SHATTERING_CHARGE_HOOK_ID
-    assert ability_use["source_id"] == enhancements.SOURCE_RULE_ID
+    assert ability_use["source_id"] == enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID
     assert ability_use["enhancement_id"] == enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID
     assert effect_payload["effect_kind"] == "fight_activation_melee_targeting_distance"
 
@@ -815,7 +820,9 @@ def test_cavalcade_soul_shattering_charge_extends_melee_targeting_through_lifecy
         and pool.target_unit_instance_id == _ENEMY_UNIT_ID
     )
     assert len(extended_pools) == 1
-    assert enhancements.SOURCE_RULE_ID in extended_pools[0].targeting_rule_ids
+    assert (
+        enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID in extended_pools[0].targeting_rule_ids
+    )
 
 
 def test_cavalcade_soul_shattering_charge_roster_requires_mounted_target() -> None:
@@ -835,30 +842,32 @@ def test_cavalcade_soul_shattering_charge_roster_requires_mounted_target() -> No
 
 
 def test_cavalcade_enhancement_effect_uses_phase17f_execution_source_id() -> None:
-    record = _cavalcade_enhancement_execution_record()
+    record = _cavalcade_enhancement_execution_record(enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID)
     contribution = enhancements.runtime_contribution()
     binding = contribution.enhancement_effect_bindings[0]
 
-    assert record.execution_id == enhancements.SOURCE_RULE_ID
+    assert record.execution_id == enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID
     assert binding.source_id == record.execution_id
 
 
 def test_cavalcade_soul_shattering_charge_hook_uses_phase17f_execution_source_id() -> None:
-    record = _cavalcade_enhancement_execution_record()
+    record = _cavalcade_enhancement_execution_record(
+        enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID
+    )
     contribution = enhancements.runtime_contribution()
     binding = contribution.fight_activation_ability_hook_bindings[0]
 
-    assert record.execution_id == enhancements.SOURCE_RULE_ID
+    assert record.execution_id == enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID
     assert binding.source_id == record.execution_id
 
 
 def test_cavalcade_warp_riders_uses_phase17f_execution_source_id() -> None:
-    record = _cavalcade_stratagem_execution_record()
+    record = _cavalcade_stratagem_execution_record(stratagems.WARP_RIDERS_SOURCE_RULE_ID)
     contribution = stratagems.runtime_contribution()
     binding = contribution.stratagem_handler_bindings[0]
     catalog_record = contribution.stratagem_records[0]
 
-    assert record.execution_id == stratagems.SOURCE_RULE_ID
+    assert record.execution_id == stratagems.WARP_RIDERS_SOURCE_RULE_ID
     assert binding.handler_id == stratagems.WARP_RIDERS_HANDLER_ID
     assert catalog_record.definition.source_id == record.execution_id
 
@@ -979,7 +988,7 @@ def test_fight_activation_ability_registry_rejects_cavalcade_handler_identity_dr
     ) -> FightActivationAbilityOption:
         return FightActivationAbilityOption(
             hook_id="phase17g:wrong-hook",
-            source_id=enhancements.SOURCE_RULE_ID,
+            source_id=enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID,
             ability_id=enhancements.SOUL_SHATTERING_CHARGE_ABILITY_ID,
             enhancement_id=enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID,
             model_proximity_inches=3.0,
@@ -989,7 +998,7 @@ def test_fight_activation_ability_registry_rejects_cavalcade_handler_identity_dr
         (
             FightActivationAbilityHookBinding(
                 hook_id=enhancements.SOUL_SHATTERING_CHARGE_HOOK_ID,
-                source_id=enhancements.SOURCE_RULE_ID,
+                source_id=enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID,
                 handler=hook_id_drift,
             ),
         )
@@ -1012,7 +1021,7 @@ def test_fight_activation_ability_registry_rejects_cavalcade_handler_identity_dr
         (
             FightActivationAbilityHookBinding(
                 hook_id=enhancements.SOUL_SHATTERING_CHARGE_HOOK_ID,
-                source_id=enhancements.SOURCE_RULE_ID,
+                source_id=enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID,
                 handler=source_id_drift,
             ),
         )
@@ -1034,26 +1043,28 @@ def _cavalcade_rule_execution_record() -> Phase17FExecutionRecord:
     return records[0]
 
 
-def _cavalcade_enhancement_execution_record() -> Phase17FExecutionRecord:
+def _cavalcade_enhancement_execution_record(source_rule_id: str) -> Phase17FExecutionRecord:
     records = tuple(
         record
         for record in faction_execution_2026_27.execution_records()
         if record.faction_id == rule.CHAOS_DAEMONS_FACTION_ID
-        and record.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT_DESCRIPTORS
+        and record.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
         and record.detachment_id == rule.CAVALCADE_DETACHMENT_ID
+        and record.execution_id == source_rule_id
     )
     if len(records) != 1:
         raise AssertionError("expected one Cavalcade of Chaos enhancement execution record")
     return records[0]
 
 
-def _cavalcade_stratagem_execution_record() -> Phase17FExecutionRecord:
+def _cavalcade_stratagem_execution_record(source_rule_id: str) -> Phase17FExecutionRecord:
     records = tuple(
         record
         for record in faction_execution_2026_27.execution_records()
         if record.faction_id == rule.CHAOS_DAEMONS_FACTION_ID
-        and record.coverage_kind is Phase17ECoverageKind.DETACHMENT_STRATAGEM_DESCRIPTORS
+        and record.coverage_kind is Phase17ECoverageKind.DETACHMENT_STRATAGEM
         and record.detachment_id == rule.CAVALCADE_DETACHMENT_ID
+        and record.execution_id == source_rule_id
     )
     if len(records) != 1:
         raise AssertionError("expected one Cavalcade of Chaos stratagem execution record")
@@ -1313,21 +1324,21 @@ def _cavalcade_catalog(
             CatalogStratagemDefinition(
                 stratagem_id=stratagems.WARP_RIDERS_STRATAGEM_ID,
                 name="Warp-Riders",
-                source_id=stratagems.SOURCE_RULE_ID,
+                source_id=stratagems.WARP_RIDERS_SOURCE_RULE_ID,
                 command_point_cost=1,
                 timing_tags=("movement:selected-to-move",),
             ),
             CatalogStratagemDefinition(
                 stratagem_id=stratagems.FROM_BEYOND_THE_VEIL_STRATAGEM_ID,
                 name="From Beyond the Veil",
-                source_id=stratagems.SOURCE_RULE_ID,
+                source_id=stratagems.FROM_BEYOND_THE_VEIL_SOURCE_RULE_ID,
                 command_point_cost=1,
                 timing_tags=("movement:end-phase", "strategic-reserves:ingress"),
             ),
             CatalogStratagemDefinition(
                 stratagem_id=stratagems.INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID,
                 name="Inescapable Manifestations",
-                source_id=stratagems.SOURCE_RULE_ID,
+                source_id=stratagems.INESCAPABLE_MANIFESTATIONS_SOURCE_RULE_ID,
                 command_point_cost=1,
                 timing_tags=("movement:selected-to-fall-back",),
             ),

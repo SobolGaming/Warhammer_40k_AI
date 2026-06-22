@@ -43,18 +43,34 @@ from .rule import (
 CONTRIBUTION_ID = (
     "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:stratagems:scaffold"
 )
-SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:cavalcade-of-chaos:stratagems"
 WARP_RIDERS_STRATAGEM_ID = "chaos-daemons:cavalcade-of-chaos:warp-riders"
+WARP_RIDERS_SOURCE_RULE_ID = (
+    "phase17f:phase17e:stratagem:chaos-daemons:cavalcade-of-chaos:"
+    "chaos-daemons:cavalcade-of-chaos:warp-riders"
+)
+SOURCE_RULE_ID = WARP_RIDERS_SOURCE_RULE_ID
 WARP_RIDERS_HANDLER_ID = (
     "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:warp_riders"
 )
-WARP_RIDERS_RECORD_ID = f"{SOURCE_RULE_ID}:{WARP_RIDERS_STRATAGEM_ID}"
+WARP_RIDERS_RECORD_ID = f"{WARP_RIDERS_SOURCE_RULE_ID}:{WARP_RIDERS_STRATAGEM_ID}"
 FROM_BEYOND_THE_VEIL_STRATAGEM_ID = "chaos-daemons:cavalcade-of-chaos:from-beyond-the-veil"
-FROM_BEYOND_THE_VEIL_RECORD_ID = f"{SOURCE_RULE_ID}:{FROM_BEYOND_THE_VEIL_STRATAGEM_ID}"
+FROM_BEYOND_THE_VEIL_SOURCE_RULE_ID = (
+    "phase17f:phase17e:stratagem:chaos-daemons:cavalcade-of-chaos:"
+    "chaos-daemons:cavalcade-of-chaos:from-beyond-the-veil"
+)
+FROM_BEYOND_THE_VEIL_RECORD_ID = (
+    f"{FROM_BEYOND_THE_VEIL_SOURCE_RULE_ID}:{FROM_BEYOND_THE_VEIL_STRATAGEM_ID}"
+)
 INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID = (
     "chaos-daemons:cavalcade-of-chaos:inescapable-manifestations"
 )
-INESCAPABLE_MANIFESTATIONS_RECORD_ID = f"{SOURCE_RULE_ID}:{INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID}"
+INESCAPABLE_MANIFESTATIONS_SOURCE_RULE_ID = (
+    "phase17f:phase17e:stratagem:chaos-daemons:cavalcade-of-chaos:"
+    "chaos-daemons:cavalcade-of-chaos:inescapable-manifestations"
+)
+INESCAPABLE_MANIFESTATIONS_RECORD_ID = (
+    f"{INESCAPABLE_MANIFESTATIONS_SOURCE_RULE_ID}:{INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID}"
+)
 MOBILE = "MOBILE"
 
 
@@ -87,7 +103,7 @@ def apply_warp_riders(context: StratagemHandlerContext) -> StratagemHandlerExecu
         "effect_kind": "warp_riders_mobile",
         "stratagem_id": WARP_RIDERS_STRATAGEM_ID,
         "handler_id": WARP_RIDERS_HANDLER_ID,
-        "source_id": SOURCE_RULE_ID,
+        "source_id": WARP_RIDERS_SOURCE_RULE_ID,
         "player_id": context.use_record.player_id,
         "battle_round": context.use_record.battle_round,
         "phase": BattlePhase.MOVEMENT.value,
@@ -176,7 +192,7 @@ def _warp_riders_record() -> StratagemCatalogRecord:
         definition=StratagemDefinition(
             stratagem_id=WARP_RIDERS_STRATAGEM_ID,
             name="Warp-Riders",
-            source_id=SOURCE_RULE_ID,
+            source_id=WARP_RIDERS_SOURCE_RULE_ID,
             command_point_cost=1,
             category=StratagemCategory.STRATEGIC_PLOY,
             when_descriptor=(
@@ -215,7 +231,7 @@ def _from_beyond_the_veil_record() -> StratagemCatalogRecord:
         definition=StratagemDefinition(
             stratagem_id=FROM_BEYOND_THE_VEIL_STRATAGEM_ID,
             name="From Beyond the Veil",
-            source_id=SOURCE_RULE_ID,
+            source_id=FROM_BEYOND_THE_VEIL_SOURCE_RULE_ID,
             command_point_cost=1,
             category=StratagemCategory.STRATEGIC_PLOY,
             when_descriptor="End of the Movement phase, from the start of the battle.",
@@ -252,7 +268,7 @@ def _inescapable_manifestations_record() -> StratagemCatalogRecord:
         definition=StratagemDefinition(
             stratagem_id=INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID,
             name="Inescapable Manifestations",
-            source_id=SOURCE_RULE_ID,
+            source_id=INESCAPABLE_MANIFESTATIONS_SOURCE_RULE_ID,
             command_point_cost=1,
             category=StratagemCategory.STRATEGIC_PLOY,
             when_descriptor=(
@@ -295,7 +311,7 @@ def _warp_riders_effect(
 ) -> PersistingEffect:
     return PersistingEffect(
         effect_id=f"{context.use_record.use_id}:warp-riders-mobile:{target_unit_id}",
-        source_rule_id=SOURCE_RULE_ID,
+        source_rule_id=WARP_RIDERS_SOURCE_RULE_ID,
         owner_player_id=context.use_record.player_id,
         target_unit_instance_ids=(target_unit_id,),
         started_battle_round=context.state.battle_round,
