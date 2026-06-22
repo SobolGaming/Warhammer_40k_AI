@@ -15,6 +15,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27 as faction_detachment_source,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_subrules_2026_27 as faction_subrule_source,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     Phase17ECoverageKind,
     Phase17ECoverageRow,
@@ -50,6 +53,43 @@ def test_phase17e_payload_is_deterministic_json_safe_and_round_trips() -> None:
         faction_coverage_source.Phase17ECoveragePackage.from_payload(stale_payload)
 
 
+def test_phase17e_exact_subrule_source_payloads_are_deterministic_and_validated() -> None:
+    enhancement = next(
+        row for row in faction_subrule_source.enhancement_rows() if row.runtime_consumer_ids
+    )
+    stratagem = next(
+        row for row in faction_subrule_source.stratagem_rows() if row.runtime_consumer_ids
+    )
+    enhancement_payload = enhancement.to_payload()
+    stratagem_payload = stratagem.to_payload()
+    payload = {
+        "identity": faction_subrule_source.source_package_identity_payload(),
+        "enhancement": enhancement_payload,
+        "stratagem": stratagem_payload,
+    }
+
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    assert " object at 0x" not in encoded
+    assert enhancement.source_id in enhancement_payload["source_ids"]
+    assert stratagem.source_id in stratagem_payload["source_ids"]
+    assert faction_subrule_source.SourceEnhancementRow.from_payload(enhancement_payload) == (
+        enhancement
+    )
+    assert faction_subrule_source.SourceStratagemRow.from_payload(stratagem_payload) == stratagem
+
+    with pytest.raises(ValueError, match="points"):
+        replace(enhancement, points=-1)
+
+    with pytest.raises(ValueError, match="must not be empty"):
+        replace(enhancement, source_ids=())
+
+    with pytest.raises(ValueError, match="command_point_cost"):
+        replace(stratagem, command_point_cost=-1)
+
+    with pytest.raises(ValueError, match="must be unique"):
+        replace(stratagem, runtime_consumer_ids=("duplicate", "duplicate"))
+
+
 def test_phase17e_manifest_records_match_official_source_manifest() -> None:
     manifest_entries = load_official_source_manifest(FACTION_PACK_MANIFEST)
     entries_by_package_id = {entry.package_id: entry for entry in manifest_entries}
@@ -81,11 +121,13 @@ def test_phase17e_loads_every_seeded_faction_and_detachment() -> None:
     assert len(rows_by_kind[Phase17ECoverageKind.FACTION_ARMY_RULE]) == len(faction_rows)
     assert len(rows_by_kind[Phase17ECoverageKind.DATASHEET_INTAKE]) == len(faction_rows)
     assert len(rows_by_kind[Phase17ECoverageKind.DETACHMENT_RULE]) == len(detachment_rows)
-    assert len(rows_by_kind[Phase17ECoverageKind.DETACHMENT_ENHANCEMENT_DESCRIPTORS]) == (
-        len(detachment_rows)
+    assert rows_by_kind[Phase17ECoverageKind.DETACHMENT_ENHANCEMENT_DESCRIPTORS] == []
+    assert rows_by_kind[Phase17ECoverageKind.DETACHMENT_STRATAGEM_DESCRIPTORS] == []
+    assert len(rows_by_kind[Phase17ECoverageKind.DETACHMENT_ENHANCEMENT]) == len(
+        faction_subrule_source.enhancement_rows()
     )
-    assert len(rows_by_kind[Phase17ECoverageKind.DETACHMENT_STRATAGEM_DESCRIPTORS]) == (
-        len(detachment_rows)
+    assert len(rows_by_kind[Phase17ECoverageKind.DETACHMENT_STRATAGEM]) == len(
+        faction_subrule_source.stratagem_rows()
     )
 
     army_rule_rows = {
@@ -95,12 +137,6 @@ def test_phase17e_loads_every_seeded_faction_and_detachment() -> None:
         row.faction_id: row for row in rows_by_kind[Phase17ECoverageKind.DATASHEET_INTAKE]
     }
     detachment_rule_rows = _detachment_row_map(rows_by_kind[Phase17ECoverageKind.DETACHMENT_RULE])
-    enhancement_rows = _detachment_row_map(
-        rows_by_kind[Phase17ECoverageKind.DETACHMENT_ENHANCEMENT_DESCRIPTORS]
-    )
-    stratagem_rows = _detachment_row_map(
-        rows_by_kind[Phase17ECoverageKind.DETACHMENT_STRATAGEM_DESCRIPTORS]
-    )
 
     for faction_row in faction_rows:
         pdf_record = pdf_by_faction_id[faction_row.faction_id]
@@ -120,33 +156,109 @@ def test_phase17e_loads_every_seeded_faction_and_detachment() -> None:
     for detachment_row in detachment_rows:
         key = (detachment_row.faction_id, detachment_row.detachment_id)
         pdf_record = pdf_by_faction_id[detachment_row.faction_id]
-        for coverage_row in (
-            detachment_rule_rows[key],
-            enhancement_rows[key],
-            stratagem_rows[key],
-        ):
-            assert detachment_row.source_id in coverage_row.source_ids
-            assert pdf_record.source_id in coverage_row.source_ids
-            assert coverage_row.detachment_name == detachment_row.name
-            assert coverage_row.force_disposition_id == detachment_row.force_disposition_id
-            assert coverage_row.detachment_point_cost == detachment_row.detachment_point_cost
-            assert coverage_row.is_new_for_eleventh is detachment_row.is_new_for_eleventh
+        coverage_row = detachment_rule_rows[key]
+        assert detachment_row.source_id in coverage_row.source_ids
+        assert pdf_record.source_id in coverage_row.source_ids
+        assert coverage_row.detachment_name == detachment_row.name
+        assert coverage_row.force_disposition_id == detachment_row.force_disposition_id
+        assert coverage_row.detachment_point_cost == detachment_row.detachment_point_cost
+        assert coverage_row.is_new_for_eleventh is detachment_row.is_new_for_eleventh
+
+
+def test_phase17e_exact_enhancement_and_stratagem_rows_cover_source_catalog() -> None:
+    package = faction_coverage_source.phase17e_coverage_package()
+    rows_by_kind = _rows_by_kind(package.coverage_rows)
+    pdf_by_faction_id = {record.faction_id: record for record in package.pdf_records}
+    detachment_rows_by_owner_id = {
+        (row.faction_id, row.detachment_id): row
+        for row in faction_detachment_source.detachment_rows()
+    }
+
+    enhancement_rows = {
+        (row.faction_id, row.detachment_id, row.rule_id): row
+        for row in rows_by_kind[Phase17ECoverageKind.DETACHMENT_ENHANCEMENT]
+    }
+    stratagem_rows = {
+        (row.faction_id, row.detachment_id, row.rule_id): row
+        for row in rows_by_kind[Phase17ECoverageKind.DETACHMENT_STRATAGEM]
+    }
+
+    assert set(enhancement_rows) == {
+        (row.faction_id, row.detachment_id, row.enhancement_id)
+        for row in faction_subrule_source.enhancement_rows()
+    }
+    assert set(stratagem_rows) == {
+        (row.faction_id, row.detachment_id, row.stratagem_id)
+        for row in faction_subrule_source.stratagem_rows()
+    }
+
+    for enhancement_source_row in faction_subrule_source.enhancement_rows():
+        coverage_row = enhancement_rows[
+            (
+                enhancement_source_row.faction_id,
+                enhancement_source_row.detachment_id,
+                enhancement_source_row.enhancement_id,
+            )
+        ]
+        detachment_row = detachment_rows_by_owner_id[
+            (enhancement_source_row.faction_id, enhancement_source_row.detachment_id)
+        ]
+        _assert_exact_subrule_coverage_matches_source(
+            coverage_row=coverage_row,
+            source_ids=enhancement_source_row.all_source_ids,
+            rule_id=enhancement_source_row.enhancement_id,
+            rule_name=enhancement_source_row.name,
+            timing_descriptor=enhancement_source_row.timing_descriptor,
+            rule_category=enhancement_source_row.category,
+            runtime_support_status=enhancement_source_row.runtime_support_status.value,
+            runtime_consumer_ids=enhancement_source_row.runtime_consumer_ids,
+            detachment_source_id=detachment_row.source_id,
+            pdf_source_id=pdf_by_faction_id[enhancement_source_row.faction_id].source_id,
+        )
+
+    for stratagem_source_row in faction_subrule_source.stratagem_rows():
+        coverage_row = stratagem_rows[
+            (
+                stratagem_source_row.faction_id,
+                stratagem_source_row.detachment_id,
+                stratagem_source_row.stratagem_id,
+            )
+        ]
+        detachment_row = detachment_rows_by_owner_id[
+            (stratagem_source_row.faction_id, stratagem_source_row.detachment_id)
+        ]
+        _assert_exact_subrule_coverage_matches_source(
+            coverage_row=coverage_row,
+            source_ids=stratagem_source_row.all_source_ids,
+            rule_id=stratagem_source_row.stratagem_id,
+            rule_name=stratagem_source_row.name,
+            timing_descriptor=stratagem_source_row.timing_descriptor,
+            rule_category=stratagem_source_row.category,
+            runtime_support_status=stratagem_source_row.runtime_support_status.value,
+            runtime_consumer_ids=stratagem_source_row.runtime_consumer_ids,
+            detachment_source_id=detachment_row.source_id,
+            pdf_source_id=pdf_by_faction_id[stratagem_source_row.faction_id].source_id,
+        )
 
 
 def test_phase17e_coverage_report_groups_supported_and_approved_unsupported_rows() -> None:
     package = faction_coverage_source.phase17e_coverage_package()
     faction_count = len(faction_detachment_source.faction_rows())
     detachment_count = len(faction_detachment_source.detachment_rows())
+    enhancement_rows = faction_subrule_source.enhancement_rows()
+    stratagem_rows = faction_subrule_source.stratagem_rows()
+    implemented_exact_count = sum(1 for row in enhancement_rows if row.runtime_consumer_ids) + sum(
+        1 for row in stratagem_rows if row.runtime_consumer_ids
+    )
+    source_only_exact_count = len(enhancement_rows) + len(stratagem_rows) - implemented_exact_count
     status_counts = package.status_counts()
 
-    assert status_counts[Phase17ECoverageStatus.IMPLEMENTED.value] == 0
+    assert status_counts[Phase17ECoverageStatus.IMPLEMENTED.value] == implemented_exact_count
     assert status_counts[Phase17ECoverageStatus.GENERIC_SUPPORTED.value] == 0
     assert status_counts[Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED.value] == (
-        faction_count + detachment_count
+        faction_count + detachment_count + source_only_exact_count
     )
-    assert status_counts[Phase17ECoverageStatus.UNSUPPORTED.value] == (
-        faction_count + (detachment_count * 2)
-    )
+    assert status_counts[Phase17ECoverageStatus.UNSUPPORTED.value] == faction_count
     unsupported_count = status_counts[Phase17ECoverageStatus.UNSUPPORTED.value]
     assert len(package.unsupported_rows()) == unsupported_count
     assert package.unapproved_unsupported_rows() == ()
@@ -168,7 +280,9 @@ def test_phase17e_coverage_rows_reject_unapproved_or_incomplete_status_shapes() 
     with pytest.raises(Phase17EFactionCoverageError, match="Only unsupported"):
         replace(
             named_handler_row,
-            unsupported_reason=Phase17EUnsupportedReason.EXACT_DETACHMENT_SUBROWS_REQUIRE_NATIVE_SOURCE,
+            unsupported_reason=(
+                Phase17EUnsupportedReason.DATASHEET_INTAKE_REQUIRES_GENERATED_SOURCE_ROWS
+            ),
         )
 
     with pytest.raises(Phase17EFactionCoverageError, match="require a reason"):
@@ -218,3 +332,33 @@ def _detachment_row_map(
         assert row.detachment_id is not None
         mapped_rows[(row.faction_id, row.detachment_id)] = row
     return mapped_rows
+
+
+def _assert_exact_subrule_coverage_matches_source(
+    *,
+    coverage_row: Phase17ECoverageRow,
+    source_ids: tuple[str, ...],
+    rule_id: str,
+    rule_name: str,
+    timing_descriptor: str,
+    rule_category: str,
+    runtime_support_status: str,
+    runtime_consumer_ids: tuple[str, ...],
+    detachment_source_id: str,
+    pdf_source_id: str,
+) -> None:
+    assert coverage_row.rule_id == rule_id
+    assert coverage_row.rule_name == rule_name
+    assert coverage_row.timing_descriptor == timing_descriptor
+    assert coverage_row.rule_category == rule_category
+    assert coverage_row.runtime_support_status is not None
+    assert coverage_row.runtime_support_status.value == runtime_support_status
+    assert coverage_row.runtime_consumer_ids == runtime_consumer_ids
+    assert all(source_id in coverage_row.source_ids for source_id in source_ids)
+    assert detachment_source_id in coverage_row.source_ids
+    assert pdf_source_id in coverage_row.source_ids
+    if runtime_consumer_ids:
+        assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+        assert coverage_row.handler_id == runtime_consumer_ids[0]
+    else:
+        assert coverage_row.status is Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED

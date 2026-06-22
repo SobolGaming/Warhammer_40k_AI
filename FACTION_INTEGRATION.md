@@ -111,18 +111,20 @@ coverage package is:
 - upstream identity:
   `official-11th-edition-faction-packs-and-detachment-source-package`
 - source edition: `11th`
-- schema version: `core-v2-phase17e-faction-coverage-v1`
+- schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `6810281a9eacd4e4178c4ce2996a50b8bab4d184cc76dedf69c1615726de794a`
+  `09fee8dd3903543a202adf928d0014318cd18ced4f078244a5efaba87c6d27a8`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
 detachment rules are source-linked named-handler-required rows. Datasheet intake,
-enhancement descriptor subrows, and Stratagem descriptor subrows that are absent
-from the update PDFs are fail-closed as approved unsupported diagnostics, so no
+is fail-closed as an approved unsupported diagnostic. Exact Enhancement and
+Stratagem rows are generated from the exact subrule source package and include
+stable rule IDs, owner faction/detachment IDs, timing/category metadata, source
+IDs, and support status. Source-only exact rows are named-handler-required;
+exact rows with existing runtime consumers are marked implemented. No aggregate
+faction-pack Enhancement or Stratagem row is used to hide missing detail, and no
 unapproved unsupported descriptor remains for Phase 17E matched-play coverage.
-Those approved diagnostics are the source-row generation queue for later Phase
-17 work; they are not runtime fallbacks.
 
 ## Phase 17F Execution Gate
 
@@ -139,20 +141,22 @@ Phase 17E coverage row. The execution package is:
 - source date: `2026-06-11`
 - upstream identity: `gw-11e-phase17e-faction-coverage-2026-27`
 - source edition: `11th`
-- schema version: `core-v2-phase17f-faction-execution-v1`
+- schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `7ec4269baff98ca2ea6b97de6a7305d502b00cf8a4fdb3ce4fb47aea4d1c90bf`
+  `4ccd95bcfdf2e68bcfe87d94c202be8d984a39e4293db09721217c2533026d4f`
 - upstream Phase 17E checksum:
-  `6810281a9eacd4e4178c4ce2996a50b8bab4d184cc76dedf69c1615726de794a`
+  `09fee8dd3903543a202adf928d0014318cd18ced4f078244a5efaba87c6d27a8`
 
-The package emits 854 execution records, one for every Phase 17E coverage row:
-294 rows are blocked as `structured_rule_semantics_required`, and 560 rows are
-blocked as `approved_phase17e_source_gap`. The engine dispatcher can execute
-every record and returns typed `unsupported` results with those reasons. No
-Phase 17E row remains a missing handler, runtime no-op, raw-PDF parse, or silent
-fallback. Future executable rows require a registered generic IR executor or
-named handler; unregistered executable statuses return typed `unsupported`
-diagnostics and cannot emit `applied` by status alone.
+The package emits 2140 execution records, one for every Phase 17E coverage row:
+2092 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, and 20 exact Enhancement/Stratagem
+rows are executable named-handler rows because they already have runtime
+consumers. The engine dispatcher can route every record and returns typed
+`unsupported` diagnostics unless a matching executor is registered. No Phase 17E
+row remains a missing handler, runtime no-op, raw-PDF parse, or silent fallback.
+Future executable rows require a registered generic IR executor or named
+handler; unregistered executable statuses return typed `unsupported` diagnostics
+and cannot emit `applied` by status alone.
 Phase 17F is an execution dispatch gate, not semantic execution. It proves that
 every Phase 17E coverage row has a deterministic fail-closed engine route. It
 does not implement the game effects of army rules, detachment rules,
@@ -295,9 +299,9 @@ implemented rule, and the selected runtime manifest must carry that ID into the
 objective-control state records only; `GameState` owns retained-control overlays,
 expiry checks, and phase-boundary objective-control records.
 
-Enhancement effect bindings map to Phase 17F through the generated detachment
-enhancement-descriptor execution row until native exact enhancement subrows
-exist. The binding `source_id` must be that generated execution row ID, the
+Enhancement effect bindings map to Phase 17F through the generated exact
+Enhancement execution row. The binding `source_id` must be that generated row
+ID, the
 selected runtime manifest must expose the binding ID in the
 `RuntimeContentBundle` audit summary, and the lifecycle-owned enhancement effect
 service must apply the static modifier idempotently from Phase 16D
@@ -307,8 +311,7 @@ runtime rule-text parsing.
 
 Fight activation ability hook bindings follow the same Phase 17F mapping rule.
 The binding `source_id` must be the generated execution row ID for the
-implemented rule or enhancement descriptor family until native exact
-enhancement subrows exist. The selected runtime manifest must expose the hook ID
+implemented rule or exact Enhancement row. The selected runtime manifest must expose the hook ID
 in the `RuntimeContentBundle` audit summary. Hook handlers return typed ability
 options only; the Fight engine emits the finite use/decline request, records the
 engine-owned persisting melee targeting permission, and lowers accepted melee
@@ -392,18 +395,9 @@ Required outputs:
 
 This matrix is generated from the Phase 17F execution package. It records
 execution status, not semantic support. Rows marked `unsupported` are deliberately
-blocked until native structured rule semantics or generated source rows replace
-the approved blocker.
-
-### Death Guard Execution Status
-
-| Covered item family | Rows | Execution status | Engine result | Source block |
-|---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+blocked until native structured rule semantics land. Exact Enhancement and
+Stratagem families can repeat when a faction has both source-only rows and
+already engine-consumed named handlers.
 
 ### Orks Execution Status
 
@@ -411,8 +405,8 @@ the approved blocker.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 12 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 12 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 12 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 44 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 66 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Aeldari Execution Status
@@ -421,19 +415,11 @@ the approved blocker.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 15 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 15 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 15 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 45 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 6 | `executable_named_handler` | `applied` | `none` |
+| Stratagems | 66 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 9 | `executable_named_handler` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
-
-Runtime addendum: `Path of the Outcast` is implemented as a Phase 17G semantic
-slice. Far-reaching Doom grants the +6 inch detection-range effect over the
-11th Edition Hidden baseline until the selected RANGERS/SHROUD RUNNERS unit has
-shot. Camouflaged Snipers preserves Hidden after ranged attacks, Assassins' Eye
-adds AP against CHARACTER targets, Eldritch Suppression forces source-linked
-Battle-shock, Casting Back the Veil applies the persistent detection-range
-bonus to a hit enemy unit, and Nomads of the Hidden Way records its charge and
-TRANSPORT embark restrictions before emitting the shared triggered-movement
-decision path.
 
 ### Drukhari Execution Status
 
@@ -441,29 +427,9 @@ decision path.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
-
-Runtime addendum: `Power from Pain` now has a deterministic faction-resource
-ledger for Pain tokens, gains one token at the Drukhari player's Command phase
-start, gains one token when an enemy unit is destroyed, and gains one token when
-an enemy unit fails a Battle-shock test. Lithe Agility is integrated through the
-existing source-backed Movement and Charge grant decisions: accepting the grant
-spends one Pain token, records a phase-scoped empowerment effect on the selected
-rules unit, and unlocks the corresponding Advance or Charge `select_dice_reroll`
-request. Hatred Eternal hit-reroll empowerment remains blocked on a
-source-backed selected-to-shoot/fight grant surface, so the generated army-rule
-status table still tracks unsupported Drukhari runtime semantics outside the
-implemented token and Lithe Agility path.
-
-Mustering addendum: `Corsairs and Travelling Players` is implemented in the shared
-`army_mustering` and `list_validation` path. DRUKHARI armies can include
-non-DRUKHARI HARLEQUINS and ANHRATHE units up to the Incursion, Strike Force,
-or Onslaught battle-size cap, and those allied units cannot be selected as
-WARLORD or receive Enhancements. The generated execution-status row above
-remains blocked for Drukhari semantics outside the implemented mustering and
-Power from Pain runtime subset.
 
 ### Tyranids Execution Status
 
@@ -471,8 +437,8 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 32 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 48 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Genestealer Cults Execution Status
@@ -481,8 +447,8 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 20 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 30 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Necrons Execution Status
@@ -491,8 +457,8 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 12 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 12 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 12 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 54 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Leagues of Votann Execution Status
@@ -501,8 +467,8 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 28 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 42 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### T'au Empire Execution Status
@@ -511,8 +477,8 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 7 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 7 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 7 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 20 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 30 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Space Marines Execution Status
@@ -521,8 +487,8 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 22 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 22 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 22 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 80 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 119 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Dark Angels Execution Status
@@ -531,8 +497,6 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Blood Angels Execution Status
@@ -541,8 +505,6 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Space Wolves Execution Status
@@ -551,8 +513,6 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 7 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 7 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 7 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Black Templars Execution Status
@@ -561,8 +521,6 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 6 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 6 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 6 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Deathwatch Execution Status
@@ -571,8 +529,6 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Grey Knights Execution Status
@@ -581,8 +537,8 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Chaos Space Marines Execution Status
@@ -591,8 +547,8 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 17 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 17 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 17 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 60 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 90 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### World Eaters Execution Status
@@ -601,8 +557,8 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Emperor's Children Execution Status
@@ -611,8 +567,18 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 28 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 42 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Death Guard Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 28 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 42 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Thousand Sons Execution Status
@@ -621,8 +587,8 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Chaos Knights Execution Status
@@ -631,8 +597,8 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 26 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Chaos Daemons Execution Status
@@ -641,48 +607,10 @@ Power from Pain runtime subset.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
-
-Phase 17G supported runtime slice: Shadow of Chaos Battle-shock hooks,
-Cavalcade of Chaos / Unholy Avalanche Fall Back eligibility hooks, Cavalcade of
-Chaos / Apocalyptic Steeds Upgrade enhancement effects, Cavalcade of Chaos /
-Soul-Shattering Charge Upgrade selected-to-fight ability hooks, and Cavalcade of
-Chaos / Warp-Riders selected-to-move Stratagem handling through the shared
-`use_stratagem` path, plus Blood Legion / Murdercall Movement-end surge hooks
-and Blood Legion / Blood Tainted phase-end objective-control retention hooks.
-The source-status table remains the Phase 17F baseline until a later
-execution-status overlay replaces blocked rows with implemented semantic status.
-
-### Adepta Sororitas Execution Status
-
-| Covered item family | Rows | Execution status | Engine result | Source block |
-|---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
-
-### Adeptus Custodes Execution Status
-
-| Covered item family | Rows | Execution status | Engine result | Source block |
-|---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 9 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
-
-### Adeptus Mechanicus Execution Status
-
-| Covered item family | Rows | Execution status | Engine result | Source block |
-|---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 10 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 26 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 2 | `executable_named_handler` | `applied` | `none` |
+| Stratagems | 40 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 3 | `executable_named_handler` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Astra Militarum Execution Status
@@ -691,18 +619,28 @@ execution-status overlay replaces blocked rows with implemented semantic status.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 11 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 11 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 11 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 54 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
-### Imperial Agents Execution Status
+### Adepta Sororitas Execution Status
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Detachment rules | 5 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 5 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 5 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 20 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 30 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Adeptus Mechanicus Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 28 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 42 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Imperial Knights Execution Status
@@ -711,8 +649,28 @@ execution-status overlay replaces blocked rows with implemented semantic status.
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancement descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
-| Stratagem descriptors | 8 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:exact_detachment_subrows_require_native_source` |
+| Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Adeptus Custodes Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+### Imperial Agents Execution Status
+
+| Covered item family | Rows | Execution status | Engine result | Source block |
+|---|---:|---|---|---|
+| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 5 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 20 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 30 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ## Queue Source

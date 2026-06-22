@@ -8,6 +8,7 @@ from typing import Self, TypedDict
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27,
+    faction_subrules_2026_27,
 )
 
 EDITION_ID = "warhammer_40000_11th"
@@ -17,7 +18,7 @@ SOURCE_TITLE = "Warhammer 40,000 11th Edition Phase 17E Faction Coverage"
 SOURCE_VERSION = "2026-27"
 SOURCE_DATE = "2026-06-11"
 UPSTREAM_IDENTITY = "official-11th-edition-faction-packs-and-detachment-source-package"
-IMPORTED_AT_SCHEMA_VERSION = "core-v2-phase17e-faction-coverage-v1"
+IMPORTED_AT_SCHEMA_VERSION = "core-v2-phase17e-faction-coverage-v2"
 
 
 class Phase17EFactionCoverageError(ValueError):
@@ -27,6 +28,8 @@ class Phase17EFactionCoverageError(ValueError):
 class Phase17ECoverageKind(StrEnum):
     FACTION_ARMY_RULE = "faction_army_rule"
     DETACHMENT_RULE = "detachment_rule"
+    DETACHMENT_ENHANCEMENT = "detachment_enhancement"
+    DETACHMENT_STRATAGEM = "detachment_stratagem"
     DETACHMENT_ENHANCEMENT_DESCRIPTORS = "detachment_enhancement_descriptors"
     DETACHMENT_STRATAGEM_DESCRIPTORS = "detachment_stratagem_descriptors"
     DATASHEET_INTAKE = "datasheet_intake"
@@ -40,9 +43,6 @@ class Phase17ECoverageStatus(StrEnum):
 
 
 class Phase17EUnsupportedReason(StrEnum):
-    EXACT_DETACHMENT_SUBROWS_REQUIRE_NATIVE_SOURCE = (
-        "exact_detachment_subrows_require_native_source"
-    )
     DATASHEET_INTAKE_REQUIRES_GENERATED_SOURCE_ROWS = (
         "datasheet_intake_requires_generated_source_rows"
     )
@@ -50,8 +50,13 @@ class Phase17EUnsupportedReason(StrEnum):
 
 APPROVED_UNSUPPORTED_REASONS = frozenset(
     {
-        Phase17EUnsupportedReason.EXACT_DETACHMENT_SUBROWS_REQUIRE_NATIVE_SOURCE,
         Phase17EUnsupportedReason.DATASHEET_INTAKE_REQUIRES_GENERATED_SOURCE_ROWS,
+    }
+)
+_EXACT_SUBRULE_COVERAGE_KINDS = frozenset(
+    {
+        Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
+        Phase17ECoverageKind.DETACHMENT_STRATAGEM,
     }
 )
 
@@ -82,6 +87,11 @@ class Phase17ECoverageRowPayload(TypedDict):
     force_disposition_id: str | None
     detachment_point_cost: int | None
     is_new_for_eleventh: bool | None
+    rule_id: str | None
+    timing_descriptor: str | None
+    rule_category: str | None
+    runtime_support_status: str | None
+    runtime_consumer_ids: list[str]
     handler_id: str | None
     rule_ir_hash: str | None
     unsupported_reason: str | None
@@ -186,6 +196,11 @@ class Phase17ECoverageRow:
     force_disposition_id: str | None = None
     detachment_point_cost: int | None = None
     is_new_for_eleventh: bool | None = None
+    rule_id: str | None = None
+    timing_descriptor: str | None = None
+    rule_category: str | None = None
+    runtime_support_status: faction_subrules_2026_27.SourceSubruleRuntimeStatus | None = None
+    runtime_consumer_ids: tuple[str, ...] = ()
     handler_id: str | None = None
     rule_ir_hash: str | None = None
     unsupported_reason: Phase17EUnsupportedReason | None = None
@@ -242,6 +257,33 @@ class Phase17ECoverageRow:
             _validate_detachment_point_cost(self.detachment_point_cost)
         if self.is_new_for_eleventh is not None and type(self.is_new_for_eleventh) is not bool:
             raise Phase17EFactionCoverageError("is_new_for_eleventh must be a boolean.")
+        if self.rule_id is not None:
+            object.__setattr__(self, "rule_id", _validate_identifier("rule_id", self.rule_id))
+        if self.timing_descriptor is not None:
+            object.__setattr__(
+                self,
+                "timing_descriptor",
+                _validate_non_empty_text("timing_descriptor", self.timing_descriptor),
+            )
+        if self.rule_category is not None:
+            object.__setattr__(
+                self,
+                "rule_category",
+                _validate_non_empty_text("rule_category", self.rule_category),
+            )
+        runtime_support_status = self.runtime_support_status
+        if runtime_support_status is not None:
+            runtime_support_status = _runtime_support_status_from_token(runtime_support_status)
+            object.__setattr__(self, "runtime_support_status", runtime_support_status)
+        object.__setattr__(
+            self,
+            "runtime_consumer_ids",
+            _validate_identifier_tuple(
+                "runtime_consumer_ids",
+                self.runtime_consumer_ids,
+                allow_empty=True,
+            ),
+        )
         if self.handler_id is not None:
             object.__setattr__(
                 self,
@@ -273,6 +315,28 @@ class Phase17ECoverageRow:
             raise Phase17EFactionCoverageError(
                 "Generic-supported coverage rows require rule_ir_hash."
             )
+        if status is Phase17ECoverageStatus.IMPLEMENTED and self.handler_id is None:
+            raise Phase17EFactionCoverageError("Implemented coverage rows require handler_id.")
+        if self.coverage_kind in _EXACT_SUBRULE_COVERAGE_KINDS:
+            if (
+                self.rule_id is None
+                or self.timing_descriptor is None
+                or self.rule_category is None
+                or runtime_support_status is None
+            ):
+                raise Phase17EFactionCoverageError(
+                    "Exact subrule coverage rows require rule metadata."
+                )
+        elif (
+            self.rule_id is not None
+            or self.timing_descriptor is not None
+            or self.rule_category is not None
+            or runtime_support_status is not None
+            or self.runtime_consumer_ids
+        ):
+            raise Phase17EFactionCoverageError(
+                "Only exact subrule coverage rows can include rule metadata."
+            )
 
     @property
     def is_unsupported(self) -> bool:
@@ -300,6 +364,13 @@ class Phase17ECoverageRow:
             "force_disposition_id": self.force_disposition_id,
             "detachment_point_cost": self.detachment_point_cost,
             "is_new_for_eleventh": self.is_new_for_eleventh,
+            "rule_id": self.rule_id,
+            "timing_descriptor": self.timing_descriptor,
+            "rule_category": self.rule_category,
+            "runtime_support_status": (
+                None if self.runtime_support_status is None else self.runtime_support_status.value
+            ),
+            "runtime_consumer_ids": list(self.runtime_consumer_ids),
             "handler_id": self.handler_id,
             "rule_ir_hash": self.rule_ir_hash,
             "unsupported_reason": (
@@ -310,6 +381,7 @@ class Phase17ECoverageRow:
     @classmethod
     def from_payload(cls, payload: Phase17ECoverageRowPayload) -> Self:
         unsupported_reason = payload["unsupported_reason"]
+        runtime_support_status = payload["runtime_support_status"]
         return cls(
             descriptor_id=payload["descriptor_id"],
             coverage_kind=_coverage_kind_from_token(payload["coverage_kind"]),
@@ -324,6 +396,15 @@ class Phase17ECoverageRow:
             force_disposition_id=payload["force_disposition_id"],
             detachment_point_cost=payload["detachment_point_cost"],
             is_new_for_eleventh=payload["is_new_for_eleventh"],
+            rule_id=payload["rule_id"],
+            timing_descriptor=payload["timing_descriptor"],
+            rule_category=payload["rule_category"],
+            runtime_support_status=(
+                None
+                if runtime_support_status is None
+                else _runtime_support_status_from_token(runtime_support_status)
+            ),
+            runtime_consumer_ids=tuple(payload["runtime_consumer_ids"]),
             handler_id=payload["handler_id"],
             rule_ir_hash=payload["rule_ir_hash"],
             unsupported_reason=(
@@ -410,8 +491,16 @@ def phase17e_coverage_package() -> Phase17ECoveragePackage:
     pdf_by_faction_id = {record.faction_id: record for record in pdf_records}
     detachment_rows_by_faction_id: dict[str, list[faction_detachments_2026_27.SourceDetachmentRow]]
     detachment_rows_by_faction_id = {}
+    detachment_rows_by_owner_id: dict[
+        tuple[str, str],
+        faction_detachments_2026_27.SourceDetachmentRow,
+    ]
+    detachment_rows_by_owner_id = {}
     for detachment_row in faction_detachments_2026_27.detachment_rows():
         detachment_rows_by_faction_id.setdefault(detachment_row.faction_id, []).append(
+            detachment_row
+        )
+        detachment_rows_by_owner_id[(detachment_row.faction_id, detachment_row.detachment_id)] = (
             detachment_row
         )
 
@@ -424,6 +513,39 @@ def phase17e_coverage_package() -> Phase17ECoveragePackage:
             key=lambda row: row.detachment_id,
         ):
             rows.extend(_detachment_rows(detachment_row=detachment_row, pdf_record=pdf_record))
+
+    for enhancement_source_row in faction_subrules_2026_27.enhancement_rows():
+        detachment_row = _detachment_row_for_subrule(
+            detachment_rows_by_owner_id,
+            faction_id=enhancement_source_row.faction_id,
+            detachment_id=enhancement_source_row.detachment_id,
+        )
+        rows.append(
+            _enhancement_row(
+                source_row=enhancement_source_row,
+                detachment_row=detachment_row,
+                pdf_record=_pdf_record_for_faction(
+                    pdf_by_faction_id,
+                    enhancement_source_row.faction_id,
+                ),
+            )
+        )
+    for stratagem_source_row in faction_subrules_2026_27.stratagem_rows():
+        detachment_row = _detachment_row_for_subrule(
+            detachment_rows_by_owner_id,
+            faction_id=stratagem_source_row.faction_id,
+            detachment_id=stratagem_source_row.detachment_id,
+        )
+        rows.append(
+            _stratagem_row(
+                source_row=stratagem_source_row,
+                detachment_row=detachment_row,
+                pdf_record=_pdf_record_for_faction(
+                    pdf_by_faction_id,
+                    stratagem_source_row.faction_id,
+                ),
+            )
+        )
 
     return Phase17ECoveragePackage(pdf_records=pdf_records, coverage_rows=tuple(rows))
 
@@ -511,45 +633,77 @@ def _detachment_rows(
             is_new_for_eleventh=detachment_row.is_new_for_eleventh,
             handler_id=f"phase17e:detachment:{detachment_row.detachment_id}:rule",
         ),
-        Phase17ECoverageRow(
-            descriptor_id=(
-                f"phase17e:{detachment_row.faction_id}:{detachment_row.detachment_id}:enhancements"
+    )
+
+
+def _enhancement_row(
+    *,
+    source_row: faction_subrules_2026_27.SourceEnhancementRow,
+    detachment_row: faction_detachments_2026_27.SourceDetachmentRow,
+    pdf_record: Phase17EFactionPdfRecord,
+) -> Phase17ECoverageRow:
+    return Phase17ECoverageRow(
+        descriptor_id=f"phase17e:{source_row.source_row_id}",
+        coverage_kind=Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
+        status=_exact_subrule_coverage_status(source_row.runtime_consumer_ids),
+        faction_id=source_row.faction_id,
+        faction_name=source_row.faction_name,
+        source_ids=(*source_row.all_source_ids, detachment_row.source_id, pdf_record.source_id),
+        source_pdf_package_id=pdf_record.package_id,
+        rule_name=source_row.name,
+        detachment_id=source_row.detachment_id,
+        detachment_name=source_row.detachment_name,
+        force_disposition_id=detachment_row.force_disposition_id,
+        detachment_point_cost=detachment_row.detachment_point_cost,
+        is_new_for_eleventh=detachment_row.is_new_for_eleventh,
+        rule_id=source_row.enhancement_id,
+        timing_descriptor=source_row.timing_descriptor,
+        rule_category=source_row.category,
+        runtime_support_status=source_row.runtime_support_status,
+        runtime_consumer_ids=source_row.runtime_consumer_ids,
+        handler_id=_exact_subrule_handler_id(
+            default_handler_id=(
+                "phase17e:"
+                f"{source_row.faction_id}:{source_row.detachment_id}:"
+                f"enhancement:{source_row.enhancement_id}"
             ),
-            coverage_kind=Phase17ECoverageKind.DETACHMENT_ENHANCEMENT_DESCRIPTORS,
-            status=Phase17ECoverageStatus.UNSUPPORTED,
-            faction_id=detachment_row.faction_id,
-            faction_name=pdf_record.faction_name,
-            source_ids=(detachment_row.source_id, pdf_record.source_id),
-            source_pdf_package_id=pdf_record.package_id,
-            rule_name=f"{detachment_row.name} enhancement descriptors",
-            detachment_id=detachment_row.detachment_id,
-            detachment_name=detachment_row.name,
-            force_disposition_id=detachment_row.force_disposition_id,
-            detachment_point_cost=detachment_row.detachment_point_cost,
-            is_new_for_eleventh=detachment_row.is_new_for_eleventh,
-            unsupported_reason=(
-                Phase17EUnsupportedReason.EXACT_DETACHMENT_SUBROWS_REQUIRE_NATIVE_SOURCE
-            ),
+            runtime_consumer_ids=source_row.runtime_consumer_ids,
         ),
-        Phase17ECoverageRow(
-            descriptor_id=(
-                f"phase17e:{detachment_row.faction_id}:{detachment_row.detachment_id}:stratagems"
+    )
+
+
+def _stratagem_row(
+    *,
+    source_row: faction_subrules_2026_27.SourceStratagemRow,
+    detachment_row: faction_detachments_2026_27.SourceDetachmentRow,
+    pdf_record: Phase17EFactionPdfRecord,
+) -> Phase17ECoverageRow:
+    return Phase17ECoverageRow(
+        descriptor_id=f"phase17e:{source_row.source_row_id}",
+        coverage_kind=Phase17ECoverageKind.DETACHMENT_STRATAGEM,
+        status=_exact_subrule_coverage_status(source_row.runtime_consumer_ids),
+        faction_id=source_row.faction_id,
+        faction_name=source_row.faction_name,
+        source_ids=(*source_row.all_source_ids, detachment_row.source_id, pdf_record.source_id),
+        source_pdf_package_id=pdf_record.package_id,
+        rule_name=source_row.name,
+        detachment_id=source_row.detachment_id,
+        detachment_name=source_row.detachment_name,
+        force_disposition_id=detachment_row.force_disposition_id,
+        detachment_point_cost=detachment_row.detachment_point_cost,
+        is_new_for_eleventh=detachment_row.is_new_for_eleventh,
+        rule_id=source_row.stratagem_id,
+        timing_descriptor=source_row.timing_descriptor,
+        rule_category=source_row.category,
+        runtime_support_status=source_row.runtime_support_status,
+        runtime_consumer_ids=source_row.runtime_consumer_ids,
+        handler_id=_exact_subrule_handler_id(
+            default_handler_id=(
+                "phase17e:"
+                f"{source_row.faction_id}:{source_row.detachment_id}:"
+                f"stratagem:{source_row.stratagem_id}"
             ),
-            coverage_kind=Phase17ECoverageKind.DETACHMENT_STRATAGEM_DESCRIPTORS,
-            status=Phase17ECoverageStatus.UNSUPPORTED,
-            faction_id=detachment_row.faction_id,
-            faction_name=pdf_record.faction_name,
-            source_ids=(detachment_row.source_id, pdf_record.source_id),
-            source_pdf_package_id=pdf_record.package_id,
-            rule_name=f"{detachment_row.name} Stratagem descriptors",
-            detachment_id=detachment_row.detachment_id,
-            detachment_name=detachment_row.name,
-            force_disposition_id=detachment_row.force_disposition_id,
-            detachment_point_cost=detachment_row.detachment_point_cost,
-            is_new_for_eleventh=detachment_row.is_new_for_eleventh,
-            unsupported_reason=(
-                Phase17EUnsupportedReason.EXACT_DETACHMENT_SUBROWS_REQUIRE_NATIVE_SOURCE
-            ),
+            runtime_consumer_ids=source_row.runtime_consumer_ids,
         ),
     )
 
@@ -562,6 +716,36 @@ def _pdf_record_for_faction(
     if record is None:
         raise Phase17EFactionCoverageError("Phase17E faction is missing PDF source coverage.")
     return record
+
+
+def _detachment_row_for_subrule(
+    rows_by_owner_id: dict[tuple[str, str], faction_detachments_2026_27.SourceDetachmentRow],
+    *,
+    faction_id: str,
+    detachment_id: str,
+) -> faction_detachments_2026_27.SourceDetachmentRow:
+    row = rows_by_owner_id.get((faction_id, detachment_id))
+    if row is None:
+        raise Phase17EFactionCoverageError("Exact subrule row references unknown detachment.")
+    return row
+
+
+def _exact_subrule_coverage_status(
+    runtime_consumer_ids: tuple[str, ...],
+) -> Phase17ECoverageStatus:
+    if runtime_consumer_ids:
+        return Phase17ECoverageStatus.IMPLEMENTED
+    return Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED
+
+
+def _exact_subrule_handler_id(
+    *,
+    default_handler_id: str,
+    runtime_consumer_ids: tuple[str, ...],
+) -> str:
+    if runtime_consumer_ids:
+        return runtime_consumer_ids[0]
+    return default_handler_id
 
 
 def _validate_pdf_records(
@@ -660,6 +844,21 @@ def _unsupported_reason_from_token(token: object) -> Phase17EUnsupportedReason:
         ) from exc
 
 
+def _runtime_support_status_from_token(
+    token: object,
+) -> faction_subrules_2026_27.SourceSubruleRuntimeStatus:
+    if type(token) is faction_subrules_2026_27.SourceSubruleRuntimeStatus:
+        return token
+    if type(token) is not str:
+        raise Phase17EFactionCoverageError("Phase17E runtime support token must be a string.")
+    try:
+        return faction_subrules_2026_27.SourceSubruleRuntimeStatus(token)
+    except ValueError as exc:
+        raise Phase17EFactionCoverageError(
+            f"Unsupported Phase17E runtime support status: {token}."
+        ) from exc
+
+
 def _validate_identifier(field_name: str, value: object) -> str:
     if type(value) is not str:
         raise Phase17EFactionCoverageError(f"Phase17E {field_name} must be a string.")
@@ -691,10 +890,15 @@ def _validate_sha256(field_name: str, value: object) -> str:
     return digest
 
 
-def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
+def _validate_identifier_tuple(
+    field_name: str,
+    values: tuple[str, ...],
+    *,
+    allow_empty: bool = False,
+) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise Phase17EFactionCoverageError(f"Phase17E {field_name} must be a tuple.")
-    if not values:
+    if not values and not allow_empty:
         raise Phase17EFactionCoverageError(f"Phase17E {field_name} must not be empty.")
     seen: set[str] = set()
     validated: list[str] = []

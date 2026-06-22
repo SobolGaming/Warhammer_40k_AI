@@ -49,7 +49,15 @@ SOUL_SHATTERING_CHARGE_ENHANCEMENT_SOURCE_ID = (
     "gw-11e-faction-detachments-2026-27:enhancement:"
     "chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade"
 )
-SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:cavalcade-of-chaos:enhancements"
+APOCALYPTIC_STEEDS_SOURCE_RULE_ID = (
+    "phase17f:phase17e:enhancement:chaos-daemons:cavalcade-of-chaos:"
+    "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade"
+)
+SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID = (
+    "phase17f:phase17e:enhancement:chaos-daemons:cavalcade-of-chaos:"
+    "chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade"
+)
+SOURCE_RULE_ID = APOCALYPTIC_STEEDS_SOURCE_RULE_ID
 MODIFIER_ID = f"{EFFECT_ID}:movement-plus-1"
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
 CAVALCADE_DETACHMENT_ID = "cavalcade-of-chaos"
@@ -63,7 +71,7 @@ def runtime_contribution() -> RuntimeContentContribution:
         enhancement_effect_bindings=(
             EnhancementEffectBinding(
                 effect_id=EFFECT_ID,
-                source_id=SOURCE_RULE_ID,
+                source_id=APOCALYPTIC_STEEDS_SOURCE_RULE_ID,
                 enhancement_id=ENHANCEMENT_ID,
                 handler=apocalyptic_steeds_effect,
             ),
@@ -71,7 +79,7 @@ def runtime_contribution() -> RuntimeContentContribution:
         fight_activation_ability_hook_bindings=(
             FightActivationAbilityHookBinding(
                 hook_id=SOUL_SHATTERING_CHARGE_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
+                source_id=SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID,
                 handler=soul_shattering_charge_option,
             ),
         ),
@@ -98,7 +106,7 @@ def apocalyptic_steeds_effect(
     return (
         EnhancementCharacteristicModifier(
             effect_id=EFFECT_ID,
-            source_id=SOURCE_RULE_ID,
+            source_id=APOCALYPTIC_STEEDS_SOURCE_RULE_ID,
             enhancement_id=ENHANCEMENT_ID,
             target_unit_instance_id=unit.unit_instance_id,
             characteristic=Characteristic.MOVEMENT,
@@ -149,7 +157,7 @@ def soul_shattering_charge_option(
         return None
     return FightActivationAbilityOption(
         hook_id=SOUL_SHATTERING_CHARGE_HOOK_ID,
-        source_id=SOURCE_RULE_ID,
+        source_id=SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID,
         ability_id=SOUL_SHATTERING_CHARGE_ABILITY_ID,
         enhancement_id=SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID,
         model_proximity_inches=3.0,
