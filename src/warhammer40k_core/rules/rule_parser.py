@@ -42,6 +42,9 @@ from warhammer40k_core.rules.rule_templates import (
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
     rule_template_by_id,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14,
+)
 
 RULE_PARSER_VERSION = "phase17c-rule-parser-v1"
 
@@ -307,49 +310,8 @@ _CHARACTERISTIC_BY_LABEL = {
     "wounds": Characteristic.WOUNDS,
     "ws": Characteristic.WEAPON_SKILL,
 }
-_KNOWN_KEYWORD_SEQUENCE_PARTS = tuple(
-    sorted(
-        (
-            "ADEPTA SORORITAS",
-            "ADEPTUS ASTARTES",
-            "ADEPTUS CUSTODES",
-            "ADEPTUS MECHANICUS",
-            "AELDARI",
-            "ASTRA MILITARUM",
-            "ASURYANI",
-            "BLACK TEMPLARS",
-            "BLOOD ANGELS",
-            "CHAOS DAEMONS",
-            "CHAOS KNIGHTS",
-            "CHAOS SPACE MARINES",
-            "DARK ANGELS",
-            "DEATH GUARD",
-            "DEATHWATCH",
-            "DRUKHARI",
-            "EMPEROR'S CHILDREN",
-            "GENESTEALER CULTS",
-            "GREY KNIGHTS",
-            "HERETIC ASTARTES",
-            "IMPERIAL AGENTS",
-            "IMPERIAL KNIGHTS",
-            "KHORNE",
-            "LEAGUES OF VOTANN",
-            "LEGIONES DAEMONICA",
-            "NECRONS",
-            "NURGLE",
-            "ORKS",
-            "SLAANESH",
-            "SPACE MARINES",
-            "SPACE WOLVES",
-            "T'AU EMPIRE",
-            "THOUSAND SONS",
-            "TYRANIDS",
-            "TZEENTCH",
-            "WORLD EATERS",
-        ),
-        key=len,
-        reverse=True,
-    )
+_SOURCE_KEYWORD_SEQUENCE_PARTS = (
+    datasheet_keyword_lexicon_2026_06_14.canonical_datasheet_keyword_sequence_parts()
 )
 
 
@@ -1361,7 +1323,7 @@ def _keyword_sequence_tokens(value: str) -> tuple[str, ...]:
     normalized = " ".join(value.strip().upper().replace("-", " ").split())
     if not normalized:
         raise RuleIRError("Keyword sequence must not be empty.")
-    tokens = tuple(_keyword_token(token) for token in _split_known_keyword_sequence(normalized))
+    tokens = tuple(_keyword_token(token) for token in _split_source_keyword_sequence(normalized))
     if not tokens:
         raise RuleIRError("Keyword sequence must contain at least one keyword.")
     return tokens
@@ -1374,11 +1336,11 @@ def _keyword_sequence_parameter_pairs(value: str) -> tuple[tuple[str, RuleParame
     return (("required_keyword_sequence", "|".join(tokens)),)
 
 
-def _split_known_keyword_sequence(value: str) -> tuple[str, ...]:
+def _split_source_keyword_sequence(value: str) -> tuple[str, ...]:
     remaining = value
     tokens: list[str] = []
     while remaining:
-        match = _longest_known_keyword_prefix(remaining)
+        match = _longest_source_keyword_prefix(remaining)
         if match is None:
             tokens.append(remaining)
             break
@@ -1387,8 +1349,8 @@ def _split_known_keyword_sequence(value: str) -> tuple[str, ...]:
     return tuple(tokens)
 
 
-def _longest_known_keyword_prefix(value: str) -> str | None:
-    for keyword in _KNOWN_KEYWORD_SEQUENCE_PARTS:
+def _longest_source_keyword_prefix(value: str) -> str | None:
+    for keyword in _SOURCE_KEYWORD_SEQUENCE_PARTS:
         if value == keyword or value.startswith(f"{keyword} "):
             return keyword
     return None

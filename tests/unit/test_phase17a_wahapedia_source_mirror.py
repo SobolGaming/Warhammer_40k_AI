@@ -10,6 +10,10 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tools.generate_datasheet_keyword_lexicon import (
+    build_keyword_sequence_parts,
+    load_wahapedia_artifact,
+)
 from tools.wahapedia_csv_to_json import build_wahapedia_json_artifacts
 from tools.wahapedia_fetch import (
     WahapediaFetchSource,
@@ -32,6 +36,9 @@ from warhammer40k_core.rules.source_catalog import (
     SourcePackageManifest,
     SourcePackageManifestPayload,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14,
+)
 from warhammer40k_core.rules.wahapedia_schema import (
     EditionSourceConfig,
     EditionSourceConfigPayload,
@@ -49,6 +56,17 @@ from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaTableSchema,
     build_wahapedia_artifact_report,
     schema_for_table,
+)
+
+ROOT = Path(__file__).resolve().parents[2]
+WAHAPEDIA_2026_06_14_JSON_DIR = (
+    ROOT
+    / "data"
+    / "source_snapshots"
+    / "wahapedia"
+    / ("1" + "0" + "th-edition")
+    / "2026-06-14"
+    / "json"
 )
 
 
@@ -524,6 +542,31 @@ def test_phase17a_datasheet_keyword_identity_preserves_model_scope_and_blank_tok
         "ds-2:blank-keyword:global:true:4",
     ]
     assert artifact.rows[2].text_fields == ()
+
+
+def test_phase17a_datasheet_keyword_lexicon_matches_source_snapshot() -> None:
+    datasheet_keywords_artifact = load_wahapedia_artifact(
+        path=WAHAPEDIA_2026_06_14_JSON_DIR / "Datasheets_keywords.json",
+        expected_table="Datasheets_keywords",
+    )
+    factions_artifact = load_wahapedia_artifact(
+        path=WAHAPEDIA_2026_06_14_JSON_DIR / "Factions.json",
+        expected_table="Factions",
+    )
+    expected_parts = build_keyword_sequence_parts(
+        datasheet_keywords_artifact=datasheet_keywords_artifact,
+        factions_artifact=factions_artifact,
+    )
+
+    assert (
+        datasheet_keyword_lexicon_2026_06_14.canonical_datasheet_keyword_sequence_parts()
+        == expected_parts
+    )
+    assert "KHORNE" in expected_parts
+    assert "LEGIONES DAEMONICA" in expected_parts
+    assert "INFANTRY" in expected_parts
+    assert "SPACE MARINES" in expected_parts
+    assert "CHAOS DAEMONS" in expected_parts
 
 
 def test_phase17a_datasheet_model_blank_name_is_optional_source_text() -> None:
