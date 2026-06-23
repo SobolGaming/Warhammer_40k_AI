@@ -6,11 +6,35 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr
 
 ## Summary
 
-| Detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed exact rows |
-| ---: | ---: | ---: | ---: |
-| 15 | 51 | 75 | 15 |
+| Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
+| ---: | ---: | ---: | ---: | ---: |
+| 15 | 2 | 51 | 75 | 15 |
 
-## Detachment Rules
+## Detachment Rule Support
+
+This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
+
+| Detachment | Overall support | Engine support | Tests | Notes |
+| --- | --- | --- | --- | --- |
+| Armoured Warhost | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Aspect Host | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Corsair Coterie | `Full` | Relentless Raiders movement/charge completion mortal-wound hook, Void Thieves sticky objective-control hook, four enhancements, and six named Stratagem handlers | Focused mustering, objective-control, movement-completion, turn-end, Stratagem-cost, runtime-modifier, Stratagem effect, targeting-restriction, and triggered-movement tests | Includes Veterans of the Void mustering, objective-control ownership checks after sticky states, D6 2+ into D3 mortal wounds for enemies ending Normal/Advance/Fall Back/Charge moves on controlled objectives, Anhrathe sticky control, and Corsair Coterie Stratagem support. |
+| Devoted of Ynnead | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Eldritch Raiders | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Fateful Performance | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Ghosts of the Webway | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Guardian Battlehost | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Path of the Outcast | `Full` | Far-reaching Doom shooting-unit-selected hook | Focused hook, lifecycle, and hidden-target detection tests | Runtime grants the +6 inch detection-range effect over the 11th Edition 15 inch Hidden baseline and expires it after the source shoots. |
+| Seer Council | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Serpent's Brood | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Spirit Conclave | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Twilight Flickers | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Warhost | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Windrider Host | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+
+## Detachment Rule Coverage Rows
+
+These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
 
 | Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
 | --- | --- | --- | --- | --- | --- |

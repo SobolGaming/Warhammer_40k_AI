@@ -6,11 +6,37 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_space_marines-h16lkqvvn
 
 ## Summary
 
-| Detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed exact rows |
-| ---: | ---: | ---: | ---: |
-| 17 | 60 | 90 | 0 |
+| Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
+| ---: | ---: | ---: | ---: | ---: |
+| 17 | 0 | 60 | 90 | 0 |
 
-## Detachment Rules
+## Detachment Rule Support
+
+This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
+
+| Detachment | Overall support | Engine support | Tests | Notes |
+| --- | --- | --- | --- | --- |
+| Cabal of Chaos | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Chaos Cult | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Creations of Bile | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Cult of the Arkifane | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Deceptors | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Devotees of Destruction | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Dread Talons | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Fellhammer Siege-host | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Huron's Marauders | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Murdertalon Raiders | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Nightmare Hunt | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Pactbound Zealots | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Renegade Raiders | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Renegade Warband | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Soulforged Warpack | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Veterans of the Long War | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Warpstrike Champions | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+
+## Detachment Rule Coverage Rows
+
+These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
 
 | Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
 | --- | --- | --- | --- | --- | --- |

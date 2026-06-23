@@ -8,6 +8,7 @@ from itertools import combinations
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.deployment_zones import DeploymentZone
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollSpec,
@@ -56,6 +57,7 @@ from warhammer40k_core.engine.aircraft import (
     apply_aircraft_reserve_transition_to_battlefield,
     resolve_aircraft_reserve_transition,
 )
+from warhammer40k_core.engine.army_mustering import ArmyMusteringError
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldRemovalKind,
@@ -128,7 +130,12 @@ from warhammer40k_core.engine.reaction_windows import (
 from warhammer40k_core.engine.reaction_windows import (
     ReactionWindowKind,
 )
+from warhammer40k_core.engine.reserve_arrival_hooks import (
+    ReserveArrivalDistanceContext,
+    ReserveArrivalDistanceHookRegistry,
+)
 from warhammer40k_core.engine.reserves import (
+    DEFAULT_RESERVE_ENEMY_DISTANCE_INCHES,
     LargeModelReservePlacementException,
     ReinforcementPlacement,
     ReserveKind,
@@ -2384,6 +2391,9 @@ class MovementPhaseHandler:
     movement_end_surge_hooks: MovementEndSurgeHookRegistry = field(
         default_factory=MovementEndSurgeHookRegistry.empty
     )
+    reserve_arrival_distance_hooks: ReserveArrivalDistanceHookRegistry = field(
+        default_factory=ReserveArrivalDistanceHookRegistry.empty
+    )
     unit_move_completed_mortal_wound_hooks: UnitMoveCompletedMortalWoundHookRegistry = field(
         default_factory=UnitMoveCompletedMortalWoundHookRegistry.empty
     )
@@ -2419,6 +2429,10 @@ class MovementPhaseHandler:
         if type(self.movement_end_surge_hooks) is not MovementEndSurgeHookRegistry:
             raise GameLifecycleError(
                 "MovementPhaseHandler movement_end_surge_hooks must be a registry."
+            )
+        if type(self.reserve_arrival_distance_hooks) is not ReserveArrivalDistanceHookRegistry:
+            raise GameLifecycleError(
+                "MovementPhaseHandler reserve_arrival_distance_hooks must be a registry."
             )
         if (
             type(self.unit_move_completed_mortal_wound_hooks)
@@ -2703,6 +2717,7 @@ class MovementPhaseHandler:
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                reserve_arrival_distance_hooks=self.reserve_arrival_distance_hooks,
             )
         if result.decision_type == SELECT_DISEMBARK_UNIT_DECISION_TYPE:
             return _apply_disembark_unit_selection_decision(
@@ -4030,6 +4045,7 @@ def _resolve_reinforcement_placement_submission(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    reserve_arrival_distance_hooks: ReserveArrivalDistanceHookRegistry,
     unit_instance_id: str,
     placement_kind: BattlefieldPlacementKind,
     attempted_placement: UnitPlacement,
@@ -4056,6 +4072,24 @@ def _resolve_reinforcement_placement_submission(
     )
     scenario = _battlefield_scenario(state)
     battlefield_state = scenario.battlefield_state
+    enemy_deployment_zones = mission_setup.enemy_deployment_zones_for_player(
+        reserve_state.player_id,
+    )
+    deep_strike_enemy_distance = _deep_strike_enemy_distance_for_reserve_arrival(
+        state=state,
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        reserve_state=reserve_state,
+        attempted_placement=attempted_placement,
+        placement_kind=placement_kind,
+        battle_round=state.battle_round,
+        battlefield_width_inches=battlefield_state.battlefield_width_inches,
+        battlefield_depth_inches=battlefield_state.battlefield_depth_inches,
+        terrain_features=battlefield_state.terrain_features,
+        objective_markers=_objective_markers_for_state(state),
+        enemy_deployment_zones=enemy_deployment_zones,
+        reserve_arrival_distance_hooks=reserve_arrival_distance_hooks,
+    )
     placement = resolve_reserve_arrival(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -4067,10 +4101,9 @@ def _resolve_reinforcement_placement_submission(
         battlefield_depth_inches=battlefield_state.battlefield_depth_inches,
         terrain_features=battlefield_state.terrain_features,
         objective_markers=_objective_markers_for_state(state),
-        enemy_deployment_zones=mission_setup.enemy_deployment_zones_for_player(
-            reserve_state.player_id,
-        ),
+        enemy_deployment_zones=enemy_deployment_zones,
         large_model_exceptions=large_model_exceptions,
+        deep_strike_enemy_horizontal_distance_inches=deep_strike_enemy_distance,
     )
     if not placement.is_valid:
         invalid_payload = {
@@ -4103,6 +4136,56 @@ def _resolve_reinforcement_placement_submission(
         result=result,
     )
     return None
+
+
+def _deep_strike_enemy_distance_for_reserve_arrival(
+    *,
+    state: GameState,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    reserve_state: ReserveState,
+    attempted_placement: UnitPlacement,
+    placement_kind: BattlefieldPlacementKind,
+    battle_round: int,
+    battlefield_width_inches: float,
+    battlefield_depth_inches: float,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+    objective_markers: tuple[ObjectiveMarker, ...],
+    enemy_deployment_zones: tuple[DeploymentZone, ...],
+    reserve_arrival_distance_hooks: ReserveArrivalDistanceHookRegistry,
+) -> float | None:
+    if placement_kind is not BattlefieldPlacementKind.DEEP_STRIKE:
+        return None
+    unit = _unit_for_reserve_state(scenario=scenario, reserve_state=reserve_state)
+    context = ReserveArrivalDistanceContext(
+        state=state,
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        reserve_state=reserve_state,
+        unit=unit,
+        attempted_placement=attempted_placement,
+        placement_kind=placement_kind,
+        battle_round=battle_round,
+        battlefield_width_inches=battlefield_width_inches,
+        battlefield_depth_inches=battlefield_depth_inches,
+        terrain_features=terrain_features,
+        objective_markers=objective_markers,
+        enemy_deployment_zones=enemy_deployment_zones,
+        base_enemy_horizontal_distance_inches=DEFAULT_RESERVE_ENEMY_DISTANCE_INCHES,
+    )
+    return reserve_arrival_distance_hooks.effective_enemy_horizontal_distance_inches(context)
+
+
+def _unit_for_reserve_state(
+    *,
+    scenario: BattlefieldScenario,
+    reserve_state: ReserveState,
+) -> UnitInstance:
+    army_id = reserve_state.unit_instance_id.split(":", maxsplit=1)[0]
+    try:
+        return scenario.army_by_id(army_id).unit_by_id(reserve_state.unit_instance_id)
+    except ArmyMusteringError as exc:
+        raise GameLifecycleError("Reserve arrival distance hook target unit is unknown.") from exc
 
 
 def _apply_valid_reinforcement_placement(
@@ -4841,6 +4924,7 @@ def _apply_placement_proposal_decision(
     result: DecisionResult,
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
+    reserve_arrival_distance_hooks: ReserveArrivalDistanceHookRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -4877,6 +4961,7 @@ def _apply_placement_proposal_decision(
             result=result,
             decisions=decisions,
             ruleset_descriptor=ruleset_descriptor,
+            reserve_arrival_distance_hooks=reserve_arrival_distance_hooks,
             unit_instance_id=submission.unit_instance_id,
             placement_kind=submission.placement_kind,
             attempted_placement=submission.attempted_placement,

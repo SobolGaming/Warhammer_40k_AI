@@ -6,11 +6,32 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_necrons-qodfthk7tt-bzeqy07okc
 
 ## Summary
 
-| Detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed exact rows |
-| ---: | ---: | ---: | ---: |
-| 12 | 36 | 54 | 0 |
+| Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
+| ---: | ---: | ---: | ---: | ---: |
+| 12 | 0 | 36 | 54 | 0 |
 
-## Detachment Rules
+## Detachment Rule Support
+
+This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
+
+| Detachment | Overall support | Engine support | Tests | Notes |
+| --- | --- | --- | --- | --- |
+| Annihilation Legion | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Awakened Dynasty | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Canoptek Court | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Cryptek Conclave | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Cursed Legion | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Hand of the Dynasty | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Hypercrypt Legion | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Obeisance Phalanx | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Pantheon of Woe | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Skyshroud Spearhead | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Starshatter Arsenal | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| The Phaeron's Armoury | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+
+## Detachment Rule Coverage Rows
+
+These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
 
 | Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
 | --- | --- | --- | --- | --- | --- |

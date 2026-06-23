@@ -6,11 +6,29 @@ Source PDF: [eng_08-06_warhammer40000_faction_pack_grey_knights-geqfqwt3wh-g2fik
 
 ## Summary
 
-| Detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed exact rows |
-| ---: | ---: | ---: | ---: |
-| 9 | 24 | 36 | 0 |
+| Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
+| ---: | ---: | ---: | ---: | ---: |
+| 9 | 0 | 24 | 36 | 0 |
 
-## Detachment Rules
+## Detachment Rule Support
+
+This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
+
+| Detachment | Overall support | Engine support | Tests | Notes |
+| --- | --- | --- | --- | --- |
+| Argent Assault | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Augurium Task Force | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Banishers | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Brotherhood Strike | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Fires of Purgation | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Hallowed Conclave | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Immaterial Interdiction | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Sanctic Spearhead | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Warpbane Task Force | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+
+## Detachment Rule Coverage Rows
+
+These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
 
 | Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
 | --- | --- | --- | --- | --- | --- |

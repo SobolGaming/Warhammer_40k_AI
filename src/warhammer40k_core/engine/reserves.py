@@ -116,7 +116,8 @@ LARGE_MODEL_STRATEGIC_RESERVE_RESTRICTIONS = (
 
 _DEFAULT_BATTLEFIELD_WIDTH_INCHES = 60.0
 _DEFAULT_BATTLEFIELD_DEPTH_INCHES = 44.0
-_RESERVE_ENEMY_DISTANCE_INCHES = 8.0
+DEFAULT_RESERVE_ENEMY_DISTANCE_INCHES = 8.0
+_RESERVE_ENEMY_DISTANCE_INCHES = DEFAULT_RESERVE_ENEMY_DISTANCE_INCHES
 _EPSILON = 1e-9
 _RESERVES_RULE_ID = "reserves"
 _STRATEGIC_RESERVES_RULE_ID = "strategic_reserves"
@@ -1668,6 +1669,7 @@ def resolve_reserve_arrival(
     enemy_deployment_zones: tuple[DeploymentZone, ...] = (),
     large_model_exceptions: tuple[LargeModelReservePlacementException, ...] = (),
     strategic_reserve_rule: StrategicReserveRule | None = None,
+    deep_strike_enemy_horizontal_distance_inches: float | None = None,
 ) -> ReinforcementPlacement:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("resolve_reserve_arrival scenario must be a scenario.")
@@ -1696,6 +1698,21 @@ def resolve_reserve_arrival(
     strategic_rule = strategic_reserve_rule or StrategicReserveRule()
     if type(strategic_rule) is not StrategicReserveRule:
         raise GameLifecycleError("strategic_reserve_rule must be a StrategicReserveRule.")
+    deep_strike_enemy_distance = (
+        None
+        if deep_strike_enemy_horizontal_distance_inches is None
+        else _validate_positive_number(
+            "deep_strike_enemy_horizontal_distance_inches",
+            deep_strike_enemy_horizontal_distance_inches,
+        )
+    )
+    if (
+        deep_strike_enemy_distance is not None
+        and placement_kind is not BattlefieldPlacementKind.DEEP_STRIKE
+    ):
+        raise GameLifecycleError(
+            "deep_strike_enemy_horizontal_distance_inches only applies to Deep Strike placement."
+        )
 
     unit = _unit_for_reserve_state(scenario=scenario, reserve_state=reserve_state)
     qualifying_edges = strategic_rule.qualifying_edges_for_battle_round(requested_round)
@@ -1758,6 +1775,8 @@ def resolve_reserve_arrival(
         enemy_distance_inches=(
             strategic_rule.enemy_horizontal_distance_inches
             if placement_kind is BattlefieldPlacementKind.STRATEGIC_RESERVES
+            else deep_strike_enemy_distance
+            if deep_strike_enemy_distance is not None
             else _RESERVE_ENEMY_DISTANCE_INCHES
         ),
     )

@@ -92,6 +92,10 @@ from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeHookRegistry,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.reserve_arrival_hooks import (
+    ReserveArrivalDistanceHookBinding,
+    ReserveArrivalDistanceHookRegistry,
+)
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionRegistry,
     RuleRuntimeBinding,
@@ -187,6 +191,10 @@ class RuntimeContentContribution:
     advance_move_hook_bindings: tuple[AdvanceMoveHookBinding, ...] = ()
     fall_back_hook_bindings: tuple[FallBackEligibilityHookBinding, ...] = ()
     movement_end_surge_hook_bindings: tuple[MovementEndSurgeHookBinding, ...] = ()
+    reserve_arrival_distance_hook_bindings: tuple[
+        ReserveArrivalDistanceHookBinding,
+        ...,
+    ] = ()
     unit_move_completed_mortal_wound_hook_bindings: tuple[
         UnitMoveCompletedMortalWoundHookBinding,
         ...,
@@ -389,6 +397,15 @@ class RuntimeContentContribution:
                 "RuntimeContentContribution movement_end_surge_hook_bindings",
                 self.movement_end_surge_hook_bindings,
                 MovementEndSurgeHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "reserve_arrival_distance_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution reserve_arrival_distance_hook_bindings",
+                self.reserve_arrival_distance_hook_bindings,
+                ReserveArrivalDistanceHookBinding,
             ),
         )
         object.__setattr__(
@@ -624,6 +641,7 @@ class RuntimeContentContribution:
             advance_move_hook_bindings=self.advance_move_hook_bindings,
             fall_back_hook_bindings=self.fall_back_hook_bindings,
             movement_end_surge_hook_bindings=self.movement_end_surge_hook_bindings,
+            reserve_arrival_distance_hook_bindings=(self.reserve_arrival_distance_hook_bindings),
             unit_move_completed_mortal_wound_hook_bindings=(
                 self.unit_move_completed_mortal_wound_hook_bindings
             ),
@@ -659,6 +677,19 @@ class RuntimeContentContribution:
         )
 
 
+def _combine_contribution_values[T](
+    contributions: tuple[RuntimeContentContribution, ...],
+    field_name: str,
+    getter: Callable[[RuntimeContentContribution], tuple[T, ...]],
+    identifier_for: Callable[[T], str],
+) -> tuple[T, ...]:
+    return _combine_unique_values(
+        field_name,
+        _contribution_values(contributions, getter),
+        identifier_for,
+    )
+
+
 def combine_runtime_content_contributions(
     *,
     contribution_id: str,
@@ -667,157 +698,112 @@ def combine_runtime_content_contributions(
     validated_contributions = _validate_contributions(contributions)
     return RuntimeContentContribution(
         contribution_id=contribution_id,
-        ability_records=_combine_unique_values(
+        ability_records=_combine_contribution_values(
+            validated_contributions,
             "ability record",
-            tuple(
-                record
-                for contribution in validated_contributions
-                for record in contribution.ability_records
-            ),
+            lambda contribution: contribution.ability_records,
             lambda record: record.record_id,
         ),
-        stratagem_records=_combine_unique_values(
+        stratagem_records=_combine_contribution_values(
+            validated_contributions,
             "Stratagem record",
-            tuple(
-                record
-                for contribution in validated_contributions
-                for record in contribution.stratagem_records
-            ),
+            lambda contribution: contribution.stratagem_records,
             lambda record: record.record_id,
         ),
-        ability_handler_bindings=_combine_unique_values(
+        ability_handler_bindings=_combine_contribution_values(
+            validated_contributions,
             "ability handler binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.ability_handler_bindings
-            ),
+            lambda contribution: contribution.ability_handler_bindings,
             lambda binding: binding.handler_id,
         ),
-        stratagem_handler_bindings=_combine_unique_values(
+        stratagem_handler_bindings=_combine_contribution_values(
+            validated_contributions,
             "Stratagem handler binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.stratagem_handler_bindings
-            ),
+            lambda contribution: contribution.stratagem_handler_bindings,
             lambda binding: binding.handler_id,
         ),
-        rule_runtime_bindings=_combine_unique_values(
+        rule_runtime_bindings=_combine_contribution_values(
+            validated_contributions,
             "RuleIR binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.rule_runtime_bindings
-            ),
+            lambda contribution: contribution.rule_runtime_bindings,
             lambda binding: binding.binding_id,
         ),
-        event_subscriptions=_combine_unique_values(
+        event_subscriptions=_combine_contribution_values(
+            validated_contributions,
             "event subscription",
-            tuple(
-                subscription
-                for contribution in validated_contributions
-                for subscription in contribution.event_subscriptions
-            ),
+            lambda contribution: contribution.event_subscriptions,
             lambda subscription: subscription.subscription_id,
         ),
-        event_handler_bindings=_combine_unique_values(
+        event_handler_bindings=_combine_contribution_values(
+            validated_contributions,
             "event handler binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.event_handler_bindings
-            ),
+            lambda contribution: contribution.event_handler_bindings,
             lambda binding: binding.handler_id,
         ),
-        battle_formation_hook_bindings=_combine_unique_values(
+        battle_formation_hook_bindings=_combine_contribution_values(
+            validated_contributions,
             "battle formation hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.battle_formation_hook_bindings
-            ),
+            lambda contribution: contribution.battle_formation_hook_bindings,
             lambda binding: binding.hook_id,
         ),
-        battle_round_start_hook_bindings=_combine_unique_values(
+        battle_round_start_hook_bindings=_combine_contribution_values(
+            validated_contributions,
             "battle-round start hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.battle_round_start_hook_bindings
-            ),
+            lambda contribution: contribution.battle_round_start_hook_bindings,
             lambda binding: binding.hook_id,
         ),
-        turn_end_hook_bindings=_combine_unique_values(
+        turn_end_hook_bindings=_combine_contribution_values(
+            validated_contributions,
             "turn-end hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.turn_end_hook_bindings
-            ),
+            lambda contribution: contribution.turn_end_hook_bindings,
             lambda binding: binding.hook_id,
         ),
-        command_phase_start_hook_bindings=_combine_unique_values(
+        command_phase_start_hook_bindings=_combine_contribution_values(
+            validated_contributions,
             "Command-phase start hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.command_phase_start_hook_bindings
-            ),
+            lambda contribution: contribution.command_phase_start_hook_bindings,
             lambda binding: binding.hook_id,
         ),
-        unit_destroyed_hook_bindings=_combine_unique_values(
+        unit_destroyed_hook_bindings=_combine_contribution_values(
+            validated_contributions,
             "Unit-destroyed hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.unit_destroyed_hook_bindings
-            ),
+            lambda contribution: contribution.unit_destroyed_hook_bindings,
             lambda binding: binding.hook_id,
         ),
-        battle_shock_hook_bindings=_combine_unique_values(
+        battle_shock_hook_bindings=_combine_contribution_values(
+            validated_contributions,
             "Battle-shock hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.battle_shock_hook_bindings
-            ),
+            lambda contribution: contribution.battle_shock_hook_bindings,
             lambda binding: binding.hook_id,
         ),
-        advance_eligibility_hook_bindings=_combine_unique_values(
+        advance_eligibility_hook_bindings=_combine_contribution_values(
+            validated_contributions,
             "Advance eligibility hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.advance_eligibility_hook_bindings
-            ),
+            lambda contribution: contribution.advance_eligibility_hook_bindings,
             lambda binding: binding.hook_id,
         ),
-        advance_move_hook_bindings=_combine_unique_values(
+        advance_move_hook_bindings=_combine_contribution_values(
+            validated_contributions,
             "Advance hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.advance_move_hook_bindings
-            ),
+            lambda contribution: contribution.advance_move_hook_bindings,
             lambda binding: binding.hook_id,
         ),
-        fall_back_hook_bindings=_combine_unique_values(
+        fall_back_hook_bindings=_combine_contribution_values(
+            validated_contributions,
             "Fall Back eligibility hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.fall_back_hook_bindings
-            ),
+            lambda contribution: contribution.fall_back_hook_bindings,
             lambda binding: binding.hook_id,
         ),
-        movement_end_surge_hook_bindings=_combine_unique_values(
+        movement_end_surge_hook_bindings=_combine_contribution_values(
+            validated_contributions,
             "movement-end surge hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.movement_end_surge_hook_bindings
-            ),
+            lambda contribution: contribution.movement_end_surge_hook_bindings,
+            lambda binding: binding.hook_id,
+        ),
+        reserve_arrival_distance_hook_bindings=_combine_contribution_values(
+            validated_contributions,
+            "reserve arrival distance hook binding",
+            lambda contribution: contribution.reserve_arrival_distance_hook_bindings,
             lambda binding: binding.hook_id,
         ),
         unit_move_completed_mortal_wound_hook_bindings=_combine_unique_values(
@@ -1051,6 +1037,7 @@ class RuntimeContentBundle:
     advance_move_hook_registry: AdvanceMoveHookRegistry
     fall_back_hook_registry: FallBackEligibilityHookRegistry
     movement_end_surge_hook_registry: MovementEndSurgeHookRegistry
+    reserve_arrival_distance_hook_registry: ReserveArrivalDistanceHookRegistry
     unit_move_completed_mortal_wound_hook_registry: UnitMoveCompletedMortalWoundHookRegistry
     mortal_wound_feel_no_pain_hook_registry: MortalWoundFeelNoPainContinuationHookRegistry
     charge_declaration_hook_registry: ChargeDeclarationHookRegistry
@@ -1124,6 +1111,13 @@ class RuntimeContentBundle:
             )
         if type(self.movement_end_surge_hook_registry) is not MovementEndSurgeHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires MovementEndSurgeHookRegistry.")
+        if (
+            type(self.reserve_arrival_distance_hook_registry)
+            is not ReserveArrivalDistanceHookRegistry
+        ):
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires ReserveArrivalDistanceHookRegistry."
+            )
         if (
             type(self.unit_move_completed_mortal_wound_hook_registry)
             is not UnitMoveCompletedMortalWoundHookRegistry
@@ -1235,45 +1229,40 @@ class RuntimeContentBundle:
         ability_records = _merge_records(
             "ability_records",
             base_ability_records,
-            tuple(
-                record
-                for contribution in validated_contributions
-                for record in contribution.ability_records
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.ability_records,
             ),
             AbilityCatalogRecord,
         )
         stratagem_records = _merge_records(
             "stratagem_records",
             base_stratagem_records,
-            tuple(
-                record
-                for contribution in validated_contributions
-                for record in contribution.stratagem_records
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.stratagem_records,
             ),
             StratagemCatalogRecord,
         )
         ability_registry = _merged_ability_registry(
             base_ability_handler_registry,
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.ability_handler_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.ability_handler_bindings,
             ),
         )
         stratagem_registry = _merged_stratagem_registry(
             base_stratagem_handler_registry,
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.stratagem_handler_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.stratagem_handler_bindings,
             ),
         )
         rule_registry = _merged_rule_registry(
             base_rule_execution_registry,
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.rule_runtime_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.rule_runtime_bindings,
             ),
         )
         named_handlers = _merged_named_handlers(validated_contributions)
@@ -1304,32 +1293,28 @@ class RuntimeContentBundle:
             records=ability_records,
         )
         event_handler_registry = RuntimeContentEventHandlerRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.event_handler_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.event_handler_bindings,
             )
         )
         event_index = RuntimeContentEventIndex.from_subscriptions(
-            tuple(
-                subscription
-                for contribution in validated_contributions
-                for subscription in contribution.event_subscriptions
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.event_subscriptions,
             ),
             handler_registry=event_handler_registry,
         )
         battle_formation_hook_registry = BattleFormationHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.battle_formation_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.battle_formation_hook_bindings,
             )
         )
         battle_round_start_hook_registry = BattleRoundStartHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.battle_round_start_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.battle_round_start_hook_bindings,
             )
         )
         turn_end_hook_registry = TurnEndHookRegistry.from_bindings(
@@ -1338,60 +1323,58 @@ class RuntimeContentBundle:
                     ability_indexes_by_player_id=ability_indexes_by_player_id,
                     armies=validated_armies,
                 ),
-                *(
-                    binding
-                    for contribution in validated_contributions
-                    for binding in contribution.turn_end_hook_bindings
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.turn_end_hook_bindings,
                 ),
             )
         )
         command_phase_start_hook_registry = CommandPhaseStartHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.command_phase_start_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.command_phase_start_hook_bindings,
             )
         )
         unit_destroyed_hook_registry = UnitDestroyedHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.unit_destroyed_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.unit_destroyed_hook_bindings,
             )
         )
         battle_shock_hook_registry = BattleShockHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.battle_shock_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.battle_shock_hook_bindings,
             )
         )
         advance_eligibility_hook_registry = AdvanceEligibilityHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.advance_eligibility_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.advance_eligibility_hook_bindings,
             )
         )
         advance_move_hook_registry = AdvanceMoveHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.advance_move_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.advance_move_hook_bindings,
             )
         )
         fall_back_hook_registry = FallBackEligibilityHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.fall_back_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.fall_back_hook_bindings,
             )
         )
         movement_end_surge_hook_registry = MovementEndSurgeHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.movement_end_surge_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.movement_end_surge_hook_bindings,
+            )
+        )
+        reserve_arrival_distance_hook_registry = ReserveArrivalDistanceHookRegistry.from_bindings(
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.reserve_arrival_distance_hook_bindings,
             )
         )
         unit_move_completed_mortal_wound_hook_registry = (
@@ -1563,6 +1546,7 @@ class RuntimeContentBundle:
             advance_move_hook_registry=advance_move_hook_registry,
             fall_back_hook_registry=fall_back_hook_registry,
             movement_end_surge_hook_registry=movement_end_surge_hook_registry,
+            reserve_arrival_distance_hook_registry=reserve_arrival_distance_hook_registry,
             unit_move_completed_mortal_wound_hook_registry=(
                 unit_move_completed_mortal_wound_hook_registry
             ),
@@ -1640,6 +1624,10 @@ class RuntimeContentBundle:
             ],
             "movement_end_surge_hook_ids": [
                 binding.hook_id for binding in self.movement_end_surge_hook_registry.all_bindings()
+            ],
+            "reserve_arrival_distance_hook_ids": [
+                binding.hook_id
+                for binding in self.reserve_arrival_distance_hook_registry.all_bindings()
             ],
             "unit_move_completed_mortal_wound_hook_ids": [
                 binding.hook_id

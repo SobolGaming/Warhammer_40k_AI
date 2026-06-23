@@ -150,6 +150,8 @@ class SupportSectionRow:
 
 @dataclass(frozen=True)
 class DetachmentRuleSupportRow:
+    faction_id: str
+    detachment_id: str
     faction: str
     detachment: str
     engine: str
@@ -238,6 +240,21 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
     ),
     (
         "chaos-daemons",
+        "daemonic-incursion",
+    ): SupportSectionRow(
+        subject="Daemonic Incursion",
+        engine="Warp Rifts reserve-arrival distance hook",
+        documentation="Source row, execution record, and generated matrix",
+        tests="Focused runtime hook and Deep Strike placement tests",
+        overall="Full",
+        notes=(
+            "Allows qualifying LEGIONES DAEMONICA Deep Strike units wholly within Shadow "
+            "of Chaos or within 6 inches of a matching named Greater Daemon anchor to use "
+            "the 6 inch enemy distance."
+        ),
+    ),
+    (
+        "chaos-daemons",
         "shadow-legion",
     ): SupportSectionRow(
         subject="Shadow Legion",
@@ -277,6 +294,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     "phase17f:phase17e:chaos-daemons:cavalcade-of-chaos:stratagems": (
         "Cavalcade of Chaos Stratagems"
     ),
+    "phase17f:phase17e:chaos-daemons:daemonic-incursion:rule": "Warp Rifts",
     "phase17f:phase17e:chaos-daemons:shadow-legion:rule": "Shadow Legion",
     "phase17f:phase17e:chaos-space-marines:army-rule": "Dark Pacts",
     "phase17f:phase17e:death-guard:army-rule": "Nurgle's Gift",
@@ -354,6 +372,7 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche": (
         "Unholy Avalanche"
     ),
+    "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts": ("Warp Rifts"),
     "warhammer_40000_11th:drukhari:army_rule:power_from_pain:battle-shock-failed": (
         "Power from Pain"
     ),
@@ -747,6 +766,9 @@ def _faction_support_markdown(
         coverage_rows,
         Phase17ECoverageKind.DETACHMENT_RULE,
     )
+    detachment_support_rows = _detachment_rule_support_rows_for_faction(
+        faction_row.faction_id,
+    )
     enhancement_rows = _coverage_rows_for_kind(
         coverage_rows,
         Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
@@ -756,8 +778,13 @@ def _faction_support_markdown(
         Phase17ECoverageKind.DETACHMENT_STRATAGEM,
     )
     exact_rows = (*enhancement_rows, *stratagem_rows)
-    implemented_exact_count = sum(
-        1 for row in exact_rows if row.status is Phase17ECoverageStatus.IMPLEMENTED
+    engine_consumed_row_count = sum(
+        1
+        for row in (*detachment_rule_rows, *exact_rows)
+        if row.status is Phase17ECoverageStatus.IMPLEMENTED
+    )
+    supported_detachment_count = sum(
+        1 for row in detachment_support_rows if _detachment_rule_is_supported(row)
     )
     lines = [
         f"# {faction_row.name} Support Matrix",
@@ -775,26 +802,68 @@ def _faction_support_markdown(
         "",
         "## Summary",
         "",
-        "| Detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed exact rows |",
-        "| ---: | ---: | ---: | ---: |",
         (
-            f"| {len(detachment_rule_rows)} | {len(enhancement_rows)} | "
-            f"{len(stratagem_rows)} | {implemented_exact_count} |"
+            "| Detachment rules | Supported detachment rules | Exact Enhancements | "
+            "Exact Stratagems | Engine-consumed rows |"
+        ),
+        "| ---: | ---: | ---: | ---: | ---: |",
+        (
+            f"| {len(detachment_rule_rows)} | {supported_detachment_count} | "
+            f"{len(enhancement_rows)} | {len(stratagem_rows)} | {engine_consumed_row_count} |"
         ),
     ]
-    lines.extend(_faction_detachment_rule_rows_markdown(detachment_rule_rows))
+    lines.extend(_faction_detachment_rule_support_markdown(detachment_support_rows))
+    lines.extend(_faction_detachment_rule_coverage_rows_markdown(detachment_rule_rows))
     lines.extend(_faction_exact_rule_rows_markdown("Enhancements", enhancement_rows))
     lines.extend(_faction_exact_rule_rows_markdown("Stratagems", stratagem_rows))
     lines.append("")
     return "\n".join(lines)
 
 
-def _faction_detachment_rule_rows_markdown(
+def _faction_detachment_rule_support_markdown(
+    rows: tuple[DetachmentRuleSupportRow, ...],
+) -> list[str]:
+    lines = [
+        "",
+        "## Detachment Rule Support",
+        "",
+        (
+            "This table reports semantic engine support. `Full` means the current CORE V2 "
+            "scope has gameplay hooks plus focused tests; `None` means only source rows "
+            "and generated scaffold exist."
+        ),
+        "",
+        "| Detachment | Overall support | Engine support | Tests | Notes |",
+        "| --- | --- | --- | --- | --- |",
+    ]
+    for row in rows:
+        lines.append(
+            "| "
+            + " | ".join(
+                (
+                    _markdown_text(row.detachment),
+                    f"`{_markdown_text(row.overall)}`",
+                    _markdown_text(row.engine),
+                    _markdown_text(row.tests),
+                    _markdown_text(row.notes),
+                )
+            )
+            + " |"
+        )
+    return lines
+
+
+def _faction_detachment_rule_coverage_rows_markdown(
     rows: tuple[Phase17ECoverageRow, ...],
 ) -> list[str]:
     lines = [
         "",
-        "## Detachment Rules",
+        "## Detachment Rule Coverage Rows",
+        "",
+        (
+            "These rows expose the underlying Phase17E source coverage and handler IDs. "
+            "Use the support table above for semantic support status."
+        ),
         "",
         "| Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |",
         "| --- | --- | --- | --- | --- | --- |",
@@ -1655,14 +1724,15 @@ def _faction_index_section_markdown() -> list[str]:
             "Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split "
             "into generated per-faction files under `docs/factions/`. The exact rows expose "
             "their coverage row IDs, source IDs, timing/category metadata, and current "
-            "support status."
+            "support status. Supported detachment counts report semantic engine support, "
+            "not just source-row intake."
         ),
         "",
         (
-            "| Faction | Detachments | Exact Enhancements | Exact Stratagems | "
-            "Engine-consumed exact rows | File |"
+            "| Faction | Detachments | Supported detachment rules | Exact Enhancements | "
+            "Exact Stratagems | Engine-consumed rows | File |"
         ),
-        "| --- | ---: | ---: | ---: | ---: | --- |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | --- |",
     ]
     for faction_row in faction_detachments_2026_27.faction_rows():
         faction_rows = tuple(
@@ -1680,11 +1750,17 @@ def _faction_index_section_markdown() -> list[str]:
             faction_rows,
             Phase17ECoverageKind.DETACHMENT_STRATAGEM,
         )
-        implemented_exact_count = sum(
+        supported_detachment_count = sum(
+            1
+            for row in _detachment_rule_support_rows_for_faction(faction_row.faction_id)
+            if _detachment_rule_is_supported(row)
+        )
+        engine_consumed_row_count = sum(
             1
             for row in faction_rows
             if row.coverage_kind
             in {
+                Phase17ECoverageKind.DETACHMENT_RULE,
                 Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
                 Phase17ECoverageKind.DETACHMENT_STRATAGEM,
             }
@@ -1696,9 +1772,10 @@ def _faction_index_section_markdown() -> list[str]:
                 (
                     _markdown_text(faction_row.name),
                     str(detachment_count),
+                    str(supported_detachment_count),
                     str(enhancement_count),
                     str(stratagem_count),
-                    str(implemented_exact_count),
+                    str(engine_consumed_row_count),
                     f"[{_markdown_text(faction_row.faction_id)}](factions/{faction_row.faction_id}.md)",
                 )
             )
@@ -1789,6 +1866,8 @@ def _detachment_rule_support_rows() -> tuple[DetachmentRuleSupportRow, ...]:
         if override is None:
             rows.append(
                 DetachmentRuleSupportRow(
+                    faction_id=source_row.faction_id,
+                    detachment_id=source_row.detachment_id,
                     faction=faction_names[source_row.faction_id],
                     detachment=source_row.name,
                     engine="Generated scaffold only",
@@ -1801,6 +1880,8 @@ def _detachment_rule_support_rows() -> tuple[DetachmentRuleSupportRow, ...]:
         else:
             rows.append(
                 DetachmentRuleSupportRow(
+                    faction_id=source_row.faction_id,
+                    detachment_id=source_row.detachment_id,
                     faction=faction_names[source_row.faction_id],
                     detachment=source_row.name,
                     engine=override.engine,
@@ -1811,6 +1892,21 @@ def _detachment_rule_support_rows() -> tuple[DetachmentRuleSupportRow, ...]:
                 )
             )
     return tuple(rows)
+
+
+def _detachment_rule_support_rows_for_faction(
+    faction_id: str,
+) -> tuple[DetachmentRuleSupportRow, ...]:
+    return tuple(
+        sorted(
+            (row for row in _detachment_rule_support_rows() if row.faction_id == faction_id),
+            key=lambda row: (row.detachment.lower(), row.detachment_id),
+        )
+    )
+
+
+def _detachment_rule_is_supported(row: DetachmentRuleSupportRow) -> bool:
+    return row.overall != "None"
 
 
 def _wargear_keyword_support_rows() -> tuple[SupportSectionRow, ...]:

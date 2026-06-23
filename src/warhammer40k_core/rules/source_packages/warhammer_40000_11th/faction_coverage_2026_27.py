@@ -59,6 +59,9 @@ _EXACT_SUBRULE_COVERAGE_KINDS = frozenset(
         Phase17ECoverageKind.DETACHMENT_STRATAGEM,
     }
 )
+DAEMONIC_INCURSION_WARP_RIFTS_RUNTIME_CONSUMER_ID = (
+    "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts"
+)
 
 
 class Phase17EFactionPdfRecordPayload(TypedDict):
@@ -326,6 +329,23 @@ class Phase17ECoverageRow:
             ):
                 raise Phase17EFactionCoverageError(
                     "Exact subrule coverage rows require rule metadata."
+                )
+        elif self.coverage_kind is Phase17ECoverageKind.DETACHMENT_RULE:
+            if (
+                self.rule_id is not None
+                or self.timing_descriptor is not None
+                or self.rule_category is not None
+            ):
+                raise Phase17EFactionCoverageError(
+                    "Detachment rule coverage rows cannot include exact subrule metadata."
+                )
+            if runtime_support_status is not None and not self.runtime_consumer_ids:
+                raise Phase17EFactionCoverageError(
+                    "Detachment rule runtime support requires runtime consumers."
+                )
+            if self.runtime_consumer_ids and runtime_support_status is None:
+                raise Phase17EFactionCoverageError(
+                    "Detachment rule runtime consumers require runtime support status."
                 )
         elif (
             self.rule_id is not None
@@ -614,13 +634,18 @@ def _detachment_rows(
     detachment_row: faction_detachments_2026_27.SourceDetachmentRow,
     pdf_record: Phase17EFactionPdfRecord,
 ) -> tuple[Phase17ECoverageRow, ...]:
+    runtime_consumer_ids = _detachment_rule_runtime_consumer_ids(detachment_row)
     return (
         Phase17ECoverageRow(
             descriptor_id=(
                 f"phase17e:{detachment_row.faction_id}:{detachment_row.detachment_id}:rule"
             ),
             coverage_kind=Phase17ECoverageKind.DETACHMENT_RULE,
-            status=Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED,
+            status=(
+                Phase17ECoverageStatus.IMPLEMENTED
+                if runtime_consumer_ids
+                else Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED
+            ),
             faction_id=detachment_row.faction_id,
             faction_name=pdf_record.faction_name,
             source_ids=(detachment_row.source_id, pdf_record.source_id),
@@ -631,9 +656,30 @@ def _detachment_rows(
             force_disposition_id=detachment_row.force_disposition_id,
             detachment_point_cost=detachment_row.detachment_point_cost,
             is_new_for_eleventh=detachment_row.is_new_for_eleventh,
-            handler_id=f"phase17e:detachment:{detachment_row.detachment_id}:rule",
+            runtime_support_status=(
+                faction_subrules_2026_27.SourceSubruleRuntimeStatus.ENGINE_CONSUMED
+                if runtime_consumer_ids
+                else None
+            ),
+            runtime_consumer_ids=runtime_consumer_ids,
+            handler_id=(
+                runtime_consumer_ids[0]
+                if runtime_consumer_ids
+                else f"phase17e:detachment:{detachment_row.detachment_id}:rule"
+            ),
         ),
     )
+
+
+def _detachment_rule_runtime_consumer_ids(
+    detachment_row: faction_detachments_2026_27.SourceDetachmentRow,
+) -> tuple[str, ...]:
+    if (
+        detachment_row.faction_id == "chaos-daemons"
+        and detachment_row.detachment_id == "daemonic-incursion"
+    ):
+        return (DAEMONIC_INCURSION_WARP_RIFTS_RUNTIME_CONSUMER_ID,)
+    return ()
 
 
 def _enhancement_row(

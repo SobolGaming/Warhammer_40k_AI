@@ -27,6 +27,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     advance_move_hook_ids: list[str]
     fall_back_hook_ids: list[str]
     movement_end_surge_hook_ids: list[str]
+    reserve_arrival_distance_hook_ids: list[str]
     unit_move_completed_mortal_wound_hook_ids: list[str]
     mortal_wound_feel_no_pain_hook_ids: list[str]
     charge_declaration_hook_ids: list[str]
