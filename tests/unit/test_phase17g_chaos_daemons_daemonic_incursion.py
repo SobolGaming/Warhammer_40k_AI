@@ -9,6 +9,7 @@ from tests.unit.test_phase10p_reserves import (
     _decision_request,  # pyright: ignore[reportPrivateUsage]
     _last_event_payload,  # pyright: ignore[reportPrivateUsage]
     _single_model_reserve_placement,  # pyright: ignore[reportPrivateUsage]
+    _south_edge_touching_pose,  # pyright: ignore[reportPrivateUsage]
     _submit_handler_decision,  # pyright: ignore[reportPrivateUsage]
     _submit_reserve_placement_payload,  # pyright: ignore[reportPrivateUsage]
     _with_model_pose,  # pyright: ignore[reportPrivateUsage]
@@ -64,8 +65,11 @@ _RESERVE_BASE_DIAMETER_MM = 32.0
 
 
 def test_daemonic_incursion_runtime_hook_materializes_only_for_selected_detachment() -> None:
+    direct_contribution = rule.runtime_contribution()
     summary = build_runtime_content_bundle(_daemonic_incursion_config()).to_summary_payload()
 
+    assert direct_contribution.contribution_id == rule.CONTRIBUTION_ID
+    assert not direct_contribution.contribution_id.endswith(":scaffold")
     assert rule.WARP_RIFTS_HOOK_ID in summary["reserve_arrival_distance_hook_ids"]
     assert rule.SOURCE_RULE_ID in summary["selected_execution_record_ids"]
     assert any(
@@ -159,10 +163,38 @@ def test_warp_rifts_requires_shared_god_keyword_for_greater_daemon_anchor() -> N
     assert remaining_state.status is ReserveStatus.IN_RESERVES
 
 
+def test_warp_rifts_does_not_reduce_strategic_reserves_enemy_distance() -> None:
+    state, reserve_state, reserve_unit = _daemonic_incursion_reserve_state(
+        reserve_kind=ReserveKind.STRATEGIC_RESERVES
+    )
+    target_pose = _south_edge_touching_pose(base_diameter_mm=_RESERVE_BASE_DIAMETER_MM, x=16.0)
+    _place_enemy_at_base_distance(state=state, target_pose=target_pose, distance_inches=7.0)
+
+    status = _submit_reserve_arrival(
+        state=state,
+        reserve_state=reserve_state,
+        reserve_unit=reserve_unit,
+        target_pose=target_pose,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        battle_round=3,
+        result_id="phase17g-warp-rifts-strategic-reserves",
+    )
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    violations = cast(list[dict[str, JsonValue]], status.payload["violations"])
+    assert ReservePlacementViolationCode.RESERVE_ENEMY_DISTANCE.value in {
+        cast(str, violation["violation_code"]) for violation in violations
+    }
+    remaining_state = state.reserve_state_for_unit(reserve_state.unit_instance_id)
+    assert remaining_state is not None
+    assert remaining_state.status is ReserveStatus.IN_RESERVES
+
+
 def _daemonic_incursion_reserve_state(
     *,
     reserve_god_keyword: str = "Khorne",
     anchor_god_keyword: str = "Khorne",
+    reserve_kind: ReserveKind = ReserveKind.DEEP_STRIKE,
 ) -> tuple[GameState, ReserveState, UnitInstance]:
     state, _scenario, reserve_state, _reserve_unit = _battle_state_with_reserve(
         reserve_base_diameter_mm=_RESERVE_BASE_DIAMETER_MM
@@ -174,10 +206,10 @@ def _daemonic_incursion_reserve_state(
             anchor_god_keyword=anchor_god_keyword,
         )
     )
-    deep_strike_state = replace(reserve_state, reserve_kind=ReserveKind.DEEP_STRIKE)
-    state.replace_reserve_state(deep_strike_state)
+    updated_reserve_state = replace(reserve_state, reserve_kind=reserve_kind)
+    state.replace_reserve_state(updated_reserve_state)
     reserve_unit = _unit_by_id(state, _RESERVE_UNIT_ID)
-    return state, deep_strike_state, reserve_unit
+    return state, updated_reserve_state, reserve_unit
 
 
 def _submit_deep_strike_arrival(
@@ -188,7 +220,28 @@ def _submit_deep_strike_arrival(
     target_pose: Pose,
     result_id: str,
 ) -> _ResolvedArrivalStatus:
-    _set_movement_ready_for_reinforcements(state)
+    return _submit_reserve_arrival(
+        state=state,
+        reserve_state=reserve_state,
+        reserve_unit=reserve_unit,
+        target_pose=target_pose,
+        placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+        battle_round=1,
+        result_id=result_id,
+    )
+
+
+def _submit_reserve_arrival(
+    *,
+    state: GameState,
+    reserve_state: ReserveState,
+    reserve_unit: UnitInstance,
+    target_pose: Pose,
+    placement_kind: BattlefieldPlacementKind,
+    battle_round: int,
+    result_id: str,
+) -> _ResolvedArrivalStatus:
+    _set_movement_ready_for_reinforcements(state, battle_round=battle_round)
     handler = MovementPhaseHandler(
         ruleset_descriptor=_ruleset(),
         reserve_arrival_distance_hooks=ReserveArrivalDistanceHookRegistry.from_bindings(
@@ -213,7 +266,7 @@ def _submit_deep_strike_arrival(
         decisions=decisions,
         request=placement_request,
         reserve_unit=reserve_unit,
-        placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+        placement_kind=placement_kind,
         attempted_placement=_single_model_reserve_placement(
             reserve_unit=reserve_unit,
             pose=target_pose,
@@ -238,14 +291,14 @@ class _ResolvedArrivalStatus:
     decisions: DecisionController
 
 
-def _set_movement_ready_for_reinforcements(state: GameState) -> None:
+def _set_movement_ready_for_reinforcements(state: GameState, *, battle_round: int) -> None:
     state.stage = GameLifecycleStage.BATTLE
     state.setup_step_index = None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
-    state.battle_round = 1
+    state.battle_round = battle_round
     state.active_player_id = "player-a"
     state.movement_phase_state = MovementPhaseState(
-        battle_round=1,
+        battle_round=battle_round,
         active_player_id="player-a",
         selected_unit_ids=(_ANCHOR_UNIT_ID,),
         moved_unit_ids=(_ANCHOR_UNIT_ID,),
