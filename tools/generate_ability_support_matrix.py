@@ -262,20 +262,22 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
             "Mustering restrictions and keyword grants, Murderer's Cowl Advance "
             "eligibility, Penumbral Puppetry hit modifiers, Gloam Rot wound "
             "modifiers, Shadow's Caress snap-target restriction, Leaping Shadows "
-            "Scouts grants, and Disciples of Be'lakor Dark Pacts hooks"
+            "Scouts grants, Malice Made Manifest Fight-start mortal wounds, and "
+            "Disciples of Be'lakor Dark Pacts hooks"
         ),
         documentation="Adapter contract, decision catalog, README, and generated matrix",
         tests=(
             "Focused mustering, runtime hook, modifier, target-restriction, "
-            "Scouts enhancement, out-of-phase shooting, Be'lakor auto-pass, and "
-            "Feel No Pain routing tests"
+            "Scouts enhancement, Malice Made Manifest target/FNP routing, "
+            "out-of-phase shooting, Be'lakor auto-pass, and Feel No Pain routing tests"
         ),
         overall="Full",
         notes=(
             "Includes Shadow Legion/Undivided/Deep Strike keyword grants, Thralls of "
             "the First Prince roster caps and exclusions, attached rules-unit Scouts "
-            "9 grants from Leaping Shadows, Dark Pacts selected-to-shoot/fight grants "
-            "for Undivided units, Be'lakor Leadership auto-pass, and Shadow-source D3 "
+            "9 grants from Leaping Shadows, Fight-start D6/D3 mortal wounds from "
+            "Malice Made Manifest, Dark Pacts selected-to-shoot/fight grants for "
+            "Undivided units, Be'lakor Leadership auto-pass, and Shadow-source D3 "
             "mortal-wound Feel No Pain continuation."
         ),
     ),

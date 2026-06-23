@@ -28,7 +28,7 @@ from warhammer40k_core.engine.sticky_objective_control import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
-CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:rule:scaffold"
+CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:rule"
 MURDERCALL_HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall"
 BLOOD_TAINTED_HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted"
 SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:blood-legion:rule"

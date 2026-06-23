@@ -77,6 +77,9 @@ from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
     FIGHT_INTERRUPT_DECISION_TYPE,
 )
+from warhammer40k_core.engine.fight_phase_start_hooks import (
+    SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
+)
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
 )
@@ -145,6 +148,7 @@ from warhammer40k_core.engine.phases.fight import (
     invalid_fight_attack_sequence_selection_status,
     invalid_fight_interrupt_status,
     invalid_fight_movement_proposal_status,
+    invalid_fight_phase_start_faction_rule_status,
     invalid_melee_declaration_status,
 )
 from warhammer40k_core.engine.phases.movement import (
@@ -308,6 +312,7 @@ _COMMAND_DECISION_TYPES = frozenset(
 )
 _FIGHT_DECISION_TYPES = frozenset(
     (
+        SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
         FIGHT_ACTIVATION_DECISION_TYPE,
         SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
         FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
@@ -882,6 +887,19 @@ class GameLifecycle:
                 request=pending_request,
                 result=result,
                 charge_declaration_hooks=(self._charge_phase_handler.charge_declaration_hooks),
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type
+            == SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE
+        ):
+            invalid_status = invalid_fight_phase_start_faction_rule_status(
+                state=state,
+                request=pending_request,
+                result=result,
             )
             if invalid_status is not None:
                 return invalid_status
@@ -2056,6 +2074,7 @@ class GameLifecycle:
             attack_sequence_completed_hooks=(
                 self._runtime_content_bundle.attack_sequence_completed_hook_registry
             ),
+            fight_phase_start_hooks=self._runtime_content_bundle.fight_phase_start_hook_registry,
             runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._battle_round_flow = BattleRoundFlow(
