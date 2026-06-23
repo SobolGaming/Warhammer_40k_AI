@@ -876,11 +876,23 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "[aeldari](factions/aeldari.md)" in generated_markdown
     assert "Faction-pack Stratagems" not in generated_markdown
     assert "Faction-pack Enhancements" not in generated_markdown
-    assert "| Aeldari | 15 | 51 | 75 | 15 | [aeldari](factions/aeldari.md) |" in (
+    assert "| Aeldari | 15 | 2 | 51 | 75 | 15 | [aeldari](factions/aeldari.md) |" in (
         generated_markdown
+    )
+    assert (
+        "| Chaos Daemons | 9 | 4 | 28 | 43 | 7 | [chaos-daemons](factions/chaos-daemons.md) |"
+        in (generated_markdown)
     )
     aeldari_markdown = generated_faction_markdown["aeldari.md"]
     chaos_daemons_markdown = generated_faction_markdown["chaos-daemons.md"]
+    assert "## Detachment Rule Support" in aeldari_markdown
+    assert "## Detachment Rule Support" in chaos_daemons_markdown
+    assert "| Supported detachment rules |" in chaos_daemons_markdown
+    assert (
+        "| Daemonic Incursion | `Full` | Warp Rifts reserve-arrival distance hook |"
+    ) in chaos_daemons_markdown
+    assert "| Legion of Excess | `None` | Generated scaffold only |" in chaos_daemons_markdown
+    assert "## Detachment Rule Coverage Rows" in chaos_daemons_markdown
     assert "| Corsair Coterie | Pirates' Due |" in aeldari_markdown
     assert "| Corsair Coterie | Archraider |" in aeldari_markdown
     assert "`implemented` / `engine_consumed`" in aeldari_markdown

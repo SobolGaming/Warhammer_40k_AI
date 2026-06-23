@@ -6,11 +6,29 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_daemons-kisvudjypt-uzk9
 
 ## Summary
 
-| Detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed exact rows |
-| ---: | ---: | ---: | ---: |
-| 9 | 28 | 43 | 6 |
+| Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
+| ---: | ---: | ---: | ---: | ---: |
+| 9 | 4 | 28 | 43 | 7 |
 
-## Detachment Rules
+## Detachment Rule Support
+
+This table reports semantic engine support. `Full` means the current CORE V2 scope has gameplay hooks plus focused tests; `None` means only source rows and generated scaffold exist.
+
+| Detachment | Overall support | Engine support | Tests | Notes |
+| --- | --- | --- | --- | --- |
+| Blood Legion | `Full` | Murdercall surge and Blood Tainted sticky-objective hooks | Focused triggered-move and phase-end objective-control tests | Includes Khorne daemon, range, Aircraft, Battle-shock, and destruction-attribution gates. |
+| Cavalcade of Chaos | `Full` | Unholy Avalanche Fall Back eligibility hook, three named Stratagem records, and two Enhancement bindings | Focused Fall Back, Shoot, Charge, Stratagem, Enhancement, and handler-drift tests | Includes MOUNTED LEGIONES DAEMONICA Shoot and Charge permissions after Fall Back, Warp-Riders MOBILE, From Beyond the Veil ingress, Inescapable Manifestations Desperate Escape, Apocalyptic Steeds +1 Movement, and Soul-Shattering Charge melee targeting. |
+| Daemonic Incursion | `Full` | Warp Rifts reserve-arrival distance hook | Focused runtime hook and Deep Strike placement tests | Allows qualifying LEGIONES DAEMONICA Deep Strike units wholly within Shadow of Chaos or within 6 inches of a matching named Greater Daemon anchor to use the 6 inch enemy distance. |
+| Legion of Excess | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Lords of the Warp | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Plague Legion | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Scintillating Legion | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| Shadow Legion | `Full` | Mustering restrictions and keyword grants, Murderer's Cowl Advance eligibility, Penumbral Puppetry hit modifiers, Gloam Rot wound modifiers, Shadow's Caress snap-target restriction, and Disciples of Be'lakor Dark Pacts hooks | Focused mustering, runtime hook, modifier, target-restriction, out-of-phase shooting, Be'lakor auto-pass, and Feel No Pain routing tests | Includes Shadow Legion/Undivided/Deep Strike keyword grants, Thralls of the First Prince roster caps and exclusions, Dark Pacts selected-to-shoot/fight grants for Undivided units, Be'lakor Leadership auto-pass, and Shadow-source D3 mortal-wound Feel No Pain continuation. |
+| Warptide | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+
+## Detachment Rule Coverage Rows
+
+These rows expose the underlying Phase17E source coverage and handler IDs. Use the support table above for semantic support status.
 
 | Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
 | --- | --- | --- | --- | --- | --- |
