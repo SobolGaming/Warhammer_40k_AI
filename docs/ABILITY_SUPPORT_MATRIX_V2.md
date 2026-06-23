@@ -25,6 +25,7 @@ Core keyword ability rows are still primarily surfaced through source-backed cat
 | Subject | Engine support | Documentation | Tests | Overall | Notes |
 | --- | --- | --- | --- | --- | --- |
 | Deep Strike | Reserve declaration and placement hosts | Adapter contract and architecture | Focused reserve/deployment tests | Full | Current generated rows are `engine_consumed`. |
+| Scouts X | Pre-battle Scout Move, Scout reserve setup, and Dedicated Transport Scout Move hosts | Adapter contract and decision catalog | Focused pre-battle, setup smoke, and enhancement-grant tests | Full | Consumes structured Scouts descriptors for distance selection; a SCOUTS keyword without a descriptor fails fast. |
 | Other Core Rules keyword abilities | Mixed phase-owned hosts or explicit unsupported descriptors | Architecture and source-row unsupported audits | Coverage varies by keyword | Partial | Keep expanded per-keyword rows separate from wargear keyword abilities. |
 
 ## Core Terrain And Visibility

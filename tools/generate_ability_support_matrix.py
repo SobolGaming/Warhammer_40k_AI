@@ -1520,6 +1520,20 @@ def _structured_support_sections_markdown() -> list[str]:
                     "Current generated rows are `engine_consumed`.",
                 ),
                 SupportSectionRow(
+                    "Scouts X",
+                    (
+                        "Pre-battle Scout Move, Scout reserve setup, and Dedicated "
+                        "Transport Scout Move hosts"
+                    ),
+                    "Adapter contract and decision catalog",
+                    "Focused pre-battle, setup smoke, and enhancement-grant tests",
+                    "Full",
+                    (
+                        "Consumes structured Scouts descriptors for distance selection; "
+                        "a SCOUTS keyword without a descriptor fails fast."
+                    ),
+                ),
+                SupportSectionRow(
                     "Other Core Rules keyword abilities",
                     "Mixed phase-owned hosts or explicit unsupported descriptors",
                     "Architecture and source-row unsupported audits",
