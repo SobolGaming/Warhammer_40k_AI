@@ -439,6 +439,76 @@ def test_phase17c_aura_targets_preserve_structured_allegiance(
     assert parameter_payload(target.parameters)["allegiance"] == expected_allegiance
 
 
+def test_phase17c_aura_target_faction_keyword_sequence_compiles_to_keyword_gates() -> None:
+    rule_ir = _compiled(
+        "Daemon Lord of Khorne (Aura): While a friendly Khorne Legiones Daemonica "
+        'unit is within 6" of this model, each time a model in that unit makes a '
+        "melee attack, add 1 to the Hit roll."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    target = clause.target
+    keyword_gates = tuple(
+        condition
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.KEYWORD_GATE
+    )
+    distance_condition = next(
+        condition
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.DISTANCE_PREDICATE
+    )
+
+    assert rule_ir.is_supported
+    assert target is not None
+    assert target.kind is RuleTargetKind.AURA_UNITS
+    assert parameter_payload(target.parameters) == {
+        "allegiance": "friendly",
+        "eligible_target": "aura_units",
+        "required_keyword_sequence": "KHORNE|LEGIONES_DAEMONICA",
+    }
+    assert tuple(
+        parameter_payload(condition.parameters)["required_keyword"] for condition in keyword_gates
+    ) == ("KHORNE", "LEGIONES_DAEMONICA")
+    assert parameter_payload(distance_condition.parameters) == {
+        "distance_inches": 6.0,
+        "negated": False,
+        "object_kind": "model",
+        "object_reference": "this",
+        "predicate": "within",
+        "qualifier": None,
+        "range_kind": "numeric_range",
+    }
+
+
+def test_phase17c_enemy_aura_target_keyword_compiles_to_keyword_gate() -> None:
+    rule_ir = _compiled(
+        'Ded Glowy Ammo (Aura): While an enemy Infantry unit is within 6" of this '
+        "model, subtract 1 from the Toughness characteristic of models in that unit."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    target = clause.target
+    keyword_gates = tuple(
+        condition
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.KEYWORD_GATE
+    )
+    effect = clause.effects[0]
+
+    assert rule_ir.is_supported
+    assert target is not None
+    assert target.kind is RuleTargetKind.AURA_UNITS
+    assert parameter_payload(target.parameters) == {
+        "allegiance": "enemy",
+        "eligible_target": "aura_units",
+        "required_keyword": "INFANTRY",
+    }
+    assert tuple(
+        parameter_payload(condition.parameters)["required_keyword"] for condition in keyword_gates
+    ) == ("INFANTRY",)
+    assert effect.kind is RuleEffectKind.MODIFY_CHARACTERISTIC
+    assert parameter_payload(effect.parameters) == {"characteristic": "toughness", "delta": -1}
+
+
 def test_phase17c_compiler_rejects_stale_or_duplicate_source_inputs() -> None:
     source = RuleSourceText.from_raw(source_id="phase17c:rule:stale", raw_text="Gain 1CP.")
 

@@ -1123,7 +1123,7 @@ def _name_key(value: str) -> str:
 
 def _slug(value: str) -> str:
     normalized = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
-    lowered = normalized.casefold().replace("&", " and ")
+    lowered = normalized.casefold().replace("'", "").replace("&", " and ")
     characters: list[str] = []
     previous_dash = False
     for character in lowered:

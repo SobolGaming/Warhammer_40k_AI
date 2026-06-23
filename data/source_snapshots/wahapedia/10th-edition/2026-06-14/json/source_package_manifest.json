@@ -1,15 +1,15 @@
 {
   "artifacts": [
     {
-      "artifact_hash": "380e272a2b8d9e29ff89e04d1af2c1424793962578fd898b33c4a09ad487b12e",
+      "artifact_hash": "5d2718402066eecc33195e14f98d44900e374e8450ef246c2b766dd08e833990",
       "artifact_name": "Abilities.json"
     },
     {
-      "artifact_hash": "14132f301c76f94816620c112e43873af3e1df0979af43f745df7dfa3689b5c0",
+      "artifact_hash": "1722c3e070c45594aefe86f70250415e7f42774b79b3eaab4a10702129f6252c",
       "artifact_name": "Datasheets.json"
     },
     {
-      "artifact_hash": "293607d87ca2c6d2a2a31a62ecc3d49d263ce5951886f8d925c7f9440dbae27c",
+      "artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
       "artifact_name": "Datasheets_abilities.json"
     },
     {
@@ -21,7 +21,7 @@
       "artifact_name": "Datasheets_enhancements.json"
     },
     {
-      "artifact_hash": "b37dc970764e6a22369dd9f23a539e368128929457e84ab78a7e544d42f8a4d1",
+      "artifact_hash": "91081f23391dc9cc8a39eb9ee90c3cedb1d09439ecd16c0bd9390b48af4c3a14",
       "artifact_name": "Datasheets_keywords.json"
     },
     {
@@ -29,7 +29,7 @@
       "artifact_name": "Datasheets_leader.json"
     },
     {
-      "artifact_hash": "8f36f37ffe46f825a33cc220c0690b457ddb06318797f4ad362b0ccc65785a3e",
+      "artifact_hash": "1917ca16ffac89b5920eb134bb64d981cdc4f07cb439271a858e50299b3d919a",
       "artifact_name": "Datasheets_models.json"
     },
     {
@@ -37,7 +37,7 @@
       "artifact_name": "Datasheets_models_cost.json"
     },
     {
-      "artifact_hash": "85b11104df2e9b1befde254d547980cb12495dc98e9de7300d6114a21b9d67df",
+      "artifact_hash": "869b21016b1ce7904351c6671e00ab963bd8a536b39872c52524b00abf14bd38",
       "artifact_name": "Datasheets_options.json"
     },
     {
@@ -45,27 +45,27 @@
       "artifact_name": "Datasheets_stratagems.json"
     },
     {
-      "artifact_hash": "b57d6ff9e99259c9161b3459c71c3913adab7a54e44e1edcc832748cdf4a42b4",
+      "artifact_hash": "80335a2bceb155f1c8de2618e5a7ec78acd2ed792859e5af4d1518d27d6e059d",
       "artifact_name": "Datasheets_unit_composition.json"
     },
     {
-      "artifact_hash": "4e6f4fc111e4abdf9089da7575f2aa8cfda25ce2387049a307367d25c7263052",
+      "artifact_hash": "75c7de227690056f634b7d6d5038500a1185e8d4c8a0b3e17c5ee044eedeec68",
       "artifact_name": "Datasheets_wargear.json"
     },
     {
-      "artifact_hash": "57e27de5c2962a0abc34ea80ac7016cd38ab5ab0069d479cb8fb2a6799f6d745",
+      "artifact_hash": "f30fc4175d3437299498b0c075dc5e2b865de0ed840e28782c1f438ba667cce5",
       "artifact_name": "Detachment_abilities.json"
     },
     {
-      "artifact_hash": "55f9f8896c79c9c6e362e96da4d0b9cc769d800ea9f9c83a6df967ace0b89a8c",
+      "artifact_hash": "3207095e90fc602291d9f1d20c9290f8595add5a498cfda9d93a6c08d7613b95",
       "artifact_name": "Detachments.json"
     },
     {
-      "artifact_hash": "85b2959e9e96c9fb5ee0d66048defe6993ff5c7d443025c2c913317df5981afa",
+      "artifact_hash": "8617babce97aa4b85b9e8ec86a57d50339dfe3f136ead0407d90f4244e7bfade",
       "artifact_name": "Enhancements.json"
     },
     {
-      "artifact_hash": "1d20b49e7f559fb79af8845ba952ef8736f1380540b2319239c2d776c5eac487",
+      "artifact_hash": "3677d904916c2ebf57a2369995b8ee2a6d35e25d8026f958cc35f4e699995646",
       "artifact_name": "Factions.json"
     },
     {
@@ -73,11 +73,11 @@
       "artifact_name": "Last_update.json"
     },
     {
-      "artifact_hash": "f41c15a07f980e76c135d0f4388656d660a56d570ff10689c323f32deed4e176",
+      "artifact_hash": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
       "artifact_name": "Source.json"
     },
     {
-      "artifact_hash": "18d0f4f272e84f90563e445b5de2af7ac69673942c61f9445cd3258cda87553e",
+      "artifact_hash": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958",
       "artifact_name": "Stratagems.json"
     }
   ],
@@ -85,7 +85,7 @@
     "source_date": "2026-06-14",
     "version_id": "wahapedia-10th-edition-2026-06-14"
   },
-  "package_hash": "13027a43c47ada7400176521a063f572d3ba3fb3afebac2a8c76ea21b97fba3e",
+  "package_hash": "8d864acb52e813bc22176b85dc4c21e28d4fef4bc581b90f2a84ee575cb10129",
   "package_id": {
     "namespace": "wahapedia",
     "package_name": "source-mirror",

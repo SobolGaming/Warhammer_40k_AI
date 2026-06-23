@@ -1129,7 +1129,11 @@ def _aura_affected_unit_ids(
             ):
                 continue
             unit = scenario.unit_instance_for_placement(unit_placement)
-            if required_keywords and not set(required_keywords).issubset(set(unit.keywords)):
+            if required_keywords and not _unit_has_required_keywords(
+                unit_keywords=unit.keywords,
+                faction_keywords=unit.faction_keywords,
+                required_keywords=required_keywords,
+            ):
                 continue
             if _unit_within_aura(
                 scenario=scenario,
@@ -1203,6 +1207,22 @@ def _required_keywords(conditions: tuple[RuleCondition, ...]) -> tuple[str, ...]
         if type(keyword) is str:
             keywords.append(keyword)
     return tuple(sorted(keywords))
+
+
+def _unit_has_required_keywords(
+    *,
+    unit_keywords: tuple[str, ...],
+    faction_keywords: tuple[str, ...],
+    required_keywords: tuple[str, ...],
+) -> bool:
+    unit_keyword_set = {
+        _canonical_keyword(keyword) for keyword in (*unit_keywords, *faction_keywords)
+    }
+    return {_canonical_keyword(keyword) for keyword in required_keywords}.issubset(unit_keyword_set)
+
+
+def _canonical_keyword(keyword: str) -> str:
+    return keyword.strip().upper().replace("_", " ").replace("-", " ")
 
 
 def _clause_semantic_unavailable_reason(

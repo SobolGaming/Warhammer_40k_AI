@@ -42,6 +42,9 @@ from warhammer40k_core.rules.rule_templates import (
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
     rule_template_by_id,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14,
+)
 
 RULE_PARSER_VERSION = "phase17c-rule-parser-v1"
 
@@ -94,7 +97,7 @@ _LEADING_UNIT_RE = re.compile(
 )
 _TARGET_RE = re.compile(
     r"\b(?:select\s+)?(?:one\s+)?(?P<allegiance>friendly|enemy)\s+"
-    r"(?:(?P<keyword>[A-Z][A-Z0-9_-]*(?:\s+[A-Z0-9_-]+){0,3})\s+)?"
+    r"(?:(?P<keyword>[A-Z][A-Z0-9_'-]*(?:\s+[A-Z0-9_'-]+){0,5})\s+)?"
     r"(?:model|unit)\b",
     re.IGNORECASE,
 )
@@ -117,11 +120,11 @@ _RESOURCE_TARGET_RE = re.compile(
     re.IGNORECASE,
 )
 _HAS_KEYWORD_RE = re.compile(
-    r"\b(?:has|have|with)\s+the\s+(?P<keyword>[A-Z][A-Z0-9_-]*(?:\s+[A-Z0-9_-]+){0,3})"
+    r"\b(?:has|have|with)\s+the\s+(?P<keyword>[A-Z][A-Z0-9_'-]*(?:\s+[A-Z0-9_'-]+){0,5})"
     r"\s+keyword\b"
 )
 _KEYWORD_UNIT_RE = re.compile(
-    r"\b(?P<keyword>[A-Z][A-Z0-9_-]*(?:\s+[A-Z0-9_-]+){0,3})\s+(?:model|unit)\b"
+    r"\b(?P<keyword>[A-Z][A-Z0-9_'-]*(?:\s+[A-Z0-9_'-]+){0,5})\s+(?:model|unit)\b"
 )
 _ADD_ROLL_RE = re.compile(
     rf"\b(?P<verb>add|subtract)\s+(?P<value>\d+)\s+(?:to|from)\s+"
@@ -215,7 +218,8 @@ _DISTANCE_RELATION_RE = re.compile(
     r"of\s+"
     r"(?:(?P<quantity>one\s+or\s+more|any|a|an)\s+)?"
     r"(?:(?P<allegiance>enemy|friendly)\s+)?"
-    r"(?:(?P<keyword>[A-Z][A-Z0-9_-]*(?:\s+[A-Z0-9_-]+){0,3})\s+)?"
+    r"(?:(?P<object_reference>this|that|selected|target)\s+)?"
+    r"(?:(?P<keyword>[A-Z][A-Z0-9_'-]*(?:\s+[A-Z0-9_'-]+){0,5})\s+)?"
     r"(?P<object_kind>units?|models?|objective\s+markers?)\b",
     re.IGNORECASE,
 )
@@ -306,6 +310,9 @@ _CHARACTERISTIC_BY_LABEL = {
     "wounds": Characteristic.WOUNDS,
     "ws": Characteristic.WEAPON_SKILL,
 }
+_SOURCE_KEYWORD_SEQUENCE_PARTS = (
+    datasheet_keyword_lexicon_2026_06_14.canonical_datasheet_keyword_sequence_parts()
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -605,17 +612,36 @@ def _parse_frequency_conditions(clause_text: _ClauseText) -> tuple[RuleCondition
 
 def _parse_keyword_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
     conditions: list[RuleCondition] = []
+    target_match_ranges: list[tuple[int, int]] = []
+    for match in _TARGET_RE.finditer(clause_text.text):
+        keyword_text = match.group("keyword")
+        if keyword_text is None:
+            continue
+        target_match_ranges.append((match.start(), match.end()))
+        conditions.extend(_keyword_gate_conditions_from_match(clause_text=clause_text, match=match))
     for pattern in (_HAS_KEYWORD_RE, _KEYWORD_UNIT_RE):
         for match in pattern.finditer(clause_text.text):
-            keyword = _keyword_token(match.group("keyword"))
-            conditions.append(
-                RuleCondition(
-                    kind=RuleConditionKind.KEYWORD_GATE,
-                    source_span=_span_from_match(clause_text, match),
-                    parameters=parameters_from_pairs((("required_keyword", keyword),)),
-                )
+            if pattern is _KEYWORD_UNIT_RE and _match_inside_ranges(match, target_match_ranges):
+                continue
+            conditions.extend(
+                _keyword_gate_conditions_from_match(clause_text=clause_text, match=match)
             )
     return tuple(conditions)
+
+
+def _keyword_gate_conditions_from_match(
+    *,
+    clause_text: _ClauseText,
+    match: re.Match[str],
+) -> tuple[RuleCondition, ...]:
+    return tuple(
+        RuleCondition(
+            kind=RuleConditionKind.KEYWORD_GATE,
+            source_span=_span_from_match(clause_text, match),
+            parameters=parameters_from_pairs((("required_keyword", keyword),)),
+        )
+        for keyword in _keyword_sequence_tokens(match.group("keyword"))
+    )
 
 
 def _parse_distance_conditions(
@@ -663,7 +689,7 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
         pairs: list[tuple[str, RuleParameterValue]] = [("allegiance", allegiance)]
         keyword_text = match.group("keyword")
         if keyword_text is not None:
-            pairs.append(("required_keyword", _keyword_token(keyword_text)))
+            pairs.extend(_keyword_sequence_parameter_pairs(keyword_text))
         return RuleTargetSpec(
             kind=target_kind,
             source_span=_span_from_match(clause_text, match),
@@ -714,7 +740,7 @@ def _aura_target_parameter_pairs(
     pairs.append(("allegiance", _lower_group(match, "allegiance")))
     keyword_text = match.group("keyword")
     if keyword_text is not None:
-        pairs.append(("required_keyword", _keyword_token(keyword_text)))
+        pairs.extend(_keyword_sequence_parameter_pairs(keyword_text))
     return tuple(pairs)
 
 
@@ -1227,7 +1253,10 @@ def _distance_relation_parameter_pairs(
         pairs.append(("object_allegiance", allegiance.lower()))
     keyword_text = match.group("keyword")
     if keyword_text is not None:
-        pairs.append(("required_keyword", _keyword_token(keyword_text)))
+        pairs.extend(_keyword_sequence_parameter_pairs(keyword_text))
+    object_reference = match.group("object_reference")
+    if object_reference is not None:
+        pairs.append(("object_reference", _subject_token(object_reference)))
     return tuple(pairs)
 
 
@@ -1290,6 +1319,43 @@ def _keyword_token(value: str) -> str:
     return value.strip().upper().replace(" ", "_").replace("-", "_")
 
 
+def _keyword_sequence_tokens(value: str) -> tuple[str, ...]:
+    normalized = " ".join(value.strip().upper().replace("-", " ").split())
+    if not normalized:
+        raise RuleIRError("Keyword sequence must not be empty.")
+    tokens = tuple(_keyword_token(token) for token in _split_source_keyword_sequence(normalized))
+    if not tokens:
+        raise RuleIRError("Keyword sequence must contain at least one keyword.")
+    return tokens
+
+
+def _keyword_sequence_parameter_pairs(value: str) -> tuple[tuple[str, RuleParameterValue], ...]:
+    tokens = _keyword_sequence_tokens(value)
+    if len(tokens) == 1:
+        return (("required_keyword", tokens[0]),)
+    return (("required_keyword_sequence", "|".join(tokens)),)
+
+
+def _split_source_keyword_sequence(value: str) -> tuple[str, ...]:
+    remaining = value
+    tokens: list[str] = []
+    while remaining:
+        match = _longest_source_keyword_prefix(remaining)
+        if match is None:
+            tokens.append(remaining)
+            break
+        tokens.append(match)
+        remaining = remaining[len(match) :].strip()
+    return tuple(tokens)
+
+
+def _longest_source_keyword_prefix(value: str) -> str | None:
+    for keyword in _SOURCE_KEYWORD_SEQUENCE_PARTS:
+        if value == keyword or value.startswith(f"{keyword} "):
+            return keyword
+    return None
+
+
 def _ability_token(value: str) -> str:
     stripped = value.strip(" []().,;:")
     return " ".join(stripped.split())
@@ -1330,3 +1396,10 @@ def _span_matches_existing_effect(
         span.start >= effect.source_span.start and span.end <= effect.source_span.end
         for effect in effects
     )
+
+
+def _match_inside_ranges(
+    match: re.Match[str],
+    ranges: list[tuple[int, int]],
+) -> bool:
+    return any(start <= match.start() and match.end() <= end for start, end in ranges)

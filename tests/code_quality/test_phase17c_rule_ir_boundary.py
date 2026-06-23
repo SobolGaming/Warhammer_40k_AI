@@ -78,3 +78,40 @@ def test_phase17c_rule_language_tooling_has_no_llm_or_network_imports() -> None:
     assert not violations, (
         "Phase 17C parser/compiler must stay deterministic tooling:\n" + "\n".join(violations)
     )
+
+
+def test_phase17c_rule_parser_keyword_sequence_lexicon_is_source_generated() -> None:
+    path = RULE_TOOLING / "rule_parser.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    hardcoded_keyword_literals: list[str] = []
+    source_lexicon_assignment_found = False
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Constant) and node.value in {
+            "KHORNE",
+            "LEGIONES DAEMONICA",
+            "WORLD EATERS",
+        }:
+            hardcoded_keyword_literals.append(f"{path.relative_to(ROOT).as_posix()}:{node.lineno}")
+            continue
+
+        if not isinstance(node, ast.Assign):
+            continue
+        if not any(
+            isinstance(target, ast.Name) and target.id == "_SOURCE_KEYWORD_SEQUENCE_PARTS"
+            for target in node.targets
+        ):
+            continue
+        source_lexicon_assignment_found = (
+            isinstance(node.value, ast.Call)
+            and isinstance(node.value.func, ast.Attribute)
+            and node.value.func.attr == "canonical_datasheet_keyword_sequence_parts"
+            and isinstance(node.value.func.value, ast.Name)
+            and node.value.func.value.id == "datasheet_keyword_lexicon_2026_06_14"
+        )
+
+    assert source_lexicon_assignment_found
+    assert not hardcoded_keyword_literals, (
+        "Parser keyword sequences must come from the generated source-package lexicon:\n"
+        + "\n".join(hardcoded_keyword_literals)
+    )
