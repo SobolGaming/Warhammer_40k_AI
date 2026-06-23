@@ -113,7 +113,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `11b0bd20aa7c64e3096238a4e59fee6ae4e74f4f2e471f6c77af34a9e3b712fd`
+  `e42076f902e02047a2a45c9f9175800adda77b52bed6d65dafa9b15f39390415`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -150,13 +150,13 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `a0233ddf3d7a6925fb51c45d08068b50543d0f79a376e6602686400dc0fab43e`
+  `ea0b3b48faeb1108c5fee181a2feb900b8fe85413e309a3cd2604392b70165c8`
 - upstream Phase 17E checksum:
-  `11b0bd20aa7c64e3096238a4e59fee6ae4e74f4f2e471f6c77af34a9e3b712fd`
+  `e42076f902e02047a2a45c9f9175800adda77b52bed6d65dafa9b15f39390415`
 
 The package emits 2140 execution records, one for every Phase 17E coverage row:
-2085 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, and 27 exact detachment,
+2084 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, and 28 exact detachment,
 Enhancement, and Stratagem rows are executable named-handler rows because they
 already have runtime consumers. The engine dispatcher can route every record and returns typed
 `unsupported` diagnostics unless a matching executor is registered. No Phase 17E
@@ -615,8 +615,8 @@ already engine-consumed named handlers.
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 5 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 4 | `executable_named_handler` | `applied` | `none` |
-| Enhancements | 23 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 5 | `executable_named_handler` | `applied` | `none` |
+| Enhancements | 22 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 6 | `executable_named_handler` | `applied` | `none` |
 | Stratagems | 40 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 3 | `executable_named_handler` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
