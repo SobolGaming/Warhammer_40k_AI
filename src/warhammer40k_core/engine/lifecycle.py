@@ -1996,6 +1996,9 @@ class GameLifecycle:
             movement_end_surge_hooks=(
                 self._runtime_content_bundle.movement_end_surge_hook_registry
             ),
+            reserve_arrival_distance_hooks=(
+                self._runtime_content_bundle.reserve_arrival_distance_hook_registry
+            ),
             unit_move_completed_mortal_wound_hooks=(
                 self._runtime_content_bundle.unit_move_completed_mortal_wound_hook_registry
             ),

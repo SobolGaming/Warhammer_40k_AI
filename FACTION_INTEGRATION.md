@@ -113,7 +113,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `a6272740493276e8d76d1ccb36cda3cecf067e61cdaffa92477938fec243a640`
+  `a23cf3d30f1ca96713eced78dc44f61b3760aef7b568349288c57433efbb9b56`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -150,15 +150,15 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `cf2e4dd37586ffc71d1c0ac6bfdedf81bcb426b0945be9119d2b95b9f85f4f15`
+  `51f42839c298e98e517fe621fcbe318597eb35b692c7d106cec2dbc5ec2b2b2c`
 - upstream Phase 17E checksum:
-  `a6272740493276e8d76d1ccb36cda3cecf067e61cdaffa92477938fec243a640`
+  `a23cf3d30f1ca96713eced78dc44f61b3760aef7b568349288c57433efbb9b56`
 
 The package emits 2140 execution records, one for every Phase 17E coverage row:
-2091 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, and 21 exact Enhancement/Stratagem
-rows are executable named-handler rows because they already have runtime
-consumers. The engine dispatcher can route every record and returns typed
+2090 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, and 22 exact detachment,
+Enhancement, and Stratagem rows are executable named-handler rows because they
+already have runtime consumers. The engine dispatcher can route every record and returns typed
 `unsupported` diagnostics unless a matching executor is registered. No Phase 17E
 row remains a missing handler, runtime no-op, raw-PDF parse, or silent fallback.
 Future executable rows require a registered generic IR executor or named
@@ -613,7 +613,8 @@ already engine-consumed named handlers.
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 1 | `executable_named_handler` | `applied` | `none` |
 | Enhancements | 25 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 3 | `executable_named_handler` | `applied` | `none` |
 | Stratagems | 40 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |

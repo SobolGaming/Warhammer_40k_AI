@@ -44,6 +44,9 @@ FADE_TO_DARKNESS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
     "enhancement:fade_to_darkness:unit-destroyed",
 )
+DAEMONIC_INCURSION_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts",
+)
 
 
 def test_phase17f_execution_package_covers_every_phase17e_coverage_row() -> None:
@@ -119,6 +122,23 @@ def test_phase17f_fade_to_darkness_execution_record_is_named_handler() -> None:
     assert record.runtime_consumer_ids == FADE_TO_DARKNESS_RUNTIME_CONSUMERS
     assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
     assert record.handler_id == FADE_TO_DARKNESS_RUNTIME_CONSUMERS[0]
+    assert record.block_reason is None
+
+
+def test_phase17f_daemonic_incursion_execution_record_is_named_handler() -> None:
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_kind is Phase17ECoverageKind.DETACHMENT_RULE
+        and record.faction_id == "chaos-daemons"
+        and record.detachment_id == "daemonic-incursion"
+    )
+
+    assert record.rule_name == "Daemonic Incursion detachment rule"
+    assert record.runtime_support_status == "engine_consumed"
+    assert record.runtime_consumer_ids == DAEMONIC_INCURSION_RUNTIME_CONSUMERS
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
+    assert record.handler_id == DAEMONIC_INCURSION_RUNTIME_CONSUMERS[0]
     assert record.block_reason is None
 
 

@@ -187,11 +187,35 @@ def base_footprint_intersects_no_mans_land(
     battlefield_bounds: tuple[float, float, float, float],
     deployment_zones: tuple[DeploymentZone, ...],
 ) -> bool:
+    return footprint_for_no_mans_land(
+        battlefield_bounds=battlefield_bounds,
+        deployment_zones=deployment_zones,
+    ).intersects(footprint_for_base(base, pose))
+
+
+def base_footprint_within_no_mans_land(
+    base: BaseShape,
+    pose: Pose,
+    *,
+    battlefield_bounds: tuple[float, float, float, float],
+    deployment_zones: tuple[DeploymentZone, ...],
+) -> bool:
+    return footprint_for_no_mans_land(
+        battlefield_bounds=battlefield_bounds,
+        deployment_zones=deployment_zones,
+    ).covers(footprint_for_base(base, pose))
+
+
+def footprint_for_no_mans_land(
+    *,
+    battlefield_bounds: tuple[float, float, float, float],
+    deployment_zones: tuple[DeploymentZone, ...],
+) -> _Geometry:
     min_x, min_y, max_x, max_y = battlefield_bounds
     no_mans_land = _box(min_x, min_y, max_x, max_y)
     for deployment_zone in deployment_zones:
         no_mans_land = no_mans_land.difference(footprint_for_deployment_zone(deployment_zone))
-    return no_mans_land.intersects(footprint_for_base(base, pose))
+    return no_mans_land
 
 
 def base_footprint_within_deployment_zone(
