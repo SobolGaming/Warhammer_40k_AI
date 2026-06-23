@@ -172,6 +172,11 @@ def test_shadow_legion_enhancement_runtime_contribution_registers_exact_hooks() 
     contribution = enhancements.runtime_contribution()
 
     assert contribution.contribution_id == enhancements.CONTRIBUTION_ID
+    assert (
+        contribution.contribution_id
+        == "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancements"
+    )
+    assert "fade_to_darkness" not in contribution.contribution_id
     assert not contribution.contribution_id.endswith(":scaffold")
     assert contribution.enhancement_effect_bindings[0].effect_id == (
         enhancements.LEAPING_SHADOWS_EFFECT_ID

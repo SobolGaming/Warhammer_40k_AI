@@ -34,9 +34,7 @@ from warhammer40k_core.engine.unit_destroyed_hooks import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_proximity import unit_within_enemy_engagement_range
 
-CONTRIBUTION_ID = (
-    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:fade_to_darkness"
-)
+CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancements"
 
 DETACHMENT_ID = "shadow-legion"
 SHADOW_LEGION_KEYWORD = "SHADOW LEGION"
