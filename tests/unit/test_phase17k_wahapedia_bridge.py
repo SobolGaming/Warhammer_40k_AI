@@ -880,7 +880,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         generated_markdown
     )
     assert (
-        "| Chaos Daemons | 9 | 4 | 28 | 43 | 7 | [chaos-daemons](factions/chaos-daemons.md) |"
+        "| Chaos Daemons | 9 | 4 | 28 | 43 | 8 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
     aeldari_markdown = generated_faction_markdown["aeldari.md"]

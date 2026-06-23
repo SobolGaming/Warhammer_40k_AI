@@ -2,14 +2,25 @@ from __future__ import annotations
 
 from typing import cast
 
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+)
 from warhammer40k_core.core.faction_aliases import CHAOS_DAEMONS_FACTION_ID
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
 from warhammer40k_core.engine.battlefield_state import PlacementError
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.enhancement_effects import (
+    EnhancementDatasheetAbilityGrant,
+    EnhancementEffectBinding,
+    EnhancementEffectContext,
+)
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveOrigin
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     TurnEndHookBinding,
@@ -26,13 +37,30 @@ from warhammer40k_core.engine.unit_proximity import unit_within_enemy_engagement
 CONTRIBUTION_ID = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:fade_to_darkness"
 )
-SOURCE_RULE_ID = "phase17f:phase17e:enhancement:chaos-daemons:shadow-legion:000009980004"
+
+DETACHMENT_ID = "shadow-legion"
+SHADOW_LEGION_KEYWORD = "SHADOW LEGION"
+
+LEAPING_SHADOWS_ENHANCEMENT_ID = "000009980002"
+LEAPING_SHADOWS_SOURCE_RULE_ID = (
+    "phase17f:phase17e:enhancement:chaos-daemons:shadow-legion:000009980002"
+)
+LEAPING_SHADOWS_EFFECT_ID = (
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+    "enhancement:leaping_shadows:scouts_9"
+)
+LEAPING_SHADOWS_ABILITY_ID = "chaos-daemons:shadow-legion:leaping-shadows:scouts-9"
+LEAPING_SHADOWS_SCOUTS_DISTANCE = '9"'
+
+FADE_TO_DARKNESS_ENHANCEMENT_ID = "000009980004"
+FADE_TO_DARKNESS_SOURCE_RULE_ID = (
+    "phase17f:phase17e:enhancement:chaos-daemons:shadow-legion:000009980004"
+)
+SOURCE_RULE_ID = FADE_TO_DARKNESS_SOURCE_RULE_ID
+ENHANCEMENT_ID = FADE_TO_DARKNESS_ENHANCEMENT_ID
 HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:fade_to_darkness"
 UNIT_DESTROYED_HOOK_ID = f"{HOOK_ID}:unit-destroyed"
 TURN_END_HOOK_ID = f"{HOOK_ID}:turn-end-reserves"
-
-DETACHMENT_ID = "shadow-legion"
-ENHANCEMENT_ID = "000009980004"
 SUBMISSION_KIND = "chaos_daemons_shadow_legion_fade_to_darkness_turn_end"
 ELIGIBLE_EVENT = "chaos_daemons_shadow_legion_fade_to_darkness_eligible"
 USED_EVENT = "chaos_daemons_shadow_legion_fade_to_darkness_used"
@@ -42,6 +70,14 @@ DECLINED_EVENT = "chaos_daemons_shadow_legion_fade_to_darkness_declined"
 def runtime_contribution() -> RuntimeContentContribution:
     return RuntimeContentContribution(
         contribution_id=CONTRIBUTION_ID,
+        enhancement_effect_bindings=(
+            EnhancementEffectBinding(
+                effect_id=LEAPING_SHADOWS_EFFECT_ID,
+                source_id=LEAPING_SHADOWS_SOURCE_RULE_ID,
+                enhancement_id=LEAPING_SHADOWS_ENHANCEMENT_ID,
+                handler=leaping_shadows_effect,
+            ),
+        ),
         unit_destroyed_hook_bindings=(
             UnitDestroyedHookBinding(
                 hook_id=UNIT_DESTROYED_HOOK_ID,
@@ -57,6 +93,48 @@ def runtime_contribution() -> RuntimeContentContribution:
                 result_handler=apply_fade_to_darkness_turn_end_result,
             ),
         ),
+    )
+
+
+def leaping_shadows_effect(
+    context: EnhancementEffectContext,
+) -> tuple[EnhancementDatasheetAbilityGrant, ...]:
+    if type(context) is not EnhancementEffectContext:
+        raise GameLifecycleError("Leaping Shadows requires an EnhancementEffectContext.")
+    if context.assignment.enhancement_id != LEAPING_SHADOWS_ENHANCEMENT_ID:
+        return ()
+    if not (
+        context.army.detachment_selection.faction_id == CHAOS_DAEMONS_FACTION_ID
+        and DETACHMENT_ID in context.army.detachment_selection.detachment_ids
+    ):
+        raise GameLifecycleError("Leaping Shadows requires Shadow Legion.")
+    if not _unit_has_keyword(context.target_unit, SHADOW_LEGION_KEYWORD):
+        raise GameLifecycleError("Leaping Shadows requires a Shadow Legion model.")
+    view = rules_unit_view_by_id(
+        state=context.state,
+        unit_instance_id=context.target_unit.unit_instance_id,
+    )
+    if view.owner_player_id != context.army.player_id:
+        raise GameLifecycleError("Leaping Shadows rules unit owner drift.")
+    descriptor = _leaping_shadows_scouts_descriptor()
+    return tuple(
+        EnhancementDatasheetAbilityGrant(
+            effect_id=LEAPING_SHADOWS_EFFECT_ID,
+            source_id=LEAPING_SHADOWS_SOURCE_RULE_ID,
+            enhancement_id=LEAPING_SHADOWS_ENHANCEMENT_ID,
+            target_unit_instance_id=component.unit.unit_instance_id,
+            datasheet_ability=descriptor,
+            replay_payload={
+                "effect_kind": "leaping_shadows_scouts_9",
+                "assignment_source_id": context.assignment.source_id,
+                "target_unit_selection_id": context.assignment.target_unit_selection_id,
+                "bearer_unit_instance_id": context.target_unit.unit_instance_id,
+                "target_rules_unit_instance_id": view.unit_instance_id,
+                "component_unit_instance_id": component.unit.unit_instance_id,
+                "scouts_distance_inches": 9,
+            },
+        )
+        for component in view.components
     )
 
 
@@ -282,6 +360,19 @@ def _unit_for_assignment(
     raise GameLifecycleError("Fade to Darkness assignment target unit was not mustered.")
 
 
+def _leaping_shadows_scouts_descriptor() -> DatasheetAbilityDescriptor:
+    return DatasheetAbilityDescriptor(
+        ability_id=LEAPING_SHADOWS_ABILITY_ID,
+        name=f"Scouts {LEAPING_SHADOWS_SCOUTS_DISTANCE}",
+        source_id=LEAPING_SHADOWS_SOURCE_RULE_ID,
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="Leaping Shadows grants Scouts 9.",
+        timing_tags=("before_battle", "scouts"),
+        parameter_tokens=(LEAPING_SHADOWS_SCOUTS_DISTANCE,),
+    )
+
+
 def _unit_can_enter_strategic_reserves(
     state: object,
     *,
@@ -300,6 +391,13 @@ def _unit_can_enter_strategic_reserves(
     except PlacementError:
         return False
     return not unit_within_enemy_engagement_range(state=state, unit_instance_id=unit_instance_id)
+
+
+def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Leaping Shadows keyword lookup requires UnitInstance.")
+    requested_keyword = _canonical_keyword(keyword)
+    return requested_keyword in {_canonical_keyword(stored) for stored in unit.keywords}
 
 
 def _destroyed_enemy_unit_ids_for_fade_unit(
@@ -489,3 +587,7 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"Fade to Darkness {field_name} must not be empty.")
     return stripped
+
+
+def _canonical_keyword(value: str) -> str:
+    return _validate_identifier("keyword", value).upper().replace("_", " ").replace("-", " ")

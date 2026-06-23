@@ -35,6 +35,7 @@ from warhammer40k_core.engine.advance_eligibility_hooks import AdvanceEligibilit
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
+    AttachedUnitFormation,
     EnhancementAssignment,
     RosterUnitPointValue,
     WarlordSelection,
@@ -57,6 +58,10 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.enhancement_effects import (
+    EnhancementEffectRegistry,
+    apply_enhancement_effects,
+)
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.shadow_legion import (  # noqa: E501
     enhancements,
@@ -87,6 +92,8 @@ from warhammer40k_core.engine.phases.shooting import (
     _request_shooting_unit_selected_grant_decision_if_available,  # pyright: ignore[reportPrivateUsage]
     request_out_of_phase_shooting_declaration,
 )
+from warhammer40k_core.engine.prebattle import scout_ability_instances_for_rules_unit
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
     RuntimeModifierRegistry,
@@ -103,6 +110,10 @@ from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     TurnEndRequestContext,
     TurnEndResultContext,
+)
+from warhammer40k_core.engine.unit_abilities import (
+    scouts_ability_descriptors_for_unit,
+    scouts_distance_inches_from_descriptor,
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -157,17 +168,88 @@ def test_shadow_legion_runtime_contribution_registers_engine_hooks() -> None:
     )
 
 
-def test_shadow_legion_fade_to_darkness_runtime_contribution_registers_exact_hooks() -> None:
+def test_shadow_legion_enhancement_runtime_contribution_registers_exact_hooks() -> None:
     contribution = enhancements.runtime_contribution()
 
     assert contribution.contribution_id == enhancements.CONTRIBUTION_ID
     assert not contribution.contribution_id.endswith(":scaffold")
+    assert contribution.enhancement_effect_bindings[0].effect_id == (
+        enhancements.LEAPING_SHADOWS_EFFECT_ID
+    )
+    assert contribution.enhancement_effect_bindings[0].source_id == (
+        enhancements.LEAPING_SHADOWS_SOURCE_RULE_ID
+    )
+    assert contribution.enhancement_effect_bindings[0].enhancement_id == (
+        enhancements.LEAPING_SHADOWS_ENHANCEMENT_ID
+    )
     assert contribution.unit_destroyed_hook_bindings[0].hook_id == (
         enhancements.UNIT_DESTROYED_HOOK_ID
     )
     assert contribution.unit_destroyed_hook_bindings[0].source_id == enhancements.SOURCE_RULE_ID
     assert contribution.turn_end_hook_bindings[0].hook_id == enhancements.TURN_END_HOOK_ID
     assert contribution.turn_end_hook_bindings[0].source_id == enhancements.SOURCE_RULE_ID
+
+
+def test_leaping_shadows_grants_scouts_nine_to_bearers_attached_rules_unit() -> None:
+    state = _shadow_legion_state(
+        unit_keywords=("Shadow Legion", "Undivided", "Character"),
+        player_a_unit_selection_ids=("bodyguard-unit", "leader-unit"),
+    )
+    bodyguard = _unit_for_player_by_index(state, player_id="player-a", index=0)
+    leader = _unit_for_player_by_index(state, player_id="player-a", index=1)
+    _attach_shadow_legion_units(state, bodyguard=bodyguard, leader=leader)
+    _assign_leaping_shadows(state, unit=leader)
+    decisions = DecisionController()
+
+    apply_enhancement_effects(
+        state=state,
+        registry=EnhancementEffectRegistry.from_bindings(
+            enhancements.runtime_contribution().enhancement_effect_bindings
+        ),
+        decisions=decisions,
+    )
+    apply_enhancement_effects(
+        state=state,
+        registry=EnhancementEffectRegistry.from_bindings(
+            enhancements.runtime_contribution().enhancement_effect_bindings
+        ),
+        decisions=decisions,
+    )
+
+    refreshed_bodyguard = _refreshed_unit(state, bodyguard)
+    refreshed_leader = _refreshed_unit(state, leader)
+    bodyguard_scouts = scouts_ability_descriptors_for_unit(refreshed_bodyguard)
+    leader_scouts = scouts_ability_descriptors_for_unit(refreshed_leader)
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=leader.unit_instance_id)
+    scout_instances = scout_ability_instances_for_rules_unit(
+        view=rules_unit,
+        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+    )
+
+    assert [
+        scouts_distance_inches_from_descriptor(descriptor) for descriptor in bodyguard_scouts
+    ] == [9.0]
+    leader_scout_distances = [
+        scouts_distance_inches_from_descriptor(descriptor) for descriptor in leader_scouts
+    ]
+    assert leader_scout_distances == [9.0]
+    assert {descriptor.source_id for descriptor in (*bodyguard_scouts, *leader_scouts)} == {
+        enhancements.LEAPING_SHADOWS_SOURCE_RULE_ID
+    }
+    assert {instance.distance_inches for instance in scout_instances} == {9.0}
+    assert {instance.source_id for instance in scout_instances} == {
+        enhancements.LEAPING_SHADOWS_SOURCE_RULE_ID
+    }
+    assert _event_count(decisions, "enhancement_effects_applied") == 1
+    effect_event = _last_event_payload(decisions, "enhancement_effects_applied")
+    effect_payloads = cast(list[JsonValue], effect_event["effects"])
+    applied_target_unit_ids: set[str] = set()
+    for payload in effect_payloads:
+        effect_payload = cast(dict[str, JsonValue], payload)
+        target_unit_instance_id = effect_payload["target_unit_instance_id"]
+        assert isinstance(target_unit_instance_id, str)
+        applied_target_unit_ids.add(target_unit_instance_id)
+    assert applied_target_unit_ids == {bodyguard.unit_instance_id, leader.unit_instance_id}
 
 
 def test_shadow_legion_mustering_grants_keywords_and_deep_strike() -> None:
@@ -1084,6 +1166,60 @@ def _assign_fade_to_darkness(state: GameState, *, unit: UnitInstance) -> None:
                         enhancement_id=enhancements.ENHANCEMENT_ID,
                         target_unit_selection_id=unit.unit_instance_id.removeprefix(prefix),
                         source_id=enhancements.SOURCE_RULE_ID,
+                    ),
+                ),
+            )
+        )
+    state.army_definitions = updated_armies
+
+
+def _assign_leaping_shadows(state: GameState, *, unit: UnitInstance) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != "player-a":
+            updated_armies.append(army)
+            continue
+        prefix = f"{army.army_id}:"
+        if not unit.unit_instance_id.startswith(prefix):
+            raise AssertionError(f"Unit {unit.unit_instance_id} is not owned by {army.army_id}.")
+        updated_armies.append(
+            replace(
+                army,
+                enhancement_assignments=(
+                    EnhancementAssignment(
+                        enhancement_id=enhancements.LEAPING_SHADOWS_ENHANCEMENT_ID,
+                        target_unit_selection_id=unit.unit_instance_id.removeprefix(prefix),
+                        source_id=enhancements.LEAPING_SHADOWS_SOURCE_RULE_ID,
+                    ),
+                ),
+            )
+        )
+    state.army_definitions = updated_armies
+
+
+def _attach_shadow_legion_units(
+    state: GameState,
+    *,
+    bodyguard: UnitInstance,
+    leader: UnitInstance,
+) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != "player-a":
+            updated_armies.append(army)
+            continue
+        updated_armies.append(
+            replace(
+                army,
+                attached_units=(
+                    AttachedUnitFormation(
+                        attached_unit_instance_id=f"attached-unit:{army.army_id}:bodyguard-unit",
+                        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+                        leader_unit_instance_ids=(leader.unit_instance_id,),
+                        component_unit_instance_ids=tuple(
+                            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+                        ),
+                        source_id="phase17g:shadow-legion:test-attached-unit",
                     ),
                 ),
             )
