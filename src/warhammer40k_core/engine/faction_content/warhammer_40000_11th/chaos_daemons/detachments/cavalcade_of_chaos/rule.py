@@ -13,7 +13,7 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
-CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:rule:scaffold"
+CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:rule"
 HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche"
 SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:cavalcade-of-chaos:rule"
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"

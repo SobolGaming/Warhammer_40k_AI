@@ -48,8 +48,42 @@ LEAPING_SHADOWS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
     "enhancement:leaping_shadows:scouts_9",
 )
+MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:malice_made_manifest",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+    "enhancement:malice_made_manifest:mortal-wound-fnp",
+)
+BLOOD_LEGION_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall",
+    "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted",
+)
+CAVALCADE_OF_CHAOS_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche",
+)
 DAEMONIC_INCURSION_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts",
+)
+SHADOW_LEGION_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "murderers-cowl:advance-eligibility",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "shadows-caress:snap-target-restriction",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:shooting:lethal_hits",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:shooting:sustained_hits_1",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:fight:lethal_hits",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:fight:sustained_hits_1",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:attack-sequence-completed",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:mortal-wound-fnp",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:penumbral-puppetry:hit-roll",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:gloam-rot:wound-roll",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:weapon-profile",
 )
 
 
@@ -147,20 +181,67 @@ def test_phase17f_leaping_shadows_execution_record_is_named_handler() -> None:
     assert record.block_reason is None
 
 
-def test_phase17f_daemonic_incursion_execution_record_is_named_handler() -> None:
+def test_phase17f_malice_made_manifest_execution_record_is_named_handler() -> None:
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
+        and record.faction_id == "chaos-daemons"
+        and record.detachment_id == "shadow-legion"
+        and record.rule_id == "000009980005"
+    )
+
+    assert record.rule_name == "Malice Made Manifest"
+    assert record.runtime_support_status == "engine_consumed"
+    assert record.runtime_consumer_ids == MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
+    assert record.handler_id == MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS[0]
+    assert record.block_reason is None
+
+
+@pytest.mark.parametrize(
+    ("detachment_id", "rule_name", "runtime_consumers"),
+    [
+        (
+            "blood-legion",
+            "Blood Legion detachment rule",
+            BLOOD_LEGION_RUNTIME_CONSUMERS,
+        ),
+        (
+            "cavalcade-of-chaos",
+            "Cavalcade of Chaos detachment rule",
+            CAVALCADE_OF_CHAOS_RUNTIME_CONSUMERS,
+        ),
+        (
+            "daemonic-incursion",
+            "Daemonic Incursion detachment rule",
+            DAEMONIC_INCURSION_RUNTIME_CONSUMERS,
+        ),
+        (
+            "shadow-legion",
+            "Shadow Legion detachment rule",
+            SHADOW_LEGION_RUNTIME_CONSUMERS,
+        ),
+    ],
+)
+def test_phase17f_chaos_daemons_detachment_rule_execution_record_is_named_handler(
+    detachment_id: str,
+    rule_name: str,
+    runtime_consumers: tuple[str, ...],
+) -> None:
     record = next(
         record
         for record in faction_execution_source.phase17f_execution_package().execution_records
         if record.coverage_kind is Phase17ECoverageKind.DETACHMENT_RULE
         and record.faction_id == "chaos-daemons"
-        and record.detachment_id == "daemonic-incursion"
+        and record.detachment_id == detachment_id
     )
 
-    assert record.rule_name == "Daemonic Incursion detachment rule"
+    assert record.rule_name == rule_name
     assert record.runtime_support_status == "engine_consumed"
-    assert record.runtime_consumer_ids == DAEMONIC_INCURSION_RUNTIME_CONSUMERS
+    assert record.runtime_consumer_ids == tuple(sorted(runtime_consumers))
     assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
-    assert record.handler_id == DAEMONIC_INCURSION_RUNTIME_CONSUMERS[0]
+    assert record.handler_id == runtime_consumers[0]
     assert record.block_reason is None
 
 

@@ -47,6 +47,7 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
     AttackSequenceCompletedHookRegistry,
 )
+from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
 from warhammer40k_core.engine.damage_allocation import (
     FeelNoPainSource,
     feel_no_pain_roll_spec,
@@ -70,6 +71,12 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as dark_pacts,
 )
+from warhammer40k_core.engine.fight_phase_start_hooks import (
+    SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
+    FightPhaseStartHookRegistry,
+    FightPhaseStartRequestContext,
+    FightPhaseStartResultContext,
+)
 from warhammer40k_core.engine.fight_unit_selected_hooks import FightUnitSelectedContext
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
@@ -83,6 +90,10 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHookRegistry,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.phases.fight import (
+    FightPhaseHandler,
+    invalid_fight_phase_start_faction_rule_status,
+)
 from warhammer40k_core.engine.phases.shooting import (
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
     ShootingPhaseHandler,
@@ -119,6 +130,7 @@ from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
+from warhammer40k_core.geometry.pose import Pose
 
 _DAEMON_DATASHEET_ID = "phase17g-shadow-legion-daemon"
 _BELAKOR_DATASHEET_ID = "phase17g-shadow-legion-belakor"
@@ -193,6 +205,18 @@ def test_shadow_legion_enhancement_runtime_contribution_registers_exact_hooks() 
     assert contribution.unit_destroyed_hook_bindings[0].source_id == enhancements.SOURCE_RULE_ID
     assert contribution.turn_end_hook_bindings[0].hook_id == enhancements.TURN_END_HOOK_ID
     assert contribution.turn_end_hook_bindings[0].source_id == enhancements.SOURCE_RULE_ID
+    assert contribution.fight_phase_start_hook_bindings[0].hook_id == (
+        enhancements.MALICE_MADE_MANIFEST_HOOK_ID
+    )
+    assert contribution.fight_phase_start_hook_bindings[0].source_id == (
+        enhancements.MALICE_MADE_MANIFEST_SOURCE_RULE_ID
+    )
+    assert contribution.mortal_wound_feel_no_pain_hook_bindings[0].hook_id == (
+        enhancements.MALICE_MADE_MANIFEST_MORTAL_WOUND_FNP_HOOK_ID
+    )
+    assert contribution.mortal_wound_feel_no_pain_hook_bindings[0].source_kind == (
+        enhancements.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_SOURCE_KIND
+    )
 
 
 def test_leaping_shadows_grants_scouts_nine_to_bearers_attached_rules_unit() -> None:
@@ -255,6 +279,437 @@ def test_leaping_shadows_grants_scouts_nine_to_bearers_attached_rules_unit() -> 
         assert isinstance(target_unit_instance_id, str)
         applied_target_unit_ids.add(target_unit_instance_id)
     assert applied_target_unit_ids == {bodyguard.unit_instance_id, leader.unit_instance_id}
+
+
+def test_malice_made_manifest_fight_start_applies_three_mortal_wounds_on_six() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    state.game_id = "j"
+    bearer = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_malice_made_manifest(state, unit=bearer)
+    _place_malice_made_manifest_engagement(state, bearer=bearer, target=target)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    decisions = DecisionController()
+    starting_wounds = sum(model.wounds_remaining for model in target.own_models)
+
+    request = _decision_request(
+        enhancements.malice_made_manifest_fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=decisions)
+        )
+    )
+
+    assert request.decision_type == SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE
+    assert request.actor_id == "player-a"
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["source_rule_id"] == enhancements.MALICE_MADE_MANIFEST_SOURCE_RULE_ID
+    assert request_payload["hook_id"] == enhancements.MALICE_MADE_MANIFEST_HOOK_ID
+    assert request_payload["enhancement_id"] == enhancements.MALICE_MADE_MANIFEST_ENHANCEMENT_ID
+    assert request_payload["bearer_unit_instance_id"] == bearer.unit_instance_id
+    assert request_payload["eligible_enemy_unit_instance_ids"] == [target.unit_instance_id]
+
+    result = DecisionResult.for_request(
+        result_id="result-malice-made-manifest-six",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    handled = enhancements.apply_malice_made_manifest_fight_phase_start_result(
+        FightPhaseStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+
+    assert handled is True
+    payload = _last_event_payload(decisions, enhancements.MALICE_MADE_MANIFEST_RESOLVED_EVENT)
+    assert payload["source_rule_id"] == enhancements.MALICE_MADE_MANIFEST_SOURCE_RULE_ID
+    assert payload["hook_id"] == enhancements.MALICE_MADE_MANIFEST_HOOK_ID
+    assert payload["target_enemy_unit_instance_id"] == target.unit_instance_id
+    assert payload["mortal_wounds"] == 3
+    d6_payload = cast(dict[str, JsonValue], payload["d6_result"])
+    assert d6_payload["current_total"] == 6
+    application = cast(dict[str, JsonValue], payload["mortal_wound_application"])
+    assert application["mortal_wounds"] == 3
+    assert (
+        starting_wounds
+        - sum(model.wounds_remaining for model in _refreshed_unit(state, target).own_models)
+        == 3
+    )
+    assert (
+        enhancements.malice_made_manifest_fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=decisions)
+        )
+        is None
+    )
+
+
+def test_malice_made_manifest_routes_mortal_wound_feel_no_pain_choice() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    state.game_id = "phase17g-malice-actual-7"
+    bearer = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_malice_made_manifest(state, unit=bearer)
+    _place_malice_made_manifest_engagement(state, bearer=bearer, target=target)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    source_a = FeelNoPainSource(source_id="malice-fnp-a", threshold=5)
+    source_b = FeelNoPainSource(source_id="malice-fnp-b", threshold=6)
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=target.own_models[0].model_instance_id,
+        sources=(source_a, source_b),
+    )
+    decisions = DecisionController()
+    starting_wounds = sum(model.wounds_remaining for model in target.own_models)
+    request = _decision_request(
+        enhancements.malice_made_manifest_fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=decisions)
+        )
+    )
+    result = DecisionResult.for_request(
+        result_id="result-malice-made-manifest-fnp",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+
+    status = enhancements.apply_malice_made_manifest_fight_phase_start_result(
+        FightPhaseStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+
+    assert type(status) is not bool
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    fnp_request = _decision_request(status.decision_request)
+    assert is_mortal_wound_feel_no_pain_request(fnp_request)
+    source_context = mortal_wound_feel_no_pain_source_context(fnp_request)
+    assert isinstance(source_context, dict)
+    assert source_context["source_kind"] == (
+        enhancements.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_SOURCE_KIND
+    )
+    pending_payload = cast(dict[str, JsonValue], source_context["resolution_payload"])
+    assert pending_payload["hook_id"] == enhancements.MALICE_MADE_MANIFEST_HOOK_ID
+    assert pending_payload["mortal_wounds"] == 1
+    assert {option.option_id for option in fnp_request.options} == {
+        source_a.source_id,
+        source_b.source_id,
+    }
+
+    fnp_result = DecisionResult.for_request(
+        result_id="result-malice-fnp-source-a",
+        request=fnp_request,
+        selected_option_id=source_a.source_id,
+    )
+    decisions.submit_result(fnp_result)
+    continuation_status = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+        enhancements.runtime_contribution().mortal_wound_feel_no_pain_hook_bindings
+    ).apply_decision(
+        MortalWoundFeelNoPainContinuationContext(
+            state=state,
+            decisions=decisions,
+            request=fnp_request,
+            result=fnp_result,
+            source_context=source_context,
+            dice_manager=DiceRollManager(
+                state.game_id,
+                event_log=decisions.event_log,
+                injected_results=(
+                    DiceRollResult.from_values(
+                        roll_id="malice-fnp-roll",
+                        spec=feel_no_pain_roll_spec(
+                            source=source_a,
+                            player_id="player-b",
+                            model_instance_id=target.own_models[0].model_instance_id,
+                            wound_index=1,
+                        ),
+                        values=(1,),
+                        source="fixed",
+                    ),
+                ),
+            ),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+    )
+
+    assert continuation_status is None
+    payload = _last_event_payload(decisions, enhancements.MALICE_MADE_MANIFEST_RESOLVED_EVENT)
+    assert payload["feel_no_pain_result_id"] == fnp_result.result_id
+    application = cast(dict[str, JsonValue], payload["mortal_wound_application"])
+    assert application["mortal_wounds"] == 1
+    assert (
+        starting_wounds
+        - sum(model.wounds_remaining for model in _refreshed_unit(state, target).own_models)
+        == 1
+    )
+
+
+def test_malice_made_manifest_fight_handler_requests_and_resolves_start_choice() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    state.game_id = "j"
+    bearer = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_malice_made_manifest(state, unit=bearer)
+    _place_malice_made_manifest_engagement(state, bearer=bearer, target=target)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    decisions = DecisionController()
+    handler = FightPhaseHandler(
+        fight_phase_start_hooks=FightPhaseStartHookRegistry.from_bindings(
+            enhancements.runtime_contribution().fight_phase_start_hook_bindings
+        ),
+    )
+
+    status = handler.begin_phase(state=state, decisions=decisions)
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = _decision_request(status.decision_request)
+    assert request.decision_type == SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE
+    result = DecisionResult.for_request(
+        result_id="result-malice-made-manifest-handler",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    assert (
+        invalid_fight_phase_start_faction_rule_status(
+            state=state,
+            request=request,
+            result=result,
+        )
+        is None
+    )
+    decisions.submit_result(result)
+
+    resolved_status = handler.apply_decision(
+        state=state,
+        result=result,
+        decisions=decisions,
+    )
+
+    assert resolved_status is None
+    assert decisions.records[-1].result == result
+    payload = _last_event_payload(decisions, enhancements.MALICE_MADE_MANIFEST_RESOLVED_EVENT)
+    assert payload["target_enemy_unit_instance_id"] == target.unit_instance_id
+    assert payload["mortal_wounds"] == 3
+
+
+def test_malice_made_manifest_fight_start_rejects_battle_round_drift_before_recording() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    state.game_id = "phase17g-malice-drift"
+    bearer = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_malice_made_manifest(state, unit=bearer)
+    _place_malice_made_manifest_engagement(state, bearer=bearer, target=target)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    decisions = DecisionController()
+    request = _decision_request(
+        enhancements.malice_made_manifest_fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=decisions)
+        )
+    )
+    result = DecisionResult.for_request(
+        result_id="result-malice-made-manifest-drift",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    state.battle_round += 1
+
+    rejected = invalid_fight_phase_start_faction_rule_status(
+        state=state,
+        request=request,
+        result=result,
+    )
+
+    assert rejected is not None
+    assert rejected.status_kind is LifecycleStatusKind.INVALID
+    rejected_payload = cast(dict[str, JsonValue], rejected.payload)
+    assert rejected_payload["invalid_reason"] == "battle_round_drift"
+    assert decisions.records == ()
+    assert (
+        tuple(
+            event
+            for event in decisions.event_log.records
+            if event.event_type == enhancements.MALICE_MADE_MANIFEST_RESOLVED_EVENT
+        )
+        == ()
+    )
+
+
+def test_malice_made_manifest_fight_start_records_no_effect_on_one() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    state.game_id = "malice-seed-2"
+    bearer = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_malice_made_manifest(state, unit=bearer)
+    _place_malice_made_manifest_engagement(state, bearer=bearer, target=target)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    decisions = DecisionController()
+    starting_wounds = sum(model.wounds_remaining for model in target.own_models)
+    request = _decision_request(
+        enhancements.malice_made_manifest_fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=decisions)
+        )
+    )
+    result = DecisionResult.for_request(
+        result_id="result-malice-made-manifest-one",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+
+    handled = enhancements.apply_malice_made_manifest_fight_phase_start_result(
+        FightPhaseStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+
+    assert handled is True
+    payload = _last_event_payload(decisions, enhancements.MALICE_MADE_MANIFEST_NO_EFFECT_EVENT)
+    d6_payload = cast(dict[str, JsonValue], payload["d6_result"])
+    assert d6_payload["current_total"] == 1
+    assert payload["mortal_wounds"] == 0
+    assert payload["target_enemy_unit_instance_id"] == target.unit_instance_id
+    assert (
+        sum(model.wounds_remaining for model in _refreshed_unit(state, target).own_models)
+        == starting_wounds
+    )
+    assert (
+        enhancements.malice_made_manifest_fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=decisions)
+        )
+        is None
+    )
+
+
+def test_malice_made_manifest_request_requires_fight_start_context() -> None:
+    with pytest.raises(GameLifecycleError, match=r"requires a Fight-start context"):
+        enhancements.malice_made_manifest_fight_phase_start_request(
+            cast(FightPhaseStartRequestContext, object())
+        )
+
+
+def test_malice_made_manifest_rejects_target_drift_before_damage() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    bearer = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_malice_made_manifest(state, unit=bearer)
+    _place_malice_made_manifest_engagement(state, bearer=bearer, target=target)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    decisions = DecisionController()
+    request = _decision_request(
+        enhancements.malice_made_manifest_fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=decisions)
+        )
+    )
+    result = DecisionResult.for_request(
+        result_id="result-malice-made-manifest-target-drift",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=target.unit_instance_id,
+        poses=_unit_line_poses(x=40.0, y=40.0),
+    )
+
+    with pytest.raises(GameLifecycleError, match=r"target is no longer eligible"):
+        enhancements.apply_malice_made_manifest_fight_phase_start_result(
+            FightPhaseStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+            )
+        )
+
+    assert _event_count(decisions, enhancements.MALICE_MADE_MANIFEST_RESOLVED_EVENT) == 0
+
+
+def test_malice_made_manifest_rejects_assignment_drift_before_damage() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    bearer = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_malice_made_manifest(state, unit=bearer)
+    _place_malice_made_manifest_engagement(state, bearer=bearer, target=target)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    decisions = DecisionController()
+    request = _decision_request(
+        enhancements.malice_made_manifest_fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=decisions)
+        )
+    )
+    result = DecisionResult.for_request(
+        result_id="result-malice-made-manifest-assignment-drift",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    state.army_definitions = [
+        replace(army, enhancement_assignments=()) if army.player_id == "player-a" else army
+        for army in state.army_definitions
+    ]
+
+    with pytest.raises(GameLifecycleError, match=r"assignment no longer matches unit"):
+        enhancements.apply_malice_made_manifest_fight_phase_start_result(
+            FightPhaseStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+            )
+        )
+
+    assert _event_count(decisions, enhancements.MALICE_MADE_MANIFEST_RESOLVED_EVENT) == 0
+
+
+def test_malice_made_manifest_rejects_option_payload_drift() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    bearer = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_malice_made_manifest(state, unit=bearer)
+    _place_malice_made_manifest_engagement(state, bearer=bearer, target=target)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    decisions = DecisionController()
+    request = _decision_request(
+        enhancements.malice_made_manifest_fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=decisions)
+        )
+    )
+    option_payload = cast(dict[str, JsonValue], request.options[0].payload)
+    result = DecisionResult(
+        result_id="result-malice-made-manifest-payload-drift",
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id=request.options[0].option_id,
+        payload={**option_payload, "hook_id": "drifted-hook"},
+    )
+
+    with pytest.raises(GameLifecycleError, match=r"result payload drift"):
+        enhancements.apply_malice_made_manifest_fight_phase_start_result(
+            FightPhaseStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+            )
+        )
+
+
+def test_malice_made_manifest_assignment_requires_shadow_legion_bearer() -> None:
+    state = _shadow_legion_state(unit_keywords=("Undivided", "Character"))
+    bearer = _unit_for_player(state, player_id="player-a")
+    _assign_malice_made_manifest(state, unit=bearer)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match=r"Malice Made Manifest requires a Shadow Legion model\.",
+    ):
+        enhancements.malice_made_manifest_fight_phase_start_request(
+            FightPhaseStartRequestContext(state=state, decisions=DecisionController())
+        )
 
 
 def test_shadow_legion_mustering_grants_keywords_and_deep_strike() -> None:
@@ -1202,6 +1657,30 @@ def _assign_leaping_shadows(state: GameState, *, unit: UnitInstance) -> None:
     state.army_definitions = updated_armies
 
 
+def _assign_malice_made_manifest(state: GameState, *, unit: UnitInstance) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != "player-a":
+            updated_armies.append(army)
+            continue
+        prefix = f"{army.army_id}:"
+        if not unit.unit_instance_id.startswith(prefix):
+            raise AssertionError(f"Unit {unit.unit_instance_id} is not owned by {army.army_id}.")
+        updated_armies.append(
+            replace(
+                army,
+                enhancement_assignments=(
+                    EnhancementAssignment(
+                        enhancement_id=enhancements.MALICE_MADE_MANIFEST_ENHANCEMENT_ID,
+                        target_unit_selection_id=unit.unit_instance_id.removeprefix(prefix),
+                        source_id=enhancements.MALICE_MADE_MANIFEST_SOURCE_RULE_ID,
+                    ),
+                ),
+            )
+        )
+    state.army_definitions = updated_armies
+
+
 def _attach_shadow_legion_units(
     state: GameState,
     *,
@@ -1230,6 +1709,66 @@ def _attach_shadow_legion_units(
             )
         )
     state.army_definitions = updated_armies
+
+
+def _place_malice_made_manifest_engagement(
+    state: GameState,
+    *,
+    bearer: UnitInstance,
+    target: UnitInstance,
+) -> None:
+    _place_unit_poses(
+        state,
+        unit_instance_id=bearer.unit_instance_id,
+        poses=_unit_line_poses(x=10.0, y=20.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=target.unit_instance_id,
+        poses=_unit_line_poses(x=12.0, y=20.0),
+    )
+
+
+def _place_unit_poses(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    poses: tuple[Pose, ...],
+) -> None:
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
+    placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)
+    state.replace_battlefield_state(
+        state.battlefield_state.with_unit_placement(_with_model_poses(placement, poses=poses))
+    )
+
+
+def _unit_line_poses(*, x: float, y: float) -> tuple[Pose, ...]:
+    return tuple(Pose.at(x, y + index * 1.8) for index in range(5))
+
+
+def _with_model_poses(
+    unit_placement: UnitPlacement,
+    *,
+    poses: tuple[Pose, ...],
+) -> UnitPlacement:
+    if len(poses) != len(unit_placement.model_placements):
+        raise AssertionError("test pose fixture must match unit model count")
+    return UnitPlacement(
+        army_id=unit_placement.army_id,
+        player_id=unit_placement.player_id,
+        unit_instance_id=unit_placement.unit_instance_id,
+        model_placements=tuple(
+            ModelPlacement(
+                army_id=placement.army_id,
+                player_id=placement.player_id,
+                unit_instance_id=placement.unit_instance_id,
+                model_instance_id=placement.model_instance_id,
+                pose=pose,
+            )
+            for placement, pose in zip(unit_placement.model_placements, poses, strict=True)
+        ),
+    )
 
 
 def _record_fade_to_darkness_destroyed_enemy(

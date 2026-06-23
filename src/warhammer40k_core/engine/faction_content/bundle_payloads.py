@@ -21,6 +21,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     battle_round_start_hook_ids: list[str]
     turn_end_hook_ids: list[str]
     command_phase_start_hook_ids: list[str]
+    fight_phase_start_hook_ids: list[str]
     unit_destroyed_hook_ids: list[str]
     battle_shock_hook_ids: list[str]
     advance_eligibility_hook_ids: list[str]

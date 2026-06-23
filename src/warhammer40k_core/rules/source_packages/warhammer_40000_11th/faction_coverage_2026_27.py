@@ -62,6 +62,42 @@ _EXACT_SUBRULE_COVERAGE_KINDS = frozenset(
 DAEMONIC_INCURSION_WARP_RIFTS_RUNTIME_CONSUMER_ID = (
     "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts"
 )
+BLOOD_LEGION_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall",
+    "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted",
+)
+CAVALCADE_OF_CHAOS_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche",
+)
+DAEMONIC_INCURSION_RUNTIME_CONSUMER_IDS = (DAEMONIC_INCURSION_WARP_RIFTS_RUNTIME_CONSUMER_ID,)
+SHADOW_LEGION_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "murderers-cowl:advance-eligibility",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "shadows-caress:snap-target-restriction",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:shooting:lethal_hits",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:shooting:sustained_hits_1",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:fight:lethal_hits",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:fight:sustained_hits_1",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:attack-sequence-completed",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:mortal-wound-fnp",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:penumbral-puppetry:hit-roll",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:gloam-rot:wound-roll",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:weapon-profile",
+)
+CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMER_IDS_BY_DETACHMENT_ID = {
+    "blood-legion": BLOOD_LEGION_RUNTIME_CONSUMER_IDS,
+    "cavalcade-of-chaos": CAVALCADE_OF_CHAOS_RUNTIME_CONSUMER_IDS,
+    "daemonic-incursion": DAEMONIC_INCURSION_RUNTIME_CONSUMER_IDS,
+    "shadow-legion": SHADOW_LEGION_RUNTIME_CONSUMER_IDS,
+}
 
 
 class Phase17EFactionPdfRecordPayload(TypedDict):
@@ -674,11 +710,11 @@ def _detachment_rows(
 def _detachment_rule_runtime_consumer_ids(
     detachment_row: faction_detachments_2026_27.SourceDetachmentRow,
 ) -> tuple[str, ...]:
-    if (
-        detachment_row.faction_id == "chaos-daemons"
-        and detachment_row.detachment_id == "daemonic-incursion"
-    ):
-        return (DAEMONIC_INCURSION_WARP_RIFTS_RUNTIME_CONSUMER_ID,)
+    if detachment_row.faction_id == "chaos-daemons":
+        return CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMER_IDS_BY_DETACHMENT_ID.get(
+            detachment_row.detachment_id,
+            (),
+        )
     return ()
 
 

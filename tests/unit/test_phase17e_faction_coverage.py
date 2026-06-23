@@ -67,9 +67,50 @@ LEAPING_SHADOWS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
     "enhancement:leaping_shadows:scouts_9",
 )
+MALICE_MADE_MANIFEST_SOURCE_ROW_ID = "enhancement:chaos-daemons:shadow-legion:000009980005"
+MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:malice_made_manifest",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+    "enhancement:malice_made_manifest:mortal-wound-fnp",
+)
+BLOOD_LEGION_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall",
+    "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted",
+)
+CAVALCADE_OF_CHAOS_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche",
+)
 DAEMONIC_INCURSION_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts",
 )
+SHADOW_LEGION_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "murderers-cowl:advance-eligibility",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "shadows-caress:snap-target-restriction",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:shooting:lethal_hits",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:shooting:sustained_hits_1",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:fight:lethal_hits",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:fight:sustained_hits_1",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:attack-sequence-completed",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:mortal-wound-fnp",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:penumbral-puppetry:hit-roll",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:gloam-rot:wound-roll",
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
+    "disciples-of-belakor:weapon-profile",
+)
+CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY = {
+    ("chaos-daemons", "blood-legion"): BLOOD_LEGION_RUNTIME_CONSUMERS,
+    ("chaos-daemons", "cavalcade-of-chaos"): CAVALCADE_OF_CHAOS_RUNTIME_CONSUMERS,
+    ("chaos-daemons", "daemonic-incursion"): DAEMONIC_INCURSION_RUNTIME_CONSUMERS,
+    ("chaos-daemons", "shadow-legion"): SHADOW_LEGION_RUNTIME_CONSUMERS,
+}
 
 
 def test_phase17e_payload_is_deterministic_json_safe_and_round_trips() -> None:
@@ -268,12 +309,13 @@ def test_phase17e_loads_every_seeded_faction_and_detachment() -> None:
         assert coverage_row.force_disposition_id == detachment_row.force_disposition_id
         assert coverage_row.detachment_point_cost == detachment_row.detachment_point_cost
         assert coverage_row.is_new_for_eleventh is detachment_row.is_new_for_eleventh
-        if key == ("chaos-daemons", "daemonic-incursion"):
+        if key in CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY:
+            runtime_consumers = CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY[key]
             assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
             assert coverage_row.runtime_support_status is not None
             assert coverage_row.runtime_support_status.value == "engine_consumed"
-            assert coverage_row.runtime_consumer_ids == DAEMONIC_INCURSION_RUNTIME_CONSUMERS
-            assert coverage_row.handler_id == DAEMONIC_INCURSION_RUNTIME_CONSUMERS[0]
+            assert coverage_row.runtime_consumer_ids == tuple(sorted(runtime_consumers))
+            assert coverage_row.handler_id == runtime_consumers[0]
         else:
             assert coverage_row.status is Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED
             assert coverage_row.runtime_support_status is None
@@ -409,21 +451,75 @@ def test_phase17e_leaping_shadows_exact_row_is_engine_consumed() -> None:
     assert coverage_row.handler_id == LEAPING_SHADOWS_RUNTIME_CONSUMERS[0]
 
 
-def test_phase17e_daemonic_incursion_detachment_rule_is_engine_consumed() -> None:
+def test_phase17e_malice_made_manifest_exact_row_is_engine_consumed() -> None:
+    source_row = next(
+        row
+        for row in faction_subrule_source.enhancement_rows()
+        if row.source_row_id == MALICE_MADE_MANIFEST_SOURCE_ROW_ID
+    )
+    coverage_row = next(
+        row
+        for row in faction_coverage_source.coverage_rows()
+        if row.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
+        and row.faction_id == "chaos-daemons"
+        and row.detachment_id == "shadow-legion"
+        and row.rule_id == "000009980005"
+    )
+
+    assert source_row.name == "Malice Made Manifest"
+    assert source_row.runtime_support_status.value == "engine_consumed"
+    assert source_row.runtime_consumer_ids == MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS
+    assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+    assert coverage_row.runtime_support_status is not None
+    assert coverage_row.runtime_support_status.value == "engine_consumed"
+    assert coverage_row.runtime_consumer_ids == MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS
+    assert coverage_row.handler_id == MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS[0]
+
+
+@pytest.mark.parametrize(
+    ("detachment_id", "rule_name", "runtime_consumers"),
+    [
+        (
+            "blood-legion",
+            "Blood Legion detachment rule",
+            BLOOD_LEGION_RUNTIME_CONSUMERS,
+        ),
+        (
+            "cavalcade-of-chaos",
+            "Cavalcade of Chaos detachment rule",
+            CAVALCADE_OF_CHAOS_RUNTIME_CONSUMERS,
+        ),
+        (
+            "daemonic-incursion",
+            "Daemonic Incursion detachment rule",
+            DAEMONIC_INCURSION_RUNTIME_CONSUMERS,
+        ),
+        (
+            "shadow-legion",
+            "Shadow Legion detachment rule",
+            SHADOW_LEGION_RUNTIME_CONSUMERS,
+        ),
+    ],
+)
+def test_phase17e_chaos_daemons_detachment_rule_is_engine_consumed(
+    detachment_id: str,
+    rule_name: str,
+    runtime_consumers: tuple[str, ...],
+) -> None:
     coverage_row = next(
         row
         for row in faction_coverage_source.coverage_rows()
         if row.coverage_kind is Phase17ECoverageKind.DETACHMENT_RULE
         and row.faction_id == "chaos-daemons"
-        and row.detachment_id == "daemonic-incursion"
+        and row.detachment_id == detachment_id
     )
 
-    assert coverage_row.rule_name == "Daemonic Incursion detachment rule"
+    assert coverage_row.rule_name == rule_name
     assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
     assert coverage_row.runtime_support_status is not None
     assert coverage_row.runtime_support_status.value == "engine_consumed"
-    assert coverage_row.runtime_consumer_ids == DAEMONIC_INCURSION_RUNTIME_CONSUMERS
-    assert coverage_row.handler_id == DAEMONIC_INCURSION_RUNTIME_CONSUMERS[0]
+    assert coverage_row.runtime_consumer_ids == tuple(sorted(runtime_consumers))
+    assert coverage_row.handler_id == runtime_consumers[0]
 
 
 def test_phase17e_coverage_report_groups_supported_and_approved_unsupported_rows() -> None:
@@ -435,7 +531,7 @@ def test_phase17e_coverage_report_groups_supported_and_approved_unsupported_rows
     implemented_exact_count = sum(1 for row in enhancement_rows if row.runtime_consumer_ids) + sum(
         1 for row in stratagem_rows if row.runtime_consumer_ids
     )
-    implemented_detachment_rule_count = 1
+    implemented_detachment_rule_count = len(CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY)
     source_only_exact_count = len(enhancement_rows) + len(stratagem_rows) - implemented_exact_count
     status_counts = package.status_counts()
 

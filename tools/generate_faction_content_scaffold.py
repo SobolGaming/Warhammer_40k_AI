@@ -33,6 +33,10 @@ SHADOW_LEGION_ENHANCEMENTS_MODULE_PATH = (
 DAEMONIC_INCURSION_RULE_MODULE_PATH = (
     f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.daemonic_incursion.rule"
 )
+BLOOD_LEGION_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.blood_legion.rule"
+CAVALCADE_OF_CHAOS_RULE_MODULE_PATH = (
+    f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.cavalcade_of_chaos.rule"
+)
 IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
     CHAOS_SPACE_MARINES_ARMY_RULE_MODULE_PATH: (
         "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts"
@@ -48,6 +52,12 @@ IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
     ),
     DAEMONIC_INCURSION_RULE_MODULE_PATH: (
         "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:rule:warp_rifts"
+    ),
+    BLOOD_LEGION_RULE_MODULE_PATH: (
+        "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:rule"
+    ),
+    CAVALCADE_OF_CHAOS_RULE_MODULE_PATH: (
+        "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:rule"
     ),
 }
 

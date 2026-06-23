@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
@@ -52,10 +51,22 @@ from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectBinding,
     EnhancementEffectRegistry,
 )
-from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle_payloads import (
     RuntimeContentBundleSummaryPayload,
+)
+from warhammer40k_core.engine.faction_content.bundle_validation import (
+    summary_hash as _summary_hash,
+)
+from warhammer40k_core.engine.faction_content.bundle_validation import (
+    validate_identifier as _validate_identifier,
+)
+from warhammer40k_core.engine.faction_content.bundle_validation import (
+    validate_identifier_tuple as _validate_identifier_tuple,
+)
+from warhammer40k_core.engine.faction_content.bundle_validation import (
+    validate_tuple as _validate_tuple,
 )
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventHandlerBinding,
@@ -78,6 +89,10 @@ from warhammer40k_core.engine.fall_back_hooks import (
 from warhammer40k_core.engine.fight_activation_abilities import (
     FightActivationAbilityHookBinding,
     FightActivationAbilityHookRegistry,
+)
+from warhammer40k_core.engine.fight_phase_start_hooks import (
+    FightPhaseStartHookBinding,
+    FightPhaseStartHookRegistry,
 )
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrantBinding,
@@ -185,6 +200,7 @@ class RuntimeContentContribution:
     battle_round_start_hook_bindings: tuple[BattleRoundStartHookBinding, ...] = ()
     turn_end_hook_bindings: tuple[TurnEndHookBinding, ...] = ()
     command_phase_start_hook_bindings: tuple[CommandPhaseStartHookBinding, ...] = ()
+    fight_phase_start_hook_bindings: tuple[FightPhaseStartHookBinding, ...] = ()
     unit_destroyed_hook_bindings: tuple[UnitDestroyedHookBinding, ...] = ()
     battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = ()
     advance_eligibility_hook_bindings: tuple[AdvanceEligibilityHookBinding, ...] = ()
@@ -343,6 +359,15 @@ class RuntimeContentContribution:
                 "RuntimeContentContribution command_phase_start_hook_bindings",
                 self.command_phase_start_hook_bindings,
                 CommandPhaseStartHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "fight_phase_start_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution fight_phase_start_hook_bindings",
+                self.fight_phase_start_hook_bindings,
+                FightPhaseStartHookBinding,
             ),
         )
         object.__setattr__(
@@ -635,6 +660,7 @@ class RuntimeContentContribution:
             battle_round_start_hook_bindings=self.battle_round_start_hook_bindings,
             turn_end_hook_bindings=self.turn_end_hook_bindings,
             command_phase_start_hook_bindings=self.command_phase_start_hook_bindings,
+            fight_phase_start_hook_bindings=self.fight_phase_start_hook_bindings,
             unit_destroyed_hook_bindings=self.unit_destroyed_hook_bindings,
             battle_shock_hook_bindings=self.battle_shock_hook_bindings,
             advance_eligibility_hook_bindings=self.advance_eligibility_hook_bindings,
@@ -762,6 +788,12 @@ def combine_runtime_content_contributions(
             validated_contributions,
             "Command-phase start hook binding",
             lambda contribution: contribution.command_phase_start_hook_bindings,
+            lambda binding: binding.hook_id,
+        ),
+        fight_phase_start_hook_bindings=_combine_contribution_values(
+            validated_contributions,
+            "Fight-phase start hook binding",
+            lambda contribution: contribution.fight_phase_start_hook_bindings,
             lambda binding: binding.hook_id,
         ),
         unit_destroyed_hook_bindings=_combine_contribution_values(
@@ -1031,6 +1063,7 @@ class RuntimeContentBundle:
     battle_round_start_hook_registry: BattleRoundStartHookRegistry
     turn_end_hook_registry: TurnEndHookRegistry
     command_phase_start_hook_registry: CommandPhaseStartHookRegistry
+    fight_phase_start_hook_registry: FightPhaseStartHookRegistry
     unit_destroyed_hook_registry: UnitDestroyedHookRegistry
     battle_shock_hook_registry: BattleShockHookRegistry
     advance_eligibility_hook_registry: AdvanceEligibilityHookRegistry
@@ -1095,6 +1128,8 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires TurnEndHookRegistry.")
         if type(self.command_phase_start_hook_registry) is not CommandPhaseStartHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires CommandPhaseStartHookRegistry.")
+        if type(self.fight_phase_start_hook_registry) is not FightPhaseStartHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires FightPhaseStartHookRegistry.")
         if type(self.unit_destroyed_hook_registry) is not UnitDestroyedHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires UnitDestroyedHookRegistry.")
         if type(self.battle_shock_hook_registry) is not BattleShockHookRegistry:
@@ -1335,6 +1370,12 @@ class RuntimeContentBundle:
                 lambda contribution: contribution.command_phase_start_hook_bindings,
             )
         )
+        fight_phase_start_hook_registry = FightPhaseStartHookRegistry.from_bindings(
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.fight_phase_start_hook_bindings,
+            )
+        )
         unit_destroyed_hook_registry = UnitDestroyedHookRegistry.from_bindings(
             _contribution_values(
                 validated_contributions,
@@ -1540,6 +1581,7 @@ class RuntimeContentBundle:
             battle_round_start_hook_registry=battle_round_start_hook_registry,
             turn_end_hook_registry=turn_end_hook_registry,
             command_phase_start_hook_registry=command_phase_start_hook_registry,
+            fight_phase_start_hook_registry=fight_phase_start_hook_registry,
             unit_destroyed_hook_registry=unit_destroyed_hook_registry,
             battle_shock_hook_registry=battle_shock_hook_registry,
             advance_eligibility_hook_registry=advance_eligibility_hook_registry,
@@ -1606,6 +1648,9 @@ class RuntimeContentBundle:
             ],
             "command_phase_start_hook_ids": [
                 binding.hook_id for binding in self.command_phase_start_hook_registry.all_bindings()
+            ],
+            "fight_phase_start_hook_ids": [
+                binding.hook_id for binding in self.fight_phase_start_hook_registry.all_bindings()
             ],
             "unit_destroyed_hook_ids": [
                 binding.hook_id for binding in self.unit_destroyed_hook_registry.all_bindings()
@@ -1942,46 +1987,3 @@ def _merge_records[T](
         *_validate_tuple(f"base {field_name}", base_records, expected_type),
         *_validate_tuple(f"contribution {field_name}", contribution_records, expected_type),
     )
-
-
-def _validate_tuple[T](
-    field_name: str,
-    value: object,
-    expected_type: type[T],
-) -> tuple[T, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError(f"{field_name} must be a tuple.")
-    validated: list[T] = []
-    for item in cast(tuple[object, ...], value):
-        if type(item) is not expected_type:
-            raise GameLifecycleError(f"{field_name} contains invalid values.")
-        validated.append(item)
-    return tuple(validated)
-
-
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Runtime content {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Runtime content {field_name} must not be empty.")
-    return stripped
-
-
-def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError(f"Runtime content {field_name} must be a tuple.")
-    seen: set[str] = set()
-    identifiers: list[str] = []
-    for value in cast(tuple[object, ...], values):
-        identifier = _validate_identifier(f"{field_name} value", value)
-        if identifier in seen:
-            raise GameLifecycleError(f"Runtime content {field_name} must not contain duplicates.")
-        seen.add(identifier)
-        identifiers.append(identifier)
-    return tuple(sorted(identifiers))
-
-
-def _summary_hash(payload: Mapping[str, JsonValue]) -> str:
-    serialized = canonical_json(validate_json_value(dict(payload)))
-    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
