@@ -168,11 +168,11 @@ Current status:
   support includes selected Chaos Daemons, Chaos Space Marines, Aeldari,
   Death Guard, World Eaters, and Space Marines Phase 17G slices. Chaos Daemons Shadow Legion
   supports Thralls of the First Prince mustering restrictions and keyword
-  grants, Murderer's Cowl, Penumbral Puppetry, Gloam Rot, Shadow's Caress, Fade
-  to Darkness, and Disciples of Be'lakor Dark Pacts through shared advance,
-  target-restriction, runtime-modifier, selected-unit grant,
-  attack-completion, turn-end reserves, out-of-phase shooting, and Feel No Pain
-  continuation paths. Chaos Space Marines Dark
+  grants, Murderer's Cowl, Penumbral Puppetry, Gloam Rot, Shadow's Caress,
+  Leaping Shadows, Fade to Darkness, and Disciples of Be'lakor Dark Pacts
+  through shared advance, Scouts, target-restriction, runtime-modifier,
+  selected-unit grant, attack-completion, turn-end reserves, out-of-phase
+  shooting, and Feel No Pain continuation paths. Chaos Space Marines Dark
   Pacts uses shared selected-to-shoot and selected-to-fight grant decisions,
   out-of-phase selected-to-shoot grant routing, attack-sequence weapon keyword
   modifiers, and post-attack Leadership-test D3 mortal-wound routing including

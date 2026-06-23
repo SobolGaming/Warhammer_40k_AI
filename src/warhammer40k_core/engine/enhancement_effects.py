@@ -5,6 +5,10 @@ from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.datasheet import (
+    DatasheetAbilityDescriptor,
+    DatasheetAbilityDescriptorPayload,
+)
 from warhammer40k_core.core.modifiers import ModifierOperation
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
@@ -47,6 +51,15 @@ class EnhancementUnitKeywordGrantPayload(TypedDict):
     enhancement_id: str
     target_unit_instance_id: str
     keyword: str
+    replay_payload: JsonValue
+
+
+class EnhancementDatasheetAbilityGrantPayload(TypedDict):
+    effect_id: str
+    source_id: str
+    enhancement_id: str
+    target_unit_instance_id: str
+    datasheet_ability: DatasheetAbilityDescriptorPayload
     replay_payload: JsonValue
 
 
@@ -216,6 +229,47 @@ class EnhancementUnitKeywordGrant:
 
 
 @dataclass(frozen=True, slots=True)
+class EnhancementDatasheetAbilityGrant:
+    effect_id: str
+    source_id: str
+    enhancement_id: str
+    target_unit_instance_id: str
+    datasheet_ability: DatasheetAbilityDescriptor
+    replay_payload: JsonValue = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "effect_id", _validate_identifier("effect_id", self.effect_id))
+        object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
+        object.__setattr__(
+            self,
+            "enhancement_id",
+            _validate_identifier("enhancement_id", self.enhancement_id),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier("target_unit_instance_id", self.target_unit_instance_id),
+        )
+        if type(self.datasheet_ability) is not DatasheetAbilityDescriptor:
+            raise GameLifecycleError(
+                "EnhancementDatasheetAbilityGrant datasheet_ability must be a descriptor."
+            )
+        if self.datasheet_ability.source_id != self.source_id:
+            raise GameLifecycleError("Enhancement datasheet ability source drift.")
+        object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
+
+    def to_payload(self) -> EnhancementDatasheetAbilityGrantPayload:
+        return {
+            "effect_id": self.effect_id,
+            "source_id": self.source_id,
+            "enhancement_id": self.enhancement_id,
+            "target_unit_instance_id": self.target_unit_instance_id,
+            "datasheet_ability": self.datasheet_ability.to_payload(),
+            "replay_payload": self.replay_payload,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class EnhancementEffectBinding:
     effect_id: str
     source_id: str
@@ -237,7 +291,8 @@ class EnhancementEffectBinding:
 def _enhancement_effect_sort_key(
     effect: EnhancementCharacteristicModifier
     | EnhancementPersistingEffectGrant
-    | EnhancementUnitKeywordGrant,
+    | EnhancementUnitKeywordGrant
+    | EnhancementDatasheetAbilityGrant,
 ) -> str:
     return effect.effect_id
 
@@ -270,7 +325,9 @@ class EnhancementEffectRegistry:
             EnhancementCharacteristicModifier
             | EnhancementPersistingEffectGrant
             | EnhancementUnitKeywordGrant
+            | EnhancementDatasheetAbilityGrant
         ] = []
+        allowed_target_unit_ids = _effect_target_unit_instance_ids(context)
         for binding in self.bindings:
             if binding.enhancement_id != context.assignment.enhancement_id:
                 continue
@@ -283,13 +340,17 @@ class EnhancementEffectRegistry:
                         EnhancementCharacteristicModifier
                         | EnhancementPersistingEffectGrant
                         | EnhancementUnitKeywordGrant
+                        | EnhancementDatasheetAbilityGrant
                     ) = effect
                 elif type(effect) in (
                     EnhancementPersistingEffectGrant,
                     EnhancementUnitKeywordGrant,
+                    EnhancementDatasheetAbilityGrant,
                 ):
                     supported_effect = cast(
-                        EnhancementPersistingEffectGrant | EnhancementUnitKeywordGrant,
+                        EnhancementPersistingEffectGrant
+                        | EnhancementUnitKeywordGrant
+                        | EnhancementDatasheetAbilityGrant,
                         effect,
                     )
                 else:
@@ -304,7 +365,7 @@ class EnhancementEffectRegistry:
                     raise GameLifecycleError(
                         "Enhancement effect handler returned enhancement_id drift."
                     )
-                if supported_effect.target_unit_instance_id != context.target_unit.unit_instance_id:
+                if supported_effect.target_unit_instance_id not in allowed_target_unit_ids:
                     raise GameLifecycleError(
                         "Enhancement effect handler returned target unit drift."
                     )
@@ -360,6 +421,14 @@ def apply_enhancement_effects(
                     continue
                 if type(effect) is EnhancementUnitKeywordGrant:
                     updated_army, payload = _apply_unit_keyword_grant(
+                        army=updated_army,
+                        effect=effect,
+                    )
+                    if payload is not None:
+                        event_payloads.append(payload)
+                    continue
+                if type(effect) is EnhancementDatasheetAbilityGrant:
+                    updated_army, payload = _apply_datasheet_ability_grant(
                         army=updated_army,
                         effect=effect,
                     )
@@ -458,6 +527,52 @@ def _apply_unit_keyword_grant(
     return updated_army, payload
 
 
+def _apply_datasheet_ability_grant(
+    *,
+    army: ArmyDefinition,
+    effect: EnhancementDatasheetAbilityGrant,
+) -> tuple[ArmyDefinition, dict[str, JsonValue] | None]:
+    updated_units: list[UnitInstance] = []
+    target_seen = False
+    payload: dict[str, JsonValue] | None = None
+    for unit in army.units:
+        if unit.unit_instance_id != effect.target_unit_instance_id:
+            updated_units.append(unit)
+            continue
+        target_seen = True
+        if any(
+            ability.ability_id == effect.datasheet_ability.ability_id
+            for ability in unit.datasheet_abilities
+        ):
+            updated_units.append(unit)
+            continue
+        updated_abilities = tuple(
+            sorted(
+                (*unit.datasheet_abilities, effect.datasheet_ability),
+                key=lambda ability: ability.ability_id,
+            )
+        )
+        updated_units.append(replace(unit, datasheet_abilities=updated_abilities))
+        payload = {
+            **cast(dict[str, JsonValue], effect.to_payload()),
+            "player_id": army.player_id,
+            "army_id": army.army_id,
+            "before_datasheet_ability_ids": [
+                ability.ability_id for ability in unit.datasheet_abilities
+            ],
+            "after_datasheet_ability_ids": [ability.ability_id for ability in updated_abilities],
+        }
+    if not target_seen:
+        raise GameLifecycleError("Enhancement datasheet ability target unit is not in the army.")
+    if payload is None:
+        return army, None
+    updated_army = replace(
+        army,
+        units=tuple(sorted(updated_units, key=lambda stored: stored.unit_instance_id)),
+    )
+    return updated_army, payload
+
+
 def _apply_model_characteristic_modifier(
     *,
     model: ModelInstance,
@@ -520,6 +635,16 @@ def _unit_for_assignment(
         if unit.unit_instance_id == expected_unit_instance_id:
             return unit
     raise GameLifecycleError("EnhancementAssignment target unit was not mustered.")
+
+
+def _effect_target_unit_instance_ids(context: EnhancementEffectContext) -> frozenset[str]:
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    view = rules_unit_view_by_id(
+        state=context.state,
+        unit_instance_id=context.target_unit.unit_instance_id,
+    )
+    return frozenset(component.unit.unit_instance_id for component in view.components)
 
 
 def _validate_effect_bindings(value: object) -> tuple[EnhancementEffectBinding, ...]:

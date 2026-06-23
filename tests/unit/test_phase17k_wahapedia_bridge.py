@@ -880,9 +880,16 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         generated_markdown
     )
     assert (
-        "| Chaos Daemons | 9 | 4 | 28 | 43 | 7 | [chaos-daemons](factions/chaos-daemons.md) |"
+        "| Chaos Daemons | 9 | 4 | 28 | 43 | 8 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
+    assert (
+        "| Scouts X | Pre-battle Scout Move, Scout reserve setup, and Dedicated "
+        "Transport Scout Move hosts | Adapter contract and decision catalog | "
+        "Focused pre-battle, setup smoke, and enhancement-grant tests | Full | "
+        "Consumes structured Scouts descriptors for distance selection; a SCOUTS keyword "
+        "without a descriptor fails fast. |"
+    ) in generated_markdown
     aeldari_markdown = generated_faction_markdown["aeldari.md"]
     chaos_daemons_markdown = generated_faction_markdown["chaos-daemons.md"]
     assert "## Detachment Rule Support" in aeldari_markdown

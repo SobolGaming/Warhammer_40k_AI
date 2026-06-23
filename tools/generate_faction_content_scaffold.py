@@ -44,7 +44,7 @@ IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
         "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule"
     ),
     SHADOW_LEGION_ENHANCEMENTS_MODULE_PATH: (
-        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:fade_to_darkness"
+        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancements"
     ),
     DAEMONIC_INCURSION_RULE_MODULE_PATH: (
         "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:rule:warp_rifts"

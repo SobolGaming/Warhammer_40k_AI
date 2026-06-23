@@ -25,6 +25,7 @@ Core keyword ability rows are still primarily surfaced through source-backed cat
 | Subject | Engine support | Documentation | Tests | Overall | Notes |
 | --- | --- | --- | --- | --- | --- |
 | Deep Strike | Reserve declaration and placement hosts | Adapter contract and architecture | Focused reserve/deployment tests | Full | Current generated rows are `engine_consumed`. |
+| Scouts X | Pre-battle Scout Move, Scout reserve setup, and Dedicated Transport Scout Move hosts | Adapter contract and decision catalog | Focused pre-battle, setup smoke, and enhancement-grant tests | Full | Consumes structured Scouts descriptors for distance selection; a SCOUTS keyword without a descriptor fails fast. |
 | Other Core Rules keyword abilities | Mixed phase-owned hosts or explicit unsupported descriptors | Architecture and source-row unsupported audits | Coverage varies by keyword | Partial | Keep expanded per-keyword rows separate from wargear keyword abilities. |
 
 ## Core Terrain And Visibility
@@ -116,7 +117,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Death Guard | 9 | 0 | 28 | 42 | 0 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 0 | 24 | 36 | 0 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 26 | 36 | 0 | [chaos-knights](factions/chaos-knights.md) |
-| Chaos Daemons | 9 | 4 | 28 | 43 | 7 | [chaos-daemons](factions/chaos-daemons.md) |
+| Chaos Daemons | 9 | 4 | 28 | 43 | 8 | [chaos-daemons](factions/chaos-daemons.md) |
 | Astra Militarum | 11 | 0 | 36 | 54 | 0 | [astra-militarum](factions/astra-militarum.md) |
 | Adepta Sororitas | 8 | 0 | 20 | 30 | 0 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 0 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
@@ -267,6 +268,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:warp_riders` | Warp-Riders |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:fade_to_darkness:turn-end-reserves` | Turn End Reserves |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:fade_to_darkness:unit-destroyed` | Unit Destroyed |
+| `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:leaping_shadows:scouts_9` | 000009980002 |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:attack-sequence-completed` | Shadow Legion |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:fight:lethal_hits` | Shadow Legion |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:disciples-of-belakor:fight:sustained_hits_1` | Shadow Legion |
