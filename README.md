@@ -190,8 +190,11 @@ Current status:
   Marines Oath of Moment supports Command phase target selection, target-scoped
   Hit-roll rerolls, the Codex Space Marines Detachment Wound-roll bonus gate,
   and Black Templars, Space Wolves, and Deathwatch Chapter mustering
-  restrictions; broad datasheet, wargear, weapon, and remaining faction
-  execution remains later Phase 17 work.
+  restrictions. Necrons Reanimation Protocols supports Command phase
+  rules-unit activation, source-backed D3 healing, destroyed-model revival,
+  attached rules-unit identity, and owning-player healing selections through the
+  shared healing decision path; broad datasheet, wargear, weapon, and remaining
+  faction execution remains later Phase 17 work.
 - Matched-play mustering supports Incursion, Strike Force, and Onslaught battle
   sizes, including the Drukhari `Corsairs and Travelling Players` ally rule for
   HARLEQUINS and ANHRATHE units.
