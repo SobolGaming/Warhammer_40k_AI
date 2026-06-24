@@ -62,6 +62,7 @@ class HealingEffectPayload(TypedDict):
     target_unit_instance_id: str
     amount: int
     opposing_player_id: str
+    selection_actor_player_id: str | None
     source_rule_id: str
     source_context: JsonValue
     phase_start_model_ids: list[str]
@@ -200,6 +201,7 @@ class HealingEffect:
     target_unit_instance_id: str
     amount: int
     opposing_player_id: str
+    selection_actor_player_id: str | None = None
     source_rule_id: str = CORE_HEALING_RULE_ID
     source_context: JsonValue = None
     phase_start_model_ids: tuple[str, ...] = ()
@@ -219,6 +221,14 @@ class HealingEffect:
             self,
             "opposing_player_id",
             _validate_identifier("opposing_player_id", self.opposing_player_id),
+        )
+        object.__setattr__(
+            self,
+            "selection_actor_player_id",
+            _validate_optional_identifier(
+                "selection_actor_player_id",
+                self.selection_actor_player_id,
+            ),
         )
         object.__setattr__(
             self,
@@ -281,6 +291,7 @@ class HealingEffect:
             target_unit_instance_id=self.target_unit_instance_id,
             amount=self.amount,
             opposing_player_id=self.opposing_player_id,
+            selection_actor_player_id=self.selection_actor_player_id,
             source_rule_id=self.source_rule_id,
             source_context=self.source_context,
             phase_start_model_ids=self.phase_start_model_ids,
@@ -295,6 +306,7 @@ class HealingEffect:
             "target_unit_instance_id": self.target_unit_instance_id,
             "amount": self.amount,
             "opposing_player_id": self.opposing_player_id,
+            "selection_actor_player_id": self.selection_actor_player_id,
             "source_rule_id": self.source_rule_id,
             "source_context": self.source_context,
             "phase_start_model_ids": list(self.phase_start_model_ids),
@@ -312,6 +324,7 @@ class HealingEffect:
             target_unit_instance_id=payload["target_unit_instance_id"],
             amount=payload["amount"],
             opposing_player_id=payload["opposing_player_id"],
+            selection_actor_player_id=payload["selection_actor_player_id"],
             source_rule_id=payload["source_rule_id"],
             source_context=payload["source_context"],
             phase_start_model_ids=tuple(payload["phase_start_model_ids"]),
@@ -737,7 +750,7 @@ def _build_healing_model_request(
     request = DecisionRequest(
         request_id=f"{effect.effect_id}:healing-step-{step_index:03d}",
         decision_type=SELECT_HEALING_MODEL_DECISION_TYPE,
-        actor_id=effect.opposing_player_id,
+        actor_id=_healing_selection_actor_player_id(effect),
         payload=validate_json_value(
             {
                 "selection_kind": candidates.step_kind.value,
@@ -1175,6 +1188,11 @@ def _validate_effect_for_state(*, state: GameState, effect: HealingEffect) -> No
         raise GameLifecycleError("Healing resolution requires a HealingEffect.")
     if effect.opposing_player_id not in state.player_ids:
         raise GameLifecycleError("Healing opposing player is not in this game.")
+    if (
+        effect.selection_actor_player_id is not None
+        and effect.selection_actor_player_id not in state.player_ids
+    ):
+        raise GameLifecycleError("Healing selection actor is not in this game.")
     rules_unit = rules_unit_view_by_id(
         state=state,
         unit_instance_id=effect.target_unit_instance_id,
@@ -1189,6 +1207,14 @@ def _validate_effect_for_state(*, state: GameState, effect: HealingEffect) -> No
     owner = unit_owner_player_id(state=state, unit_instance_id=effect.target_unit_instance_id)
     if effect.opposing_player_id == owner:
         raise GameLifecycleError("Healing opposing player cannot control the target unit.")
+
+
+def _healing_selection_actor_player_id(effect: HealingEffect) -> str:
+    if type(effect) is not HealingEffect:
+        raise GameLifecycleError("Healing selection actor lookup requires a HealingEffect.")
+    if effect.selection_actor_player_id is not None:
+        return effect.selection_actor_player_id
+    return effect.opposing_player_id
 
 
 def _validate_selection_matches_effect(

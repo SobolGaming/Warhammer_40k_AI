@@ -46,6 +46,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
@@ -142,14 +143,20 @@ class CommandPhaseHandler:
 
         command_state = _ensure_command_step_state(state, active_player_id=active_player_id)
         if not command_state.command_points_granted:
-            command_start_status = _resolve_command_step_start(
+            _resolve_command_step_start(
+                state=state,
+                decisions=decisions,
+                command_phase_start_hooks=self.command_phase_start_hooks,
+            )
+            command_state = _command_step_state(state)
+        if not command_state.scoring_hooks_resolved:
+            command_start_status = _request_command_phase_start_faction_rule_if_available(
                 state=state,
                 decisions=decisions,
                 command_phase_start_hooks=self.command_phase_start_hooks,
             )
             if command_start_status is not None:
                 return command_start_status
-            command_state = _command_step_state(state)
         if not command_state.scoring_hooks_resolved:
             _resolve_command_phase_scoring_hooks(state=state, decisions=decisions)
             command_state = _command_step_state(state)
@@ -716,24 +723,46 @@ def _command_phase_start_faction_rule_drift_reason(
         return "command_phase_start_window_closed"
     target_unit_id = payload.get("target_unit_instance_id")
     target_owner_id = payload.get("target_owner_player_id")
-    if target_unit_id is None and target_owner_id is None:
+    if target_unit_id is not None or target_owner_id is not None:
+        if type(target_unit_id) is not str or not target_unit_id.strip():
+            return "target_unit_instance_id_invalid"
+        if type(target_owner_id) is not str or not target_owner_id.strip():
+            return "target_owner_player_id_invalid"
+        owner_id, target_unit = _unit_owner_and_instance_by_id(
+            state=state,
+            unit_instance_id=target_unit_id,
+        )
+        if owner_id is None or target_unit is None:
+            return "target_unit_missing"
+        if owner_id != target_owner_id:
+            return "target_owner_drift"
+        if owner_id == result.actor_id:
+            return "target_not_opponent"
+        if not target_unit.alive_own_models():
+            return "target_unit_destroyed"
+    rules_unit_id = payload.get("rules_unit_instance_id")
+    rules_unit_owner_id = payload.get("rules_unit_owner_player_id")
+    if rules_unit_id is None and rules_unit_owner_id is None:
         return None
-    if type(target_unit_id) is not str or not target_unit_id.strip():
-        return "target_unit_instance_id_invalid"
-    if type(target_owner_id) is not str or not target_owner_id.strip():
-        return "target_owner_player_id_invalid"
-    owner_id, target_unit = _unit_owner_and_instance_by_id(
-        state=state,
-        unit_instance_id=target_unit_id,
-    )
-    if owner_id is None or target_unit is None:
-        return "target_unit_missing"
-    if owner_id != target_owner_id:
-        return "target_owner_drift"
-    if owner_id == result.actor_id:
-        return "target_not_opponent"
-    if not target_unit.alive_own_models():
-        return "target_unit_destroyed"
+    if type(rules_unit_id) is not str or not rules_unit_id.strip():
+        return "rules_unit_instance_id_invalid"
+    if type(rules_unit_owner_id) is not str or not rules_unit_owner_id.strip():
+        return "rules_unit_owner_player_id_invalid"
+    if not _rules_unit_id_exists(state=state, unit_instance_id=rules_unit_id):
+        return "rules_unit_missing"
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=rules_unit_id)
+    if rules_unit.owner_player_id != rules_unit_owner_id:
+        return "rules_unit_owner_drift"
+    if rules_unit.owner_player_id != result.actor_id:
+        return "rules_unit_not_owned_by_actor"
+    if not rules_unit.alive_models():
+        return "rules_unit_destroyed"
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        return "battlefield_state_missing"
+    placed_model_ids = set(battlefield.placed_model_ids())
+    if not any(model.model_instance_id in placed_model_ids for model in rules_unit.alive_models()):
+        return "rules_unit_not_on_battlefield"
     return None
 
 
@@ -767,7 +796,7 @@ def _resolve_command_step_start(
     state: GameState,
     decisions: DecisionController,
     command_phase_start_hooks: CommandPhaseStartHookRegistry,
-) -> LifecycleStatus | None:
+) -> None:
     active_player_id = _active_player_id(state)
     cleared_battle_shocked_unit_ids = state.clear_battle_shock_for_player(active_player_id)
     gain_payloads: list[JsonValue] = []
@@ -805,6 +834,15 @@ def _resolve_command_step_start(
             "cleared_battle_shocked_unit_ids": list(cleared_battle_shocked_unit_ids),
         },
     )
+
+
+def _request_command_phase_start_faction_rule_if_available(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    command_phase_start_hooks: CommandPhaseStartHookRegistry,
+) -> LifecycleStatus | None:
+    active_player_id = _active_player_id(state)
     faction_rule_request = command_phase_start_hooks.next_request_for(
         CommandPhaseStartRequestContext(
             state=state,
@@ -835,6 +873,19 @@ def _resolve_command_step_start(
             "phase_body_status": "command_phase_start_faction_rule_pending",
         },
     )
+
+
+def _rules_unit_id_exists(*, state: GameState, unit_instance_id: str) -> bool:
+    requested_id = _validate_player_id("rules_unit_instance_id", unit_instance_id)
+    for army in state.army_definitions:
+        if any(unit.unit_instance_id == requested_id for unit in army.units):
+            return True
+        for attached_unit in army.attached_units:
+            if attached_unit.attached_unit_instance_id == requested_id:
+                return True
+            if requested_id in attached_unit.component_unit_instance_ids:
+                return True
+    return False
 
 
 def _resolve_command_phase_scoring_hooks(

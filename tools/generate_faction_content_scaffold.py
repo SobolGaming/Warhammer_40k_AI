@@ -26,6 +26,7 @@ PLACEHOLDER_MARKER = (
 )
 CHAOS_SPACE_MARINES_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_space_marines.army_rule"
 SPACE_MARINES_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.space_marines.army_rule"
+NECRONS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.necrons.army_rule"
 GREY_KNIGHTS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.grey_knights.army_rule"
 SHADOW_LEGION_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.shadow_legion.rule"
 SHADOW_LEGION_ENHANCEMENTS_MODULE_PATH = (
@@ -45,6 +46,7 @@ IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
     SPACE_MARINES_ARMY_RULE_MODULE_PATH: (
         "warhammer_40000_11th:space_marines:army_rule:oath_of_moment"
     ),
+    NECRONS_ARMY_RULE_MODULE_PATH: ("warhammer_40000_11th:necrons:army_rule:reanimation_protocols"),
     GREY_KNIGHTS_ARMY_RULE_MODULE_PATH: (
         "warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity"
     ),
