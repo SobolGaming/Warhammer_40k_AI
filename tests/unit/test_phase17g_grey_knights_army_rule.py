@@ -50,6 +50,8 @@ def test_gate_of_infinity_runtime_contribution_registers_turn_end_hook() -> None
     contribution = army_rule.runtime_contribution()
 
     assert contribution.contribution_id == army_rule.CONTRIBUTION_ID
+    assert contribution.contribution_id == army_rule.HOOK_ID
+    assert not contribution.contribution_id.endswith(":scaffold")
     assert len(contribution.turn_end_hook_bindings) == 1
     binding = contribution.turn_end_hook_bindings[0]
     assert binding.hook_id == army_rule.HOOK_ID

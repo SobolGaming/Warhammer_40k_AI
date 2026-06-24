@@ -22,8 +22,8 @@ from warhammer40k_core.engine.turn_end_hooks import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_proximity import unit_within_enemy_engagement_range
 
-CONTRIBUTION_ID = "warhammer_40000_11th:grey_knights:army_rule:scaffold"
-HOOK_ID = "warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity"
+CONTRIBUTION_ID = "warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity"
+HOOK_ID = CONTRIBUTION_ID
 SOURCE_RULE_ID = "phase17f:phase17e:grey-knights:army-rule:000010345"
 GREY_KNIGHTS_FACTION_ID = "grey-knights"
 GATE_OF_INFINITY_ABILITY_ID = "000010345"
