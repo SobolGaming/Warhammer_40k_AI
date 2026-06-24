@@ -50,6 +50,10 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.reserves import ReserveOrigin
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
+from warhammer40k_core.engine.runtime_modifiers import (
+    ObjectiveControlModifierBinding,
+    ObjectiveControlModifierContext,
+)
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     TurnEndHookBinding,
@@ -86,6 +90,15 @@ LEAPING_SHADOWS_EFFECT_ID = (
 )
 LEAPING_SHADOWS_ABILITY_ID = "chaos-daemons:shadow-legion:leaping-shadows:scouts-9"
 LEAPING_SHADOWS_SCOUTS_DISTANCE = '9"'
+
+MANTLE_OF_GLOOM_ENHANCEMENT_ID = "000009980003"
+MANTLE_OF_GLOOM_SOURCE_RULE_ID = (
+    "phase17f:phase17e:enhancement:chaos-daemons:shadow-legion:000009980003"
+)
+MANTLE_OF_GLOOM_OBJECTIVE_CONTROL_MODIFIER_ID = (
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+    "enhancement:mantle_of_gloom:objective-control"
+)
 
 MALICE_MADE_MANIFEST_ENHANCEMENT_ID = "000009980005"
 MALICE_MADE_MANIFEST_SOURCE_RULE_ID = (
@@ -133,6 +146,13 @@ def runtime_contribution() -> RuntimeContentContribution:
                 source_id=LEAPING_SHADOWS_SOURCE_RULE_ID,
                 enhancement_id=LEAPING_SHADOWS_ENHANCEMENT_ID,
                 handler=leaping_shadows_effect,
+            ),
+        ),
+        objective_control_modifier_bindings=(
+            ObjectiveControlModifierBinding(
+                modifier_id=MANTLE_OF_GLOOM_OBJECTIVE_CONTROL_MODIFIER_ID,
+                source_id=MANTLE_OF_GLOOM_SOURCE_RULE_ID,
+                handler=mantle_of_gloom_objective_control_modifier,
             ),
         ),
         unit_destroyed_hook_bindings=(
@@ -208,6 +228,34 @@ def leaping_shadows_effect(
             },
         )
         for component in view.components
+    )
+
+
+def mantle_of_gloom_modified_objective_control(
+    *,
+    state: object,
+    unit_instance_id: str,
+    current_objective_control: int,
+) -> int:
+    if type(current_objective_control) is not int:
+        raise GameLifecycleError("Mantle of Gloom Objective Control requires an int.")
+    if current_objective_control < 0:
+        raise GameLifecycleError("Mantle of Gloom Objective Control cannot be negative.")
+    if _unit_is_enemy_within_mantle_of_gloom(
+        state=state,
+        target_unit_instance_id=unit_instance_id,
+    ):
+        return max(0, current_objective_control - 1)
+    return current_objective_control
+
+
+def mantle_of_gloom_objective_control_modifier(context: ObjectiveControlModifierContext) -> int:
+    if type(context) is not ObjectiveControlModifierContext:
+        raise GameLifecycleError("Mantle of Gloom Objective Control modifier requires context.")
+    return mantle_of_gloom_modified_objective_control(
+        state=context.state,
+        unit_instance_id=context.unit_instance_id,
+        current_objective_control=context.current_objective_control,
     )
 
 
@@ -813,6 +861,63 @@ def _malice_made_manifest_recorded_this_fight_start(
             continue
         if payload.get("bearer_rules_unit_instance_id") == bearer_rules_unit_instance_id:
             return True
+    return False
+
+
+def _unit_is_enemy_within_mantle_of_gloom(
+    *,
+    state: object,
+    target_unit_instance_id: str,
+) -> bool:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Mantle of Gloom target lookup requires GameState.")
+    if state.battlefield_state is None:
+        raise GameLifecycleError("Mantle of Gloom target lookup requires battlefield_state.")
+    target_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=target_unit_instance_id,
+    )
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    target_models = _alive_geometry_models_for_rules_unit(
+        state=state,
+        scenario=scenario,
+        rules_unit=target_rules_unit,
+    )
+    if not target_models:
+        return False
+    for army in _shadow_legion_armies(state):
+        if army.player_id == target_rules_unit.owner_player_id:
+            continue
+        for _assignment, bearer in _assigned_units(
+            army,
+            enhancement_id=MANTLE_OF_GLOOM_ENHANCEMENT_ID,
+        ):
+            if not _unit_has_keyword(bearer, SHADOW_LEGION_KEYWORD):
+                raise GameLifecycleError("Mantle of Gloom requires a Shadow Legion model.")
+            if not bearer.alive_own_models():
+                continue
+            bearer_rules_unit = rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=bearer.unit_instance_id,
+            )
+            if bearer_rules_unit.owner_player_id != army.player_id:
+                raise GameLifecycleError("Mantle of Gloom rules unit owner drift.")
+            bearer_models = _alive_geometry_models_for_rules_unit(
+                state=state,
+                scenario=scenario,
+                rules_unit=bearer_rules_unit,
+            )
+            if _any_models_within_engagement_range(
+                state=state,
+                first_models=bearer_models,
+                second_models=target_models,
+            ):
+                return True
     return False
 
 

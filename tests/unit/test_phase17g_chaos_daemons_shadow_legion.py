@@ -107,6 +107,7 @@ from warhammer40k_core.engine.prebattle import scout_ability_instances_for_rules
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
+    ObjectiveControlModifierContext,
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
     WoundRollModifierContext,
@@ -199,6 +200,12 @@ def test_shadow_legion_enhancement_runtime_contribution_registers_exact_hooks() 
     assert contribution.enhancement_effect_bindings[0].enhancement_id == (
         enhancements.LEAPING_SHADOWS_ENHANCEMENT_ID
     )
+    assert contribution.objective_control_modifier_bindings[0].modifier_id == (
+        enhancements.MANTLE_OF_GLOOM_OBJECTIVE_CONTROL_MODIFIER_ID
+    )
+    assert contribution.objective_control_modifier_bindings[0].source_id == (
+        enhancements.MANTLE_OF_GLOOM_SOURCE_RULE_ID
+    )
     assert contribution.unit_destroyed_hook_bindings[0].hook_id == (
         enhancements.UNIT_DESTROYED_HOOK_ID
     )
@@ -279,6 +286,159 @@ def test_leaping_shadows_grants_scouts_nine_to_bearers_attached_rules_unit() -> 
         assert isinstance(target_unit_instance_id, str)
         applied_target_unit_ids.add(target_unit_instance_id)
     assert applied_target_unit_ids == {bodyguard.unit_instance_id, leader.unit_instance_id}
+
+
+def test_mantle_of_gloom_reduces_enemy_oc_in_engagement_with_bearers_attached_unit() -> None:
+    state = _shadow_legion_state(
+        unit_keywords=("Shadow Legion", "Undivided", "Character"),
+        player_a_unit_selection_ids=("bodyguard-unit", "leader-unit"),
+    )
+    bodyguard = _unit_for_player_by_index(state, player_id="player-a", index=0)
+    leader = _unit_for_player_by_index(state, player_id="player-a", index=1)
+    target = _unit_for_player(state, player_id="player-b")
+    _attach_shadow_legion_units(state, bodyguard=bodyguard, leader=leader)
+    _assign_mantle_of_gloom(state, unit=leader)
+    _place_unit_poses(
+        state,
+        unit_instance_id=bodyguard.unit_instance_id,
+        poses=_unit_line_poses(x=10.0, y=20.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=leader.unit_instance_id,
+        poses=_unit_line_poses(x=30.0, y=20.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=target.unit_instance_id,
+        poses=_unit_line_poses(x=12.0, y=20.0),
+    )
+    registry = RuntimeModifierRegistry.from_bindings(
+        objective_control_modifier_bindings=(
+            enhancements.runtime_contribution().objective_control_modifier_bindings
+        )
+    )
+
+    assert (
+        enhancements.mantle_of_gloom_modified_objective_control(
+            state=state,
+            unit_instance_id=target.unit_instance_id,
+            current_objective_control=2,
+        )
+        == 1
+    )
+    assert (
+        enhancements.mantle_of_gloom_modified_objective_control(
+            state=state,
+            unit_instance_id=target.unit_instance_id,
+            current_objective_control=1,
+        )
+        == 0
+    )
+    assert (
+        registry.modified_objective_control(
+            ObjectiveControlModifierContext(
+                state=state,
+                unit_instance_id=target.unit_instance_id,
+                model_instance_id=target.own_models[0].model_instance_id,
+                base_objective_control=2,
+                current_objective_control=2,
+            )
+        )
+        == 1
+    )
+    assert (
+        registry.modified_objective_control(
+            ObjectiveControlModifierContext(
+                state=state,
+                unit_instance_id=bodyguard.unit_instance_id,
+                model_instance_id=bodyguard.own_models[0].model_instance_id,
+                base_objective_control=2,
+                current_objective_control=2,
+            )
+        )
+        == 2
+    )
+
+
+def test_mantle_of_gloom_ignores_enemy_units_outside_engagement_range() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    bearer = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_mantle_of_gloom(state, unit=bearer)
+    _place_unit_poses(
+        state,
+        unit_instance_id=bearer.unit_instance_id,
+        poses=_unit_line_poses(x=10.0, y=20.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=target.unit_instance_id,
+        poses=_unit_line_poses(x=30.0, y=20.0),
+    )
+
+    assert (
+        enhancements.mantle_of_gloom_modified_objective_control(
+            state=state,
+            unit_instance_id=target.unit_instance_id,
+            current_objective_control=2,
+        )
+        == 2
+    )
+
+
+def test_mantle_of_gloom_requires_living_bearer_in_attached_rules_unit() -> None:
+    state = _shadow_legion_state(
+        unit_keywords=("Shadow Legion", "Undivided", "Character"),
+        player_a_unit_selection_ids=("bodyguard-unit", "leader-unit"),
+    )
+    bodyguard = _unit_for_player_by_index(state, player_id="player-a", index=0)
+    leader = _unit_for_player_by_index(state, player_id="player-a", index=1)
+    target = _unit_for_player(state, player_id="player-b")
+    _attach_shadow_legion_units(state, bodyguard=bodyguard, leader=leader)
+    _assign_mantle_of_gloom(state, unit=leader)
+    _place_unit_poses(
+        state,
+        unit_instance_id=bodyguard.unit_instance_id,
+        poses=_unit_line_poses(x=10.0, y=20.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=leader.unit_instance_id,
+        poses=_unit_line_poses(x=30.0, y=20.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=target.unit_instance_id,
+        poses=_unit_line_poses(x=12.0, y=20.0),
+    )
+    _destroy_unit_own_models(state, unit_instance_id=leader.unit_instance_id)
+
+    assert (
+        enhancements.mantle_of_gloom_modified_objective_control(
+            state=state,
+            unit_instance_id=target.unit_instance_id,
+            current_objective_control=2,
+        )
+        == 2
+    )
+
+
+def test_mantle_of_gloom_assignment_requires_shadow_legion_bearer() -> None:
+    state = _shadow_legion_state(unit_keywords=("Undivided", "Character"))
+    bearer = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_mantle_of_gloom(state, unit=bearer)
+    _place_malice_made_manifest_engagement(state, bearer=bearer, target=target)
+
+    with pytest.raises(
+        GameLifecycleError, match=r"Mantle of Gloom requires a Shadow Legion model\."
+    ):
+        enhancements.mantle_of_gloom_modified_objective_control(
+            state=state,
+            unit_instance_id=target.unit_instance_id,
+            current_objective_control=2,
+        )
 
 
 def test_malice_made_manifest_fight_start_applies_three_mortal_wounds_on_six() -> None:
@@ -1655,6 +1815,57 @@ def _assign_leaping_shadows(state: GameState, *, unit: UnitInstance) -> None:
             )
         )
     state.army_definitions = updated_armies
+
+
+def _assign_mantle_of_gloom(state: GameState, *, unit: UnitInstance) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != "player-a":
+            updated_armies.append(army)
+            continue
+        prefix = f"{army.army_id}:"
+        if not unit.unit_instance_id.startswith(prefix):
+            raise AssertionError(f"Unit {unit.unit_instance_id} is not owned by {army.army_id}.")
+        updated_armies.append(
+            replace(
+                army,
+                enhancement_assignments=(
+                    EnhancementAssignment(
+                        enhancement_id=enhancements.MANTLE_OF_GLOOM_ENHANCEMENT_ID,
+                        target_unit_selection_id=unit.unit_instance_id.removeprefix(prefix),
+                        source_id=enhancements.MANTLE_OF_GLOOM_SOURCE_RULE_ID,
+                    ),
+                ),
+            )
+        )
+    state.army_definitions = updated_armies
+
+
+def _destroy_unit_own_models(state: GameState, *, unit_instance_id: str) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    removed_model_ids: list[str] = []
+    for army in state.army_definitions:
+        updated_units: list[UnitInstance] = []
+        for unit in army.units:
+            if unit.unit_instance_id != unit_instance_id:
+                updated_units.append(unit)
+                continue
+            removed_model_ids.extend(model.model_instance_id for model in unit.own_models)
+            updated_units.append(
+                replace(
+                    unit,
+                    own_models=tuple(
+                        replace(model, wounds_remaining=0) for model in unit.own_models
+                    ),
+                )
+            )
+        updated_armies.append(replace(army, units=tuple(updated_units)))
+    if not removed_model_ids:
+        raise AssertionError(f"Unit {unit_instance_id} was not found.")
+    if state.battlefield_state is None:
+        raise AssertionError("Expected battlefield_state.")
+    state.army_definitions = updated_armies
+    state.battlefield_state = state.battlefield_state.with_removed_models(tuple(removed_model_ids))
 
 
 def _assign_malice_made_manifest(state: GameState, *, unit: UnitInstance) -> None:

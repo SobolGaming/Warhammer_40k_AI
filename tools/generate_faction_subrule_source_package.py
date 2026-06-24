@@ -497,6 +497,13 @@ def _runtime_enhancement_seeds(
         )
         if seed is not None:
             rows.append(seed)
+    for objective_control_binding in contribution.objective_control_modifier_bindings:
+        seed = _runtime_enhancement_seed_from_exact_source_id(
+            source_id=objective_control_binding.source_id,
+            runtime_consumer_id=objective_control_binding.modifier_id,
+        )
+        if seed is not None:
+            rows.append(seed)
     return tuple(rows)
 
 

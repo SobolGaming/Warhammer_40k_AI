@@ -48,6 +48,10 @@ LEAPING_SHADOWS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
     "enhancement:leaping_shadows:scouts_9",
 )
+MANTLE_OF_GLOOM_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+    "enhancement:mantle_of_gloom:objective-control",
+)
 MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:malice_made_manifest",
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
@@ -178,6 +182,24 @@ def test_phase17f_leaping_shadows_execution_record_is_named_handler() -> None:
     assert record.runtime_consumer_ids == LEAPING_SHADOWS_RUNTIME_CONSUMERS
     assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
     assert record.handler_id == LEAPING_SHADOWS_RUNTIME_CONSUMERS[0]
+    assert record.block_reason is None
+
+
+def test_phase17f_mantle_of_gloom_execution_record_is_named_handler() -> None:
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
+        and record.faction_id == "chaos-daemons"
+        and record.detachment_id == "shadow-legion"
+        and record.rule_id == "000009980003"
+    )
+
+    assert record.rule_name == "Mantle of Gloom (Aura)"
+    assert record.runtime_support_status == "engine_consumed"
+    assert record.runtime_consumer_ids == MANTLE_OF_GLOOM_RUNTIME_CONSUMERS
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
+    assert record.handler_id == MANTLE_OF_GLOOM_RUNTIME_CONSUMERS[0]
     assert record.block_reason is None
 
 

@@ -67,6 +67,11 @@ LEAPING_SHADOWS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
     "enhancement:leaping_shadows:scouts_9",
 )
+MANTLE_OF_GLOOM_SOURCE_ROW_ID = "enhancement:chaos-daemons:shadow-legion:000009980003"
+MANTLE_OF_GLOOM_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+    "enhancement:mantle_of_gloom:objective-control",
+)
 MALICE_MADE_MANIFEST_SOURCE_ROW_ID = "enhancement:chaos-daemons:shadow-legion:000009980005"
 MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:malice_made_manifest",
@@ -449,6 +454,31 @@ def test_phase17e_leaping_shadows_exact_row_is_engine_consumed() -> None:
     assert coverage_row.runtime_support_status.value == "engine_consumed"
     assert coverage_row.runtime_consumer_ids == LEAPING_SHADOWS_RUNTIME_CONSUMERS
     assert coverage_row.handler_id == LEAPING_SHADOWS_RUNTIME_CONSUMERS[0]
+
+
+def test_phase17e_mantle_of_gloom_exact_row_is_engine_consumed() -> None:
+    source_row = next(
+        row
+        for row in faction_subrule_source.enhancement_rows()
+        if row.source_row_id == MANTLE_OF_GLOOM_SOURCE_ROW_ID
+    )
+    coverage_row = next(
+        row
+        for row in faction_coverage_source.coverage_rows()
+        if row.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
+        and row.faction_id == "chaos-daemons"
+        and row.detachment_id == "shadow-legion"
+        and row.rule_id == "000009980003"
+    )
+
+    assert source_row.name == "Mantle of Gloom (Aura)"
+    assert source_row.runtime_support_status.value == "engine_consumed"
+    assert source_row.runtime_consumer_ids == MANTLE_OF_GLOOM_RUNTIME_CONSUMERS
+    assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+    assert coverage_row.runtime_support_status is not None
+    assert coverage_row.runtime_support_status.value == "engine_consumed"
+    assert coverage_row.runtime_consumer_ids == MANTLE_OF_GLOOM_RUNTIME_CONSUMERS
+    assert coverage_row.handler_id == MANTLE_OF_GLOOM_RUNTIME_CONSUMERS[0]
 
 
 def test_phase17e_malice_made_manifest_exact_row_is_engine_consumed() -> None:
