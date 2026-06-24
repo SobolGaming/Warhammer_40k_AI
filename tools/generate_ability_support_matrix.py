@@ -1670,6 +1670,19 @@ def _structured_support_sections_markdown() -> list[str]:
                     "Includes movement, charge, and shooting target restrictions.",
                 ),
                 SupportSectionRow(
+                    "Grey Knights - Gate of Infinity",
+                    "Named army-rule handler",
+                    "Adapter contract, decision catalog, architecture, and generated matrix",
+                    "Focused turn-end, reserves, cap, and attached-rules-unit tests",
+                    "Full",
+                    (
+                        "Implements opponent Fight phase Gate of Infinity selections, "
+                        "battle-size caps, complete choices, required next-Movement "
+                        "Strategic Reserves arrival, and attached rules-unit component "
+                        "validation."
+                    ),
+                ),
+                SupportSectionRow(
                     "Space Marines - Oath of Moment and Space Marine Chapters",
                     "Named army-rule handler plus shared mustering/list-validation host",
                     (
@@ -1683,6 +1696,22 @@ def _structured_support_sections_markdown() -> list[str]:
                         "Hit-roll rerolls, Codex Space Marines Detachment Wound-roll "
                         "bonus gating, and Black Templars, Space Wolves, and Deathwatch "
                         "roster restrictions."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Necrons - Reanimation Protocols",
+                    "Named army-rule handler plus shared Healing Wounds resolver",
+                    (
+                        "README, adapter contract, decision catalog, architecture, "
+                        "and generated matrix"
+                    ),
+                    "Focused command-phase healing, revival, and validation tests",
+                    "Full",
+                    (
+                        "Implements Command phase rules-unit activation, source-backed "
+                        "D3 healing, destroyed-model revival, attached rules-unit "
+                        "identity, stale rules-unit rejection, and owning-player "
+                        "healing selections."
                     ),
                 ),
                 SupportSectionRow(
