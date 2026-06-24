@@ -883,6 +883,12 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| Chaos Daemons | 9 | 4 | 28 | 43 | 13 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
+    assert "| Grey Knights - Gate of Infinity | Named army-rule handler |" in generated_markdown
+    necrons_reanimation_row_prefix = (
+        "| Necrons - Reanimation Protocols | "
+        "Named army-rule handler plus shared Healing Wounds resolver |"
+    )
+    assert necrons_reanimation_row_prefix in generated_markdown
     assert (
         "| Scouts X | Pre-battle Scout Move, Scout reserve setup, and Dedicated "
         "Transport Scout Move hosts | Adapter contract and decision catalog | "
