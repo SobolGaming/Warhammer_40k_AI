@@ -16,12 +16,18 @@ from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.abilities import (
     CORE_DEADLY_DEMISE_HANDLER_ID,
+    CORE_DEEP_STRIKE_HANDLER_ID,
     CORE_FEEL_NO_PAIN_HANDLER_ID,
     CORE_FIGHTS_FIRST_HANDLER_ID,
+    CORE_FIRING_DECK_HANDLER_ID,
     CORE_HAZARDOUS_HANDLER_ID,
+    CORE_INFILTRATORS_HANDLER_ID,
+    CORE_LEADER_HANDLER_ID,
     CORE_LONE_OPERATIVE_HANDLER_ID,
     CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID,
+    CORE_SCOUTS_HANDLER_ID,
     CORE_STEALTH_HANDLER_ID,
+    CORE_SUPPORT_HANDLER_ID,
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
@@ -77,12 +83,17 @@ def test_source_backed_core_ability_rows_include_phase12d_families() -> None:
     blob = json.dumps(payload, sort_keys=True)
     ability_ids = {record.definition.ability_id for record in records}
     deep_strike = _record_by_ability_id(records, "core-deep-strike")
+    firing_deck = _record_by_ability_id(records, "core-firing-deck")
     hazardous = _record_by_ability_id(records, "core-hazardous")
     deadly_demise = _record_by_ability_id(records, "core-deadly-demise")
     feel_no_pain = _record_by_ability_id(records, "core-feel-no-pain")
+    infiltrators = _record_by_ability_id(records, "core-infiltrators")
+    leader = _record_by_ability_id(records, "core-leader")
     fights_first = _record_by_ability_id(records, "core-fights-first")
     lone_operative = _record_by_ability_id(records, "core-lone-operative")
+    scouts = _record_by_ability_id(records, "core-scouts")
     stealth = _record_by_ability_id(records, "core-stealth")
+    support = _record_by_ability_id(records, "core-support")
 
     assert {
         "core-deadly-demise",
@@ -103,35 +114,53 @@ def test_source_backed_core_ability_rows_include_phase12d_families() -> None:
     assert deep_strike.source_kind is AbilitySourceKind.DATASHEET
     assert deep_strike.datasheet_id == "core-deep-strike-unit"
     assert deep_strike.definition.keyword_gate.required_keywords == ("DEEP_STRIKE",)
-    assert deep_strike.definition.handler_id == "unsupported:phase-15b:deep-strike"
+    assert deep_strike.definition.handler_id == CORE_DEEP_STRIKE_HANDLER_ID
+    assert firing_deck.source_kind is AbilitySourceKind.CORE
+    assert firing_deck.definition.handler_id == CORE_FIRING_DECK_HANDLER_ID
     assert hazardous.source_kind is AbilitySourceKind.WEAPON
     assert hazardous.definition.handler_id == "core:hazardous"
     assert deadly_demise.source_kind is AbilitySourceKind.CORE
     assert deadly_demise.definition.handler_id == CORE_DEADLY_DEMISE_HANDLER_ID
     assert feel_no_pain.source_kind is AbilitySourceKind.CORE
     assert feel_no_pain.definition.handler_id == CORE_FEEL_NO_PAIN_HANDLER_ID
+    assert infiltrators.source_kind is AbilitySourceKind.CORE
+    assert infiltrators.definition.handler_id == CORE_INFILTRATORS_HANDLER_ID
+    assert leader.source_kind is AbilitySourceKind.DATASHEET
+    assert leader.datasheet_id == "core-character-leader"
+    assert leader.definition.handler_id == CORE_LEADER_HANDLER_ID
     assert fights_first.source_kind is AbilitySourceKind.CORE
     assert fights_first.definition.handler_id == CORE_FIGHTS_FIRST_HANDLER_ID
     assert fights_first.definition.timing.phase is BattlePhaseKind.FIGHT
     assert lone_operative.source_kind is AbilitySourceKind.CORE
     assert lone_operative.definition.handler_id == CORE_LONE_OPERATIVE_HANDLER_ID
+    assert scouts.source_kind is AbilitySourceKind.CORE
+    assert scouts.definition.handler_id == CORE_SCOUTS_HANDLER_ID
     assert stealth.source_kind is AbilitySourceKind.CORE
     assert stealth.definition.handler_id == CORE_STEALTH_HANDLER_ID
+    assert support.source_kind is AbilitySourceKind.DATASHEET
+    assert support.datasheet_id == "core-character-support"
+    assert support.definition.handler_id == CORE_SUPPORT_HANDLER_ID
     assert eleventh_edition_core_ability_index().all_records() == tuple(
         sorted(records, key=lambda record: record.record_id)
     )
 
 
-def test_phase14i_core_ability_rows_are_supported_or_explicitly_unsupported() -> None:
+def test_phase14i_core_ability_rows_are_supported() -> None:
     rows = source_data.ability_rows()
     supported_handler_ids = {
+        CORE_DEEP_STRIKE_HANDLER_ID,
         CORE_DEADLY_DEMISE_HANDLER_ID,
         CORE_FEEL_NO_PAIN_HANDLER_ID,
+        CORE_FIRING_DECK_HANDLER_ID,
         CORE_FIGHTS_FIRST_HANDLER_ID,
         CORE_HAZARDOUS_HANDLER_ID,
+        CORE_INFILTRATORS_HANDLER_ID,
+        CORE_LEADER_HANDLER_ID,
         CORE_LONE_OPERATIVE_HANDLER_ID,
         CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID,
+        CORE_SCOUTS_HANDLER_ID,
         CORE_STEALTH_HANDLER_ID,
+        CORE_SUPPORT_HANDLER_ID,
     }
 
     assert [
@@ -140,18 +169,78 @@ def test_phase14i_core_ability_rows_are_supported_or_explicitly_unsupported() ->
         if row.handler_id not in supported_handler_ids
         and not row.handler_id.startswith("unsupported:")
     ] == []
-    assert tuple(
-        (row.ability_id, row.handler_id)
-        for row in rows
-        if row.handler_id.startswith("unsupported:")
-    ) == (
-        ("core-deep-strike", "unsupported:phase-15b:deep-strike"),
-        ("core-firing-deck", "unsupported:phase-13d:firing-deck"),
-        ("core-infiltrators", "unsupported:phase-15b:infiltrators"),
-        ("core-leader", "unsupported:phase-15c:leader"),
-        ("core-scouts", "unsupported:phase-15b:scouts"),
-        ("core-support", "unsupported:phase-15c:support"),
+    assert (
+        tuple(
+            (row.ability_id, row.handler_id)
+            for row in rows
+            if row.handler_id.startswith("unsupported:")
+        )
+        == ()
     )
+
+
+def test_phase14i_phase_owned_core_keyword_rows_execute_through_supported_handlers() -> None:
+    records = eleventh_edition_core_ability_catalog_records()
+    registry = default_ability_handler_registry()
+    rows: tuple[
+        tuple[str, TimingTriggerKind, BattlePhaseKind | None, tuple[str, ...]],
+        ...,
+    ] = (
+        (
+            "core-deep-strike",
+            TimingTriggerKind.BEFORE_BATTLE,
+            None,
+            ("DEEP_STRIKE",),
+        ),
+        (
+            "core-firing-deck",
+            TimingTriggerKind.START_PHASE,
+            BattlePhaseKind.SHOOTING,
+            ("FIRING_DECK",),
+        ),
+        (
+            "core-infiltrators",
+            TimingTriggerKind.BEFORE_BATTLE,
+            None,
+            ("INFILTRATORS",),
+        ),
+        (
+            "core-leader",
+            TimingTriggerKind.BEFORE_BATTLE,
+            None,
+            ("LEADER",),
+        ),
+        (
+            "core-scouts",
+            TimingTriggerKind.BEFORE_BATTLE,
+            None,
+            ("SCOUTS",),
+        ),
+        (
+            "core-support",
+            TimingTriggerKind.BEFORE_BATTLE,
+            None,
+            ("SUPPORT",),
+        ),
+    )
+
+    for ability_id, trigger_kind, phase, source_keywords in rows:
+        record = _record_by_ability_id(records, ability_id)
+        result = registry.execute(
+            record=record,
+            context=_context(
+                trigger_kind=trigger_kind,
+                phase=phase,
+                source_keywords=source_keywords,
+            ),
+        )
+        replay_payload = cast(dict[str, object], result.replay_payload)
+
+        assert result.status is AbilityResolutionStatus.APPLIED
+        assert replay_payload["effect_payload"] == {
+            "effect_kind": "source_registered_core_keyword",
+            "resolved_by": "phase_host",
+        }
 
 
 def test_ability_catalog_index_partitions_by_trigger_and_rejects_invalid_inputs() -> None:
