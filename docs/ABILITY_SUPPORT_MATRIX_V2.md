@@ -97,6 +97,7 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | Grey Knights - Gate of Infinity | Named army-rule handler | Adapter contract, decision catalog, architecture, and generated matrix | Focused turn-end, reserves, cap, and attached-rules-unit tests | Full | Implements opponent Fight phase Gate of Infinity selections, battle-size caps, complete choices, required next-Movement Strategic Reserves arrival, and attached rules-unit component validation. |
 | Space Marines - Oath of Moment and Space Marine Chapters | Named army-rule handler plus shared mustering/list-validation host | README, adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, reroll, wound-modifier, and mustering tests | Full | Implements Command phase Oath target selection, target-scoped Hit-roll rerolls, Codex Space Marines Detachment Wound-roll bonus gating, and Black Templars, Space Wolves, and Deathwatch roster restrictions. |
 | Necrons - Reanimation Protocols | Named army-rule handler plus shared Healing Wounds resolver | README, adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase healing, revival, and validation tests | Full | Implements Command phase rules-unit activation, source-backed D3 healing, destroyed-model revival, attached rules-unit identity, stale rules-unit rejection, and owning-player healing selections. |
+| Leagues of Votann - Prioritised Efficiency | Named army-rule handler plus faction-resource ledger | README, generated matrix, and source coverage | Focused command-phase, scoring, mode, and runtime-modifier tests | Full | Implements deterministic Yield Point gains from Command phase objective control, Hostile Acquisition and Fortify Takeover modes, and mode-scoped Hit/Wound modifiers. |
 | Drukhari - Power from Pain | Named army-rule handler plus faction-resource ledger | README, faction integration note, adapter contract, and generated matrix | Focused faction runtime tests | Full | Implements Pain token gain at own Command phase start, enemy unit destruction, and enemy Battle-shock failure, plus optional Lithe Agility empowerment for Advance and Charge rerolls and Hatred Eternal selected-to-shoot/selected-to-fight empowerment for attack hit rerolls. |
 | Drukhari - Corsairs and Travelling Players | Shared mustering/list-validation host | README, faction integration note, and generated matrix | Focused mustering tests | Full | Allows non-DRUKHARI HARLEQUINS and ANHRATHE allies under Incursion, Strike Force, and Onslaught caps; forbids allied Warlords and Enhancements. No player-facing decision or phase runtime hook is introduced. |
 
@@ -112,7 +113,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Tyranids | 10 | 0 | 32 | 48 | 0 | [tyranids](factions/tyranids.md) |
 | Genestealer Cults | 9 | 0 | 20 | 30 | 0 | [genestealer-cults](factions/genestealer-cults.md) |
 | Necrons | 12 | 0 | 36 | 54 | 0 | [necrons](factions/necrons.md) |
-| Leagues of Votann | 10 | 0 | 28 | 42 | 0 | [leagues-of-votann](factions/leagues-of-votann.md) |
+| Leagues of Votann | 10 | 0 | 28 | 42 | 1 | [leagues-of-votann](factions/leagues-of-votann.md) |
 | T'au Empire | 7 | 0 | 20 | 30 | 0 | [tau-empire](factions/tau-empire.md) |
 | Space Marines | 22 | 0 | 80 | 119 | 0 | [space-marines](factions/space-marines.md) |
 | Dark Angels | 8 | 0 | 0 | 0 | 0 | [dark-angels](factions/dark-angels.md) |
@@ -320,9 +321,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction` | Thrill Seekers |
 | `warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity` | Gate Of Infinity |
-| `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start` | Command Phase Start |
-| `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll` | Hit Roll |
-| `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll` | Wound Roll |
+| `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start` | Prioritised Efficiency |
+| `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll` | Prioritised Efficiency |
+| `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll` | Prioritised Efficiency |
 | `warhammer_40000_11th:necrons:army_rule:reanimation_protocols` | Reanimation Protocols |
 | `warhammer_40000_11th:space_marines:army_rule:oath_of_moment` | Oath of Moment |
 | `warhammer_40000_11th:space_marines:army_rule:oath_of_moment:wound-roll` | Oath of Moment |

@@ -422,5 +422,26 @@
     "source_kind": "faction",
     "source_wargear_id": null,
     "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency",
+    "ability_name": "Prioritised Efficiency",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/leagues-of-votann/faction/warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency/none",
+    "datasheet_id": "leagues-of-votann",
+    "datasheet_name": "Leagues of Votann",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start",
+      "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
+      "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.prioritised_efficiency"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
   }
 ]

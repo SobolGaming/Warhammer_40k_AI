@@ -4,7 +4,9 @@ import json
 from dataclasses import replace
 from typing import cast
 
+import pytest
 from tests.unit.test_phase11c_command_phase import (
+    _battle_state,  # pyright: ignore[reportPrivateUsage]
     _battle_state_with_center_objective_positions,  # pyright: ignore[reportPrivateUsage]
 )
 
@@ -38,11 +40,13 @@ from warhammer40k_core.engine.list_validation import (
     ModelProfileSelection,
     UnitMusterSelection,
 )
-from warhammer40k_core.engine.phase import BattlePhase
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.phases.command import CommandPhaseHandler
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
     WoundRollModifierContext,
 )
+from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
 VOTANN_DATASHEET_ID = "phase17g-leagues-of-votann-hearthkyn"
@@ -119,6 +123,288 @@ def test_command_start_gains_yield_points_from_objective_control() -> None:
     assert restored == state.to_payload()
 
 
+def test_command_start_records_zero_yield_without_resource_gain() -> None:
+    state = _votann_center_objective_state(
+        player_a_offsets=(),
+        player_b_offsets=(),
+    )
+    state.battle_round = 2
+    decisions = DecisionController()
+    registry = CommandPhaseStartHookRegistry.from_bindings(
+        army_rule.runtime_contribution().command_phase_start_hook_bindings
+    )
+
+    registry.resolve(
+        CommandPhaseStartContext(
+            state=state,
+            decisions=decisions,
+            active_player_id="player-a",
+        )
+    )
+
+    assert army_rule.yield_points_available(state, player_id="player-a") == 0
+    payload = _last_event_payload(
+        decisions,
+        "leagues_of_votann_prioritised_efficiency_resolved",
+    )
+    assert payload["yield_points_gained"] == 0
+    assert payload["yield_points_total"] == 0
+    assert payload["faction_resource_result"] is None
+
+
+def test_command_phase_handler_with_bundle_hook_transitions_to_fortify_takeover() -> None:
+    state = _votann_center_objective_state(
+        player_a_offsets=((0.0, 0.0),),
+        player_b_offsets=(),
+    )
+    state.battle_round = 2
+    gain = state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=army_rule.YIELD_POINT_RESOURCE_KIND,
+        amount=6,
+        source_id="phase17g:leagues-of-votann:test-starting-yield-points",
+    )
+    assert gain.status is FactionResourceStatus.APPLIED
+    assert (
+        army_rule.prioritised_efficiency_mode_for_player(state, player_id="player-a")
+        is army_rule.PrioritisedEfficiencyMode.HOSTILE_ACQUISITION
+    )
+    bundle = build_runtime_content_bundle(_votann_runtime_config())
+    decisions = DecisionController()
+    handler = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        command_phase_start_hooks=bundle.command_phase_start_hook_registry,
+    )
+
+    completed = handler.begin_phase(state=state, decisions=decisions)
+
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    assert army_rule.yield_points_available(state, player_id="player-a") == 8
+    assert (
+        army_rule.prioritised_efficiency_mode_for_player(state, player_id="player-a")
+        is army_rule.PrioritisedEfficiencyMode.FORTIFY_TAKEOVER
+    )
+    payload = _last_event_payload(
+        decisions,
+        "leagues_of_votann_prioritised_efficiency_resolved",
+    )
+    assert payload["yield_points_gained"] == 2
+    assert payload["yield_points_total"] == 8
+    assert payload["mode_before"] == "hostile_acquisition"
+    assert payload["mode_after"] == "fortify_takeover"
+    event_types = tuple(record.event_type for record in decisions.event_log.records)
+    assert event_types.index("command_points_gained") < event_types.index(
+        "leagues_of_votann_prioritised_efficiency_resolved"
+    )
+    assert event_types.index("leagues_of_votann_prioritised_efficiency_resolved") < (
+        event_types.index("command_step_started")
+    )
+
+
+def test_non_votann_detachment_with_votann_keyword_unit_does_not_gain_yield_points() -> None:
+    state = _battle_state_with_center_objective_positions(
+        player_a_offsets=((0.0, 0.0),),
+        player_b_offsets=(),
+    )
+    state.battle_round = 2
+    _mark_player_units_as_votann(state, player_id="player-a")
+    decisions = DecisionController()
+    registry = CommandPhaseStartHookRegistry.from_bindings(
+        army_rule.runtime_contribution().command_phase_start_hook_bindings
+    )
+
+    registry.resolve(
+        CommandPhaseStartContext(
+            state=state,
+            decisions=decisions,
+            active_player_id="player-a",
+        )
+    )
+
+    assert army_rule.yield_points_available(state, player_id="player-a") == 0
+    assert all(
+        record.event_type != "leagues_of_votann_prioritised_efficiency_resolved"
+        for record in decisions.event_log.records
+    )
+
+
+def test_prioritised_efficiency_mode_requires_votann_detachment_selection() -> None:
+    state = _battle_state_with_center_objective_positions(
+        player_a_offsets=((0.0, 0.0),),
+        player_b_offsets=(),
+    )
+    _mark_player_units_as_votann(state, player_id="player-a")
+    gain = state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=army_rule.YIELD_POINT_RESOURCE_KIND,
+        amount=7,
+        source_id="phase17g:leagues-of-votann:test-non-owner-yield-points",
+    )
+    assert gain.status is FactionResourceStatus.APPLIED
+
+    with pytest.raises(GameLifecycleError, match="requires a Leagues of Votann detachment"):
+        army_rule.prioritised_efficiency_mode_for_player(state, player_id="player-a")
+
+
+def test_prioritised_efficiency_requires_typed_runtime_contexts() -> None:
+    with pytest.raises(GameLifecycleError, match="requires command-phase context"):
+        army_rule.resolve_command_phase_start(cast(CommandPhaseStartContext, object()))
+
+    with pytest.raises(GameLifecycleError, match="hit modifier requires context"):
+        army_rule.prioritised_efficiency_hit_roll_modifier(cast(HitRollModifierContext, object()))
+
+    with pytest.raises(GameLifecycleError, match="wound modifier requires context"):
+        army_rule.prioritised_efficiency_wound_roll_modifier(
+            cast(WoundRollModifierContext, object())
+        )
+
+
+def test_yield_points_from_objectives_gates_round_one_and_round_two_scoring() -> None:
+    assert (
+        _yield_points_from_objectives(
+            battle_round=1,
+            own_deployment=("home",),
+            outside=("outside-1", "outside-2"),
+            controlled_count=3,
+            opponent_max=0,
+        )
+        == 1
+    )
+    assert (
+        _yield_points_from_objectives(
+            battle_round=2,
+            own_deployment=(),
+            outside=("outside-1",),
+            controlled_count=1,
+            opponent_max=1,
+        )
+        == 1
+    )
+    assert (
+        _yield_points_from_objectives(
+            battle_round=2,
+            own_deployment=(),
+            outside=("outside-1", "outside-2"),
+            controlled_count=2,
+            opponent_max=2,
+        )
+        == 2
+    )
+    assert (
+        _yield_points_from_objectives(
+            battle_round=2,
+            own_deployment=("home",),
+            outside=(),
+            controlled_count=1,
+            opponent_max=0,
+        )
+        == 2
+    )
+
+
+def test_yield_points_from_objectives_do_not_score_control_more_when_tied_or_behind() -> None:
+    assert (
+        _yield_points_from_objectives(
+            battle_round=2,
+            own_deployment=("home",),
+            outside=(),
+            controlled_count=1,
+            opponent_max=1,
+        )
+        == 1
+    )
+    assert (
+        _yield_points_from_objectives(
+            battle_round=2,
+            own_deployment=("home",),
+            outside=(),
+            controlled_count=1,
+            opponent_max=2,
+        )
+        == 1
+    )
+
+
+@pytest.mark.parametrize(
+    ("battle_round", "message"),
+    [
+        (cast(int, "2"), "battle_round must be an int"),
+        (0, "requires an active battle round"),
+    ],
+)
+def test_yield_points_from_objectives_reject_invalid_battle_round(
+    battle_round: int,
+    message: str,
+) -> None:
+    with pytest.raises(GameLifecycleError, match=message):
+        army_rule._yield_points_from_objectives(  # pyright: ignore[reportPrivateUsage]
+            battle_round=battle_round,
+            own_deployment_controlled_objective_ids=(),
+            outside_own_deployment_controlled_objective_ids=(),
+            controlled_objective_count=0,
+            opponent_max_controlled_objective_count=0,
+        )
+
+
+def test_yield_points_from_objectives_reject_malformed_counts_and_identifier_sets() -> None:
+    with pytest.raises(GameLifecycleError, match="must be a tuple"):
+        army_rule._yield_points_from_objectives(  # pyright: ignore[reportPrivateUsage]
+            battle_round=2,
+            own_deployment_controlled_objective_ids=cast(tuple[str, ...], ["home"]),
+            outside_own_deployment_controlled_objective_ids=(),
+            controlled_objective_count=0,
+            opponent_max_controlled_objective_count=0,
+        )
+
+    with pytest.raises(GameLifecycleError, match="controlled_objective_count must be an int"):
+        army_rule._yield_points_from_objectives(  # pyright: ignore[reportPrivateUsage]
+            battle_round=2,
+            own_deployment_controlled_objective_ids=(),
+            outside_own_deployment_controlled_objective_ids=(),
+            controlled_objective_count=cast(int, "1"),
+            opponent_max_controlled_objective_count=0,
+        )
+
+    with pytest.raises(GameLifecycleError, match="must be non-negative"):
+        army_rule._yield_points_from_objectives(  # pyright: ignore[reportPrivateUsage]
+            battle_round=2,
+            own_deployment_controlled_objective_ids=(),
+            outside_own_deployment_controlled_objective_ids=(),
+            controlled_objective_count=0,
+            opponent_max_controlled_objective_count=-1,
+        )
+
+
+def test_own_deployment_objectives_use_official_layout_home_markers() -> None:
+    state = _battle_state()
+
+    assert army_rule._own_deployment_objective_ids(  # pyright: ignore[reportPrivateUsage]
+        state,
+        player_id="player-a",
+    ) == ("take-and-hold-vs-purge-the-foe-layout-3-left-home",)
+    assert army_rule._own_deployment_objective_ids(  # pyright: ignore[reportPrivateUsage]
+        state,
+        player_id="player-b",
+    ) == ("take-and-hold-vs-purge-the-foe-layout-3-right-home",)
+
+
+def test_own_deployment_objective_lookup_requires_mission_setup_and_zone() -> None:
+    state = _battle_state()
+    state.mission_setup = None
+    with pytest.raises(GameLifecycleError, match="requires MissionSetup"):
+        army_rule._own_deployment_objective_ids(  # pyright: ignore[reportPrivateUsage]
+            state,
+            player_id="player-a",
+        )
+
+    state = _battle_state()
+    with pytest.raises(GameLifecycleError, match="requires the player's deployment zone"):
+        army_rule._own_deployment_objective_ids(  # pyright: ignore[reportPrivateUsage]
+            state,
+            player_id="player-c",
+        )
+
+
 def test_hostile_acquisition_hit_bonus_targets_units_on_objectives() -> None:
     state = _votann_center_objective_state(
         player_a_offsets=(),
@@ -142,6 +428,21 @@ def test_hostile_acquisition_hit_bonus_targets_units_on_objectives() -> None:
                 attacking_unit_id=VOTANN_UNIT_ID,
                 target_unit_id=ENEMY_UNIT_ID,
                 source_phase=BattlePhase.MOVEMENT,
+            )
+        )
+        == 0
+    )
+
+    empty_state = _votann_center_objective_state(
+        player_a_offsets=(),
+        player_b_offsets=(),
+    )
+    assert (
+        army_rule.prioritised_efficiency_hit_roll_modifier(
+            _hit_context(
+                state=empty_state,
+                attacking_unit_id=VOTANN_UNIT_ID,
+                target_unit_id=ENEMY_UNIT_ID,
             )
         )
         == 0
@@ -200,6 +501,28 @@ def test_fortify_takeover_hit_bonus_and_wound_penalty() -> None:
         == 0
     )
 
+    no_objective_state = _votann_center_objective_state(
+        player_a_offsets=(),
+        player_b_offsets=(),
+    )
+    gain = no_objective_state.gain_faction_resource(
+        player_id="player-a",
+        resource_kind=army_rule.YIELD_POINT_RESOURCE_KIND,
+        amount=7,
+        source_id="phase17g:leagues-of-votann:test-yield-points-no-objective",
+    )
+    assert gain.status is FactionResourceStatus.APPLIED
+    assert (
+        army_rule.prioritised_efficiency_hit_roll_modifier(
+            _hit_context(
+                state=no_objective_state,
+                attacking_unit_id=VOTANN_UNIT_ID,
+                target_unit_id=ENEMY_UNIT_ID,
+            )
+        )
+        == 0
+    )
+
     _add_unit_keyword(state, unit_instance_id=VOTANN_UNIT_ID, keyword="Vehicle")
     assert (
         army_rule.prioritised_efficiency_wound_roll_modifier(
@@ -209,6 +532,93 @@ def test_fortify_takeover_hit_bonus_and_wound_penalty() -> None:
                 target_unit_id=VOTANN_UNIT_ID,
                 strength=5,
                 toughness=4,
+            )
+        )
+        == 0
+    )
+
+
+def test_unit_scoped_modifiers_reject_non_owner_and_unknown_units() -> None:
+    state = _battle_state_with_center_objective_positions(
+        player_a_offsets=((0.0, 0.0),),
+        player_b_offsets=((0.0, 0.0),),
+    )
+    _mark_player_units_as_votann(state, player_id="player-a")
+
+    assert (
+        army_rule.prioritised_efficiency_hit_roll_modifier(
+            _hit_context(
+                state=state,
+                attacking_unit_id=VOTANN_UNIT_ID,
+                target_unit_id=ENEMY_UNIT_ID,
+            )
+        )
+        == 0
+    )
+    assert (
+        army_rule.prioritised_efficiency_wound_roll_modifier(
+            _wound_context(
+                state=state,
+                attacking_unit_id=ENEMY_UNIT_ID,
+                target_unit_id=VOTANN_UNIT_ID,
+                strength=5,
+                toughness=4,
+            )
+        )
+        == 0
+    )
+
+    owned_state = _votann_center_objective_state(
+        player_a_offsets=((0.0, 0.0),),
+        player_b_offsets=(),
+    )
+    with pytest.raises(GameLifecycleError, match="attacking unit is unknown"):
+        army_rule.prioritised_efficiency_hit_roll_modifier(
+            _hit_context(
+                state=owned_state,
+                attacking_unit_id="unknown-attacker",
+                target_unit_id=ENEMY_UNIT_ID,
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="target unit is unknown"):
+        army_rule.prioritised_efficiency_wound_roll_modifier(
+            _wound_context(
+                state=owned_state,
+                attacking_unit_id=ENEMY_UNIT_ID,
+                target_unit_id="unknown-target",
+                strength=5,
+                toughness=4,
+            )
+        )
+
+
+def test_wound_modifier_requires_fortify_takeover_and_supported_phase() -> None:
+    state = _votann_center_objective_state(
+        player_a_offsets=((0.0, 0.0),),
+        player_b_offsets=(),
+    )
+
+    assert (
+        army_rule.prioritised_efficiency_wound_roll_modifier(
+            _wound_context(
+                state=state,
+                attacking_unit_id=ENEMY_UNIT_ID,
+                target_unit_id=VOTANN_UNIT_ID,
+                strength=5,
+                toughness=4,
+            )
+        )
+        == 0
+    )
+    assert (
+        army_rule.prioritised_efficiency_wound_roll_modifier(
+            _wound_context(
+                state=state,
+                attacking_unit_id=ENEMY_UNIT_ID,
+                target_unit_id=VOTANN_UNIT_ID,
+                strength=5,
+                toughness=4,
+                source_phase=BattlePhase.MOVEMENT,
             )
         )
         == 0
@@ -247,6 +657,18 @@ def _mark_player_as_votann(state: GameState, *, player_id: str) -> None:
     state.army_definitions = updated_armies
 
 
+def _mark_player_units_as_votann(state: GameState, *, player_id: str) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != player_id:
+            updated_armies.append(army)
+            continue
+        updated_armies.append(
+            replace(army, units=tuple(_with_votann_keyword(unit) for unit in army.units))
+        )
+    state.army_definitions = updated_armies
+
+
 def _with_votann_keyword(unit: UnitInstance) -> UnitInstance:
     return replace(
         unit,
@@ -269,6 +691,23 @@ def _add_unit_keyword(state: GameState, *, unit_instance_id: str, keyword: str) 
             )
         updated_armies.append(replace(army, units=tuple(updated_units)))
     state.army_definitions = updated_armies
+
+
+def _yield_points_from_objectives(
+    *,
+    battle_round: int,
+    own_deployment: tuple[str, ...],
+    outside: tuple[str, ...],
+    controlled_count: int,
+    opponent_max: int,
+) -> int:
+    return army_rule._yield_points_from_objectives(  # pyright: ignore[reportPrivateUsage]
+        battle_round=battle_round,
+        own_deployment_controlled_objective_ids=own_deployment,
+        outside_own_deployment_controlled_objective_ids=outside,
+        controlled_objective_count=controlled_count,
+        opponent_max_controlled_objective_count=opponent_max,
+    )
 
 
 def _hit_context(

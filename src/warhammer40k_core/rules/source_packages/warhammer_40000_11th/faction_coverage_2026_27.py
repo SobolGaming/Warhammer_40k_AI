@@ -98,6 +98,17 @@ CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMER_IDS_BY_DETACHMENT_ID = {
     "daemonic-incursion": DAEMONIC_INCURSION_RUNTIME_CONSUMER_IDS,
     "shadow-legion": SHADOW_LEGION_RUNTIME_CONSUMER_IDS,
 }
+LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start",
+    "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
+    "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll",
+)
+FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
+    "leagues-of-votann": "Prioritised Efficiency",
+}
+FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID = {
+    "leagues-of-votann": LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMER_IDS,
+}
 
 
 class Phase17EFactionPdfRecordPayload(TypedDict):
@@ -365,6 +376,23 @@ class Phase17ECoverageRow:
             ):
                 raise Phase17EFactionCoverageError(
                     "Exact subrule coverage rows require rule metadata."
+                )
+        elif self.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE:
+            if (
+                self.rule_id is not None
+                or self.timing_descriptor is not None
+                or self.rule_category is not None
+            ):
+                raise Phase17EFactionCoverageError(
+                    "Faction army rule coverage rows cannot include exact subrule metadata."
+                )
+            if runtime_support_status is not None and not self.runtime_consumer_ids:
+                raise Phase17EFactionCoverageError(
+                    "Faction army rule runtime support requires runtime consumers."
+                )
+            if self.runtime_consumer_ids and runtime_support_status is None:
+                raise Phase17EFactionCoverageError(
+                    "Faction army rule runtime consumers require runtime support status."
                 )
         elif self.coverage_kind is Phase17ECoverageKind.DETACHMENT_RULE:
             if (
@@ -634,16 +662,48 @@ def _army_rule_row(
     faction_row: faction_detachments_2026_27.SourceFactionRow,
     pdf_record: Phase17EFactionPdfRecord,
 ) -> Phase17ECoverageRow:
+    runtime_consumer_ids = _faction_army_rule_runtime_consumer_ids(faction_row)
     return Phase17ECoverageRow(
         descriptor_id=f"phase17e:{faction_row.faction_id}:army-rule",
         coverage_kind=Phase17ECoverageKind.FACTION_ARMY_RULE,
-        status=Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED,
+        status=(
+            Phase17ECoverageStatus.IMPLEMENTED
+            if runtime_consumer_ids
+            else Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED
+        ),
         faction_id=faction_row.faction_id,
         faction_name=faction_row.name,
         source_ids=(faction_row.source_id, pdf_record.source_id),
         source_pdf_package_id=pdf_record.package_id,
-        rule_name=f"{faction_row.name} army rule",
-        handler_id=f"phase17e:faction:{faction_row.faction_id}:army-rule",
+        rule_name=_faction_army_rule_name(faction_row),
+        runtime_support_status=(
+            faction_subrules_2026_27.SourceSubruleRuntimeStatus.ENGINE_CONSUMED
+            if runtime_consumer_ids
+            else None
+        ),
+        runtime_consumer_ids=runtime_consumer_ids,
+        handler_id=(
+            runtime_consumer_ids[0]
+            if runtime_consumer_ids
+            else f"phase17e:faction:{faction_row.faction_id}:army-rule"
+        ),
+    )
+
+
+def _faction_army_rule_name(
+    faction_row: faction_detachments_2026_27.SourceFactionRow,
+) -> str:
+    return FACTION_ARMY_RULE_NAMES_BY_FACTION_ID.get(
+        faction_row.faction_id,
+        f"{faction_row.name} army rule",
+    )
+
+
+def _faction_army_rule_runtime_consumer_ids(
+    faction_row: faction_detachments_2026_27.SourceFactionRow,
+) -> tuple[str, ...]:
+    return tuple(
+        sorted(FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID.get(faction_row.faction_id, ()))
     )
 
 

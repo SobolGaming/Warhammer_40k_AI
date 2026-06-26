@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
 CONTRIBUTION_ID = "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency"
 HOOK_ID = "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency"
-SOURCE_RULE_ID = "phase17g:leagues-of-votann:army-rule"
+SOURCE_RULE_ID = "phase17f:phase17e:leagues-of-votann:army-rule"
 COMMAND_PHASE_START_HOOK_ID = f"{HOOK_ID}:command-phase-start"
 PRIORITISED_EFFICIENCY_HIT_MODIFIER_ID = f"{HOOK_ID}:hit-roll"
 PRIORITISED_EFFICIENCY_WOUND_MODIFIER_ID = f"{HOOK_ID}:wound-roll"
@@ -168,6 +168,10 @@ def prioritised_efficiency_mode_for_player(
     *,
     player_id: str,
 ) -> PrioritisedEfficiencyMode:
+    if _leagues_of_votann_army_for_player(state, player_id=player_id) is None:
+        raise GameLifecycleError(
+            "Prioritised Efficiency mode requires a Leagues of Votann detachment."
+        )
     if yield_points_available(state, player_id=player_id) >= FORTIFY_TAKEOVER_YIELD_POINT_THRESHOLD:
         return PrioritisedEfficiencyMode.FORTIFY_TAKEOVER
     return PrioritisedEfficiencyMode.HOSTILE_ACQUISITION
@@ -488,10 +492,6 @@ def _leagues_of_votann_army_for_player(
     if army is None:
         return None
     if army.detachment_selection.faction_id == LEAGUES_OF_VOTANN_FACTION_ID:
-        return army
-    if any(
-        _unit_has_faction_keyword(unit, LEAGUES_OF_VOTANN_FACTION_KEYWORD) for unit in army.units
-    ):
         return army
     return None
 

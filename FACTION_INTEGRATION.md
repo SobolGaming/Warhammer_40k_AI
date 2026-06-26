@@ -113,18 +113,20 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `e42076f902e02047a2a45c9f9175800adda77b52bed6d65dafa9b15f39390415`
+  `4a170ce4b8516d8b6fa56a77d56fd734a5d271e7cc3be91cba4b8054f9bd9ce9`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
-detachment rules are source-linked named-handler-required rows. Datasheet intake,
-is fail-closed as an approved unsupported diagnostic. Exact Enhancement and
-Stratagem rows are generated from the exact subrule source package and include
-stable rule IDs, owner faction/detachment IDs, timing/category metadata, source
-IDs, and support status. Source-only exact rows are named-handler-required;
-exact rows with existing runtime consumers are marked implemented. No aggregate
-faction-pack Enhancement or Stratagem row is used to hide missing detail, and no
-unapproved unsupported descriptor remains for Phase 17E matched-play coverage.
+detachment rules are source-linked named-handler rows: source-only rows remain
+named-handler-required, while rows with existing runtime consumers are marked
+implemented. Datasheet intake is fail-closed as an approved unsupported
+diagnostic. Exact Enhancement and Stratagem rows are generated from the exact
+subrule source package and include stable rule IDs, owner faction/detachment IDs,
+timing/category metadata, source IDs, and support status. Source-only exact rows
+are named-handler-required; exact rows with existing runtime consumers are
+marked implemented. No aggregate faction-pack Enhancement or Stratagem row is
+used to hide missing detail, and no unapproved unsupported descriptor remains for
+Phase 17E matched-play coverage.
 The exact subrule source package also exposes checksum-covered
 `skipped_bridge_rows()` and `runtime_only_rows()` audit APIs. Current bridge
 input accounting captures 601 approved skipped bridge rows: 573 rows whose
@@ -150,15 +152,16 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `ea0b3b48faeb1108c5fee181a2feb900b8fe85413e309a3cd2604392b70165c8`
+  `5197058bbde3aab21605528bfb245445205c39a19248a4198daf93171206fa09`
 - upstream Phase 17E checksum:
-  `e42076f902e02047a2a45c9f9175800adda77b52bed6d65dafa9b15f39390415`
+  `4a170ce4b8516d8b6fa56a77d56fd734a5d271e7cc3be91cba4b8054f9bd9ce9`
 
 The package emits 2140 execution records, one for every Phase 17E coverage row:
-2084 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, and 28 exact detachment,
-Enhancement, and Stratagem rows are executable named-handler rows because they
-already have runtime consumers. The engine dispatcher can route every record and returns typed
+2083 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, and 29 rows are executable
+named-handler rows because they already have runtime consumers: 1 faction army
+rule plus 28 exact detachment, Enhancement, and Stratagem rows. The engine
+dispatcher can route every record and returns typed
 `unsupported` diagnostics unless a matching executor is registered. No Phase 17E
 row remains a missing handler, runtime no-op, raw-PDF parse, or silent fallback.
 Future executable rows require a registered generic IR executor or named
@@ -472,7 +475,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 28 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 42 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
