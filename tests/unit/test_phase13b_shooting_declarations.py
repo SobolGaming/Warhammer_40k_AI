@@ -12924,12 +12924,16 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
     state.battlefield_state = battlefield.with_removed_models(
         tuple(model.model_instance_id for model in defender.own_models)
     )
-    with pytest.raises(GameLifecycleError, match="requires alive models"):
-        continue_mortal_wound_application(
-            state=state,
-            request_id="phase13d-no-model-request",
-            progress=no_models_progress,
-        )
+    no_models_routing = continue_mortal_wound_application(
+        state=state,
+        request_id="phase13d-no-model-request",
+        progress=no_models_progress,
+    )
+    no_models_application = no_models_routing.application
+    assert no_models_routing.request is None
+    assert no_models_application is not None
+    assert no_models_application.applications == ()
+    assert no_models_application.remaining_mortal_wounds_lost == 1
 
     routed_lifecycle, routed_units = _shooting_lifecycle(alpha_unit_ids=("unit-1",))
     routed_state = _state(routed_lifecycle)
