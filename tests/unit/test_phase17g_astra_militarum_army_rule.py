@@ -89,6 +89,8 @@ INFANTRY_UNIT_ID = "army-alpha:infantry"
 SQUADRON_UNIT_ID = "army-alpha:sentinel"
 UNORDERABLE_UNIT_ID = "army-alpha:servitors"
 ENEMY_UNIT_ID = "army-beta:enemy-unit"
+NON_ASTRA_FACTION_ID = "phase17g-non-astra-force"
+NON_ASTRA_DETACHMENT_ID = "phase17g-non-astra-auxiliary-detachment"
 _DEFAULT_OFFICER_ORDERS_PAYLOAD = object()
 
 
@@ -154,6 +156,27 @@ def test_lifecycle_requests_voice_of_command_and_records_move_order() -> None:
         cast(GameStatePayload, json.loads(json.dumps(state.to_payload())))
     )
     assert restored.to_payload() == state.to_payload()
+
+
+def test_non_astra_selected_detachment_with_astra_keyword_units_gets_no_request() -> None:
+    lifecycle = _non_astra_selected_lifecycle_with_astra_keyword_units(
+        orders_per_battle_round=6,
+    )
+    state = _require_state(lifecycle)
+    army = state.army_definition_for_player("player-a")
+    assert army is not None
+    assert army.detachment_selection.faction_id == NON_ASTRA_FACTION_ID
+    assert any("Astra Militarum" in unit.faction_keywords for unit in army.units)
+
+    request = army_rule.voice_of_command_request(
+        CommandPhaseStartRequestContext(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            active_player_id="player-a",
+        )
+    )
+
+    assert request is None
 
 
 def test_lifecycle_rejects_voice_of_command_drift_before_mutation() -> None:
@@ -1228,6 +1251,37 @@ def _battle_ready_lifecycle(
         orders_per_battle_round=orders_per_battle_round,
         officer_orders_payload=officer_orders_payload,
     )
+    return _battle_ready_lifecycle_from_config(config)
+
+
+def _non_astra_selected_lifecycle_with_astra_keyword_units(
+    *,
+    orders_per_battle_round: int,
+) -> GameLifecycle:
+    config = _astra_config(
+        orders_per_battle_round=orders_per_battle_round,
+        officer_orders_payload=_DEFAULT_OFFICER_ORDERS_PAYLOAD,
+    )
+    catalog = _catalog_with_non_astra_auxiliary_detachment(config.army_catalog)
+    player_a_request, player_b_request = config.army_muster_requests
+    non_astra_request = replace(
+        player_a_request,
+        catalog_id=catalog.catalog_id,
+        detachment_selection=DetachmentSelection(
+            faction_id=NON_ASTRA_FACTION_ID,
+            detachment_ids=(NON_ASTRA_DETACHMENT_ID,),
+        ),
+    )
+    return _battle_ready_lifecycle_from_config(
+        replace(
+            config,
+            army_catalog=catalog,
+            army_muster_requests=(non_astra_request, player_b_request),
+        )
+    )
+
+
+def _battle_ready_lifecycle_from_config(config: GameConfig) -> GameLifecycle:
     lifecycle = GameLifecycle()
     lifecycle.start(config)
     state = _require_state(lifecycle)
@@ -1248,6 +1302,38 @@ def _battle_ready_lifecycle(
     _complete_setup_through_gate(state=state, config=config)
     _runtime_content_bundle(lifecycle)
     return lifecycle
+
+
+def _catalog_with_non_astra_auxiliary_detachment(catalog: ArmyCatalog) -> ArmyCatalog:
+    return replace(
+        catalog,
+        factions=(
+            *catalog.factions,
+            FactionDefinition(
+                faction_id=NON_ASTRA_FACTION_ID,
+                name="Non-Astra Auxiliary Force",
+                faction_keywords=("Astra Militarum", "Non-Astra"),
+                source_ids=("phase17g:astra:non-astra:faction",),
+            ),
+        ),
+        detachments=(
+            *catalog.detachments,
+            DetachmentDefinition(
+                detachment_id=NON_ASTRA_DETACHMENT_ID,
+                name="Non-Astra Auxiliary Detachment",
+                faction_id=NON_ASTRA_FACTION_ID,
+                detachment_point_cost=1,
+                unit_datasheet_ids=(
+                    OFFICER_DATASHEET_ID,
+                    INFANTRY_DATASHEET_ID,
+                    SQUADRON_DATASHEET_ID,
+                    UNORDERABLE_DATASHEET_ID,
+                ),
+                force_disposition_ids=("phase17g-force",),
+                source_ids=("phase17g:astra:non-astra:detachment",),
+            ),
+        ),
+    )
 
 
 def _astra_config(

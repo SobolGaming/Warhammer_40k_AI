@@ -99,6 +99,7 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | World Eaters - Blessings of Khorne | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes battle-round selection and supported blessing effects. |
 | Orks - Waaagh! | Named army-rule handler | Adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, advance eligibility, weapon-profile, save-option, and validation tests | Full | Implements optional once-per-battle Command phase Waaagh! call, active until the start of the next own Command phase, including Advance-then-Charge eligibility, melee Strength/Attacks modifiers, and a 5+ invulnerable save. |
 | Black Templars - Templar Vows | Named army-rule handler | Adapter contract, decision catalog, source coverage, and generated matrix | Focused vow selection, modifier, charge, Fall Back, and objective tests | Full | Implements battle-round Templar Vow selection, Abhor the Witch Precision and PSYKER charge requirements, Accept Any Challenge wound modifiers, Suffer Not the Unclean charge-after-Fall-Back, and Uphold the Honour sticky objective control. |
+| Astra Militarum - Voice of Command | Named army-rule handler | Adapter contract, decision catalog, source coverage, and generated matrix | Focused command-phase, Battle-shock, and runtime-modifier tests | Full | Implements Command phase Order selection, order replacement, Battle-shock order cleanup, and all six Order modifiers through shared decision and modifier hosts. |
 | Emperor's Children - Thrill Seekers | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes movement, charge, and shooting target restrictions. |
 | Grey Knights - Gate of Infinity | Named army-rule handler | Adapter contract, decision catalog, architecture, and generated matrix | Focused turn-end, reserves, cap, and attached-rules-unit tests | Full | Implements opponent Fight phase Gate of Infinity selections, battle-size caps, complete choices, required next-Movement Strategic Reserves arrival, and attached rules-unit component validation. |
 | Space Marines - Oath of Moment and Space Marine Chapters | Named army-rule handler plus shared mustering/list-validation host | README, adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, reroll, wound-modifier, and mustering tests | Full | Implements Command phase Oath target selection, target-scoped Hit-roll rerolls, Codex Space Marines Detachment Wound-roll bonus gating, and Black Templars, Space Wolves, and Deathwatch roster restrictions. |
@@ -135,7 +136,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Thousand Sons | 9 | 0 | 24 | 36 | 0 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 26 | 36 | 0 | [chaos-knights](factions/chaos-knights.md) |
 | Chaos Daemons | 9 | 4 | 28 | 43 | 14 | [chaos-daemons](factions/chaos-daemons.md) |
-| Astra Militarum | 11 | 0 | 36 | 54 | 0 | [astra-militarum](factions/astra-militarum.md) |
+| Astra Militarum | 11 | 0 | 36 | 54 | 1 | [astra-militarum](factions/astra-militarum.md) |
 | Adepta Sororitas | 8 | 0 | 20 | 30 | 0 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 0 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
 | Imperial Knights | 8 | 0 | 24 | 36 | 0 | [imperial-knights](factions/imperial-knights.md) |
@@ -276,13 +277,13 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:eldritch_suppression` | Eldritch Suppression |
 | `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:nomads_of_the_hidden_way` | Nomads of the Hidden Way |
 | `warhammer_40000_11th:aeldari:path_of_the_outcast:far_reaching_doom:selected_shooting_unit` | Far-reaching Doom |
-| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command` | Voice Of Command |
-| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock` | Battle Shock |
-| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:movement` | Movement |
-| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:objective-control` | Objective Control |
-| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:save-option` | Save Option |
-| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:unit-characteristic` | Unit Characteristic |
-| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:weapon-profile` | Weapon Profile |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command` | Voice of Command |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock` | Voice of Command |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:movement` | Voice of Command - Move! Move! Move! |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:objective-control` | Voice of Command - Duty and Honour! |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:save-option` | Voice of Command - Take Cover! |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:unit-characteristic` | Voice of Command - Duty and Honour! |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:weapon-profile` | Voice of Command - Weapon Orders |
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows` | Templar Vows |
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-declaration` | Templar Vows |
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-targets` | Templar Vows |

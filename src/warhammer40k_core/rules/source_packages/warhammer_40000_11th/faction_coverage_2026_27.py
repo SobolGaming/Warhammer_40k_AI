@@ -106,6 +106,15 @@ AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
     "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind",
 )
+ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:movement",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:objective-control",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:save-option",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:unit-characteristic",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:weapon-profile",
+)
 CHAOS_DAEMONS_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",
 )
@@ -183,6 +192,7 @@ WORLD_EATERS_BLESSINGS_OF_KHORNE_RUNTIME_CONSUMER_IDS = (
 )
 FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "aeldari": "Battle Focus",
+    "astra-militarum": "Voice of Command",
     "black-templars": "Templar Vows",
     "chaos-daemons": "The Shadow of Chaos",
     "chaos-space-marines": "Dark Pacts",
@@ -198,6 +208,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
 }
 FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID = {
     "aeldari": AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMER_IDS,
+    "astra-militarum": ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMER_IDS,
     "black-templars": BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMER_IDS,
     "chaos-daemons": CHAOS_DAEMONS_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_IDS,
     "chaos-space-marines": CHAOS_SPACE_MARINES_DARK_PACTS_RUNTIME_CONSUMER_IDS,

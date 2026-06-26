@@ -29,6 +29,9 @@ from warhammer40k_core.engine.faction_content.bundle import (
     RuntimeContentContribution,
 )
 from warhammer40k_core.engine.faction_content.manifest import RuntimeContentSupportStatus
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.astra_militarum import (
+    army_rule as astra_militarum_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.black_templars import (
     army_rule as black_templars_army_rule,
 )
@@ -301,6 +304,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
         "Path of the Outcast Enhancements"
     ),
     "phase17f:phase17e:aeldari:path-of-the-outcast:far-reaching-doom": ("Far-reaching Doom"),
+    "phase17f:phase17e:astra-militarum:army-rule": "Voice of Command",
     "phase17f:phase17e:black-templars:army-rule": "Templar Vows",
     "phase17f:phase17e:chaos-daemons:army-rule": "The Shadow of Chaos",
     "phase17f:phase17e:chaos-daemons:blood-legion:rule": "Blood Legion",
@@ -339,6 +343,25 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     "warhammer_40000_11th:aeldari:army_rule:sudden_strike": ("Battle Focus - Sudden Strike"),
     "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind": (
         "Battle Focus - Swift as the Wind"
+    ),
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command": ("Voice of Command"),
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock": (
+        "Voice of Command"
+    ),
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:movement": (
+        "Voice of Command - Move! Move! Move!"
+    ),
+    (
+        "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:objective-control"
+    ): "Voice of Command - Duty and Honour!",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:save-option": (
+        "Voice of Command - Take Cover!"
+    ),
+    (
+        "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:unit-characteristic"
+    ): "Voice of Command - Duty and Honour!",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:weapon-profile": (
+        "Voice of Command - Weapon Orders"
     ),
     SPACE_MARINE_CHAPTERS_SOURCE_ID: "Space Marine Chapters",
     "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider": ("Archraider"),
@@ -554,6 +577,13 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             runtime_consumer_ids=_black_templars_runtime_consumer_ids(),
         ),
         _implemented_faction_army_rule_row(
+            faction_id=astra_militarum_army_rule.ASTRA_MILITARUM_FACTION_ID,
+            ability_id=astra_militarum_army_rule.HOOK_ID,
+            ability_name="Voice of Command",
+            semantic_category="faction.army_rule.voice_of_command",
+            runtime_consumer_ids=_astra_militarum_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
             faction_id=emperors_children_army_rule.EMPERORS_CHILDREN_FACTION_ID,
             ability_id=emperors_children_army_rule.HOOK_ID,
             ability_name="Thrill Seekers",
@@ -726,6 +756,32 @@ def _black_templars_runtime_consumer_ids() -> tuple[str, ...]:
                     for binding in contribution.phase_end_objective_control_hook_bindings
                 ),
                 *(binding.modifier_id for binding in contribution.wound_roll_modifier_bindings),
+                *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
+            }
+        )
+    )
+
+
+def _astra_militarum_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = astra_militarum_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                *(binding.hook_id for binding in contribution.command_phase_start_hook_bindings),
+                *(binding.hook_id for binding in contribution.battle_shock_hook_bindings),
+                *(
+                    binding.modifier_id
+                    for binding in contribution.unit_characteristic_modifier_bindings
+                ),
+                *(
+                    binding.modifier_id
+                    for binding in contribution.movement_budget_modifier_bindings
+                ),
+                *(
+                    binding.modifier_id
+                    for binding in contribution.objective_control_modifier_bindings
+                ),
+                *(binding.modifier_id for binding in contribution.save_option_modifier_bindings),
                 *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
             }
         )
@@ -1938,6 +1994,18 @@ def _structured_support_sections_markdown() -> list[str]:
                         "Precision and PSYKER charge requirements, Accept Any Challenge "
                         "wound modifiers, Suffer Not the Unclean charge-after-Fall-Back, "
                         "and Uphold the Honour sticky objective control."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Astra Militarum - Voice of Command",
+                    "Named army-rule handler",
+                    "Adapter contract, decision catalog, source coverage, and generated matrix",
+                    "Focused command-phase, Battle-shock, and runtime-modifier tests",
+                    "Full",
+                    (
+                        "Implements Command phase Order selection, order replacement, "
+                        "Battle-shock order cleanup, and all six Order modifiers through "
+                        "shared decision and modifier hosts."
                     ),
                 ),
                 SupportSectionRow(

@@ -1132,8 +1132,6 @@ def _astra_militarum_army_for_player(
         return None
     if army.detachment_selection.faction_id == ASTRA_MILITARUM_FACTION_ID:
         return army
-    if any(_unit_has_faction_keyword(unit, ASTRA_MILITARUM_FACTION_KEYWORD) for unit in army.units):
-        return army
     return None
 
 

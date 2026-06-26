@@ -8,7 +8,7 @@ Source PDF: [eng_11-06_warhammer40000_faction_pack_astra_militarum-etf9ihpodv-mb
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 11 | 0 | 36 | 54 | 0 |
+| 11 | 0 | 36 | 54 | 1 |
 
 ## Detachment Rule Support
 
