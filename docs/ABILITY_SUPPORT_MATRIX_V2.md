@@ -320,6 +320,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction` | Thrill Seekers |
 | `warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity` | Gate Of Infinity |
+| `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start` | Command Phase Start |
+| `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll` | Hit Roll |
+| `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll` | Wound Roll |
 | `warhammer_40000_11th:necrons:army_rule:reanimation_protocols` | Reanimation Protocols |
 | `warhammer_40000_11th:space_marines:army_rule:oath_of_moment` | Oath of Moment |
 | `warhammer_40000_11th:space_marines:army_rule:oath_of_moment:wound-roll` | Oath of Moment |

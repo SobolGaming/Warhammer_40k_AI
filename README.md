@@ -193,8 +193,11 @@ Current status:
   restrictions. Necrons Reanimation Protocols supports Command phase
   rules-unit activation, source-backed D3 healing, destroyed-model revival,
   attached rules-unit identity, and owning-player healing selections through the
-  shared healing decision path; broad datasheet, wargear, weapon, and remaining
-  faction execution remains later Phase 17 work.
+  shared healing decision path. Leagues of Votann Prioritised Efficiency
+  supports deterministic Yield Point gains from Command phase objective control,
+  derived Hostile Acquisition/Fortify Takeover modes, and mode-scoped Hit/Wound
+  modifiers. Broad datasheet, wargear, weapon, and remaining faction execution
+  remains later Phase 17 work.
 - Matched-play mustering supports Incursion, Strike Force, and Onslaught battle
   sizes, including the Drukhari `Corsairs and Travelling Players` ally rule for
   HARLEQUINS and ANHRATHE units.

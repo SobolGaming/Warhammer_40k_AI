@@ -28,6 +28,7 @@ CHAOS_SPACE_MARINES_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_space_mar
 SPACE_MARINES_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.space_marines.army_rule"
 NECRONS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.necrons.army_rule"
 GREY_KNIGHTS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.grey_knights.army_rule"
+LEAGUES_OF_VOTANN_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.leagues_of_votann.army_rule"
 SHADOW_LEGION_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.shadow_legion.rule"
 SHADOW_LEGION_ENHANCEMENTS_MODULE_PATH = (
     f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.shadow_legion.enhancements"
@@ -49,6 +50,9 @@ IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
     NECRONS_ARMY_RULE_MODULE_PATH: ("warhammer_40000_11th:necrons:army_rule:reanimation_protocols"),
     GREY_KNIGHTS_ARMY_RULE_MODULE_PATH: (
         "warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity"
+    ),
+    LEAGUES_OF_VOTANN_ARMY_RULE_MODULE_PATH: (
+        "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency"
     ),
     SHADOW_LEGION_RULE_MODULE_PATH: (
         "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule"
