@@ -883,7 +883,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| Chaos Daemons | 9 | 4 | 28 | 43 | 13 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
+    assert (
+        "| Leagues of Votann | 10 | 0 | 28 | 42 | 1 | "
+        "[leagues-of-votann](factions/leagues-of-votann.md) |"
+    ) in generated_markdown
     assert "| Grey Knights - Gate of Infinity | Named army-rule handler |" in generated_markdown
+    assert (
+        "| Leagues of Votann - Prioritised Efficiency | "
+        "Named army-rule handler plus faction-resource ledger |"
+    ) in generated_markdown
     necrons_reanimation_row_prefix = (
         "| Necrons - Reanimation Protocols | "
         "Named army-rule handler plus shared Healing Wounds resolver |"
@@ -1004,6 +1012,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         for row in rows_by_name["Thrill Seekers"]
     )
     assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Prioritised Efficiency"]
+    )
+    assert all(
         row.runtime_consumer_ids
         == ("warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",)
         for row in rows_by_name["The Shadow of Chaos"]
@@ -1017,6 +1029,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Thrill Seekers"]) == (
         "Emperor's Children",
+    )
+    assert tuple(row.datasheet_name for row in rows_by_name["Prioritised Efficiency"]) == (
+        "Leagues of Votann",
     )
     assert set(rows_by_name["Dark Pacts"][0].runtime_consumer_ids) == {
         chaos_space_marines_army_rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID,
@@ -1049,6 +1064,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         emperors_children_army_rule.SHOOTING_TARGET_RESTRICTION_HOOK_ID,
         emperors_children_army_rule.CHARGE_TARGET_RESTRICTION_HOOK_ID,
     }
+    assert set(rows_by_name["Prioritised Efficiency"][0].runtime_consumer_ids) == {
+        "warhammer_40000_11th:leagues_of_votann:army_rule:"
+        "prioritised_efficiency:command-phase-start",
+        "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
+        "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll",
+    }
+    assert categories_by_name["Faction Army Rule Prioritised Efficiency"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
     assert categories_by_name["Leadership Characteristic"].ability_names == ("Daemonic Icon",)
     assert categories_by_name["Leadership Characteristic"].datasheet_names == (
         "Bloodcrushers",

@@ -165,8 +165,9 @@ Current status:
   reserves, transports, missions, replay, source ingestion, catalog generation,
   rule IR, generic rule execution, and adapter decision submission is in place.
 - Faction semantic execution is active incremental work. Current runtime
-  support includes selected Chaos Daemons, Chaos Space Marines, Aeldari,
-  Death Guard, World Eaters, and Space Marines Phase 17G slices. Chaos Daemons Shadow Legion
+  support includes selected Phase 17G faction slices across Chaos Daemons,
+  Chaos Space Marines, Aeldari, Death Guard, World Eaters, Space Marines,
+  Necrons, and Leagues of Votann. Chaos Daemons Shadow Legion
   supports Thralls of the First Prince mustering restrictions and keyword
   grants, Murderer's Cowl, Penumbral Puppetry, Gloam Rot, Shadow's Caress,
   Leaping Shadows, Mantle of Gloom, Fade to Darkness, and Disciples of
@@ -193,8 +194,11 @@ Current status:
   restrictions. Necrons Reanimation Protocols supports Command phase
   rules-unit activation, source-backed D3 healing, destroyed-model revival,
   attached rules-unit identity, and owning-player healing selections through the
-  shared healing decision path; broad datasheet, wargear, weapon, and remaining
-  faction execution remains later Phase 17 work.
+  shared healing decision path. Leagues of Votann Prioritised Efficiency
+  supports deterministic Yield Point gains from Command phase objective control,
+  derived Hostile Acquisition/Fortify Takeover modes, and mode-scoped Hit/Wound
+  modifiers. Broad datasheet, wargear, weapon, and remaining faction execution
+  remains later Phase 17 work.
 - Matched-play mustering supports Incursion, Strike Force, and Onslaught battle
   sizes, including the Drukhari `Corsairs and Travelling Players` ally rule for
   HARLEQUINS and ANHRATHE units.

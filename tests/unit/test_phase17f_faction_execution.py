@@ -89,6 +89,11 @@ SHADOW_LEGION_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
     "disciples-of-belakor:weapon-profile",
 )
+LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start",
+    "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
+    "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll",
+)
 
 
 def test_phase17f_execution_package_covers_every_phase17e_coverage_row() -> None:
@@ -264,6 +269,25 @@ def test_phase17f_chaos_daemons_detachment_rule_execution_record_is_named_handle
     assert record.runtime_consumer_ids == tuple(sorted(runtime_consumers))
     assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
     assert record.handler_id == runtime_consumers[0]
+    assert record.block_reason is None
+
+
+def test_phase17f_leagues_of_votann_army_rule_execution_record_is_named_handler() -> None:
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and record.faction_id == "leagues-of-votann"
+    )
+
+    assert record.coverage_descriptor_id == "phase17e:leagues-of-votann:army-rule"
+    assert record.rule_name == "Prioritised Efficiency"
+    assert record.runtime_support_status == "engine_consumed"
+    assert record.runtime_consumer_ids == tuple(
+        sorted(LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS)
+    )
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
+    assert record.handler_id == LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS[0]
     assert record.block_reason is None
 
 

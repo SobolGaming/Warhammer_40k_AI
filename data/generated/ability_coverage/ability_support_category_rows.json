@@ -401,6 +401,41 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency",
+        "ability_name": "Prioritised Efficiency",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/leagues-of-votann/faction/warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency/none",
+        "datasheet_id": "leagues-of-votann",
+        "datasheet_name": "Leagues of Votann",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Prioritised Efficiency"
+    ],
+    "category_id": "faction.army_rule.prioritised_efficiency",
+    "category_name": "Faction Army Rule Prioritised Efficiency",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/leagues-of-votann/faction/warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency/none"
+    ],
+    "datasheet_names": [
+      "Leagues of Votann"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start",
+      "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
+      "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001112:collar-of-khorne",
         "ability_name": "Collar of Khorne",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/wargear/000001112:collar-of-khorne/000001112:collar-of-khorne",

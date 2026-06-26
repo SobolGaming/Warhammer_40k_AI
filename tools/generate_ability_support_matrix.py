@@ -44,6 +44,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_chil
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.generated_manifest import (
     generated_runtime_content_rows,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.leagues_of_votann import (
+    army_rule as leagues_of_votann_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines import (
     army_rule as space_marines_army_rule,
 )
@@ -307,6 +310,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     "phase17f:phase17e:death-guard:army-rule": "Nurgle's Gift",
     "phase17f:phase17e:drukhari:army-rule": "Power from Pain",
     "phase17f:phase17e:emperors-children:army-rule": "Thrill Seekers",
+    "phase17f:phase17e:leagues-of-votann:army-rule": "Prioritised Efficiency",
     "phase17g:space-marines:army-rule": "Oath of Moment",
     "phase17f:phase17e:world-eaters:army-rule": "Blessings of Khorne",
     "phase17g:aeldari:corsair-coterie:enhancements": "Corsair Coterie Enhancements",
@@ -555,6 +559,13 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             semantic_category="faction.army_rule.corsairs_and_travelling_players",
             runtime_consumer_ids=("army-mustering:drukhari-corsairs-and-travelling-players",),
         ),
+        _implemented_faction_army_rule_row(
+            faction_id=leagues_of_votann_army_rule.LEAGUES_OF_VOTANN_FACTION_ID,
+            ability_id=leagues_of_votann_army_rule.HOOK_ID,
+            ability_name="Prioritised Efficiency",
+            semantic_category="faction.army_rule.prioritised_efficiency",
+            runtime_consumer_ids=_leagues_of_votann_runtime_consumer_ids(),
+        ),
     )
 
 
@@ -692,6 +703,19 @@ def _space_marines_runtime_consumer_ids() -> tuple[str, ...]:
     )
 
 
+def _leagues_of_votann_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = leagues_of_votann_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                *(binding.hook_id for binding in contribution.command_phase_start_hook_bindings),
+                *(binding.modifier_id for binding in contribution.hit_roll_modifier_bindings),
+                *(binding.modifier_id for binding in contribution.wound_roll_modifier_bindings),
+            }
+        )
+    )
+
+
 def support_matrix_markdown(
     category_rows: list[AbilityCoverageCategoryRowPayload],
 ) -> str:
@@ -769,6 +793,10 @@ def _faction_support_markdown(
         for row in faction_coverage_2026_27.coverage_rows()
         if row.faction_id == faction_row.faction_id
     )
+    army_rule_rows = _coverage_rows_for_kind(
+        coverage_rows,
+        Phase17ECoverageKind.FACTION_ARMY_RULE,
+    )
     detachment_rule_rows = _coverage_rows_for_kind(
         coverage_rows,
         Phase17ECoverageKind.DETACHMENT_RULE,
@@ -787,7 +815,7 @@ def _faction_support_markdown(
     exact_rows = (*enhancement_rows, *stratagem_rows)
     engine_consumed_row_count = sum(
         1
-        for row in (*detachment_rule_rows, *exact_rows)
+        for row in (*army_rule_rows, *detachment_rule_rows, *exact_rows)
         if row.status is Phase17ECoverageStatus.IMPLEMENTED
     )
     supported_detachment_count = sum(
@@ -1821,6 +1849,18 @@ def _structured_support_sections_markdown() -> list[str]:
                     ),
                 ),
                 SupportSectionRow(
+                    "Leagues of Votann - Prioritised Efficiency",
+                    "Named army-rule handler plus faction-resource ledger",
+                    "README, generated matrix, and source coverage",
+                    "Focused command-phase, scoring, mode, and runtime-modifier tests",
+                    "Full",
+                    (
+                        "Implements deterministic Yield Point gains from Command phase "
+                        "objective control, Hostile Acquisition and Fortify Takeover modes, "
+                        "and mode-scoped Hit/Wound modifiers."
+                    ),
+                ),
+                SupportSectionRow(
                     "Drukhari - Power from Pain",
                     "Named army-rule handler plus faction-resource ledger",
                     "README, faction integration note, adapter contract, and generated matrix",
@@ -1916,6 +1956,7 @@ def _faction_index_section_markdown() -> list[str]:
             for row in faction_rows
             if row.coverage_kind
             in {
+                Phase17ECoverageKind.FACTION_ARMY_RULE,
                 Phase17ECoverageKind.DETACHMENT_RULE,
                 Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
                 Phase17ECoverageKind.DETACHMENT_STRATAGEM,

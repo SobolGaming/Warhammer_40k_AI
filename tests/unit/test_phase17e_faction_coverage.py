@@ -116,6 +116,14 @@ CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY = {
     ("chaos-daemons", "daemonic-incursion"): DAEMONIC_INCURSION_RUNTIME_CONSUMERS,
     ("chaos-daemons", "shadow-legion"): SHADOW_LEGION_RUNTIME_CONSUMERS,
 }
+LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start",
+    "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
+    "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll",
+)
+FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID = {
+    "leagues-of-votann": LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS,
+}
 
 
 def test_phase17e_payload_is_deterministic_json_safe_and_round_trips() -> None:
@@ -296,8 +304,20 @@ def test_phase17e_loads_every_seeded_faction_and_detachment() -> None:
 
         assert faction_row.source_id in army_row.source_ids
         assert pdf_record.source_id in army_row.source_ids
-        assert army_row.status is Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED
-        assert army_row.handler_id == f"phase17e:faction:{faction_row.faction_id}:army-rule"
+        if faction_row.faction_id in FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID:
+            army_rule_runtime_consumers: tuple[str, ...] = (
+                FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID[faction_row.faction_id]
+            )
+            assert army_row.status is Phase17ECoverageStatus.IMPLEMENTED
+            assert army_row.runtime_support_status is not None
+            assert army_row.runtime_support_status.value == "engine_consumed"
+            assert army_row.runtime_consumer_ids == tuple(sorted(army_rule_runtime_consumers))
+            assert army_row.handler_id == army_rule_runtime_consumers[0]
+        else:
+            assert army_row.status is Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED
+            assert army_row.runtime_support_status is None
+            assert army_row.runtime_consumer_ids == ()
+            assert army_row.handler_id == f"phase17e:faction:{faction_row.faction_id}:army-rule"
         assert faction_row.source_id in datasheet_row.source_ids
         assert pdf_record.source_id in datasheet_row.source_ids
         assert datasheet_row.unsupported_reason is (
@@ -315,12 +335,14 @@ def test_phase17e_loads_every_seeded_faction_and_detachment() -> None:
         assert coverage_row.detachment_point_cost == detachment_row.detachment_point_cost
         assert coverage_row.is_new_for_eleventh is detachment_row.is_new_for_eleventh
         if key in CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY:
-            runtime_consumers = CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY[key]
+            detachment_runtime_consumers: tuple[str, ...] = (
+                CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY[key]
+            )
             assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
             assert coverage_row.runtime_support_status is not None
             assert coverage_row.runtime_support_status.value == "engine_consumed"
-            assert coverage_row.runtime_consumer_ids == tuple(sorted(runtime_consumers))
-            assert coverage_row.handler_id == runtime_consumers[0]
+            assert coverage_row.runtime_consumer_ids == tuple(sorted(detachment_runtime_consumers))
+            assert coverage_row.handler_id == detachment_runtime_consumers[0]
         else:
             assert coverage_row.status is Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED
             assert coverage_row.runtime_support_status is None
@@ -552,6 +574,25 @@ def test_phase17e_chaos_daemons_detachment_rule_is_engine_consumed(
     assert coverage_row.handler_id == runtime_consumers[0]
 
 
+def test_phase17e_leagues_of_votann_army_rule_is_engine_consumed() -> None:
+    coverage_row = next(
+        row
+        for row in faction_coverage_source.coverage_rows()
+        if row.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and row.faction_id == "leagues-of-votann"
+    )
+
+    assert coverage_row.descriptor_id == "phase17e:leagues-of-votann:army-rule"
+    assert coverage_row.rule_name == "Prioritised Efficiency"
+    assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+    assert coverage_row.runtime_support_status is not None
+    assert coverage_row.runtime_support_status.value == "engine_consumed"
+    assert coverage_row.runtime_consumer_ids == tuple(
+        sorted(LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS)
+    )
+    assert coverage_row.handler_id == LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS[0]
+
+
 def test_phase17e_coverage_report_groups_supported_and_approved_unsupported_rows() -> None:
     package = faction_coverage_source.phase17e_coverage_package()
     faction_count = len(faction_detachment_source.faction_rows())
@@ -561,16 +602,17 @@ def test_phase17e_coverage_report_groups_supported_and_approved_unsupported_rows
     implemented_exact_count = sum(1 for row in enhancement_rows if row.runtime_consumer_ids) + sum(
         1 for row in stratagem_rows if row.runtime_consumer_ids
     )
+    implemented_army_rule_count = len(FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID)
     implemented_detachment_rule_count = len(CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY)
     source_only_exact_count = len(enhancement_rows) + len(stratagem_rows) - implemented_exact_count
     status_counts = package.status_counts()
 
     assert status_counts[Phase17ECoverageStatus.IMPLEMENTED.value] == (
-        implemented_exact_count + implemented_detachment_rule_count
+        implemented_army_rule_count + implemented_exact_count + implemented_detachment_rule_count
     )
     assert status_counts[Phase17ECoverageStatus.GENERIC_SUPPORTED.value] == 0
     assert status_counts[Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED.value] == (
-        faction_count
+        (faction_count - implemented_army_rule_count)
         + (detachment_count - implemented_detachment_rule_count)
         + source_only_exact_count
     )
@@ -588,10 +630,31 @@ def test_phase17e_coverage_rows_reject_unapproved_or_incomplete_status_shapes() 
         for row in package.coverage_rows
         if row.status is Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED
     )
+    implemented_army_rule_row = next(
+        row
+        for row in package.coverage_rows
+        if row.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and row.status is Phase17ECoverageStatus.IMPLEMENTED
+    )
     unsupported_row = package.unsupported_rows()[0]
 
     with pytest.raises(Phase17EFactionCoverageError, match="require handler_id"):
         replace(named_handler_row, handler_id=None)
+
+    with pytest.raises(Phase17EFactionCoverageError, match="require rule_ir_hash"):
+        replace(named_handler_row, status=Phase17ECoverageStatus.GENERIC_SUPPORTED)
+
+    with pytest.raises(Phase17EFactionCoverageError, match="require handler_id"):
+        replace(implemented_army_rule_row, handler_id=None)
+
+    with pytest.raises(Phase17EFactionCoverageError, match="cannot include exact"):
+        replace(implemented_army_rule_row, rule_id="unexpected-exact-rule-id")
+
+    with pytest.raises(Phase17EFactionCoverageError, match="requires runtime consumers"):
+        replace(implemented_army_rule_row, runtime_consumer_ids=())
+
+    with pytest.raises(Phase17EFactionCoverageError, match="require runtime support"):
+        replace(implemented_army_rule_row, runtime_support_status=None)
 
     with pytest.raises(Phase17EFactionCoverageError, match="Only unsupported"):
         replace(
@@ -603,6 +666,90 @@ def test_phase17e_coverage_rows_reject_unapproved_or_incomplete_status_shapes() 
 
     with pytest.raises(Phase17EFactionCoverageError, match="require a reason"):
         replace(unsupported_row, unsupported_reason=None)
+
+
+def test_phase17e_coverage_rows_reject_malformed_runtime_shape_tokens() -> None:
+    package = faction_coverage_source.phase17e_coverage_package()
+    named_handler_row = next(
+        row
+        for row in package.coverage_rows
+        if row.status is Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED
+    )
+    implemented_army_rule_row = next(
+        row
+        for row in package.coverage_rows
+        if row.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and row.status is Phase17ECoverageStatus.IMPLEMENTED
+    )
+    implemented_detachment_row = next(
+        row
+        for row in package.coverage_rows
+        if row.coverage_kind is Phase17ECoverageKind.DETACHMENT_RULE
+        and row.status is Phase17ECoverageStatus.IMPLEMENTED
+    )
+    implemented_exact_row = next(
+        row
+        for row in package.coverage_rows
+        if row.coverage_kind in _EXACT_SUBRULE_TEST_KINDS
+        and row.status is Phase17ECoverageStatus.IMPLEMENTED
+    )
+    datasheet_row = next(
+        row
+        for row in package.coverage_rows
+        if row.coverage_kind is Phase17ECoverageKind.DATASHEET_INTAKE
+    )
+    unsupported_row = package.unsupported_rows()[0]
+
+    with pytest.raises(Phase17EFactionCoverageError, match="Unsupported Phase17E coverage kind"):
+        replace(named_handler_row, coverage_kind=cast(Phase17ECoverageKind, "unknown-kind"))
+
+    with pytest.raises(Phase17EFactionCoverageError, match="Unsupported Phase17E coverage status"):
+        replace(named_handler_row, status=cast(Phase17ECoverageStatus, "unknown-status"))
+
+    with pytest.raises(
+        Phase17EFactionCoverageError,
+        match="Unsupported Phase17E unsupported reason",
+    ):
+        replace(
+            unsupported_row,
+            unsupported_reason=cast(Phase17EUnsupportedReason, "unknown-reason"),
+        )
+
+    with pytest.raises(
+        Phase17EFactionCoverageError,
+        match="Unsupported Phase17E runtime support status",
+    ):
+        replace(
+            implemented_army_rule_row,
+            runtime_support_status=cast(
+                faction_subrule_source.SourceSubruleRuntimeStatus,
+                "unknown-runtime-status",
+            ),
+        )
+
+    with pytest.raises(Phase17EFactionCoverageError, match="source_ids must be a tuple"):
+        replace(named_handler_row, source_ids=cast(tuple[str, ...], ["source"]))
+
+    with pytest.raises(Phase17EFactionCoverageError, match="source_ids must be unique"):
+        replace(named_handler_row, source_ids=("duplicate-source", "duplicate-source"))
+
+    with pytest.raises(Phase17EFactionCoverageError, match="Exact subrule coverage"):
+        replace(implemented_exact_row, runtime_support_status=None)
+
+    with pytest.raises(Phase17EFactionCoverageError, match="Detachment rule coverage"):
+        replace(implemented_detachment_row, rule_id="unexpected-exact-rule-id")
+
+    with pytest.raises(Phase17EFactionCoverageError, match="requires runtime consumers"):
+        replace(implemented_detachment_row, runtime_consumer_ids=())
+
+    with pytest.raises(Phase17EFactionCoverageError, match="require runtime support"):
+        replace(implemented_detachment_row, runtime_support_status=None)
+
+    with pytest.raises(Phase17EFactionCoverageError, match="Only exact subrule coverage"):
+        replace(datasheet_row, rule_id="unexpected-rule-id")
+
+    with pytest.raises(Phase17EFactionCoverageError, match="detachment_point_cost must be"):
+        replace(implemented_detachment_row, detachment_point_cost=0)
 
 
 def test_phase17e_local_raw_faction_pdfs_match_manifest_when_present() -> None:
@@ -664,6 +811,14 @@ def _rows_by_kind(
     for row in rows:
         rows_by_kind[row.coverage_kind].append(row)
     return rows_by_kind
+
+
+_EXACT_SUBRULE_TEST_KINDS = frozenset(
+    (
+        Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
+        Phase17ECoverageKind.DETACHMENT_STRATAGEM,
+    )
+)
 
 
 def _detachment_row_map(
