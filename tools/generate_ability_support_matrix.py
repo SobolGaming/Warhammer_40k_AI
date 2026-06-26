@@ -1685,12 +1685,38 @@ def _structured_support_sections_markdown() -> list[str]:
     )
     lines.extend(
         _support_section_markdown(
-            "Core Terrain And Visibility",
+            "Core Rules",
             (
-                "Terrain visibility behavior is source-backed through the ruleset descriptor "
-                "and consumed by Shooting target selection and declaration validation."
+                "Core rule behavior is source-backed through canonical keywords, ruleset "
+                "descriptors, or named runtime consumers, then consumed by Movement, Shooting "
+                "target selection, attack resolution, and Stratagem effect hosts."
             ),
             (
+                SupportSectionRow(
+                    "TOWERING keyword",
+                    "Terrain visibility exception and Plunging Fire eligibility",
+                    "Ruleset descriptor, keyword lexicon, and generated matrix",
+                    "Focused visibility/cover and Shooting declaration tests",
+                    "Full",
+                    (
+                        "Consumes canonical TOWERING keywords in terrain line-of-sight "
+                        "exception policy and lets TOWERING attackers claim Plunging Fire "
+                        "against ground-level targets within 12 inches."
+                    ),
+                ),
+                SupportSectionRow(
+                    "TITANIC keyword",
+                    ("Desperate Escape overflight exemption and Core Stratagem eligibility gates"),
+                    "Source row, adapter contract, and generated matrix",
+                    "Focused Fall Back/Desperate Escape and Fire Overwatch tests",
+                    "Full",
+                    (
+                        "The source ability row registers TITANIC as a canonical keyword; "
+                        "Movement treats FLY or TITANIC units as overflight-exempt for "
+                        "Desperate Escape checks, and Fire Overwatch rejects TITANIC units "
+                        "before CP spend."
+                    ),
+                ),
                 SupportSectionRow(
                     "Hidden and Detection Range",
                     "Terrain visibility policy plus Shooting target detection gate",
@@ -1702,6 +1728,34 @@ def _structured_support_sections_markdown() -> list[str]:
                         "range, terrain-area and keyword requirements, and hidden-status loss "
                         "after ranged attacks; detection modifiers are consumed from "
                         "engine-owned persisting effects."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Plunging Fire",
+                    "Shooting target evidence plus attack-sequence Ballistic Skill modifier",
+                    "Ruleset descriptor, architecture, and generated matrix",
+                    "Focused Shooting declaration, save, and fail-fast validation tests",
+                    "Full",
+                    (
+                        "Adds `core-rules:plunging-fire` to accepted targeting evidence from "
+                        "eligible terrain-floor or TOWERING range gates, then improves the "
+                        "attack pool's Ballistic Skill in the shared attack sequence."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Gone to Ground",
+                    "Automatic Hidden detection penalty for Dense/Solid terrain",
+                    "Ruleset descriptor, GameState history, adapter contract, and generated matrix",
+                    "Focused Shooting target and ranged attack history tests",
+                    "Full",
+                    (
+                        "Hidden models within Dense terrain features, represented by "
+                        "`LineOfSightPolicy.DENSE_COVER`, subtract 3 inches from effective "
+                        "Detection Range when they are not fully visible because of intervening "
+                        "Solid terrain and their unit has not made ranged attacks in the current "
+                        "or previous player turn. Accepted shooting declarations record "
+                        "`RangedAttackHistoryRecord`; no player choice, Stratagem use, CP spend, "
+                        "or retired Go to Ground Stratagem is involved."
                     ),
                 ),
             ),

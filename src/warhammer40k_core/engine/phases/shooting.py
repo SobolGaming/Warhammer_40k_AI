@@ -195,7 +195,11 @@ from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
 if TYPE_CHECKING:
-    from warhammer40k_core.engine.game_state import GameState, OneShotWeaponUseRecord
+    from warhammer40k_core.engine.game_state import (
+        GameState,
+        OneShotWeaponUseRecord,
+        RangedAttackHistoryRecord,
+    )
     from warhammer40k_core.engine.reaction_queue import ReactionQueue
     from warhammer40k_core.engine.stratagems import (
         StratagemCatalogIndex,
@@ -304,6 +308,7 @@ type _ShootingModelCandidateCacheKey = tuple[
     str | None,
     str,
     str,
+    bool,
     bool,
     int,
 ]
@@ -2481,12 +2486,17 @@ def _request_shooting_declaration(
         state=state,
         target_unit_ids=candidate_target_unit_ids,
     )
+    target_unit_ids_with_recent_ranged_attacks = _target_unit_ids_with_recent_ranged_attacks(
+        state=state,
+        target_unit_ids=candidate_target_unit_ids,
+    )
     detection_range_bonus_by_target_id = _detection_range_bonus_inches_by_target_id(
         state=state,
         target_unit_ids=candidate_target_unit_ids,
     )
     detection_context_fingerprint = _targeting_detection_context_fingerprint(
         hidden_target_unit_ids=hidden_target_unit_ids,
+        target_unit_ids_with_recent_ranged_attacks=target_unit_ids_with_recent_ranged_attacks,
         detection_range_bonus_by_target_id=detection_range_bonus_by_target_id,
     )
     target_candidates: list[JsonValue] = []
@@ -2525,6 +2535,9 @@ def _request_shooting_declaration(
                     target_unit_ids=candidate_target_unit_ids,
                     terrain_features=terrain_features,
                     hidden_target_unit_ids=hidden_target_unit_ids,
+                    target_unit_ids_with_recent_ranged_attacks=(
+                        target_unit_ids_with_recent_ranged_attacks
+                    ),
                     target_detection_range_bonus_inches_by_unit_id=(
                         detection_range_bonus_by_target_id
                     ),
@@ -3555,6 +3568,14 @@ def _apply_shooting_declaration_decision(
         ineligible_unit_instance_ids=ineligible_unit_ids,
         attack_sequence=attack_sequence,
     )
+    ranged_attack_history_record = _record_ranged_attack_history_for_declaration(
+        state=state,
+        player_id=_active_player_id(state),
+        unit_instance_id=proposal.unit_instance_id,
+        phase=BattlePhase.SHOOTING,
+        request_id=result.request_id,
+        result_id=result.result_id,
+    )
     apply_hidden_status_loss_after_ranged_attacks(
         state=state,
         decisions=decisions,
@@ -3579,6 +3600,7 @@ def _apply_shooting_declaration_decision(
                 "visibility_cache_key": proposal.visibility_cache_key,
                 "attack_pools": [pool.to_payload() for pool in attack_pools],
                 "one_shot_weapon_use_records": [record.to_payload() for record in one_shot_records],
+                "ranged_attack_history_record": ranged_attack_history_record.to_payload(),
                 "ineligible_unit_instance_ids": list(ineligible_unit_ids),
                 "phase_body_status": "declaration_accepted",
             }
@@ -3635,6 +3657,14 @@ def _apply_out_of_phase_shooting_declaration_decision(
         attack_pools=attack_pools,
         attack_sequence=attack_sequence,
     )
+    ranged_attack_history_record = _record_ranged_attack_history_for_declaration(
+        state=state,
+        player_id=out_of_phase_state.player_id,
+        unit_instance_id=proposal.unit_instance_id,
+        phase=out_of_phase_state.parent_phase,
+        request_id=result.request_id,
+        result_id=result.result_id,
+    )
     apply_hidden_status_loss_after_ranged_attacks(
         state=state,
         decisions=decisions,
@@ -3660,10 +3690,38 @@ def _apply_out_of_phase_shooting_declaration_decision(
                 "visibility_cache_key": proposal.visibility_cache_key,
                 "attack_pools": [pool.to_payload() for pool in attack_pools],
                 "one_shot_weapon_use_records": [record.to_payload() for record in one_shot_records],
+                "ranged_attack_history_record": ranged_attack_history_record.to_payload(),
             }
         ),
     )
     return True
+
+
+def _record_ranged_attack_history_for_declaration(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+    phase: BattlePhase,
+    request_id: str,
+    result_id: str,
+) -> RangedAttackHistoryRecord:
+    from warhammer40k_core.engine.game_state import RangedAttackHistoryRecord
+
+    active_player_id = state.active_player_id
+    if active_player_id is None:
+        raise GameLifecycleError("Ranged attack history requires an active player turn.")
+    record = RangedAttackHistoryRecord(
+        player_id=player_id,
+        unit_instance_id=unit_instance_id,
+        battle_round=state.battle_round,
+        active_player_id=active_player_id,
+        phase=phase,
+        request_id=request_id,
+        result_id=result_id,
+    )
+    state.record_ranged_attack_history(record)
+    return record
 
 
 def _record_one_shot_weapon_uses_for_attack_pools(
@@ -4141,6 +4199,10 @@ def _attack_pools_or_validation(
         state=state,
         target_unit_ids=proposal_target_unit_ids,
     )
+    target_unit_ids_with_recent_ranged_attacks = _target_unit_ids_with_recent_ranged_attacks(
+        state=state,
+        target_unit_ids=proposal_target_unit_ids,
+    )
     detection_range_bonus_by_target_id = _detection_range_bonus_inches_by_target_id(
         state=state,
         target_unit_ids=proposal_target_unit_ids,
@@ -4211,6 +4273,7 @@ def _attack_pools_or_validation(
             target_unit_id=declaration.target_unit_instance_id,
             terrain_features=terrain_features,
             hidden_target_unit_ids=hidden_target_unit_ids,
+            target_unit_ids_with_recent_ranged_attacks=target_unit_ids_with_recent_ranged_attacks,
             target_detection_range_bonus_inches=detection_range_bonus_by_target_id.get(
                 declaration.target_unit_instance_id,
                 0,
@@ -5697,6 +5760,10 @@ def _rules_unit_has_legal_shooting_declaration(
         state=state,
         target_unit_ids=resolved_target_unit_ids,
     )
+    target_unit_ids_with_recent_ranged_attacks = _target_unit_ids_with_recent_ranged_attacks(
+        state=state,
+        target_unit_ids=resolved_target_unit_ids,
+    )
     detection_range_bonus_by_target_id = _detection_range_bonus_inches_by_target_id(
         state=state,
         target_unit_ids=resolved_target_unit_ids,
@@ -5723,6 +5790,9 @@ def _rules_unit_has_legal_shooting_declaration(
                 target_unit_id=target_unit_id,
                 terrain_features=terrain_features,
                 hidden_target_unit_ids=hidden_target_unit_ids,
+                target_unit_ids_with_recent_ranged_attacks=(
+                    target_unit_ids_with_recent_ranged_attacks
+                ),
                 target_detection_range_bonus_inches=detection_range_bonus_by_target_id.get(
                     target_unit_id,
                     0,
@@ -5792,15 +5862,38 @@ def _shot_source_unit_ids_for_detection_effects(state: GameState) -> tuple[str, 
     return shooting_state.shot_unit_ids
 
 
+def _target_unit_ids_with_recent_ranged_attacks(
+    *,
+    state: GameState,
+    target_unit_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            target_unit_id
+            for target_unit_id in _validate_identifier_tuple(
+                "recent ranged attack target_unit_ids",
+                target_unit_ids,
+            )
+            if state.unit_made_ranged_attacks_current_or_previous_turn(
+                unit_instance_id=target_unit_id,
+            )
+        )
+    )
+
+
 def _targeting_detection_context_fingerprint(
     *,
     hidden_target_unit_ids: tuple[str, ...],
+    target_unit_ids_with_recent_ranged_attacks: tuple[str, ...],
     detection_range_bonus_by_target_id: dict[str, int],
 ) -> str:
     return canonical_json(
         validate_json_value(
             {
                 "hidden_target_unit_ids": list(hidden_target_unit_ids),
+                "target_unit_ids_with_recent_ranged_attacks": list(
+                    target_unit_ids_with_recent_ranged_attacks
+                ),
                 "detection_range_bonus_by_target_id": detection_range_bonus_by_target_id,
             }
         )
@@ -5830,6 +5923,10 @@ def _unit_has_legal_shooting_declaration(
         state=state,
         target_unit_ids=resolved_target_unit_ids,
     )
+    target_unit_ids_with_recent_ranged_attacks = _target_unit_ids_with_recent_ranged_attacks(
+        state=state,
+        target_unit_ids=resolved_target_unit_ids,
+    )
     detection_range_bonus_by_target_id = _detection_range_bonus_inches_by_target_id(
         state=state,
         target_unit_ids=resolved_target_unit_ids,
@@ -5852,6 +5949,9 @@ def _unit_has_legal_shooting_declaration(
                 target_unit_id=target_unit_id,
                 terrain_features=terrain_features,
                 hidden_target_unit_ids=hidden_target_unit_ids,
+                target_unit_ids_with_recent_ranged_attacks=(
+                    target_unit_ids_with_recent_ranged_attacks
+                ),
                 target_detection_range_bonus_inches=detection_range_bonus_by_target_id.get(
                     target_unit_id,
                     0,
@@ -5899,6 +5999,10 @@ def _legal_shooting_types_for_rules_unit(
         state=state,
         target_unit_ids=resolved_target_unit_ids,
     )
+    target_unit_ids_with_recent_ranged_attacks = _target_unit_ids_with_recent_ranged_attacks(
+        state=state,
+        target_unit_ids=resolved_target_unit_ids,
+    )
     detection_range_bonus_by_target_id = _detection_range_bonus_inches_by_target_id(
         state=state,
         target_unit_ids=resolved_target_unit_ids,
@@ -5932,6 +6036,9 @@ def _legal_shooting_types_for_rules_unit(
                     target_unit_id=target_unit_id,
                     terrain_features=terrain_features,
                     hidden_target_unit_ids=hidden_target_unit_ids,
+                    target_unit_ids_with_recent_ranged_attacks=(
+                        target_unit_ids_with_recent_ranged_attacks
+                    ),
                     target_detection_range_bonus_inches=detection_range_bonus_by_target_id.get(
                         target_unit_id,
                         0,
@@ -5977,6 +6084,7 @@ def _cached_shooting_target_candidate_for_model(
     target_unit_id: str,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     hidden_target_unit_ids: tuple[str, ...],
+    target_unit_ids_with_recent_ranged_attacks: tuple[str, ...],
     target_detection_range_bonus_inches: int,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
     state: GameState | None = None,
@@ -5986,6 +6094,9 @@ def _cached_shooting_target_candidate_for_model(
         weapon=weapon,
         target_unit_id=target_unit_id,
         target_is_hidden=target_unit_id in hidden_target_unit_ids,
+        target_made_recent_ranged_attacks=(
+            target_unit_id in target_unit_ids_with_recent_ranged_attacks
+        ),
         target_detection_range_bonus_inches=target_detection_range_bonus_inches,
     )
     if cache_key not in cache:
@@ -5998,6 +6109,7 @@ def _cached_shooting_target_candidate_for_model(
             target_unit_id=target_unit_id,
             terrain_features=terrain_features,
             hidden_target_unit_ids=hidden_target_unit_ids,
+            target_unit_ids_with_recent_ranged_attacks=(target_unit_ids_with_recent_ranged_attacks),
             target_detection_range_bonus_inches=target_detection_range_bonus_inches,
         )
         if shooting_target_restriction_hooks is not None:
@@ -6037,6 +6149,7 @@ def _shooting_model_candidate_cache_key(
     weapon: _AvailableWeapon,
     target_unit_id: str,
     target_is_hidden: bool,
+    target_made_recent_ranged_attacks: bool,
     target_detection_range_bonus_inches: int,
 ) -> _ShootingModelCandidateCacheKey:
     profile = weapon["weapon_profile"]
@@ -6049,6 +6162,7 @@ def _shooting_model_candidate_cache_key(
         _weapon_profile_cache_fingerprint(profile),
         target_unit_id,
         target_is_hidden,
+        target_made_recent_ranged_attacks,
         target_detection_range_bonus_inches,
     )
 

@@ -2189,6 +2189,16 @@ def continue_mortal_wound_application(
         raise GameLifecycleError("remove_destroyed_models must be a bool.")
     current = progress
     while current.remaining_mortal_wounds > 0:
+        rules_unit = rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=current.target_unit_instance_id,
+        )
+        if not alive_placed_models_for_rules_unit(state=state, rules_unit=rules_unit):
+            completed = current.with_remaining_lost()
+            return MortalWoundRoutingResult(
+                progress=completed,
+                application=completed.to_application(),
+            )
         allocation_context = allocation_context_for_unit(
             state=state,
             target_unit_instance_id=current.target_unit_instance_id,

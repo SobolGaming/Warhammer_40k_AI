@@ -153,6 +153,7 @@ from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
     GameStatePayload,
+    RangedAttackHistoryRecord,
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
@@ -222,6 +223,7 @@ from warhammer40k_core.engine.shooting_targets import (
     PLUNGING_FIRE_RULE_ID,
     STEALTH_RULE_ID,
     ShootingTargetViolationCode,
+    shooting_target_candidate_for_model,
     shooting_target_candidates_for_unit,
     shooting_target_violation_code_from_token,
     unit_has_line_of_sight_to_target,
@@ -1029,6 +1031,60 @@ def test_phase13d_heavy_does_not_apply_to_out_of_phase_shooting() -> None:
     assert pool_payload["hit_roll_modifier"] == 0
     assert HEAVY_RULE_ID not in targeting_rule_ids
     assert FIRE_OVERWATCH_RULE_ID in targeting_rule_ids
+
+
+def test_out_of_phase_shooting_declaration_records_ranged_attack_history() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    state.active_player_id = "player-b"
+    declaration_request = _decision_request(
+        request_out_of_phase_shooting_declaration(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            ruleset_descriptor=_ruleset(),
+            army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+            player_id="player-a",
+            unit_instance_id=attacker.unit_instance_id,
+            parent_phase=BattlePhase.MOVEMENT,
+            source_rule_id=FIRE_OVERWATCH_RULE_ID,
+            source_decision_request_id="phase13b-history-fire-overwatch-request",
+            source_decision_result_id="phase13b-history-fire-overwatch-result",
+            source_context={
+                "triggering_enemy_unit_instance_id": defender.unit_instance_id,
+            },
+            target_unit_ids=(defender.unit_instance_id,),
+        )
+    )
+    proposal = _proposal_from_request(
+        request=declaration_request,
+        target_unit_id=defender.unit_instance_id,
+    )
+
+    _submit_payload(
+        lifecycle,
+        request=declaration_request,
+        payload=proposal.to_payload(),
+        result_id="phase13b-declare-out-of-phase-history",
+    )
+
+    assert len(state.ranged_attack_history_records) == 1
+    record = state.ranged_attack_history_records[0]
+    assert record.player_id == "player-a"
+    assert record.unit_instance_id == attacker.unit_instance_id
+    assert record.battle_round == 1
+    assert record.active_player_id == "player-b"
+    assert record.phase is BattlePhase.MOVEMENT
+    assert record.request_id == declaration_request.request_id
+    assert record.result_id == "phase13b-declare-out-of-phase-history"
+    assert state.unit_made_ranged_attacks_current_or_previous_turn(
+        unit_instance_id=attacker.unit_instance_id
+    )
+
+    accepted_payload = _last_event_payload(lifecycle, "out_of_phase_shooting_declaration_accepted")
+    assert accepted_payload["ranged_attack_history_record"] == record.to_payload()
 
 
 def test_phase13d_heavy_does_not_apply_to_unit_set_up_this_turn() -> None:
@@ -12868,12 +12924,16 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
     state.battlefield_state = battlefield.with_removed_models(
         tuple(model.model_instance_id for model in defender.own_models)
     )
-    with pytest.raises(GameLifecycleError, match="requires alive models"):
-        continue_mortal_wound_application(
-            state=state,
-            request_id="phase13d-no-model-request",
-            progress=no_models_progress,
-        )
+    no_models_routing = continue_mortal_wound_application(
+        state=state,
+        request_id="phase13d-no-model-request",
+        progress=no_models_progress,
+    )
+    no_models_application = no_models_routing.application
+    assert no_models_routing.request is None
+    assert no_models_application is not None
+    assert no_models_application.applications == ()
+    assert no_models_application.remaining_mortal_wounds_lost == 1
 
     routed_lifecycle, routed_units = _shooting_lifecycle(alpha_unit_ids=("unit-1",))
     routed_state = _state(routed_lifecycle)
@@ -14425,6 +14485,120 @@ def test_target_range_visibility_and_lone_operative_gates_are_explicit() -> None
     )
     assert close_candidates[0].is_legal
     assert close_candidates[0].shooting_types == (ShootingType.NORMAL,)
+
+
+def test_gone_to_ground_reduces_hidden_detection_range_in_solid_terrain() -> None:
+    scenario, attacker, target, profile = _gone_to_ground_detection_context()
+    solid_woods = _dense_solid_woods()
+
+    gone_to_ground_candidate = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_profile=profile,
+        target_unit_id=target.unit_instance_id,
+        terrain_features=(solid_woods,),
+        hidden_target_unit_ids=(target.unit_instance_id,),
+    )
+    recent_shot_candidate = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_profile=profile,
+        target_unit_id=target.unit_instance_id,
+        terrain_features=(solid_woods,),
+        hidden_target_unit_ids=(target.unit_instance_id,),
+        target_unit_ids_with_recent_ranged_attacks=(target.unit_instance_id,),
+    )
+
+    assert gone_to_ground_candidate.violation_code is (
+        ShootingTargetViolationCode.OUTSIDE_DETECTION_RANGE
+    )
+    assert gone_to_ground_candidate.message == (
+        "Hidden target is outside the attacker's effective detection range."
+    )
+    assert recent_shot_candidate.is_legal
+    assert recent_shot_candidate.line_of_sight_witness is not None
+    assert not recent_shot_candidate.line_of_sight_witness.unit_fully_visible
+
+
+def test_gone_to_ground_does_not_reduce_detection_when_solid_target_fully_visible() -> None:
+    scenario, attacker, target, profile = _gone_to_ground_detection_context()
+    towering_attacker = replace(attacker, keywords=(*attacker.keywords, "TOWERING"))
+
+    candidate = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=towering_attacker,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_profile=profile,
+        target_unit_id=target.unit_instance_id,
+        terrain_features=(_dense_solid_woods(),),
+        hidden_target_unit_ids=(target.unit_instance_id,),
+    )
+
+    assert candidate.is_legal
+    assert candidate.line_of_sight_witness is not None
+    assert candidate.line_of_sight_witness.unit_fully_visible
+
+
+def test_gone_to_ground_does_not_reduce_detection_for_non_solid_obscuring_terrain() -> None:
+    scenario, attacker, target, profile = _gone_to_ground_detection_context()
+    non_solid_hill = _non_solid_hill_with_wall()
+
+    candidate = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_profile=profile,
+        target_unit_id=target.unit_instance_id,
+        terrain_features=(non_solid_hill,),
+        hidden_target_unit_ids=(target.unit_instance_id,),
+    )
+
+    assert candidate.is_legal
+    assert candidate.line_of_sight_witness is not None
+    assert not candidate.line_of_sight_witness.unit_fully_visible
+    assert any(
+        record.blocks_full_visibility and record.terrain_feature_kind is TerrainFeatureKind.HILLS
+        for record in candidate.line_of_sight_witness.all_blocker_records()
+    )
+
+
+def test_ranged_attack_history_tracks_current_and_previous_player_turns() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    unit_id = units["intercessor-1"].unit_instance_id
+    state.record_ranged_attack_history(
+        RangedAttackHistoryRecord(
+            player_id="player-a",
+            unit_instance_id=unit_id,
+            battle_round=1,
+            active_player_id="player-a",
+            phase=BattlePhase.SHOOTING,
+            request_id="phase13b-ranged-history-request",
+            result_id="phase13b-ranged-history-result",
+        )
+    )
+
+    assert state.unit_made_ranged_attacks_current_or_previous_turn(unit_instance_id=unit_id)
+
+    state.active_player_id = "player-b"
+    restored_state = GameState.from_payload(
+        cast(GameStatePayload, json.loads(json.dumps(state.to_payload(), sort_keys=True)))
+    )
+    assert restored_state.unit_made_ranged_attacks_current_or_previous_turn(
+        unit_instance_id=unit_id
+    )
+
+    restored_state.battle_round = 2
+    restored_state.active_player_id = "player-a"
+    assert not restored_state.unit_made_ranged_attacks_current_or_previous_turn(
+        unit_instance_id=unit_id
+    )
 
 
 def test_phase13d_lone_operative_within_twelve_is_visible_even_with_closer_enemy() -> None:
@@ -17632,6 +17806,76 @@ def _display_geometry(
         width_inches=width_inches,
         depth_inches=depth_inches,
         display_template_id="test_axis_aligned_terrain",
+    )
+
+
+def _gone_to_ground_detection_context() -> tuple[
+    BattlefieldScenario,
+    UnitInstance,
+    UnitInstance,
+    WeaponProfile,
+]:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    attacker = units["intercessor-1"]
+    target = units["enemy"]
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(Pose.at(25.5 + (index * 1.4), 35.0) for index in range(5)),
+    )
+    return scenario, attacker, target, _first_weapon_profile(lifecycle, attacker)
+
+
+def _dense_solid_woods() -> TerrainFeatureDefinition:
+    return TerrainFeatureDefinition(
+        feature_id="phase13b-dense-solid-woods",
+        feature_kind=TerrainFeatureKind.WOODS,
+        footprint_center_x_inches=29.5,
+        footprint_center_y_inches=35.0,
+        footprint_width_inches=12.0,
+        footprint_depth_inches=6.0,
+        display_geometry=_display_geometry(
+            center_x_inches=29.5,
+            center_y_inches=35.0,
+            width_inches=12.0,
+            depth_inches=6.0,
+        ),
+    )
+
+
+def _non_solid_hill_with_wall() -> TerrainFeatureDefinition:
+    return TerrainFeatureDefinition(
+        feature_id="phase13b-non-solid-hill-with-wall",
+        feature_kind=TerrainFeatureKind.HILLS,
+        footprint_center_x_inches=25.5,
+        footprint_center_y_inches=35.0,
+        footprint_width_inches=12.0,
+        footprint_depth_inches=6.0,
+        display_geometry=_display_geometry(
+            center_x_inches=25.5,
+            center_y_inches=35.0,
+            width_inches=12.0,
+            depth_inches=6.0,
+        ),
+        walls=(
+            TerrainWallDefinition(
+                wall_id="partial-wall",
+                center_x_inches=22.0,
+                center_y_inches=35.0,
+                bottom_z_inches=0.0,
+                width_inches=0.2,
+                depth_inches=1.0,
+                height_inches=4.0,
+            ),
+        ),
     )
 
 
