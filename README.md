@@ -165,8 +165,9 @@ Current status:
   reserves, transports, missions, replay, source ingestion, catalog generation,
   rule IR, generic rule execution, and adapter decision submission is in place.
 - Faction semantic execution is active incremental work. Current runtime
-  support includes selected Chaos Daemons, Chaos Space Marines, Aeldari,
-  Death Guard, World Eaters, and Space Marines Phase 17G slices. Chaos Daemons Shadow Legion
+  support includes selected Phase 17G faction slices across Chaos Daemons,
+  Chaos Space Marines, Aeldari, Death Guard, World Eaters, Space Marines,
+  Necrons, and Leagues of Votann. Chaos Daemons Shadow Legion
   supports Thralls of the First Prince mustering restrictions and keyword
   grants, Murderer's Cowl, Penumbral Puppetry, Gloam Rot, Shadow's Caress,
   Leaping Shadows, Mantle of Gloom, Fade to Darkness, and Disciples of
