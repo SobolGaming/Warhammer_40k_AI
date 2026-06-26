@@ -276,6 +276,13 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:eldritch_suppression` | Eldritch Suppression |
 | `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:nomads_of_the_hidden_way` | Nomads of the Hidden Way |
 | `warhammer_40000_11th:aeldari:path_of_the_outcast:far_reaching_doom:selected_shooting_unit` | Far-reaching Doom |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command` | Voice Of Command |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock` | Battle Shock |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:movement` | Movement |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:objective-control` | Objective Control |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:save-option` | Save Option |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:unit-characteristic` | Unit Characteristic |
+| `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:weapon-profile` | Weapon Profile |
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows` | Templar Vows |
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-declaration` | Templar Vows |
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-targets` | Templar Vows |
