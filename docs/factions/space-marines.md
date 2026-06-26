@@ -8,7 +8,7 @@ Source PDF: [eng_08-06_warhammer40000_faction_pack_space-marines-nd2ezs5yzn-wxe2
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 22 | 0 | 80 | 119 | 0 |
+| 22 | 0 | 80 | 119 | 1 |
 
 ## Detachment Rule Support
 

@@ -8,7 +8,7 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_aeldari-glkjirbhiw-9udkry7xbr
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 15 | 2 | 51 | 75 | 15 |
+| 15 | 2 | 51 | 75 | 16 |
 
 ## Detachment Rule Support
 

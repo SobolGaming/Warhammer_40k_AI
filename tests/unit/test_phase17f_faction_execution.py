@@ -94,6 +94,20 @@ LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
     "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll",
 )
+SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
+    "aeldari": "Battle Focus",
+    "chaos-daemons": "The Shadow of Chaos",
+    "chaos-space-marines": "Dark Pacts",
+    "death-guard": "Nurgle's Gift",
+    "drukhari": "Power from Pain",
+    "emperors-children": "Thrill Seekers",
+    "grey-knights": "Gate of Infinity",
+    "leagues-of-votann": "Prioritised Efficiency",
+    "necrons": "Reanimation Protocols",
+    "orks": "Waaagh!",
+    "space-marines": "Oath of Moment",
+    "world-eaters": "Blessings of Khorne",
+}
 
 
 def test_phase17f_execution_package_covers_every_phase17e_coverage_row() -> None:
@@ -289,6 +303,35 @@ def test_phase17f_leagues_of_votann_army_rule_execution_record_is_named_handler(
     assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
     assert record.handler_id == LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS[0]
     assert record.block_reason is None
+
+
+def test_phase17f_source_backed_army_rule_execution_records_are_named_handlers() -> None:
+    assert set(faction_coverage_source.FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID) == set(
+        SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID
+    )
+    execution_records_by_faction_id = {
+        record.faction_id: record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+    }
+
+    for faction_id, rule_name in SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID.items():
+        record = execution_records_by_faction_id[faction_id]
+        runtime_consumers = tuple(
+            sorted(
+                faction_coverage_source.FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID[
+                    faction_id
+                ]
+            )
+        )
+        assert record.coverage_descriptor_id == f"phase17e:{faction_id}:army-rule"
+        assert record.execution_id == f"phase17f:phase17e:{faction_id}:army-rule"
+        assert record.rule_name == rule_name
+        assert record.runtime_support_status == "engine_consumed"
+        assert record.runtime_consumer_ids == runtime_consumers
+        assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
+        assert record.handler_id == runtime_consumers[0]
+        assert record.block_reason is None
 
 
 def test_phase17f_execution_payload_is_deterministic_json_safe_and_round_trips() -> None:

@@ -8,7 +8,7 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_death_guard-dgm6djcpoa-iiqvms
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 0 | 28 | 42 | 0 |
+| 9 | 0 | 28 | 42 | 1 |
 
 ## Detachment Rule Support
 

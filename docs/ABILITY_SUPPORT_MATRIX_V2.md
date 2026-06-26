@@ -97,6 +97,7 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | Chaos Space Marines - Dark Pacts | Named army-rule handler | Adapter contract and generated matrix | Focused faction runtime tests | Full | Uses selected-to-shoot and selected-to-fight grant decisions for Lethal Hits or Sustained Hits 1, including out-of-phase shooting, then resolves the post-attack Leadership test, failed-test D3 mortal wounds, and any mortal-wound Feel No Pain continuation through engine hooks. |
 | Death Guard - Nurgle's Gift | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes contagion modifiers for supported characteristics and rolls. |
 | World Eaters - Blessings of Khorne | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes battle-round selection and supported blessing effects. |
+| Orks - Waaagh! | Named army-rule handler | Adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, advance eligibility, weapon-profile, save-option, and validation tests | Full | Implements optional once-per-battle Command phase Waaagh! call, active until the start of the next own Command phase, including Advance-then-Charge eligibility, melee Strength/Attacks modifiers, and a 5+ invulnerable save. |
 | Emperor's Children - Thrill Seekers | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes movement, charge, and shooting target restrictions. |
 | Grey Knights - Gate of Infinity | Named army-rule handler | Adapter contract, decision catalog, architecture, and generated matrix | Focused turn-end, reserves, cap, and attached-rules-unit tests | Full | Implements opponent Fight phase Gate of Infinity selections, battle-size caps, complete choices, required next-Movement Strategic Reserves arrival, and attached rules-unit component validation. |
 | Space Marines - Oath of Moment and Space Marine Chapters | Named army-rule handler plus shared mustering/list-validation host | README, adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, reroll, wound-modifier, and mustering tests | Full | Implements Command phase Oath target selection, target-scoped Hit-roll rerolls, Codex Space Marines Detachment Wound-roll bonus gating, and Black Templars, Space Wolves, and Deathwatch roster restrictions. |
@@ -111,28 +112,28 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 
 | Faction | Detachments | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows | File |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| Orks | 12 | 0 | 44 | 66 | 0 | [orks](factions/orks.md) |
-| Aeldari | 15 | 2 | 51 | 75 | 15 | [aeldari](factions/aeldari.md) |
-| Drukhari | 9 | 0 | 24 | 36 | 0 | [drukhari](factions/drukhari.md) |
+| Orks | 12 | 0 | 44 | 66 | 1 | [orks](factions/orks.md) |
+| Aeldari | 15 | 2 | 51 | 75 | 16 | [aeldari](factions/aeldari.md) |
+| Drukhari | 9 | 0 | 24 | 36 | 1 | [drukhari](factions/drukhari.md) |
 | Tyranids | 10 | 0 | 32 | 48 | 0 | [tyranids](factions/tyranids.md) |
 | Genestealer Cults | 9 | 0 | 20 | 30 | 0 | [genestealer-cults](factions/genestealer-cults.md) |
-| Necrons | 12 | 0 | 36 | 54 | 0 | [necrons](factions/necrons.md) |
+| Necrons | 12 | 0 | 36 | 54 | 1 | [necrons](factions/necrons.md) |
 | Leagues of Votann | 10 | 0 | 28 | 42 | 1 | [leagues-of-votann](factions/leagues-of-votann.md) |
 | T'au Empire | 7 | 0 | 20 | 30 | 0 | [tau-empire](factions/tau-empire.md) |
-| Space Marines | 22 | 0 | 80 | 119 | 0 | [space-marines](factions/space-marines.md) |
+| Space Marines | 22 | 0 | 80 | 119 | 1 | [space-marines](factions/space-marines.md) |
 | Dark Angels | 8 | 0 | 0 | 0 | 0 | [dark-angels](factions/dark-angels.md) |
 | Blood Angels | 8 | 0 | 0 | 0 | 0 | [blood-angels](factions/blood-angels.md) |
 | Space Wolves | 7 | 0 | 0 | 0 | 0 | [space-wolves](factions/space-wolves.md) |
 | Black Templars | 6 | 0 | 0 | 0 | 0 | [black-templars](factions/black-templars.md) |
 | Deathwatch | 1 | 0 | 0 | 0 | 0 | [deathwatch](factions/deathwatch.md) |
-| Grey Knights | 9 | 0 | 24 | 36 | 0 | [grey-knights](factions/grey-knights.md) |
-| Chaos Space Marines | 17 | 0 | 60 | 90 | 0 | [chaos-space-marines](factions/chaos-space-marines.md) |
-| World Eaters | 8 | 0 | 24 | 36 | 0 | [world-eaters](factions/world-eaters.md) |
-| Emperor's Children | 10 | 0 | 28 | 42 | 0 | [emperors-children](factions/emperors-children.md) |
-| Death Guard | 9 | 0 | 28 | 42 | 0 | [death-guard](factions/death-guard.md) |
+| Grey Knights | 9 | 0 | 24 | 36 | 1 | [grey-knights](factions/grey-knights.md) |
+| Chaos Space Marines | 17 | 0 | 60 | 90 | 1 | [chaos-space-marines](factions/chaos-space-marines.md) |
+| World Eaters | 8 | 0 | 24 | 36 | 1 | [world-eaters](factions/world-eaters.md) |
+| Emperor's Children | 10 | 0 | 28 | 42 | 1 | [emperors-children](factions/emperors-children.md) |
+| Death Guard | 9 | 0 | 28 | 42 | 1 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 0 | 24 | 36 | 0 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 26 | 36 | 0 | [chaos-knights](factions/chaos-knights.md) |
-| Chaos Daemons | 9 | 4 | 28 | 43 | 13 | [chaos-daemons](factions/chaos-daemons.md) |
+| Chaos Daemons | 9 | 4 | 28 | 43 | 14 | [chaos-daemons](factions/chaos-daemons.md) |
 | Astra Militarum | 11 | 0 | 36 | 54 | 0 | [astra-militarum](factions/astra-militarum.md) |
 | Adepta Sororitas | 8 | 0 | 20 | 30 | 0 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 0 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
@@ -329,8 +330,12 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll` | Prioritised Efficiency |
 | `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll` | Prioritised Efficiency |
 | `warhammer_40000_11th:necrons:army_rule:reanimation_protocols` | Reanimation Protocols |
-| `warhammer_40000_11th:space_marines:army_rule:oath_of_moment` | Oath of Moment |
-| `warhammer_40000_11th:space_marines:army_rule:oath_of_moment:wound-roll` | Oath of Moment |
+| `warhammer_40000_11th:orks:army_rule:waaagh` | Waaagh! |
+| `warhammer_40000_11th:orks:army_rule:waaagh:advance-eligibility` | Waaagh! |
+| `warhammer_40000_11th:orks:army_rule:waaagh:invulnerable-save` | Waaagh! |
+| `warhammer_40000_11th:orks:army_rule:waaagh:weapon-profile` | Waaagh! |
+| `warhammer_40000_11th:space_marines:army_rule:oath_of_moment` | Oath Of Moment<br>Oath of Moment |
+| `warhammer_40000_11th:space_marines:army_rule:oath_of_moment:wound-roll` | Oath of Moment<br>Wound Roll |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne` | Blessings of Khorne |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration` | Blessings of Khorne - Rage-fuelled Invigoration |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage` | Blessings of Khorne - Total Carnage |

@@ -8,7 +8,7 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_world_eaters-az7rivdn6x-d9rvb
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 8 | 0 | 24 | 36 | 0 |
+| 8 | 0 | 24 | 36 | 1 |
 
 ## Detachment Rule Support
 

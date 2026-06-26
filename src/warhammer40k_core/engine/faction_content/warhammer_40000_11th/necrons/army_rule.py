@@ -29,7 +29,7 @@ from warhammer40k_core.geometry.pose import Pose
 
 CONTRIBUTION_ID = "warhammer_40000_11th:necrons:army_rule:reanimation_protocols"
 HOOK_ID = "warhammer_40000_11th:necrons:army_rule:reanimation_protocols"
-SOURCE_RULE_ID = "phase17g:necrons:army-rule"
+SOURCE_RULE_ID = "phase17f:phase17e:necrons:army-rule"
 NECRONS_FACTION_ID = "necrons"
 NECRONS_FACTION_KEYWORD = "NECRONS"
 REANIMATION_EFFECT_KIND = "necrons_reanimation_protocols"

@@ -8,7 +8,7 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_necrons-qodfthk7tt-bzeqy07okc
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 12 | 0 | 36 | 54 | 0 |
+| 12 | 0 | 36 | 54 | 1 |
 
 ## Detachment Rule Support
 

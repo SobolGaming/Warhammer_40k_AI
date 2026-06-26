@@ -436,6 +436,42 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:orks:army_rule:waaagh",
+        "ability_name": "Waaagh!",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/orks/faction/warhammer_40000_11th:orks:army_rule:waaagh/none",
+        "datasheet_id": "orks",
+        "datasheet_name": "Orks",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Waaagh!"
+    ],
+    "category_id": "faction.army_rule.waaagh",
+    "category_name": "Faction Army Rule Waaagh",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/orks/faction/warhammer_40000_11th:orks:army_rule:waaagh/none"
+    ],
+    "datasheet_names": [
+      "Orks"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:orks:army_rule:waaagh",
+      "warhammer_40000_11th:orks:army_rule:waaagh:advance-eligibility",
+      "warhammer_40000_11th:orks:army_rule:waaagh:invulnerable-save",
+      "warhammer_40000_11th:orks:army_rule:waaagh:weapon-profile"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001112:collar-of-khorne",
         "ability_name": "Collar of Khorne",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/wargear/000001112:collar-of-khorne/000001112:collar-of-khorne",

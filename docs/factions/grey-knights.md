@@ -8,7 +8,7 @@ Source PDF: [eng_08-06_warhammer40000_faction_pack_grey_knights-geqfqwt3wh-g2fik
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 0 | 24 | 36 | 0 |
+| 9 | 0 | 24 | 36 | 1 |
 
 ## Detachment Rule Support
 
