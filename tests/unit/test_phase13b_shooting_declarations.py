@@ -6610,6 +6610,73 @@ def test_phase14e_benefit_of_cover_worsens_ballistic_skill_before_hit_roll() -> 
     assert payload["successful"] is False
 
 
+def test_hit_roll_bonus_cap_applies_after_ballistic_skill_modifier() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    state.record_persisting_effect(_phase13f_cover_effect(defender.unit_instance_id))
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="bs-penalty-hit-roll-bonus-rifle",
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 4),
+    )
+    sequence_id = "bs-penalty-hit-roll-bonus"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+
+    resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id=sequence_id,
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                replace(
+                    _attack_pool_for_test(
+                        attacker=attacker,
+                        defender=defender,
+                        weapon_profile=weapon_profile,
+                        attacks=1,
+                    ),
+                    hit_roll_modifier=2,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id=f"{sequence_id}:hit", spec=hit_spec, value=4),
+                _fixed_roll_result(roll_id=f"{sequence_id}:wound", spec=wound_spec, value=1),
+            ),
+        ),
+    )
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    payload = cast(dict[str, object], hit_payload["payload"])
+
+    assert payload["target_number"] == 5
+    assert payload["modifier"] == 2
+    assert payload["capped_modifier"] == 1
+    assert payload["final_roll"] == 5
+    assert payload["successful"] is True
+
+
 def test_psychic_attack_can_ignore_detrimental_skill_and_hit_roll_modifiers() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -6704,6 +6771,105 @@ def test_psychic_attack_can_ignore_detrimental_skill_and_hit_roll_modifiers() ->
     assert payload["is_psychic_attack"] is True
     assert payload["target_number"] == 3
     assert payload["modifier"] == 0
+    assert payload["successful"] is True
+
+
+def test_psychic_attack_can_ignore_detrimental_modifiers_and_keep_hit_bonus() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    state.record_persisting_effect(_phase13f_cover_effect(defender.unit_instance_id))
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="psychic-ignore-detrimental-keep-hit-bonus-rifle",
+        keywords=(WeaponKeyword.PSYCHIC,),
+    )
+    sequence_id = "psychic-ignore-detrimental-keep-hit-bonus"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    dice_manager = DiceRollManager(
+        sequence_id,
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=(
+            _fixed_roll_result(roll_id=f"{sequence_id}:hit", spec=hit_spec, value=2),
+            _fixed_roll_result(roll_id=f"{sequence_id}:wound", spec=wound_spec, value=1),
+        ),
+    )
+    attack_sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            replace(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+                hit_roll_modifier=2,
+            ),
+        ),
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=attack_sequence,
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+    )
+    assert status is not None
+    request = _decision_request(status)
+    assert request.decision_type == SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE
+    assert cast(dict[str, object], request.payload)["skill_modifier"] == 1
+    assert cast(dict[str, object], request.payload)["hit_roll_modifier"] == 2
+    option = request.option_by_id("ignore-detrimental-modifiers")
+    option_payload = cast(dict[str, object], option.payload)
+    assert option_payload["effective_skill_modifier"] == 0
+    assert option_payload["effective_hit_roll_modifier"] == 2
+    assert option_payload["ignored_skill_modifier"] == 1
+    assert option_payload["ignored_hit_roll_modifier"] == 0
+
+    lifecycle.decision_controller.submit_result(
+        DecisionResult.for_request(
+            result_id="psychic-ignore-detrimental-keep-hit-bonus-selection",
+            request=request,
+            selected_option_id="ignore-detrimental-modifiers",
+        )
+    )
+    completed_sequence, _allocated_ids, follow_up_status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=cast(AttackSequence, remaining_sequence),
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+    )
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    payload = cast(dict[str, object], hit_payload["payload"])
+
+    assert completed_sequence is None
+    assert follow_up_status is None
+    assert payload["is_psychic_attack"] is True
+    assert payload["target_number"] == 3
+    assert payload["modifier"] == 2
+    assert payload["capped_modifier"] == 1
+    assert payload["final_roll"] == 3
     assert payload["successful"] is True
 
 
