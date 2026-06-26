@@ -364,6 +364,31 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "warhammer_40000_11th:black_templars:army_rule:templar_vows",
+    "ability_name": "Templar Vows",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/black-templars/faction/warhammer_40000_11th:black_templars:army_rule:templar_vows/none",
+    "datasheet_id": "black-templars",
+    "datasheet_name": "Black Templars",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows",
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-declaration",
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-targets",
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:melee-precision",
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows:accept_any_challenge:wound-roll",
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows:suffer_not_the_unclean:fall-back",
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows:uphold_the_honour:objective-control"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.templar_vows"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers",
     "ability_name": "Thrill Seekers",
     "catalog_id": "runtime-content-warhammer-40000-11th",

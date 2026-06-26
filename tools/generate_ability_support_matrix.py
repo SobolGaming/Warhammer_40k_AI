@@ -29,6 +29,9 @@ from warhammer40k_core.engine.faction_content.bundle import (
     RuntimeContentContribution,
 )
 from warhammer40k_core.engine.faction_content.manifest import RuntimeContentSupportStatus
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.black_templars import (
+    army_rule as black_templars_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as chaos_space_marines_army_rule,
 )
@@ -298,6 +301,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
         "Path of the Outcast Enhancements"
     ),
     "phase17f:phase17e:aeldari:path-of-the-outcast:far-reaching-doom": ("Far-reaching Doom"),
+    "phase17f:phase17e:black-templars:army-rule": "Templar Vows",
     "phase17f:phase17e:chaos-daemons:army-rule": "The Shadow of Chaos",
     "phase17f:phase17e:chaos-daemons:blood-legion:rule": "Blood Legion",
     "phase17f:phase17e:chaos-daemons:cavalcade-of-chaos:enhancements": (
@@ -543,6 +547,13 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             runtime_consumer_ids=_orks_runtime_consumer_ids(),
         ),
         _implemented_faction_army_rule_row(
+            faction_id=black_templars_army_rule.BLACK_TEMPLARS_FACTION_ID,
+            ability_id=black_templars_army_rule.HOOK_ID,
+            ability_name="Templar Vows",
+            semantic_category="faction.army_rule.templar_vows",
+            runtime_consumer_ids=_black_templars_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
             faction_id=emperors_children_army_rule.EMPERORS_CHILDREN_FACTION_ID,
             ability_id=emperors_children_army_rule.HOOK_ID,
             ability_name="Thrill Seekers",
@@ -693,6 +704,29 @@ def _orks_runtime_consumer_ids() -> tuple[str, ...]:
                 *(binding.hook_id for binding in contribution.advance_eligibility_hook_bindings),
                 *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
                 *(binding.modifier_id for binding in contribution.save_option_modifier_bindings),
+            }
+        )
+    )
+
+
+def _black_templars_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = black_templars_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                *(binding.hook_id for binding in contribution.battle_round_start_hook_bindings),
+                *(binding.hook_id for binding in contribution.charge_declaration_hook_bindings),
+                *(
+                    binding.hook_id
+                    for binding in contribution.charge_target_restriction_hook_bindings
+                ),
+                *(binding.hook_id for binding in contribution.fall_back_hook_bindings),
+                *(
+                    binding.hook_id
+                    for binding in contribution.phase_end_objective_control_hook_bindings
+                ),
+                *(binding.modifier_id for binding in contribution.wound_roll_modifier_bindings),
+                *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
             }
         )
     )
@@ -1891,6 +1925,19 @@ def _structured_support_sections_markdown() -> list[str]:
                         "active until the start of the next own Command phase, including "
                         "Advance-then-Charge eligibility, melee Strength/Attacks modifiers, "
                         "and a 5+ invulnerable save."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Black Templars - Templar Vows",
+                    "Named army-rule handler",
+                    "Adapter contract, decision catalog, source coverage, and generated matrix",
+                    "Focused vow selection, modifier, charge, Fall Back, and objective tests",
+                    "Full",
+                    (
+                        "Implements battle-round Templar Vow selection, Abhor the Witch "
+                        "Precision and PSYKER charge requirements, Accept Any Challenge "
+                        "wound modifiers, Suffer Not the Unclean charge-after-Fall-Back, "
+                        "and Uphold the Honour sticky objective control."
                     ),
                 ),
                 SupportSectionRow(

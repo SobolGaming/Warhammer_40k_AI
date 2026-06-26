@@ -30,6 +30,7 @@ NECRONS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.necrons.army_rule"
 GREY_KNIGHTS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.grey_knights.army_rule"
 LEAGUES_OF_VOTANN_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.leagues_of_votann.army_rule"
 ORKS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.orks.army_rule"
+BLACK_TEMPLARS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.black_templars.army_rule"
 SHADOW_LEGION_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.shadow_legion.rule"
 SHADOW_LEGION_ENHANCEMENTS_MODULE_PATH = (
     f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.shadow_legion.enhancements"
@@ -56,6 +57,9 @@ IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
         "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency"
     ),
     ORKS_ARMY_RULE_MODULE_PATH: "warhammer_40000_11th:orks:army_rule:waaagh",
+    BLACK_TEMPLARS_ARMY_RULE_MODULE_PATH: (
+        "warhammer_40000_11th:black_templars:army_rule:templar_vows"
+    ),
     SHADOW_LEGION_RULE_MODULE_PATH: (
         "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule"
     ),

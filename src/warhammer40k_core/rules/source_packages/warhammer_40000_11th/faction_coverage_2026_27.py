@@ -159,6 +159,16 @@ ORKS_WAAAGH_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:orks:army_rule:waaagh:invulnerable-save",
     "warhammer_40000_11th:orks:army_rule:waaagh:weapon-profile",
 )
+BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows",
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-declaration",
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-targets",
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:melee-precision",
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows:accept_any_challenge:wound-roll",
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows:suffer_not_the_unclean:fall-back",
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows:"
+    "uphold_the_honour:objective-control",
+)
 SPACE_MARINES_OATH_OF_MOMENT_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:space_marines:army_rule:oath_of_moment",
     "warhammer_40000_11th:space_marines:army_rule:oath_of_moment:wound-roll",
@@ -173,6 +183,7 @@ WORLD_EATERS_BLESSINGS_OF_KHORNE_RUNTIME_CONSUMER_IDS = (
 )
 FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "aeldari": "Battle Focus",
+    "black-templars": "Templar Vows",
     "chaos-daemons": "The Shadow of Chaos",
     "chaos-space-marines": "Dark Pacts",
     "death-guard": "Nurgle's Gift",
@@ -187,6 +198,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
 }
 FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID = {
     "aeldari": AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMER_IDS,
+    "black-templars": BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMER_IDS,
     "chaos-daemons": CHAOS_DAEMONS_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_IDS,
     "chaos-space-marines": CHAOS_SPACE_MARINES_DARK_PACTS_RUNTIME_CONSUMER_IDS,
     "death-guard": DEATH_GUARD_NURGLES_GIFT_RUNTIME_CONSUMER_IDS,

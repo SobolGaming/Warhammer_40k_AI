@@ -94,8 +94,19 @@ LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
     "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll",
 )
+BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows",
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-declaration",
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-targets",
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:melee-precision",
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows:accept_any_challenge:wound-roll",
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows:suffer_not_the_unclean:fall-back",
+    "warhammer_40000_11th:black_templars:army_rule:templar_vows:"
+    "uphold_the_honour:objective-control",
+)
 SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "aeldari": "Battle Focus",
+    "black-templars": "Templar Vows",
     "chaos-daemons": "The Shadow of Chaos",
     "chaos-space-marines": "Dark Pacts",
     "death-guard": "Nurgle's Gift",
@@ -302,6 +313,26 @@ def test_phase17f_leagues_of_votann_army_rule_execution_record_is_named_handler(
     )
     assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
     assert record.handler_id == LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS[0]
+    assert record.block_reason is None
+
+
+def test_phase17f_black_templars_army_rule_execution_record_is_named_handler() -> None:
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and record.faction_id == "black-templars"
+    )
+
+    assert record.coverage_descriptor_id == "phase17e:black-templars:army-rule"
+    assert record.execution_id == "phase17f:phase17e:black-templars:army-rule"
+    assert record.rule_name == "Templar Vows"
+    assert record.runtime_support_status == "engine_consumed"
+    assert record.runtime_consumer_ids == tuple(
+        sorted(BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS)
+    )
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
+    assert record.handler_id == BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS[0]
     assert record.block_reason is None
 
 

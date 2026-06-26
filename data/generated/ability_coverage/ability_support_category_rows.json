@@ -2,6 +2,45 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:black_templars:army_rule:templar_vows",
+        "ability_name": "Templar Vows",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/black-templars/faction/warhammer_40000_11th:black_templars:army_rule:templar_vows/none",
+        "datasheet_id": "black-templars",
+        "datasheet_name": "Black Templars",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Templar Vows"
+    ],
+    "category_id": "faction.army_rule.templar_vows",
+    "category_name": "Black Templars Army Rule",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/black-templars/faction/warhammer_40000_11th:black_templars:army_rule:templar_vows/none"
+    ],
+    "datasheet_names": [
+      "Black Templars"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows",
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-declaration",
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-targets",
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:melee-precision",
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows:accept_any_challenge:wound-roll",
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows:suffer_not_the_unclean:fall-back",
+      "warhammer_40000_11th:black_templars:army_rule:templar_vows:uphold_the_honour:objective-control"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000008433",
         "ability_name": "The Shadow of Chaos",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/faction/000008433/none",

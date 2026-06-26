@@ -8,7 +8,7 @@ Source PDF: [eng_08-06_warhammer40000_faction_pack_black_templars-3rhveur6zi-dsp
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 6 | 0 | 0 | 0 | 0 |
+| 6 | 0 | 0 | 0 | 1 |
 
 ## Detachment Rule Support
 
