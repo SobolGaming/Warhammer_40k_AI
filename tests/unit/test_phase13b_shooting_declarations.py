@@ -10,7 +10,13 @@ import warhammer40k_core.engine.attack_sequence as attack_sequence_module
 import warhammer40k_core.engine.phases.shooting as shooting_phase_module
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetWargearOption
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+    DatasheetDefinition,
+    DatasheetWargearOption,
+)
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollResult,
@@ -11358,6 +11364,7 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_pose=Pose.at(14.0, 35.0),
+        catalog=_catalog_with_deadly_demise_datasheet(token="D3"),
     )
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
@@ -11369,21 +11376,18 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
     state.battlefield_state = battlefield.with_removed_models(
         tuple(model.model_instance_id for model in defender.own_models[1:])
     )
-    deadly_demise_source = DestructionReactionSource(
-        source_id="phase13e-success-deadly-demise",
-        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
-        source_rule_id="phase13e-success-deadly-demise-rule",
-        payload={
-            "trigger_roll_threshold": 6,
-            "range_inches": 6.0,
-            "mortal_wounds": {"kind": "d3"},
-        },
-        optional=False,
-    )
-    state.record_model_destruction_reaction_sources(
+    deadly_demise_source = _single_deadly_demise_source(
+        state=state,
         model_instance_id=defender_model.model_instance_id,
-        sources=(deadly_demise_source,),
     )
+    assert deadly_demise_source.source_rule_id == (
+        "datasheet:core-intercessor-like-infantry:ability:deadly-demise"
+    )
+    assert deadly_demise_source.payload == {
+        "trigger_roll_threshold": 6,
+        "range_inches": 6.0,
+        "mortal_wounds": {"kind": "d3"},
+    }
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
         damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
@@ -11495,6 +11499,46 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
     assert event_types.index("deadly_demise_mortal_wounds_applied") < event_types.index(
         "model_destroyed"
     )
+
+
+def test_phase13e_deadly_demise_descriptor_registers_sources_for_each_model() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        catalog=_catalog_with_deadly_demise_datasheet(token="2"),
+    )
+    state = _state(lifecycle)
+    defender = units["enemy"]
+
+    sources_by_model = {
+        model.model_instance_id: state.destruction_reaction_sources_for_model(
+            model_instance_id=model.model_instance_id
+        )
+        for model in defender.own_models
+    }
+    payload = cast(dict[str, object], state.to_payload())
+
+    assert set(sources_by_model) == {model.model_instance_id for model in defender.own_models}
+    for model in defender.own_models:
+        sources = sources_by_model[model.model_instance_id]
+        assert len(sources) == 1
+        source = sources[0]
+        assert source.source_id == (
+            "datasheet:core-intercessor-like-infantry:ability:deadly-demise:"
+            f"{model.model_instance_id}:deadly-demise"
+        )
+        assert source.reaction_kind is DestructionReactionKind.DEADLY_DEMISE
+        assert source.source_rule_id == (
+            "datasheet:core-intercessor-like-infantry:ability:deadly-demise"
+        )
+        assert source.optional is False
+        assert source.payload == {
+            "trigger_roll_threshold": 6,
+            "range_inches": 6.0,
+            "mortal_wounds": {"kind": "fixed", "value": 2},
+        }
+    assert "<" not in json.dumps(payload, sort_keys=True)
+    assert "object at 0x" not in json.dumps(payload, sort_keys=True)
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
 
 
 def test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal() -> None:
@@ -15750,6 +15794,54 @@ def _catalog_with_same_profile_id_target_cache_collision_weapons() -> ArmyCatalo
         datasheets=tuple(updated_datasheets),
         wargear=(*catalog.wargear, long_wargear, short_wargear),
     )
+
+
+def _catalog_with_deadly_demise_datasheet(*, token: str) -> ArmyCatalog:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    ability = DatasheetAbilityDescriptor(
+        ability_id="core-deadly-demise",
+        name=f"Deadly Demise {token}",
+        source_id="datasheet:core-intercessor-like-infantry:ability:deadly-demise",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.CORE,
+        effect_description="CORE Deadly Demise descriptor.",
+        timing_tags=("after_destroyed", "deadly_demise"),
+        parameter_tokens=(token,),
+    )
+    updated_datasheets: list[DatasheetDefinition] = []
+    for datasheet in catalog.datasheets:
+        if datasheet.datasheet_id != "core-intercessor-like-infantry":
+            updated_datasheets.append(datasheet)
+            continue
+        updated_datasheets.append(
+            replace(
+                datasheet,
+                abilities=tuple(
+                    sorted(
+                        (*datasheet.abilities, ability),
+                        key=lambda stored: stored.ability_id,
+                    )
+                ),
+            )
+        )
+    return replace(catalog, datasheets=tuple(updated_datasheets))
+
+
+def _single_deadly_demise_source(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> DestructionReactionSource:
+    sources = tuple(
+        source
+        for source in state.destruction_reaction_sources_for_model(
+            model_instance_id=model_instance_id
+        )
+        if source.reaction_kind is DestructionReactionKind.DEADLY_DEMISE
+    )
+    if len(sources) != 1:
+        raise AssertionError(f"expected one Deadly Demise source, found {len(sources)}")
+    return sources[0]
 
 
 def _config(

@@ -20,6 +20,7 @@ from warhammer40k_core.engine.timing_windows import (
 
 CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID = "core:movement-keyword-gate"
 CORE_HAZARDOUS_HANDLER_ID = "core:hazardous"
+CORE_DEADLY_DEMISE_HANDLER_ID = "core:deadly-demise"
 GENERIC_RULE_IR_ABILITY_HANDLER_ID = "generic:rule-ir"
 MOVEMENT_CAPABILITY_FLAGS_PAYLOAD_KEY = "movement_capability_flags"
 
@@ -805,6 +806,11 @@ def default_ability_handler_registry() -> AbilityHandlerRegistry:
             handler=_hazardous_keyword_handler,
         )
         .with_handler(
+            handler_id=CORE_DEADLY_DEMISE_HANDLER_ID,
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED),
+            handler=_deadly_demise_keyword_handler,
+        )
+        .with_handler(
             handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
             timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
             handler=_generic_rule_ir_ability_handler,
@@ -944,6 +950,24 @@ def _hazardous_keyword_handler(
             "source_keywords": list(context.source_keywords),
             "effect_payload": {
                 "effect_kind": "hazardous_weapon_test",
+                "resolved_by": "attack_sequence",
+            },
+        },
+    )
+
+
+def _deadly_demise_keyword_handler(
+    record: AbilityCatalogRecord,
+    context: AbilityExecutionContext,
+) -> AbilityResolutionResult:
+    return AbilityResolutionResult.applied(
+        record,
+        replay_payload={
+            "source_id": record.definition.source_id,
+            "trigger_kind": context.trigger_kind.value,
+            "source_keywords": list(context.source_keywords),
+            "effect_payload": {
+                "effect_kind": "deadly_demise_destruction_reaction",
                 "resolved_by": "attack_sequence",
             },
         },

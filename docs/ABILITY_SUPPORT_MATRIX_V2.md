@@ -26,6 +26,7 @@ Core keyword ability rows are still primarily surfaced through source-backed cat
 | --- | --- | --- | --- | --- | --- |
 | Deep Strike | Reserve declaration and placement hosts | Adapter contract and architecture | Focused reserve/deployment tests | Full | Current generated rows are `engine_consumed`. |
 | Scouts X | Pre-battle Scout Move, Scout reserve setup, and Dedicated Transport Scout Move hosts | Adapter contract and decision catalog | Focused pre-battle, setup smoke, and enhancement-grant tests | Full | Consumes structured Scouts descriptors for distance selection; a SCOUTS keyword without a descriptor fails fast. |
+| Deadly Demise X | Static source registration plus mandatory pre-removal destruction-reaction resolver | Architecture, source-row registry, and generated matrix | Focused descriptor, Shooting damage, FNP continuation, and replay tests | Full | Consumes structured Deadly Demise descriptors for fixed, D3, and D6 mortal wounds; source-backed model registrations feed the existing mandatory destruction-reaction path. |
 | Other Core Rules keyword abilities | Mixed phase-owned hosts or explicit unsupported descriptors | Architecture and source-row unsupported audits | Coverage varies by keyword | Partial | Keep expanded per-keyword rows separate from wargear keyword abilities. |
 
 ## Core Terrain And Visibility

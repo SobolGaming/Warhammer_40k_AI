@@ -64,7 +64,6 @@ def test_phase14i_unsupported_core_ability_contract_is_explicit() -> None:
     )
 
     assert tuple((row.ability_id, row.handler_id) for row in unsupported_rows) == (
-        ("core-deadly-demise", "unsupported:phase-13c:deadly-demise"),
         ("core-deep-strike", "unsupported:phase-15b:deep-strike"),
         ("core-feel-no-pain", "unsupported:phase-13c:feel-no-pain"),
         ("core-firing-deck", "unsupported:phase-13d:firing-deck"),

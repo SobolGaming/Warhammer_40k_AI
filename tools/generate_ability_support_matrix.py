@@ -1539,6 +1539,21 @@ def _structured_support_sections_markdown() -> list[str]:
                     ),
                 ),
                 SupportSectionRow(
+                    "Deadly Demise X",
+                    (
+                        "Static source registration plus mandatory pre-removal "
+                        "destruction-reaction resolver"
+                    ),
+                    "Architecture, source-row registry, and generated matrix",
+                    "Focused descriptor, Shooting damage, FNP continuation, and replay tests",
+                    "Full",
+                    (
+                        "Consumes structured Deadly Demise descriptors for fixed, D3, and D6 "
+                        "mortal wounds; source-backed model registrations feed the existing "
+                        "mandatory destruction-reaction path."
+                    ),
+                ),
+                SupportSectionRow(
                     "Other Core Rules keyword abilities",
                     "Mixed phase-owned hosts or explicit unsupported descriptors",
                     "Architecture and source-row unsupported audits",

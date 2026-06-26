@@ -15,12 +15,19 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
 )
 from warhammer40k_core.engine.damage_allocation import (
+    DestructionReactionKind,
+    DestructionReactionSource,
     FeelNoPainAttackCondition,
     FeelNoPainSource,
     feel_no_pain_attack_condition_from_token,
 )
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.unit_abilities import (
+    DeadlyDemiseAbilityProfile,
+    deadly_demise_profile_for_unit,
+)
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -53,6 +60,8 @@ CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID = (
     "catalog-ir:can-advance-and-shoot-and-charge"
 )
 CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID = "catalog-ir:can-be-placed-in-reserves"
+DEADLY_DEMISE_TRIGGER_ROLL_THRESHOLD = 6
+DEADLY_DEMISE_RANGE_INCHES = 6.0
 
 _CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
     {
@@ -238,6 +247,31 @@ def record_catalog_feel_no_pain_sources_for_unit(
                         source=source,
                     )
                     recorded_sources.append((bearer_id, source))
+    return tuple(sorted(recorded_sources, key=lambda binding: (binding[0], binding[1].source_id)))
+
+
+def record_core_deadly_demise_sources_for_unit(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+) -> tuple[tuple[str, DestructionReactionSource], ...]:
+    _validate_game_state(state)
+    _validate_unit(unit)
+    profile = deadly_demise_profile_for_unit(unit)
+    if profile is None:
+        return ()
+    recorded_sources: list[tuple[str, DestructionReactionSource]] = []
+    for model in unit.own_models:
+        source = _deadly_demise_source_for_model(
+            profile=profile,
+            model_instance_id=model.model_instance_id,
+        )
+        _record_model_destruction_reaction_source(
+            state=state,
+            model_instance_id=model.model_instance_id,
+            source=source,
+        )
+        recorded_sources.append((model.model_instance_id, source))
     return tuple(sorted(recorded_sources, key=lambda binding: (binding[0], binding[1].source_id)))
 
 
@@ -469,6 +503,47 @@ def _feel_no_pain_attack_condition_parameter(
     return feel_no_pain_attack_condition_from_token(value.strip())
 
 
+def _deadly_demise_source_for_model(
+    *,
+    profile: DeadlyDemiseAbilityProfile,
+    model_instance_id: str,
+) -> DestructionReactionSource:
+    if type(profile) is not DeadlyDemiseAbilityProfile:
+        raise GameLifecycleError("Deadly Demise source registration requires an ability profile.")
+    model_id = _string_identifier("Deadly Demise source model_instance_id", model_instance_id)
+    return DestructionReactionSource(
+        source_id=f"{profile.source_id}:{model_id}:deadly-demise",
+        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+        source_rule_id=profile.source_id,
+        payload=_deadly_demise_source_payload(profile.mortal_wounds_token),
+        optional=False,
+    )
+
+
+def _deadly_demise_source_payload(token: str) -> dict[str, JsonValue]:
+    mortal_wounds = _deadly_demise_mortal_wounds_payload(token)
+    return {
+        "trigger_roll_threshold": DEADLY_DEMISE_TRIGGER_ROLL_THRESHOLD,
+        "range_inches": DEADLY_DEMISE_RANGE_INCHES,
+        "mortal_wounds": mortal_wounds,
+    }
+
+
+def _deadly_demise_mortal_wounds_payload(token: str) -> dict[str, JsonValue]:
+    normalized = _string_identifier("Deadly Demise mortal wounds token", token).upper()
+    if normalized == "D3":
+        return {"kind": "d3"}
+    if normalized == "D6":
+        return {"kind": "d6"}
+    try:
+        value = int(normalized)
+    except ValueError as exc:
+        raise GameLifecycleError("Unsupported Deadly Demise mortal-wound token.") from exc
+    if value < 1:
+        raise GameLifecycleError("Deadly Demise fixed mortal wounds must be positive.")
+    return {"kind": "fixed", "value": value}
+
+
 def _record_model_feel_no_pain_source(
     *,
     state: GameState,
@@ -488,6 +563,27 @@ def _record_model_feel_no_pain_source(
         decline_allowed=state.feel_no_pain_decline_allowed_for_model(
             model_instance_id=model_instance_id
         ),
+    )
+
+
+def _record_model_destruction_reaction_source(
+    *,
+    state: GameState,
+    model_instance_id: str,
+    source: DestructionReactionSource,
+) -> None:
+    existing_sources = state.destruction_reaction_sources_for_model(
+        model_instance_id=model_instance_id
+    )
+    for existing_source in existing_sources:
+        if existing_source.source_id != source.source_id:
+            continue
+        if existing_source != source:
+            raise GameLifecycleError("Core Deadly Demise source conflicts with existing state.")
+        return
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=model_instance_id,
+        sources=(*existing_sources, source),
     )
 
 
@@ -578,6 +674,12 @@ def _string_parameter(parameters: Mapping[str, object], *, key: str) -> str:
     value = parameters.get(key)
     if type(value) is not str or not value.strip():
         raise GameLifecycleError(f"Catalog rule parameter {key} must be a non-empty string.")
+    return value.strip()
+
+
+def _string_identifier(label: str, value: object) -> str:
+    if type(value) is not str or not value.strip():
+        raise GameLifecycleError(f"{label} must be a non-empty string.")
     return value.strip()
 
 

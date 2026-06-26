@@ -151,7 +151,7 @@ def core_ability_rows() -> tuple[SourceAbilityRow, ...]:
                     restrictions_descriptor="core ability parameters define the trigger value",
                     trigger_kind="after_unit_destroyed",
                     phase=None,
-                    handler_id="unsupported:phase-13c:deadly-demise",
+                    handler_id="core:deadly-demise",
                     required_keywords=("DEADLY_DEMISE",),
                 ),
                 SourceAbilityRow(
