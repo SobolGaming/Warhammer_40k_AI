@@ -35,6 +35,11 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacementError,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    record_core_deadly_demise_sources_for_unit,
+    record_core_feel_no_pain_sources_for_unit,
+    record_core_fights_first_source_for_unit,
+)
 from warhammer40k_core.engine.command_points import (
     CommandPointGainResult,
     CommandPointLedger,
@@ -1839,6 +1844,7 @@ class GameState:
         self.army_definitions.sort(key=lambda stored: stored.player_id)
         self._record_starting_strength_records_for_army(army_definition)
         self._record_starting_attached_unit_records_for_army(army_definition)
+        self._record_static_core_ability_sources_for_army(army_definition)
 
     def record_faction_rule_state(self, state: FactionRuleState) -> None:
         if type(state) is not FactionRuleState:
@@ -1920,7 +1926,28 @@ class GameState:
         self.army_definitions = sorted(updated_armies, key=lambda stored: stored.player_id)
         self.starting_strength_records.append(record)
         self.starting_strength_records.sort(key=lambda stored: stored.unit_instance_id)
+        self._record_static_core_ability_sources_for_unit(unit)
         return record
+
+    def _record_static_core_ability_sources_for_army(
+        self,
+        army_definition: ArmyDefinition,
+    ) -> None:
+        if type(army_definition) is not ArmyDefinition:
+            raise GameLifecycleError(
+                "Static core ability source registration requires an ArmyDefinition."
+            )
+        for unit in army_definition.units:
+            self._record_static_core_ability_sources_for_unit(unit)
+
+    def _record_static_core_ability_sources_for_unit(self, unit: UnitInstance) -> None:
+        if type(unit) is not UnitInstance:
+            raise GameLifecycleError(
+                "Static core ability source registration requires a UnitInstance."
+            )
+        record_core_deadly_demise_sources_for_unit(state=self, unit=unit)
+        record_core_feel_no_pain_sources_for_unit(state=self, unit=unit)
+        record_core_fights_first_source_for_unit(state=self, unit=unit)
 
     def apply_strategic_reserve_declarations(
         self,

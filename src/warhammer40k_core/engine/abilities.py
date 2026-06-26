@@ -20,6 +20,11 @@ from warhammer40k_core.engine.timing_windows import (
 
 CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID = "core:movement-keyword-gate"
 CORE_HAZARDOUS_HANDLER_ID = "core:hazardous"
+CORE_DEADLY_DEMISE_HANDLER_ID = "core:deadly-demise"
+CORE_FEEL_NO_PAIN_HANDLER_ID = "core:feel-no-pain"
+CORE_FIGHTS_FIRST_HANDLER_ID = "core:fights-first"
+CORE_LONE_OPERATIVE_HANDLER_ID = "core:lone-operative"
+CORE_STEALTH_HANDLER_ID = "core:stealth"
 GENERIC_RULE_IR_ABILITY_HANDLER_ID = "generic:rule-ir"
 MOVEMENT_CAPABILITY_FLAGS_PAYLOAD_KEY = "movement_capability_flags"
 
@@ -805,6 +810,38 @@ def default_ability_handler_registry() -> AbilityHandlerRegistry:
             handler=_hazardous_keyword_handler,
         )
         .with_handler(
+            handler_id=CORE_DEADLY_DEMISE_HANDLER_ID,
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED),
+            handler=_deadly_demise_keyword_handler,
+        )
+        .with_handler(
+            handler_id=CORE_FEEL_NO_PAIN_HANDLER_ID,
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY),
+            handler=_source_registered_keyword_handler,
+        )
+        .with_handler(
+            handler_id=CORE_FIGHTS_FIRST_HANDLER_ID,
+            timing=AbilityTimingDescriptor(
+                trigger_kind=TimingTriggerKind.START_PHASE,
+                phase=BattlePhaseKind.FIGHT,
+            ),
+            handler=_source_registered_keyword_handler,
+        )
+        .with_handler(
+            handler_id=CORE_LONE_OPERATIVE_HANDLER_ID,
+            timing=AbilityTimingDescriptor(
+                trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET
+            ),
+            handler=_source_registered_keyword_handler,
+        )
+        .with_handler(
+            handler_id=CORE_STEALTH_HANDLER_ID,
+            timing=AbilityTimingDescriptor(
+                trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET
+            ),
+            handler=_source_registered_keyword_handler,
+        )
+        .with_handler(
             handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
             timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
             handler=_generic_rule_ir_ability_handler,
@@ -945,6 +982,42 @@ def _hazardous_keyword_handler(
             "effect_payload": {
                 "effect_kind": "hazardous_weapon_test",
                 "resolved_by": "attack_sequence",
+            },
+        },
+    )
+
+
+def _deadly_demise_keyword_handler(
+    record: AbilityCatalogRecord,
+    context: AbilityExecutionContext,
+) -> AbilityResolutionResult:
+    return AbilityResolutionResult.applied(
+        record,
+        replay_payload={
+            "source_id": record.definition.source_id,
+            "trigger_kind": context.trigger_kind.value,
+            "source_keywords": list(context.source_keywords),
+            "effect_payload": {
+                "effect_kind": "deadly_demise_destruction_reaction",
+                "resolved_by": "attack_sequence",
+            },
+        },
+    )
+
+
+def _source_registered_keyword_handler(
+    record: AbilityCatalogRecord,
+    context: AbilityExecutionContext,
+) -> AbilityResolutionResult:
+    return AbilityResolutionResult.applied(
+        record,
+        replay_payload={
+            "source_id": record.definition.source_id,
+            "trigger_kind": context.trigger_kind.value,
+            "source_keywords": list(context.source_keywords),
+            "effect_payload": {
+                "effect_kind": "source_registered_core_keyword",
+                "resolved_by": "phase_host",
             },
         },
     )

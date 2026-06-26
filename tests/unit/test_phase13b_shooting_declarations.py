@@ -10,7 +10,13 @@ import warhammer40k_core.engine.attack_sequence as attack_sequence_module
 import warhammer40k_core.engine.phases.shooting as shooting_phase_module
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetWargearOption
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+    DatasheetDefinition,
+    DatasheetWargearOption,
+)
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollResult,
@@ -86,6 +92,9 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelPlacement,
     PlacedArmy,
     UnitPlacement,
+)
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    record_core_feel_no_pain_sources_for_unit,
 )
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.core_stratagem_effects import GO_TO_GROUND_EFFECT_KIND
@@ -209,7 +218,9 @@ from warhammer40k_core.engine.saves import (
     saving_throw_roll_spec,
 )
 from warhammer40k_core.engine.shooting_targets import (
+    LONE_OPERATIVE_RULE_ID,
     PLUNGING_FIRE_RULE_ID,
+    STEALTH_RULE_ID,
     ShootingTargetViolationCode,
     shooting_target_candidates_for_unit,
     shooting_target_violation_code_from_token,
@@ -231,6 +242,10 @@ from warhammer40k_core.engine.transports import (
     TransportCapacityProfile,
     TransportCargoState,
     TransportMovementStatus,
+)
+from warhammer40k_core.engine.unit_abilities import (
+    feel_no_pain_profile_for_unit,
+    unit_has_feel_no_pain,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
@@ -6610,6 +6625,73 @@ def test_phase14e_benefit_of_cover_worsens_ballistic_skill_before_hit_roll() -> 
     assert payload["successful"] is False
 
 
+def test_hit_roll_bonus_cap_applies_after_ballistic_skill_modifier() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    state.record_persisting_effect(_phase13f_cover_effect(defender.unit_instance_id))
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="bs-penalty-hit-roll-bonus-rifle",
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 4),
+    )
+    sequence_id = "bs-penalty-hit-roll-bonus"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+
+    resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id=sequence_id,
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                replace(
+                    _attack_pool_for_test(
+                        attacker=attacker,
+                        defender=defender,
+                        weapon_profile=weapon_profile,
+                        attacks=1,
+                    ),
+                    hit_roll_modifier=2,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id=f"{sequence_id}:hit", spec=hit_spec, value=4),
+                _fixed_roll_result(roll_id=f"{sequence_id}:wound", spec=wound_spec, value=1),
+            ),
+        ),
+    )
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    payload = cast(dict[str, object], hit_payload["payload"])
+
+    assert payload["target_number"] == 5
+    assert payload["modifier"] == 2
+    assert payload["capped_modifier"] == 1
+    assert payload["final_roll"] == 5
+    assert payload["successful"] is True
+
+
 def test_psychic_attack_can_ignore_detrimental_skill_and_hit_roll_modifiers() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -6704,6 +6786,105 @@ def test_psychic_attack_can_ignore_detrimental_skill_and_hit_roll_modifiers() ->
     assert payload["is_psychic_attack"] is True
     assert payload["target_number"] == 3
     assert payload["modifier"] == 0
+    assert payload["successful"] is True
+
+
+def test_psychic_attack_can_ignore_detrimental_modifiers_and_keep_hit_bonus() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    state.record_persisting_effect(_phase13f_cover_effect(defender.unit_instance_id))
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="psychic-ignore-detrimental-keep-hit-bonus-rifle",
+        keywords=(WeaponKeyword.PSYCHIC,),
+    )
+    sequence_id = "psychic-ignore-detrimental-keep-hit-bonus"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    dice_manager = DiceRollManager(
+        sequence_id,
+        event_log=lifecycle.decision_controller.event_log,
+        injected_results=(
+            _fixed_roll_result(roll_id=f"{sequence_id}:hit", spec=hit_spec, value=2),
+            _fixed_roll_result(roll_id=f"{sequence_id}:wound", spec=wound_spec, value=1),
+        ),
+    )
+    attack_sequence = AttackSequence.start(
+        sequence_id=sequence_id,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            replace(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+                hit_roll_modifier=2,
+            ),
+        ),
+    )
+
+    remaining_sequence, _allocated_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=attack_sequence,
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+    )
+    assert status is not None
+    request = _decision_request(status)
+    assert request.decision_type == SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE
+    assert cast(dict[str, object], request.payload)["skill_modifier"] == 1
+    assert cast(dict[str, object], request.payload)["hit_roll_modifier"] == 2
+    option = request.option_by_id("ignore-detrimental-modifiers")
+    option_payload = cast(dict[str, object], option.payload)
+    assert option_payload["effective_skill_modifier"] == 0
+    assert option_payload["effective_hit_roll_modifier"] == 2
+    assert option_payload["ignored_skill_modifier"] == 1
+    assert option_payload["ignored_hit_roll_modifier"] == 0
+
+    lifecycle.decision_controller.submit_result(
+        DecisionResult.for_request(
+            result_id="psychic-ignore-detrimental-keep-hit-bonus-selection",
+            request=request,
+            selected_option_id="ignore-detrimental-modifiers",
+        )
+    )
+    completed_sequence, _allocated_ids, follow_up_status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=cast(AttackSequence, remaining_sequence),
+        already_allocated_model_ids=(),
+        dice_manager=dice_manager,
+    )
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    payload = cast(dict[str, object], hit_payload["payload"])
+
+    assert completed_sequence is None
+    assert follow_up_status is None
+    assert payload["is_psychic_attack"] is True
+    assert payload["target_number"] == 3
+    assert payload["modifier"] == 2
+    assert payload["capped_modifier"] == 1
+    assert payload["final_roll"] == 3
     assert payload["successful"] is True
 
 
@@ -11192,6 +11373,7 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         enemy_pose=Pose.at(14.0, 35.0),
+        catalog=_catalog_with_deadly_demise_datasheet(token="D3"),
     )
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
@@ -11203,21 +11385,18 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
     state.battlefield_state = battlefield.with_removed_models(
         tuple(model.model_instance_id for model in defender.own_models[1:])
     )
-    deadly_demise_source = DestructionReactionSource(
-        source_id="phase13e-success-deadly-demise",
-        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
-        source_rule_id="phase13e-success-deadly-demise-rule",
-        payload={
-            "trigger_roll_threshold": 6,
-            "range_inches": 6.0,
-            "mortal_wounds": {"kind": "d3"},
-        },
-        optional=False,
-    )
-    state.record_model_destruction_reaction_sources(
+    deadly_demise_source = _single_deadly_demise_source(
+        state=state,
         model_instance_id=defender_model.model_instance_id,
-        sources=(deadly_demise_source,),
     )
+    assert deadly_demise_source.source_rule_id == (
+        "datasheet:core-intercessor-like-infantry:ability:deadly-demise"
+    )
+    assert deadly_demise_source.payload == {
+        "trigger_roll_threshold": 6,
+        "range_inches": 6.0,
+        "mortal_wounds": {"kind": "d3"},
+    }
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
         damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
@@ -11329,6 +11508,95 @@ def test_phase13e_successful_deadly_demise_applies_mortal_wounds_before_removal(
     assert event_types.index("deadly_demise_mortal_wounds_applied") < event_types.index(
         "model_destroyed"
     )
+
+
+def test_phase13e_deadly_demise_descriptor_registers_sources_for_each_model() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        catalog=_catalog_with_deadly_demise_datasheet(token="2"),
+    )
+    state = _state(lifecycle)
+    defender = units["enemy"]
+
+    sources_by_model = {
+        model.model_instance_id: state.destruction_reaction_sources_for_model(
+            model_instance_id=model.model_instance_id
+        )
+        for model in defender.own_models
+    }
+    payload = cast(dict[str, object], state.to_payload())
+
+    assert set(sources_by_model) == {model.model_instance_id for model in defender.own_models}
+    for model in defender.own_models:
+        sources = sources_by_model[model.model_instance_id]
+        assert len(sources) == 1
+        source = sources[0]
+        assert source.source_id == (
+            "datasheet:core-intercessor-like-infantry:ability:deadly-demise:"
+            f"{model.model_instance_id}:deadly-demise"
+        )
+        assert source.reaction_kind is DestructionReactionKind.DEADLY_DEMISE
+        assert source.source_rule_id == (
+            "datasheet:core-intercessor-like-infantry:ability:deadly-demise"
+        )
+        assert source.optional is False
+        assert source.payload == {
+            "trigger_roll_threshold": 6,
+            "range_inches": 6.0,
+            "mortal_wounds": {"kind": "fixed", "value": 2},
+        }
+    assert "<" not in json.dumps(payload, sort_keys=True)
+    assert "object at 0x" not in json.dumps(payload, sort_keys=True)
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+
+def test_phase13c_feel_no_pain_descriptor_registers_sources_for_each_model() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        catalog=_catalog_with_core_feel_no_pain_datasheet(token="5+"),
+    )
+    state = _state(lifecycle)
+    defender = units["enemy"]
+
+    duplicate_sources = record_core_feel_no_pain_sources_for_unit(
+        state=state,
+        unit=defender,
+    )
+    sources_by_model = {
+        model.model_instance_id: state.feel_no_pain_sources_for_model(
+            model_instance_id=model.model_instance_id
+        )
+        for model in defender.own_models
+    }
+    payload = cast(dict[str, object], state.to_payload())
+
+    assert unit_has_feel_no_pain(defender)
+    assert len(duplicate_sources) == len(defender.own_models)
+    assert set(sources_by_model) == {model.model_instance_id for model in defender.own_models}
+    for model in defender.own_models:
+        sources = sources_by_model[model.model_instance_id]
+        assert len(sources) == 1
+        source = sources[0]
+        assert source.source_id == (
+            "datasheet:core-intercessor-like-infantry:ability:feel-no-pain:"
+            f"{model.model_instance_id}:feel-no-pain"
+        )
+        assert source.threshold == 5
+        assert source.attack_condition is None
+    assert "<" not in json.dumps(payload, sort_keys=True)
+    assert "object at 0x" not in json.dumps(payload, sort_keys=True)
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+
+def test_phase13c_feel_no_pain_keyword_without_descriptor_fails_fast() -> None:
+    _lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    defender = replace(
+        units["enemy"],
+        keywords=(*units["enemy"].keywords, "Feel No Pain"),
+    )
+
+    with pytest.raises(GameLifecycleError, match="Feel No Pain keyword requires"):
+        feel_no_pain_profile_for_unit(defender)
 
 
 def test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal() -> None:
@@ -14207,6 +14475,79 @@ def test_phase13d_lone_operative_within_twelve_is_visible_even_with_closer_enemy
     assert candidates[0].shooting_types == (ShootingType.NORMAL,)
 
 
+def test_phase13d_lone_operative_descriptor_blocks_targets_outside_twelve() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_pose=Pose.at(32.0, 35.0),
+        catalog=_catalog_with_lone_operative_datasheet(),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    target = units["enemy"]
+    profile = _first_weapon_profile(lifecycle, attacker)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+
+    blocked_candidates = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=profile,
+        target_unit_ids=(target.unit_instance_id,),
+    )
+    close_scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=_compact_test_unit_poses(origin=Pose.at(25.0, 35.0), model_count=5),
+    )
+    close_candidates = shooting_target_candidates_for_unit(
+        scenario=close_scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=profile,
+        target_unit_ids=(target.unit_instance_id,),
+    )
+
+    assert blocked_candidates[0].violation_code is ShootingTargetViolationCode.LONE_OPERATIVE
+    assert blocked_candidates[0].targeting_rule_ids == (LONE_OPERATIVE_RULE_ID,)
+    assert close_candidates[0].is_legal
+
+
+def test_phase13d_stealth_descriptor_applies_ranged_hit_roll_penalty() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_pose=Pose.at(25.0, 35.0),
+        catalog=_catalog_with_stealth_datasheet(),
+    )
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    target = units["enemy"]
+    profile = _first_weapon_profile(lifecycle, attacker)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+
+    candidates = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        weapon_profile=profile,
+        target_unit_ids=(target.unit_instance_id,),
+    )
+
+    assert candidates[0].is_legal
+    assert candidates[0].hit_roll_modifier == -1
+    assert STEALTH_RULE_ID in candidates[0].targeting_rule_ids
+    assert candidates[0] == type(candidates[0]).from_payload(candidates[0].to_payload())
+
+
 def test_phase14i_hunter_target_candidate_requires_one_listed_keyword() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
@@ -15584,6 +15925,106 @@ def _catalog_with_same_profile_id_target_cache_collision_weapons() -> ArmyCatalo
         datasheets=tuple(updated_datasheets),
         wargear=(*catalog.wargear, long_wargear, short_wargear),
     )
+
+
+def _catalog_with_deadly_demise_datasheet(*, token: str) -> ArmyCatalog:
+    return _catalog_with_core_datasheet_ability(
+        DatasheetAbilityDescriptor(
+            ability_id="core-deadly-demise",
+            name=f"Deadly Demise {token}",
+            source_id="datasheet:core-intercessor-like-infantry:ability:deadly-demise",
+            support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+            source_kind=CatalogAbilitySourceKind.CORE,
+            effect_description="CORE Deadly Demise descriptor.",
+            timing_tags=("after_destroyed", "deadly_demise"),
+            parameter_tokens=(token,),
+        )
+    )
+
+
+def _catalog_with_core_feel_no_pain_datasheet(*, token: str) -> ArmyCatalog:
+    return _catalog_with_core_datasheet_ability(
+        DatasheetAbilityDescriptor(
+            ability_id="core-feel-no-pain",
+            name=f"Feel No Pain {token}",
+            source_id="datasheet:core-intercessor-like-infantry:ability:feel-no-pain",
+            support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+            source_kind=CatalogAbilitySourceKind.CORE,
+            effect_description="CORE Feel No Pain descriptor.",
+            timing_tags=("lost_wound", "feel_no_pain"),
+            parameter_tokens=(token,),
+        )
+    )
+
+
+def _catalog_with_lone_operative_datasheet() -> ArmyCatalog:
+    return _catalog_with_core_datasheet_ability(
+        DatasheetAbilityDescriptor(
+            ability_id="core-lone-operative",
+            name="Lone Operative",
+            source_id="datasheet:core-intercessor-like-infantry:ability:lone-operative",
+            support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+            source_kind=CatalogAbilitySourceKind.CORE,
+            effect_description="CORE Lone Operative descriptor.",
+            timing_tags=("target_selection", "lone_operative"),
+        )
+    )
+
+
+def _catalog_with_stealth_datasheet() -> ArmyCatalog:
+    return _catalog_with_core_datasheet_ability(
+        DatasheetAbilityDescriptor(
+            ability_id="core-stealth",
+            name="Stealth",
+            source_id="datasheet:core-intercessor-like-infantry:ability:stealth",
+            support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+            source_kind=CatalogAbilitySourceKind.CORE,
+            effect_description="CORE Stealth descriptor.",
+            timing_tags=("ranged_attack", "stealth"),
+        )
+    )
+
+
+def _catalog_with_core_datasheet_ability(
+    ability: DatasheetAbilityDescriptor,
+) -> ArmyCatalog:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    if type(ability) is not DatasheetAbilityDescriptor:
+        raise AssertionError("Test catalog core ability requires a descriptor.")
+    updated_datasheets: list[DatasheetDefinition] = []
+    for datasheet in catalog.datasheets:
+        if datasheet.datasheet_id != "core-intercessor-like-infantry":
+            updated_datasheets.append(datasheet)
+            continue
+        updated_datasheets.append(
+            replace(
+                datasheet,
+                abilities=tuple(
+                    sorted(
+                        (*datasheet.abilities, ability),
+                        key=lambda stored: stored.ability_id,
+                    )
+                ),
+            )
+        )
+    return replace(catalog, datasheets=tuple(updated_datasheets))
+
+
+def _single_deadly_demise_source(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> DestructionReactionSource:
+    sources = tuple(
+        source
+        for source in state.destruction_reaction_sources_for_model(
+            model_instance_id=model_instance_id
+        )
+        if source.reaction_kind is DestructionReactionKind.DEADLY_DEMISE
+    )
+    if len(sources) != 1:
+        raise AssertionError(f"expected one Deadly Demise source, found {len(sources)}")
+    return sources[0]
 
 
 def _config(

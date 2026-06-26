@@ -20,6 +20,12 @@ class DeadlyDemiseAbilityProfile:
     mortal_wounds_token: str
 
 
+@dataclass(frozen=True, slots=True)
+class FeelNoPainAbilityProfile:
+    source_id: str
+    threshold: int
+
+
 DEEP_STRIKE_ABILITY_IDS = frozenset({"000008343", "core-deep-strike", "deep-strike"})
 INFILTRATORS_ABILITY_IDS = frozenset({"core-infiltrators", "infiltrators"})
 LEADER_ABILITY_IDS = frozenset({"core-leader", "leader"})
@@ -27,6 +33,10 @@ SUPPORT_ABILITY_IDS = frozenset({"core-support", "support"})
 SCOUTS_ABILITY_IDS = frozenset({"core-scouts", "scouts"})
 FIRING_DECK_ABILITY_IDS = frozenset({"core-firing-deck", "firing-deck"})
 DEADLY_DEMISE_ABILITY_IDS = frozenset({"core-deadly-demise", "deadly-demise"})
+FEEL_NO_PAIN_ABILITY_IDS = frozenset({"core-feel-no-pain", "feel-no-pain"})
+FIGHTS_FIRST_ABILITY_IDS = frozenset({"core-fights-first", "fights-first"})
+LONE_OPERATIVE_ABILITY_IDS = frozenset({"core-lone-operative", "lone-operative"})
+STEALTH_ABILITY_IDS = frozenset({"core-stealth", "stealth"})
 
 _DEEP_STRIKE_SPEC = CoreKeywordAbilitySpec(
     keyword="DEEP_STRIKE",
@@ -63,6 +73,26 @@ _DEADLY_DEMISE_SPEC = CoreKeywordAbilitySpec(
     ability_ids=DEADLY_DEMISE_ABILITY_IDS,
     name_words=("DEADLY", "DEMISE"),
 )
+_FEEL_NO_PAIN_SPEC = CoreKeywordAbilitySpec(
+    keyword="FEEL_NO_PAIN",
+    ability_ids=FEEL_NO_PAIN_ABILITY_IDS,
+    name_words=("FEEL", "NO", "PAIN"),
+)
+_FIGHTS_FIRST_SPEC = CoreKeywordAbilitySpec(
+    keyword="FIGHTS_FIRST",
+    ability_ids=FIGHTS_FIRST_ABILITY_IDS,
+    name_words=("FIGHTS", "FIRST"),
+)
+_LONE_OPERATIVE_SPEC = CoreKeywordAbilitySpec(
+    keyword="LONE_OPERATIVE",
+    ability_ids=LONE_OPERATIVE_ABILITY_IDS,
+    name_words=("LONE", "OPERATIVE"),
+)
+_STEALTH_SPEC = CoreKeywordAbilitySpec(
+    keyword="STEALTH",
+    ability_ids=STEALTH_ABILITY_IDS,
+    name_words=("STEALTH",),
+)
 
 
 def unit_has_deep_strike(unit: UnitInstance) -> bool:
@@ -95,6 +125,22 @@ def unit_has_firing_deck(unit: UnitInstance) -> bool:
 
 def unit_has_deadly_demise(unit: UnitInstance) -> bool:
     return _unit_has_core_keyword_ability(unit=unit, spec=_DEADLY_DEMISE_SPEC)
+
+
+def unit_has_feel_no_pain(unit: UnitInstance) -> bool:
+    return _unit_has_core_keyword_ability(unit=unit, spec=_FEEL_NO_PAIN_SPEC)
+
+
+def unit_has_fights_first(unit: UnitInstance) -> bool:
+    return _unit_has_core_keyword_ability(unit=unit, spec=_FIGHTS_FIRST_SPEC)
+
+
+def unit_has_lone_operative(unit: UnitInstance) -> bool:
+    return _unit_has_core_keyword_ability(unit=unit, spec=_LONE_OPERATIVE_SPEC)
+
+
+def unit_has_stealth(unit: UnitInstance) -> bool:
+    return _unit_has_core_keyword_ability(unit=unit, spec=_STEALTH_SPEC)
 
 
 def scouts_ability_descriptors_for_unit(
@@ -143,6 +189,43 @@ def deadly_demise_profile_for_unit(unit: UnitInstance) -> DeadlyDemiseAbilityPro
     _require_descriptor_only(descriptor=descriptor, ability_name="Deadly Demise")
     token = _single_parameter_token(descriptor=descriptor, ability_name="Deadly Demise")
     return DeadlyDemiseAbilityProfile(source_id=descriptor.source_id, mortal_wounds_token=token)
+
+
+def feel_no_pain_profile_for_unit(unit: UnitInstance) -> FeelNoPainAbilityProfile | None:
+    descriptors = _ability_descriptors_for_unit(unit=unit, spec=_FEEL_NO_PAIN_SPEC)
+    if not descriptors:
+        if unit_has_keyword(unit, _FEEL_NO_PAIN_SPEC.keyword):
+            raise GameLifecycleError(
+                "Feel No Pain keyword requires a structured datasheet ability descriptor."
+            )
+        return None
+    if len(descriptors) > 1:
+        raise GameLifecycleError("Datasheet must not contain duplicate Feel No Pain descriptors.")
+    descriptor = next(iter(descriptors))
+    _require_descriptor_only(descriptor=descriptor, ability_name="Feel No Pain")
+    token = _single_parameter_token(descriptor=descriptor, ability_name="Feel No Pain")
+    return FeelNoPainAbilityProfile(
+        source_id=descriptor.source_id,
+        threshold=_d6_target_token(token=token, field_name="Feel No Pain descriptor threshold"),
+    )
+
+
+def fights_first_source_id_for_unit(unit: UnitInstance, *, fallback_source_id: str) -> str | None:
+    descriptors = _ability_descriptors_for_unit(unit=unit, spec=_FIGHTS_FIRST_SPEC)
+    if len(descriptors) > 1:
+        raise GameLifecycleError("Datasheet must not contain duplicate Fights First descriptors.")
+    if descriptors:
+        descriptor = next(iter(descriptors))
+        _require_descriptor_only(descriptor=descriptor, ability_name="Fights First")
+        if descriptor.parameter_tokens:
+            raise GameLifecycleError("Fights First descriptor must not define value tokens.")
+        return descriptor.source_id
+    if unit_has_keyword(unit, _FIGHTS_FIRST_SPEC.keyword):
+        return _normalize_source_identifier(
+            fallback_source_id,
+            field_name="Fights First fallback source_id",
+        )
+    return None
 
 
 def _unit_has_core_keyword_ability(
@@ -243,6 +326,14 @@ def _positive_float_token(*, token: str, field_name: str) -> float:
     return value
 
 
+def _d6_target_token(*, token: str, field_name: str) -> int:
+    normalized = token.removesuffix("+").strip()
+    value = _positive_int_token(token=normalized, field_name=field_name)
+    if value < 2 or value > 6:
+        raise GameLifecycleError(f"{field_name} must be between 2 and 6.")
+    return value
+
+
 def _normalize_parameter_token(token: str) -> str:
     if type(token) is not str:
         raise GameLifecycleError("Ability parameter token must be a string.")
@@ -266,6 +357,12 @@ def _canonical_words(value: str) -> tuple[str, ...]:
         raise GameLifecycleError("Ability name must be a string.")
     normalized = value.upper().replace("-", " ").replace("_", " ").replace('"', " ")
     return tuple(word for word in normalized.split() if word)
+
+
+def _normalize_source_identifier(value: str, *, field_name: str) -> str:
+    if type(value) is not str or not value.strip():
+        raise GameLifecycleError(f"{field_name} must be a non-empty string.")
+    return value.strip()
 
 
 def _validate_unit(unit: UnitInstance) -> None:

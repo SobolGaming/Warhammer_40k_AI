@@ -6,6 +6,7 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -358,6 +359,102 @@ def test_phase14e_melee_lance_uses_charge_move_wound_modifier() -> None:
     assert wound_payload["capped_modifier"] == 1
     assert wound_payload["final_roll"] == 3
     assert wound_payload["successful"] is True
+
+
+def test_hit_roll_bonus_cap_applies_after_weapon_skill_modifier() -> None:
+    catalog, ruleset, scenario, attacker, target_a, _target_b = _melee_fixture(
+        target_b_pose=Pose.at(30.0, 30.0),
+    )
+    request = _melee_request(
+        catalog=catalog,
+        ruleset=ruleset,
+        scenario=scenario,
+        attacker=attacker,
+    )
+    proposal = _melee_proposal(
+        request=request,
+        attacker=attacker,
+        declarations=(
+            MeleeWeaponDeclaration(
+                attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                wargear_id="core-leader-blade",
+                weapon_profile_id="core-leader-blade:standard",
+                target_allocations=(MeleeTargetAllocation(target_a.unit_instance_id),),
+            ),
+        ),
+    )
+    state = _attack_sequence_state(
+        game_id="ws-penalty-hit-roll-bonus",
+        ruleset=ruleset,
+        scenario=scenario,
+    )
+    sequence = melee_attack_sequence_from_proposal(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        proposal=proposal,
+        army_catalog=catalog,
+        dice_manager=DiceRollManager("ws-penalty-hit-roll-bonus-attacks"),
+        sequence_id="ws-penalty-hit-roll-bonus",
+        state=state,
+    )
+    base_profile = replace(
+        sequence.current_pool().weapon_profile,
+        skill=CharacteristicValue.from_raw(Characteristic.WEAPON_SKILL, 4),
+    )
+    worsened_profile = replace(
+        base_profile,
+        skill=CharacteristicValue.from_raw(Characteristic.WEAPON_SKILL, 5),
+    )
+    sequence = replace(
+        sequence,
+        attack_pools=(
+            replace(
+                sequence.current_pool(),
+                attacks=1,
+                weapon_profile=worsened_profile,
+                hit_roll_modifier=2,
+            ),
+        ),
+    )
+    attack_context_id = sequence.attack_context_id()
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=worsened_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id=sequence.attacker_player_id,
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=worsened_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id=sequence.attacker_player_id,
+    )
+    decisions = DecisionController()
+
+    resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset,
+        attack_sequence=sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "ws-penalty-hit-roll-bonus-resolution",
+            event_log=decisions.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id="ws-penalty-hit-roll-bonus-hit", spec=hit_spec, value=4),
+                _fixed_roll_result(
+                    roll_id="ws-penalty-hit-roll-bonus-wound",
+                    spec=wound_spec,
+                    value=1,
+                ),
+            ),
+        ),
+    )
+    hit_payload = _attack_step_payload(decisions, AttackSequenceStep.HIT)
+
+    assert hit_payload["target_number"] == 5
+    assert hit_payload["modifier"] == 2
+    assert hit_payload["capped_modifier"] == 1
+    assert hit_payload["final_roll"] == 5
+    assert hit_payload["successful"] is True
 
 
 def test_phase18b_command_reroll_window_opens_after_fight_hit_roll() -> None:

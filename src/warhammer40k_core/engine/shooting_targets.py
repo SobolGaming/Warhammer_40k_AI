@@ -26,6 +26,7 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_view_from_armies,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType, validate_shooting_type_tuple
+from warhammer40k_core.engine.unit_abilities import unit_has_lone_operative, unit_has_stealth
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
     HUNTER_RULE_ID,
@@ -48,6 +49,7 @@ from warhammer40k_core.geometry.volume import Model
 BENEFIT_OF_COVER_RULE_ID = "core-rules:benefit-of-cover"
 BIG_GUNS_NEVER_TIRE_RULE_ID = "big_guns_never_tire"
 LONE_OPERATIVE_RULE_ID = "lone_operative"
+STEALTH_RULE_ID = "stealth"
 PLUNGING_FIRE_RULE_ID = "core-rules:plunging-fire"
 PLUNGING_FIRE_TERRAIN_HEIGHT_INCHES = 3.0
 PLUNGING_FIRE_TOWERING_RANGE_INCHES = 12.0
@@ -757,7 +759,7 @@ def _target_candidate(
             observer_model_id=witness.observer_model_id,
         )
 
-    if _keywords_include(target_rules_unit.keywords, "LONE_OPERATIVE") and not (
+    if _rules_unit_has_lone_operative(target_rules_unit) and not (
         _lone_operative_target_allowed(
             scenario=scenario,
             attacker_unit=attacker_unit,
@@ -793,6 +795,9 @@ def _target_candidate(
         and evidence.cover_result.cover_effect is CoverEffect.ATTACKER_BS_MODIFIER
     ):
         targeting_rule_ids.append(BENEFIT_OF_COVER_RULE_ID)
+    if _rules_unit_has_stealth(target_rules_unit):
+        hit_roll_modifier -= 1
+        targeting_rule_ids.append(STEALTH_RULE_ID)
     if _plunging_fire_applies(
         attacker_unit=attacker_unit,
         attacker_models=attacker_models,
@@ -1377,6 +1382,18 @@ def _lone_operative_target_allowed(
         second_rules_unit=target_rules_unit,
     )
     return target_distance <= 12.0
+
+
+def _rules_unit_has_lone_operative(rules_unit: RulesUnitView) -> bool:
+    if type(rules_unit) is not RulesUnitView:
+        raise GameLifecycleError("Lone Operative target lookup requires a rules unit.")
+    return any(unit_has_lone_operative(component.unit) for component in rules_unit.components)
+
+
+def _rules_unit_has_stealth(rules_unit: RulesUnitView) -> bool:
+    if type(rules_unit) is not RulesUnitView:
+        raise GameLifecycleError("Stealth target lookup requires a rules unit.")
+    return any(unit_has_stealth(component.unit) for component in rules_unit.components)
 
 
 def _closest_distance_between_unit_and_rules_unit(
