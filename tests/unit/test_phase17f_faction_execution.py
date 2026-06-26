@@ -89,6 +89,15 @@ SHADOW_LEGION_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
     "disciples-of-belakor:weapon-profile",
 )
+ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:movement",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:objective-control",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:save-option",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:unit-characteristic",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:weapon-profile",
+)
 LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start",
     "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
@@ -106,6 +115,7 @@ BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS = (
 )
 SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "aeldari": "Battle Focus",
+    "astra-militarum": "Voice of Command",
     "black-templars": "Templar Vows",
     "chaos-daemons": "The Shadow of Chaos",
     "chaos-space-marines": "Dark Pacts",
@@ -333,6 +343,26 @@ def test_phase17f_black_templars_army_rule_execution_record_is_named_handler() -
     )
     assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
     assert record.handler_id == BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS[0]
+    assert record.block_reason is None
+
+
+def test_phase17f_astra_militarum_army_rule_execution_record_is_named_handler() -> None:
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and record.faction_id == "astra-militarum"
+    )
+
+    assert record.coverage_descriptor_id == "phase17e:astra-militarum:army-rule"
+    assert record.execution_id == "phase17f:phase17e:astra-militarum:army-rule"
+    assert record.rule_name == "Voice of Command"
+    assert record.runtime_support_status == "engine_consumed"
+    assert record.runtime_consumer_ids == tuple(
+        sorted(ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS)
+    )
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
+    assert record.handler_id == ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS[0]
     assert record.block_reason is None
 
 

@@ -124,6 +124,15 @@ AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
     "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind",
 )
+ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:movement",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:objective-control",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:save-option",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:unit-characteristic",
+    "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:weapon-profile",
+)
 CHAOS_DAEMONS_SHADOW_OF_CHAOS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",
 )
@@ -201,6 +210,7 @@ WORLD_EATERS_BLESSINGS_OF_KHORNE_RUNTIME_CONSUMERS = (
 )
 FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "aeldari": "Battle Focus",
+    "astra-militarum": "Voice of Command",
     "black-templars": "Templar Vows",
     "chaos-daemons": "The Shadow of Chaos",
     "chaos-space-marines": "Dark Pacts",
@@ -216,6 +226,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
 }
 FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID = {
     "aeldari": AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMERS,
+    "astra-militarum": ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS,
     "black-templars": BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS,
     "chaos-daemons": CHAOS_DAEMONS_SHADOW_OF_CHAOS_RUNTIME_CONSUMERS,
     "chaos-space-marines": CHAOS_SPACE_MARINES_DARK_PACTS_RUNTIME_CONSUMERS,
@@ -715,6 +726,35 @@ def test_phase17e_black_templars_army_rule_is_engine_consumed() -> None:
         sorted(BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS)
     )
     assert coverage_row.handler_id == BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS[0]
+
+
+def test_phase17e_astra_militarum_army_rule_is_engine_consumed() -> None:
+    coverage_row = next(
+        row
+        for row in faction_coverage_source.coverage_rows()
+        if row.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and row.faction_id == "astra-militarum"
+    )
+
+    assert coverage_row.descriptor_id == "phase17e:astra-militarum:army-rule"
+    assert coverage_row.rule_name == "Voice of Command"
+    assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+    assert coverage_row.runtime_support_status is not None
+    assert coverage_row.runtime_support_status.value == "engine_consumed"
+    assert coverage_row.runtime_consumer_ids == tuple(
+        sorted(ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS)
+    )
+    assert coverage_row.handler_id == ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS[0]
+    assert (
+        faction_coverage_source.FACTION_ARMY_RULE_NAMES_BY_FACTION_ID["astra-militarum"]
+        == "Voice of Command"
+    )
+    assert (
+        faction_coverage_source.FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID[
+            "astra-militarum"
+        ]
+        == ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS
+    )
 
 
 @pytest.mark.parametrize(

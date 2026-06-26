@@ -475,6 +475,45 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command",
+        "ability_name": "Voice of Command",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/astra-militarum/faction/warhammer_40000_11th:astra_militarum:army_rule:voice_of_command/none",
+        "datasheet_id": "astra-militarum",
+        "datasheet_name": "Astra Militarum",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Voice of Command"
+    ],
+    "category_id": "faction.army_rule.voice_of_command",
+    "category_name": "Faction Army Rule Voice Of Command",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/astra-militarum/faction/warhammer_40000_11th:astra_militarum:army_rule:voice_of_command/none"
+    ],
+    "datasheet_names": [
+      "Astra Militarum"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command",
+      "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock",
+      "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:movement",
+      "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:objective-control",
+      "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:save-option",
+      "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:unit-characteristic",
+      "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:weapon-profile"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "warhammer_40000_11th:orks:army_rule:waaagh",
         "ability_name": "Waaagh!",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/orks/faction/warhammer_40000_11th:orks:army_rule:waaagh/none",
