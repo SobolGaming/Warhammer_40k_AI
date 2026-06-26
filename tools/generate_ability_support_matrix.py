@@ -47,6 +47,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.generated_man
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.leagues_of_votann import (
     army_rule as leagues_of_votann_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.orks import (
+    army_rule as orks_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines import (
     army_rule as space_marines_army_rule,
 )
@@ -418,6 +421,10 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords": (
         "Blessings of Khorne"
     ),
+    "warhammer_40000_11th:orks:army_rule:waaagh": "Waaagh!",
+    "warhammer_40000_11th:orks:army_rule:waaagh:advance-eligibility": "Waaagh!",
+    "warhammer_40000_11th:orks:army_rule:waaagh:invulnerable-save": "Waaagh!",
+    "warhammer_40000_11th:orks:army_rule:waaagh:weapon-profile": "Waaagh!",
 }
 
 
@@ -527,6 +534,13 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             ability_name="Blessings of Khorne",
             semantic_category="faction.army_rule.blessings_of_khorne",
             runtime_consumer_ids=_world_eaters_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
+            faction_id=orks_army_rule.ORKS_FACTION_ID,
+            ability_id=orks_army_rule.HOOK_ID,
+            ability_name="Waaagh!",
+            semantic_category="faction.army_rule.waaagh",
+            runtime_consumer_ids=_orks_runtime_consumer_ids(),
         ),
         _implemented_faction_army_rule_row(
             faction_id=emperors_children_army_rule.EMPERORS_CHILDREN_FACTION_ID,
@@ -665,6 +679,20 @@ def _world_eaters_runtime_consumer_ids() -> tuple[str, ...]:
                     for binding in contribution.fight_activation_ability_hook_bindings
                 ),
                 *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
+            }
+        )
+    )
+
+
+def _orks_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = orks_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                *(binding.hook_id for binding in contribution.command_phase_start_hook_bindings),
+                *(binding.hook_id for binding in contribution.advance_eligibility_hook_bindings),
+                *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
+                *(binding.modifier_id for binding in contribution.save_option_modifier_bindings),
             }
         )
     )
@@ -1848,6 +1876,22 @@ def _structured_support_sections_markdown() -> list[str]:
                     "Focused faction runtime tests",
                     "Full",
                     "Includes battle-round selection and supported blessing effects.",
+                ),
+                SupportSectionRow(
+                    "Orks - Waaagh!",
+                    "Named army-rule handler",
+                    "Adapter contract, decision catalog, architecture, and generated matrix",
+                    (
+                        "Focused command-phase, advance eligibility, weapon-profile, "
+                        "save-option, and validation tests"
+                    ),
+                    "Full",
+                    (
+                        "Implements optional once-per-battle Command phase Waaagh! call, "
+                        "active until the start of the next own Command phase, including "
+                        "Advance-then-Charge eligibility, melee Strength/Attacks modifiers, "
+                        "and a 5+ invulnerable save."
+                    ),
                 ),
                 SupportSectionRow(
                     "Emperor's Children - Thrill Seekers",

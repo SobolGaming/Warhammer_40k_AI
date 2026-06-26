@@ -97,6 +97,7 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | Chaos Space Marines - Dark Pacts | Named army-rule handler | Adapter contract and generated matrix | Focused faction runtime tests | Full | Uses selected-to-shoot and selected-to-fight grant decisions for Lethal Hits or Sustained Hits 1, including out-of-phase shooting, then resolves the post-attack Leadership test, failed-test D3 mortal wounds, and any mortal-wound Feel No Pain continuation through engine hooks. |
 | Death Guard - Nurgle's Gift | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes contagion modifiers for supported characteristics and rolls. |
 | World Eaters - Blessings of Khorne | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes battle-round selection and supported blessing effects. |
+| Orks - Waaagh! | Named army-rule handler | Adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, advance eligibility, weapon-profile, save-option, and validation tests | Full | Implements optional once-per-battle Command phase Waaagh! call, active until the start of the next own Command phase, including Advance-then-Charge eligibility, melee Strength/Attacks modifiers, and a 5+ invulnerable save. |
 | Emperor's Children - Thrill Seekers | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes movement, charge, and shooting target restrictions. |
 | Grey Knights - Gate of Infinity | Named army-rule handler | Adapter contract, decision catalog, architecture, and generated matrix | Focused turn-end, reserves, cap, and attached-rules-unit tests | Full | Implements opponent Fight phase Gate of Infinity selections, battle-size caps, complete choices, required next-Movement Strategic Reserves arrival, and attached rules-unit component validation. |
 | Space Marines - Oath of Moment and Space Marine Chapters | Named army-rule handler plus shared mustering/list-validation host | README, adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, reroll, wound-modifier, and mustering tests | Full | Implements Command phase Oath target selection, target-scoped Hit-roll rerolls, Codex Space Marines Detachment Wound-roll bonus gating, and Black Templars, Space Wolves, and Deathwatch roster restrictions. |
@@ -329,6 +330,10 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll` | Prioritised Efficiency |
 | `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll` | Prioritised Efficiency |
 | `warhammer_40000_11th:necrons:army_rule:reanimation_protocols` | Reanimation Protocols |
+| `warhammer_40000_11th:orks:army_rule:waaagh` | Waaagh! |
+| `warhammer_40000_11th:orks:army_rule:waaagh:advance-eligibility` | Waaagh! |
+| `warhammer_40000_11th:orks:army_rule:waaagh:invulnerable-save` | Waaagh! |
+| `warhammer_40000_11th:orks:army_rule:waaagh:weapon-profile` | Waaagh! |
 | `warhammer_40000_11th:space_marines:army_rule:oath_of_moment` | Oath of Moment |
 | `warhammer_40000_11th:space_marines:army_rule:oath_of_moment:wound-roll` | Oath of Moment |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne` | Blessings of Khorne |
