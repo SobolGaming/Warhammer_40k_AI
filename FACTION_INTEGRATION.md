@@ -113,7 +113,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `79120d99e0c717bef7a718d0bd14727e98f60b6dfaf9295d6e8fa40f26401f14`
+  `d85cf78bc394e969ab9149af7a5712972923e6f83be6c179788e52399fe77af3`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -152,14 +152,14 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `c651d5f45ea57441331c31bf99b979a0f9f510b5b1a8a692b9bb0c5f26024822`
+  `44ac813fe718478b4f7aace91045f80443985a78e4b11ab835da5a94ae5fbf05`
 - upstream Phase 17E checksum:
-  `79120d99e0c717bef7a718d0bd14727e98f60b6dfaf9295d6e8fa40f26401f14`
+  `d85cf78bc394e969ab9149af7a5712972923e6f83be6c179788e52399fe77af3`
 
 The package emits 2140 execution records, one for every Phase 17E coverage row:
-2072 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, and 40 rows are executable
-named-handler rows because they already have runtime consumers: 12 faction army
+2071 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, and 41 rows are executable
+named-handler rows because they already have runtime consumers: 13 faction army
 rules plus 28 exact detachment, Enhancement, and Stratagem rows. The engine
 dispatcher can route every record and returns typed
 `unsupported` diagnostics unless a matching executor is registered. No Phase 17E
@@ -529,7 +529,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 6 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 

@@ -98,6 +98,7 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | Death Guard - Nurgle's Gift | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes contagion modifiers for supported characteristics and rolls. |
 | World Eaters - Blessings of Khorne | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes battle-round selection and supported blessing effects. |
 | Orks - Waaagh! | Named army-rule handler | Adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, advance eligibility, weapon-profile, save-option, and validation tests | Full | Implements optional once-per-battle Command phase Waaagh! call, active until the start of the next own Command phase, including Advance-then-Charge eligibility, melee Strength/Attacks modifiers, and a 5+ invulnerable save. |
+| Black Templars - Templar Vows | Named army-rule handler | Adapter contract, decision catalog, source coverage, and generated matrix | Focused vow selection, modifier, charge, Fall Back, and objective tests | Full | Implements battle-round Templar Vow selection, Abhor the Witch Precision and PSYKER charge requirements, Accept Any Challenge wound modifiers, Suffer Not the Unclean charge-after-Fall-Back, and Uphold the Honour sticky objective control. |
 | Emperor's Children - Thrill Seekers | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes movement, charge, and shooting target restrictions. |
 | Grey Knights - Gate of Infinity | Named army-rule handler | Adapter contract, decision catalog, architecture, and generated matrix | Focused turn-end, reserves, cap, and attached-rules-unit tests | Full | Implements opponent Fight phase Gate of Infinity selections, battle-size caps, complete choices, required next-Movement Strategic Reserves arrival, and attached rules-unit component validation. |
 | Space Marines - Oath of Moment and Space Marine Chapters | Named army-rule handler plus shared mustering/list-validation host | README, adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, reroll, wound-modifier, and mustering tests | Full | Implements Command phase Oath target selection, target-scoped Hit-roll rerolls, Codex Space Marines Detachment Wound-roll bonus gating, and Black Templars, Space Wolves, and Deathwatch roster restrictions. |
@@ -124,7 +125,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Dark Angels | 8 | 0 | 0 | 0 | 0 | [dark-angels](factions/dark-angels.md) |
 | Blood Angels | 8 | 0 | 0 | 0 | 0 | [blood-angels](factions/blood-angels.md) |
 | Space Wolves | 7 | 0 | 0 | 0 | 0 | [space-wolves](factions/space-wolves.md) |
-| Black Templars | 6 | 0 | 0 | 0 | 0 | [black-templars](factions/black-templars.md) |
+| Black Templars | 6 | 0 | 0 | 0 | 1 | [black-templars](factions/black-templars.md) |
 | Deathwatch | 1 | 0 | 0 | 0 | 0 | [deathwatch](factions/deathwatch.md) |
 | Grey Knights | 9 | 0 | 24 | 36 | 1 | [grey-knights](factions/grey-knights.md) |
 | Chaos Space Marines | 17 | 0 | 60 | 90 | 1 | [chaos-space-marines](factions/chaos-space-marines.md) |
@@ -276,12 +277,12 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:nomads_of_the_hidden_way` | Nomads of the Hidden Way |
 | `warhammer_40000_11th:aeldari:path_of_the_outcast:far_reaching_doom:selected_shooting_unit` | Far-reaching Doom |
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows` | Templar Vows |
-| `warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-declaration` | Charge Declaration |
-| `warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-targets` | Charge Targets |
-| `warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:melee-precision` | Melee Precision |
-| `warhammer_40000_11th:black_templars:army_rule:templar_vows:accept_any_challenge:wound-roll` | Wound Roll |
-| `warhammer_40000_11th:black_templars:army_rule:templar_vows:suffer_not_the_unclean:fall-back` | Fall Back |
-| `warhammer_40000_11th:black_templars:army_rule:templar_vows:uphold_the_honour:objective-control` | Objective Control |
+| `warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-declaration` | Templar Vows |
+| `warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-targets` | Templar Vows |
+| `warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:melee-precision` | Templar Vows |
+| `warhammer_40000_11th:black_templars:army_rule:templar_vows:accept_any_challenge:wound-roll` | Templar Vows |
+| `warhammer_40000_11th:black_templars:army_rule:templar_vows:suffer_not_the_unclean:fall-back` | Templar Vows |
+| `warhammer_40000_11th:black_templars:army_rule:templar_vows:uphold_the_honour:objective-control` | Templar Vows |
 | `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos` | The Shadow of Chaos |
 | `warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted` | Blood Tainted |
 | `warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall` | Murdercall |
