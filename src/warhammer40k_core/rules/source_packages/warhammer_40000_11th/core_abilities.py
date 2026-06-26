@@ -176,9 +176,9 @@ def core_ability_rows() -> tuple[SourceAbilityRow, ...]:
                     when_descriptor="each time this model would lose a wound",
                     effect_descriptor="roll to ignore that lost wound",
                     restrictions_descriptor="only one feel-no-pain ability per lost wound",
-                    trigger_kind="any_phase",
+                    trigger_kind="passive_query",
                     phase=None,
-                    handler_id="unsupported:phase-13c:feel-no-pain",
+                    handler_id="core:feel-no-pain",
                     required_keywords=("FEEL_NO_PAIN",),
                 ),
                 SourceAbilityRow(
@@ -193,6 +193,21 @@ def core_ability_rows() -> tuple[SourceAbilityRow, ...]:
                     phase="shooting",
                     handler_id="unsupported:phase-13d:firing-deck",
                     required_keywords=("FIRING_DECK",),
+                ),
+                SourceAbilityRow(
+                    ability_id="core-fights-first",
+                    name="Fights First",
+                    source_kind="core",
+                    source_id=f"{source_prefix}:fights-first",
+                    when_descriptor="fight phase activation order",
+                    effect_descriptor="eligible unit fights in the Fights First ordering band",
+                    restrictions_descriptor=(
+                        "fight eligibility and alternating activation rules apply"
+                    ),
+                    trigger_kind="start_phase",
+                    phase="fight",
+                    handler_id="core:fights-first",
+                    required_keywords=("FIGHTS_FIRST",),
                 ),
                 SourceAbilityRow(
                     ability_id="core-hazardous",
@@ -260,7 +275,7 @@ def core_ability_rows() -> tuple[SourceAbilityRow, ...]:
                     ),
                     trigger_kind="after_unit_selected_as_target",
                     phase="shooting",
-                    handler_id="unsupported:phase-13b:lone-operative",
+                    handler_id="core:lone-operative",
                     required_keywords=("LONE_OPERATIVE",),
                 ),
                 SourceAbilityRow(
@@ -286,7 +301,7 @@ def core_ability_rows() -> tuple[SourceAbilityRow, ...]:
                     restrictions_descriptor="ranged attack timing restrictions apply",
                     trigger_kind="after_unit_selected_as_target",
                     phase="shooting",
-                    handler_id="unsupported:phase-13d:stealth",
+                    handler_id="core:stealth",
                     required_keywords=("STEALTH",),
                 ),
             ),

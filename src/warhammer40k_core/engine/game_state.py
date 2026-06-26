@@ -37,6 +37,8 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     record_core_deadly_demise_sources_for_unit,
+    record_core_feel_no_pain_sources_for_unit,
+    record_core_fights_first_source_for_unit,
 )
 from warhammer40k_core.engine.command_points import (
     CommandPointGainResult,
@@ -1944,6 +1946,8 @@ class GameState:
                 "Static core ability source registration requires a UnitInstance."
             )
         record_core_deadly_demise_sources_for_unit(state=self, unit=unit)
+        record_core_feel_no_pain_sources_for_unit(state=self, unit=unit)
+        record_core_fights_first_source_for_unit(state=self, unit=unit)
 
     def apply_strategic_reserve_declarations(
         self,

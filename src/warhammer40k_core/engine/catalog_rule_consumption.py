@@ -21,12 +21,16 @@ from warhammer40k_core.engine.damage_allocation import (
     FeelNoPainSource,
     feel_no_pain_attack_condition_from_token,
 )
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_abilities import (
     DeadlyDemiseAbilityProfile,
+    FeelNoPainAbilityProfile,
     deadly_demise_profile_for_unit,
+    feel_no_pain_profile_for_unit,
+    fights_first_source_id_for_unit,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
@@ -62,6 +66,8 @@ CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID = (
 CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID = "catalog-ir:can-be-placed-in-reserves"
 DEADLY_DEMISE_TRIGGER_ROLL_THRESHOLD = 6
 DEADLY_DEMISE_RANGE_INCHES = 6.0
+CORE_FIGHTS_FIRST_SOURCE_ID = "gw-11e-core-abilities:core:fights-first"
+CORE_FIGHTS_FIRST_EFFECT_KIND = "fights_first"
 
 _CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
     {
@@ -273,6 +279,53 @@ def record_core_deadly_demise_sources_for_unit(
         )
         recorded_sources.append((model.model_instance_id, source))
     return tuple(sorted(recorded_sources, key=lambda binding: (binding[0], binding[1].source_id)))
+
+
+def record_core_feel_no_pain_sources_for_unit(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+) -> tuple[tuple[str, FeelNoPainSource], ...]:
+    _validate_game_state(state)
+    _validate_unit(unit)
+    profile = feel_no_pain_profile_for_unit(unit)
+    if profile is None:
+        return ()
+    recorded_sources: list[tuple[str, FeelNoPainSource]] = []
+    for model in unit.own_models:
+        source = _feel_no_pain_source_for_model(
+            profile=profile,
+            model_instance_id=model.model_instance_id,
+        )
+        _record_model_feel_no_pain_source(
+            state=state,
+            model_instance_id=model.model_instance_id,
+            source=source,
+        )
+        recorded_sources.append((model.model_instance_id, source))
+    return tuple(sorted(recorded_sources, key=lambda binding: (binding[0], binding[1].source_id)))
+
+
+def record_core_fights_first_source_for_unit(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+) -> PersistingEffect | None:
+    _validate_game_state(state)
+    _validate_unit(unit)
+    source_id = fights_first_source_id_for_unit(
+        unit,
+        fallback_source_id=CORE_FIGHTS_FIRST_SOURCE_ID,
+    )
+    if source_id is None:
+        return None
+    effect = _fights_first_effect_for_unit(
+        state=state,
+        unit=unit,
+        source_id=source_id,
+    )
+    _record_static_persisting_effect(state=state, effect=effect)
+    return effect
 
 
 def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
@@ -544,6 +597,43 @@ def _deadly_demise_mortal_wounds_payload(token: str) -> dict[str, JsonValue]:
     return {"kind": "fixed", "value": value}
 
 
+def _feel_no_pain_source_for_model(
+    *,
+    profile: FeelNoPainAbilityProfile,
+    model_instance_id: str,
+) -> FeelNoPainSource:
+    if type(profile) is not FeelNoPainAbilityProfile:
+        raise GameLifecycleError("Feel No Pain source registration requires an ability profile.")
+    model_id = _string_identifier("Feel No Pain source model_instance_id", model_instance_id)
+    return FeelNoPainSource(
+        source_id=f"{profile.source_id}:{model_id}:feel-no-pain",
+        threshold=profile.threshold,
+    )
+
+
+def _fights_first_effect_for_unit(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    source_id: str,
+) -> PersistingEffect:
+    unit_id = _string_identifier("Fights First unit_instance_id", unit.unit_instance_id)
+    source = _string_identifier("Fights First source_id", source_id)
+    owner = _owner_player_id_for_unit(state=state, unit=unit)
+    return PersistingEffect(
+        effect_id=f"{source}:{unit_id}:fights-first",
+        source_rule_id=source,
+        owner_player_id=owner,
+        target_unit_instance_ids=(unit_id,),
+        started_battle_round=_static_ability_started_battle_round(state),
+        expiration=EffectExpiration.end_of_battle(),
+        effect_payload={
+            "effect_kind": CORE_FIGHTS_FIRST_EFFECT_KIND,
+            "source_rule_id": source,
+        },
+    )
+
+
 def _record_model_feel_no_pain_source(
     *,
     state: GameState,
@@ -566,6 +656,20 @@ def _record_model_feel_no_pain_source(
     )
 
 
+def _record_static_persisting_effect(
+    *,
+    state: GameState,
+    effect: PersistingEffect,
+) -> None:
+    for existing_effect in state.persisting_effects:
+        if existing_effect.effect_id != effect.effect_id:
+            continue
+        if existing_effect != effect:
+            raise GameLifecycleError("Core static persisting effect conflicts with existing state.")
+        return
+    state.record_persisting_effect(effect)
+
+
 def _record_model_destruction_reaction_source(
     *,
     state: GameState,
@@ -585,6 +689,21 @@ def _record_model_destruction_reaction_source(
         model_instance_id=model_instance_id,
         sources=(*existing_sources, source),
     )
+
+
+def _owner_player_id_for_unit(*, state: GameState, unit: UnitInstance) -> str:
+    for army in state.army_definitions:
+        if any(stored.unit_instance_id == unit.unit_instance_id for stored in army.units):
+            return army.player_id
+    raise GameLifecycleError("Core ability source registration requires a mustered unit.")
+
+
+def _static_ability_started_battle_round(state: GameState) -> int:
+    if type(state.battle_round) is not int:
+        raise GameLifecycleError("Core static ability source requires an integer battle round.")
+    if state.battle_round < 0:
+        raise GameLifecycleError("Core static ability source requires a non-negative battle round.")
+    return 1
 
 
 def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:

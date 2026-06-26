@@ -8,6 +8,12 @@ import pytest
 
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission, ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+    DatasheetDefinition,
+)
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
@@ -25,6 +31,9 @@ from warhammer40k_core.engine.attack_sequence import (
     ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
 )
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    record_core_fights_first_source_for_unit,
+)
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -94,6 +103,10 @@ from warhammer40k_core.engine.stratagems import (
     StratagemTargetProposal,
     StratagemTargetProposalPayload,
     stratagem_decline_payload,
+)
+from warhammer40k_core.engine.unit_abilities import (
+    fights_first_source_id_for_unit,
+    unit_has_fights_first,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pathing import PathWitness
@@ -781,6 +794,104 @@ def test_fights_first_resolves_before_remaining_combats_with_active_player_alter
     assert third_request.actor_id == "player-a"
     assert third_payload["ordering_band"] == "remaining_combats"
     assert _request_unit_ids(third_request) == [units["alpha-remaining"].unit_instance_id]
+
+
+def test_fights_first_descriptor_registers_static_ordering_source() -> None:
+    fights_first_datasheet_id = "phase15c-fights-first-infantry"
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("alpha-first", "alpha-remaining"),
+        enemy_unit_ids=("enemy-first", "enemy-remaining"),
+        origins={
+            "alpha-first": Pose.at(10.0, 20.0),
+            "enemy-first": Pose.at(13.0, 20.0),
+            "alpha-remaining": Pose.at(10.0, 40.0),
+            "enemy-remaining": Pose.at(13.0, 40.0),
+        },
+        game_id="phase15c-fights-first-descriptor",
+        catalog=_catalog_with_fights_first_datasheet(
+            datasheet_id=fights_first_datasheet_id,
+        ),
+        alpha_unit_specs={
+            "alpha-first": (fights_first_datasheet_id, "core-intercessor-like", 5),
+        },
+        enemy_unit_specs={
+            "enemy-first": (fights_first_datasheet_id, "core-intercessor-like", 5),
+        },
+    )
+    state = _state(lifecycle)
+    registry = FightsFirstRegistry.from_state(state)
+    duplicate_effect = record_core_fights_first_source_for_unit(
+        state=state,
+        unit=units["alpha-first"],
+    )
+    original_battle_round = state.battle_round
+    state.battle_round = original_battle_round + 1
+    later_duplicate_effect = record_core_fights_first_source_for_unit(
+        state=state,
+        unit=units["alpha-first"],
+    )
+    state.battle_round = original_battle_round
+
+    first_request = _advance_to_fight_order_request(lifecycle)
+    first_payload = cast(dict[str, object], first_request.payload)
+    first_status = _submit_normal_fight(
+        lifecycle,
+        request=first_request,
+        unit=units["alpha-first"],
+        result_id="phase15c-alpha-first-descriptor",
+    )
+    second_request = _decision_request(first_status)
+    second_payload = cast(dict[str, object], second_request.payload)
+    second_status = _submit_normal_fight(
+        lifecycle,
+        request=second_request,
+        unit=units["enemy-first"],
+        result_id="phase15c-enemy-first-descriptor",
+    )
+    third_request = _decision_request(second_status)
+    third_payload = cast(dict[str, object], third_request.payload)
+    payload = cast(dict[str, object], state.to_payload())
+    keyword_unit = replace(
+        units["alpha-remaining"],
+        keywords=(*units["alpha-remaining"].keywords, "Fights First"),
+    )
+
+    assert unit_has_fights_first(units["alpha-first"])
+    assert unit_has_fights_first(keyword_unit)
+    assert (
+        fights_first_source_id_for_unit(
+            units["alpha-first"],
+            fallback_source_id="phase15c-unused-fallback",
+        )
+        == f"datasheet:{fights_first_datasheet_id}:ability:fights-first"
+    )
+    assert (
+        fights_first_source_id_for_unit(
+            keyword_unit,
+            fallback_source_id="phase15c:keyword-fights-first",
+        )
+        == "phase15c:keyword-fights-first"
+    )
+    assert duplicate_effect is not None
+    assert later_duplicate_effect == duplicate_effect
+    assert len(FightsFirstRegistry.from_state(state).sources) == len(registry.sources)
+    assert registry.has_unit(units["alpha-first"].unit_instance_id)
+    assert registry.has_unit(units["enemy-first"].unit_instance_id)
+    assert not registry.has_unit(units["alpha-remaining"].unit_instance_id)
+    assert all(source.effect_kind == FIGHTS_FIRST_EFFECT_KIND for source in registry.sources)
+    assert all(
+        source.source_rule_id == f"datasheet:{fights_first_datasheet_id}:ability:fights-first"
+        for source in registry.sources
+    )
+    assert first_payload["ordering_band"] == "fights_first"
+    assert _request_unit_ids(first_request) == [units["alpha-first"].unit_instance_id]
+    assert second_payload["ordering_band"] == "fights_first"
+    assert _request_unit_ids(second_request) == [units["enemy-first"].unit_instance_id]
+    assert third_payload["ordering_band"] == "remaining_combats"
+    assert _request_unit_ids(third_request) == [units["alpha-remaining"].unit_instance_id]
+    assert "<" not in json.dumps(payload, sort_keys=True)
+    assert "object at 0x" not in json.dumps(payload, sort_keys=True)
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
 
 
 def test_remaining_combat_returns_to_fights_first_when_new_fights_first_unit_is_eligible() -> None:
@@ -1947,6 +2058,7 @@ def _fight_lifecycle(
     model_count: int = 5,
     alpha_unit_specs: dict[str, tuple[str, str, int]] | None = None,
     enemy_unit_specs: dict[str, tuple[str, str, int]] | None = None,
+    catalog: ArmyCatalog | None = None,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     config = _config(
         game_id=game_id,
@@ -1957,6 +2069,7 @@ def _fight_lifecycle(
         model_count=model_count,
         alpha_unit_specs=alpha_unit_specs,
         enemy_unit_specs=enemy_unit_specs,
+        catalog=catalog,
     )
     armies = _mustered_armies(config)
     scenario = create_deterministic_battlefield_scenario(
@@ -2079,18 +2192,19 @@ def _config(
     model_count: int,
     alpha_unit_specs: dict[str, tuple[str, str, int]] | None = None,
     enemy_unit_specs: dict[str, tuple[str, str, int]] | None = None,
+    catalog: ArmyCatalog | None = None,
 ) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase15c-test"
         ),
-        army_catalog=catalog,
+        army_catalog=resolved_catalog,
         army_muster_requests=(
             _army_muster_request(
-                catalog=catalog,
+                catalog=resolved_catalog,
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_selection_ids=alpha_unit_ids,
@@ -2100,7 +2214,7 @@ def _config(
                 unit_specs=alpha_unit_specs,
             ),
             _army_muster_request(
-                catalog=catalog,
+                catalog=resolved_catalog,
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=enemy_unit_ids,
@@ -2217,6 +2331,65 @@ def _unit_selection_spec(
     if unit_specs is not None and unit_id in unit_specs:
         return unit_specs[unit_id]
     return (default_datasheet_id, default_model_profile_id, default_model_count)
+
+
+def _catalog_with_fights_first_datasheet(*, datasheet_id: str) -> ArmyCatalog:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    requested_datasheet_id = _test_identifier(datasheet_id)
+    source_datasheet = _datasheet_by_id(
+        catalog=catalog,
+        datasheet_id="core-intercessor-like-infantry",
+    )
+    ability = DatasheetAbilityDescriptor(
+        ability_id="core-fights-first",
+        name="Fights First",
+        source_id=f"datasheet:{requested_datasheet_id}:ability:fights-first",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.CORE,
+        effect_description="CORE Fights First descriptor.",
+        timing_tags=("fight_phase", "fights_first"),
+    )
+    fights_first_datasheet = replace(
+        source_datasheet,
+        datasheet_id=requested_datasheet_id,
+        name="Phase 15C Fights First Infantry",
+        abilities=tuple(
+            sorted(
+                (*source_datasheet.abilities, ability),
+                key=lambda stored: stored.ability_id,
+            )
+        ),
+    )
+    updated_detachments = tuple(
+        replace(
+            detachment,
+            unit_datasheet_ids=tuple(
+                sorted((*detachment.unit_datasheet_ids, requested_datasheet_id))
+            ),
+        )
+        if detachment.detachment_id == "core-combined-arms"
+        else detachment
+        for detachment in catalog.detachments
+    )
+    return replace(
+        catalog,
+        datasheets=(*catalog.datasheets, fights_first_datasheet),
+        detachments=updated_detachments,
+    )
+
+
+def _datasheet_by_id(*, catalog: ArmyCatalog, datasheet_id: str) -> DatasheetDefinition:
+    requested_datasheet_id = _test_identifier(datasheet_id)
+    for datasheet in catalog.datasheets:
+        if datasheet.datasheet_id == requested_datasheet_id:
+            return datasheet
+    raise AssertionError(f"Unknown test datasheet: {requested_datasheet_id}")
+
+
+def _test_identifier(value: str) -> str:
+    if type(value) is not str or not value.strip():
+        raise AssertionError("Test identifier must be a non-empty string.")
+    return value.strip()
 
 
 def _unit_selection(

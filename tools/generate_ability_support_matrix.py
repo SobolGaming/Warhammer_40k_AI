@@ -1554,6 +1554,52 @@ def _structured_support_sections_markdown() -> list[str]:
                     ),
                 ),
                 SupportSectionRow(
+                    "Stealth",
+                    "Shooting target candidate hit-roll penalty",
+                    "Architecture, source-row registry, and generated matrix",
+                    "Focused descriptor-backed Shooting target tests",
+                    "Full",
+                    (
+                        "Consumes keyword or descriptor-backed Stealth on target rules units "
+                        "and carries the -1 hit-roll modifier through accepted ranged pools."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Lone Operative",
+                    "Shooting target range gate",
+                    "Adapter contract, source-row registry, and generated matrix",
+                    "Focused keyword and descriptor-backed Shooting target tests",
+                    "Full",
+                    (
+                        "Blocks target selection outside 12 inches using the shared Shooting "
+                        "candidate legality path and records the Lone Operative rule ID."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Feel No Pain X+",
+                    "Static per-model source registration plus shared lost-wound resolver",
+                    "Adapter contract, source-row registry, and generated matrix",
+                    "Focused descriptor, damage, mortal-wound, and replay tests",
+                    "Full",
+                    (
+                        "Consumes structured Feel No Pain threshold descriptors and feeds the "
+                        "existing normal damage, mortal-wound, Hazardous, Explosives, and "
+                        "Deadly Demise FNP continuation paths."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Fights First",
+                    "Static fight-order source registration plus Fight phase ordering bands",
+                    "Adapter contract, source-row registry, and generated matrix",
+                    "Focused descriptor-backed Fight-order tests",
+                    "Full",
+                    (
+                        "Registers battle-long Fights First sources from structured descriptors "
+                        "or canonical keywords and consumes them through the shared activation "
+                        "ordering state."
+                    ),
+                ),
+                SupportSectionRow(
                     "Other Core Rules keyword abilities",
                     "Mixed phase-owned hosts or explicit unsupported descriptors",
                     "Architecture and source-row unsupported audits",

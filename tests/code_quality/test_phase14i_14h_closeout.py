@@ -65,13 +65,10 @@ def test_phase14i_unsupported_core_ability_contract_is_explicit() -> None:
 
     assert tuple((row.ability_id, row.handler_id) for row in unsupported_rows) == (
         ("core-deep-strike", "unsupported:phase-15b:deep-strike"),
-        ("core-feel-no-pain", "unsupported:phase-13c:feel-no-pain"),
         ("core-firing-deck", "unsupported:phase-13d:firing-deck"),
         ("core-infiltrators", "unsupported:phase-15b:infiltrators"),
         ("core-leader", "unsupported:phase-15c:leader"),
-        ("core-lone-operative", "unsupported:phase-13b:lone-operative"),
         ("core-scouts", "unsupported:phase-15b:scouts"),
-        ("core-stealth", "unsupported:phase-13d:stealth"),
         ("core-support", "unsupported:phase-15c:support"),
     )
 
