@@ -275,6 +275,13 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:eldritch_suppression` | Eldritch Suppression |
 | `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:nomads_of_the_hidden_way` | Nomads of the Hidden Way |
 | `warhammer_40000_11th:aeldari:path_of_the_outcast:far_reaching_doom:selected_shooting_unit` | Far-reaching Doom |
+| `warhammer_40000_11th:black_templars:army_rule:templar_vows` | Templar Vows |
+| `warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-declaration` | Charge Declaration |
+| `warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-targets` | Charge Targets |
+| `warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:melee-precision` | Melee Precision |
+| `warhammer_40000_11th:black_templars:army_rule:templar_vows:accept_any_challenge:wound-roll` | Wound Roll |
+| `warhammer_40000_11th:black_templars:army_rule:templar_vows:suffer_not_the_unclean:fall-back` | Fall Back |
+| `warhammer_40000_11th:black_templars:army_rule:templar_vows:uphold_the_honour:objective-control` | Objective Control |
 | `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos` | The Shadow of Chaos |
 | `warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted` | Blood Tainted |
 | `warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall` | Murdercall |

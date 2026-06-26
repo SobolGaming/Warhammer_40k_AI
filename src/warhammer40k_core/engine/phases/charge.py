@@ -121,6 +121,7 @@ COMPLETE_CHARGE_PHASE_OPTION_ID = "complete_charge_phase"
 CHARGE_MOVE_ACTION = "charge_move"
 FIGHTS_FIRST_CHARGE_EFFECT_KIND = "charge_grants_fights_first"
 CHARGE_AFTER_FALL_BACK_EFFECT_KIND = "charge_after_fall_back_allowed"
+CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY = "charge_move_required_target_unit_instance_ids"
 _COMPLETE_CHARGE_PHASE_STATUS = "charge_phase_complete"
 _CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS = "charge_move_proposal_required"
 _CHARGE_MOVE_INVALID_STATUS = "charge_move_invalid"
@@ -343,6 +344,12 @@ class ChargeMoveProposal:
         reachable_target_ids = set(
             _payload_identifier_list(context, key="reachable_target_unit_instance_ids")
         )
+        required_target_ids = set(
+            _payload_optional_identifier_list(
+                context,
+                key=CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
+            )
+        )
         selected_target_ids = set(self.charge_target_unit_instance_ids)
         if selected_target_ids - reachable_target_ids:
             return ProposalValidationResult.invalid(
@@ -353,6 +360,14 @@ class ChargeMoveProposal:
                 field="charge_target_unit_instance_ids",
             )
         if self.is_no_move_choice:
+            if required_target_ids:
+                return ProposalValidationResult.invalid(
+                    proposal_request_id=request.request_id,
+                    proposal_kind=request.proposal_kind,
+                    violation_code="charge_required_target_not_selected",
+                    message="Charge Move must select a required reachable target.",
+                    field="charge_target_unit_instance_ids",
+                )
             if self.witness is not None:
                 return ProposalValidationResult.invalid(
                     proposal_request_id=request.request_id,
@@ -364,6 +379,14 @@ class ChargeMoveProposal:
             return ProposalValidationResult.valid(
                 proposal_request_id=request.request_id,
                 proposal_kind=request.proposal_kind,
+            )
+        if required_target_ids and selected_target_ids.isdisjoint(required_target_ids):
+            return ProposalValidationResult.invalid(
+                proposal_request_id=request.request_id,
+                proposal_kind=request.proposal_kind,
+                violation_code="charge_required_target_not_selected",
+                message="Charge Move selected targets did not include a required reachable target.",
+                field="charge_target_unit_instance_ids",
             )
         if self.witness is None:
             return ProposalValidationResult.invalid(
@@ -1177,6 +1200,30 @@ def invalid_charge_move_proposal_status(
             ),
             message="Charge Move reachable target snapshot is stale.",
         )
+    current_required = _required_charge_target_unit_instance_ids(
+        state=state,
+        unit_instance_id=proposal.unit_instance_id,
+        reachable_target_unit_instance_ids=tuple(current_reachable),
+    )
+    requested_required = _payload_optional_identifier_list(
+        _proposal_context(proposal_request),
+        key=CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
+    )
+    if current_required != requested_required:
+        return _reject_invalid_charge_proposal(
+            state=state,
+            decisions=decisions,
+            result=result,
+            proposal_validation=ProposalValidationResult.invalid(
+                proposal_request_id=proposal_request.request_id,
+                proposal_kind=proposal_request.proposal_kind,
+                violation_code="charge_required_targets_drift",
+                message="Charge Move required target snapshot no longer matches state.",
+                field=CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
+                status="stale",
+            ),
+            message="Charge Move required target snapshot is stale.",
+        )
     if proposal.witness is not None:
         witness_validation = _charge_witness_matches_current_unit_status(
             state=state,
@@ -1926,6 +1973,11 @@ def _request_charge_move_proposal(
 ) -> LifecycleStatus:
     if charge_state.active_selection is None:
         raise GameLifecycleError("Charge Move proposal requires active_selection.")
+    required_target_ids = _required_charge_target_unit_instance_ids(
+        state=state,
+        unit_instance_id=roll_result.request.unit_instance_id,
+        reachable_target_unit_instance_ids=tuple(roll_result.reachable_target_distances_inches),
+    )
     proposal_request = MovementProposalRequest(
         request_id=state.next_decision_request_id(),
         decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -1948,6 +2000,7 @@ def _request_charge_move_proposal(
             "reachable_target_distances_inches": dict(
                 sorted(roll_result.reachable_target_distances_inches.items())
             ),
+            CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY: list(required_target_ids),
             "charge_roll": validate_json_value(roll_result.to_payload()),
         },
     )
@@ -1972,6 +2025,7 @@ def _request_charge_move_proposal(
                 "reachable_target_unit_instance_ids": list(
                     roll_result.reachable_target_distances_inches
                 ),
+                CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY: list(required_target_ids),
                 "phase_body_status": _CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS,
             }
         ),
@@ -1991,6 +2045,7 @@ def _request_charge_move_proposal(
             "reachable_target_unit_instance_ids": list(
                 roll_result.reachable_target_distances_inches
             ),
+            CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY: list(required_target_ids),
         },
     )
 
@@ -2449,6 +2504,52 @@ def _charge_after_fall_back_allowed_by_effects(
         if payload.get("effect_kind") == CHARGE_AFTER_FALL_BACK_EFFECT_KIND:
             return True
     return False
+
+
+def _required_charge_target_unit_instance_ids(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    reachable_target_unit_instance_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    reachable_ids = set(
+        _validate_identifier_tuple(
+            "reachable_target_unit_instance_ids",
+            reachable_target_unit_instance_ids,
+        )
+    )
+    if not reachable_ids:
+        return ()
+    required_ids: set[str] = set()
+    for effect in state.persisting_effects_for_unit(requested_unit_id):
+        payload = effect.effect_payload
+        if not isinstance(payload, dict):
+            continue
+        for candidate_payload in _charge_target_requirement_payloads(payload):
+            required_ids.update(
+                required_id
+                for required_id in _payload_identifier_list(
+                    candidate_payload,
+                    key=CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
+                )
+                if required_id in reachable_ids
+            )
+    return tuple(sorted(required_ids))
+
+
+def _charge_target_requirement_payloads(
+    effect_payload: Mapping[str, object],
+) -> tuple[Mapping[str, object], ...]:
+    payloads: list[Mapping[str, object]] = []
+    if CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY in effect_payload:
+        payloads.append(effect_payload)
+    raw_source_payload = effect_payload.get("source_payload")
+    if isinstance(raw_source_payload, dict) and (
+        CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY in raw_source_payload
+    ):
+        payloads.append(cast(Mapping[str, object], raw_source_payload))
+    return tuple(payloads)
 
 
 def _charge_target_restriction(
@@ -3622,7 +3723,7 @@ def _payload_object(payload: dict[str, object], *, key: str) -> dict[str, object
     return cast(dict[str, object], value)
 
 
-def _payload_identifier_list(payload: dict[str, object], *, key: str) -> tuple[str, ...]:
+def _payload_identifier_list(payload: Mapping[str, object], *, key: str) -> tuple[str, ...]:
     value = payload.get(key)
     if type(value) is not list:
         raise GameLifecycleError(f"Payload field {key} must be a list.")
@@ -3631,6 +3732,16 @@ def _payload_identifier_list(payload: dict[str, object], *, key: str) -> tuple[s
     if len(set(validated)) != len(validated):
         raise GameLifecycleError(f"Payload field {key} must not contain duplicates.")
     return tuple(sorted(validated))
+
+
+def _payload_optional_identifier_list(
+    payload: Mapping[str, object],
+    *,
+    key: str,
+) -> tuple[str, ...]:
+    if key not in payload:
+        return ()
+    return _payload_identifier_list(payload, key=key)
 
 
 def _invalid_charging_unit_finite_decision_status(
