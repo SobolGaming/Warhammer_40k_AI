@@ -165,6 +165,7 @@ from warhammer40k_core.engine.phases.shooting import (
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
     ShootingPhaseHandler,
+    invalid_shooting_phase_start_faction_rule_status,
 )
 from warhammer40k_core.engine.prebattle import (
     SELECT_PREBATTLE_ACTION_DECISION_TYPE,
@@ -191,6 +192,9 @@ from warhammer40k_core.engine.sequencing import (
     apply_sequencing_decision_from_request,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE, SetupFlow
+from warhammer40k_core.engine.shooting_phase_start_hooks import (
+    SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
+)
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
 )
@@ -282,6 +286,7 @@ _TRIGGERED_MOVEMENT_DECISION_TYPES = frozenset((SELECT_TRIGGERED_MOVEMENT_DECISI
 _SHOOTING_DECISION_TYPES = frozenset(
     (
         SELECT_SHOOTING_UNIT_DECISION_TYPE,
+        SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
         SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
         SELECT_SHOOTING_TYPE_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
@@ -887,6 +892,19 @@ class GameLifecycle:
                 request=pending_request,
                 result=result,
                 charge_declaration_hooks=(self._charge_phase_handler.charge_declaration_hooks),
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type
+            == SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE
+        ):
+            invalid_status = invalid_shooting_phase_start_faction_rule_status(
+                state=state,
+                request=pending_request,
+                result=result,
             )
             if invalid_status is not None:
                 return invalid_status
@@ -2051,6 +2069,9 @@ class GameLifecycle:
             ),
             shooting_target_restriction_hooks=(
                 self._runtime_content_bundle.shooting_target_restriction_hook_registry
+            ),
+            shooting_phase_start_hooks=(
+                self._runtime_content_bundle.shooting_phase_start_hook_registry
             ),
             shooting_end_surge_hooks=self._runtime_content_bundle.shooting_end_surge_hook_registry,
             attack_sequence_completed_hooks=(

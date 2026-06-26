@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from types import MappingProxyType
 from typing import cast
 
@@ -130,6 +130,10 @@ from warhammer40k_core.engine.shooting_end_surge_hooks import (
     ShootingEndSurgeHookBinding,
     ShootingEndSurgeHookRegistry,
 )
+from warhammer40k_core.engine.shooting_phase_start_hooks import (
+    ShootingPhaseStartHookBinding,
+    ShootingPhaseStartHookRegistry,
+)
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedGrantBinding,
     ShootingUnitSelectedGrantRegistry,
@@ -201,6 +205,7 @@ class RuntimeContentContribution:
     turn_end_hook_bindings: tuple[TurnEndHookBinding, ...] = ()
     command_phase_start_hook_bindings: tuple[CommandPhaseStartHookBinding, ...] = ()
     fight_phase_start_hook_bindings: tuple[FightPhaseStartHookBinding, ...] = ()
+    shooting_phase_start_hook_bindings: tuple[ShootingPhaseStartHookBinding, ...] = ()
     unit_destroyed_hook_bindings: tuple[UnitDestroyedHookBinding, ...] = ()
     battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = ()
     advance_eligibility_hook_bindings: tuple[AdvanceEligibilityHookBinding, ...] = ()
@@ -368,6 +373,15 @@ class RuntimeContentContribution:
                 "RuntimeContentContribution fight_phase_start_hook_bindings",
                 self.fight_phase_start_hook_bindings,
                 FightPhaseStartHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "shooting_phase_start_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution shooting_phase_start_hook_bindings",
+                self.shooting_phase_start_hook_bindings,
+                ShootingPhaseStartHookBinding,
             ),
         )
         object.__setattr__(
@@ -647,60 +661,7 @@ class RuntimeContentContribution:
         )
 
     def with_contribution_id(self, contribution_id: str) -> RuntimeContentContribution:
-        return RuntimeContentContribution(
-            contribution_id=contribution_id,
-            ability_records=self.ability_records,
-            stratagem_records=self.stratagem_records,
-            ability_handler_bindings=self.ability_handler_bindings,
-            stratagem_handler_bindings=self.stratagem_handler_bindings,
-            rule_runtime_bindings=self.rule_runtime_bindings,
-            event_subscriptions=self.event_subscriptions,
-            event_handler_bindings=self.event_handler_bindings,
-            battle_formation_hook_bindings=self.battle_formation_hook_bindings,
-            battle_round_start_hook_bindings=self.battle_round_start_hook_bindings,
-            turn_end_hook_bindings=self.turn_end_hook_bindings,
-            command_phase_start_hook_bindings=self.command_phase_start_hook_bindings,
-            fight_phase_start_hook_bindings=self.fight_phase_start_hook_bindings,
-            unit_destroyed_hook_bindings=self.unit_destroyed_hook_bindings,
-            battle_shock_hook_bindings=self.battle_shock_hook_bindings,
-            advance_eligibility_hook_bindings=self.advance_eligibility_hook_bindings,
-            advance_move_hook_bindings=self.advance_move_hook_bindings,
-            fall_back_hook_bindings=self.fall_back_hook_bindings,
-            movement_end_surge_hook_bindings=self.movement_end_surge_hook_bindings,
-            reserve_arrival_distance_hook_bindings=(self.reserve_arrival_distance_hook_bindings),
-            unit_move_completed_mortal_wound_hook_bindings=(
-                self.unit_move_completed_mortal_wound_hook_bindings
-            ),
-            mortal_wound_feel_no_pain_hook_bindings=(self.mortal_wound_feel_no_pain_hook_bindings),
-            charge_declaration_hook_bindings=self.charge_declaration_hook_bindings,
-            shooting_target_restriction_hook_bindings=(
-                self.shooting_target_restriction_hook_bindings
-            ),
-            charge_target_restriction_hook_bindings=(self.charge_target_restriction_hook_bindings),
-            shooting_unit_selected_hook_bindings=self.shooting_unit_selected_hook_bindings,
-            shooting_unit_selected_grant_hook_bindings=(
-                self.shooting_unit_selected_grant_hook_bindings
-            ),
-            attack_sequence_completed_hook_bindings=(self.attack_sequence_completed_hook_bindings),
-            shooting_end_surge_hook_bindings=self.shooting_end_surge_hook_bindings,
-            enhancement_effect_bindings=self.enhancement_effect_bindings,
-            fight_activation_ability_hook_bindings=self.fight_activation_ability_hook_bindings,
-            fight_unit_selected_grant_hook_bindings=(self.fight_unit_selected_grant_hook_bindings),
-            phase_end_objective_control_hook_bindings=(
-                self.phase_end_objective_control_hook_bindings
-            ),
-            stratagem_cost_choice_hook_bindings=self.stratagem_cost_choice_hook_bindings,
-            stratagem_cost_modifier_bindings=self.stratagem_cost_modifier_bindings,
-            unit_characteristic_modifier_bindings=self.unit_characteristic_modifier_bindings,
-            hit_roll_modifier_bindings=self.hit_roll_modifier_bindings,
-            wound_roll_modifier_bindings=self.wound_roll_modifier_bindings,
-            save_option_modifier_bindings=self.save_option_modifier_bindings,
-            movement_budget_modifier_bindings=self.movement_budget_modifier_bindings,
-            objective_control_modifier_bindings=self.objective_control_modifier_bindings,
-            charge_roll_modifier_bindings=self.charge_roll_modifier_bindings,
-            weapon_profile_modifier_bindings=self.weapon_profile_modifier_bindings,
-            faction_named_handlers=self.faction_named_handlers,
-        )
+        return replace(self, contribution_id=contribution_id)
 
 
 def _combine_contribution_values[T](
@@ -794,6 +755,12 @@ def combine_runtime_content_contributions(
             validated_contributions,
             "Fight-phase start hook binding",
             lambda contribution: contribution.fight_phase_start_hook_bindings,
+            lambda binding: binding.hook_id,
+        ),
+        shooting_phase_start_hook_bindings=_combine_contribution_values(
+            validated_contributions,
+            "Shooting-phase start hook binding",
+            lambda contribution: contribution.shooting_phase_start_hook_bindings,
             lambda binding: binding.hook_id,
         ),
         unit_destroyed_hook_bindings=_combine_contribution_values(
@@ -1064,6 +1031,7 @@ class RuntimeContentBundle:
     turn_end_hook_registry: TurnEndHookRegistry
     command_phase_start_hook_registry: CommandPhaseStartHookRegistry
     fight_phase_start_hook_registry: FightPhaseStartHookRegistry
+    shooting_phase_start_hook_registry: ShootingPhaseStartHookRegistry
     unit_destroyed_hook_registry: UnitDestroyedHookRegistry
     battle_shock_hook_registry: BattleShockHookRegistry
     advance_eligibility_hook_registry: AdvanceEligibilityHookRegistry
@@ -1130,6 +1098,10 @@ class RuntimeContentBundle:
             raise GameLifecycleError("RuntimeContentBundle requires CommandPhaseStartHookRegistry.")
         if type(self.fight_phase_start_hook_registry) is not FightPhaseStartHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires FightPhaseStartHookRegistry.")
+        if type(self.shooting_phase_start_hook_registry) is not ShootingPhaseStartHookRegistry:
+            raise GameLifecycleError(
+                "RuntimeContentBundle requires ShootingPhaseStartHookRegistry."
+            )
         if type(self.unit_destroyed_hook_registry) is not UnitDestroyedHookRegistry:
             raise GameLifecycleError("RuntimeContentBundle requires UnitDestroyedHookRegistry.")
         if type(self.battle_shock_hook_registry) is not BattleShockHookRegistry:
@@ -1376,6 +1348,12 @@ class RuntimeContentBundle:
                 lambda contribution: contribution.fight_phase_start_hook_bindings,
             )
         )
+        shooting_phase_start_hook_registry = ShootingPhaseStartHookRegistry.from_bindings(
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.shooting_phase_start_hook_bindings,
+            )
+        )
         unit_destroyed_hook_registry = UnitDestroyedHookRegistry.from_bindings(
             _contribution_values(
                 validated_contributions,
@@ -1582,6 +1560,7 @@ class RuntimeContentBundle:
             turn_end_hook_registry=turn_end_hook_registry,
             command_phase_start_hook_registry=command_phase_start_hook_registry,
             fight_phase_start_hook_registry=fight_phase_start_hook_registry,
+            shooting_phase_start_hook_registry=shooting_phase_start_hook_registry,
             unit_destroyed_hook_registry=unit_destroyed_hook_registry,
             battle_shock_hook_registry=battle_shock_hook_registry,
             advance_eligibility_hook_registry=advance_eligibility_hook_registry,
@@ -1651,6 +1630,10 @@ class RuntimeContentBundle:
             ],
             "fight_phase_start_hook_ids": [
                 binding.hook_id for binding in self.fight_phase_start_hook_registry.all_bindings()
+            ],
+            "shooting_phase_start_hook_ids": [
+                binding.hook_id
+                for binding in self.shooting_phase_start_hook_registry.all_bindings()
             ],
             "unit_destroyed_hook_ids": [
                 binding.hook_id for binding in self.unit_destroyed_hook_registry.all_bindings()

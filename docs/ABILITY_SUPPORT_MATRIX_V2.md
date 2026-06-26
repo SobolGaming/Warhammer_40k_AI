@@ -352,6 +352,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:orks:army_rule:waaagh:weapon-profile` | Waaagh! |
 | `warhammer_40000_11th:space_marines:army_rule:oath_of_moment` | Oath Of Moment<br>Oath of Moment |
 | `warhammer_40000_11th:space_marines:army_rule:oath_of_moment:wound-roll` | Oath of Moment<br>Wound Roll |
+| `warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good:weapon-profile` | Weapon Profile |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne` | Blessings of Khorne |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration` | Blessings of Khorne - Rage-fuelled Invigoration |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage` | Blessings of Khorne - Total Carnage |
