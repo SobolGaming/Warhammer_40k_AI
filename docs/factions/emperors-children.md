@@ -8,7 +8,7 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_emperor_s_children-fffbpc3gn0
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 10 | 0 | 28 | 42 | 0 |
+| 10 | 0 | 28 | 42 | 1 |
 
 ## Detachment Rule Support
 

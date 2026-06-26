@@ -8,7 +8,7 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_daemons-kisvudjypt-uzk9
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 4 | 28 | 43 | 13 |
+| 9 | 4 | 28 | 43 | 14 |
 
 ## Detachment Rule Support
 

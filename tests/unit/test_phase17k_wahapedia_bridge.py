@@ -876,11 +876,11 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "[aeldari](factions/aeldari.md)" in generated_markdown
     assert "Faction-pack Stratagems" not in generated_markdown
     assert "Faction-pack Enhancements" not in generated_markdown
-    assert "| Aeldari | 15 | 2 | 51 | 75 | 15 | [aeldari](factions/aeldari.md) |" in (
+    assert "| Aeldari | 15 | 2 | 51 | 75 | 16 | [aeldari](factions/aeldari.md) |" in (
         generated_markdown
     )
     assert (
-        "| Chaos Daemons | 9 | 4 | 28 | 43 | 13 | [chaos-daemons](factions/chaos-daemons.md) |"
+        "| Chaos Daemons | 9 | 4 | 28 | 43 | 14 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
     assert (

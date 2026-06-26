@@ -113,7 +113,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `4a170ce4b8516d8b6fa56a77d56fd734a5d271e7cc3be91cba4b8054f9bd9ce9`
+  `79120d99e0c717bef7a718d0bd14727e98f60b6dfaf9295d6e8fa40f26401f14`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -152,15 +152,15 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `5197058bbde3aab21605528bfb245445205c39a19248a4198daf93171206fa09`
+  `c651d5f45ea57441331c31bf99b979a0f9f510b5b1a8a692b9bb0c5f26024822`
 - upstream Phase 17E checksum:
-  `4a170ce4b8516d8b6fa56a77d56fd734a5d271e7cc3be91cba4b8054f9bd9ce9`
+  `79120d99e0c717bef7a718d0bd14727e98f60b6dfaf9295d6e8fa40f26401f14`
 
 The package emits 2140 execution records, one for every Phase 17E coverage row:
-2083 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, and 29 rows are executable
-named-handler rows because they already have runtime consumers: 1 faction army
-rule plus 28 exact detachment, Enhancement, and Stratagem rows. The engine
+2072 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, and 40 rows are executable
+named-handler rows because they already have runtime consumers: 12 faction army
+rules plus 28 exact detachment, Enhancement, and Stratagem rows. The engine
 dispatcher can route every record and returns typed
 `unsupported` diagnostics unless a matching executor is registered. No Phase 17E
 row remains a missing handler, runtime no-op, raw-PDF parse, or silent fallback.
@@ -413,7 +413,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 12 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 44 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 66 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
@@ -423,7 +423,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 15 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 45 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 6 | `executable_named_handler` | `applied` | `none` |
@@ -435,7 +435,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
@@ -465,7 +465,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 12 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 54 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
@@ -495,7 +495,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 22 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 80 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 119 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
@@ -545,7 +545,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
@@ -555,7 +555,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 17 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 60 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 90 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
@@ -565,7 +565,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
@@ -575,7 +575,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 28 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 42 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
@@ -585,7 +585,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 28 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 42 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
@@ -615,7 +615,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 5 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 4 | `executable_named_handler` | `applied` | `none` |
 | Enhancements | 22 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |

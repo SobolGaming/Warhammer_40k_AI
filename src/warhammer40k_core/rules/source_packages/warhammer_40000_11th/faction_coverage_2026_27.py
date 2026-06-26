@@ -98,16 +98,106 @@ CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMER_IDS_BY_DETACHMENT_ID = {
     "daemonic-incursion": DAEMONIC_INCURSION_RUNTIME_CONSUMER_IDS,
     "shadow-legion": SHADOW_LEGION_RUNTIME_CONSUMER_IDS,
 }
+AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:aeldari:army_rule:fade_back",
+    "warhammer_40000_11th:aeldari:army_rule:flitting_shadows",
+    "warhammer_40000_11th:aeldari:army_rule:opportunity_seized",
+    "warhammer_40000_11th:aeldari:army_rule:star_engines",
+    "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
+    "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind",
+)
+CHAOS_DAEMONS_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",
+)
+CHAOS_SPACE_MARINES_DARK_PACTS_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed",
+    "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits",
+    "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1",
+    "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:mortal_wound_feel_no_pain",
+    "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:lethal_hits",
+    "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:sustained_hits_1",
+    "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier",
+)
+DEATH_GUARD_NURGLES_GIFT_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:death_guard:army_rule:nurgles_gift",
+    "warhammer_40000_11th:death_guard:army_rule:nurgles_gift:armour-save-option",
+    "warhammer_40000_11th:death_guard:army_rule:nurgles_gift:leadership",
+    "warhammer_40000_11th:death_guard:army_rule:nurgles_gift:melee-hit-roll",
+    "warhammer_40000_11th:death_guard:army_rule:nurgles_gift:movement-budget",
+    "warhammer_40000_11th:death_guard:army_rule:nurgles_gift:objective-control",
+    "warhammer_40000_11th:death_guard:army_rule:nurgles_gift:toughness",
+)
+DRUKHARI_POWER_FROM_PAIN_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:battle-shock-failed",
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:command-phase-start",
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:enemy-unit-destroyed",
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:hatred-eternal-fight",
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:hatred-eternal-shooting",
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:lithe-agility-advance",
+    "warhammer_40000_11th:drukhari:army_rule:power_from_pain:lithe-agility-charge",
+)
+EMPERORS_CHILDREN_THRILL_SEEKERS_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+    "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+    "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+    "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction",
+)
+GREY_KNIGHTS_GATE_OF_INFINITY_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity",
+)
 LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start",
     "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
     "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll",
 )
+NECRONS_REANIMATION_PROTOCOLS_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:necrons:army_rule:reanimation_protocols",
+)
+ORKS_WAAAGH_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:orks:army_rule:waaagh",
+    "warhammer_40000_11th:orks:army_rule:waaagh:advance-eligibility",
+    "warhammer_40000_11th:orks:army_rule:waaagh:invulnerable-save",
+    "warhammer_40000_11th:orks:army_rule:waaagh:weapon-profile",
+)
+SPACE_MARINES_OATH_OF_MOMENT_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:space_marines:army_rule:oath_of_moment",
+    "warhammer_40000_11th:space_marines:army_rule:oath_of_moment:wound-roll",
+)
+WORLD_EATERS_BLESSINGS_OF_KHORNE_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne",
+    "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration",
+    "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage",
+    "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:"
+    "unbridled_bloodlust:charge_roll",
+    "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords",
+)
 FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
+    "aeldari": "Battle Focus",
+    "chaos-daemons": "The Shadow of Chaos",
+    "chaos-space-marines": "Dark Pacts",
+    "death-guard": "Nurgle's Gift",
+    "drukhari": "Power from Pain",
+    "emperors-children": "Thrill Seekers",
+    "grey-knights": "Gate of Infinity",
     "leagues-of-votann": "Prioritised Efficiency",
+    "necrons": "Reanimation Protocols",
+    "orks": "Waaagh!",
+    "space-marines": "Oath of Moment",
+    "world-eaters": "Blessings of Khorne",
 }
 FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID = {
+    "aeldari": AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMER_IDS,
+    "chaos-daemons": CHAOS_DAEMONS_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_IDS,
+    "chaos-space-marines": CHAOS_SPACE_MARINES_DARK_PACTS_RUNTIME_CONSUMER_IDS,
+    "death-guard": DEATH_GUARD_NURGLES_GIFT_RUNTIME_CONSUMER_IDS,
+    "drukhari": DRUKHARI_POWER_FROM_PAIN_RUNTIME_CONSUMER_IDS,
+    "emperors-children": EMPERORS_CHILDREN_THRILL_SEEKERS_RUNTIME_CONSUMER_IDS,
+    "grey-knights": GREY_KNIGHTS_GATE_OF_INFINITY_RUNTIME_CONSUMER_IDS,
     "leagues-of-votann": LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMER_IDS,
+    "necrons": NECRONS_REANIMATION_PROTOCOLS_RUNTIME_CONSUMER_IDS,
+    "orks": ORKS_WAAAGH_RUNTIME_CONSUMER_IDS,
+    "space-marines": SPACE_MARINES_OATH_OF_MOMENT_RUNTIME_CONSUMER_IDS,
+    "world-eaters": WORLD_EATERS_BLESSINGS_OF_KHORNE_RUNTIME_CONSUMER_IDS,
 }
 
 

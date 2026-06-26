@@ -25,7 +25,7 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 
 CONTRIBUTION_ID = "warhammer_40000_11th:space_marines:army_rule:oath_of_moment"
 HOOK_ID = "warhammer_40000_11th:space_marines:army_rule:oath_of_moment"
-SOURCE_RULE_ID = "phase17g:space-marines:army-rule"
+SOURCE_RULE_ID = "phase17f:phase17e:space-marines:army-rule"
 SPACE_MARINES_FACTION_ID = "space-marines"
 ADEPTUS_ASTARTES_KEYWORD = "ADEPTUS ASTARTES"
 OATH_OF_MOMENT_EFFECT_KIND = "space_marines_oath_of_moment_target"

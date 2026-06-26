@@ -8,7 +8,7 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_orks-agh9kwrtno-0xarrl5fjj.pd
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 12 | 0 | 44 | 66 | 0 |
+| 12 | 0 | 44 | 66 | 1 |
 
 ## Detachment Rule Support
 
