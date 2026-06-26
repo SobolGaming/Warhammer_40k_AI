@@ -19,6 +19,12 @@ from warhammer40k_core.engine.timing_windows import (
 )
 
 CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID = "core:movement-keyword-gate"
+CORE_DEEP_STRIKE_HANDLER_ID = "core:deep-strike"
+CORE_FIRING_DECK_HANDLER_ID = "core:firing-deck"
+CORE_INFILTRATORS_HANDLER_ID = "core:infiltrators"
+CORE_LEADER_HANDLER_ID = "core:leader"
+CORE_SCOUTS_HANDLER_ID = "core:scouts"
+CORE_SUPPORT_HANDLER_ID = "core:support"
 CORE_HAZARDOUS_HANDLER_ID = "core:hazardous"
 CORE_DEADLY_DEMISE_HANDLER_ID = "core:deadly-demise"
 CORE_FEEL_NO_PAIN_HANDLER_ID = "core:feel-no-pain"
@@ -803,6 +809,39 @@ def default_ability_handler_registry() -> AbilityHandlerRegistry:
             handler_id=CORE_MOVEMENT_KEYWORD_GATE_HANDLER_ID,
             timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
             handler=_movement_keyword_gate_handler,
+        )
+        .with_handler(
+            handler_id=CORE_DEEP_STRIKE_HANDLER_ID,
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.BEFORE_BATTLE),
+            handler=_source_registered_keyword_handler,
+        )
+        .with_handler(
+            handler_id=CORE_FIRING_DECK_HANDLER_ID,
+            timing=AbilityTimingDescriptor(
+                trigger_kind=TimingTriggerKind.START_PHASE,
+                phase=BattlePhaseKind.SHOOTING,
+            ),
+            handler=_source_registered_keyword_handler,
+        )
+        .with_handler(
+            handler_id=CORE_INFILTRATORS_HANDLER_ID,
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.BEFORE_BATTLE),
+            handler=_source_registered_keyword_handler,
+        )
+        .with_handler(
+            handler_id=CORE_LEADER_HANDLER_ID,
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.BEFORE_BATTLE),
+            handler=_source_registered_keyword_handler,
+        )
+        .with_handler(
+            handler_id=CORE_SCOUTS_HANDLER_ID,
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.BEFORE_BATTLE),
+            handler=_source_registered_keyword_handler,
+        )
+        .with_handler(
+            handler_id=CORE_SUPPORT_HANDLER_ID,
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.BEFORE_BATTLE),
+            handler=_source_registered_keyword_handler,
         )
         .with_handler(
             handler_id=CORE_HAZARDOUS_HANDLER_ID,

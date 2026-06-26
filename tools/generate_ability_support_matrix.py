@@ -1511,18 +1511,34 @@ def _structured_support_sections_markdown() -> list[str]:
         _support_section_markdown(
             "Core Keyword Abilities",
             (
-                "Core keyword ability rows are still primarily surfaced through source-backed "
-                "category rows above. This table records the current section ownership without "
-                "claiming complete generated source coverage for every Core Rules keyword."
+                "Core keyword ability rows are source-backed through either semantic runtime "
+                "handlers or phase-owned hosts that consume structured datasheet descriptors and "
+                "canonical keywords."
             ),
             (
                 SupportSectionRow(
                     "Deep Strike",
                     "Reserve declaration and placement hosts",
-                    "Adapter contract and architecture",
-                    "Focused reserve/deployment tests",
+                    "Adapter contract, source-row registry, and architecture",
+                    "Focused reserve, deployment, source-row, and replay tests",
                     "Full",
-                    "Current generated rows are `engine_consumed`.",
+                    (
+                        "The source row resolves through a phase-host handler while Reserve "
+                        "declaration and setup placement consume the shared Deep Strike "
+                        "datasheet/keyword classifier."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Infiltrators",
+                    "Deployment placement validation and enemy-distance gates",
+                    "Adapter contract, source-row registry, and generated matrix",
+                    "Focused keyword and descriptor-backed deployment tests",
+                    "Full",
+                    (
+                        "Allows deployment outside the owning zone only when every attached "
+                        "component has Infiltrators, then enforces more-than-8-inch enemy unit "
+                        "and enemy deployment-zone distance gates."
+                    ),
                 ),
                 SupportSectionRow(
                     "Scouts X",
@@ -1536,6 +1552,43 @@ def _structured_support_sections_markdown() -> list[str]:
                     (
                         "Consumes structured Scouts descriptors for distance selection; "
                         "a SCOUTS keyword without a descriptor fails fast."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Firing Deck X",
+                    "Transport Shooting declaration and attack-pool source binding",
+                    "Adapter contract, source-row registry, and generated matrix",
+                    "Focused Transport resolver, Shooting declaration, and replay tests",
+                    "Full",
+                    (
+                        "Consumes structured Firing Deck values, exposes eligible embarked "
+                        "non-One-Shot ranged weapons, binds each contribution to source "
+                        "unit/model evidence, and marks selected embarked units ineligible to "
+                        "shoot."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Leader",
+                    "Muster-time attached-unit formation as leader components",
+                    "Architecture, source-row registry, and adapter deployment contract",
+                    "Focused mustering, attached rules-unit, deployment, and fight tests",
+                    "Full",
+                    (
+                        "Consumes structured Leader declarations during army mustering, forms "
+                        "first-class attached rules units, and preserves leader model ownership "
+                        "through group-aware battlefield operations."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Support",
+                    "Muster-time attached-unit formation as support components",
+                    "Architecture, source-row registry, and adapter deployment contract",
+                    "Focused mustering, attached rules-unit, deployment, and transport tests",
+                    "Full",
+                    (
+                        "Consumes structured Support declarations separately from Leader, "
+                        "requires support units to attach legally, and preserves support model "
+                        "ownership through attached rules-unit APIs."
                     ),
                 ),
                 SupportSectionRow(
@@ -1598,14 +1651,6 @@ def _structured_support_sections_markdown() -> list[str]:
                         "or canonical keywords and consumes them through the shared activation "
                         "ordering state."
                     ),
-                ),
-                SupportSectionRow(
-                    "Other Core Rules keyword abilities",
-                    "Mixed phase-owned hosts or explicit unsupported descriptors",
-                    "Architecture and source-row unsupported audits",
-                    "Coverage varies by keyword",
-                    "Partial",
-                    "Keep expanded per-keyword rows separate from wargear keyword abilities.",
                 ),
             ),
         )

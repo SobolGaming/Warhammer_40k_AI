@@ -58,19 +58,12 @@ def test_phase14i_core_stratagem_source_cutover_is_complete() -> None:
     assert [row.stratagem_id for row in rows if row.handler_id.startswith("unsupported:")] == []
 
 
-def test_phase14i_unsupported_core_ability_contract_is_explicit() -> None:
+def test_phase14i_core_ability_source_rows_have_no_unsupported_handlers() -> None:
     unsupported_rows = tuple(
         row for row in ability_rows() if row.handler_id.startswith("unsupported:")
     )
 
-    assert tuple((row.ability_id, row.handler_id) for row in unsupported_rows) == (
-        ("core-deep-strike", "unsupported:phase-15b:deep-strike"),
-        ("core-firing-deck", "unsupported:phase-13d:firing-deck"),
-        ("core-infiltrators", "unsupported:phase-15b:infiltrators"),
-        ("core-leader", "unsupported:phase-15c:leader"),
-        ("core-scouts", "unsupported:phase-15b:scouts"),
-        ("core-support", "unsupported:phase-15c:support"),
-    )
+    assert tuple((row.ability_id, row.handler_id) for row in unsupported_rows) == ()
 
 
 def test_phase14i_docs_mark_complete_without_overclaiming_ability_runtime() -> None:
