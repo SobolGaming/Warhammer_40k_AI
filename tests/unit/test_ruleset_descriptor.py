@@ -121,6 +121,7 @@ def test_eleventh_migration_baseline_has_explicit_policy_data() -> None:
     assert descriptor.engagement_policy.vertical_inches == 5.0
     assert terrain_visibility_policy.hidden_supported
     assert terrain_visibility_policy.hidden_detection_range_inches == 15.0
+    assert terrain_visibility_policy.hidden_gone_to_ground_detection_penalty_inches == 3.0
     assert terrain_visibility_policy.hidden_requires_keywords == ("BEAST", "INFANTRY", "SWARM")
     assert terrain_visibility_policy.hidden_requires_terrain_area_occupancy
     assert terrain_visibility_policy.hidden_lost_after_shooting

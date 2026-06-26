@@ -153,6 +153,7 @@ from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
     GameStatePayload,
+    RangedAttackHistoryRecord,
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
@@ -222,6 +223,7 @@ from warhammer40k_core.engine.shooting_targets import (
     PLUNGING_FIRE_RULE_ID,
     STEALTH_RULE_ID,
     ShootingTargetViolationCode,
+    shooting_target_candidate_for_model,
     shooting_target_candidates_for_unit,
     shooting_target_violation_code_from_token,
     unit_has_line_of_sight_to_target,
@@ -14427,6 +14429,92 @@ def test_target_range_visibility_and_lone_operative_gates_are_explicit() -> None
     assert close_candidates[0].shooting_types == (ShootingType.NORMAL,)
 
 
+def test_gone_to_ground_reduces_hidden_detection_range_in_solid_terrain() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    attacker = units["intercessor-1"]
+    target = units["enemy"]
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(Pose.at(25.5 + (index * 1.4), 35.0) for index in range(5)),
+    )
+    solid_woods = _dense_solid_woods()
+    profile = _first_weapon_profile(lifecycle, attacker)
+
+    gone_to_ground_candidate = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_profile=profile,
+        target_unit_id=target.unit_instance_id,
+        terrain_features=(solid_woods,),
+        hidden_target_unit_ids=(target.unit_instance_id,),
+    )
+    recent_shot_candidate = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_profile=profile,
+        target_unit_id=target.unit_instance_id,
+        terrain_features=(solid_woods,),
+        hidden_target_unit_ids=(target.unit_instance_id,),
+        target_unit_ids_with_recent_ranged_attacks=(target.unit_instance_id,),
+    )
+
+    assert gone_to_ground_candidate.violation_code is (
+        ShootingTargetViolationCode.OUTSIDE_DETECTION_RANGE
+    )
+    assert gone_to_ground_candidate.message == (
+        "Hidden target is outside the attacker's effective detection range."
+    )
+    assert recent_shot_candidate.is_legal
+    assert recent_shot_candidate.line_of_sight_witness is not None
+    assert not recent_shot_candidate.line_of_sight_witness.unit_fully_visible
+
+
+def test_ranged_attack_history_tracks_current_and_previous_player_turns() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    unit_id = units["intercessor-1"].unit_instance_id
+    state.record_ranged_attack_history(
+        RangedAttackHistoryRecord(
+            player_id="player-a",
+            unit_instance_id=unit_id,
+            battle_round=1,
+            active_player_id="player-a",
+            phase=BattlePhase.SHOOTING,
+            request_id="phase13b-ranged-history-request",
+            result_id="phase13b-ranged-history-result",
+        )
+    )
+
+    assert state.unit_made_ranged_attacks_current_or_previous_turn(unit_instance_id=unit_id)
+
+    state.active_player_id = "player-b"
+    restored_state = GameState.from_payload(
+        cast(GameStatePayload, json.loads(json.dumps(state.to_payload(), sort_keys=True)))
+    )
+    assert restored_state.unit_made_ranged_attacks_current_or_previous_turn(
+        unit_instance_id=unit_id
+    )
+
+    restored_state.battle_round = 2
+    restored_state.active_player_id = "player-a"
+    assert not restored_state.unit_made_ranged_attacks_current_or_previous_turn(
+        unit_instance_id=unit_id
+    )
+
+
 def test_phase13d_lone_operative_within_twelve_is_visible_even_with_closer_enemy() -> None:
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
@@ -17632,6 +17720,23 @@ def _display_geometry(
         width_inches=width_inches,
         depth_inches=depth_inches,
         display_template_id="test_axis_aligned_terrain",
+    )
+
+
+def _dense_solid_woods() -> TerrainFeatureDefinition:
+    return TerrainFeatureDefinition(
+        feature_id="phase13b-dense-solid-woods",
+        feature_kind=TerrainFeatureKind.WOODS,
+        footprint_center_x_inches=29.5,
+        footprint_center_y_inches=35.0,
+        footprint_width_inches=12.0,
+        footprint_depth_inches=6.0,
+        display_geometry=_display_geometry(
+            center_x_inches=29.5,
+            center_y_inches=35.0,
+            width_inches=12.0,
+            depth_inches=6.0,
+        ),
     )
 
 

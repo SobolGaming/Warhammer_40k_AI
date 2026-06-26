@@ -233,6 +233,7 @@ class TerrainMovementPolicyPayload(TypedDict):
 class TerrainVisibilityPolicyDescriptorPayload(TypedDict):
     hidden_supported: bool
     hidden_detection_range_inches: float | None
+    hidden_gone_to_ground_detection_penalty_inches: float
     hidden_requires_keywords: list[str]
     hidden_requires_terrain_area_occupancy: bool
     hidden_lost_after_shooting: bool
@@ -1300,6 +1301,7 @@ class TerrainFeatureVisibilityPolicy:
 class TerrainVisibilityPolicyDescriptor:
     hidden_supported: bool
     hidden_detection_range_inches: float | None
+    hidden_gone_to_ground_detection_penalty_inches: float = 0.0
     hidden_requires_keywords: tuple[str, ...] = ()
     hidden_requires_terrain_area_occupancy: bool = False
     hidden_lost_after_shooting: bool = False
@@ -1320,6 +1322,14 @@ class TerrainVisibilityPolicyDescriptor:
             _validate_optional_positive_number(
                 "TerrainVisibilityPolicyDescriptor hidden_detection_range_inches",
                 self.hidden_detection_range_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "hidden_gone_to_ground_detection_penalty_inches",
+            _validate_non_negative_number(
+                "TerrainVisibilityPolicyDescriptor hidden_gone_to_ground_detection_penalty_inches",
+                self.hidden_gone_to_ground_detection_penalty_inches,
             ),
         )
         object.__setattr__(
@@ -1369,6 +1379,9 @@ class TerrainVisibilityPolicyDescriptor:
         return {
             "hidden_supported": self.hidden_supported,
             "hidden_detection_range_inches": self.hidden_detection_range_inches,
+            "hidden_gone_to_ground_detection_penalty_inches": (
+                self.hidden_gone_to_ground_detection_penalty_inches
+            ),
             "hidden_requires_keywords": list(self.hidden_requires_keywords),
             "hidden_requires_terrain_area_occupancy": (self.hidden_requires_terrain_area_occupancy),
             "hidden_lost_after_shooting": self.hidden_lost_after_shooting,
@@ -1382,6 +1395,9 @@ class TerrainVisibilityPolicyDescriptor:
         return cls(
             hidden_supported=payload["hidden_supported"],
             hidden_detection_range_inches=payload["hidden_detection_range_inches"],
+            hidden_gone_to_ground_detection_penalty_inches=payload[
+                "hidden_gone_to_ground_detection_penalty_inches"
+            ],
             hidden_requires_keywords=tuple(payload["hidden_requires_keywords"]),
             hidden_requires_terrain_area_occupancy=payload[
                 "hidden_requires_terrain_area_occupancy"
@@ -1913,6 +1929,7 @@ class RulesetDescriptor:
             terrain_visibility_policy=TerrainVisibilityPolicyDescriptor(
                 hidden_supported=True,
                 hidden_detection_range_inches=15.0,
+                hidden_gone_to_ground_detection_penalty_inches=3.0,
                 hidden_requires_keywords=("BEAST", "INFANTRY", "SWARM"),
                 hidden_requires_terrain_area_occupancy=True,
                 hidden_lost_after_shooting=True,

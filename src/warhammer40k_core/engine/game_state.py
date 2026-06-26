@@ -252,6 +252,16 @@ class OneShotWeaponUseRecordPayload(TypedDict):
     selection_id: str
 
 
+class RangedAttackHistoryRecordPayload(TypedDict):
+    player_id: str
+    unit_instance_id: str
+    battle_round: int
+    active_player_id: str
+    phase: str
+    request_id: str
+    result_id: str
+
+
 class GameStatePayload(TypedDict):
     game_id: str
     ruleset_descriptor_hash: str
@@ -286,6 +296,7 @@ class GameStatePayload(TypedDict):
     feel_no_pain_decline_allowed_model_ids: list[str]
     destruction_reaction_sources_by_model_id: dict[str, list[DestructionReactionSourcePayload]]
     one_shot_weapon_use_records: list[OneShotWeaponUseRecordPayload]
+    ranged_attack_history_records: list[RangedAttackHistoryRecordPayload]
     reserve_states: list[ReserveStatePayload]
     hover_mode_states: list[HoverModeStatePayload]
     transport_cargo_states: list[TransportCargoStatePayload]
@@ -609,6 +620,10 @@ def _new_destruction_reaction_sources_by_model_id() -> dict[
 
 
 def _new_one_shot_weapon_use_records() -> list[OneShotWeaponUseRecord]:
+    return []
+
+
+def _new_ranged_attack_history_records() -> list[RangedAttackHistoryRecord]:
     return []
 
 
@@ -1024,6 +1039,83 @@ class OneShotWeaponUseRecord:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class RangedAttackHistoryRecord:
+    player_id: str
+    unit_instance_id: str
+    battle_round: int
+    active_player_id: str
+    phase: BattlePhase
+    request_id: str
+    result_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier("RangedAttackHistoryRecord player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier(
+                "RangedAttackHistoryRecord unit_instance_id",
+                self.unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "battle_round",
+            _validate_positive_int("RangedAttackHistoryRecord battle_round", self.battle_round),
+        )
+        object.__setattr__(
+            self,
+            "active_player_id",
+            _validate_identifier(
+                "RangedAttackHistoryRecord active_player_id",
+                self.active_player_id,
+            ),
+        )
+        object.__setattr__(self, "phase", battle_phase_kind_from_token(self.phase))
+        object.__setattr__(
+            self,
+            "request_id",
+            _validate_identifier("RangedAttackHistoryRecord request_id", self.request_id),
+        )
+        object.__setattr__(
+            self,
+            "result_id",
+            _validate_identifier("RangedAttackHistoryRecord result_id", self.result_id),
+        )
+
+    @property
+    def turn_key(self) -> tuple[int, str]:
+        return (self.battle_round, self.active_player_id)
+
+    def to_payload(self) -> RangedAttackHistoryRecordPayload:
+        return {
+            "player_id": self.player_id,
+            "unit_instance_id": self.unit_instance_id,
+            "battle_round": self.battle_round,
+            "active_player_id": self.active_player_id,
+            "phase": self.phase.value,
+            "request_id": self.request_id,
+            "result_id": self.result_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: RangedAttackHistoryRecordPayload) -> Self:
+        return cls(
+            player_id=payload["player_id"],
+            unit_instance_id=payload["unit_instance_id"],
+            battle_round=payload["battle_round"],
+            active_player_id=payload["active_player_id"],
+            phase=battle_phase_kind_from_token(payload["phase"]),
+            request_id=payload["request_id"],
+            result_id=payload["result_id"],
+        )
+
+
 @dataclass(slots=True)
 class GameState:
     game_id: str
@@ -1079,6 +1171,9 @@ class GameState:
     ] = field(default_factory=_new_destruction_reaction_sources_by_model_id)
     one_shot_weapon_use_records: list[OneShotWeaponUseRecord] = field(
         default_factory=_new_one_shot_weapon_use_records
+    )
+    ranged_attack_history_records: list[RangedAttackHistoryRecord] = field(
+        default_factory=_new_ranged_attack_history_records
     )
     reserve_states: list[ReserveState] = field(default_factory=_new_reserve_states)
     hover_mode_states: list[HoverModeState] = field(default_factory=_new_hover_mode_states)
@@ -1269,6 +1364,12 @@ class GameState:
         self.one_shot_weapon_use_records = _validate_one_shot_weapon_use_records(
             self.one_shot_weapon_use_records,
             army_definitions=self.army_definitions,
+        )
+        self.ranged_attack_history_records = _validate_ranged_attack_history_records(
+            self.ranged_attack_history_records,
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+            player_ids=self.player_ids,
         )
         self.reserve_states = _validate_reserve_states(
             self.reserve_states,
@@ -1622,6 +1723,56 @@ class GameState:
             army_definitions=self.army_definitions,
         )
         return record
+
+    def record_ranged_attack_history(self, record: RangedAttackHistoryRecord) -> None:
+        if type(record) is not RangedAttackHistoryRecord:
+            raise GameLifecycleError(
+                "GameState ranged attack history requires RangedAttackHistoryRecord."
+            )
+        self.ranged_attack_history_records = _validate_ranged_attack_history_records(
+            [*self.ranged_attack_history_records, record],
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+            player_ids=self.player_ids,
+        )
+
+    def unit_made_ranged_attacks_current_or_previous_turn(
+        self,
+        *,
+        unit_instance_id: str,
+    ) -> bool:
+        requested_unit_id = _validate_identifier(
+            "Ranged attack history unit_instance_id",
+            unit_instance_id,
+        )
+        known_unit_ids = _known_rules_unit_ids(
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+        )
+        if known_unit_ids and requested_unit_id not in known_unit_ids:
+            raise GameLifecycleError("Ranged attack history unit_instance_id is unknown.")
+        relevant_turn_keys = set(self._current_and_previous_player_turn_keys())
+        if not relevant_turn_keys:
+            return False
+        return any(
+            record.unit_instance_id == requested_unit_id and record.turn_key in relevant_turn_keys
+            for record in self.ranged_attack_history_records
+        )
+
+    def _current_and_previous_player_turn_keys(self) -> tuple[tuple[int, str], ...]:
+        if self.active_player_id is None:
+            return ()
+        if self.battle_round < 1:
+            return ()
+        current_key = (self.battle_round, self.active_player_id)
+        active_index = self.turn_order.index(self.active_player_id)
+        if active_index > 0:
+            previous_key = (self.battle_round, self.turn_order[active_index - 1])
+            return (current_key, previous_key)
+        previous_round = self.battle_round - 1
+        if previous_round < 1:
+            return (current_key,)
+        return (current_key, (previous_round, self.turn_order[-1]))
 
     def record_model_destruction_reaction_sources(
         self,
@@ -4159,6 +4310,9 @@ class GameState:
             "one_shot_weapon_use_records": [
                 record.to_payload() for record in self.one_shot_weapon_use_records
             ],
+            "ranged_attack_history_records": [
+                record.to_payload() for record in self.ranged_attack_history_records
+            ],
             "reserve_states": [state.to_payload() for state in self.reserve_states],
             "hover_mode_states": [state.to_payload() for state in self.hover_mode_states],
             "transport_cargo_states": [state.to_payload() for state in self.transport_cargo_states],
@@ -4459,6 +4613,10 @@ class GameState:
             one_shot_weapon_use_records=[
                 OneShotWeaponUseRecord.from_payload(record)
                 for record in payload["one_shot_weapon_use_records"]
+            ],
+            ranged_attack_history_records=[
+                RangedAttackHistoryRecord.from_payload(record)
+                for record in payload["ranged_attack_history_records"]
             ],
             reserve_states=[
                 ReserveState.from_payload(state) for state in payload["reserve_states"]
@@ -5296,6 +5454,60 @@ def _validate_one_shot_weapon_use_records(
         seen.add(value.weapon_key)
         records.append(value)
     return sorted(records, key=lambda record: record.weapon_key)
+
+
+def _validate_ranged_attack_history_records(
+    values: object,
+    *,
+    army_definitions: list[ArmyDefinition],
+    starting_strength_records: list[StartingStrengthRecord],
+    player_ids: tuple[str, ...],
+) -> list[RangedAttackHistoryRecord]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState ranged attack history records must be a list.")
+    known_unit_ids = _known_rules_unit_ids(
+        army_definitions=army_definitions,
+        starting_strength_records=starting_strength_records,
+    )
+    owner_ids_by_unit_id = _known_rules_unit_owner_ids(
+        army_definitions=army_definitions,
+        starting_strength_records=starting_strength_records,
+    )
+    records: list[RangedAttackHistoryRecord] = []
+    seen_result_ids: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not RangedAttackHistoryRecord:
+            raise GameLifecycleError(
+                "GameState ranged attack history records must contain "
+                "RangedAttackHistoryRecord values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("RangedAttackHistoryRecord player_id is not in this game.")
+        if value.active_player_id not in player_ids:
+            raise GameLifecycleError(
+                "RangedAttackHistoryRecord active_player_id is not in this game."
+            )
+        if known_unit_ids and value.unit_instance_id not in known_unit_ids:
+            raise GameLifecycleError("RangedAttackHistoryRecord unit_instance_id is unknown.")
+        owner_id = owner_ids_by_unit_id.get(value.unit_instance_id)
+        if owner_id is not None and value.player_id != owner_id:
+            raise GameLifecycleError(
+                "RangedAttackHistoryRecord player_id must control unit_instance_id."
+            )
+        if value.result_id in seen_result_ids:
+            raise GameLifecycleError("RangedAttackHistoryRecord result_id must be unique.")
+        seen_result_ids.add(value.result_id)
+        records.append(value)
+    return sorted(
+        records,
+        key=lambda record: (
+            record.battle_round,
+            record.active_player_id,
+            record.player_id,
+            record.unit_instance_id,
+            record.result_id,
+        ),
+    )
 
 
 def _validate_feel_no_pain_decline_allowed_model_ids(
@@ -6568,6 +6780,19 @@ def _known_rules_unit_ids(
     return {unit.unit_instance_id for army in army_definitions for unit in army.units} | {
         record.unit_instance_id for record in starting_strength_records
     }
+
+
+def _known_rules_unit_owner_ids(
+    *,
+    army_definitions: list[ArmyDefinition],
+    starting_strength_records: list[StartingStrengthRecord],
+) -> dict[str, str]:
+    owner_ids = {
+        unit.unit_instance_id: army.player_id for army in army_definitions for unit in army.units
+    }
+    for record in starting_strength_records:
+        owner_ids[record.unit_instance_id] = record.player_id
+    return owner_ids
 
 
 def _physical_unit_ids(army_definitions: list[ArmyDefinition]) -> set[str]:

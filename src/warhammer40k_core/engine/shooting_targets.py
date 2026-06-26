@@ -7,7 +7,12 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
-from warhammer40k_core.core.ruleset_descriptor import CoverEffect, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    CoverEffect,
+    LineOfSightPolicy,
+    RulesetDescriptor,
+    TerrainFeatureKind,
+)
 from warhammer40k_core.core.weapon_profiles import (
     RangeProfileKind,
     WeaponKeyword,
@@ -36,6 +41,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     has_weapon_keyword,
     hunter_target_allowed,
 )
+from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.visibility import (
@@ -349,6 +355,7 @@ def shooting_target_candidates_for_unit(
     target_unit_ids: tuple[str, ...],
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     hidden_target_unit_ids: tuple[str, ...] = (),
+    target_unit_ids_with_recent_ranged_attacks: tuple[str, ...] = (),
     target_detection_range_bonus_inches_by_unit_id: Mapping[str, int] | None = None,
 ) -> tuple[ShootingTargetCandidate, ...]:
     _validate_target_query_inputs(
@@ -360,6 +367,10 @@ def shooting_target_candidates_for_unit(
         terrain_features=terrain_features,
     )
     hidden_target_ids = _validate_identifier_tuple("hidden_target_unit_ids", hidden_target_unit_ids)
+    recent_ranged_attack_target_ids = _validate_identifier_tuple(
+        "target_unit_ids_with_recent_ranged_attacks",
+        target_unit_ids_with_recent_ranged_attacks,
+    )
     detection_range_bonus_by_unit_id = _validate_detection_range_bonus_mapping(
         target_detection_range_bonus_inches_by_unit_id
     )
@@ -377,6 +388,7 @@ def shooting_target_candidates_for_unit(
             target_unit_id=target_unit_id,
             terrain_features=terrain_features,
             hidden_target_unit_ids=hidden_target_ids,
+            target_unit_ids_with_recent_ranged_attacks=recent_ranged_attack_target_ids,
             target_detection_range_bonus_inches=(
                 detection_range_bonus_by_unit_id.get(target_unit_id, 0)
             ),
@@ -395,6 +407,7 @@ def shooting_target_candidate_for_model(
     target_unit_id: str,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     hidden_target_unit_ids: tuple[str, ...] = (),
+    target_unit_ids_with_recent_ranged_attacks: tuple[str, ...] = (),
     target_detection_range_bonus_inches: int = 0,
 ) -> ShootingTargetCandidate:
     _validate_target_query_inputs(
@@ -406,6 +419,10 @@ def shooting_target_candidate_for_model(
         terrain_features=terrain_features,
     )
     hidden_target_ids = _validate_identifier_tuple("hidden_target_unit_ids", hidden_target_unit_ids)
+    recent_ranged_attack_target_ids = _validate_identifier_tuple(
+        "target_unit_ids_with_recent_ranged_attacks",
+        target_unit_ids_with_recent_ranged_attacks,
+    )
     return _target_candidate(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
@@ -418,6 +435,7 @@ def shooting_target_candidate_for_model(
         target_unit_id=target_unit_id,
         terrain_features=terrain_features,
         hidden_target_unit_ids=hidden_target_ids,
+        target_unit_ids_with_recent_ranged_attacks=recent_ranged_attack_target_ids,
         target_detection_range_bonus_inches=_validate_non_negative_int(
             "target_detection_range_bonus_inches",
             target_detection_range_bonus_inches,
@@ -545,6 +563,7 @@ def _target_candidate(
     target_unit_id: str,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     hidden_target_unit_ids: tuple[str, ...],
+    target_unit_ids_with_recent_ranged_attacks: tuple[str, ...],
     target_detection_range_bonus_inches: int,
 ) -> ShootingTargetCandidate:
     target_rules_unit = rules_unit_view_from_armies(
@@ -631,11 +650,17 @@ def _target_candidate(
             visibility_cache_key=visibility_cache_key,
         )
     detection_validation = _hidden_target_detection_validation(
+        scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
+        attacker_unit=attacker_unit,
         attacker_models=attacker_models,
+        target_rules_unit=target_rules_unit,
         target_models=target_models,
         target_unit_id=target_unit_id,
+        visibility_cache_key=visibility_cache_key,
+        terrain_features=terrain_features,
         hidden_target_unit_ids=hidden_target_unit_ids,
+        target_unit_ids_with_recent_ranged_attacks=target_unit_ids_with_recent_ranged_attacks,
         target_detection_range_bonus_inches=target_detection_range_bonus_inches,
     )
     if detection_validation is not None:
@@ -1039,11 +1064,17 @@ def _target_in_range_model_ids(
 
 def _hidden_target_detection_validation(
     *,
+    scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
+    attacker_unit: UnitInstance,
     attacker_models: tuple[Model, ...],
+    target_rules_unit: RulesUnitView,
     target_models: tuple[Model, ...],
     target_unit_id: str,
+    visibility_cache_key: str,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
     hidden_target_unit_ids: tuple[str, ...],
+    target_unit_ids_with_recent_ranged_attacks: tuple[str, ...],
     target_detection_range_bonus_inches: int,
 ) -> str | None:
     if target_unit_id not in hidden_target_unit_ids:
@@ -1054,15 +1085,153 @@ def _hidden_target_detection_validation(
     hidden_detection_range = visibility_policy.hidden_detection_range_inches
     if hidden_detection_range is None:
         raise GameLifecycleError("Hidden target state requires a detection range.")
-    effective_detection_range = hidden_detection_range + float(target_detection_range_bonus_inches)
-    target_within_detection_ids = _target_in_range_model_ids(
+    target_within_detection = _target_within_effective_hidden_detection_range(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        attacker_unit=attacker_unit,
         attacker_models=attacker_models,
+        target_rules_unit=target_rules_unit,
         target_models=target_models,
-        range_inches=effective_detection_range,
+        visibility_cache_key=visibility_cache_key,
+        terrain_features=terrain_features,
+        hidden_detection_range_inches=hidden_detection_range,
+        target_detection_range_bonus_inches=target_detection_range_bonus_inches,
+        target_made_recent_ranged_attacks=(
+            target_unit_id in target_unit_ids_with_recent_ranged_attacks
+        ),
     )
-    if target_within_detection_ids:
+    if target_within_detection:
         return None
     return "Hidden target is outside the attacker's effective detection range."
+
+
+def _target_within_effective_hidden_detection_range(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    attacker_unit: UnitInstance,
+    attacker_models: tuple[Model, ...],
+    target_rules_unit: RulesUnitView,
+    target_models: tuple[Model, ...],
+    visibility_cache_key: str,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+    hidden_detection_range_inches: float,
+    target_detection_range_bonus_inches: int,
+    target_made_recent_ranged_attacks: bool,
+) -> bool:
+    visibility_policy = ruleset_descriptor.terrain_visibility_policy
+    base_detection_range = hidden_detection_range_inches + float(
+        target_detection_range_bonus_inches
+    )
+    blocker_models = _shooting_dynamic_model_blockers(
+        scenario=scenario,
+        observing_unit_id=attacker_unit.unit_instance_id,
+        target_unit_id=target_rules_unit.unit_instance_id,
+    )
+    for attacker_model in attacker_models:
+        for target_model in target_models:
+            effective_detection_range = base_detection_range
+            if (
+                not target_made_recent_ranged_attacks
+                and visibility_policy.hidden_gone_to_ground_detection_penalty_inches > 0.0
+                and _target_model_has_gone_to_ground_against_attacker(
+                    ruleset_descriptor=ruleset_descriptor,
+                    attacker_unit=attacker_unit,
+                    attacker_model=attacker_model,
+                    target_rules_unit=target_rules_unit,
+                    target_model=target_model,
+                    visibility_cache_key=visibility_cache_key,
+                    terrain_features=terrain_features,
+                    dynamic_model_blockers=blocker_models,
+                )
+            ):
+                effective_detection_range -= (
+                    visibility_policy.hidden_gone_to_ground_detection_penalty_inches
+                )
+            if attacker_model.range_to(target_model) <= max(0.0, effective_detection_range):
+                return True
+    return False
+
+
+def _target_model_has_gone_to_ground_against_attacker(
+    *,
+    ruleset_descriptor: RulesetDescriptor,
+    attacker_unit: UnitInstance,
+    attacker_model: Model,
+    target_rules_unit: RulesUnitView,
+    target_model: Model,
+    visibility_cache_key: str,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+    dynamic_model_blockers: tuple[Model, ...],
+) -> bool:
+    if not _model_within_solid_terrain_feature(
+        ruleset_descriptor=ruleset_descriptor,
+        model=target_model,
+        terrain_features=terrain_features,
+    ):
+        return False
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=ruleset_descriptor,
+        los_cache_key=visibility_cache_key,
+        observer_model=attacker_model,
+        target_models=(target_model,),
+        terrain_features=terrain_features,
+        dynamic_model_blockers=dynamic_model_blockers,
+        observer_keywords=attacker_unit.keywords,
+        target_keywords=target_rules_unit.keywords,
+    )
+    witness = context.resolve_line_of_sight()
+    if witness.unit_fully_visible:
+        return False
+    return any(
+        record.blocks_full_visibility
+        and record.terrain_feature_kind is not None
+        and _terrain_feature_kind_is_solid(
+            ruleset_descriptor=ruleset_descriptor,
+            feature_kind=record.terrain_feature_kind,
+        )
+        for record in witness.all_blocker_records()
+    )
+
+
+def _model_within_solid_terrain_feature(
+    *,
+    ruleset_descriptor: RulesetDescriptor,
+    model: Model,
+    terrain_features: tuple[TerrainFeatureDefinition, ...],
+) -> bool:
+    for feature in terrain_features:
+        if not _terrain_feature_kind_is_solid(
+            ruleset_descriptor=ruleset_descriptor,
+            feature_kind=feature.feature_kind,
+        ):
+            continue
+        if _model_footprint_intersects_feature(model=model, feature=feature):
+            return True
+    return False
+
+
+def _terrain_feature_kind_is_solid(
+    *,
+    ruleset_descriptor: RulesetDescriptor,
+    feature_kind: TerrainFeatureKind,
+) -> bool:
+    policy = ruleset_descriptor.terrain_visibility_policy.policy_for_feature_kind(
+        feature_kind,
+    )
+    return policy.line_of_sight_policy is LineOfSightPolicy.DENSE_COVER
+
+
+def _model_footprint_intersects_feature(
+    *,
+    model: Model,
+    feature: TerrainFeatureDefinition,
+) -> bool:
+    return shapely_backend.base_footprint_intersects_bounds(
+        model.base,
+        model.pose,
+        feature.bounds(),
+    )
 
 
 def _plunging_fire_applies(
