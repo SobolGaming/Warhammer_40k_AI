@@ -200,8 +200,12 @@ Current status:
   modifiers. Orks Waaagh! supports optional once-per-battle Command phase
   activation, active-effect expiry at the next own Command phase, Advance-then-
   Charge eligibility, melee Strength/Attacks modifiers, and a 5+ invulnerable
-  save through shared runtime hooks. Broad datasheet, wargear, weapon, and
-  remaining faction execution remains later Phase 17 work.
+  save through shared runtime hooks. Chaos Knights Harbingers of Dread supports
+  battle-round Dread selections/rolls, Deathly Terror/Despair Leadership auras,
+  Dismay forced below-starting Battle-shock tests, Delirium D3 mortal wounds,
+  Doom wound modifiers, and the Darkness Stealth hit modifier through shared
+  runtime hooks. Broad datasheet, wargear, weapon, and remaining faction
+  execution remains later Phase 17 work.
 - Matched-play mustering supports Incursion, Strike Force, and Onslaught battle
   sizes, including the Drukhari `Corsairs and Travelling Players` ally rule for
   HARLEQUINS and ANHRATHE units.

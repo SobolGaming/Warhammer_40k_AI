@@ -389,6 +389,29 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread",
+    "ability_name": "Harbingers of Dread",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/chaos-knights/faction/warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread/none",
+    "datasheet_id": "chaos-knights",
+    "datasheet_name": "Chaos Knights",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread",
+      "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:battle-shock",
+      "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:darkness:hit-roll",
+      "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:doom:wound-roll",
+      "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:leadership"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.harbingers_of_dread"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command",
     "ability_name": "Voice of Command",
     "catalog_id": "runtime-content-warhammer-40000-11th",

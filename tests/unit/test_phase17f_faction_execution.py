@@ -122,6 +122,7 @@ SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "astra-militarum": "Voice of Command",
     "black-templars": "Templar Vows",
     "chaos-daemons": "The Shadow of Chaos",
+    "chaos-knights": "Harbingers of Dread",
     "chaos-space-marines": "Dark Pacts",
     "death-guard": "Nurgle's Gift",
     "drukhari": "Power from Pain",

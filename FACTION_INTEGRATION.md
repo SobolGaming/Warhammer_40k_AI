@@ -113,7 +113,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `865f242c558f6b983338afc9a39bf75e57ccebd6e17b772b5663c17992c9e895`
+  `fee8e5476c2ab224949d749a5c79ac8af1cd3f61a36f774f0d9143a70ef1e58a`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -152,14 +152,14 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `bc68899e3023d9b21851989ac10dda92e011443a1beead336e5b2f153af48037`
+  `de5c1a1ec2c1aa4cd5cdb7fb8688ab609d873f0a2889b6fe0ecb9f19a5ea0f18`
 - upstream Phase 17E checksum:
-  `865f242c558f6b983338afc9a39bf75e57ccebd6e17b772b5663c17992c9e895`
+  `fee8e5476c2ab224949d749a5c79ac8af1cd3f61a36f774f0d9143a70ef1e58a`
 
 The package emits 2140 execution records, one for every Phase 17E coverage row:
-2069 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, and 43 rows are executable
-named-handler rows because they already have runtime consumers: 15 faction army
+2068 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, and 44 rows are executable
+named-handler rows because they already have runtime consumers: 16 faction army
 rules plus 28 exact detachment, Enhancement, and Stratagem rows. The engine
 dispatcher can route every record and returns typed
 `unsupported` diagnostics unless a matching executor is registered. No Phase 17E
@@ -605,7 +605,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 26 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
@@ -957,6 +957,11 @@ Initial letters are defined in the pilot phase.
 - Detachment letters: Bastions of Tyranny, Hunting Warpack, Iconoclast Fiefdom,
   Helhunt Lance, Houndpack Lance, Infernal Lance, Lords of Dread, Traitoris
   Lance.
+- Army rule runtime support: Harbingers of Dread Dread selections/rolls,
+  Deathly Terror/Despair Leadership auras, Dismay forced Battle-shock,
+  Delirium D3 mortal wounds, Doom wound modifiers, and Darkness Stealth hit
+  modifiers. Detachment rules, enhancements, and Stratagems remain
+  source-covered scaffold rows until their named handlers are implemented.
 
 ### Phase Chaos Daemons
 

@@ -439,6 +439,43 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread",
+        "ability_name": "Harbingers of Dread",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/chaos-knights/faction/warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread/none",
+        "datasheet_id": "chaos-knights",
+        "datasheet_name": "Chaos Knights",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Harbingers of Dread"
+    ],
+    "category_id": "faction.army_rule.harbingers_of_dread",
+    "category_name": "Faction Army Rule Harbingers Of Dread",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/chaos-knights/faction/warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread/none"
+    ],
+    "datasheet_names": [
+      "Chaos Knights"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread",
+      "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:battle-shock",
+      "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:darkness:hit-roll",
+      "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:doom:wound-roll",
+      "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:leadership"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "warhammer_40000_11th:space_marines:army_rule:oath_of_moment",
         "ability_name": "Oath of Moment",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/space-marines/faction/warhammer_40000_11th:space_marines:army_rule:oath_of_moment/none",
