@@ -664,6 +664,14 @@ already engine-consumed named handlers.
 | Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
+Runtime note: Phase 17G also implements Imperial Knights Bondsman as a
+source-backed Command phase handler under
+`phase17g:imperial-knights:bondsman`. It uses structured datasheet ability
+descriptors tagged or named `Bondsman`, emits the shared
+`select_faction_rule_command_phase_start_option` decision, validates a friendly
+ARMIGER model within 12" that is not already affected, and records a
+model-scoped persisting effect until the start of that player's next turn.
+
 ### Adeptus Custodes Execution Status
 
 | Covered item family | Rows | Execution status | Engine result | Source block |

@@ -20,6 +20,7 @@ from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationRequestContext,
     BattleFormationResultContext,
 )
+from warhammer40k_core.engine.command_phase_start_hooks import CommandPhaseStartHookBinding
 from warhammer40k_core.engine.command_points import (
     CommandPointGainStatus,
     CommandPointSourceKind,
@@ -71,6 +72,55 @@ from warhammer40k_core.engine.unit_destroyed_hooks import (
     UnitDestroyedHookBinding,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+
+from .bondsman import (
+    ARMIGER_KEYWORD as ARMIGER_KEYWORD,
+)
+from .bondsman import (
+    BONDSMAN_ABILITY_NAME as BONDSMAN_ABILITY_NAME,
+)
+from .bondsman import (
+    BONDSMAN_APPLIED_EVENT as BONDSMAN_APPLIED_EVENT,
+)
+from .bondsman import (
+    BONDSMAN_APPLIED_STATE_KIND as BONDSMAN_APPLIED_STATE_KIND,
+)
+from .bondsman import (
+    BONDSMAN_DONE_EVENT as BONDSMAN_DONE_EVENT,
+)
+from .bondsman import (
+    BONDSMAN_DONE_OPTION_ID as BONDSMAN_DONE_OPTION_ID,
+)
+from .bondsman import (
+    BONDSMAN_DONE_STATE_KIND as BONDSMAN_DONE_STATE_KIND,
+)
+from .bondsman import (
+    BONDSMAN_EFFECT_KIND as BONDSMAN_EFFECT_KIND,
+)
+from .bondsman import (
+    BONDSMAN_HOOK_ID as BONDSMAN_HOOK_ID,
+)
+from .bondsman import (
+    BONDSMAN_RANGE_INCHES as BONDSMAN_RANGE_INCHES,
+)
+from .bondsman import (
+    BONDSMAN_SELECTION_KIND as BONDSMAN_SELECTION_KIND,
+)
+from .bondsman import (
+    BONDSMAN_SOURCE_RULE_ID as BONDSMAN_SOURCE_RULE_ID,
+)
+from .bondsman import (
+    active_bondsman_ability_id_for_model as active_bondsman_ability_id_for_model,
+)
+from .bondsman import (
+    apply_bondsman_result as apply_bondsman_result,
+)
+from .bondsman import (
+    bondsman_request as bondsman_request,
+)
+from .bondsman import (
+    model_is_affected_by_bondsman as model_is_affected_by_bondsman,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -172,6 +222,14 @@ def runtime_contribution() -> RuntimeContentContribution:
                 source_id=SOURCE_RULE_ID,
                 request_handler=code_chivalric_oath_request,
                 result_handler=apply_code_chivalric_oath_result,
+            ),
+        ),
+        command_phase_start_hook_bindings=(
+            CommandPhaseStartHookBinding(
+                hook_id=BONDSMAN_HOOK_ID,
+                source_id=BONDSMAN_SOURCE_RULE_ID,
+                request_handler=bondsman_request,
+                result_handler=apply_bondsman_result,
             ),
         ),
         unit_destroyed_hook_bindings=(

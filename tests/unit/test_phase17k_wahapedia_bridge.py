@@ -918,6 +918,13 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Full |"
     ) in generated_markdown
     assert (
+        "| Imperial Knights - Bondsman | "
+        "Named Command phase handler plus model-scoped persisting-effect host | "
+        "Adapter contract, decision catalog, generated matrix, and runtime inventory | "
+        "Focused command-phase selection, range, Armiger, drift, and expiry tests | "
+        "Full |"
+    ) in generated_markdown
+    assert (
         "| Imperial Knights - Freeblades | Shared mustering/list-validation host | "
         "Generated matrix and mustering tests | Focused mustering tests | Full |"
     ) in generated_markdown
@@ -981,6 +988,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert (
         f"| `{imperial_knights_army_rule.SETUP_HOOK_ID}` | Code Chivalric - Oath Selection |"
     ) in generated_markdown
+    assert f"| `{imperial_knights_army_rule.BONDSMAN_HOOK_ID}` | Bondsman |" in (generated_markdown)
     assert (
         f"| `{imperial_knights_army_rule.END_BATTLE_ROUND_SUBSCRIPTION_ID}` | Code Chivalric |"
     ) in generated_markdown
@@ -1056,6 +1064,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         for row in rows_by_name["Code Chivalric"]
     )
     assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Bondsman"]
+    )
+    assert all(
         row.runtime_consumer_ids
         == ("warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",)
         for row in rows_by_name["The Shadow of Chaos"]
@@ -1076,6 +1088,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert tuple(row.datasheet_name for row in rows_by_name["Code Chivalric"]) == (
         "Imperial Knights",
     )
+    assert tuple(row.datasheet_name for row in rows_by_name["Bondsman"]) == ("Imperial Knights",)
     assert set(rows_by_name["Dark Pacts"][0].runtime_consumer_ids) == {
         chaos_space_marines_army_rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID,
         chaos_space_marines_army_rule.FIGHT_LETHAL_HITS_HOOK_ID,
@@ -1126,10 +1139,16 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         f"{imperial_knights_army_rule.HOOK_ID}:legacy:objective-control",
         f"{imperial_knights_army_rule.HOOK_ID}:legacy:leadership",
     }
+    assert rows_by_name["Bondsman"][0].runtime_consumer_ids == (
+        imperial_knights_army_rule.BONDSMAN_HOOK_ID,
+    )
     assert categories_by_name["Faction Army Rule Prioritised Efficiency"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
     )
     assert categories_by_name["Faction Army Rule Code Chivalric"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["Faction Army Rule Bondsman"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
     )
     assert categories_by_name["Leadership Characteristic"].ability_names == ("Daemonic Icon",)

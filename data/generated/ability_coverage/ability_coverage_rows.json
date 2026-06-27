@@ -441,6 +441,25 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "warhammer_40000_11th:imperial_knights:army_rule:bondsman",
+    "ability_name": "Bondsman",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/imperial-knights/faction/warhammer_40000_11th:imperial_knights:army_rule:bondsman/none",
+    "datasheet_id": "imperial-knights",
+    "datasheet_name": "Imperial Knights",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:imperial_knights:army_rule:bondsman"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.bondsman"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command",
     "ability_name": "Voice of Command",
     "catalog_id": "runtime-content-warhammer-40000-11th",

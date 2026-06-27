@@ -332,6 +332,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     "phase17f:phase17e:drukhari:army-rule": "Power from Pain",
     "phase17f:phase17e:emperors-children:army-rule": "Thrill Seekers",
     "phase17f:phase17e:imperial-knights:army-rule": "Code Chivalric",
+    imperial_knights_army_rule.BONDSMAN_SOURCE_RULE_ID: "Bondsman",
     "phase17f:phase17e:leagues-of-votann:army-rule": "Prioritised Efficiency",
     "phase17g:space-marines:army-rule": "Oath of Moment",
     "phase17f:phase17e:tau-empire:army-rule": "For the Greater Good",
@@ -389,6 +390,7 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     imperial_knights_army_rule.END_BATTLE_ROUND_EVENT_HANDLER_ID: "Code Chivalric",
     imperial_knights_army_rule.END_TURN_SUBSCRIPTION_ID: "Code Chivalric",
     imperial_knights_army_rule.END_BATTLE_ROUND_SUBSCRIPTION_ID: "Code Chivalric",
+    imperial_knights_army_rule.BONDSMAN_HOOK_ID: "Bondsman",
     f"{imperial_knights_army_rule.HOOK_ID}:martial-valour:shooting": (
         "Code Chivalric - Martial Valour"
     ),
@@ -634,7 +636,14 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             ability_id=imperial_knights_army_rule.HOOK_ID,
             ability_name=imperial_knights_army_rule.CODE_CHIVALRIC_ABILITY_NAME,
             semantic_category="faction.army_rule.code_chivalric",
-            runtime_consumer_ids=_imperial_knights_runtime_consumer_ids(),
+            runtime_consumer_ids=_imperial_knights_code_chivalric_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
+            faction_id=imperial_knights_army_rule.IMPERIAL_KNIGHTS_FACTION_ID,
+            ability_id=imperial_knights_army_rule.BONDSMAN_HOOK_ID,
+            ability_name=imperial_knights_army_rule.BONDSMAN_ABILITY_NAME,
+            semantic_category="faction.army_rule.bondsman",
+            runtime_consumer_ids=_imperial_knights_bondsman_runtime_consumer_ids(),
         ),
         _implemented_faction_army_rule_row(
             faction_id=astra_militarum_army_rule.ASTRA_MILITARUM_FACTION_ID,
@@ -847,7 +856,7 @@ def _chaos_knights_runtime_consumer_ids() -> tuple[str, ...]:
     )
 
 
-def _imperial_knights_runtime_consumer_ids() -> tuple[str, ...]:
+def _imperial_knights_code_chivalric_runtime_consumer_ids() -> tuple[str, ...]:
     contribution = imperial_knights_army_rule.runtime_contribution()
     return tuple(
         sorted(
@@ -872,6 +881,17 @@ def _imperial_knights_runtime_consumer_ids() -> tuple[str, ...]:
                     for binding in contribution.unit_characteristic_modifier_bindings
                 ),
             }
+        )
+    )
+
+
+def _imperial_knights_bondsman_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = imperial_knights_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            binding.hook_id
+            for binding in contribution.command_phase_start_hook_bindings
+            if binding.source_id == imperial_knights_army_rule.BONDSMAN_SOURCE_RULE_ID
         )
     )
 
@@ -2167,6 +2187,20 @@ def _structured_support_sections_markdown() -> list[str]:
                         "Reap a Great Tally battle-round check, Honoured CP rewards, Martial "
                         "Valour rerolls, Eager movement and charge modifiers, and Legacy OC "
                         "and Leadership modifiers."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Imperial Knights - Bondsman",
+                    "Named Command phase handler plus model-scoped persisting-effect host",
+                    "Adapter contract, decision catalog, generated matrix, and runtime inventory",
+                    "Focused command-phase selection, range, Armiger, drift, and expiry tests",
+                    "Full",
+                    (
+                        "Implements the Bondsman command-phase source/target selection rule: "
+                        "each eligible Bondsman-tagged Imperial Knights model selects one "
+                        "friendly ARMIGER model within 12 inches that is not already affected; "
+                        "the selected named Bondsman ability is recorded as a model-scoped "
+                        "persisting effect until the start of that player's next turn."
                     ),
                 ),
                 SupportSectionRow(

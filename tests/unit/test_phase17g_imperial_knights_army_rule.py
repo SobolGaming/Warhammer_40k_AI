@@ -10,16 +10,27 @@ from tests.unit.test_phase11c_command_phase import (
     _battle_state,  # pyright: ignore[reportPrivateUsage]
     _battle_state_with_center_objective_positions,  # pyright: ignore[reportPrivateUsage]
     _config,  # pyright: ignore[reportPrivateUsage]
+    _default_unit_selection,  # pyright: ignore[reportPrivateUsage]
     _setup_state_at_declare_battle_formations,  # pyright: ignore[reportPrivateUsage]
     _unit_by_id,  # pyright: ignore[reportPrivateUsage]
 )
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_formation_hooks import (
     SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
     BattleFormationRequestContext,
     BattleFormationResultContext,
+)
+from warhammer40k_core.engine.command_phase_start_hooks import (
+    SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
+    CommandPhaseStartRequestContext,
+    CommandPhaseStartResultContext,
 )
 from warhammer40k_core.engine.command_points import (
     CommandPointGainResult,
@@ -32,7 +43,7 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.effects import PersistingEffect
+from warhammer40k_core.engine.effects import EffectExpirationBoundary, PersistingEffect
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEvent,
@@ -64,8 +75,11 @@ from warhammer40k_core.engine.source_backed_rerolls import (
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.geometry.pose import Pose
 
 IMPERIAL_KNIGHTS_UNIT_ID = "army-alpha:intercessor-unit-1"
+BONDSMAN_ARMIGER_UNIT_ID = "army-alpha:intercessor-unit-2"
+BONDSMAN_TEST_ABILITY_ID = "phase17g-imperial-knights-paladins-duty"
 ENEMY_UNIT_ID = "army-beta:intercessor-unit-3"
 
 
@@ -161,6 +175,221 @@ def test_code_chivalric_random_oath_rolls_engine_dice_and_rewards_three_cp() -> 
     assert payload["quality_roll"] is not None
     assert payload["random_selection"] is True
     assert payload["command_point_reward_amount"] == 3
+
+
+def test_bondsman_command_phase_application_records_model_effect_until_next_own_turn() -> None:
+    state = _bondsman_battle_state()
+    decisions = DecisionController()
+    request = army_rule.bondsman_request(
+        CommandPhaseStartRequestContext(
+            state=state,
+            decisions=decisions,
+            active_player_id="player-a",
+        )
+    )
+
+    assert request is not None
+    assert request.decision_type == SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE
+    assert request.actor_id == "player-a"
+    option = _bondsman_apply_option(request)
+    option_payload = _json_object(option.payload)
+    target_model_id = _json_string(option_payload, "target_armiger_model_instance_id")
+    result = DecisionResult.for_request(
+        result_id="phase17g-imperial-knights-bondsman-application-result",
+        request=request,
+        selected_option_id=option.option_id,
+    )
+
+    handled = army_rule.apply_bondsman_result(
+        CommandPhaseStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+            active_player_id="player-a",
+        )
+    )
+
+    assert handled is True
+    assert army_rule.model_is_affected_by_bondsman(
+        state,
+        model_instance_id=target_model_id,
+    )
+    assert (
+        army_rule.active_bondsman_ability_id_for_model(
+            state,
+            model_instance_id=target_model_id,
+        )
+        == BONDSMAN_TEST_ABILITY_ID
+    )
+    bondsman_states = state.faction_rule_states_for_player(
+        player_id="player-a",
+        state_kind=army_rule.BONDSMAN_APPLIED_STATE_KIND,
+    )
+    assert len(bondsman_states) == 1
+    bondsman_effects = tuple(
+        effect
+        for effect in state.persisting_effects
+        if effect.source_rule_id == army_rule.BONDSMAN_SOURCE_RULE_ID
+    )
+    assert len(bondsman_effects) == 1
+    effect_payload = _json_object(bondsman_effects[0].effect_payload)
+    assert effect_payload["target_armiger_model_instance_id"] == target_model_id
+    assert effect_payload["bondsman_ability_id"] == BONDSMAN_TEST_ABILITY_ID
+    assert effect_payload["expires_at_battle_round"] == state.battle_round + 1
+    assert _event_records_of_type(decisions, army_rule.BONDSMAN_APPLIED_EVENT)
+    restored = GameState.from_payload(
+        cast(GameStatePayload, json.loads(json.dumps(state.to_payload())))
+    )
+    assert restored.to_payload() == state.to_payload()
+
+    next_request = army_rule.bondsman_request(
+        CommandPhaseStartRequestContext(
+            state=state,
+            decisions=decisions,
+            active_player_id="player-a",
+        )
+    )
+
+    assert next_request is not None
+    assert all(
+        _json_object(candidate.payload).get("target_armiger_model_instance_id") != target_model_id
+        for candidate in next_request.options
+        if candidate.option_id != army_rule.BONDSMAN_DONE_OPTION_ID
+    )
+    expired = state.expire_persisting_effects_at_boundary(
+        EffectExpirationBoundary.turn_start(
+            battle_round=state.battle_round + 1,
+            player_id="player-a",
+        )
+    )
+    assert expired == bondsman_effects
+    assert not army_rule.model_is_affected_by_bondsman(
+        state,
+        model_instance_id=target_model_id,
+    )
+
+
+def test_bondsman_done_option_suppresses_only_current_command_phase() -> None:
+    state = _bondsman_battle_state()
+    decisions = DecisionController()
+    request = army_rule.bondsman_request(
+        CommandPhaseStartRequestContext(
+            state=state,
+            decisions=decisions,
+            active_player_id="player-a",
+        )
+    )
+    assert request is not None
+    result = DecisionResult.for_request(
+        result_id="phase17g-imperial-knights-bondsman-done-result",
+        request=request,
+        selected_option_id=army_rule.BONDSMAN_DONE_OPTION_ID,
+    )
+
+    handled = army_rule.apply_bondsman_result(
+        CommandPhaseStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+            active_player_id="player-a",
+        )
+    )
+
+    assert handled is True
+    assert not state.persisting_effects
+    assert _event_records_of_type(decisions, army_rule.BONDSMAN_DONE_EVENT)
+    assert (
+        army_rule.bondsman_request(
+            CommandPhaseStartRequestContext(
+                state=state,
+                decisions=decisions,
+                active_player_id="player-a",
+            )
+        )
+        is None
+    )
+    state.battle_round += 1
+    assert (
+        army_rule.bondsman_request(
+            CommandPhaseStartRequestContext(
+                state=state,
+                decisions=decisions,
+                active_player_id="player-a",
+            )
+        )
+        is not None
+    )
+
+
+def test_bondsman_requires_friendly_armiger_target_within_twelve_inches() -> None:
+    decisions = DecisionController()
+    without_armiger = _bondsman_battle_state(target_is_armiger=False)
+    assert (
+        army_rule.bondsman_request(
+            CommandPhaseStartRequestContext(
+                state=without_armiger,
+                decisions=decisions,
+                active_player_id="player-a",
+            )
+        )
+        is None
+    )
+
+    out_of_range = _bondsman_battle_state(target_is_armiger=True, target_x=40.0)
+    assert (
+        army_rule.bondsman_request(
+            CommandPhaseStartRequestContext(
+                state=out_of_range,
+                decisions=decisions,
+                active_player_id="player-a",
+            )
+        )
+        is None
+    )
+
+
+def test_bondsman_rejects_drifted_selection_before_mutation() -> None:
+    state = _bondsman_battle_state()
+    decisions = DecisionController()
+    request = army_rule.bondsman_request(
+        CommandPhaseStartRequestContext(
+            state=state,
+            decisions=decisions,
+            active_player_id="player-a",
+        )
+    )
+    assert request is not None
+    option = _bondsman_apply_option(request)
+    result = DecisionResult.for_request(
+        result_id="phase17g-imperial-knights-bondsman-drift-result",
+        request=request,
+        selected_option_id=option.option_id,
+    )
+    _place_unit_line(
+        state,
+        unit_instance_id=BONDSMAN_ARMIGER_UNIT_ID,
+        start_x=40.0,
+        y=10.0,
+    )
+
+    with pytest.raises(GameLifecycleError, match="Bondsman selection is no longer eligible"):
+        army_rule.apply_bondsman_result(
+            CommandPhaseStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+                active_player_id="player-a",
+            )
+        )
+
+    assert not state.persisting_effects
+    assert not state.faction_rule_states_for_player(
+        player_id="player-a",
+        state_kind=army_rule.BONDSMAN_APPLIED_STATE_KIND,
+    )
 
 
 def test_code_chivalric_lay_low_honours_army_from_destroyed_character_model() -> None:
@@ -1099,6 +1328,10 @@ def test_code_chivalric_public_handlers_fail_fast_for_wrong_context_types() -> N
         army_rule.apply_code_chivalric_oath_result(
             cast(BattleFormationResultContext, invalid_object)
         )
+    with pytest.raises(GameLifecycleError, match="Bondsman requires request context"):
+        army_rule.bondsman_request(cast(CommandPhaseStartRequestContext, invalid_object))
+    with pytest.raises(GameLifecycleError, match="Bondsman requires result context"):
+        army_rule.apply_bondsman_result(cast(CommandPhaseStartResultContext, invalid_object))
     with pytest.raises(GameLifecycleError, match="unit-destroyed hook"):
         army_rule.record_code_chivalric_enemy_unit_destroyed(
             cast(UnitDestroyedContext, invalid_object)
@@ -1341,6 +1574,27 @@ def _random_oath_option(request: DecisionRequest) -> DecisionOption:
     raise AssertionError("missing random Code Chivalric oath option")
 
 
+def _bondsman_apply_option(request: DecisionRequest) -> DecisionOption:
+    for option in request.options:
+        payload = _json_object(option.payload)
+        if payload.get("selected_bondsman_option") == "apply":
+            return option
+    raise AssertionError("missing Bondsman application option")
+
+
+def _json_object(value: JsonValue) -> dict[str, JsonValue]:
+    if not isinstance(value, dict):
+        pytest.fail("expected JSON object")
+    return value
+
+
+def _json_string(payload: dict[str, JsonValue], key: str) -> str:
+    value = payload.get(key)
+    if type(value) is not str:
+        raise AssertionError(f"expected JSON string at {key}")
+    return value
+
+
 def _mark_player_as_imperial_knights(state: GameState, *, player_id: str) -> None:
     updated_armies: list[ArmyDefinition] = []
     for army in state.army_definitions:
@@ -1362,6 +1616,109 @@ def _mark_player_as_imperial_knights(state: GameState, *, player_id: str) -> Non
             )
         )
     state.army_definitions = updated_armies
+
+
+def _bondsman_battle_state(
+    *,
+    target_is_armiger: bool = True,
+    target_x: float = 16.0,
+) -> GameState:
+    state = _battle_state(
+        player_a_units=(
+            _default_unit_selection("intercessor-unit-1"),
+            _default_unit_selection("intercessor-unit-2"),
+        ),
+    )
+    _mark_player_as_imperial_knights(state, player_id="player-a")
+    _mark_bondsman_source_and_armiger_target(state, target_is_armiger=target_is_armiger)
+    _place_unit_line(
+        state,
+        unit_instance_id=IMPERIAL_KNIGHTS_UNIT_ID,
+        start_x=10.0,
+        y=10.0,
+    )
+    _place_unit_line(
+        state,
+        unit_instance_id=BONDSMAN_ARMIGER_UNIT_ID,
+        start_x=target_x,
+        y=10.0,
+    )
+    _set_current_phase(state, BattlePhase.COMMAND, active_player_id="player-a")
+    return state
+
+
+def _bondsman_ability() -> DatasheetAbilityDescriptor:
+    return DatasheetAbilityDescriptor(
+        ability_id=BONDSMAN_TEST_ABILITY_ID,
+        name="Paladin's Duty (Bondsman)",
+        source_id="phase17g:imperial-knights:paladins-duty",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description=(
+            "While a model is affected by this ability, weapons equipped by that model "
+            "have the LETHAL HITS ability, and melee weapons equipped by that model "
+            "have the LANCE ability."
+        ),
+    )
+
+
+def _mark_bondsman_source_and_armiger_target(
+    state: GameState,
+    *,
+    target_is_armiger: bool,
+) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != "player-a":
+            updated_armies.append(army)
+            continue
+        updated_units: list[UnitInstance] = []
+        for unit in army.units:
+            datasheet_abilities = unit.datasheet_abilities
+            keywords = unit.keywords
+            if unit.unit_instance_id == IMPERIAL_KNIGHTS_UNIT_ID:
+                datasheet_abilities = (*unit.datasheet_abilities, _bondsman_ability())
+            if unit.unit_instance_id == BONDSMAN_ARMIGER_UNIT_ID and target_is_armiger:
+                keywords = _with_unique_keyword(unit.keywords, army_rule.ARMIGER_KEYWORD)
+            updated_units.append(
+                replace(
+                    unit,
+                    keywords=keywords,
+                    datasheet_abilities=datasheet_abilities,
+                )
+            )
+        updated_armies.append(replace(army, units=tuple(updated_units)))
+    state.army_definitions = updated_armies
+
+
+def _place_unit_line(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    start_x: float,
+    y: float,
+) -> None:
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
+    unit_placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)
+    placements = tuple(
+        placement.with_pose(
+            Pose.at(
+                start_x + float(index),
+                y,
+                placement.pose.position.z,
+                facing_degrees=placement.pose.facing.degrees,
+            )
+        )
+        for index, placement in enumerate(unit_placement.model_placements)
+    )
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        unit_placement.with_model_placements(placements)
+    )
+
+
+def _with_unique_keyword(keywords: tuple[str, ...], keyword: str) -> tuple[str, ...]:
+    return tuple(sorted({*keywords, keyword}))
 
 
 def _mark_enemy_unit_as_character(state: GameState, *, player_id: str) -> None:
