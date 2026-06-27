@@ -179,6 +179,19 @@ EMPERORS_CHILDREN_THRILL_SEEKERS_RUNTIME_CONSUMERS = (
 GREY_KNIGHTS_GATE_OF_INFINITY_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity",
 )
+IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:charge-roll",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:movement-budget",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:enemy-unit-destroyed",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-battle-round",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-turn",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:leadership",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:objective-control",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:martial-valour:fight",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:martial-valour:shooting",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:oath-selection",
+)
 LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start",
     "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
@@ -230,6 +243,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "drukhari": "Power from Pain",
     "emperors-children": "Thrill Seekers",
     "grey-knights": "Gate of Infinity",
+    "imperial-knights": "Code Chivalric",
     "leagues-of-votann": "Prioritised Efficiency",
     "necrons": "Reanimation Protocols",
     "orks": "Waaagh!",
@@ -248,6 +262,7 @@ FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID = {
     "drukhari": DRUKHARI_POWER_FROM_PAIN_RUNTIME_CONSUMERS,
     "emperors-children": EMPERORS_CHILDREN_THRILL_SEEKERS_RUNTIME_CONSUMERS,
     "grey-knights": GREY_KNIGHTS_GATE_OF_INFINITY_RUNTIME_CONSUMERS,
+    "imperial-knights": IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS,
     "leagues-of-votann": LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS,
     "necrons": NECRONS_REANIMATION_PROTOCOLS_RUNTIME_CONSUMERS,
     "orks": ORKS_WAAAGH_RUNTIME_CONSUMERS,
@@ -796,6 +811,35 @@ def test_phase17e_tau_empire_army_rule_is_engine_consumed() -> None:
     assert (
         faction_coverage_source.FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID["tau-empire"]
         == TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMERS
+    )
+
+
+def test_phase17e_imperial_knights_army_rule_is_engine_consumed() -> None:
+    coverage_row = next(
+        row
+        for row in faction_coverage_source.coverage_rows()
+        if row.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and row.faction_id == "imperial-knights"
+    )
+
+    assert coverage_row.descriptor_id == "phase17e:imperial-knights:army-rule"
+    assert coverage_row.rule_name == "Code Chivalric"
+    assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+    assert coverage_row.runtime_support_status is not None
+    assert coverage_row.runtime_support_status.value == "engine_consumed"
+    assert coverage_row.runtime_consumer_ids == tuple(
+        sorted(IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS)
+    )
+    assert coverage_row.handler_id == IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS[0]
+    assert (
+        faction_coverage_source.FACTION_ARMY_RULE_NAMES_BY_FACTION_ID["imperial-knights"]
+        == "Code Chivalric"
+    )
+    assert (
+        faction_coverage_source.FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID[
+            "imperial-knights"
+        ]
+        == IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS
     )
 
 

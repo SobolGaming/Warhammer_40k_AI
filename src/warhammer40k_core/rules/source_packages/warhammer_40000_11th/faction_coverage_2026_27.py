@@ -161,6 +161,19 @@ EMPERORS_CHILDREN_THRILL_SEEKERS_RUNTIME_CONSUMER_IDS = (
 GREY_KNIGHTS_GATE_OF_INFINITY_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity",
 )
+IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:charge-roll",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:movement-budget",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:enemy-unit-destroyed",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-battle-round",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-turn",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:leadership",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:objective-control",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:martial-valour:fight",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:martial-valour:shooting",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:oath-selection",
+)
 LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start",
     "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
@@ -212,6 +225,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "drukhari": "Power from Pain",
     "emperors-children": "Thrill Seekers",
     "grey-knights": "Gate of Infinity",
+    "imperial-knights": "Code Chivalric",
     "leagues-of-votann": "Prioritised Efficiency",
     "necrons": "Reanimation Protocols",
     "orks": "Waaagh!",
@@ -230,6 +244,7 @@ FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID = {
     "drukhari": DRUKHARI_POWER_FROM_PAIN_RUNTIME_CONSUMER_IDS,
     "emperors-children": EMPERORS_CHILDREN_THRILL_SEEKERS_RUNTIME_CONSUMER_IDS,
     "grey-knights": GREY_KNIGHTS_GATE_OF_INFINITY_RUNTIME_CONSUMER_IDS,
+    "imperial-knights": IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMER_IDS,
     "leagues-of-votann": LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMER_IDS,
     "necrons": NECRONS_REANIMATION_PROTOCOLS_RUNTIME_CONSUMER_IDS,
     "orks": ORKS_WAAAGH_RUNTIME_CONSUMER_IDS,

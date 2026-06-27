@@ -412,6 +412,35 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric",
+    "ability_name": "Code Chivalric",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/imperial-knights/faction/warhammer_40000_11th:imperial_knights:army_rule:code_chivalric/none",
+    "datasheet_id": "imperial-knights",
+    "datasheet_name": "Imperial Knights",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:charge-roll",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:movement-budget",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-battle-round",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-turn",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:enemy-unit-destroyed",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:leadership",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:objective-control",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:martial-valour:fight",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:martial-valour:shooting",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:oath-selection"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.code_chivalric"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command",
     "ability_name": "Voice of Command",
     "catalog_id": "runtime-content-warhammer-40000-11th",
