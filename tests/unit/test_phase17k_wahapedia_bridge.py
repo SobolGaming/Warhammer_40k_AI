@@ -898,6 +898,12 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert necrons_reanimation_row_prefix in generated_markdown
     assert (
+        "| Chaos Knights - Harbingers of Dread | Named army-rule handler | "
+        "Adapter contract, decision catalog, source coverage, and generated matrix | "
+        "Focused Dread selection, forced Battle-shock, mortal-wound, runtime-modifier, "
+        "source ID, and fail-fast tests | Full |"
+    ) in generated_markdown
+    assert (
         "| Scouts X | Pre-battle Scout Move, Scout reserve setup, and Dedicated "
         "Transport Scout Move hosts | Adapter contract and decision catalog | "
         "Focused pre-battle, setup smoke, and enhancement-grant tests | Full | "

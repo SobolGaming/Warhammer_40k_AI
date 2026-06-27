@@ -46,8 +46,8 @@ from warhammer40k_core.geometry.volume import Model as GeometryModel
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
-CONTRIBUTION_ID = "warhammer_40000_11th:chaos_knights:army_rule:scaffold"
 HOOK_ID = "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread"
+CONTRIBUTION_ID = HOOK_ID
 BATTLE_SHOCK_HOOK_ID = f"{HOOK_ID}:battle-shock"
 LEADERSHIP_MODIFIER_ID = f"{HOOK_ID}:leadership"
 DARKNESS_HIT_MODIFIER_ID = f"{HOOK_ID}:darkness:hit-roll"

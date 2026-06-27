@@ -25,6 +25,7 @@ PLACEHOLDER_MARKER = (
     "# Generated scaffold placeholder. Remove this marker when implementing semantics."
 )
 CHAOS_SPACE_MARINES_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_space_marines.army_rule"
+CHAOS_KNIGHTS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_knights.army_rule"
 SPACE_MARINES_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.space_marines.army_rule"
 NECRONS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.necrons.army_rule"
 GREY_KNIGHTS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.grey_knights.army_rule"
@@ -47,6 +48,9 @@ CAVALCADE_OF_CHAOS_RULE_MODULE_PATH = (
 IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
     CHAOS_SPACE_MARINES_ARMY_RULE_MODULE_PATH: (
         "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts"
+    ),
+    CHAOS_KNIGHTS_ARMY_RULE_MODULE_PATH: (
+        "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread"
     ),
     SPACE_MARINES_ARMY_RULE_MODULE_PATH: (
         "warhammer_40000_11th:space_marines:army_rule:oath_of_moment"

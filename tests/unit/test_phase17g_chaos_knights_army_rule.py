@@ -851,6 +851,8 @@ def test_chaos_knights_army_rule_uses_phase17f_execution_source_id() -> None:
     contribution = army_rule.runtime_contribution()
 
     assert record.execution_id == army_rule.SOURCE_RULE_ID
+    assert contribution.contribution_id == army_rule.HOOK_ID
+    assert contribution.contribution_id == record.handler_id
     assert contribution.battle_round_start_hook_bindings[0].source_id == record.execution_id
     assert contribution.battle_shock_hook_bindings[0].source_id == record.execution_id
     assert contribution.unit_characteristic_modifier_bindings[0].source_id == record.execution_id

@@ -2058,6 +2058,24 @@ def _structured_support_sections_markdown() -> list[str]:
                     ),
                 ),
                 SupportSectionRow(
+                    "Chaos Knights - Harbingers of Dread",
+                    "Named army-rule handler",
+                    "Adapter contract, decision catalog, source coverage, and generated matrix",
+                    (
+                        "Focused Dread selection, forced Battle-shock, mortal-wound, "
+                        "runtime-modifier, source ID, and fail-fast tests"
+                    ),
+                    "Full",
+                    (
+                        "Implements battle-round Dread selections and 2D6 rolls, Deathly "
+                        "Terror/Despair Leadership auras, Dismay forced below-starting "
+                        "Battle-shock tests, Delirium D3 mortal wounds, Doom wound modifiers, "
+                        "and the Darkness Stealth hit modifier. Delirium mortal-wound "
+                        "Feel No Pain continuation is explicitly deferred and emits a typed "
+                        "unsupported event without applying wounds."
+                    ),
+                ),
+                SupportSectionRow(
                     "Astra Militarum - Voice of Command",
                     "Named army-rule handler",
                     "Adapter contract, decision catalog, source coverage, and generated matrix",

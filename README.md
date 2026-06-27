@@ -204,8 +204,9 @@ Current status:
   battle-round Dread selections/rolls, Deathly Terror/Despair Leadership auras,
   Dismay forced below-starting Battle-shock tests, Delirium D3 mortal wounds,
   Doom wound modifiers, and the Darkness Stealth hit modifier through shared
-  runtime hooks. Broad datasheet, wargear, weapon, and remaining faction
-  execution remains later Phase 17 work.
+  runtime hooks. Delirium mortal-wound Feel No Pain continuation is deferred
+  and emits a typed unsupported event without applying wounds. Broad datasheet,
+  wargear, weapon, and remaining faction execution remains later Phase 17 work.
 - Matched-play mustering supports Incursion, Strike Force, and Onslaught battle
   sizes, including the Drukhari `Corsairs and Travelling Players` ally rule for
   HARLEQUINS and ANHRATHE units.

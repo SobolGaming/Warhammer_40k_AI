@@ -960,8 +960,10 @@ Initial letters are defined in the pilot phase.
 - Army rule runtime support: Harbingers of Dread Dread selections/rolls,
   Deathly Terror/Despair Leadership auras, Dismay forced Battle-shock,
   Delirium D3 mortal wounds, Doom wound modifiers, and Darkness Stealth hit
-  modifiers. Detachment rules, enhancements, and Stratagems remain
-  source-covered scaffold rows until their named handlers are implemented.
+  modifiers. Delirium mortal-wound Feel No Pain continuation is deferred and
+  emits a typed unsupported event without applying wounds. Detachment rules,
+  enhancements, and Stratagems remain source-covered scaffold rows until their
+  named handlers are implemented.
 
 ### Phase Chaos Daemons
 
