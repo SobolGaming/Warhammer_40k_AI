@@ -463,6 +463,252 @@ def _daemonic_pact_catalog() -> ArmyCatalog:
     )
 
 
+def _dreadblades_catalog() -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_datasheet = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
+    single_model_composition = (
+        UnitCompositionDefinition(
+            model_profile_id=base_datasheet.model_profiles[0].model_profile_id,
+            min_models=1,
+            max_models=1,
+        ),
+    )
+
+    def single_model_datasheet(
+        *,
+        datasheet_id: str,
+        name: str,
+        keywords: tuple[str, ...],
+        faction_keywords: tuple[str, ...],
+    ) -> DatasheetDefinition:
+        return replace(
+            _phase17g_datasheet(
+                base_datasheet,
+                datasheet_id=datasheet_id,
+                name=name,
+                keywords=keywords,
+                faction_keywords=faction_keywords,
+            ),
+            composition=single_model_composition,
+        )
+
+    datasheets = (
+        single_model_datasheet(
+            datasheet_id="phase17g-chaos-lord",
+            name="Chaos Lord",
+            keywords=("Character", "Chaos", "Heretic Astartes", "Infantry"),
+            faction_keywords=("Heretic Astartes",),
+        ),
+        single_model_datasheet(
+            datasheet_id="phase17g-tainted-mutant",
+            name="Tainted Mutant",
+            keywords=("Character", "Heretic Astartes", "Infantry"),
+            faction_keywords=("Heretic Astartes",),
+        ),
+        single_model_datasheet(
+            datasheet_id="phase17g-war-dog-stalker",
+            name="War Dog Stalker",
+            keywords=("Chaos", "Vehicle", "War Dog"),
+            faction_keywords=("Chaos Knights",),
+        ),
+        single_model_datasheet(
+            datasheet_id="phase17g-knight-abominant",
+            name="Knight Abominant",
+            keywords=("Character", "Chaos", "Titanic", "Vehicle"),
+            faction_keywords=("Chaos Knights",),
+        ),
+    )
+    factions = (
+        FactionDefinition(
+            faction_id="chaos-space-marines",
+            name="Chaos Space Marines",
+            faction_keywords=("Heretic Astartes",),
+            source_ids=("phase17g:heretic-astartes",),
+        ),
+        FactionDefinition(
+            faction_id="chaos-knights",
+            name="Chaos Knights",
+            faction_keywords=("Chaos Knights",),
+            source_ids=("phase17g:chaos-knights",),
+        ),
+    )
+    enhancements = (
+        EnhancementDefinition(
+            enhancement_id="phase17g-dark-panoply",
+            name="Dark Panoply",
+            source_id="phase17g:dark-panoply",
+            points=20,
+        ),
+    )
+    detachments = (
+        DetachmentDefinition(
+            detachment_id="phase17g-csm-detachment",
+            name="Phase 17G CSM Detachment",
+            faction_id="chaos-space-marines",
+            detachment_point_cost=1,
+            unit_datasheet_ids=("phase17g-chaos-lord", "phase17g-tainted-mutant"),
+            force_disposition_ids=("phase17g-force",),
+            enhancement_ids=("phase17g-dark-panoply",),
+            source_ids=("phase17g:csm-detachment",),
+        ),
+    )
+    return ArmyCatalog(
+        catalog_id="phase17g-dreadblades-catalog",
+        ruleset_id=base_catalog.ruleset_id,
+        source_package_id="phase17g-dreadblades-source",
+        datasheets=datasheets,
+        wargear=base_catalog.wargear,
+        factions=factions,
+        detachments=detachments,
+        enhancements=enhancements,
+        source_ids=("phase17g:dreadblades-catalog",),
+    )
+
+
+def _cult_of_dark_gods_catalog() -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_datasheet = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
+    datasheets = (
+        _phase17g_datasheet(
+            base_datasheet,
+            datasheet_id="phase17g-chaos-legionaries",
+            name="Chaos Legionaries",
+            keywords=("Battleline", "Character", "Chaos", "Heretic Astartes", "Infantry"),
+            faction_keywords=("Heretic Astartes",),
+        ),
+        _phase17g_datasheet(
+            base_datasheet,
+            datasheet_id="phase17g-khorne-berzerkers",
+            name="Khorne Berzerkers",
+            keywords=("Battleline", "Chaos", "Infantry", "Khorne"),
+            faction_keywords=("World Eaters",),
+        ),
+        _phase17g_datasheet(
+            base_datasheet,
+            datasheet_id="phase17g-rubric-marines",
+            name="Rubric Marines",
+            keywords=("Battleline", "Chaos", "Infantry", "Tzeentch"),
+            faction_keywords=("Thousand Sons",),
+        ),
+        _phase17g_datasheet(
+            base_datasheet,
+            datasheet_id="phase17g-plague-marines",
+            name="Plague Marines",
+            keywords=("Battleline", "Chaos", "Infantry", "Nurgle"),
+            faction_keywords=("Death Guard",),
+        ),
+        _phase17g_datasheet(
+            base_datasheet,
+            datasheet_id="phase17g-noise-marines",
+            name="Noise Marines",
+            keywords=("Battleline", "Chaos", "Infantry", "Slaanesh"),
+            faction_keywords=("Emperor's Children",),
+        ),
+    )
+    factions = (
+        FactionDefinition(
+            faction_id="chaos-space-marines",
+            name="Chaos Space Marines",
+            faction_keywords=("Heretic Astartes",),
+            source_ids=("phase17g:heretic-astartes",),
+        ),
+        FactionDefinition(
+            faction_id="world-eaters",
+            name="World Eaters",
+            faction_keywords=("World Eaters",),
+            source_ids=("phase17g:world-eaters",),
+        ),
+        FactionDefinition(
+            faction_id="thousand-sons",
+            name="Thousand Sons",
+            faction_keywords=("Thousand Sons",),
+            source_ids=("phase17g:thousand-sons",),
+        ),
+        FactionDefinition(
+            faction_id="death-guard",
+            name="Death Guard",
+            faction_keywords=("Death Guard",),
+            source_ids=("phase17g:death-guard",),
+        ),
+        FactionDefinition(
+            faction_id="emperors-children",
+            name="Emperor's Children",
+            faction_keywords=("Emperor's Children",),
+            source_ids=("phase17g:emperors-children",),
+        ),
+    )
+    detachments = (
+        DetachmentDefinition(
+            detachment_id="phase17g-csm-detachment",
+            name="Phase 17G CSM Detachment",
+            faction_id="chaos-space-marines",
+            detachment_point_cost=1,
+            unit_datasheet_ids=("phase17g-chaos-legionaries",),
+            force_disposition_ids=("phase17g-force",),
+            source_ids=("phase17g:csm-detachment",),
+        ),
+    )
+    return ArmyCatalog(
+        catalog_id="phase17g-cult-of-dark-gods-catalog",
+        ruleset_id=base_catalog.ruleset_id,
+        source_package_id="phase17g-cult-of-dark-gods-source",
+        datasheets=datasheets,
+        wargear=base_catalog.wargear,
+        factions=factions,
+        detachments=detachments,
+        source_ids=("phase17g:cult-of-dark-gods-catalog",),
+    )
+
+
+def _forbidden_pact_faction_catalog() -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_datasheet = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
+    datasheet = _phase17g_datasheet(
+        base_datasheet,
+        datasheet_id="phase17g-daemonettes",
+        name="Daemonettes",
+        keywords=("Battleline", "Infantry", "Slaanesh"),
+        faction_keywords=("Legions of Excess",),
+    )
+    forbidden_factions = (
+        ("legions-of-excess", "Legions of Excess"),
+        ("plague-legions", "Plague Legions"),
+        ("blood-legions", "Blood Legions"),
+        ("scintillating-legions", "Scintillating Legions"),
+    )
+    factions = tuple(
+        FactionDefinition(
+            faction_id=faction_id,
+            name=name,
+            faction_keywords=(name,),
+            source_ids=(f"phase17g:{faction_id}",),
+        )
+        for faction_id, name in forbidden_factions
+    )
+    detachments = tuple(
+        DetachmentDefinition(
+            detachment_id=f"phase17g-{faction_id}-detachment",
+            name=f"Phase 17G {name} Detachment",
+            faction_id=faction_id,
+            detachment_point_cost=1,
+            unit_datasheet_ids=("phase17g-daemonettes",),
+            force_disposition_ids=("phase17g-force",),
+            source_ids=(f"phase17g:{faction_id}:detachment",),
+        )
+        for faction_id, name in forbidden_factions
+    )
+    return ArmyCatalog(
+        catalog_id="phase17g-forbidden-pact-factions-catalog",
+        ruleset_id=base_catalog.ruleset_id,
+        source_package_id="phase17g-forbidden-pact-factions-source",
+        datasheets=(datasheet,),
+        wargear=base_catalog.wargear,
+        factions=factions,
+        detachments=detachments,
+        source_ids=("phase17g:forbidden-pact-factions-catalog",),
+    )
+
+
 def _drukhari_corsairs_and_travelling_players_catalog() -> ArmyCatalog:
     base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
     base_datasheet = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
@@ -730,6 +976,103 @@ def _daemonic_pact_request(
         unit_points=unit_points,
         enhancement_assignments=enhancement_assignments,
         warlord_selection=warlord_selection,
+    )
+
+
+def _dreadblades_request(
+    catalog: ArmyCatalog,
+    *,
+    unit_points: tuple[RosterUnitPointValue, ...],
+    warlord_selection: WarlordSelection,
+    enhancement_assignments: tuple[EnhancementAssignment, ...] = (),
+    war_dog_count: int = 0,
+    include_titanic: bool = False,
+    base_datasheet_id: str = "phase17g-chaos-lord",
+) -> ArmyMusterRequest:
+    base_selection_id = "chaos-lord" if base_datasheet_id == "phase17g-chaos-lord" else "mutant"
+    war_dog_selections = tuple(
+        _unit_selection(
+            unit_selection_id=f"war-dog-{index}",
+            datasheet_id="phase17g-war-dog-stalker",
+            model_count=1,
+        )
+        for index in range(1, war_dog_count + 1)
+    )
+    titanic_selections = (
+        (
+            _unit_selection(
+                unit_selection_id="knight-abominant",
+                datasheet_id="phase17g-knight-abominant",
+                model_count=1,
+            ),
+        )
+        if include_titanic
+        else ()
+    )
+    return _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id="chaos-space-marines",
+            detachment_ids=("phase17g-csm-detachment",),
+            enhancement_ids=tuple(
+                assignment.enhancement_id for assignment in enhancement_assignments
+            ),
+        ),
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id=base_selection_id,
+                datasheet_id=base_datasheet_id,
+                model_count=1,
+            ),
+            *war_dog_selections,
+            *titanic_selections,
+        ),
+        unit_points=unit_points,
+        enhancement_assignments=enhancement_assignments,
+        warlord_selection=warlord_selection,
+    )
+
+
+def _cult_of_dark_gods_request(
+    catalog: ArmyCatalog,
+    *,
+    unit_points: tuple[RosterUnitPointValue, ...],
+    battle_size: BattleSize = BattleSize.STRIKE_FORCE,
+) -> ArmyMusterRequest:
+    return _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id="chaos-space-marines",
+            detachment_ids=("phase17g-csm-detachment",),
+        ),
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="legionaries",
+                datasheet_id="phase17g-chaos-legionaries",
+            ),
+            _unit_selection(
+                unit_selection_id="khorne-berzerkers",
+                datasheet_id="phase17g-khorne-berzerkers",
+            ),
+            _unit_selection(
+                unit_selection_id="rubric-marines",
+                datasheet_id="phase17g-rubric-marines",
+            ),
+            _unit_selection(
+                unit_selection_id="plague-marines",
+                datasheet_id="phase17g-plague-marines",
+            ),
+            _unit_selection(
+                unit_selection_id="noise-marines",
+                datasheet_id="phase17g-noise-marines",
+            ),
+        ),
+        unit_points=unit_points,
+        warlord_selection=WarlordSelection(
+            unit_selection_id="legionaries",
+            source_id="phase17g:warlord",
+        ),
+        battle_size=battle_size,
     )
 
 
@@ -2171,6 +2514,237 @@ def test_phase17g_daemonic_pact_reports_roster_violations() -> None:
         "daemonic_pact_points_limit_exceeded",
         "daemonic_pact_warlord_forbidden",
     }
+
+
+@pytest.mark.parametrize(
+    ("battle_size", "cap"),
+    [
+        (BattleSize.INCURSION, 250),
+        (BattleSize.STRIKE_FORCE, 500),
+        (BattleSize.ONSLAUGHT, 750),
+    ],
+)
+def test_phase17g_daemonic_pact_points_cap_scales_by_battle_size(
+    battle_size: BattleSize,
+    cap: int,
+) -> None:
+    catalog = _daemonic_pact_catalog()
+    legal_request = _daemonic_pact_request(
+        catalog,
+        unit_points=(
+            _unit_points("legionaries", 100),
+            _unit_points("bloodletters", 0),
+            _unit_points("bloodthirster", cap),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="legionaries",
+            source_id="phase17g:warlord",
+        ),
+    )
+    legal_request = replace(legal_request, battle_size=battle_size)
+    over_cap_request = replace(
+        legal_request,
+        unit_points=(
+            _unit_points("legionaries", 100),
+            _unit_points("bloodletters", 0),
+            _unit_points("bloodthirster", cap + 1),
+        ),
+    )
+
+    legal_report = validate_roster_legality(catalog=catalog, request=legal_request)
+    over_cap_report = validate_roster_legality(catalog=catalog, request=over_cap_request)
+
+    assert legal_report.is_legal
+    assert "daemonic_pact_points_limit_exceeded" in {
+        violation.violation_code for violation in over_cap_report.violations
+    }
+
+
+def test_phase17g_dreadblades_allows_one_titanic_or_three_war_dogs_for_chaos_armies() -> None:
+    catalog = _dreadblades_catalog()
+    titanic_request = _dreadblades_request(
+        catalog,
+        unit_points=(
+            _unit_points("chaos-lord", 100),
+            _unit_points("knight-abominant", 400),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="chaos-lord",
+            source_id="phase17g:warlord",
+        ),
+        include_titanic=True,
+    )
+    war_dog_request = _dreadblades_request(
+        catalog,
+        unit_points=(
+            _unit_points("chaos-lord", 100),
+            _unit_points("war-dog-1", 140),
+            _unit_points("war-dog-2", 140),
+            _unit_points("war-dog-3", 140),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="chaos-lord",
+            source_id="phase17g:warlord",
+        ),
+        war_dog_count=3,
+    )
+
+    titanic_army = muster_army(catalog=catalog, request=titanic_request)
+    war_dog_army = muster_army(catalog=catalog, request=war_dog_request)
+
+    assert titanic_army.roster_legality_report.is_legal
+    assert {unit.datasheet_id for unit in titanic_army.units} == {
+        "phase17g-chaos-lord",
+        "phase17g-knight-abominant",
+    }
+    assert war_dog_army.roster_legality_report.is_legal
+    assert (
+        sum(1 for unit in war_dog_army.units if unit.datasheet_id == "phase17g-war-dog-stalker")
+        == 3
+    )
+
+
+def test_phase17g_dreadblades_reports_roster_violations() -> None:
+    catalog = _dreadblades_catalog()
+    request = _dreadblades_request(
+        catalog,
+        unit_points=(
+            _unit_points("mutant", 100),
+            _unit_points("war-dog-1", 140),
+            _unit_points("knight-abominant", 400),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="phase17g-dark-panoply",
+                target_unit_selection_id="war-dog-1",
+                source_id="phase17g:enhancement-assignment",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="knight-abominant",
+            source_id="phase17g:warlord",
+        ),
+        war_dog_count=1,
+        include_titanic=True,
+        base_datasheet_id="phase17g-tainted-mutant",
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+
+    assert {violation.violation_code for violation in report.violations} >= {
+        "dreadblades_chaos_army_required",
+        "dreadblades_enhancement_forbidden",
+        "dreadblades_limit_exceeded",
+        "warlord_dreadblades_forbidden",
+    }
+
+
+def test_phase17g_cult_of_dark_gods_allows_cult_units_and_replaces_faction_keywords() -> None:
+    catalog = _cult_of_dark_gods_catalog()
+    request = _cult_of_dark_gods_request(
+        catalog,
+        unit_points=(
+            _unit_points("legionaries", 100),
+            _unit_points("khorne-berzerkers", 100),
+            _unit_points("rubric-marines", 100),
+            _unit_points("plague-marines", 100),
+            _unit_points("noise-marines", 100),
+        ),
+    )
+
+    army = muster_army(catalog=catalog, request=request)
+    faction_keywords_by_datasheet = {
+        unit.datasheet_id: unit.faction_keywords for unit in army.units
+    }
+
+    assert army.roster_legality_report.is_legal
+    assert faction_keywords_by_datasheet["phase17g-khorne-berzerkers"] == ("Heretic Astartes",)
+    assert faction_keywords_by_datasheet["phase17g-rubric-marines"] == ("Heretic Astartes",)
+    assert faction_keywords_by_datasheet["phase17g-plague-marines"] == ("Heretic Astartes",)
+    assert faction_keywords_by_datasheet["phase17g-noise-marines"] == ("Heretic Astartes",)
+
+
+@pytest.mark.parametrize(
+    ("battle_size", "cap"),
+    [
+        (BattleSize.INCURSION, 250),
+        (BattleSize.STRIKE_FORCE, 500),
+        (BattleSize.ONSLAUGHT, 750),
+    ],
+)
+def test_phase17g_cult_of_dark_gods_points_cap_scales_by_battle_size(
+    battle_size: BattleSize,
+    cap: int,
+) -> None:
+    catalog = _cult_of_dark_gods_catalog()
+    legal_request = _cult_of_dark_gods_request(
+        catalog,
+        unit_points=(
+            _unit_points("legionaries", 100),
+            _unit_points("khorne-berzerkers", cap),
+            _unit_points("rubric-marines", 0),
+            _unit_points("plague-marines", 0),
+            _unit_points("noise-marines", 0),
+        ),
+        battle_size=battle_size,
+    )
+    over_cap_request = replace(
+        legal_request,
+        unit_points=(
+            _unit_points("legionaries", 100),
+            _unit_points("khorne-berzerkers", cap + 1),
+            _unit_points("rubric-marines", 0),
+            _unit_points("plague-marines", 0),
+            _unit_points("noise-marines", 0),
+        ),
+    )
+
+    legal_report = validate_roster_legality(catalog=catalog, request=legal_request)
+    over_cap_report = validate_roster_legality(catalog=catalog, request=over_cap_request)
+
+    assert legal_report.is_legal
+    assert "cult_of_dark_gods_points_limit_exceeded" in {
+        violation.violation_code for violation in over_cap_report.violations
+    }
+
+
+@pytest.mark.parametrize(
+    ("faction_id", "detachment_id"),
+    [
+        ("legions-of-excess", "phase17g-legions-of-excess-detachment"),
+        ("plague-legions", "phase17g-plague-legions-detachment"),
+        ("blood-legions", "phase17g-blood-legions-detachment"),
+        ("scintillating-legions", "phase17g-scintillating-legions-detachment"),
+    ],
+)
+def test_phase17g_pact_army_factions_are_forbidden_by_default(
+    faction_id: str,
+    detachment_id: str,
+) -> None:
+    catalog = _forbidden_pact_faction_catalog()
+    request = _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id=faction_id,
+            detachment_ids=(detachment_id,),
+        ),
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="daemonettes",
+                datasheet_id="phase17g-daemonettes",
+            ),
+        ),
+        unit_points=(_unit_points("daemonettes", 100),),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="daemonettes",
+            source_id="phase17g:warlord",
+        ),
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+
+    assert report.violations[0].violation_code == "detachment_selection_invalid"
+    assert "forbids selecting" in report.violations[0].message
 
 
 def test_phase17g_drukhari_corsairs_and_travelling_players_allows_allies() -> None:

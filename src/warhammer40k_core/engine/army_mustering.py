@@ -28,7 +28,9 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelectionPayload,
     battle_size_from_token,
     battle_size_mustering_policy,
+    cult_of_dark_gods_datasheet_allowed_for_faction,
     daemonic_pact_datasheet_allowed_for_faction,
+    dreadblades_datasheet_allowed_for_faction,
     drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction,
     freeblades_datasheet_allowed_for_faction,
     shadow_legion_thralls_datasheet_allowed_for_faction,
@@ -56,6 +58,17 @@ DAEMONIC_PACT_POINTS_CAP_BY_BATTLE_SIZE = {
     BattleSize.ONSLAUGHT: 750,
 }
 DAEMONIC_PACT_GOD_KEYWORDS = ("KHORNE", "TZEENTCH", "NURGLE", "SLAANESH")
+DREADBLADES_SOURCE_ID = "phase17g:chaos-knights:dreadblades"
+DREADBLADES_REQUIRED_ARMY_KEYWORD = "CHAOS"
+DREADBLADES_TITANIC_KEYWORD = "TITANIC"
+DREADBLADES_WAR_DOG_KEYWORD = "WAR DOG"
+CULT_OF_DARK_GODS_SOURCE_ID = "phase17g:chaos-space-marines:cult-of-the-dark-gods"
+CULT_OF_DARK_GODS_REPLACEMENT_FACTION_KEYWORD = "Heretic Astartes"
+CULT_OF_DARK_GODS_POINTS_CAP_BY_BATTLE_SIZE = {
+    BattleSize.INCURSION: 250,
+    BattleSize.STRIKE_FORCE: 500,
+    BattleSize.ONSLAUGHT: 750,
+}
 DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_SOURCE_ID = (
     "phase17g:drukhari:corsairs-and-travelling-players"
 )
@@ -1072,6 +1085,12 @@ def muster_army(
         units=resolved_units,
         roster_legality_report=roster_legality_report,
     )
+    resolved_units = _apply_cult_of_dark_gods_faction_keyword_replacements(
+        request=request,
+        faction=faction,
+        units=resolved_units,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+    )
     resolved_units = _apply_shadow_legion_keyword_grants(
         request=request,
         units=resolved_units,
@@ -1191,6 +1210,18 @@ def validate_roster_legality(
         violations=violations,
     )
     _append_daemonic_pact_violations(
+        request=request,
+        faction=faction,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        violations=violations,
+    )
+    _append_dreadblades_violations(
+        request=request,
+        faction=faction,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        violations=violations,
+    )
+    _append_cult_of_dark_gods_violations(
         request=request,
         faction=faction,
         datasheets_by_selection_id=datasheets_by_selection_id,
@@ -1399,6 +1430,15 @@ def _append_warlord_violations(
                 message="Freeblades Imperial Knights models cannot be selected as Warlord.",
                 unit_selection_id=request.warlord_selection.unit_selection_id,
                 source_id=FREEBLADES_SOURCE_ID,
+            )
+        )
+    elif dreadblades_datasheet_allowed_for_faction(datasheet=datasheet, faction=faction):
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="warlord_dreadblades_forbidden",
+                message="Dreadblades Chaos Knights models cannot be selected as Warlord.",
+                unit_selection_id=request.warlord_selection.unit_selection_id,
+                source_id=DREADBLADES_SOURCE_ID,
             )
         )
     elif not set(datasheet.keywords.faction_keywords).intersection(faction.faction_keywords):
@@ -1941,6 +1981,146 @@ def _append_daemonic_pact_god_ratio_violations(
         )
 
 
+def _append_dreadblades_violations(
+    *,
+    request: ArmyMusterRequest,
+    faction: FactionDefinition,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    dreadblade_selection_ids = tuple(
+        sorted(
+            selection_id
+            for selection_id, datasheet in datasheets_by_selection_id.items()
+            if dreadblades_datasheet_allowed_for_faction(datasheet=datasheet, faction=faction)
+        )
+    )
+    if not dreadblade_selection_ids:
+        return
+    if not all(
+        _datasheet_has_any_keyword(datasheet, frozenset({DREADBLADES_REQUIRED_ARMY_KEYWORD}))
+        for datasheet in datasheets_by_selection_id.values()
+    ):
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="dreadblades_chaos_army_required",
+                message="Dreadblades require every model in the army to have the CHAOS keyword.",
+                unit_selection_id=dreadblade_selection_ids[0],
+                source_id=DREADBLADES_SOURCE_ID,
+            )
+        )
+    selection_by_id = {
+        selection.unit_selection_id: selection for selection in request.unit_selections
+    }
+    titanic_model_count = _allied_keyword_model_count(
+        allied_selection_ids=dreadblade_selection_ids,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        selection_by_id=selection_by_id,
+        keyword=DREADBLADES_TITANIC_KEYWORD,
+        source_label="Dreadblades",
+    )
+    war_dog_model_count = _allied_keyword_model_count(
+        allied_selection_ids=dreadblade_selection_ids,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        selection_by_id=selection_by_id,
+        keyword=DREADBLADES_WAR_DOG_KEYWORD,
+        source_label="Dreadblades",
+    )
+    if (
+        titanic_model_count > 1
+        or (titanic_model_count > 0 and war_dog_model_count > 0)
+        or war_dog_model_count > 3
+    ):
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="dreadblades_limit_exceeded",
+                message=(
+                    "Dreadblades can include either one TITANIC Chaos Knights model "
+                    "or up to three WAR DOG models."
+                ),
+                unit_selection_id=dreadblade_selection_ids[0],
+                source_id=DREADBLADES_SOURCE_ID,
+            )
+        )
+    _append_dreadblades_enhancement_violations(
+        request=request,
+        dreadblade_selection_ids=dreadblade_selection_ids,
+        violations=violations,
+    )
+
+
+def _append_dreadblades_enhancement_violations(
+    *,
+    request: ArmyMusterRequest,
+    dreadblade_selection_ids: tuple[str, ...],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    dreadblade_selection_id_set = set(dreadblade_selection_ids)
+    for assignment in request.enhancement_assignments:
+        if assignment.target_unit_selection_id not in dreadblade_selection_id_set:
+            continue
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="dreadblades_enhancement_forbidden",
+                message="Dreadblades Chaos Knights models cannot receive Enhancements.",
+                unit_selection_id=assignment.target_unit_selection_id,
+                source_id=assignment.source_id,
+            )
+        )
+
+
+def _append_cult_of_dark_gods_violations(
+    *,
+    request: ArmyMusterRequest,
+    faction: FactionDefinition,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    cult_selection_ids = tuple(
+        sorted(
+            selection_id
+            for selection_id, datasheet in datasheets_by_selection_id.items()
+            if cult_of_dark_gods_datasheet_allowed_for_faction(
+                datasheet=datasheet,
+                faction=faction,
+            )
+        )
+    )
+    if not cult_selection_ids:
+        return
+    _append_cult_of_dark_gods_points_violation(
+        request=request,
+        cult_selection_ids=cult_selection_ids,
+        violations=violations,
+    )
+
+
+def _append_cult_of_dark_gods_points_violation(
+    *,
+    request: ArmyMusterRequest,
+    cult_selection_ids: tuple[str, ...],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    points_by_selection_id = {point.unit_selection_id: point for point in request.unit_points}
+    cap = CULT_OF_DARK_GODS_POINTS_CAP_BY_BATTLE_SIZE.get(request.battle_size)
+    if cap is None:
+        raise ArmyMusteringError("Cult of the Dark Gods points cap is unavailable.")
+    total = sum(
+        points_by_selection_id[selection_id].points
+        for selection_id in cult_selection_ids
+        if selection_id in points_by_selection_id
+    )
+    if total > cap:
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="cult_of_dark_gods_points_limit_exceeded",
+                message="Cult of the Dark Gods units exceed the battle-size limit.",
+                unit_selection_id=cult_selection_ids[0],
+                source_id=CULT_OF_DARK_GODS_SOURCE_ID,
+            )
+        )
+
+
 def _append_drukhari_corsairs_and_travelling_players_violations(
     *,
     request: ArmyMusterRequest,
@@ -2059,17 +2239,19 @@ def _append_freeblades_violations(
     selection_by_id = {
         selection.unit_selection_id: selection for selection in request.unit_selections
     }
-    titanic_model_count = _freeblade_keyword_model_count(
-        freeblade_selection_ids=freeblade_selection_ids,
+    titanic_model_count = _allied_keyword_model_count(
+        allied_selection_ids=freeblade_selection_ids,
         datasheets_by_selection_id=datasheets_by_selection_id,
         selection_by_id=selection_by_id,
         keyword=FREEBLADES_TITANIC_KEYWORD,
+        source_label="Freeblades",
     )
-    armiger_model_count = _freeblade_keyword_model_count(
-        freeblade_selection_ids=freeblade_selection_ids,
+    armiger_model_count = _allied_keyword_model_count(
+        allied_selection_ids=freeblade_selection_ids,
         datasheets_by_selection_id=datasheets_by_selection_id,
         selection_by_id=selection_by_id,
         keyword=FREEBLADES_ARMIGER_KEYWORD,
+        source_label="Freeblades",
     )
     if (
         titanic_model_count > 1
@@ -2087,21 +2269,22 @@ def _append_freeblades_violations(
     )
 
 
-def _freeblade_keyword_model_count(
+def _allied_keyword_model_count(
     *,
-    freeblade_selection_ids: tuple[str, ...],
+    allied_selection_ids: tuple[str, ...],
     datasheets_by_selection_id: dict[str, DatasheetDefinition],
     selection_by_id: dict[str, UnitMusterSelection],
     keyword: str,
+    source_label: str,
 ) -> int:
     count = 0
-    for selection_id in freeblade_selection_ids:
+    for selection_id in allied_selection_ids:
         datasheet = datasheets_by_selection_id[selection_id]
         if not _datasheet_has_keyword(datasheet, keyword):
             continue
         selection = selection_by_id.get(selection_id)
         if selection is None:
-            raise ArmyMusteringError("Freeblades selection lookup failed.")
+            raise ArmyMusteringError(f"{source_label} selection lookup failed.")
         count += _unit_selection_model_count(selection)
     return count
 
@@ -2643,6 +2826,34 @@ def _warlord_violation_blocks_keyword(violation: RosterLegalityViolation) -> boo
         or violation.violation_code.endswith("_warlord_forbidden")
         or violation.violation_code.startswith("supreme_commander_warlord")
     )
+
+
+def _apply_cult_of_dark_gods_faction_keyword_replacements(
+    *,
+    request: ArmyMusterRequest,
+    faction: FactionDefinition,
+    units: tuple[UnitInstance, ...],
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+) -> tuple[UnitInstance, ...]:
+    replaced_units: list[UnitInstance] = []
+    for unit in units:
+        selection_id = unit.unit_instance_id.removeprefix(f"{request.army_id}:")
+        datasheet = datasheets_by_selection_id.get(selection_id)
+        if datasheet is None:
+            raise ArmyMusteringError("Cult of the Dark Gods selection lookup failed.")
+        if not cult_of_dark_gods_datasheet_allowed_for_faction(
+            datasheet=datasheet,
+            faction=faction,
+        ):
+            replaced_units.append(unit)
+            continue
+        replaced_units.append(
+            replace(
+                unit,
+                faction_keywords=(CULT_OF_DARK_GODS_REPLACEMENT_FACTION_KEYWORD,),
+            )
+        )
+    return tuple(replaced_units)
 
 
 def _apply_shadow_legion_keyword_grants(

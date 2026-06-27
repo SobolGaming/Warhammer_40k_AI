@@ -30,11 +30,28 @@ class BattleSize(StrEnum):
 
 DAEMONIC_PACT_FACTION_KEYWORD = "LEGIONES DAEMONICA"
 DAEMONIC_PACT_BASE_FACTION_KEYWORDS = frozenset({"CHAOS KNIGHTS", "HERETIC ASTARTES"})
+CHAOS_KNIGHTS_DREADBLADES_FACTION_KEYWORD = "CHAOS KNIGHTS"
+CHAOS_KNIGHTS_DREADBLADES_ALLOWED_KEYWORDS = frozenset({"TITANIC", "WAR DOG"})
+CULT_OF_DARK_GODS_REQUIRED_FACTION_KEYWORD = "HERETIC ASTARTES"
+CULT_OF_DARK_GODS_ALLOWED_NAMES = frozenset(
+    {
+        "KHORNEBERZERKERS",
+        "NOISEMARINES",
+        "PLAGUEMARINES",
+        "RUBRICMARINES",
+    }
+)
 DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_FACTION_KEYWORD = "DRUKHARI"
 DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_ALLY_KEYWORDS = frozenset({"HARLEQUINS", "ANHRATHE"})
 FREEBLADES_REQUIRED_FACTION_KEYWORD = "IMPERIUM"
 FREEBLADES_IMPERIAL_KNIGHTS_FACTION_KEYWORD = "IMPERIAL KNIGHTS"
 FREEBLADES_ALLOWED_KEYWORDS = frozenset({"ARMIGER", "TITANIC"})
+FORBIDDEN_DEFAULT_ARMY_FACTION_RULE_BY_KEYWORD = {
+    "BLOOD LEGIONS": "Pact of Blood",
+    "LEGIONS OF EXCESS": "Pact of Excess",
+    "PLAGUE LEGIONS": "Pact of Decay",
+    "SCINTILLATING LEGIONS": "Pact of Sorcery",
+}
 SHADOW_LEGION_FACTION_KEYWORD = "LEGIONES DAEMONICA"
 SHADOW_LEGION_DETACHMENT_ID = "shadow-legion"
 SHADOW_LEGION_HERETIC_ASTARTES_FACTION_KEYWORD = "HERETIC ASTARTES"
@@ -480,6 +497,7 @@ def validate_detachment_selection(
         raise ListValidationError("selection must be a DetachmentSelection.")
     policy = battle_size_mustering_policy(battle_size)
     faction = _catalog_faction_by_id(catalog, selection.faction_id)
+    _validate_army_faction_can_be_selected(faction)
     detachments = tuple(
         _catalog_detachment_by_id(catalog, detachment_id)
         for detachment_id in selection.detachment_ids
@@ -586,6 +604,14 @@ def validate_unit_selection_for_army(
         datasheet=datasheet,
         faction=faction,
     )
+    dreadblades_allowed = dreadblades_datasheet_allowed_for_faction(
+        datasheet=datasheet,
+        faction=faction,
+    )
+    cult_of_dark_gods_allowed = cult_of_dark_gods_datasheet_allowed_for_faction(
+        datasheet=datasheet,
+        faction=faction,
+    )
     drukhari_corsairs_allowed = (
         drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction(
             datasheet=datasheet,
@@ -604,6 +630,8 @@ def validate_unit_selection_for_army(
     if (
         not shares_selected_faction
         and not daemonic_pact_allowed
+        and not dreadblades_allowed
+        and not cult_of_dark_gods_allowed
         and not drukhari_corsairs_allowed
         and not freeblades_allowed
         and not shadow_legion_thralls_allowed
@@ -620,6 +648,8 @@ def validate_unit_selection_for_army(
     if (
         datasheet.datasheet_id not in allowed_datasheet_ids
         and not daemonic_pact_allowed
+        and not dreadblades_allowed
+        and not cult_of_dark_gods_allowed
         and not drukhari_corsairs_allowed
         and not freeblades_allowed
         and not shadow_legion_thralls_allowed
@@ -643,6 +673,41 @@ def daemonic_pact_datasheet_allowed_for_faction(
         return False
     faction_keywords = {_canonical_keyword(keyword) for keyword in faction.faction_keywords}
     return bool(faction_keywords & DAEMONIC_PACT_BASE_FACTION_KEYWORDS)
+
+
+def dreadblades_datasheet_allowed_for_faction(
+    *,
+    datasheet: DatasheetDefinition,
+    faction: FactionDefinition,
+) -> bool:
+    if type(datasheet) is not DatasheetDefinition:
+        raise ListValidationError("Dreadblades datasheet must be a DatasheetDefinition.")
+    if type(faction) is not FactionDefinition:
+        raise ListValidationError("Dreadblades faction must be a FactionDefinition.")
+    if _faction_has_keyword(faction, CHAOS_KNIGHTS_DREADBLADES_FACTION_KEYWORD):
+        return False
+    if not _datasheet_has_faction_keyword(
+        datasheet,
+        CHAOS_KNIGHTS_DREADBLADES_FACTION_KEYWORD,
+    ):
+        return False
+    return _datasheet_has_any_keyword(datasheet, CHAOS_KNIGHTS_DREADBLADES_ALLOWED_KEYWORDS)
+
+
+def cult_of_dark_gods_datasheet_allowed_for_faction(
+    *,
+    datasheet: DatasheetDefinition,
+    faction: FactionDefinition,
+) -> bool:
+    if type(datasheet) is not DatasheetDefinition:
+        raise ListValidationError("Cult of the Dark Gods datasheet must be a DatasheetDefinition.")
+    if type(faction) is not FactionDefinition:
+        raise ListValidationError("Cult of the Dark Gods faction must be a FactionDefinition.")
+    if not _faction_has_keyword(faction, CULT_OF_DARK_GODS_REQUIRED_FACTION_KEYWORD):
+        return False
+    if _datasheet_has_faction_keyword(datasheet, CULT_OF_DARK_GODS_REQUIRED_FACTION_KEYWORD):
+        return False
+    return _canonical_name(datasheet.name) in CULT_OF_DARK_GODS_ALLOWED_NAMES
 
 
 def drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction(
@@ -857,6 +922,23 @@ def _faction_has_keyword(
 ) -> bool:
     canonical = _canonical_keyword(keyword)
     return any(_canonical_keyword(stored) == canonical for stored in faction.faction_keywords)
+
+
+def _validate_army_faction_can_be_selected(faction: FactionDefinition) -> None:
+    faction_tokens = (
+        faction.faction_id,
+        faction.name,
+        *faction.faction_keywords,
+    )
+    for token in faction_tokens:
+        canonical = _canonical_keyword(token)
+        rule_name = FORBIDDEN_DEFAULT_ARMY_FACTION_RULE_BY_KEYWORD.get(canonical)
+        if rule_name is None:
+            continue
+        raise ListValidationError(
+            f"{rule_name} forbids selecting {canonical} as Army Faction "
+            "unless specifically stated otherwise."
+        )
 
 
 def _canonical_keyword(value: str) -> str:
