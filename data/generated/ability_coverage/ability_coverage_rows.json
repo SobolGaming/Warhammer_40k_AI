@@ -548,6 +548,27 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers",
+    "ability_name": "Cabal of Sorcerers",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/thousand-sons/faction/warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers/none",
+    "datasheet_id": "thousand-sons",
+    "datasheet_name": "Thousand Sons",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers",
+      "warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:mortal-wound-feel-no-pain",
+      "warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:weapon-profile"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.cabal_of_sorcerers"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "warhammer_40000_11th:drukhari:army_rule:power_from_pain",
     "ability_name": "Power from Pain",
     "catalog_id": "runtime-content-warhammer-40000-11th",
