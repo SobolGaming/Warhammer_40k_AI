@@ -4,7 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
-from warhammer40k_core.engine.effects import PersistingEffectPayload
+from warhammer40k_core.engine.effects import PersistingEffect, PersistingEffectPayload
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
@@ -25,7 +25,10 @@ class FightUnitSelectedGrantPayload(TypedDict):
 class FightUnitSelectedPersistingEffectPayload(TypedDict):
     hook_id: str
     source_id: str
+    unit_instance_id: str
+    event_type: str
     persisting_effect: PersistingEffectPayload
+    replay_payload: JsonValue
 
 
 SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE = "select_fight_unit_grant"
@@ -35,6 +38,10 @@ DECLINE_FIGHT_UNIT_GRANT_OPTION_ID = "decline_fight_unit_grant"
 type FightUnitSelectedGrantHandler = Callable[
     ["FightUnitSelectedContext"],
     "FightUnitSelectedGrant | None",
+]
+type FightUnitSelectedHandler = Callable[
+    ["FightUnitSelectedContext"],
+    tuple["FightUnitSelectedEffectGrant", ...],
 ]
 
 
@@ -149,6 +156,62 @@ class FightUnitSelectedGrant:
 
 
 @dataclass(frozen=True, slots=True)
+class FightUnitSelectedEffectGrant:
+    hook_id: str
+    source_id: str
+    unit_instance_id: str
+    persisting_effect: PersistingEffect
+    event_type: str = "fight_unit_selected_effect_granted"
+    replay_payload: JsonValue = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
+        object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
+        object.__setattr__(
+            self,
+            "unit_instance_id",
+            _validate_identifier("unit_instance_id", self.unit_instance_id),
+        )
+        if type(self.persisting_effect) is not PersistingEffect:
+            raise GameLifecycleError(
+                "FightUnitSelectedEffectGrant persisting_effect must be a PersistingEffect."
+            )
+        if self.persisting_effect.source_rule_id != self.source_id:
+            raise GameLifecycleError(
+                "FightUnitSelectedEffectGrant source_id must match persisting_effect."
+            )
+        object.__setattr__(
+            self,
+            "event_type",
+            _validate_identifier("event_type", self.event_type),
+        )
+        object.__setattr__(self, "replay_payload", validate_json_value(self.replay_payload))
+
+    def to_payload(self) -> FightUnitSelectedPersistingEffectPayload:
+        return {
+            "hook_id": self.hook_id,
+            "source_id": self.source_id,
+            "unit_instance_id": self.unit_instance_id,
+            "event_type": self.event_type,
+            "persisting_effect": self.persisting_effect.to_payload(),
+            "replay_payload": self.replay_payload,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class FightUnitSelectedHookBinding:
+    hook_id: str
+    source_id: str
+    handler: FightUnitSelectedHandler
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
+        object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
+        if not callable(self.handler):
+            raise GameLifecycleError("FightUnitSelectedHookBinding handler must be callable.")
+
+
+@dataclass(frozen=True, slots=True)
 class FightUnitSelectedGrantBinding:
     hook_id: str
     source_id: str
@@ -159,6 +222,60 @@ class FightUnitSelectedGrantBinding:
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
         if not callable(self.handler):
             raise GameLifecycleError("FightUnitSelectedGrantBinding handler must be callable.")
+
+
+@dataclass(frozen=True, slots=True)
+class FightUnitSelectedHookRegistry:
+    bindings: tuple[FightUnitSelectedHookBinding, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "bindings", _validate_hook_bindings(self.bindings))
+
+    @classmethod
+    def empty(cls) -> Self:
+        return cls(bindings=())
+
+    @classmethod
+    def from_bindings(cls, bindings: tuple[FightUnitSelectedHookBinding, ...]) -> Self:
+        return cls(bindings=bindings)
+
+    def all_bindings(self) -> tuple[FightUnitSelectedHookBinding, ...]:
+        return self.bindings
+
+    def grants_for(
+        self,
+        context: FightUnitSelectedContext,
+    ) -> tuple[FightUnitSelectedEffectGrant, ...]:
+        if type(context) is not FightUnitSelectedContext:
+            raise GameLifecycleError("Fight-unit-selected hooks require a context.")
+        grants: list[FightUnitSelectedEffectGrant] = []
+        for binding in self.bindings:
+            handler_grants = binding.handler(context)
+            if type(handler_grants) is not tuple:
+                raise GameLifecycleError("Fight-unit-selected handlers must return a tuple.")
+            for grant in handler_grants:
+                if type(grant) is not FightUnitSelectedEffectGrant:
+                    raise GameLifecycleError(
+                        "Fight-unit-selected handlers must return "
+                        "FightUnitSelectedEffectGrant values."
+                    )
+                if grant.hook_id != binding.hook_id:
+                    raise GameLifecycleError("Fight-unit-selected handler returned hook_id drift.")
+                if grant.source_id != binding.source_id:
+                    raise GameLifecycleError(
+                        "Fight-unit-selected handler returned source_id drift."
+                    )
+                grants.append(grant)
+        return tuple(
+            sorted(
+                grants,
+                key=lambda grant: (
+                    grant.hook_id,
+                    grant.unit_instance_id,
+                    grant.persisting_effect.effect_id,
+                ),
+            )
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -204,6 +321,26 @@ class FightUnitSelectedGrantRegistry:
                 )
             grants.append(grant)
         return tuple(sorted(grants, key=lambda grant: grant.hook_id))
+
+
+def _validate_hook_bindings(
+    value: object,
+) -> tuple[FightUnitSelectedHookBinding, ...]:
+    if type(value) is not tuple:
+        raise GameLifecycleError("FightUnitSelectedHookRegistry bindings must be a tuple.")
+    bindings: list[FightUnitSelectedHookBinding] = []
+    seen: set[str] = set()
+    for binding in cast(tuple[object, ...], value):
+        if type(binding) is not FightUnitSelectedHookBinding:
+            raise GameLifecycleError(
+                "FightUnitSelectedHookRegistry bindings must contain "
+                "FightUnitSelectedHookBinding values."
+            )
+        if binding.hook_id in seen:
+            raise GameLifecycleError("FightUnitSelectedHookRegistry hook IDs must be unique.")
+        seen.add(binding.hook_id)
+        bindings.append(binding)
+    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
 
 
 def _validate_grant_bindings(

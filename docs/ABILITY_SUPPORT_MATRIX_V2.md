@@ -243,6 +243,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `core:smokescreen` | Smokescreen |
 | `descriptor:movement:deep-strike-placement` | Deep Strike |
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
+| `end_battle_round` | End Battle Round |
+| `end_turn` | End Turn |
 | `generic:force-desperate-escape` | Inescapable Manifestations |
 | `generic:ingress-move` | From Beyond the Veil |
 | `phase17g:aeldari:corsair-coterie:stratagems:cloak-and-shadow:target-restriction` | Cloak and Shadow |
@@ -349,6 +351,15 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction` | Thrill Seekers |
 | `warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity` | Gate Of Infinity |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:charge-roll` | Charge Roll |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:movement-budget` | Movement Budget |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-battle-round` | End Battle Round |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-turn` | End Turn |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:enemy-unit-destroyed` | Enemy Unit Destroyed |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:leadership` | Leadership |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:objective-control` | Objective Control |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:martial-valour:shooting` | Shooting |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:oath-selection` | Oath Selection |
 | `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start` | Prioritised Efficiency |
 | `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll` | Prioritised Efficiency |
 | `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll` | Prioritised Efficiency |

@@ -142,6 +142,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrant,
     FightUnitSelectedGrantPayload,
     FightUnitSelectedGrantRegistry,
+    FightUnitSelectedHookRegistry,
 )
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -212,6 +213,9 @@ class FightPhaseHandler:
     fight_activation_ability_hooks: FightActivationAbilityHookRegistry = field(
         default_factory=FightActivationAbilityHookRegistry.empty
     )
+    fight_unit_selected_hooks: FightUnitSelectedHookRegistry = field(
+        default_factory=FightUnitSelectedHookRegistry.empty
+    )
     fight_unit_selected_grant_hooks: FightUnitSelectedGrantRegistry = field(
         default_factory=FightUnitSelectedGrantRegistry.empty
     )
@@ -240,6 +244,10 @@ class FightPhaseHandler:
         if type(self.fight_activation_ability_hooks) is not FightActivationAbilityHookRegistry:
             raise GameLifecycleError(
                 "FightPhaseHandler fight_activation_ability_hooks must be a registry."
+            )
+        if type(self.fight_unit_selected_hooks) is not FightUnitSelectedHookRegistry:
+            raise GameLifecycleError(
+                "FightPhaseHandler fight_unit_selected_hooks must be a registry."
             )
         if type(self.fight_unit_selected_grant_hooks) is not FightUnitSelectedGrantRegistry:
             raise GameLifecycleError(
@@ -2870,6 +2878,12 @@ def _apply_fight_activation_decision(
             }
         ),
     )
+    _apply_fight_unit_selected_effect_grants(
+        state=state,
+        decisions=decisions,
+        activation=selection,
+        registry=handler.fight_unit_selected_hooks,
+    )
     del reaction_queue, policy
     return _request_fight_unit_selected_grant_decision_if_available(
         state=state,
@@ -2877,6 +2891,37 @@ def _apply_fight_activation_decision(
         activation=selection,
         registry=handler.fight_unit_selected_grant_hooks,
     )
+
+
+def _apply_fight_unit_selected_effect_grants(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    activation: FightActivationSelection,
+    registry: FightUnitSelectedHookRegistry,
+) -> None:
+    if type(registry) is not FightUnitSelectedHookRegistry:
+        raise GameLifecycleError("Fight-unit-selected effect grants require a registry.")
+    context = _fight_unit_selected_context(state=state, activation=activation)
+    for grant in registry.grants_for(context):
+        state.record_persisting_effect(grant.persisting_effect)
+        decisions.event_log.append(
+            grant.event_type,
+            validate_json_value(
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "phase": BattlePhase.FIGHT.value,
+                    "active_player_id": state.active_player_id,
+                    "player_id": activation.player_id,
+                    "unit_instance_id": activation.unit_instance_id,
+                    "request_id": activation.request_id,
+                    "result_id": activation.result_id,
+                    "grant": grant.to_payload(),
+                    "persisting_effect": grant.persisting_effect.to_payload(),
+                }
+            ),
+        )
 
 
 def _request_fight_unit_selected_grant_decision_if_available(

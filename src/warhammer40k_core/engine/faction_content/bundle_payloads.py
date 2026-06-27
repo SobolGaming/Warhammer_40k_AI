@@ -41,6 +41,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     shooting_end_surge_hook_ids: list[str]
     enhancement_effect_binding_ids: list[str]
     fight_activation_ability_hook_ids: list[str]
+    fight_unit_selected_hook_ids: list[str]
     fight_unit_selected_grant_hook_ids: list[str]
     phase_end_objective_control_hook_ids: list[str]
     stratagem_cost_choice_hook_ids: list[str]
