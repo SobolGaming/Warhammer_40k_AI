@@ -438,6 +438,41 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers",
+        "ability_name": "Cabal of Sorcerers",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/thousand-sons/faction/warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers/none",
+        "datasheet_id": "thousand-sons",
+        "datasheet_name": "Thousand Sons",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Cabal of Sorcerers"
+    ],
+    "category_id": "faction.army_rule.cabal_of_sorcerers",
+    "category_name": "Faction Army Rule Cabal Of Sorcerers",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/thousand-sons/faction/warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers/none"
+    ],
+    "datasheet_names": [
+      "Thousand Sons"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers",
+      "warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:mortal-wound-feel-no-pain",
+      "warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:weapon-profile"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric",
         "ability_name": "Code Chivalric",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/imperial-knights/faction/warhammer_40000_11th:imperial_knights:army_rule:code_chivalric/none",

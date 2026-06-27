@@ -68,6 +68,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.tau_empire import (
     army_rule as tau_empire_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
+    army_rule as thousand_sons_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
     army_rule as world_eaters_army_rule,
 )
@@ -336,6 +339,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     "phase17f:phase17e:leagues-of-votann:army-rule": "Prioritised Efficiency",
     "phase17g:space-marines:army-rule": "Oath of Moment",
     "phase17f:phase17e:tau-empire:army-rule": "For the Greater Good",
+    "phase17f:phase17e:thousand-sons:army-rule": "Cabal of Sorcerers",
     "phase17f:phase17e:world-eaters:army-rule": "Blessings of Khorne",
     "phase17g:aeldari:corsair-coterie:enhancements": "Corsair Coterie Enhancements",
     "phase17g:aeldari:corsair-coterie:relentless-raiders": "Corsair Coterie",
@@ -411,6 +415,11 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     ),
     tau_empire_army_rule.HOOK_ID: "For the Greater Good",
     tau_empire_army_rule.WEAPON_PROFILE_MODIFIER_ID: "For the Greater Good - Weapon Profile",
+    thousand_sons_army_rule.HOOK_ID: "Cabal of Sorcerers",
+    thousand_sons_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID: (
+        "Cabal of Sorcerers - Mortal Wound Feel No Pain"
+    ),
+    thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID: ("Cabal of Sorcerers - Weapon Profile"),
     SPACE_MARINE_CHAPTERS_SOURCE_ID: "Space Marine Chapters",
     "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider": ("Archraider"),
     "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:lord_of_deceit": (
@@ -672,6 +681,13 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             ability_name=tau_empire_army_rule.FOR_THE_GREATER_GOOD_ABILITY_NAME,
             semantic_category="faction.army_rule.for_the_greater_good",
             runtime_consumer_ids=_tau_empire_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
+            faction_id=thousand_sons_army_rule.THOUSAND_SONS_FACTION_ID,
+            ability_id=thousand_sons_army_rule.HOOK_ID,
+            ability_name=thousand_sons_army_rule.CABAL_OF_SORCERERS_ABILITY_NAME,
+            semantic_category="faction.army_rule.cabal_of_sorcerers",
+            runtime_consumer_ids=_thousand_sons_runtime_consumer_ids(),
         ),
         _implemented_faction_army_rule_row(
             faction_id="drukhari",
@@ -962,6 +978,22 @@ def _tau_empire_runtime_consumer_ids() -> tuple[str, ...]:
             {
                 *(binding.hook_id for binding in contribution.shooting_phase_start_hook_bindings),
                 *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
+            }
+        )
+    )
+
+
+def _thousand_sons_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = thousand_sons_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                *(binding.hook_id for binding in contribution.shooting_phase_start_hook_bindings),
+                *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
+                *(
+                    binding.hook_id
+                    for binding in contribution.mortal_wound_feel_no_pain_hook_bindings
+                ),
             }
         )
     )
@@ -2275,6 +2307,22 @@ def _structured_support_sections_markdown() -> list[str]:
                         "Ballistic Skill improvement, and Markerlight [IGNORES COVER]. "
                         "Selected-shooter-specific Guided identity is deferred if future "
                         "rules require it."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Thousand Sons - Cabal of Sorcerers",
+                    (
+                        "Shooting-phase-start faction-rule hook plus weapon-profile and "
+                        "mortal-wound Feel No Pain hooks"
+                    ),
+                    "Adapter contract, decision catalog, source coverage, and generated matrix",
+                    "Focused ritual, invalid-submission, movement, modifier, and wound tests",
+                    "Full",
+                    (
+                        "Implements Shooting-start ritual selections, Psychic tests with "
+                        "optional Channel the Warp perils, Destiny's Ruin hit rerolls, "
+                        "Temporal Surge movement proposals and charge lockout, Doombolt "
+                        "mortal wounds, and Twist of Fate AP modifiers."
                     ),
                 ),
                 SupportSectionRow(

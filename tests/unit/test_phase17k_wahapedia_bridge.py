@@ -105,6 +105,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_chil
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.imperial_knights import (
     army_rule as imperial_knights_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
+    army_rule as thousand_sons_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
     army_rule as world_eaters_army_rule,
 )
@@ -894,6 +897,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| Imperial Knights | 8 | 0 | 24 | 36 | 1 | "
         "[imperial-knights](factions/imperial-knights.md) |"
     ) in generated_markdown
+    assert (
+        "| Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |"
+    ) in generated_markdown
     assert "| Grey Knights - Gate of Infinity | Named army-rule handler |" in generated_markdown
     assert (
         "| Leagues of Votann - Prioritised Efficiency | "
@@ -927,6 +933,13 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert (
         "| Imperial Knights - Freeblades | Shared mustering/list-validation host | "
         "Generated matrix and mustering tests | Focused mustering tests | Full |"
+    ) in generated_markdown
+    assert (
+        "| Thousand Sons - Cabal of Sorcerers | "
+        "Shooting-phase-start faction-rule hook plus weapon-profile and mortal-wound "
+        "Feel No Pain hooks | "
+        "Adapter contract, decision catalog, source coverage, and generated matrix | "
+        "Focused ritual, invalid-submission, movement, modifier, and wound tests | Full |"
     ) in generated_markdown
     assert (
         "| Scouts X | Pre-battle Scout Move, Scout reserve setup, and Dedicated "
@@ -996,6 +1009,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         f"| `{imperial_knights_army_rule.HOOK_ID}:martial-valour:fight` | "
         "Code Chivalric - Martial Valour |"
     ) in generated_markdown
+    assert (f"| `{thousand_sons_army_rule.HOOK_ID}` | Cabal of Sorcerers |") in generated_markdown
+    assert (
+        f"| `{thousand_sons_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID}` | "
+        "Cabal of Sorcerers - Mortal Wound Feel No Pain |"
+    ) in generated_markdown
+    assert (
+        f"| `{thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID}` | "
+        "Cabal of Sorcerers - Weapon Profile |"
+    ) in generated_markdown
     assert tuple(row.datasheet_name for row in rows_by_name["Instrument of Chaos"]) == (
         "Bloodletters",
         "Bloodcrushers",
@@ -1061,6 +1083,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert all(
         row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Cabal of Sorcerers"]
+    )
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
         for row in rows_by_name["Code Chivalric"]
     )
     assert all(
@@ -1084,6 +1110,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Prioritised Efficiency"]) == (
         "Leagues of Votann",
+    )
+    assert tuple(row.datasheet_name for row in rows_by_name["Cabal of Sorcerers"]) == (
+        "Thousand Sons",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Code Chivalric"]) == (
         "Imperial Knights",
@@ -1126,6 +1155,24 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
         "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll",
     }
+    assert set(rows_by_name["Cabal of Sorcerers"][0].runtime_consumer_ids) == {
+        thousand_sons_army_rule.HOOK_ID,
+        thousand_sons_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
+        thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID,
+    }
+    assert any(
+        row_payload["ability_id"] == thousand_sons_army_rule.HOOK_ID
+        and row_payload["ability_name"] == "Cabal of Sorcerers"
+        and row_payload["datasheet_name"] == "Thousand Sons"
+        and row_payload["support_stage"] == AbilityCoverageSupportStage.ENGINE_CONSUMED.value
+        and set(row_payload["runtime_consumer_ids"])
+        == {
+            thousand_sons_army_rule.HOOK_ID,
+            thousand_sons_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
+            thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID,
+        }
+        for row_payload in snapshot
+    )
     assert set(rows_by_name["Code Chivalric"][0].runtime_consumer_ids) == {
         imperial_knights_army_rule.HOOK_ID,
         imperial_knights_army_rule.SETUP_HOOK_ID,
@@ -1225,6 +1272,17 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert categories_by_name["Emperor's Children Army Rule"].ability_names == ("Thrill Seekers",)
     assert categories_by_name["Emperor's Children Army Rule"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["Faction Army Rule Cabal Of Sorcerers"].ability_names == (
+        "Cabal of Sorcerers",
+    )
+    assert categories_by_name["Faction Army Rule Cabal Of Sorcerers"].runtime_consumer_ids == (
+        thousand_sons_army_rule.HOOK_ID,
+        thousand_sons_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
+        thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID,
+    )
+    assert categories_by_name["Faction Army Rule Cabal Of Sorcerers"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
     )
     assert categories_by_name["Unknown Abilities"].ability_names == (
