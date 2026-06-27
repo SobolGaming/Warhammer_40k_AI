@@ -30,6 +30,7 @@ from warhammer40k_core.engine.list_validation import (
     battle_size_mustering_policy,
     daemonic_pact_datasheet_allowed_for_faction,
     drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction,
+    freeblades_datasheet_allowed_for_faction,
     shadow_legion_thralls_datasheet_allowed_for_faction,
     validate_detachment_selection,
     validate_unit_selection_for_army,
@@ -63,6 +64,10 @@ DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_POINTS_CAP_BY_BATTLE_SIZE = {
     BattleSize.STRIKE_FORCE: 500,
     BattleSize.ONSLAUGHT: 750,
 }
+FREEBLADES_SOURCE_ID = "phase17g:imperial-knights:freeblades"
+FREEBLADES_REQUIRED_FACTION_KEYWORD = "IMPERIUM"
+FREEBLADES_ARMIGER_KEYWORD = "ARMIGER"
+FREEBLADES_TITANIC_KEYWORD = "TITANIC"
 AELDARI_FACTION_ID = "aeldari"
 CORSAIR_COTERIE_DETACHMENT_ID = "corsair-coterie"
 CORSAIR_COTERIE_ENHANCEMENT_IDS = frozenset(
@@ -1197,6 +1202,12 @@ def validate_roster_legality(
         datasheets_by_selection_id=datasheets_by_selection_id,
         violations=violations,
     )
+    _append_freeblades_violations(
+        request=request,
+        faction=faction,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        violations=violations,
+    )
     _append_shadow_legion_violations(
         request=request,
         faction=faction,
@@ -1379,6 +1390,15 @@ def _append_warlord_violations(
                 ),
                 unit_selection_id=request.warlord_selection.unit_selection_id,
                 source_id=DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_SOURCE_ID,
+            )
+        )
+    elif freeblades_datasheet_allowed_for_faction(datasheet=datasheet, faction=faction):
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="warlord_freeblades_forbidden",
+                message="Freeblades Imperial Knights models cannot be selected as Warlord.",
+                unit_selection_id=request.warlord_selection.unit_selection_id,
+                source_id=FREEBLADES_SOURCE_ID,
             )
         )
     elif not set(datasheet.keywords.faction_keywords).intersection(faction.faction_keywords):
@@ -2002,6 +2022,122 @@ def _append_drukhari_corsairs_and_travelling_players_enhancement_violations(
                     "Corsairs and Travelling Players HARLEQUINS or ANHRATHE units cannot "
                     "receive Enhancements."
                 ),
+                unit_selection_id=assignment.target_unit_selection_id,
+                source_id=assignment.source_id,
+            )
+        )
+
+
+def _append_freeblades_violations(
+    *,
+    request: ArmyMusterRequest,
+    faction: FactionDefinition,
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    freeblade_selection_ids = tuple(
+        sorted(
+            selection_id
+            for selection_id, datasheet in datasheets_by_selection_id.items()
+            if freeblades_datasheet_allowed_for_faction(datasheet=datasheet, faction=faction)
+        )
+    )
+    if not freeblade_selection_ids:
+        return
+    if not all(
+        _datasheet_has_any_keyword(datasheet, frozenset({FREEBLADES_REQUIRED_FACTION_KEYWORD}))
+        for datasheet in datasheets_by_selection_id.values()
+    ):
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="freeblades_imperium_army_required",
+                message="Freeblades require every model in the army to have the IMPERIUM keyword.",
+                unit_selection_id=freeblade_selection_ids[0],
+                source_id=FREEBLADES_SOURCE_ID,
+            )
+        )
+    selection_by_id = {
+        selection.unit_selection_id: selection for selection in request.unit_selections
+    }
+    titanic_model_count = _freeblade_keyword_model_count(
+        freeblade_selection_ids=freeblade_selection_ids,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        selection_by_id=selection_by_id,
+        keyword=FREEBLADES_TITANIC_KEYWORD,
+    )
+    armiger_model_count = _freeblade_keyword_model_count(
+        freeblade_selection_ids=freeblade_selection_ids,
+        datasheets_by_selection_id=datasheets_by_selection_id,
+        selection_by_id=selection_by_id,
+        keyword=FREEBLADES_ARMIGER_KEYWORD,
+    )
+    if (
+        titanic_model_count > 1
+        or (titanic_model_count > 0 and armiger_model_count > 0)
+        or armiger_model_count > 3
+    ):
+        _append_freeblades_limit_violation(
+            freeblade_selection_ids=freeblade_selection_ids,
+            violations=violations,
+        )
+    _append_freeblades_enhancement_violations(
+        request=request,
+        freeblade_selection_ids=freeblade_selection_ids,
+        violations=violations,
+    )
+
+
+def _freeblade_keyword_model_count(
+    *,
+    freeblade_selection_ids: tuple[str, ...],
+    datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    selection_by_id: dict[str, UnitMusterSelection],
+    keyword: str,
+) -> int:
+    count = 0
+    for selection_id in freeblade_selection_ids:
+        datasheet = datasheets_by_selection_id[selection_id]
+        if not _datasheet_has_keyword(datasheet, keyword):
+            continue
+        selection = selection_by_id.get(selection_id)
+        if selection is None:
+            raise ArmyMusteringError("Freeblades selection lookup failed.")
+        count += _unit_selection_model_count(selection)
+    return count
+
+
+def _append_freeblades_limit_violation(
+    *,
+    freeblade_selection_ids: tuple[str, ...],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    violations.append(
+        RosterLegalityViolation(
+            violation_code="freeblades_limit_exceeded",
+            message=(
+                "Freeblades can include either one TITANIC Imperial Knights model "
+                "or up to three ARMIGER models."
+            ),
+            unit_selection_id=freeblade_selection_ids[0],
+            source_id=FREEBLADES_SOURCE_ID,
+        )
+    )
+
+
+def _append_freeblades_enhancement_violations(
+    *,
+    request: ArmyMusterRequest,
+    freeblade_selection_ids: tuple[str, ...],
+    violations: list[RosterLegalityViolation],
+) -> None:
+    freeblade_selection_id_set = set(freeblade_selection_ids)
+    for assignment in request.enhancement_assignments:
+        if assignment.target_unit_selection_id not in freeblade_selection_id_set:
+            continue
+        violations.append(
+            RosterLegalityViolation(
+                violation_code="freeblades_enhancement_forbidden",
+                message="Freeblades Imperial Knights models cannot receive Enhancements.",
                 unit_selection_id=assignment.target_unit_selection_id,
                 source_id=assignment.source_id,
             )

@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.battle_round_hooks import (
     SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
     BattleRoundStartHookRegistry,
@@ -12,6 +14,10 @@ from warhammer40k_core.engine.battle_round_hooks import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content.events import (
+    RuntimeContentEvent,
+    RuntimeContentEventIndex,
+)
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
@@ -65,6 +71,9 @@ class BattleRoundFlow:
         phase_end_objective_control_hooks: PhaseEndObjectiveControlHookRegistry | None = None,
         unit_destroyed_hooks: UnitDestroyedHookRegistry | None = None,
         runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+        runtime_event_index: RuntimeContentEventIndex | None = None,
+        ruleset_descriptor: RulesetDescriptor | None = None,
+        army_catalog: ArmyCatalog | None = None,
     ) -> None:
         self._phase_handlers = dict(phase_handlers)
         self._battle_round_start_hooks = (
@@ -90,6 +99,11 @@ class BattleRoundFlow:
             if runtime_modifier_registry is None
             else runtime_modifier_registry
         )
+        self._runtime_event_index = (
+            RuntimeContentEventIndex.empty() if runtime_event_index is None else runtime_event_index
+        )
+        self._ruleset_descriptor = ruleset_descriptor
+        self._army_catalog = army_catalog
         if type(self._battle_round_start_hooks) is not BattleRoundStartHookRegistry:
             raise GameLifecycleError("BattleRoundFlow requires a battle-round start hook registry.")
         if type(self._turn_end_hooks) is not TurnEndHookRegistry:
@@ -105,6 +119,14 @@ class BattleRoundFlow:
             raise GameLifecycleError("BattleRoundFlow requires a unit-destroyed hook registry.")
         if type(self._runtime_modifier_registry) is not RuntimeModifierRegistry:
             raise GameLifecycleError("BattleRoundFlow requires a runtime modifier registry.")
+        if type(self._runtime_event_index) is not RuntimeContentEventIndex:
+            raise GameLifecycleError("BattleRoundFlow requires a runtime event index.")
+        if self._ruleset_descriptor is not None and type(self._ruleset_descriptor) is not (
+            RulesetDescriptor
+        ):
+            raise GameLifecycleError("BattleRoundFlow ruleset_descriptor must be a descriptor.")
+        if self._army_catalog is not None and type(self._army_catalog) is not ArmyCatalog:
+            raise GameLifecycleError("BattleRoundFlow army_catalog must be an ArmyCatalog.")
 
     def advance(
         self,
@@ -122,7 +144,14 @@ class BattleRoundFlow:
         handler = self._phase_handlers.get(current_phase)
         if handler is None:
             raise GameLifecycleError("BattleRoundFlow missing handler for current battle phase.")
-        _emit_start_timing_windows(state=state, decisions=decisions)
+        _emit_start_timing_windows(
+            state=state,
+            decisions=decisions,
+            runtime_event_index=self._runtime_event_index,
+            runtime_modifier_registry=self._runtime_modifier_registry,
+            ruleset_descriptor=self._ruleset_descriptor,
+            army_catalog=self._army_catalog,
+        )
         start_request = (
             self._battle_round_start_hooks.next_request_for(
                 BattleRoundStartRequestContext(state=state, decisions=decisions)
@@ -174,7 +203,14 @@ class BattleRoundFlow:
         ):
             return status
 
-        _emit_end_timing_windows(state=state, decisions=decisions)
+        _emit_end_timing_windows(
+            state=state,
+            decisions=decisions,
+            runtime_event_index=self._runtime_event_index,
+            runtime_modifier_registry=self._runtime_modifier_registry,
+            ruleset_descriptor=self._ruleset_descriptor,
+            army_catalog=self._army_catalog,
+        )
         _apply_phase_end_objective_control_hooks(
             state=state,
             decisions=decisions,
@@ -330,7 +366,15 @@ def _phase_body_status(status: LifecycleStatus) -> str:
     return "complete"
 
 
-def _emit_start_timing_windows(*, state: GameState, decisions: DecisionController) -> None:
+def _emit_start_timing_windows(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    runtime_event_index: RuntimeContentEventIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    ruleset_descriptor: RulesetDescriptor | None,
+    army_catalog: ArmyCatalog | None,
+) -> None:
     current_phase = state.current_battle_phase
     if current_phase is None:
         raise GameLifecycleError("Start timing windows require a current battle phase.")
@@ -349,6 +393,10 @@ def _emit_start_timing_windows(*, state: GameState, decisions: DecisionControlle
             window_id=(
                 f"timing-window:{state.game_id}:round-{state.battle_round:02d}:battle-round:start"
             ),
+            runtime_event_index=runtime_event_index,
+            runtime_modifier_registry=runtime_modifier_registry,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
         )
     if battle_phase_index == 0:
         _emit_timing_window_if_missing(
@@ -362,6 +410,10 @@ def _emit_start_timing_windows(*, state: GameState, decisions: DecisionControlle
                 f"timing-window:{state.game_id}:round-{state.battle_round:02d}:"
                 f"turn:{active_player_id}:start"
             ),
+            runtime_event_index=runtime_event_index,
+            runtime_modifier_registry=runtime_modifier_registry,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
         )
     _emit_timing_window_if_missing(
         state=state,
@@ -374,6 +426,10 @@ def _emit_start_timing_windows(*, state: GameState, decisions: DecisionControlle
             f"timing-window:{state.game_id}:round-{state.battle_round:02d}:"
             f"turn:{active_player_id}:phase:{current_phase.value}:start"
         ),
+        runtime_event_index=runtime_event_index,
+        runtime_modifier_registry=runtime_modifier_registry,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
     )
 
 
@@ -438,7 +494,15 @@ def _emit_phase_start_objective_proximity_snapshot_if_available(
     )
 
 
-def _emit_end_timing_windows(*, state: GameState, decisions: DecisionController) -> None:
+def _emit_end_timing_windows(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    runtime_event_index: RuntimeContentEventIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    ruleset_descriptor: RulesetDescriptor | None,
+    army_catalog: ArmyCatalog | None,
+) -> None:
     completed_phase = state.current_battle_phase
     if completed_phase is None:
         raise GameLifecycleError("End timing windows require a current battle phase.")
@@ -458,6 +522,10 @@ def _emit_end_timing_windows(*, state: GameState, decisions: DecisionController)
             f"turn:{active_player_id}:phase:{completed_phase.value}:end"
         ),
         resolution_order=_END_WINDOW_RESOLUTION_ORDER,
+        runtime_event_index=runtime_event_index,
+        runtime_modifier_registry=runtime_modifier_registry,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
     )
     if battle_phase_index + 1 < len(state.battle_phase_sequence):
         return
@@ -473,6 +541,10 @@ def _emit_end_timing_windows(*, state: GameState, decisions: DecisionController)
             f"turn:{active_player_id}:end"
         ),
         resolution_order=_END_WINDOW_RESOLUTION_ORDER,
+        runtime_event_index=runtime_event_index,
+        runtime_modifier_registry=runtime_modifier_registry,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
     )
     if state.turn_order.index(active_player_id) + 1 < len(state.turn_order):
         return
@@ -487,6 +559,10 @@ def _emit_end_timing_windows(*, state: GameState, decisions: DecisionController)
             f"timing-window:{state.game_id}:round-{state.battle_round:02d}:battle-round:end"
         ),
         resolution_order=_END_WINDOW_RESOLUTION_ORDER,
+        runtime_event_index=runtime_event_index,
+        runtime_modifier_registry=runtime_modifier_registry,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
     )
 
 
@@ -646,6 +722,10 @@ def _emit_timing_window_if_missing(
     source_step: str,
     window_id: str,
     resolution_order: tuple[str, ...] = (),
+    runtime_event_index: RuntimeContentEventIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    ruleset_descriptor: RulesetDescriptor | None,
+    army_catalog: ArmyCatalog | None,
 ) -> None:
     if _timing_window_event_exists(
         decisions=decisions,
@@ -667,12 +747,91 @@ def _emit_timing_window_if_missing(
         active_player_id=active_player_id,
         phase=phase,
     )
-    payload = {
-        "timing_window": window.to_payload(),
-        "resolution_order": list(resolution_order),
-    }
+    payload_value = validate_json_value(
+        {
+            "timing_window": window.to_payload(),
+            "resolution_order": list(resolution_order),
+        }
+    )
+    if not isinstance(payload_value, dict):
+        raise GameLifecycleError("Timing window payload must be an object.")
+    payload = payload_value
     decisions.event_log.append("timing_window_opened", payload)
     decisions.event_log.append("timing_window_resolved", payload)
+    _dispatch_runtime_timing_window_event(
+        state=state,
+        decisions=decisions,
+        runtime_event_index=runtime_event_index,
+        runtime_modifier_registry=runtime_modifier_registry,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+        trigger_kind=trigger_kind,
+        active_player_id=active_player_id,
+        phase=phase,
+        window_payload=payload,
+    )
+
+
+def _dispatch_runtime_timing_window_event(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    runtime_event_index: RuntimeContentEventIndex,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    ruleset_descriptor: RulesetDescriptor | None,
+    army_catalog: ArmyCatalog | None,
+    trigger_kind: TimingTriggerKind,
+    active_player_id: str | None,
+    phase: BattlePhase | None,
+    window_payload: dict[str, JsonValue],
+) -> None:
+    if not runtime_event_index.subscriptions_for(trigger_kind):
+        return
+    if ruleset_descriptor is None:
+        raise GameLifecycleError("Runtime timing events require ruleset_descriptor.")
+    if army_catalog is None:
+        raise GameLifecycleError("Runtime timing events require army_catalog.")
+    timing_window_payload = window_payload.get("timing_window")
+    if not isinstance(timing_window_payload, dict):
+        raise GameLifecycleError("Runtime timing event requires timing_window payload.")
+    window_id = _payload_string(timing_window_payload, key="window_id")
+    for player_id in _runtime_event_player_ids(state):
+        event = RuntimeContentEvent(
+            event_id=f"{window_id}:runtime:{player_id}",
+            game_id=state.game_id,
+            player_id=player_id,
+            battle_round=state.battle_round,
+            trigger_kind=trigger_kind,
+            phase=phase,
+            active_player_id=active_player_id,
+            event_payload=window_payload,
+        )
+        for result in runtime_event_index.dispatch(
+            event,
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            runtime_modifier_registry=runtime_modifier_registry,
+        ):
+            decisions.event_log.append(
+                "runtime_content_event_resolved",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "player_id": player_id,
+                    "trigger_kind": trigger_kind.value,
+                    "runtime_event": event.to_payload(),
+                    "result": result.to_payload(),
+                },
+            )
+
+
+def _runtime_event_player_ids(state: GameState) -> tuple[str, ...]:
+    player_ids = tuple(army.player_id for army in state.army_definitions)
+    if player_ids:
+        return tuple(sorted(player_ids))
+    return tuple(sorted(state.player_ids))
 
 
 def _timing_window_event_exists(

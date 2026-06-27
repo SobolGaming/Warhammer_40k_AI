@@ -107,6 +107,7 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierBinding,
     HitRollModifierContext,
+    RuntimeModifierRegistry,
     WoundRollModifierBinding,
     WoundRollModifierContext,
 )
@@ -537,6 +538,7 @@ def test_runtime_event_index_dispatches_matching_subscriptions_deterministically
         decisions=decisions,
         ruleset_descriptor=config.ruleset_descriptor,
         army_catalog=config.army_catalog,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
 
     assert [result.subscription_id for result in results] == [
@@ -1296,6 +1298,7 @@ def test_runtime_event_results_and_dispatch_fail_closed() -> None:
         decisions=decisions,
         ruleset_descriptor=config.ruleset_descriptor,
         army_catalog=config.army_catalog,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )[0]
 
     assert event.target_unit_instance_ids == ("unit-a", "unit-b")
@@ -1377,6 +1380,7 @@ def test_runtime_event_results_and_dispatch_fail_closed() -> None:
             decisions=decisions,
             ruleset_descriptor=config.ruleset_descriptor,
             army_catalog=config.army_catalog,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         )
 
 
@@ -1439,6 +1443,7 @@ def test_runtime_event_filters_and_module_index_validation_are_fail_closed() -> 
             decisions=decisions,
             ruleset_descriptor=config.ruleset_descriptor,
             army_catalog=config.army_catalog,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         )
         == ()
     )
@@ -1540,6 +1545,7 @@ def test_runtime_event_filters_and_module_index_validation_are_fail_closed() -> 
             decisions=decisions,
             ruleset_descriptor=config.ruleset_descriptor,
             army_catalog=config.army_catalog,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         )
 
     module_index = RuntimeContentModuleIndex(

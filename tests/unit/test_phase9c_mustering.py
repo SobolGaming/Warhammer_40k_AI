@@ -17,6 +17,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptor,
     DatasheetDefinition,
     DatasheetKeywordSet,
+    UnitCompositionDefinition,
 )
 from warhammer40k_core.core.detachment import (
     DetachmentDefinition,
@@ -548,6 +549,124 @@ def _drukhari_corsairs_and_travelling_players_catalog() -> ArmyCatalog:
     )
 
 
+def _freeblades_catalog() -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_datasheet = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
+    single_model_composition = (
+        UnitCompositionDefinition(
+            model_profile_id=base_datasheet.model_profiles[0].model_profile_id,
+            min_models=1,
+            max_models=1,
+        ),
+    )
+
+    def single_model_datasheet(
+        *,
+        datasheet_id: str,
+        name: str,
+        keywords: tuple[str, ...],
+        faction_keywords: tuple[str, ...],
+    ) -> DatasheetDefinition:
+        return replace(
+            _phase17g_datasheet(
+                base_datasheet,
+                datasheet_id=datasheet_id,
+                name=name,
+                keywords=keywords,
+                faction_keywords=faction_keywords,
+            ),
+            composition=single_model_composition,
+        )
+
+    datasheets = (
+        single_model_datasheet(
+            datasheet_id="phase17g-space-marine-captain",
+            name="Space Marine Captain",
+            keywords=("Character", "Infantry", "Adeptus Astartes"),
+            faction_keywords=("Adeptus Astartes", "Imperium"),
+        ),
+        single_model_datasheet(
+            datasheet_id="phase17g-tau-commander",
+            name="Tau Commander",
+            keywords=("Character", "Infantry", "Tau Empire"),
+            faction_keywords=("Tau Empire",),
+        ),
+        single_model_datasheet(
+            datasheet_id="phase17g-armiger-warglaive",
+            name="Armiger Warglaive",
+            keywords=("Armiger", "Vehicle"),
+            faction_keywords=("Imperial Knights", "Imperium"),
+        ),
+        single_model_datasheet(
+            datasheet_id="phase17g-knight-crusader",
+            name="Knight Crusader",
+            keywords=("Character", "Titanic", "Vehicle"),
+            faction_keywords=("Imperial Knights", "Imperium"),
+        ),
+    )
+    factions = (
+        FactionDefinition(
+            faction_id="adeptus-astartes",
+            name="Adeptus Astartes",
+            faction_keywords=("Adeptus Astartes", "Imperium"),
+            source_ids=("phase17g:adeptus-astartes",),
+        ),
+        FactionDefinition(
+            faction_id="tau-empire",
+            name="Tau Empire",
+            faction_keywords=("Tau Empire",),
+            source_ids=("phase17g:tau-empire",),
+        ),
+        FactionDefinition(
+            faction_id="imperial-knights",
+            name="Imperial Knights",
+            faction_keywords=("Imperial Knights", "Imperium"),
+            source_ids=("phase17g:imperial-knights",),
+        ),
+    )
+    enhancements = (
+        EnhancementDefinition(
+            enhancement_id="phase17g-master-crafted",
+            name="Master-crafted Weapon",
+            source_id="phase17g:master-crafted",
+            points=20,
+        ),
+    )
+    detachments = (
+        DetachmentDefinition(
+            detachment_id="phase17g-adeptus-astartes-detachment",
+            name="Phase 17G Adeptus Astartes Detachment",
+            faction_id="adeptus-astartes",
+            detachment_point_cost=1,
+            unit_datasheet_ids=("phase17g-space-marine-captain",),
+            force_disposition_ids=("phase17g-force",),
+            enhancement_ids=("phase17g-master-crafted",),
+            source_ids=("phase17g:adeptus-astartes-detachment",),
+        ),
+        DetachmentDefinition(
+            detachment_id="phase17g-tau-detachment",
+            name="Phase 17G Tau Detachment",
+            faction_id="tau-empire",
+            detachment_point_cost=1,
+            unit_datasheet_ids=("phase17g-tau-commander",),
+            force_disposition_ids=("phase17g-force",),
+            enhancement_ids=("phase17g-master-crafted",),
+            source_ids=("phase17g:tau-detachment",),
+        ),
+    )
+    return ArmyCatalog(
+        catalog_id="phase17g-freeblades-catalog",
+        ruleset_id=base_catalog.ruleset_id,
+        source_package_id="phase17g-freeblades-source",
+        datasheets=datasheets,
+        wargear=base_catalog.wargear,
+        factions=factions,
+        detachments=detachments,
+        enhancements=enhancements,
+        source_ids=("phase17g:freeblades-catalog",),
+    )
+
+
 def _phase17g_datasheet(
     base_datasheet: DatasheetDefinition,
     *,
@@ -660,6 +779,69 @@ def _drukhari_corsairs_and_travelling_players_request(
         enhancement_assignments=enhancement_assignments,
         warlord_selection=warlord_selection,
         battle_size=battle_size,
+    )
+
+
+def _freeblades_request(
+    catalog: ArmyCatalog,
+    *,
+    unit_points: tuple[RosterUnitPointValue, ...],
+    warlord_selection: WarlordSelection,
+    enhancement_assignments: tuple[EnhancementAssignment, ...] = (),
+    armiger_count: int = 0,
+    include_titanic: bool = False,
+    faction_id: str = "adeptus-astartes",
+) -> ArmyMusterRequest:
+    if faction_id == "adeptus-astartes":
+        base_selection_id = "captain"
+        base_datasheet_id = "phase17g-space-marine-captain"
+        detachment_id = "phase17g-adeptus-astartes-detachment"
+    elif faction_id == "tau-empire":
+        base_selection_id = "commander"
+        base_datasheet_id = "phase17g-tau-commander"
+        detachment_id = "phase17g-tau-detachment"
+    else:
+        raise AssertionError("unsupported Freeblades test faction")
+    armiger_selections = tuple(
+        _unit_selection(
+            unit_selection_id=f"armiger-{index}",
+            datasheet_id="phase17g-armiger-warglaive",
+            model_count=1,
+        )
+        for index in range(1, armiger_count + 1)
+    )
+    titanic_selections = (
+        (
+            _unit_selection(
+                unit_selection_id="knight-crusader",
+                datasheet_id="phase17g-knight-crusader",
+                model_count=1,
+            ),
+        )
+        if include_titanic
+        else ()
+    )
+    return _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id=faction_id,
+            detachment_ids=(detachment_id,),
+            enhancement_ids=tuple(
+                assignment.enhancement_id for assignment in enhancement_assignments
+            ),
+        ),
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id=base_selection_id,
+                datasheet_id=base_datasheet_id,
+                model_count=1,
+            ),
+            *armiger_selections,
+            *titanic_selections,
+        ),
+        unit_points=unit_points,
+        enhancement_assignments=enhancement_assignments,
+        warlord_selection=warlord_selection,
     )
 
 
@@ -2106,6 +2288,104 @@ def test_phase17g_drukhari_corsairs_rejects_other_faction_allies() -> None:
             source_id="phase17g:warlord",
         ),
         include_outsider=True,
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+
+    assert "unit_selection_invalid" in {violation.violation_code for violation in report.violations}
+
+
+def test_phase17g_freeblades_allows_one_titanic_or_three_armigers_for_imperium_armies() -> None:
+    catalog = _freeblades_catalog()
+    titanic_request = _freeblades_request(
+        catalog,
+        unit_points=(
+            _unit_points("captain", 100),
+            _unit_points("knight-crusader", 400),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="captain",
+            source_id="phase17g:warlord",
+        ),
+        include_titanic=True,
+    )
+    armiger_request = _freeblades_request(
+        catalog,
+        unit_points=(
+            _unit_points("captain", 100),
+            _unit_points("armiger-1", 140),
+            _unit_points("armiger-2", 140),
+            _unit_points("armiger-3", 140),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="captain",
+            source_id="phase17g:warlord",
+        ),
+        armiger_count=3,
+    )
+
+    titanic_army = muster_army(catalog=catalog, request=titanic_request)
+    armiger_army = muster_army(catalog=catalog, request=armiger_request)
+
+    assert titanic_army.roster_legality_report.is_legal
+    assert {unit.datasheet_id for unit in titanic_army.units} == {
+        "phase17g-knight-crusader",
+        "phase17g-space-marine-captain",
+    }
+    assert armiger_army.roster_legality_report.is_legal
+    assert (
+        sum(1 for unit in armiger_army.units if unit.datasheet_id == "phase17g-armiger-warglaive")
+        == 3
+    )
+
+
+def test_phase17g_freeblades_reports_roster_violations() -> None:
+    catalog = _freeblades_catalog()
+    request = _freeblades_request(
+        catalog,
+        unit_points=(
+            _unit_points("captain", 100),
+            _unit_points("armiger-1", 140),
+            _unit_points("knight-crusader", 400),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="phase17g-master-crafted",
+                target_unit_selection_id="armiger-1",
+                source_id="phase17g:enhancement-assignment",
+            ),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="knight-crusader",
+            source_id="phase17g:warlord",
+        ),
+        armiger_count=1,
+        include_titanic=True,
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+
+    assert {violation.violation_code for violation in report.violations} >= {
+        "freeblades_enhancement_forbidden",
+        "freeblades_limit_exceeded",
+        "warlord_freeblades_forbidden",
+    }
+
+
+def test_phase17g_freeblades_rejects_non_imperium_faction_access() -> None:
+    catalog = _freeblades_catalog()
+    request = _freeblades_request(
+        catalog,
+        unit_points=(
+            _unit_points("commander", 100),
+            _unit_points("armiger-1", 140),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="commander",
+            source_id="phase17g:warlord",
+        ),
+        armiger_count=1,
+        faction_id="tau-empire",
     )
 
     report = validate_roster_legality(catalog=catalog, request=request)

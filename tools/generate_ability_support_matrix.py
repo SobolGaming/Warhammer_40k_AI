@@ -53,6 +53,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_chil
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.generated_manifest import (
     generated_runtime_content_rows,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.imperial_knights import (
+    army_rule as imperial_knights_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.leagues_of_votann import (
     army_rule as leagues_of_votann_army_rule,
 )
@@ -328,6 +331,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     "phase17f:phase17e:death-guard:army-rule": "Nurgle's Gift",
     "phase17f:phase17e:drukhari:army-rule": "Power from Pain",
     "phase17f:phase17e:emperors-children:army-rule": "Thrill Seekers",
+    "phase17f:phase17e:imperial-knights:army-rule": "Code Chivalric",
     "phase17f:phase17e:leagues-of-votann:army-rule": "Prioritised Efficiency",
     "phase17g:space-marines:army-rule": "Oath of Moment",
     "phase17f:phase17e:tau-empire:army-rule": "For the Greater Good",
@@ -378,6 +382,31 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     ),
     chaos_knights_army_rule.DARKNESS_HIT_MODIFIER_ID: "Harbingers of Dread - Darkness",
     chaos_knights_army_rule.DOOM_WOUND_MODIFIER_ID: "Harbingers of Dread - Doom",
+    imperial_knights_army_rule.HOOK_ID: "Code Chivalric",
+    imperial_knights_army_rule.SETUP_HOOK_ID: "Code Chivalric - Oath Selection",
+    imperial_knights_army_rule.UNIT_DESTROYED_HOOK_ID: "Code Chivalric",
+    imperial_knights_army_rule.END_TURN_EVENT_HANDLER_ID: "Code Chivalric",
+    imperial_knights_army_rule.END_BATTLE_ROUND_EVENT_HANDLER_ID: "Code Chivalric",
+    imperial_knights_army_rule.END_TURN_SUBSCRIPTION_ID: "Code Chivalric",
+    imperial_knights_army_rule.END_BATTLE_ROUND_SUBSCRIPTION_ID: "Code Chivalric",
+    f"{imperial_knights_army_rule.HOOK_ID}:martial-valour:shooting": (
+        "Code Chivalric - Martial Valour"
+    ),
+    f"{imperial_knights_army_rule.HOOK_ID}:martial-valour:fight": (
+        "Code Chivalric - Martial Valour"
+    ),
+    f"{imperial_knights_army_rule.HOOK_ID}:eager:movement-budget": (
+        "Code Chivalric - Eager for the Challenge"
+    ),
+    f"{imperial_knights_army_rule.HOOK_ID}:eager:charge-roll": (
+        "Code Chivalric - Eager for the Challenge"
+    ),
+    f"{imperial_knights_army_rule.HOOK_ID}:legacy:objective-control": (
+        "Code Chivalric - Legacy Unsullied"
+    ),
+    f"{imperial_knights_army_rule.HOOK_ID}:legacy:leadership": (
+        "Code Chivalric - Legacy Unsullied"
+    ),
     tau_empire_army_rule.HOOK_ID: "For the Greater Good",
     tau_empire_army_rule.WEAPON_PROFILE_MODIFIER_ID: "For the Greater Good - Weapon Profile",
     SPACE_MARINE_CHAPTERS_SOURCE_ID: "Space Marine Chapters",
@@ -601,6 +630,13 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             runtime_consumer_ids=_chaos_knights_runtime_consumer_ids(),
         ),
         _implemented_faction_army_rule_row(
+            faction_id=imperial_knights_army_rule.IMPERIAL_KNIGHTS_FACTION_ID,
+            ability_id=imperial_knights_army_rule.HOOK_ID,
+            ability_name=imperial_knights_army_rule.CODE_CHIVALRIC_ABILITY_NAME,
+            semantic_category="faction.army_rule.code_chivalric",
+            runtime_consumer_ids=_imperial_knights_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
             faction_id=astra_militarum_army_rule.ASTRA_MILITARUM_FACTION_ID,
             ability_id=astra_militarum_army_rule.HOOK_ID,
             ability_name="Voice of Command",
@@ -806,6 +842,35 @@ def _chaos_knights_runtime_consumer_ids() -> tuple[str, ...]:
                 ),
                 *(binding.modifier_id for binding in contribution.hit_roll_modifier_bindings),
                 *(binding.modifier_id for binding in contribution.wound_roll_modifier_bindings),
+            }
+        )
+    )
+
+
+def _imperial_knights_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = imperial_knights_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                contribution.contribution_id,
+                *(binding.handler_id for binding in contribution.event_handler_bindings),
+                *(binding.hook_id for binding in contribution.battle_formation_hook_bindings),
+                *(binding.hook_id for binding in contribution.unit_destroyed_hook_bindings),
+                *(binding.hook_id for binding in contribution.shooting_unit_selected_hook_bindings),
+                *(binding.hook_id for binding in contribution.fight_unit_selected_hook_bindings),
+                *(
+                    binding.modifier_id
+                    for binding in contribution.movement_budget_modifier_bindings
+                ),
+                *(binding.modifier_id for binding in contribution.charge_roll_modifier_bindings),
+                *(
+                    binding.modifier_id
+                    for binding in contribution.objective_control_modifier_bindings
+                ),
+                *(
+                    binding.modifier_id
+                    for binding in contribution.unit_characteristic_modifier_bindings
+                ),
             }
         )
     )
@@ -1343,7 +1408,7 @@ def _add_runtime_content_inventory_entries(
     _add_hook_bindings(
         inventory,
         (
-            (binding.trigger_kind.value, binding.source_rule_id)
+            (binding.subscription_id, binding.source_rule_id)
             for binding in contribution.event_subscriptions
         ),
         labels_by_id,
@@ -1511,6 +1576,14 @@ def _add_runtime_content_inventory_entries(
         inventory,
         (
             (binding.hook_id, binding.source_id)
+            for binding in contribution.fight_unit_selected_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
             for binding in contribution.fight_unit_selected_grant_hook_bindings
         ),
         labels_by_id,
@@ -1633,10 +1706,15 @@ def _add_handler_bindings(
     labels_by_id: Mapping[str, set[str]],
 ) -> None:
     for handler_id in handler_ids:
-        labels = labels_by_id.get(handler_id)
-        if labels is None:
-            labels = {_label_from_identifier(handler_id)}
-        for label in labels:
+        label_override = _RUNTIME_ID_LABEL_OVERRIDES.get(handler_id)
+        labels_for_handler: set[str] | None
+        if label_override is not None:
+            labels_for_handler = {label_override}
+        else:
+            labels_for_handler = labels_by_id.get(handler_id)
+            if labels_for_handler is None:
+                labels_for_handler = {_label_from_identifier(handler_id)}
+        for label in labels_for_handler:
             _add_inventory_entry(inventory, hook_id=handler_id, label=label)
 
 
@@ -2073,6 +2151,34 @@ def _structured_support_sections_markdown() -> list[str]:
                         "and the Darkness Stealth hit modifier. Delirium mortal-wound "
                         "Feel No Pain continuation is explicitly deferred and emits a typed "
                         "unsupported event without applying wounds."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Imperial Knights - Code Chivalric",
+                    "Named army-rule handler plus setup/timing/runtime modifier hosts",
+                    "Adapter contract, decision catalog, source coverage, and generated matrix",
+                    (
+                        "Focused oath selection, fulfilment, modifier, reroll, "
+                        "and source coverage tests"
+                    ),
+                    "Full",
+                    (
+                        "Implements source-backed Code Chivalric oath selection, the updated "
+                        "Reap a Great Tally battle-round check, Honoured CP rewards, Martial "
+                        "Valour rerolls, Eager movement and charge modifiers, and Legacy OC "
+                        "and Leadership modifiers."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Imperial Knights - Freeblades",
+                    "Shared mustering/list-validation host",
+                    "Generated matrix and mustering tests",
+                    "Focused mustering tests",
+                    "Full",
+                    (
+                        "Allows Imperium armies to include either one TITANIC Imperial "
+                        "Knights model or up to three ARMIGER models; allied Freeblades "
+                        "cannot be Warlords or receive Enhancements."
                     ),
                 ),
                 SupportSectionRow(

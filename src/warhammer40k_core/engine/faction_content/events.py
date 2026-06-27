@@ -16,6 +16,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
     timing_trigger_kind_from_token,
@@ -140,6 +141,7 @@ class RuntimeContentEventContext:
     decisions: DecisionController
     ruleset_descriptor: RulesetDescriptor
     army_catalog: ArmyCatalog
+    runtime_modifier_registry: RuntimeModifierRegistry
 
     def __post_init__(self) -> None:
         if type(self.event) is not RuntimeContentEvent:
@@ -152,6 +154,8 @@ class RuntimeContentEventContext:
             raise GameLifecycleError("Runtime event context requires RulesetDescriptor.")
         if type(self.army_catalog) is not ArmyCatalog:
             raise GameLifecycleError("Runtime event context requires ArmyCatalog.")
+        if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
+            raise GameLifecycleError("Runtime event context requires RuntimeModifierRegistry.")
 
 
 RuntimeEventHandler = Callable[[RuntimeContentEventContext], "RuntimeContentEventResult"]
@@ -406,6 +410,7 @@ class RuntimeContentEventIndex:
         decisions: DecisionController,
         ruleset_descriptor: RulesetDescriptor,
         army_catalog: ArmyCatalog,
+        runtime_modifier_registry: RuntimeModifierRegistry,
     ) -> tuple[RuntimeContentEventResult, ...]:
         if type(event) is not RuntimeContentEvent:
             raise GameLifecycleError("Runtime event dispatch requires a RuntimeContentEvent.")
@@ -415,6 +420,7 @@ class RuntimeContentEventIndex:
             decisions=decisions,
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         results: list[RuntimeContentEventResult] = []
         for subscription in self.subscriptions_for(event.trigger_kind):

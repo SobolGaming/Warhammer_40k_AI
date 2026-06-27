@@ -102,6 +102,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.death_guard i
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
     army_rule as emperors_children_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.imperial_knights import (
+    army_rule as imperial_knights_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
     army_rule as world_eaters_army_rule,
 )
@@ -887,6 +890,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| Leagues of Votann | 10 | 0 | 28 | 42 | 1 | "
         "[leagues-of-votann](factions/leagues-of-votann.md) |"
     ) in generated_markdown
+    assert (
+        "| Imperial Knights | 8 | 0 | 24 | 36 | 1 | "
+        "[imperial-knights](factions/imperial-knights.md) |"
+    ) in generated_markdown
     assert "| Grey Knights - Gate of Infinity | Named army-rule handler |" in generated_markdown
     assert (
         "| Leagues of Votann - Prioritised Efficiency | "
@@ -904,6 +911,17 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "source ID, and fail-fast tests | Full |"
     ) in generated_markdown
     assert (
+        "| Imperial Knights - Code Chivalric | "
+        "Named army-rule handler plus setup/timing/runtime modifier hosts | "
+        "Adapter contract, decision catalog, source coverage, and generated matrix | "
+        "Focused oath selection, fulfilment, modifier, reroll, and source coverage tests | "
+        "Full |"
+    ) in generated_markdown
+    assert (
+        "| Imperial Knights - Freeblades | Shared mustering/list-validation host | "
+        "Generated matrix and mustering tests | Focused mustering tests | Full |"
+    ) in generated_markdown
+    assert (
         "| Scouts X | Pre-battle Scout Move, Scout reserve setup, and Dedicated "
         "Transport Scout Move hosts | Adapter contract and decision catalog | "
         "Focused pre-battle, setup smoke, and enhancement-grant tests | Full | "
@@ -912,9 +930,11 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in generated_markdown
     aeldari_markdown = generated_faction_markdown["aeldari.md"]
     chaos_daemons_markdown = generated_faction_markdown["chaos-daemons.md"]
+    imperial_knights_markdown = generated_faction_markdown["imperial-knights.md"]
     assert "## Detachment Rule Support" in aeldari_markdown
     assert "## Detachment Rule Support" in chaos_daemons_markdown
     assert "| Supported detachment rules |" in chaos_daemons_markdown
+    assert "| 8 | 0 | 24 | 36 | 1 |" in imperial_knights_markdown
     assert (
         "| Daemonic Incursion | `Full` | Warp Rifts reserve-arrival distance hook |"
     ) in chaos_daemons_markdown
@@ -957,6 +977,16 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert (
         "| `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:"
         "soul_shattering_charge_upgrade` | Soul-Shattering Charge Upgrade |"
+    ) in generated_markdown
+    assert (
+        f"| `{imperial_knights_army_rule.SETUP_HOOK_ID}` | Code Chivalric - Oath Selection |"
+    ) in generated_markdown
+    assert (
+        f"| `{imperial_knights_army_rule.END_BATTLE_ROUND_SUBSCRIPTION_ID}` | Code Chivalric |"
+    ) in generated_markdown
+    assert (
+        f"| `{imperial_knights_army_rule.HOOK_ID}:martial-valour:fight` | "
+        "Code Chivalric - Martial Valour |"
     ) in generated_markdown
     assert tuple(row.datasheet_name for row in rows_by_name["Instrument of Chaos"]) == (
         "Bloodletters",
@@ -1022,6 +1052,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         for row in rows_by_name["Prioritised Efficiency"]
     )
     assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Code Chivalric"]
+    )
+    assert all(
         row.runtime_consumer_ids
         == ("warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",)
         for row in rows_by_name["The Shadow of Chaos"]
@@ -1038,6 +1072,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Prioritised Efficiency"]) == (
         "Leagues of Votann",
+    )
+    assert tuple(row.datasheet_name for row in rows_by_name["Code Chivalric"]) == (
+        "Imperial Knights",
     )
     assert set(rows_by_name["Dark Pacts"][0].runtime_consumer_ids) == {
         chaos_space_marines_army_rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID,
@@ -1076,7 +1113,23 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll",
         "warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll",
     }
+    assert set(rows_by_name["Code Chivalric"][0].runtime_consumer_ids) == {
+        imperial_knights_army_rule.HOOK_ID,
+        imperial_knights_army_rule.SETUP_HOOK_ID,
+        imperial_knights_army_rule.UNIT_DESTROYED_HOOK_ID,
+        imperial_knights_army_rule.END_TURN_EVENT_HANDLER_ID,
+        imperial_knights_army_rule.END_BATTLE_ROUND_EVENT_HANDLER_ID,
+        f"{imperial_knights_army_rule.HOOK_ID}:martial-valour:shooting",
+        f"{imperial_knights_army_rule.HOOK_ID}:martial-valour:fight",
+        f"{imperial_knights_army_rule.HOOK_ID}:eager:movement-budget",
+        f"{imperial_knights_army_rule.HOOK_ID}:eager:charge-roll",
+        f"{imperial_knights_army_rule.HOOK_ID}:legacy:objective-control",
+        f"{imperial_knights_army_rule.HOOK_ID}:legacy:leadership",
+    }
     assert categories_by_name["Faction Army Rule Prioritised Efficiency"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["Faction Army Rule Code Chivalric"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
     )
     assert categories_by_name["Leadership Characteristic"].ability_names == ("Daemonic Icon",)

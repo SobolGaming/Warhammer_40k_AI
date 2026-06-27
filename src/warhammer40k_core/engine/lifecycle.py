@@ -526,11 +526,23 @@ class GameLifecycle:
                 if self._runtime_content_bundle is not None
                 else None
             ),
+            unit_destroyed_hooks=(
+                self._runtime_content_bundle.unit_destroyed_hook_registry
+                if self._runtime_content_bundle is not None
+                else None
+            ),
             runtime_modifier_registry=(
                 self._runtime_content_bundle.runtime_modifier_registry
                 if self._runtime_content_bundle is not None
                 else None
             ),
+            runtime_event_index=(
+                self._runtime_content_bundle.event_index
+                if self._runtime_content_bundle is not None
+                else None
+            ),
+            ruleset_descriptor=config.ruleset_descriptor,
+            army_catalog=config.army_catalog,
         )
         current_setup_step = self.state.current_setup_step
         if current_setup_step is None:
@@ -1916,11 +1928,23 @@ class GameLifecycle:
                 if lifecycle._runtime_content_bundle is not None
                 else None
             ),
+            unit_destroyed_hooks=(
+                lifecycle._runtime_content_bundle.unit_destroyed_hook_registry
+                if lifecycle._runtime_content_bundle is not None
+                else None
+            ),
             runtime_modifier_registry=(
                 lifecycle._runtime_content_bundle.runtime_modifier_registry
                 if lifecycle._runtime_content_bundle is not None
                 else None
             ),
+            runtime_event_index=(
+                lifecycle._runtime_content_bundle.event_index
+                if lifecycle._runtime_content_bundle is not None
+                else None
+            ),
+            ruleset_descriptor=None if config is None else config.ruleset_descriptor,
+            army_catalog=None if config is None else config.army_catalog,
         )
         return lifecycle
 
@@ -2089,6 +2113,9 @@ class GameLifecycle:
             fight_activation_ability_hooks=(
                 self._runtime_content_bundle.fight_activation_ability_hook_registry
             ),
+            fight_unit_selected_hooks=(
+                self._runtime_content_bundle.fight_unit_selected_hook_registry
+            ),
             fight_unit_selected_grant_hooks=(
                 self._runtime_content_bundle.fight_unit_selected_grant_hook_registry
             ),
@@ -2107,6 +2134,9 @@ class GameLifecycle:
             ),
             unit_destroyed_hooks=self._runtime_content_bundle.unit_destroyed_hook_registry,
             runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
+            runtime_event_index=self._runtime_content_bundle.event_index,
+            ruleset_descriptor=self._config.ruleset_descriptor,
+            army_catalog=self._config.army_catalog,
         )
         self._runtime_content_activation_input_hash = _runtime_content_activation_input_hash(
             config=self._config,

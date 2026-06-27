@@ -34,6 +34,7 @@ ASTRA_MILITARUM_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.astra_militarum.arm
 ORKS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.orks.army_rule"
 BLACK_TEMPLARS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.black_templars.army_rule"
 TAU_EMPIRE_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.tau_empire.army_rule"
+IMPERIAL_KNIGHTS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.imperial_knights.army_rule"
 SHADOW_LEGION_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.shadow_legion.rule"
 SHADOW_LEGION_ENHANCEMENTS_MODULE_PATH = (
     f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.shadow_legion.enhancements"
@@ -71,6 +72,9 @@ IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
     ),
     TAU_EMPIRE_ARMY_RULE_MODULE_PATH: (
         "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good"
+    ),
+    IMPERIAL_KNIGHTS_ARMY_RULE_MODULE_PATH: (
+        "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric"
     ),
     SHADOW_LEGION_RULE_MODULE_PATH: (
         "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule"

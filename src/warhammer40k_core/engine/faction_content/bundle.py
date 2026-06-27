@@ -97,6 +97,8 @@ from warhammer40k_core.engine.fight_phase_start_hooks import (
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrantBinding,
     FightUnitSelectedGrantRegistry,
+    FightUnitSelectedHookBinding,
+    FightUnitSelectedHookRegistry,
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHookBinding,
@@ -245,6 +247,7 @@ class RuntimeContentContribution:
     shooting_end_surge_hook_bindings: tuple[ShootingEndSurgeHookBinding, ...] = ()
     enhancement_effect_bindings: tuple[EnhancementEffectBinding, ...] = ()
     fight_activation_ability_hook_bindings: tuple[FightActivationAbilityHookBinding, ...] = ()
+    fight_unit_selected_hook_bindings: tuple[FightUnitSelectedHookBinding, ...] = ()
     fight_unit_selected_grant_hook_bindings: tuple[FightUnitSelectedGrantBinding, ...] = ()
     phase_end_objective_control_hook_bindings: tuple[PhaseEndObjectiveControlHookBinding, ...] = ()
     stratagem_cost_choice_hook_bindings: tuple[StratagemCostChoiceHookBinding, ...] = ()
@@ -544,6 +547,15 @@ class RuntimeContentContribution:
                 "RuntimeContentContribution fight_activation_ability_hook_bindings",
                 self.fight_activation_ability_hook_bindings,
                 FightActivationAbilityHookBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "fight_unit_selected_hook_bindings",
+            _validate_tuple(
+                "RuntimeContentContribution fight_unit_selected_hook_bindings",
+                self.fight_unit_selected_hook_bindings,
+                FightUnitSelectedHookBinding,
             ),
         )
         object.__setattr__(
@@ -1050,6 +1062,7 @@ class RuntimeContentBundle:
     shooting_end_surge_hook_registry: ShootingEndSurgeHookRegistry
     enhancement_effect_registry: EnhancementEffectRegistry
     fight_activation_ability_hook_registry: FightActivationAbilityHookRegistry
+    fight_unit_selected_hook_registry: FightUnitSelectedHookRegistry
     fight_unit_selected_grant_hook_registry: FightUnitSelectedGrantRegistry
     phase_end_objective_control_hook_registry: PhaseEndObjectiveControlHookRegistry
     stratagem_cost_choice_hook_registry: StratagemCostChoiceHookRegistry
@@ -1184,6 +1197,8 @@ class RuntimeContentBundle:
             raise GameLifecycleError(
                 "RuntimeContentBundle requires FightActivationAbilityHookRegistry."
             )
+        if type(self.fight_unit_selected_hook_registry) is not FightUnitSelectedHookRegistry:
+            raise GameLifecycleError("RuntimeContentBundle requires FightUnitSelectedHookRegistry.")
         if type(self.fight_unit_selected_grant_hook_registry) is not FightUnitSelectedGrantRegistry:
             raise GameLifecycleError(
                 "RuntimeContentBundle requires FightUnitSelectedGrantRegistry."
@@ -1478,6 +1493,13 @@ class RuntimeContentBundle:
                 for binding in contribution.fight_activation_ability_hook_bindings
             )
         )
+        fight_unit_selected_hook_registry = FightUnitSelectedHookRegistry.from_bindings(
+            tuple(
+                binding
+                for contribution in validated_contributions
+                for binding in contribution.fight_unit_selected_hook_bindings
+            )
+        )
         fight_unit_selected_grant_hook_registry = FightUnitSelectedGrantRegistry.from_bindings(
             tuple(
                 binding
@@ -1581,6 +1603,7 @@ class RuntimeContentBundle:
             shooting_end_surge_hook_registry=shooting_end_surge_hook_registry,
             enhancement_effect_registry=enhancement_effect_registry,
             fight_activation_ability_hook_registry=fight_activation_ability_hook_registry,
+            fight_unit_selected_hook_registry=fight_unit_selected_hook_registry,
             fight_unit_selected_grant_hook_registry=fight_unit_selected_grant_hook_registry,
             phase_end_objective_control_hook_registry=(phase_end_objective_control_hook_registry),
             stratagem_cost_choice_hook_registry=stratagem_cost_choice_hook_registry,
@@ -1697,6 +1720,9 @@ class RuntimeContentBundle:
             "fight_activation_ability_hook_ids": [
                 binding.hook_id
                 for binding in self.fight_activation_ability_hook_registry.all_bindings()
+            ],
+            "fight_unit_selected_hook_ids": [
+                binding.hook_id for binding in self.fight_unit_selected_hook_registry.all_bindings()
             ],
             "fight_unit_selected_grant_hook_ids": [
                 binding.hook_id

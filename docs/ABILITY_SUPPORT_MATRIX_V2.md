@@ -100,6 +100,8 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | Orks - Waaagh! | Named army-rule handler | Adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, advance eligibility, weapon-profile, save-option, and validation tests | Full | Implements optional once-per-battle Command phase Waaagh! call, active until the start of the next own Command phase, including Advance-then-Charge eligibility, melee Strength/Attacks modifiers, and a 5+ invulnerable save. |
 | Black Templars - Templar Vows | Named army-rule handler | Adapter contract, decision catalog, source coverage, and generated matrix | Focused vow selection, modifier, charge, Fall Back, and objective tests | Full | Implements battle-round Templar Vow selection, Abhor the Witch Precision and PSYKER charge requirements, Accept Any Challenge wound modifiers, Suffer Not the Unclean charge-after-Fall-Back, and Uphold the Honour sticky objective control. |
 | Chaos Knights - Harbingers of Dread | Named army-rule handler | Adapter contract, decision catalog, source coverage, and generated matrix | Focused Dread selection, forced Battle-shock, mortal-wound, runtime-modifier, source ID, and fail-fast tests | Full | Implements battle-round Dread selections and 2D6 rolls, Deathly Terror/Despair Leadership auras, Dismay forced below-starting Battle-shock tests, Delirium D3 mortal wounds, Doom wound modifiers, and the Darkness Stealth hit modifier. Delirium mortal-wound Feel No Pain continuation is explicitly deferred and emits a typed unsupported event without applying wounds. |
+| Imperial Knights - Code Chivalric | Named army-rule handler plus setup/timing/runtime modifier hosts | Adapter contract, decision catalog, source coverage, and generated matrix | Focused oath selection, fulfilment, modifier, reroll, and source coverage tests | Full | Implements source-backed Code Chivalric oath selection, the updated Reap a Great Tally battle-round check, Honoured CP rewards, Martial Valour rerolls, Eager movement and charge modifiers, and Legacy OC and Leadership modifiers. |
+| Imperial Knights - Freeblades | Shared mustering/list-validation host | Generated matrix and mustering tests | Focused mustering tests | Full | Allows Imperium armies to include either one TITANIC Imperial Knights model or up to three ARMIGER models; allied Freeblades cannot be Warlords or receive Enhancements. |
 | Astra Militarum - Voice of Command | Named army-rule handler | Adapter contract, decision catalog, source coverage, and generated matrix | Focused command-phase, Battle-shock, and runtime-modifier tests | Full | Implements Command phase Order selection, order replacement, Battle-shock order cleanup, and all six Order modifiers through shared decision and modifier hosts. |
 | Emperor's Children - Thrill Seekers | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes movement, charge, and shooting target restrictions. |
 | Grey Knights - Gate of Infinity | Named army-rule handler | Adapter contract, decision catalog, architecture, and generated matrix | Focused turn-end, reserves, cap, and attached-rules-unit tests | Full | Implements opponent Fight phase Gate of Infinity selections, battle-size caps, complete choices, required next-Movement Strategic Reserves arrival, and attached rules-unit component validation. |
@@ -141,7 +143,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Astra Militarum | 11 | 0 | 36 | 54 | 1 | [astra-militarum](factions/astra-militarum.md) |
 | Adepta Sororitas | 8 | 0 | 20 | 30 | 0 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 0 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
-| Imperial Knights | 8 | 0 | 24 | 36 | 0 | [imperial-knights](factions/imperial-knights.md) |
+| Imperial Knights | 8 | 0 | 24 | 36 | 1 | [imperial-knights](factions/imperial-knights.md) |
 | Adeptus Custodes | 9 | 0 | 24 | 36 | 0 | [adeptus-custodes](factions/adeptus-custodes.md) |
 | Imperial Agents | 5 | 0 | 20 | 30 | 0 | [imperial-agents](factions/imperial-agents.md) |
 
@@ -349,6 +351,19 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction` | Thrill Seekers |
 | `warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity` | Gate Of Infinity |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric` | Code Chivalric |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:charge-roll` | Code Chivalric - Eager for the Challenge |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:movement-budget` | Code Chivalric - Eager for the Challenge |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-battle-round` | Code Chivalric |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-turn` | Code Chivalric |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:enemy-unit-destroyed` | Code Chivalric |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:leadership` | Code Chivalric - Legacy Unsullied |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:objective-control` | Code Chivalric - Legacy Unsullied |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:martial-valour:fight` | Code Chivalric - Martial Valour |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:martial-valour:shooting` | Code Chivalric - Martial Valour |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:oath-selection` | Code Chivalric - Oath Selection |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:subscription:end-battle-round` | Code Chivalric |
+| `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:subscription:end-turn` | Code Chivalric |
 | `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:command-phase-start` | Prioritised Efficiency |
 | `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:hit-roll` | Prioritised Efficiency |
 | `warhammer_40000_11th:leagues_of_votann:army_rule:prioritised_efficiency:wound-roll` | Prioritised Efficiency |

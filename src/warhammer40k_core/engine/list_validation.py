@@ -32,6 +32,9 @@ DAEMONIC_PACT_FACTION_KEYWORD = "LEGIONES DAEMONICA"
 DAEMONIC_PACT_BASE_FACTION_KEYWORDS = frozenset({"CHAOS KNIGHTS", "HERETIC ASTARTES"})
 DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_FACTION_KEYWORD = "DRUKHARI"
 DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_ALLY_KEYWORDS = frozenset({"HARLEQUINS", "ANHRATHE"})
+FREEBLADES_REQUIRED_FACTION_KEYWORD = "IMPERIUM"
+FREEBLADES_IMPERIAL_KNIGHTS_FACTION_KEYWORD = "IMPERIAL KNIGHTS"
+FREEBLADES_ALLOWED_KEYWORDS = frozenset({"ARMIGER", "TITANIC"})
 SHADOW_LEGION_FACTION_KEYWORD = "LEGIONES DAEMONICA"
 SHADOW_LEGION_DETACHMENT_ID = "shadow-legion"
 SHADOW_LEGION_HERETIC_ASTARTES_FACTION_KEYWORD = "HERETIC ASTARTES"
@@ -589,6 +592,10 @@ def validate_unit_selection_for_army(
             faction=faction,
         )
     )
+    freeblades_allowed = freeblades_datasheet_allowed_for_faction(
+        datasheet=datasheet,
+        faction=faction,
+    )
     shadow_legion_thralls_allowed = shadow_legion_thralls_datasheet_has_faction_access(
         datasheet=datasheet,
         faction=faction,
@@ -598,6 +605,7 @@ def validate_unit_selection_for_army(
         not shares_selected_faction
         and not daemonic_pact_allowed
         and not drukhari_corsairs_allowed
+        and not freeblades_allowed
         and not shadow_legion_thralls_allowed
     ):
         raise ListValidationError("UnitMusterSelection datasheet is not legal for faction.")
@@ -613,6 +621,7 @@ def validate_unit_selection_for_army(
         datasheet.datasheet_id not in allowed_datasheet_ids
         and not daemonic_pact_allowed
         and not drukhari_corsairs_allowed
+        and not freeblades_allowed
         and not shadow_legion_thralls_allowed
     ):
         raise ListValidationError(
@@ -663,6 +672,36 @@ def drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction(
         datasheet,
         DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_ALLY_KEYWORDS,
     )
+
+
+def freeblades_datasheet_allowed_for_faction(
+    *,
+    datasheet: DatasheetDefinition,
+    faction: FactionDefinition,
+) -> bool:
+    if type(datasheet) is not DatasheetDefinition:
+        raise ListValidationError("Freeblades datasheet must be a DatasheetDefinition.")
+    if type(faction) is not FactionDefinition:
+        raise ListValidationError("Freeblades faction must be a FactionDefinition.")
+    if not _faction_has_keyword(faction, FREEBLADES_REQUIRED_FACTION_KEYWORD):
+        return False
+    selected_faction_keywords = {
+        _canonical_keyword(keyword) for keyword in faction.faction_keywords
+    }
+    datasheet_faction_keywords = {
+        _canonical_keyword(keyword) for keyword in datasheet.keywords.faction_keywords
+    }
+    selected_non_imperium_faction_keywords = selected_faction_keywords - {
+        _canonical_keyword(FREEBLADES_REQUIRED_FACTION_KEYWORD)
+    }
+    if selected_non_imperium_faction_keywords & datasheet_faction_keywords:
+        return False
+    if not _datasheet_has_faction_keyword(
+        datasheet,
+        FREEBLADES_IMPERIAL_KNIGHTS_FACTION_KEYWORD,
+    ):
+        return False
+    return _datasheet_has_any_keyword(datasheet, FREEBLADES_ALLOWED_KEYWORDS)
 
 
 def shadow_legion_thralls_datasheet_allowed_for_faction(

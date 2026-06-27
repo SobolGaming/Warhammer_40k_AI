@@ -117,6 +117,19 @@ TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good",
     "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good:weapon-profile",
 )
+IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:charge-roll",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:movement-budget",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:enemy-unit-destroyed",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-battle-round",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-turn",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:leadership",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:objective-control",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:martial-valour:fight",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:martial-valour:shooting",
+    "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:oath-selection",
+)
 SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "aeldari": "Battle Focus",
     "astra-militarum": "Voice of Command",
@@ -128,6 +141,7 @@ SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "drukhari": "Power from Pain",
     "emperors-children": "Thrill Seekers",
     "grey-knights": "Gate of Infinity",
+    "imperial-knights": "Code Chivalric",
     "leagues-of-votann": "Prioritised Efficiency",
     "necrons": "Reanimation Protocols",
     "orks": "Waaagh!",
@@ -389,6 +403,26 @@ def test_phase17f_tau_empire_army_rule_execution_record_is_named_handler() -> No
     )
     assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
     assert record.handler_id == TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMERS[0]
+    assert record.block_reason is None
+
+
+def test_phase17f_imperial_knights_army_rule_execution_record_is_named_handler() -> None:
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and record.faction_id == "imperial-knights"
+    )
+
+    assert record.coverage_descriptor_id == "phase17e:imperial-knights:army-rule"
+    assert record.execution_id == "phase17f:phase17e:imperial-knights:army-rule"
+    assert record.rule_name == "Code Chivalric"
+    assert record.runtime_support_status == "engine_consumed"
+    assert record.runtime_consumer_ids == tuple(
+        sorted(IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS)
+    )
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
+    assert record.handler_id == IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS[0]
     assert record.block_reason is None
 
 

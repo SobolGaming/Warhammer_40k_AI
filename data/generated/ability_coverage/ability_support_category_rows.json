@@ -405,6 +405,49 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric",
+        "ability_name": "Code Chivalric",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/imperial-knights/faction/warhammer_40000_11th:imperial_knights:army_rule:code_chivalric/none",
+        "datasheet_id": "imperial-knights",
+        "datasheet_name": "Imperial Knights",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Code Chivalric"
+    ],
+    "category_id": "faction.army_rule.code_chivalric",
+    "category_name": "Faction Army Rule Code Chivalric",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/imperial-knights/faction/warhammer_40000_11th:imperial_knights:army_rule:code_chivalric/none"
+    ],
+    "datasheet_names": [
+      "Imperial Knights"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:charge-roll",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:movement-budget",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-battle-round",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:end-turn",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:enemy-unit-destroyed",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:leadership",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:legacy:objective-control",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:martial-valour:fight",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:martial-valour:shooting",
+      "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:oath-selection"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good",
         "ability_name": "For the Greater Good",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/tau-empire/faction/warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good/none",
