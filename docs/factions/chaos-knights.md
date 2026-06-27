@@ -8,7 +8,7 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_knights-nd97dcwfqa-6prd
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 8 | 0 | 26 | 36 | 0 |
+| 8 | 0 | 26 | 36 | 1 |
 
 ## Detachment Rule Support
 

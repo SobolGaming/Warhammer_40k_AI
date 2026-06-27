@@ -35,6 +35,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.astra_militar
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.black_templars import (
     army_rule as black_templars_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_knights import (
+    army_rule as chaos_knights_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as chaos_space_marines_army_rule,
 )
@@ -320,6 +323,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     ),
     "phase17f:phase17e:chaos-daemons:daemonic-incursion:rule": "Warp Rifts",
     "phase17f:phase17e:chaos-daemons:shadow-legion:rule": "Shadow Legion",
+    "phase17f:phase17e:chaos-knights:army-rule": "Harbingers of Dread",
     "phase17f:phase17e:chaos-space-marines:army-rule": "Dark Pacts",
     "phase17f:phase17e:death-guard:army-rule": "Nurgle's Gift",
     "phase17f:phase17e:drukhari:army-rule": "Power from Pain",
@@ -367,6 +371,13 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:weapon-profile": (
         "Voice of Command - Weapon Orders"
     ),
+    chaos_knights_army_rule.HOOK_ID: "Harbingers of Dread",
+    chaos_knights_army_rule.BATTLE_SHOCK_HOOK_ID: "Harbingers of Dread - Battle-shock",
+    chaos_knights_army_rule.LEADERSHIP_MODIFIER_ID: (
+        "Harbingers of Dread - Deathly Terror and Despair"
+    ),
+    chaos_knights_army_rule.DARKNESS_HIT_MODIFIER_ID: "Harbingers of Dread - Darkness",
+    chaos_knights_army_rule.DOOM_WOUND_MODIFIER_ID: "Harbingers of Dread - Doom",
     tau_empire_army_rule.HOOK_ID: "For the Greater Good",
     tau_empire_army_rule.WEAPON_PROFILE_MODIFIER_ID: "For the Greater Good - Weapon Profile",
     SPACE_MARINE_CHAPTERS_SOURCE_ID: "Space Marine Chapters",
@@ -583,6 +594,13 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             runtime_consumer_ids=_black_templars_runtime_consumer_ids(),
         ),
         _implemented_faction_army_rule_row(
+            faction_id=chaos_knights_army_rule.CHAOS_KNIGHTS_FACTION_ID,
+            ability_id=chaos_knights_army_rule.HOOK_ID,
+            ability_name="Harbingers of Dread",
+            semantic_category="faction.army_rule.harbingers_of_dread",
+            runtime_consumer_ids=_chaos_knights_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
             faction_id=astra_militarum_army_rule.ASTRA_MILITARUM_FACTION_ID,
             ability_id=astra_militarum_army_rule.HOOK_ID,
             ability_name="Voice of Command",
@@ -770,6 +788,24 @@ def _black_templars_runtime_consumer_ids() -> tuple[str, ...]:
                 ),
                 *(binding.modifier_id for binding in contribution.wound_roll_modifier_bindings),
                 *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
+            }
+        )
+    )
+
+
+def _chaos_knights_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = chaos_knights_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                *(binding.hook_id for binding in contribution.battle_round_start_hook_bindings),
+                *(binding.hook_id for binding in contribution.battle_shock_hook_bindings),
+                *(
+                    binding.modifier_id
+                    for binding in contribution.unit_characteristic_modifier_bindings
+                ),
+                *(binding.modifier_id for binding in contribution.hit_roll_modifier_bindings),
+                *(binding.modifier_id for binding in contribution.wound_roll_modifier_bindings),
             }
         )
     )
@@ -2019,6 +2055,24 @@ def _structured_support_sections_markdown() -> list[str]:
                         "Precision and PSYKER charge requirements, Accept Any Challenge "
                         "wound modifiers, Suffer Not the Unclean charge-after-Fall-Back, "
                         "and Uphold the Honour sticky objective control."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Chaos Knights - Harbingers of Dread",
+                    "Named army-rule handler",
+                    "Adapter contract, decision catalog, source coverage, and generated matrix",
+                    (
+                        "Focused Dread selection, forced Battle-shock, mortal-wound, "
+                        "runtime-modifier, source ID, and fail-fast tests"
+                    ),
+                    "Full",
+                    (
+                        "Implements battle-round Dread selections and 2D6 rolls, Deathly "
+                        "Terror/Despair Leadership auras, Dismay forced below-starting "
+                        "Battle-shock tests, Delirium D3 mortal wounds, Doom wound modifiers, "
+                        "and the Darkness Stealth hit modifier. Delirium mortal-wound "
+                        "Feel No Pain continuation is explicitly deferred and emits a typed "
+                        "unsupported event without applying wounds."
                     ),
                 ),
                 SupportSectionRow(

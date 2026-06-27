@@ -11,6 +11,7 @@ from warhammer40k_core.engine.battle_shock import (
     collect_battle_shock_test_requests,
 )
 from warhammer40k_core.engine.battle_shock_hooks import (
+    BattleShockForcedTestContext,
     BattleShockHookRegistry,
     BattleShockModifierContext,
     BattleShockOutcomeContext,
@@ -1135,6 +1136,16 @@ def _resolve_battle_shock_step(
 
     state.command_step_state = _command_step_state(state).enter_battle_shock_step()
     phase_start_battle_shocked_unit_ids = tuple(state.battle_shocked_unit_ids)
+    forced_below_starting_strength_unit_ids = (
+        battle_shock_hooks.forced_below_starting_strength_unit_ids(
+            BattleShockForcedTestContext(
+                state=state,
+                active_player_id=active_player_id,
+                phase=BattlePhase.COMMAND,
+                phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+            )
+        )
+    )
     requests = collect_battle_shock_test_requests(
         game_id=state.game_id,
         battle_round=state.battle_round,
@@ -1143,6 +1154,7 @@ def _resolve_battle_shock_step(
         battlefield_state=battlefield_state,
         starting_strength_records=tuple(state.starting_strength_records),
         state=state,
+        forced_below_starting_strength_unit_ids=forced_below_starting_strength_unit_ids,
         ability_index=ability_index,
         runtime_modifier_registry=runtime_modifier_registry,
     )

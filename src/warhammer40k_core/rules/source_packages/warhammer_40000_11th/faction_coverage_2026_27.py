@@ -118,6 +118,13 @@ ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMER_IDS = (
 CHAOS_DAEMONS_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",
 )
+CHAOS_KNIGHTS_HARBINGERS_OF_DREAD_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread",
+    "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:battle-shock",
+    "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:darkness:hit-roll",
+    "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:doom:wound-roll",
+    "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:leadership",
+)
 CHAOS_SPACE_MARINES_DARK_PACTS_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed",
     "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits",
@@ -199,6 +206,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "astra-militarum": "Voice of Command",
     "black-templars": "Templar Vows",
     "chaos-daemons": "The Shadow of Chaos",
+    "chaos-knights": "Harbingers of Dread",
     "chaos-space-marines": "Dark Pacts",
     "death-guard": "Nurgle's Gift",
     "drukhari": "Power from Pain",
@@ -216,6 +224,7 @@ FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID = {
     "astra-militarum": ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMER_IDS,
     "black-templars": BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMER_IDS,
     "chaos-daemons": CHAOS_DAEMONS_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_IDS,
+    "chaos-knights": CHAOS_KNIGHTS_HARBINGERS_OF_DREAD_RUNTIME_CONSUMER_IDS,
     "chaos-space-marines": CHAOS_SPACE_MARINES_DARK_PACTS_RUNTIME_CONSUMER_IDS,
     "death-guard": DEATH_GUARD_NURGLES_GIFT_RUNTIME_CONSUMER_IDS,
     "drukhari": DRUKHARI_POWER_FROM_PAIN_RUNTIME_CONSUMER_IDS,

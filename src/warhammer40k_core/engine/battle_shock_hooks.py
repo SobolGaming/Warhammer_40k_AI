@@ -19,6 +19,38 @@ type BattleShockModifierHandler = Callable[
     tuple[RollModifier, ...],
 ]
 type BattleShockOutcomeHandler = Callable[["BattleShockOutcomeContext"], None]
+type BattleShockForcedTestHandler = Callable[
+    ["BattleShockForcedTestContext"],
+    tuple[str, ...],
+]
+
+
+@dataclass(frozen=True, slots=True)
+class BattleShockForcedTestContext:
+    state: GameState
+    active_player_id: str
+    phase: BattlePhase
+    phase_start_battle_shocked_unit_ids: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(self.state) is not GameState:
+            raise GameLifecycleError("BattleShockForcedTestContext state must be a GameState.")
+        object.__setattr__(
+            self,
+            "active_player_id",
+            _validate_identifier("active_player_id", self.active_player_id),
+        )
+        object.__setattr__(self, "phase", _battle_phase_from_token(self.phase))
+        object.__setattr__(
+            self,
+            "phase_start_battle_shocked_unit_ids",
+            _validate_identifier_tuple(
+                "phase_start_battle_shocked_unit_ids",
+                self.phase_start_battle_shocked_unit_ids,
+            ),
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -104,14 +136,21 @@ class BattleShockOutcomeContext:
 class BattleShockHookBinding:
     hook_id: str
     source_id: str
+    forced_test_handler: BattleShockForcedTestHandler | None = None
     modifier_handler: BattleShockModifierHandler | None = None
     outcome_handler: BattleShockOutcomeHandler | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
-        if self.modifier_handler is None and self.outcome_handler is None:
+        if (
+            self.forced_test_handler is None
+            and self.modifier_handler is None
+            and self.outcome_handler is None
+        ):
             raise GameLifecycleError("BattleShockHookBinding requires at least one handler.")
+        if self.forced_test_handler is not None and not callable(self.forced_test_handler):
+            raise GameLifecycleError("BattleShockHookBinding forced_test_handler must be callable.")
         if self.modifier_handler is not None and not callable(self.modifier_handler):
             raise GameLifecycleError("BattleShockHookBinding modifier_handler must be callable.")
         if self.outcome_handler is not None and not callable(self.outcome_handler):
@@ -151,6 +190,25 @@ class BattleShockHookRegistry:
             modifiers.extend(_validate_roll_modifier_tuple(handler_modifiers))
         _validate_unique_modifier_ids(tuple(modifiers))
         return tuple(sorted(modifiers, key=lambda modifier: modifier.modifier_id))
+
+    def forced_below_starting_strength_unit_ids(
+        self,
+        context: BattleShockForcedTestContext,
+    ) -> tuple[str, ...]:
+        if type(context) is not BattleShockForcedTestContext:
+            raise GameLifecycleError("Battle-shock forced-test hooks require a context.")
+        forced_ids: set[str] = set()
+        for binding in self.bindings:
+            if binding.forced_test_handler is None:
+                continue
+            handler_ids = binding.forced_test_handler(context)
+            forced_ids.update(
+                _validate_identifier_tuple(
+                    "forced_below_starting_strength_unit_ids",
+                    handler_ids,
+                )
+            )
+        return tuple(sorted(forced_ids))
 
     def resolve_outcomes(self, context: BattleShockOutcomeContext) -> None:
         if type(context) is not BattleShockOutcomeContext:
