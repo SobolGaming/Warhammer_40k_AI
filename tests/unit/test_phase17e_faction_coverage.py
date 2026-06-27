@@ -186,6 +186,10 @@ ORKS_WAAAGH_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:orks:army_rule:waaagh:invulnerable-save",
     "warhammer_40000_11th:orks:army_rule:waaagh:weapon-profile",
 )
+TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good",
+    "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good:weapon-profile",
+)
 BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:black_templars:army_rule:templar_vows",
     "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-declaration",
@@ -222,6 +226,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "necrons": "Reanimation Protocols",
     "orks": "Waaagh!",
     "space-marines": "Oath of Moment",
+    "tau-empire": "For the Greater Good",
     "world-eaters": "Blessings of Khorne",
 }
 FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID = {
@@ -238,6 +243,7 @@ FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID = {
     "necrons": NECRONS_REANIMATION_PROTOCOLS_RUNTIME_CONSUMERS,
     "orks": ORKS_WAAAGH_RUNTIME_CONSUMERS,
     "space-marines": SPACE_MARINES_OATH_OF_MOMENT_RUNTIME_CONSUMERS,
+    "tau-empire": TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMERS,
     "world-eaters": WORLD_EATERS_BLESSINGS_OF_KHORNE_RUNTIME_CONSUMERS,
 }
 
@@ -754,6 +760,33 @@ def test_phase17e_astra_militarum_army_rule_is_engine_consumed() -> None:
             "astra-militarum"
         ]
         == ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS
+    )
+
+
+def test_phase17e_tau_empire_army_rule_is_engine_consumed() -> None:
+    coverage_row = next(
+        row
+        for row in faction_coverage_source.coverage_rows()
+        if row.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and row.faction_id == "tau-empire"
+    )
+
+    assert coverage_row.descriptor_id == "phase17e:tau-empire:army-rule"
+    assert coverage_row.rule_name == "For the Greater Good"
+    assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+    assert coverage_row.runtime_support_status is not None
+    assert coverage_row.runtime_support_status.value == "engine_consumed"
+    assert coverage_row.runtime_consumer_ids == tuple(
+        sorted(TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMERS)
+    )
+    assert coverage_row.handler_id == TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMERS[0]
+    assert (
+        faction_coverage_source.FACTION_ARMY_RULE_NAMES_BY_FACTION_ID["tau-empire"]
+        == "For the Greater Good"
+    )
+    assert (
+        faction_coverage_source.FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID["tau-empire"]
+        == TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMERS
     )
 
 

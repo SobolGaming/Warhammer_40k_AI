@@ -8,7 +8,7 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_tau_empire-avmkx2gg8i-jezqgeb
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 7 | 0 | 20 | 30 | 0 |
+| 7 | 0 | 20 | 30 | 1 |
 
 ## Detachment Rule Support
 

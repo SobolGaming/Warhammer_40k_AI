@@ -103,6 +103,7 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | Emperor's Children - Thrill Seekers | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes movement, charge, and shooting target restrictions. |
 | Grey Knights - Gate of Infinity | Named army-rule handler | Adapter contract, decision catalog, architecture, and generated matrix | Focused turn-end, reserves, cap, and attached-rules-unit tests | Full | Implements opponent Fight phase Gate of Infinity selections, battle-size caps, complete choices, required next-Movement Strategic Reserves arrival, and attached rules-unit component validation. |
 | Space Marines - Oath of Moment and Space Marine Chapters | Named army-rule handler plus shared mustering/list-validation host | README, adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, reroll, wound-modifier, and mustering tests | Full | Implements Command phase Oath target selection, target-scoped Hit-roll rerolls, Codex Space Marines Detachment Wound-roll bonus gating, and Black Templars, Space Wolves, and Deathwatch roster restrictions. |
+| T'au Empire - For the Greater Good | Shooting-phase-start faction-rule hook plus weapon-profile modifier | Adapter contract, decision catalog, source coverage, and generated matrix | Focused shooting-start, invalid-submission, and runtime-modifier tests | Full | Implements Observer/Spotted selections, target-centric Guided Ballistic Skill improvement, and Markerlight [IGNORES COVER]. Selected-shooter-specific Guided identity is deferred if future rules require it. |
 | Necrons - Reanimation Protocols | Named army-rule handler plus shared Healing Wounds resolver | README, adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase healing, revival, and validation tests | Full | Implements Command phase rules-unit activation, source-backed D3 healing, destroyed-model revival, attached rules-unit identity, stale rules-unit rejection, and owning-player healing selections. |
 | Leagues of Votann - Prioritised Efficiency | Named army-rule handler plus faction-resource ledger | README, generated matrix, and source coverage | Focused command-phase, scoring, mode, and runtime-modifier tests | Full | Implements deterministic Yield Point gains from Command phase objective control, Hostile Acquisition and Fortify Takeover modes, and mode-scoped Hit/Wound modifiers. |
 | Drukhari - Power from Pain | Named army-rule handler plus faction-resource ledger | README, faction integration note, adapter contract, and generated matrix | Focused faction runtime tests | Full | Implements Pain token gain at own Command phase start, enemy unit destruction, and enemy Battle-shock failure, plus optional Lithe Agility empowerment for Advance and Charge rerolls and Hatred Eternal selected-to-shoot/selected-to-fight empowerment for attack hit rerolls. |
@@ -121,7 +122,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Genestealer Cults | 9 | 0 | 20 | 30 | 0 | [genestealer-cults](factions/genestealer-cults.md) |
 | Necrons | 12 | 0 | 36 | 54 | 1 | [necrons](factions/necrons.md) |
 | Leagues of Votann | 10 | 0 | 28 | 42 | 1 | [leagues-of-votann](factions/leagues-of-votann.md) |
-| T'au Empire | 7 | 0 | 20 | 30 | 0 | [tau-empire](factions/tau-empire.md) |
+| T'au Empire | 7 | 0 | 20 | 30 | 1 | [tau-empire](factions/tau-empire.md) |
 | Space Marines | 22 | 0 | 80 | 119 | 1 | [space-marines](factions/space-marines.md) |
 | Dark Angels | 8 | 0 | 0 | 0 | 0 | [dark-angels](factions/dark-angels.md) |
 | Blood Angels | 8 | 0 | 0 | 0 | 0 | [blood-angels](factions/blood-angels.md) |
@@ -352,6 +353,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:orks:army_rule:waaagh:weapon-profile` | Waaagh! |
 | `warhammer_40000_11th:space_marines:army_rule:oath_of_moment` | Oath Of Moment<br>Oath of Moment |
 | `warhammer_40000_11th:space_marines:army_rule:oath_of_moment:wound-roll` | Oath of Moment<br>Wound Roll |
+| `warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good` | For the Greater Good |
+| `warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good:weapon-profile` | For the Greater Good - Weapon Profile |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne` | Blessings of Khorne |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration` | Blessings of Khorne - Rage-fuelled Invigoration |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage` | Blessings of Khorne - Total Carnage |

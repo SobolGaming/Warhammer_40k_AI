@@ -121,6 +121,12 @@ from warhammer40k_core.engine.shooting_end_surge_hooks import (
     ShootingEndSurgeGrant,
     ShootingEndSurgeHookRegistry,
 )
+from warhammer40k_core.engine.shooting_phase_start_hooks import (
+    SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
+    ShootingPhaseStartHookRegistry,
+    ShootingPhaseStartRequestContext,
+    ShootingPhaseStartResultContext,
+)
 from warhammer40k_core.engine.shooting_targets import (
     ShootingTargetCandidate,
     ShootingTargetViolationCode,
@@ -965,6 +971,9 @@ class ShootingPhaseHandler:
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry = field(
         default_factory=ShootingTargetRestrictionHookRegistry.empty
     )
+    shooting_phase_start_hooks: ShootingPhaseStartHookRegistry = field(
+        default_factory=ShootingPhaseStartHookRegistry.empty
+    )
     shooting_end_surge_hooks: ShootingEndSurgeHookRegistry = field(
         default_factory=ShootingEndSurgeHookRegistry.empty
     )
@@ -1006,6 +1015,10 @@ class ShootingPhaseHandler:
             raise GameLifecycleError(
                 "ShootingPhaseHandler shooting_target_restriction_hooks must be a registry."
             )
+        if type(self.shooting_phase_start_hooks) is not ShootingPhaseStartHookRegistry:
+            raise GameLifecycleError(
+                "ShootingPhaseHandler shooting_phase_start_hooks must be a registry."
+            )
         if type(self.shooting_end_surge_hooks) is not ShootingEndSurgeHookRegistry:
             raise GameLifecycleError(
                 "ShootingPhaseHandler shooting_end_surge_hooks must be a registry."
@@ -1036,6 +1049,14 @@ class ShootingPhaseHandler:
     ) -> LifecycleStatus:
         del reaction_queue
         _validate_shooting_phase_state(state)
+        if state.shooting_phase_state is None:
+            phase_start_status = _request_shooting_phase_start_rule_if_available(
+                handler=self,
+                state=state,
+                decisions=decisions,
+            )
+            if phase_start_status is not None:
+                return phase_start_status
         shooting_state = _ensure_shooting_phase_state(state=state)
         if shooting_state.attack_sequence is not None:
             completed_candidate = shooting_state.attack_sequence
@@ -1524,6 +1545,23 @@ class ShootingPhaseHandler:
         result: DecisionResult,
         decisions: DecisionController,
     ) -> LifecycleStatus | None:
+        if result.decision_type == SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE:
+            phase_start_result = self.shooting_phase_start_hooks.apply_result(
+                ShootingPhaseStartResultContext(
+                    state=state,
+                    decisions=decisions,
+                    request=decisions.record_for_result(result).request,
+                    result=result,
+                    ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+                    army_catalog=_army_catalog_for_handler(self),
+                    shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
+                )
+            )
+            if type(phase_start_result) is LifecycleStatus:
+                return phase_start_result
+            if phase_start_result:
+                return None
+            raise GameLifecycleError("Shooting phase start faction rule result was not handled.")
         if result.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE:
             return _apply_shooting_unit_selection_decision(
                 state=state,
@@ -1596,6 +1634,129 @@ class ShootingPhaseHandler:
                 stratagem_index=self.stratagem_index,
             )
         raise GameLifecycleError("ShootingPhaseHandler received unsupported decision_type.")
+
+
+def invalid_shooting_phase_start_faction_rule_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    invalid_status = _invalid_finite_decision_status(
+        state=state,
+        request=request,
+        result=result,
+        invalid_reason="invalid_shooting_phase_start_faction_rule_result",
+    )
+    if invalid_status is not None:
+        return invalid_status
+    payload = _decision_payload_object(result.payload)
+    request_payload = _decision_payload_object(request.payload)
+    drift_reason = _shooting_phase_start_faction_rule_drift_reason(
+        state=state,
+        request=request,
+        result=result,
+        payload=payload,
+        request_payload=request_payload,
+    )
+    if drift_reason is None:
+        return None
+    return LifecycleStatus.invalid(
+        stage=state.stage,
+        message="Shooting phase start faction rule option drifted.",
+        payload=validate_json_value(
+            {
+                "game_id": state.game_id,
+                "player_id": result.actor_id,
+                "battle_round": state.battle_round,
+                "phase": (
+                    None if state.current_battle_phase is None else state.current_battle_phase.value
+                ),
+                "invalid_reason": drift_reason,
+            }
+        ),
+    )
+
+
+def _shooting_phase_start_faction_rule_drift_reason(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    payload: dict[str, object],
+    request_payload: dict[str, object],
+) -> str | None:
+    if result.actor_id is None:
+        return "actor_missing"
+    if request.actor_id != result.actor_id:
+        return "actor_player_drift"
+    if _payload_string(payload, key="game_id") != state.game_id:
+        return "game_id_drift"
+    if _payload_int(payload, key="battle_round") != state.battle_round:
+        return "battle_round_drift"
+    if _payload_string(payload, key="phase") != BattlePhase.SHOOTING.value:
+        return "payload_phase_drift"
+    if _payload_string(payload, key="active_player_id") != _active_player_id(state):
+        return "active_player_drift"
+    if _payload_string(request_payload, key="game_id") != state.game_id:
+        return "request_game_id_drift"
+    if _payload_int(request_payload, key="battle_round") != state.battle_round:
+        return "request_battle_round_drift"
+    if _payload_string(request_payload, key="phase") != BattlePhase.SHOOTING.value:
+        return "request_phase_drift"
+    if _payload_string(request_payload, key="active_player_id") != _active_player_id(state):
+        return "request_active_player_drift"
+    if state.current_battle_phase is not BattlePhase.SHOOTING:
+        return "phase_drift"
+    if state.shooting_phase_state is not None:
+        return "shooting_phase_start_window_closed"
+    return None
+
+
+def _request_shooting_phase_start_rule_if_available(
+    *,
+    handler: ShootingPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+) -> LifecycleStatus | None:
+    request = handler.shooting_phase_start_hooks.next_request_for(
+        ShootingPhaseStartRequestContext(
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
+            army_catalog=_army_catalog_for_handler(handler),
+            shooting_target_restriction_hooks=handler.shooting_target_restriction_hooks,
+        )
+    )
+    if request is None:
+        return None
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "shooting_phase_start_faction_rule_requested",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": _active_player_id(state),
+                "phase": BattlePhase.SHOOTING.value,
+                "decision_type": request.decision_type,
+                "request_id": request.request_id,
+                "actor_id": request.actor_id,
+            }
+        ),
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=request,
+        payload=validate_json_value(
+            {
+                "phase": BattlePhase.SHOOTING.value,
+                "active_player_id": _active_player_id(state),
+                "phase_body_status": "shooting_phase_start_faction_rule_pending",
+                "request_id": request.request_id,
+            }
+        ),
+    )
 
 
 def _complete_out_of_phase_shooting(
@@ -6206,6 +6367,33 @@ def shooting_unit_has_legal_declaration_against_targets(
     )
 
 
+def shooting_rules_unit_is_eligible_to_shoot(
+    *,
+    state: GameState,
+    rules_unit: RulesUnitView,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
+    player_id: str,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
+) -> bool:
+    if not _rules_unit_can_select_to_shoot(
+        state=state,
+        rules_unit=rules_unit,
+        army_catalog=army_catalog,
+        player_id=player_id,
+    ):
+        return False
+    return _rules_unit_has_legal_shooting_declaration(
+        state=state,
+        scenario=_battlefield_scenario(state),
+        rules_unit=rules_unit,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+        player_id=player_id,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+    )
+
+
 def _rules_unit_state_unit_ids(rules_unit: RulesUnitView) -> tuple[str, ...]:
     return tuple(
         dict.fromkeys((rules_unit.unit_instance_id, *rules_unit.component_unit_instance_ids))
@@ -6461,6 +6649,51 @@ def _invalid_if_current_option_payload_drifted(
                 "invalid_reason": invalid_reason,
                 "selected_option_id": result.selected_option_id,
             },
+        )
+    return None
+
+
+def _invalid_finite_decision_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    invalid_reason: str,
+) -> LifecycleStatus | None:
+    if result.request_id != request.request_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result does not match the pending request.",
+            payload={"invalid_reason": invalid_reason, "field": "request_id"},
+        )
+    if result.decision_type != request.decision_type:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result type does not match the pending request.",
+            payload={"invalid_reason": invalid_reason, "field": "decision_type"},
+        )
+    if result.actor_id != request.actor_id:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result actor does not match the pending request.",
+            payload={"invalid_reason": invalid_reason, "field": "actor_id"},
+        )
+    if result.selected_option_id not in {option.option_id for option in request.options}:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result selected option is not pending.",
+            payload={"invalid_reason": invalid_reason, "field": "selected_option_id"},
+        )
+    selected_payload = next(
+        option.payload
+        for option in request.options
+        if option.option_id == result.selected_option_id
+    )
+    if result.payload != selected_payload:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Decision result payload does not match the selected option.",
+            payload={"invalid_reason": invalid_reason, "field": "payload"},
         )
     return None
 
