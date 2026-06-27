@@ -172,7 +172,6 @@ from warhammer40k_core.engine.shooting_targets import (
 from warhammer40k_core.engine.source_backed_rerolls import (
     SourceBackedRerollPermissionContext,
     source_backed_reroll_permission_context_for_unit,
-    source_backed_reroll_permission_for_unit,
 )
 from warhammer40k_core.engine.timing_windows import (
     TimingTriggerKind,
@@ -7299,13 +7298,19 @@ def _request_source_backed_hit_reroll_if_available(
     actor_id = roll_state.original_result.spec.actor_id
     if actor_id is None:
         return None
-    permission = source_backed_reroll_permission_for_unit(
+    permission_context = source_backed_reroll_permission_context_for_unit(
         state=state,
         player_id=actor_id,
         unit_instance_id=attacking_unit_instance_id,
         roll_type=roll_state.original_result.spec.roll_type,
         timing_window="attack_sequence.hit",
         target_unit_instance_id=target_unit_instance_id,
+    )
+    if permission_context is None:
+        return None
+    permission = _source_backed_hit_permission_for_attack(
+        permission_context=permission_context,
+        roll_state=roll_state,
     )
     if permission is None:
         return None
@@ -7331,6 +7336,7 @@ def _request_source_backed_hit_reroll_if_available(
                 "attack_context_id": attack_context_id,
                 "weapon_profile_id": weapon_profile_id,
                 "hit_roll_state": validate_json_value(roll_state.to_payload()),
+                "source_payload": validate_json_value(permission_context.source_payload),
             },
         },
     )
@@ -7350,6 +7356,36 @@ def _request_source_backed_hit_reroll_if_available(
             "attack_context_id": attack_context_id,
             "pending_request_id": request.request_id,
         },
+    )
+
+
+def _source_backed_hit_permission_for_attack(
+    *,
+    permission_context: SourceBackedRerollPermissionContext,
+    roll_state: DiceRollState,
+) -> RerollPermission | None:
+    source_payload = permission_context.source_payload
+    conditional = source_payload.get("conditional_hit_reroll")
+    if conditional is None:
+        return permission_context.permission
+    if not isinstance(conditional, dict):
+        raise GameLifecycleError("Conditional hit reroll payload must be an object.")
+    reroll_values = conditional.get("reroll_unmodified_values")
+    if not isinstance(reroll_values, list) or not all(
+        type(value) is int for value in reroll_values
+    ):
+        raise GameLifecycleError("Conditional hit reroll requires integer reroll values.")
+    selections = tuple(
+        (index,)
+        for index, value in enumerate(roll_state.current_values)
+        if value in cast(list[int], reroll_values)
+    )
+    if not selections:
+        return None
+    return replace(
+        permission_context.permission,
+        component_selection_policy=RerollComponentSelectionPolicy.COMPONENT_SELECTION,
+        allowed_component_selections=selections,
     )
 
 

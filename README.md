@@ -167,7 +167,7 @@ Current status:
 - Faction semantic execution is active incremental work. Current runtime
   support includes selected Phase 17G faction slices across Chaos Daemons,
   Chaos Space Marines, Aeldari, Death Guard, World Eaters, Orks,
-  Space Marines, Necrons, and Leagues of Votann. Chaos Daemons Shadow Legion
+  Space Marines, Necrons, Leagues of Votann, and Thousand Sons. Chaos Daemons Shadow Legion
   supports Thralls of the First Prince mustering restrictions and keyword
   grants, Murderer's Cowl, Penumbral Puppetry, Gloam Rot, Shadow's Caress,
   Leaping Shadows, Mantle of Gloom, Fade to Darkness, and Disciples of
@@ -205,7 +205,12 @@ Current status:
   Dismay forced below-starting Battle-shock tests, Delirium D3 mortal wounds,
   Doom wound modifiers, and the Darkness Stealth hit modifier through shared
   runtime hooks. Delirium mortal-wound Feel No Pain continuation is deferred
-  and emits a typed unsupported event without applying wounds. Broad datasheet,
+  and emits a typed unsupported event without applying wounds. Thousand Sons
+  Cabal of Sorcerers supports Shooting-start Ritual selection, Psychic tests
+  with optional Channel the Warp perils, Destiny's Ruin hit rerolls, Temporal
+  Surge movement proposals and charge lockout, Doombolt mortal wounds, and Twist
+  of Fate AP modifiers through shared decision, movement, reroll, and
+  mortal-wound routing paths. Broad datasheet,
   wargear, weapon, and remaining faction execution remains later Phase 17 work.
 - Matched-play mustering supports Incursion, Strike Force, and Onslaught battle
   sizes, including the Drukhari `Corsairs and Travelling Players` ally rule for

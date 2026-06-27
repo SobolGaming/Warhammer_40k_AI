@@ -138,7 +138,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | World Eaters | 8 | 0 | 24 | 36 | 1 | [world-eaters](factions/world-eaters.md) |
 | Emperor's Children | 10 | 0 | 28 | 42 | 1 | [emperors-children](factions/emperors-children.md) |
 | Death Guard | 9 | 0 | 28 | 42 | 1 | [death-guard](factions/death-guard.md) |
-| Thousand Sons | 9 | 0 | 24 | 36 | 0 | [thousand-sons](factions/thousand-sons.md) |
+| Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 26 | 36 | 1 | [chaos-knights](factions/chaos-knights.md) |
 | Chaos Daemons | 9 | 4 | 28 | 43 | 14 | [chaos-daemons](factions/chaos-daemons.md) |
 | Astra Militarum | 11 | 0 | 36 | 54 | 1 | [astra-militarum](factions/astra-militarum.md) |
@@ -378,6 +378,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:space_marines:army_rule:oath_of_moment:wound-roll` | Oath of Moment<br>Wound Roll |
 | `warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good` | For the Greater Good |
 | `warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good:weapon-profile` | For the Greater Good - Weapon Profile |
+| `warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:mortal-wound-feel-no-pain` | Mortal Wound Feel No Pain |
+| `warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:weapon-profile` | Weapon Profile |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne` | Blessings of Khorne |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration` | Blessings of Khorne - Rage-fuelled Invigoration |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage` | Blessings of Khorne - Total Carnage |

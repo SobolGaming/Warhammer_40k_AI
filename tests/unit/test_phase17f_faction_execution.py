@@ -117,6 +117,11 @@ TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good",
     "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good:weapon-profile",
 )
+THOUSAND_SONS_CABAL_OF_SORCERERS_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers",
+    "warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:mortal-wound-feel-no-pain",
+    "warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:weapon-profile",
+)
 IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric",
     "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:charge-roll",
@@ -147,6 +152,7 @@ SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "orks": "Waaagh!",
     "space-marines": "Oath of Moment",
     "tau-empire": "For the Greater Good",
+    "thousand-sons": "Cabal of Sorcerers",
     "world-eaters": "Blessings of Khorne",
 }
 
@@ -403,6 +409,26 @@ def test_phase17f_tau_empire_army_rule_execution_record_is_named_handler() -> No
     )
     assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
     assert record.handler_id == TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMERS[0]
+    assert record.block_reason is None
+
+
+def test_phase17f_thousand_sons_army_rule_execution_record_is_named_handler() -> None:
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and record.faction_id == "thousand-sons"
+    )
+
+    assert record.coverage_descriptor_id == "phase17e:thousand-sons:army-rule"
+    assert record.execution_id == "phase17f:phase17e:thousand-sons:army-rule"
+    assert record.rule_name == "Cabal of Sorcerers"
+    assert record.runtime_support_status == "engine_consumed"
+    assert record.runtime_consumer_ids == tuple(
+        sorted(THOUSAND_SONS_CABAL_OF_SORCERERS_RUNTIME_CONSUMERS)
+    )
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
+    assert record.handler_id == THOUSAND_SONS_CABAL_OF_SORCERERS_RUNTIME_CONSUMERS[0]
     assert record.block_reason is None
 
 
