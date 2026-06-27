@@ -163,6 +163,14 @@ def for_the_greater_good_request(
 def apply_for_the_greater_good_result(context: ShootingPhaseStartResultContext) -> bool:
     if type(context) is not ShootingPhaseStartResultContext:
         raise GameLifecycleError("For the Greater Good requires result context.")
+    if (
+        context.request.decision_type
+        != SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE
+    ):
+        return False
+    request_payload = _payload_object(context.request.payload)
+    if request_payload.get("hook_id") != HOOK_ID:
+        return False
     result = context.result
     if result.actor_id is None:
         raise GameLifecycleError("For the Greater Good result requires an actor.")

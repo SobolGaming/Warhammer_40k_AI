@@ -113,6 +113,10 @@ BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:black_templars:army_rule:templar_vows:"
     "uphold_the_honour:objective-control",
 )
+TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good",
+    "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good:weapon-profile",
+)
 SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "aeldari": "Battle Focus",
     "astra-militarum": "Voice of Command",
@@ -127,6 +131,7 @@ SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "necrons": "Reanimation Protocols",
     "orks": "Waaagh!",
     "space-marines": "Oath of Moment",
+    "tau-empire": "For the Greater Good",
     "world-eaters": "Blessings of Khorne",
 }
 
@@ -363,6 +368,26 @@ def test_phase17f_astra_militarum_army_rule_execution_record_is_named_handler() 
     )
     assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
     assert record.handler_id == ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS[0]
+    assert record.block_reason is None
+
+
+def test_phase17f_tau_empire_army_rule_execution_record_is_named_handler() -> None:
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and record.faction_id == "tau-empire"
+    )
+
+    assert record.coverage_descriptor_id == "phase17e:tau-empire:army-rule"
+    assert record.execution_id == "phase17f:phase17e:tau-empire:army-rule"
+    assert record.rule_name == "For the Greater Good"
+    assert record.runtime_support_status == "engine_consumed"
+    assert record.runtime_consumer_ids == tuple(
+        sorted(TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMERS)
+    )
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
+    assert record.handler_id == TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMERS[0]
     assert record.block_reason is None
 
 

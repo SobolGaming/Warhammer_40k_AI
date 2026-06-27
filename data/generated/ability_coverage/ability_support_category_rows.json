@@ -405,6 +405,40 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good",
+        "ability_name": "For the Greater Good",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/tau-empire/faction/warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good/none",
+        "datasheet_id": "tau-empire",
+        "datasheet_name": "T'au Empire",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "For the Greater Good"
+    ],
+    "category_id": "faction.army_rule.for_the_greater_good",
+    "category_name": "Faction Army Rule For The Greater Good",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/tau-empire/faction/warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good/none"
+    ],
+    "datasheet_names": [
+      "T'au Empire"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good",
+      "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good:weapon-profile"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "warhammer_40000_11th:space_marines:army_rule:oath_of_moment",
         "ability_name": "Oath of Moment",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/space-marines/faction/warhammer_40000_11th:space_marines:army_rule:oath_of_moment/none",

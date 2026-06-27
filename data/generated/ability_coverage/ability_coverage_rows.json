@@ -457,6 +457,26 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good",
+    "ability_name": "For the Greater Good",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/tau-empire/faction/warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good/none",
+    "datasheet_id": "tau-empire",
+    "datasheet_name": "T'au Empire",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good",
+      "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good:weapon-profile"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.for_the_greater_good"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "warhammer_40000_11th:drukhari:army_rule:power_from_pain",
     "ability_name": "Power from Pain",
     "catalog_id": "runtime-content-warhammer-40000-11th",

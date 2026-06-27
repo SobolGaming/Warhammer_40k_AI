@@ -488,6 +488,41 @@ def test_for_the_greater_good_result_application_fails_fast_on_drift() -> None:
         )
 
 
+def test_for_the_greater_good_result_handler_ignores_unrelated_shooting_start_request() -> None:
+    lifecycle = _battle_ready_lifecycle()
+    state = _require_state(lifecycle)
+    request = DecisionRequest(
+        request_id="phase17g-unrelated-shooting-start",
+        decision_type=SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
+        actor_id="player-b",
+        payload=validate_json_value(
+            {
+                "hook_id": "warhammer_40000_11th:other_faction:army_rule:unrelated",
+            }
+        ),
+        options=(
+            DecisionOption(
+                option_id="phase17g-unrelated-shooting-start-option",
+                label="Unrelated option",
+                payload=validate_json_value({"selected_unrelated_option": "done"}),
+            ),
+        ),
+    )
+    result = DecisionResult.for_request(
+        result_id="phase17g-unrelated-shooting-start-result",
+        request=request,
+        selected_option_id="phase17g-unrelated-shooting-start-option",
+    )
+
+    assert (
+        army_rule.apply_for_the_greater_good_result(
+            _result_context(lifecycle, request=request, result=result)
+        )
+        is False
+    )
+    assert state.persisting_effects == []
+
+
 def test_shooting_phase_start_hook_registry_fails_fast_and_orders_bindings() -> None:
     lifecycle = _battle_ready_lifecycle()
     request = _synthetic_shooting_start_request("phase17g-hook-request")

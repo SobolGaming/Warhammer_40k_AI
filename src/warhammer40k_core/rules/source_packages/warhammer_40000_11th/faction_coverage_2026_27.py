@@ -168,6 +168,10 @@ ORKS_WAAAGH_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:orks:army_rule:waaagh:invulnerable-save",
     "warhammer_40000_11th:orks:army_rule:waaagh:weapon-profile",
 )
+TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good",
+    "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good:weapon-profile",
+)
 BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:black_templars:army_rule:templar_vows",
     "warhammer_40000_11th:black_templars:army_rule:templar_vows:abhor_the_witch:charge-declaration",
@@ -204,6 +208,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "necrons": "Reanimation Protocols",
     "orks": "Waaagh!",
     "space-marines": "Oath of Moment",
+    "tau-empire": "For the Greater Good",
     "world-eaters": "Blessings of Khorne",
 }
 FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID = {
@@ -220,6 +225,7 @@ FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID = {
     "necrons": NECRONS_REANIMATION_PROTOCOLS_RUNTIME_CONSUMER_IDS,
     "orks": ORKS_WAAAGH_RUNTIME_CONSUMER_IDS,
     "space-marines": SPACE_MARINES_OATH_OF_MOMENT_RUNTIME_CONSUMER_IDS,
+    "tau-empire": TAU_EMPIRE_FOR_THE_GREATER_GOOD_RUNTIME_CONSUMER_IDS,
     "world-eaters": WORLD_EATERS_BLESSINGS_OF_KHORNE_RUNTIME_CONSUMER_IDS,
 }
 
