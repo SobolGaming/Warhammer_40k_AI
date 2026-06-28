@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.decisions import submit_option, submit_parameterized_payload
 from warhammer40k_core.adapters.event_stream import EventStreamCursor, EventStreamDeltaPayload
 from warhammer40k_core.adapters.projection import (
@@ -21,7 +22,7 @@ def _new_parameterized_lifecycle() -> GameLifecycle:
 
 
 @dataclass(slots=True)
-class LocalGameSession:
+class LocalGameSession(AdapterGameSession):
     lifecycle: GameLifecycle = field(default_factory=_new_parameterized_lifecycle)
 
     def start(self, config: GameConfig) -> LifecycleStatus:

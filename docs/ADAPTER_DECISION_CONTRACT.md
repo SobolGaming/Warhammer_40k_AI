@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window and interface-intent requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]`. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window and interface-intent requirements, Phase 18C shared adapter session facade requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]`. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window/interface-intent requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]` for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window/interface-intent requirements, Phase 18C shared adapter session facade requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]` for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -34,6 +34,11 @@ Adapters are producers of answers. The engine remains the owner of validation, m
 
 The shared contract uses these objects and payloads:
 
+- `AdapterGameSession`: public session facade implemented by
+  `LocalGameSession` and consumed by CLI, UI, network, headless, and replay
+  producer adapters. It is the adapter-facing route to lifecycle advancement,
+  viewer-safe projection, source-hashed catalog projection, viewer-scoped event
+  deltas, finite submissions, and parameterized payload submissions.
 - `DecisionRequest`: engine request for one player choice.
 - `FiniteOptionSubmission`: adapter wrapper for selecting one finite option.
 - `ParameterizedSubmission`: adapter wrapper for submitting JSON-safe proposal payloads.
@@ -1983,6 +1988,67 @@ Adapters must not:
 - bypass `DecisionRequest -> DecisionResult -> validation -> engine mutation`;
 - inspect or transmit hidden opponent data through public projection/event APIs;
 - suppress `DecisionRecord` or `EventRecord` generation for accepted engine decisions.
+
+## Shared Session Facade
+
+Phase 18C promotes `LocalGameSession` into the shared adapter session facade.
+Adapter producers may render, rank, generate, or transport choices differently,
+but their engine-facing calls converge on one public protocol:
+
+```python
+class AdapterGameSession(Protocol):
+    def start(self, config: GameConfig) -> LifecycleStatus: ...
+    def advance_until_decision_or_terminal(self) -> LifecycleStatus: ...
+    def view(self, *, viewer_player_id: str) -> GameViewPayload: ...
+    def rules_catalog_view(self) -> RulesCatalogViewPayload: ...
+    def events_since(
+        self,
+        cursor: EventStreamCursor,
+        *,
+        viewer_player_id: str,
+    ) -> EventStreamDeltaPayload: ...
+    def submit_option(
+        self,
+        *,
+        request_id: str,
+        option_id: str,
+        result_id: str,
+    ) -> LifecycleStatus: ...
+    def submit_parameterized_payload(
+        self,
+        *,
+        request_id: str,
+        payload: JsonValue,
+        result_id: str,
+    ) -> LifecycleStatus: ...
+```
+
+The thin producers map to that protocol as follows:
+
+- CLI renders a `DecisionRequest`, maps a human choice to an emitted option ID,
+  and calls `submit_option(...)` or `submit_parameterized_payload(...)`.
+- UI renders `view(...)` and `rules_catalog_view(...)`, gathers UI intent, and
+  submits only through the session facade.
+- Network adapters serialize `LifecycleStatus`, `GameViewPayload`,
+  `RulesCatalogViewPayload`, and `EventStreamDeltaPayload`, then route client
+  submissions through the same session methods.
+- Headless producers may rank finite options or generate parameterized payload
+  candidates from viewer-safe views, but the accepted answer is still submitted
+  through the session facade.
+- Replay producers submit recorded `DecisionRecord` or `DecisionResult` values
+  by routing finite results to `submit_option(...)` and parameterized results to
+  `submit_parameterized_payload(...)`.
+
+Thin producers must not import `GameLifecycle`, access a session's `.lifecycle`
+attribute, access `decision_controller`, or call `submit_decision(...)`
+directly. Those operations belong inside the session implementation and
+engine-owned replay validation, not producer or transport layers.
+
+`LocalGameSession` is the local implementation of this facade. It owns the
+`GameLifecycle` instance, validates viewer IDs for event streams, projects
+viewer-safe views and source-hashed catalog data, and delegates submissions to
+the adapter submission helpers that enforce pending `request_id` matching before
+calling `GameLifecycle.submit_decision(...)`.
 
 ## Suggested Adapter Loop
 

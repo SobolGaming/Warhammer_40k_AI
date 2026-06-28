@@ -2,14 +2,13 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from warhammer40k_core.adapters.contracts import FiniteOptionSubmission, ParameterizedSubmission
-from warhammer40k_core.adapters.decisions import (
-    submit_option,
-    submit_parameterized_payload,
+from warhammer40k_core.adapters.contracts import (
+    AdapterGameSession,
+    FiniteOptionSubmission,
+    ParameterizedSubmission,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 
 
@@ -87,16 +86,14 @@ def parameterized_submission_from_cli_payload(
 
 def submit_cli_choice(
     *,
-    lifecycle: GameLifecycle,
-    request_id: str,
+    session: AdapterGameSession,
+    prompt: CliDecisionPromptPayload,
     choice: str,
     result_id: str,
 ) -> LifecycleStatus:
-    request = _pending_request(lifecycle, request_id=request_id)
-    option_id = _option_id_for_cli_choice(request=request, choice=choice)
-    return submit_option(
-        lifecycle=lifecycle,
-        request_id=request.request_id,
+    option_id = _option_id_for_cli_prompt(prompt=prompt, choice=choice)
+    return session.submit_option(
+        request_id=_prompt_request_id(prompt),
         option_id=option_id,
         result_id=result_id,
     )
@@ -104,30 +101,16 @@ def submit_cli_choice(
 
 def submit_cli_payload(
     *,
-    lifecycle: GameLifecycle,
+    session: AdapterGameSession,
     request_id: str,
     payload: JsonValue,
     result_id: str,
 ) -> LifecycleStatus:
-    return submit_parameterized_payload(
-        lifecycle=lifecycle,
+    return session.submit_parameterized_payload(
         request_id=request_id,
         payload=payload,
         result_id=result_id,
     )
-
-
-def _pending_request(lifecycle: GameLifecycle, *, request_id: str) -> DecisionRequest:
-    if type(lifecycle) is not GameLifecycle:
-        raise GameLifecycleError("CLI submission requires a GameLifecycle.")
-    pending_requests = lifecycle.decision_controller.queue.pending_requests
-    if not pending_requests:
-        raise GameLifecycleError("CLI submission requires a pending DecisionRequest.")
-    pending_request = pending_requests[0]
-    expected_request_id = _validate_cli_request_id(request_id)
-    if pending_request.request_id != expected_request_id:
-        raise GameLifecycleError("CLI submission request_id does not match pending request.")
-    return pending_request
 
 
 def _option_id_for_cli_choice(*, request: DecisionRequest, choice: str) -> str:
@@ -140,6 +123,20 @@ def _option_id_for_cli_choice(*, request: DecisionRequest, choice: str) -> str:
         if option_index < 1 or option_index > len(request.options):
             raise GameLifecycleError("CLI finite choice option index is out of range.")
         return request.options[option_index - 1].option_id
+    raise GameLifecycleError("CLI finite choice does not match a pending option.")
+
+
+def _option_id_for_cli_prompt(*, prompt: CliDecisionPromptPayload, choice: str) -> str:
+    normalized = _validate_cli_choice(choice)
+    options = prompt["options"]
+    option_by_id = {option["option_id"]: option for option in options}
+    if normalized in option_by_id:
+        return normalized
+    if normalized.isdecimal():
+        option_index = int(normalized)
+        if option_index < 1 or option_index > len(options):
+            raise GameLifecycleError("CLI finite choice option index is out of range.")
+        return options[option_index - 1]["option_id"]
     raise GameLifecycleError("CLI finite choice does not match a pending option.")
 
 
@@ -157,10 +154,11 @@ def _validate_cli_choice(value: object) -> str:
     return stripped
 
 
-def _validate_cli_request_id(value: object) -> str:
+def _prompt_request_id(prompt: CliDecisionPromptPayload) -> str:
+    value = prompt["request_id"]
     if type(value) is not str:
-        raise GameLifecycleError("CLI request_id must be a string.")
+        raise GameLifecycleError("CLI prompt request_id must be a string.")
     stripped = value.strip()
     if not stripped:
-        raise GameLifecycleError("CLI request_id must not be empty.")
+        raise GameLifecycleError("CLI prompt request_id must not be empty.")
     return stripped

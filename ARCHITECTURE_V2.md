@@ -113,6 +113,11 @@ live unit/model display records keyed by stable IDs.
 **Phase 18B is complete** for deterministic replay artifacts, lifecycle replay
 through `GameLifecycle.submit_decision(...)`, drift diagnostics, projection hash
 checkpoints, human-readable traces, and JSONL `DecisionRecord` corpus export.
+**Phase 18C is complete** for the shared adapter session facade:
+`AdapterGameSession` defines the public `start`, `advance`, `view`,
+`rules_catalog_view`, `events_since`, `submit_option`, and
+`submit_parameterized_payload` protocol implemented by `LocalGameSession` and
+used by thin CLI, UI, network, headless, and replay producers.
 **Phase 16A is
 complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
 source-backed battlefield at Create Battlefield, deploys units through
@@ -347,6 +352,7 @@ Completed / implemented foundation:
 | 17J | Complete | Warhammer Event Companion v1.0 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with pending coordinate extraction, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
+| 18C | Complete | Shared adapter session facade for CLI, UI, network, headless, and replay producers |
 
 Next / planned sequence:
 
@@ -355,7 +361,7 @@ Next / planned sequence:
 | 17G | In progress | Incremental faction army-rule, detachment-rule, enhancement-effect, and faction/detachment Stratagem semantic execution |
 | 17H | Planned | Datasheet, wargear, weapon ability, generated source-row coverage, and execution for covered ability items |
 | 17I | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
-| 18C-18D | Planned | Local visual UI and network play |
+| 18D-18E | Planned | Local visual UI and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
 
@@ -4829,7 +4835,55 @@ Required tests:
 - exported `DecisionRecord`s contain no object reprs, memory addresses, or
   UI-owned state.
 
-## Phase 18C: local visual game UI
+## Phase 18C: shared adapter session facade
+
+Status: Complete. `adapters/contracts.py` defines `AdapterGameSession`, and
+`adapters/local_session.py` implements it as the local authoritative session.
+CLI, UI, network, headless, and replay producer modules route through the same
+session methods instead of owning lifecycle mutation, queue access, or
+adapter-specific validation paths.
+
+Modules:
+
+- `adapters/contracts.py`
+- `adapters/local_session.py`
+- `adapters/ui.py`
+- `adapters/network.py`
+- `adapters/headless.py`
+- `adapters/replay.py`
+- `interfaces/cli.py`
+- `tests/unit/test_phase18c_adapter_session_facade.py`
+- `tests/code_quality/test_adapter_decision_contract.py`
+
+Invariants:
+
+- one public session protocol exposes `start`, lifecycle advancement,
+  viewer-safe live projection, source-hashed catalog projection,
+  viewer-filtered event deltas, finite option submission, and parameterized
+  payload submission;
+- `LocalGameSession` owns the authoritative `GameLifecycle` and delegates
+  accepted adapter choices through the shared adapter submission helpers;
+- CLI, UI, network, headless, and replay producers differ only in how they
+  render, rank, generate, or transport choices;
+- producer modules do not import `GameLifecycle`, access `.lifecycle`,
+  `decision_controller`, or call `submit_decision(...)` directly;
+- replay producer wrappers route recorded finite and parameterized results
+  through the same session protocol used by live adapters.
+
+Required tests:
+
+- `LocalGameSession` satisfies `AdapterGameSession` and returns JSON-safe
+  status/projection/event payloads;
+- CLI, UI, network, and headless finite producers submit the same option through
+  the session facade;
+- headless parameterized proposal generation submits a real deployment payload
+  through the session facade;
+- replay finite and parameterized records submit through the session facade and
+  reproduce the same `DecisionRecord` payloads;
+- static audit prevents thin producer modules from importing lifecycle internals,
+  reaching through `.lifecycle`, or bypassing `AdapterGameSession`.
+
+## Phase 18D: local visual game UI
 
 Invariants:
 
@@ -4837,13 +4891,14 @@ Invariants:
 - UI submits only `DecisionResult`s;
 - UI can visualize movement paths, LoS witnesses, attack allocation, scoring, and Stratagem windows;
 - UI never owns authoritative state progression.
-- UI consumes the Phase 18A hybrid catalog/live projection: it may cache static
+- UI consumes the Phase 18A hybrid catalog/live projection and Phase 18C
+  session facade: it may cache static
   catalog display data and render live `current_characteristics` plus
   `visible_modifiers`, but it never computes rules-effective datacard values;
 - UI explains visible characteristic changes from modifier display traces and
   treats hidden/unknown fields as explicit viewer-scoped presentation states.
 
-## Phase 18D: network/server-authoritative play
+## Phase 18E: network/server-authoritative play
 
 Invariants:
 
@@ -5122,9 +5177,9 @@ Exit criteria:
 | Leader/attached units | 6, 16D, 17A, 14H |
 | Faction/detachment/enhancement rules | 17C-17G, 14J |
 | Mission packs | 11A, 11E, 11F, 16A, 17J, 20A, 14J |
-| Adapter/UI contract | 11D, 12B, 14D-14I, 17J |
-| Human CLI/UI | 18A, 18C |
-| Network play | 18D |
+| Adapter/UI contract | 11D, 12B, 14D-14I, 17J, 18C |
+| Human CLI/UI | 18A, 18D |
+| Network play | 18E |
 | Replay | 18B, all state-changing phases |
 | AI/headless self-play | 19B-19E |
 | Performance budgets | 10U, 19A |
