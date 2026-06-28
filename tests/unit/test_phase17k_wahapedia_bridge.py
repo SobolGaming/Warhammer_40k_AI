@@ -36,6 +36,12 @@ from warhammer40k_core.core.model_geometry_catalog import (
     GeometrySourceUnits,
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import (
+    AbilityKind,
+    AntiKeywordMatchMode,
+    TargetKeywordMatchMode,
+    WeaponKeyword,
+)
 from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
@@ -230,7 +236,7 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
     bloodcrusher = profiles_by_id["000001115:bloodcrushers"]
     assert bloodcrusher.base_size.kind is BaseSizeKind.OVAL
     assert math.isclose(bloodcrusher.base_size.length_mm or 0.0, 90.0)
-    assert math.isclose(bloodcrusher.base_size.width_mm or 0.0, 52.0)
+    assert math.isclose(bloodcrusher.base_size.width_mm or 0.0, 52.5)
     assert bloodcrusher.characteristic(Characteristic.MOVEMENT).raw == 10
     assert bloodcrusher.characteristic(Characteristic.TOUGHNESS).raw == 7
     assert bloodcrusher.characteristic(Characteristic.SAVE).raw == 3
@@ -244,7 +250,7 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
         for evidence in package.model_geometries[0].evidence
         if evidence.measurement_kind is GeometryMeasurementKind.FOOTPRINT
     )
-    assert footprint_evidence.source_id == EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID
+    assert footprint_evidence.source_id.endswith(":base-size:page-65-chaos-daemons-bloodcrushers")
     assert (
         footprint_evidence.document_reference == EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE
     )
@@ -252,6 +258,7 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
         Path(__file__).resolve().parents[2] / EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE
     ).is_file()
     assert EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID in bloodcrusher.source_ids
+    assert footprint_evidence.source_id in bloodcrusher.source_ids
 
     assert wargear_by_id["000001115:hellblade"].weapon_profiles[0].attack_profile.fixed_attacks == 2
     horn = wargear_by_id["000001115:juggernauts-bladed-horn"].weapon_profiles[0]
@@ -1898,6 +1905,132 @@ def test_phase17k_bridge_normalizes_core_keyword_ability_timing_and_parameters()
     assert fields_by_name["Deadly Demise D3"]["parameter_tokens"] == "D3"
 
 
+def test_phase17k_bridge_normalizes_conditioned_wargear_weapon_keywords() -> None:
+    artifacts = _conditioned_weapon_keyword_bridge_artifacts(
+        "[LETHAL HITS: non-MONSTER/VEHICLE, RAPID FIRE 1]"
+    )
+    wargear_row = _artifact_by_table(artifacts, "Datasheets_wargear").rows[0]
+    wargear_fields = wargear_row.runtime_fields_payload()
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=artifacts,
+    )
+    profile = package.army_catalog.wargear[0].weapon_profiles[0]
+    abilities_by_kind = {ability.ability_kind: ability for ability in profile.abilities}
+    lethal = abilities_by_kind[AbilityKind.LETHAL_HITS]
+
+    assert wargear_fields["weapon_keywords"] == "Lethal Hits,Rapid Fire"
+    assert wargear_fields["weapon_abilities"]
+    assert tuple(keyword.value for keyword in profile.keywords) == (
+        WeaponKeyword.LETHAL_HITS.value,
+        WeaponKeyword.RAPID_FIRE.value,
+    )
+    assert lethal.target_keywords == ("MONSTER", "VEHICLE")
+    assert {parameter.name: parameter.value for parameter in lethal.parameters} == {
+        "target_keyword_match_mode": TargetKeywordMatchMode.MISSING_KEYWORD.value
+    }
+    assert abilities_by_kind[AbilityKind.RAPID_FIRE].parameters[0].value == 1
+
+
+def test_phase17k_bridge_normalizes_conditioned_valued_and_anti_weapon_keywords() -> None:
+    artifacts = _conditioned_weapon_keyword_bridge_artifacts(
+        "[SUSTAINED HITS 2: non-MONSTER/VEHICLE, MELTA 3: MONSTER, "
+        "CLEAVE 4: INFANTRY, DEVASTATING WOUNDS: MONSTER, "
+        "HUNTER: non-MONSTER/VEHICLE, ANTI-non-PSYKER 2+]"
+    )
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=artifacts,
+    )
+    profile = package.army_catalog.wargear[0].weapon_profiles[0]
+    abilities_by_kind = {ability.ability_kind: ability for ability in profile.abilities}
+    sustained = abilities_by_kind[AbilityKind.SUSTAINED_HITS]
+    melta = abilities_by_kind[AbilityKind.MELTA]
+    cleave = abilities_by_kind[AbilityKind.CLEAVE]
+    devastating = abilities_by_kind[AbilityKind.DEVASTATING_WOUNDS]
+    hunter = abilities_by_kind[AbilityKind.HUNTER]
+    anti = abilities_by_kind[AbilityKind.ANTI_KEYWORD]
+
+    assert tuple(keyword.value for keyword in profile.keywords) == (
+        WeaponKeyword.CLEAVE.value,
+        WeaponKeyword.DEVASTATING_WOUNDS.value,
+        WeaponKeyword.HUNTER.value,
+        WeaponKeyword.MELTA.value,
+        WeaponKeyword.SUSTAINED_HITS.value,
+    )
+    assert sustained.target_keywords == ("MONSTER", "VEHICLE")
+    assert {parameter.name: parameter.value for parameter in sustained.parameters} == {
+        "target_keyword_match_mode": TargetKeywordMatchMode.MISSING_KEYWORD.value,
+        "value": 2,
+    }
+    assert melta.target_keywords == ("MONSTER",)
+    assert melta.parameters[0].value == 3
+    assert cleave.target_keywords == ("INFANTRY",)
+    assert cleave.parameters[0].value == 4
+    assert devastating.target_keywords == ("MONSTER",)
+    assert hunter.target_keywords == ("MONSTER", "VEHICLE")
+    assert {parameter.name: parameter.value for parameter in hunter.parameters} == {
+        "target_keyword_match_mode": TargetKeywordMatchMode.MISSING_KEYWORD.value
+    }
+    assert {parameter.name: parameter.value for parameter in anti.parameters} == {
+        "keyword": "PSYKER",
+        "match_mode": AntiKeywordMatchMode.MISSING_KEYWORD.value,
+        "threshold": 2,
+    }
+
+
+def test_phase17k_bridge_allows_duplicate_anti_weapon_keyword_descriptors() -> None:
+    artifacts = _conditioned_weapon_keyword_bridge_artifacts("[ANTI-INFANTRY 2+, ANTI-VEHICLE 4+]")
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=artifacts,
+    )
+    profile = package.army_catalog.wargear[0].weapon_profiles[0]
+    anti_abilities = tuple(
+        ability for ability in profile.abilities if ability.ability_kind is AbilityKind.ANTI_KEYWORD
+    )
+
+    assert len(anti_abilities) == 2
+    assert {
+        ability.parameters[0].value
+        for ability in anti_abilities
+        if ability.parameters[0].name == "keyword"
+    } == {"INFANTRY", "VEHICLE"}
+
+
+@pytest.mark.parametrize(
+    ("description", "message"),
+    [
+        ("[]", "weapon keyword list must not be empty"),
+        ("[: MONSTER]", "weapon keyword must not be empty"),
+        ("[LETHAL HITS:]", "weapon keyword condition must not be empty"),
+        ("[ANTI-INFANTRY 4+: MONSTER]", "Anti weapon keywords do not support target conditions"),
+        ("[EXTRA ATTACKS: MONSTER]", "Unsupported conditioned Wahapedia weapon keyword"),
+        ("[RAPID FIRE]", "Valued Wahapedia weapon keyword is missing its value"),
+        ("[UNKNOWN]", "Unsupported Wahapedia weapon keyword"),
+        ("[LETHAL HITS, LETHAL HITS]", "must not duplicate"),
+        (
+            "[DEVASTATING WOUNDS: INFANTRY, DEVASTATING WOUNDS: MONSTER]",
+            "duplicate non-Anti ability kinds",
+        ),
+        (
+            "[MELTA 2: non-MONSTER/VEHICLE, MELTA 4: INFANTRY]",
+            "duplicate non-Anti ability kinds",
+        ),
+        ("[LETHAL HITS: non-]", "Invalid Wahapedia weapon ability descriptor"),
+    ],
+)
+def test_phase17k_bridge_rejects_invalid_conditioned_wargear_weapon_keywords(
+    description: str,
+    message: str,
+) -> None:
+    with pytest.raises(WahapediaBridgeError, match=message):
+        _conditioned_weapon_keyword_bridge_artifacts(description)
+
+
 def test_phase17k_bridge_tags_warlord_mustering_datasheet_abilities() -> None:
     artifacts = build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=_warlord_mustering_source_artifacts(),
@@ -2168,6 +2301,58 @@ def test_phase17k_bridge_requires_accepted_height_overrides() -> None:
             datasheet_ids=("000001115",),
             height_overrides=(),
         )
+
+
+def test_phase17k_bridge_uses_event_companion_model_qualified_base_sizes() -> None:
+    artifacts = _jakhals_bridge_artifacts()
+    model_rows = _artifact_by_table(artifacts, "Datasheets_models").rows
+    model_fields_by_name = {
+        row.runtime_fields_payload()["name"]: row.runtime_fields_payload() for row in model_rows
+    }
+    dishonoured_row = next(
+        row for row in model_rows if row.runtime_fields_payload()["name"] == "Dishonoured"
+    )
+
+    assert set(model_fields_by_name) == {"Dishonoured", "Jakhal Pack Leader", "Jakhals"}
+    assert model_fields_by_name["Jakhal Pack Leader"]["base_size"] == "28.5mm"
+    assert model_fields_by_name["Jakhal Pack Leader"]["min_models"] == "1"
+    assert model_fields_by_name["Jakhal Pack Leader"]["max_models"] == "1"
+    assert model_fields_by_name["Jakhals"]["base_size"] == "28.5mm"
+    assert model_fields_by_name["Jakhals"]["min_models"] == "8"
+    assert model_fields_by_name["Jakhals"]["max_models"] == "17"
+    assert model_fields_by_name["Dishonoured"]["base_size"] == "40mm"
+    assert model_fields_by_name["Dishonoured"]["min_models"] == "1"
+    assert model_fields_by_name["Dishonoured"]["max_models"] == "2"
+    assert model_fields_by_name["Dishonoured"]["base_size_source_id"].endswith(
+        ":base-size:page-93-world-eaters-jakhals-dishonoured"
+    )
+    assert EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID in _source_ids_from_row(dishonoured_row)
+
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=artifacts,
+    )
+    datasheet = package.army_catalog.datasheet_by_id("test-jakhals")
+    profiles_by_id = {profile.model_profile_id: profile for profile in datasheet.model_profiles}
+    dishonoured = profiles_by_id["test-jakhals:dishonoured"]
+    dishonoured_geometry = next(
+        geometry
+        for geometry in package.model_geometries
+        if geometry.model_profile_id == "test-jakhals:dishonoured"
+    )
+    dishonoured_footprint_evidence = next(
+        evidence
+        for evidence in dishonoured_geometry.evidence
+        if evidence.measurement_kind is GeometryMeasurementKind.FOOTPRINT
+    )
+
+    assert dishonoured.base_size.kind is BaseSizeKind.CIRCULAR
+    assert math.isclose(dishonoured.base_size.diameter_mm or 0.0, 40.0)
+    assert dishonoured_footprint_evidence.source_id.endswith(
+        ":base-size:page-93-world-eaters-jakhals-dishonoured"
+    )
+    assert package.to_payload() == type(package).from_payload(package.to_payload()).to_payload()
 
 
 def _bloodcrushers_package() -> CanonicalCatalogPackage:
@@ -2612,6 +2797,119 @@ def _bloodcrushers_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     )
 
 
+def _jakhals_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_jakhals_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-jakhals",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-jakhals",
+                model_name="Jakhal Pack Leader",
+                height=1.25,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:world-eaters:jakhals:pack-leader:height",
+                height_document_reference="World Eaters Faction Pack p.34",
+            ),
+            ModelHeightOverride(
+                datasheet_id="test-jakhals",
+                model_name="Dishonoured",
+                height=1.5,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:world-eaters:jakhals:dishonoured:height",
+                height_document_reference="World Eaters Faction Pack p.34",
+            ),
+            ModelHeightOverride(
+                datasheet_id="test-jakhals",
+                model_name="Jakhals",
+                height=1.25,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:world-eaters:jakhals:jakhals:height",
+                height_document_reference="World Eaters Faction Pack p.34",
+            ),
+        ),
+    )
+
+
+def _jakhals_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-world-eaters-rule,WE,Blessings of Khorne,Army rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-jakhals,Jakhals,WE",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    "test-jakhals,1,Faction,test-world-eaters-rule,,,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-jakhals,Chaos,,false",
+                    "test-jakhals,Grenades,,false",
+                    "test-jakhals,Infantry,,false",
+                    "test-jakhals,Jakhals,,false",
+                    "test-jakhals,Khorne,,false",
+                    "test-jakhals,World Eaters,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-jakhals,1,7,4,6,-,1,7,1,28.5mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    "test-jakhals,1,1,Autopistol,Ranged,12,1,4,3,0,1,pistol",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    'test-jakhals,1,"1 Jakhal Pack Leader, 1 Dishonoured and 8 Jakhals"',
+                    "test-jakhals,2,or:",
+                    'test-jakhals,3,"1 Jakhal Pack Leader, 2 Dishonoured and 17 Jakhals"',
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "WE,World Eaters")),
+        ),
+    )
+
+
 def _flesh_hounds_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     return build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=_flesh_hounds_source_artifacts(),
@@ -2848,6 +3146,102 @@ def _keyword_ability_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
         _artifact_from_csv(
             "Datasheets_unit_composition",
             "\n".join(("datasheet_id,line,description", "test-keyword-unit,1,1 Alpha")),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _conditioned_weapon_keyword_bridge_artifacts(
+    description: str,
+) -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_conditioned_weapon_keyword_source_artifacts(description),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-condition-keyword-unit",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-condition-keyword-unit",
+                model_name="Alpha",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:condition-keyword-height",
+                height_document_reference="test-doc:condition-keyword-height",
+            ),
+        ),
+    )
+
+
+def _conditioned_weapon_keyword_source_artifacts(
+    description: str,
+) -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Test Army Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-condition-keyword-unit,Condition Keyword Unit,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-condition-keyword-unit,1,Faction,test-army-rule,"
+                        "Test Army Rule,Test rule text.,"
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-condition-keyword-unit,Infantry,,false",
+                    "test-condition-keyword-unit,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    (
+                        "test-condition-keyword-unit,1,1,Aperture rifle,Ranged,24,2,3,4,-1,1,"
+                        f'"{description}"'
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-condition-keyword-unit,1,6,4,3,-,2,7,1,32mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(("datasheet_id,line,description", "test-condition-keyword-unit,1,1 Alpha")),
         ),
         _artifact_from_csv(
             "Factions",

@@ -15,6 +15,7 @@ from warhammer40k_core.core.weapon_profiles import (
     RangeProfile,
     WeaponKeyword,
     WeaponProfile,
+    WeaponProfileError,
 )
 from warhammer40k_core.engine.core_stratagem_effects import (
     FIRE_OVERWATCH_EFFECT_KIND,
@@ -123,12 +124,13 @@ def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> N
         keywords=(),
         abilities=(AbilityDescriptor.lethal_hits(),),
     )
-    duplicate_profile = _profile(
-        keywords=(WeaponKeyword.RAPID_FIRE,),
-        abilities=(AbilityDescriptor.rapid_fire(1), AbilityDescriptor.rapid_fire(2)),
-    )
     no_descriptor_profile = _profile(keywords=(), abilities=())
 
+    with pytest.raises(WeaponProfileError, match="duplicate non-Anti ability kinds"):
+        _profile(
+            keywords=(WeaponKeyword.RAPID_FIRE,),
+            abilities=(AbilityDescriptor.rapid_fire(1), AbilityDescriptor.rapid_fire(2)),
+        )
     with pytest.raises(GameLifecycleError, match="requires a structured ability descriptor"):
         weapon_ability_int_value(profile, AbilityKind.RAPID_FIRE)
     with pytest.raises(GameLifecycleError, match="requires a structured ability descriptor"):
@@ -143,16 +145,6 @@ def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> N
         weapon_ability_int_value(orphan_rapid_fire_profile, AbilityKind.RAPID_FIRE)
     with pytest.raises(GameLifecycleError, match="descriptor requires the weapon keyword"):
         lethal_hits_applies(orphan_lethal_profile, target_keywords=("VEHICLE",))
-    with pytest.raises(GameLifecycleError, match="requires controlling-player selection"):
-        weapon_ability_int_value(duplicate_profile, AbilityKind.RAPID_FIRE)
-    assert (
-        weapon_ability_int_value(
-            duplicate_profile,
-            AbilityKind.RAPID_FIRE,
-            selected_ability_id="rapid-fire:2",
-        )
-        == 2
-    )
     assert weapon_ability_int_value(no_descriptor_profile, AbilityKind.HEAVY) is None
     assert melta_damage_bonus(no_descriptor_profile, target_within_half_range=True) == 0
     assert sustained_hits_generated_hits(no_descriptor_profile, critical_hit=True) == 1
@@ -346,6 +338,64 @@ def test_phase14i_keyword_gated_weapon_abilities_match_target_keywords() -> None
     )
 
 
+def test_phase14i_non_keyword_gated_weapon_abilities_match_missing_target_keywords() -> None:
+    profile = _profile(
+        keywords=(
+            WeaponKeyword.DEVASTATING_WOUNDS,
+            WeaponKeyword.LETHAL_HITS,
+            WeaponKeyword.RAPID_FIRE,
+            WeaponKeyword.SUSTAINED_HITS,
+        ),
+        abilities=(
+            AbilityDescriptor.devastating_wounds(target_keywords=("non-MONSTER/VEHICLE",)),
+            AbilityDescriptor.lethal_hits(target_keywords=("non-MONSTER/VEHICLE",)),
+            AbilityDescriptor.rapid_fire(1, target_keywords=("non-MONSTER/VEHICLE",)),
+            AbilityDescriptor.sustained_hits(1, target_keywords=("non-MONSTER/VEHICLE",)),
+        ),
+    )
+
+    assert lethal_hits_applies(profile, target_keywords=("INFANTRY",))
+    assert not lethal_hits_applies(profile, target_keywords=("MONSTER",))
+    assert not lethal_hits_applies(profile, target_keywords=("VEHICLE",))
+    assert (
+        devastating_wounds_resolution(profile, target_keywords=("INFANTRY",))
+        is DevastatingWoundsResolution.MORTAL_WOUNDS
+    )
+    assert devastating_wounds_resolution(profile, target_keywords=("MONSTER",)) is None
+    assert (
+        weapon_ability_int_value(
+            profile,
+            AbilityKind.RAPID_FIRE,
+            target_keywords=("INFANTRY",),
+        )
+        == 1
+    )
+    assert (
+        weapon_ability_int_value(
+            profile,
+            AbilityKind.RAPID_FIRE,
+            target_keywords=("VEHICLE",),
+        )
+        is None
+    )
+    assert (
+        sustained_hits_generated_hits(
+            profile,
+            critical_hit=True,
+            target_keywords=("CHARACTER",),
+        )
+        == 2
+    )
+    assert (
+        sustained_hits_generated_hits(
+            profile,
+            critical_hit=True,
+            target_keywords=("MONSTER",),
+        )
+        == 1
+    )
+
+
 def test_phase14i_hunter_target_gate_is_target_eligibility() -> None:
     profile = _profile(
         keywords=(WeaponKeyword.HUNTER,),
@@ -368,26 +418,24 @@ def test_phase14i_hunter_target_gate_is_target_eligibility() -> None:
         hunter_target_allowed(orphan_descriptor, target_keywords=("Vehicle",))
 
 
-def test_phase14i_duplicate_weapon_ability_selection_is_adapter_visible() -> None:
+def test_phase14i_duplicate_anti_weapon_ability_selection_is_adapter_visible() -> None:
+    anti_vehicle = AbilityDescriptor.anti_keyword("Vehicle", 4)
+    anti_infantry = AbilityDescriptor.anti_keyword("Infantry", 2)
     profile = _profile(
-        keywords=(WeaponKeyword.RAPID_FIRE,),
-        abilities=(AbilityDescriptor.rapid_fire(2), AbilityDescriptor.rapid_fire(1)),
+        keywords=(),
+        abilities=(anti_vehicle, anti_infantry),
     )
     single_descriptor_profile = _profile(
-        keywords=(WeaponKeyword.RAPID_FIRE,),
-        abilities=(AbilityDescriptor.rapid_fire(1),),
-    )
-    orphan_descriptor_profile = _profile(
         keywords=(),
-        abilities=(AbilityDescriptor.rapid_fire(1),),
+        abilities=(anti_vehicle,),
     )
 
     request = weapon_ability_selection_request(
         profile,
-        AbilityKind.RAPID_FIRE,
-        target_keywords=(),
+        AbilityKind.ANTI_KEYWORD,
+        target_keywords=("INFANTRY", "VEHICLE"),
         actor_id="player-a",
-        request_id="phase14i-duplicate-rapid-fire-selection",
+        request_id="phase14i-duplicate-anti-selection",
         source_context={"timing": "weapon-profile-import"},
     )
 
@@ -395,34 +443,24 @@ def test_phase14i_duplicate_weapon_ability_selection_is_adapter_visible() -> Non
     assert (
         weapon_ability_selection_request(
             single_descriptor_profile,
-            AbilityKind.RAPID_FIRE,
-            target_keywords=(),
+            AbilityKind.ANTI_KEYWORD,
+            target_keywords=("VEHICLE",),
             actor_id="player-a",
-            request_id="phase14i-single-rapid-fire-selection",
+            request_id="phase14i-single-anti-selection",
         )
         is None
     )
-    with pytest.raises(GameLifecycleError, match="descriptor requires the weapon keyword"):
-        weapon_ability_selection_request(
-            orphan_descriptor_profile,
-            AbilityKind.RAPID_FIRE,
-            target_keywords=(),
-            actor_id="player-a",
-            request_id="phase14i-orphan-rapid-fire-selection",
-        )
     assert request.decision_type == WEAPON_ABILITY_SELECTION_DECISION_TYPE
     assert request.actor_id == "player-a"
-    assert tuple(option.option_id for option in request.options) == (
-        "rapid-fire:1",
-        "rapid-fire:2",
-    )
+    expected_option_ids = tuple(sorted((anti_vehicle.ability_id, anti_infantry.ability_id)))
+    assert tuple(option.option_id for option in request.options) == expected_option_ids
     first_option_payload = cast(dict[str, JsonValue], request.options[0].payload)
-    assert first_option_payload["selected_ability_id"] == "rapid-fire:1"
+    assert first_option_payload["selected_ability_id"] == expected_option_ids[0]
     assert (
-        weapon_ability_int_value(
-            profile,
-            AbilityKind.RAPID_FIRE,
-            selected_ability_id=request.options[1].option_id,
+        anti_keyword_critical_threshold(
+            profile=profile,
+            target_keywords=("INFANTRY", "VEHICLE"),
+            selected_ability_id=anti_infantry.ability_id,
         )
         == 2
     )

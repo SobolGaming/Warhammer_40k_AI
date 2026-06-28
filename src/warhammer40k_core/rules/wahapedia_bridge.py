@@ -11,6 +11,8 @@ from warhammer40k_core.core.datasheet import (
     MUSTERING_WARLORD_FORBIDDEN,
     MUSTERING_WARLORD_REQUIRED,
     MUSTERING_WARLORD_RULE_KEY,
+    BaseSizeDefinition,
+    BaseSizeKind,
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
     WargearOptionConditionKind,
@@ -21,10 +23,19 @@ from warhammer40k_core.core.model_geometry_catalog import (
     GeometryReviewStatus,
     GeometrySourceUnits,
 )
-from warhammer40k_core.core.weapon_profiles import WeaponKeyword
+from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
+    AntiKeywordMatchMode,
+    WeaponKeyword,
+    WeaponProfileError,
+    validate_weapon_ability_descriptor_multiplicity,
+)
 from warhammer40k_core.rules.data_package import DataPackageId
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    event_companion_2026_06 as event_companion_source,
+)
 from warhammer40k_core.rules.wahapedia_schema import (
     NormalizedSourceRow,
     WahapediaCsvTable,
@@ -86,10 +97,12 @@ class ModelHeightOverride:
         object.__setattr__(self, "evidence_kind", GeometryEvidenceKind(self.evidence_kind))
 
 
-_UNIT_COMPOSITION_RE = re.compile(
-    r"^(?P<min>\d+)(?:-(?P<max>\d+))?\s+(?P<name>.+?)$",
+_UNIT_COMPOSITION_PART_RE = re.compile(
+    r"(?P<count>\d+(?:-\d+)?)\s+(?P<name>.+?)"
+    r"(?=(?:,\s+|\s+and\s+)\d+(?:-\d+)?\s+|$)",
     re.IGNORECASE,
 )
+_UNIT_COMPOSITION_SEPARATOR_RE = re.compile(r"(?:,\s+|\s+and\s+)", re.IGNORECASE)
 _MODEL_COST_RE = re.compile(r"^(?P<count>\d+)\s+models?$", re.IGNORECASE)
 _OPTION_RE = re.compile(
     r"^1 (?P<model>.+?) that is not equipped with (?:a|an|1) "
@@ -130,6 +143,7 @@ def build_wahapedia_canonical_bridge_artifacts(
         rows_by_table=rows_by_table,
         corrections_by_datasheet=corrections_by_datasheet,
         height_by_datasheet_and_model=height_by_datasheet_and_model,
+        event_companion_base_sizes_by_key=_event_companion_base_sizes_by_key(),
     )
     bridged_rows = _empty_bridge_rows()
     for datasheet_id in selected_datasheet_ids:
@@ -145,6 +159,9 @@ class _BridgeContext:
     rows_by_table: dict[str, tuple[NormalizedSourceRow, ...]]
     corrections_by_datasheet: dict[str, PdfDatasheetCorrection]
     height_by_datasheet_and_model: dict[tuple[str, str], ModelHeightOverride]
+    event_companion_base_sizes_by_key: dict[
+        tuple[str, str], event_companion_source.BaseSizeSourceRecord
+    ]
 
 
 @dataclass(frozen=True, slots=True)
@@ -154,7 +171,39 @@ class _CompositionEntry:
     model_profile_id: str
     min_models: int
     max_models: int
+    source_rows: tuple[NormalizedSourceRow, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class _CompositionPart:
+    model_name: str
+    min_models: int
+    max_models: int
     source_row: NormalizedSourceRow
+
+
+@dataclass(slots=True)
+class _CompositionEntryAccumulator:
+    line: str
+    model_name: str
+    model_profile_id: str
+    min_models: int
+    max_models: int
+    source_rows: list[NormalizedSourceRow]
+
+
+@dataclass(frozen=True, slots=True)
+class _BaseSizeEvidence:
+    base_size_text: str
+    source_id: str
+    document_reference: str
+    source_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class _WeaponKeywordEntry:
+    keyword: WeaponKeyword | None
+    ability: AbilityDescriptor | None = None
 
 
 EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID = (
@@ -205,14 +254,7 @@ def _bridge_datasheet(
             "source_ids": _joined(faction_source_ids),
         },
     )
-    model_source_ids = tuple(
-        _deduplicated(
-            [
-                *_source_ids(model_source_row, *cost_rows),
-                EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID,
-            ]
-        )
-    )
+    model_source_ids = _source_ids(model_source_row, *cost_rows)
     bridged_rows["Datasheets"].append(
         {
             "id": datasheet_id,
@@ -235,6 +277,13 @@ def _bridge_datasheet(
             datasheet_id=datasheet_id,
             model_name=entry.model_name,
         )
+        base_size = _base_size_evidence(
+            context=context,
+            faction_name=_required_field(faction_row, "name"),
+            datasheet_name=_required_field(datasheet_row, "name"),
+            model_name=entry.model_name,
+            model_source_row=model_source_row,
+        )
         bridged_rows["Datasheets_models"].append(
             {
                 "datasheet_id": datasheet_id,
@@ -253,9 +302,9 @@ def _bridge_datasheet(
                 "bs": "-",
                 "min_models": str(entry.min_models),
                 "max_models": str(entry.max_models),
-                "base_size": _required_field(model_source_row, "base_size"),
-                "base_size_source_id": EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID,
-                "base_size_document_reference": EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE,
+                "base_size": base_size.base_size_text,
+                "base_size_source_id": base_size.source_id,
+                "base_size_document_reference": base_size.document_reference,
                 "height": str(height.height),
                 "height_units": height.height_units.value,
                 "height_source_id": height.height_source_id,
@@ -263,7 +312,15 @@ def _bridge_datasheet(
                 "height_reviewer_status": height.reviewer_status.value,
                 "height_evidence_kind": height.evidence_kind.value,
                 "source_ids": _joined(
-                    tuple(_deduplicated([*model_source_ids, entry.source_row.stable_source_id()]))
+                    tuple(
+                        _deduplicated(
+                            [
+                                *model_source_ids,
+                                *_source_ids(*entry.source_rows),
+                                *base_size.source_ids,
+                            ]
+                        )
+                    )
                 ),
             }
         )
@@ -302,27 +359,156 @@ def _composition_entries(
     )
     if not rows:
         raise WahapediaBridgeError("Datasheet has no unit composition rows.")
-    entries: list[_CompositionEntry] = []
+    accumulators: dict[str, _CompositionEntryAccumulator] = {}
     for row in rows:
-        description = _required_field(row, "description")
-        match = _UNIT_COMPOSITION_RE.fullmatch(description)
-        if match is None:
+        for part in _composition_parts_from_row(row):
+            key = _name_key(part.model_name)
+            accumulator = accumulators.get(key)
+            if accumulator is None:
+                accumulators[key] = _CompositionEntryAccumulator(
+                    line=str(len(accumulators) + 1),
+                    model_name=part.model_name,
+                    model_profile_id=f"{datasheet_id}:{_slug(part.model_name)}",
+                    min_models=part.min_models,
+                    max_models=part.max_models,
+                    source_rows=[part.source_row],
+                )
+                continue
+            accumulator.min_models = min(accumulator.min_models, part.min_models)
+            accumulator.max_models = max(accumulator.max_models, part.max_models)
+            if not any(
+                source_row.stable_source_id() == part.source_row.stable_source_id()
+                for source_row in accumulator.source_rows
+            ):
+                accumulator.source_rows.append(part.source_row)
+    if not accumulators:
+        raise WahapediaBridgeError("Datasheet has no model composition entries.")
+    return tuple(
+        _CompositionEntry(
+            line=accumulator.line,
+            model_name=accumulator.model_name,
+            model_profile_id=accumulator.model_profile_id,
+            min_models=accumulator.min_models,
+            max_models=accumulator.max_models,
+            source_rows=tuple(accumulator.source_rows),
+        )
+        for accumulator in accumulators.values()
+    )
+
+
+def _composition_parts_from_row(row: NormalizedSourceRow) -> tuple[_CompositionPart, ...]:
+    description = _required_field(row, "description").strip()
+    if description.casefold() == "or:":
+        return ()
+    parts: list[_CompositionPart] = []
+    position = 0
+    for match in _UNIT_COMPOSITION_PART_RE.finditer(description):
+        separator = description[position : match.start()]
+        if separator and _UNIT_COMPOSITION_SEPARATOR_RE.fullmatch(separator) is None:
             raise WahapediaBridgeError("Unsupported unit composition row shape.")
-        minimum = _int_from_text(match.group("min"))
-        maximum_text = match.group("max")
-        maximum = minimum if maximum_text is None else _int_from_text(maximum_text)
-        model_name = match.group("name").strip()
-        entries.append(
-            _CompositionEntry(
-                line=_required_field(row, "line"),
-                model_name=model_name,
-                model_profile_id=f"{datasheet_id}:{_slug(model_name)}",
+        minimum, maximum = _composition_count_range(match.group("count"))
+        parts.append(
+            _CompositionPart(
+                model_name=match.group("name").strip(),
                 min_models=minimum,
                 max_models=maximum,
                 source_row=row,
             )
         )
-    return tuple(entries)
+        position = match.end()
+    if not parts or position != len(description):
+        raise WahapediaBridgeError("Unsupported unit composition row shape.")
+    return tuple(parts)
+
+
+def _composition_count_range(count_text: str) -> tuple[int, int]:
+    if "-" not in count_text:
+        count = _int_from_text(count_text)
+        return count, count
+    minimum_text, maximum_text = count_text.split("-", maxsplit=1)
+    minimum = _int_from_text(minimum_text)
+    maximum = _int_from_text(maximum_text)
+    if maximum < minimum:
+        raise WahapediaBridgeError("Unit composition maximum must be at least its minimum.")
+    return minimum, maximum
+
+
+def _base_size_evidence(
+    *,
+    context: _BridgeContext,
+    faction_name: str,
+    datasheet_name: str,
+    model_name: str,
+    model_source_row: NormalizedSourceRow,
+) -> _BaseSizeEvidence:
+    faction_key = _name_key(faction_name)
+    model_qualified_key = _name_key(f"{datasheet_name}: {model_name}")
+    datasheet_key = _name_key(datasheet_name)
+    record = context.event_companion_base_sizes_by_key.get((faction_key, model_qualified_key))
+    if record is None:
+        record = context.event_companion_base_sizes_by_key.get((faction_key, datasheet_key))
+    if record is not None:
+        return _event_companion_base_size_evidence(record)
+    fallback_source_id = model_source_row.stable_source_id()
+    return _BaseSizeEvidence(
+        base_size_text=_required_field(model_source_row, "base_size"),
+        source_id=fallback_source_id,
+        document_reference=fallback_source_id,
+        source_ids=(fallback_source_id,),
+    )
+
+
+def _event_companion_base_size_evidence(
+    record: event_companion_source.BaseSizeSourceRecord,
+) -> _BaseSizeEvidence:
+    return _BaseSizeEvidence(
+        base_size_text=_bridge_base_size_text_from_event_companion_record(record),
+        source_id=record.source_id,
+        document_reference=EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE,
+        source_ids=(EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID, record.source_id),
+    )
+
+
+def _bridge_base_size_text_from_event_companion_record(
+    record: event_companion_source.BaseSizeSourceRecord,
+) -> str:
+    if record.canonical_base_size is None:
+        return record.source_base_text
+    return _bridge_base_size_text(record.canonical_base_size)
+
+
+def _bridge_base_size_text(base_size: BaseSizeDefinition) -> str:
+    if base_size.kind is BaseSizeKind.CIRCULAR:
+        diameter = base_size.diameter_mm
+        if diameter is None:
+            raise WahapediaBridgeError("Circular base size record is missing diameter.")
+        return f"{_millimeter_text(diameter)}mm"
+    if base_size.kind is BaseSizeKind.OVAL:
+        length = base_size.length_mm
+        width = base_size.width_mm
+        if length is None or width is None:
+            raise WahapediaBridgeError("Oval base size record is missing dimensions.")
+        return f"{_millimeter_text(length)} x {_millimeter_text(width)}mm"
+    raise WahapediaBridgeError("Unsupported Event Companion canonical base size kind.")
+
+
+def _millimeter_text(value: float) -> str:
+    if value.is_integer():
+        return str(int(value))
+    return f"{value:g}"
+
+
+def _event_companion_base_sizes_by_key() -> dict[
+    tuple[str, str], event_companion_source.BaseSizeSourceRecord
+]:
+    rows_by_key: dict[tuple[str, str], event_companion_source.BaseSizeSourceRecord] = {}
+    for row in event_companion_source.base_size_source_rows():
+        key = (_name_key(row.faction_name), _name_key(row.unit_name))
+        existing = rows_by_key.get(key)
+        if existing is not None:
+            raise WahapediaBridgeError("Duplicate Event Companion base size row key.")
+        rows_by_key[key] = row
+    return rows_by_key
 
 
 def _keywords_for_datasheet(
@@ -443,6 +629,7 @@ def _bridge_wargear(
                 "ap": _required_field(row, "AP"),
                 "d": _required_field(row, "D"),
                 "weapon_keywords": _joined(_weapon_keywords(_required_field(row, "description"))),
+                "weapon_abilities": _weapon_abilities_payload(_required_field(row, "description")),
                 "default_loadout": "true",
                 "source_ids": _joined(_source_ids(row)),
             }
@@ -560,6 +747,7 @@ def _bridge_abilities(
                     "ap": "",
                     "d": "",
                     "weapon_keywords": "",
+                    "weapon_abilities": "",
                     "default_loadout": "false",
                     "source_ids": _joined(_source_ids(row)),
                 }
@@ -749,6 +937,7 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "ap",
             "d",
             "weapon_keywords",
+            "weapon_abilities",
             "default_loadout",
             "source_ids",
         ),
@@ -1032,17 +1221,202 @@ def _skill_value(row: NormalizedSourceRow) -> str:
 
 
 def _weapon_keywords(description: str) -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            _deduplicated(
+                [
+                    entry.keyword.value
+                    for entry in _weapon_keyword_entries(description)
+                    if entry.keyword is not None
+                ]
+            )
+        )
+    )
+
+
+def _weapon_abilities_payload(description: str) -> str:
+    abilities = tuple(
+        entry.ability for entry in _weapon_keyword_entries(description) if entry.ability is not None
+    )
+    if not abilities:
+        return ""
+    seen: set[str] = set()
+    for ability in abilities:
+        if ability.ability_id in seen:
+            raise WahapediaBridgeError("Wahapedia weapon abilities must not duplicate.")
+        seen.add(ability.ability_id)
+    try:
+        validate_weapon_ability_descriptor_multiplicity(abilities)
+    except WeaponProfileError as exc:
+        raise WahapediaBridgeError(
+            "Wahapedia weapon abilities must not duplicate non-Anti ability kinds."
+        ) from exc
+    return json.dumps(
+        [ability.to_payload() for ability in sorted(abilities, key=lambda item: item.ability_id)],
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
+def _weapon_keyword_entries(description: str) -> tuple[_WeaponKeywordEntry, ...]:
     if not description.strip():
         return ()
-    canonical_by_key = {_name_key(keyword.value): keyword.value for keyword in WeaponKeyword}
-    keywords: list[str] = []
-    for raw_keyword in description.split(","):
-        key = _name_key(raw_keyword)
-        keyword = canonical_by_key.get(key)
-        if keyword is None:
-            raise WahapediaBridgeError("Unsupported Wahapedia weapon keyword.")
-        keywords.append(keyword)
-    return tuple(sorted(_deduplicated(keywords)))
+    entries: list[_WeaponKeywordEntry] = []
+    for raw_item in _weapon_keyword_items(description):
+        entries.append(_weapon_keyword_entry(raw_item))
+    return tuple(entries)
+
+
+def _weapon_keyword_items(description: str) -> tuple[str, ...]:
+    body = _weapon_keyword_body(description)
+    items = tuple(item.strip() for item in body.split(",") if item.strip())
+    if not items:
+        raise WahapediaBridgeError("Wahapedia weapon keyword list must not be empty.")
+    return items
+
+
+def _weapon_keyword_body(description: str) -> str:
+    stripped = description.strip()
+    if stripped.startswith("[") and stripped.endswith("]"):
+        stripped = stripped[1:-1].strip()
+    return stripped
+
+
+def _weapon_keyword_entry(raw_item: str) -> _WeaponKeywordEntry:
+    ability_text, target_condition = _weapon_keyword_condition(raw_item)
+    try:
+        return _weapon_keyword_entry_from_parts(
+            ability_text=ability_text,
+            target_keywords=() if target_condition is None else (target_condition,),
+        )
+    except WeaponProfileError as exc:
+        raise WahapediaBridgeError("Invalid Wahapedia weapon ability descriptor.") from exc
+
+
+def _weapon_keyword_condition(raw_item: str) -> tuple[str, str | None]:
+    parts = raw_item.split(":", maxsplit=1)
+    ability_text = parts[0].strip()
+    if not ability_text:
+        raise WahapediaBridgeError("Wahapedia weapon keyword must not be empty.")
+    if len(parts) == 1:
+        return ability_text, None
+    condition = parts[1].strip()
+    if not condition:
+        raise WahapediaBridgeError("Wahapedia weapon keyword condition must not be empty.")
+    return ability_text, condition
+
+
+def _weapon_keyword_entry_from_parts(
+    *,
+    ability_text: str,
+    target_keywords: tuple[str, ...],
+) -> _WeaponKeywordEntry:
+    valued = _valued_weapon_ability_entry(ability_text, target_keywords=target_keywords)
+    if valued is not None:
+        return valued
+    anti = _anti_weapon_ability_entry(ability_text)
+    if anti is not None:
+        if target_keywords:
+            raise WahapediaBridgeError("Anti weapon keywords do not support target conditions.")
+        return anti
+    canonical_by_key = {_name_key(keyword.value): keyword for keyword in WeaponKeyword}
+    keyword = canonical_by_key.get(_name_key(ability_text))
+    if keyword is None:
+        raise WahapediaBridgeError("Unsupported Wahapedia weapon keyword.")
+    ability = _unvalued_weapon_ability(keyword=keyword, target_keywords=target_keywords)
+    if target_keywords and ability is None:
+        raise WahapediaBridgeError("Unsupported conditioned Wahapedia weapon keyword.")
+    return _WeaponKeywordEntry(keyword=keyword, ability=ability)
+
+
+def _valued_weapon_ability_entry(
+    ability_text: str,
+    *,
+    target_keywords: tuple[str, ...],
+) -> _WeaponKeywordEntry | None:
+    match = re.fullmatch(
+        r"(?P<name>rapid[\s-]+fire|sustained[\s-]+hits|melta|cleave)\s+"
+        r"(?P<value>\d+)\+?",
+        ability_text.strip(),
+        re.IGNORECASE,
+    )
+    if match is None:
+        return None
+    value = _int_from_text(match.group("value"))
+    key = _name_key(match.group("name"))
+    if key == "rapid-fire":
+        return _WeaponKeywordEntry(
+            keyword=WeaponKeyword.RAPID_FIRE,
+            ability=AbilityDescriptor.rapid_fire(value, target_keywords=target_keywords),
+        )
+    if key == "sustained-hits":
+        return _WeaponKeywordEntry(
+            keyword=WeaponKeyword.SUSTAINED_HITS,
+            ability=AbilityDescriptor.sustained_hits(value, target_keywords=target_keywords),
+        )
+    if key == "melta":
+        return _WeaponKeywordEntry(
+            keyword=WeaponKeyword.MELTA,
+            ability=AbilityDescriptor.melta(value, target_keywords=target_keywords),
+        )
+    if key == "cleave":
+        return _WeaponKeywordEntry(
+            keyword=WeaponKeyword.CLEAVE,
+            ability=AbilityDescriptor.cleave(value, target_keywords=target_keywords),
+        )
+    raise WahapediaBridgeError("Unsupported valued Wahapedia weapon keyword.")
+
+
+def _anti_weapon_ability_entry(ability_text: str) -> _WeaponKeywordEntry | None:
+    match = re.fullmatch(
+        r"anti[\s-]+(?P<keyword>.+?)\s+(?P<threshold>[2-6])\+?",
+        ability_text.strip(),
+        re.IGNORECASE,
+    )
+    if match is None:
+        return None
+    keyword = match.group("keyword").strip()
+    match_mode = AntiKeywordMatchMode.HAS_KEYWORD
+    for prefix in ("non-", "non_", "non "):
+        if keyword.casefold().startswith(prefix):
+            keyword = keyword[len(prefix) :].strip()
+            match_mode = AntiKeywordMatchMode.MISSING_KEYWORD
+            break
+    return _WeaponKeywordEntry(
+        keyword=None,
+        ability=AbilityDescriptor.anti_keyword(
+            keyword,
+            _int_from_text(match.group("threshold")),
+            match_mode=match_mode,
+        ),
+    )
+
+
+def _unvalued_weapon_ability(
+    *,
+    keyword: WeaponKeyword,
+    target_keywords: tuple[str, ...],
+) -> AbilityDescriptor | None:
+    if keyword is WeaponKeyword.LETHAL_HITS:
+        return AbilityDescriptor.lethal_hits(target_keywords=target_keywords)
+    if keyword is WeaponKeyword.DEVASTATING_WOUNDS:
+        return AbilityDescriptor.devastating_wounds(target_keywords=target_keywords)
+    if keyword is WeaponKeyword.HEAVY:
+        if target_keywords:
+            raise WahapediaBridgeError("Heavy does not support target conditions.")
+        return AbilityDescriptor.heavy()
+    if keyword is WeaponKeyword.HUNTER:
+        if not target_keywords:
+            raise WahapediaBridgeError("Hunter requires target keywords.")
+        return AbilityDescriptor.hunter(target_keywords=target_keywords)
+    if keyword in {
+        WeaponKeyword.CLEAVE,
+        WeaponKeyword.MELTA,
+        WeaponKeyword.RAPID_FIRE,
+        WeaponKeyword.SUSTAINED_HITS,
+    }:
+        raise WahapediaBridgeError("Valued Wahapedia weapon keyword is missing its value.")
+    return None
 
 
 def _ability_timing_tags(name: str) -> str:

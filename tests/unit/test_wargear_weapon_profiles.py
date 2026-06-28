@@ -19,6 +19,7 @@ from warhammer40k_core.core.weapon_profiles import (
     DamageProfile,
     RangeProfile,
     RangeProfileKind,
+    TargetKeywordMatchMode,
     WeaponKeyword,
     WeaponProfile,
     WeaponProfileError,
@@ -28,6 +29,7 @@ from warhammer40k_core.core.weapon_profiles import (
     ability_timing_from_token,
     canonical_weapon_keyword_tokens,
     range_profile_kind_from_token,
+    target_keyword_match_mode_from_token,
     weapon_keyword_from_token,
 )
 from warhammer40k_core.rules.keywords import canonical_rule_keyword_tokens
@@ -153,6 +155,57 @@ def test_ability_descriptors_are_typed_payload_data_without_execution() -> None:
     assert "<" not in blob
     assert "object at 0x" not in blob
     assert tuple(AbilityDescriptor.from_payload(payload) for payload in payloads) == abilities
+
+
+def test_ability_descriptors_support_non_target_keyword_gates() -> None:
+    explicit = AbilityDescriptor.lethal_hits(
+        target_keywords=("MONSTER/VEHICLE",),
+        target_keyword_match_mode=TargetKeywordMatchMode.MISSING_KEYWORD,
+    )
+    inferred = AbilityDescriptor.lethal_hits(target_keywords=("non-MONSTER/VEHICLE",))
+    payload = inferred.to_payload()
+
+    assert inferred == explicit
+    assert payload["target_keywords"] == ["MONSTER", "VEHICLE"]
+    assert payload["parameters"] == [
+        {"name": "target_keyword_match_mode", "value": TargetKeywordMatchMode.MISSING_KEYWORD.value}
+    ]
+    assert AbilityDescriptor.from_payload(payload) == inferred
+    assert (
+        target_keyword_match_mode_from_token(TargetKeywordMatchMode.MISSING_KEYWORD)
+        is TargetKeywordMatchMode.MISSING_KEYWORD
+    )
+    assert (
+        target_keyword_match_mode_from_token(TargetKeywordMatchMode.MISSING_KEYWORD.value)
+        is TargetKeywordMatchMode.MISSING_KEYWORD
+    )
+
+    with pytest.raises(WeaponProfileError, match="mix positive and non- conditions"):
+        AbilityDescriptor.lethal_hits(target_keywords=("MONSTER", "non-VEHICLE"))
+    with pytest.raises(WeaponProfileError, match="requires keywords"):
+        AbilityDescriptor.lethal_hits(target_keywords=("non-",))
+    with pytest.raises(WeaponProfileError, match="conflicts with non- keywords"):
+        AbilityDescriptor.lethal_hits(
+            target_keywords=("non-MONSTER",),
+            target_keyword_match_mode=TargetKeywordMatchMode.HAS_KEYWORD,
+        )
+    with pytest.raises(WeaponProfileError, match="requires keywords"):
+        AbilityDescriptor(
+            ability_id="lethal-hits:bad-match-mode",
+            name="Bad Lethal Hits",
+            ability_kind=AbilityKind.LETHAL_HITS,
+            parameters=(
+                AbilityParameter(
+                    name="target_keyword_match_mode",
+                    value=TargetKeywordMatchMode.MISSING_KEYWORD.value,
+                ),
+            ),
+            timing=AbilityTiming.ATTACK_SEQUENCE,
+        )
+    with pytest.raises(WeaponProfileError):
+        target_keyword_match_mode_from_token("unsupported")
+    with pytest.raises(WeaponProfileError, match="must be a string"):
+        target_keyword_match_mode_from_token(1)
 
 
 def test_ability_descriptors_fail_fast_for_unsupported_shapes() -> None:
@@ -354,6 +407,34 @@ def test_weapon_profile_abilities_are_deduplicated_and_sorted_deterministically(
             damage_profile=DamageProfile.fixed(1),
             abilities=(rapid_fire, rapid_fire),
         )
+    with pytest.raises(WeaponProfileError, match="duplicate non-Anti ability kinds"):
+        WeaponProfile(
+            profile_id="duplicate-non-anti-ability-kinds",
+            name="Duplicate non-Anti ability kinds",
+            range_profile=RangeProfile.distance(12),
+            attack_profile=AttackProfile.fixed(1),
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+            strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+            armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+            damage_profile=DamageProfile.fixed(1),
+            abilities=(AbilityDescriptor.rapid_fire(1), AbilityDescriptor.rapid_fire(2)),
+        )
+    anti_profile = WeaponProfile(
+        profile_id="duplicate-anti-ability-kinds",
+        name="Duplicate Anti ability kinds",
+        range_profile=RangeProfile.distance(12),
+        attack_profile=AttackProfile.fixed(1),
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+        damage_profile=DamageProfile.fixed(1),
+        abilities=(
+            AbilityDescriptor.anti_keyword("Infantry", 2),
+            AbilityDescriptor.anti_keyword("Vehicle", 4),
+        ),
+    )
+
+    assert len(anti_profile.abilities) == 2
     with pytest.raises(WeaponProfileError):
         WeaponProfile(
             profile_id="bad-ability",
