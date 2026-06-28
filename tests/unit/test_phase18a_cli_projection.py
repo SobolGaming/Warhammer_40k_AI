@@ -39,6 +39,7 @@ from warhammer40k_core.engine.phases.movement import (
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.interfaces.cli import (
+    CliDecisionPromptPayload,
     render_decision_request_for_cli,
     submit_cli_choice,
     submit_cli_payload,
@@ -58,8 +59,8 @@ def test_cli_adapter_renders_finite_options_and_records_normal_decision() -> Non
 
     prompt = render_decision_request_for_cli(request)
     follow_up = submit_cli_choice(
-        lifecycle=session.lifecycle,
-        request_id=prompt["request_id"],
+        session=session,
+        prompt=prompt,
         choice="tactical",
         result_id="phase18a-cli-secondary-a",
     )
@@ -89,11 +90,12 @@ def test_invalid_cli_choice_is_rejected_without_queue_or_record_mutation() -> No
     session.start(_config(game_id="phase18a-cli-invalid-game"))
     status = session.advance_until_decision_or_terminal()
     request = _decision_request(status)
+    prompt = render_decision_request_for_cli(request)
 
     with pytest.raises(GameLifecycleError, match="out of range"):
         submit_cli_choice(
-            lifecycle=session.lifecycle,
-            request_id=request.request_id,
+            session=session,
+            prompt=prompt,
             choice="99",
             result_id="phase18a-cli-invalid-choice",
         )
@@ -107,11 +109,19 @@ def test_stale_cli_choice_is_rejected_without_queue_or_record_mutation() -> None
     session.start(_config(game_id="phase18a-cli-stale-choice-game"))
     status = session.advance_until_decision_or_terminal()
     request = _decision_request(status)
+    prompt = render_decision_request_for_cli(request)
+    stale_prompt = cast(
+        CliDecisionPromptPayload,
+        {
+            **prompt,
+            "request_id": "phase18a-stale-cli-request",
+        },
+    )
 
     with pytest.raises(GameLifecycleError, match="request_id does not match pending request"):
         submit_cli_choice(
-            lifecycle=session.lifecycle,
-            request_id="phase18a-stale-cli-request",
+            session=session,
+            prompt=stale_prompt,
             choice="tactical",
             result_id="phase18a-cli-stale-choice",
         )
@@ -141,7 +151,7 @@ def test_stale_cli_payload_is_rejected_when_parameterized_request_is_pending() -
 
     with pytest.raises(GameLifecycleError, match="request_id does not match pending request"):
         submit_cli_payload(
-            lifecycle=session.lifecycle,
+            session=session,
             request_id="phase18a-stale-cli-payload-request",
             payload={"accepted": True},
             result_id="phase18a-cli-stale-payload",

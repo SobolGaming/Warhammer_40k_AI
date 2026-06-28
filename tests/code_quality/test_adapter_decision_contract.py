@@ -10,9 +10,18 @@ TEST_ROOTS = (
     ROOT / "tests" / "replay",
 )
 ADAPTER_HELPER_PATHS = (ROOT / "tests" / "deployment_submission_helpers.py",)
+SESSION_PRODUCER_PATHS = (
+    ROOT / "src" / "warhammer40k_core" / "interfaces" / "cli.py",
+    ROOT / "src" / "warhammer40k_core" / "adapters" / "ui.py",
+    ROOT / "src" / "warhammer40k_core" / "adapters" / "network.py",
+    ROOT / "src" / "warhammer40k_core" / "adapters" / "headless.py",
+    ROOT / "src" / "warhammer40k_core" / "adapters" / "replay.py",
+)
+SESSION_PROTOCOL_PATH = ROOT / "src" / "warhammer40k_core" / "adapters" / "contracts.py"
 
 ADAPTER_FACING_NAMES = frozenset(
     (
+        "AdapterGameSession",
         "EventStreamCursor",
         "FiniteOptionSubmission",
         "LocalGameSession",
@@ -66,6 +75,24 @@ FORBIDDEN_PARAMETERIZED_HELPER_TOKENS = frozenset(
         "DecisionResult(",
     )
 )
+SESSION_PROTOCOL_METHODS = frozenset(
+    (
+        "advance_until_decision_or_terminal",
+        "events_since",
+        "rules_catalog_view",
+        "start",
+        "submit_option",
+        "submit_parameterized_payload",
+        "view",
+    )
+)
+SESSION_PRODUCER_FORBIDDEN_NAMES = frozenset(("GameLifecycle",))
+SESSION_PRODUCER_FORBIDDEN_ATTRIBUTES = frozenset(
+    (
+        "decision_controller",
+        "submit_decision",
+    )
+)
 
 
 def test_adapter_facing_tests_submit_choices_through_lifecycle() -> None:
@@ -103,11 +130,46 @@ def test_adapter_submission_helpers_do_not_construct_parameterized_results_direc
     )
 
 
+def test_shared_adapter_session_protocol_exposes_required_facade_methods() -> None:
+    tree = ast.parse(SESSION_PROTOCOL_PATH.read_text(encoding="utf-8"))
+    protocol_node = _class_node(tree=tree, class_name="AdapterGameSession")
+    method_names = {node.name for node in protocol_node.body if isinstance(node, ast.FunctionDef)}
+
+    assert method_names == SESSION_PROTOCOL_METHODS
+
+
+def test_thin_adapter_producers_use_session_protocol_not_lifecycle_bypass() -> None:
+    violations: list[str] = []
+
+    for path in SESSION_PRODUCER_PATHS:
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name) and node.id in SESSION_PRODUCER_FORBIDDEN_NAMES:
+                violations.append(_format_violation(path=path, node=node, call_name=node.id))
+            if (
+                isinstance(node, ast.Attribute)
+                and node.attr in SESSION_PRODUCER_FORBIDDEN_ATTRIBUTES
+            ):
+                violations.append(_format_violation(path=path, node=node, call_name=node.attr))
+
+    assert not violations, (
+        "Thin adapter producers must depend on AdapterGameSession and must not bypass "
+        "the shared session facade:\n" + "\n".join(violations)
+    )
+
+
 def _test_paths() -> tuple[Path, ...]:
     paths: list[Path] = []
     for root in TEST_ROOTS:
         paths.extend(path for path in root.rglob("test_*.py") if path.is_file())
     return tuple(sorted(paths))
+
+
+def _class_node(*, tree: ast.Module, class_name: str) -> ast.ClassDef:
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef) and node.name == class_name:
+            return node
+    raise AssertionError(f"Expected class {class_name}.")
 
 
 def _is_adapter_facing_test(node: ast.FunctionDef) -> bool:
@@ -153,5 +215,5 @@ def _is_pending_queue_expression(node: ast.expr) -> bool:
     return False
 
 
-def _format_violation(*, path: Path, node: ast.Call, call_name: str) -> str:
+def _format_violation(*, path: Path, node: ast.expr, call_name: str) -> str:
     return f"{path.relative_to(ROOT)}:{node.lineno} calls {call_name}"
