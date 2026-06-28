@@ -31,9 +31,9 @@ from warhammer40k_core.engine.runtime_modifiers import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
-CONTRIBUTION_ID = "warhammer_40000_11th:adeptus_custodes:army_rule:scaffold"
 SOURCE_RULE_ID = "phase17f:phase17e:adeptus-custodes:army-rule"
 HOOK_ID = "warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah"
+CONTRIBUTION_ID = HOOK_ID
 DACATARAI_HOOK_ID = f"{HOOK_ID}:dacatarai"
 RENDAX_HOOK_ID = f"{HOOK_ID}:rendax"
 WEAPON_PROFILE_MODIFIER_ID = f"{HOOK_ID}:weapon-profile"

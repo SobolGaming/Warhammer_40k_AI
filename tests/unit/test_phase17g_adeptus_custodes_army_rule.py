@@ -32,7 +32,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
-from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.army_mustering import ArmyDefinition, AttachedUnitFormation
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -60,6 +60,7 @@ from warhammer40k_core.engine.phases.fight import (
 )
 from warhammer40k_core.engine.runtime_modifiers import WeaponProfileModifierContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 
 
 def test_adeptus_custodes_faction_alias_matches_army_keyword() -> None:
@@ -73,6 +74,8 @@ def test_martial_katah_runtime_contribution_registers_hooks() -> None:
     contribution = army_rule.runtime_contribution()
 
     assert contribution.contribution_id == army_rule.CONTRIBUTION_ID
+    assert army_rule.CONTRIBUTION_ID == army_rule.HOOK_ID
+    assert not contribution.contribution_id.endswith(":scaffold")
     assert {
         binding.hook_id for binding in contribution.fight_unit_selected_grant_hook_bindings
     } == {
@@ -202,6 +205,41 @@ def test_martial_katah_rendax_grants_lethal_hits_to_melee_profiles() -> None:
     assert WeaponKeyword.SUSTAINED_HITS not in modified.keywords
     assert any(ability.ability_id == "lethal-hits" for ability in modified.abilities)
     assert army_rule.SOURCE_RULE_ID in modified.source_ids
+
+
+def test_martial_katah_effect_applies_to_attached_rules_unit_components() -> None:
+    state = _custodes_battle_state()
+    attached_id, bodyguard, leader = _attach_custodes_rules_unit(state)
+    target = _unit_for_player(state, player_id="player-b")
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    _record_martial_katah_effect(
+        state,
+        unit=bodyguard,
+        stance=army_rule.MartialKatahStance.DACATARAI,
+    )
+
+    assert army_rule.martial_katah_target_unit_ids(
+        state,
+        unit_instance_id=leader.unit_instance_id,
+    ) == (
+        attached_id,
+        bodyguard.unit_instance_id,
+        leader.unit_instance_id,
+    )
+    assert (
+        army_rule.active_martial_katah_for_unit(
+            state,
+            unit_instance_id=leader.unit_instance_id,
+        )
+        is army_rule.MartialKatahStance.DACATARAI
+    )
+
+    modified = army_rule.martial_katah_weapon_profile_modifier(
+        _modifier_context(state=state, unit=leader, target=target, melee=True)
+    )
+
+    assert WeaponKeyword.SUSTAINED_HITS in modified.keywords
+    assert any(ability.ability_id == "sustained-hits:1" for ability in modified.abilities)
 
 
 def test_martial_katah_is_not_available_for_non_custodes_armies() -> None:
@@ -441,6 +479,69 @@ def _unit_for_player(state: GameState, *, player_id: str) -> UnitInstance:
     if army is None:
         raise AssertionError(f"Missing army for {player_id}.")
     return army.units[0]
+
+
+def _attach_custodes_rules_unit(state: GameState) -> tuple[str, UnitInstance, UnitInstance]:
+    bodyguard = _unit_for_player(state, player_id="player-a")
+    leader = _cloned_unit_instance(
+        bodyguard,
+        unit_instance_id="army-alpha:martial-katah-leader",
+        model_id_prefix="army-alpha:martial-katah-leader",
+    )
+    attached_id = "attached-unit:army-alpha:martial-katah"
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+        ),
+        source_id="martial-katah-test:attached-unit",
+    )
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != "player-a":
+            updated_armies.append(army)
+            continue
+        updated_armies.append(
+            replace(
+                army,
+                units=tuple(sorted((*army.units, leader), key=lambda unit: unit.unit_instance_id)),
+                attached_units=(*army.attached_units, formation),
+            )
+        )
+    state.army_definitions = updated_armies
+    attached_starting_model_count = len(bodyguard.own_models) + len(leader.own_models)
+    state.starting_strength_records.append(
+        StartingStrengthRecord(
+            player_id="player-a",
+            unit_instance_id=attached_id,
+            starting_model_count=attached_starting_model_count,
+            single_model_starting_wounds=None,
+            source_id="martial-katah-test:attached-unit:starting-strength",
+        )
+    )
+    state.starting_strength_records.sort(key=lambda record: record.unit_instance_id)
+    return attached_id, bodyguard, leader
+
+
+def _cloned_unit_instance(
+    unit: UnitInstance,
+    *,
+    unit_instance_id: str,
+    model_id_prefix: str,
+) -> UnitInstance:
+    return replace(
+        unit,
+        unit_instance_id=unit_instance_id,
+        own_models=tuple(
+            replace(
+                model,
+                model_instance_id=f"{model_id_prefix}:{index:03}",
+            )
+            for index, model in enumerate(unit.own_models, start=1)
+        ),
+    )
 
 
 def _set_current_battle_phase(state: GameState, phase: BattlePhase) -> None:

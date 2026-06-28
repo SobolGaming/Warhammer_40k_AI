@@ -657,6 +657,41 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah",
+        "ability_name": "Martial Ka'tah",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/adeptus-custodes/faction/warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah/none",
+        "datasheet_id": "adeptus-custodes",
+        "datasheet_name": "Adeptus Custodes",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Martial Ka'tah"
+    ],
+    "category_id": "faction.army_rule.martial_katah",
+    "category_name": "Faction Army Rule Martial Katah",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/adeptus-custodes/faction/warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah/none"
+    ],
+    "datasheet_names": [
+      "Adeptus Custodes"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:dacatarai",
+      "warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:rendax",
+      "warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:weapon-profile"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "warhammer_40000_11th:space_marines:army_rule:oath_of_moment",
         "ability_name": "Oath of Moment",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/space-marines/faction/warhammer_40000_11th:space_marines:army_rule:oath_of_moment/none",
