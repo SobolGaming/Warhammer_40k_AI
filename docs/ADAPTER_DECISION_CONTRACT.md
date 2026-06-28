@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window and interface-intent requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]`. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window and interface-intent requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]`. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window/interface-intent requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]` for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window/interface-intent requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]` for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 The short rule:
 
@@ -65,6 +65,7 @@ The shared contract uses these objects and payloads:
 - `MeleeDeclarationProposal`: Fight phase parameterized answer selecting each fighting model's primary melee weapon, optional `[EXTRA ATTACKS]` weapons, and target allocations for those melee weapons.
 - `PsychicAttackModifierIgnoreSelection`: finite Shooting/Fight attack-sequence answer selecting one engine-emitted way to keep or ignore current `[PSYCHIC]` weapon skill and hit-roll modifiers for the active attack context.
 - `PlacementProposalPayload`: parameterized placement answer, including attempted `UnitPlacement`.
+- `CultAmbushMarker`: replay-safe Genestealer Cults marker state used by the Cult Ambush marker placement and ingress contracts.
 - `DeploymentPlacementRequest`: Deploy Armies parameterized request context containing source mission setup, owning deployment zone IDs, selected rules-unit/component/model IDs, ruleset hash, and setup-step context.
 - `DeploymentPlacementProposal`: Deploy Armies placement answer containing the complete selected rules-unit model placement set, placement kind `deployment`, proposal request ID, ruleset hash, and replay-safe source context.
 - `BattleFormationDeclarationState`: Declare Battle Formations reserve declaration state containing the next player, completed players, and per-player available reserve declaration counts.
@@ -133,6 +134,7 @@ Relevant modules:
 - `src/warhammer40k_core/engine/setup_completion.py`
 - `src/warhammer40k_core/engine/battle_formation_hooks.py`
 - `src/warhammer40k_core/engine/faction_rule_states.py`
+- `src/warhammer40k_core/engine/cult_ambush.py`
 - `src/warhammer40k_core/engine/charge_declaration.py`
 - `src/warhammer40k_core/engine/phases/charge.py`
 - `src/warhammer40k_core/engine/fight_order.py`
@@ -1081,9 +1083,59 @@ Required Phase 17G Shooting-start faction-rule tests:
 - deterministic JSON-safe decision, effect, event, lifecycle, and replay payload round-trip;
 - viewer-scoped projection/event redaction for any future hidden Shooting-start faction-rule selections.
 
+## Phase 17G Genestealer Cults Cult Ambush Decisions
+
+Phase 17G implements the 11th Edition Genestealer Cults `Cult Ambush` army rule update. During `declare_battle_formations`, the setup hook grants Resurgence points through the faction-resource ledger based on battle size: Incursion 6, Strike Force 10, and Onslaught 14. This grant is automatic and emits no adapter choice.
+
+When an eligible Genestealer Cults unit is destroyed, the engine may emit the finite decision type `select_cult_ambush_resurgence`. The pending request payload contains source rule ID, model-destroyed event ID, destroyed unit ID, destroyed player ID, destroying player ID, battle round, phase, starting strength, Resurgence cost, and current Resurgence points. Current option IDs are:
+
+- `genestealer_cults:cult_ambush:decline:<destroyed_unit_instance_id>`;
+- `genestealer_cults:cult_ambush:spend:<destroyed_unit_instance_id>`.
+
+Option payloads include `selection: "decline"` or `selection: "spend"`, source rule ID, destroyed unit ID, model-destroyed event ID, and the Resurgence cost for spend options. Adapters must not decide unit eligibility, calculate costs, spend Resurgence points, clone units, create reserve states, reset wounds or `[ONE SHOT]` usage, or place markers locally.
+
+Accepted spend selections revalidate that every relevant destroyed-unit model has Cult Ambush through the unit's structured ability descriptor, re-check the starting-strength cost table, spend Resurgence points, add an identical replacement unit at Starting Strength with new deterministic model IDs and full wounds, and create a Strategic Reserves `ReserveState` source-backed by Cult Ambush. The replacement is treated as a Cult Ambush reserve unit: it cannot be selected for Rapid Ingress, may later arrive by ordinary Strategic Reserves rules, and is not destroyed by the third-battle-round reserve deadline.
+
+If a marker can legally be placed, the engine emits the parameterized decision type `submit_cult_ambush_marker_placement`. The pending request uses the fixed `submit_parameterized_payload` option and carries source rule ID, marker ID, player ID, replacement unit ID, destroyed unit ID, marker diameter, and required enemy horizontal distance. Adapter payloads use:
+
+```json
+{
+  "request_id": "decision-request-000012",
+  "submission_kind": "cult_ambush_marker_placement",
+  "marker_id": "cult-ambush-marker:game-1:round-01:player-a:unit-1:result-1",
+  "player_id": "player-a",
+  "x_inches": 12.0,
+  "y_inches": 18.0
+}
+```
+
+If the engine reports that no legal marker position exists, adapters may answer the same request with `submission_kind: "cult_ambush_no_marker"` and a replay-safe `no_marker_reason`; this is rejected if a legal marker position still exists. Marker placement validates battlefield bounds and more-than-9-inch horizontal enemy distance before recording a 32mm Cult Ambush marker. Enemy non-AIRCRAFT model moves that end within 8 inches remove markers automatically through engine event processing, not through an adapter choice.
+
+At the end of an opponent Movement phase, each surviving marker can emit the shared turn-end finite decision type `select_faction_rule_turn_end_option` with `selection_kind: "cult_ambush_marker_ingress"`. Current options are:
+
+- `genestealer_cults:cult_ambush:marker:<marker_id>:decline`;
+- `genestealer_cults:cult_ambush:marker:<marker_id>:unit:<unit_instance_id>`.
+
+Accepted ingress selections emit a placement proposal request with `proposal_kind: "cult_ambush_placement"` and placement kind `cult_ambush`. The submitted `PlacementProposalPayload` must place at least one model in base contact with the marker and every other model wholly within 3 inches of that marker. The engine validates reserve state, marker activity, battlefield bounds, model/objective overlap, coherency, and marker distance before placing the unit, marking the reserve arrived, and removing the marker. Cult Ambush marker ingress can resolve in battle round 1.
+
+Malformed, stale, wrong-actor, wrong-unit, wrong-marker, unsupported-option, option-payload drift, cost drift, insufficient-resource, ability drift, illegal marker position, missing reserve state, non-Cult-Ambush reserve state, arrived reserve state, inactive marker, placement kind drift, model overlap, objective marker overlap, battlefield-bounds, marker-distance, and coherency-invalid submissions reject before unauthorized mutation.
+
+Cult Ambush choices and markers are public table information in the current Phase 17G rules scope. If a future update hides a marker, replacement unit, pending request, or reserve state, projections and event deltas must be viewer-scoped and must not leak hidden information through marker counts, option counts, eligible unit IDs, selected payloads, reserve state, or derived distances.
+
+Required Phase 17G Cult Ambush tests:
+
+- initial Resurgence grant by battle size is idempotent and replay-safe;
+- valid spend and decline choices through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- replacement units are deterministic, full-wound, source-backed Cult Ambush Strategic Reserves;
+- marker placement accepts valid parameterized payloads and rejects stale, drifted, malformed, or illegal positions;
+- enemy non-AIRCRAFT marker removal and AIRCRAFT exclusion are event-driven and replay-safe;
+- valid marker ingress selection emits `cult_ambush_placement` and first-round placement can arrive through the shared placement proposal contract;
+- deterministic JSON-safe decision, marker, reserve, event, lifecycle, and replay payload round-trip;
+- viewer-scoped projection/event redaction for any future hidden Cult Ambush state.
+
 ## Phase 17G Turn-End Faction-Rule Decisions
 
-Phase 17G adds opt-in turn-end decisions for faction runtime content and generic catalog IR consumers. These decisions are emitted only when the mustered army's runtime contribution or catalog IR index registers a turn-end hook and the completed phase matches the hook's timing. Current implemented support includes Aeldari Corsair Coterie Webway Pathstone, Chaos Daemons Shadow Legion Fade to Darkness, Grey Knights Gate of Infinity, and catalog IR `catalog-ir:can-be-placed-in-reserves` abilities such as Chaos Daemons Flesh Hounds' Hunters from the Warp at the end of the opponent's turn.
+Phase 17G adds opt-in turn-end decisions for faction runtime content and generic catalog IR consumers. These decisions are emitted only when the mustered army's runtime contribution or catalog IR index registers a turn-end hook and the completed phase matches the hook's timing. Current implemented support includes Aeldari Corsair Coterie Webway Pathstone, Chaos Daemons Shadow Legion Fade to Darkness, Genestealer Cults Cult Ambush marker ingress, Grey Knights Gate of Infinity, and catalog IR `catalog-ir:can-be-placed-in-reserves` abilities such as Chaos Daemons Flesh Hounds' Hunters from the Warp at the end of the opponent's turn.
 
 Phase-end objective-control hooks and phase-end cleanup resolve before turn-end faction-rule decisions are emitted. Adapters must therefore treat turn-end repositioning choices as occurring after engine-owned phase-end objective-control state has already been recorded for that phase.
 
@@ -1107,7 +1159,12 @@ Current Grey Knights Gate of Infinity options use:
 - `grey-knights:gate-of-infinity:<rules_unit_instance_id>:use`;
 - `grey-knights:gate-of-infinity:complete`.
 
-Webway option payloads include `submission_kind: "aeldari_corsair_coterie_webway_pathstone_turn_end"`, player ID, source rule ID, hook ID, enhancement ID, target unit ID, and `use_ability`. Fade to Darkness option payloads include `submission_kind: "chaos_daemons_shadow_legion_fade_to_darkness_turn_end"`, player ID, source rule ID, hook ID, enhancement ID, target unit ID, and `use_ability`; the request payload also carries `destroyed_enemy_unit_instance_ids` captured by the engine from current Fight phase unit-destroyed evidence. Grey Knights option payloads include `submission_kind: "grey_knights_gate_of_infinity_turn_end"`, player ID, source rule ID, hook ID, ability ID, ability name, target rules-unit ID, component unit IDs, `use_ability`, and action `use` or `complete`. Catalog IR option payloads include `submission_kind: "catalog_ir_turn_end_reserves"`, player ID, source rule ID, hook ID, catalog record ID, ability ID, ability name, target unit ID, and `use_ability`. Adapters must not remove the unit from the battlefield, create a reserve state, decide reserve eligibility locally, synthesize destroyed-enemy evidence for Fade to Darkness, split an attached Grey Knights rules unit, or calculate Grey Knights remaining cap locally.
+Current Genestealer Cults Cult Ambush marker ingress options use:
+
+- `genestealer_cults:cult_ambush:marker:<marker_id>:decline`;
+- `genestealer_cults:cult_ambush:marker:<marker_id>:unit:<unit_instance_id>`.
+
+Webway option payloads include `submission_kind: "aeldari_corsair_coterie_webway_pathstone_turn_end"`, player ID, source rule ID, hook ID, enhancement ID, target unit ID, and `use_ability`. Fade to Darkness option payloads include `submission_kind: "chaos_daemons_shadow_legion_fade_to_darkness_turn_end"`, player ID, source rule ID, hook ID, enhancement ID, target unit ID, and `use_ability`; the request payload also carries `destroyed_enemy_unit_instance_ids` captured by the engine from current Fight phase unit-destroyed evidence. Grey Knights option payloads include `submission_kind: "grey_knights_gate_of_infinity_turn_end"`, player ID, source rule ID, hook ID, ability ID, ability name, target rules-unit ID, component unit IDs, `use_ability`, and action `use` or `complete`. Genestealer Cults marker ingress option payloads include `selection: "decline"` or `selection: "ingress"`, source rule ID, marker ID, and the selected Cult Ambush unit ID for ingress selections. Catalog IR option payloads include `submission_kind: "catalog_ir_turn_end_reserves"`, player ID, source rule ID, hook ID, catalog record ID, ability ID, ability name, target unit ID, and `use_ability`. Adapters must not remove the unit from the battlefield, create a reserve state, decide reserve eligibility locally, synthesize destroyed-enemy evidence for Fade to Darkness, split an attached Grey Knights rules unit, calculate Grey Knights remaining cap locally, or move Cult Ambush units from markers locally.
 
 Accepted use selections validate that the unit is still on the battlefield, not already in reserves, not within Engagement Range when required by the source rule, and, for Fade to Darkness, that the enhanced unit destroyed one or more enemy units in the current Fight phase, then remove it from the battlefield and create a Strategic Reserves `ReserveState` with source evidence. Grey Knights Gate of Infinity validates the selected rules unit and every attached component, removes each component unit through engine-owned reserve mutation, and creates required-arrival Strategic Reserves states for the next Grey Knights Movement phase. Accepted decline or complete selections emit a replay-safe event and do not mutate battlefield or reserve state. Webway Pathstone records a used event once per battle for the enhanced unit and does not offer another decision after use. Fade to Darkness records a use or decline event for the current Fight phase and does not offer another decision for that unit in the same phase. Gate of Infinity records each selected rules unit and re-emits the request until the battle-size cap is exhausted, the Grey Knights player chooses `complete`, or no eligible unit remains. Catalog IR Hunters from the Warp is not once-per-battle in the source text, so it may be offered again in a later eligible opponent turn after the unit returns and becomes eligible.
 
@@ -1120,6 +1177,7 @@ Required Phase 17G turn-end faction-rule tests:
 - valid Webway Pathstone use and decline choices through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
 - valid Fade to Darkness use and decline choices through the shared turn-end `DecisionRequest` / `DecisionResult` hook path;
 - valid Grey Knights Gate of Infinity use and complete choices through the shared turn-end `DecisionRequest` / `DecisionResult` hook path;
+- valid Genestealer Cults Cult Ambush marker ingress and decline choices through the shared turn-end `DecisionRequest` / `DecisionResult` hook path;
 - valid catalog IR Hunters from the Warp use choice through the shared turn-end hook path;
 - once-per-battle and once-per-turn request gating;
 - Grey Knights battle-size cap, required next-Movement arrival, and attached rules-unit component validation;
@@ -1461,7 +1519,8 @@ Current placement proposal kinds:
 - `reinforcement_placement`;
 - `deep_strike_placement`;
 - `strategic_reserves_placement`;
-- `disembark_placement`.
+- `disembark_placement`;
+- `cult_ambush_placement`.
 
 The request's `placement_kinds` field enumerates the legal physical placement methods available for that unit and state. The submitted payload must match the pending request.
 
@@ -1525,6 +1584,8 @@ Example Disembark submission shape:
   "restriction_overrides": []
 }
 ```
+
+Cult Ambush marker ingress uses the same placement payload shape with `proposal_kind: "cult_ambush_placement"` and `placement_kind: "cult_ambush"`. The proposal request context carries the Cult Ambush marker payload. The submitted placement must put at least one model in base contact with that marker and all other models wholly within 3 inches of it.
 
 Serialized payload helpers may omit empty optional collections such as `large_model_exceptions` or `restriction_overrides`; inbound parsing accepts omitted empty optional fields.
 

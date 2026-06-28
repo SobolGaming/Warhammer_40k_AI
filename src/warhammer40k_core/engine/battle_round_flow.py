@@ -11,6 +11,9 @@ from warhammer40k_core.engine.battle_round_hooks import (
     BattleRoundStartRequestContext,
     BattleRoundStartResultContext,
 )
+from warhammer40k_core.engine.cult_ambush import (
+    resolve_cult_ambush_marker_removal_for_completed_moves,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -221,6 +224,11 @@ class BattleRoundFlow:
             state=state,
             decisions=decisions,
             registry=self._unit_destroyed_hooks,
+        )
+        resolve_cult_ambush_marker_removal_for_completed_moves(
+            state=state,
+            decisions=decisions,
+            completed_phase=current_phase,
         )
         turn_end_request = self._turn_end_hooks.next_request_for(
             TurnEndRequestContext(

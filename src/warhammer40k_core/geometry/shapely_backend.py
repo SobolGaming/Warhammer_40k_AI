@@ -253,6 +253,33 @@ def base_footprint_distance(
     return footprint_for_base(first, first_pose).distance(footprint_for_base(second, second_pose))
 
 
+def bounds_have_point_clear_of_model_footprints(
+    *,
+    bounds: tuple[float, float, float, float],
+    blocked_models: tuple[Model, ...],
+    clear_distance_inches: float,
+    marker_radius_inches: float,
+) -> bool:
+    min_x, min_y, max_x, max_y = bounds
+    surface = _box(min_x, min_y, max_x, max_y)
+    clearance = _validate_non_negative_number(
+        "clear_distance_inches",
+        clear_distance_inches,
+    ) + _validate_non_negative_number("marker_radius_inches", marker_radius_inches)
+    legal_area = surface
+    for model in blocked_models:
+        valid_model = _validate_model("blocked_model", model)
+        legal_area = legal_area.difference(
+            footprint_for_base(valid_model.base, valid_model.pose).buffer(
+                clearance,
+                quad_segs=_FOOTPRINT_QUAD_SEGS,
+            )
+        )
+        if legal_area.is_empty:
+            return False
+    return not legal_area.is_empty
+
+
 def base_footprints_intersect(
     first: BaseShape,
     first_pose: Pose,
@@ -391,6 +418,15 @@ def _validate_model(field_name: str, value: object) -> Model:
     if type(value) is not Model:
         raise GeometryError(f"{field_name} must be a Model.")
     return value
+
+
+def _validate_non_negative_number(field_name: str, value: object) -> float:
+    if not isinstance(value, int | float) or type(value) is bool:
+        raise GeometryError(f"{field_name} must be a number.")
+    number = float(value)
+    if number < 0.0:
+        raise GeometryError(f"{field_name} must be non-negative.")
+    return number
 
 
 def _vertical_gap(

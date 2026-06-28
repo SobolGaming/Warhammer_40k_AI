@@ -353,6 +353,10 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction` | Thrill Seekers |
+| `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush` | Cult Ambush |
+| `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:initial_resurgence` | Cult Ambush |
+| `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker_ingress` | Cult Ambush |
+| `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:unit_destroyed` | Cult Ambush |
 | `warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity` | Gate Of Infinity |
 | `warhammer_40000_11th:imperial_knights:army_rule:bondsman` | Bondsman |
 | `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric` | Code Chivalric |
