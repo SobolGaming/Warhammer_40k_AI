@@ -383,9 +383,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers` | Cabal of Sorcerers |
 | `warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:mortal-wound-feel-no-pain` | Cabal of Sorcerers - Mortal Wound Feel No Pain |
 | `warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:weapon-profile` | Cabal of Sorcerers - Weapon Profile |
-| `warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp` | Shadow In The Warp |
-| `warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp:battle-shock` | Battle Shock |
-| `warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp:synapse:weapon-profile` | Weapon Profile |
+| `warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp` | Shadow in the Warp / Synapse |
+| `warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp:battle-shock` | Shadow in the Warp / Synapse - Battle-shock |
+| `warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp:synapse:weapon-profile` | Shadow in the Warp / Synapse - Weapon Profile |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne` | Blessings of Khorne |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration` | Blessings of Khorne - Rage-fuelled Invigoration |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage` | Blessings of Khorne - Total Carnage |

@@ -71,6 +71,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.tau_empire im
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
     army_rule as thousand_sons_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.tyranids import (
+    army_rule as tyranids_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
     army_rule as world_eaters_army_rule,
 )
@@ -340,6 +343,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     "phase17g:space-marines:army-rule": "Oath of Moment",
     "phase17f:phase17e:tau-empire:army-rule": "For the Greater Good",
     "phase17f:phase17e:thousand-sons:army-rule": "Cabal of Sorcerers",
+    tyranids_army_rule.SOURCE_RULE_ID: "Shadow in the Warp / Synapse",
     "phase17f:phase17e:world-eaters:army-rule": "Blessings of Khorne",
     "phase17g:aeldari:corsair-coterie:enhancements": "Corsair Coterie Enhancements",
     "phase17g:aeldari:corsair-coterie:relentless-raiders": "Corsair Coterie",
@@ -420,6 +424,11 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
         "Cabal of Sorcerers - Mortal Wound Feel No Pain"
     ),
     thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID: ("Cabal of Sorcerers - Weapon Profile"),
+    tyranids_army_rule.HOOK_ID: "Shadow in the Warp / Synapse",
+    tyranids_army_rule.BATTLE_SHOCK_HOOK_ID: "Shadow in the Warp / Synapse - Battle-shock",
+    tyranids_army_rule.WEAPON_PROFILE_MODIFIER_ID: (
+        "Shadow in the Warp / Synapse - Weapon Profile"
+    ),
     SPACE_MARINE_CHAPTERS_SOURCE_ID: "Space Marine Chapters",
     "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider": ("Archraider"),
     "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:lord_of_deceit": (
@@ -688,6 +697,13 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             ability_name=thousand_sons_army_rule.CABAL_OF_SORCERERS_ABILITY_NAME,
             semantic_category="faction.army_rule.cabal_of_sorcerers",
             runtime_consumer_ids=_thousand_sons_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
+            faction_id=tyranids_army_rule.TYRANIDS_FACTION_ID,
+            ability_id=tyranids_army_rule.HOOK_ID,
+            ability_name="Shadow in the Warp / Synapse",
+            semantic_category="faction.army_rule.shadow_in_the_warp_synapse",
+            runtime_consumer_ids=_tyranids_runtime_consumer_ids(),
         ),
         _implemented_faction_army_rule_row(
             faction_id="drukhari",
@@ -994,6 +1010,19 @@ def _thousand_sons_runtime_consumer_ids() -> tuple[str, ...]:
                     binding.hook_id
                     for binding in contribution.mortal_wound_feel_no_pain_hook_bindings
                 ),
+            }
+        )
+    )
+
+
+def _tyranids_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = tyranids_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                *(binding.hook_id for binding in contribution.command_phase_start_hook_bindings),
+                *(binding.hook_id for binding in contribution.battle_shock_hook_bindings),
+                *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
             }
         )
     )
