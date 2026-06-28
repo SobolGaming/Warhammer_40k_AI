@@ -1981,6 +1981,26 @@ def test_phase17k_bridge_normalizes_conditioned_valued_and_anti_weapon_keywords(
     }
 
 
+def test_phase17k_bridge_allows_duplicate_anti_weapon_keyword_descriptors() -> None:
+    artifacts = _conditioned_weapon_keyword_bridge_artifacts("[ANTI-INFANTRY 2+, ANTI-VEHICLE 4+]")
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=artifacts,
+    )
+    profile = package.army_catalog.wargear[0].weapon_profiles[0]
+    anti_abilities = tuple(
+        ability for ability in profile.abilities if ability.ability_kind is AbilityKind.ANTI_KEYWORD
+    )
+
+    assert len(anti_abilities) == 2
+    assert {
+        ability.parameters[0].value
+        for ability in anti_abilities
+        if ability.parameters[0].name == "keyword"
+    } == {"INFANTRY", "VEHICLE"}
+
+
 @pytest.mark.parametrize(
     ("description", "message"),
     [
@@ -1992,6 +2012,14 @@ def test_phase17k_bridge_normalizes_conditioned_valued_and_anti_weapon_keywords(
         ("[RAPID FIRE]", "Valued Wahapedia weapon keyword is missing its value"),
         ("[UNKNOWN]", "Unsupported Wahapedia weapon keyword"),
         ("[LETHAL HITS, LETHAL HITS]", "must not duplicate"),
+        (
+            "[DEVASTATING WOUNDS: INFANTRY, DEVASTATING WOUNDS: MONSTER]",
+            "duplicate non-Anti ability kinds",
+        ),
+        (
+            "[MELTA 2: non-MONSTER/VEHICLE, MELTA 4: INFANTRY]",
+            "duplicate non-Anti ability kinds",
+        ),
         ("[LETHAL HITS: non-]", "Invalid Wahapedia weapon ability descriptor"),
     ],
 )

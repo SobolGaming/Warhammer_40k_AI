@@ -28,6 +28,7 @@ from warhammer40k_core.core.weapon_profiles import (
     AntiKeywordMatchMode,
     WeaponKeyword,
     WeaponProfileError,
+    validate_weapon_ability_descriptor_multiplicity,
 )
 from warhammer40k_core.rules.data_package import DataPackageId
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
@@ -1244,6 +1245,12 @@ def _weapon_abilities_payload(description: str) -> str:
         if ability.ability_id in seen:
             raise WahapediaBridgeError("Wahapedia weapon abilities must not duplicate.")
         seen.add(ability.ability_id)
+    try:
+        validate_weapon_ability_descriptor_multiplicity(abilities)
+    except WeaponProfileError as exc:
+        raise WahapediaBridgeError(
+            "Wahapedia weapon abilities must not duplicate non-Anti ability kinds."
+        ) from exc
     return json.dumps(
         [ability.to_payload() for ability in sorted(abilities, key=lambda item: item.ability_id)],
         sort_keys=True,

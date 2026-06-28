@@ -407,6 +407,34 @@ def test_weapon_profile_abilities_are_deduplicated_and_sorted_deterministically(
             damage_profile=DamageProfile.fixed(1),
             abilities=(rapid_fire, rapid_fire),
         )
+    with pytest.raises(WeaponProfileError, match="duplicate non-Anti ability kinds"):
+        WeaponProfile(
+            profile_id="duplicate-non-anti-ability-kinds",
+            name="Duplicate non-Anti ability kinds",
+            range_profile=RangeProfile.distance(12),
+            attack_profile=AttackProfile.fixed(1),
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+            strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+            armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+            damage_profile=DamageProfile.fixed(1),
+            abilities=(AbilityDescriptor.rapid_fire(1), AbilityDescriptor.rapid_fire(2)),
+        )
+    anti_profile = WeaponProfile(
+        profile_id="duplicate-anti-ability-kinds",
+        name="Duplicate Anti ability kinds",
+        range_profile=RangeProfile.distance(12),
+        attack_profile=AttackProfile.fixed(1),
+        skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 4),
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+        damage_profile=DamageProfile.fixed(1),
+        abilities=(
+            AbilityDescriptor.anti_keyword("Infantry", 2),
+            AbilityDescriptor.anti_keyword("Vehicle", 4),
+        ),
+    )
+
+    assert len(anti_profile.abilities) == 2
     with pytest.raises(WeaponProfileError):
         WeaponProfile(
             profile_id="bad-ability",

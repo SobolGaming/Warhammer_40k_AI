@@ -1025,7 +1025,25 @@ def _canonical_ability_tuple(
         if ability.ability_id in seen:
             raise WeaponProfileError("WeaponProfile abilities must not contain duplicate IDs.")
         seen.add(ability.ability_id)
+    validate_weapon_ability_descriptor_multiplicity(validated)
     return tuple(sorted(validated, key=lambda ability: ability.ability_id))
+
+
+def validate_weapon_ability_descriptor_multiplicity(
+    abilities: tuple[AbilityDescriptor, ...],
+) -> None:
+    if type(abilities) is not tuple:
+        raise WeaponProfileError("Weapon ability descriptor multiplicity requires a tuple.")
+    seen_non_selectable_kinds: set[AbilityKind] = set()
+    for ability in abilities:
+        _validate_ability_descriptor(ability)
+        if ability.ability_kind is AbilityKind.ANTI_KEYWORD:
+            continue
+        if ability.ability_kind in seen_non_selectable_kinds:
+            raise WeaponProfileError(
+                "WeaponProfile abilities must not contain duplicate non-Anti ability kinds."
+            )
+        seen_non_selectable_kinds.add(ability.ability_kind)
 
 
 def _validate_ability_descriptor(ability: object) -> AbilityDescriptor:
