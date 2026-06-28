@@ -236,7 +236,7 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
     bloodcrusher = profiles_by_id["000001115:bloodcrushers"]
     assert bloodcrusher.base_size.kind is BaseSizeKind.OVAL
     assert math.isclose(bloodcrusher.base_size.length_mm or 0.0, 90.0)
-    assert math.isclose(bloodcrusher.base_size.width_mm or 0.0, 52.0)
+    assert math.isclose(bloodcrusher.base_size.width_mm or 0.0, 52.5)
     assert bloodcrusher.characteristic(Characteristic.MOVEMENT).raw == 10
     assert bloodcrusher.characteristic(Characteristic.TOUGHNESS).raw == 7
     assert bloodcrusher.characteristic(Characteristic.SAVE).raw == 3
@@ -250,7 +250,7 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
         for evidence in package.model_geometries[0].evidence
         if evidence.measurement_kind is GeometryMeasurementKind.FOOTPRINT
     )
-    assert footprint_evidence.source_id == EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID
+    assert footprint_evidence.source_id.endswith(":base-size:page-65-chaos-daemons-bloodcrushers")
     assert (
         footprint_evidence.document_reference == EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE
     )
@@ -258,6 +258,7 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
         Path(__file__).resolve().parents[2] / EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE
     ).is_file()
     assert EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID in bloodcrusher.source_ids
+    assert footprint_evidence.source_id in bloodcrusher.source_ids
 
     assert wargear_by_id["000001115:hellblade"].weapon_profiles[0].attack_profile.fixed_attacks == 2
     horn = wargear_by_id["000001115:juggernauts-bladed-horn"].weapon_profiles[0]
@@ -2274,6 +2275,58 @@ def test_phase17k_bridge_requires_accepted_height_overrides() -> None:
         )
 
 
+def test_phase17k_bridge_uses_event_companion_model_qualified_base_sizes() -> None:
+    artifacts = _jakhals_bridge_artifacts()
+    model_rows = _artifact_by_table(artifacts, "Datasheets_models").rows
+    model_fields_by_name = {
+        row.runtime_fields_payload()["name"]: row.runtime_fields_payload() for row in model_rows
+    }
+    dishonoured_row = next(
+        row for row in model_rows if row.runtime_fields_payload()["name"] == "Dishonoured"
+    )
+
+    assert set(model_fields_by_name) == {"Dishonoured", "Jakhal Pack Leader", "Jakhals"}
+    assert model_fields_by_name["Jakhal Pack Leader"]["base_size"] == "28.5mm"
+    assert model_fields_by_name["Jakhal Pack Leader"]["min_models"] == "1"
+    assert model_fields_by_name["Jakhal Pack Leader"]["max_models"] == "1"
+    assert model_fields_by_name["Jakhals"]["base_size"] == "28.5mm"
+    assert model_fields_by_name["Jakhals"]["min_models"] == "8"
+    assert model_fields_by_name["Jakhals"]["max_models"] == "17"
+    assert model_fields_by_name["Dishonoured"]["base_size"] == "40mm"
+    assert model_fields_by_name["Dishonoured"]["min_models"] == "1"
+    assert model_fields_by_name["Dishonoured"]["max_models"] == "2"
+    assert model_fields_by_name["Dishonoured"]["base_size_source_id"].endswith(
+        ":base-size:page-93-world-eaters-jakhals-dishonoured"
+    )
+    assert EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID in _source_ids_from_row(dishonoured_row)
+
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=artifacts,
+    )
+    datasheet = package.army_catalog.datasheet_by_id("test-jakhals")
+    profiles_by_id = {profile.model_profile_id: profile for profile in datasheet.model_profiles}
+    dishonoured = profiles_by_id["test-jakhals:dishonoured"]
+    dishonoured_geometry = next(
+        geometry
+        for geometry in package.model_geometries
+        if geometry.model_profile_id == "test-jakhals:dishonoured"
+    )
+    dishonoured_footprint_evidence = next(
+        evidence
+        for evidence in dishonoured_geometry.evidence
+        if evidence.measurement_kind is GeometryMeasurementKind.FOOTPRINT
+    )
+
+    assert dishonoured.base_size.kind is BaseSizeKind.CIRCULAR
+    assert math.isclose(dishonoured.base_size.diameter_mm or 0.0, 40.0)
+    assert dishonoured_footprint_evidence.source_id.endswith(
+        ":base-size:page-93-world-eaters-jakhals-dishonoured"
+    )
+    assert package.to_payload() == type(package).from_payload(package.to_payload()).to_payload()
+
+
 def _bloodcrushers_package() -> CanonicalCatalogPackage:
     return build_canonical_catalog_package(
         package_id=_catalog_package_id(),
@@ -2713,6 +2766,119 @@ def _bloodcrushers_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
         source_artifacts=_wahapedia_source_artifacts(),
         bridge_package_id=_bridge_package_id(),
         datasheet_ids=("000001115",),
+    )
+
+
+def _jakhals_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_jakhals_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-jakhals",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-jakhals",
+                model_name="Jakhal Pack Leader",
+                height=1.25,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:world-eaters:jakhals:pack-leader:height",
+                height_document_reference="World Eaters Faction Pack p.34",
+            ),
+            ModelHeightOverride(
+                datasheet_id="test-jakhals",
+                model_name="Dishonoured",
+                height=1.5,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:world-eaters:jakhals:dishonoured:height",
+                height_document_reference="World Eaters Faction Pack p.34",
+            ),
+            ModelHeightOverride(
+                datasheet_id="test-jakhals",
+                model_name="Jakhals",
+                height=1.25,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:world-eaters:jakhals:jakhals:height",
+                height_document_reference="World Eaters Faction Pack p.34",
+            ),
+        ),
+    )
+
+
+def _jakhals_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-world-eaters-rule,WE,Blessings of Khorne,Army rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-jakhals,Jakhals,WE",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    "test-jakhals,1,Faction,test-world-eaters-rule,,,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-jakhals,Chaos,,false",
+                    "test-jakhals,Grenades,,false",
+                    "test-jakhals,Infantry,,false",
+                    "test-jakhals,Jakhals,,false",
+                    "test-jakhals,Khorne,,false",
+                    "test-jakhals,World Eaters,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-jakhals,1,7,4,6,-,1,7,1,28.5mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    "test-jakhals,1,1,Autopistol,Ranged,12,1,4,3,0,1,pistol",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    'test-jakhals,1,"1 Jakhal Pack Leader, 1 Dishonoured and 8 Jakhals"',
+                    "test-jakhals,2,or:",
+                    'test-jakhals,3,"1 Jakhal Pack Leader, 2 Dishonoured and 17 Jakhals"',
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "WE,World Eaters")),
+        ),
     )
 
 

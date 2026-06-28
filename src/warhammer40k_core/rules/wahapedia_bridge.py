@@ -11,6 +11,8 @@ from warhammer40k_core.core.datasheet import (
     MUSTERING_WARLORD_FORBIDDEN,
     MUSTERING_WARLORD_REQUIRED,
     MUSTERING_WARLORD_RULE_KEY,
+    BaseSizeDefinition,
+    BaseSizeKind,
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
     WargearOptionConditionKind,
@@ -30,6 +32,9 @@ from warhammer40k_core.core.weapon_profiles import (
 from warhammer40k_core.rules.data_package import DataPackageId
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    event_companion_2026_06 as event_companion_source,
+)
 from warhammer40k_core.rules.wahapedia_schema import (
     NormalizedSourceRow,
     WahapediaCsvTable,
@@ -91,10 +96,12 @@ class ModelHeightOverride:
         object.__setattr__(self, "evidence_kind", GeometryEvidenceKind(self.evidence_kind))
 
 
-_UNIT_COMPOSITION_RE = re.compile(
-    r"^(?P<min>\d+)(?:-(?P<max>\d+))?\s+(?P<name>.+?)$",
+_UNIT_COMPOSITION_PART_RE = re.compile(
+    r"(?P<count>\d+(?:-\d+)?)\s+(?P<name>.+?)"
+    r"(?=(?:,\s+|\s+and\s+)\d+(?:-\d+)?\s+|$)",
     re.IGNORECASE,
 )
+_UNIT_COMPOSITION_SEPARATOR_RE = re.compile(r"(?:,\s+|\s+and\s+)", re.IGNORECASE)
 _MODEL_COST_RE = re.compile(r"^(?P<count>\d+)\s+models?$", re.IGNORECASE)
 _OPTION_RE = re.compile(
     r"^1 (?P<model>.+?) that is not equipped with (?:a|an|1) "
@@ -135,6 +142,7 @@ def build_wahapedia_canonical_bridge_artifacts(
         rows_by_table=rows_by_table,
         corrections_by_datasheet=corrections_by_datasheet,
         height_by_datasheet_and_model=height_by_datasheet_and_model,
+        event_companion_base_sizes_by_key=_event_companion_base_sizes_by_key(),
     )
     bridged_rows = _empty_bridge_rows()
     for datasheet_id in selected_datasheet_ids:
@@ -150,6 +158,9 @@ class _BridgeContext:
     rows_by_table: dict[str, tuple[NormalizedSourceRow, ...]]
     corrections_by_datasheet: dict[str, PdfDatasheetCorrection]
     height_by_datasheet_and_model: dict[tuple[str, str], ModelHeightOverride]
+    event_companion_base_sizes_by_key: dict[
+        tuple[str, str], event_companion_source.BaseSizeSourceRecord
+    ]
 
 
 @dataclass(frozen=True, slots=True)
@@ -159,7 +170,33 @@ class _CompositionEntry:
     model_profile_id: str
     min_models: int
     max_models: int
+    source_rows: tuple[NormalizedSourceRow, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class _CompositionPart:
+    model_name: str
+    min_models: int
+    max_models: int
     source_row: NormalizedSourceRow
+
+
+@dataclass(slots=True)
+class _CompositionEntryAccumulator:
+    line: str
+    model_name: str
+    model_profile_id: str
+    min_models: int
+    max_models: int
+    source_rows: list[NormalizedSourceRow]
+
+
+@dataclass(frozen=True, slots=True)
+class _BaseSizeEvidence:
+    base_size_text: str
+    source_id: str
+    document_reference: str
+    source_ids: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -216,14 +253,7 @@ def _bridge_datasheet(
             "source_ids": _joined(faction_source_ids),
         },
     )
-    model_source_ids = tuple(
-        _deduplicated(
-            [
-                *_source_ids(model_source_row, *cost_rows),
-                EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID,
-            ]
-        )
-    )
+    model_source_ids = _source_ids(model_source_row, *cost_rows)
     bridged_rows["Datasheets"].append(
         {
             "id": datasheet_id,
@@ -246,6 +276,13 @@ def _bridge_datasheet(
             datasheet_id=datasheet_id,
             model_name=entry.model_name,
         )
+        base_size = _base_size_evidence(
+            context=context,
+            faction_name=_required_field(faction_row, "name"),
+            datasheet_name=_required_field(datasheet_row, "name"),
+            model_name=entry.model_name,
+            model_source_row=model_source_row,
+        )
         bridged_rows["Datasheets_models"].append(
             {
                 "datasheet_id": datasheet_id,
@@ -264,9 +301,9 @@ def _bridge_datasheet(
                 "bs": "-",
                 "min_models": str(entry.min_models),
                 "max_models": str(entry.max_models),
-                "base_size": _required_field(model_source_row, "base_size"),
-                "base_size_source_id": EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID,
-                "base_size_document_reference": EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE,
+                "base_size": base_size.base_size_text,
+                "base_size_source_id": base_size.source_id,
+                "base_size_document_reference": base_size.document_reference,
                 "height": str(height.height),
                 "height_units": height.height_units.value,
                 "height_source_id": height.height_source_id,
@@ -274,7 +311,15 @@ def _bridge_datasheet(
                 "height_reviewer_status": height.reviewer_status.value,
                 "height_evidence_kind": height.evidence_kind.value,
                 "source_ids": _joined(
-                    tuple(_deduplicated([*model_source_ids, entry.source_row.stable_source_id()]))
+                    tuple(
+                        _deduplicated(
+                            [
+                                *model_source_ids,
+                                *_source_ids(*entry.source_rows),
+                                *base_size.source_ids,
+                            ]
+                        )
+                    )
                 ),
             }
         )
@@ -313,27 +358,156 @@ def _composition_entries(
     )
     if not rows:
         raise WahapediaBridgeError("Datasheet has no unit composition rows.")
-    entries: list[_CompositionEntry] = []
+    accumulators: dict[str, _CompositionEntryAccumulator] = {}
     for row in rows:
-        description = _required_field(row, "description")
-        match = _UNIT_COMPOSITION_RE.fullmatch(description)
-        if match is None:
+        for part in _composition_parts_from_row(row):
+            key = _name_key(part.model_name)
+            accumulator = accumulators.get(key)
+            if accumulator is None:
+                accumulators[key] = _CompositionEntryAccumulator(
+                    line=str(len(accumulators) + 1),
+                    model_name=part.model_name,
+                    model_profile_id=f"{datasheet_id}:{_slug(part.model_name)}",
+                    min_models=part.min_models,
+                    max_models=part.max_models,
+                    source_rows=[part.source_row],
+                )
+                continue
+            accumulator.min_models = min(accumulator.min_models, part.min_models)
+            accumulator.max_models = max(accumulator.max_models, part.max_models)
+            if not any(
+                source_row.stable_source_id() == part.source_row.stable_source_id()
+                for source_row in accumulator.source_rows
+            ):
+                accumulator.source_rows.append(part.source_row)
+    if not accumulators:
+        raise WahapediaBridgeError("Datasheet has no model composition entries.")
+    return tuple(
+        _CompositionEntry(
+            line=accumulator.line,
+            model_name=accumulator.model_name,
+            model_profile_id=accumulator.model_profile_id,
+            min_models=accumulator.min_models,
+            max_models=accumulator.max_models,
+            source_rows=tuple(accumulator.source_rows),
+        )
+        for accumulator in accumulators.values()
+    )
+
+
+def _composition_parts_from_row(row: NormalizedSourceRow) -> tuple[_CompositionPart, ...]:
+    description = _required_field(row, "description").strip()
+    if description.casefold() == "or:":
+        return ()
+    parts: list[_CompositionPart] = []
+    position = 0
+    for match in _UNIT_COMPOSITION_PART_RE.finditer(description):
+        separator = description[position : match.start()]
+        if separator and _UNIT_COMPOSITION_SEPARATOR_RE.fullmatch(separator) is None:
             raise WahapediaBridgeError("Unsupported unit composition row shape.")
-        minimum = _int_from_text(match.group("min"))
-        maximum_text = match.group("max")
-        maximum = minimum if maximum_text is None else _int_from_text(maximum_text)
-        model_name = match.group("name").strip()
-        entries.append(
-            _CompositionEntry(
-                line=_required_field(row, "line"),
-                model_name=model_name,
-                model_profile_id=f"{datasheet_id}:{_slug(model_name)}",
+        minimum, maximum = _composition_count_range(match.group("count"))
+        parts.append(
+            _CompositionPart(
+                model_name=match.group("name").strip(),
                 min_models=minimum,
                 max_models=maximum,
                 source_row=row,
             )
         )
-    return tuple(entries)
+        position = match.end()
+    if not parts or position != len(description):
+        raise WahapediaBridgeError("Unsupported unit composition row shape.")
+    return tuple(parts)
+
+
+def _composition_count_range(count_text: str) -> tuple[int, int]:
+    if "-" not in count_text:
+        count = _int_from_text(count_text)
+        return count, count
+    minimum_text, maximum_text = count_text.split("-", maxsplit=1)
+    minimum = _int_from_text(minimum_text)
+    maximum = _int_from_text(maximum_text)
+    if maximum < minimum:
+        raise WahapediaBridgeError("Unit composition maximum must be at least its minimum.")
+    return minimum, maximum
+
+
+def _base_size_evidence(
+    *,
+    context: _BridgeContext,
+    faction_name: str,
+    datasheet_name: str,
+    model_name: str,
+    model_source_row: NormalizedSourceRow,
+) -> _BaseSizeEvidence:
+    faction_key = _name_key(faction_name)
+    model_qualified_key = _name_key(f"{datasheet_name}: {model_name}")
+    datasheet_key = _name_key(datasheet_name)
+    record = context.event_companion_base_sizes_by_key.get((faction_key, model_qualified_key))
+    if record is None:
+        record = context.event_companion_base_sizes_by_key.get((faction_key, datasheet_key))
+    if record is not None:
+        return _event_companion_base_size_evidence(record)
+    fallback_source_id = model_source_row.stable_source_id()
+    return _BaseSizeEvidence(
+        base_size_text=_required_field(model_source_row, "base_size"),
+        source_id=fallback_source_id,
+        document_reference=fallback_source_id,
+        source_ids=(fallback_source_id,),
+    )
+
+
+def _event_companion_base_size_evidence(
+    record: event_companion_source.BaseSizeSourceRecord,
+) -> _BaseSizeEvidence:
+    return _BaseSizeEvidence(
+        base_size_text=_bridge_base_size_text_from_event_companion_record(record),
+        source_id=record.source_id,
+        document_reference=EVENT_COMPANION_BASE_SIZE_GUIDE_DOCUMENT_REFERENCE,
+        source_ids=(EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID, record.source_id),
+    )
+
+
+def _bridge_base_size_text_from_event_companion_record(
+    record: event_companion_source.BaseSizeSourceRecord,
+) -> str:
+    if record.canonical_base_size is None:
+        return record.source_base_text
+    return _bridge_base_size_text(record.canonical_base_size)
+
+
+def _bridge_base_size_text(base_size: BaseSizeDefinition) -> str:
+    if base_size.kind is BaseSizeKind.CIRCULAR:
+        diameter = base_size.diameter_mm
+        if diameter is None:
+            raise WahapediaBridgeError("Circular base size record is missing diameter.")
+        return f"{_millimeter_text(diameter)}mm"
+    if base_size.kind is BaseSizeKind.OVAL:
+        length = base_size.length_mm
+        width = base_size.width_mm
+        if length is None or width is None:
+            raise WahapediaBridgeError("Oval base size record is missing dimensions.")
+        return f"{_millimeter_text(length)} x {_millimeter_text(width)}mm"
+    raise WahapediaBridgeError("Unsupported Event Companion canonical base size kind.")
+
+
+def _millimeter_text(value: float) -> str:
+    if value.is_integer():
+        return str(int(value))
+    return f"{value:g}"
+
+
+def _event_companion_base_sizes_by_key() -> dict[
+    tuple[str, str], event_companion_source.BaseSizeSourceRecord
+]:
+    rows_by_key: dict[tuple[str, str], event_companion_source.BaseSizeSourceRecord] = {}
+    for row in event_companion_source.base_size_source_rows():
+        key = (_name_key(row.faction_name), _name_key(row.unit_name))
+        existing = rows_by_key.get(key)
+        if existing is not None:
+            raise WahapediaBridgeError("Duplicate Event Companion base size row key.")
+        rows_by_key[key] = row
+    return rows_by_key
 
 
 def _keywords_for_datasheet(
