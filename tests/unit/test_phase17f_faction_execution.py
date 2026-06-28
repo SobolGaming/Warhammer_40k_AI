@@ -150,6 +150,7 @@ SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "death-guard": "Nurgle's Gift",
     "drukhari": "Power from Pain",
     "emperors-children": "Thrill Seekers",
+    "genestealer-cults": "Cult Ambush",
     "grey-knights": "Gate of Infinity",
     "imperial-knights": "Code Chivalric",
     "leagues-of-votann": "Prioritised Efficiency",

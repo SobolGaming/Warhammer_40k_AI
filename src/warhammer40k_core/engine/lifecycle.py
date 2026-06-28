@@ -34,6 +34,17 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
 )
+from warhammer40k_core.engine.cult_ambush import (
+    SELECT_CULT_AMBUSH_RESURGENCE_DECISION_TYPE,
+    SUBMIT_CULT_AMBUSH_MARKER_PLACEMENT_DECISION_TYPE,
+    apply_cult_ambush_marker_placement_decision,
+    apply_cult_ambush_placement,
+    apply_cult_ambush_resurgence_decision,
+    invalid_cult_ambush_marker_placement_status,
+    invalid_cult_ambush_placement_status,
+    invalid_cult_ambush_resurgence_status,
+    is_cult_ambush_placement_request,
+)
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
     SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
@@ -623,6 +634,7 @@ class GameLifecycle:
         pending_request = self._pending_decision_request()
         sequencing_decision: SequencingDecision | None = None
         stratagem_placement_request: DecisionRequest | None = None
+        cult_ambush_placement_request: DecisionRequest | None = None
         if (
             type(result) is DecisionResult
             and pending_request is not None
@@ -658,6 +670,20 @@ class GameLifecycle:
             invalid_status = invalid_stratagem_placement_proposal_status(
                 state=state,
                 request=stratagem_placement_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and is_cult_ambush_placement_request(pending_request)
+        ):
+            cult_ambush_placement_request = pending_request
+        if cult_ambush_placement_request is not None:
+            invalid_status = invalid_cult_ambush_placement_status(
+                state=state,
+                request=cult_ambush_placement_request,
                 result=result,
             )
             if invalid_status is not None:
@@ -723,6 +749,7 @@ class GameLifecycle:
             and pending_request.decision_type in _MOVEMENT_PROPOSAL_DECISION_TYPES
             and stratagem_placement_request is None
             and destroyed_transport_placement_request is None
+            and cult_ambush_placement_request is None
         ):
             result.validate_for_request(pending_request)
             if is_heroic_intervention_charge_move_request(pending_request):
@@ -1043,6 +1070,30 @@ class GameLifecycle:
         if (
             type(result) is DecisionResult
             and pending_request is not None
+            and pending_request.decision_type == SELECT_CULT_AMBUSH_RESURGENCE_DECISION_TYPE
+        ):
+            invalid_status = invalid_cult_ambush_resurgence_status(
+                state=state,
+                request=pending_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SUBMIT_CULT_AMBUSH_MARKER_PLACEMENT_DECISION_TYPE
+        ):
+            invalid_status = invalid_cult_ambush_marker_placement_status(
+                state=state,
+                request=pending_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
             and pending_request.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE
         ):
             invalid_status = _invalid_finite_decision_status(
@@ -1231,6 +1282,32 @@ class GameLifecycle:
                         "result_id": result.result_id,
                     },
                 )
+            return self.advance_until_decision_or_terminal()
+        if record.request.decision_type == SELECT_CULT_AMBUSH_RESURGENCE_DECISION_TYPE:
+            apply_cult_ambush_resurgence_decision(
+                state=state,
+                decisions=self.decision_controller,
+                request=record.request,
+                result=result,
+            )
+            return self.advance_until_decision_or_terminal()
+        if record.request.decision_type == SUBMIT_CULT_AMBUSH_MARKER_PLACEMENT_DECISION_TYPE:
+            apply_cult_ambush_marker_placement_decision(
+                state=state,
+                decisions=self.decision_controller,
+                request=record.request,
+                result=result,
+            )
+            return self.advance_until_decision_or_terminal()
+        if is_cult_ambush_placement_request(record.request):
+            placement_status = apply_cult_ambush_placement(
+                state=state,
+                decisions=self.decision_controller,
+                request=record.request,
+                result=result,
+            )
+            if placement_status is not None:
+                return placement_status
             return self.advance_until_decision_or_terminal()
         if is_stratagem_placement_proposal_request(record.request):
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)

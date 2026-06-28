@@ -52,6 +52,7 @@ from warhammer40k_core.engine.core_stratagem_effects import (
     SMOKESCREEN_EFFECT_KIND,
     SMOKESCREEN_HIT_ROLL_MODIFIER,
 )
+from warhammer40k_core.engine.cult_ambush import reserve_state_is_cult_ambush
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     MortalWoundApplication,
@@ -3906,6 +3907,7 @@ def _rapid_ingress_unit_ids(*, state: GameState, player_id: str) -> tuple[str, .
             reserve_state.unit_instance_id
             for reserve_state in state.unarrived_reserve_states_for_player(player_id)
             if reserve_state.status is ReserveStatus.IN_RESERVES
+            and not reserve_state_is_cult_ambush(reserve_state)
         )
     )
 

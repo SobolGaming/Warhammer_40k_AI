@@ -109,6 +109,7 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | Space Marines - Oath of Moment and Space Marine Chapters | Named army-rule handler plus shared mustering/list-validation host | README, adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, reroll, wound-modifier, and mustering tests | Full | Implements Command phase Oath target selection, target-scoped Hit-roll rerolls, Codex Space Marines Detachment Wound-roll bonus gating, and Black Templars, Space Wolves, and Deathwatch roster restrictions. |
 | T'au Empire - For the Greater Good | Shooting-phase-start faction-rule hook plus weapon-profile modifier | Adapter contract, decision catalog, source coverage, and generated matrix | Focused shooting-start, invalid-submission, and runtime-modifier tests | Full | Implements Observer/Spotted selections, target-centric Guided Ballistic Skill improvement, and Markerlight [IGNORES COVER]. Selected-shooter-specific Guided identity is deferred if future rules require it. |
 | Thousand Sons - Cabal of Sorcerers | Shooting-phase-start faction-rule hook plus weapon-profile and mortal-wound Feel No Pain hooks | Adapter contract, decision catalog, source coverage, and generated matrix | Focused ritual, invalid-submission, movement, modifier, and wound tests | Full | Implements Shooting-start ritual selections, Psychic tests with optional Channel the Warp perils, Destiny's Ruin hit rerolls, Temporal Surge movement proposals and charge lockout, Doombolt mortal wounds, and Twist of Fate AP modifiers. |
+| Genestealer Cults - Cult Ambush | Named army-rule handler plus faction-resource ledger, destroyed-unit resurgence, marker placement, and marker ingress hosts | Adapter contract, decision catalog, source coverage, and generated matrix | Focused setup, destroyed-unit, marker placement/removal, reserves, ingress, invalid-submission, replay-safe record, and routing tests | Full | Implements battle-size Resurgence points, optional destroyed-unit replacement spending, Cult Ambush marker placement and removal, marker-based ingress including battle round 1, Strategic Reserves arrival, Rapid Ingress exclusion, and third-round auto-destroy exemption. |
 | Tyranids - Shadow in the Warp and Synapse | Command-phase-start faction-rule hook plus Battle-shock and weapon-profile modifiers | README, adapter contract, decision catalog, source coverage, and generated matrix | Focused command-phase, Battle-shock, and runtime-modifier tests | Full | Implements once-per-battle Shadow in the Warp in either player's Command phase, forced enemy Battle-shock tests, Synapse 3D6 Battle-shock tests, Synapse-range Shadow penalties, and melee Strength modifiers. |
 | Necrons - Reanimation Protocols | Named army-rule handler plus shared Healing Wounds resolver | README, adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase healing, revival, and validation tests | Full | Implements Command phase rules-unit activation, source-backed D3 healing, destroyed-model revival, attached rules-unit identity, stale rules-unit rejection, and owning-player healing selections. |
 | Leagues of Votann - Prioritised Efficiency | Named army-rule handler plus faction-resource ledger | README, generated matrix, and source coverage | Focused command-phase, scoring, mode, and runtime-modifier tests | Full | Implements deterministic Yield Point gains from Command phase objective control, Hostile Acquisition and Fortify Takeover modes, and mode-scoped Hit/Wound modifiers. |
@@ -125,7 +126,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Aeldari | 15 | 2 | 51 | 75 | 16 | [aeldari](factions/aeldari.md) |
 | Drukhari | 9 | 0 | 24 | 36 | 1 | [drukhari](factions/drukhari.md) |
 | Tyranids | 10 | 0 | 32 | 48 | 1 | [tyranids](factions/tyranids.md) |
-| Genestealer Cults | 9 | 0 | 20 | 30 | 0 | [genestealer-cults](factions/genestealer-cults.md) |
+| Genestealer Cults | 9 | 0 | 20 | 30 | 1 | [genestealer-cults](factions/genestealer-cults.md) |
 | Necrons | 12 | 0 | 36 | 54 | 1 | [necrons](factions/necrons.md) |
 | Leagues of Votann | 10 | 0 | 28 | 42 | 1 | [leagues-of-votann](factions/leagues-of-votann.md) |
 | T'au Empire | 7 | 0 | 20 | 30 | 1 | [tau-empire](factions/tau-empire.md) |
@@ -353,6 +354,10 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction` | Thrill Seekers |
+| `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush` | Cult Ambush |
+| `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:initial_resurgence` | Cult Ambush |
+| `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker_ingress` | Cult Ambush |
+| `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:unit_destroyed` | Cult Ambush |
 | `warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity` | Gate Of Infinity |
 | `warhammer_40000_11th:imperial_knights:army_rule:bondsman` | Bondsman |
 | `warhammer_40000_11th:imperial_knights:army_rule:code_chivalric` | Code Chivalric |

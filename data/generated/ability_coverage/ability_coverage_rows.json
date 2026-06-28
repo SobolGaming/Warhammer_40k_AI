@@ -569,6 +569,28 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush",
+    "ability_name": "Cult Ambush",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/genestealer-cults/faction/warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush/none",
+    "datasheet_id": "genestealer-cults",
+    "datasheet_name": "Genestealer Cults",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush",
+      "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:initial_resurgence",
+      "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:unit_destroyed",
+      "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker_ingress"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.cult_ambush"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp",
     "ability_name": "Shadow in the Warp / Synapse",
     "catalog_id": "runtime-content-warhammer-40000-11th",

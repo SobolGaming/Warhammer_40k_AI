@@ -12,6 +12,7 @@ from typing import cast
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
 from warhammer40k_core.core.faction_aliases import CHAOS_SPACE_MARINES_FACTION_ID
 from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
+from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.ability_coverage import (
     AbilityCoverageAbilityDatasheetPairPayload,
     AbilityCoverageCategoryRowPayload,
@@ -337,6 +338,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     "phase17f:phase17e:death-guard:army-rule": "Nurgle's Gift",
     "phase17f:phase17e:drukhari:army-rule": "Power from Pain",
     "phase17f:phase17e:emperors-children:army-rule": "Thrill Seekers",
+    genestealer_cults_cult_ambush.SOURCE_RULE_ID: "Cult Ambush",
     "phase17f:phase17e:imperial-knights:army-rule": "Code Chivalric",
     imperial_knights_army_rule.BONDSMAN_SOURCE_RULE_ID: "Bondsman",
     "phase17f:phase17e:leagues-of-votann:army-rule": "Prioritised Efficiency",
@@ -424,6 +426,10 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
         "Cabal of Sorcerers - Mortal Wound Feel No Pain"
     ),
     thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID: ("Cabal of Sorcerers - Weapon Profile"),
+    genestealer_cults_cult_ambush.SOURCE_RULE_ID: "Cult Ambush",
+    genestealer_cults_cult_ambush.BATTLE_FORMATION_HOOK_ID: "Cult Ambush",
+    genestealer_cults_cult_ambush.UNIT_DESTROYED_HOOK_ID: "Cult Ambush",
+    genestealer_cults_cult_ambush.TURN_END_HOOK_ID: "Cult Ambush",
     tyranids_army_rule.HOOK_ID: "Shadow in the Warp / Synapse",
     tyranids_army_rule.BATTLE_SHOCK_HOOK_ID: "Shadow in the Warp / Synapse - Battle-shock",
     tyranids_army_rule.WEAPON_PROFILE_MODIFIER_ID: (
@@ -697,6 +703,18 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             ability_name=thousand_sons_army_rule.CABAL_OF_SORCERERS_ABILITY_NAME,
             semantic_category="faction.army_rule.cabal_of_sorcerers",
             runtime_consumer_ids=_thousand_sons_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
+            faction_id=genestealer_cults_cult_ambush.GENESTEALER_CULTS_FACTION_ID,
+            ability_id=genestealer_cults_cult_ambush.SOURCE_RULE_ID,
+            ability_name="Cult Ambush",
+            semantic_category="faction.army_rule.cult_ambush",
+            runtime_consumer_ids=(
+                genestealer_cults_cult_ambush.SOURCE_RULE_ID,
+                genestealer_cults_cult_ambush.BATTLE_FORMATION_HOOK_ID,
+                genestealer_cults_cult_ambush.UNIT_DESTROYED_HOOK_ID,
+                genestealer_cults_cult_ambush.TURN_END_HOOK_ID,
+            ),
         ),
         _implemented_faction_army_rule_row(
             faction_id=tyranids_army_rule.TYRANIDS_FACTION_ID,
@@ -2352,6 +2370,26 @@ def _structured_support_sections_markdown() -> list[str]:
                         "optional Channel the Warp perils, Destiny's Ruin hit rerolls, "
                         "Temporal Surge movement proposals and charge lockout, Doombolt "
                         "mortal wounds, and Twist of Fate AP modifiers."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Genestealer Cults - Cult Ambush",
+                    (
+                        "Named army-rule handler plus faction-resource ledger, "
+                        "destroyed-unit resurgence, marker placement, and marker ingress hosts"
+                    ),
+                    "Adapter contract, decision catalog, source coverage, and generated matrix",
+                    (
+                        "Focused setup, destroyed-unit, marker placement/removal, reserves, "
+                        "ingress, invalid-submission, replay-safe record, and routing tests"
+                    ),
+                    "Full",
+                    (
+                        "Implements battle-size Resurgence points, optional destroyed-unit "
+                        "replacement spending, Cult Ambush marker placement and removal, "
+                        "marker-based ingress including battle round 1, Strategic Reserves "
+                        "arrival, Rapid Ingress exclusion, and third-round auto-destroy "
+                        "exemption."
                     ),
                 ),
                 SupportSectionRow(

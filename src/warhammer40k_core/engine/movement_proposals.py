@@ -51,6 +51,7 @@ class ProposalKind(StrEnum):
     DEEP_STRIKE = "deep_strike_placement"
     STRATEGIC_RESERVES = "strategic_reserves_placement"
     DISEMBARK = "disembark_placement"
+    CULT_AMBUSH = "cult_ambush_placement"
 
 
 class ProposalViolationPayload(TypedDict):

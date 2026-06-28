@@ -516,6 +516,42 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush",
+        "ability_name": "Cult Ambush",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/genestealer-cults/faction/warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush/none",
+        "datasheet_id": "genestealer-cults",
+        "datasheet_name": "Genestealer Cults",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Cult Ambush"
+    ],
+    "category_id": "faction.army_rule.cult_ambush",
+    "category_name": "Faction Army Rule Cult Ambush",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/genestealer-cults/faction/warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush/none"
+    ],
+    "datasheet_names": [
+      "Genestealer Cults"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush",
+      "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:initial_resurgence",
+      "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker_ingress",
+      "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:unit_destroyed"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good",
         "ability_name": "For the Greater Good",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/tau-empire/faction/warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good/none",

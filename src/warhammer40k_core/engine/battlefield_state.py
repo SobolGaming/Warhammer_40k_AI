@@ -49,6 +49,7 @@ class BattlefieldPlacementKind(StrEnum):
     DISEMBARK = "disembark"
     RETURN_TO_BATTLEFIELD = "return_to_battlefield"
     SPLIT_UNIT = "split_unit"
+    CULT_AMBUSH = "cult_ambush"
 
 
 class BattlefieldRemovalKind(StrEnum):

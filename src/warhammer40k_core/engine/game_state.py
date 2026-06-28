@@ -51,6 +51,10 @@ from warhammer40k_core.engine.command_points import (
     CommandStepStatePayload,
     initial_command_point_ledgers,
 )
+from warhammer40k_core.engine.cult_ambush import (
+    CultAmbushMarker,
+    CultAmbushMarkerPayload,
+)
 from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionSource,
     DestructionReactionSourcePayload,
@@ -298,6 +302,7 @@ class GameStatePayload(TypedDict):
     one_shot_weapon_use_records: list[OneShotWeaponUseRecordPayload]
     ranged_attack_history_records: list[RangedAttackHistoryRecordPayload]
     reserve_states: list[ReserveStatePayload]
+    cult_ambush_markers: list[CultAmbushMarkerPayload]
     hover_mode_states: list[HoverModeStatePayload]
     transport_cargo_states: list[TransportCargoStatePayload]
     dedicated_transport_setup_consequences: list[DedicatedTransportSetupConsequencePayload]
@@ -509,6 +514,10 @@ def _new_starting_strength_records() -> list[StartingStrengthRecord]:
 
 
 def _new_reserve_states() -> list[ReserveState]:
+    return []
+
+
+def _new_cult_ambush_markers() -> list[CultAmbushMarker]:
     return []
 
 
@@ -1176,6 +1185,7 @@ class GameState:
         default_factory=_new_ranged_attack_history_records
     )
     reserve_states: list[ReserveState] = field(default_factory=_new_reserve_states)
+    cult_ambush_markers: list[CultAmbushMarker] = field(default_factory=_new_cult_ambush_markers)
     hover_mode_states: list[HoverModeState] = field(default_factory=_new_hover_mode_states)
     transport_cargo_states: list[TransportCargoState] = field(
         default_factory=_new_transport_cargo_states
@@ -1373,6 +1383,10 @@ class GameState:
         )
         self.reserve_states = _validate_reserve_states(
             self.reserve_states,
+            player_ids=self.player_ids,
+        )
+        self.cult_ambush_markers = _validate_cult_ambush_markers(
+            self.cult_ambush_markers,
             player_ids=self.player_ids,
         )
         self.hover_mode_states = _validate_hover_mode_states(
@@ -2332,6 +2346,34 @@ class GameState:
         ledger = self.faction_resource_ledger_for_player(requested_player_id)
         updated, result = ledger.gain(
             battle_round=self.battle_round,
+            resource_kind=resource_kind,
+            amount=amount,
+            source_id=source_id,
+        )
+        if updated is not ledger:
+            self.faction_resource_ledgers = [
+                updated if stored.player_id == requested_player_id else stored
+                for stored in self.faction_resource_ledgers
+            ]
+            self.faction_resource_ledgers.sort(key=lambda stored: stored.player_id)
+        return result
+
+    def gain_starting_faction_resource(
+        self,
+        *,
+        player_id: str,
+        resource_kind: str,
+        amount: int,
+        source_id: str,
+    ) -> FactionResourceResult:
+        if self.stage is not GameLifecycleStage.SETUP or self.battle_round != 0:
+            raise GameLifecycleError(
+                "Starting faction resources can only be granted during setup before battle."
+            )
+        requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
+        ledger = self.faction_resource_ledger_for_player(requested_player_id)
+        updated, result = ledger.gain(
+            battle_round=1,
             resource_kind=resource_kind,
             amount=amount,
             source_id=source_id,
@@ -3791,6 +3833,42 @@ class GameState:
                 return
         raise GameLifecycleError("ReserveState does not exist for unit.")
 
+    def record_cult_ambush_marker(self, marker: CultAmbushMarker) -> None:
+        if type(marker) is not CultAmbushMarker:
+            raise GameLifecycleError("cult_ambush_marker must be a CultAmbushMarker.")
+        if marker.player_id not in self.player_ids:
+            raise GameLifecycleError("CultAmbushMarker player_id is not in this game.")
+        if self.cult_ambush_marker_by_id(marker.marker_id) is not None:
+            raise GameLifecycleError("CultAmbushMarker already exists.")
+        self.cult_ambush_markers.append(marker)
+        self.cult_ambush_markers.sort(key=lambda stored: stored.marker_id)
+
+    def cult_ambush_marker_by_id(self, marker_id: str) -> CultAmbushMarker | None:
+        requested_marker_id = _validate_identifier("cult_ambush_marker_id", marker_id)
+        for marker in self.cult_ambush_markers:
+            if marker.marker_id == requested_marker_id:
+                return marker
+        return None
+
+    def replace_cult_ambush_marker(self, marker: CultAmbushMarker) -> None:
+        if type(marker) is not CultAmbushMarker:
+            raise GameLifecycleError("cult_ambush_marker must be a CultAmbushMarker.")
+        for index, stored in enumerate(self.cult_ambush_markers):
+            if stored.marker_id == marker.marker_id:
+                self.cult_ambush_markers[index] = marker
+                self.cult_ambush_markers.sort(key=lambda stored_marker: stored_marker.marker_id)
+                return
+        raise GameLifecycleError("CultAmbushMarker does not exist.")
+
+    def remove_cult_ambush_marker(self, marker_id: str) -> CultAmbushMarker:
+        requested_marker_id = _validate_identifier("cult_ambush_marker_id", marker_id)
+        for index, marker in enumerate(self.cult_ambush_markers):
+            if marker.marker_id == requested_marker_id:
+                removed = self.cult_ambush_markers.pop(index)
+                self.cult_ambush_markers.sort(key=lambda stored: stored.marker_id)
+                return removed
+        raise GameLifecycleError("CultAmbushMarker does not exist.")
+
     def reposition_unit_to_strategic_reserves(
         self,
         *,
@@ -4314,6 +4392,7 @@ class GameState:
                 record.to_payload() for record in self.ranged_attack_history_records
             ],
             "reserve_states": [state.to_payload() for state in self.reserve_states],
+            "cult_ambush_markers": [marker.to_payload() for marker in self.cult_ambush_markers],
             "hover_mode_states": [state.to_payload() for state in self.hover_mode_states],
             "transport_cargo_states": [state.to_payload() for state in self.transport_cargo_states],
             "dedicated_transport_setup_consequences": [
@@ -4620,6 +4699,9 @@ class GameState:
             ],
             reserve_states=[
                 ReserveState.from_payload(state) for state in payload["reserve_states"]
+            ],
+            cult_ambush_markers=[
+                CultAmbushMarker.from_payload(marker) for marker in payload["cult_ambush_markers"]
             ],
             hover_mode_states=[
                 HoverModeState.from_payload(state) for state in payload["hover_mode_states"]
@@ -5919,6 +6001,29 @@ def _validate_reserve_states(
         seen.add(value.unit_instance_id)
         validated.append(value)
     return sorted(validated, key=lambda state: state.unit_instance_id)
+
+
+def _validate_cult_ambush_markers(
+    values: object,
+    *,
+    player_ids: tuple[str, ...],
+) -> list[CultAmbushMarker]:
+    if not isinstance(values, list):
+        raise GameLifecycleError("GameState cult_ambush_markers must be a list.")
+    validated: list[CultAmbushMarker] = []
+    seen: set[str] = set()
+    for value in cast(list[object], values):
+        if type(value) is not CultAmbushMarker:
+            raise GameLifecycleError(
+                "GameState cult_ambush_markers must contain CultAmbushMarker values."
+            )
+        if value.player_id not in player_ids:
+            raise GameLifecycleError("CultAmbushMarker player_id is not in this game.")
+        if value.marker_id in seen:
+            raise GameLifecycleError("GameState cult_ambush_markers must be unique.")
+        seen.add(value.marker_id)
+        validated.append(value)
+    return sorted(validated, key=lambda marker: marker.marker_id)
 
 
 def _validate_hover_mode_states(
