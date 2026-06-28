@@ -94,6 +94,9 @@ from warhammer40k_core.engine.damage_allocation import FeelNoPainAttackCondition
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
+    army_rule as adepta_sororitas_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as chaos_space_marines_army_rule,
 )
@@ -883,6 +886,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         genestealer_cults_cult_ambush.UNIT_DESTROYED_HOOK_ID,
         genestealer_cults_cult_ambush.TURN_END_HOOK_ID,
     )
+    adepta_sororitas_runtime_ids = (
+        adepta_sororitas_army_rule.BATTLE_ROUND_START_HOOK_ID,
+        adepta_sororitas_army_rule.UNIT_DESTROYED_HOOK_ID,
+    )
 
     assert ability_coverage_rows_payload(rows) == snapshot
     assert ability_coverage_category_rows_payload(category_rows) == category_snapshot
@@ -917,7 +924,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "| Tyranids | 10 | 0 | 32 | 48 | 1 | [tyranids](factions/tyranids.md) |" in (
         generated_markdown
     )
+    assert (
+        "| Adepta Sororitas | 8 | 0 | 20 | 30 | 1 | "
+        "[adepta-sororitas](factions/adepta-sororitas.md) |"
+    ) in generated_markdown
     assert "| Grey Knights - Gate of Infinity | Named army-rule handler |" in generated_markdown
+    assert (
+        "| Adepta Sororitas - Acts of Faith | "
+        "Battle-round-start and unit-destroyed Miracle dice hooks |"
+    ) in generated_markdown
     assert (
         "| Leagues of Votann - Prioritised Efficiency | "
         "Named army-rule handler plus faction-resource ledger |"
@@ -979,6 +994,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "without a descriptor fails fast. |"
     ) in generated_markdown
     aeldari_markdown = generated_faction_markdown["aeldari.md"]
+    adepta_sororitas_markdown = generated_faction_markdown["adepta-sororitas.md"]
     chaos_daemons_markdown = generated_faction_markdown["chaos-daemons.md"]
     genestealer_cults_markdown = generated_faction_markdown["genestealer-cults.md"]
     imperial_knights_markdown = generated_faction_markdown["imperial-knights.md"]
@@ -986,6 +1002,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "## Detachment Rule Support" in aeldari_markdown
     assert "## Detachment Rule Support" in chaos_daemons_markdown
     assert "| Supported detachment rules |" in chaos_daemons_markdown
+    assert "| 8 | 0 | 20 | 30 | 1 |" in adepta_sororitas_markdown
     assert "| 9 | 0 | 20 | 30 | 1 |" in genestealer_cults_markdown
     assert "| 8 | 0 | 24 | 36 | 1 |" in imperial_knights_markdown
     assert "| 10 | 0 | 32 | 48 | 1 |" in tyranids_markdown
@@ -1035,6 +1052,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert (
         f"| `{imperial_knights_army_rule.SETUP_HOOK_ID}` | Code Chivalric - Oath Selection |"
     ) in generated_markdown
+    for runtime_id in adepta_sororitas_runtime_ids:
+        assert f"| `{runtime_id}` | Acts of Faith |" in generated_markdown
     assert f"| `{imperial_knights_army_rule.BONDSMAN_HOOK_ID}` | Bondsman |" in (generated_markdown)
     assert (
         f"| `{imperial_knights_army_rule.END_BATTLE_ROUND_SUBSCRIPTION_ID}` | Code Chivalric |"
@@ -1172,6 +1191,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert tuple(row.datasheet_name for row in rows_by_name["Cult Ambush"]) == (
         "Genestealer Cults",
     )
+    assert tuple(row.datasheet_name for row in rows_by_name["Acts of Faith"]) == (
+        "Adepta Sororitas",
+    )
     assert tuple(row.datasheet_name for row in rows_by_name["Shadow in the Warp / Synapse"]) == (
         "Tyranids",
     )
@@ -1222,6 +1244,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID,
     }
     assert set(rows_by_name["Cult Ambush"][0].runtime_consumer_ids) == set(cult_ambush_runtime_ids)
+    assert set(rows_by_name["Acts of Faith"][0].runtime_consumer_ids) == set(
+        adepta_sororitas_runtime_ids
+    )
     assert set(rows_by_name["Shadow in the Warp / Synapse"][0].runtime_consumer_ids) == {
         tyranids_army_rule.HOOK_ID,
         tyranids_army_rule.BATTLE_SHOCK_HOOK_ID,
@@ -1246,6 +1271,14 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         and row_payload["datasheet_name"] == "Genestealer Cults"
         and row_payload["support_stage"] == AbilityCoverageSupportStage.ENGINE_CONSUMED.value
         and set(row_payload["runtime_consumer_ids"]) == set(cult_ambush_runtime_ids)
+        for row_payload in snapshot
+    )
+    assert any(
+        row_payload["ability_id"] == adepta_sororitas_army_rule.HOOK_ID
+        and row_payload["ability_name"] == "Acts of Faith"
+        and row_payload["datasheet_name"] == "Adepta Sororitas"
+        and row_payload["support_stage"] == AbilityCoverageSupportStage.ENGINE_CONSUMED.value
+        and set(row_payload["runtime_consumer_ids"]) == set(adepta_sororitas_runtime_ids)
         for row_payload in snapshot
     )
     assert any(
@@ -1380,6 +1413,13 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert categories_by_name["Faction Army Rule Cult Ambush"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
     )
+    assert categories_by_name["Faction Army Rule Acts Of Faith"].ability_names == ("Acts of Faith",)
+    assert categories_by_name["Faction Army Rule Acts Of Faith"].runtime_consumer_ids == tuple(
+        sorted(adepta_sororitas_runtime_ids)
+    )
+    assert categories_by_name["Faction Army Rule Acts Of Faith"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
     assert categories_by_name["Faction Army Rule Shadow In The Warp Synapse"].ability_names == (
         "Shadow in the Warp / Synapse",
     )
@@ -1410,6 +1450,13 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         and row_payload["ability_names"] == ["Cult Ambush"]
         and row_payload["support_stages"] == [AbilityCoverageSupportStage.ENGINE_CONSUMED.value]
         and set(row_payload["runtime_consumer_ids"]) == set(cult_ambush_runtime_ids)
+        for row_payload in category_snapshot
+    )
+    assert any(
+        row_payload["category_name"] == "Faction Army Rule Acts Of Faith"
+        and row_payload["ability_names"] == ["Acts of Faith"]
+        and row_payload["support_stages"] == [AbilityCoverageSupportStage.ENGINE_CONSUMED.value]
+        and set(row_payload["runtime_consumer_ids"]) == set(adepta_sororitas_runtime_ids)
         for row_payload in category_snapshot
     )
     assert categories_by_name["Unknown Abilities"].ability_names == (

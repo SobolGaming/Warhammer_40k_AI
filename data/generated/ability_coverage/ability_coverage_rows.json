@@ -269,6 +269,26 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith",
+    "ability_name": "Acts of Faith",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/adepta-sororitas/faction/warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith/none",
+    "datasheet_id": "adepta-sororitas",
+    "datasheet_name": "Adepta Sororitas",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start",
+      "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.acts_of_faith"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts",
     "ability_name": "Dark Pacts",
     "catalog_id": "runtime-content-warhammer-40000-11th",

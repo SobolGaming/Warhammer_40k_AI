@@ -106,6 +106,10 @@ AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
     "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind",
 )
+ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start",
+    "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed",
+)
 ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command",
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock",
@@ -231,6 +235,7 @@ WORLD_EATERS_BLESSINGS_OF_KHORNE_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords",
 )
 FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
+    "adepta-sororitas": "Acts of Faith",
     "aeldari": "Battle Focus",
     "astra-militarum": "Voice of Command",
     "black-templars": "Templar Vows",
@@ -253,6 +258,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "world-eaters": "Blessings of Khorne",
 }
 FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID = {
+    "adepta-sororitas": ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMER_IDS,
     "aeldari": AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMER_IDS,
     "astra-militarum": ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMER_IDS,
     "black-templars": BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMER_IDS,

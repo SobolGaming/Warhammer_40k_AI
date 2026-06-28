@@ -94,6 +94,7 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | Subject | Engine support | Documentation | Tests | Overall | Notes |
 | --- | --- | --- | --- | --- | --- |
 | Chaos Daemons - The Shadow of Chaos | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Current generated rows are `engine_consumed`. |
+| Adepta Sororitas - Acts of Faith | Battle-round-start and unit-destroyed Miracle dice hooks | Source coverage, generated matrix, and runtime inventory | Focused Miracle dice gain, spend, serialization, and fail-fast tests | Full | Implements the updated Miracle dice gaining section: one D6 at the start of each battle round and one D6 each time a friendly ADEPTA SORORITAS unit is destroyed, persisted in the Miracle dice pool with fixed non-rerollable values. |
 | Chaos Space Marines - Dark Pacts | Named army-rule handler | Adapter contract and generated matrix | Focused faction runtime tests | Full | Uses selected-to-shoot and selected-to-fight grant decisions for Lethal Hits or Sustained Hits 1, including out-of-phase shooting, then resolves the post-attack Leadership test, failed-test D3 mortal wounds, and any mortal-wound Feel No Pain continuation through engine hooks. |
 | Death Guard - Nurgle's Gift | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes contagion modifiers for supported characteristics and rolls. |
 | World Eaters - Blessings of Khorne | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes battle-round selection and supported blessing effects. |
@@ -145,7 +146,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Chaos Knights | 8 | 0 | 26 | 36 | 1 | [chaos-knights](factions/chaos-knights.md) |
 | Chaos Daemons | 9 | 4 | 28 | 43 | 14 | [chaos-daemons](factions/chaos-daemons.md) |
 | Astra Militarum | 11 | 0 | 36 | 54 | 1 | [astra-militarum](factions/astra-militarum.md) |
-| Adepta Sororitas | 8 | 0 | 20 | 30 | 0 | [adepta-sororitas](factions/adepta-sororitas.md) |
+| Adepta Sororitas | 8 | 0 | 20 | 30 | 1 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 0 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
 | Imperial Knights | 8 | 0 | 24 | 36 | 1 | [imperial-knights](factions/imperial-knights.md) |
 | Adeptus Custodes | 9 | 0 | 24 | 36 | 0 | [adeptus-custodes](factions/adeptus-custodes.md) |
@@ -254,6 +255,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `phase17g:aeldari:corsair-coterie:stratagems:cloak-and-shadow:target-restriction` | Cloak and Shadow |
 | `phase17g:aeldari:corsair-coterie:stratagems:outcast-ambush:weapon-profile` | Outcast Ambush |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
+| `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start` | Acts of Faith |
+| `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed` | Acts of Faith |
 | `warhammer_40000_11th:aeldari:army_rule:fade_back` | Battle Focus - Fade Back |
 | `warhammer_40000_11th:aeldari:army_rule:flitting_shadows` | Battle Focus - Flitting Shadows |
 | `warhammer_40000_11th:aeldari:army_rule:opportunity_seized` | Battle Focus - Opportunity Seized |

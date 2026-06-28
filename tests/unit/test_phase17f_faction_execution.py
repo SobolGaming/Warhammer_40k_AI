@@ -89,6 +89,10 @@ SHADOW_LEGION_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
     "disciples-of-belakor:weapon-profile",
 )
+ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start",
+    "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed",
+)
 ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command",
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock",
@@ -141,6 +145,7 @@ IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:oath-selection",
 )
 SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
+    "adepta-sororitas": "Acts of Faith",
     "aeldari": "Battle Focus",
     "astra-militarum": "Voice of Command",
     "black-templars": "Templar Vows",
@@ -376,6 +381,26 @@ def test_phase17f_black_templars_army_rule_execution_record_is_named_handler() -
     )
     assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
     assert record.handler_id == BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS[0]
+    assert record.block_reason is None
+
+
+def test_phase17f_adepta_sororitas_army_rule_execution_record_is_named_handler() -> None:
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and record.faction_id == "adepta-sororitas"
+    )
+
+    assert record.coverage_descriptor_id == "phase17e:adepta-sororitas:army-rule"
+    assert record.execution_id == "phase17f:phase17e:adepta-sororitas:army-rule"
+    assert record.rule_name == "Acts of Faith"
+    assert record.runtime_support_status == "engine_consumed"
+    assert record.runtime_consumer_ids == tuple(
+        sorted(ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMERS)
+    )
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
+    assert record.handler_id == ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMERS[0]
     assert record.block_reason is None
 
 

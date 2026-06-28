@@ -8,7 +8,7 @@ Source PDF: [eng_11-06_warhammer40000_faction_pack_adepta_sororitas-ktlklgb0t5-k
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 8 | 0 | 20 | 30 | 0 |
+| 8 | 0 | 20 | 30 | 1 |
 
 ## Detachment Rule Support
 
