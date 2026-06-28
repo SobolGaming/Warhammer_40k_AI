@@ -289,6 +289,27 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah",
+    "ability_name": "Martial Ka'tah",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/adeptus-custodes/faction/warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah/none",
+    "datasheet_id": "adeptus-custodes",
+    "datasheet_name": "Adeptus Custodes",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:dacatarai",
+      "warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:rendax",
+      "warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:weapon-profile"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.martial_katah"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts",
     "ability_name": "Dark Pacts",
     "catalog_id": "runtime-content-warhammer-40000-11th",

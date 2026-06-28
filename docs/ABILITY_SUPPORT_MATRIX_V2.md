@@ -95,6 +95,7 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | --- | --- | --- | --- | --- | --- |
 | Chaos Daemons - The Shadow of Chaos | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Current generated rows are `engine_consumed`. |
 | Adepta Sororitas - Acts of Faith | Battle-round-start and unit-destroyed Miracle dice hooks | Source coverage, generated matrix, and runtime inventory | Focused Miracle dice gain, spend, serialization, and fail-fast tests | Full | Implements the updated Miracle dice gaining section: one D6 at the start of each battle round and one D6 each time a friendly ADEPTA SORORITAS unit is destroyed, persisted in the Miracle dice pool with fixed non-rerollable values. |
+| Adeptus Custodes - Martial Ka'tah | Selected-to-fight stance grants plus melee weapon-profile modifier | Adapter contract, decision catalog, source coverage, and generated matrix | Focused grant, decision, runtime-modifier, source coverage, and fail-fast tests | Full | Implements Dacatarai and Rendax finite selected-to-fight options; the accepted stance persists as a Fight phase effect and grants [SUSTAINED HITS 1] or [LETHAL HITS] to melee weapon profiles. |
 | Chaos Space Marines - Dark Pacts | Named army-rule handler | Adapter contract and generated matrix | Focused faction runtime tests | Full | Uses selected-to-shoot and selected-to-fight grant decisions for Lethal Hits or Sustained Hits 1, including out-of-phase shooting, then resolves the post-attack Leadership test, failed-test D3 mortal wounds, and any mortal-wound Feel No Pain continuation through engine hooks. |
 | Death Guard - Nurgle's Gift | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes contagion modifiers for supported characteristics and rolls. |
 | World Eaters - Blessings of Khorne | Named army-rule handler | Architecture and generated matrix | Focused faction runtime tests | Full | Includes battle-round selection and supported blessing effects. |
@@ -149,7 +150,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Adepta Sororitas | 8 | 0 | 20 | 30 | 1 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 0 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
 | Imperial Knights | 8 | 0 | 24 | 36 | 1 | [imperial-knights](factions/imperial-knights.md) |
-| Adeptus Custodes | 9 | 0 | 24 | 36 | 0 | [adeptus-custodes](factions/adeptus-custodes.md) |
+| Adeptus Custodes | 9 | 0 | 24 | 36 | 1 | [adeptus-custodes](factions/adeptus-custodes.md) |
 | Imperial Agents | 5 | 0 | 20 | 30 | 0 | [imperial-agents](factions/imperial-agents.md) |
 
 ## Datasheet Abilities
@@ -257,6 +258,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start` | Acts of Faith |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed` | Acts of Faith |
+| `warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:dacatarai` | Martial Ka'tah - Dacatarai |
+| `warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:rendax` | Martial Ka'tah - Rendax |
+| `warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:weapon-profile` | Martial Ka'tah - Weapon Profile |
 | `warhammer_40000_11th:aeldari:army_rule:fade_back` | Battle Focus - Fade Back |
 | `warhammer_40000_11th:aeldari:army_rule:flitting_shadows` | Battle Focus - Flitting Shadows |
 | `warhammer_40000_11th:aeldari:army_rule:opportunity_seized` | Battle Focus - Opportunity Seized |

@@ -113,7 +113,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `f51aa78ba2ba5641eeeb9541a1a119fec9e8d87050f13ac83344d7815cf5fab2`
+  `61ebafebb095a559af26652e7017ff8ec711e4ab75cf2853c3fa60117ed2612d`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -152,14 +152,14 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `860db43e74df47ed49f99b922c4bae745161c6952dba04c5c2172b1cc4e40d27`
+  `4c994ef970aea507e022bc4cf08f451d136ccb075ef5f00fd8abb1cf1e0bb196`
 - upstream Phase 17E checksum:
-  `f51aa78ba2ba5641eeeb9541a1a119fec9e8d87050f13ac83344d7815cf5fab2`
+  `61ebafebb095a559af26652e7017ff8ec711e4ab75cf2853c3fa60117ed2612d`
 
 The package emits 2140 execution records, one for every Phase 17E coverage row:
-2063 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, and 49 rows are executable
-named-handler rows because they already have runtime consumers: 21 faction army
+2062 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, and 50 rows are executable
+named-handler rows because they already have runtime consumers: 22 faction army
 rules plus 28 exact detachment, Enhancement, and Stratagem rows. The engine
 dispatcher can route every record and returns typed
 `unsupported` diagnostics unless a matching executor is registered. No Phase 17E
@@ -676,11 +676,18 @@ model-scoped persisting effect until the start of that player's next turn.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
+
+Runtime note: Phase 17G implements Adeptus Custodes Martial Ka'tah as a
+source-backed selected-to-fight grant. Eligible Custodes rules units choose
+Dacatarai or Rendax through `select_fight_unit_grant`, record a replay-safe
+Fight-phase persisting effect across the rules unit and attached components,
+and consume that effect through the shared melee weapon profile modifier path
+to grant `SUSTAINED HITS 1` or `LETHAL HITS` until the effect expires.
 
 ### Imperial Agents Execution Status
 

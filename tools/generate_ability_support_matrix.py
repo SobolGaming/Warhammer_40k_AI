@@ -10,7 +10,10 @@ from pathlib import Path
 from typing import cast
 
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
-from warhammer40k_core.core.faction_aliases import CHAOS_SPACE_MARINES_FACTION_ID
+from warhammer40k_core.core.faction_aliases import (
+    ADEPTUS_CUSTODES_FACTION_ID,
+    CHAOS_SPACE_MARINES_FACTION_ID,
+)
 from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
 from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.ability_coverage import (
@@ -32,6 +35,9 @@ from warhammer40k_core.engine.faction_content.bundle import (
 from warhammer40k_core.engine.faction_content.manifest import RuntimeContentSupportStatus
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
     army_rule as adepta_sororitas_army_rule,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adeptus_custodes import (
+    army_rule as adeptus_custodes_army_rule,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.astra_militarum import (
     army_rule as astra_militarum_army_rule,
@@ -337,6 +343,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     "phase17f:phase17e:chaos-daemons:daemonic-incursion:rule": "Warp Rifts",
     "phase17f:phase17e:chaos-daemons:shadow-legion:rule": "Shadow Legion",
     adepta_sororitas_army_rule.SOURCE_RULE_ID: "Acts of Faith",
+    adeptus_custodes_army_rule.SOURCE_RULE_ID: "Martial Ka'tah",
     "phase17f:phase17e:chaos-knights:army-rule": "Harbingers of Dread",
     "phase17f:phase17e:chaos-space-marines:army-rule": "Dark Pacts",
     "phase17f:phase17e:death-guard:army-rule": "Nurgle's Gift",
@@ -492,6 +499,9 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts": ("Warp Rifts"),
     adepta_sororitas_army_rule.BATTLE_ROUND_START_HOOK_ID: "Acts of Faith",
     adepta_sororitas_army_rule.UNIT_DESTROYED_HOOK_ID: "Acts of Faith",
+    adeptus_custodes_army_rule.DACATARAI_HOOK_ID: "Martial Ka'tah - Dacatarai",
+    adeptus_custodes_army_rule.RENDAX_HOOK_ID: "Martial Ka'tah - Rendax",
+    adeptus_custodes_army_rule.WEAPON_PROFILE_MODIFIER_ID: "Martial Ka'tah - Weapon Profile",
     "warhammer_40000_11th:drukhari:army_rule:power_from_pain:battle-shock-failed": (
         "Power from Pain"
     ),
@@ -625,6 +635,13 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             ability_name=adepta_sororitas_army_rule.ACTS_OF_FAITH_ABILITY_NAME,
             semantic_category="faction.army_rule.acts_of_faith",
             runtime_consumer_ids=_adepta_sororitas_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
+            faction_id=ADEPTUS_CUSTODES_FACTION_ID,
+            ability_id=adeptus_custodes_army_rule.HOOK_ID,
+            ability_name=adeptus_custodes_army_rule.MARTIAL_KATAH_ABILITY_NAME,
+            semantic_category="faction.army_rule.martial_katah",
+            runtime_consumer_ids=_adeptus_custodes_runtime_consumer_ids(),
         ),
         _implemented_faction_army_rule_row(
             faction_id=CHAOS_SPACE_MARINES_FACTION_ID,
@@ -801,6 +818,21 @@ def _adepta_sororitas_runtime_consumer_ids() -> tuple[str, ...]:
             {
                 *(binding.hook_id for binding in contribution.battle_round_start_hook_bindings),
                 *(binding.hook_id for binding in contribution.unit_destroyed_hook_bindings),
+            }
+        )
+    )
+
+
+def _adeptus_custodes_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = adeptus_custodes_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                *(
+                    binding.hook_id
+                    for binding in contribution.fight_unit_selected_grant_hook_bindings
+                ),
+                *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
             }
         )
     )
@@ -2212,6 +2244,21 @@ def _structured_support_sections_markdown() -> list[str]:
                         "the start of each battle round and one D6 each time a friendly "
                         "ADEPTA SORORITAS unit is destroyed, persisted in the Miracle "
                         "dice pool with fixed non-rerollable values."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Adeptus Custodes - Martial Ka'tah",
+                    "Selected-to-fight stance grants plus melee weapon-profile modifier",
+                    "Adapter contract, decision catalog, source coverage, and generated matrix",
+                    (
+                        "Focused grant, decision, runtime-modifier, source coverage, "
+                        "and fail-fast tests"
+                    ),
+                    "Full",
+                    (
+                        "Implements Dacatarai and Rendax finite selected-to-fight options; "
+                        "the accepted stance persists as a Fight phase effect and grants "
+                        "[SUSTAINED HITS 1] or [LETHAL HITS] to melee weapon profiles."
                     ),
                 ),
                 SupportSectionRow(
