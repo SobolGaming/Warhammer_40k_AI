@@ -405,6 +405,40 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith",
+        "ability_name": "Acts of Faith",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/adepta-sororitas/faction/warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith/none",
+        "datasheet_id": "adepta-sororitas",
+        "datasheet_name": "Adepta Sororitas",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Acts of Faith"
+    ],
+    "category_id": "faction.army_rule.acts_of_faith",
+    "category_name": "Faction Army Rule Acts Of Faith",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/adepta-sororitas/faction/warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith/none"
+    ],
+    "datasheet_names": [
+      "Adepta Sororitas"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start",
+      "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "warhammer_40000_11th:imperial_knights:army_rule:bondsman",
         "ability_name": "Bondsman",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/imperial-knights/faction/warhammer_40000_11th:imperial_knights:army_rule:bondsman/none",

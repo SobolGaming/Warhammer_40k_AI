@@ -254,6 +254,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `phase17g:aeldari:corsair-coterie:stratagems:cloak-and-shadow:target-restriction` | Cloak and Shadow |
 | `phase17g:aeldari:corsair-coterie:stratagems:outcast-ambush:weapon-profile` | Outcast Ambush |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
+| `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start` | Acts of Faith |
+| `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed` | Acts of Faith |
 | `warhammer_40000_11th:aeldari:army_rule:fade_back` | Battle Focus - Fade Back |
 | `warhammer_40000_11th:aeldari:army_rule:flitting_shadows` | Battle Focus - Flitting Shadows |
 | `warhammer_40000_11th:aeldari:army_rule:opportunity_seized` | Battle Focus - Opportunity Seized |

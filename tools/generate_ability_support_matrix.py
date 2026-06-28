@@ -30,6 +30,9 @@ from warhammer40k_core.engine.faction_content.bundle import (
     RuntimeContentContribution,
 )
 from warhammer40k_core.engine.faction_content.manifest import RuntimeContentSupportStatus
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
+    army_rule as adepta_sororitas_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.astra_militarum import (
     army_rule as astra_militarum_army_rule,
 )
@@ -333,6 +336,7 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     ),
     "phase17f:phase17e:chaos-daemons:daemonic-incursion:rule": "Warp Rifts",
     "phase17f:phase17e:chaos-daemons:shadow-legion:rule": "Shadow Legion",
+    adepta_sororitas_army_rule.SOURCE_RULE_ID: "Acts of Faith",
     "phase17f:phase17e:chaos-knights:army-rule": "Harbingers of Dread",
     "phase17f:phase17e:chaos-space-marines:army-rule": "Dark Pacts",
     "phase17f:phase17e:death-guard:army-rule": "Nurgle's Gift",
@@ -486,6 +490,8 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
         "Unholy Avalanche"
     ),
     "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts": ("Warp Rifts"),
+    adepta_sororitas_army_rule.BATTLE_ROUND_START_HOOK_ID: "Acts of Faith",
+    adepta_sororitas_army_rule.UNIT_DESTROYED_HOOK_ID: "Acts of Faith",
     "warhammer_40000_11th:drukhari:army_rule:power_from_pain:battle-shock-failed": (
         "Power from Pain"
     ),
@@ -613,6 +619,13 @@ def _write_json(path: Path, payload: object) -> None:
 
 def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
     return (
+        _implemented_faction_army_rule_row(
+            faction_id=adepta_sororitas_army_rule.ADEPTA_SORORITAS_FACTION_ID,
+            ability_id=adepta_sororitas_army_rule.HOOK_ID,
+            ability_name=adepta_sororitas_army_rule.ACTS_OF_FAITH_ABILITY_NAME,
+            semantic_category="faction.army_rule.acts_of_faith",
+            runtime_consumer_ids=_adepta_sororitas_runtime_consumer_ids(),
+        ),
         _implemented_faction_army_rule_row(
             faction_id=CHAOS_SPACE_MARINES_FACTION_ID,
             ability_id=chaos_space_marines_army_rule.HOOK_ID,
@@ -779,6 +792,18 @@ def _source_faction_row(faction_id: str) -> faction_detachments_2026_27.SourceFa
         if row.faction_id == faction_id:
             return row
     raise ValueError("Ability support matrix runtime row references unknown faction.")
+
+
+def _adepta_sororitas_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = adepta_sororitas_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                *(binding.hook_id for binding in contribution.battle_round_start_hook_bindings),
+                *(binding.hook_id for binding in contribution.unit_destroyed_hook_bindings),
+            }
+        )
+    )
 
 
 def _chaos_space_marines_runtime_consumer_ids() -> tuple[str, ...]:
