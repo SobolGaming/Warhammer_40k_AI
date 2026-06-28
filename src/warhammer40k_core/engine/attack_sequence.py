@@ -4648,6 +4648,10 @@ def _defer_grouped_devastating_wounds(
         resolution = _devastating_wounds_resolution_for_attack(
             pool=pool,
             attack_context=attack_context,
+            target_keywords=rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=attack_context["target_unit_instance_id"],
+            ).keywords,
         )
         if resolution is not DevastatingWoundsResolution.MORTAL_WOUNDS:
             normal_contexts.append((wounded_sequence, attack_context))
@@ -4667,7 +4671,13 @@ def _defer_grouped_devastating_wounds(
             return current, (), status
         if damage_value is None:
             raise GameLifecycleError("Damage roll did not resolve a value.")
-        mortal_wounds = damage_value + _melta_damage_modifier(pool)
+        mortal_wounds = damage_value + _melta_damage_modifier(
+            pool,
+            target_keywords=rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=attack_context["target_unit_instance_id"],
+            ).keywords,
+        )
         deferred = DeferredMortalWounds(
             source_rule_id=DEVASTATING_WOUNDS_RULE_ID,
             target_unit_instance_id=attack_context["target_unit_instance_id"],
@@ -5110,7 +5120,13 @@ def _resolve_grouped_damage_from(
             )
         if damage_value is None:
             raise GameLifecycleError("Damage roll did not resolve a value.")
-        damage_amount = damage_value + _melta_damage_modifier(pool)
+        damage_amount = damage_value + _melta_damage_modifier(
+            pool,
+            target_keywords=rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=pool.target_unit_instance_id,
+            ).keywords,
+        )
         _next_sequence, resolved_allocated_ids, status = _resolve_lost_wound_stage(
             state=state,
             decisions=decisions,
@@ -5502,6 +5518,10 @@ def _save_options_for_allocation(
         _devastating_wounds_resolution_for_attack(
             pool=pool,
             attack_context=attack_context,
+            target_keywords=rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=attack_context["target_unit_instance_id"],
+            ).keywords,
         )
         is DevastatingWoundsResolution.NO_SAVES
     )
@@ -8650,20 +8670,29 @@ def _cover_result_with_effect_source(
     )
 
 
-def _melta_damage_modifier(pool: RangedAttackPool) -> int:
+def _melta_damage_modifier(
+    pool: RangedAttackPool,
+    *,
+    target_keywords: tuple[str, ...],
+) -> int:
     if not any(rule_id.startswith(MELTA_RULE_ID) for rule_id in pool.targeting_rule_ids):
         return 0
-    return melta_damage_bonus(pool.weapon_profile, target_within_half_range=True)
+    return melta_damage_bonus(
+        pool.weapon_profile,
+        target_within_half_range=True,
+        target_keywords=target_keywords,
+    )
 
 
 def _devastating_wounds_resolution_for_attack(
     *,
     pool: RangedAttackPool,
     attack_context: AttackResolutionContextPayload,
+    target_keywords: tuple[str, ...],
 ) -> DevastatingWoundsResolution | None:
     if not bool(attack_context["wound_roll"]["critical"]):
         return None
-    return devastating_wounds_resolution(pool.weapon_profile)
+    return devastating_wounds_resolution(pool.weapon_profile, target_keywords=target_keywords)
 
 
 def _resolve_hazardous_tests(

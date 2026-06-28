@@ -75,6 +75,11 @@ class AntiKeywordMatchMode(StrEnum):
     MISSING_KEYWORD = "missing_keyword"
 
 
+class TargetKeywordMatchMode(StrEnum):
+    HAS_KEYWORD = "has_keyword"
+    MISSING_KEYWORD = "missing_keyword"
+
+
 class RangeProfileKind(StrEnum):
     DISTANCE = "distance"
     MELEE = "melee"
@@ -96,6 +101,7 @@ class DamageProfilePayload(TypedDict):
 
 
 AbilityParameterValue = int | float | str | bool
+TARGET_KEYWORD_MATCH_MODE_PARAMETER = "target_keyword_match_mode"
 
 
 class AbilityParameterPayload(TypedDict):
@@ -173,13 +179,20 @@ class AbilityDescriptor:
         if ability_kind != self.ability_kind:
             object.__setattr__(self, "ability_kind", ability_kind)
 
-        parameters = _canonical_ability_parameters(self.parameters)
-        if parameters != self.parameters:
-            object.__setattr__(self, "parameters", parameters)
-
-        target_keywords = _canonical_target_keyword_tuple(self.target_keywords)
+        raw_parameters = _canonical_ability_parameters(self.parameters)
+        target_keywords, target_keyword_match_mode = _canonical_target_keyword_gate(
+            self.target_keywords,
+            explicit_match_mode=_optional_target_keyword_match_mode(raw_parameters),
+        )
         if target_keywords != self.target_keywords:
             object.__setattr__(self, "target_keywords", target_keywords)
+        parameters = _parameters_with_target_keyword_match_mode(
+            raw_parameters,
+            target_keyword_match_mode=target_keyword_match_mode,
+            target_keywords=target_keywords,
+        )
+        if parameters != self.parameters:
+            object.__setattr__(self, "parameters", parameters)
 
         timing = _validate_optional_ability_timing(self.timing)
         if timing != self.timing:
@@ -198,73 +211,180 @@ class AbilityDescriptor:
         )
 
     @classmethod
-    def sustained_hits(cls, value: int, *, target_keywords: tuple[str, ...] = ()) -> Self:
-        canonical_target_keywords = _canonical_target_keyword_tuple(target_keywords)
+    def sustained_hits(
+        cls,
+        value: int,
+        *,
+        target_keywords: tuple[str, ...] = (),
+        target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+    ) -> Self:
+        canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
+            target_keywords,
+            explicit_match_mode=target_keyword_match_mode,
+        )
+        id_suffix = _target_keyword_ability_id_suffix(
+            canonical_target_keywords,
+            resolved_match_mode,
+        )
+        name_suffix = _target_keyword_name_suffix(canonical_target_keywords, resolved_match_mode)
         return cls(
-            ability_id=(
-                f"sustained-hits:{value}"
-                f"{_target_keyword_ability_id_suffix(canonical_target_keywords)}"
-            ),
-            name=(
-                f"Sustained Hits {value}{_target_keyword_name_suffix(canonical_target_keywords)}"
-            ),
+            ability_id=f"sustained-hits:{value}{id_suffix}",
+            name=f"Sustained Hits {value}{name_suffix}",
             ability_kind=AbilityKind.SUSTAINED_HITS,
-            parameters=(AbilityParameter.integer(value),),
-            target_keywords=canonical_target_keywords,
-            timing=AbilityTiming.ATTACK_SEQUENCE,
-        )
-
-    @classmethod
-    def lethal_hits(cls, *, target_keywords: tuple[str, ...] = ()) -> Self:
-        canonical_target_keywords = _canonical_target_keyword_tuple(target_keywords)
-        return cls(
-            ability_id=(
-                f"lethal-hits{_target_keyword_ability_id_suffix(canonical_target_keywords)}"
+            parameters=_parameters_with_target_keyword_match_mode(
+                (AbilityParameter.integer(value),),
+                target_keyword_match_mode=resolved_match_mode,
+                target_keywords=canonical_target_keywords,
             ),
-            name=f"Lethal Hits{_target_keyword_name_suffix(canonical_target_keywords)}",
-            ability_kind=AbilityKind.LETHAL_HITS,
             target_keywords=canonical_target_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
         )
 
     @classmethod
-    def hunter(cls, *, target_keywords: tuple[str, ...]) -> Self:
-        canonical_target_keywords = _canonical_target_keyword_tuple(target_keywords)
+    def lethal_hits(
+        cls,
+        *,
+        target_keywords: tuple[str, ...] = (),
+        target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+    ) -> Self:
+        canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
+            target_keywords,
+            explicit_match_mode=target_keyword_match_mode,
+        )
+        id_suffix = _target_keyword_ability_id_suffix(
+            canonical_target_keywords,
+            resolved_match_mode,
+        )
+        name_suffix = _target_keyword_name_suffix(canonical_target_keywords, resolved_match_mode)
         return cls(
-            ability_id=f"hunter{_target_keyword_ability_id_suffix(canonical_target_keywords)}",
-            name=f"Hunter{_target_keyword_name_suffix(canonical_target_keywords)}",
+            ability_id=f"lethal-hits{id_suffix}",
+            name=f"Lethal Hits{name_suffix}",
+            ability_kind=AbilityKind.LETHAL_HITS,
+            parameters=_parameters_with_target_keyword_match_mode(
+                (),
+                target_keyword_match_mode=resolved_match_mode,
+                target_keywords=canonical_target_keywords,
+            ),
+            target_keywords=canonical_target_keywords,
+            timing=AbilityTiming.ATTACK_SEQUENCE,
+        )
+
+    @classmethod
+    def hunter(
+        cls,
+        *,
+        target_keywords: tuple[str, ...],
+        target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+    ) -> Self:
+        canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
+            target_keywords,
+            explicit_match_mode=target_keyword_match_mode,
+        )
+        id_suffix = _target_keyword_ability_id_suffix(
+            canonical_target_keywords,
+            resolved_match_mode,
+        )
+        name_suffix = _target_keyword_name_suffix(canonical_target_keywords, resolved_match_mode)
+        return cls(
+            ability_id=f"hunter{id_suffix}",
+            name=f"Hunter{name_suffix}",
             ability_kind=AbilityKind.HUNTER,
+            parameters=_parameters_with_target_keyword_match_mode(
+                (),
+                target_keyword_match_mode=resolved_match_mode,
+                target_keywords=canonical_target_keywords,
+            ),
             target_keywords=canonical_target_keywords,
             timing=AbilityTiming.TARGET_DECLARATION,
         )
 
     @classmethod
-    def cleave(cls, value: int) -> Self:
+    def cleave(
+        cls,
+        value: int,
+        *,
+        target_keywords: tuple[str, ...] = (),
+        target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+    ) -> Self:
+        canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
+            target_keywords,
+            explicit_match_mode=target_keyword_match_mode,
+        )
+        id_suffix = _target_keyword_ability_id_suffix(
+            canonical_target_keywords,
+            resolved_match_mode,
+        )
+        name_suffix = _target_keyword_name_suffix(canonical_target_keywords, resolved_match_mode)
         return cls(
-            ability_id=f"cleave:{value}",
-            name=f"Cleave {value}",
+            ability_id=f"cleave:{value}{id_suffix}",
+            name=f"Cleave {value}{name_suffix}",
             ability_kind=AbilityKind.CLEAVE,
-            parameters=(AbilityParameter.integer(value),),
+            parameters=_parameters_with_target_keyword_match_mode(
+                (AbilityParameter.integer(value),),
+                target_keyword_match_mode=resolved_match_mode,
+                target_keywords=canonical_target_keywords,
+            ),
+            target_keywords=canonical_target_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
         )
 
     @classmethod
-    def melta(cls, value: int) -> Self:
+    def melta(
+        cls,
+        value: int,
+        *,
+        target_keywords: tuple[str, ...] = (),
+        target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+    ) -> Self:
+        canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
+            target_keywords,
+            explicit_match_mode=target_keyword_match_mode,
+        )
+        id_suffix = _target_keyword_ability_id_suffix(
+            canonical_target_keywords,
+            resolved_match_mode,
+        )
+        name_suffix = _target_keyword_name_suffix(canonical_target_keywords, resolved_match_mode)
         return cls(
-            ability_id=f"melta:{value}",
-            name=f"Melta {value}",
+            ability_id=f"melta:{value}{id_suffix}",
+            name=f"Melta {value}{name_suffix}",
             ability_kind=AbilityKind.MELTA,
-            parameters=(AbilityParameter.integer(value),),
+            parameters=_parameters_with_target_keyword_match_mode(
+                (AbilityParameter.integer(value),),
+                target_keyword_match_mode=resolved_match_mode,
+                target_keywords=canonical_target_keywords,
+            ),
+            target_keywords=canonical_target_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
         )
 
     @classmethod
-    def rapid_fire(cls, value: int) -> Self:
+    def rapid_fire(
+        cls,
+        value: int,
+        *,
+        target_keywords: tuple[str, ...] = (),
+        target_keyword_match_mode: TargetKeywordMatchMode | None = None,
+    ) -> Self:
+        canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
+            target_keywords,
+            explicit_match_mode=target_keyword_match_mode,
+        )
+        id_suffix = _target_keyword_ability_id_suffix(
+            canonical_target_keywords,
+            resolved_match_mode,
+        )
+        name_suffix = _target_keyword_name_suffix(canonical_target_keywords, resolved_match_mode)
         return cls(
-            ability_id=f"rapid-fire:{value}",
-            name=f"Rapid Fire {value}",
+            ability_id=f"rapid-fire:{value}{id_suffix}",
+            name=f"Rapid Fire {value}{name_suffix}",
             ability_kind=AbilityKind.RAPID_FIRE,
-            parameters=(AbilityParameter.integer(value),),
+            parameters=_parameters_with_target_keyword_match_mode(
+                (AbilityParameter.integer(value),),
+                target_keyword_match_mode=resolved_match_mode,
+                target_keywords=canonical_target_keywords,
+            ),
+            target_keywords=canonical_target_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
         )
 
@@ -311,13 +431,30 @@ class AbilityDescriptor:
     def devastating_wounds(
         cls,
         effect: DevastatingWoundsEffect = DevastatingWoundsEffect.MORTAL_WOUNDS,
+        *,
+        target_keywords: tuple[str, ...] = (),
+        target_keyword_match_mode: TargetKeywordMatchMode | None = None,
     ) -> Self:
         resolved_effect = devastating_wounds_effect_from_token(effect)
+        canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
+            target_keywords,
+            explicit_match_mode=target_keyword_match_mode,
+        )
+        id_suffix = _target_keyword_ability_id_suffix(
+            canonical_target_keywords,
+            resolved_match_mode,
+        )
+        name_suffix = _target_keyword_name_suffix(canonical_target_keywords, resolved_match_mode)
         return cls(
-            ability_id=f"devastating-wounds:{resolved_effect.value}",
-            name="Devastating Wounds",
+            ability_id=f"devastating-wounds:{resolved_effect.value}{id_suffix}",
+            name=f"Devastating Wounds{name_suffix}",
             ability_kind=AbilityKind.DEVASTATING_WOUNDS,
-            parameters=(AbilityParameter(name="effect", value=resolved_effect.value),),
+            parameters=_parameters_with_target_keyword_match_mode(
+                (AbilityParameter(name="effect", value=resolved_effect.value),),
+                target_keyword_match_mode=resolved_match_mode,
+                target_keywords=canonical_target_keywords,
+            ),
+            target_keywords=canonical_target_keywords,
             timing=AbilityTiming.ATTACK_SEQUENCE,
         )
 
@@ -664,6 +801,17 @@ def anti_keyword_match_mode_from_token(token: object) -> AntiKeywordMatchMode:
         raise WeaponProfileError(f"Unsupported AntiKeywordMatchMode token: {token}.") from exc
 
 
+def target_keyword_match_mode_from_token(token: object) -> TargetKeywordMatchMode:
+    if type(token) is TargetKeywordMatchMode:
+        return token
+    if type(token) is not str:
+        raise WeaponProfileError("TargetKeywordMatchMode token must be a string.")
+    try:
+        return TargetKeywordMatchMode(token)
+    except ValueError as exc:
+        raise WeaponProfileError(f"Unsupported TargetKeywordMatchMode token: {token}.") from exc
+
+
 def range_profile_kind_from_token(token: object) -> RangeProfileKind:
     if type(token) is not str:
         raise WeaponProfileError("RangeProfile kind token must be a string.")
@@ -904,15 +1052,27 @@ def _validate_ability_parameter(parameter: object) -> AbilityParameter:
     return parameter
 
 
-def _canonical_target_keyword_tuple(values: tuple[str, ...]) -> tuple[str, ...]:
+def _canonical_target_keyword_gate(
+    values: tuple[str, ...],
+    *,
+    explicit_match_mode: TargetKeywordMatchMode | None,
+) -> tuple[tuple[str, ...], TargetKeywordMatchMode]:
     if type(values) is not tuple:
         raise WeaponProfileError("AbilityDescriptor target_keywords must be a tuple.")
     keywords: list[str] = []
     seen: set[str] = set()
+    inferred_match_mode: TargetKeywordMatchMode | None = None
     for value in values:
         if type(value) is not str:
             raise WeaponProfileError("AbilityDescriptor target keyword must be a string.")
-        for part in value.split("/"):
+        match_mode, keyword_group = _target_keyword_condition_group(value)
+        if inferred_match_mode is None:
+            inferred_match_mode = match_mode
+        elif inferred_match_mode is not match_mode:
+            raise WeaponProfileError(
+                "AbilityDescriptor target keyword gate must not mix positive and non- conditions."
+            )
+        for part in keyword_group.split("/"):
             keyword = _canonical_rule_keyword(part)
             if keyword in seen:
                 raise WeaponProfileError(
@@ -920,19 +1080,114 @@ def _canonical_target_keyword_tuple(values: tuple[str, ...]) -> tuple[str, ...]:
                 )
             seen.add(keyword)
             keywords.append(keyword)
-    return tuple(keywords)
+    resolved_match_mode = _resolve_target_keyword_match_mode(
+        explicit_match_mode=explicit_match_mode,
+        inferred_match_mode=inferred_match_mode,
+    )
+    if not keywords and resolved_match_mode is TargetKeywordMatchMode.MISSING_KEYWORD:
+        raise WeaponProfileError("AbilityDescriptor non- target keyword gate requires keywords.")
+    return tuple(keywords), resolved_match_mode
 
 
-def _target_keyword_ability_id_suffix(target_keywords: tuple[str, ...]) -> str:
+def _target_keyword_condition_group(value: str) -> tuple[TargetKeywordMatchMode, str]:
+    stripped = _validate_identifier("AbilityDescriptor target keyword", value)
+    for prefix in ("non-", "non_", "non "):
+        if stripped.casefold().startswith(prefix):
+            keyword_group = stripped[len(prefix) :].strip()
+            if not keyword_group:
+                raise WeaponProfileError(
+                    "AbilityDescriptor non- target keyword gate requires keywords."
+                )
+            return TargetKeywordMatchMode.MISSING_KEYWORD, keyword_group
+    return TargetKeywordMatchMode.HAS_KEYWORD, stripped
+
+
+def _resolve_target_keyword_match_mode(
+    *,
+    explicit_match_mode: TargetKeywordMatchMode | None,
+    inferred_match_mode: TargetKeywordMatchMode | None,
+) -> TargetKeywordMatchMode:
+    if explicit_match_mode is None:
+        return (
+            TargetKeywordMatchMode.HAS_KEYWORD
+            if inferred_match_mode is None
+            else inferred_match_mode
+        )
+    resolved_explicit = target_keyword_match_mode_from_token(explicit_match_mode)
+    if (
+        inferred_match_mode is not None
+        and inferred_match_mode is not TargetKeywordMatchMode.HAS_KEYWORD
+        and inferred_match_mode is not resolved_explicit
+    ):
+        raise WeaponProfileError(
+            "AbilityDescriptor explicit target keyword match mode conflicts with non- keywords."
+        )
+    return resolved_explicit
+
+
+def _optional_target_keyword_match_mode(
+    parameters: tuple[AbilityParameter, ...],
+) -> TargetKeywordMatchMode | None:
+    for parameter in parameters:
+        if parameter.name == TARGET_KEYWORD_MATCH_MODE_PARAMETER:
+            return target_keyword_match_mode_from_token(parameter.value)
+    return None
+
+
+def _parameters_with_target_keyword_match_mode(
+    parameters: tuple[AbilityParameter, ...],
+    *,
+    target_keyword_match_mode: TargetKeywordMatchMode,
+    target_keywords: tuple[str, ...],
+) -> tuple[AbilityParameter, ...]:
+    if not target_keywords:
+        if target_keyword_match_mode is TargetKeywordMatchMode.MISSING_KEYWORD:
+            raise WeaponProfileError(
+                "AbilityDescriptor non- target keyword gate requires keywords."
+            )
+        return tuple(
+            parameter
+            for parameter in parameters
+            if parameter.name != TARGET_KEYWORD_MATCH_MODE_PARAMETER
+        )
+    retained = tuple(
+        parameter
+        for parameter in parameters
+        if parameter.name != TARGET_KEYWORD_MATCH_MODE_PARAMETER
+    )
+    if target_keyword_match_mode is TargetKeywordMatchMode.HAS_KEYWORD:
+        return _canonical_ability_parameters(retained)
+    return _canonical_ability_parameters(
+        (
+            *retained,
+            AbilityParameter(
+                name=TARGET_KEYWORD_MATCH_MODE_PARAMETER,
+                value=target_keyword_match_mode.value,
+            ),
+        )
+    )
+
+
+def _target_keyword_ability_id_suffix(
+    target_keywords: tuple[str, ...],
+    target_keyword_match_mode: TargetKeywordMatchMode,
+) -> str:
     if not target_keywords:
         return ""
-    return ":" + "/".join(keyword.lower() for keyword in target_keywords)
+    prefix = "non-" if target_keyword_match_mode is TargetKeywordMatchMode.MISSING_KEYWORD else ""
+    return ":" + prefix + "/".join(keyword.lower() for keyword in target_keywords)
 
 
-def _target_keyword_name_suffix(target_keywords: tuple[str, ...]) -> str:
+def _target_keyword_name_suffix(
+    target_keywords: tuple[str, ...],
+    target_keyword_match_mode: TargetKeywordMatchMode,
+) -> str:
     if not target_keywords:
         return ""
-    return ": " + "/".join(keyword.replace("_", " ").title() for keyword in target_keywords)
+    prefix = "non-" if target_keyword_match_mode is TargetKeywordMatchMode.MISSING_KEYWORD else ""
+    return (
+        ": " + prefix + "/".join(keyword.replace("_", " ").title() for keyword in target_keywords)
+    )
 
 
 def _validate_supported_ability_shape(
@@ -950,6 +1205,7 @@ def _validate_supported_ability_shape(
         AbilityKind.RAPID_FIRE,
     }:
         _validate_single_positive_int_parameter(ability_kind, parameters)
+        _validate_target_keyword_match_mode_parameter(parameters, target_keywords=target_keywords)
         if timing is not AbilityTiming.ATTACK_SEQUENCE:
             raise WeaponProfileError("Parameterized weapon abilities must use attack timing.")
         if condition is not None:
@@ -957,8 +1213,12 @@ def _validate_supported_ability_shape(
         return
 
     if ability_kind is AbilityKind.LETHAL_HITS:
-        if parameters:
-            raise WeaponProfileError("Lethal Hits ability must not include parameters.")
+        _validate_parameter_names(
+            "Lethal Hits ability",
+            parameters,
+            allowed_names=frozenset({TARGET_KEYWORD_MATCH_MODE_PARAMETER}),
+        )
+        _validate_target_keyword_match_mode_parameter(parameters, target_keywords=target_keywords)
         if timing is not AbilityTiming.ATTACK_SEQUENCE:
             raise WeaponProfileError("Lethal Hits ability must use attack timing.")
         if condition is not None:
@@ -966,8 +1226,12 @@ def _validate_supported_ability_shape(
         return
 
     if ability_kind is AbilityKind.HUNTER:
-        if parameters:
-            raise WeaponProfileError("Hunter ability must not include parameters.")
+        _validate_parameter_names(
+            "Hunter ability",
+            parameters,
+            allowed_names=frozenset({TARGET_KEYWORD_MATCH_MODE_PARAMETER}),
+        )
+        _validate_target_keyword_match_mode_parameter(parameters, target_keywords=target_keywords)
         if not target_keywords:
             raise WeaponProfileError("Hunter ability requires target keywords.")
         if timing is not AbilityTiming.TARGET_DECLARATION:
@@ -977,7 +1241,7 @@ def _validate_supported_ability_shape(
         return
 
     if ability_kind is AbilityKind.ANTI_KEYWORD:
-        _validate_anti_keyword_parameters(parameters)
+        _validate_anti_keyword_parameters(parameters, target_keywords=target_keywords)
         if timing is not AbilityTiming.ATTACK_SEQUENCE:
             raise WeaponProfileError("Anti keyword ability must use attack timing.")
         if condition is not None:
@@ -986,6 +1250,7 @@ def _validate_supported_ability_shape(
 
     if ability_kind is AbilityKind.DEVASTATING_WOUNDS:
         _validate_devastating_wounds_parameters(parameters)
+        _validate_target_keyword_match_mode_parameter(parameters, target_keywords=target_keywords)
         if timing is not AbilityTiming.ATTACK_SEQUENCE:
             raise WeaponProfileError("Devastating Wounds ability must use attack timing.")
         if condition is not None:
@@ -1010,24 +1275,53 @@ def _validate_single_positive_int_parameter(
     ability_kind: AbilityKind,
     parameters: tuple[AbilityParameter, ...],
 ) -> None:
-    if len(parameters) != 1 or parameters[0].name != "value":
+    _validate_parameter_names(
+        f"{ability_kind.value} ability",
+        parameters,
+        allowed_names=frozenset({"value", TARGET_KEYWORD_MATCH_MODE_PARAMETER}),
+    )
+    value_parameters = tuple(parameter for parameter in parameters if parameter.name == "value")
+    if len(value_parameters) != 1:
         raise WeaponProfileError(f"{ability_kind.value} ability must include one value parameter.")
-    value = parameters[0].value
+    value = value_parameters[0].value
     if type(value) is not int or value < 1:
         raise WeaponProfileError(f"{ability_kind.value} ability value parameter must be positive.")
 
 
-def _validate_anti_keyword_parameters(parameters: tuple[AbilityParameter, ...]) -> None:
-    if len(parameters) not in {2, 3}:
-        raise WeaponProfileError(
-            "anti_keyword ability must include keyword and threshold, "
-            "and may include optional match_mode."
-        )
+def _validate_parameter_names(
+    ability_label: str,
+    parameters: tuple[AbilityParameter, ...],
+    *,
+    allowed_names: frozenset[str],
+) -> None:
+    names = {parameter.name for parameter in parameters}
+    if not names.issubset(allowed_names):
+        raise WeaponProfileError(f"{ability_label} includes unsupported parameters.")
+
+
+def _validate_target_keyword_match_mode_parameter(
+    parameters: tuple[AbilityParameter, ...],
+    *,
+    target_keywords: tuple[str, ...],
+) -> None:
+    match_mode = _optional_target_keyword_match_mode(parameters)
+    if match_mode is None:
+        return
+    if not target_keywords:
+        raise WeaponProfileError("target_keyword_match_mode parameter requires target keywords.")
+
+
+def _validate_anti_keyword_parameters(
+    parameters: tuple[AbilityParameter, ...],
+    *,
+    target_keywords: tuple[str, ...],
+) -> None:
     by_name = {parameter.name: parameter for parameter in parameters}
-    if set(by_name) not in ({"keyword", "threshold"}, {"keyword", "threshold", "match_mode"}):
+    allowed_names = {"keyword", "threshold", "match_mode", TARGET_KEYWORD_MATCH_MODE_PARAMETER}
+    if not {"keyword", "threshold"}.issubset(by_name) or not set(by_name).issubset(allowed_names):
         raise WeaponProfileError(
             "anti_keyword ability must include keyword and threshold, "
-            "and may include optional match_mode."
+            "and may include optional match modes."
         )
     keyword = by_name["keyword"].value
     if type(keyword) is not str:
@@ -1036,6 +1330,7 @@ def _validate_anti_keyword_parameters(parameters: tuple[AbilityParameter, ...]) 
         raise WeaponProfileError("anti_keyword keyword parameter must be canonical.")
     if "match_mode" in by_name:
         anti_keyword_match_mode_from_token(by_name["match_mode"].value)
+    _validate_target_keyword_match_mode_parameter(parameters, target_keywords=target_keywords)
     _validate_d6_critical_threshold(
         "anti_keyword threshold parameter",
         by_name["threshold"].value,
@@ -1043,9 +1338,15 @@ def _validate_anti_keyword_parameters(parameters: tuple[AbilityParameter, ...]) 
 
 
 def _validate_devastating_wounds_parameters(parameters: tuple[AbilityParameter, ...]) -> None:
-    if len(parameters) != 1 or parameters[0].name != "effect":
+    _validate_parameter_names(
+        "devastating_wounds ability",
+        parameters,
+        allowed_names=frozenset({"effect", TARGET_KEYWORD_MATCH_MODE_PARAMETER}),
+    )
+    effect_parameters = tuple(parameter for parameter in parameters if parameter.name == "effect")
+    if len(effect_parameters) != 1:
         raise WeaponProfileError("devastating_wounds ability must include one effect parameter.")
-    devastating_wounds_effect_from_token(parameters[0].value)
+    devastating_wounds_effect_from_token(effect_parameters[0].value)
 
 
 def _canonical_rule_keyword(keyword: object) -> str:

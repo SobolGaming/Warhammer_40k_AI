@@ -21,7 +21,12 @@ from warhammer40k_core.core.model_geometry_catalog import (
     GeometryReviewStatus,
     GeometrySourceUnits,
 )
-from warhammer40k_core.core.weapon_profiles import WeaponKeyword
+from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
+    AntiKeywordMatchMode,
+    WeaponKeyword,
+    WeaponProfileError,
+)
 from warhammer40k_core.rules.data_package import DataPackageId
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
@@ -155,6 +160,12 @@ class _CompositionEntry:
     min_models: int
     max_models: int
     source_row: NormalizedSourceRow
+
+
+@dataclass(frozen=True, slots=True)
+class _WeaponKeywordEntry:
+    keyword: WeaponKeyword | None
+    ability: AbilityDescriptor | None = None
 
 
 EVENT_COMPANION_BASE_SIZE_GUIDE_SOURCE_ID = (
@@ -443,6 +454,7 @@ def _bridge_wargear(
                 "ap": _required_field(row, "AP"),
                 "d": _required_field(row, "D"),
                 "weapon_keywords": _joined(_weapon_keywords(_required_field(row, "description"))),
+                "weapon_abilities": _weapon_abilities_payload(_required_field(row, "description")),
                 "default_loadout": "true",
                 "source_ids": _joined(_source_ids(row)),
             }
@@ -560,6 +572,7 @@ def _bridge_abilities(
                     "ap": "",
                     "d": "",
                     "weapon_keywords": "",
+                    "weapon_abilities": "",
                     "default_loadout": "false",
                     "source_ids": _joined(_source_ids(row)),
                 }
@@ -749,6 +762,7 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "ap",
             "d",
             "weapon_keywords",
+            "weapon_abilities",
             "default_loadout",
             "source_ids",
         ),
@@ -1032,17 +1046,196 @@ def _skill_value(row: NormalizedSourceRow) -> str:
 
 
 def _weapon_keywords(description: str) -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            _deduplicated(
+                [
+                    entry.keyword.value
+                    for entry in _weapon_keyword_entries(description)
+                    if entry.keyword is not None
+                ]
+            )
+        )
+    )
+
+
+def _weapon_abilities_payload(description: str) -> str:
+    abilities = tuple(
+        entry.ability for entry in _weapon_keyword_entries(description) if entry.ability is not None
+    )
+    if not abilities:
+        return ""
+    seen: set[str] = set()
+    for ability in abilities:
+        if ability.ability_id in seen:
+            raise WahapediaBridgeError("Wahapedia weapon abilities must not duplicate.")
+        seen.add(ability.ability_id)
+    return json.dumps(
+        [ability.to_payload() for ability in sorted(abilities, key=lambda item: item.ability_id)],
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
+def _weapon_keyword_entries(description: str) -> tuple[_WeaponKeywordEntry, ...]:
     if not description.strip():
         return ()
-    canonical_by_key = {_name_key(keyword.value): keyword.value for keyword in WeaponKeyword}
-    keywords: list[str] = []
-    for raw_keyword in description.split(","):
-        key = _name_key(raw_keyword)
-        keyword = canonical_by_key.get(key)
-        if keyword is None:
-            raise WahapediaBridgeError("Unsupported Wahapedia weapon keyword.")
-        keywords.append(keyword)
-    return tuple(sorted(_deduplicated(keywords)))
+    entries: list[_WeaponKeywordEntry] = []
+    for raw_item in _weapon_keyword_items(description):
+        entries.append(_weapon_keyword_entry(raw_item))
+    return tuple(entries)
+
+
+def _weapon_keyword_items(description: str) -> tuple[str, ...]:
+    body = _weapon_keyword_body(description)
+    items = tuple(item.strip() for item in body.split(",") if item.strip())
+    if not items:
+        raise WahapediaBridgeError("Wahapedia weapon keyword list must not be empty.")
+    return items
+
+
+def _weapon_keyword_body(description: str) -> str:
+    stripped = description.strip()
+    if stripped.startswith("[") and stripped.endswith("]"):
+        stripped = stripped[1:-1].strip()
+    return stripped
+
+
+def _weapon_keyword_entry(raw_item: str) -> _WeaponKeywordEntry:
+    ability_text, target_condition = _weapon_keyword_condition(raw_item)
+    try:
+        return _weapon_keyword_entry_from_parts(
+            ability_text=ability_text,
+            target_keywords=() if target_condition is None else (target_condition,),
+        )
+    except WeaponProfileError as exc:
+        raise WahapediaBridgeError("Invalid Wahapedia weapon ability descriptor.") from exc
+
+
+def _weapon_keyword_condition(raw_item: str) -> tuple[str, str | None]:
+    parts = raw_item.split(":", maxsplit=1)
+    ability_text = parts[0].strip()
+    if not ability_text:
+        raise WahapediaBridgeError("Wahapedia weapon keyword must not be empty.")
+    if len(parts) == 1:
+        return ability_text, None
+    condition = parts[1].strip()
+    if not condition:
+        raise WahapediaBridgeError("Wahapedia weapon keyword condition must not be empty.")
+    return ability_text, condition
+
+
+def _weapon_keyword_entry_from_parts(
+    *,
+    ability_text: str,
+    target_keywords: tuple[str, ...],
+) -> _WeaponKeywordEntry:
+    valued = _valued_weapon_ability_entry(ability_text, target_keywords=target_keywords)
+    if valued is not None:
+        return valued
+    anti = _anti_weapon_ability_entry(ability_text)
+    if anti is not None:
+        if target_keywords:
+            raise WahapediaBridgeError("Anti weapon keywords do not support target conditions.")
+        return anti
+    canonical_by_key = {_name_key(keyword.value): keyword for keyword in WeaponKeyword}
+    keyword = canonical_by_key.get(_name_key(ability_text))
+    if keyword is None:
+        raise WahapediaBridgeError("Unsupported Wahapedia weapon keyword.")
+    ability = _unvalued_weapon_ability(keyword=keyword, target_keywords=target_keywords)
+    if target_keywords and ability is None:
+        raise WahapediaBridgeError("Unsupported conditioned Wahapedia weapon keyword.")
+    return _WeaponKeywordEntry(keyword=keyword, ability=ability)
+
+
+def _valued_weapon_ability_entry(
+    ability_text: str,
+    *,
+    target_keywords: tuple[str, ...],
+) -> _WeaponKeywordEntry | None:
+    match = re.fullmatch(
+        r"(?P<name>rapid[\s-]+fire|sustained[\s-]+hits|melta|cleave)\s+"
+        r"(?P<value>\d+)\+?",
+        ability_text.strip(),
+        re.IGNORECASE,
+    )
+    if match is None:
+        return None
+    value = _int_from_text(match.group("value"))
+    key = _name_key(match.group("name"))
+    if key == "rapid-fire":
+        return _WeaponKeywordEntry(
+            keyword=WeaponKeyword.RAPID_FIRE,
+            ability=AbilityDescriptor.rapid_fire(value, target_keywords=target_keywords),
+        )
+    if key == "sustained-hits":
+        return _WeaponKeywordEntry(
+            keyword=WeaponKeyword.SUSTAINED_HITS,
+            ability=AbilityDescriptor.sustained_hits(value, target_keywords=target_keywords),
+        )
+    if key == "melta":
+        return _WeaponKeywordEntry(
+            keyword=WeaponKeyword.MELTA,
+            ability=AbilityDescriptor.melta(value, target_keywords=target_keywords),
+        )
+    if key == "cleave":
+        return _WeaponKeywordEntry(
+            keyword=WeaponKeyword.CLEAVE,
+            ability=AbilityDescriptor.cleave(value, target_keywords=target_keywords),
+        )
+    raise WahapediaBridgeError("Unsupported valued Wahapedia weapon keyword.")
+
+
+def _anti_weapon_ability_entry(ability_text: str) -> _WeaponKeywordEntry | None:
+    match = re.fullmatch(
+        r"anti[\s-]+(?P<keyword>.+?)\s+(?P<threshold>[2-6])\+?",
+        ability_text.strip(),
+        re.IGNORECASE,
+    )
+    if match is None:
+        return None
+    keyword = match.group("keyword").strip()
+    match_mode = AntiKeywordMatchMode.HAS_KEYWORD
+    for prefix in ("non-", "non_", "non "):
+        if keyword.casefold().startswith(prefix):
+            keyword = keyword[len(prefix) :].strip()
+            match_mode = AntiKeywordMatchMode.MISSING_KEYWORD
+            break
+    return _WeaponKeywordEntry(
+        keyword=None,
+        ability=AbilityDescriptor.anti_keyword(
+            keyword,
+            _int_from_text(match.group("threshold")),
+            match_mode=match_mode,
+        ),
+    )
+
+
+def _unvalued_weapon_ability(
+    *,
+    keyword: WeaponKeyword,
+    target_keywords: tuple[str, ...],
+) -> AbilityDescriptor | None:
+    if keyword is WeaponKeyword.LETHAL_HITS:
+        return AbilityDescriptor.lethal_hits(target_keywords=target_keywords)
+    if keyword is WeaponKeyword.DEVASTATING_WOUNDS:
+        return AbilityDescriptor.devastating_wounds(target_keywords=target_keywords)
+    if keyword is WeaponKeyword.HEAVY:
+        if target_keywords:
+            raise WahapediaBridgeError("Heavy does not support target conditions.")
+        return AbilityDescriptor.heavy()
+    if keyword is WeaponKeyword.HUNTER:
+        if not target_keywords:
+            raise WahapediaBridgeError("Hunter requires target keywords.")
+        return AbilityDescriptor.hunter(target_keywords=target_keywords)
+    if keyword in {
+        WeaponKeyword.CLEAVE,
+        WeaponKeyword.MELTA,
+        WeaponKeyword.RAPID_FIRE,
+        WeaponKeyword.SUSTAINED_HITS,
+    }:
+        raise WahapediaBridgeError("Valued Wahapedia weapon keyword is missing its value.")
+    return None
 
 
 def _ability_timing_tags(name: str) -> str:

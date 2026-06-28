@@ -2923,6 +2923,7 @@ def _cleave_attack_bonus_for_target(
         profile,
         single_target=single_target,
         target_model_count=len(target_unit.alive_own_models()),
+        target_keywords=target_unit.keywords,
     )
 
 

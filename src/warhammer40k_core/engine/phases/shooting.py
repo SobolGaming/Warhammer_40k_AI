@@ -4919,6 +4919,7 @@ def _apply_phase13d_weapon_modifiers(
     rapid_bonus = rapid_fire_attack_bonus(
         weapon_profile,
         target_within_half_range=target_within_half_range,
+        target_keywords=target_rules_unit.keywords,
     )
     if rapid_bonus > 0:
         attacks += rapid_bonus
@@ -4933,6 +4934,7 @@ def _apply_phase13d_weapon_modifiers(
     melta_bonus = melta_damage_bonus(
         weapon_profile,
         target_within_half_range=target_within_half_range,
+        target_keywords=target_rules_unit.keywords,
     )
     if melta_bonus > 0:
         targeting_rule_ids.append(melta_rule_id(melta_bonus))

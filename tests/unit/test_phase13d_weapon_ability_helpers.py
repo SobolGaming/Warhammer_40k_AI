@@ -346,6 +346,64 @@ def test_phase14i_keyword_gated_weapon_abilities_match_target_keywords() -> None
     )
 
 
+def test_phase14i_non_keyword_gated_weapon_abilities_match_missing_target_keywords() -> None:
+    profile = _profile(
+        keywords=(
+            WeaponKeyword.DEVASTATING_WOUNDS,
+            WeaponKeyword.LETHAL_HITS,
+            WeaponKeyword.RAPID_FIRE,
+            WeaponKeyword.SUSTAINED_HITS,
+        ),
+        abilities=(
+            AbilityDescriptor.devastating_wounds(target_keywords=("non-MONSTER/VEHICLE",)),
+            AbilityDescriptor.lethal_hits(target_keywords=("non-MONSTER/VEHICLE",)),
+            AbilityDescriptor.rapid_fire(1, target_keywords=("non-MONSTER/VEHICLE",)),
+            AbilityDescriptor.sustained_hits(1, target_keywords=("non-MONSTER/VEHICLE",)),
+        ),
+    )
+
+    assert lethal_hits_applies(profile, target_keywords=("INFANTRY",))
+    assert not lethal_hits_applies(profile, target_keywords=("MONSTER",))
+    assert not lethal_hits_applies(profile, target_keywords=("VEHICLE",))
+    assert (
+        devastating_wounds_resolution(profile, target_keywords=("INFANTRY",))
+        is DevastatingWoundsResolution.MORTAL_WOUNDS
+    )
+    assert devastating_wounds_resolution(profile, target_keywords=("MONSTER",)) is None
+    assert (
+        weapon_ability_int_value(
+            profile,
+            AbilityKind.RAPID_FIRE,
+            target_keywords=("INFANTRY",),
+        )
+        == 1
+    )
+    assert (
+        weapon_ability_int_value(
+            profile,
+            AbilityKind.RAPID_FIRE,
+            target_keywords=("VEHICLE",),
+        )
+        is None
+    )
+    assert (
+        sustained_hits_generated_hits(
+            profile,
+            critical_hit=True,
+            target_keywords=("CHARACTER",),
+        )
+        == 2
+    )
+    assert (
+        sustained_hits_generated_hits(
+            profile,
+            critical_hit=True,
+            target_keywords=("MONSTER",),
+        )
+        == 1
+    )
+
+
 def test_phase14i_hunter_target_gate_is_target_eligibility() -> None:
     profile = _profile(
         keywords=(WeaponKeyword.HUNTER,),

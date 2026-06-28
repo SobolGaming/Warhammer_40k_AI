@@ -56,11 +56,14 @@ from warhammer40k_core.core.model_geometry_catalog import (
 from warhammer40k_core.core.ruleset import RulesetId
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
+    AbilityDescriptorPayload,
     AttackProfile,
     DamageProfile,
     RangeProfile,
     WeaponKeyword,
     WeaponProfile,
+    WeaponProfileError,
 )
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
@@ -429,6 +432,9 @@ def _weapon_profile_from_row(row: NormalizedSourceRow) -> WeaponProfile:
         damage_profile=_damage_profile_from_raw_text(_required_field(row=row, column_name="d")),
         keywords=_weapon_keywords_from_field(
             _optional_field(row=row, column_name="weapon_keywords") or ""
+        ),
+        abilities=_weapon_abilities_from_field(
+            _optional_field(row=row, column_name="weapon_abilities") or ""
         ),
         source_ids=_source_ids_from_row(row),
     )
@@ -985,6 +991,43 @@ def _weapon_keywords_from_field(value: str) -> tuple[WeaponKeyword, ...]:
         except ValueError as exc:
             raise CatalogGenerationError("Unsupported weapon keyword in source row.") from exc
     return tuple(sorted(keywords, key=lambda keyword: keyword.value))
+
+
+def _weapon_abilities_from_field(value: str) -> tuple[AbilityDescriptor, ...]:
+    if not value.strip():
+        return ()
+    try:
+        raw_payload: object = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise CatalogGenerationError("Weapon ability descriptor payload must be JSON.") from exc
+    if type(raw_payload) is not list:
+        raise CatalogGenerationError("Weapon ability descriptor payload must be a list.")
+    abilities: list[AbilityDescriptor] = []
+    for item in cast(list[object], raw_payload):
+        payload = _weapon_ability_payload(item)
+        try:
+            abilities.append(AbilityDescriptor.from_payload(payload))
+        except WeaponProfileError as exc:
+            raise CatalogGenerationError("Weapon ability descriptor payload is invalid.") from exc
+    return tuple(abilities)
+
+
+def _weapon_ability_payload(value: object) -> AbilityDescriptorPayload:
+    if type(value) is not dict:
+        raise CatalogGenerationError("Weapon ability descriptor item must be an object.")
+    mapping = cast(dict[str, object], value)
+    required_keys = {
+        "ability_id",
+        "name",
+        "ability_kind",
+        "parameters",
+        "target_keywords",
+        "timing",
+        "condition",
+    }
+    if set(mapping) != required_keys:
+        raise CatalogGenerationError("Weapon ability descriptor item has invalid keys.")
+    return cast(AbilityDescriptorPayload, mapping)
 
 
 def _has_required_height_fields(row: NormalizedSourceRow) -> bool:

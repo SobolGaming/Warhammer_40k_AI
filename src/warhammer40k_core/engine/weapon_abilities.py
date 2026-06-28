@@ -4,14 +4,17 @@ from enum import StrEnum
 from typing import cast
 
 from warhammer40k_core.core.weapon_profiles import (
+    TARGET_KEYWORD_MATCH_MODE_PARAMETER,
     AbilityDescriptor,
     AbilityKind,
     AntiKeywordMatchMode,
     DevastatingWoundsEffect,
+    TargetKeywordMatchMode,
     WeaponKeyword,
     WeaponProfile,
     anti_keyword_match_mode_from_token,
     devastating_wounds_effect_from_token,
+    target_keyword_match_mode_from_token,
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -145,8 +148,8 @@ def weapon_ability_applies(
         )
     if descriptors:
         return any(
-            _target_keyword_gate_matches(
-                descriptor.target_keywords,
+            _target_keyword_gate_matches_descriptor(
+                descriptor,
                 target_keywords=target_keywords,
             )
             for descriptor in descriptors
@@ -241,8 +244,8 @@ def hunter_target_allowed(profile: WeaponProfile, *, target_keywords: tuple[str,
             raise GameLifecycleError("Hunter requires a structured ability descriptor.")
         return True
     return any(
-        _target_keyword_gate_matches(
-            descriptor.target_keywords,
+        _target_keyword_gate_matches_descriptor(
+            descriptor,
             target_keywords=target_keywords,
         )
         for descriptor in descriptors
@@ -294,8 +297,13 @@ def anti_keyword_critical_threshold(
     return threshold
 
 
-def devastating_wounds_resolution(profile: WeaponProfile) -> DevastatingWoundsResolution | None:
+def devastating_wounds_resolution(
+    profile: WeaponProfile,
+    *,
+    target_keywords: tuple[str, ...] = (),
+) -> DevastatingWoundsResolution | None:
     _validate_weapon_profile(profile)
+    _target_keyword_set(target_keywords)
     descriptors = tuple(
         ability
         for ability in profile.abilities
@@ -309,19 +317,39 @@ def devastating_wounds_resolution(profile: WeaponProfile) -> DevastatingWoundsRe
         return None
     if not descriptors:
         raise GameLifecycleError("Devastating Wounds requires a structured ability descriptor.")
-    descriptor = descriptors[0]
-    if len(descriptor.parameters) != 1 or descriptor.parameters[0].name != "effect":
+    matching_descriptors = _matching_ability_descriptors(
+        profile,
+        AbilityKind.DEVASTATING_WOUNDS,
+        target_keywords=target_keywords,
+    )
+    if not matching_descriptors:
+        return None
+    descriptor = matching_descriptors[0]
+    effect = _ability_parameter_by_name_from_descriptor(
+        descriptor=descriptor,
+        parameter_name="effect",
+    )
+    if type(effect) is not str:
         raise GameLifecycleError("Devastating Wounds descriptor requires one effect parameter.")
-    effect = devastating_wounds_effect_from_token(descriptor.parameters[0].value)
-    if effect is DevastatingWoundsEffect.MORTAL_WOUNDS:
+    resolved_effect = devastating_wounds_effect_from_token(effect)
+    if resolved_effect is DevastatingWoundsEffect.MORTAL_WOUNDS:
         return DevastatingWoundsResolution.MORTAL_WOUNDS
-    if effect is DevastatingWoundsEffect.NO_SAVES:
+    if resolved_effect is DevastatingWoundsEffect.NO_SAVES:
         return DevastatingWoundsResolution.NO_SAVES
     raise GameLifecycleError("Unsupported Devastating Wounds effect.")
 
 
-def rapid_fire_attack_bonus(profile: WeaponProfile, *, target_within_half_range: bool) -> int:
-    value = weapon_ability_int_value(profile, AbilityKind.RAPID_FIRE)
+def rapid_fire_attack_bonus(
+    profile: WeaponProfile,
+    *,
+    target_within_half_range: bool,
+    target_keywords: tuple[str, ...] = (),
+) -> int:
+    value = weapon_ability_int_value(
+        profile,
+        AbilityKind.RAPID_FIRE,
+        target_keywords=target_keywords,
+    )
     if value is None or not target_within_half_range:
         return 0
     return value
@@ -336,9 +364,17 @@ def blast_attack_bonus(*, target_model_count: int) -> int:
 
 
 def cleave_attack_bonus(
-    profile: WeaponProfile, *, single_target: bool, target_model_count: int
+    profile: WeaponProfile,
+    *,
+    single_target: bool,
+    target_model_count: int,
+    target_keywords: tuple[str, ...] = (),
 ) -> int:
-    value = weapon_ability_int_value(profile, AbilityKind.CLEAVE)
+    value = weapon_ability_int_value(
+        profile,
+        AbilityKind.CLEAVE,
+        target_keywords=target_keywords,
+    )
     if value is None or not single_target:
         return 0
     if type(target_model_count) is not int:
@@ -348,8 +384,17 @@ def cleave_attack_bonus(
     return value * (target_model_count // 5)
 
 
-def melta_damage_bonus(profile: WeaponProfile, *, target_within_half_range: bool) -> int:
-    value = weapon_ability_int_value(profile, AbilityKind.MELTA)
+def melta_damage_bonus(
+    profile: WeaponProfile,
+    *,
+    target_within_half_range: bool,
+    target_keywords: tuple[str, ...] = (),
+) -> int:
+    value = weapon_ability_int_value(
+        profile,
+        AbilityKind.MELTA,
+        target_keywords=target_keywords,
+    )
     if value is None or not target_within_half_range:
         return 0
     return value
@@ -394,10 +439,12 @@ def heavy_rule_id() -> str:
 def _ability_parameter_value(descriptor: AbilityDescriptor) -> object:
     if type(descriptor) is not AbilityDescriptor:
         raise GameLifecycleError("Weapon ability lookup requires an ability descriptor.")
-    parameters = descriptor.parameters
-    if len(parameters) != 1 or parameters[0].name != "value":
+    value_parameters = tuple(
+        parameter for parameter in descriptor.parameters if parameter.name == "value"
+    )
+    if len(value_parameters) != 1:
         raise GameLifecycleError("Parameterized weapon ability requires one value parameter.")
-    return parameters[0].value
+    return value_parameters[0].value
 
 
 def _ability_descriptors(
@@ -418,8 +465,8 @@ def _matching_ability_descriptors(
         return tuple(
             descriptor
             for descriptor in _ability_descriptors(profile, ability_kind)
-            if _target_keyword_gate_matches(
-                descriptor.target_keywords,
+            if _target_keyword_gate_matches_descriptor(
+                descriptor,
                 target_keywords=target_keywords,
             )
             and _anti_keyword_descriptor_matches(
@@ -430,8 +477,8 @@ def _matching_ability_descriptors(
     return tuple(
         descriptor
         for descriptor in _ability_descriptors(profile, ability_kind)
-        if _target_keyword_gate_matches(
-            descriptor.target_keywords,
+        if _target_keyword_gate_matches_descriptor(
+            descriptor,
             target_keywords=target_keywords,
         )
     )
@@ -526,18 +573,39 @@ def _anti_keyword_descriptor_match_mode(descriptor: AbilityDescriptor) -> AntiKe
     return anti_keyword_match_mode_from_token(mode)
 
 
-def _target_keyword_gate_matches(
-    gate_keywords: tuple[str, ...],
+def _target_keyword_gate_matches_descriptor(
+    descriptor: AbilityDescriptor,
     *,
     target_keywords: tuple[str, ...],
 ) -> bool:
+    if type(descriptor) is not AbilityDescriptor:
+        raise GameLifecycleError("Weapon ability target gate requires an ability descriptor.")
+    gate_keywords = descriptor.target_keywords
     validated_gate_keywords = _validate_target_keyword_tuple(
         "Weapon ability target keyword gate",
         gate_keywords,
     )
     if not validated_gate_keywords:
         return True
-    return bool(set(validated_gate_keywords) & _target_keyword_set(target_keywords))
+    has_matching_keyword = bool(set(validated_gate_keywords) & _target_keyword_set(target_keywords))
+    match_mode = _target_keyword_match_mode_from_descriptor(descriptor)
+    if match_mode is TargetKeywordMatchMode.HAS_KEYWORD:
+        return has_matching_keyword
+    if match_mode is TargetKeywordMatchMode.MISSING_KEYWORD:
+        return not has_matching_keyword
+    raise GameLifecycleError("Unsupported target keyword match mode.")
+
+
+def _target_keyword_match_mode_from_descriptor(
+    descriptor: AbilityDescriptor,
+) -> TargetKeywordMatchMode:
+    mode = _optional_ability_parameter_by_name_from_descriptor(
+        descriptor=descriptor,
+        parameter_name=TARGET_KEYWORD_MATCH_MODE_PARAMETER,
+    )
+    if mode is None:
+        return TargetKeywordMatchMode.HAS_KEYWORD
+    return target_keyword_match_mode_from_token(mode)
 
 
 def _target_keyword_set(target_keywords: tuple[str, ...]) -> frozenset[str]:

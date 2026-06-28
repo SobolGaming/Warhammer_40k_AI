@@ -36,6 +36,12 @@ from warhammer40k_core.core.model_geometry_catalog import (
     GeometrySourceUnits,
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import (
+    AbilityKind,
+    AntiKeywordMatchMode,
+    TargetKeywordMatchMode,
+    WeaponKeyword,
+)
 from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
@@ -1898,6 +1904,104 @@ def test_phase17k_bridge_normalizes_core_keyword_ability_timing_and_parameters()
     assert fields_by_name["Deadly Demise D3"]["parameter_tokens"] == "D3"
 
 
+def test_phase17k_bridge_normalizes_conditioned_wargear_weapon_keywords() -> None:
+    artifacts = _conditioned_weapon_keyword_bridge_artifacts(
+        "[LETHAL HITS: non-MONSTER/VEHICLE, RAPID FIRE 1]"
+    )
+    wargear_row = _artifact_by_table(artifacts, "Datasheets_wargear").rows[0]
+    wargear_fields = wargear_row.runtime_fields_payload()
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=artifacts,
+    )
+    profile = package.army_catalog.wargear[0].weapon_profiles[0]
+    abilities_by_kind = {ability.ability_kind: ability for ability in profile.abilities}
+    lethal = abilities_by_kind[AbilityKind.LETHAL_HITS]
+
+    assert wargear_fields["weapon_keywords"] == "Lethal Hits,Rapid Fire"
+    assert wargear_fields["weapon_abilities"]
+    assert tuple(keyword.value for keyword in profile.keywords) == (
+        WeaponKeyword.LETHAL_HITS.value,
+        WeaponKeyword.RAPID_FIRE.value,
+    )
+    assert lethal.target_keywords == ("MONSTER", "VEHICLE")
+    assert {parameter.name: parameter.value for parameter in lethal.parameters} == {
+        "target_keyword_match_mode": TargetKeywordMatchMode.MISSING_KEYWORD.value
+    }
+    assert abilities_by_kind[AbilityKind.RAPID_FIRE].parameters[0].value == 1
+
+
+def test_phase17k_bridge_normalizes_conditioned_valued_and_anti_weapon_keywords() -> None:
+    artifacts = _conditioned_weapon_keyword_bridge_artifacts(
+        "[SUSTAINED HITS 2: non-MONSTER/VEHICLE, MELTA 3: MONSTER, "
+        "CLEAVE 4: INFANTRY, DEVASTATING WOUNDS: MONSTER, "
+        "HUNTER: non-MONSTER/VEHICLE, ANTI-non-PSYKER 2+]"
+    )
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=artifacts,
+    )
+    profile = package.army_catalog.wargear[0].weapon_profiles[0]
+    abilities_by_kind = {ability.ability_kind: ability for ability in profile.abilities}
+    sustained = abilities_by_kind[AbilityKind.SUSTAINED_HITS]
+    melta = abilities_by_kind[AbilityKind.MELTA]
+    cleave = abilities_by_kind[AbilityKind.CLEAVE]
+    devastating = abilities_by_kind[AbilityKind.DEVASTATING_WOUNDS]
+    hunter = abilities_by_kind[AbilityKind.HUNTER]
+    anti = abilities_by_kind[AbilityKind.ANTI_KEYWORD]
+
+    assert tuple(keyword.value for keyword in profile.keywords) == (
+        WeaponKeyword.CLEAVE.value,
+        WeaponKeyword.DEVASTATING_WOUNDS.value,
+        WeaponKeyword.HUNTER.value,
+        WeaponKeyword.MELTA.value,
+        WeaponKeyword.SUSTAINED_HITS.value,
+    )
+    assert sustained.target_keywords == ("MONSTER", "VEHICLE")
+    assert {parameter.name: parameter.value for parameter in sustained.parameters} == {
+        "target_keyword_match_mode": TargetKeywordMatchMode.MISSING_KEYWORD.value,
+        "value": 2,
+    }
+    assert melta.target_keywords == ("MONSTER",)
+    assert melta.parameters[0].value == 3
+    assert cleave.target_keywords == ("INFANTRY",)
+    assert cleave.parameters[0].value == 4
+    assert devastating.target_keywords == ("MONSTER",)
+    assert hunter.target_keywords == ("MONSTER", "VEHICLE")
+    assert {parameter.name: parameter.value for parameter in hunter.parameters} == {
+        "target_keyword_match_mode": TargetKeywordMatchMode.MISSING_KEYWORD.value
+    }
+    assert {parameter.name: parameter.value for parameter in anti.parameters} == {
+        "keyword": "PSYKER",
+        "match_mode": AntiKeywordMatchMode.MISSING_KEYWORD.value,
+        "threshold": 2,
+    }
+
+
+@pytest.mark.parametrize(
+    ("description", "message"),
+    [
+        ("[]", "weapon keyword list must not be empty"),
+        ("[: MONSTER]", "weapon keyword must not be empty"),
+        ("[LETHAL HITS:]", "weapon keyword condition must not be empty"),
+        ("[ANTI-INFANTRY 4+: MONSTER]", "Anti weapon keywords do not support target conditions"),
+        ("[EXTRA ATTACKS: MONSTER]", "Unsupported conditioned Wahapedia weapon keyword"),
+        ("[RAPID FIRE]", "Valued Wahapedia weapon keyword is missing its value"),
+        ("[UNKNOWN]", "Unsupported Wahapedia weapon keyword"),
+        ("[LETHAL HITS, LETHAL HITS]", "must not duplicate"),
+        ("[LETHAL HITS: non-]", "Invalid Wahapedia weapon ability descriptor"),
+    ],
+)
+def test_phase17k_bridge_rejects_invalid_conditioned_wargear_weapon_keywords(
+    description: str,
+    message: str,
+) -> None:
+    with pytest.raises(WahapediaBridgeError, match=message):
+        _conditioned_weapon_keyword_bridge_artifacts(description)
+
+
 def test_phase17k_bridge_tags_warlord_mustering_datasheet_abilities() -> None:
     artifacts = build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=_warlord_mustering_source_artifacts(),
@@ -2848,6 +2952,102 @@ def _keyword_ability_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
         _artifact_from_csv(
             "Datasheets_unit_composition",
             "\n".join(("datasheet_id,line,description", "test-keyword-unit,1,1 Alpha")),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _conditioned_weapon_keyword_bridge_artifacts(
+    description: str,
+) -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_conditioned_weapon_keyword_source_artifacts(description),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-condition-keyword-unit",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-condition-keyword-unit",
+                model_name="Alpha",
+                height=1.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="test-source:condition-keyword-height",
+                height_document_reference="test-doc:condition-keyword-height",
+            ),
+        ),
+    )
+
+
+def _conditioned_weapon_keyword_source_artifacts(
+    description: str,
+) -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Test Army Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-condition-keyword-unit,Condition Keyword Unit,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-condition-keyword-unit,1,Faction,test-army-rule,"
+                        "Test Army Rule,Test rule text.,"
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-condition-keyword-unit,Infantry,,false",
+                    "test-condition-keyword-unit,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    (
+                        "test-condition-keyword-unit,1,1,Aperture rifle,Ranged,24,2,3,4,-1,1,"
+                        f'"{description}"'
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-condition-keyword-unit,1,6,4,3,-,2,7,1,32mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(("datasheet_id,line,description", "test-condition-keyword-unit,1,1 Alpha")),
         ),
         _artifact_from_csv(
             "Factions",
