@@ -179,6 +179,12 @@ EMPERORS_CHILDREN_THRILL_SEEKERS_RUNTIME_CONSUMERS = (
 GREY_KNIGHTS_GATE_OF_INFINITY_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:grey_knights:army_rule:gate_of_infinity",
 )
+GENESTEALER_CULTS_CULT_AMBUSH_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush",
+    "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:initial_resurgence",
+    "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker_ingress",
+    "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:unit_destroyed",
+)
 IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric",
     "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:charge-roll",
@@ -252,6 +258,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "death-guard": "Nurgle's Gift",
     "drukhari": "Power from Pain",
     "emperors-children": "Thrill Seekers",
+    "genestealer-cults": "Cult Ambush",
     "grey-knights": "Gate of Infinity",
     "imperial-knights": "Code Chivalric",
     "leagues-of-votann": "Prioritised Efficiency",
@@ -273,6 +280,7 @@ FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID = {
     "death-guard": DEATH_GUARD_NURGLES_GIFT_RUNTIME_CONSUMERS,
     "drukhari": DRUKHARI_POWER_FROM_PAIN_RUNTIME_CONSUMERS,
     "emperors-children": EMPERORS_CHILDREN_THRILL_SEEKERS_RUNTIME_CONSUMERS,
+    "genestealer-cults": GENESTEALER_CULTS_CULT_AMBUSH_RUNTIME_CONSUMERS,
     "grey-knights": GREY_KNIGHTS_GATE_OF_INFINITY_RUNTIME_CONSUMERS,
     "imperial-knights": IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS,
     "leagues-of-votann": LEAGUES_OF_VOTANN_PRIORITISED_EFFICIENCY_RUNTIME_CONSUMERS,

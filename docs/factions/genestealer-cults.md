@@ -8,7 +8,7 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_genestealer_cults-ee2tg004ty-
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 0 | 20 | 30 | 0 |
+| 9 | 0 | 20 | 30 | 1 |
 
 ## Detachment Rule Support
 

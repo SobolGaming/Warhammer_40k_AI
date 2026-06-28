@@ -2373,6 +2373,26 @@ def _structured_support_sections_markdown() -> list[str]:
                     ),
                 ),
                 SupportSectionRow(
+                    "Genestealer Cults - Cult Ambush",
+                    (
+                        "Named army-rule handler plus faction-resource ledger, "
+                        "destroyed-unit resurgence, marker placement, and marker ingress hosts"
+                    ),
+                    "Adapter contract, decision catalog, source coverage, and generated matrix",
+                    (
+                        "Focused setup, destroyed-unit, marker placement/removal, reserves, "
+                        "ingress, invalid-submission, replay-safe record, and routing tests"
+                    ),
+                    "Full",
+                    (
+                        "Implements battle-size Resurgence points, optional destroyed-unit "
+                        "replacement spending, Cult Ambush marker placement and removal, "
+                        "marker-based ingress including battle round 1, Strategic Reserves "
+                        "arrival, Rapid Ingress exclusion, and third-round auto-destroy "
+                        "exemption."
+                    ),
+                ),
+                SupportSectionRow(
                     "Tyranids - Shadow in the Warp and Synapse",
                     (
                         "Command-phase-start faction-rule hook plus Battle-shock and "

@@ -36,6 +36,7 @@ from warhammer40k_core.core.model_geometry_catalog import (
     GeometrySourceUnits,
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityExecutionContext,
@@ -876,6 +877,12 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     for row in rows:
         rows_by_name.setdefault(row.ability_name, []).append(row)
     categories_by_name = {row.category_name: row for row in category_rows}
+    cult_ambush_runtime_ids = (
+        genestealer_cults_cult_ambush.SOURCE_RULE_ID,
+        genestealer_cults_cult_ambush.BATTLE_FORMATION_HOOK_ID,
+        genestealer_cults_cult_ambush.UNIT_DESTROYED_HOOK_ID,
+        genestealer_cults_cult_ambush.TURN_END_HOOK_ID,
+    )
 
     assert ability_coverage_rows_payload(rows) == snapshot
     assert ability_coverage_category_rows_payload(category_rows) == category_snapshot
@@ -902,6 +909,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in generated_markdown
     assert (
         "| Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |"
+    ) in generated_markdown
+    assert (
+        "| Genestealer Cults | 9 | 0 | 20 | 30 | 1 | "
+        "[genestealer-cults](factions/genestealer-cults.md) |"
     ) in generated_markdown
     assert "| Tyranids | 10 | 0 | 32 | 48 | 1 | [tyranids](factions/tyranids.md) |" in (
         generated_markdown
@@ -948,6 +959,11 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Focused ritual, invalid-submission, movement, modifier, and wound tests | Full |"
     ) in generated_markdown
     assert (
+        "| Genestealer Cults - Cult Ambush | "
+        "Named army-rule handler plus faction-resource ledger, destroyed-unit resurgence, "
+        "marker placement, and marker ingress hosts |"
+    ) in generated_markdown
+    assert (
         "| Tyranids - Shadow in the Warp and Synapse | "
         "Command-phase-start faction-rule hook plus Battle-shock and "
         "weapon-profile modifiers | "
@@ -964,11 +980,13 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in generated_markdown
     aeldari_markdown = generated_faction_markdown["aeldari.md"]
     chaos_daemons_markdown = generated_faction_markdown["chaos-daemons.md"]
+    genestealer_cults_markdown = generated_faction_markdown["genestealer-cults.md"]
     imperial_knights_markdown = generated_faction_markdown["imperial-knights.md"]
     tyranids_markdown = generated_faction_markdown["tyranids.md"]
     assert "## Detachment Rule Support" in aeldari_markdown
     assert "## Detachment Rule Support" in chaos_daemons_markdown
     assert "| Supported detachment rules |" in chaos_daemons_markdown
+    assert "| 9 | 0 | 20 | 30 | 1 |" in genestealer_cults_markdown
     assert "| 8 | 0 | 24 | 36 | 1 |" in imperial_knights_markdown
     assert "| 10 | 0 | 32 | 48 | 1 |" in tyranids_markdown
     assert (
@@ -1034,6 +1052,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         f"| `{thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID}` | "
         "Cabal of Sorcerers - Weapon Profile |"
     ) in generated_markdown
+    for runtime_id in cult_ambush_runtime_ids:
+        assert f"| `{runtime_id}` | Cult Ambush |" in generated_markdown
     assert (
         f"| `{tyranids_army_rule.HOOK_ID}` | Shadow in the Warp / Synapse |"
     ) in generated_markdown
@@ -1114,6 +1134,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert all(
         row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Cult Ambush"]
+    )
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
         for row in rows_by_name["Shadow in the Warp / Synapse"]
     )
     assert all(
@@ -1144,6 +1168,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Cabal of Sorcerers"]) == (
         "Thousand Sons",
+    )
+    assert tuple(row.datasheet_name for row in rows_by_name["Cult Ambush"]) == (
+        "Genestealer Cults",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Shadow in the Warp / Synapse"]) == (
         "Tyranids",
@@ -1194,6 +1221,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         thousand_sons_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
         thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID,
     }
+    assert set(rows_by_name["Cult Ambush"][0].runtime_consumer_ids) == set(cult_ambush_runtime_ids)
     assert set(rows_by_name["Shadow in the Warp / Synapse"][0].runtime_consumer_ids) == {
         tyranids_army_rule.HOOK_ID,
         tyranids_army_rule.BATTLE_SHOCK_HOOK_ID,
@@ -1210,6 +1238,14 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
             thousand_sons_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
             thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID,
         }
+        for row_payload in snapshot
+    )
+    assert any(
+        row_payload["ability_id"] == genestealer_cults_cult_ambush.SOURCE_RULE_ID
+        and row_payload["ability_name"] == "Cult Ambush"
+        and row_payload["datasheet_name"] == "Genestealer Cults"
+        and row_payload["support_stage"] == AbilityCoverageSupportStage.ENGINE_CONSUMED.value
+        and set(row_payload["runtime_consumer_ids"]) == set(cult_ambush_runtime_ids)
         for row_payload in snapshot
     )
     assert any(
@@ -1337,6 +1373,13 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert categories_by_name["Faction Army Rule Cabal Of Sorcerers"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
     )
+    assert categories_by_name["Faction Army Rule Cult Ambush"].ability_names == ("Cult Ambush",)
+    assert categories_by_name["Faction Army Rule Cult Ambush"].runtime_consumer_ids == tuple(
+        sorted(cult_ambush_runtime_ids)
+    )
+    assert categories_by_name["Faction Army Rule Cult Ambush"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
     assert categories_by_name["Faction Army Rule Shadow In The Warp Synapse"].ability_names == (
         "Shadow in the Warp / Synapse",
     )
@@ -1360,6 +1403,13 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
             tyranids_army_rule.BATTLE_SHOCK_HOOK_ID,
             tyranids_army_rule.WEAPON_PROFILE_MODIFIER_ID,
         }
+        for row_payload in category_snapshot
+    )
+    assert any(
+        row_payload["category_name"] == "Faction Army Rule Cult Ambush"
+        and row_payload["ability_names"] == ["Cult Ambush"]
+        and row_payload["support_stages"] == [AbilityCoverageSupportStage.ENGINE_CONSUMED.value]
+        and set(row_payload["runtime_consumer_ids"]) == set(cult_ambush_runtime_ids)
         for row_payload in category_snapshot
     )
     assert categories_by_name["Unknown Abilities"].ability_names == (
