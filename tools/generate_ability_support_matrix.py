@@ -33,6 +33,9 @@ from warhammer40k_core.engine.faction_content.manifest import RuntimeContentSupp
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
     army_rule as adepta_sororitas_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adeptus_custodes import (
+    army_rule as adeptus_custodes_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.astra_militarum import (
     army_rule as astra_militarum_army_rule,
 )
@@ -492,6 +495,9 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts": ("Warp Rifts"),
     adepta_sororitas_army_rule.BATTLE_ROUND_START_HOOK_ID: "Acts of Faith",
     adepta_sororitas_army_rule.UNIT_DESTROYED_HOOK_ID: "Acts of Faith",
+    adeptus_custodes_army_rule.DACATARAI_HOOK_ID: "Martial Ka'tah - Dacatarai",
+    adeptus_custodes_army_rule.RENDAX_HOOK_ID: "Martial Ka'tah - Rendax",
+    adeptus_custodes_army_rule.WEAPON_PROFILE_MODIFIER_ID: "Martial Ka'tah - Weapon Profile",
     "warhammer_40000_11th:drukhari:army_rule:power_from_pain:battle-shock-failed": (
         "Power from Pain"
     ),

@@ -146,6 +146,7 @@ IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS = (
 )
 SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "adepta-sororitas": "Acts of Faith",
+    "adeptus-custodes": "Martial Ka'tah",
     "aeldari": "Battle Focus",
     "astra-militarum": "Voice of Command",
     "black-templars": "Templar Vows",

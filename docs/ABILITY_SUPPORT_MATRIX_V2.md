@@ -149,7 +149,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Adepta Sororitas | 8 | 0 | 20 | 30 | 1 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 0 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
 | Imperial Knights | 8 | 0 | 24 | 36 | 1 | [imperial-knights](factions/imperial-knights.md) |
-| Adeptus Custodes | 9 | 0 | 24 | 36 | 0 | [adeptus-custodes](factions/adeptus-custodes.md) |
+| Adeptus Custodes | 9 | 0 | 24 | 36 | 1 | [adeptus-custodes](factions/adeptus-custodes.md) |
 | Imperial Agents | 5 | 0 | 20 | 30 | 0 | [imperial-agents](factions/imperial-agents.md) |
 
 ## Datasheet Abilities
@@ -257,6 +257,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start` | Acts of Faith |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed` | Acts of Faith |
+| `warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:dacatarai` | Martial Ka'tah - Dacatarai |
+| `warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:rendax` | Martial Ka'tah - Rendax |
+| `warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:weapon-profile` | Martial Ka'tah - Weapon Profile |
 | `warhammer_40000_11th:aeldari:army_rule:fade_back` | Battle Focus - Fade Back |
 | `warhammer_40000_11th:aeldari:army_rule:flitting_shadows` | Battle Focus - Flitting Shadows |
 | `warhammer_40000_11th:aeldari:army_rule:opportunity_seized` | Battle Focus - Opportunity Seized |

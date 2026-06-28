@@ -128,6 +128,11 @@ ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start",
     "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed",
 )
+ADEPTUS_CUSTODES_MARTIAL_KATAH_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:dacatarai",
+    "warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:rendax",
+    "warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:weapon-profile",
+)
 ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command",
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock",
@@ -254,6 +259,7 @@ WORLD_EATERS_BLESSINGS_OF_KHORNE_RUNTIME_CONSUMERS = (
 )
 FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "adepta-sororitas": "Acts of Faith",
+    "adeptus-custodes": "Martial Ka'tah",
     "aeldari": "Battle Focus",
     "astra-militarum": "Voice of Command",
     "black-templars": "Templar Vows",
@@ -277,6 +283,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
 }
 FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID = {
     "adepta-sororitas": ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMERS,
+    "adeptus-custodes": ADEPTUS_CUSTODES_MARTIAL_KATAH_RUNTIME_CONSUMERS,
     "aeldari": AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMERS,
     "astra-militarum": ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS,
     "black-templars": BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS,

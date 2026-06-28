@@ -68,17 +68,20 @@ SPACE_MARINES_FACTION_ID = "space-marines"
 CHAOS_SPACE_MARINES_FACTION_ID = "chaos-space-marines"
 AELDARI_FACTION_ID = "aeldari"
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
+ADEPTUS_CUSTODES_FACTION_ID = "adeptus-custodes"
 
 SPACE_MARINES_FACTION_ALIAS = "Adeptus Astartes"
 CHAOS_SPACE_MARINES_FACTION_ALIAS = "Heretic Astartes"
 AELDARI_FACTION_ALIAS = "Asuryani"
 CHAOS_DAEMONS_FACTION_ALIAS = "Legiones Daemonica"
+ADEPTUS_CUSTODES_FACTION_ALIAS = "Adeptus Custodes"
 
 FACTION_ALIAS_SOURCE_PREFIX = "core-v2:faction-reference-aliases"
 SPACE_MARINES_FACTION_ALIAS_SOURCE_ID = f"{FACTION_ALIAS_SOURCE_PREFIX}:space-marines"
 CHAOS_SPACE_MARINES_FACTION_ALIAS_SOURCE_ID = f"{FACTION_ALIAS_SOURCE_PREFIX}:chaos-space-marines"
 AELDARI_FACTION_ALIAS_SOURCE_ID = f"{FACTION_ALIAS_SOURCE_PREFIX}:aeldari"
 CHAOS_DAEMONS_FACTION_ALIAS_SOURCE_ID = f"{FACTION_ALIAS_SOURCE_PREFIX}:chaos-daemons"
+ADEPTUS_CUSTODES_FACTION_ALIAS_SOURCE_ID = f"{FACTION_ALIAS_SOURCE_PREFIX}:adeptus-custodes"
 
 
 def faction_aliases() -> tuple[FactionAliasDefinition, ...]:
@@ -155,6 +158,12 @@ _FACTION_ALIASES: tuple[FactionAliasDefinition, ...] = (
         name="Chaos Daemons",
         keyword=CHAOS_DAEMONS_FACTION_ALIAS,
         source_id=CHAOS_DAEMONS_FACTION_ALIAS_SOURCE_ID,
+    ),
+    FactionAliasDefinition.from_primary_keyword(
+        faction_id=ADEPTUS_CUSTODES_FACTION_ID,
+        name="Adeptus Custodes",
+        keyword=ADEPTUS_CUSTODES_FACTION_ALIAS,
+        source_id=ADEPTUS_CUSTODES_FACTION_ALIAS_SOURCE_ID,
     ),
 )
 _FACTION_ALIASES_BY_ID = {definition.faction_id: definition for definition in _FACTION_ALIASES}
