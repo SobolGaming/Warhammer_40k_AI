@@ -100,6 +100,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sorori
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adeptus_custodes import (
     army_rule as adeptus_custodes_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adeptus_mechanicus import (
+    army_rule as adeptus_mechanicus_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as chaos_space_marines_army_rule,
 )
@@ -898,6 +901,11 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         adeptus_custodes_army_rule.RENDAX_HOOK_ID,
         adeptus_custodes_army_rule.WEAPON_PROFILE_MODIFIER_ID,
     )
+    adeptus_mechanicus_runtime_ids = (
+        adeptus_mechanicus_army_rule.HOOK_ID,
+        adeptus_mechanicus_army_rule.PROTECTOR_HIT_MODIFIER_ID,
+        adeptus_mechanicus_army_rule.WEAPON_PROFILE_MODIFIER_ID,
+    )
 
     assert ability_coverage_rows_payload(rows) == snapshot
     assert ability_coverage_category_rows_payload(category_rows) == category_snapshot
@@ -940,6 +948,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| Adeptus Custodes | 9 | 0 | 24 | 36 | 1 | "
         "[adeptus-custodes](factions/adeptus-custodes.md) |"
     ) in generated_markdown
+    assert (
+        "| Adeptus Mechanicus | 10 | 0 | 28 | 42 | 1 | "
+        "[adeptus-mechanicus](factions/adeptus-mechanicus.md) |"
+    ) in generated_markdown
     assert "| Grey Knights - Gate of Infinity | Named army-rule handler |" in generated_markdown
     assert (
         "| Adepta Sororitas - Acts of Faith | "
@@ -951,6 +963,14 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Adapter contract, decision catalog, source coverage, and generated matrix | "
         "Focused grant, decision, runtime-modifier, source coverage, and fail-fast tests | "
         "Full |"
+    ) in generated_markdown
+    assert (
+        "| Adeptus Mechanicus - Doctrina Imperatives | "
+        "Battle-round-start Imperative selection plus weapon-profile and Protector "
+        "melee hit-roll modifiers | "
+        "Adapter contract, source coverage, generated matrix, and runtime inventory | "
+        "Focused battle-round selection, invalid-submission, attached-unit, aura, "
+        "and runtime-modifier tests | Full |"
     ) in generated_markdown
     assert (
         "| Leagues of Votann - Prioritised Efficiency | "
@@ -1015,6 +1035,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     aeldari_markdown = generated_faction_markdown["aeldari.md"]
     adepta_sororitas_markdown = generated_faction_markdown["adepta-sororitas.md"]
     adeptus_custodes_markdown = generated_faction_markdown["adeptus-custodes.md"]
+    adeptus_mechanicus_markdown = generated_faction_markdown["adeptus-mechanicus.md"]
     chaos_daemons_markdown = generated_faction_markdown["chaos-daemons.md"]
     genestealer_cults_markdown = generated_faction_markdown["genestealer-cults.md"]
     imperial_knights_markdown = generated_faction_markdown["imperial-knights.md"]
@@ -1024,6 +1045,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "| Supported detachment rules |" in chaos_daemons_markdown
     assert "| 8 | 0 | 20 | 30 | 1 |" in adepta_sororitas_markdown
     assert "| 9 | 0 | 24 | 36 | 1 |" in adeptus_custodes_markdown
+    assert "| 10 | 0 | 28 | 42 | 1 |" in adeptus_mechanicus_markdown
     assert "| 9 | 0 | 20 | 30 | 1 |" in genestealer_cults_markdown
     assert "| 8 | 0 | 24 | 36 | 1 |" in imperial_knights_markdown
     assert "| 10 | 0 | 32 | 48 | 1 |" in tyranids_markdown
@@ -1084,6 +1106,17 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert (
         f"| `{adeptus_custodes_army_rule.WEAPON_PROFILE_MODIFIER_ID}` | "
         "Martial Ka'tah - Weapon Profile |"
+    ) in generated_markdown
+    assert (
+        f"| `{adeptus_mechanicus_army_rule.HOOK_ID}` | Doctrina Imperatives |"
+    ) in generated_markdown
+    assert (
+        f"| `{adeptus_mechanicus_army_rule.PROTECTOR_HIT_MODIFIER_ID}` | "
+        "Doctrina Imperatives - Protector Melee Hit Roll |"
+    ) in generated_markdown
+    assert (
+        f"| `{adeptus_mechanicus_army_rule.WEAPON_PROFILE_MODIFIER_ID}` | "
+        "Doctrina Imperatives - Weapon Profile |"
     ) in generated_markdown
     assert f"| `{imperial_knights_army_rule.BONDSMAN_HOOK_ID}` | Bondsman |" in (generated_markdown)
     assert (
@@ -1192,6 +1225,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert all(
         row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Doctrina Imperatives"]
+    )
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
         for row in rows_by_name["Shadow in the Warp / Synapse"]
     )
     assert all(
@@ -1231,6 +1268,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Martial Ka'tah"]) == (
         "Adeptus Custodes",
+    )
+    assert tuple(row.datasheet_name for row in rows_by_name["Doctrina Imperatives"]) == (
+        "Adeptus Mechanicus",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Shadow in the Warp / Synapse"]) == (
         "Tyranids",
@@ -1288,6 +1328,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert set(rows_by_name["Martial Ka'tah"][0].runtime_consumer_ids) == set(
         adeptus_custodes_runtime_ids
     )
+    assert set(rows_by_name["Doctrina Imperatives"][0].runtime_consumer_ids) == set(
+        adeptus_mechanicus_runtime_ids
+    )
     assert set(rows_by_name["Shadow in the Warp / Synapse"][0].runtime_consumer_ids) == {
         tyranids_army_rule.HOOK_ID,
         tyranids_army_rule.BATTLE_SHOCK_HOOK_ID,
@@ -1331,6 +1374,14 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         for row_payload in snapshot
     )
     assert any(
+        row_payload["ability_id"] == adeptus_mechanicus_army_rule.HOOK_ID
+        and row_payload["ability_name"] == "Doctrina Imperatives"
+        and row_payload["datasheet_name"] == "Adeptus Mechanicus"
+        and row_payload["support_stage"] == AbilityCoverageSupportStage.ENGINE_CONSUMED.value
+        and set(row_payload["runtime_consumer_ids"]) == set(adeptus_mechanicus_runtime_ids)
+        for row_payload in snapshot
+    )
+    assert any(
         row_payload["ability_id"] == tyranids_army_rule.HOOK_ID
         and row_payload["ability_name"] == "Shadow in the Warp / Synapse"
         and row_payload["datasheet_name"] == "Tyranids"
@@ -1368,6 +1419,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert categories_by_name["Faction Army Rule Bondsman"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
     )
+    assert categories_by_name["Faction Army Rule Doctrina Imperatives"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["Faction Army Rule Doctrina Imperatives"].datasheet_names == (
+        "Adeptus Mechanicus",
+    )
+    assert set(
+        categories_by_name["Faction Army Rule Doctrina Imperatives"].runtime_consumer_ids
+    ) == set(adeptus_mechanicus_runtime_ids)
     assert categories_by_name["Leadership Characteristic"].ability_names == ("Daemonic Icon",)
     assert categories_by_name["Leadership Characteristic"].datasheet_names == (
         "Bloodcrushers",
