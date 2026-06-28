@@ -109,6 +109,7 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | Space Marines - Oath of Moment and Space Marine Chapters | Named army-rule handler plus shared mustering/list-validation host | README, adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase, reroll, wound-modifier, and mustering tests | Full | Implements Command phase Oath target selection, target-scoped Hit-roll rerolls, Codex Space Marines Detachment Wound-roll bonus gating, and Black Templars, Space Wolves, and Deathwatch roster restrictions. |
 | T'au Empire - For the Greater Good | Shooting-phase-start faction-rule hook plus weapon-profile modifier | Adapter contract, decision catalog, source coverage, and generated matrix | Focused shooting-start, invalid-submission, and runtime-modifier tests | Full | Implements Observer/Spotted selections, target-centric Guided Ballistic Skill improvement, and Markerlight [IGNORES COVER]. Selected-shooter-specific Guided identity is deferred if future rules require it. |
 | Thousand Sons - Cabal of Sorcerers | Shooting-phase-start faction-rule hook plus weapon-profile and mortal-wound Feel No Pain hooks | Adapter contract, decision catalog, source coverage, and generated matrix | Focused ritual, invalid-submission, movement, modifier, and wound tests | Full | Implements Shooting-start ritual selections, Psychic tests with optional Channel the Warp perils, Destiny's Ruin hit rerolls, Temporal Surge movement proposals and charge lockout, Doombolt mortal wounds, and Twist of Fate AP modifiers. |
+| Tyranids - Shadow in the Warp and Synapse | Command-phase-start faction-rule hook plus Battle-shock and weapon-profile modifiers | README, adapter contract, decision catalog, source coverage, and generated matrix | Focused command-phase, Battle-shock, and runtime-modifier tests | Full | Implements once-per-battle Shadow in the Warp in either player's Command phase, forced enemy Battle-shock tests, Synapse 3D6 Battle-shock tests, Synapse-range Shadow penalties, and melee Strength modifiers. |
 | Necrons - Reanimation Protocols | Named army-rule handler plus shared Healing Wounds resolver | README, adapter contract, decision catalog, architecture, and generated matrix | Focused command-phase healing, revival, and validation tests | Full | Implements Command phase rules-unit activation, source-backed D3 healing, destroyed-model revival, attached rules-unit identity, stale rules-unit rejection, and owning-player healing selections. |
 | Leagues of Votann - Prioritised Efficiency | Named army-rule handler plus faction-resource ledger | README, generated matrix, and source coverage | Focused command-phase, scoring, mode, and runtime-modifier tests | Full | Implements deterministic Yield Point gains from Command phase objective control, Hostile Acquisition and Fortify Takeover modes, and mode-scoped Hit/Wound modifiers. |
 | Drukhari - Power from Pain | Named army-rule handler plus faction-resource ledger | README, faction integration note, adapter contract, and generated matrix | Focused faction runtime tests | Full | Implements Pain token gain at own Command phase start, enemy unit destruction, and enemy Battle-shock failure, plus optional Lithe Agility empowerment for Advance and Charge rerolls and Hatred Eternal selected-to-shoot/selected-to-fight empowerment for attack hit rerolls. |
@@ -123,7 +124,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Orks | 12 | 0 | 44 | 66 | 1 | [orks](factions/orks.md) |
 | Aeldari | 15 | 2 | 51 | 75 | 16 | [aeldari](factions/aeldari.md) |
 | Drukhari | 9 | 0 | 24 | 36 | 1 | [drukhari](factions/drukhari.md) |
-| Tyranids | 10 | 0 | 32 | 48 | 0 | [tyranids](factions/tyranids.md) |
+| Tyranids | 10 | 0 | 32 | 48 | 1 | [tyranids](factions/tyranids.md) |
 | Genestealer Cults | 9 | 0 | 20 | 30 | 0 | [genestealer-cults](factions/genestealer-cults.md) |
 | Necrons | 12 | 0 | 36 | 54 | 1 | [necrons](factions/necrons.md) |
 | Leagues of Votann | 10 | 0 | 28 | 42 | 1 | [leagues-of-votann](factions/leagues-of-votann.md) |
@@ -382,6 +383,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers` | Cabal of Sorcerers |
 | `warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:mortal-wound-feel-no-pain` | Cabal of Sorcerers - Mortal Wound Feel No Pain |
 | `warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:weapon-profile` | Cabal of Sorcerers - Weapon Profile |
+| `warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp` | Shadow In The Warp |
+| `warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp:battle-shock` | Battle Shock |
+| `warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp:synapse:weapon-profile` | Weapon Profile |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne` | Blessings of Khorne |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration` | Blessings of Khorne - Rage-fuelled Invigoration |
 | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage` | Blessings of Khorne - Total Carnage |

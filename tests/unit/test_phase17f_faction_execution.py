@@ -122,6 +122,11 @@ THOUSAND_SONS_CABAL_OF_SORCERERS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:mortal-wound-feel-no-pain",
     "warhammer_40000_11th:thousand_sons:army_rule:cabal_of_sorcerers:weapon-profile",
 )
+TYRANIDS_SHADOW_IN_THE_WARP_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp",
+    "warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp:battle-shock",
+    "warhammer_40000_11th:tyranids:army_rule:shadow_in_the_warp:synapse:weapon-profile",
+)
 IMPERIAL_KNIGHTS_CODE_CHIVALRIC_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric",
     "warhammer_40000_11th:imperial_knights:army_rule:code_chivalric:eager:charge-roll",
@@ -153,6 +158,7 @@ SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "space-marines": "Oath of Moment",
     "tau-empire": "For the Greater Good",
     "thousand-sons": "Cabal of Sorcerers",
+    "tyranids": "Shadow in the Warp / Synapse",
     "world-eaters": "Blessings of Khorne",
 }
 

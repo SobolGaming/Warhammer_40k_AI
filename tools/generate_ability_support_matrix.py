@@ -2326,6 +2326,25 @@ def _structured_support_sections_markdown() -> list[str]:
                     ),
                 ),
                 SupportSectionRow(
+                    "Tyranids - Shadow in the Warp and Synapse",
+                    (
+                        "Command-phase-start faction-rule hook plus Battle-shock and "
+                        "weapon-profile modifiers"
+                    ),
+                    (
+                        "README, adapter contract, decision catalog, source coverage, "
+                        "and generated matrix"
+                    ),
+                    "Focused command-phase, Battle-shock, and runtime-modifier tests",
+                    "Full",
+                    (
+                        "Implements once-per-battle Shadow in the Warp in either "
+                        "player's Command phase, forced enemy Battle-shock tests, "
+                        "Synapse 3D6 Battle-shock tests, Synapse-range Shadow "
+                        "penalties, and melee Strength modifiers."
+                    ),
+                ),
+                SupportSectionRow(
                     "Necrons - Reanimation Protocols",
                     "Named army-rule handler plus shared Healing Wounds resolver",
                     (

@@ -1,13 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-from dataclasses import dataclass
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass, field
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Self, cast
 
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
+from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -27,6 +31,10 @@ type CommandPhaseStartResultHandler = Callable[
     ["CommandPhaseStartResultContext"],
     bool,
 ]
+
+
+def _empty_ability_indexes() -> Mapping[str, AbilityCatalogIndex]:
+    return MappingProxyType({})
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,6 +93,15 @@ class CommandPhaseStartResultContext:
     request: DecisionRequest
     result: DecisionResult
     active_player_id: str
+    battle_shock_hooks: BattleShockHookRegistry = field(
+        default_factory=BattleShockHookRegistry.empty
+    )
+    runtime_modifier_registry: RuntimeModifierRegistry = field(
+        default_factory=RuntimeModifierRegistry.empty
+    )
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = field(
+        default_factory=_empty_ability_indexes
+    )
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -107,6 +124,19 @@ class CommandPhaseStartResultContext:
             self,
             "active_player_id",
             _validate_identifier("active_player_id", self.active_player_id),
+        )
+        if type(self.battle_shock_hooks) is not BattleShockHookRegistry:
+            raise GameLifecycleError(
+                "CommandPhaseStartResultContext battle_shock_hooks must be a registry."
+            )
+        if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
+            raise GameLifecycleError(
+                "CommandPhaseStartResultContext runtime_modifier_registry must be a registry."
+            )
+        object.__setattr__(
+            self,
+            "ability_indexes_by_player_id",
+            _validate_ability_index_mapping(self.ability_indexes_by_player_id),
         )
         _validate_command_phase_start_state(self.state, active_player_id=self.active_player_id)
 
@@ -180,9 +210,15 @@ class CommandPhaseStartHookRegistry:
                 )
             requests.append(request)
         if len(requests) > 1:
-            raise GameLifecycleError(
-                "Command-phase start hooks produced multiple simultaneous requests."
+            sequenced_request = _sequenced_command_phase_start_request(
+                context=context,
+                requests=tuple(requests),
             )
+            if sequenced_request is None:
+                raise GameLifecycleError(
+                    "Command-phase start hooks produced multiple simultaneous requests."
+                )
+            return sequenced_request
         if not requests:
             return None
         return requests[0]
@@ -224,6 +260,36 @@ def _validate_bindings(value: object) -> tuple[CommandPhaseStartHookBinding, ...
     return tuple(sorted(bindings, key=lambda item: item.hook_id))
 
 
+def _sequenced_command_phase_start_request(
+    *,
+    context: CommandPhaseStartRequestContext,
+    requests: tuple[DecisionRequest, ...],
+) -> DecisionRequest | None:
+    active_actor_requests = tuple(
+        request for request in requests if request.actor_id == context.active_player_id
+    )
+    non_active_actor_requests = tuple(
+        request for request in requests if request.actor_id != context.active_player_id
+    )
+    if len(active_actor_requests) > 1:
+        return None
+    for request in non_active_actor_requests:
+        if not _request_allows_non_active_actor(request):
+            return None
+    if active_actor_requests:
+        return active_actor_requests[0]
+    if non_active_actor_requests:
+        return non_active_actor_requests[0]
+    return None
+
+
+def _request_allows_non_active_actor(request: DecisionRequest) -> bool:
+    payload = request.payload
+    if not isinstance(payload, Mapping):
+        return False
+    return payload.get("actor_may_be_non_active") is True
+
+
 def _validate_identifier(field_name: str, value: object) -> str:
     if type(value) is not str:
         raise GameLifecycleError(f"Command-phase start hook {field_name} must be a string.")
@@ -231,6 +297,24 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"Command-phase start hook {field_name} must not be empty.")
     return stripped
+
+
+def _validate_ability_index_mapping(
+    indexes: object,
+) -> Mapping[str, AbilityCatalogIndex]:
+    if not isinstance(indexes, Mapping):
+        raise GameLifecycleError(
+            "CommandPhaseStartResultContext ability_indexes_by_player_id must be a mapping."
+        )
+    validated: dict[str, AbilityCatalogIndex] = {}
+    for raw_player_id, raw_index in cast(Mapping[object, object], indexes).items():
+        player_id = _validate_identifier("ability_indexes_by_player_id key", raw_player_id)
+        if type(raw_index) is not AbilityCatalogIndex:
+            raise GameLifecycleError(
+                "CommandPhaseStartResultContext ability indexes must be AbilityCatalogIndex."
+            )
+        validated[player_id] = raw_index
+    return MappingProxyType(dict(sorted(validated.items())))
 
 
 def _validate_command_phase_start_state(state: GameState, *, active_player_id: str) -> None:
