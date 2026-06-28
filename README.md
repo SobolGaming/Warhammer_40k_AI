@@ -167,8 +167,8 @@ Current status:
 - Faction semantic execution is active incremental work. Current runtime
   support includes selected Phase 17G faction slices across Chaos Daemons,
   Chaos Space Marines, Aeldari, Death Guard, World Eaters, Orks,
-  Space Marines, Necrons, Leagues of Votann, and Thousand Sons. Chaos Daemons Shadow Legion
-  supports Thralls of the First Prince mustering restrictions and keyword
+  Space Marines, Necrons, Leagues of Votann, Thousand Sons, and Tyranids.
+  Chaos Daemons Shadow Legion supports Thralls of the First Prince mustering restrictions and keyword
   grants, Murderer's Cowl, Penumbral Puppetry, Gloam Rot, Shadow's Caress,
   Leaping Shadows, Mantle of Gloom, Fade to Darkness, and Disciples of
   Be'lakor Dark Pacts through shared advance, Scouts, objective-control aura,
@@ -210,7 +210,10 @@ Current status:
   with optional Channel the Warp perils, Destiny's Ruin hit rerolls, Temporal
   Surge movement proposals and charge lockout, Doombolt mortal wounds, and Twist
   of Fate AP modifiers through shared decision, movement, reroll, and
-  mortal-wound routing paths. Broad datasheet,
+  mortal-wound routing paths. Tyranids Shadow in the Warp and Synapse support
+  once-per-battle either-Command-phase activation, forced enemy Battle-shock
+  tests, Synapse 3D6 Battle-shock tests, Shadow Synapse-range penalties, and
+  melee Strength modifiers through shared hooks. Broad datasheet,
   wargear, weapon, and remaining faction execution remains later Phase 17 work.
 - Matched-play mustering supports Incursion, Strike Force, and Onslaught battle
   sizes, including the Drukhari `Corsairs and Travelling Players` ally rule for

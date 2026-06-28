@@ -8,7 +8,7 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_tyranids-avhhzmcte8-j0kseag7t
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 10 | 0 | 32 | 48 | 0 |
+| 10 | 0 | 32 | 48 | 1 |
 
 ## Detachment Rule Support
 

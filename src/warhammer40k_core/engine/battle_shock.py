@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import TYPE_CHECKING, Self, TypedDict, cast
@@ -44,6 +45,7 @@ class BattleShockTestReason(StrEnum):
     BELOW_HALF_STRENGTH = "below_half_strength"
     BELOW_STARTING_STRENGTH_FORCED = "below_starting_strength_forced"
     FORCED_BY_STRATAGEM = "forced_by_stratagem"
+    FORCED_BY_ARMY_RULE = "forced_by_army_rule"
 
 
 class StratagemTargetPermissionStatus(StrEnum):
@@ -164,7 +166,9 @@ class BattleShockTestRequest:
         reason: BattleShockTestReason,
         leadership_target: int,
         below_half_strength_context: BelowHalfStrengthContext,
+        dice_expression: DiceExpression | None = None,
     ) -> Self:
+        expression = _battle_shock_dice_expression(dice_expression)
         return cls(
             request_id=request_id,
             game_id=game_id,
@@ -175,7 +179,7 @@ class BattleShockTestRequest:
             leadership_target=leadership_target,
             below_half_strength_context=below_half_strength_context,
             spec=DiceRollSpec(
-                expression=DiceExpression(quantity=2, sides=6),
+                expression=expression,
                 reason=f"Battle-shock test for {unit_instance_id}",
                 roll_type=BATTLE_SHOCK_ROLL_TYPE,
                 actor_id=unit_instance_id,
@@ -511,6 +515,7 @@ def collect_battle_shock_test_requests(
     allow_duplicate_below_half_tests: bool = False,
     ability_index: AbilityCatalogIndex | None = None,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    battle_shock_dice_expressions_by_unit_id: Mapping[str, DiceExpression] | None = None,
 ) -> tuple[BattleShockTestRequest, ...]:
     requested_game_id = _validate_identifier("game_id", game_id)
     requested_round = _validate_positive_int("battle_round", battle_round)
@@ -536,6 +541,9 @@ def collect_battle_shock_test_requests(
     if type(allow_duplicate_below_half_tests) is not bool:
         raise GameLifecycleError("allow_duplicate_below_half_tests must be a bool.")
     runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
+    dice_expressions_by_unit = _battle_shock_dice_expression_mapping(
+        battle_shock_dice_expressions_by_unit_id
+    )
 
     requests: list[BattleShockTestRequest] = []
     for unit in army.units:
@@ -568,6 +576,7 @@ def collect_battle_shock_test_requests(
                     ability_index=catalog_ability_index,
                     state=state,
                     runtime_modifier_registry=runtime_modifiers,
+                    dice_expression=dice_expressions_by_unit.get(unit.unit_instance_id),
                 )
             )
             forced_test_added = True
@@ -586,6 +595,7 @@ def collect_battle_shock_test_requests(
                     ability_index=catalog_ability_index,
                     state=state,
                     runtime_modifier_registry=runtime_modifiers,
+                    dice_expression=dice_expressions_by_unit.get(unit.unit_instance_id),
                 )
             )
     return tuple(
@@ -648,6 +658,23 @@ def battle_shock_test_reason_from_token(token: object) -> BattleShockTestReason:
         raise GameLifecycleError(f"Unsupported BattleShockTestReason token: {token}.") from exc
 
 
+def battle_shock_leadership_target_for_unit(
+    unit: UnitInstance,
+    *,
+    current_model_ids: tuple[str, ...],
+    ability_index: AbilityCatalogIndex,
+    state: GameState | None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+) -> int:
+    return _best_leadership(
+        unit,
+        current_model_ids=current_model_ids,
+        ability_index=ability_index,
+        state=state,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
+
+
 def stratagem_target_permission_status_from_token(
     token: object,
 ) -> StratagemTargetPermissionStatus:
@@ -675,6 +702,7 @@ def _battle_shock_request_for_context(
     ability_index: AbilityCatalogIndex,
     state: GameState | None,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    dice_expression: DiceExpression | None,
 ) -> BattleShockTestRequest:
     return BattleShockTestRequest.for_unit(
         request_id=(
@@ -693,6 +721,7 @@ def _battle_shock_request_for_context(
             runtime_modifier_registry=runtime_modifier_registry,
         ),
         below_half_strength_context=context,
+        dice_expression=dice_expression,
     )
 
 
@@ -781,6 +810,39 @@ def _battle_shock_ability_index(
     return ability_index
 
 
+def _battle_shock_dice_expression(
+    expression: DiceExpression | None,
+) -> DiceExpression:
+    if expression is None:
+        return DiceExpression(quantity=2, sides=6)
+    if type(expression) is not DiceExpression:
+        raise GameLifecycleError("Battle-shock dice expression must be a DiceExpression.")
+    if expression not in {
+        DiceExpression(quantity=2, sides=6),
+        DiceExpression(quantity=3, sides=6),
+    }:
+        raise GameLifecycleError("Battle-shock dice expression must be 2D6 or 3D6.")
+    return expression
+
+
+def _battle_shock_dice_expression_mapping(
+    mapping: object,
+) -> Mapping[str, DiceExpression]:
+    if mapping is None:
+        return {}
+    if not isinstance(mapping, Mapping):
+        raise GameLifecycleError("battle_shock_dice_expressions_by_unit_id must be a mapping.")
+    validated: dict[str, DiceExpression] = {}
+    for raw_unit_id, raw_expression in cast(Mapping[object, object], mapping).items():
+        unit_id = _validate_identifier("battle_shock_dice_expressions_by_unit_id key", raw_unit_id)
+        if unit_id in validated:
+            raise GameLifecycleError(
+                "battle_shock_dice_expressions_by_unit_id contains duplicate unit IDs."
+            )
+        validated[unit_id] = _battle_shock_dice_expression(cast(DiceExpression, raw_expression))
+    return validated
+
+
 def _model_leadership(model: ModelInstance) -> int:
     if type(model) is not ModelInstance:
         raise GameLifecycleError("Leadership lookup requires a ModelInstance.")
@@ -832,8 +894,7 @@ def _starting_strength_by_unit(
 
 
 def _validate_battle_shock_spec(spec: DiceRollSpec, *, unit_instance_id: str) -> None:
-    if spec.expression != DiceExpression(quantity=2, sides=6):
-        raise GameLifecycleError("BattleShockTestRequest spec must roll 2D6.")
+    _battle_shock_dice_expression(spec.expression)
     if spec.roll_type != BATTLE_SHOCK_ROLL_TYPE:
         raise GameLifecycleError("BattleShockTestRequest spec roll_type drift.")
     if spec.actor_id != unit_instance_id:

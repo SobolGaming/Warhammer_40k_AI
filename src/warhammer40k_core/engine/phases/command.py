@@ -5,12 +5,15 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import cast
 
+from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.battle_shock import (
     BattleShockResult,
+    BattleShockTestReason,
     collect_battle_shock_test_requests,
 )
 from warhammer40k_core.engine.battle_shock_hooks import (
+    BattleShockDiceExpressionContext,
     BattleShockForcedTestContext,
     BattleShockHookRegistry,
     BattleShockModifierContext,
@@ -250,6 +253,9 @@ class CommandPhaseHandler:
                     request=record.request,
                     result=result,
                     active_player_id=active_player_id,
+                    battle_shock_hooks=self.battle_shock_hooks,
+                    runtime_modifier_registry=self.runtime_modifier_registry,
+                    ability_indexes_by_player_id=self.ability_indexes_by_player_id,
                 )
             )
             if not handled:
@@ -508,6 +514,15 @@ def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
     return value
 
 
+def _payload_optional_bool(payload: dict[str, JsonValue], *, key: str) -> bool:
+    value = payload.get(key)
+    if value is None:
+        return False
+    if type(value) is not bool:
+        raise GameLifecycleError(f"Decision payload key must be a boolean: {key}.")
+    return value
+
+
 def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     if key not in payload:
         raise GameLifecycleError(f"Decision payload missing required key: {key}.")
@@ -700,21 +715,32 @@ def _command_phase_start_faction_rule_drift_reason(
         return "payload_phase_drift"
     if state.current_battle_phase is not BattlePhase.COMMAND:
         return "phase_drift"
-    if result.actor_id != _active_player_id(state):
-        return "player_not_active"
+    active_player_id = _active_player_id(state)
     request_payload = _decision_payload_object(request.payload)
+    actor_may_be_non_active = _payload_optional_bool(
+        request_payload,
+        key="actor_may_be_non_active",
+    )
+    if result.actor_id != active_player_id and not actor_may_be_non_active:
+        return "player_not_active"
+    payload_active_player_id = payload.get("active_player_id")
+    if payload_active_player_id is not None:
+        if type(payload_active_player_id) is not str or not payload_active_player_id.strip():
+            return "active_player_id_invalid"
+        if payload_active_player_id != active_player_id:
+            return "active_player_id_drift"
     if _payload_string(request_payload, key="game_id") != state.game_id:
         return "request_game_id_drift"
     if _payload_int(request_payload, key="battle_round") != state.battle_round:
         return "request_battle_round_drift"
     if _payload_string(request_payload, key="phase") != BattlePhase.COMMAND.value:
         return "request_phase_drift"
-    if _payload_string(request_payload, key="active_player_id") != result.actor_id:
+    if _payload_string(request_payload, key="active_player_id") != active_player_id:
         return "request_active_player_drift"
     command_state = state.command_step_state
     if command_state is None:
         return "command_step_state_missing"
-    if command_state.active_player_id != result.actor_id:
+    if command_state.active_player_id != active_player_id:
         return "command_step_active_player_drift"
     if command_state.battle_round != state.battle_round:
         return "command_step_battle_round_drift"
@@ -1146,6 +1172,21 @@ def _resolve_battle_shock_step(
             )
         )
     )
+    dice_expressions_by_unit_id = {
+        unit.unit_instance_id: battle_shock_hooks.dice_expression_for(
+            BattleShockDiceExpressionContext(
+                state=state,
+                player_id=active_player_id,
+                unit_instance_id=unit.unit_instance_id,
+                reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
+                active_player_id=active_player_id,
+                phase=BattlePhase.COMMAND,
+                default_expression=DiceExpression(quantity=2, sides=6),
+                phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+            )
+        )
+        for unit in army.units
+    }
     requests = collect_battle_shock_test_requests(
         game_id=state.game_id,
         battle_round=state.battle_round,
@@ -1157,6 +1198,7 @@ def _resolve_battle_shock_step(
         forced_below_starting_strength_unit_ids=forced_below_starting_strength_unit_ids,
         ability_index=ability_index,
         runtime_modifier_registry=runtime_modifier_registry,
+        battle_shock_dice_expressions_by_unit_id=dice_expressions_by_unit_id,
     )
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     result_payloads: list[JsonValue] = []
@@ -1178,7 +1220,10 @@ def _resolve_battle_shock_step(
         if auto_pass_effect is None:
             roll_state = manager.roll(request.spec)
         else:
-            roll_state = manager.roll_fixed(request.spec, [6, 6])
+            roll_state = manager.roll_fixed(
+                request.spec,
+                [6] * request.spec.expression.quantity,
+            )
             decisions.event_log.append(
                 "battle_shock_test_auto_passed",
                 {

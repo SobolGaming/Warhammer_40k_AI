@@ -108,6 +108,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.imperial_knig
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
     army_rule as thousand_sons_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.tyranids import (
+    army_rule as tyranids_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
     army_rule as world_eaters_army_rule,
 )
@@ -900,6 +903,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert (
         "| Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |"
     ) in generated_markdown
+    assert "| Tyranids | 10 | 0 | 32 | 48 | 1 | [tyranids](factions/tyranids.md) |" in (
+        generated_markdown
+    )
     assert "| Grey Knights - Gate of Infinity | Named army-rule handler |" in generated_markdown
     assert (
         "| Leagues of Votann - Prioritised Efficiency | "
@@ -942,6 +948,14 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "Focused ritual, invalid-submission, movement, modifier, and wound tests | Full |"
     ) in generated_markdown
     assert (
+        "| Tyranids - Shadow in the Warp and Synapse | "
+        "Command-phase-start faction-rule hook plus Battle-shock and "
+        "weapon-profile modifiers | "
+        "README, adapter contract, decision catalog, source coverage, and "
+        "generated matrix | "
+        "Focused command-phase, Battle-shock, and runtime-modifier tests | Full |"
+    ) in generated_markdown
+    assert (
         "| Scouts X | Pre-battle Scout Move, Scout reserve setup, and Dedicated "
         "Transport Scout Move hosts | Adapter contract and decision catalog | "
         "Focused pre-battle, setup smoke, and enhancement-grant tests | Full | "
@@ -951,10 +965,12 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     aeldari_markdown = generated_faction_markdown["aeldari.md"]
     chaos_daemons_markdown = generated_faction_markdown["chaos-daemons.md"]
     imperial_knights_markdown = generated_faction_markdown["imperial-knights.md"]
+    tyranids_markdown = generated_faction_markdown["tyranids.md"]
     assert "## Detachment Rule Support" in aeldari_markdown
     assert "## Detachment Rule Support" in chaos_daemons_markdown
     assert "| Supported detachment rules |" in chaos_daemons_markdown
     assert "| 8 | 0 | 24 | 36 | 1 |" in imperial_knights_markdown
+    assert "| 10 | 0 | 32 | 48 | 1 |" in tyranids_markdown
     assert (
         "| Daemonic Incursion | `Full` | Warp Rifts reserve-arrival distance hook |"
     ) in chaos_daemons_markdown
@@ -1017,6 +1033,17 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert (
         f"| `{thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID}` | "
         "Cabal of Sorcerers - Weapon Profile |"
+    ) in generated_markdown
+    assert (
+        f"| `{tyranids_army_rule.HOOK_ID}` | Shadow in the Warp / Synapse |"
+    ) in generated_markdown
+    assert (
+        f"| `{tyranids_army_rule.BATTLE_SHOCK_HOOK_ID}` | "
+        "Shadow in the Warp / Synapse - Battle-shock |"
+    ) in generated_markdown
+    assert (
+        f"| `{tyranids_army_rule.WEAPON_PROFILE_MODIFIER_ID}` | "
+        "Shadow in the Warp / Synapse - Weapon Profile |"
     ) in generated_markdown
     assert tuple(row.datasheet_name for row in rows_by_name["Instrument of Chaos"]) == (
         "Bloodletters",
@@ -1087,6 +1114,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert all(
         row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in rows_by_name["Shadow in the Warp / Synapse"]
+    )
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
         for row in rows_by_name["Code Chivalric"]
     )
     assert all(
@@ -1113,6 +1144,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Cabal of Sorcerers"]) == (
         "Thousand Sons",
+    )
+    assert tuple(row.datasheet_name for row in rows_by_name["Shadow in the Warp / Synapse"]) == (
+        "Tyranids",
     )
     assert tuple(row.datasheet_name for row in rows_by_name["Code Chivalric"]) == (
         "Imperial Knights",
@@ -1160,6 +1194,11 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         thousand_sons_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
         thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID,
     }
+    assert set(rows_by_name["Shadow in the Warp / Synapse"][0].runtime_consumer_ids) == {
+        tyranids_army_rule.HOOK_ID,
+        tyranids_army_rule.BATTLE_SHOCK_HOOK_ID,
+        tyranids_army_rule.WEAPON_PROFILE_MODIFIER_ID,
+    }
     assert any(
         row_payload["ability_id"] == thousand_sons_army_rule.HOOK_ID
         and row_payload["ability_name"] == "Cabal of Sorcerers"
@@ -1170,6 +1209,19 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
             thousand_sons_army_rule.HOOK_ID,
             thousand_sons_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
             thousand_sons_army_rule.WEAPON_PROFILE_MODIFIER_ID,
+        }
+        for row_payload in snapshot
+    )
+    assert any(
+        row_payload["ability_id"] == tyranids_army_rule.HOOK_ID
+        and row_payload["ability_name"] == "Shadow in the Warp / Synapse"
+        and row_payload["datasheet_name"] == "Tyranids"
+        and row_payload["support_stage"] == AbilityCoverageSupportStage.ENGINE_CONSUMED.value
+        and set(row_payload["runtime_consumer_ids"])
+        == {
+            tyranids_army_rule.HOOK_ID,
+            tyranids_army_rule.BATTLE_SHOCK_HOOK_ID,
+            tyranids_army_rule.WEAPON_PROFILE_MODIFIER_ID,
         }
         for row_payload in snapshot
     )
@@ -1284,6 +1336,31 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert categories_by_name["Faction Army Rule Cabal Of Sorcerers"].support_stages == (
         AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert categories_by_name["Faction Army Rule Shadow In The Warp Synapse"].ability_names == (
+        "Shadow in the Warp / Synapse",
+    )
+    assert categories_by_name[
+        "Faction Army Rule Shadow In The Warp Synapse"
+    ].runtime_consumer_ids == (
+        tyranids_army_rule.HOOK_ID,
+        tyranids_army_rule.BATTLE_SHOCK_HOOK_ID,
+        tyranids_army_rule.WEAPON_PROFILE_MODIFIER_ID,
+    )
+    assert categories_by_name["Faction Army Rule Shadow In The Warp Synapse"].support_stages == (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+    )
+    assert any(
+        row_payload["category_name"] == "Faction Army Rule Shadow In The Warp Synapse"
+        and row_payload["ability_names"] == ["Shadow in the Warp / Synapse"]
+        and row_payload["support_stages"] == [AbilityCoverageSupportStage.ENGINE_CONSUMED.value]
+        and set(row_payload["runtime_consumer_ids"])
+        == {
+            tyranids_army_rule.HOOK_ID,
+            tyranids_army_rule.BATTLE_SHOCK_HOOK_ID,
+            tyranids_army_rule.WEAPON_PROFILE_MODIFIER_ID,
+        }
+        for row_payload in category_snapshot
     )
     assert categories_by_name["Unknown Abilities"].ability_names == (
         "Bane of Cowards",

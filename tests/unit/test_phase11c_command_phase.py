@@ -1642,7 +1642,7 @@ def test_battle_shock_payload_and_validation_paths_are_fail_fast() -> None:
             below_half_strength_context=request.below_half_strength_context,
             spec=cast(Any, object()),
         )
-    with pytest.raises(GameLifecycleError, match="must roll 2D6"):
+    with pytest.raises(GameLifecycleError, match="must be 2D6 or 3D6"):
         BattleShockTestRequest(
             request_id="request-bad-expression",
             game_id="phase11c-game",
