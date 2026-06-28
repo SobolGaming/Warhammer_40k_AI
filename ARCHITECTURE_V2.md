@@ -4865,7 +4865,7 @@ Invariants:
   accepted adapter choices through the shared adapter submission helpers;
 - CLI, UI, network, headless, and replay producers differ only in how they
   render, rank, generate, or transport choices;
-- producer modules do not import `GameLifecycle`, access
+- producer modules do not import `GameLifecycle`, access `.lifecycle`,
   `decision_controller`, or call `submit_decision(...)` directly;
 - replay producer wrappers route recorded finite and parameterized results
   through the same session protocol used by live adapters.
@@ -4880,8 +4880,8 @@ Required tests:
   through the session facade;
 - replay finite and parameterized records submit through the session facade and
   reproduce the same `DecisionRecord` payloads;
-- static audit prevents thin producer modules from bypassing
-  `AdapterGameSession`.
+- static audit prevents thin producer modules from importing lifecycle internals,
+  reaching through `.lifecycle`, or bypassing `AdapterGameSession`.
 
 ## Phase 18D: local visual game UI
 

@@ -87,9 +87,12 @@ SESSION_PROTOCOL_METHODS = frozenset(
     )
 )
 SESSION_PRODUCER_FORBIDDEN_NAMES = frozenset(("GameLifecycle",))
+SESSION_PRODUCER_FORBIDDEN_IMPORT_MODULES = frozenset(("warhammer40k_core.engine.lifecycle",))
+SESSION_PRODUCER_FORBIDDEN_IMPORT_NAMES = frozenset(("GameLifecycle",))
 SESSION_PRODUCER_FORBIDDEN_ATTRIBUTES = frozenset(
     (
         "decision_controller",
+        "lifecycle",
         "submit_decision",
     )
 )
@@ -143,19 +146,40 @@ def test_thin_adapter_producers_use_session_protocol_not_lifecycle_bypass() -> N
 
     for path in SESSION_PRODUCER_PATHS:
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Name) and node.id in SESSION_PRODUCER_FORBIDDEN_NAMES:
-                violations.append(_format_violation(path=path, node=node, call_name=node.id))
-            if (
-                isinstance(node, ast.Attribute)
-                and node.attr in SESSION_PRODUCER_FORBIDDEN_ATTRIBUTES
-            ):
-                violations.append(_format_violation(path=path, node=node, call_name=node.attr))
+        violations.extend(_session_producer_bypass_violations(path=path, tree=tree))
 
     assert not violations, (
         "Thin adapter producers must depend on AdapterGameSession and must not bypass "
         "the shared session facade:\n" + "\n".join(violations)
     )
+
+
+def test_thin_adapter_producer_audit_catches_import_and_lifecycle_attribute_bypass() -> None:
+    tree = ast.parse(
+        """
+import warhammer40k_core.engine.lifecycle
+from warhammer40k_core.engine.lifecycle import GameLifecycle
+
+def bypass(session: object) -> None:
+    session.lifecycle.config
+    session.lifecycle.advance_until_decision_or_terminal()
+    session.lifecycle._pending_decision_request()
+    session.decision_controller
+    session.submit_decision(None)
+"""
+    )
+
+    violations = _session_producer_bypass_violations(
+        path=ROOT / "src" / "warhammer40k_core" / "adapters" / "bad_producer.py",
+        tree=tree,
+    )
+
+    assert len(violations) == 8
+    assert any("warhammer40k_core.engine.lifecycle" in violation for violation in violations)
+    assert any("GameLifecycle" in violation for violation in violations)
+    assert sum("lifecycle" in violation for violation in violations) == 5
+    assert any("decision_controller" in violation for violation in violations)
+    assert any("submit_decision" in violation for violation in violations)
 
 
 def _test_paths() -> tuple[Path, ...]:
@@ -170,6 +194,48 @@ def _class_node(*, tree: ast.Module, class_name: str) -> ast.ClassDef:
         if isinstance(node, ast.ClassDef) and node.name == class_name:
             return node
     raise AssertionError(f"Expected class {class_name}.")
+
+
+def _session_producer_bypass_violations(*, path: Path, tree: ast.Module) -> list[str]:
+    violations: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            if node.module in SESSION_PRODUCER_FORBIDDEN_IMPORT_MODULES:
+                violations.append(
+                    _format_violation(
+                        path=path,
+                        line_number=node.lineno,
+                        call_name=node.module,
+                    )
+                )
+            for alias in node.names:
+                if alias.name in SESSION_PRODUCER_FORBIDDEN_IMPORT_NAMES:
+                    violations.append(
+                        _format_violation(
+                            path=path,
+                            line_number=node.lineno,
+                            call_name=alias.name,
+                        )
+                    )
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name in SESSION_PRODUCER_FORBIDDEN_IMPORT_MODULES:
+                    violations.append(
+                        _format_violation(
+                            path=path,
+                            line_number=node.lineno,
+                            call_name=alias.name,
+                        )
+                    )
+        if isinstance(node, ast.Name) and node.id in SESSION_PRODUCER_FORBIDDEN_NAMES:
+            violations.append(
+                _format_violation(path=path, line_number=node.lineno, call_name=node.id)
+            )
+        if isinstance(node, ast.Attribute) and node.attr in SESSION_PRODUCER_FORBIDDEN_ATTRIBUTES:
+            violations.append(
+                _format_violation(path=path, line_number=node.lineno, call_name=node.attr)
+            )
+    return violations
 
 
 def _is_adapter_facing_test(node: ast.FunctionDef) -> bool:
@@ -188,20 +254,28 @@ def _decision_bypass_violations(*, path: Path, node: ast.FunctionDef) -> list[st
             continue
         function = child.func
         if isinstance(function, ast.Attribute) and function.attr in FORBIDDEN_BYPASS_METHODS:
-            violations.append(_format_violation(path=path, node=child, call_name=function.attr))
+            violations.append(
+                _format_violation(path=path, line_number=child.lineno, call_name=function.attr)
+            )
         if (
             isinstance(function, ast.Attribute)
             and function.attr in FORBIDDEN_QUEUE_MUTATION_METHODS
         ):
-            violations.append(_format_violation(path=path, node=child, call_name=function.attr))
+            violations.append(
+                _format_violation(path=path, line_number=child.lineno, call_name=function.attr)
+            )
         if (
             isinstance(function, ast.Attribute)
             and function.attr in FORBIDDEN_QUEUE_ATTRIBUTE_MUTATION_METHODS
             and _is_pending_queue_expression(function.value)
         ):
-            violations.append(_format_violation(path=path, node=child, call_name=function.attr))
+            violations.append(
+                _format_violation(path=path, line_number=child.lineno, call_name=function.attr)
+            )
         if isinstance(function, ast.Name) and function.id in FORBIDDEN_BYPASS_HELPERS:
-            violations.append(_format_violation(path=path, node=child, call_name=function.id))
+            violations.append(
+                _format_violation(path=path, line_number=child.lineno, call_name=function.id)
+            )
     return violations
 
 
@@ -215,5 +289,5 @@ def _is_pending_queue_expression(node: ast.expr) -> bool:
     return False
 
 
-def _format_violation(*, path: Path, node: ast.expr, call_name: str) -> str:
-    return f"{path.relative_to(ROOT)}:{node.lineno} calls {call_name}"
+def _format_violation(*, path: Path, line_number: int, call_name: str) -> str:
+    return f"{path.relative_to(ROOT)}:{line_number} uses {call_name}"

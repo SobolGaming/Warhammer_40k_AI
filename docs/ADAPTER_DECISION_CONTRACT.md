@@ -2039,6 +2039,11 @@ The thin producers map to that protocol as follows:
   by routing finite results to `submit_option(...)` and parameterized results to
   `submit_parameterized_payload(...)`.
 
+Thin producers must not import `GameLifecycle`, access a session's `.lifecycle`
+attribute, access `decision_controller`, or call `submit_decision(...)`
+directly. Those operations belong inside the session implementation and
+engine-owned replay validation, not producer or transport layers.
+
 `LocalGameSession` is the local implementation of this facade. It owns the
 `GameLifecycle` instance, validates viewer IDs for event streams, projects
 viewer-safe views and source-hashed catalog data, and delegates submissions to
