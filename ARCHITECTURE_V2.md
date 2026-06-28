@@ -110,6 +110,9 @@ hybrid datacard projections: `interfaces/cli.py` renders pending finite and
 parameterized requests, submits normal lifecycle `DecisionResult`s, and
 `adapters/projection.py` exposes source-hashed static catalog display data plus
 live unit/model display records keyed by stable IDs.
+**Phase 18B is complete** for deterministic replay artifacts, lifecycle replay
+through `GameLifecycle.submit_decision(...)`, drift diagnostics, projection hash
+checkpoints, human-readable traces, and JSONL `DecisionRecord` corpus export.
 **Phase 16A is
 complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
 source-backed battlefield at Create Battlefield, deploys units through
@@ -343,6 +346,7 @@ Completed / implemented foundation:
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
 | 17J | Complete | Warhammer Event Companion v1.0 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with pending coordinate extraction, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
+| 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
 
 Next / planned sequence:
 
@@ -351,7 +355,7 @@ Next / planned sequence:
 | 17G | In progress | Incremental faction army-rule, detachment-rule, enhancement-effect, and faction/detachment Stratagem semantic execution |
 | 17H | Planned | Datasheet, wargear, weapon ability, generated source-row coverage, and execution for covered ability items |
 | 17I | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
-| 18B-18D | Planned | Replay inspection, local visual UI, and network play |
+| 18C-18D | Planned | Local visual UI and network play |
 | 19A-19E | Planned | Profiling, AI orchestration, self-play, and training corpus generation |
 | 20A-20D | Planned | Full-game coverage, regression, soak, and release gates |
 
@@ -4787,13 +4791,43 @@ Required tests:
 
 ## Phase 18B: replay inspection and deterministic replay runner
 
+Status: Complete. `engine/replay.py` defines `ReplayArtifact`,
+`ReplayRunner`, `ReplayTraceExporter`, source identity payloads, initial RNG
+state capture, lifecycle snapshot capture, decision/event stream tails,
+projection checkpoints, and typed drift diagnostics. Replay submits recorded
+results through the same `GameLifecycle.submit_decision(...)` path used by UI,
+network, headless, AI, tests, and adapters.
+
+Modules:
+
+- `engine/replay.py`
+- `tests/replay/test_phase18b_replay_runner.py`
+
 Invariants:
 
-- replay can load snapshot + event/decision tail;
-- replay can step forward deterministically;
-- replay drift is detected and reported;
-- replay can export human-readable decision/event traces;
-- replay can export training-friendly DecisionRecord corpora.
+- replay artifacts carry game config/catalog/source package identity, initial
+  seed/RNG state, initial lifecycle snapshot, `DecisionRecord` and
+  `EventRecord` stream tails, and projection hash checkpoints;
+- replay can load an artifact and step forward deterministically by submitting
+  recorded `DecisionResult`s through `GameLifecycle.submit_decision(...)`;
+- replay compares reproduced request IDs, decision types, actors, request
+  payload hashes, legal option fingerprints, record payloads, event stream
+  hashes, and projection hashes;
+- replay drift is detected and returned as typed diagnostics, including stale
+  request IDs and legal option fingerprint drift;
+- replay can export human-readable decision/event traces, JSONL
+  `DecisionRecord` corpora, and failure triage payloads;
+- exported replay records are deterministic, JSON-safe, and contain no Python
+  object reprs, memory addresses, or UI-owned state.
+
+Required tests:
+
+- golden setup-to-battle replay reproduces exactly;
+- golden movement/shooting/charge/fight replay reproduces exactly;
+- deliberately stale `request_id` fails with typed diagnostics;
+- deliberately changed legal option fingerprint fails with drift diagnostics;
+- exported `DecisionRecord`s contain no object reprs, memory addresses, or
+  UI-owned state.
 
 ## Phase 18C: local visual game UI
 
