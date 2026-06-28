@@ -113,7 +113,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `61ebafebb095a559af26652e7017ff8ec711e4ab75cf2853c3fa60117ed2612d`
+  `d3b0a4b9e73bf2c2464be63484563d8a18e3463553da65b6d57d9d6030dd384b`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -152,14 +152,14 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `4c994ef970aea507e022bc4cf08f451d136ccb075ef5f00fd8abb1cf1e0bb196`
+  `760fc82b5a159390b942b348f2d77a618162710b2955fff4e5315cc7329b28e1`
 - upstream Phase 17E checksum:
-  `61ebafebb095a559af26652e7017ff8ec711e4ab75cf2853c3fa60117ed2612d`
+  `d3b0a4b9e73bf2c2464be63484563d8a18e3463553da65b6d57d9d6030dd384b`
 
 The package emits 2140 execution records, one for every Phase 17E coverage row:
-2062 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, and 50 rows are executable
-named-handler rows because they already have runtime consumers: 22 faction army
+2061 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, and 51 rows are executable
+named-handler rows because they already have runtime consumers: 23 faction army
 rules plus 28 exact detachment, Enhancement, and Stratagem rows. The engine
 dispatcher can route every record and returns typed
 `unsupported` diagnostics unless a matching executor is registered. No Phase 17E
@@ -648,7 +648,7 @@ already engine-consumed named handlers.
 
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
-| Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 28 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 42 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |

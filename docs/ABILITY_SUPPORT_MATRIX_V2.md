@@ -148,7 +148,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Chaos Daemons | 9 | 4 | 28 | 43 | 14 | [chaos-daemons](factions/chaos-daemons.md) |
 | Astra Militarum | 11 | 0 | 36 | 54 | 1 | [astra-militarum](factions/astra-militarum.md) |
 | Adepta Sororitas | 8 | 0 | 20 | 30 | 1 | [adepta-sororitas](factions/adepta-sororitas.md) |
-| Adeptus Mechanicus | 10 | 0 | 28 | 42 | 0 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
+| Adeptus Mechanicus | 10 | 0 | 28 | 42 | 1 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
 | Imperial Knights | 8 | 0 | 24 | 36 | 1 | [imperial-knights](factions/imperial-knights.md) |
 | Adeptus Custodes | 9 | 0 | 24 | 36 | 1 | [adeptus-custodes](factions/adeptus-custodes.md) |
 | Imperial Agents | 5 | 0 | 20 | 30 | 0 | [imperial-agents](factions/imperial-agents.md) |
@@ -261,6 +261,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:dacatarai` | Martial Ka'tah - Dacatarai |
 | `warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:rendax` | Martial Ka'tah - Rendax |
 | `warhammer_40000_11th:adeptus_custodes:army_rule:martial_katah:weapon-profile` | Martial Ka'tah - Weapon Profile |
+| `warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives` | Doctrina Imperatives |
+| `warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives:protector:melee-hit-roll` | Melee Hit Roll |
+| `warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives:weapon-profile` | Weapon Profile |
 | `warhammer_40000_11th:aeldari:army_rule:fade_back` | Battle Focus - Fade Back |
 | `warhammer_40000_11th:aeldari:army_rule:flitting_shadows` | Battle Focus - Flitting Shadows |
 | `warhammer_40000_11th:aeldari:army_rule:opportunity_seized` | Battle Focus - Opportunity Seized |
