@@ -124,6 +124,10 @@ AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:aeldari:army_rule:sudden_strike",
     "warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind",
 )
+ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start",
+    "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed",
+)
 ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command",
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock",
@@ -249,6 +253,7 @@ WORLD_EATERS_BLESSINGS_OF_KHORNE_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords",
 )
 FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
+    "adepta-sororitas": "Acts of Faith",
     "aeldari": "Battle Focus",
     "astra-militarum": "Voice of Command",
     "black-templars": "Templar Vows",
@@ -271,6 +276,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "world-eaters": "Blessings of Khorne",
 }
 FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID = {
+    "adepta-sororitas": ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMERS,
     "aeldari": AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMERS,
     "astra-militarum": ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS,
     "black-templars": BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS,
@@ -778,6 +784,35 @@ def test_phase17e_black_templars_army_rule_is_engine_consumed() -> None:
         sorted(BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS)
     )
     assert coverage_row.handler_id == BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS[0]
+
+
+def test_phase17e_adepta_sororitas_army_rule_is_engine_consumed() -> None:
+    coverage_row = next(
+        row
+        for row in faction_coverage_source.coverage_rows()
+        if row.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and row.faction_id == "adepta-sororitas"
+    )
+
+    assert coverage_row.descriptor_id == "phase17e:adepta-sororitas:army-rule"
+    assert coverage_row.rule_name == "Acts of Faith"
+    assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+    assert coverage_row.runtime_support_status is not None
+    assert coverage_row.runtime_support_status.value == "engine_consumed"
+    assert coverage_row.runtime_consumer_ids == tuple(
+        sorted(ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMERS)
+    )
+    assert coverage_row.handler_id == ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMERS[0]
+    assert (
+        faction_coverage_source.FACTION_ARMY_RULE_NAMES_BY_FACTION_ID["adepta-sororitas"]
+        == "Acts of Faith"
+    )
+    assert (
+        faction_coverage_source.FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID[
+            "adepta-sororitas"
+        ]
+        == ADEPTA_SORORITAS_ACTS_OF_FAITH_RUNTIME_CONSUMERS
+    )
 
 
 def test_phase17e_astra_militarum_army_rule_is_engine_consumed() -> None:

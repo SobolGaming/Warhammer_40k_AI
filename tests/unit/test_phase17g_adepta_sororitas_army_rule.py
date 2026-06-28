@@ -199,7 +199,11 @@ def test_miracle_die_pool_spend_and_game_state_payload_round_trip() -> None:
 def test_acts_of_faith_runtime_contribution_exposes_hooks() -> None:
     contribution = army_rule.runtime_contribution()
 
+    assert (
+        army_rule.CONTRIBUTION_ID == "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith"
+    )
     assert contribution.contribution_id == army_rule.CONTRIBUTION_ID
+    assert not contribution.contribution_id.endswith(":scaffold")
     assert tuple(binding.hook_id for binding in contribution.battle_round_start_hook_bindings) == (
         army_rule.BATTLE_ROUND_START_HOOK_ID,
     )

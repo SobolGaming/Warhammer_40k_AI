@@ -2202,6 +2202,19 @@ def _structured_support_sections_markdown() -> list[str]:
                     "Current generated rows are `engine_consumed`.",
                 ),
                 SupportSectionRow(
+                    "Adepta Sororitas - Acts of Faith",
+                    "Battle-round-start and unit-destroyed Miracle dice hooks",
+                    "Source coverage, generated matrix, and runtime inventory",
+                    "Focused Miracle dice gain, spend, serialization, and fail-fast tests",
+                    "Full",
+                    (
+                        "Implements the updated Miracle dice gaining section: one D6 at "
+                        "the start of each battle round and one D6 each time a friendly "
+                        "ADEPTA SORORITAS unit is destroyed, persisted in the Miracle "
+                        "dice pool with fixed non-rerollable values."
+                    ),
+                ),
+                SupportSectionRow(
                     "Chaos Space Marines - Dark Pacts",
                     "Named army-rule handler",
                     "Adapter contract and generated matrix",

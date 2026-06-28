@@ -36,8 +36,8 @@ ADEPTA_SORORITAS_FACTION_KEYWORD = "ADEPTA SORORITAS"
 ACTS_OF_FAITH_ABILITY_NAME = "Acts of Faith"
 SOURCE_RULE_ID = "phase17f:phase17e:adepta-sororitas:army-rule"
 
-CONTRIBUTION_ID = "warhammer_40000_11th:adepta_sororitas:army_rule:scaffold"
 HOOK_ID = "warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith"
+CONTRIBUTION_ID = HOOK_ID
 BATTLE_ROUND_START_HOOK_ID = f"{HOOK_ID}:battle-round-start"
 UNIT_DESTROYED_HOOK_ID = f"{HOOK_ID}:unit-destroyed"
 MIRACLE_DIE_GAIN_ROLL_TYPE = "adepta_sororitas_miracle_die_gain"
