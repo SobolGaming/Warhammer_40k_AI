@@ -39,6 +39,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sorori
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adeptus_custodes import (
     army_rule as adeptus_custodes_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adeptus_mechanicus import (
+    army_rule as adeptus_mechanicus_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.astra_militarum import (
     army_rule as astra_militarum_army_rule,
 )
@@ -344,6 +347,14 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
     "phase17f:phase17e:chaos-daemons:shadow-legion:rule": "Shadow Legion",
     adepta_sororitas_army_rule.SOURCE_RULE_ID: "Acts of Faith",
     adeptus_custodes_army_rule.SOURCE_RULE_ID: "Martial Ka'tah",
+    adeptus_mechanicus_army_rule.SOURCE_RULE_ID: "Doctrina Imperatives",
+    adeptus_mechanicus_army_rule.HOOK_ID: "Doctrina Imperatives",
+    adeptus_mechanicus_army_rule.PROTECTOR_HIT_MODIFIER_ID: (
+        "Doctrina Imperatives - Protector Melee Hit Roll"
+    ),
+    adeptus_mechanicus_army_rule.WEAPON_PROFILE_MODIFIER_ID: (
+        "Doctrina Imperatives - Weapon Profile"
+    ),
     "phase17f:phase17e:chaos-knights:army-rule": "Harbingers of Dread",
     "phase17f:phase17e:chaos-space-marines:army-rule": "Dark Pacts",
     "phase17f:phase17e:death-guard:army-rule": "Nurgle's Gift",
@@ -432,6 +443,13 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
     ),
     tau_empire_army_rule.HOOK_ID: "For the Greater Good",
     tau_empire_army_rule.WEAPON_PROFILE_MODIFIER_ID: "For the Greater Good - Weapon Profile",
+    adeptus_mechanicus_army_rule.HOOK_ID: "Doctrina Imperatives",
+    adeptus_mechanicus_army_rule.PROTECTOR_HIT_MODIFIER_ID: (
+        "Doctrina Imperatives - Protector Melee Hit Roll"
+    ),
+    adeptus_mechanicus_army_rule.WEAPON_PROFILE_MODIFIER_ID: (
+        "Doctrina Imperatives - Weapon Profile"
+    ),
     thousand_sons_army_rule.HOOK_ID: "Cabal of Sorcerers",
     thousand_sons_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID: (
         "Cabal of Sorcerers - Mortal Wound Feel No Pain"
@@ -644,6 +662,13 @@ def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
             runtime_consumer_ids=_adeptus_custodes_runtime_consumer_ids(),
         ),
         _implemented_faction_army_rule_row(
+            faction_id=adeptus_mechanicus_army_rule.ADEPTUS_MECHANICUS_FACTION_ID,
+            ability_id=adeptus_mechanicus_army_rule.HOOK_ID,
+            ability_name=adeptus_mechanicus_army_rule.DOCTRINA_IMPERATIVES_ABILITY_NAME,
+            semantic_category="faction.army_rule.doctrina_imperatives",
+            runtime_consumer_ids=_adeptus_mechanicus_runtime_consumer_ids(),
+        ),
+        _implemented_faction_army_rule_row(
             faction_id=CHAOS_SPACE_MARINES_FACTION_ID,
             ability_id=chaos_space_marines_army_rule.HOOK_ID,
             ability_name="Dark Pacts",
@@ -832,6 +857,19 @@ def _adeptus_custodes_runtime_consumer_ids() -> tuple[str, ...]:
                     binding.hook_id
                     for binding in contribution.fight_unit_selected_grant_hook_bindings
                 ),
+                *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
+            }
+        )
+    )
+
+
+def _adeptus_mechanicus_runtime_consumer_ids() -> tuple[str, ...]:
+    contribution = adeptus_mechanicus_army_rule.runtime_contribution()
+    return tuple(
+        sorted(
+            {
+                *(binding.hook_id for binding in contribution.battle_round_start_hook_bindings),
+                *(binding.modifier_id for binding in contribution.hit_roll_modifier_bindings),
                 *(binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings),
             }
         )
@@ -2259,6 +2297,26 @@ def _structured_support_sections_markdown() -> list[str]:
                         "Implements Dacatarai and Rendax finite selected-to-fight options; "
                         "the accepted stance persists as a Fight phase effect and grants "
                         "[SUSTAINED HITS 1] or [LETHAL HITS] to melee weapon profiles."
+                    ),
+                ),
+                SupportSectionRow(
+                    "Adeptus Mechanicus - Doctrina Imperatives",
+                    (
+                        "Battle-round-start Imperative selection plus weapon-profile and "
+                        "Protector melee hit-roll modifiers"
+                    ),
+                    "Adapter contract, source coverage, generated matrix, and runtime inventory",
+                    (
+                        "Focused battle-round selection, invalid-submission, attached-unit, "
+                        "aura, and runtime-modifier tests"
+                    ),
+                    "Full",
+                    (
+                        "Implements Protector and Conqueror selections until the end of the "
+                        "battle round for units with Doctrina Imperatives, including "
+                        "ranged Heavy/Assault grants, BS/WS improvements, Protector melee "
+                        "Hit-roll penalties, and Conqueror AP improvement with Battleline "
+                        "or friendly Battleline proximity gates."
                     ),
                 ),
                 SupportSectionRow(

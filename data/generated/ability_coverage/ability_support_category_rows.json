@@ -586,6 +586,41 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives",
+        "ability_name": "Doctrina Imperatives",
+        "coverage_row_id": "runtime-content-warhammer-40000-11th/adeptus-mechanicus/faction/warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives/none",
+        "datasheet_id": "adeptus-mechanicus",
+        "datasheet_name": "Adeptus Mechanicus",
+        "source_kind": "faction"
+      }
+    ],
+    "ability_names": [
+      "Doctrina Imperatives"
+    ],
+    "category_id": "faction.army_rule.doctrina_imperatives",
+    "category_name": "Faction Army Rule Doctrina Imperatives",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "runtime-content-warhammer-40000-11th/adeptus-mechanicus/faction/warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives/none"
+    ],
+    "datasheet_names": [
+      "Adeptus Mechanicus"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives",
+      "warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives:protector:melee-hit-roll",
+      "warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives:weapon-profile"
+    ],
+    "source_kind_counts": {
+      "faction": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good",
         "ability_name": "For the Greater Good",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/tau-empire/faction/warhammer_40000_11th:tau_empire:army_rule:for_the_greater_good/none",

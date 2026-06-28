@@ -310,6 +310,27 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives",
+    "ability_name": "Doctrina Imperatives",
+    "catalog_id": "runtime-content-warhammer-40000-11th",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "runtime-content-warhammer-40000-11th/adeptus-mechanicus/faction/warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives/none",
+    "datasheet_id": "adeptus-mechanicus",
+    "datasheet_name": "Adeptus Mechanicus",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives",
+      "warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives:protector:melee-hit-roll",
+      "warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives:weapon-profile"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.doctrina_imperatives"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts",
     "ability_name": "Dark Pacts",
     "catalog_id": "runtime-content-warhammer-40000-11th",
