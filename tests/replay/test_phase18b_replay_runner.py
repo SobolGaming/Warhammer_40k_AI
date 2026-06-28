@@ -17,6 +17,7 @@ from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlace
 from warhammer40k_core.engine.decision_record import DecisionRecord, DecisionRecordPayload
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
+from warhammer40k_core.engine.fight_resolution import PILE_IN_ACTION, FightMovementProposal
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -59,6 +60,7 @@ from warhammer40k_core.engine.phases.shooting import (
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.replay import (
     ReplayArtifact,
+    ReplayArtifactError,
     ReplayArtifactPayload,
     ReplayDiagnosticCode,
     ReplayProjectionCheckpoint,
@@ -114,6 +116,24 @@ def test_setup_to_battle_replay_reproduces_exactly() -> None:
     assert payload["projection_checkpoints"]
 
 
+@pytest.mark.parametrize("field_name", ["seed", "history", "draw_count"])
+def test_replay_artifact_rejects_initial_rng_state_drift(field_name: str) -> None:
+    artifact = _setup_to_battle_artifact()
+    payload = _artifact_payload_copy(artifact)
+    rng_state = payload["initial_rng_state"]
+    if field_name == "seed":
+        rng_state["seed"] = "phase18b-drifted-seed"
+    elif field_name == "history":
+        rng_state["history"].append("phase18b-drifted-history-token")
+    elif field_name == "draw_count":
+        rng_state["draw_count"] += 1
+    else:
+        raise AssertionError(f"Unhandled RNG drift field: {field_name}")
+
+    with pytest.raises(ReplayArtifactError, match="initial_rng_state drifted from snapshot"):
+        ReplayArtifact.from_payload(payload)
+
+
 def test_movement_shooting_charge_fight_replay_reproduces_exactly() -> None:
     artifact = _movement_shooting_charge_fight_artifact()
 
@@ -126,6 +146,7 @@ def test_movement_shooting_charge_fight_replay_reproduces_exactly() -> None:
     assert result.reproduced_decision_count == len(artifact.decision_records)
     assert any(event.event_type == "charge_move_completed" for event in artifact.event_records)
     assert any(event.event_type == "fight_movement_requested" for event in artifact.event_records)
+    assert any(event.event_type == "fight_movement_completed" for event in artifact.event_records)
 
 
 def test_replay_with_deliberately_stale_request_id_fails_with_typed_diagnostics() -> None:
@@ -242,11 +263,18 @@ def _movement_shooting_charge_fight_artifact() -> ReplayArtifact:
         units=units,
         game_id=game_id,
     )
-    fight_request = _assert_decision_request(status, MOVEMENT_PROPOSAL_DECISION_TYPE)
-    fight_proposal = MovementProposalRequest.from_decision_request_payload(fight_request.payload)
+    next_fight_request = _assert_decision_request(status, MOVEMENT_PROPOSAL_DECISION_TYPE)
+    next_fight_proposal = MovementProposalRequest.from_decision_request_payload(
+        next_fight_request.payload
+    )
     state = _state(lifecycle)
     assert state.current_battle_phase is BattlePhase.FIGHT
-    assert fight_proposal.proposal_kind is ProposalKind.PILE_IN
+    assert next_fight_proposal.proposal_kind is ProposalKind.PILE_IN
+    assert next_fight_proposal.unit_instance_id == units["target"].unit_instance_id
+    assert any(
+        event.event_type == "fight_movement_completed"
+        for event in lifecycle.decision_controller.event_log.records
+    )
     return ReplayArtifact.capture(
         artifact_id="phase18b-movement-shooting-charge-fight",
         initial_lifecycle_payload=initial_payload,
@@ -255,7 +283,7 @@ def _movement_shooting_charge_fight_artifact() -> ReplayArtifact:
             initial_checkpoint,
             _projection_checkpoint(
                 lifecycle,
-                checkpoint_id="phase18b-combat-fight-entry",
+                checkpoint_id="phase18b-combat-pile-in-completed",
                 decision_record_index=len(lifecycle.decision_controller.records),
             ),
         ),
@@ -337,7 +365,7 @@ def _drive_movement_shooting_charge_fight(
     )
     assert charge_proposal.proposal_kind is ProposalKind.CHARGE_MOVE
     assert charge_proposal.unit_instance_id == attacker_unit_id
-    return _submit_parameterized(
+    status = _submit_parameterized(
         lifecycle=lifecycle,
         request=proposal_request,
         payload=validate_json_value(
@@ -348,7 +376,7 @@ def _drive_movement_shooting_charge_fight(
                 movement_phase_action=CHARGE_MOVE_ACTION,
                 movement_mode=MovementMode.CHARGE,
                 charge_target_unit_instance_ids=(target_unit_id,),
-                witness=_charge_path_witness_for_unit(
+                witness=_straight_line_witness_for_unit(
                     lifecycle,
                     unit_instance_id=attacker_unit_id,
                     dx=2.0,
@@ -356,6 +384,32 @@ def _drive_movement_shooting_charge_fight(
             ).to_payload()
         ),
         result_id=f"{game_id}-submit-charge-move",
+    )
+    pile_in_request = _assert_decision_request(status, MOVEMENT_PROPOSAL_DECISION_TYPE)
+    pile_in_proposal = MovementProposalRequest.from_decision_request_payload(
+        pile_in_request.payload
+    )
+    assert pile_in_proposal.proposal_kind is ProposalKind.PILE_IN
+    assert pile_in_proposal.unit_instance_id == attacker_unit_id
+    return _submit_parameterized(
+        lifecycle=lifecycle,
+        request=pile_in_request,
+        payload=validate_json_value(
+            FightMovementProposal(
+                proposal_request_id=pile_in_proposal.request_id,
+                proposal_kind=ProposalKind.PILE_IN,
+                unit_instance_id=pile_in_proposal.unit_instance_id,
+                movement_phase_action=PILE_IN_ACTION,
+                movement_mode=MovementMode.PILE_IN,
+                pile_in_target_unit_instance_ids=(target_unit_id,),
+                witness=_straight_line_witness_for_unit(
+                    lifecycle,
+                    unit_instance_id=attacker_unit_id,
+                    dx=0.1,
+                ),
+            ).to_payload()
+        ),
+        result_id=f"{game_id}-submit-pile-in",
     )
 
 
@@ -654,7 +708,7 @@ def _unit_placement_at(
     )
 
 
-def _charge_path_witness_for_unit(
+def _straight_line_witness_for_unit(
     lifecycle: GameLifecycle,
     *,
     unit_instance_id: str,

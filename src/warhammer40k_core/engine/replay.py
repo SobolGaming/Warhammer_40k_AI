@@ -363,6 +363,8 @@ class ReplayArtifact:
 
         rng_state = _rng_state_payload(self.initial_rng_state)
         RandomSource.from_payload(rng_state)
+        if rng_state != _initial_rng_state_payload(initial_lifecycle):
+            raise ReplayArtifactError("ReplayArtifact initial_rng_state drifted from snapshot.")
         object.__setattr__(self, "initial_rng_state", rng_state)
 
         records = _validate_decision_record_tuple(self.decision_records)
