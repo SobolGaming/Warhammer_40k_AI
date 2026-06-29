@@ -38,6 +38,7 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import AttackProfile
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.advance_hooks import (
     SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE,
     AdvanceMoveContext,
@@ -417,6 +418,7 @@ def test_lithe_agility_charge_grant_spends_pain_token_and_unlocks_charge_reroll(
         state=state,
         player_id="player-a",
         unit_instance_id=unit.unit_instance_id,
+        ability_index=AbilityCatalogIndex.from_records(()),
     )
 
     assert pain_tokens_available(state, player_id="player-a") == 0
@@ -2083,6 +2085,10 @@ def test_drukhari_advance_roll_permission_requires_lithe_agility_empowerment() -
             unit_instance_id=unit.unit_instance_id,
             player_id="player-a",
             keywords=unit.keywords,
+            ability_index=AbilityCatalogIndex.from_records(()),
+            current_model_instance_ids=tuple(
+                sorted(model.model_instance_id for model in unit.own_models)
+            ),
         )
         is None
     )
@@ -2121,6 +2127,10 @@ def test_drukhari_advance_roll_permission_requires_lithe_agility_empowerment() -
         unit_instance_id=unit.unit_instance_id,
         player_id="player-a",
         keywords=unit.keywords,
+        ability_index=AbilityCatalogIndex.from_records(()),
+        current_model_instance_ids=tuple(
+            sorted(model.model_instance_id for model in unit.own_models)
+        ),
     )
 
     assert permission is not None

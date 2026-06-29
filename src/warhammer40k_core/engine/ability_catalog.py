@@ -202,6 +202,12 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
     if turn_timing is not None:
         return turn_timing
     if any(
+        _effect_is_passive_rule_exception_grant(effect)
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+    ):
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
+    if any(
         effect.kind is RuleEffectKind.SET_CHARACTERISTIC
         for clause in rule_ir.clauses
         for effect in clause.effects
@@ -211,6 +217,12 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
         _effect_is_feel_no_pain_grant(effect)
         for clause in rule_ir.clauses
         for effect in clause.effects
+    ):
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
+    if any(
+        clause.trigger is None
+        and any(effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY for effect in clause.effects)
+        for clause in rule_ir.clauses
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
     if any(
@@ -253,6 +265,17 @@ def _effect_is_feel_no_pain_grant(effect: RuleEffectSpec) -> bool:
         return False
     parameters = parameter_payload(effect.parameters)
     return parameters.get("ability") == "Feel No Pain"
+
+
+def _effect_is_passive_rule_exception_grant(effect: RuleEffectSpec) -> bool:
+    if effect.kind is not RuleEffectKind.GRANT_ABILITY:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return parameters.get("ability") in {
+        "can_advance_and_charge",
+        "can_fall_back_and_charge",
+        "can_advance_and_shoot_and_charge",
+    }
 
 
 def _effect_is_turn_end_reserve_permission(effect: RuleEffectSpec) -> bool:

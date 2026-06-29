@@ -2142,6 +2142,9 @@ class GameLifecycle:
             stratagem_cost_modifier_registry=(
                 self._runtime_content_bundle.stratagem_cost_modifier_registry
             ),
+            ability_indexes_by_player_id=(
+                self._runtime_content_bundle.ability_indexes_by_player_id
+            ),
             runtime_modifier_registry=self._runtime_content_bundle.runtime_modifier_registry,
         )
         self._charge_phase_handler = ChargePhaseHandler(

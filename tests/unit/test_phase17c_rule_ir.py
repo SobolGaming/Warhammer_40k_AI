@@ -63,7 +63,8 @@ def test_phase17c_normalized_source_text_compiles_to_stable_rule_ir() -> None:
         if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL
     )
     assert any(
-        parameter_payload(effect.parameters) == {"weapon_ability": "Lethal Hits"}
+        parameter_payload(effect.parameters)
+        == {"weapon_ability": "Lethal Hits", "weapon_scope": "ranged"}
         for effect in effects
         if effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY
     )
@@ -205,6 +206,13 @@ def test_phase17c_death_guard_cloud_of_flies_fixture_text_keeps_residual_explici
             RuleEffectKind.GRANT_ABILITY,
         ),
         (
+            "This unit is eligible to declare a charge in a turn in  which it Advanced.",
+            None,
+            None,
+            RuleTargetKind.THIS_UNIT,
+            RuleEffectKind.GRANT_ABILITY,
+        ),
+        (
             "Ranged weapons equipped by models in that unit gain Sustained Hits.",
             None,
             None,
@@ -326,6 +334,132 @@ def test_phase17c_bearer_feel_no_pain_qualifier_compiles_to_model_source_ir() ->
         "attack_condition": "psychic_attack",
         "threshold": 3,
     }
+
+
+def test_phase17c_advance_charge_eligibility_compiles_to_rule_exception_grant() -> None:
+    rule_ir = _compiled(
+        "This unit is eligible to declare a charge in a turn in  which it Advanced."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.GRANT_ABILITY
+    )
+
+    assert rule_ir.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert parameter_payload(effect.parameters) == {"ability": "can_advance_and_charge"}
+
+
+def test_phase17c_leading_model_advance_charge_rerolls_compile_to_two_permissions() -> None:
+    rule_ir = _compiled(
+        "While this model is leading a unit, you can re-roll  Advance and Charge rolls "
+        "made for that unit."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    reroll_effects = tuple(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.REROLL_PERMISSION
+    )
+
+    assert rule_ir.is_supported
+    assert any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters) == {"relationship": "this_model_leading_unit"}
+        for condition in clause.conditions
+    )
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.SELECTED_UNIT
+    assert tuple(parameter_payload(effect.parameters) for effect in reroll_effects) == (
+        {"roll_type": "advance"},
+        {"roll_type": "charge"},
+    )
+
+
+def test_phase17c_leading_model_scoped_weapon_keyword_grant_compiles_to_generic_scope() -> None:
+    rule_ir = _compiled(
+        "While this model is leading a unit, melee weapons equipped by models in that unit "
+        "have the  [LETHAL HITS] ability."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    weapon_effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY
+    )
+
+    assert rule_ir.is_supported
+    assert any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters) == {"relationship": "this_model_leading_unit"}
+        for condition in clause.conditions
+    )
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.SELECTED_UNIT
+    assert parameter_payload(weapon_effect.parameters) == {
+        "target_scope": "models_in_selected_unit",
+        "weapon_ability": "Lethal Hits",
+        "weapon_scope": "melee",
+    }
+
+
+@pytest.mark.parametrize(
+    ("raw_text", "expected_scope", "expected_parameters"),
+    [
+        (
+            "Ranged weapons equipped by models in that unit have the [DEVASTATING WOUNDS] ability.",
+            "ranged",
+            {
+                "target_scope": "models_in_selected_unit",
+                "weapon_ability": "Devastating Wounds",
+                "weapon_scope": "ranged",
+            },
+        ),
+        (
+            "All weapons equipped by models in that unit have the [SUSTAINED HITS 1] ability.",
+            "all",
+            {
+                "target_scope": "models_in_selected_unit",
+                "weapon_ability": "Sustained Hits",
+                "weapon_ability_value": 1,
+                "weapon_scope": "all",
+            },
+        ),
+        (
+            "Weapons equipped by models in that unit have the [LANCE] ability.",
+            "all",
+            {
+                "target_scope": "models_in_selected_unit",
+                "weapon_ability": "Lance",
+                "weapon_scope": "all",
+            },
+        ),
+    ],
+)
+def test_phase17c_scoped_weapon_keyword_grant_variants_compile_to_generic_scope(
+    raw_text: str,
+    expected_scope: str,
+    expected_parameters: dict[str, object],
+) -> None:
+    rule_ir = _compiled(raw_text).rule_ir
+    effect = next(
+        effect for effect in _effects(rule_ir) if effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY
+    )
+    parameters = parameter_payload(effect.parameters)
+
+    assert rule_ir.is_supported
+    assert parameters["weapon_scope"] == expected_scope
+    assert parameters == expected_parameters
+
+
+def test_phase17c_single_charge_reroll_permission_compiles_with_unit_target_suffix() -> None:
+    rule_ir = _compiled("This unit can re-roll Charge rolls made for this unit.").rule_ir
+    clause = rule_ir.clauses[0]
+    effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.REROLL_PERMISSION
+    )
+
+    assert rule_ir.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert parameter_payload(effect.parameters) == {"roll_type": "charge"}
 
 
 def test_phase17c_skullmaster_fury_compiles_to_charge_move_weapon_keyword_grant() -> None:

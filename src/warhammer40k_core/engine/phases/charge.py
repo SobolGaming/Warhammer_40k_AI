@@ -30,6 +30,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_charge_roll_modifiers_for_unit,
+    catalog_charge_roll_reroll_permission_for_unit,
 )
 from warhammer40k_core.engine.charge_declaration import (
     CHARGE_MOVE_PENDING_STATUS,
@@ -1769,6 +1770,7 @@ def _resolve_charge_roll(
         state=state,
         player_id=selection.player_id,
         unit_instance_id=selection.unit_instance_id,
+        ability_index=ability_index,
     )
     if reroll_permission is not None:
         reroll_request = _charge_roll_reroll_request(
@@ -1932,14 +1934,28 @@ def _charge_reroll_permission_for_unit(
     state: GameState,
     player_id: str,
     unit_instance_id: str,
+    ability_index: AbilityCatalogIndex,
 ) -> RerollPermission | None:
-    return source_backed_reroll_permission_for_unit(
+    unit = _unit_by_id(state=state, unit_instance_id=unit_instance_id)
+    catalog_permission = catalog_charge_roll_reroll_permission_for_unit(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=_current_model_instance_ids_for_charge_unit(
+            state=state,
+            unit=unit,
+        ),
+        player_id=player_id,
+    )
+    source_backed_permission = source_backed_reroll_permission_for_unit(
         state=state,
         player_id=player_id,
         unit_instance_id=unit_instance_id,
         roll_type="charge_roll",
         timing_window="after_charge_roll",
     )
+    if catalog_permission is not None and source_backed_permission is not None:
+        raise GameLifecycleError("Multiple charge reroll permissions are available.")
+    return catalog_permission if catalog_permission is not None else source_backed_permission
 
 
 def _current_model_instance_ids_for_charge_unit(

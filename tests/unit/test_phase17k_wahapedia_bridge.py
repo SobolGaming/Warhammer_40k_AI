@@ -34,20 +34,25 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionConditionKind,
     WargearOptionEffectKind,
 )
+from warhammer40k_core.core.dice import RerollComponentSelectionPolicy
 from warhammer40k_core.core.model_geometry_catalog import (
     GeometryMeasurementKind,
     GeometrySourceUnits,
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
     AbilityKind,
     AntiKeywordMatchMode,
+    RangeProfile,
     TargetKeywordMatchMode,
     WeaponKeyword,
+    WeaponProfile,
 )
 from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
+    AbilityCatalogRecord,
     AbilityExecutionContext,
     AbilityResolutionStatus,
     default_ability_handler_registry,
@@ -66,6 +71,10 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_coverage_rows_from_catalog,
     ability_coverage_rows_payload,
 )
+from warhammer40k_core.engine.advance_eligibility_hooks import (
+    AdvanceEligibilityContext,
+    AdvanceEligibilityHookRegistry,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_shock import collect_battle_shock_test_requests
 from warhammer40k_core.engine.battlefield_state import (
@@ -75,10 +84,12 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
     CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
     CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
     CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+    CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
     CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
     CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID,
@@ -88,10 +99,25 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+    CatalogAdvanceEligibilityRuntime,
+    CatalogWeaponKeywordGrant,
+    CatalogWeaponKeywordGrantRuntime,
+    _catalog_roll_reroll_permission,  # pyright: ignore[reportPrivateUsage]
+    _catalog_weapon_keyword_grant_from_effect,  # pyright: ignore[reportPrivateUsage]
+    _effect_is_roll_reroll_permission,  # pyright: ignore[reportPrivateUsage]
+    _profile_with_catalog_weapon_keyword_grant,  # pyright: ignore[reportPrivateUsage]
+    _roll_reroll_consumer_id_for_effect,  # pyright: ignore[reportPrivateUsage]
+    _weapon_ability_descriptor_for_grant,  # pyright: ignore[reportPrivateUsage]
+    _weapon_keyword_grant_consumer_ids_for_effect,  # pyright: ignore[reportPrivateUsage]
+    _weapon_scope_matches_profile,  # pyright: ignore[reportPrivateUsage]
+    catalog_advance_roll_reroll_permission_for_unit,
     catalog_charge_roll_modifiers_for_unit,
+    catalog_charge_roll_reroll_permission_for_unit,
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
     catalog_rule_ir_registered_hook_ids,
+    catalog_weapon_keyword_grants_for_unit,
+    catalog_weapon_profile_modifier_bindings,
     record_catalog_feel_no_pain_sources_for_unit,
 )
 from warhammer40k_core.engine.catalog_turn_end_reserves import (
@@ -143,6 +169,18 @@ from warhammer40k_core.engine.list_validation import (
     resolve_wargear_selections,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phases.charge import (
+    _charge_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.phases.movement import (
+    _ability_index_for_player,  # pyright: ignore[reportPrivateUsage]
+    _advance_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
+    _validate_ability_index_mapping,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+    WeaponProfileModifierContext,
+)
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
@@ -605,6 +643,8 @@ def test_phase17k_instrument_of_chaos_catalog_ir_modifies_charge_roll_result() -
         )
     with pytest.raises(GameLifecycleError, match="classification requires RuleIR"):
         catalog_rule_ir_consumers_for_rule(cast(RuleIR, object()))
+    with pytest.raises(GameLifecycleError, match="classification requires RuleIR"):
+        catalog_rule_ir_hook_ids_for_rule(cast(RuleIR, object()))
 
 
 def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() -> None:
@@ -861,6 +901,575 @@ def test_phase17k_flesh_hounds_hunters_from_the_warp_uses_generic_turn_end_reser
         if record.event_type == CATALOG_TURN_END_RESERVES_USED_EVENT
     )
     assert len(used_events) == 1
+
+
+def test_phase17k_datasheet_advance_charge_text_uses_generic_advance_eligibility() -> None:
+    package = _advance_charge_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    advance_charge_record = records_by_name["Bounding Advance"]
+    replay_payload = advance_charge_record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    runtime = CatalogAdvanceEligibilityRuntime(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army,),
+    )
+    registry = AdvanceEligibilityHookRegistry.from_bindings(runtime.bindings())
+    state = _battle_state_with_army(
+        army=army,
+        battlefield=_bloodcrushers_battlefield_state(army=army, unit=unit),
+    )
+
+    grants = registry.grants_for(
+        AdvanceEligibilityContext(
+            state=state,
+            player_id=army.player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            movement_request_id="phase17k-advance-charge-request",
+            movement_result_id="phase17k-advance-charge-result",
+        )
+    )
+
+    assert advance_charge_record.definition.timing.trigger_kind is TimingTriggerKind.PASSIVE_QUERY
+    assert rule_ir.is_supported
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) == {
+        CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+    }
+    assert tuple(binding.hook_id for binding in registry.all_bindings()) == (
+        CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+    )
+    assert len(grants) == 1
+    assert grants[0].hook_id == CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID
+    assert grants[0].can_declare_charge is True
+    assert grants[0].can_shoot is False
+    assert grants[0].replay_payload == {
+        "ability": "can_advance_and_charge",
+        "ability_ids": [advance_charge_record.definition.ability_id],
+        "catalog_record_ids": [advance_charge_record.record_id],
+        "source_rule_ids": [advance_charge_record.definition.source_id],
+    }
+
+
+def test_phase17k_leading_model_reroll_text_uses_generic_advance_charge_rerolls() -> None:
+    package = _advance_charge_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    reroll_record = records_by_name["Lead the Hunt"]
+    replay_payload = reroll_record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
+    state = _battle_state_with_army(army=army, battlefield=battlefield)
+    current_model_ids = _current_model_ids(battlefield=battlefield, unit=unit)
+    advance_permission = catalog_advance_roll_reroll_permission_for_unit(
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        player_id=army.player_id,
+    )
+    charge_permission = catalog_charge_roll_reroll_permission_for_unit(
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        player_id=army.player_id,
+    )
+    advance_phase_permission = _advance_reroll_permission_for_unit(
+        state=state,
+        unit=unit,
+        unit_instance_id=unit.unit_instance_id,
+        player_id=army.player_id,
+        keywords=unit.keywords,
+        ability_index=player_index,
+        current_model_instance_ids=current_model_ids,
+    )
+    charge_phase_permission = _charge_reroll_permission_for_unit(
+        state=state,
+        player_id=army.player_id,
+        unit_instance_id=unit.unit_instance_id,
+        ability_index=player_index,
+    )
+    keyword_permission = _advance_reroll_permission_for_unit(
+        state=state,
+        unit=unit,
+        unit_instance_id=unit.unit_instance_id,
+        player_id=army.player_id,
+        keywords=("ADVANCE_REROLL",),
+        ability_index=AbilityCatalogIndex.from_records(()),
+        current_model_instance_ids=(),
+    )
+    empty_index = AbilityCatalogIndex.from_records(())
+    duplicate_index = AbilityCatalogIndex.from_records(
+        (
+            *player_index.all_records(),
+            replace(reroll_record, record_id=f"{reroll_record.record_id}:duplicate"),
+        )
+    )
+
+    assert reroll_record.definition.timing.trigger_kind is TimingTriggerKind.AFTER_DICE_ROLL
+    assert rule_ir.is_supported
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) == {
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    }
+    assert advance_permission is not None
+    assert advance_permission.eligible_roll_type == "advance_roll"
+    assert advance_permission.timing_window == "after_advance_roll"
+    assert advance_permission.owning_player_id == army.player_id
+    assert (
+        advance_permission.component_selection_policy is RerollComponentSelectionPolicy.WHOLE_ROLL
+    )
+    assert charge_permission is not None
+    assert charge_permission.eligible_roll_type == "charge_roll"
+    assert charge_permission.timing_window == "after_charge_roll"
+    assert charge_permission.owning_player_id == army.player_id
+    assert charge_permission.component_selection_policy is RerollComponentSelectionPolicy.WHOLE_ROLL
+    assert advance_phase_permission == advance_permission
+    assert charge_phase_permission == charge_permission
+    assert keyword_permission is not None
+    assert keyword_permission.source_id == f"{unit.unit_instance_id}:advance-reroll"
+    assert keyword_permission.eligible_roll_type == "advance_roll"
+    assert (
+        catalog_advance_roll_reroll_permission_for_unit(
+            ability_index=empty_index,
+            unit=unit,
+            current_model_instance_ids=current_model_ids,
+            player_id=army.player_id,
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="Multiple catalog roll reroll permissions"):
+        catalog_advance_roll_reroll_permission_for_unit(
+            ability_index=duplicate_index,
+            unit=unit,
+            current_model_instance_ids=current_model_ids,
+            player_id=army.player_id,
+        )
+    with pytest.raises(GameLifecycleError, match="requires an ability record"):
+        _catalog_roll_reroll_permission(
+            record=cast(AbilityCatalogRecord, object()),
+            clause=rule_ir.clauses[0],
+            effect_index=0,
+            player_id=army.player_id,
+            roll_type="advance_roll",
+            timing_window="after_advance_roll",
+        )
+    with pytest.raises(GameLifecycleError, match="requires a rule clause"):
+        _catalog_roll_reroll_permission(
+            record=reroll_record,
+            clause=cast(RuleClause, object()),
+            effect_index=0,
+            player_id=army.player_id,
+            roll_type="advance_roll",
+            timing_window="after_advance_roll",
+        )
+    with pytest.raises(GameLifecycleError, match="effect_index must be non-negative"):
+        _catalog_roll_reroll_permission(
+            record=reroll_record,
+            clause=rule_ir.clauses[0],
+            effect_index=-1,
+            player_id=army.player_id,
+            roll_type="advance_roll",
+            timing_window="after_advance_roll",
+        )
+
+
+def test_phase17k_leading_model_weapon_keyword_text_modifies_scoped_weapon_profiles() -> None:
+    package = _advance_charge_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    weapon_grant_record = records_by_name["Pack Killers"]
+    replay_payload = weapon_grant_record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
+    state = _battle_state_with_army(army=army, battlefield=battlefield)
+    current_model_ids = _current_model_ids(battlefield=battlefield, unit=unit)
+    swift_claws = next(
+        wargear
+        for wargear in package.army_catalog.wargear
+        if wargear.wargear_id == "test-advance-charge-unit:swift-claws"
+    )
+    melee_profile = swift_claws.weapon_profiles[0]
+    ranged_profile = replace(
+        melee_profile,
+        profile_id=f"{melee_profile.profile_id}:ranged-copy",
+        range_profile=RangeProfile.distance(12),
+    )
+    grants = catalog_weapon_keyword_grants_for_unit(
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+    )
+    bindings = catalog_weapon_profile_modifier_bindings(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army,),
+    )
+    registry = RuntimeModifierRegistry.from_bindings(
+        weapon_profile_modifier_bindings=bindings,
+    )
+    attacker_model_id = unit.own_models[0].model_instance_id
+    melee_context = WeaponProfileModifierContext(
+        state=state,
+        source_phase=BattlePhase.FIGHT,
+        attacking_unit_instance_id=unit.unit_instance_id,
+        attacker_model_instance_id=attacker_model_id,
+        target_unit_instance_id="phase17k-target-unit",
+        weapon_profile=melee_profile,
+    )
+    ranged_context = replace(melee_context, weapon_profile=ranged_profile)
+    modified_melee = registry.modified_weapon_profile(melee_context)
+    modified_ranged = registry.modified_weapon_profile(ranged_context)
+
+    assert weapon_grant_record.definition.timing.trigger_kind is TimingTriggerKind.PASSIVE_QUERY
+    assert rule_ir.is_supported
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:lethal-hits",
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) == {
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:lethal-hits",
+    }
+    assert tuple(binding.modifier_id for binding in bindings) == (
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+    )
+    assert len(grants) == 1
+    assert grants[0].keyword is WeaponKeyword.LETHAL_HITS
+    assert grants[0].weapon_scope == "melee"
+    assert grants[0].ability is not None
+    assert grants[0].ability.ability_kind is AbilityKind.LETHAL_HITS
+    assert WeaponKeyword.LETHAL_HITS in modified_melee.keywords
+    assert any(
+        ability.ability_kind is AbilityKind.LETHAL_HITS for ability in modified_melee.abilities
+    )
+    assert grants[0].source_id in modified_melee.source_ids
+    assert modified_ranged == ranged_profile
+
+
+def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values() -> None:
+    package = _advance_charge_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    record = {record.definition.name: record for record in player_index.all_records()}[
+        "Pack Killers"
+    ]
+    replay_payload = record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    clause = rule_ir.clauses[0]
+    melee_profile = next(
+        wargear.weapon_profiles[0]
+        for wargear in package.army_catalog.wargear
+        if wargear.wargear_id == "test-advance-charge-unit:swift-claws"
+    )
+    ranged_profile = replace(
+        melee_profile,
+        profile_id=f"{melee_profile.profile_id}:helper-ranged-copy",
+        range_profile=RangeProfile.distance(12),
+    )
+    grant = CatalogWeaponKeywordGrant(
+        source_id="phase17k-helper-grant",
+        keyword=cast(WeaponKeyword, "Lance"),
+        weapon_scope="all weapons",
+    )
+    updated_profile = _profile_with_catalog_weapon_keyword_grant(
+        profile=melee_profile,
+        grant=grant,
+    )
+
+    assert _catalog_weapon_keyword_grant_from_effect(
+        record=record,
+        clause=clause,
+        effect_index=0,
+        effect=clause.effects[0],
+    ) == CatalogWeaponKeywordGrant(
+        source_id=f"{record.record_id}:{clause.clause_id}:effect-000:weapon-keyword",
+        keyword=WeaponKeyword.LETHAL_HITS,
+        weapon_scope="melee",
+        ability=AbilityDescriptor.lethal_hits(),
+    )
+    assert (
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=clause,
+            effect_index=1,
+            effect=_effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="hit", delta=1),
+        )
+        is None
+    )
+    assert (
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=clause,
+            effect_index=1,
+            effect=_effect(RuleEffectKind.GRANT_WEAPON_ABILITY, weapon_scope="melee"),
+        )
+        is None
+    )
+    assert (
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=clause,
+            effect_index=1,
+            effect=_effect(RuleEffectKind.GRANT_WEAPON_ABILITY, weapon_ability="Lethal Hits"),
+        )
+        is None
+    )
+    assert (
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=clause,
+            effect_index=1,
+            effect=_effect(
+                RuleEffectKind.GRANT_WEAPON_ABILITY,
+                weapon_ability="Sustained Hits",
+                weapon_scope="all",
+            ),
+        )
+        is None
+    )
+    assert _weapon_keyword_grant_consumer_ids_for_effect(
+        _effect(
+            RuleEffectKind.GRANT_WEAPON_ABILITY,
+            weapon_ability="Sustained Hits",
+            weapon_ability_value=1,
+            weapon_scope="all",
+        )
+    ) == (
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:sustained-hits",
+    )
+    assert (
+        _weapon_keyword_grant_consumer_ids_for_effect(
+            _effect(
+                RuleEffectKind.GRANT_WEAPON_ABILITY,
+                weapon_ability="Hunter",
+                weapon_scope="all",
+            )
+        )
+        == ()
+    )
+    assert grant.keyword is WeaponKeyword.LANCE
+    assert grant.weapon_scope == "all"
+    assert WeaponKeyword.LANCE in updated_profile.keywords
+    assert grant.source_id in updated_profile.source_ids
+    assert (
+        _profile_with_catalog_weapon_keyword_grant(profile=updated_profile, grant=grant)
+        is updated_profile
+    )
+    assert _weapon_scope_matches_profile(weapon_scope="all", profile=melee_profile)
+    assert _weapon_scope_matches_profile(weapon_scope="melee", profile=melee_profile)
+    assert not _weapon_scope_matches_profile(weapon_scope="ranged", profile=melee_profile)
+    assert _weapon_scope_matches_profile(weapon_scope="ranged weapons", profile=ranged_profile)
+    assert not _weapon_scope_matches_profile(weapon_scope="melee", profile=ranged_profile)
+    for keyword, parameters, expected_kind in (
+        (WeaponKeyword.DEVASTATING_WOUNDS, {}, AbilityKind.DEVASTATING_WOUNDS),
+        (WeaponKeyword.HEAVY, {}, AbilityKind.HEAVY),
+        (WeaponKeyword.SUSTAINED_HITS, {"weapon_ability_value": 1}, AbilityKind.SUSTAINED_HITS),
+        (WeaponKeyword.RAPID_FIRE, {"weapon_ability_value": 2}, AbilityKind.RAPID_FIRE),
+        (WeaponKeyword.MELTA, {"weapon_ability_value": 3}, AbilityKind.MELTA),
+        (WeaponKeyword.CLEAVE, {"weapon_ability_value": 4}, AbilityKind.CLEAVE),
+    ):
+        descriptor = _weapon_ability_descriptor_for_grant(
+            parameters=parameters,
+            keyword=keyword,
+        )
+        assert descriptor is not None
+        assert descriptor.ability_kind is expected_kind
+    assert _weapon_ability_descriptor_for_grant(parameters={}, keyword=WeaponKeyword.LANCE) is None
+    runtime = CatalogWeaponKeywordGrantRuntime(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army,),
+    )
+    with pytest.raises(GameLifecycleError, match="missing player ability index"):
+        CatalogWeaponKeywordGrantRuntime(ability_indexes_by_player_id={}, armies=(army,))
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        runtime.weapon_profile_modifier(cast(WeaponProfileModifierContext, object()))
+    with pytest.raises(GameLifecycleError, match="unit is unknown"):
+        runtime.weapon_profile_modifier(
+            WeaponProfileModifierContext(
+                state=_battle_state_with_army(
+                    army=army,
+                    battlefield=_bloodcrushers_battlefield_state(army=army, unit=unit),
+                ),
+                source_phase=BattlePhase.FIGHT,
+                attacking_unit_instance_id="phase17k-unknown-unit",
+                attacker_model_instance_id=unit.own_models[0].model_instance_id,
+                target_unit_instance_id="phase17k-target-unit",
+                weapon_profile=melee_profile,
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="ability must be a descriptor"):
+        CatalogWeaponKeywordGrant(
+            source_id="phase17k-bad-ability-grant",
+            keyword=WeaponKeyword.LANCE,
+            weapon_scope="all",
+            ability=cast(AbilityDescriptor, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="requires an ability record"):
+        _catalog_weapon_keyword_grant_from_effect(
+            record=cast(AbilityCatalogRecord, object()),
+            clause=clause,
+            effect_index=0,
+            effect=clause.effects[0],
+        )
+    with pytest.raises(GameLifecycleError, match="requires a rule clause"):
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=cast(RuleClause, object()),
+            effect_index=0,
+            effect=clause.effects[0],
+        )
+    with pytest.raises(GameLifecycleError, match="effect_index must be non-negative"):
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=clause,
+            effect_index=-1,
+            effect=clause.effects[0],
+        )
+    with pytest.raises(GameLifecycleError, match="requires a rule effect"):
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=clause,
+            effect_index=0,
+            effect=cast(RuleEffectSpec, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="unsupported keyword"):
+        _weapon_keyword_grant_consumer_ids_for_effect(
+            _effect(
+                RuleEffectKind.GRANT_WEAPON_ABILITY,
+                weapon_ability="Bad Keyword",
+                weapon_scope="all",
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="requires RuleEffectSpec values"):
+        _weapon_keyword_grant_consumer_ids_for_effect(cast(RuleEffectSpec, object()))
+    with pytest.raises(GameLifecycleError, match="cannot infer Hunter targets"):
+        _weapon_ability_descriptor_for_grant(parameters={}, keyword=WeaponKeyword.HUNTER)
+    with pytest.raises(GameLifecycleError, match="must be a positive integer"):
+        _weapon_ability_descriptor_for_grant(
+            parameters={},
+            keyword=WeaponKeyword.SUSTAINED_HITS,
+        )
+    with pytest.raises(GameLifecycleError, match="must be a positive integer"):
+        _weapon_ability_descriptor_for_grant(
+            parameters={"weapon_ability_value": 0},
+            keyword=WeaponKeyword.SUSTAINED_HITS,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a WeaponProfile"):
+        _profile_with_catalog_weapon_keyword_grant(
+            profile=cast(WeaponProfile, object()),
+            grant=grant,
+        )
+    with pytest.raises(GameLifecycleError, match="requires grant data"):
+        _profile_with_catalog_weapon_keyword_grant(
+            profile=melee_profile,
+            grant=cast(CatalogWeaponKeywordGrant, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="requires a WeaponProfile"):
+        _weapon_scope_matches_profile(
+            weapon_scope="all",
+            profile=cast(WeaponProfile, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="Unsupported catalog weapon keyword grant scope"):
+        _weapon_scope_matches_profile(weapon_scope="bad scope", profile=melee_profile)
+
+
+def test_phase17k_catalog_ir_roll_reroll_classification_requires_supported_target() -> None:
+    this_unit_rule = _catalog_rule_ir(
+        (
+            _effect(RuleEffectKind.REROLL_PERMISSION, roll_type="advance"),
+            _effect(RuleEffectKind.REROLL_PERMISSION, roll_type="charge"),
+        ),
+        target_kind=RuleTargetKind.THIS_UNIT,
+    )
+    selected_unit_without_leader_rule = _catalog_rule_ir(
+        (_effect(RuleEffectKind.REROLL_PERMISSION, roll_type="advance"),),
+        target_kind=RuleTargetKind.SELECTED_UNIT,
+    )
+    unsupported_roll_rule = _catalog_rule_ir(
+        (_effect(RuleEffectKind.REROLL_PERMISSION, roll_type="damage"),),
+        target_kind=RuleTargetKind.THIS_UNIT,
+    )
+
+    assert catalog_rule_ir_consumers_for_rule(this_unit_rule) == (
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(this_unit_rule)) == {
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    }
+    assert catalog_rule_ir_consumers_for_rule(selected_unit_without_leader_rule) == ()
+    assert catalog_rule_ir_consumers_for_rule(unsupported_roll_rule) == ()
+    assert catalog_rule_ir_hook_ids_for_rule(unsupported_roll_rule) == ()
+
+
+def test_phase17k_catalog_ir_roll_reroll_effect_helpers_are_strict() -> None:
+    advance_effect = _effect(RuleEffectKind.REROLL_PERMISSION, roll_type="advance")
+    charge_effect = _effect(RuleEffectKind.REROLL_PERMISSION, roll_type="charge")
+    non_reroll_effect = _effect(RuleEffectKind.GRANT_ABILITY, ability="can_advance_and_charge")
+    malformed_effect = _effect(RuleEffectKind.REROLL_PERMISSION, roll_type=1)
+
+    assert _effect_is_roll_reroll_permission(advance_effect, roll_type="advance_roll")
+    assert not _effect_is_roll_reroll_permission(advance_effect, roll_type="charge_roll")
+    assert not _effect_is_roll_reroll_permission(non_reroll_effect, roll_type="advance_roll")
+    assert not _effect_is_roll_reroll_permission(malformed_effect, roll_type="advance_roll")
+    assert (
+        _roll_reroll_consumer_id_for_effect(advance_effect)
+        == CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID
+    )
+    assert (
+        _roll_reroll_consumer_id_for_effect(charge_effect)
+        == CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID
+    )
+    assert _roll_reroll_consumer_id_for_effect(non_reroll_effect) is None
+    assert _roll_reroll_consumer_id_for_effect(malformed_effect) is None
+    with pytest.raises(GameLifecycleError, match="requires RuleEffectSpec values"):
+        _effect_is_roll_reroll_permission(
+            cast(RuleEffectSpec, object()),
+            roll_type="advance_roll",
+        )
+    with pytest.raises(GameLifecycleError, match="requires RuleEffectSpec values"):
+        _roll_reroll_consumer_id_for_effect(cast(RuleEffectSpec, object()))
+
+
+def test_phase17k_movement_phase_ability_index_mapping_is_fail_fast() -> None:
+    index = AbilityCatalogIndex.from_records(())
+    validated = _validate_ability_index_mapping({"player-a": index})
+    present_index = _ability_index_for_player(validated, player_id="player-a")
+    missing_index = _ability_index_for_player(validated, player_id="player-b")
+
+    assert validated["player-a"] is index
+    assert present_index is index
+    assert tuple(missing_index.all_records()) == ()
+    with pytest.raises(GameLifecycleError, match="must be a mapping"):
+        _validate_ability_index_mapping(("player-a", index))
+    with pytest.raises(GameLifecycleError, match="values must be AbilityCatalogIndex"):
+        _validate_ability_index_mapping({"player-a": cast(AbilityCatalogIndex, object())})
+    with pytest.raises(GameLifecycleError, match="must be a mapping"):
+        _ability_index_for_player(("player-a", index), player_id="player-a")
+    with pytest.raises(GameLifecycleError, match="contained an invalid value"):
+        _ability_index_for_player(
+            {"player-a": cast(AbilityCatalogIndex, object())},
+            player_id="player-a",
+        )
 
 
 def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
@@ -1830,6 +2439,8 @@ def test_phase17k_catalog_ir_future_hooks_classify_supported_rule_ir_without_con
             _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="wound", delta=1),
             _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="invulnerable_save", delta=1),
             _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="critical_hit", delta=-1),
+            _effect(RuleEffectKind.REROLL_PERMISSION, roll_type="advance_roll"),
+            _effect(RuleEffectKind.REROLL_PERMISSION, roll_type="charge_roll"),
             _effect(
                 RuleEffectKind.MODIFY_CHARACTERISTIC,
                 characteristic=Characteristic.TOUGHNESS.value,
@@ -1853,6 +2464,8 @@ def test_phase17k_catalog_ir_future_hooks_classify_supported_rule_ir_without_con
         CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
         CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
         CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
         "catalog-ir:toughness-characteristic-modifier",
         "catalog-ir:objective-control-characteristic-modifier",
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
@@ -1868,6 +2481,8 @@ def test_phase17k_catalog_ir_future_hooks_classify_supported_rule_ir_without_con
         CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
         CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
         CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
         "catalog-ir:movement-characteristic-query",
         "catalog-ir:toughness-characteristic-query",
         "catalog-ir:objective-control-characteristic-query",
@@ -2433,6 +3048,14 @@ def _flesh_hounds_package() -> CanonicalCatalogPackage:
     )
 
 
+def _advance_charge_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_advance_charge_bridge_artifacts(),
+    )
+
+
 def _bloodcrushers_unit(
     *,
     package: CanonicalCatalogPackage,
@@ -2498,6 +3121,30 @@ def _flesh_hounds_unit(
                     option_id=option.option_id,
                     model_profile_id=option.model_profile_id,
                     wargear_ids=(selected_wargear_id,),
+                ),
+            ),
+        ),
+        datasheet=datasheet,
+    )
+
+
+def _advance_charge_unit(
+    *,
+    package: CanonicalCatalogPackage,
+) -> UnitInstance:
+    datasheet = package.army_catalog.datasheet_by_id("test-advance-charge-unit")
+    return UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-daemons",
+        selection=UnitMusterSelection(
+            unit_selection_id="advance-charge-unit-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="test-advance-charge-unit:swift-hunter",
+                    model_count=1,
                 ),
             ),
         ),
@@ -2986,6 +3633,115 @@ def _flesh_hounds_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                 height_source_id="geometry-review:chaos-daemons:flesh-hounds:height",
                 height_document_reference="Chaos Daemons Faction Pack p.26",
             ),
+        ),
+    )
+
+
+def _advance_charge_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_advance_charge_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-advance-charge-unit",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-advance-charge-unit",
+                model_name="Swift Hunter",
+                height=1.4,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:test:advance-charge:swift-hunter:height",
+                height_document_reference="Test Advance Charge Datasheet",
+            ),
+        ),
+    )
+
+
+def _advance_charge_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Test Army Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-advance-charge-unit,Advance Charge Unit,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-advance-charge-unit,1,Faction,test-army-rule,"
+                        "Test Army Rule,Test rule text.,"
+                    ),
+                    (
+                        "test-advance-charge-unit,2,Datasheet,,Bounding Advance,"
+                        "This unit is eligible to declare a charge in a turn in  which "
+                        "it Advanced.,"
+                    ),
+                    (
+                        "test-advance-charge-unit,3,Datasheet,,Lead the Hunt,"
+                        '"While this model is leading a unit, you can re-roll  Advance '
+                        'and Charge rolls made for that unit.",'
+                    ),
+                    (
+                        "test-advance-charge-unit,4,Datasheet,,Pack Killers,"
+                        '"While this model is leading a unit, melee weapons equipped by '
+                        'models in that unit have the  [LETHAL HITS] ability.",'
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-advance-charge-unit,Beasts,,false",
+                    "test-advance-charge-unit,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-advance-charge-unit,1,10,4,6,5,2,7,1,40mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    "test-advance-charge-unit,1,1,Swift claws,Melee,Melee,4,4,4,0,1,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    "test-advance-charge-unit,1,1 Swift Hunter",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
         ),
     )
 
