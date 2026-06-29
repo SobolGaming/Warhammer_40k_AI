@@ -209,6 +209,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:save-characteristic-query` | No current generated rows |
 | `catalog-ir:save-roll-modifier` | No current generated rows |
+| `catalog-ir:shadow-of-chaos-aura` | No current generated rows |
 | `catalog-ir:strength-characteristic-modifier` | No current generated rows |
 | `catalog-ir:strength-characteristic-query` | No current generated rows |
 | `catalog-ir:toughness-characteristic-modifier` | No current generated rows |

@@ -83,6 +83,7 @@ TARGET_SCOPED_EFFECT_KINDS = (
     RuleEffectKind.PLACEMENT_PERMISSION,
     RuleEffectKind.PLACEMENT_RESTRICTION,
     RuleEffectKind.REROLL_PERMISSION,
+    RuleEffectKind.SET_CONTEXTUAL_STATUS,
     RuleEffectKind.SET_CHARACTERISTIC,
 )
 AURA_ALLEGIANCE_ANY = "any"
@@ -579,6 +580,7 @@ def default_rule_execution_registry() -> RuleExecutionRegistry:
                     RuleEffectKind.GRANT_WEAPON_ABILITY,
                     RuleEffectKind.PLACEMENT_PERMISSION,
                     RuleEffectKind.PLACEMENT_RESTRICTION,
+                    RuleEffectKind.SET_CONTEXTUAL_STATUS,
                     RuleEffectKind.SET_CHARACTERISTIC,
                 ),
                 handler=_generic_effect_handler,

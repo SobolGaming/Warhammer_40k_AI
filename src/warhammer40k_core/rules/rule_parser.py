@@ -29,6 +29,7 @@ from warhammer40k_core.rules.rule_templates import (
     AURA_TEMPLATE_ID,
     CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
     CHARACTERISTIC_SET_TEMPLATE_ID,
+    CONTEXTUAL_STATUS_TEMPLATE_ID,
     DICE_ROLL_MODIFIER_TEMPLATE_ID,
     DISTANCE_PREDICATE_TEMPLATE_ID,
     GRANT_ABILITY_TEMPLATE_ID,
@@ -196,6 +197,11 @@ _FEEL_NO_PAIN_ABILITY_RE = re.compile(
     r"\b(?:gains?|have|has)\s+(?:the\s+)?Feel\s+No\s+Pain\s+"
     r"(?P<threshold>[2-6])\+\s+ability"
     r"(?:\s+against\s+(?P<attack_condition>Psychic\s+Attacks?))?\b",
+    re.IGNORECASE,
+)
+_SHADOW_OF_CHAOS_STATUS_RE = re.compile(
+    r"\b(?:that|selected|target)\s+unit\s+is\s+within\s+your\s+"
+    r"army(?:'|\u2019)s\s+Shadow\s+of\s+Chaos\b",
     re.IGNORECASE,
 )
 _WEAPON_KEYWORD_PATTERN = "|".join(
@@ -446,6 +452,7 @@ def _compile_clause(
             *_parse_characteristic_effects(clause_text),
             *_parse_resource_effects(clause_text),
             *_parse_grant_ability_effects(clause_text),
+            *_parse_contextual_status_effects(clause_text),
             *_parse_weapon_ability_effects(clause_text),
             *_parse_placement_effects(clause_text),
         )
@@ -977,6 +984,25 @@ def _parse_grant_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSp
     return tuple(effects)
 
 
+def _parse_contextual_status_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
+    effects: list[RuleEffectSpec] = []
+    for match in _SHADOW_OF_CHAOS_STATUS_RE.finditer(clause_text.text):
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.SET_CONTEXTUAL_STATUS,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("status", "within_shadow_of_chaos"),
+                        ("rules_context", "shadow_of_chaos"),
+                        ("owner", "your_army"),
+                    )
+                ),
+            )
+        )
+    return tuple(effects)
+
+
 def _parse_weapon_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
     for match in _NAMED_WEAPON_ABILITY_RE.finditer(clause_text.text):
@@ -1216,6 +1242,8 @@ def _template_id_for_clause(
             candidates.append(WEAPON_ABILITY_GRANT_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.GRANT_ABILITY:
             candidates.append(GRANT_ABILITY_TEMPLATE_ID)
+        elif effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS:
+            candidates.append(CONTEXTUAL_STATUS_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
             candidates.append(DICE_ROLL_MODIFIER_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.REROLL_PERMISSION:

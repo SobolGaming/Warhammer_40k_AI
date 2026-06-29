@@ -17,7 +17,14 @@ from tests.unit.test_phase11c_command_phase import (
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    CatalogJsonObject,
+    DatasheetAbilityDescriptor,
+    DatasheetDefinition,
+    DatasheetKeywordSet,
+)
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -59,6 +66,8 @@ from warhammer40k_core.engine.stratagems import (
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
 )
@@ -125,6 +134,53 @@ def test_daemonic_manifestation_modifies_battle_shock_and_heals_one_model() -> N
     healing_effect = cast(dict[str, JsonValue], manifestation_payload["healing_effect"])
     assert healing_effect["source_rule_id"] == army_rule.SOURCE_RULE_ID
     assert _model_by_id(state, wounded_model_id).wounds_remaining == 2
+
+
+def test_daemonic_manifestation_uses_semantic_shadow_of_chaos_aura() -> None:
+    state = _battle_state(
+        player_a_units=(
+            _default_unit_selection("intercessor-unit-1"),
+            _default_unit_selection("intercessor-unit-2"),
+        )
+    )
+    _mark_player_as_chaos_daemons(state, player_id="player-a", remove_battleline=True)
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-alpha:intercessor-unit-2"
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Character", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(_semantic_shadow_aura_ability(allegiance="Khorne"),),
+    )
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("Infantry", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+    )
+    _place_unit_near_center(state, unit_instance_id=source_unit_id, offset=(16.0, 0.0))
+    _place_unit_near_center(state, unit_instance_id=target_unit_id, offset=(18.0, 0.0))
+    _remove_first_models(state, unit_instance_id=target_unit_id, count=3)
+    wounded_model_id = _placed_model_ids(state, target_unit_id)[0]
+    _replace_model_wounds(state, model_instance_id=wounded_model_id, wounds_remaining=1)
+    _record_battle_shock_auto_pass(state, unit_instance_id=target_unit_id)
+    decisions = DecisionController()
+    handler = CommandPhaseHandler(
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        battle_shock_hooks=_chaos_daemons_battle_shock_hooks(),
+    )
+
+    completed = handler.begin_phase(state=state, decisions=decisions)
+
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    assert _model_by_id(state, wounded_model_id).wounds_remaining == 2
+    manifestation_payload = _event_payload(
+        decisions,
+        "chaos_daemons_daemonic_manifestation_healing_resolved",
+    )
+    assert manifestation_payload["unit_instance_id"] == target_unit_id
+    assert manifestation_payload["source_rule_id"] == army_rule.SOURCE_RULE_ID
 
 
 def test_daemonic_manifestation_caps_non_battleline_healing_before_revival() -> None:
@@ -555,6 +611,67 @@ def _mark_player_as_chaos_daemons(
             )
         )
     state.army_definitions = updated_armies
+
+
+def _replace_unit_keywords_and_abilities(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    keywords: tuple[str, ...],
+    faction_keywords: tuple[str, ...],
+    datasheet_abilities: tuple[DatasheetAbilityDescriptor, ...] | None = None,
+) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    replaced = False
+    for army in state.army_definitions:
+        updated_units: list[UnitInstance] = []
+        for unit in army.units:
+            if unit.unit_instance_id != unit_instance_id:
+                updated_units.append(unit)
+                continue
+            replaced = True
+            updated_units.append(
+                replace(
+                    unit,
+                    keywords=keywords,
+                    faction_keywords=faction_keywords,
+                    datasheet_abilities=(
+                        unit.datasheet_abilities
+                        if datasheet_abilities is None
+                        else datasheet_abilities
+                    ),
+                )
+            )
+        updated_armies.append(replace(army, units=tuple(updated_units)))
+    if not replaced:
+        raise AssertionError(f"missing unit {unit_instance_id}")
+    state.army_definitions = updated_armies
+
+
+def _semantic_shadow_aura_ability(*, allegiance: str) -> DatasheetAbilityDescriptor:
+    compiled = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id=f"phase17g:test:semantic-shadow-aura:{allegiance.lower()}",
+            raw_text=(
+                f"Daemonic Shadow (Aura): While a friendly {allegiance} Legiones Daemonica "
+                'unit is within 6" of this model, that unit is within your army\u2019s Shadow '
+                "of Chaos."
+            ),
+        )
+    )
+    if not compiled.rule_ir.is_supported:
+        raise AssertionError("semantic Shadow of Chaos aura must compile")
+    return DatasheetAbilityDescriptor(
+        ability_id=f"phase17g-semantic-shadow-aura-{allegiance.lower()}",
+        name="Daemonic Shadow",
+        source_id=f"phase17g:test:semantic-shadow-aura:{allegiance.lower()}",
+        support=CatalogAbilitySupport.GENERIC_RULE_IR,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="semantic Shadow of Chaos aura",
+        rule_ir_payload=cast(CatalogJsonObject, compiled.rule_ir.to_payload()),
+        timing_tags=("passive_query",),
+        parameter_tokens=(allegiance.lower(), "shadow_of_chaos"),
+    )
 
 
 def _record_battle_shock_auto_pass(state: GameState, *, unit_instance_id: str) -> None:
