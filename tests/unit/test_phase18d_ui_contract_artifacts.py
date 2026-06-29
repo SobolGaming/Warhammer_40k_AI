@@ -5,8 +5,17 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import cast
+from typing import Protocol, cast
 
+from jsonschema import Draft202012Validator
+from referencing import Resource
+from referencing.jsonschema import (
+    DRAFT202012,
+    EMPTY_REGISTRY,
+    Schema,
+    SchemaRegistry,
+    SchemaResource,
+)
 from scripts.export_ui_contract_fixtures import (
     MODEL_ALPHA_1,
     PLAYER_A,
@@ -15,9 +24,11 @@ from scripts.export_ui_contract_fixtures import (
     UI_FIXTURE_DIR,
     UNIT_ALPHA,
     UNIT_BETA,
+    build_local_session_at_movement_request,
     export_ui_contract_files,
 )
 
+from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -45,6 +56,13 @@ FIXTURE_FILES = (
     "post_deployment_view.json",
     "visible_modifier_datacard_view.json",
 )
+GAME_VIEW_FIXTURE_FILES = (
+    "hidden_secondary_redaction_view.json",
+    "initial_setup_view_player1.json",
+    "initial_setup_view_player2.json",
+    "post_deployment_view.json",
+    "visible_modifier_datacard_view.json",
+)
 PROPOSAL_EXAMPLE_FILES = (
     "charge_move.json",
     "deployment_placement.json",
@@ -53,6 +71,10 @@ PROPOSAL_EXAMPLE_FILES = (
     "opportunity_window.json",
     "shooting_target_selection.json",
 )
+
+
+class _PayloadValidator(Protocol):
+    def validate(self, instance: object) -> None: ...
 
 
 def test_ui_contract_artifacts_are_json_safe_and_scrubbed() -> None:
@@ -71,6 +93,33 @@ def test_ui_contract_artifacts_are_json_safe_and_scrubbed() -> None:
         assert not MEMORY_REPR_PATTERN.search(encoded)
         assert "object at 0x" not in encoded
         _assert_no_ui_owned_state(payload)
+
+
+def test_ui_contract_schemas_validate_generated_and_live_payloads() -> None:
+    registry = _schema_registry()
+    for schema_payload in _schema_payloads().values():
+        Draft202012Validator.check_schema(schema_payload)
+
+    game_view_validator = _schema_validator(
+        "game_view.schema.json",
+        registry=registry,
+    )
+    for fixture_name in GAME_VIEW_FIXTURE_FILES:
+        game_view_validator.validate(_fixture(fixture_name))
+
+    _schema_validator("decision_request_view.schema.json", registry=registry).validate(
+        _fixture("pending_movement_request.json")
+    )
+
+    session, _status = build_local_session_at_movement_request(
+        game_id="ui-contract-schema-validation"
+    )
+    _schema_validator("rules_catalog_view.schema.json", registry=registry).validate(
+        session.rules_catalog_view()
+    )
+    _schema_validator("event_stream_delta.schema.json", registry=registry).validate(
+        session.events_since(EventStreamCursor(0), viewer_player_id=PLAYER_A)
+    )
 
 
 def test_exporter_reproduces_committed_ui_contract_payloads(tmp_path: Path) -> None:
@@ -228,6 +277,33 @@ def _read_json(path: Path) -> dict[str, JsonValue]:
     payload = validate_json_value(json.loads(path.read_text(encoding="utf-8")))
     assert isinstance(payload, dict), f"{path} must contain a JSON object."
     return payload
+
+
+def _schema_payloads() -> dict[str, Schema]:
+    payloads: dict[str, Schema] = {}
+    for path in SCHEMA_FILES:
+        payloads[path.name] = cast(Schema, _read_json(REPO_ROOT / path))
+    return payloads
+
+
+def _schema_registry() -> SchemaRegistry:
+    registry = EMPTY_REGISTRY
+    for schema in _schema_payloads().values():
+        if not isinstance(schema, dict):
+            raise TypeError("UI contract schemas must be JSON objects.")
+        schema_id = schema.get("$id")
+        assert type(schema_id) is str, "UI contract schemas must declare string $id values."
+        resource = cast(
+            SchemaResource,
+            Resource.from_contents(cast(Schema, schema), default_specification=DRAFT202012),
+        )
+        registry = registry.with_resource(schema_id, resource)
+    return registry
+
+
+def _schema_validator(schema_name: str, *, registry: SchemaRegistry) -> _PayloadValidator:
+    schema = _schema_payloads()[schema_name]
+    return cast(_PayloadValidator, Draft202012Validator(schema, registry=registry))
 
 
 def _assert_no_ui_owned_state(value: JsonValue) -> None:
