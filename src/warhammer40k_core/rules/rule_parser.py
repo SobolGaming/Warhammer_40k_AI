@@ -238,11 +238,29 @@ _WEAPON_KEYWORD_PATTERN = "|".join(
     re.escape(keyword)
     for keyword in sorted(canonical_weapon_keyword_tokens(), key=len, reverse=True)
 )
+_WEAPON_ABILITY_VALUE_PATTERN = r"D3|\d+"
+_ABILITY_CHOICE_PREFIX_RE = re.compile(
+    r"\bselect\s+one\s+of\s+the\s+following\s+abilities\s*:",
+    re.IGNORECASE,
+)
+_THAT_ABILITY_APPLICATION_RE = re.compile(r"\bthat\s+ability\b", re.IGNORECASE)
+_WEAPON_ABILITY_CHOICE_TOKEN_RE = re.compile(
+    rf"\[\s*(?P<ability>{_WEAPON_KEYWORD_PATTERN})"
+    rf"(?:\s+(?P<ability_value>{_WEAPON_ABILITY_VALUE_PATTERN}))?\s*\]",
+    re.IGNORECASE,
+)
+_NAMED_WEAPON_ABILITY_CHOICE_RE = re.compile(
+    r"\bselect\s+one\s+of\s+the\s+following\s+abilities\s*:\s+(?P<abilities>.+?)\.\s+"
+    r"Until\s+the\s+end\s+of\s+the\s+(?:phase|turn|battle\s+round|battle),\s+"
+    r"(?P<target_scope>this\s+model|this\s+unit|that\s+unit|selected\s+unit)'?s\s+"
+    r"(?P<weapon_names>.+?)\s+(?:has|have)\s+that\s+ability\b",
+    re.IGNORECASE | re.DOTALL,
+)
 _WEAPON_ABILITY_RE = re.compile(
     rf"\b(?P<weapon_scope>(?:all\s+)?weapons?|ranged\s+weapons?|melee\s+weapons?)"
     rf".{{0,100}}\b(?:gain|gains|have|has)\s+"
     rf"(?:the\s+)?\[?(?P<ability>{_WEAPON_KEYWORD_PATTERN})"
-    rf"(?:\s+(?P<ability_value>\d+))?\]?"
+    rf"(?:\s+(?P<ability_value>{_WEAPON_ABILITY_VALUE_PATTERN}))?\]?"
     rf"(?:\s+ability)?\b",
     re.IGNORECASE,
 )
@@ -250,7 +268,7 @@ _NAMED_WEAPON_ABILITY_RE = re.compile(
     rf"\b(?P<weapon_name>[A-Z][A-Za-z0-9 ':-]+?)\s+equipped\s+by\s+models\s+"
     rf"in\s+(?:that|this|the\s+selected)\s+unit\s+(?:gain|gains|have|has)\s+"
     rf"(?:the\s+)?\[?(?P<ability>{_WEAPON_KEYWORD_PATTERN})"
-    rf"(?:\s+(?P<ability_value>\d+))?\]?"
+    rf"(?:\s+(?P<ability_value>{_WEAPON_ABILITY_VALUE_PATTERN}))?\]?"
     rf"(?:\s+ability)?\b",
     re.IGNORECASE,
 )
@@ -432,6 +450,12 @@ def _split_clause_text(normalized_text: str) -> tuple[_ClauseText, ...]:
     for index, character in enumerate(normalized_text):
         if character not in {"\n", ";", "."}:
             continue
+        if character == ";" and _semicolon_inside_ability_choice_list(
+            normalized_text=normalized_text,
+            start=start,
+            index=index,
+        ):
+            continue
         if (
             character == "."
             and index + 1 < len(normalized_text)
@@ -457,10 +481,51 @@ def _split_clause_text(normalized_text: str) -> tuple[_ClauseText, ...]:
         for coarse_clause in coarse_clauses
         for split_clause in _split_repeated_trigger_anchors(coarse_clause)
     ]
+    clauses = list(_merge_ability_choice_application_clauses(normalized_text, tuple(clauses)))
     if not clauses:
         full_span = TextSpan(text=normalized_text, start=0, end=len(normalized_text))
         return (_ClauseText(span=full_span),)
     return tuple(clauses)
+
+
+def _semicolon_inside_ability_choice_list(
+    *,
+    normalized_text: str,
+    start: int,
+    index: int,
+) -> bool:
+    segment = normalized_text[start:index]
+    return _ABILITY_CHOICE_PREFIX_RE.search(segment) is not None and "." not in segment
+
+
+def _merge_ability_choice_application_clauses(
+    normalized_text: str,
+    clauses: tuple[_ClauseText, ...],
+) -> tuple[_ClauseText, ...]:
+    merged: list[_ClauseText] = []
+    index = 0
+    while index < len(clauses):
+        current = clauses[index]
+        if (
+            index + 1 < len(clauses)
+            and _ABILITY_CHOICE_PREFIX_RE.search(current.text) is not None
+            and _THAT_ABILITY_APPLICATION_RE.search(clauses[index + 1].text) is not None
+        ):
+            next_clause = clauses[index + 1]
+            merged.append(
+                _ClauseText(
+                    span=TextSpan(
+                        text=normalized_text[current.span.start : next_clause.span.end],
+                        start=current.span.start,
+                        end=next_clause.span.end,
+                    )
+                )
+            )
+            index += 2
+            continue
+        merged.append(current)
+        index += 1
+    return tuple(merged)
 
 
 def _split_repeated_trigger_anchors(clause_text: _ClauseText) -> tuple[_ClauseText, ...]:
@@ -1272,14 +1337,22 @@ def _parse_contextual_status_effects(clause_text: _ClauseText) -> tuple[RuleEffe
 
 def _parse_weapon_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
+    for match in _NAMED_WEAPON_ABILITY_CHOICE_RE.finditer(clause_text.text):
+        effects.extend(_weapon_ability_choice_effects_from_match(clause_text, match))
     for match in _NAMED_WEAPON_ABILITY_RE.finditer(clause_text.text):
+        if _span_matches_existing_effect(
+            clause_text=clause_text,
+            match=match,
+            effects=tuple(effects),
+        ):
+            continue
         weapon_name = _weapon_name_token(match.group("weapon_name"))
         generic_scope = _generic_weapon_scope_from_token(weapon_name)
         pairs: list[tuple[str, RuleParameterValue]] = [
             ("weapon_ability", _ability_token(match.group("ability"))),
             ("target_scope", "models_in_selected_unit"),
         ]
-        ability_value = _optional_int_group(match, "ability_value")
+        ability_value = _optional_weapon_ability_value_group(match, "ability_value")
         if ability_value is not None:
             pairs.append(("weapon_ability_value", ability_value))
         if generic_scope is None:
@@ -1304,7 +1377,7 @@ def _parse_weapon_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectS
             ("weapon_ability", _ability_token(match.group("ability"))),
             ("weapon_scope", _weapon_scope_token(match.group("weapon_scope"))),
         ]
-        ability_value = _optional_int_group(match, "ability_value")
+        ability_value = _optional_weapon_ability_value_group(match, "ability_value")
         if ability_value is not None:
             scoped_pairs.append(("weapon_ability_value", ability_value))
         effects.append(
@@ -1315,6 +1388,78 @@ def _parse_weapon_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectS
             )
         )
     return tuple(effects)
+
+
+def _weapon_ability_choice_effects_from_match(
+    clause_text: _ClauseText,
+    match: re.Match[str],
+) -> tuple[RuleEffectSpec, ...]:
+    source_span = _span_from_match(clause_text, match)
+    weapon_names = _weapon_name_tokens(match.group("weapon_names"))
+    target_scope = _weapon_owner_target_scope_token(match.group("target_scope"))
+    selection_group_id = f"weapon_ability_choice_{source_span.start:04d}"
+    effects: list[RuleEffectSpec] = []
+    for option_index, (ability, ability_value) in enumerate(
+        _weapon_ability_choices_from_text(match.group("abilities")),
+        start=1,
+    ):
+        pairs: list[tuple[str, RuleParameterValue]] = [
+            ("selection_group_id", selection_group_id),
+            ("selection_kind", "select_one"),
+            (
+                "selection_option_id",
+                _weapon_ability_choice_option_id(
+                    option_index=option_index,
+                    ability=ability,
+                    ability_value=ability_value,
+                ),
+            ),
+            ("selection_option_index", option_index),
+            ("target_scope", target_scope),
+            ("weapon_ability", ability),
+            *_weapon_name_parameter_pairs(weapon_names),
+        ]
+        if ability_value is not None:
+            pairs.append(("weapon_ability_value", ability_value))
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.GRANT_WEAPON_ABILITY,
+                source_span=source_span,
+                parameters=parameters_from_pairs(tuple(pairs)),
+            )
+        )
+    return tuple(effects)
+
+
+def _weapon_ability_choices_from_text(
+    abilities_text: str,
+) -> tuple[tuple[str, RuleParameterValue | None], ...]:
+    choices: list[tuple[str, RuleParameterValue | None]] = []
+    for option_match in _WEAPON_ABILITY_CHOICE_TOKEN_RE.finditer(abilities_text):
+        ability = _ability_token(option_match.group("ability"))
+        if not _is_weapon_keyword(ability):
+            raise RuleIRError(f"Unsupported weapon ability choice in rule language: {ability}.")
+        choices.append(
+            (
+                ability,
+                _optional_weapon_ability_value_group(option_match, "ability_value"),
+            )
+        )
+    if not choices:
+        raise RuleIRError("Weapon ability choice list must contain weapon ability options.")
+    return tuple(choices)
+
+
+def _weapon_ability_choice_option_id(
+    *,
+    option_index: int,
+    ability: str,
+    ability_value: RuleParameterValue | None,
+) -> str:
+    token_parts = [_catalog_like_token(ability)]
+    if ability_value is not None:
+        token_parts.append(_catalog_like_token(str(ability_value)))
+    return f"option_{option_index:03d}_{'_'.join(token_parts)}"
 
 
 def _parse_placement_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
@@ -1689,11 +1834,19 @@ def _lower_group(match: re.Match[str], group_name: str) -> str:
     return match.group(group_name).lower().replace(" ", "_").replace("-", "_")
 
 
-def _optional_int_group(match: re.Match[str], group_name: str) -> int | None:
+def _optional_weapon_ability_value_group(
+    match: re.Match[str],
+    group_name: str,
+) -> RuleParameterValue | None:
     value = match.group(group_name)
     if value is None:
         return None
-    return int(value)
+    stripped = value.strip().upper()
+    if stripped.isdecimal():
+        return int(stripped)
+    if stripped == "D3":
+        return stripped
+    raise RuleIRError(f"Unsupported weapon ability value in rule language: {value}.")
 
 
 def _owner_token(owner: str | None) -> str | None:
@@ -1824,6 +1977,38 @@ def _weapon_name_token(value: str) -> str:
     return " ".join(stripped.split())
 
 
+def _weapon_name_tokens(value: str) -> tuple[str, ...]:
+    names: list[str] = []
+    for raw_name in re.split(r"\s*,\s*|\s+and\s+|\s+or\s+", value.strip()):
+        name = _weapon_name_token(raw_name)
+        if name:
+            names.append(name)
+    if not names:
+        raise RuleIRError("Named weapon ability grant requires a weapon name.")
+    return tuple(dict.fromkeys(names))
+
+
+def _weapon_name_parameter_pairs(
+    weapon_names: tuple[str, ...],
+) -> tuple[tuple[str, RuleParameterValue], ...]:
+    if not weapon_names:
+        raise RuleIRError("Named weapon ability grant requires weapon names.")
+    if len(weapon_names) == 1:
+        return (("weapon_name", weapon_names[0]),)
+    return (("weapon_names", "|".join(weapon_names)),)
+
+
+def _weapon_owner_target_scope_token(value: str) -> str:
+    token = _subject_token(value)
+    if token == "this_model":
+        return "this_model"
+    if token == "this_unit":
+        return "models_in_this_unit"
+    if token in {"that_unit", "selected_unit"}:
+        return "models_in_selected_unit"
+    raise RuleIRError(f"Unsupported named weapon owner scope in rule language: {value}.")
+
+
 def _generic_weapon_scope_from_token(value: str) -> str | None:
     normalized = " ".join(value.strip().lower().replace("-", " ").split())
     if normalized in {"melee weapon", "melee weapons"}:
@@ -1844,6 +2029,10 @@ def _weapon_scope_token(value: str) -> str:
 
 def _is_weapon_keyword(value: str) -> bool:
     return value.lower() in {keyword.lower() for keyword in canonical_weapon_keyword_tokens()}
+
+
+def _catalog_like_token(value: str) -> str:
+    return value.strip().lower().replace("-", "_").replace(" ", "_")
 
 
 def _characteristic_from_label(value: str) -> Characteristic:

@@ -222,7 +222,11 @@ INITIAL_RULE_TEMPLATES: tuple[RuleTemplate, ...] = (
         template_id=WEAPON_ABILITY_GRANT_TEMPLATE_ID,
         family=RuleTemplateFamily.CONDITIONAL_WEAPON_ABILITY_GRANT,
         description="Weapon ability grants attached to a selected unit or weapon scope.",
-        canonical_patterns=("weapons equipped by models in that unit gain <weapon ability>",),
+        canonical_patterns=(
+            "weapons equipped by models in that unit gain <weapon ability>",
+            "select one of the following abilities: <weapon ability list>; "
+            "this model's <weapon name> has that ability",
+        ),
     ),
     RuleTemplate(
         template_id=MOVEMENT_DISTANCE_TEMPLATE_ID,
