@@ -1,0 +1,192 @@
+{
+  "decision_request": {
+    "actor_id": "player-a",
+    "decision_type": "use_stratagem",
+    "options": [
+      {
+        "label": "Decline",
+        "option_id": "decline_stratagem_window",
+        "payload": {
+          "action": {
+            "action_id": "decline_stratagem_window",
+            "action_kind": "pass",
+            "batching_mode": "none",
+            "controller_id": null,
+            "cost": [],
+            "label": "Decline",
+            "payload": {
+              "submission_kind": "decline_stratagem_window"
+            },
+            "source_id": "core-rules:opportunity-window:pass",
+            "target_ids": [],
+            "target_spec": null
+          },
+          "legal_action_fingerprint": "482e4d228da6fa2e95feb28069ac89c0e4d05f9628743dc230b42478d051d942",
+          "revision": 1,
+          "sequence_number": 12,
+          "state_hash": "ui-contract-opportunity-state-hash-000001",
+          "submission_kind": "opportunity_action",
+          "window_id": "ui-contract-opportunity-window-000001"
+        }
+      },
+      {
+        "label": "Command Re-roll",
+        "option_id": "use-command-reroll",
+        "payload": {
+          "action": {
+            "action_id": "use-command-reroll",
+            "action_kind": "reroll",
+            "batching_mode": "none",
+            "controller_id": "player-a",
+            "cost": [
+              {
+                "amount": 1,
+                "resource": "command_point"
+              }
+            ],
+            "label": "Command Re-roll",
+            "payload": {
+              "reroll_request_id": "ui-contract-reroll-request-000001",
+              "stratagem_id": "core-command-reroll"
+            },
+            "source_id": "core-rules:stratagem:command-reroll",
+            "target_ids": [
+              "ui-contract-hit-roll-000001"
+            ],
+            "target_spec": {
+              "roll_id": "ui-contract-hit-roll-000001",
+              "target_kind": "dice_roll"
+            }
+          },
+          "legal_action_fingerprint": "482e4d228da6fa2e95feb28069ac89c0e4d05f9628743dc230b42478d051d942",
+          "revision": 1,
+          "sequence_number": 12,
+          "state_hash": "ui-contract-opportunity-state-hash-000001",
+          "submission_kind": "opportunity_action",
+          "window_id": "ui-contract-opportunity-window-000001"
+        }
+      }
+    ],
+    "payload": {
+      "handler_payload": null,
+      "legal_action_fingerprint": "482e4d228da6fa2e95feb28069ac89c0e4d05f9628743dc230b42478d051d942",
+      "opportunity_window": {
+        "acting_player_id": "player-a",
+        "anchor_event_ids": [
+          "ui-contract-hit-roll-event-000001"
+        ],
+        "closes_on": "all_players_pass_current_revision",
+        "default_action_id": "decline_stratagem_window",
+        "eligible_player_ids": [
+          "player-a"
+        ],
+        "legal_actions": [
+          {
+            "action_id": "decline_stratagem_window",
+            "action_kind": "pass",
+            "batching_mode": "none",
+            "controller_id": null,
+            "cost": [],
+            "label": "Decline",
+            "payload": {
+              "submission_kind": "decline_stratagem_window"
+            },
+            "source_id": "core-rules:opportunity-window:pass",
+            "target_ids": [],
+            "target_spec": null
+          },
+          {
+            "action_id": "use-command-reroll",
+            "action_kind": "reroll",
+            "batching_mode": "none",
+            "controller_id": "player-a",
+            "cost": [
+              {
+                "amount": 1,
+                "resource": "command_point"
+              }
+            ],
+            "label": "Command Re-roll",
+            "payload": {
+              "reroll_request_id": "ui-contract-reroll-request-000001",
+              "stratagem_id": "core-command-reroll"
+            },
+            "source_id": "core-rules:stratagem:command-reroll",
+            "target_ids": [
+              "ui-contract-hit-roll-000001"
+            ],
+            "target_spec": {
+              "roll_id": "ui-contract-hit-roll-000001",
+              "target_kind": "dice_roll"
+            }
+          }
+        ],
+        "metadata": {
+          "host": "command_reroll"
+        },
+        "priority_order": [
+          "player-a"
+        ],
+        "revision": 1,
+        "sequence_number": 12,
+        "state_hash": "ui-contract-opportunity-state-hash-000001",
+        "timing_window": {
+          "active_player_id": "player-a",
+          "battle_round": 1,
+          "descriptor": {
+            "descriptor_id": "ui-contract-opportunity-window-000001:descriptor",
+            "metadata": {
+              "roll_kind": "hit_roll"
+            },
+            "phase": "shooting",
+            "source_rule_id": "core-rules:stratagem:command-reroll",
+            "source_step": null,
+            "trigger_kind": "after_dice_roll"
+          },
+          "game_id": "ui-contract-opportunity-example",
+          "phase": "shooting",
+          "trigger_event_id": "ui-contract-hit-roll-event-000001",
+          "window_id": "ui-contract-opportunity-window-000001"
+        },
+        "window_id": "ui-contract-opportunity-window-000001"
+      },
+      "opportunity_window_id": "ui-contract-opportunity-window-000001",
+      "submission_family": "opportunity_window"
+    },
+    "request_id": "ui-contract-opportunity-request-000001"
+  },
+  "selected_option_id": "use-command-reroll",
+  "selected_option_payload": {
+    "action": {
+      "action_id": "use-command-reroll",
+      "action_kind": "reroll",
+      "batching_mode": "none",
+      "controller_id": "player-a",
+      "cost": [
+        {
+          "amount": 1,
+          "resource": "command_point"
+        }
+      ],
+      "label": "Command Re-roll",
+      "payload": {
+        "reroll_request_id": "ui-contract-reroll-request-000001",
+        "stratagem_id": "core-command-reroll"
+      },
+      "source_id": "core-rules:stratagem:command-reroll",
+      "target_ids": [
+        "ui-contract-hit-roll-000001"
+      ],
+      "target_spec": {
+        "roll_id": "ui-contract-hit-roll-000001",
+        "target_kind": "dice_roll"
+      }
+    },
+    "legal_action_fingerprint": "482e4d228da6fa2e95feb28069ac89c0e4d05f9628743dc230b42478d051d942",
+    "revision": 1,
+    "sequence_number": 12,
+    "state_hash": "ui-contract-opportunity-state-hash-000001",
+    "submission_kind": "opportunity_action",
+    "window_id": "ui-contract-opportunity-window-000001"
+  }
+}

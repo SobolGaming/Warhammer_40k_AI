@@ -122,6 +122,24 @@ class DetachmentDisplayPayload(TypedDict):
     source_ids: list[str]
 
 
+class ArmyRuleDisplayPayload(TypedDict):
+    army_rule_id: str
+    display_name: str
+    source_id: str
+    content_scope: str
+    ability_descriptor_ids: list[str]
+
+
+class StratagemDisplayPayload(TypedDict):
+    stratagem_id: str
+    display_name: str
+    source_id: str
+    content_scope: str
+    command_point_cost: int
+    timing_tags: list[str]
+    ability_descriptor_ids: list[str]
+
+
 class EnhancementDisplayPayload(TypedDict):
     enhancement_id: str
     display_name: str
@@ -153,6 +171,8 @@ class RulesCatalogViewPayload(TypedDict):
     weapon_profile_display_by_id: dict[str, WeaponProfileDisplayPayload]
     faction_display_by_id: dict[str, FactionDisplayPayload]
     detachment_display_by_id: dict[str, DetachmentDisplayPayload]
+    army_rule_display_by_id: dict[str, ArmyRuleDisplayPayload]
+    stratagem_display_by_id: dict[str, StratagemDisplayPayload]
     enhancement_display_by_id: dict[str, EnhancementDisplayPayload]
     wargear_option_display_by_id: dict[str, WargearOptionDisplayPayload]
     base_size_display_by_id: dict[str, BaseSizeDisplayPayload]
@@ -394,6 +414,28 @@ def project_rules_catalog_view(*, catalog: ArmyCatalog) -> RulesCatalogViewPaylo
                 "source_ids": list(detachment.source_ids),
             }
             for detachment in catalog.detachments
+        },
+        "army_rule_display_by_id": {
+            rule.rule_id: {
+                "army_rule_id": rule.rule_id,
+                "display_name": rule.name,
+                "source_id": rule.source_id,
+                "content_scope": rule.content_scope.value,
+                "ability_descriptor_ids": list(rule.ability_descriptor_ids),
+            }
+            for rule in catalog.army_rules
+        },
+        "stratagem_display_by_id": {
+            stratagem.stratagem_id: {
+                "stratagem_id": stratagem.stratagem_id,
+                "display_name": stratagem.name,
+                "source_id": stratagem.source_id,
+                "content_scope": stratagem.content_scope.value,
+                "command_point_cost": stratagem.command_point_cost,
+                "timing_tags": list(stratagem.timing_tags),
+                "ability_descriptor_ids": list(stratagem.ability_descriptor_ids),
+            }
+            for stratagem in catalog.stratagems
         },
         "enhancement_display_by_id": {
             enhancement.enhancement_id: {
