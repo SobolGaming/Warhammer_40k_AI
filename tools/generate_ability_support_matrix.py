@@ -7,14 +7,21 @@ from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import cast
+from typing import TypedDict, cast
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind, CatalogAbilitySupport
 from warhammer40k_core.core.faction_aliases import (
     ADEPTUS_CUSTODES_FACTION_ID,
     CHAOS_SPACE_MARINES_FACTION_ID,
 )
-from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
+from warhammer40k_core.core.model_geometry_catalog import (
+    GeometryMeasurementKind,
+    GeometryReviewStatus,
+    GeometrySourceUnits,
+    ModelGeometryCatalogRecord,
+)
+from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword
 from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.ability_coverage import (
     AbilityCoverageAbilityDatasheetPairPayload,
@@ -94,6 +101,7 @@ from warhammer40k_core.engine.stratagem_catalog import (
     eleventh_edition_core_stratagem_catalog_records,
 )
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
+from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
@@ -127,6 +135,38 @@ DEFAULT_DOCS_PATH = Path("docs") / "ABILITY_SUPPORT_MATRIX_V2.md"
 DEFAULT_FACTION_DOCS_DIR = Path("docs") / "factions"
 GENERATED_BY_COMMAND = "uv run python tools/generate_ability_support_matrix.py"
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
+DATASHEET_SUPPORT_FULL = "Full"
+DATASHEET_SUPPORT_PLAYABLE = "Playable"
+DATASHEET_SUPPORT_PARTIAL = "Partial"
+DATASHEET_SUPPORT_CATALOG_ONLY = "Catalog-only"
+DATASHEET_SUPPORT_BLOCKED = "Blocked"
+DATASHEET_SUPPORT_UNKNOWN = "Unknown"
+DATASHEET_SUPPORT_NONE = "None"
+DATASHEET_SUPPORT_OVERALL_VALUES = frozenset(
+    (
+        DATASHEET_SUPPORT_FULL,
+        DATASHEET_SUPPORT_PLAYABLE,
+        DATASHEET_SUPPORT_PARTIAL,
+        DATASHEET_SUPPORT_CATALOG_ONLY,
+        DATASHEET_SUPPORT_BLOCKED,
+        DATASHEET_SUPPORT_UNKNOWN,
+    )
+)
+DATASHEET_SUPPORT_COMPONENT_VALUES = frozenset(
+    (*DATASHEET_SUPPORT_OVERALL_VALUES, DATASHEET_SUPPORT_NONE)
+)
+_DATASHEET_ABILITY_FULL_STAGES = frozenset(
+    (
+        AbilityCoverageSupportStage.ENGINE_CONSUMED,
+        AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,
+    )
+)
+_DATASHEET_ABILITY_PARTIAL_STAGES = frozenset((AbilityCoverageSupportStage.DESCRIPTOR_ONLY,))
+_DATASHEET_ABILITY_BLOCKING_STAGES = frozenset(
+    (AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED,)
+)
+_SUPPORTED_WEAPON_KEYWORDS = frozenset(WeaponKeyword)
+_SUPPORTED_WEAPON_ABILITY_KINDS = frozenset(AbilityKind)
 REQUIRED_TABLES = (
     "Abilities",
     "Datasheets",
@@ -205,6 +245,68 @@ class DetachmentRuleSupportRow:
 class RuntimeHookInventoryRow:
     hook_id: str
     ability_or_rule_labels: tuple[str, ...]
+
+
+class DatasheetSupportRowPayload(TypedDict):
+    faction_id: str
+    datasheet_id: str
+    datasheet_name: str
+    overall: str
+    catalog_status: str
+    model_geometry_status: str
+    wargear_status: str
+    weapon_keyword_status: str
+    datasheet_ability_status: str
+    faction_interaction_status: str
+    tests_evidence: str
+    notes: str
+    ability_coverage_row_ids: list[str]
+    detachment_ids: list[str]
+    supported_detachment_ids: list[str]
+
+
+@dataclass(frozen=True)
+class DatasheetSupportRow:
+    faction_id: str
+    datasheet_id: str
+    datasheet_name: str
+    overall: str
+    catalog_status: str
+    model_geometry_status: str
+    wargear_status: str
+    weapon_keyword_status: str
+    datasheet_ability_status: str
+    faction_interaction_status: str
+    tests_evidence: str
+    notes: str
+    ability_coverage_row_ids: tuple[str, ...]
+    detachment_ids: tuple[str, ...]
+    supported_detachment_ids: tuple[str, ...]
+
+    def to_payload(self) -> DatasheetSupportRowPayload:
+        return {
+            "faction_id": self.faction_id,
+            "datasheet_id": self.datasheet_id,
+            "datasheet_name": self.datasheet_name,
+            "overall": self.overall,
+            "catalog_status": self.catalog_status,
+            "model_geometry_status": self.model_geometry_status,
+            "wargear_status": self.wargear_status,
+            "weapon_keyword_status": self.weapon_keyword_status,
+            "datasheet_ability_status": self.datasheet_ability_status,
+            "faction_interaction_status": self.faction_interaction_status,
+            "tests_evidence": self.tests_evidence,
+            "notes": self.notes,
+            "ability_coverage_row_ids": list(self.ability_coverage_row_ids),
+            "detachment_ids": list(self.detachment_ids),
+            "supported_detachment_ids": list(self.supported_detachment_ids),
+        }
+
+
+@dataclass(frozen=True)
+class _ComponentEvidence:
+    status: str
+    notes: tuple[str, ...] = ()
 
 
 _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
@@ -567,17 +669,27 @@ def main() -> None:
     output_dir = _resolve_repo_path(args.output_dir)
     docs_path = _resolve_repo_path(args.docs_path)
     faction_docs_dir = _resolve_repo_path(args.faction_docs_dir)
-    rows = ability_support_matrix_rows(source_json_dir=source_json_dir)
+    package = _ability_support_catalog_package(source_json_dir=source_json_dir)
+    rows = _ability_support_matrix_rows_from_package(package)
     category_rows = ability_coverage_category_rows(rows)
+    datasheet_rows = _datasheet_support_rows_from_package(
+        package=package,
+        ability_rows=rows,
+    )
     row_payloads = ability_coverage_rows_payload(rows)
     category_payloads = ability_coverage_category_rows_payload(category_rows)
+    datasheet_payloads = datasheet_support_rows_payload(datasheet_rows)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     _write_json(output_dir / "ability_coverage_rows.json", row_payloads)
     _write_json(output_dir / "ability_support_category_rows.json", category_payloads)
+    _write_json(output_dir / "datasheet_support_rows.json", datasheet_payloads)
     docs_path.write_text(support_matrix_markdown(category_payloads), encoding="utf-8")
     faction_docs_dir.mkdir(parents=True, exist_ok=True)
-    for filename, markdown in faction_support_markdown_files().items():
+    for filename, markdown in faction_support_markdown_files(
+        datasheet_support_rows=datasheet_rows,
+        ability_rows=rows,
+    ).items():
         (faction_docs_dir / filename).write_text(markdown, encoding="utf-8")
 
 
@@ -585,6 +697,35 @@ def ability_support_matrix_rows(
     *,
     source_json_dir: Path = DEFAULT_SOURCE_JSON_DIR,
 ) -> tuple[AbilityCoverageRow, ...]:
+    return _ability_support_matrix_rows_from_package(
+        _ability_support_catalog_package(source_json_dir=source_json_dir)
+    )
+
+
+def datasheet_support_rows(
+    *,
+    source_json_dir: Path = DEFAULT_SOURCE_JSON_DIR,
+) -> tuple[DatasheetSupportRow, ...]:
+    package = _ability_support_catalog_package(source_json_dir=source_json_dir)
+    ability_rows = _ability_support_matrix_rows_from_package(package)
+    return _datasheet_support_rows_from_package(package=package, ability_rows=ability_rows)
+
+
+def datasheet_support_rows_payload(
+    rows: tuple[DatasheetSupportRow, ...],
+) -> list[DatasheetSupportRowPayload]:
+    if type(rows) is not tuple:
+        raise ValueError("Datasheet support rows must be a tuple.")
+    for row in rows:
+        if type(row) is not DatasheetSupportRow:
+            raise ValueError("Datasheet support payloads require DatasheetSupportRow values.")
+    return [row.to_payload() for row in rows]
+
+
+def _ability_support_catalog_package(
+    *,
+    source_json_dir: Path = DEFAULT_SOURCE_JSON_DIR,
+) -> CanonicalCatalogPackage:
     source_json_dir = _resolve_repo_path(source_json_dir)
     artifacts = _load_source_artifacts(source_json_dir)
     bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
@@ -597,16 +738,535 @@ def ability_support_matrix_rows(
             + FLESH_HOUNDS_HEIGHT_OVERRIDES
         ),
     )
-    package = build_canonical_catalog_package(
+    return build_canonical_catalog_package(
         package_id=_catalog_package_id(),
         catalog_version=_catalog_version(),
         source_artifacts=bridge_artifacts,
     )
+
+
+def _ability_support_matrix_rows_from_package(
+    package: CanonicalCatalogPackage,
+) -> tuple[AbilityCoverageRow, ...]:
+    if type(package) is not CanonicalCatalogPackage:
+        raise ValueError("Ability support matrix rows require a canonical catalog package.")
     rows = ability_coverage_rows_from_catalog(
         package.army_catalog,
         datasheet_ids=DAEMON_WARGEAR_DATASHEET_IDS,
     )
     return (*rows, *_runtime_faction_army_rule_rows())
+
+
+def _datasheet_support_rows_from_package(
+    *,
+    package: CanonicalCatalogPackage,
+    ability_rows: tuple[AbilityCoverageRow, ...],
+) -> tuple[DatasheetSupportRow, ...]:
+    if type(package) is not CanonicalCatalogPackage:
+        raise ValueError("Datasheet support rows require a canonical catalog package.")
+    if type(ability_rows) is not tuple:
+        raise ValueError("Datasheet support rows require ability rows.")
+    for row in ability_rows:
+        if type(row) is not AbilityCoverageRow:
+            raise ValueError("Datasheet support rows require AbilityCoverageRow values.")
+    rows_by_datasheet = _ability_coverage_rows_by_datasheet_id(ability_rows)
+    geometry_by_profile_id = _geometry_by_profile_id(package.model_geometries)
+    faction_doc_ids_by_name = _faction_doc_ids_by_name()
+    support_rows: list[DatasheetSupportRow] = []
+    for datasheet in package.army_catalog.datasheets:
+        faction_id = _faction_doc_id_for_datasheet(
+            catalog=package.army_catalog,
+            datasheet_id=datasheet.datasheet_id,
+            faction_keywords=datasheet.keywords.faction_keywords,
+            faction_doc_ids_by_name=faction_doc_ids_by_name,
+        )
+        datasheet_rows = rows_by_datasheet.get(datasheet.datasheet_id, ())
+        catalog = _catalog_status(datasheet=datasheet)
+        geometry = _model_geometry_status(
+            datasheet=datasheet,
+            geometry_by_profile_id=geometry_by_profile_id,
+        )
+        wargear = _wargear_status(
+            catalog=package.army_catalog,
+            datasheet_id=datasheet.datasheet_id,
+            default_or_allowed_wargear_ids=_datasheet_default_or_allowed_wargear_ids(datasheet),
+            ability_rows=datasheet_rows,
+        )
+        weapon_keywords = _weapon_keyword_status(
+            catalog=package.army_catalog,
+            wargear_ids=_datasheet_default_or_allowed_wargear_ids(datasheet),
+        )
+        datasheet_abilities = _datasheet_ability_status(datasheet_rows)
+        faction_interactions = _faction_interaction_status(
+            faction_id=faction_id,
+            ability_rows=datasheet_rows,
+            detachment_support_rows=_detachment_rule_support_rows_for_faction(faction_id),
+        )
+        overall = _overall_datasheet_status(
+            catalog=catalog.status,
+            model_geometry=geometry.status,
+            wargear=wargear.status,
+            weapon_keywords=weapon_keywords.status,
+            datasheet_abilities=datasheet_abilities.status,
+            faction_interactions=faction_interactions.status,
+            ability_rows=datasheet_rows,
+        )
+        notes = _datasheet_support_notes(
+            overall=overall,
+            catalog=catalog,
+            model_geometry=geometry,
+            wargear=wargear,
+            weapon_keywords=weapon_keywords,
+            datasheet_abilities=datasheet_abilities,
+            faction_interactions=faction_interactions,
+        )
+        detachment_rows = _faction_interaction_detachment_rows(faction_id)
+        detachment_ids = tuple(row.detachment_id for row in detachment_rows)
+        supported_detachment_ids = tuple(
+            row.detachment_id for row in detachment_rows if _detachment_rule_is_supported(row)
+        )
+        support_rows.append(
+            DatasheetSupportRow(
+                faction_id=faction_id,
+                datasheet_id=datasheet.datasheet_id,
+                datasheet_name=datasheet.name,
+                overall=overall,
+                catalog_status=catalog.status,
+                model_geometry_status=geometry.status,
+                wargear_status=wargear.status,
+                weapon_keyword_status=weapon_keywords.status,
+                datasheet_ability_status=datasheet_abilities.status,
+                faction_interaction_status=faction_interactions.status,
+                tests_evidence=_datasheet_tests_evidence(datasheet_rows),
+                notes=notes,
+                ability_coverage_row_ids=tuple(row.coverage_row_id for row in datasheet_rows),
+                detachment_ids=detachment_ids,
+                supported_detachment_ids=supported_detachment_ids,
+            )
+        )
+    return tuple(
+        sorted(
+            support_rows,
+            key=lambda row: (row.faction_id, row.datasheet_name.lower(), row.datasheet_id),
+        )
+    )
+
+
+def _ability_coverage_rows_by_datasheet_id(
+    rows: tuple[AbilityCoverageRow, ...],
+) -> dict[str, tuple[AbilityCoverageRow, ...]]:
+    grouped: dict[str, list[AbilityCoverageRow]] = {}
+    for row in rows:
+        if type(row) is not AbilityCoverageRow:
+            raise ValueError("Ability coverage grouping requires AbilityCoverageRow values.")
+        grouped.setdefault(row.datasheet_id, []).append(row)
+    return {
+        datasheet_id: tuple(sorted(group_rows, key=_ability_coverage_detail_sort_key))
+        for datasheet_id, group_rows in grouped.items()
+    }
+
+
+def _ability_coverage_detail_sort_key(
+    row: AbilityCoverageRow,
+) -> tuple[str, str, str, str]:
+    return (
+        row.source_kind.value,
+        row.ability_name.lower(),
+        row.ability_id,
+        row.source_wargear_id or "",
+    )
+
+
+def _geometry_by_profile_id(
+    records: tuple[ModelGeometryCatalogRecord, ...],
+) -> dict[str, ModelGeometryCatalogRecord]:
+    if type(records) is not tuple:
+        raise ValueError("Datasheet support geometry records must be a tuple.")
+    by_profile_id: dict[str, ModelGeometryCatalogRecord] = {}
+    for record in records:
+        if type(record) is not ModelGeometryCatalogRecord:
+            raise ValueError("Datasheet support geometry records must contain catalog records.")
+        if record.model_profile_id in by_profile_id:
+            raise ValueError("Datasheet support geometry records must not duplicate profiles.")
+        by_profile_id[record.model_profile_id] = record
+    return by_profile_id
+
+
+def _faction_doc_ids_by_name() -> dict[str, str]:
+    return {row.name: row.faction_id for row in faction_detachments_2026_27.faction_rows()}
+
+
+def _faction_doc_id_for_datasheet(
+    *,
+    catalog: ArmyCatalog,
+    datasheet_id: str,
+    faction_keywords: tuple[str, ...],
+    faction_doc_ids_by_name: Mapping[str, str],
+) -> str:
+    if type(catalog) is not ArmyCatalog:
+        raise ValueError("Datasheet support faction matching requires an ArmyCatalog.")
+    if not faction_keywords:
+        raise ValueError("Datasheet support faction matching requires faction keywords.")
+    matches = tuple(
+        faction
+        for faction in catalog.factions
+        if set(faction.faction_keywords).intersection(faction_keywords)
+    )
+    if len(matches) != 1:
+        raise ValueError(
+            f"Datasheet support requires exactly one catalog faction for {datasheet_id}."
+        )
+    faction_id = faction_doc_ids_by_name.get(matches[0].name)
+    if faction_id is None:
+        raise ValueError("Datasheet support catalog faction has no generated faction document.")
+    return faction_id
+
+
+def _catalog_status(*, datasheet: object) -> _ComponentEvidence:
+    from warhammer40k_core.core.datasheet import DatasheetDefinition
+
+    if type(datasheet) is not DatasheetDefinition:
+        raise ValueError("Datasheet support catalog status requires a DatasheetDefinition.")
+    missing: list[str] = []
+    if not datasheet.source_ids:
+        missing.append("datasheet source IDs")
+    if not datasheet.model_profiles:
+        missing.append("model profiles")
+    if not datasheet.composition:
+        missing.append("unit composition")
+    if not datasheet.keywords.keywords:
+        missing.append("keywords")
+    if not datasheet.keywords.faction_keywords:
+        missing.append("faction keywords")
+    if not datasheet.wargear_options:
+        missing.append("wargear options")
+    if missing:
+        return _component(DATASHEET_SUPPORT_BLOCKED, _missing_note("Missing catalog data", missing))
+    return _component(DATASHEET_SUPPORT_FULL)
+
+
+def _model_geometry_status(
+    *,
+    datasheet: object,
+    geometry_by_profile_id: Mapping[str, ModelGeometryCatalogRecord],
+) -> _ComponentEvidence:
+    from warhammer40k_core.core.datasheet import DatasheetDefinition
+
+    if type(datasheet) is not DatasheetDefinition:
+        raise ValueError("Datasheet support geometry status requires a DatasheetDefinition.")
+    missing_geometry: list[str] = []
+    incomplete_geometry: list[str] = []
+    for profile in datasheet.model_profiles:
+        geometry_record = geometry_by_profile_id.get(profile.model_profile_id)
+        if geometry_record is None:
+            missing_geometry.append(profile.model_profile_id)
+            continue
+        if geometry_record.height.height_inches <= 0.0:
+            incomplete_geometry.append(f"{profile.model_profile_id}: missing height")
+        if not _geometry_record_has_accepted_evidence(geometry_record):
+            incomplete_geometry.append(f"{profile.model_profile_id}: unaccepted evidence")
+    if missing_geometry:
+        return _component(
+            DATASHEET_SUPPORT_BLOCKED,
+            _missing_note("Missing model geometry", missing_geometry),
+        )
+    if incomplete_geometry:
+        return _component(
+            DATASHEET_SUPPORT_PARTIAL,
+            _missing_note("Incomplete model geometry evidence", incomplete_geometry),
+        )
+    return _component(DATASHEET_SUPPORT_FULL)
+
+
+def _geometry_record_has_accepted_evidence(record: ModelGeometryCatalogRecord) -> bool:
+    evidence_by_id = {evidence.evidence_id: evidence for evidence in record.evidence}
+    linked_evidence_ids = {record.height.evidence_id, record.footprint.evidence_id}
+    if record.support_base is not None:
+        linked_evidence_ids.add(record.support_base.evidence_id)
+    if record.z_offset is not None:
+        linked_evidence_ids.add(record.z_offset.evidence_id)
+    for evidence_id in linked_evidence_ids:
+        evidence = evidence_by_id.get(evidence_id)
+        if evidence is None:
+            return False
+        if evidence.reviewer_status is not GeometryReviewStatus.ACCEPTED:
+            return False
+        if evidence.measurement_kind not in {
+            GeometryMeasurementKind.FOOTPRINT,
+            GeometryMeasurementKind.SUPPORT_BASE,
+            GeometryMeasurementKind.Z_OFFSET,
+            GeometryMeasurementKind.HEIGHT,
+        }:
+            return False
+    return True
+
+
+def _datasheet_default_or_allowed_wargear_ids(datasheet: object) -> tuple[str, ...]:
+    from warhammer40k_core.core.datasheet import DatasheetDefinition
+
+    if type(datasheet) is not DatasheetDefinition:
+        raise ValueError("Datasheet support wargear IDs require a DatasheetDefinition.")
+    return tuple(
+        sorted(
+            {
+                wargear_id
+                for option in datasheet.wargear_options
+                for wargear_id in (*option.default_wargear_ids, *option.allowed_wargear_ids)
+            }
+        )
+    )
+
+
+def _wargear_status(
+    *,
+    catalog: ArmyCatalog,
+    datasheet_id: str,
+    default_or_allowed_wargear_ids: tuple[str, ...],
+    ability_rows: tuple[AbilityCoverageRow, ...],
+) -> _ComponentEvidence:
+    wargear_by_id = {item.wargear_id: item for item in catalog.wargear}
+    ability_wargear_ids = {
+        row.source_wargear_id for row in ability_rows if row.source_wargear_id is not None
+    }
+    required_wargear_ids = tuple(sorted({*default_or_allowed_wargear_ids, *ability_wargear_ids}))
+    if not required_wargear_ids:
+        return _component(
+            DATASHEET_SUPPORT_BLOCKED,
+            f"Missing required wargear links for `{datasheet_id}`.",
+        )
+    missing = tuple(
+        wargear_id for wargear_id in required_wargear_ids if wargear_id not in wargear_by_id
+    )
+    if missing:
+        return _component(DATASHEET_SUPPORT_BLOCKED, _missing_note("Missing wargear", missing))
+    incomplete_profiles = tuple(
+        profile.profile_id
+        for wargear_id in required_wargear_ids
+        for profile in wargear_by_id[wargear_id].weapon_profiles
+        if not profile.source_ids
+    )
+    if incomplete_profiles:
+        return _component(
+            DATASHEET_SUPPORT_PARTIAL,
+            _missing_note("Incomplete weapon profile source evidence", incomplete_profiles),
+        )
+    return _component(DATASHEET_SUPPORT_FULL)
+
+
+def _weapon_keyword_status(
+    *,
+    catalog: ArmyCatalog,
+    wargear_ids: tuple[str, ...],
+) -> _ComponentEvidence:
+    wargear_by_id = {item.wargear_id: item for item in catalog.wargear}
+    weapon_keywords: set[WeaponKeyword] = set()
+    weapon_ability_kinds: set[AbilityKind] = set()
+    unsupported: list[str] = []
+    for wargear_id in wargear_ids:
+        wargear = wargear_by_id[wargear_id]
+        for profile in wargear.weapon_profiles:
+            weapon_keywords.update(profile.keywords)
+            weapon_ability_kinds.update(ability.ability_kind for ability in profile.abilities)
+            unsupported.extend(
+                keyword.value
+                for keyword in profile.keywords
+                if keyword not in _SUPPORTED_WEAPON_KEYWORDS
+            )
+            unsupported.extend(
+                ability.ability_kind.value
+                for ability in profile.abilities
+                if ability.ability_kind not in _SUPPORTED_WEAPON_ABILITY_KINDS
+            )
+    if unsupported:
+        return _component(
+            DATASHEET_SUPPORT_PARTIAL,
+            _missing_note("Unsupported weapon keyword abilities", tuple(sorted(unsupported))),
+        )
+    if not weapon_keywords and not weapon_ability_kinds:
+        return _component(DATASHEET_SUPPORT_NONE)
+    labels = tuple(
+        sorted(
+            {
+                *(keyword.value for keyword in weapon_keywords),
+                *(ability_kind.value for ability_kind in weapon_ability_kinds),
+            }
+        )
+    )
+    return _component(DATASHEET_SUPPORT_FULL, "Supported weapon keywords: " + ", ".join(labels))
+
+
+def _datasheet_ability_status(
+    ability_rows: tuple[AbilityCoverageRow, ...],
+) -> _ComponentEvidence:
+    if not ability_rows:
+        return _component(DATASHEET_SUPPORT_NONE)
+    blocking_notes: list[str] = []
+    partial_notes: list[str] = []
+    for row in ability_rows:
+        ability_label = f"`{row.ability_id}` {row.ability_name}"
+        if row.diagnostic_reasons:
+            blocking_notes.append(
+                f"{ability_label}: diagnostics {_inline_code_list(row.diagnostic_reasons)}"
+            )
+        if row.support_stage in _DATASHEET_ABILITY_BLOCKING_STAGES:
+            blocking_notes.append(f"{ability_label}: `{row.support_stage.value}`")
+        elif row.support_stage in _DATASHEET_ABILITY_PARTIAL_STAGES:
+            partial_notes.append(f"{ability_label}: `{row.support_stage.value}`")
+        elif row.support_stage in _DATASHEET_ABILITY_FULL_STAGES:
+            if (
+                row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+                and not row.runtime_consumer_ids
+            ):
+                blocking_notes.append(f"{ability_label}: missing runtime consumer")
+        else:
+            partial_notes.append(f"{ability_label}: `{row.support_stage.value}`")
+    if blocking_notes:
+        return _component(DATASHEET_SUPPORT_BLOCKED, *tuple(blocking_notes))
+    if partial_notes:
+        return _component(DATASHEET_SUPPORT_PARTIAL, *tuple(partial_notes))
+    return _component(DATASHEET_SUPPORT_FULL)
+
+
+def _faction_interaction_status(
+    *,
+    faction_id: str,
+    ability_rows: tuple[AbilityCoverageRow, ...],
+    detachment_support_rows: tuple[DetachmentRuleSupportRow, ...],
+) -> _ComponentEvidence:
+    faction_rows = tuple(
+        row for row in ability_rows if row.source_kind is CatalogAbilitySourceKind.FACTION
+    )
+    if not faction_rows and not detachment_support_rows:
+        return _component(DATASHEET_SUPPORT_NONE)
+    supported_detachments = tuple(
+        row for row in detachment_support_rows if _detachment_rule_is_supported(row)
+    )
+    detachment_note = (
+        f"detachment support {len(supported_detachments)}/{len(detachment_support_rows)}"
+        if detachment_support_rows
+        else "no generated detachment support rows"
+    )
+    if not faction_rows:
+        return _component(
+            DATASHEET_SUPPORT_PARTIAL,
+            f"No source-backed faction ability row; {detachment_note}.",
+        )
+    faction_rows_supported = all(
+        row.support_stage in _DATASHEET_ABILITY_FULL_STAGES and not row.diagnostic_reasons
+        for row in faction_rows
+    )
+    if not faction_rows_supported:
+        return _component(
+            DATASHEET_SUPPORT_PARTIAL,
+            f"Faction ability row is not fully consumed; {detachment_note}.",
+        )
+    if detachment_support_rows and len(supported_detachments) != len(detachment_support_rows):
+        supported_ids = tuple(row.detachment_id for row in supported_detachments)
+        return _component(
+            DATASHEET_SUPPORT_PARTIAL,
+            (
+                f"Faction army rule consumed; {detachment_note}. Supported detachment IDs: "
+                f"{_inline_code_list(supported_ids)}."
+            ),
+        )
+    return _component(DATASHEET_SUPPORT_FULL, f"Faction army rule consumed; {detachment_note}.")
+
+
+def _faction_interaction_detachment_rows(
+    faction_id: str,
+) -> tuple[DetachmentRuleSupportRow, ...]:
+    return _detachment_rule_support_rows_for_faction(faction_id)
+
+
+def _overall_datasheet_status(
+    *,
+    catalog: str,
+    model_geometry: str,
+    wargear: str,
+    weapon_keywords: str,
+    datasheet_abilities: str,
+    faction_interactions: str,
+    ability_rows: tuple[AbilityCoverageRow, ...],
+) -> str:
+    evidence_statuses = (
+        catalog,
+        model_geometry,
+        wargear,
+        weapon_keywords,
+        datasheet_abilities,
+    )
+    if DATASHEET_SUPPORT_UNKNOWN in evidence_statuses:
+        return DATASHEET_SUPPORT_UNKNOWN
+    if DATASHEET_SUPPORT_BLOCKED in evidence_statuses:
+        return DATASHEET_SUPPORT_BLOCKED
+    if not ability_rows and weapon_keywords == DATASHEET_SUPPORT_NONE:
+        return DATASHEET_SUPPORT_CATALOG_ONLY
+    if DATASHEET_SUPPORT_PARTIAL in evidence_statuses:
+        return DATASHEET_SUPPORT_PARTIAL
+    if faction_interactions == DATASHEET_SUPPORT_PARTIAL:
+        return DATASHEET_SUPPORT_PLAYABLE
+    return DATASHEET_SUPPORT_FULL
+
+
+def _datasheet_support_notes(
+    *,
+    overall: str,
+    catalog: _ComponentEvidence,
+    model_geometry: _ComponentEvidence,
+    wargear: _ComponentEvidence,
+    weapon_keywords: _ComponentEvidence,
+    datasheet_abilities: _ComponentEvidence,
+    faction_interactions: _ComponentEvidence,
+) -> str:
+    notes = tuple(
+        note
+        for component in (
+            catalog,
+            model_geometry,
+            wargear,
+            weapon_keywords,
+            datasheet_abilities,
+            faction_interactions,
+        )
+        if component.status in {DATASHEET_SUPPORT_BLOCKED, DATASHEET_SUPPORT_PARTIAL}
+        for note in component.notes
+    )
+    if notes:
+        return " ".join(notes)
+    if overall == DATASHEET_SUPPORT_FULL:
+        return "No known blockers."
+    if overall == DATASHEET_SUPPORT_PLAYABLE:
+        return "No known blockers; some faction or detachment interaction proof is partial."
+    if overall == DATASHEET_SUPPORT_CATALOG_ONLY:
+        return "Catalog row is present, but semantic runtime support is not proven."
+    return "No known blockers."
+
+
+def _datasheet_tests_evidence(ability_rows: tuple[AbilityCoverageRow, ...]) -> str:
+    runtime_consumer_ids = tuple(
+        sorted(
+            {
+                runtime_consumer_id
+                for row in ability_rows
+                for runtime_consumer_id in row.runtime_consumer_ids
+            }
+        )
+    )
+    if runtime_consumer_ids:
+        return (
+            f"Runtime consumers: {_inline_code_list(runtime_consumer_ids)}; coverage artifact only"
+        )
+    return "coverage artifact only"
+
+
+def _component(status: str, *notes: str) -> _ComponentEvidence:
+    if status not in DATASHEET_SUPPORT_COMPONENT_VALUES:
+        raise ValueError(f"Unsupported datasheet support status: {status}.")
+    return _ComponentEvidence(status=status, notes=tuple(note for note in notes if note))
+
+
+def _missing_note(prefix: str, values: Iterable[str]) -> str:
+    return f"{prefix}: {_inline_code_list(tuple(values))}."
 
 
 def _parse_args() -> argparse.Namespace:
@@ -1215,15 +1875,38 @@ def support_matrix_markdown(
     return "\n".join(lines)
 
 
-def faction_support_markdown_files() -> dict[str, str]:
+def faction_support_markdown_files(
+    *,
+    datasheet_support_rows: tuple[DatasheetSupportRow, ...] | None = None,
+    ability_rows: tuple[AbilityCoverageRow, ...] | None = None,
+) -> dict[str, str]:
+    if datasheet_support_rows is None or ability_rows is None:
+        package = _ability_support_catalog_package()
+        if ability_rows is None:
+            ability_rows = _ability_support_matrix_rows_from_package(package)
+        if datasheet_support_rows is None:
+            datasheet_support_rows = _datasheet_support_rows_from_package(
+                package=package,
+                ability_rows=ability_rows,
+            )
+    ability_rows_by_id = {row.coverage_row_id: row for row in ability_rows}
     return {
-        f"{faction_row.faction_id}.md": _faction_support_markdown(faction_row)
+        f"{faction_row.faction_id}.md": _faction_support_markdown(
+            faction_row,
+            datasheet_support_rows=tuple(
+                row for row in datasheet_support_rows if row.faction_id == faction_row.faction_id
+            ),
+            ability_rows_by_id=ability_rows_by_id,
+        )
         for faction_row in faction_detachments_2026_27.faction_rows()
     }
 
 
 def _faction_support_markdown(
     faction_row: faction_detachments_2026_27.SourceFactionRow,
+    *,
+    datasheet_support_rows: tuple[DatasheetSupportRow, ...],
+    ability_rows_by_id: Mapping[str, AbilityCoverageRow],
 ) -> str:
     pdf_record = _faction_pdf_record(faction_row.faction_id)
     coverage_rows = tuple(
@@ -1286,6 +1969,13 @@ def _faction_support_markdown(
         ),
     ]
     lines.extend(_faction_detachment_rule_support_markdown(detachment_support_rows))
+    lines.extend(
+        _faction_datasheet_support_markdown(
+            faction_row=faction_row,
+            rows=datasheet_support_rows,
+            ability_rows_by_id=ability_rows_by_id,
+        )
+    )
     lines.extend(_faction_detachment_rule_coverage_rows_markdown(detachment_rule_rows))
     lines.extend(_faction_exact_rule_rows_markdown("Enhancements", enhancement_rows))
     lines.extend(_faction_exact_rule_rows_markdown("Stratagems", stratagem_rows))
@@ -1324,6 +2014,158 @@ def _faction_detachment_rule_support_markdown(
             + " |"
         )
     return lines
+
+
+def _faction_datasheet_support_markdown(
+    *,
+    faction_row: faction_detachments_2026_27.SourceFactionRow,
+    rows: tuple[DatasheetSupportRow, ...],
+    ability_rows_by_id: Mapping[str, AbilityCoverageRow],
+) -> list[str]:
+    sorted_rows = tuple(
+        sorted(rows, key=lambda row: (row.datasheet_name.lower(), row.datasheet_id))
+    )
+    lines = [
+        "",
+        "## Datasheet / Unit Support",
+        "",
+        (
+            "This table reports datasheet-level playability evidence. `Full` means "
+            "catalog/model/wargear/geometry data is present and every known datasheet/"
+            "wargear ability row is either engine-consumed or executable through supported "
+            "generic IR, with no unsupported diagnostics. `Playable` means core unit "
+            "operation is available but one or more non-blocking ability/detail proofs are "
+            "incomplete. `Partial` means at least one known ability or interaction is "
+            "descriptor-only or unsupported. `Catalog-only` means the unit is present but no "
+            "semantic ability/runtime support is proven. `Blocked` means a known unsupported "
+            "rule, missing geometry, missing wargear, or missing required source data "
+            "prevents safe play."
+        ),
+        "",
+        (
+            "| Datasheet | Overall | Catalog | Models / geometry | Wargear | "
+            "Weapon keywords | Datasheet abilities | Faction / detachment interactions | "
+            "Tests / evidence | Notes |"
+        ),
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    if not sorted_rows:
+        lines.append(
+            "| "
+            + " | ".join(
+                (
+                    f"No generated catalog datasheets for {_markdown_text(faction_row.name)}",
+                    f"`{DATASHEET_SUPPORT_UNKNOWN}`",
+                    DATASHEET_SUPPORT_UNKNOWN,
+                    DATASHEET_SUPPORT_UNKNOWN,
+                    DATASHEET_SUPPORT_UNKNOWN,
+                    DATASHEET_SUPPORT_NONE,
+                    DATASHEET_SUPPORT_NONE,
+                    DATASHEET_SUPPORT_NONE,
+                    "coverage artifact only",
+                    (
+                        "Generated catalog/support artifacts do not contain datasheet rows "
+                        "for this faction."
+                    ),
+                )
+            )
+            + " |"
+        )
+        return lines
+    for row in sorted_rows:
+        lines.append(
+            "| "
+            + " | ".join(
+                (
+                    _datasheet_label(row),
+                    f"`{_markdown_text(row.overall)}`",
+                    _markdown_text(row.catalog_status),
+                    _markdown_text(row.model_geometry_status),
+                    _markdown_text(row.wargear_status),
+                    _markdown_text(row.weapon_keyword_status),
+                    _markdown_text(row.datasheet_ability_status),
+                    _markdown_text(_faction_interaction_cell(row)),
+                    _markdown_text(row.tests_evidence),
+                    _markdown_text(row.notes),
+                )
+            )
+            + " |"
+        )
+    detail_rows = tuple(row for row in sorted_rows if row.overall != DATASHEET_SUPPORT_FULL)
+    if not detail_rows:
+        return lines
+    lines.extend(
+        (
+            "",
+            "### Datasheet Ability Details",
+            "",
+            (
+                "| Datasheet | Ability | Source kind | Support stage | Semantic categories | "
+                "Runtime consumers | Diagnostics |"
+            ),
+            "| --- | --- | --- | --- | --- | --- | --- |",
+        )
+    )
+    for row in detail_rows:
+        if not row.ability_coverage_row_ids:
+            lines.append(
+                "| "
+                + " | ".join(
+                    (
+                        _datasheet_label(row),
+                        "No AbilityCoverageRow",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "No generated ability coverage rows for this datasheet.",
+                    )
+                )
+                + " |"
+            )
+            continue
+        for coverage_row_id in row.ability_coverage_row_ids:
+            coverage_row = ability_rows_by_id.get(coverage_row_id)
+            if coverage_row is None:
+                raise ValueError(
+                    "Datasheet support detail row references unknown ability coverage."
+                )
+            lines.append(
+                "| "
+                + " | ".join(
+                    (
+                        _datasheet_label(row),
+                        _ability_detail_label(coverage_row),
+                        f"`{_markdown_text(coverage_row.source_kind.value)}`",
+                        f"`{_markdown_text(coverage_row.support_stage.value)}`",
+                        _inline_code_list(coverage_row.semantic_categories),
+                        _inline_code_list(coverage_row.runtime_consumer_ids),
+                        _inline_code_list(coverage_row.diagnostic_reasons),
+                    )
+                )
+                + " |"
+            )
+    return lines
+
+
+def _datasheet_label(row: DatasheetSupportRow) -> str:
+    return f"{_markdown_text(row.datasheet_name)} (`{_markdown_text(row.datasheet_id)}`)"
+
+
+def _ability_detail_label(row: AbilityCoverageRow) -> str:
+    return f"{_markdown_text(row.ability_name)} (`{_markdown_text(row.ability_id)}`)"
+
+
+def _faction_interaction_cell(row: DatasheetSupportRow) -> str:
+    if row.faction_interaction_status == DATASHEET_SUPPORT_NONE:
+        return DATASHEET_SUPPORT_NONE
+    if not row.detachment_ids:
+        return row.faction_interaction_status
+    return (
+        f"{row.faction_interaction_status}; supported detachments "
+        f"{len(row.supported_detachment_ids)}/{len(row.detachment_ids)} "
+        f"({_inline_code_list(row.supported_detachment_ids)})"
+    )
 
 
 def _faction_detachment_rule_coverage_rows_markdown(

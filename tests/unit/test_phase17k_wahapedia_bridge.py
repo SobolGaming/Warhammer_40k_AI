@@ -10,7 +10,10 @@ from typing import cast
 
 import pytest
 from tools.generate_ability_support_matrix import (
+    DATASHEET_SUPPORT_OVERALL_VALUES,
     ability_support_matrix_rows,
+    datasheet_support_rows,
+    datasheet_support_rows_payload,
     faction_support_markdown_files,
     support_matrix_markdown,
 )
@@ -165,6 +168,9 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTargetSpec,
     parameter_payload,
     parameters_from_pairs,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_detachments_2026_27 as faction_detachment_source,
 )
 from warhammer40k_core.rules.source_reference_generation import build_source_reference_catalog
 from warhammer40k_core.rules.wahapedia_bridge import (
@@ -859,6 +865,7 @@ def test_phase17k_flesh_hounds_hunters_from_the_warp_uses_generic_turn_end_reser
 
 def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     rows = ability_support_matrix_rows()
+    support_rows = datasheet_support_rows()
     snapshot = json.loads(
         (
             Path(__file__).resolve().parents[2]
@@ -878,6 +885,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
             / "ability_support_category_rows.json"
         ).read_text(encoding="utf-8")
     )
+    datasheet_support_snapshot = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "data"
+            / "generated"
+            / "ability_coverage"
+            / "datasheet_support_rows.json"
+        ).read_text(encoding="utf-8")
+    )
     markdown_snapshot = (
         Path(__file__).resolve().parents[2] / "docs" / "ABILITY_SUPPORT_MATRIX_V2.md"
     ).read_text(encoding="utf-8")
@@ -888,7 +904,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     generated_markdown = support_matrix_markdown(
         ability_coverage_category_rows_payload(category_rows)
     )
-    generated_faction_markdown = faction_support_markdown_files()
+    generated_faction_markdown = faction_support_markdown_files(
+        datasheet_support_rows=support_rows,
+        ability_rows=rows,
+    )
     rows_by_name: dict[str, list[AbilityCoverageRow]] = {}
     for row in rows:
         rows_by_name.setdefault(row.ability_name, []).append(row)
@@ -916,6 +935,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
 
     assert ability_coverage_rows_payload(rows) == snapshot
     assert ability_coverage_category_rows_payload(category_rows) == category_snapshot
+    assert datasheet_support_rows_payload(support_rows) == datasheet_support_snapshot
     assert generated_markdown == markdown_snapshot
     assert generated_faction_markdown == faction_markdown_snapshot
     assert "## Factions" in generated_markdown
@@ -959,6 +979,48 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| Adeptus Mechanicus | 10 | 0 | 28 | 42 | 1 | "
         "[adeptus-mechanicus](factions/adeptus-mechanicus.md) |"
     ) in generated_markdown
+    chaos_daemons_markdown = generated_faction_markdown["chaos-daemons.md"]
+    coverage_row_ids = {row.coverage_row_id for row in rows}
+    faction_ids = {row.faction_id for row in faction_detachment_source.faction_rows()}
+    detachment_ids_by_faction = {
+        faction_id: {
+            row.detachment_id
+            for row in faction_detachment_source.detachment_rows()
+            if row.faction_id == faction_id
+        }
+        for faction_id in faction_ids
+    }
+    support_rows_by_datasheet_id = {row.datasheet_id: row for row in support_rows}
+    flesh_hounds_support = support_rows_by_datasheet_id["000001112"]
+
+    assert "## Datasheet / Unit Support" in chaos_daemons_markdown
+    assert "### Datasheet Ability Details" in chaos_daemons_markdown
+    assert "Flesh Hounds (`000001112`) | `Playable` | Full | Full | Full | Full | Full" in (
+        chaos_daemons_markdown
+    )
+    assert "Hunters from the Warp (`000001112:hunters-from-the-warp`)" in (chaos_daemons_markdown)
+    assert "Collar of Khorne (`000001112:collar-of-khorne`)" in chaos_daemons_markdown
+    assert "Bloodletters (`000001114`) | `Blocked`" in chaos_daemons_markdown
+    assert "Bane of Cowards (`000001114:bane-of-cowards`)" in chaos_daemons_markdown
+    assert "Bloodcrushers (`000001115`) | `Blocked`" in chaos_daemons_markdown
+    assert "Brass Stampede (`000001115:brass-stampede`)" in chaos_daemons_markdown
+    assert flesh_hounds_support.overall == "Playable"
+    assert flesh_hounds_support.catalog_status == "Full"
+    assert flesh_hounds_support.model_geometry_status == "Full"
+    assert flesh_hounds_support.wargear_status == "Full"
+    assert flesh_hounds_support.weapon_keyword_status == "Full"
+    assert flesh_hounds_support.datasheet_ability_status == "Full"
+    assert flesh_hounds_support.faction_interaction_status == "Partial"
+    for support_row in support_rows:
+        assert support_row.overall in DATASHEET_SUPPORT_OVERALL_VALUES
+        assert support_row.faction_id in faction_ids
+        assert set(support_row.ability_coverage_row_ids).issubset(coverage_row_ids)
+        assert set(support_row.detachment_ids).issubset(
+            detachment_ids_by_faction[support_row.faction_id]
+        )
+        assert set(support_row.supported_detachment_ids).issubset(set(support_row.detachment_ids))
+        if support_row.overall != "Full":
+            assert support_row.notes or support_row.ability_coverage_row_ids
     assert "| Grey Knights - Gate of Infinity | Named army-rule handler |" in generated_markdown
     assert (
         "| Adepta Sororitas - Acts of Faith | "
