@@ -13,11 +13,14 @@ from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_rule_ir_consumers_for_clause,
     catalog_rule_ir_consumers_for_rule,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_abilities import descriptor_is_deep_strike
+from warhammer40k_core.rules.parsed_tokens import TextSpan, TextSpanPayload
 from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
     RuleEffectKind,
     RuleIR,
     RuleIRPayload,
@@ -31,6 +34,13 @@ class AbilityCoverageSupportStage(StrEnum):
     IR_COMPILED_UNSUPPORTED = "ir_compiled_unsupported"
     GENERIC_IR_EXECUTABLE = "generic_ir_executable"
     ENGINE_CONSUMED = "engine_consumed"
+
+
+class AbilityOverallSupport(StrEnum):
+    FULL = "Full"
+    PARTIAL = "Partial"
+    PARSED = "Parsed"
+    UNSUPPORTED = "Unsupported"
 
 
 class AbilityCoverageRowPayload(TypedDict):
@@ -47,6 +57,27 @@ class AbilityCoverageRowPayload(TypedDict):
     semantic_categories: list[str]
     runtime_consumer_ids: list[str]
     diagnostic_reasons: list[str]
+
+
+class AbilityClauseCoverageRowPayload(TypedDict):
+    source_ability_id: str
+    ability_name: str
+    clause_id: str
+    source_span: TextSpanPayload
+    trigger_kind: str | None
+    effect_kinds: list[str]
+    runtime_consumer_ids: list[str]
+    support_stage: str
+    diagnostics: list[str]
+
+
+class AbilitySupportRollupPayload(TypedDict):
+    source_ability_id: str
+    ability_name: str
+    total_clause_count: int
+    consumed_clause_count: int
+    unsupported_clause_count: int
+    overall_ability_support: str
 
 
 class AbilityCoverageAbilityDatasheetPairPayload(TypedDict):
@@ -152,6 +183,124 @@ class AbilityCoverageRow:
             "semantic_categories": list(self.semantic_categories),
             "runtime_consumer_ids": list(self.runtime_consumer_ids),
             "diagnostic_reasons": list(self.diagnostic_reasons),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class AbilityClauseCoverageRow:
+    source_ability_id: str
+    ability_name: str
+    clause_id: str
+    source_span: TextSpan
+    trigger_kind: str | None
+    effect_kinds: tuple[str, ...]
+    runtime_consumer_ids: tuple[str, ...]
+    support_stage: AbilityCoverageSupportStage
+    diagnostics: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "source_ability_id",
+            _validate_string("source_ability_id", self.source_ability_id),
+        )
+        object.__setattr__(
+            self,
+            "ability_name",
+            _validate_string("ability_name", self.ability_name),
+        )
+        object.__setattr__(self, "clause_id", _validate_string("clause_id", self.clause_id))
+        if type(self.source_span) is not TextSpan:
+            raise GameLifecycleError("AbilityClauseCoverageRow source_span must be TextSpan.")
+        if self.trigger_kind is not None:
+            object.__setattr__(
+                self,
+                "trigger_kind",
+                _validate_string("trigger_kind", self.trigger_kind),
+            )
+        object.__setattr__(
+            self,
+            "effect_kinds",
+            _validate_string_tuple("effect_kinds", self.effect_kinds),
+        )
+        object.__setattr__(
+            self,
+            "runtime_consumer_ids",
+            _validate_string_tuple("runtime_consumer_ids", self.runtime_consumer_ids),
+        )
+        if type(self.support_stage) is not AbilityCoverageSupportStage:
+            raise GameLifecycleError(
+                "AbilityClauseCoverageRow support_stage must be AbilityCoverageSupportStage."
+            )
+        object.__setattr__(
+            self,
+            "diagnostics",
+            _validate_string_tuple("diagnostics", self.diagnostics),
+        )
+
+    def to_payload(self) -> AbilityClauseCoverageRowPayload:
+        return {
+            "source_ability_id": self.source_ability_id,
+            "ability_name": self.ability_name,
+            "clause_id": self.clause_id,
+            "source_span": self.source_span.to_payload(),
+            "trigger_kind": self.trigger_kind,
+            "effect_kinds": list(self.effect_kinds),
+            "runtime_consumer_ids": list(self.runtime_consumer_ids),
+            "support_stage": self.support_stage.value,
+            "diagnostics": list(self.diagnostics),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class AbilitySupportRollup:
+    source_ability_id: str
+    ability_name: str
+    total_clause_count: int
+    consumed_clause_count: int
+    unsupported_clause_count: int
+    overall_ability_support: AbilityOverallSupport
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "source_ability_id",
+            _validate_string("source_ability_id", self.source_ability_id),
+        )
+        object.__setattr__(
+            self,
+            "ability_name",
+            _validate_string("ability_name", self.ability_name),
+        )
+        if type(self.total_clause_count) is not int or self.total_clause_count < 0:
+            raise GameLifecycleError(
+                "AbilitySupportRollup total_clause_count must be non-negative."
+            )
+        if type(self.consumed_clause_count) is not int or self.consumed_clause_count < 0:
+            raise GameLifecycleError(
+                "AbilitySupportRollup consumed_clause_count must be non-negative."
+            )
+        if type(self.unsupported_clause_count) is not int or self.unsupported_clause_count < 0:
+            raise GameLifecycleError(
+                "AbilitySupportRollup unsupported_clause_count must be non-negative."
+            )
+        if self.consumed_clause_count > self.total_clause_count:
+            raise GameLifecycleError("AbilitySupportRollup consumed count exceeds total.")
+        if self.unsupported_clause_count > self.total_clause_count:
+            raise GameLifecycleError("AbilitySupportRollup unsupported count exceeds total.")
+        if type(self.overall_ability_support) is not AbilityOverallSupport:
+            raise GameLifecycleError(
+                "AbilitySupportRollup overall support must be AbilityOverallSupport."
+            )
+
+    def to_payload(self) -> AbilitySupportRollupPayload:
+        return {
+            "source_ability_id": self.source_ability_id,
+            "ability_name": self.ability_name,
+            "total_clause_count": self.total_clause_count,
+            "consumed_clause_count": self.consumed_clause_count,
+            "unsupported_clause_count": self.unsupported_clause_count,
+            "overall_ability_support": self.overall_ability_support.value,
         }
 
 
@@ -328,6 +477,97 @@ def ability_coverage_rows_payload(
     return [row.to_payload() for row in rows]
 
 
+def ability_clause_coverage_rows_for_ability(
+    ability: DatasheetAbilityDescriptor,
+) -> tuple[AbilityClauseCoverageRow, ...]:
+    if type(ability) is not DatasheetAbilityDescriptor:
+        raise GameLifecycleError("Ability clause coverage requires a descriptor.")
+    rule_ir = _rule_ir_for_ability(ability)
+    if rule_ir is None:
+        return ()
+    return ability_clause_coverage_rows_for_rule_ir(
+        source_ability_id=ability.source_id,
+        ability_name=ability.name,
+        rule_ir=rule_ir,
+    )
+
+
+def ability_clause_coverage_rows_for_rule_ir(
+    *,
+    source_ability_id: str,
+    ability_name: str,
+    rule_ir: RuleIR,
+    runtime_consumers_by_clause_id: Mapping[str, tuple[str, ...]] | None = None,
+) -> tuple[AbilityClauseCoverageRow, ...]:
+    if type(rule_ir) is not RuleIR:
+        raise GameLifecycleError("Ability clause coverage requires RuleIR.")
+    source_id = _validate_string("source_ability_id", source_ability_id)
+    name = _validate_string("ability_name", ability_name)
+    consumer_override = _validated_clause_consumer_override(runtime_consumers_by_clause_id)
+    rows = tuple(
+        _clause_coverage_row(
+            source_ability_id=source_id,
+            ability_name=name,
+            clause=clause,
+            runtime_consumer_ids=(
+                catalog_rule_ir_consumers_for_clause(clause)
+                if consumer_override is None
+                else consumer_override.get(clause.clause_id, ())
+            ),
+        )
+        for clause in rule_ir.clauses
+    )
+    return tuple(sorted(rows, key=lambda row: row.clause_id))
+
+
+def ability_support_rollup_for_ability(
+    ability: DatasheetAbilityDescriptor,
+) -> AbilitySupportRollup | None:
+    if type(ability) is not DatasheetAbilityDescriptor:
+        raise GameLifecycleError("Ability support rollup requires a descriptor.")
+    rule_ir = _rule_ir_for_ability(ability)
+    if rule_ir is None:
+        return None
+    return ability_support_rollup_for_rule_ir(
+        source_ability_id=ability.source_id,
+        ability_name=ability.name,
+        rule_ir=rule_ir,
+    )
+
+
+def ability_support_rollup_for_rule_ir(
+    *,
+    source_ability_id: str,
+    ability_name: str,
+    rule_ir: RuleIR,
+    runtime_consumers_by_clause_id: Mapping[str, tuple[str, ...]] | None = None,
+) -> AbilitySupportRollup:
+    rows = ability_clause_coverage_rows_for_rule_ir(
+        source_ability_id=source_ability_id,
+        ability_name=ability_name,
+        rule_ir=rule_ir,
+        runtime_consumers_by_clause_id=runtime_consumers_by_clause_id,
+    )
+    consumed_count = sum(1 for row in rows if _clause_row_is_consumed(row))
+    unsupported_count = sum(
+        1
+        for row in rows
+        if row.support_stage is AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED
+    )
+    return AbilitySupportRollup(
+        source_ability_id=source_ability_id,
+        ability_name=ability_name,
+        total_clause_count=len(rows),
+        consumed_clause_count=consumed_count,
+        unsupported_clause_count=unsupported_count,
+        overall_ability_support=_overall_support(
+            total_clause_count=len(rows),
+            consumed_clause_count=consumed_count,
+            unsupported_clause_count=unsupported_count,
+        ),
+    )
+
+
 def ability_coverage_category_rows(
     rows: tuple[AbilityCoverageRow, ...],
 ) -> tuple[AbilityCoverageCategoryRow, ...]:
@@ -487,13 +727,17 @@ def _support_stage(
         raise GameLifecycleError("Ability support stage requires a descriptor.")
     if type(consumer_ids) is not tuple:
         raise GameLifecycleError("Ability support stage consumer_ids must be a tuple.")
-    if (
-        ability.support is CatalogAbilitySupport.GENERIC_RULE_IR
-        and rule_ir is not None
-        and rule_ir.is_supported
-        and consumer_ids
-    ):
-        return AbilityCoverageSupportStage.ENGINE_CONSUMED
+    if ability.support is CatalogAbilitySupport.GENERIC_RULE_IR and rule_ir is not None:
+        rollup = ability_support_rollup_for_rule_ir(
+            source_ability_id=ability.source_id,
+            ability_name=ability.name,
+            rule_ir=rule_ir,
+        )
+        if rollup.overall_ability_support is AbilityOverallSupport.FULL:
+            return AbilityCoverageSupportStage.ENGINE_CONSUMED
+        if rollup.overall_ability_support is AbilityOverallSupport.UNSUPPORTED:
+            return AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED
+        return AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE
     if (
         ability.support is CatalogAbilitySupport.DESCRIPTOR_ONLY
         and rule_ir is None
@@ -541,6 +785,78 @@ def _semantic_categories(
     if not categories:
         categories.add(f"{ability.source_kind.value}.rule_ir.no_effects")
     return tuple(sorted(categories))
+
+
+def _clause_coverage_row(
+    *,
+    source_ability_id: str,
+    ability_name: str,
+    clause: RuleClause,
+    runtime_consumer_ids: tuple[str, ...],
+) -> AbilityClauseCoverageRow:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Ability clause coverage requires RuleClause values.")
+    if type(runtime_consumer_ids) is not tuple:
+        raise GameLifecycleError("Ability clause coverage consumers must be a tuple.")
+    return AbilityClauseCoverageRow(
+        source_ability_id=source_ability_id,
+        ability_name=ability_name,
+        clause_id=clause.clause_id,
+        source_span=clause.source_span,
+        trigger_kind=None if clause.trigger is None else clause.trigger.kind.value,
+        effect_kinds=tuple(effect.kind.value for effect in clause.effects),
+        runtime_consumer_ids=tuple(sorted(runtime_consumer_ids)),
+        support_stage=_clause_support_stage(
+            clause=clause,
+            runtime_consumer_ids=runtime_consumer_ids,
+        ),
+        diagnostics=tuple(
+            f"{diagnostic.reason.value}:{diagnostic.source_span.start}-"
+            f"{diagnostic.source_span.end}:{diagnostic.message}"
+            for diagnostic in clause.diagnostics
+        ),
+    )
+
+
+def _clause_support_stage(
+    *,
+    clause: RuleClause,
+    runtime_consumer_ids: tuple[str, ...],
+) -> AbilityCoverageSupportStage:
+    if not clause.is_supported:
+        return AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED
+    if runtime_consumer_ids:
+        return AbilityCoverageSupportStage.ENGINE_CONSUMED
+    return AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE
+
+
+def _clause_row_is_consumed(row: AbilityClauseCoverageRow) -> bool:
+    if row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED:
+        return True
+    return (
+        row.support_stage is AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE
+        and not row.effect_kinds
+        and not row.diagnostics
+    )
+
+
+def _overall_support(
+    *,
+    total_clause_count: int,
+    consumed_clause_count: int,
+    unsupported_clause_count: int,
+) -> AbilityOverallSupport:
+    if total_clause_count == 0:
+        return AbilityOverallSupport.UNSUPPORTED
+    if unsupported_clause_count == total_clause_count:
+        return AbilityOverallSupport.UNSUPPORTED
+    if consumed_clause_count == total_clause_count and unsupported_clause_count == 0:
+        return AbilityOverallSupport.FULL
+    if consumed_clause_count > 0:
+        return AbilityOverallSupport.PARTIAL
+    if unsupported_clause_count > 0:
+        return AbilityOverallSupport.PARTIAL
+    return AbilityOverallSupport.PARSED
 
 
 def _semantic_target_token(target_kind: RuleTargetKind | None) -> str:
@@ -667,15 +983,41 @@ def _validate_source_kind_counts(
     return values
 
 
-def _validate_string_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
+def _validated_clause_consumer_override(
+    values: object,
+) -> Mapping[str, tuple[str, ...]] | None:
+    if values is None:
+        return None
+    if not isinstance(values, Mapping):
+        raise GameLifecycleError("Ability clause consumer override must be a mapping.")
+    mapping = cast(Mapping[object, object], values)
+    validated: dict[str, tuple[str, ...]] = {}
+    for clause_id, consumer_ids in mapping.items():
+        validated[_validate_string("clause_id", clause_id)] = _validate_string_tuple(
+            "runtime_consumer_ids",
+            consumer_ids,
+        )
+    return validated
+
+
+def _validate_string(field_name: str, value: object) -> str:
+    if type(field_name) is not str or not field_name:
+        raise GameLifecycleError("String validation requires a field name.")
+    if type(value) is not str or not value.strip():
+        raise GameLifecycleError(f"{field_name} must be a non-empty string.")
+    return value.strip()
+
+
+def _validate_string_tuple(field_name: str, values: object) -> tuple[str, ...]:
     if type(field_name) is not str or not field_name:
         raise GameLifecycleError("String tuple validation requires a field name.")
     if type(values) is not tuple:
         raise GameLifecycleError(f"{field_name} must be a tuple.")
-    for value in values:
+    validated = cast(tuple[object, ...], values)
+    for value in validated:
         if type(value) is not str or not value.strip():
             raise GameLifecycleError(f"{field_name} entries must be non-empty strings.")
-    return values
+    return cast(tuple[str, ...], validated)
 
 
 _SUPPORT_STAGE_ORDER: Mapping[AbilityCoverageSupportStage, int] = {

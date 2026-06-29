@@ -10,6 +10,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+    AbilityCatalogIndex,
     AbilityCatalogRecord,
     AbilityDefinition,
     AbilityExecutionContext,
@@ -28,10 +29,15 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     UnitPlacement,
 )
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_restore_lost_wounds_after_destroying_unit,
+    catalog_wound_roll_reroll_permission_for_attack,
+)
 from warhammer40k_core.engine.command_points import (
     CommandPointSourceKind,
     initial_command_point_ledgers,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.effects import (
     EffectError,
     EffectExpiration,
@@ -58,6 +64,7 @@ from warhammer40k_core.engine.rule_execution import (
 )
 from warhammer40k_core.engine.scoring import initial_victory_point_ledgers
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.rule_compiler import CompiledRuleSource, compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
@@ -188,6 +195,139 @@ def test_phase17d_generic_reroll_permission_executes() -> None:
     assert result.status is RuleExecutionStatus.APPLIED
     assert effect["kind"] == "reroll_permission"
     assert effect["parameters"] == [{"key": "roll_type", "value": "hit"}]
+
+
+def test_phase17d_champion_slayer_wound_reroll_only_applies_to_qualifying_melee_attack() -> None:
+    state = _battle_state_with_scenario()
+    unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
+    source_model_id = unit.own_models[0].model_instance_id
+    ability_index = _champion_slayer_ability_index(datasheet_id=unit.datasheet_id)
+
+    qualifying = catalog_wound_roll_reroll_permission_for_attack(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=(source_model_id,),
+        player_id="player-a",
+        attack_kind="melee",
+        target_keywords=("CHARACTER",),
+    )
+    ranged = catalog_wound_roll_reroll_permission_for_attack(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=(source_model_id,),
+        player_id="player-a",
+        attack_kind="ranged",
+        target_keywords=("CHARACTER",),
+    )
+    non_keyword_target = catalog_wound_roll_reroll_permission_for_attack(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=(source_model_id,),
+        player_id="player-a",
+        attack_kind="melee",
+        target_keywords=("INFANTRY",),
+    )
+
+    assert qualifying is not None
+    assert qualifying.eligible_roll_type == "attack_sequence.wound"
+    assert qualifying.timing_window == "attack_sequence.wound"
+    assert ranged is None
+    assert non_keyword_target is None
+
+
+def test_phase17d_champion_slayer_clause_records_share_source_identity_and_split_timings() -> None:
+    ability_index = _champion_slayer_ability_index(datasheet_id="core-intercessor-like-infantry")
+    wound_records = ability_index.records_for(TimingTriggerKind.AFTER_DICE_ROLL)
+    destroy_records = ability_index.records_for(TimingTriggerKind.AFTER_UNIT_DESTROYED)
+
+    assert len(wound_records) == 1
+    assert len(destroy_records) == 1
+    assert wound_records[0].definition.ability_id == destroy_records[0].definition.ability_id
+    assert wound_records[0].definition.source_id == destroy_records[0].definition.source_id
+    wound_payload = cast(dict[str, JsonValue], wound_records[0].definition.replay_payload)
+    destroy_payload = cast(dict[str, JsonValue], destroy_records[0].definition.replay_payload)
+    assert cast(str, wound_payload["runtime_clause_id"]).endswith(":clause:001")
+    assert cast(str, destroy_payload["runtime_clause_id"]).endswith(":clause:002")
+
+
+def test_phase17d_champion_slayer_heal_only_applies_after_enemy_character_or_monster() -> None:
+    state = _battle_state_with_scenario()
+    unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
+    model = unit.own_models[0]
+    ability_index = _champion_slayer_ability_index(datasheet_id=unit.datasheet_id)
+    _set_model_wounds(state, model_instance_id=model.model_instance_id, wounds_remaining=1)
+    wounded_unit = _unit_by_id(state, unit.unit_instance_id)
+
+    resolved = catalog_restore_lost_wounds_after_destroying_unit(
+        state=state,
+        decisions=DecisionController(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        ability_index=ability_index,
+        unit=wounded_unit,
+        current_model_instance_ids=(model.model_instance_id,),
+        player_id="player-a",
+        destroyed_player_id="player-b",
+        destroyed_unit_keywords=("MONSTER",),
+        healing_amount=3,
+        source_event_id="event:enemy-monster-destroyed",
+    )
+
+    assert resolved is not None
+    effect, request = resolved
+    assert request is None
+    assert effect.source_context == {
+        "catalog_record_id": (
+            "phase17d:test:catalog-ability:core-intercessor-like-infantry:"
+            "champion-slayer:phase17d:test:champion-slayer:clause:002"
+        ),
+        "clause_id": "phase17d:test:champion-slayer:clause:002",
+        "destroyed_unit_keywords": ["MONSTER"],
+        "effect_kind": "restore_lost_wounds",
+        "source_model_instance_id": model.model_instance_id,
+        "source_event_id": "event:enemy-monster-destroyed",
+    }
+    healed_unit = _unit_by_id(state, unit.unit_instance_id)
+    assert healed_unit.own_models[0].wounds_remaining == model.starting_wounds
+
+
+def test_phase17d_champion_slayer_heal_ignores_nonqualifying_destroyed_units() -> None:
+    state = _battle_state_with_scenario()
+    unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
+    model = unit.own_models[0]
+    ability_index = _champion_slayer_ability_index(datasheet_id=unit.datasheet_id)
+    _set_model_wounds(state, model_instance_id=model.model_instance_id, wounds_remaining=1)
+    wounded_unit = _unit_by_id(state, unit.unit_instance_id)
+
+    non_keyword = catalog_restore_lost_wounds_after_destroying_unit(
+        state=state,
+        decisions=DecisionController(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        ability_index=ability_index,
+        unit=wounded_unit,
+        current_model_instance_ids=(model.model_instance_id,),
+        player_id="player-a",
+        destroyed_player_id="player-b",
+        destroyed_unit_keywords=("INFANTRY",),
+        healing_amount=3,
+        source_event_id="event:enemy-infantry-destroyed",
+    )
+    friendly_destroyed = catalog_restore_lost_wounds_after_destroying_unit(
+        state=state,
+        decisions=DecisionController(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        ability_index=ability_index,
+        unit=wounded_unit,
+        current_model_instance_ids=(model.model_instance_id,),
+        player_id="player-a",
+        destroyed_player_id="player-a",
+        destroyed_unit_keywords=("CHARACTER",),
+        healing_amount=3,
+        source_event_id="event:friendly-character-destroyed",
+    )
+
+    assert non_keyword is None
+    assert friendly_destroyed is None
+    assert _unit_by_id(state, unit.unit_instance_id).own_models[0].wounds_remaining == 1
 
 
 def test_phase17d_generic_vp_scoring_rule_mutates_victory_point_ledger() -> None:
@@ -972,6 +1112,69 @@ def _command_point_spend_rule_ir() -> RuleIR:
     return replace(compiled.rule_ir, clauses=(spend_clause,))
 
 
+def _champion_slayer_rule_ir() -> RuleIR:
+    return compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="phase17d:test:champion-slayer",
+            raw_text=(
+                "Each time this model makes a melee attack that targets a Character or Monster "
+                "unit, you can re-roll the Wound roll. Each time this model destroys an enemy "
+                "Character or Monster unit, this model regains up to D6 lost wounds."
+            ),
+        )
+    ).rule_ir
+
+
+def _champion_slayer_ability_index(*, datasheet_id: str) -> AbilityCatalogIndex:
+    rule_ir = _champion_slayer_rule_ir()
+    records = tuple(
+        _champion_slayer_clause_record(
+            rule_ir=rule_ir,
+            clause_index=clause_index,
+            datasheet_id=datasheet_id,
+            trigger_kind=trigger_kind,
+        )
+        for clause_index, trigger_kind in (
+            (0, TimingTriggerKind.AFTER_DICE_ROLL),
+            (1, TimingTriggerKind.AFTER_UNIT_DESTROYED),
+        )
+    )
+    return AbilityCatalogIndex.from_records(records)
+
+
+def _champion_slayer_clause_record(
+    *,
+    rule_ir: RuleIR,
+    clause_index: int,
+    datasheet_id: str,
+    trigger_kind: TimingTriggerKind,
+) -> AbilityCatalogRecord:
+    clause = rule_ir.clauses[clause_index]
+    return AbilityCatalogRecord(
+        record_id=(
+            f"phase17d:test:catalog-ability:{datasheet_id}:champion-slayer:{clause.clause_id}"
+        ),
+        definition=AbilityDefinition(
+            ability_id="champion-slayer",
+            name="Champion Slayer",
+            source_id="phase17d:test:champion-slayer",
+            when_descriptor="Catalog generic rule IR.",
+            effect_descriptor="Champion Slayer compound ability.",
+            restrictions_descriptor="Datasheet ability source kind: datasheet.",
+            timing=AbilityTimingDescriptor(trigger_kind=trigger_kind),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value(
+                {
+                    "rule_ir": rule_ir.to_payload(),
+                    "runtime_clause_id": clause.clause_id,
+                }
+            ),
+        ),
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id=datasheet_id,
+    )
+
+
 def _execution_context(
     *,
     state: GameState | None = None,
@@ -1064,6 +1267,39 @@ def _battle_state_with_extra_friendly_unit() -> GameState:
         state.record_army_definition(army_definition)
     state.battlefield_state = scenario.battlefield_state
     return state
+
+
+def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
+    for army in state.army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id == unit_instance_id:
+                return unit
+    raise AssertionError(f"missing unit {unit_instance_id}")
+
+
+def _set_model_wounds(
+    state: GameState,
+    *,
+    model_instance_id: str,
+    wounds_remaining: int,
+) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    did_update = False
+    for army in state.army_definitions:
+        updated_units: list[UnitInstance] = []
+        for unit in army.units:
+            updated_models: list[ModelInstance] = []
+            for model in unit.own_models:
+                if model.model_instance_id != model_instance_id:
+                    updated_models.append(model)
+                    continue
+                updated_models.append(replace(model, wounds_remaining=wounds_remaining))
+                did_update = True
+            updated_units.append(replace(unit, own_models=tuple(updated_models)))
+        updated_armies.append(replace(army, units=tuple(updated_units)))
+    if not did_update:
+        raise AssertionError(f"missing model {model_instance_id}")
+    state.army_definitions = updated_armies
 
 
 def _scenario() -> BattlefieldScenario:

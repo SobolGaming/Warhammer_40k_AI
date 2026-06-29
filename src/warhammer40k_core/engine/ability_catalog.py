@@ -24,6 +24,7 @@ from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
@@ -63,8 +64,8 @@ def catalog_ability_records_from_catalog(catalog: ArmyCatalog) -> tuple[AbilityC
         for descriptor in datasheet.abilities:
             if descriptor.support is not CatalogAbilitySupport.GENERIC_RULE_IR:
                 continue
-            records.append(
-                _catalog_record_from_descriptor(
+            records.extend(
+                _catalog_records_from_descriptor(
                     catalog=catalog,
                     datasheet_id=datasheet.datasheet_id,
                     descriptor=descriptor,
@@ -156,21 +157,57 @@ def _record_from_source_row(row: source_data.SourceAbilityRow) -> AbilityCatalog
     )
 
 
-def _catalog_record_from_descriptor(
+def _catalog_records_from_descriptor(
     *,
     catalog: ArmyCatalog,
     datasheet_id: str,
     descriptor: DatasheetAbilityDescriptor,
-) -> AbilityCatalogRecord:
+) -> tuple[AbilityCatalogRecord, ...]:
     if descriptor.rule_ir_payload is None:
         raise GameLifecycleError("Catalog generic rule ability descriptor is missing rule_ir.")
     try:
         rule_ir = RuleIR.from_payload(cast(RuleIRPayload, descriptor.rule_ir_payload))
     except RuleIRError as exc:
         raise GameLifecycleError("Catalog generic rule ability descriptor has invalid IR.") from exc
+    if len(rule_ir.clauses) == 1:
+        return (
+            _catalog_record_from_rule_ir(
+                catalog=catalog,
+                datasheet_id=datasheet_id,
+                descriptor=descriptor,
+                rule_ir=rule_ir,
+                clause=None,
+            ),
+        )
+    return tuple(
+        _catalog_record_from_rule_ir(
+            catalog=catalog,
+            datasheet_id=datasheet_id,
+            descriptor=descriptor,
+            rule_ir=rule_ir,
+            clause=clause,
+        )
+        for clause in rule_ir.clauses
+    )
+
+
+def _catalog_record_from_rule_ir(
+    *,
+    catalog: ArmyCatalog,
+    datasheet_id: str,
+    descriptor: DatasheetAbilityDescriptor,
+    rule_ir: RuleIR,
+    clause: RuleClause | None,
+) -> AbilityCatalogRecord:
+    replay_payload: dict[str, object] = {"rule_ir": rule_ir.to_payload()}
+    if clause is not None:
+        replay_payload["runtime_clause_id"] = clause.clause_id
     return AbilityCatalogRecord(
-        record_id=(
-            f"{catalog.source_package_id}:catalog-ability:{datasheet_id}:{descriptor.ability_id}"
+        record_id=_catalog_record_id(
+            catalog=catalog,
+            datasheet_id=datasheet_id,
+            descriptor=descriptor,
+            clause=clause,
         ),
         definition=AbilityDefinition(
             ability_id=descriptor.ability_id,
@@ -179,14 +216,31 @@ def _catalog_record_from_descriptor(
             when_descriptor=_catalog_when_descriptor(descriptor),
             effect_descriptor=descriptor.effect_description,
             restrictions_descriptor=_catalog_restrictions_descriptor(descriptor),
-            timing=_catalog_timing_descriptor(rule_ir),
+            timing=(
+                _catalog_timing_descriptor(rule_ir)
+                if clause is None
+                else _catalog_timing_descriptor_for_clause(clause)
+            ),
             handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
-            replay_payload=validate_json_value({"rule_ir": rule_ir.to_payload()}),
+            replay_payload=validate_json_value(replay_payload),
         ),
         source_kind=_catalog_ability_source_kind(descriptor.source_kind),
         datasheet_id=datasheet_id,
         wargear_id=descriptor.source_wargear_id,
     )
+
+
+def _catalog_record_id(
+    *,
+    catalog: ArmyCatalog,
+    datasheet_id: str,
+    descriptor: DatasheetAbilityDescriptor,
+    clause: RuleClause | None,
+) -> str:
+    base_id = f"{catalog.source_package_id}:catalog-ability:{datasheet_id}:{descriptor.ability_id}"
+    if clause is None:
+        return base_id
+    return f"{base_id}:{clause.clause_id}"
 
 
 def _catalog_ability_source_kind(source_kind: CatalogAbilitySourceKind) -> AbilitySourceKind:
@@ -244,6 +298,39 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
     return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE)
 
 
+def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDescriptor:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog timing descriptor requires a RuleClause.")
+    if _clause_has_turn_end_reserve_permission(clause):
+        turn_timing = _catalog_turn_timing_descriptor_for_clause(clause)
+        if turn_timing is not None:
+            return turn_timing
+    if any(
+        _effect_is_passive_rule_exception_grant(effect)
+        or _effect_is_shadow_of_chaos_status(effect)
+        or _effect_is_feel_no_pain_grant(effect)
+        or effect.kind is RuleEffectKind.SET_CHARACTERISTIC
+        for effect in clause.effects
+    ):
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
+    if clause.trigger is not None and clause.trigger.kind is RuleTriggerKind.UNIT_DESTROYED:
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED)
+    if clause.trigger is None and any(
+        effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY for effect in clause.effects
+    ):
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
+    if any(
+        effect.kind
+        in {
+            RuleEffectKind.MODIFY_DICE_ROLL,
+            RuleEffectKind.REROLL_PERMISSION,
+        }
+        for effect in clause.effects
+    ):
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL)
+    return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE)
+
+
 def _catalog_turn_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor | None:
     if not any(
         _effect_is_turn_end_reserve_permission(effect)
@@ -264,6 +351,27 @@ def _catalog_turn_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor 
         if edge == "start":
             return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.START_TURN)
     return None
+
+
+def _catalog_turn_timing_descriptor_for_clause(
+    clause: RuleClause,
+) -> AbilityTimingDescriptor | None:
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return None
+    parameters = parameter_payload(trigger.parameters)
+    if parameters.get("phase") != "turn":
+        return None
+    edge = parameters.get("edge")
+    if edge == "end":
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.END_TURN)
+    if edge == "start":
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.START_TURN)
+    return None
+
+
+def _clause_has_turn_end_reserve_permission(clause: RuleClause) -> bool:
+    return any(_effect_is_turn_end_reserve_permission(effect) for effect in clause.effects)
 
 
 def _effect_is_feel_no_pain_grant(effect: RuleEffectSpec) -> bool:

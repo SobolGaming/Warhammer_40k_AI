@@ -6,6 +6,15 @@ from typing import cast
 
 import pytest
 
+from warhammer40k_core.engine.ability_coverage import (
+    AbilityOverallSupport,
+    ability_clause_coverage_rows_for_rule_ir,
+    ability_support_rollup_for_rule_ir,
+)
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,
+    CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
+)
 from warhammer40k_core.rules.rule_compiler import (
     CompiledRuleSource,
     RuleCompilerError,
@@ -14,18 +23,26 @@ from warhammer40k_core.rules.rule_compiler import (
     compile_rule_source_texts,
 )
 from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
     RuleCondition,
     RuleConditionKind,
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
     RuleIRPayload,
+    RuleParameterValue,
     RuleTargetKind,
     RuleTriggerKind,
     RuleUnsupportedReason,
     parameter_payload,
 )
 from warhammer40k_core.rules.source_data import RuleSourceText
+
+CHAMPION_SLAYER_TEXT = (
+    "Each time this model makes a melee attack that targets a Character or Monster unit, "
+    "you can re-roll the Wound roll. Each time this model destroys an enemy Character or "
+    "Monster unit, this model regains up to D6 lost wounds."
+)
 
 
 def test_phase17c_normalized_source_text_compiles_to_stable_rule_ir() -> None:
@@ -119,6 +136,118 @@ def test_phase17c_known_effect_plus_unknown_residue_is_unsupported() -> None:
         diagnostic.reason is RuleUnsupportedReason.UNSUPPORTED_LANGUAGE
         and "scatter die" in diagnostic.source_span.text
         for diagnostic in compiled.rule_ir.diagnostics
+    )
+
+
+def test_phase17c_champion_slayer_compiles_to_two_independent_clauses() -> None:
+    rule_ir = _compiled(CHAMPION_SLAYER_TEXT).rule_ir
+
+    assert rule_ir.is_supported
+    assert len(rule_ir.clauses) == 2
+    assert rule_ir.clauses[0].source_span.text.startswith("Each time this model makes")
+    assert rule_ir.clauses[1].source_span.text.startswith("Each time this model destroys")
+
+
+def test_phase17c_champion_slayer_clause_one_has_melee_target_gate_and_wound_reroll() -> None:
+    clause = _compiled(CHAMPION_SLAYER_TEXT).rule_ir.clauses[0]
+
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.DICE_ROLL
+    assert parameter_payload(clause.trigger.parameters) == {
+        "actor": "this_model",
+        "attack_kind": "melee",
+        "roll_type": "wound",
+        "timing_window": "attack_sequence.wound",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert _condition_payload(clause, RuleConditionKind.TARGET_CONSTRAINT) == {
+        "attack_kind": "melee",
+        "gate_subject": "attack_target",
+        "relationship": "this_model_makes_attack",
+    }
+    assert _condition_payload(clause, RuleConditionKind.KEYWORD_GATE) == {
+        "gate_subject": "attack_target",
+        "required_keyword_any": "CHARACTER|MONSTER",
+    }
+    assert tuple(effect.kind for effect in clause.effects) == (RuleEffectKind.REROLL_PERMISSION,)
+    assert parameter_payload(clause.effects[0].parameters) == {"roll_type": "wound"}
+
+
+def test_phase17c_champion_slayer_clause_two_has_destroyed_unit_gate_and_heal() -> None:
+    clause = _compiled(CHAMPION_SLAYER_TEXT).rule_ir.clauses[1]
+
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.UNIT_DESTROYED
+    assert parameter_payload(clause.trigger.parameters) == {
+        "actor": "this_model",
+        "destroyed_allegiance": "enemy",
+        "destroyed_unit_kind": "unit",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert _condition_payload(clause, RuleConditionKind.TARGET_CONSTRAINT) == {
+        "destroyed_allegiance": "enemy",
+        "gate_subject": "destroyed_unit",
+        "relationship": "this_model_destroyed_unit",
+    }
+    assert _condition_payload(clause, RuleConditionKind.KEYWORD_GATE) == {
+        "gate_subject": "destroyed_unit",
+        "required_keyword_any": "CHARACTER|MONSTER",
+    }
+    assert tuple(effect.kind for effect in clause.effects) == (RuleEffectKind.RESTORE_LOST_WOUNDS,)
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "amount": "D6",
+        "cap": "lost_wounds",
+        "optional": True,
+        "target": "this_model",
+    }
+
+
+def test_phase17c_champion_slayer_clause_coverage_rolls_up_partial_and_full() -> None:
+    rule_ir = _compiled(CHAMPION_SLAYER_TEXT).rule_ir
+    clause_rows = ability_clause_coverage_rows_for_rule_ir(
+        source_ability_id="source:champion-slayer",
+        ability_name="Champion Slayer",
+        rule_ir=rule_ir,
+    )
+    partial_rollup = ability_support_rollup_for_rule_ir(
+        source_ability_id="source:champion-slayer",
+        ability_name="Champion Slayer",
+        rule_ir=rule_ir,
+        runtime_consumers_by_clause_id={
+            rule_ir.clauses[0].clause_id: (CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,),
+        },
+    )
+    full_rollup = ability_support_rollup_for_rule_ir(
+        source_ability_id="source:champion-slayer",
+        ability_name="Champion Slayer",
+        rule_ir=rule_ir,
+    )
+
+    assert tuple(row.runtime_consumer_ids for row in clause_rows) == (
+        (CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,),
+        (CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,),
+    )
+    assert partial_rollup.total_clause_count == 2
+    assert partial_rollup.consumed_clause_count == 1
+    assert partial_rollup.overall_ability_support is AbilityOverallSupport.PARTIAL
+    assert full_rollup.total_clause_count == 2
+    assert full_rollup.consumed_clause_count == 2
+    assert full_rollup.unsupported_clause_count == 0
+    assert full_rollup.overall_ability_support is AbilityOverallSupport.FULL
+
+
+def test_phase17c_champion_slayer_residual_unsupported_text_preserves_source_span() -> None:
+    rule_ir = _compiled(f"{CHAMPION_SLAYER_TEXT} Consult the legacy table.").rule_ir
+    diagnostic = rule_ir.diagnostics[0]
+
+    assert not rule_ir.is_supported
+    assert diagnostic.reason is RuleUnsupportedReason.UNSUPPORTED_LANGUAGE
+    assert diagnostic.source_span.text == "Consult the legacy table."
+    assert (
+        rule_ir.normalized_text[diagnostic.source_span.start : diagnostic.source_span.end]
+        == diagnostic.source_span.text
     )
 
 
@@ -706,3 +835,14 @@ def _effects(rule_ir: RuleIR) -> tuple[RuleEffectSpec, ...]:
 
 def _conditions(rule_ir: RuleIR) -> tuple[RuleCondition, ...]:
     return tuple(condition for clause in rule_ir.clauses for condition in clause.conditions)
+
+
+def _condition_payload(
+    clause: RuleClause,
+    condition_kind: RuleConditionKind,
+) -> dict[str, RuleParameterValue]:
+    matches = tuple(
+        condition for condition in clause.conditions if condition.kind is condition_kind
+    )
+    assert len(matches) == 1
+    return parameter_payload(matches[0].parameters)

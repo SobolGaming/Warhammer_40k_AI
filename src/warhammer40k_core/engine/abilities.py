@@ -1070,10 +1070,10 @@ def _generic_rule_ir_ability_handler(
         RuleExecutionContext,
         RuleExecutionStatus,
         execute_rule_ir,
-        rule_ir_from_execution_payload,
+        scoped_rule_ir_from_execution_payload,
     )
 
-    rule_ir = rule_ir_from_execution_payload(record.definition.replay_payload)
+    rule_ir = scoped_rule_ir_from_execution_payload(record.definition.replay_payload)
     result = execute_rule_ir(
         rule_ir=rule_ir,
         context=RuleExecutionContext(

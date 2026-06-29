@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from types import MappingProxyType
 from typing import Self, TypedDict, cast
@@ -678,6 +678,26 @@ def rule_ir_from_execution_payload(payload: JsonValue) -> RuleIR:
     if not isinstance(rule_ir_payload, dict):
         raise GameLifecycleError("Generic rule execution payload requires rule_ir.")
     return RuleIR.from_payload(cast(RuleIRPayload, rule_ir_payload))
+
+
+def runtime_clause_id_from_execution_payload(payload: JsonValue) -> str | None:
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Generic rule execution payload must be a JSON object.")
+    value = payload.get("runtime_clause_id")
+    if value is None:
+        return None
+    return _validate_identifier("runtime_clause_id", value)
+
+
+def scoped_rule_ir_from_execution_payload(payload: JsonValue) -> RuleIR:
+    rule_ir = rule_ir_from_execution_payload(payload)
+    runtime_clause_id = runtime_clause_id_from_execution_payload(payload)
+    if runtime_clause_id is None:
+        return rule_ir
+    for clause in rule_ir.clauses:
+        if clause.clause_id == runtime_clause_id:
+            return replace(rule_ir, clauses=(clause,), diagnostics=clause.diagnostics)
+    raise GameLifecycleError("Generic rule execution payload runtime_clause_id is unknown.")
 
 
 def rule_execution_status_from_token(token: object) -> RuleExecutionStatus:

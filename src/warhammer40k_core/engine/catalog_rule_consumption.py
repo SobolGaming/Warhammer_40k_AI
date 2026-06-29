@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
 from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     RangeProfileKind,
@@ -37,6 +38,8 @@ from warhammer40k_core.engine.damage_allocation import (
     FeelNoPainSource,
     feel_no_pain_attack_condition_from_token,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle_validation import (
@@ -63,11 +66,13 @@ from warhammer40k_core.rules.rule_ir import (
     RuleEffectSpec,
     RuleIR,
     RuleTargetKind,
+    RuleTriggerKind,
     parameter_payload,
 )
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.healing import HealingEffect
 
 CATALOG_IR_CHARGE_ROLL_CONSUMER_ID = "catalog-ir:charge-roll-modifier"
 CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID = "catalog-ir:leadership-characteristic-query"
@@ -79,6 +84,10 @@ CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID = (
 )
 CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:advance-roll-reroll"
 CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:charge-roll-reroll"
+CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID = "catalog-ir:wound-roll-reroll"
+CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID = (
+    "catalog-ir:destroyed-unit-restore-lost-wounds"
+)
 CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID = "catalog-ir:feel-no-pain-roll"
 CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID = "catalog-ir:feel-no-pain-source"
 CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-hit-value-modifier"
@@ -122,6 +131,9 @@ _CATALOG_IR_ROLL_REROLL_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
         "advance_roll": CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
         "charge": CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
         "charge_roll": CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+        "wound": CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
+        "wound_roll": CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
+        "attack_sequence_wound": CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
     }
 )
 _CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
@@ -352,6 +364,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         *_CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS.values(),
         *_CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.values(),
         *_CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.values(),
+        CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,
         CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
         CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
@@ -436,6 +449,148 @@ def catalog_charge_roll_reroll_permission_for_unit(
         player_id=player_id,
         roll_type="charge_roll",
         timing_window="after_charge_roll",
+    )
+
+
+def catalog_wound_roll_reroll_permission_for_attack(
+    *,
+    ability_index: AbilityCatalogIndex,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+    player_id: str,
+    attack_kind: str,
+    target_keywords: tuple[str, ...],
+) -> RerollPermission | None:
+    _validate_ability_index(ability_index)
+    _validate_unit(unit)
+    current_ids = _validate_current_model_instance_ids(current_model_instance_ids)
+    _validate_this_model_source_id(unit=unit, current_model_instance_ids=current_ids)
+    owning_player_id = _validate_identifier("player_id", player_id)
+    resolved_attack_kind = _catalog_ir_lookup_token(
+        _validate_identifier("attack_kind", attack_kind)
+    )
+    resolved_target_keywords = _validate_keyword_tokens("target_keywords", target_keywords)
+    permissions: list[RerollPermission] = []
+    for record in _unit_scoped_generic_records(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=current_ids,
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+    ):
+        for clause in _clauses_from_record(record):
+            if not clause.is_supported:
+                continue
+            if not _clause_is_melee_wound_reroll_against_target_keywords(
+                clause=clause,
+                attack_kind=resolved_attack_kind,
+                target_keywords=resolved_target_keywords,
+            ):
+                continue
+            for effect_index, effect in enumerate(clause.effects):
+                if not _effect_is_roll_reroll_permission(effect, roll_type="wound_roll"):
+                    continue
+                permissions.append(
+                    _catalog_roll_reroll_permission(
+                        record=record,
+                        clause=clause,
+                        effect_index=effect_index,
+                        player_id=owning_player_id,
+                        roll_type="attack_sequence.wound",
+                        timing_window="attack_sequence.wound",
+                    )
+                )
+    if len(permissions) > 1:
+        raise GameLifecycleError("Multiple catalog wound reroll permissions are available.")
+    return permissions[0] if permissions else None
+
+
+def catalog_restore_lost_wounds_after_destroying_unit(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    ruleset_descriptor: RulesetDescriptor,
+    ability_index: AbilityCatalogIndex,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+    player_id: str,
+    destroyed_player_id: str,
+    destroyed_unit_keywords: tuple[str, ...],
+    healing_amount: int,
+    source_event_id: str,
+) -> tuple[HealingEffect, DecisionRequest | None] | None:
+    _validate_game_state(state)
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Catalog restore lost wounds requires DecisionController.")
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Catalog restore lost wounds requires RulesetDescriptor.")
+    _validate_ability_index(ability_index)
+    _validate_unit(unit)
+    from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
+
+    current_ids = _validate_current_model_instance_ids(current_model_instance_ids)
+    source_model_id = _validate_this_model_source_id(
+        unit=unit,
+        current_model_instance_ids=current_ids,
+    )
+    owning_player_id = _validate_identifier("player_id", player_id)
+    opposing_player_id = _validate_identifier("destroyed_player_id", destroyed_player_id)
+    source_event = _validate_identifier("source_event_id", source_event_id)
+    if opposing_player_id == owning_player_id:
+        return None
+    resolved_destroyed_keywords = _validate_keyword_tokens(
+        "destroyed_unit_keywords",
+        destroyed_unit_keywords,
+    )
+    amount = _validate_healing_amount(healing_amount)
+    matches: list[tuple[AbilityCatalogRecord, RuleClause, int, RuleEffectSpec]] = []
+    for record in _unit_scoped_generic_records(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=current_ids,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED,
+    ):
+        for clause in _clauses_from_record(record):
+            if not clause.is_supported:
+                continue
+            if not _clause_is_destroyed_enemy_keyword_restore_lost_wounds(
+                clause=clause,
+                destroyed_unit_keywords=resolved_destroyed_keywords,
+            ):
+                continue
+            for effect_index, effect in enumerate(clause.effects):
+                if effect.kind is RuleEffectKind.RESTORE_LOST_WOUNDS:
+                    matches.append((record, clause, effect_index, effect))
+    if len(matches) > 1:
+        raise GameLifecycleError("Multiple catalog restore-lost-wounds effects are available.")
+    if not matches:
+        return None
+    record, clause, effect_index, effect = matches[0]
+    effect_parameters = parameter_payload(effect.parameters)
+    if effect_parameters.get("amount") != "D6":
+        raise GameLifecycleError("Catalog restore lost wounds requires a D6 amount.")
+    if not _this_model_restore_has_targetable_wounds(unit=unit, source_model_id=source_model_id):
+        return None
+    healing_effect = HealingEffect(
+        effect_id=f"{record.record_id}:{clause.clause_id}:effect-{effect_index:03d}:heal",
+        target_unit_instance_id=unit.unit_instance_id,
+        amount=amount,
+        opposing_player_id=opposing_player_id,
+        source_rule_id=record.definition.source_id,
+        source_context={
+            "catalog_record_id": record.record_id,
+            "clause_id": clause.clause_id,
+            "source_event_id": source_event,
+            "destroyed_unit_keywords": list(resolved_destroyed_keywords),
+            "effect_kind": RuleEffectKind.RESTORE_LOST_WOUNDS.value,
+            "source_model_instance_id": source_model_id,
+        },
+        phase_start_model_ids=unit.own_model_ids(),
+    )
+    return resolve_healing_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
+        effect=healing_effect,
     )
 
 
@@ -685,36 +840,48 @@ def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
         raise GameLifecycleError("Catalog rule consumer classification requires RuleIR.")
     consumer_ids: set[str] = set()
     for clause in rule_ir.clauses:
-        if _clause_targets_this_model(clause):
-            for effect in clause.effects:
-                if _effect_is_feel_no_pain_grant(effect):
-                    consumer_ids.add(CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID)
-        if _clause_targets_shadow_of_chaos_aura(clause):
-            consumer_ids.add(CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID)
-        if not _clause_targets_this_unit(clause):
-            if _clause_targets_roll_reroll_unit(clause):
-                for effect in clause.effects:
-                    reroll_consumer_id = _roll_reroll_consumer_id_for_effect(effect)
-                    if reroll_consumer_id is not None:
-                        consumer_ids.add(reroll_consumer_id)
-            if _clause_targets_weapon_keyword_grant_unit(clause):
-                for effect in clause.effects:
-                    consumer_ids.update(_weapon_keyword_grant_consumer_ids_for_effect(effect))
-            continue
+        consumer_ids.update(catalog_rule_ir_consumers_for_clause(clause))
+    return tuple(sorted(consumer_ids))
+
+
+def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer classification requires RuleClause.")
+    consumer_ids: set[str] = set()
+    if _clause_targets_this_model(clause):
         for effect in clause.effects:
-            if _effect_is_charge_roll_modifier(effect):
-                consumer_ids.add(CATALOG_IR_CHARGE_ROLL_CONSUMER_ID)
-            reroll_consumer_id = _roll_reroll_consumer_id_for_effect(effect)
-            if reroll_consumer_id is not None:
-                consumer_ids.add(reroll_consumer_id)
-            consumer_ids.update(_weapon_keyword_grant_consumer_ids_for_effect(effect))
-            if _effect_is_leadership_set(effect):
-                consumer_ids.add(CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID)
-            if _effect_is_turn_end_reserve_permission(effect):
-                consumer_ids.add(CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID)
-            advance_consumer_id = _advance_eligibility_consumer_id_for_effect(effect)
-            if advance_consumer_id is not None:
-                consumer_ids.add(advance_consumer_id)
+            if _effect_is_feel_no_pain_grant(effect):
+                consumer_ids.add(CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID)
+    if _clause_targets_shadow_of_chaos_aura(clause):
+        consumer_ids.add(CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID)
+    if _clause_is_structured_wound_reroll_clause(clause):
+        consumer_ids.add(CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID)
+    if _clause_is_structured_destroyed_unit_restore_clause(clause):
+        consumer_ids.add(CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID)
+    if not _clause_targets_this_unit(clause):
+        if _clause_targets_roll_reroll_unit(clause):
+            for effect in clause.effects:
+                reroll_consumer_id = _roll_reroll_consumer_id_for_effect(effect)
+                if reroll_consumer_id is not None:
+                    consumer_ids.add(reroll_consumer_id)
+        if _clause_targets_weapon_keyword_grant_unit(clause):
+            for effect in clause.effects:
+                consumer_ids.update(_weapon_keyword_grant_consumer_ids_for_effect(effect))
+        return tuple(sorted(consumer_ids))
+    for effect in clause.effects:
+        if _effect_is_charge_roll_modifier(effect):
+            consumer_ids.add(CATALOG_IR_CHARGE_ROLL_CONSUMER_ID)
+        reroll_consumer_id = _roll_reroll_consumer_id_for_effect(effect)
+        if reroll_consumer_id is not None:
+            consumer_ids.add(reroll_consumer_id)
+        consumer_ids.update(_weapon_keyword_grant_consumer_ids_for_effect(effect))
+        if _effect_is_leadership_set(effect):
+            consumer_ids.add(CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID)
+        if _effect_is_turn_end_reserve_permission(effect):
+            consumer_ids.add(CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID)
+        advance_consumer_id = _advance_eligibility_consumer_id_for_effect(effect)
+        if advance_consumer_id is not None:
+            consumer_ids.add(advance_consumer_id)
     return tuple(sorted(consumer_ids))
 
 
@@ -804,6 +971,14 @@ def _rule_ir_from_record(record: AbilityCatalogRecord) -> RuleIR:
     return rule_ir_from_execution_payload(record.definition.replay_payload)
 
 
+def _clauses_from_record(record: AbilityCatalogRecord) -> tuple[RuleClause, ...]:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog rule consumer requires an AbilityCatalogRecord.")
+    from warhammer40k_core.engine.rule_execution import scoped_rule_ir_from_execution_payload
+
+    return scoped_rule_ir_from_execution_payload(record.definition.replay_payload).clauses
+
+
 def _record_source_matches_unit(
     *,
     record: AbilityCatalogRecord,
@@ -881,6 +1056,42 @@ def _current_wargear_bearer_model_ids(
     )
 
 
+def _validate_this_model_source_id(
+    *,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+) -> str:
+    if len(current_model_instance_ids) != 1:
+        raise GameLifecycleError("Catalog this-model rule requires exactly one source model.")
+    source_model_id = current_model_instance_ids[0]
+    for model in unit.own_models:
+        if model.model_instance_id != source_model_id:
+            continue
+        if not model.is_alive:
+            raise GameLifecycleError("Catalog this-model source must be alive.")
+        return source_model_id
+    raise GameLifecycleError("Catalog this-model source is not owned by the unit.")
+
+
+def _this_model_restore_has_targetable_wounds(
+    *,
+    unit: UnitInstance,
+    source_model_id: str,
+) -> bool:
+    wounded_model_ids = tuple(
+        model.model_instance_id
+        for model in unit.own_models
+        if model.is_alive and model.wounds_remaining < model.starting_wounds
+    )
+    if not wounded_model_ids:
+        return False
+    if wounded_model_ids == (source_model_id,):
+        return True
+    if source_model_id not in wounded_model_ids:
+        return False
+    raise GameLifecycleError("Catalog this-model healing cannot target multiple wounded models.")
+
+
 def _clause_targets_this_unit(clause: RuleClause) -> bool:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
@@ -912,6 +1123,144 @@ def _clause_has_leading_unit_relationship(clause: RuleClause) -> bool:
         condition.kind is RuleConditionKind.TARGET_CONSTRAINT
         and parameter_payload(condition.parameters).get("relationship") == "this_model_leading_unit"
         for condition in clause.conditions
+    )
+
+
+def _clause_is_structured_wound_reroll_clause(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    return (
+        _clause_targets_this_model(clause)
+        and _clause_has_melee_attack_target_gate(clause)
+        and _clause_has_roll_trigger(clause, roll_type="wound", attack_kind="melee")
+        and any(
+            _effect_is_roll_reroll_permission(effect, roll_type="wound_roll")
+            for effect in clause.effects
+        )
+    )
+
+
+def _clause_is_structured_destroyed_unit_restore_clause(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    return (
+        _clause_targets_this_model(clause)
+        and _clause_has_destroyed_enemy_unit_gate(clause)
+        and clause.trigger is not None
+        and clause.trigger.kind is RuleTriggerKind.UNIT_DESTROYED
+        and any(effect.kind is RuleEffectKind.RESTORE_LOST_WOUNDS for effect in clause.effects)
+    )
+
+
+def _clause_is_melee_wound_reroll_against_target_keywords(
+    *,
+    clause: RuleClause,
+    attack_kind: str,
+    target_keywords: tuple[str, ...],
+) -> bool:
+    if attack_kind != "melee":
+        return False
+    if not _clause_is_structured_wound_reroll_clause(clause):
+        return False
+    required_keywords = _clause_required_keyword_any(
+        clause=clause,
+        gate_subject="attack_target",
+    )
+    return _keywords_match_any(
+        target_keywords=target_keywords,
+        required_keywords=required_keywords,
+    )
+
+
+def _clause_is_destroyed_enemy_keyword_restore_lost_wounds(
+    *,
+    clause: RuleClause,
+    destroyed_unit_keywords: tuple[str, ...],
+) -> bool:
+    if not _clause_is_structured_destroyed_unit_restore_clause(clause):
+        return False
+    required_keywords = _clause_required_keyword_any(
+        clause=clause,
+        gate_subject="destroyed_unit",
+    )
+    return _keywords_match_any(
+        target_keywords=destroyed_unit_keywords,
+        required_keywords=required_keywords,
+    )
+
+
+def _clause_has_roll_trigger(
+    clause: RuleClause,
+    *,
+    roll_type: str,
+    attack_kind: str | None = None,
+) -> bool:
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.DICE_ROLL:
+        return False
+    parameters = parameter_payload(trigger.parameters)
+    return parameters.get("roll_type") == roll_type and (
+        attack_kind is None or parameters.get("attack_kind") == attack_kind
+    )
+
+
+def _clause_has_melee_attack_target_gate(clause: RuleClause) -> bool:
+    return any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters).get("relationship") == "this_model_makes_attack"
+        and parameter_payload(condition.parameters).get("attack_kind") == "melee"
+        and parameter_payload(condition.parameters).get("gate_subject") == "attack_target"
+        for condition in clause.conditions
+    ) and bool(_clause_required_keyword_any(clause=clause, gate_subject="attack_target"))
+
+
+def _clause_has_destroyed_enemy_unit_gate(clause: RuleClause) -> bool:
+    return any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters).get("relationship")
+        == "this_model_destroyed_unit"
+        and parameter_payload(condition.parameters).get("destroyed_allegiance") == "enemy"
+        and parameter_payload(condition.parameters).get("gate_subject") == "destroyed_unit"
+        for condition in clause.conditions
+    ) and bool(_clause_required_keyword_any(clause=clause, gate_subject="destroyed_unit"))
+
+
+def _clause_required_keyword_any(
+    *,
+    clause: RuleClause,
+    gate_subject: str,
+) -> tuple[str, ...]:
+    required_keywords: list[str] = []
+    for condition in clause.conditions:
+        if condition.kind is not RuleConditionKind.KEYWORD_GATE:
+            continue
+        parameters = parameter_payload(condition.parameters)
+        if parameters.get("gate_subject") != gate_subject:
+            continue
+        value = parameters.get("required_keyword_any")
+        if type(value) is not str:
+            continue
+        required_keywords.extend(_keyword_tuple_from_any_parameter(value))
+    return tuple(dict.fromkeys(required_keywords))
+
+
+def _keyword_tuple_from_any_parameter(value: str) -> tuple[str, ...]:
+    keywords = tuple(keyword for keyword in value.split("|") if keyword)
+    if not keywords:
+        raise GameLifecycleError("Catalog keyword-any condition is empty.")
+    return keywords
+
+
+def _keywords_match_any(
+    *,
+    target_keywords: tuple[str, ...],
+    required_keywords: tuple[str, ...],
+) -> bool:
+    if not required_keywords:
+        return False
+    target_keyword_set = {_catalog_keyword_token(keyword) for keyword in target_keywords}
+    return any(
+        _catalog_keyword_token(keyword) in target_keyword_set for keyword in required_keywords
     )
 
 
@@ -1515,6 +1864,8 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
         return (CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,)
     if _effect_is_shadow_of_chaos_status(effect):
         return (CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,)
+    if effect.kind is RuleEffectKind.RESTORE_LOST_WOUNDS:
+        return (CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,)
     if effect.kind in {
         RuleEffectKind.GRANT_ABILITY,
         RuleEffectKind.PLACEMENT_PERMISSION,
@@ -1605,6 +1956,10 @@ def _catalog_ir_lookup_token(value: str) -> str:
     return value.strip().lower().replace("-", "_").replace(" ", "_")
 
 
+def _catalog_keyword_token(value: str) -> str:
+    return value.strip().upper().replace("-", "_").replace(" ", "_")
+
+
 def _int_parameter(parameters: Mapping[str, object], *, key: str) -> int:
     value = parameters.get(key)
     if type(value) is not int:
@@ -1660,6 +2015,30 @@ def _validate_current_model_instance_ids(values: object) -> tuple[str, ...]:
     if not validated:
         raise GameLifecycleError("Catalog rule current model evidence must not be empty.")
     return tuple(sorted(validated))
+
+
+def _validate_keyword_tokens(field_name: str, values: object) -> tuple[str, ...]:
+    if type(field_name) is not str or not field_name:
+        raise GameLifecycleError("Catalog rule keyword validation requires a field name.")
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"Catalog rule {field_name} must be a tuple.")
+    validated: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not str or not value.strip():
+            raise GameLifecycleError(f"Catalog rule {field_name} must contain keyword strings.")
+        token = _catalog_keyword_token(value)
+        if token in seen:
+            raise GameLifecycleError(f"Catalog rule {field_name} must not duplicate keywords.")
+        seen.add(token)
+        validated.append(token)
+    return tuple(validated)
+
+
+def _validate_healing_amount(value: object) -> int:
+    if type(value) is not int or value < 1 or value > 6:
+        raise GameLifecycleError("Catalog restore lost wounds D6 result must be between 1 and 6.")
+    return value
 
 
 def _current_model_instance_ids_for_unit(
