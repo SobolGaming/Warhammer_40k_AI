@@ -51,6 +51,7 @@ from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartHookBinding,
     CommandPhaseStartHookRegistry,
 )
+from warhammer40k_core.engine.damaged_effects import CatalogDamagedEffectRuntime
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectBinding,
     EnhancementEffectRegistry,
@@ -177,13 +178,7 @@ _summary_hash = _bundle_validation.summary_hash
 _validate_identifier = _bundle_validation.validate_identifier
 _validate_identifier_tuple = _bundle_validation.validate_identifier_tuple
 _validate_tuple = _bundle_validation.validate_tuple
-
-
-def _contribution_values[T](
-    contributions: tuple[RuntimeContentContribution, ...],
-    getter: Callable[[RuntimeContentContribution], tuple[T, ...]],
-) -> tuple[T, ...]:
-    return tuple(value for contribution in contributions for value in getter(contribution))
+_contribution_values = _bundle_validation.contribution_values
 
 
 @dataclass(frozen=True, slots=True)
@@ -1528,6 +1523,7 @@ class RuntimeContentBundle:
                 for binding in contribution.stratagem_cost_modifier_bindings
             )
         )
+        damaged_runtime = CatalogDamagedEffectRuntime(armies=validated_armies)
         runtime_modifier_registry = RuntimeModifierRegistry.from_bindings(
             unit_characteristic_modifier_bindings=_contribution_values(
                 validated_contributions,
@@ -1536,7 +1532,8 @@ class RuntimeContentBundle:
             hit_roll_modifier_bindings=_contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.hit_roll_modifier_bindings,
-            ),
+            )
+            + damaged_runtime.hit_roll_bindings(),
             wound_roll_modifier_bindings=_contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.wound_roll_modifier_bindings,
@@ -1552,7 +1549,8 @@ class RuntimeContentBundle:
             objective_control_modifier_bindings=_contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.objective_control_modifier_bindings,
-            ),
+            )
+            + damaged_runtime.objective_control_bindings(),
             charge_roll_modifier_bindings=_contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.charge_roll_modifier_bindings,
@@ -1561,6 +1559,7 @@ class RuntimeContentBundle:
                 validated_contributions,
                 lambda contribution: contribution.weapon_profile_modifier_bindings,
             )
+            + damaged_runtime.weapon_profile_bindings()
             + catalog_weapon_profile_modifier_bindings(
                 ability_indexes_by_player_id=ability_indexes_by_player_id,
                 armies=validated_armies,

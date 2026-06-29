@@ -18,6 +18,8 @@ from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
     CatalogJsonObject,
+    DamagedEffectDefinition,
+    DamagedEffectDefinitionPayload,
     DatasheetAbilityDescriptor,
     DatasheetDefinition,
     DatasheetKeywordSet,
@@ -281,6 +283,7 @@ def _datasheet_from_row(
             *tuple(_structured_wargear_option_from_row(row) for row in option_rows),
         ),
         abilities=tuple(_ability_descriptor_from_row(row) for row in ability_rows),
+        damaged_effects=_damaged_effects_from_row(row),
         attachment_eligibilities=_attachment_eligibilities_from_rows(
             row=row,
             ability_rows=ability_rows,
@@ -557,6 +560,26 @@ def _rule_ir_diagnostics_from_row(row: NormalizedSourceRow) -> tuple[CatalogJson
             )
         diagnostics.append(cast(CatalogJsonObject, diagnostic))
     return tuple(diagnostics)
+
+
+def _damaged_effects_from_row(row: NormalizedSourceRow) -> tuple[DamagedEffectDefinition, ...]:
+    value = _optional_field(row=row, column_name="damaged_effects")
+    if value is None:
+        return ()
+    try:
+        payload = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise CatalogGenerationError("Datasheet damaged_effects is malformed JSON.") from exc
+    if type(payload) is not list:
+        raise CatalogGenerationError("Datasheet damaged_effects must be a JSON list.")
+    effects: list[DamagedEffectDefinition] = []
+    for raw_effect in cast(list[object], payload):
+        if type(raw_effect) is not dict:
+            raise CatalogGenerationError("Datasheet damaged_effects entries must be JSON objects.")
+        effects.append(
+            DamagedEffectDefinition.from_payload(cast(DamagedEffectDefinitionPayload, raw_effect))
+        )
+    return tuple(effects)
 
 
 def _attachment_eligibilities_from_rows(
