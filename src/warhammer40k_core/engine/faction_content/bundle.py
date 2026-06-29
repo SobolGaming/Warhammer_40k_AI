@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, replace
 from types import MappingProxyType
 from typing import cast
 
@@ -36,6 +36,9 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookBinding,
     BattleShockHookRegistry,
 )
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_advance_eligibility_hook_bindings,
+)
 from warhammer40k_core.engine.catalog_turn_end_reserves import (
     catalog_turn_end_reserve_hook_bindings,
 )
@@ -52,21 +55,10 @@ from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectRegistry,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content import bundle_validation as _bundle_validation
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle_payloads import (
     RuntimeContentBundleSummaryPayload,
-)
-from warhammer40k_core.engine.faction_content.bundle_validation import (
-    summary_hash as _summary_hash,
-)
-from warhammer40k_core.engine.faction_content.bundle_validation import (
-    validate_identifier as _validate_identifier,
-)
-from warhammer40k_core.engine.faction_content.bundle_validation import (
-    validate_identifier_tuple as _validate_identifier_tuple,
-)
-from warhammer40k_core.engine.faction_content.bundle_validation import (
-    validate_tuple as _validate_tuple,
 )
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventHandlerBinding,
@@ -179,10 +171,11 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
 )
 
 DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID = "runtime-content:module-default"
-
-
-def _empty_named_handlers() -> Mapping[str, FactionRuleNamedHandler]:
-    return MappingProxyType({})
+EMPTY_NAMED_HANDLERS: Mapping[str, FactionRuleNamedHandler] = MappingProxyType({})
+_summary_hash = _bundle_validation.summary_hash
+_validate_identifier = _bundle_validation.validate_identifier
+_validate_identifier_tuple = _bundle_validation.validate_identifier_tuple
+_validate_tuple = _bundle_validation.validate_tuple
 
 
 def _contribution_values[T](
@@ -260,9 +253,7 @@ class RuntimeContentContribution:
     objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = ()
     charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = ()
     weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = ()
-    faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = field(
-        default_factory=_empty_named_handlers
-    )
+    faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = EMPTY_NAMED_HANDLERS
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1382,9 +1373,15 @@ class RuntimeContentBundle:
             )
         )
         advance_eligibility_hook_registry = AdvanceEligibilityHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.advance_eligibility_hook_bindings,
+            (
+                *catalog_advance_eligibility_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.advance_eligibility_hook_bindings,
+                ),
             )
         )
         advance_move_hook_registry = AdvanceMoveHookRegistry.from_bindings(

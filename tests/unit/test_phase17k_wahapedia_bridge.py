@@ -66,6 +66,10 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_coverage_rows_from_catalog,
     ability_coverage_rows_payload,
 )
+from warhammer40k_core.engine.advance_eligibility_hooks import (
+    AdvanceEligibilityContext,
+    AdvanceEligibilityHookRegistry,
+)
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_shock import collect_battle_shock_test_requests
 from warhammer40k_core.engine.battlefield_state import (
@@ -88,6 +92,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+    CatalogAdvanceEligibilityRuntime,
     catalog_charge_roll_modifiers_for_unit,
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
@@ -861,6 +866,60 @@ def test_phase17k_flesh_hounds_hunters_from_the_warp_uses_generic_turn_end_reser
         if record.event_type == CATALOG_TURN_END_RESERVES_USED_EVENT
     )
     assert len(used_events) == 1
+
+
+def test_phase17k_datasheet_advance_charge_text_uses_generic_advance_eligibility() -> None:
+    package = _advance_charge_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    advance_charge_record = records_by_name["Bounding Advance"]
+    replay_payload = advance_charge_record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    runtime = CatalogAdvanceEligibilityRuntime(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army,),
+    )
+    registry = AdvanceEligibilityHookRegistry.from_bindings(runtime.bindings())
+    state = _battle_state_with_army(
+        army=army,
+        battlefield=_bloodcrushers_battlefield_state(army=army, unit=unit),
+    )
+
+    grants = registry.grants_for(
+        AdvanceEligibilityContext(
+            state=state,
+            player_id=army.player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            movement_request_id="phase17k-advance-charge-request",
+            movement_result_id="phase17k-advance-charge-result",
+        )
+    )
+
+    assert advance_charge_record.definition.timing.trigger_kind is TimingTriggerKind.PASSIVE_QUERY
+    assert rule_ir.is_supported
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) == {
+        CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+    }
+    assert tuple(binding.hook_id for binding in registry.all_bindings()) == (
+        CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+    )
+    assert len(grants) == 1
+    assert grants[0].hook_id == CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID
+    assert grants[0].can_declare_charge is True
+    assert grants[0].can_shoot is False
+    assert grants[0].replay_payload == {
+        "ability": "can_advance_and_charge",
+        "ability_ids": [advance_charge_record.definition.ability_id],
+        "catalog_record_ids": [advance_charge_record.record_id],
+        "source_rule_ids": [advance_charge_record.definition.source_id],
+    }
 
 
 def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
@@ -2433,6 +2492,14 @@ def _flesh_hounds_package() -> CanonicalCatalogPackage:
     )
 
 
+def _advance_charge_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_advance_charge_bridge_artifacts(),
+    )
+
+
 def _bloodcrushers_unit(
     *,
     package: CanonicalCatalogPackage,
@@ -2498,6 +2565,30 @@ def _flesh_hounds_unit(
                     option_id=option.option_id,
                     model_profile_id=option.model_profile_id,
                     wargear_ids=(selected_wargear_id,),
+                ),
+            ),
+        ),
+        datasheet=datasheet,
+    )
+
+
+def _advance_charge_unit(
+    *,
+    package: CanonicalCatalogPackage,
+) -> UnitInstance:
+    datasheet = package.army_catalog.datasheet_by_id("test-advance-charge-unit")
+    return UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-daemons",
+        selection=UnitMusterSelection(
+            unit_selection_id="advance-charge-unit-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="test-advance-charge-unit:swift-hunter",
+                    model_count=1,
                 ),
             ),
         ),
@@ -2986,6 +3077,105 @@ def _flesh_hounds_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                 height_source_id="geometry-review:chaos-daemons:flesh-hounds:height",
                 height_document_reference="Chaos Daemons Faction Pack p.26",
             ),
+        ),
+    )
+
+
+def _advance_charge_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_advance_charge_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-advance-charge-unit",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-advance-charge-unit",
+                model_name="Swift Hunter",
+                height=1.4,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:test:advance-charge:swift-hunter:height",
+                height_document_reference="Test Advance Charge Datasheet",
+            ),
+        ),
+    )
+
+
+def _advance_charge_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Test Army Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-advance-charge-unit,Advance Charge Unit,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-advance-charge-unit,1,Faction,test-army-rule,"
+                        "Test Army Rule,Test rule text.,"
+                    ),
+                    (
+                        "test-advance-charge-unit,2,Datasheet,,Bounding Advance,"
+                        "This unit is eligible to declare a charge in a turn in  which "
+                        "it Advanced.,"
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-advance-charge-unit,Beasts,,false",
+                    "test-advance-charge-unit,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-advance-charge-unit,1,10,4,6,5,2,7,1,40mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    "test-advance-charge-unit,1,1,Swift claws,Melee,Melee,4,4,4,0,1,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    "test-advance-charge-unit,1,1 Swift Hunter",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
         ),
     )
 

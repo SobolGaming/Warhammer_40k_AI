@@ -14,6 +14,13 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogRecord,
     AbilitySourceKind,
 )
+from warhammer40k_core.engine.advance_eligibility_hooks import (
+    AdvanceEligibilityContext,
+    AdvanceEligibilityGrant,
+    AdvanceEligibilityHookBinding,
+)
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battlefield_state import PlacementError
 from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
     DestructionReactionSource,
@@ -23,6 +30,9 @@ from warhammer40k_core.engine.damage_allocation import (
 )
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.faction_content.bundle_validation import (
+    validate_identifier as _validate_identifier,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_abilities import (
@@ -101,6 +111,14 @@ _CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
         "turn_end_reserves": CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
     }
 )
+_CATALOG_IR_ADVANCE_ELIGIBILITY_GRANT_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
+    {
+        "can_advance_and_charge": CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+        "can_advance_and_shoot_and_charge": (
+            CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID
+        ),
+    }
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -112,6 +130,114 @@ class CatalogRuleIrHookDefinition:
             raise GameLifecycleError("Catalog IR hook definition hook_id must be a non-empty str.")
         if self.hook_id != self.hook_id.strip():
             raise GameLifecycleError("Catalog IR hook definition hook_id must be stripped.")
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogAdvanceEligibilityRuntime:
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
+    armies: tuple[ArmyDefinition, ...]
+
+    def __post_init__(self) -> None:
+        indexes = _validate_ability_index_mapping(self.ability_indexes_by_player_id)
+        armies = _validate_armies(self.armies)
+        missing_ids = {army.player_id for army in armies} - set(indexes)
+        if missing_ids:
+            raise GameLifecycleError("Catalog advance eligibility missing player ability index.")
+        object.__setattr__(self, "ability_indexes_by_player_id", MappingProxyType(dict(indexes)))
+        object.__setattr__(self, "armies", armies)
+
+    def bindings(self) -> tuple[AdvanceEligibilityHookBinding, ...]:
+        bindings: list[AdvanceEligibilityHookBinding] = []
+        if _has_advance_eligibility_records(
+            self.ability_indexes_by_player_id,
+            ability="can_advance_and_charge",
+        ):
+            bindings.append(
+                AdvanceEligibilityHookBinding(
+                    hook_id=CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+                    source_id=CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+                    handler=self.advance_and_charge_handler,
+                )
+            )
+        if _has_advance_eligibility_records(
+            self.ability_indexes_by_player_id,
+            ability="can_advance_and_shoot_and_charge",
+        ):
+            bindings.append(
+                AdvanceEligibilityHookBinding(
+                    hook_id=CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
+                    source_id=CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
+                    handler=self.advance_shoot_and_charge_handler,
+                )
+            )
+        return tuple(bindings)
+
+    def advance_and_charge_handler(
+        self,
+        context: AdvanceEligibilityContext,
+    ) -> AdvanceEligibilityGrant | None:
+        return self._grant_for(
+            context=context,
+            ability="can_advance_and_charge",
+            hook_id=CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
+            can_shoot=False,
+            can_declare_charge=True,
+        )
+
+    def advance_shoot_and_charge_handler(
+        self,
+        context: AdvanceEligibilityContext,
+    ) -> AdvanceEligibilityGrant | None:
+        return self._grant_for(
+            context=context,
+            ability="can_advance_and_shoot_and_charge",
+            hook_id=CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
+            can_shoot=True,
+            can_declare_charge=True,
+        )
+
+    def _grant_for(
+        self,
+        *,
+        context: AdvanceEligibilityContext,
+        ability: str,
+        hook_id: str,
+        can_shoot: bool,
+        can_declare_charge: bool,
+    ) -> AdvanceEligibilityGrant | None:
+        if type(context) is not AdvanceEligibilityContext:
+            raise GameLifecycleError("Catalog advance eligibility requires context.")
+        matching_records = _matching_advance_eligibility_records(
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            armies=self.armies,
+            context=context,
+            ability=ability,
+        )
+        if not matching_records:
+            return None
+        return AdvanceEligibilityGrant(
+            hook_id=hook_id,
+            source_id=hook_id,
+            can_shoot=can_shoot,
+            can_declare_charge=can_declare_charge,
+            replay_payload={
+                "catalog_record_ids": [record.record_id for record in matching_records],
+                "source_rule_ids": [record.definition.source_id for record in matching_records],
+                "ability_ids": [record.definition.ability_id for record in matching_records],
+                "ability": ability,
+            },
+        )
+
+
+def catalog_advance_eligibility_hook_bindings(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[AdvanceEligibilityHookBinding, ...]:
+    return CatalogAdvanceEligibilityRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
+    ).bindings()
 
 
 def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefinition, ...]:
@@ -346,6 +472,9 @@ def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
                 consumer_ids.add(CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID)
             if _effect_is_turn_end_reserve_permission(effect):
                 consumer_ids.add(CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID)
+            advance_consumer_id = _advance_eligibility_consumer_id_for_effect(effect)
+            if advance_consumer_id is not None:
+                consumer_ids.add(advance_consumer_id)
     return tuple(sorted(consumer_ids))
 
 
@@ -380,6 +509,33 @@ def _unit_scoped_generic_records(
             current_model_instance_ids=current_model_instance_ids,
         )
     )
+
+
+def _matching_advance_eligibility_records(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+    context: AdvanceEligibilityContext,
+    ability: str,
+) -> tuple[AbilityCatalogRecord, ...]:
+    requested_ability = _validate_identifier("ability", ability)
+    army = _army_for_player(armies, player_id=context.player_id)
+    unit = _unit_in_army_by_id(army, unit_instance_id=context.unit_instance_id)
+    index = ability_indexes_by_player_id.get(context.player_id)
+    if index is None:
+        raise GameLifecycleError("Catalog advance eligibility index is missing player.")
+    current_model_ids = _current_model_instance_ids_for_unit(state=context.state, unit=unit)
+    matching_records: list[AbilityCatalogRecord] = []
+    for record in _unit_scoped_generic_records(
+        ability_index=index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+    ):
+        rule_ir = _rule_ir_from_record(record)
+        if _rule_ir_grants_advance_eligibility(rule_ir, ability=requested_ability):
+            matching_records.append(record)
+    return tuple(sorted(matching_records, key=lambda record: record.record_id))
 
 
 def _rule_ir_from_record(record: AbilityCatalogRecord) -> RuleIR:
@@ -517,6 +673,45 @@ def _effect_is_turn_end_reserve_permission(effect: RuleEffectSpec) -> bool:
         parameters.get("placement_kind") == "turn_end_reserves"
         and parameters.get("reserve_kind") == "strategic_reserves"
         and parameters.get("action") == "remove_from_battlefield_to_strategic_reserves"
+    )
+
+
+def _rule_ir_grants_advance_eligibility(rule_ir: RuleIR, *, ability: str) -> bool:
+    if type(rule_ir) is not RuleIR:
+        raise GameLifecycleError("Catalog advance eligibility requires RuleIR.")
+    if not rule_ir.is_supported:
+        return False
+    requested_ability = _validate_identifier("ability", ability)
+    return any(
+        _clause_targets_this_unit(clause)
+        and any(
+            _effect_grants_ability(effect, ability=requested_ability) for effect in clause.effects
+        )
+        for clause in rule_ir.clauses
+    )
+
+
+def _advance_eligibility_consumer_id_for_effect(effect: RuleEffectSpec) -> str | None:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.GRANT_ABILITY:
+        return None
+    parameters = parameter_payload(effect.parameters)
+    ability = parameters.get("ability")
+    if type(ability) is not str:
+        return None
+    return _CATALOG_IR_ADVANCE_ELIGIBILITY_GRANT_CONSUMER_IDS.get(_catalog_ir_lookup_token(ability))
+
+
+def _effect_grants_ability(effect: RuleEffectSpec, *, ability: str) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.GRANT_ABILITY:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    value = parameters.get("ability")
+    return type(value) is str and _catalog_ir_lookup_token(value) == _catalog_ir_lookup_token(
+        ability
     )
 
 
@@ -829,7 +1024,7 @@ def _leadership_value(value: object) -> int:
     raise GameLifecycleError("Catalog Leadership set-characteristic value is invalid.")
 
 
-def _validate_ability_index(ability_index: AbilityCatalogIndex) -> AbilityCatalogIndex:
+def _validate_ability_index(ability_index: object) -> AbilityCatalogIndex:
     if type(ability_index) is not AbilityCatalogIndex:
         raise GameLifecycleError("Catalog rule consumer requires an AbilityCatalogIndex.")
     return ability_index
@@ -865,3 +1060,89 @@ def _validate_current_model_instance_ids(values: object) -> tuple[str, ...]:
     if not validated:
         raise GameLifecycleError("Catalog rule current model evidence must not be empty.")
     return tuple(sorted(validated))
+
+
+def _current_model_instance_ids_for_unit(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+) -> tuple[str, ...]:
+    _validate_game_state(state)
+    _validate_unit(unit)
+    if state.battlefield_state is None:
+        raise GameLifecycleError("Catalog advance eligibility requires battlefield_state.")
+    try:
+        placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+    except PlacementError as exc:
+        raise GameLifecycleError("Catalog advance eligibility unit is not placed.") from exc
+    return tuple(
+        sorted(model_placement.model_instance_id for model_placement in placement.model_placements)
+    )
+
+
+def _has_advance_eligibility_records(
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    *,
+    ability: str,
+) -> bool:
+    requested_ability = _validate_identifier("ability", ability)
+    return any(
+        _record_can_grant_advance_eligibility(record, ability=requested_ability)
+        for index in ability_indexes_by_player_id.values()
+        for record in index.all_records()
+    )
+
+
+def _record_can_grant_advance_eligibility(
+    record: AbilityCatalogRecord,
+    *,
+    ability: str,
+) -> bool:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog advance eligibility requires ability records.")
+    if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
+        return False
+    return _rule_ir_grants_advance_eligibility(_rule_ir_from_record(record), ability=ability)
+
+
+def _army_for_player(armies: tuple[ArmyDefinition, ...], *, player_id: str) -> ArmyDefinition:
+    requested_player_id = _validate_identifier("player_id", player_id)
+    for army in armies:
+        if army.player_id == requested_player_id:
+            return army
+    raise GameLifecycleError("Catalog advance eligibility player army is unknown.")
+
+
+def _unit_in_army_by_id(army: ArmyDefinition, *, unit_instance_id: str) -> UnitInstance:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for unit in army.units:
+        if unit.unit_instance_id == requested_unit_id:
+            return unit
+    raise GameLifecycleError("Catalog advance eligibility unit is unknown.")
+
+
+def _validate_ability_index_mapping(
+    value: object,
+) -> Mapping[str, AbilityCatalogIndex]:
+    if not isinstance(value, Mapping):
+        raise GameLifecycleError("Catalog advance eligibility requires ability indexes.")
+    mapping = cast(Mapping[object, object], value)
+    validated: dict[str, AbilityCatalogIndex] = {}
+    for player_id, index in mapping.items():
+        validated[_validate_identifier("player_id", player_id)] = _validate_ability_index(index)
+    return MappingProxyType(validated)
+
+
+def _validate_armies(value: object) -> tuple[ArmyDefinition, ...]:
+    if type(value) is not tuple:
+        raise GameLifecycleError("Catalog advance eligibility requires army tuple.")
+    armies: list[ArmyDefinition] = []
+    seen: set[str] = set()
+    for army in cast(tuple[object, ...], value):
+        if type(army) is not ArmyDefinition:
+            raise GameLifecycleError("Catalog advance eligibility requires ArmyDefinition values.")
+        if army.player_id in seen:
+            raise GameLifecycleError("Catalog advance eligibility duplicate player army.")
+        seen.add(army.player_id)
+        armies.append(army)
+    return tuple(sorted(armies, key=lambda army: army.player_id))

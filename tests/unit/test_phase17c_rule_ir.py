@@ -205,6 +205,13 @@ def test_phase17c_death_guard_cloud_of_flies_fixture_text_keeps_residual_explici
             RuleEffectKind.GRANT_ABILITY,
         ),
         (
+            "This unit is eligible to declare a charge in a turn in  which it Advanced.",
+            None,
+            None,
+            RuleTargetKind.THIS_UNIT,
+            RuleEffectKind.GRANT_ABILITY,
+        ),
+        (
             "Ranged weapons equipped by models in that unit gain Sustained Hits.",
             None,
             None,
@@ -326,6 +333,21 @@ def test_phase17c_bearer_feel_no_pain_qualifier_compiles_to_model_source_ir() ->
         "attack_condition": "psychic_attack",
         "threshold": 3,
     }
+
+
+def test_phase17c_advance_charge_eligibility_compiles_to_rule_exception_grant() -> None:
+    rule_ir = _compiled(
+        "This unit is eligible to declare a charge in a turn in  which it Advanced."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.GRANT_ABILITY
+    )
+
+    assert rule_ir.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert parameter_payload(effect.parameters) == {"ability": "can_advance_and_charge"}
 
 
 def test_phase17c_skullmaster_fury_compiles_to_charge_move_weapon_keyword_grant() -> None:

@@ -176,6 +176,13 @@ _GRANT_ABILITY_RE = re.compile(
     r"\b(?:gains?|have|has)\s+(?P<ability>[A-Z][A-Za-z0-9 -]*(?:\s+\d+)?)\s+until\b",
     re.IGNORECASE,
 )
+_CHARGE_ELIGIBILITY_AFTER_MOVE_RE = re.compile(
+    r"\b(?:(?:this|that|selected|target)\s+unit\s+)?"
+    r"(?:is\s+)?eligible\s+to\s+declare\s+a\s+charge\s+in\s+a\s+turn\s+"
+    r"in\s+which\s+(?:it|this\s+unit|that\s+unit|the\s+unit)\s+"
+    r"(?P<movement>Advanced|Fell\s+Back)\b",
+    re.IGNORECASE,
+)
 _FEEL_NO_PAIN_ABILITY_RE = re.compile(
     r"\b(?:gains?|have|has)\s+(?:the\s+)?Feel\s+No\s+Pain\s+"
     r"(?P<threshold>[2-6])\+\s+ability"
@@ -879,6 +886,18 @@ def _parse_resource_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, .
 
 def _parse_grant_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
+    for match in _CHARGE_ELIGIBILITY_AFTER_MOVE_RE.finditer(clause_text.text):
+        movement = " ".join(match.group("movement").lower().split())
+        ability = (
+            "can_fall_back_and_charge" if movement == "fell back" else "can_advance_and_charge"
+        )
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.GRANT_ABILITY,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs((("ability", ability),)),
+            )
+        )
     for match in _FEEL_NO_PAIN_ABILITY_RE.finditer(clause_text.text):
         parameter_pairs: list[tuple[str, RuleParameterValue]] = [
             ("ability", "Feel No Pain"),
