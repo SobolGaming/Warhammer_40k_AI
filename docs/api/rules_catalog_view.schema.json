@@ -1,0 +1,173 @@
+{
+  "$id": "https://warhammer40k-core.local/api/rules_catalog_view.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "base_size_display_by_id": {
+      "additionalProperties": {
+        "$ref": "#/$defs/base_size"
+      },
+      "type": "object"
+    },
+    "catalog_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "datasheet_display_by_id": {
+      "additionalProperties": {
+        "$ref": "#/$defs/display_record"
+      },
+      "type": "object"
+    },
+    "detachment_display_by_id": {
+      "additionalProperties": {
+        "$ref": "#/$defs/display_record"
+      },
+      "type": "object"
+    },
+    "enhancement_display_by_id": {
+      "additionalProperties": {
+        "$ref": "#/$defs/display_record"
+      },
+      "type": "object"
+    },
+    "faction_display_by_id": {
+      "additionalProperties": {
+        "$ref": "#/$defs/display_record"
+      },
+      "type": "object"
+    },
+    "model_profile_display_by_id": {
+      "additionalProperties": {
+        "$ref": "#/$defs/display_record"
+      },
+      "type": "object"
+    },
+    "projection_schema": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "ruleset_id": {
+      "$ref": "#/$defs/json_value"
+    },
+    "source_hash": {
+      "minLength": 64,
+      "type": "string"
+    },
+    "source_package_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "wargear_display_by_id": {
+      "additionalProperties": {
+        "$ref": "#/$defs/display_record"
+      },
+      "type": "object"
+    },
+    "wargear_option_display_by_id": {
+      "additionalProperties": {
+        "$ref": "#/$defs/display_record"
+      },
+      "type": "object"
+    },
+    "weapon_profile_display_by_id": {
+      "additionalProperties": {
+        "$ref": "#/$defs/display_record"
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "projection_schema",
+    "catalog_id",
+    "ruleset_id",
+    "source_package_id",
+    "source_hash",
+    "datasheet_display_by_id",
+    "model_profile_display_by_id",
+    "wargear_display_by_id",
+    "weapon_profile_display_by_id",
+    "faction_display_by_id",
+    "detachment_display_by_id",
+    "enhancement_display_by_id",
+    "wargear_option_display_by_id",
+    "base_size_display_by_id"
+  ],
+  "title": "CORE V2 RulesCatalogViewPayload",
+  "type": "object",
+  "$defs": {
+    "base_size": {
+      "additionalProperties": false,
+      "properties": {
+        "base_size_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "diameter_mm": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "kind": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "length_mm": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "width_mm": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "base_size_id",
+        "kind",
+        "diameter_mm",
+        "length_mm",
+        "width_mm"
+      ],
+      "type": "object"
+    },
+    "display_record": {
+      "additionalProperties": {
+        "$ref": "#/$defs/json_value"
+      },
+      "type": "object"
+    },
+    "json_value": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/json_value"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/json_value"
+          },
+          "type": "object"
+        }
+      ]
+    }
+  }
+}

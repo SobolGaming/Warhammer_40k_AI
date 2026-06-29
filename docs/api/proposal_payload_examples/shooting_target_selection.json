@@ -1,0 +1,23 @@
+{
+  "battle_round": 1,
+  "declarations": [
+    {
+      "attacker_model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+      "firing_deck_source_model_instance_id": null,
+      "firing_deck_source_unit_instance_id": null,
+      "selected_weapon_ability_ids": [],
+      "shooting_type": "normal",
+      "target_unit_instance_id": "army-beta:intercessor-unit-2",
+      "wargear_id": "core-bolt-rifle",
+      "weapon_profile_id": "core-bolt-rifle:standard"
+    }
+  ],
+  "firing_deck_selection": null,
+  "player_id": "player-a",
+  "proposal_kind": "shooting_declaration",
+  "proposal_request_id": "ui-contract-shooting-declaration-request-000001",
+  "source_decision_request_id": "ui-contract-select-shooting-unit-request-000001",
+  "source_decision_result_id": "ui-contract-select-shooting-unit-result-000001",
+  "unit_instance_id": "army-alpha:intercessor-unit-1",
+  "visibility_cache_key": "ui-contract-visibility-cache-000001"
+}
