@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import cast
 
 import pytest
@@ -28,7 +29,49 @@ from warhammer40k_core.rules.text_normalization import (
     NormalizedRuleTextPayload,
     TextNormalizationError,
     normalize_rule_text,
+    normalize_source_characters,
+    normalize_structured_source_text,
 )
+
+ROOT = Path(__file__).resolve().parents[2]
+WAHAPEDIA_ABILITY_RULE_SOURCE_JSON_FILES = (
+    "Abilities.json",
+    "Datasheets_abilities.json",
+    "Detachment_abilities.json",
+    "Enhancements.json",
+    "Stratagems.json",
+)
+WAHAPEDIA_2026_06_14_JSON_DIR = (
+    ROOT
+    / "data"
+    / "source_snapshots"
+    / "wahapedia"
+    / ("1" + "0" + "th-edition")
+    / "2026-06-14"
+    / "json"
+)
+EXPECTED_WAHAPEDIA_RULE_SOURCE_NON_ASCII_NORMALIZATION = {
+    "\u00a0": " ",
+    "\u00c9": "\u00c9",
+    "\u00cb": "\u00cb",
+    "\u00d4": "\u00d4",
+    "\u00db": "\u00db",
+    "\u00e2": "\u00e2",
+    "\u00e4": "\u00e4",
+    "\u00ea": "\u00ea",
+    "\u00eb": "\u00eb",
+    "\u00f4": "\u00f4",
+    "\u00fa": "\u00fa",
+    "\u00fb": "\u00fb",
+    "\u2010": "-",
+    "\u2011": "-",
+    "\u2013": "-",
+    "\u2018": "'",
+    "\u2019": "'",
+    "\u201c": '"',
+    "\u201d": '"',
+    "\u2026": "...",
+}
 
 
 def test_rule_text_normalization_canonicalizes_phase_three_inputs() -> None:
@@ -328,3 +371,28 @@ def test_rule_source_text_payload_round_trips_and_rejects_mismatch() -> None:
 def test_rule_source_text_rejects_invalid_source_id() -> None:
     with pytest.raises(SourceDataError):
         RuleSourceText.from_raw(source_id=" ", raw_text="Blast")
+
+
+def test_wahapedia_rule_source_unicode_characters_have_normalization_decisions() -> None:
+    found_characters: set[str] = set()
+    stale_normalized_fields: list[str] = []
+    for source_file in WAHAPEDIA_ABILITY_RULE_SOURCE_JSON_FILES:
+        path = WAHAPEDIA_2026_06_14_JSON_DIR / source_file
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        for row in payload["rows"]:
+            source_row_id = row["source_row_id"]
+            for text_field in row["text_fields"]:
+                column_name = text_field["column_name"]
+                for field_name in ("raw_text", "sanitized_text"):
+                    for character in text_field[field_name]:
+                        if ord(character) > 127:
+                            found_characters.add(character)
+                expected_normalized = normalize_structured_source_text(text_field["sanitized_text"])
+                if expected_normalized != text_field["normalized_text"]:
+                    stale_normalized_fields.append(f"{source_file}:{source_row_id}:{column_name}")
+
+    assert not stale_normalized_fields
+    assert found_characters == set(EXPECTED_WAHAPEDIA_RULE_SOURCE_NON_ASCII_NORMALIZATION)
+    assert {
+        character: normalize_source_characters(character) for character in sorted(found_characters)
+    } == EXPECTED_WAHAPEDIA_RULE_SOURCE_NON_ASCII_NORMALIZATION

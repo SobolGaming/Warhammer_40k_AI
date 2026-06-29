@@ -90,6 +90,7 @@ CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID = (
     "catalog-ir:can-advance-and-shoot-and-charge"
 )
 CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID = "catalog-ir:can-be-placed-in-reserves"
+CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID = "catalog-ir:shadow-of-chaos-aura"
 DEADLY_DEMISE_TRIGGER_ROLL_THRESHOLD = 6
 DEADLY_DEMISE_RANGE_INCHES = 6.0
 CORE_FIGHTS_FIRST_SOURCE_ID = "gw-11e-core-abilities:core:fights-first"
@@ -352,6 +353,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         *_CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.values(),
         *_CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.values(),
         CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
+        CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     }
     for characteristic in Characteristic:
@@ -687,6 +689,8 @@ def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
             for effect in clause.effects:
                 if _effect_is_feel_no_pain_grant(effect):
                     consumer_ids.add(CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID)
+        if _clause_targets_shadow_of_chaos_aura(clause):
+            consumer_ids.add(CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID)
         if not _clause_targets_this_unit(clause):
             if _clause_targets_roll_reroll_unit(clause):
                 for effect in clause.effects:
@@ -1004,6 +1008,30 @@ def _effect_is_turn_end_reserve_permission(effect: RuleEffectSpec) -> bool:
         parameters.get("placement_kind") == "turn_end_reserves"
         and parameters.get("reserve_kind") == "strategic_reserves"
         and parameters.get("action") == "remove_from_battlefield_to_strategic_reserves"
+    )
+
+
+def _clause_targets_shadow_of_chaos_aura(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    return (
+        clause.target is not None
+        and clause.target.kind is RuleTargetKind.AURA_UNITS
+        and any(condition.kind is RuleConditionKind.AURA for condition in clause.conditions)
+        and any(_effect_is_shadow_of_chaos_status(effect) for effect in clause.effects)
+    )
+
+
+def _effect_is_shadow_of_chaos_status(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return (
+        parameters.get("status") == "within_shadow_of_chaos"
+        and parameters.get("rules_context") == "shadow_of_chaos"
+        and parameters.get("owner") == "your_army"
     )
 
 
@@ -1485,6 +1513,8 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
         )
     if effect.kind is RuleEffectKind.GRANT_ABILITY and _effect_is_feel_no_pain_grant(effect):
         return (CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,)
+    if _effect_is_shadow_of_chaos_status(effect):
+        return (CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,)
     if effect.kind in {
         RuleEffectKind.GRANT_ABILITY,
         RuleEffectKind.PLACEMENT_PERMISSION,

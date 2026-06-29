@@ -115,3 +115,19 @@ def test_phase17c_rule_parser_keyword_sequence_lexicon_is_source_generated() -> 
         "Parser keyword sequences must come from the generated source-package lexicon:\n"
         + "\n".join(hardcoded_keyword_literals)
     )
+
+
+def test_phase17c_rule_parser_regexes_trust_normalized_punctuation() -> None:
+    parser_source = (RULE_TOOLING / "rule_parser.py").read_text(encoding="utf-8")
+    forbidden_escape_tokens = ("\\u2018", "\\u2019", "\\u201c", "\\u201d", "\\u2013", "\\u2014")
+    escaped_violations = [token for token in forbidden_escape_tokens if token in parser_source]
+    literal_violations = sorted(
+        {
+            f"U+{ord(character):04X}"
+            for character in parser_source
+            if ord(character) in {0x2018, 0x2019, 0x201C, 0x201D, 0x2013, 0x2014}
+        }
+    )
+
+    assert not escaped_violations
+    assert not literal_violations

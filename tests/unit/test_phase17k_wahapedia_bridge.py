@@ -97,6 +97,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
     CatalogAdvanceEligibilityRuntime,
@@ -195,6 +196,7 @@ from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_p
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleEffectKind,
@@ -207,6 +209,7 @@ from warhammer40k_core.rules.rule_ir import (
     parameter_payload,
     parameters_from_pairs,
 )
+from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27 as faction_detachment_source,
 )
@@ -1448,6 +1451,27 @@ def test_phase17k_catalog_ir_roll_reroll_effect_helpers_are_strict() -> None:
         )
     with pytest.raises(GameLifecycleError, match="requires RuleEffectSpec values"):
         _roll_reroll_consumer_id_for_effect(cast(RuleEffectSpec, object()))
+
+
+def test_phase17k_catalog_ir_shadow_of_chaos_aura_classifies_contextual_status() -> None:
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="phase17k:test:shadow-of-chaos-aura",
+            raw_text=(
+                "Daemonic Shadow (Aura): While a friendly Khorne Legiones Daemonica unit "
+                'is within 6" of this model, that unit is within your army\u2019s Shadow of Chaos.'
+            ),
+        )
+    ).rule_ir
+
+    assert rule_ir.is_supported
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) == {
+        CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
+    }
+    assert CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID in set(catalog_rule_ir_registered_hook_ids())
 
 
 def test_phase17k_movement_phase_ability_index_mapping_is_fail_fast() -> None:

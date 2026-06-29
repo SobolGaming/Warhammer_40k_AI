@@ -60,7 +60,12 @@ from warhammer40k_core.engine.scoring import initial_victory_point_ledgers
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.rule_compiler import CompiledRuleSource, compile_rule_source_text
-from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload, RuleParameter
+from warhammer40k_core.rules.rule_ir import (
+    RuleIR,
+    RuleIRPayload,
+    RuleParameter,
+    parameter_payload,
+)
 from warhammer40k_core.rules.source_data import RuleSourceText
 
 
@@ -557,6 +562,62 @@ def test_phase17d_aura_keyword_gates_match_target_faction_keywords() -> None:
     assert result.status is RuleExecutionStatus.APPLIED
     assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [target_unit_id]
     assert result.effect_payloads[0]["target_unit_instance_ids"] == [target_unit_id]
+
+
+def test_phase17d_shadow_of_chaos_aura_status_targets_matching_daemons() -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-alpha:intercessor-unit-3"
+    excluded_unit_id = "army-beta:intercessor-unit-2"
+    compiled = _compiled(
+        'Daemonic Shadow (Aura): While a friendly Nurgle Legiones Daemonica unit is within 6" '
+        "of this model, that unit is within your army's Shadow of Chaos."
+    )
+
+    state = _with_unit_keywords(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("CHARACTER",),
+        faction_keywords=("LEGIONES DAEMONICA", "NURGLE"),
+    )
+    state = _with_unit_keywords(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("INFANTRY",),
+        faction_keywords=("LEGIONES DAEMONICA", "NURGLE"),
+    )
+    state = _with_unit_keywords(
+        state,
+        unit_instance_id=excluded_unit_id,
+        keywords=("INFANTRY",),
+        faction_keywords=("LEGIONES DAEMONICA", "KHORNE"),
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=target_unit_id,
+        pose=Pose.at(8.0, 6.0),
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=excluded_unit_id,
+        pose=Pose.at(8.0, 6.0),
+    )
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(state=state, source_unit_instance_id=source_unit_id),
+        registry=default_rule_execution_registry(),
+    )
+    effect = _json_object(result.effect_payloads[0]["effect"])
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [target_unit_id]
+    assert result.effect_payloads[0]["target_unit_instance_ids"] == [target_unit_id]
+    assert effect["kind"] == "set_contextual_status"
+    assert parameter_payload(compiled.rule_ir.clauses[0].effects[0].parameters) == {
+        "owner": "your_army",
+        "rules_context": "shadow_of_chaos",
+        "status": "within_shadow_of_chaos",
+    }
 
 
 def test_phase17d_enemy_aura_keyword_gate_applies_only_to_matching_enemy_units() -> None:

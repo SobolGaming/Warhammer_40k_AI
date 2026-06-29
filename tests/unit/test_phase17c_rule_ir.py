@@ -614,6 +614,43 @@ def test_phase17c_aura_target_faction_keyword_sequence_compiles_to_keyword_gates
     }
 
 
+@pytest.mark.parametrize("allegiance", ["Khorne", "Nurgle", "Tzeentch", "Slaanesh"])
+def test_phase17c_shadow_of_chaos_aura_compiles_to_contextual_status(
+    allegiance: str,
+) -> None:
+    rule_ir = _compiled(
+        f"Daemonic Shadow (Aura): While a friendly {allegiance} Legiones Daemonica "
+        'unit is within 6" of this model, that unit is within your army\u2019s Shadow of Chaos.'
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    target = clause.target
+    status_effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS
+    )
+    keyword_gates = tuple(
+        condition
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.KEYWORD_GATE
+    )
+
+    assert rule_ir.is_supported
+    assert target is not None
+    assert target.kind is RuleTargetKind.AURA_UNITS
+    assert parameter_payload(target.parameters) == {
+        "allegiance": "friendly",
+        "eligible_target": "aura_units",
+        "required_keyword_sequence": f"{allegiance.upper()}|LEGIONES_DAEMONICA",
+    }
+    assert {
+        parameter_payload(condition.parameters)["required_keyword"] for condition in keyword_gates
+    } == {allegiance.upper(), "LEGIONES_DAEMONICA"}
+    assert parameter_payload(status_effect.parameters) == {
+        "owner": "your_army",
+        "rules_context": "shadow_of_chaos",
+        "status": "within_shadow_of_chaos",
+    }
+
+
 def test_phase17c_enemy_aura_target_keyword_compiles_to_keyword_gate() -> None:
     rule_ir = _compiled(
         'Ded Glowy Ammo (Aura): While an enemy Infantry unit is within 6" of this '
