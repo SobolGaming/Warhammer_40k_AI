@@ -54,10 +54,7 @@ _ROLL_TYPES = (
     "advance|battle-shock|charge|critical hit|critical wound|damage|feel no pain|hazardous|"
     "hit|invulnerable save|leadership|save|wound"
 )
-_TIMING_OWNER_PATTERN = (
-    r"your\s+opponent(?:'|\u2019)s|the\s+opponent(?:'|\u2019)s|"
-    r"opponent(?:'|\u2019)s|your|the"
-)
+_TIMING_OWNER_PATTERN = r"your\s+opponent's|the\s+opponent's|opponent's|your|the"
 _START_END_PHASE_RE = re.compile(
     rf"\bat\s+the\s+(?P<edge>start|end)\s+of\s+"
     rf"(?:(?P<owner>{_TIMING_OWNER_PATTERN})\s+)?(?P<phase>{_PHASES})\s+phase\b",
@@ -103,7 +100,7 @@ _TARGET_RE = re.compile(
     re.IGNORECASE,
 )
 _THIS_UNIT_RE = re.compile(r"\bthis\s+unit\b", re.IGNORECASE)
-_BEARER_APOSTROPHE_RE = r"(?:'|\u2019)?"
+_BEARER_APOSTROPHE_RE = r"'?"
 _BEARERS_UNIT_RE = re.compile(
     rf"\b(?:models\s+in\s+)?(?:the\s+)?bearer{_BEARER_APOSTROPHE_RE}s\s+unit\b|"
     rf"\bmade\s+for\s+(?:the\s+)?bearer{_BEARER_APOSTROPHE_RE}s\s+unit\b",
@@ -201,7 +198,7 @@ _FEEL_NO_PAIN_ABILITY_RE = re.compile(
 )
 _SHADOW_OF_CHAOS_STATUS_RE = re.compile(
     r"\b(?:that|selected|target)\s+unit\s+is\s+within\s+your\s+"
-    r"army(?:'|\u2019)s\s+Shadow\s+of\s+Chaos\b",
+    r"army's\s+Shadow\s+of\s+Chaos\b",
     re.IGNORECASE,
 )
 _WEAPON_KEYWORD_PATTERN = "|".join(
@@ -217,7 +214,7 @@ _WEAPON_ABILITY_RE = re.compile(
     re.IGNORECASE,
 )
 _NAMED_WEAPON_ABILITY_RE = re.compile(
-    rf"\b(?P<weapon_name>[A-Z][A-Za-z0-9 '\u2019:-]+?)\s+equipped\s+by\s+models\s+"
+    rf"\b(?P<weapon_name>[A-Z][A-Za-z0-9 ':-]+?)\s+equipped\s+by\s+models\s+"
     rf"in\s+(?:that|this|the\s+selected)\s+unit\s+(?:gain|gains|have|has)\s+"
     rf"(?:the\s+)?\[?(?P<ability>{_WEAPON_KEYWORD_PATTERN})"
     rf"(?:\s+(?P<ability_value>\d+))?\]?"
