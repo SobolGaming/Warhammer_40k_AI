@@ -10,6 +10,7 @@ from typing import cast
 
 import pytest
 from tools.generate_ability_support_matrix import (
+    BLOODLETTERS_HEIGHT_OVERRIDES,
     DATASHEET_SUPPORT_OVERALL_VALUES,
     ability_support_matrix_rows,
     datasheet_support_rows,
@@ -94,8 +95,10 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
     CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID,
     CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
+    CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
@@ -1627,6 +1630,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     }
     support_rows_by_datasheet_id = {row.datasheet_id: row for row in support_rows}
     flesh_hounds_support = support_rows_by_datasheet_id["000001112"]
+    bloodletters_support = support_rows_by_datasheet_id["000001114"]
 
     assert "## Datasheet / Unit Support" in chaos_daemons_markdown
     assert "### Datasheet Ability Details" in chaos_daemons_markdown
@@ -1635,7 +1639,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
     assert "Hunters from the Warp (`000001112:hunters-from-the-warp`)" in (chaos_daemons_markdown)
     assert "Collar of Khorne (`000001112:collar-of-khorne`)" in chaos_daemons_markdown
-    assert "Bloodletters (`000001114`) | `Blocked`" in chaos_daemons_markdown
+    assert "Bloodletters (`000001114`) | `Playable`" in chaos_daemons_markdown
     assert "Bane of Cowards (`000001114:bane-of-cowards`)" in chaos_daemons_markdown
     assert "Bloodcrushers (`000001115`) | `Blocked`" in chaos_daemons_markdown
     assert "Brass Stampede (`000001115:brass-stampede`)" in chaos_daemons_markdown
@@ -1646,6 +1650,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert flesh_hounds_support.weapon_keyword_status == "Full"
     assert flesh_hounds_support.datasheet_ability_status == "Full"
     assert flesh_hounds_support.faction_interaction_status == "Partial"
+    assert bloodletters_support.overall == "Playable"
+    assert bloodletters_support.datasheet_ability_status == "Playable"
     for support_row in support_rows:
         assert support_row.overall in DATASHEET_SUPPORT_OVERALL_VALUES
         assert support_row.faction_id in faction_ids
@@ -2288,10 +2294,19 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         and set(row_payload["runtime_consumer_ids"]) == set(adeptus_custodes_runtime_ids)
         for row_payload in category_snapshot
     )
-    assert categories_by_name["Unknown Abilities"].ability_names == (
-        "Bane of Cowards",
-        "Brass Stampede",
-    )
+    assert categories_by_name[
+        "Datasheet Roll Modifier Desperate Escape Enemy Unit"
+    ].ability_names == ("Bane of Cowards",)
+    assert categories_by_name[
+        "Datasheet Rule Ir Force Desperate Escape Tests Enemy Unit"
+    ].ability_names == ("Bane of Cowards",)
+    assert categories_by_name[
+        "Datasheet Roll Modifier Desperate Escape Enemy Unit"
+    ].support_stages == (AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,)
+    assert categories_by_name[
+        "Datasheet Rule Ir Force Desperate Escape Tests Enemy Unit"
+    ].support_stages == (AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,)
+    assert categories_by_name["Unknown Abilities"].ability_names == ("Brass Stampede",)
     assert categories_by_name["Unknown Abilities"].runtime_consumer_ids == ()
     assert categories_by_name["Unknown Abilities"].support_stages == (
         AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED,
@@ -3008,6 +3023,40 @@ def test_phase17k_bridge_preserves_raw_source_text_for_reference_catalog() -> No
         .from_payload(source_reference_catalog.to_payload())
         .to_payload()
     )
+
+
+def test_phase17k_bridge_compiles_rule_ir_spans_from_sanitized_source_text() -> None:
+    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000001114",),
+        height_overrides=BLOODLETTERS_HEIGHT_OVERRIDES,
+    )
+    ability_row = _row_by_id(
+        _artifact_by_table(bridge_artifacts, "Datasheets_abilities"),
+        "000001114:5",
+    )
+    fields = ability_row.runtime_fields_payload()
+    description_text = next(
+        text_field
+        for text_field in ability_row.text_fields
+        if text_field.column_name == "description"
+    )
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, json.loads(fields["rule_ir_payload"])))
+
+    assert fields["support"] == "generic_rule_ir"
+    assert "<span" in description_text.raw_text
+    assert "<span" not in fields["description"]
+    assert rule_ir.normalized_text == fields["description"]
+    assert {
+        CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
+    } <= set(catalog_rule_ir_hook_ids_for_rule(rule_ir))
+    for clause in rule_ir.clauses:
+        assert (
+            rule_ir.normalized_text[clause.source_span.start : clause.source_span.end]
+            == clause.source_span.text
+        )
 
 
 def test_phase17k_bridge_preserves_unsupported_rule_ir_diagnostics() -> None:

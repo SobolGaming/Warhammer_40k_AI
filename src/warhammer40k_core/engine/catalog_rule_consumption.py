@@ -82,6 +82,8 @@ CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:save-roll-modifier"
 CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID = (
     "catalog-ir:invulnerable-save-roll-modifier"
 )
+CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:desperate-escape-roll-modifier"
+CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID = "catalog-ir:force-desperate-escape"
 CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:advance-roll-reroll"
 CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:charge-roll-reroll"
 CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID = "catalog-ir:wound-roll-reroll"
@@ -123,6 +125,8 @@ _CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
         "critical_hit_value": CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
         "critical_wound": CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
         "critical_wound_value": CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
+        "desperate_escape": CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
+        "desperate_escape_roll": CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
     }
 )
 _CATALOG_IR_ROLL_REROLL_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
@@ -365,6 +369,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         *_CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.values(),
         *_CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.values(),
         CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,
+        CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
         CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
         CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
@@ -1859,6 +1864,8 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
     parameters = parameter_payload(effect.parameters)
     if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
         return _catalog_ir_roll_modifier_hook_ids(parameters)
+    if effect.kind is RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS:
+        return (CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,)
     if effect.kind is RuleEffectKind.REROLL_PERMISSION:
         return _catalog_ir_roll_reroll_hook_ids(parameters)
     if effect.kind is RuleEffectKind.SET_CHARACTERISTIC:

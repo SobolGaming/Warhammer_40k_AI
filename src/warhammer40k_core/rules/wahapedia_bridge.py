@@ -719,11 +719,13 @@ def _bridge_abilities(
         source_rows: tuple[NormalizedSourceRow, ...] = (row,)
         name = _raw_or_field(row, "name")
         description = _raw_or_field(row, "description")
+        description_source_row = row
         if ability_id:
             ability_source = _ability_source_row(context=context, ability_row=row)
             source_rows = (row, ability_source)
             name = _raw_or_field(ability_source, "name")
             description = _raw_or_field(ability_source, "description")
+            description_source_row = ability_source
         else:
             ability_id = f"{datasheet_id}:{_slug(name)}"
         parameter = _raw_or_field(row, "parameter")
@@ -735,9 +737,9 @@ def _bridge_abilities(
         if source_kind is CatalogAbilitySourceKind.WARGEAR:
             source_wargear_id = f"{datasheet_id}:{_slug(name)}"
         if source_kind in {CatalogAbilitySourceKind.DATASHEET, CatalogAbilitySourceKind.WARGEAR}:
-            source_text = RuleSourceText.from_raw(
-                source_id=_source_text_id(row=row, column_name="description"),
-                raw_text=description,
+            source_text = _rule_source_text_from_row_field(
+                row=description_source_row,
+                column_name="description",
             )
             mustering_warlord_value = (
                 _mustering_warlord_value(
@@ -1351,6 +1353,25 @@ def _normalized_or_field(row: NormalizedSourceRow, column_name: str) -> str:
         if text_field.column_name == column_name:
             return text_field.normalized_text
     return row.runtime_fields_payload().get(column_name, "")
+
+
+def _rule_source_text_from_row_field(
+    *,
+    row: NormalizedSourceRow,
+    column_name: str,
+) -> RuleSourceText:
+    for text_field in row.text_fields:
+        if text_field.column_name == column_name:
+            return RuleSourceText(
+                source_id=text_field.source_text_id,
+                raw_text=text_field.sanitized_text,
+                normalized_text=text_field.normalized_text,
+                parsed_tokens=text_field.parsed_tokens,
+            )
+    return RuleSourceText.from_raw(
+        source_id=_source_text_id(row=row, column_name=column_name),
+        raw_text=row.runtime_fields_payload().get(column_name, ""),
+    )
 
 
 def _source_text_id(*, row: NormalizedSourceRow, column_name: str) -> str:

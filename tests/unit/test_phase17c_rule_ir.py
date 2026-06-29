@@ -30,8 +30,11 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_support_rollup_for_rule_ir,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,
+    CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
+    catalog_rule_ir_hook_ids_for_rule,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.rules.parsed_tokens import TextSpan
@@ -874,6 +877,87 @@ def test_phase17c_hunters_from_the_warp_compiles_to_turn_end_reserve_choice() ->
         "optional": True,
         "placement_kind": "turn_end_reserves",
         "reserve_kind": "strategic_reserves",
+    }
+
+
+def test_phase17c_enemy_fall_back_desperate_escape_aura_compiles_to_semantic_ir() -> None:
+    rule_ir = _compiled(
+        "Each time an enemy unit (excluding Monsters and Vehicles) within Engagement Range "
+        "of one or more units from your army with this ability Falls Back, models in that "
+        "enemy unit must take Desperate Escape tests. When doing so, if that enemy unit is "
+        "also Battle\u2011shocked, subtract 1 from each of those Desperate Escape tests."
+    ).rule_ir
+    force_clause = rule_ir.clauses[0]
+    modifier_clause = rule_ir.clauses[1]
+    force_effect = force_clause.effects[0]
+    modifier_effect = modifier_clause.effects[0]
+    force_distance = next(
+        condition
+        for condition in force_clause.conditions
+        if condition.kind is RuleConditionKind.DISTANCE_PREDICATE
+    )
+    force_keyword_gate = next(
+        condition
+        for condition in force_clause.conditions
+        if condition.kind is RuleConditionKind.KEYWORD_GATE
+    )
+
+    assert rule_ir.is_supported
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    assert len(rule_ir.clauses) == 2
+    assert force_clause.template_id == "phase17c:desperate-escape-requirement"
+    assert force_clause.trigger is not None
+    assert force_clause.trigger.kind is RuleTriggerKind.UNIT_SELECTED
+    assert parameter_payload(force_clause.trigger.parameters) == {
+        "selected_unit_allegiance": "enemy",
+        "selection": "fall_back",
+        "timing_window": "just_after_enemy_unit_selected_to_fall_back",
+    }
+    assert force_clause.target is not None
+    assert force_clause.target.kind is RuleTargetKind.ENEMY_UNIT
+    assert parameter_payload(force_keyword_gate.parameters) == {
+        "excluded_keyword_any": "MONSTER|VEHICLE",
+        "gate_subject": "falling_back_unit",
+    }
+    assert parameter_payload(force_distance.parameters) == {
+        "distance_inches": None,
+        "negated": False,
+        "object_ability_scope": "this_ability",
+        "object_kind": "unit",
+        "object_owner": "your_army",
+        "object_quantity": "one_or_more",
+        "predicate": "within_engagement_range",
+        "qualifier": None,
+        "range_kind": "engagement_range",
+    }
+    assert force_effect.kind is RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS
+    assert parameter_payload(force_effect.parameters) == {
+        "required": True,
+        "roll_type": "desperate_escape",
+        "target_scope": "models_in_target_unit",
+    }
+    assert modifier_clause.trigger is not None
+    assert modifier_clause.trigger.kind is RuleTriggerKind.DICE_ROLL
+    assert parameter_payload(modifier_clause.trigger.parameters) == {
+        "roll_type": "desperate_escape",
+        "source_context": "previous_effect",
+        "timing_window": "desperate_escape_test",
+    }
+    assert modifier_clause.target is not None
+    assert modifier_clause.target.kind is RuleTargetKind.ENEMY_UNIT
+    assert _condition_payload(modifier_clause, RuleConditionKind.TARGET_CONSTRAINT) == {
+        "gate_subject": "that_enemy_unit",
+        "relationship": "target_unit_has_status",
+        "status": "battle_shocked",
+    }
+    assert modifier_effect.kind is RuleEffectKind.MODIFY_DICE_ROLL
+    assert parameter_payload(modifier_effect.parameters) == {
+        "delta": -1,
+        "roll_type": "desperate_escape",
+    }
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) >= {
+        CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
     }
 
 

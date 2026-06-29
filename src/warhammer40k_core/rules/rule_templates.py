@@ -15,6 +15,7 @@ class RuleTemplateFamily(StrEnum):
     CHARACTERISTIC_SET = "characteristic_set"
     CONDITIONAL_WEAPON_ABILITY_GRANT = "conditional_weapon_ability_grant"
     CONTEXTUAL_STATUS = "contextual_status"
+    DESPERATE_ESCAPE_REQUIREMENT = "desperate_escape_requirement"
     DICE_ROLL_MODIFICATION = "dice_roll_modification"
     DISTANCE_PREDICATE = "distance_predicate"
     GRANT_ABILITY = "grant_ability"
@@ -86,6 +87,7 @@ REROLL_PERMISSION_TEMPLATE_ID = "phase17c:reroll-permission"
 CHARACTERISTIC_MODIFIER_TEMPLATE_ID = "phase17c:characteristic-modifier"
 CHARACTERISTIC_SET_TEMPLATE_ID = "phase17c:characteristic-set"
 CONTEXTUAL_STATUS_TEMPLATE_ID = "phase17c:contextual-status"
+DESPERATE_ESCAPE_TEMPLATE_ID = "phase17c:desperate-escape-requirement"
 RESOURCE_MODIFIER_TEMPLATE_ID = "phase17c:resource-modifier"
 GRANT_ABILITY_TEMPLATE_ID = "phase17c:grant-ability"
 WEAPON_ABILITY_GRANT_TEMPLATE_ID = "phase17c:weapon-ability-grant"
@@ -194,6 +196,15 @@ INITIAL_RULE_TEMPLATES: tuple[RuleTemplate, ...] = (
         family=RuleTemplateFamily.CONTEXTUAL_STATUS,
         description="Contextual rules-status clauses such as within a named army rule zone.",
         canonical_patterns=("that unit is within your army's <named rule>",),
+    ),
+    RuleTemplate(
+        template_id=DESPERATE_ESCAPE_TEMPLATE_ID,
+        family=RuleTemplateFamily.DESPERATE_ESCAPE_REQUIREMENT,
+        description="Fall Back clauses that require Desperate Escape tests.",
+        canonical_patterns=(
+            "enemy unit within Engagement Range of units with this ability Falls Back",
+            "models in that enemy unit must take Desperate Escape tests",
+        ),
     ),
     RuleTemplate(
         template_id=RESOURCE_MODIFIER_TEMPLATE_ID,

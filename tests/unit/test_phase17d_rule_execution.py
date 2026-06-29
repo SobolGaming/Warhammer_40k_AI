@@ -217,6 +217,93 @@ def test_phase17d_generic_reroll_permission_executes() -> None:
     assert effect["parameters"] == [{"key": "roll_type", "value": "hit"}]
 
 
+def test_phase17d_desperate_escape_modifier_executes_when_target_is_battle_shocked() -> None:
+    rule_ir = _desperate_escape_modifier_rule_ir()
+    target_unit_id = "army-beta:enemy-unit-1"
+
+    result = execute_rule_ir(
+        rule_ir=rule_ir,
+        context=_execution_context(
+            target_unit_instance_ids=(target_unit_id,),
+            trigger_payload={"target_unit_is_battle_shocked": True},
+            phase=BattlePhaseKind.MOVEMENT,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+    effect_payload = _json_object(result.effect_payloads[0])
+    effect = _json_object(effect_payload["effect"])
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert result.applied_clause_ids == (rule_ir.clauses[0].clause_id,)
+    assert effect["kind"] == "modify_dice_roll"
+    assert effect["parameters"] == [
+        {"key": "delta", "value": -1},
+        {"key": "roll_type", "value": "desperate_escape"},
+    ]
+    assert effect_payload["target_unit_instance_ids"] == [target_unit_id]
+
+
+def test_phase17d_desperate_escape_modifier_is_invalid_when_target_not_battle_shocked() -> None:
+    rule_ir = _desperate_escape_modifier_rule_ir()
+
+    result = execute_rule_ir(
+        rule_ir=rule_ir,
+        context=_execution_context(
+            target_unit_instance_ids=("army-beta:enemy-unit-1",),
+            trigger_payload={"target_unit_statuses": []},
+            phase=BattlePhaseKind.MOVEMENT,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.INVALID
+    assert result.reason == "condition_not_met:target_unit_has_status"
+    assert result.effect_payloads == ()
+    assert result.event_records == ()
+
+
+def test_phase17d_desperate_escape_modifier_requires_target_status_evidence() -> None:
+    rule_ir = _desperate_escape_modifier_rule_ir()
+
+    result = execute_rule_ir(
+        rule_ir=rule_ir,
+        context=_execution_context(
+            target_unit_instance_ids=("army-beta:enemy-unit-1",),
+            trigger_payload={},
+            phase=BattlePhaseKind.MOVEMENT,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.INVALID
+    assert result.reason == "missing_input:target_unit_status"
+    assert result.effect_payloads == ()
+    assert result.event_records == ()
+
+
+def test_phase17d_desperate_escape_modifier_uses_state_backed_battle_shock_status() -> None:
+    rule_ir = _desperate_escape_modifier_rule_ir()
+    state = _battle_state_with_scenario()
+    target_unit_id = "army-beta:intercessor-unit-2"
+    state.battle_shocked_unit_ids.append(target_unit_id)
+    state.battle_shocked_unit_ids.sort()
+
+    result = execute_rule_ir(
+        rule_ir=rule_ir,
+        context=_execution_context(
+            state=state,
+            target_unit_instance_ids=(target_unit_id,),
+            trigger_payload={},
+            phase=BattlePhaseKind.MOVEMENT,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert result.applied_clause_ids == (rule_ir.clauses[0].clause_id,)
+    assert result.effect_payloads[0]["target_unit_instance_ids"] == [target_unit_id]
+
+
 def test_phase17d_champion_slayer_wound_reroll_only_applies_to_qualifying_melee_attack() -> None:
     state = _battle_state_with_scenario()
     unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
@@ -1728,6 +1815,21 @@ def _skullmaster_fury_text() -> str:
         "While this model is leading a unit, each time that unit ends a Charge move, "
         "until the end of the turn, Juggernaut's bladed horns equipped by models in "
         "that unit have the [DEVASTATING WOUNDS] ability."
+    )
+
+
+def _desperate_escape_modifier_rule_ir() -> RuleIR:
+    compiled = _compiled(
+        "Each time an enemy unit (excluding Monsters and Vehicles) within Engagement Range "
+        "of one or more units from your army with this ability Falls Back, models in that "
+        "enemy unit must take Desperate Escape tests. When doing so, if that enemy unit is "
+        "also Battle-shocked, subtract 1 from each of those Desperate Escape tests."
+    )
+    modifier_clause = compiled.rule_ir.clauses[1]
+    return replace(
+        compiled.rule_ir,
+        clauses=(modifier_clause,),
+        diagnostics=modifier_clause.diagnostics,
     )
 
 

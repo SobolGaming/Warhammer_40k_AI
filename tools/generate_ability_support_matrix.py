@@ -155,12 +155,8 @@ DATASHEET_SUPPORT_OVERALL_VALUES = frozenset(
 DATASHEET_SUPPORT_COMPONENT_VALUES = frozenset(
     (*DATASHEET_SUPPORT_OVERALL_VALUES, DATASHEET_SUPPORT_NONE)
 )
-_DATASHEET_ABILITY_FULL_STAGES = frozenset(
-    (
-        AbilityCoverageSupportStage.ENGINE_CONSUMED,
-        AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,
-    )
-)
+_DATASHEET_ABILITY_FULL_STAGES = frozenset((AbilityCoverageSupportStage.ENGINE_CONSUMED,))
+_DATASHEET_ABILITY_PLAYABLE_STAGES = frozenset((AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,))
 _DATASHEET_ABILITY_PARTIAL_STAGES = frozenset((AbilityCoverageSupportStage.DESCRIPTOR_ONLY,))
 _DATASHEET_ABILITY_BLOCKING_STAGES = frozenset(
     (AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED,)
@@ -1101,6 +1097,7 @@ def _datasheet_ability_status(
     if not ability_rows:
         return _component(DATASHEET_SUPPORT_NONE)
     blocking_notes: list[str] = []
+    playable_notes: list[str] = []
     partial_notes: list[str] = []
     for row in ability_rows:
         ability_label = f"`{row.ability_id}` {row.ability_name}"
@@ -1110,6 +1107,8 @@ def _datasheet_ability_status(
             )
         if row.support_stage in _DATASHEET_ABILITY_BLOCKING_STAGES:
             blocking_notes.append(f"{ability_label}: `{row.support_stage.value}`")
+        elif row.support_stage in _DATASHEET_ABILITY_PLAYABLE_STAGES:
+            playable_notes.append(f"{ability_label}: `{row.support_stage.value}`")
         elif row.support_stage in _DATASHEET_ABILITY_PARTIAL_STAGES:
             partial_notes.append(f"{ability_label}: `{row.support_stage.value}`")
         elif row.support_stage in _DATASHEET_ABILITY_FULL_STAGES:
@@ -1124,6 +1123,8 @@ def _datasheet_ability_status(
         return _component(DATASHEET_SUPPORT_BLOCKED, *tuple(blocking_notes))
     if partial_notes:
         return _component(DATASHEET_SUPPORT_PARTIAL, *tuple(partial_notes))
+    if playable_notes:
+        return _component(DATASHEET_SUPPORT_PLAYABLE, *tuple(playable_notes))
     return _component(DATASHEET_SUPPORT_FULL)
 
 
@@ -1203,6 +1204,8 @@ def _overall_datasheet_status(
         return DATASHEET_SUPPORT_CATALOG_ONLY
     if DATASHEET_SUPPORT_PARTIAL in evidence_statuses:
         return DATASHEET_SUPPORT_PARTIAL
+    if DATASHEET_SUPPORT_PLAYABLE in evidence_statuses:
+        return DATASHEET_SUPPORT_PLAYABLE
     if faction_interactions == DATASHEET_SUPPORT_PARTIAL:
         return DATASHEET_SUPPORT_PLAYABLE
     return DATASHEET_SUPPORT_FULL
@@ -1228,7 +1231,8 @@ def _datasheet_support_notes(
             datasheet_abilities,
             faction_interactions,
         )
-        if component.status in {DATASHEET_SUPPORT_BLOCKED, DATASHEET_SUPPORT_PARTIAL}
+        if component.status
+        in {DATASHEET_SUPPORT_BLOCKED, DATASHEET_SUPPORT_PARTIAL, DATASHEET_SUPPORT_PLAYABLE}
         for note in component.notes
     )
     if notes:
@@ -1842,7 +1846,8 @@ def support_matrix_markdown(
         ),
         (
             "- `generic_ir_executable`: rule text compiled to supported generic IR and can "
-            "execute through the generic IR handler."
+            "execute through the generic IR handler, but is not necessarily consumed by a "
+            "phase/query host."
         ),
         (
             "- `engine_consumed`: a structured descriptor, supported generic IR, or "
@@ -2032,10 +2037,10 @@ def _faction_datasheet_support_markdown(
         (
             "This table reports datasheet-level playability evidence. `Full` means "
             "catalog/model/wargear/geometry data is present and every known datasheet/"
-            "wargear ability row is either engine-consumed or executable through supported "
-            "generic IR, with no unsupported diagnostics. `Playable` means core unit "
-            "operation is available but one or more non-blocking ability/detail proofs are "
-            "incomplete. `Partial` means at least one known ability or interaction is "
+            "wargear ability row is engine-consumed by named runtime consumers, with no "
+            "unsupported diagnostics. `Playable` means core unit operation is available but "
+            "one or more non-blocking generic IR, ability-detail, faction, or detachment "
+            "proofs are incomplete. `Partial` means at least one known ability or interaction is "
             "descriptor-only or unsupported. `Catalog-only` means the unit is present but no "
             "semantic ability/runtime support is proven. `Blocked` means a known unsupported "
             "rule, missing geometry, missing wargear, or missing required source data "

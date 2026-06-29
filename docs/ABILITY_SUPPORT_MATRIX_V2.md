@@ -11,7 +11,7 @@ Support stages:
 
 - `descriptor_only`: catalog descriptor exists, but no structured executable IR is available.
 - `ir_compiled_unsupported`: rule text compiled to IR with preserved diagnostics, but the IR is not supported.
-- `generic_ir_executable`: rule text compiled to supported generic IR and can execute through the generic IR handler.
+- `generic_ir_executable`: rule text compiled to supported generic IR and can execute through the generic IR handler, but is not necessarily consumed by a phase/query host.
 - `engine_consumed`: a structured descriptor, supported generic IR, or implementation-backed runtime content is consumed by a phase/query host through a named runtime consumer.
 
 ## Structured Support Sections
@@ -190,11 +190,13 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:critical-wound-value-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-query` | No current generated rows |
+| `catalog-ir:desperate-escape-roll-modifier` | No current generated rows |
 | `catalog-ir:destroyed-unit-restore-lost-wounds` | No current generated rows |
 | `catalog-ir:detection-range-characteristic-modifier` | No current generated rows |
 | `catalog-ir:detection-range-characteristic-query` | No current generated rows |
 | `catalog-ir:feel-no-pain-roll` | No current generated rows |
 | `catalog-ir:feel-no-pain-source` | Collar of Khorne |
+| `catalog-ir:force-desperate-escape` | No current generated rows |
 | `catalog-ir:hit-roll-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-query` | No current generated rows |
