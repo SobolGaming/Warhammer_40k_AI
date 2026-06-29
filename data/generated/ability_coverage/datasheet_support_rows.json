@@ -1,0 +1,115 @@
+[
+  {
+    "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001115/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none",
+      "chaos-daemons-bridge-catalog/000001115/faction/000008433/none",
+      "chaos-daemons-bridge-catalog/000001115/wargear/000001115:daemonic-icon/000001115:daemonic-icon",
+      "chaos-daemons-bridge-catalog/000001115/wargear/000001115:instrument-of-chaos/000001115:instrument-of-chaos"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Blocked",
+    "datasheet_id": "000001115",
+    "datasheet_name": "Bloodcrushers",
+    "detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "legion-of-excess",
+      "lords-of-the-warp",
+      "plague-legion",
+      "scintillating-legion",
+      "shadow-legion",
+      "warptide"
+    ],
+    "faction_id": "chaos-daemons",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "`000001115:brass-stampede` Brass Stampede: diagnostics `unsupported_language` `000001115:brass-stampede` Brass Stampede: `ir_compiled_unsupported` Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "overall": "Blocked",
+    "supported_detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "shadow-legion"
+    ],
+    "tests_evidence": "Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:leadership-characteristic-query`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001114/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none",
+      "chaos-daemons-bridge-catalog/000001114/faction/000008433/none",
+      "chaos-daemons-bridge-catalog/000001114/wargear/000001114:daemonic-icon/000001114:daemonic-icon",
+      "chaos-daemons-bridge-catalog/000001114/wargear/000001114:instrument-of-chaos/000001114:instrument-of-chaos"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Blocked",
+    "datasheet_id": "000001114",
+    "datasheet_name": "Bloodletters",
+    "detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "legion-of-excess",
+      "lords-of-the-warp",
+      "plague-legion",
+      "scintillating-legion",
+      "shadow-legion",
+      "warptide"
+    ],
+    "faction_id": "chaos-daemons",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "`000001114:bane-of-cowards` Bane of Cowards: diagnostics `unsupported_language` `000001114:bane-of-cowards` Bane of Cowards: `ir_compiled_unsupported` Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "overall": "Blocked",
+    "supported_detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "shadow-legion"
+    ],
+    "tests_evidence": "Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:leadership-characteristic-query`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "None"
+  },
+  {
+    "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001112/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000001112/datasheet/000001112:hunters-from-the-warp/none",
+      "chaos-daemons-bridge-catalog/000001112/faction/000008433/none",
+      "chaos-daemons-bridge-catalog/000001112/wargear/000001112:collar-of-khorne/000001112:collar-of-khorne"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Full",
+    "datasheet_id": "000001112",
+    "datasheet_name": "Flesh Hounds",
+    "detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "legion-of-excess",
+      "lords-of-the-warp",
+      "plague-legion",
+      "scintillating-legion",
+      "shadow-legion",
+      "warptide"
+    ],
+    "faction_id": "chaos-daemons",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "overall": "Playable",
+    "supported_detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "shadow-legion"
+    ],
+    "tests_evidence": "Runtime consumers: `catalog-ir:can-be-placed-in-reserves`, `catalog-ir:feel-no-pain-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  }
+]
