@@ -190,6 +190,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:critical-wound-value-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-query` | No current generated rows |
+| `catalog-ir:destroyed-unit-restore-lost-wounds` | No current generated rows |
 | `catalog-ir:detection-range-characteristic-modifier` | No current generated rows |
 | `catalog-ir:detection-range-characteristic-query` | No current generated rows |
 | `catalog-ir:feel-no-pain-roll` | No current generated rows |
@@ -240,6 +241,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-skill-characteristic-modifier` | No current generated rows |
 | `catalog-ir:weapon-skill-characteristic-query` | No current generated rows |
 | `catalog-ir:wound-roll-modifier` | No current generated rows |
+| `catalog-ir:wound-roll-reroll` | No current generated rows |
 | `catalog-ir:wounds-characteristic-modifier` | No current generated rows |
 | `catalog-ir:wounds-characteristic-query` | No current generated rows |
 | `core:command-reroll` | Command Re-roll |

@@ -2,39 +2,73 @@ from __future__ import annotations
 
 import hashlib
 import json
-from typing import cast
+from dataclasses import replace
+from typing import Any, cast
 
 import pytest
 
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    CatalogJsonObject,
+    DatasheetAbilityDescriptor,
+)
 from warhammer40k_core.engine.ability_coverage import (
+    AbilityClauseCoverageRow,
+    AbilityCoverageAbilityDatasheetPair,
+    AbilityCoverageCategoryRow,
+    AbilityCoverageRow,
+    AbilityCoverageSupportStage,
     AbilityOverallSupport,
+    AbilitySupportRollup,
+    ability_clause_coverage_rows_for_ability,
     ability_clause_coverage_rows_for_rule_ir,
+    ability_coverage_category_rows,
+    ability_coverage_category_rows_payload,
+    ability_coverage_rows_payload,
+    ability_support_rollup_for_ability,
     ability_support_rollup_for_rule_ir,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
 )
+from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_compiler import (
     CompiledRuleSource,
     RuleCompilerError,
     compile_normalized_rule_text,
+    compile_normalized_rule_text_payload,
     compile_rule_source_text,
     compile_rule_source_texts,
+    compiler_identity_payload,
 )
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleCondition,
     RuleConditionKind,
+    RuleDuration,
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
+    RuleIRError,
     RuleIRPayload,
+    RuleParameter,
     RuleParameterValue,
+    RuleParseDiagnostic,
     RuleTargetKind,
+    RuleTargetSpec,
+    RuleTrigger,
     RuleTriggerKind,
     RuleUnsupportedReason,
     parameter_payload,
+    rule_condition_kind_from_token,
+    rule_duration_kind_from_token,
+    rule_effect_kind_from_token,
+    rule_target_kind_from_token,
+    rule_trigger_kind_from_token,
+    rule_unsupported_reason_from_token,
 )
 from warhammer40k_core.rules.source_data import RuleSourceText
 
@@ -206,11 +240,13 @@ def test_phase17c_champion_slayer_clause_two_has_destroyed_unit_gate_and_heal() 
 
 def test_phase17c_champion_slayer_clause_coverage_rolls_up_partial_and_full() -> None:
     rule_ir = _compiled(CHAMPION_SLAYER_TEXT).rule_ir
+    descriptor = _descriptor_from_rule_ir(rule_ir)
     clause_rows = ability_clause_coverage_rows_for_rule_ir(
         source_ability_id="source:champion-slayer",
         ability_name="Champion Slayer",
         rule_ir=rule_ir,
     )
+    descriptor_clause_rows = ability_clause_coverage_rows_for_ability(descriptor)
     partial_rollup = ability_support_rollup_for_rule_ir(
         source_ability_id="source:champion-slayer",
         ability_name="Champion Slayer",
@@ -224,11 +260,15 @@ def test_phase17c_champion_slayer_clause_coverage_rolls_up_partial_and_full() ->
         ability_name="Champion Slayer",
         rule_ir=rule_ir,
     )
+    descriptor_rollup = ability_support_rollup_for_ability(descriptor)
 
     assert tuple(row.runtime_consumer_ids for row in clause_rows) == (
         (CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,),
         (CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,),
     )
+    assert [row.to_payload() for row in descriptor_clause_rows] == [
+        row.to_payload() for row in clause_rows
+    ]
     assert partial_rollup.total_clause_count == 2
     assert partial_rollup.consumed_clause_count == 1
     assert partial_rollup.overall_ability_support is AbilityOverallSupport.PARTIAL
@@ -236,6 +276,169 @@ def test_phase17c_champion_slayer_clause_coverage_rolls_up_partial_and_full() ->
     assert full_rollup.consumed_clause_count == 2
     assert full_rollup.unsupported_clause_count == 0
     assert full_rollup.overall_ability_support is AbilityOverallSupport.FULL
+    assert descriptor_rollup is not None
+    assert descriptor_rollup.to_payload() == full_rollup.to_payload()
+
+
+def test_phase17c_descriptor_without_rule_ir_has_no_clause_rollup() -> None:
+    descriptor = DatasheetAbilityDescriptor(
+        ability_id="descriptor-only",
+        name="Descriptor Only",
+        source_id="phase17c:test:descriptor-only",
+        support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="Descriptor-only test ability.",
+    )
+
+    assert ability_clause_coverage_rows_for_ability(descriptor) == ()
+    assert ability_support_rollup_for_ability(descriptor) is None
+
+
+def test_phase17c_ability_coverage_rows_and_validators_are_fail_fast() -> None:
+    row = AbilityCoverageRow(
+        catalog_id="catalog",
+        datasheet_id="datasheet",
+        datasheet_name="Datasheet",
+        ability_id="ability",
+        ability_name="Ability",
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        source_wargear_id=None,
+        catalog_support=CatalogAbilitySupport.GENERIC_RULE_IR,
+        support_stage=AbilityCoverageSupportStage.ENGINE_CONSUMED,
+        semantic_categories=("custom.category",),
+        runtime_consumer_ids=("consumer",),
+    )
+    category_rows = ability_coverage_category_rows((row,))
+    category_payload = ability_coverage_category_rows_payload(category_rows)[0]
+    row_payload = ability_coverage_rows_payload((row,))[0]
+    span = TextSpan(start=0, end=4, text="Test")
+    pair = AbilityCoverageAbilityDatasheetPair(
+        coverage_row_id=row.coverage_row_id,
+        ability_id=row.ability_id,
+        ability_name=row.ability_name,
+        datasheet_id=row.datasheet_id,
+        datasheet_name=row.datasheet_name,
+        source_kind=row.source_kind,
+    )
+
+    assert row_payload["coverage_row_id"] == "catalog/datasheet/datasheet/ability/none"
+    assert category_payload["category_name"] == "Custom Category"
+    assert category_payload["runtime_consumer_ids"] == ["consumer"]
+    assert pair.to_payload()["source_kind"] == "datasheet"
+    with pytest.raises(GameLifecycleError, match="source_span must be TextSpan"):
+        AbilityClauseCoverageRow(
+            source_ability_id="source",
+            ability_name="Ability",
+            clause_id="clause",
+            source_span=cast(TextSpan, object()),
+            trigger_kind=None,
+            effect_kinds=(),
+            runtime_consumer_ids=(),
+            support_stage=AbilityCoverageSupportStage.ENGINE_CONSUMED,
+        )
+    with pytest.raises(
+        GameLifecycleError, match="support_stage must be AbilityCoverageSupportStage"
+    ):
+        AbilityClauseCoverageRow(
+            source_ability_id="source",
+            ability_name="Ability",
+            clause_id="clause",
+            source_span=span,
+            trigger_kind=None,
+            effect_kinds=(),
+            runtime_consumer_ids=(),
+            support_stage=cast(AbilityCoverageSupportStage, "bad"),
+        )
+    with pytest.raises(GameLifecycleError, match="total_clause_count must be non-negative"):
+        AbilitySupportRollup(
+            source_ability_id="source",
+            ability_name="Ability",
+            total_clause_count=-1,
+            consumed_clause_count=0,
+            unsupported_clause_count=0,
+            overall_ability_support=AbilityOverallSupport.UNSUPPORTED,
+        )
+    with pytest.raises(GameLifecycleError, match="consumed count exceeds total"):
+        AbilitySupportRollup(
+            source_ability_id="source",
+            ability_name="Ability",
+            total_clause_count=1,
+            consumed_clause_count=2,
+            unsupported_clause_count=0,
+            overall_ability_support=AbilityOverallSupport.PARTIAL,
+        )
+    with pytest.raises(GameLifecycleError, match="unsupported count exceeds total"):
+        AbilitySupportRollup(
+            source_ability_id="source",
+            ability_name="Ability",
+            total_clause_count=1,
+            consumed_clause_count=0,
+            unsupported_clause_count=2,
+            overall_ability_support=AbilityOverallSupport.PARTIAL,
+        )
+    with pytest.raises(GameLifecycleError, match="overall support must be AbilityOverallSupport"):
+        AbilitySupportRollup(
+            source_ability_id="source",
+            ability_name="Ability",
+            total_clause_count=1,
+            consumed_clause_count=0,
+            unsupported_clause_count=0,
+            overall_ability_support=cast(AbilityOverallSupport, "bad"),
+        )
+    with pytest.raises(GameLifecycleError, match="source_kind must be CatalogAbilitySourceKind"):
+        AbilityCoverageAbilityDatasheetPair(
+            coverage_row_id=row.coverage_row_id,
+            ability_id=row.ability_id,
+            ability_name=row.ability_name,
+            datasheet_id=row.datasheet_id,
+            datasheet_name=row.datasheet_name,
+            source_kind=cast(CatalogAbilitySourceKind, "bad"),
+        )
+    with pytest.raises(GameLifecycleError, match="category_id must be a string"):
+        AbilityCoverageCategoryRow(
+            category_id="",
+            category_name="Category",
+            coverage_row_count=1,
+            coverage_row_ids=(row.coverage_row_id,),
+            ability_datasheet_pairs=(pair,),
+            source_kind_counts=(("datasheet", 1),),
+            support_stages=(AbilityCoverageSupportStage.ENGINE_CONSUMED,),
+            runtime_consumer_ids=(),
+            ability_names=(row.ability_name,),
+            datasheet_names=(row.datasheet_name,),
+        )
+    with pytest.raises(GameLifecycleError, match="coverage_row_ids must match"):
+        AbilityCoverageCategoryRow(
+            category_id="custom.category",
+            category_name="Category",
+            coverage_row_count=1,
+            coverage_row_ids=(),
+            ability_datasheet_pairs=(pair,),
+            source_kind_counts=(("datasheet", 1),),
+            support_stages=(AbilityCoverageSupportStage.ENGINE_CONSUMED,),
+            runtime_consumer_ids=(),
+            ability_names=(row.ability_name,),
+            datasheet_names=(row.datasheet_name,),
+        )
+    with pytest.raises(GameLifecycleError, match="source_kind_counts keys must be unique"):
+        AbilityCoverageCategoryRow(
+            category_id="custom.category",
+            category_name="Category",
+            coverage_row_count=2,
+            coverage_row_ids=("row-a", "row-b"),
+            ability_datasheet_pairs=(pair, pair),
+            source_kind_counts=(("datasheet", 1), ("datasheet", 1)),
+            support_stages=(AbilityCoverageSupportStage.ENGINE_CONSUMED,),
+            runtime_consumer_ids=(),
+            ability_names=(row.ability_name,),
+            datasheet_names=(row.datasheet_name,),
+        )
+    with pytest.raises(GameLifecycleError, match="Ability coverage rows must be a tuple"):
+        ability_coverage_category_rows(cast(tuple[AbilityCoverageRow, ...], []))
+    with pytest.raises(GameLifecycleError, match="require coverage rows"):
+        ability_coverage_category_rows(cast(tuple[AbilityCoverageRow, ...], (object(),)))
+    with pytest.raises(GameLifecycleError, match="category rows must be a tuple"):
+        ability_coverage_category_rows_payload(cast(tuple[AbilityCoverageCategoryRow, ...], []))
 
 
 def test_phase17c_champion_slayer_residual_unsupported_text_preserves_source_span() -> None:
@@ -822,6 +1025,307 @@ def test_phase17c_compiler_rejects_stale_or_duplicate_source_inputs() -> None:
         compile_rule_source_texts((source, source))
 
 
+def test_phase17c_compiler_payload_boundary_is_fail_fast() -> None:
+    source = RuleSourceText.from_raw(
+        source_id="phase17c:rule:payload-boundary",
+        raw_text="Gain 1CP.",
+    )
+    compiled = compile_rule_source_text(source)
+    second_source = RuleSourceText.from_raw(
+        source_id="phase17c:rule:payload-boundary:second",
+        raw_text="Score 1VP.",
+    )
+    stale_effect = replace(
+        compiled.rule_ir.clauses[0].effects[0],
+        parameters=(RuleParameter(key="delta", value=2),),
+    )
+    stale_rule_ir = replace(
+        compiled.rule_ir,
+        clauses=(
+            replace(
+                compiled.rule_ir.clauses[0],
+                effects=(stale_effect,),
+            ),
+        ),
+    )
+    stale_compiled_payload = compiled.to_payload()
+    stale_compiled_payload["rule_ir"] = stale_rule_ir.to_payload()
+    identity = compiler_identity_payload()
+    invalid_parsed_payload = source.parsed_tokens.to_payload()
+    invalid_parsed_payload["keywords"] = [
+        {
+            "text": "BAD",
+            "start": 0,
+            "end": 3,
+            "keyword": "BAD",
+        }
+    ]
+
+    assert (
+        compile_normalized_rule_text_payload(
+            source_id=source.source_id,
+            normalized_text=source.normalized_text,
+            parsed_tokens=source.parsed_tokens.to_payload(),
+        ).to_payload()
+        == compiled.rule_ir.to_payload()
+    )
+    assert identity == {
+        "compiler_version": "phase17c-rule-compiler-v1",
+        "parser_version": "phase17c-rule-parser-v1",
+        "ir_schema_version": "phase17c-rule-ir-v1",
+    }
+    assert tuple(
+        compiled_source.source_text.source_id
+        for compiled_source in compile_rule_source_texts((second_source, source))
+    ) == (source.source_id, second_source.source_id)
+    with pytest.raises(RuleCompilerError, match="requires RuleSourceText"):
+        compile_rule_source_text(cast(RuleSourceText, object()))
+    with pytest.raises(RuleCompilerError, match="source_texts must be a tuple"):
+        compile_rule_source_texts(cast(tuple[RuleSourceText, ...], []))
+    with pytest.raises(RuleCompilerError, match="parsed_tokens must be ParsedRuleText"):
+        compile_normalized_rule_text(
+            source_id=source.source_id,
+            normalized_text=source.normalized_text,
+            parsed_tokens=cast(Any, object()),
+        )
+    with pytest.raises(RuleCompilerError, match="payload contains stale rule_ir"):
+        CompiledRuleSource.from_payload(stale_compiled_payload)
+    with pytest.raises(RuleCompilerError, match="source_text must be RuleSourceText"):
+        CompiledRuleSource(
+            source_text=cast(RuleSourceText, object()),
+            rule_ir=compiled.rule_ir,
+        )
+    with pytest.raises(RuleCompilerError, match="rule_ir must be RuleIR"):
+        CompiledRuleSource(
+            source_text=source,
+            rule_ir=cast(RuleIR, object()),
+        )
+    with pytest.raises(RuleCompilerError, match="source_id must match"):
+        CompiledRuleSource(
+            source_text=RuleSourceText.from_raw(
+                source_id="phase17c:rule:different-source",
+                raw_text="Gain 1CP.",
+            ),
+            rule_ir=compiled.rule_ir,
+        )
+    with pytest.raises(RuleCompilerError, match="normalized_text must match"):
+        CompiledRuleSource(
+            source_text=RuleSourceText.from_raw(
+                source_id=source.source_id,
+                raw_text="Gain 2CP.",
+            ),
+            rule_ir=compiled.rule_ir,
+        )
+    with pytest.raises(RuleCompilerError, match="compiler_version must not be empty"):
+        CompiledRuleSource(source_text=source, rule_ir=compiled.rule_ir, compiler_version="")
+    with pytest.raises(RuleCompilerError, match="compiler_version must be a string"):
+        CompiledRuleSource(
+            source_text=source,
+            rule_ir=compiled.rule_ir,
+            compiler_version=cast(str, 1),
+        )
+    with pytest.raises(RuleCompilerError, match="Parsed rule-text payload is invalid"):
+        compile_normalized_rule_text_payload(
+            source_id=source.source_id,
+            normalized_text=source.normalized_text,
+            parsed_tokens=invalid_parsed_payload,
+        )
+
+
+def test_phase17c_rule_ir_structural_validators_are_fail_fast() -> None:
+    span = TextSpan(text="Gain 1CP.", start=0, end=9)
+    second_span = TextSpan(text="Move.", start=10, end=15)
+    command_point_effect = RuleEffectSpec(
+        kind=RuleEffectKind.MODIFY_COMMAND_POINTS,
+        source_span=span,
+        parameters=(RuleParameter(key="delta", value=1),),
+    )
+    move_effect = RuleEffectSpec(
+        kind=RuleEffectKind.MODIFY_MOVE_DISTANCE,
+        source_span=second_span,
+        parameters=(RuleParameter(key="delta_inches", value=1),),
+    )
+    clause = RuleClause(
+        clause_id="phase17c:rule:structural:clause:001",
+        source_span=span,
+        effects=(command_point_effect,),
+    )
+    rule_ir = RuleIR(
+        rule_id="phase17c:rule:structural",
+        source_id="phase17c:rule:structural",
+        normalized_text="Gain 1CP.",
+        parser_version="phase17c-rule-parser-v1",
+        clauses=(clause,),
+    )
+    stale_payload = rule_ir.to_payload()
+    stale_payload["ir_hash"] = "stale"
+
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    with pytest.raises(RuleIRError, match="blocking must be a boolean"):
+        RuleParseDiagnostic(
+            reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
+            message="Unsupported.",
+            source_span=span,
+            blocking=cast(bool, "yes"),
+        )
+    with pytest.raises(RuleIRError, match="trigger must be a RuleTrigger"):
+        RuleClause(
+            clause_id="phase17c:rule:bad-trigger",
+            source_span=span,
+            trigger=cast(RuleTrigger, object()),
+            effects=(command_point_effect,),
+        )
+    with pytest.raises(RuleIRError, match="target must be a RuleTargetSpec"):
+        RuleClause(
+            clause_id="phase17c:rule:bad-target",
+            source_span=span,
+            target=cast(RuleTargetSpec, object()),
+            effects=(command_point_effect,),
+        )
+    with pytest.raises(RuleIRError, match="duration must be a RuleDuration"):
+        RuleClause(
+            clause_id="phase17c:rule:bad-duration",
+            source_span=span,
+            duration=cast(RuleDuration, object()),
+            effects=(command_point_effect,),
+        )
+    with pytest.raises(RuleIRError, match="supported components or unsupported_reason"):
+        RuleClause(clause_id="phase17c:rule:empty-clause", source_span=span)
+    with pytest.raises(RuleIRError, match="Unsupported RuleClause must include diagnostics"):
+        RuleClause(
+            clause_id="phase17c:rule:unsupported-without-diagnostic",
+            source_span=span,
+            unsupported_reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
+        )
+    with pytest.raises(RuleIRError, match="clauses must not be empty"):
+        RuleIR(
+            rule_id="phase17c:rule:no-clauses",
+            source_id="phase17c:rule:no-clauses",
+            normalized_text="Gain 1CP.",
+            parser_version="phase17c-rule-parser-v1",
+            clauses=(),
+        )
+    with pytest.raises(RuleIRError, match="ir_hash is stale"):
+        RuleIR.from_payload(stale_payload)
+    with pytest.raises(RuleIRError, match="RuleParameter key must be a string"):
+        RuleParameter(key=cast(str, 1), value=1)
+    with pytest.raises(RuleIRError, match="RuleParameter key must not be empty"):
+        RuleParameter(key="", value=1)
+    with pytest.raises(RuleIRError, match="float must be finite"):
+        RuleParameter(key="amount", value=float("inf"))
+    with pytest.raises(RuleIRError, match="JSON scalar"):
+        RuleParameter(key="amount", value=cast(RuleParameterValue, object()))
+    with pytest.raises(RuleIRError, match="source_span must be a TextSpan"):
+        RuleEffectSpec(
+            kind=RuleEffectKind.MODIFY_COMMAND_POINTS,
+            source_span=cast(TextSpan, object()),
+        )
+    with pytest.raises(RuleIRError, match="parameters must be a tuple"):
+        RuleEffectSpec(
+            kind=RuleEffectKind.MODIFY_COMMAND_POINTS,
+            source_span=span,
+            parameters=cast(tuple[RuleParameter, ...], []),
+        )
+    with pytest.raises(RuleIRError, match="parameters must contain RuleParameter values"):
+        RuleEffectSpec(
+            kind=RuleEffectKind.MODIFY_COMMAND_POINTS,
+            source_span=span,
+            parameters=cast(tuple[RuleParameter, ...], (object(),)),
+        )
+    with pytest.raises(RuleIRError, match="parameters must not contain duplicate keys"):
+        RuleEffectSpec(
+            kind=RuleEffectKind.MODIFY_COMMAND_POINTS,
+            source_span=span,
+            parameters=(
+                RuleParameter(key="delta", value=1),
+                RuleParameter(key="delta", value=2),
+            ),
+        )
+    with pytest.raises(RuleIRError, match="conditions must be a tuple"):
+        RuleClause(
+            clause_id="phase17c:rule:bad-condition-tuple",
+            source_span=span,
+            conditions=cast(tuple[RuleCondition, ...], []),
+            effects=(command_point_effect,),
+        )
+    with pytest.raises(RuleIRError, match="conditions contains an invalid value"):
+        RuleClause(
+            clause_id="phase17c:rule:bad-condition-value",
+            source_span=span,
+            conditions=cast(tuple[RuleCondition, ...], (object(),)),
+            effects=(command_point_effect,),
+        )
+    with pytest.raises(RuleIRError, match="clause IDs must be unique"):
+        RuleIR(
+            rule_id="phase17c:rule:duplicate-clauses",
+            source_id="phase17c:rule:duplicate-clauses",
+            normalized_text="Gain 1CP.",
+            parser_version="phase17c-rule-parser-v1",
+            clauses=(clause, clause),
+        )
+    with pytest.raises(RuleIRError, match="deterministically ordered"):
+        RuleIR(
+            rule_id="phase17c:rule:clause-order",
+            source_id="phase17c:rule:clause-order",
+            normalized_text="Gain 1CP. Move.",
+            parser_version="phase17c-rule-parser-v1",
+            clauses=(
+                RuleClause(
+                    clause_id="phase17c:rule:clause-order:002",
+                    source_span=second_span,
+                    effects=(move_effect,),
+                ),
+                clause,
+            ),
+        )
+    with pytest.raises(RuleIRError, match="outside normalized_text"):
+        RuleIR(
+            rule_id="phase17c:rule:outside-span",
+            source_id="phase17c:rule:outside-span",
+            normalized_text="Gain",
+            parser_version="phase17c-rule-parser-v1",
+            clauses=(clause,),
+        )
+    with pytest.raises(RuleIRError, match="text does not match normalized_text"):
+        RuleIR(
+            rule_id="phase17c:rule:mismatched-span",
+            source_id="phase17c:rule:mismatched-span",
+            normalized_text="Lost 1CP.",
+            parser_version="phase17c-rule-parser-v1",
+            clauses=(clause,),
+        )
+
+
+@pytest.mark.parametrize(
+    ("converter", "non_string_error", "unsupported_error"),
+    [
+        (rule_trigger_kind_from_token, "RuleTriggerKind token must be a string", "Unsupported"),
+        (
+            rule_condition_kind_from_token,
+            "RuleConditionKind token must be a string",
+            "Unsupported",
+        ),
+        (rule_target_kind_from_token, "RuleTargetKind token must be a string", "Unsupported"),
+        (rule_effect_kind_from_token, "RuleEffectKind token must be a string", "Unsupported"),
+        (rule_duration_kind_from_token, "RuleDurationKind token must be a string", "Unsupported"),
+        (
+            rule_unsupported_reason_from_token,
+            "RuleUnsupportedReason token must be a string",
+            "Unsupported",
+        ),
+    ],
+)
+def test_phase17c_rule_ir_token_converters_reject_invalid_tokens(
+    converter: Any,
+    non_string_error: str,
+    unsupported_error: str,
+) -> None:
+    with pytest.raises(RuleIRError, match=non_string_error):
+        converter(1)
+    with pytest.raises(RuleIRError, match=unsupported_error):
+        converter("not-a-token")
+
+
 def _compiled(raw_text: str) -> CompiledRuleSource:
     source_suffix = hashlib.sha256(raw_text.encode()).hexdigest()[:12]
     return compile_rule_source_text(
@@ -846,3 +1350,18 @@ def _condition_payload(
     )
     assert len(matches) == 1
     return parameter_payload(matches[0].parameters)
+
+
+def _descriptor_from_rule_ir(rule_ir: RuleIR) -> DatasheetAbilityDescriptor:
+    return DatasheetAbilityDescriptor(
+        ability_id="champion-slayer",
+        name="Champion Slayer",
+        source_id="source:champion-slayer",
+        support=CatalogAbilitySupport.GENERIC_RULE_IR,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="Champion Slayer compound ability.",
+        rule_ir_payload=cast(CatalogJsonObject, rule_ir.to_payload()),
+        rule_ir_diagnostics=tuple(
+            cast(CatalogJsonObject, diagnostic.to_payload()) for diagnostic in rule_ir.diagnostics
+        ),
+    )
