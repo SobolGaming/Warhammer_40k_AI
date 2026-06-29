@@ -15,6 +15,7 @@ _FORBIDDEN_TRACKED_SOURCE_PATTERNS = (
 )
 _TRACKED_FACTION_PACK_PDF_PATTERN = "data/raw/faction_packs/*.pdf"
 _ROOT = Path(__file__).resolve().parents[2]
+_GIT = Path("/usr/bin/git")
 _OFFICIAL_WARHAMMER_40000_DOWNLOADS_PAGE = (
     "https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/"
 )
@@ -95,9 +96,10 @@ def _assert_tracked_faction_pack_pdfs_match_manifest(tracked_files: tuple[str, .
 
 def _git_tracked_files() -> tuple[str, ...]:
     result = subprocess.run(
-        ["git", "ls-files"],
+        [str(_GIT), "ls-files"],
         check=True,
         capture_output=True,
+        cwd=_ROOT,
         encoding="utf-8",
     )
     return tuple(line for line in result.stdout.splitlines() if line)

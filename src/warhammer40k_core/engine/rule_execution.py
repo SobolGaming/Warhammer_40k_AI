@@ -75,6 +75,7 @@ UNIT_EFFECT_TARGET_KINDS = (
     RuleTargetKind.THIS_UNIT,
 )
 TARGET_SCOPED_EFFECT_KINDS = (
+    RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS,
     RuleEffectKind.GRANT_ABILITY,
     RuleEffectKind.GRANT_WEAPON_ABILITY,
     RuleEffectKind.MODIFY_CHARACTERISTIC,
@@ -579,6 +580,7 @@ def default_rule_execution_registry() -> RuleExecutionRegistry:
                     RuleEffectKind.MODIFY_DICE_ROLL,
                     RuleEffectKind.MODIFY_CHARACTERISTIC,
                     RuleEffectKind.MODIFY_MOVE_DISTANCE,
+                    RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS,
                     RuleEffectKind.GRANT_ABILITY,
                     RuleEffectKind.GRANT_WEAPON_ABILITY,
                     RuleEffectKind.PLACEMENT_PERMISSION,

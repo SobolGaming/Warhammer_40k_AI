@@ -100,20 +100,19 @@
     "ability_id": "000001114:bane-of-cowards",
     "ability_name": "Bane of Cowards",
     "catalog_id": "chaos-daemons-bridge-catalog",
-    "catalog_support": "unsupported",
+    "catalog_support": "generic_rule_ir",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none",
     "datasheet_id": "000001114",
     "datasheet_name": "Bloodletters",
-    "diagnostic_reasons": [
-      "unsupported_language"
-    ],
+    "diagnostic_reasons": [],
     "runtime_consumer_ids": [],
     "semantic_categories": [
-      "unknown.ability_text"
+      "datasheet.roll_modifier.desperate_escape.enemy_unit",
+      "datasheet.rule_ir.force_desperate_escape_tests.enemy_unit"
     ],
     "source_kind": "datasheet",
     "source_wargear_id": null,
-    "support_stage": "ir_compiled_unsupported"
+    "support_stage": "generic_ir_executable"
   },
   {
     "ability_id": "000008433",

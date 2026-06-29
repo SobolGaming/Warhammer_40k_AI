@@ -176,6 +176,68 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000001114:bane-of-cowards",
+        "ability_name": "Bane of Cowards",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none",
+        "datasheet_id": "000001114",
+        "datasheet_name": "Bloodletters",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Bane of Cowards"
+    ],
+    "category_id": "datasheet.roll_modifier.desperate_escape.enemy_unit",
+    "category_name": "Datasheet Roll Modifier Desperate Escape Enemy Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none"
+    ],
+    "datasheet_names": [
+      "Bloodletters"
+    ],
+    "runtime_consumer_ids": [],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "generic_ir_executable"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000001114:bane-of-cowards",
+        "ability_name": "Bane of Cowards",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none",
+        "datasheet_id": "000001114",
+        "datasheet_name": "Bloodletters",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Bane of Cowards"
+    ],
+    "category_id": "datasheet.rule_ir.force_desperate_escape_tests.enemy_unit",
+    "category_name": "Datasheet Rule Ir Force Desperate Escape Tests Enemy Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none"
+    ],
+    "datasheet_names": [
+      "Bloodletters"
+    ],
+    "runtime_consumer_ids": [],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "generic_ir_executable"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001112:hunters-from-the-warp",
         "ability_name": "Hunters from the Warp",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/datasheet/000001112:hunters-from-the-warp/none",
@@ -989,34 +1051,23 @@
         "datasheet_id": "000001115",
         "datasheet_name": "Bloodcrushers",
         "source_kind": "datasheet"
-      },
-      {
-        "ability_id": "000001114:bane-of-cowards",
-        "ability_name": "Bane of Cowards",
-        "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none",
-        "datasheet_id": "000001114",
-        "datasheet_name": "Bloodletters",
-        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
-      "Bane of Cowards",
       "Brass Stampede"
     ],
     "category_id": "unknown.ability_text",
     "category_name": "Unknown Abilities",
-    "coverage_row_count": 2,
+    "coverage_row_count": 1,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none",
-      "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none"
+      "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none"
     ],
     "datasheet_names": [
-      "Bloodcrushers",
-      "Bloodletters"
+      "Bloodcrushers"
     ],
     "runtime_consumer_ids": [],
     "source_kind_counts": {
-      "datasheet": 2
+      "datasheet": 1
     },
     "support_stages": [
       "ir_compiled_unsupported"

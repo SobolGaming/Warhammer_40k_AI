@@ -30,6 +30,7 @@ from warhammer40k_core.rules.rule_templates import (
     CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
     CHARACTERISTIC_SET_TEMPLATE_ID,
     CONTEXTUAL_STATUS_TEMPLATE_ID,
+    DESPERATE_ESCAPE_TEMPLATE_ID,
     DICE_ROLL_MODIFIER_TEMPLATE_ID,
     DISTANCE_PREDICATE_TEMPLATE_ID,
     GRANT_ABILITY_TEMPLATE_ID,
@@ -51,8 +52,8 @@ RULE_PARSER_VERSION = "phase17c-rule-parser-v1"
 
 _PHASES = "command|movement|shooting|charge|fight"
 _ROLL_TYPES = (
-    "advance|battle-shock|charge|critical hit|critical wound|damage|feel no pain|hazardous|"
-    "hit|invulnerable save|leadership|save|wound"
+    "advance|battle-shock|charge|critical hit|critical wound|damage|desperate escape|"
+    "feel no pain|hazardous|hit|invulnerable save|leadership|save|wound"
 )
 _TIMING_OWNER_PATTERN = r"your\s+opponent's|the\s+opponent's|opponent's|your|the"
 _START_END_PHASE_RE = re.compile(
@@ -91,6 +92,14 @@ _CHARGE_MOVE_END_RE = re.compile(
     r"a\s+charge\s+move\b",
     re.IGNORECASE,
 )
+_ENEMY_UNIT_FALLS_BACK_NEAR_ABILITY_RE = re.compile(
+    r"\beach\s+time\s+an?\s+enemy\s+unit"
+    r"(?:\s+\(excluding\s+(?P<excluded_keywords>[^)]+)\))?\s+"
+    r"within\s+Engagement\s+Range\s+of\s+one\s+or\s+more\s+units\s+from\s+your\s+army\s+"
+    r"with\s+this\s+ability\s+Falls\s+Back\b",
+    re.IGNORECASE,
+)
+_WHEN_DOING_SO_RE = re.compile(r"\bwhen\s+doing\s+so\b", re.IGNORECASE)
 _SETUP_RE = re.compile(r"\b(?:deployment|before\s+the\s+battle|set\s+up)\b", re.IGNORECASE)
 _DICE_TRIGGER_RE = re.compile(
     rf"\b(?:after|when|each\s+time)\s+.*\b(?P<roll>{_ROLL_TYPES})\s+roll", re.IGNORECASE
@@ -137,12 +146,14 @@ _KEYWORD_UNIT_RE = re.compile(
 )
 _ADD_ROLL_RE = re.compile(
     rf"\b(?P<verb>add|subtract)\s+(?P<value>\d+)\s+(?:to|from)\s+"
-    rf"(?:the\s+)?(?P<roll>{_ROLL_TYPES})\s+rolls?\b",
+    rf"(?:(?:the|each\s+of\s+those|each\s+of\s+these)\s+)?"
+    rf"(?P<roll>{_ROLL_TYPES})\s+(?:rolls?|tests?)\b",
     re.IGNORECASE,
 )
 _SIGNED_ROLL_RE = re.compile(
     rf"(?<![A-Za-z0-9_])(?P<sign>[+-])(?P<value>\d+)\s+to\s+"
-    rf"(?:the\s+)?(?P<roll>{_ROLL_TYPES})\s+rolls?\b",
+    rf"(?:(?:the|each\s+of\s+those|each\s+of\s+these)\s+)?"
+    rf"(?P<roll>{_ROLL_TYPES})\s+(?:rolls?|tests?)\b",
     re.IGNORECASE,
 )
 _REROLL_ROLL_LIST_RE = re.compile(
@@ -213,6 +224,16 @@ _SHADOW_OF_CHAOS_STATUS_RE = re.compile(
     r"army's\s+Shadow\s+of\s+Chaos\b",
     re.IGNORECASE,
 )
+_TARGET_BATTLE_SHOCKED_RE = re.compile(
+    r"\bif\s+(?P<subject>that\s+enemy\s+unit|that\s+unit|target\s+unit|selected\s+unit)\s+"
+    r"is\s+(?:also\s+)?Battle-shocked\b",
+    re.IGNORECASE,
+)
+_DESPERATE_ESCAPE_TESTS_RE = re.compile(
+    r"\bmodels\s+in\s+(?:that\s+enemy|that|the\s+target|the\s+selected)\s+unit\s+"
+    r"must\s+take\s+Desperate\s+Escape\s+tests\b",
+    re.IGNORECASE,
+)
 _WEAPON_KEYWORD_PATTERN = "|".join(
     re.escape(keyword)
     for keyword in sorted(canonical_weapon_keyword_tokens(), key=len, reverse=True)
@@ -258,7 +279,9 @@ _DISTANCE_RELATION_RE = re.compile(
     r"(?:(?P<allegiance>enemy|friendly)\s+)?"
     r"(?:(?P<object_reference>this|that|selected|target)\s+)?"
     r"(?:(?P<keyword>[A-Z][A-Z0-9_'-]*(?:\s+[A-Z0-9_'-]+){0,5})\s+)?"
-    r"(?P<object_kind>units?|models?|objective\s+markers?)\b",
+    r"(?P<object_kind>units?|models?|objective\s+markers?)"
+    r"(?:\s+from\s+(?P<object_owner>your\s+army)"
+    r"(?:\s+with\s+(?P<object_ability_scope>this\s+ability))?)?\b",
     re.IGNORECASE,
 )
 _RESIDUAL_TOKEN_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_+'-]*")
@@ -506,6 +529,7 @@ def _compile_clause(
             *_parse_frequency_conditions(clause_text),
             *_parse_keyword_conditions(clause_text),
             *_parse_distance_conditions(clause_text, parsed_text),
+            *_parse_status_conditions(clause_text),
         )
     )
     target = _parse_target(clause_text)
@@ -521,6 +545,7 @@ def _compile_clause(
             *_parse_weapon_ability_effects(clause_text),
             *_parse_placement_effects(clause_text),
             *_parse_restore_lost_wounds_effects(clause_text),
+            *_parse_desperate_escape_effects(clause_text),
         )
     )
     template_id = _template_id_for_clause(
@@ -673,6 +698,36 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                 )
             ),
         )
+    fall_back_match = _ENEMY_UNIT_FALLS_BACK_NEAR_ABILITY_RE.search(clause_text.text)
+    if fall_back_match is not None:
+        return RuleTrigger(
+            kind=RuleTriggerKind.UNIT_SELECTED,
+            source_span=_span_from_match(clause_text, fall_back_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("selected_unit_allegiance", "enemy"),
+                    ("selection", "fall_back"),
+                    ("timing_window", "just_after_enemy_unit_selected_to_fall_back"),
+                )
+            ),
+        )
+    doing_so_match = _WHEN_DOING_SO_RE.search(clause_text.text)
+    if (
+        doing_so_match is not None
+        and "desperate escape" in clause_text.text.lower()
+        and _TARGET_BATTLE_SHOCKED_RE.search(clause_text.text) is not None
+    ):
+        return RuleTrigger(
+            kind=RuleTriggerKind.DICE_ROLL,
+            source_span=_span_from_match(clause_text, doing_so_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("roll_type", "desperate_escape"),
+                    ("source_context", "previous_effect"),
+                    ("timing_window", "desperate_escape_test"),
+                )
+            ),
+        )
     dice_trigger_match = _DICE_TRIGGER_RE.search(clause_text.text)
     if dice_trigger_match is not None:
         return RuleTrigger(
@@ -732,6 +787,23 @@ def _parse_frequency_conditions(clause_text: _ClauseText) -> tuple[RuleCondition
 def _parse_keyword_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
     conditions: list[RuleCondition] = []
     target_match_ranges: list[tuple[int, int]] = []
+    for match in _ENEMY_UNIT_FALLS_BACK_NEAR_ABILITY_RE.finditer(clause_text.text):
+        target_match_ranges.append((match.start(), match.end()))
+        excluded_keywords = match.group("excluded_keywords")
+        if excluded_keywords is None:
+            continue
+        conditions.append(
+            RuleCondition(
+                kind=RuleConditionKind.KEYWORD_GATE,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("gate_subject", "falling_back_unit"),
+                        ("excluded_keyword_any", "|".join(_keyword_list_tokens(excluded_keywords))),
+                    )
+                ),
+            )
+        )
     for match in _THIS_MODEL_MELEE_ATTACK_TARGET_RE.finditer(clause_text.text):
         target_match_ranges.append((match.start(), match.end()))
         conditions.append(
@@ -854,6 +926,25 @@ def _parse_distance_conditions(
                     else _span_from_match(clause_text, relation_match)
                 ),
                 parameters=parameters_from_pairs(pairs),
+            )
+        )
+    return tuple(conditions)
+
+
+def _parse_status_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
+    conditions: list[RuleCondition] = []
+    for match in _TARGET_BATTLE_SHOCKED_RE.finditer(clause_text.text):
+        conditions.append(
+            RuleCondition(
+                kind=RuleConditionKind.TARGET_CONSTRAINT,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("relationship", "target_unit_has_status"),
+                        ("gate_subject", _subject_token(match.group("subject"))),
+                        ("status", "battle_shocked"),
+                    )
+                ),
             )
         )
     return tuple(conditions)
@@ -1288,6 +1379,25 @@ def _parse_restore_lost_wounds_effects(clause_text: _ClauseText) -> tuple[RuleEf
     return tuple(effects)
 
 
+def _parse_desperate_escape_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
+    effects: list[RuleEffectSpec] = []
+    for match in _DESPERATE_ESCAPE_TESTS_RE.finditer(clause_text.text):
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("required", True),
+                        ("roll_type", "desperate_escape"),
+                        ("target_scope", "models_in_target_unit"),
+                    )
+                ),
+            )
+        )
+    return tuple(effects)
+
+
 def _residual_diagnostic(
     *,
     clause_text: _ClauseText,
@@ -1441,6 +1551,8 @@ def _template_id_for_clause(
             candidates.append(GRANT_ABILITY_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS:
             candidates.append(CONTEXTUAL_STATUS_TEMPLATE_ID)
+        elif effect.kind is RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS:
+            candidates.append(DESPERATE_ESCAPE_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
             candidates.append(DICE_ROLL_MODIFIER_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.REROLL_PERMISSION:
@@ -1552,6 +1664,11 @@ def _distance_relation_parameter_pairs(
     keyword_text = match.group("keyword")
     if keyword_text is not None:
         pairs.extend(_keyword_sequence_parameter_pairs(keyword_text))
+    object_owner = match.group("object_owner")
+    if object_owner is not None:
+        pairs.append(("object_owner", _subject_token(object_owner)))
+    if match.group("object_ability_scope") is not None:
+        pairs.append(("object_ability_scope", "this_ability"))
     object_reference = match.group("object_reference")
     if object_reference is not None:
         pairs.append(("object_reference", _subject_token(object_reference)))
@@ -1643,6 +1760,24 @@ def _keyword_any_tokens(value: str) -> tuple[str, ...]:
     if not tokens:
         raise RuleIRError("Keyword any gate must contain at least one keyword.")
     return tuple(dict.fromkeys(tokens))
+
+
+def _keyword_list_tokens(value: str) -> tuple[str, ...]:
+    tokens: list[str] = []
+    for raw_token in re.split(r"\s+or\s+|\s+and\s+|\s*,\s*", value.strip(), flags=re.IGNORECASE):
+        token = raw_token.strip()
+        if token:
+            tokens.append(_singular_keyword_token(token))
+    if not tokens:
+        raise RuleIRError("Keyword list gate must contain at least one keyword.")
+    return tuple(dict.fromkeys(tokens))
+
+
+def _singular_keyword_token(value: str) -> str:
+    token = _keyword_token(value)
+    if token in {"CHARACTERS", "MONSTERS", "VEHICLES"}:
+        return token[:-1]
+    return token
 
 
 def _keyword_sequence_parameter_pairs(value: str) -> tuple[tuple[str, RuleParameterValue], ...]:

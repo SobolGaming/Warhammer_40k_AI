@@ -252,6 +252,10 @@ def _catalog_ability_source_kind(source_kind: CatalogAbilitySourceKind) -> Abili
 
 
 def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
+    for clause in rule_ir.clauses:
+        fall_back_timing = _catalog_fall_back_selection_timing_descriptor_for_clause(clause)
+        if fall_back_timing is not None:
+            return fall_back_timing
     turn_timing = _catalog_turn_timing_descriptor(rule_ir)
     if turn_timing is not None:
         return turn_timing
@@ -301,6 +305,9 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
 def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDescriptor:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog timing descriptor requires a RuleClause.")
+    fall_back_timing = _catalog_fall_back_selection_timing_descriptor_for_clause(clause)
+    if fall_back_timing is not None:
+        return fall_back_timing
     if _clause_has_turn_end_reserve_permission(clause):
         turn_timing = _catalog_turn_timing_descriptor_for_clause(clause)
         if turn_timing is not None:
@@ -329,6 +336,25 @@ def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDe
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL)
     return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE)
+
+
+def _catalog_fall_back_selection_timing_descriptor_for_clause(
+    clause: RuleClause,
+) -> AbilityTimingDescriptor | None:
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.UNIT_SELECTED:
+        return None
+    parameters = parameter_payload(trigger.parameters)
+    if (
+        parameters.get("selected_unit_allegiance") == "enemy"
+        and parameters.get("selection") == "fall_back"
+        and parameters.get("timing_window") == "just_after_enemy_unit_selected_to_fall_back"
+    ):
+        return AbilityTimingDescriptor(
+            trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+            phase=battle_phase_kind_from_token("movement"),
+        )
+    return None
 
 
 def _catalog_turn_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor | None:
