@@ -41,10 +41,13 @@ from warhammer40k_core.core.model_geometry_catalog import (
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
     AbilityKind,
     AntiKeywordMatchMode,
+    RangeProfile,
     TargetKeywordMatchMode,
     WeaponKeyword,
+    WeaponProfile,
 )
 from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.abilities import (
@@ -97,15 +100,24 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
     CatalogAdvanceEligibilityRuntime,
+    CatalogWeaponKeywordGrant,
+    CatalogWeaponKeywordGrantRuntime,
     _catalog_roll_reroll_permission,  # pyright: ignore[reportPrivateUsage]
+    _catalog_weapon_keyword_grant_from_effect,  # pyright: ignore[reportPrivateUsage]
     _effect_is_roll_reroll_permission,  # pyright: ignore[reportPrivateUsage]
+    _profile_with_catalog_weapon_keyword_grant,  # pyright: ignore[reportPrivateUsage]
     _roll_reroll_consumer_id_for_effect,  # pyright: ignore[reportPrivateUsage]
+    _weapon_ability_descriptor_for_grant,  # pyright: ignore[reportPrivateUsage]
+    _weapon_keyword_grant_consumer_ids_for_effect,  # pyright: ignore[reportPrivateUsage]
+    _weapon_scope_matches_profile,  # pyright: ignore[reportPrivateUsage]
     catalog_advance_roll_reroll_permission_for_unit,
     catalog_charge_roll_modifiers_for_unit,
     catalog_charge_roll_reroll_permission_for_unit,
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
     catalog_rule_ir_registered_hook_ids,
+    catalog_weapon_keyword_grants_for_unit,
+    catalog_weapon_profile_modifier_bindings,
     record_catalog_feel_no_pain_sources_for_unit,
 )
 from warhammer40k_core.engine.catalog_turn_end_reserves import (
@@ -164,6 +176,10 @@ from warhammer40k_core.engine.phases.movement import (
     _ability_index_for_player,  # pyright: ignore[reportPrivateUsage]
     _advance_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
     _validate_ability_index_mapping,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+    WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
@@ -1068,6 +1084,311 @@ def test_phase17k_leading_model_reroll_text_uses_generic_advance_charge_rerolls(
             roll_type="advance_roll",
             timing_window="after_advance_roll",
         )
+
+
+def test_phase17k_leading_model_weapon_keyword_text_modifies_scoped_weapon_profiles() -> None:
+    package = _advance_charge_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    weapon_grant_record = records_by_name["Pack Killers"]
+    replay_payload = weapon_grant_record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
+    state = _battle_state_with_army(army=army, battlefield=battlefield)
+    current_model_ids = _current_model_ids(battlefield=battlefield, unit=unit)
+    swift_claws = next(
+        wargear
+        for wargear in package.army_catalog.wargear
+        if wargear.wargear_id == "test-advance-charge-unit:swift-claws"
+    )
+    melee_profile = swift_claws.weapon_profiles[0]
+    ranged_profile = replace(
+        melee_profile,
+        profile_id=f"{melee_profile.profile_id}:ranged-copy",
+        range_profile=RangeProfile.distance(12),
+    )
+    grants = catalog_weapon_keyword_grants_for_unit(
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+    )
+    bindings = catalog_weapon_profile_modifier_bindings(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army,),
+    )
+    registry = RuntimeModifierRegistry.from_bindings(
+        weapon_profile_modifier_bindings=bindings,
+    )
+    attacker_model_id = unit.own_models[0].model_instance_id
+    melee_context = WeaponProfileModifierContext(
+        state=state,
+        source_phase=BattlePhase.FIGHT,
+        attacking_unit_instance_id=unit.unit_instance_id,
+        attacker_model_instance_id=attacker_model_id,
+        target_unit_instance_id="phase17k-target-unit",
+        weapon_profile=melee_profile,
+    )
+    ranged_context = replace(melee_context, weapon_profile=ranged_profile)
+    modified_melee = registry.modified_weapon_profile(melee_context)
+    modified_ranged = registry.modified_weapon_profile(ranged_context)
+
+    assert weapon_grant_record.definition.timing.trigger_kind is TimingTriggerKind.PASSIVE_QUERY
+    assert rule_ir.is_supported
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:lethal-hits",
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) == {
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:lethal-hits",
+    }
+    assert tuple(binding.modifier_id for binding in bindings) == (
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+    )
+    assert len(grants) == 1
+    assert grants[0].keyword is WeaponKeyword.LETHAL_HITS
+    assert grants[0].weapon_scope == "melee"
+    assert grants[0].ability is not None
+    assert grants[0].ability.ability_kind is AbilityKind.LETHAL_HITS
+    assert WeaponKeyword.LETHAL_HITS in modified_melee.keywords
+    assert any(
+        ability.ability_kind is AbilityKind.LETHAL_HITS for ability in modified_melee.abilities
+    )
+    assert grants[0].source_id in modified_melee.source_ids
+    assert modified_ranged == ranged_profile
+
+
+def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values() -> None:
+    package = _advance_charge_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    record = {record.definition.name: record for record in player_index.all_records()}[
+        "Pack Killers"
+    ]
+    replay_payload = record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    clause = rule_ir.clauses[0]
+    melee_profile = next(
+        wargear.weapon_profiles[0]
+        for wargear in package.army_catalog.wargear
+        if wargear.wargear_id == "test-advance-charge-unit:swift-claws"
+    )
+    ranged_profile = replace(
+        melee_profile,
+        profile_id=f"{melee_profile.profile_id}:helper-ranged-copy",
+        range_profile=RangeProfile.distance(12),
+    )
+    grant = CatalogWeaponKeywordGrant(
+        source_id="phase17k-helper-grant",
+        keyword=cast(WeaponKeyword, "Lance"),
+        weapon_scope="all weapons",
+    )
+    updated_profile = _profile_with_catalog_weapon_keyword_grant(
+        profile=melee_profile,
+        grant=grant,
+    )
+
+    assert _catalog_weapon_keyword_grant_from_effect(
+        record=record,
+        clause=clause,
+        effect_index=0,
+        effect=clause.effects[0],
+    ) == CatalogWeaponKeywordGrant(
+        source_id=f"{record.record_id}:{clause.clause_id}:effect-000:weapon-keyword",
+        keyword=WeaponKeyword.LETHAL_HITS,
+        weapon_scope="melee",
+        ability=AbilityDescriptor.lethal_hits(),
+    )
+    assert (
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=clause,
+            effect_index=1,
+            effect=_effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="hit", delta=1),
+        )
+        is None
+    )
+    assert (
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=clause,
+            effect_index=1,
+            effect=_effect(RuleEffectKind.GRANT_WEAPON_ABILITY, weapon_scope="melee"),
+        )
+        is None
+    )
+    assert (
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=clause,
+            effect_index=1,
+            effect=_effect(RuleEffectKind.GRANT_WEAPON_ABILITY, weapon_ability="Lethal Hits"),
+        )
+        is None
+    )
+    assert (
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=clause,
+            effect_index=1,
+            effect=_effect(
+                RuleEffectKind.GRANT_WEAPON_ABILITY,
+                weapon_ability="Sustained Hits",
+                weapon_scope="all",
+            ),
+        )
+        is None
+    )
+    assert _weapon_keyword_grant_consumer_ids_for_effect(
+        _effect(
+            RuleEffectKind.GRANT_WEAPON_ABILITY,
+            weapon_ability="Sustained Hits",
+            weapon_ability_value=1,
+            weapon_scope="all",
+        )
+    ) == (
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:sustained-hits",
+    )
+    assert (
+        _weapon_keyword_grant_consumer_ids_for_effect(
+            _effect(
+                RuleEffectKind.GRANT_WEAPON_ABILITY,
+                weapon_ability="Hunter",
+                weapon_scope="all",
+            )
+        )
+        == ()
+    )
+    assert grant.keyword is WeaponKeyword.LANCE
+    assert grant.weapon_scope == "all"
+    assert WeaponKeyword.LANCE in updated_profile.keywords
+    assert grant.source_id in updated_profile.source_ids
+    assert (
+        _profile_with_catalog_weapon_keyword_grant(profile=updated_profile, grant=grant)
+        is updated_profile
+    )
+    assert _weapon_scope_matches_profile(weapon_scope="all", profile=melee_profile)
+    assert _weapon_scope_matches_profile(weapon_scope="melee", profile=melee_profile)
+    assert not _weapon_scope_matches_profile(weapon_scope="ranged", profile=melee_profile)
+    assert _weapon_scope_matches_profile(weapon_scope="ranged weapons", profile=ranged_profile)
+    assert not _weapon_scope_matches_profile(weapon_scope="melee", profile=ranged_profile)
+    for keyword, parameters, expected_kind in (
+        (WeaponKeyword.DEVASTATING_WOUNDS, {}, AbilityKind.DEVASTATING_WOUNDS),
+        (WeaponKeyword.HEAVY, {}, AbilityKind.HEAVY),
+        (WeaponKeyword.SUSTAINED_HITS, {"weapon_ability_value": 1}, AbilityKind.SUSTAINED_HITS),
+        (WeaponKeyword.RAPID_FIRE, {"weapon_ability_value": 2}, AbilityKind.RAPID_FIRE),
+        (WeaponKeyword.MELTA, {"weapon_ability_value": 3}, AbilityKind.MELTA),
+        (WeaponKeyword.CLEAVE, {"weapon_ability_value": 4}, AbilityKind.CLEAVE),
+    ):
+        descriptor = _weapon_ability_descriptor_for_grant(
+            parameters=parameters,
+            keyword=keyword,
+        )
+        assert descriptor is not None
+        assert descriptor.ability_kind is expected_kind
+    assert _weapon_ability_descriptor_for_grant(parameters={}, keyword=WeaponKeyword.LANCE) is None
+    runtime = CatalogWeaponKeywordGrantRuntime(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army,),
+    )
+    with pytest.raises(GameLifecycleError, match="missing player ability index"):
+        CatalogWeaponKeywordGrantRuntime(ability_indexes_by_player_id={}, armies=(army,))
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        runtime.weapon_profile_modifier(cast(WeaponProfileModifierContext, object()))
+    with pytest.raises(GameLifecycleError, match="unit is unknown"):
+        runtime.weapon_profile_modifier(
+            WeaponProfileModifierContext(
+                state=_battle_state_with_army(
+                    army=army,
+                    battlefield=_bloodcrushers_battlefield_state(army=army, unit=unit),
+                ),
+                source_phase=BattlePhase.FIGHT,
+                attacking_unit_instance_id="phase17k-unknown-unit",
+                attacker_model_instance_id=unit.own_models[0].model_instance_id,
+                target_unit_instance_id="phase17k-target-unit",
+                weapon_profile=melee_profile,
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="ability must be a descriptor"):
+        CatalogWeaponKeywordGrant(
+            source_id="phase17k-bad-ability-grant",
+            keyword=WeaponKeyword.LANCE,
+            weapon_scope="all",
+            ability=cast(AbilityDescriptor, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="requires an ability record"):
+        _catalog_weapon_keyword_grant_from_effect(
+            record=cast(AbilityCatalogRecord, object()),
+            clause=clause,
+            effect_index=0,
+            effect=clause.effects[0],
+        )
+    with pytest.raises(GameLifecycleError, match="requires a rule clause"):
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=cast(RuleClause, object()),
+            effect_index=0,
+            effect=clause.effects[0],
+        )
+    with pytest.raises(GameLifecycleError, match="effect_index must be non-negative"):
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=clause,
+            effect_index=-1,
+            effect=clause.effects[0],
+        )
+    with pytest.raises(GameLifecycleError, match="requires a rule effect"):
+        _catalog_weapon_keyword_grant_from_effect(
+            record=record,
+            clause=clause,
+            effect_index=0,
+            effect=cast(RuleEffectSpec, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="unsupported keyword"):
+        _weapon_keyword_grant_consumer_ids_for_effect(
+            _effect(
+                RuleEffectKind.GRANT_WEAPON_ABILITY,
+                weapon_ability="Bad Keyword",
+                weapon_scope="all",
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="requires RuleEffectSpec values"):
+        _weapon_keyword_grant_consumer_ids_for_effect(cast(RuleEffectSpec, object()))
+    with pytest.raises(GameLifecycleError, match="cannot infer Hunter targets"):
+        _weapon_ability_descriptor_for_grant(parameters={}, keyword=WeaponKeyword.HUNTER)
+    with pytest.raises(GameLifecycleError, match="must be a positive integer"):
+        _weapon_ability_descriptor_for_grant(
+            parameters={},
+            keyword=WeaponKeyword.SUSTAINED_HITS,
+        )
+    with pytest.raises(GameLifecycleError, match="must be a positive integer"):
+        _weapon_ability_descriptor_for_grant(
+            parameters={"weapon_ability_value": 0},
+            keyword=WeaponKeyword.SUSTAINED_HITS,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a WeaponProfile"):
+        _profile_with_catalog_weapon_keyword_grant(
+            profile=cast(WeaponProfile, object()),
+            grant=grant,
+        )
+    with pytest.raises(GameLifecycleError, match="requires grant data"):
+        _profile_with_catalog_weapon_keyword_grant(
+            profile=melee_profile,
+            grant=cast(CatalogWeaponKeywordGrant, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="requires a WeaponProfile"):
+        _weapon_scope_matches_profile(
+            weapon_scope="all",
+            profile=cast(WeaponProfile, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="Unsupported catalog weapon keyword grant scope"):
+        _weapon_scope_matches_profile(weapon_scope="bad scope", profile=melee_profile)
 
 
 def test_phase17k_catalog_ir_roll_reroll_classification_requires_supported_target() -> None:
@@ -3372,6 +3693,11 @@ def _advance_charge_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                         "test-advance-charge-unit,3,Datasheet,,Lead the Hunt,"
                         '"While this model is leading a unit, you can re-roll  Advance '
                         'and Charge rolls made for that unit.",'
+                    ),
+                    (
+                        "test-advance-charge-unit,4,Datasheet,,Pack Killers,"
+                        '"While this model is leading a unit, melee weapons equipped by '
+                        'models in that unit have the  [LETHAL HITS] ability.",'
                     ),
                 )
             ),

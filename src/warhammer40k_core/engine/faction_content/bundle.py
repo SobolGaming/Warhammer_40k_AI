@@ -38,6 +38,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_advance_eligibility_hook_bindings,
+    catalog_weapon_profile_modifier_bindings,
 )
 from warhammer40k_core.engine.catalog_turn_end_reserves import (
     catalog_turn_end_reserve_hook_bindings,
@@ -1559,6 +1560,10 @@ class RuntimeContentBundle:
             weapon_profile_modifier_bindings=_contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.weapon_profile_modifier_bindings,
+            )
+            + catalog_weapon_profile_modifier_bindings(
+                ability_indexes_by_player_id=ability_indexes_by_player_id,
+                armies=validated_armies,
             ),
         )
         return cls(

@@ -203,15 +203,18 @@ _WEAPON_KEYWORD_PATTERN = "|".join(
     for keyword in sorted(canonical_weapon_keyword_tokens(), key=len, reverse=True)
 )
 _WEAPON_ABILITY_RE = re.compile(
-    rf"\b(?:ranged\s+|melee\s+)?weapons?.{{0,100}}\b(?:gain|gains|have|has)\s+"
-    rf"(?:the\s+)?\[?(?P<ability>{_WEAPON_KEYWORD_PATTERN})\]?"
+    rf"\b(?P<weapon_scope>(?:all\s+)?weapons?|ranged\s+weapons?|melee\s+weapons?)"
+    rf".{{0,100}}\b(?:gain|gains|have|has)\s+"
+    rf"(?:the\s+)?\[?(?P<ability>{_WEAPON_KEYWORD_PATTERN})"
+    rf"(?:\s+(?P<ability_value>\d+))?\]?"
     rf"(?:\s+ability)?\b",
     re.IGNORECASE,
 )
 _NAMED_WEAPON_ABILITY_RE = re.compile(
     rf"\b(?P<weapon_name>[A-Z][A-Za-z0-9 '\u2019:-]+?)\s+equipped\s+by\s+models\s+"
     rf"in\s+(?:that|this|the\s+selected)\s+unit\s+(?:gain|gains|have|has)\s+"
-    rf"(?:the\s+)?\[?(?P<ability>{_WEAPON_KEYWORD_PATTERN})\]?"
+    rf"(?:the\s+)?\[?(?P<ability>{_WEAPON_KEYWORD_PATTERN})"
+    rf"(?:\s+(?P<ability_value>\d+))?\]?"
     rf"(?:\s+ability)?\b",
     re.IGNORECASE,
 )
@@ -977,17 +980,24 @@ def _parse_grant_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSp
 def _parse_weapon_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
     for match in _NAMED_WEAPON_ABILITY_RE.finditer(clause_text.text):
+        weapon_name = _weapon_name_token(match.group("weapon_name"))
+        generic_scope = _generic_weapon_scope_from_token(weapon_name)
+        pairs: list[tuple[str, RuleParameterValue]] = [
+            ("weapon_ability", _ability_token(match.group("ability"))),
+            ("target_scope", "models_in_selected_unit"),
+        ]
+        ability_value = _optional_int_group(match, "ability_value")
+        if ability_value is not None:
+            pairs.append(("weapon_ability_value", ability_value))
+        if generic_scope is None:
+            pairs.append(("weapon_name", weapon_name))
+        else:
+            pairs.append(("weapon_scope", generic_scope))
         effects.append(
             RuleEffectSpec(
                 kind=RuleEffectKind.GRANT_WEAPON_ABILITY,
                 source_span=_span_from_match(clause_text, match),
-                parameters=parameters_from_pairs(
-                    (
-                        ("weapon_ability", _ability_token(match.group("ability"))),
-                        ("weapon_name", _weapon_name_token(match.group("weapon_name"))),
-                        ("target_scope", "models_in_selected_unit"),
-                    )
-                ),
+                parameters=parameters_from_pairs(tuple(pairs)),
             )
         )
     for match in _WEAPON_ABILITY_RE.finditer(clause_text.text):
@@ -997,13 +1007,18 @@ def _parse_weapon_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectS
             effects=tuple(effects),
         ):
             continue
+        scoped_pairs: list[tuple[str, RuleParameterValue]] = [
+            ("weapon_ability", _ability_token(match.group("ability"))),
+            ("weapon_scope", _weapon_scope_token(match.group("weapon_scope"))),
+        ]
+        ability_value = _optional_int_group(match, "ability_value")
+        if ability_value is not None:
+            scoped_pairs.append(("weapon_ability_value", ability_value))
         effects.append(
             RuleEffectSpec(
                 kind=RuleEffectKind.GRANT_WEAPON_ABILITY,
                 source_span=_span_from_match(clause_text, match),
-                parameters=parameters_from_pairs(
-                    (("weapon_ability", _ability_token(match.group("ability"))),)
-                ),
+                parameters=parameters_from_pairs(tuple(scoped_pairs)),
             )
         )
     return tuple(effects)
@@ -1332,6 +1347,13 @@ def _lower_group(match: re.Match[str], group_name: str) -> str:
     return match.group(group_name).lower().replace(" ", "_").replace("-", "_")
 
 
+def _optional_int_group(match: re.Match[str], group_name: str) -> int | None:
+    value = match.group(group_name)
+    if value is None:
+        return None
+    return int(value)
+
+
 def _owner_token(owner: str | None) -> str | None:
     if owner is None:
         return None
@@ -1429,6 +1451,24 @@ def _feel_no_pain_attack_condition_token(value: str) -> str:
 def _weapon_name_token(value: str) -> str:
     stripped = value.strip(" []().,;:")
     return " ".join(stripped.split())
+
+
+def _generic_weapon_scope_from_token(value: str) -> str | None:
+    normalized = " ".join(value.strip().lower().replace("-", " ").split())
+    if normalized in {"melee weapon", "melee weapons"}:
+        return "melee"
+    if normalized in {"ranged weapon", "ranged weapons"}:
+        return "ranged"
+    if normalized in {"weapon", "weapons", "all weapon", "all weapons"}:
+        return "all"
+    return None
+
+
+def _weapon_scope_token(value: str) -> str:
+    scope = _generic_weapon_scope_from_token(value)
+    if scope is None:
+        raise RuleIRError(f"Unsupported weapon scope in rule language: {value}.")
+    return scope
 
 
 def _is_weapon_keyword(value: str) -> bool:

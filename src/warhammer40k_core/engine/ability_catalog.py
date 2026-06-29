@@ -220,6 +220,12 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
     if any(
+        clause.trigger is None
+        and any(effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY for effect in clause.effects)
+        for clause in rule_ir.clauses
+    ):
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
+    if any(
         effect.kind
         in {
             RuleEffectKind.MODIFY_DICE_ROLL,

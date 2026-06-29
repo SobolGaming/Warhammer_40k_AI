@@ -1,14 +1,22 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from types import MappingProxyType
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
 from warhammer40k_core.core.modifiers import RollModifier
-from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_tokens
+from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
+    RangeProfileKind,
+    WeaponKeyword,
+    WeaponProfile,
+    WeaponProfileError,
+    canonical_weapon_keyword_tokens,
+    weapon_keyword_from_token,
+)
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -35,6 +43,10 @@ from warhammer40k_core.engine.faction_content.bundle_validation import (
     validate_identifier as _validate_identifier,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.runtime_modifiers import (
+    WeaponProfileModifierBinding,
+    WeaponProfileModifierContext,
+)
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_abilities import (
     DeadlyDemiseAbilityProfile,
@@ -241,12 +253,94 @@ class CatalogAdvanceEligibilityRuntime:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class CatalogWeaponKeywordGrant:
+    source_id: str
+    keyword: WeaponKeyword
+    weapon_scope: str
+    ability: AbilityDescriptor | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
+        object.__setattr__(self, "keyword", _weapon_keyword_from_value(self.keyword))
+        object.__setattr__(
+            self,
+            "weapon_scope",
+            _weapon_scope_from_token(self.weapon_scope),
+        )
+        if self.ability is not None and type(self.ability) is not AbilityDescriptor:
+            raise GameLifecycleError("Catalog weapon keyword grant ability must be a descriptor.")
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogWeaponKeywordGrantRuntime:
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
+    armies: tuple[ArmyDefinition, ...]
+
+    def __post_init__(self) -> None:
+        indexes = _validate_ability_index_mapping(self.ability_indexes_by_player_id)
+        armies = _validate_armies(self.armies)
+        missing_ids = {army.player_id for army in armies} - set(indexes)
+        if missing_ids:
+            raise GameLifecycleError("Catalog weapon keyword grants missing player ability index.")
+        object.__setattr__(self, "ability_indexes_by_player_id", MappingProxyType(dict(indexes)))
+        object.__setattr__(self, "armies", armies)
+
+    def bindings(self) -> tuple[WeaponProfileModifierBinding, ...]:
+        if not _has_catalog_weapon_keyword_grant_records(self.ability_indexes_by_player_id):
+            return ()
+        return (
+            WeaponProfileModifierBinding(
+                modifier_id=CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+                source_id=CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+                handler=self.weapon_profile_modifier,
+            ),
+        )
+
+    def weapon_profile_modifier(self, context: WeaponProfileModifierContext) -> WeaponProfile:
+        if type(context) is not WeaponProfileModifierContext:
+            raise GameLifecycleError("Catalog weapon keyword grant requires context.")
+        army, unit = _army_and_unit_for_unit_id(
+            armies=self.armies,
+            unit_instance_id=context.attacking_unit_instance_id,
+        )
+        index = self.ability_indexes_by_player_id.get(army.player_id)
+        if index is None:
+            raise GameLifecycleError("Catalog weapon keyword grant index is missing player.")
+        current_model_ids = _current_model_instance_ids_for_unit(state=context.state, unit=unit)
+        grants = catalog_weapon_keyword_grants_for_unit(
+            ability_index=index,
+            unit=unit,
+            current_model_instance_ids=current_model_ids,
+        )
+        profile = context.weapon_profile
+        for grant in grants:
+            if not _weapon_scope_matches_profile(
+                weapon_scope=grant.weapon_scope,
+                profile=profile,
+            ):
+                continue
+            profile = _profile_with_catalog_weapon_keyword_grant(profile=profile, grant=grant)
+        return profile
+
+
 def catalog_advance_eligibility_hook_bindings(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],
 ) -> tuple[AdvanceEligibilityHookBinding, ...]:
     return CatalogAdvanceEligibilityRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
+    ).bindings()
+
+
+def catalog_weapon_profile_modifier_bindings(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[WeaponProfileModifierBinding, ...]:
+    return CatalogWeaponKeywordGrantRuntime(
         ability_indexes_by_player_id=ability_indexes_by_player_id,
         armies=armies,
     ).bindings()
@@ -341,6 +435,40 @@ def catalog_charge_roll_reroll_permission_for_unit(
         roll_type="charge_roll",
         timing_window="after_charge_roll",
     )
+
+
+def catalog_weapon_keyword_grants_for_unit(
+    *,
+    ability_index: AbilityCatalogIndex,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+) -> tuple[CatalogWeaponKeywordGrant, ...]:
+    _validate_ability_index(ability_index)
+    _validate_unit(unit)
+    current_ids = _validate_current_model_instance_ids(current_model_instance_ids)
+    grants: list[CatalogWeaponKeywordGrant] = []
+    for record in _unit_scoped_generic_records_for_all_timings(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=current_ids,
+    ):
+        rule_ir = _rule_ir_from_record(record)
+        if not rule_ir.is_supported:
+            continue
+        for clause in rule_ir.clauses:
+            if not _clause_targets_weapon_keyword_grant_unit(clause):
+                continue
+            for effect_index, effect in enumerate(clause.effects):
+                grant = _catalog_weapon_keyword_grant_from_effect(
+                    record=record,
+                    clause=clause,
+                    effect_index=effect_index,
+                    effect=effect,
+                )
+                if grant is None:
+                    continue
+                grants.append(grant)
+    return tuple(sorted(grants, key=lambda grant: grant.source_id))
 
 
 def _catalog_roll_reroll_permission_for_unit(
@@ -565,6 +693,9 @@ def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
                     reroll_consumer_id = _roll_reroll_consumer_id_for_effect(effect)
                     if reroll_consumer_id is not None:
                         consumer_ids.add(reroll_consumer_id)
+            if _clause_targets_weapon_keyword_grant_unit(clause):
+                for effect in clause.effects:
+                    consumer_ids.update(_weapon_keyword_grant_consumer_ids_for_effect(effect))
             continue
         for effect in clause.effects:
             if _effect_is_charge_roll_modifier(effect):
@@ -572,6 +703,7 @@ def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
             reroll_consumer_id = _roll_reroll_consumer_id_for_effect(effect)
             if reroll_consumer_id is not None:
                 consumer_ids.add(reroll_consumer_id)
+            consumer_ids.update(_weapon_keyword_grant_consumer_ids_for_effect(effect))
             if _effect_is_leadership_set(effect):
                 consumer_ids.add(CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID)
             if _effect_is_turn_end_reserve_permission(effect):
@@ -606,6 +738,24 @@ def _unit_scoped_generic_records(
     return tuple(
         record
         for record in ability_index.records_for(trigger_kind)
+        if record.definition.handler_id == GENERIC_RULE_IR_ABILITY_HANDLER_ID
+        and _record_source_matches_unit(
+            record=record,
+            unit=unit,
+            current_model_instance_ids=current_model_instance_ids,
+        )
+    )
+
+
+def _unit_scoped_generic_records_for_all_timings(
+    *,
+    ability_index: AbilityCatalogIndex,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+) -> tuple[AbilityCatalogRecord, ...]:
+    return tuple(
+        record
+        for record in ability_index.all_records()
         if record.definition.handler_id == GENERIC_RULE_IR_ABILITY_HANDLER_ID
         and _record_source_matches_unit(
             record=record,
@@ -761,6 +911,18 @@ def _clause_has_leading_unit_relationship(clause: RuleClause) -> bool:
     )
 
 
+def _clause_targets_weapon_keyword_grant_unit(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    if clause.trigger is not None:
+        return False
+    return _clause_targets_this_unit(clause) or (
+        clause.target is not None
+        and clause.target.kind is RuleTargetKind.SELECTED_UNIT
+        and _clause_has_leading_unit_relationship(clause)
+    )
+
+
 def _effect_is_charge_roll_modifier(effect: RuleEffectSpec) -> bool:
     if type(effect) is not RuleEffectSpec:
         raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
@@ -795,6 +957,23 @@ def _roll_reroll_consumer_id_for_effect(effect: RuleEffectSpec) -> str | None:
     if type(roll_type) is not str:
         return None
     return _CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.get(_catalog_ir_lookup_token(roll_type))
+
+
+def _weapon_keyword_grant_consumer_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.GRANT_WEAPON_ABILITY:
+        return ()
+    parameters = parameter_payload(effect.parameters)
+    keyword = _weapon_keyword_from_parameters(parameters)
+    if keyword is None:
+        return ()
+    if not _weapon_keyword_grant_has_supported_runtime_shape(parameters, keyword=keyword):
+        return ()
+    return (
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        _catalog_ir_weapon_keyword_grant_consumer_id(keyword.value),
+    )
 
 
 def _effect_is_leadership_set(effect: RuleEffectSpec) -> bool:
@@ -912,6 +1091,211 @@ def _catalog_roll_reroll_permission(
         eligible_roll_type=_validate_identifier("roll_type", roll_type),
         component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
     )
+
+
+def _catalog_weapon_keyword_grant_from_effect(
+    *,
+    record: AbilityCatalogRecord,
+    clause: RuleClause,
+    effect_index: int,
+    effect: RuleEffectSpec,
+) -> CatalogWeaponKeywordGrant | None:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog weapon keyword grant requires an ability record.")
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog weapon keyword grant requires a rule clause.")
+    if type(effect_index) is not int or effect_index < 0:
+        raise GameLifecycleError("Catalog weapon keyword grant effect_index must be non-negative.")
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog weapon keyword grant requires a rule effect.")
+    if effect.kind is not RuleEffectKind.GRANT_WEAPON_ABILITY:
+        return None
+    parameters = parameter_payload(effect.parameters)
+    keyword = _weapon_keyword_from_parameters(parameters)
+    if keyword is None:
+        return None
+    if not _weapon_keyword_grant_has_supported_runtime_shape(parameters, keyword=keyword):
+        return None
+    return CatalogWeaponKeywordGrant(
+        source_id=f"{record.record_id}:{clause.clause_id}:effect-{effect_index:03d}:weapon-keyword",
+        keyword=keyword,
+        weapon_scope=_weapon_scope_parameter(parameters),
+        ability=_weapon_ability_descriptor_for_grant(parameters=parameters, keyword=keyword),
+    )
+
+
+def _profile_with_catalog_weapon_keyword_grant(
+    *,
+    profile: WeaponProfile,
+    grant: CatalogWeaponKeywordGrant,
+) -> WeaponProfile:
+    if type(profile) is not WeaponProfile:
+        raise GameLifecycleError("Catalog weapon keyword grant requires a WeaponProfile.")
+    if type(grant) is not CatalogWeaponKeywordGrant:
+        raise GameLifecycleError("Catalog weapon keyword grant requires grant data.")
+    keywords = profile.keywords
+    if grant.keyword not in keywords:
+        keywords = tuple(sorted((*keywords, grant.keyword), key=lambda keyword: keyword.value))
+    abilities = profile.abilities
+    if grant.ability is not None and all(
+        ability.ability_id != grant.ability.ability_id for ability in abilities
+    ):
+        abilities = tuple(
+            sorted((*abilities, grant.ability), key=lambda ability: ability.ability_id)
+        )
+    source_ids = profile.source_ids
+    if grant.source_id not in source_ids:
+        source_ids = tuple(sorted((*source_ids, grant.source_id)))
+    if (
+        keywords == profile.keywords
+        and abilities == profile.abilities
+        and source_ids == profile.source_ids
+    ):
+        return profile
+    return replace(profile, keywords=keywords, abilities=abilities, source_ids=source_ids)
+
+
+def _weapon_keyword_from_parameters(parameters: Mapping[str, object]) -> WeaponKeyword | None:
+    value = parameters.get("weapon_ability")
+    if type(value) is not str:
+        return None
+    try:
+        return weapon_keyword_from_token(value)
+    except WeaponProfileError as exc:
+        raise GameLifecycleError("Catalog weapon keyword grant has unsupported keyword.") from exc
+
+
+def _weapon_keyword_grant_has_supported_runtime_shape(
+    parameters: Mapping[str, object],
+    *,
+    keyword: WeaponKeyword,
+) -> bool:
+    if _optional_weapon_scope_parameter(parameters) is None:
+        return False
+    if keyword in _VALUE_REQUIRED_WEAPON_KEYWORDS:
+        return _optional_positive_int_parameter(parameters, key="weapon_ability_value") is not None
+    return keyword is not WeaponKeyword.HUNTER
+
+
+def _weapon_ability_descriptor_for_grant(
+    *,
+    parameters: Mapping[str, object],
+    keyword: WeaponKeyword,
+) -> AbilityDescriptor | None:
+    if keyword is WeaponKeyword.LETHAL_HITS:
+        return AbilityDescriptor.lethal_hits()
+    if keyword is WeaponKeyword.DEVASTATING_WOUNDS:
+        return AbilityDescriptor.devastating_wounds()
+    if keyword is WeaponKeyword.HEAVY:
+        return AbilityDescriptor.heavy()
+    if keyword is WeaponKeyword.SUSTAINED_HITS:
+        return AbilityDescriptor.sustained_hits(
+            _required_positive_int_parameter(parameters, key="weapon_ability_value")
+        )
+    if keyword is WeaponKeyword.RAPID_FIRE:
+        return AbilityDescriptor.rapid_fire(
+            _required_positive_int_parameter(parameters, key="weapon_ability_value")
+        )
+    if keyword is WeaponKeyword.MELTA:
+        return AbilityDescriptor.melta(
+            _required_positive_int_parameter(parameters, key="weapon_ability_value")
+        )
+    if keyword is WeaponKeyword.CLEAVE:
+        return AbilityDescriptor.cleave(
+            _required_positive_int_parameter(parameters, key="weapon_ability_value")
+        )
+    if keyword is WeaponKeyword.HUNTER:
+        raise GameLifecycleError("Catalog weapon keyword grant cannot infer Hunter targets.")
+    return None
+
+
+_VALUE_REQUIRED_WEAPON_KEYWORDS = frozenset(
+    {
+        WeaponKeyword.CLEAVE,
+        WeaponKeyword.MELTA,
+        WeaponKeyword.RAPID_FIRE,
+        WeaponKeyword.SUSTAINED_HITS,
+    }
+)
+
+
+def _weapon_scope_parameter(parameters: Mapping[str, object]) -> str:
+    scope = _optional_weapon_scope_parameter(parameters)
+    if scope is None:
+        raise GameLifecycleError("Catalog weapon keyword grant requires a generic weapon scope.")
+    return scope
+
+
+def _optional_weapon_scope_parameter(parameters: Mapping[str, object]) -> str | None:
+    value = parameters.get("weapon_scope")
+    if value is not None:
+        return _weapon_scope_from_token(value)
+    weapon_name = parameters.get("weapon_name")
+    if type(weapon_name) is str:
+        return _generic_weapon_scope_from_token(weapon_name)
+    return None
+
+
+def _weapon_scope_from_token(value: object) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError("Catalog weapon keyword grant weapon_scope must be a string.")
+    scope = _generic_weapon_scope_from_token(value)
+    if scope is None:
+        raise GameLifecycleError("Unsupported catalog weapon keyword grant scope.")
+    return scope
+
+
+def _generic_weapon_scope_from_token(value: str) -> str | None:
+    normalized = " ".join(value.strip().lower().replace("-", " ").split())
+    if normalized in {"melee", "melee weapon", "melee weapons"}:
+        return "melee"
+    if normalized in {"ranged", "ranged weapon", "ranged weapons"}:
+        return "ranged"
+    if normalized in {"all", "weapon", "weapons", "all weapon", "all weapons"}:
+        return "all"
+    return None
+
+
+def _weapon_keyword_from_value(value: object) -> WeaponKeyword:
+    if type(value) is WeaponKeyword:
+        return value
+    if type(value) is str:
+        try:
+            return weapon_keyword_from_token(value)
+        except WeaponProfileError as exc:
+            raise GameLifecycleError(
+                "Catalog weapon keyword grant keyword is unsupported."
+            ) from exc
+    raise GameLifecycleError("Catalog weapon keyword grant keyword must be a WeaponKeyword.")
+
+
+def _required_positive_int_parameter(parameters: Mapping[str, object], *, key: str) -> int:
+    value = _optional_positive_int_parameter(parameters, key=key)
+    if value is None:
+        raise GameLifecycleError(f"Catalog rule parameter {key} must be a positive integer.")
+    return value
+
+
+def _optional_positive_int_parameter(parameters: Mapping[str, object], *, key: str) -> int | None:
+    value = parameters.get(key)
+    if value is None:
+        return None
+    if type(value) is not int or value < 1:
+        raise GameLifecycleError(f"Catalog rule parameter {key} must be a positive integer.")
+    return value
+
+
+def _weapon_scope_matches_profile(*, weapon_scope: str, profile: WeaponProfile) -> bool:
+    if type(profile) is not WeaponProfile:
+        raise GameLifecycleError("Catalog weapon keyword grant requires a WeaponProfile.")
+    scope = _weapon_scope_from_token(weapon_scope)
+    if scope == "all":
+        return True
+    if scope == "melee":
+        return profile.range_profile.kind is RangeProfileKind.MELEE
+    if scope == "ranged":
+        return profile.range_profile.kind is RangeProfileKind.DISTANCE
+    raise GameLifecycleError("Unsupported catalog weapon keyword grant scope.")
 
 
 def _feel_no_pain_attack_condition_parameter(
@@ -1279,6 +1663,31 @@ def _has_advance_eligibility_records(
     )
 
 
+def _has_catalog_weapon_keyword_grant_records(
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+) -> bool:
+    return any(
+        _record_can_grant_catalog_weapon_keyword(record)
+        for index in ability_indexes_by_player_id.values()
+        for record in index.all_records()
+    )
+
+
+def _record_can_grant_catalog_weapon_keyword(record: AbilityCatalogRecord) -> bool:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog weapon keyword grants require ability records.")
+    if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
+        return False
+    rule_ir = _rule_ir_from_record(record)
+    if not rule_ir.is_supported:
+        return False
+    return any(
+        _clause_targets_weapon_keyword_grant_unit(clause)
+        and any(_weapon_keyword_grant_consumer_ids_for_effect(effect) for effect in clause.effects)
+        for clause in rule_ir.clauses
+    )
+
+
 def _record_can_grant_advance_eligibility(
     record: AbilityCatalogRecord,
     *,
@@ -1297,6 +1706,19 @@ def _army_for_player(armies: tuple[ArmyDefinition, ...], *, player_id: str) -> A
         if army.player_id == requested_player_id:
             return army
     raise GameLifecycleError("Catalog advance eligibility player army is unknown.")
+
+
+def _army_and_unit_for_unit_id(
+    *,
+    armies: tuple[ArmyDefinition, ...],
+    unit_instance_id: str,
+) -> tuple[ArmyDefinition, UnitInstance]:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    for army in armies:
+        for unit in army.units:
+            if unit.unit_instance_id == requested_unit_id:
+                return army, unit
+    raise GameLifecycleError("Catalog weapon keyword grant unit is unknown.")
 
 
 def _unit_in_army_by_id(army: ArmyDefinition, *, unit_instance_id: str) -> UnitInstance:
