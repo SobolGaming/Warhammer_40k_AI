@@ -10,7 +10,7 @@ from typing import cast
 
 import pytest
 
-from warhammer40k_core.core.datasheet import BaseSizeKind
+from warhammer40k_core.core.datasheet import BaseSizeKind, DamagedEffectKind, DamagedWeaponScope
 from warhammer40k_core.core.detachment import EnhancementSubtype
 from warhammer40k_core.core.model_geometry_catalog import (
     GeometryCoordinateFrame,
@@ -214,6 +214,58 @@ def test_phase17b_wargear_faction_detachment_enhancement_and_stratagem_records_r
     assert catalog.detachments[0].detachment_id == "plague-company"
     assert catalog.enhancements[0].enhancement_id == "deadly-pathogen"
     assert catalog.stratagems[0].stratagem_id == "cloud-of-flies"
+    assert (
+        CanonicalCatalogPackage.from_payload(package.to_payload()).to_payload()
+        == package.to_payload()
+    )
+
+
+def test_phase17b_structured_damaged_effects_round_trip_through_catalog() -> None:
+    source_id = "source:death-guard:damaged-profile"
+    package = _catalog_package(
+        damaged_effects=json.dumps(
+            [
+                {
+                    "damaged_effect_id": "dg-plague-marines:damaged:001",
+                    "model_profile_id": None,
+                    "wounds_min": 1,
+                    "wounds_max": 4,
+                    "effect_kind": "hit_roll_modifier",
+                    "modifier": -1,
+                    "weapon_scope": None,
+                    "weapon_names": [],
+                    "max_selections": None,
+                    "baseline_max_selections": None,
+                    "selection_group": None,
+                    "source_id": source_id,
+                },
+                {
+                    "damaged_effect_id": "dg-plague-marines:damaged:002",
+                    "model_profile_id": "dg-plague-marine",
+                    "wounds_min": 1,
+                    "wounds_max": 4,
+                    "effect_kind": "weapon_attacks_modifier",
+                    "modifier": 2,
+                    "weapon_scope": "melee",
+                    "weapon_names": [],
+                    "max_selections": None,
+                    "baseline_max_selections": None,
+                    "selection_group": None,
+                    "source_id": source_id,
+                },
+            ]
+        )
+    )
+    datasheet = package.army_catalog.datasheet_by_id("dg-plague-marines")
+    first, second = datasheet.damaged_effects
+
+    assert first.effect_kind is DamagedEffectKind.HIT_ROLL_MODIFIER
+    assert first.wounds_min == 1
+    assert first.wounds_max == 4
+    assert first.modifier == -1
+    assert second.model_profile_id == "dg-plague-marine"
+    assert second.effect_kind is DamagedEffectKind.WEAPON_ATTACKS_MODIFIER
+    assert second.weapon_scope is DamagedWeaponScope.MELEE
     assert (
         CanonicalCatalogPackage.from_payload(package.to_payload()).to_payload()
         == package.to_payload()
@@ -596,6 +648,7 @@ def _catalog_package(
     detachment_point_cost: str = "1",
     enhancement_name: str = "Deadly Pathogen",
     enhancement_subtypes: str = "",
+    damaged_effects: str = "",
     geometry_overrides: tuple[ModelGeometryCatalogRecord, ...] = (),
 ) -> CanonicalCatalogPackage:
     return build_canonical_catalog_package(
@@ -621,6 +674,7 @@ def _catalog_package(
             detachment_point_cost=detachment_point_cost,
             enhancement_name=enhancement_name,
             enhancement_subtypes=enhancement_subtypes,
+            damaged_effects=damaged_effects,
         ),
         geometry_overrides=geometry_overrides,
     )
@@ -660,6 +714,7 @@ def _source_artifacts_from_text_overrides(
         detachment_point_cost=overrides.get("detachment_point_cost", "1"),
         enhancement_name=overrides.get("enhancement_name", "Deadly Pathogen"),
         enhancement_subtypes=overrides.get("enhancement_subtypes", ""),
+        damaged_effects=overrides.get("damaged_effects", ""),
     )
 
 
@@ -684,6 +739,7 @@ def _source_artifacts(
     detachment_point_cost: str = "1",
     enhancement_name: str = "Deadly Pathogen",
     enhancement_subtypes: str = "",
+    damaged_effects: str = "",
     include_height: bool = True,
 ) -> tuple[WahapediaJsonArtifact, ...]:
     height_columns = (
@@ -713,9 +769,9 @@ def _source_artifacts(
         _artifact(
             table_name="Datasheets",
             csv_text=(
-                "id,name,content_scope,keywords,faction_keywords\n"
+                "id,name,content_scope,keywords,faction_keywords,damaged_effects\n"
                 f'dg-plague-marines,Plague Marines,matched_play,"{datasheet_keywords}",'
-                '"Death Guard"\n'
+                f'"Death Guard","{_csv_field(damaged_effects)}"\n'
             ),
         ),
         _artifact(table_name="Datasheets_models", csv_text=model_csv),
@@ -766,6 +822,10 @@ def _artifact(*, table_name: str, csv_text: str) -> WahapediaJsonArtifact:
         source_package_id=_source_package_id(),
         table=WahapediaCsvTable.from_csv_text(table_name=table_name, csv_text=csv_text),
     )
+
+
+def _csv_field(value: str) -> str:
+    return value.replace('"', '""')
 
 
 def _flying_hull_override() -> ModelGeometryCatalogRecord:

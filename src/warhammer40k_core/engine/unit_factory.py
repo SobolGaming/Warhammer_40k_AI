@@ -13,6 +13,8 @@ from warhammer40k_core.core.attributes import (
 from warhammer40k_core.core.datasheet import (
     BaseSizeDefinition,
     BaseSizeDefinitionPayload,
+    DamagedEffectDefinition,
+    DamagedEffectDefinitionPayload,
     DatasheetAbilityDescriptor,
     DatasheetAbilityDescriptorPayload,
     DatasheetDefinition,
@@ -63,6 +65,7 @@ class UnitInstancePayload(TypedDict):
     keywords: list[str]
     faction_keywords: list[str]
     datasheet_abilities: list[DatasheetAbilityDescriptorPayload]
+    damaged_effects: list[DamagedEffectDefinitionPayload]
     datasheet_source_ids: list[str]
     own_models: list[ModelInstancePayload]
     wargear_selections: list[WargearSelectionPayload]
@@ -210,6 +213,7 @@ class UnitInstance:
     datasheet_source_ids: tuple[str, ...]
     own_models: tuple[ModelInstance, ...]
     wargear_selections: tuple[WargearSelection, ...]
+    damaged_effects: tuple[DamagedEffectDefinition, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -255,6 +259,14 @@ class UnitInstance:
         )
         object.__setattr__(
             self,
+            "damaged_effects",
+            _validate_damaged_effect_tuple(
+                "UnitInstance damaged_effects",
+                self.damaged_effects,
+            ),
+        )
+        object.__setattr__(
+            self,
             "datasheet_source_ids",
             _validate_identifier_tuple(
                 "UnitInstance datasheet_source_ids",
@@ -289,6 +301,7 @@ class UnitInstance:
             "keywords": list(self.keywords),
             "faction_keywords": list(self.faction_keywords),
             "datasheet_abilities": [ability.to_payload() for ability in self.datasheet_abilities],
+            "damaged_effects": [effect.to_payload() for effect in self.damaged_effects],
             "datasheet_source_ids": list(self.datasheet_source_ids),
             "own_models": [model.to_payload() for model in self.own_models],
             "wargear_selections": [selection.to_payload() for selection in self.wargear_selections],
@@ -305,6 +318,10 @@ class UnitInstance:
             datasheet_abilities=tuple(
                 DatasheetAbilityDescriptor.from_payload(ability)
                 for ability in payload["datasheet_abilities"]
+            ),
+            damaged_effects=tuple(
+                DamagedEffectDefinition.from_payload(effect)
+                for effect in payload["damaged_effects"]
             ),
             datasheet_source_ids=tuple(payload["datasheet_source_ids"]),
             own_models=tuple(ModelInstance.from_payload(model) for model in payload["own_models"]),
@@ -389,6 +406,7 @@ class UnitFactory:
             keywords=datasheet.keywords.keywords,
             faction_keywords=datasheet.keywords.faction_keywords,
             datasheet_abilities=datasheet.abilities,
+            damaged_effects=datasheet.damaged_effects,
             datasheet_source_ids=datasheet.source_ids,
             own_models=tuple(own_models),
             wargear_selections=wargear_selections,
@@ -691,6 +709,25 @@ def _validate_datasheet_ability_tuple(
         seen.add(value.ability_id)
         validated.append(value)
     return tuple(sorted(validated, key=lambda ability: ability.ability_id))
+
+
+def _validate_damaged_effect_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[DamagedEffectDefinition, ...]:
+    if type(values) is not tuple:
+        raise UnitFactoryError(f"{field_name} must be a tuple.")
+    validated: list[DamagedEffectDefinition] = []
+    seen: set[str] = set()
+    raw_values = cast(tuple[object, ...], values)
+    for value in raw_values:
+        if type(value) is not DamagedEffectDefinition:
+            raise UnitFactoryError(f"{field_name} must contain DamagedEffectDefinition values.")
+        if value.damaged_effect_id in seen:
+            raise UnitFactoryError(f"{field_name} must not contain duplicate IDs.")
+        seen.add(value.damaged_effect_id)
+        validated.append(value)
+    return tuple(sorted(validated, key=lambda effect: effect.damaged_effect_id))
 
 
 def _validate_unique_model_instance_ids(models: tuple[ModelInstance, ...]) -> None:

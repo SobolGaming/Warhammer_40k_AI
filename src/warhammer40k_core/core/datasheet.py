@@ -42,6 +42,21 @@ class CatalogAbilitySourceKind(StrEnum):
     WARGEAR = "wargear"
 
 
+class DamagedEffectKind(StrEnum):
+    HIT_ROLL_MODIFIER = "hit_roll_modifier"
+    OBJECTIVE_CONTROL_MODIFIER = "objective_control_modifier"
+    WEAPON_ATTACKS_MODIFIER = "weapon_attacks_modifier"
+    WEAPON_ATTACKS_HALVE = "weapon_attacks_halve"
+    SHOOTING_WEAPON_SELECTION_LIMIT = "shooting_weapon_selection_limit"
+    ABILITY_SELECTION_LIMIT = "ability_selection_limit"
+
+
+class DamagedWeaponScope(StrEnum):
+    ALL = "all"
+    MELEE = "melee"
+    NAMED = "named"
+
+
 class WargearOptionConditionKind(StrEnum):
     MODEL_NOT_EQUIPPED_WITH = "model_not_equipped_with"
 
@@ -141,6 +156,21 @@ class DatasheetAbilityDescriptorPayload(TypedDict):
     parameter_tokens: list[str]
 
 
+class DamagedEffectDefinitionPayload(TypedDict):
+    damaged_effect_id: str
+    model_profile_id: str | None
+    wounds_min: int
+    wounds_max: int
+    effect_kind: str
+    modifier: int | None
+    weapon_scope: str | None
+    weapon_names: list[str]
+    max_selections: int | None
+    baseline_max_selections: int | None
+    selection_group: str | None
+    source_id: str
+
+
 class AttachmentEligibilityPayload(TypedDict):
     role: str
     allowed_bodyguard_datasheet_ids: list[str]
@@ -156,6 +186,7 @@ class DatasheetDefinitionPayload(TypedDict):
     composition: list[UnitCompositionDefinitionPayload]
     wargear_options: list[DatasheetWargearOptionPayload]
     abilities: list[DatasheetAbilityDescriptorPayload]
+    damaged_effects: list[DamagedEffectDefinitionPayload]
     attachment_eligibilities: list[AttachmentEligibilityPayload]
     source_ids: list[str]
 
@@ -690,6 +721,179 @@ class DatasheetAbilityDescriptor:
 
 
 @dataclass(frozen=True, slots=True)
+class DamagedEffectDefinition:
+    damaged_effect_id: str
+    model_profile_id: str | None
+    wounds_min: int
+    wounds_max: int
+    effect_kind: DamagedEffectKind
+    source_id: str
+    modifier: int | None = None
+    weapon_scope: DamagedWeaponScope | None = None
+    weapon_names: tuple[str, ...] = ()
+    max_selections: int | None = None
+    baseline_max_selections: int | None = None
+    selection_group: str | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "damaged_effect_id",
+            _validate_unprefixed_identifier(
+                "DamagedEffectDefinition damaged_effect_id",
+                self.damaged_effect_id,
+                "damaged-effect:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "model_profile_id",
+            _validate_optional_identifier(
+                "DamagedEffectDefinition model_profile_id",
+                self.model_profile_id,
+            ),
+        )
+        wounds_min = _validate_positive_int("DamagedEffectDefinition wounds_min", self.wounds_min)
+        wounds_max = _validate_positive_int("DamagedEffectDefinition wounds_max", self.wounds_max)
+        if wounds_max < wounds_min:
+            raise DatasheetCatalogError(
+                "DamagedEffectDefinition wounds_max must be at least wounds_min."
+            )
+        object.__setattr__(self, "wounds_min", wounds_min)
+        object.__setattr__(self, "wounds_max", wounds_max)
+        effect_kind = damaged_effect_kind_from_token(self.effect_kind)
+        object.__setattr__(self, "effect_kind", effect_kind)
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_identifier("DamagedEffectDefinition source_id", self.source_id),
+        )
+        modifier = _validate_optional_int("DamagedEffectDefinition modifier", self.modifier)
+        weapon_scope = (
+            None
+            if self.weapon_scope is None
+            else damaged_weapon_scope_from_token(self.weapon_scope)
+        )
+        weapon_names = _validate_identifier_tuple(
+            "DamagedEffectDefinition weapon_names",
+            self.weapon_names,
+        )
+        max_selections = _validate_optional_positive_int(
+            "DamagedEffectDefinition max_selections",
+            self.max_selections,
+        )
+        baseline_max_selections = _validate_optional_positive_int(
+            "DamagedEffectDefinition baseline_max_selections",
+            self.baseline_max_selections,
+        )
+        selection_group = _validate_optional_identifier(
+            "DamagedEffectDefinition selection_group",
+            self.selection_group,
+        )
+        if effect_kind in {
+            DamagedEffectKind.HIT_ROLL_MODIFIER,
+            DamagedEffectKind.OBJECTIVE_CONTROL_MODIFIER,
+        }:
+            if modifier is None:
+                raise DatasheetCatalogError(
+                    "Damaged roll and Objective Control effects require a modifier."
+                )
+            if weapon_scope is not None or weapon_names:
+                raise DatasheetCatalogError(
+                    "Damaged roll and Objective Control effects must not include weapon scope."
+                )
+            if (
+                max_selections is not None
+                or baseline_max_selections is not None
+                or selection_group is not None
+            ):
+                raise DatasheetCatalogError(
+                    "Damaged roll and Objective Control effects must not include selection limits."
+                )
+        if effect_kind is DamagedEffectKind.WEAPON_ATTACKS_MODIFIER:
+            if modifier is None:
+                raise DatasheetCatalogError("Damaged weapon Attacks modifiers require a modifier.")
+            _validate_damaged_weapon_scope(weapon_scope=weapon_scope, weapon_names=weapon_names)
+            _validate_no_damaged_selection_limit(
+                max_selections=max_selections,
+                baseline_max_selections=baseline_max_selections,
+                selection_group=selection_group,
+            )
+        if effect_kind is DamagedEffectKind.WEAPON_ATTACKS_HALVE:
+            if modifier is not None:
+                raise DatasheetCatalogError("Damaged weapon Attacks halving must not modify.")
+            _validate_damaged_weapon_scope(weapon_scope=weapon_scope, weapon_names=weapon_names)
+            _validate_no_damaged_selection_limit(
+                max_selections=max_selections,
+                baseline_max_selections=baseline_max_selections,
+                selection_group=selection_group,
+            )
+        if effect_kind in {
+            DamagedEffectKind.SHOOTING_WEAPON_SELECTION_LIMIT,
+            DamagedEffectKind.ABILITY_SELECTION_LIMIT,
+        }:
+            if modifier is not None or weapon_scope is not None or weapon_names:
+                raise DatasheetCatalogError(
+                    "Damaged selection limits must not include characteristic modifiers."
+                )
+            if max_selections is None:
+                raise DatasheetCatalogError("Damaged selection limits require max_selections.")
+            if baseline_max_selections is None:
+                raise DatasheetCatalogError(
+                    "Damaged selection limits require baseline_max_selections."
+                )
+            if baseline_max_selections < max_selections:
+                raise DatasheetCatalogError(
+                    "Damaged selection limit baseline must be at least max_selections."
+                )
+            if selection_group is None:
+                raise DatasheetCatalogError("Damaged selection limits require selection_group.")
+        object.__setattr__(self, "modifier", modifier)
+        object.__setattr__(self, "weapon_scope", weapon_scope)
+        object.__setattr__(self, "weapon_names", weapon_names)
+        object.__setattr__(self, "max_selections", max_selections)
+        object.__setattr__(self, "baseline_max_selections", baseline_max_selections)
+        object.__setattr__(self, "selection_group", selection_group)
+
+    def applies_to_wounds(self, wounds_remaining: int) -> bool:
+        wounds = _validate_non_negative_int("wounds_remaining", wounds_remaining)
+        return self.wounds_min <= wounds <= self.wounds_max
+
+    def to_payload(self) -> DamagedEffectDefinitionPayload:
+        return {
+            "damaged_effect_id": self.damaged_effect_id,
+            "model_profile_id": self.model_profile_id,
+            "wounds_min": self.wounds_min,
+            "wounds_max": self.wounds_max,
+            "effect_kind": self.effect_kind.value,
+            "modifier": self.modifier,
+            "weapon_scope": None if self.weapon_scope is None else self.weapon_scope.value,
+            "weapon_names": list(self.weapon_names),
+            "max_selections": self.max_selections,
+            "baseline_max_selections": self.baseline_max_selections,
+            "selection_group": self.selection_group,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DamagedEffectDefinitionPayload) -> Self:
+        return cls(
+            damaged_effect_id=payload["damaged_effect_id"],
+            model_profile_id=payload["model_profile_id"],
+            wounds_min=payload["wounds_min"],
+            wounds_max=payload["wounds_max"],
+            effect_kind=damaged_effect_kind_from_token(payload["effect_kind"]),
+            modifier=payload["modifier"],
+            weapon_scope=damaged_weapon_scope_from_token(payload["weapon_scope"]),
+            weapon_names=tuple(payload["weapon_names"]),
+            max_selections=payload["max_selections"],
+            baseline_max_selections=payload["baseline_max_selections"],
+            selection_group=payload["selection_group"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class AttachmentEligibility:
     role: AttachmentRole
     allowed_bodyguard_datasheet_ids: tuple[str, ...]
@@ -738,6 +942,7 @@ class DatasheetDefinition:
     composition: tuple[UnitCompositionDefinition, ...]
     wargear_options: tuple[DatasheetWargearOption, ...] = ()
     abilities: tuple[DatasheetAbilityDescriptor, ...] = ()
+    damaged_effects: tuple[DamagedEffectDefinition, ...] = ()
     attachment_eligibilities: tuple[AttachmentEligibility, ...] = ()
     source_ids: tuple[str, ...] = ()
 
@@ -793,6 +998,18 @@ class DatasheetDefinition:
             "DatasheetDefinition abilities",
             self.abilities,
         )
+        damaged_effects = _validate_damaged_effect_tuple(
+            "DatasheetDefinition damaged_effects",
+            self.damaged_effects,
+        )
+        for damaged_effect in damaged_effects:
+            if (
+                damaged_effect.model_profile_id is not None
+                and damaged_effect.model_profile_id not in model_profile_ids
+            ):
+                raise DatasheetCatalogError(
+                    "DatasheetDefinition damaged effect references an unknown model profile."
+                )
         attachment_eligibilities = _validate_attachment_eligibility_tuple(
             "DatasheetDefinition attachment_eligibilities",
             self.attachment_eligibilities,
@@ -816,6 +1033,11 @@ class DatasheetDefinition:
             self,
             "abilities",
             tuple(sorted(abilities, key=lambda ability: ability.ability_id)),
+        )
+        object.__setattr__(
+            self,
+            "damaged_effects",
+            tuple(sorted(damaged_effects, key=lambda effect: effect.damaged_effect_id)),
         )
         object.__setattr__(
             self,
@@ -853,6 +1075,7 @@ class DatasheetDefinition:
             "composition": [part.to_payload() for part in self.composition],
             "wargear_options": [option.to_payload() for option in self.wargear_options],
             "abilities": [ability.to_payload() for ability in self.abilities],
+            "damaged_effects": [effect.to_payload() for effect in self.damaged_effects],
             "attachment_eligibilities": [
                 eligibility.to_payload() for eligibility in self.attachment_eligibilities
             ],
@@ -878,6 +1101,10 @@ class DatasheetDefinition:
             ),
             abilities=tuple(
                 DatasheetAbilityDescriptor.from_payload(ability) for ability in payload["abilities"]
+            ),
+            damaged_effects=tuple(
+                DamagedEffectDefinition.from_payload(effect)
+                for effect in payload["damaged_effects"]
             ),
             attachment_eligibilities=tuple(
                 AttachmentEligibility.from_payload(eligibility)
@@ -920,6 +1147,30 @@ def catalog_ability_source_kind_from_token(token: object) -> CatalogAbilitySourc
         raise DatasheetCatalogError(
             f"Unsupported CatalogAbilitySourceKind token: {token}."
         ) from exc
+
+
+def damaged_effect_kind_from_token(token: object) -> DamagedEffectKind:
+    if type(token) is DamagedEffectKind:
+        return token
+    if type(token) is not str:
+        raise DatasheetCatalogError("DamagedEffectKind token must be a string.")
+    try:
+        return DamagedEffectKind(token)
+    except ValueError as exc:
+        raise DatasheetCatalogError(f"Unsupported DamagedEffectKind token: {token}.") from exc
+
+
+def damaged_weapon_scope_from_token(token: object | None) -> DamagedWeaponScope | None:
+    if token is None:
+        return None
+    if type(token) is DamagedWeaponScope:
+        return token
+    if type(token) is not str:
+        raise DatasheetCatalogError("DamagedWeaponScope token must be a string.")
+    try:
+        return DamagedWeaponScope(token)
+    except ValueError as exc:
+        raise DatasheetCatalogError(f"Unsupported DamagedWeaponScope token: {token}.") from exc
 
 
 def wargear_option_condition_kind_from_token(token: object) -> WargearOptionConditionKind:
@@ -1094,6 +1345,58 @@ def _validate_non_negative_int(field_name: str, value: object) -> int:
     return value
 
 
+def _validate_optional_int(field_name: str, value: object) -> int | None:
+    if value is None:
+        return None
+    if type(value) is not int:
+        raise DatasheetCatalogError(f"{field_name} must be an integer.")
+    return value
+
+
+def _validate_optional_positive_int(field_name: str, value: object) -> int | None:
+    integer = _validate_optional_int(field_name, value)
+    if integer is None:
+        return None
+    if integer < 1:
+        raise DatasheetCatalogError(f"{field_name} must be at least 1.")
+    return integer
+
+
+def _validate_damaged_weapon_scope(
+    *,
+    weapon_scope: DamagedWeaponScope | None,
+    weapon_names: tuple[str, ...],
+) -> None:
+    if weapon_scope is None:
+        raise DatasheetCatalogError("Damaged weapon Attacks effects require weapon scope.")
+    if weapon_scope is DamagedWeaponScope.NAMED:
+        if not weapon_names:
+            raise DatasheetCatalogError(
+                "Damaged named weapon Attacks effects require weapon_names."
+            )
+        return
+    if weapon_names:
+        raise DatasheetCatalogError(
+            "Damaged non-named weapon Attacks effects must not include weapon_names."
+        )
+
+
+def _validate_no_damaged_selection_limit(
+    *,
+    max_selections: int | None,
+    baseline_max_selections: int | None,
+    selection_group: str | None,
+) -> None:
+    if (
+        max_selections is not None
+        or baseline_max_selections is not None
+        or selection_group is not None
+    ):
+        raise DatasheetCatalogError(
+            "Damaged weapon Attacks effects must not include selection limits."
+        )
+
+
 def _canonical_characteristic_values(
     values: tuple[CharacteristicValue, ...],
 ) -> tuple[CharacteristicValue, ...]:
@@ -1247,6 +1550,24 @@ def _validate_ability_descriptor_tuple(
         if value.ability_id in seen:
             raise DatasheetCatalogError(f"{field_name} must not contain duplicate ability IDs.")
         seen.add(value.ability_id)
+        validated.append(value)
+    return tuple(validated)
+
+
+def _validate_damaged_effect_tuple(
+    field_name: str,
+    values: tuple[DamagedEffectDefinition, ...],
+) -> tuple[DamagedEffectDefinition, ...]:
+    if type(values) is not tuple:
+        raise DatasheetCatalogError(f"{field_name} must be a tuple.")
+    seen: set[str] = set()
+    validated: list[DamagedEffectDefinition] = []
+    for value in values:
+        if type(value) is not DamagedEffectDefinition:
+            raise DatasheetCatalogError(f"{field_name} must contain damaged effect definitions.")
+        if value.damaged_effect_id in seen:
+            raise DatasheetCatalogError(f"{field_name} must not contain duplicate IDs.")
+        seen.add(value.damaged_effect_id)
         validated.append(value)
     return tuple(validated)
 

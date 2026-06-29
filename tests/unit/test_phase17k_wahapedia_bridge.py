@@ -28,6 +28,8 @@ from warhammer40k_core.core.datasheet import (
     BaseSizeKind,
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
+    DamagedEffectKind,
+    DamagedWeaponScope,
     DatasheetDefinition,
     DatasheetWargearOption,
     DatasheetWargearOptionEffect,
@@ -2541,6 +2543,149 @@ def test_phase17k_bridge_datasheet_source_ids_include_pdf_correction_source_id()
     assert "pdf:chaos-daemons-faction-pack:2026-06-10:p30-p31" in source_ids
 
 
+@pytest.mark.parametrize(
+    ("description", "expected", "expected_wounds_max"),
+    [
+        (
+            (
+                "While this model has 1-7 wounds remaining, subtract 4 from this model's "
+                "Objective Control characteristic, and each time this model makes an attack, "
+                "subtract 1 from the Hit roll."
+            ),
+            (
+                (DamagedEffectKind.OBJECTIVE_CONTROL_MODIFIER, -4, None, (), None, None, None),
+                (DamagedEffectKind.HIT_ROLL_MODIFIER, -1, None, (), None, None, None),
+            ),
+            7,
+        ),
+        (
+            (
+                "DAMAGED: 1\N{EN DASH}7 WOUNDS REMAINING\n"
+                "While this model has 1\N{EN DASH}7 wounds remaining, "
+                "add 2 to the Attacks characteristic of this "
+                "model\N{RIGHT SINGLE QUOTATION MARK}s melee weapons."
+            ),
+            (
+                (
+                    DamagedEffectKind.WEAPON_ATTACKS_MODIFIER,
+                    2,
+                    DamagedWeaponScope.MELEE,
+                    (),
+                    None,
+                    None,
+                    None,
+                ),
+            ),
+            7,
+        ),
+        (
+            (
+                "While this model has 1-8 wounds remaining, subtract 4 from its Objective "
+                "Control characteristic and you can only select one of the C'tan Powers "
+                "weapons in your Shooting phase, instead of two."
+            ),
+            (
+                (DamagedEffectKind.OBJECTIVE_CONTROL_MODIFIER, -4, None, (), None, None, None),
+                (
+                    DamagedEffectKind.SHOOTING_WEAPON_SELECTION_LIMIT,
+                    None,
+                    None,
+                    (),
+                    1,
+                    2,
+                    "C'tan Powers weapons",
+                ),
+            ),
+            8,
+        ),
+        (
+            (
+                "While this model has 1-6 wounds remaining, the Attacks characteristics of "
+                "all of its weapons are halved, and you can only select one ability when "
+                "using its Relics of the Matriarchs ability, instead of up to two."
+            ),
+            (
+                (
+                    DamagedEffectKind.WEAPON_ATTACKS_HALVE,
+                    None,
+                    DamagedWeaponScope.ALL,
+                    (),
+                    None,
+                    None,
+                    None,
+                ),
+                (
+                    DamagedEffectKind.ABILITY_SELECTION_LIMIT,
+                    None,
+                    None,
+                    (),
+                    1,
+                    2,
+                    "Relics of the Matriarchs ability",
+                ),
+            ),
+            6,
+        ),
+    ],
+)
+def test_phase17k_bridge_normalizes_damaged_sections_to_structured_effects(
+    description: str,
+    expected: tuple[
+        tuple[
+            DamagedEffectKind,
+            int | None,
+            DamagedWeaponScope | None,
+            tuple[str, ...],
+            int | None,
+            int | None,
+            str | None,
+        ],
+        ...,
+    ],
+    expected_wounds_max: int,
+) -> None:
+    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_damaged_source_artifacts(description),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-damaged",),
+        pdf_corrections=(),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-damaged",
+                model_name="Damaged Beast",
+                height=2.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:test-damaged:height",
+                height_document_reference="Test Faction Pack p.1",
+            ),
+        ),
+    )
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=bridge_artifacts,
+    )
+    datasheet = package.army_catalog.datasheet_by_id("test-damaged")
+
+    assert (
+        tuple(
+            (
+                effect.effect_kind,
+                effect.modifier,
+                effect.weapon_scope,
+                effect.weapon_names,
+                effect.max_selections,
+                effect.baseline_max_selections,
+                effect.selection_group,
+            )
+            for effect in datasheet.damaged_effects
+        )
+        == expected
+    )
+    assert {effect.wounds_min for effect in datasheet.damaged_effects} == {1}
+    assert {effect.wounds_max for effect in datasheet.damaged_effects} == {expected_wounds_max}
+
+
 def test_phase17k_bridge_deduplicates_same_faction_rows_for_multiple_datasheets() -> None:
     artifacts = build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=_same_faction_source_artifacts(),
@@ -3643,6 +3788,81 @@ def _jakhals_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     )
 
 
+def _damaged_source_artifacts(damaged_description: str) -> tuple[WahapediaJsonArtifact, ...]:
+    escaped_description = _csv_field(damaged_description)
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-faction-rule,TST,Test Rule,Army rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id,damaged_description",
+                    f'test-damaged,Damaged Beast,TST,"{escaped_description}"',
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    "test-damaged,1,Faction,test-faction-rule,,,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-damaged,Character,,false",
+                    "test-damaged,Monster,,false",
+                    "test-damaged,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-damaged,1,8,10,4,5,14,6,5,100mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    "test-damaged,1,1,Claws,Melee,melee,4,2,10,-2,3,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    'test-damaged,1,"1 Damaged Beast"',
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "TST,Test Faction")),
+        ),
+    )
+
+
 def _flesh_hounds_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     return build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=_flesh_hounds_source_artifacts(),
@@ -4423,6 +4643,10 @@ def _artifact_from_csv(table_name: str, csv_text: str) -> WahapediaJsonArtifact:
         source_package_id=_bridge_package_id(),
         table=WahapediaCsvTable.from_csv_text(table_name=table_name, csv_text=f"{csv_text}\n"),
     )
+
+
+def _csv_field(value: str) -> str:
+    return value.replace('"', '""')
 
 
 @lru_cache(maxsize=1)

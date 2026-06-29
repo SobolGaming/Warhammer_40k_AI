@@ -15,6 +15,9 @@ from warhammer40k_core.core.datasheet import (
     BaseSizeKind,
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
+    DamagedEffectDefinition,
+    DamagedEffectKind,
+    DamagedWeaponScope,
     WargearOptionConditionKind,
     WargearOptionEffectKind,
 )
@@ -109,6 +112,64 @@ _OPTION_RE = re.compile(
     r"(?P<forbidden>.+?) can be equipped with 1 (?P<granted>.+?)\.$",
     re.IGNORECASE,
 )
+_DAMAGED_HEADER_RE = re.compile(
+    r"^\s*DAMAGED:\s*\d+\s*-\s*\d+\s+WOUNDS\s+REMAINING\s*",
+    re.IGNORECASE,
+)
+_DAMAGED_RANGE_RE = re.compile(
+    r"While\s+(?:this\s+model|this\s+unit's\s+(?P<model_name>.+?)\s+model)\s+has\s+"
+    r"(?P<wounds_min>\d+)\s*-\s*(?P<wounds_max>\d+)\s+wounds\s+remaining",
+    re.IGNORECASE,
+)
+_DAMAGED_HIT_RE = re.compile(
+    r"each\s+time\s+(?:this\s+model|it|this\s+unit)\s+makes\s+an\s+attack,\s+"
+    r"subtract\s+(?P<value>\d+)\s+from\s+the\s+Hit\s+roll",
+    re.IGNORECASE,
+)
+_DAMAGED_MODEL_POSSESSIVE_RE = r"this\s+model'?s"
+_DAMAGED_APOSTROPHE_RE = r"'"
+_DAMAGED_OC_RE = re.compile(
+    rf"subtract\s+(?P<value>\d+)\s+from\s+"
+    rf"(?:{_DAMAGED_MODEL_POSSESSIVE_RE}|its)\s+"
+    r"Objective\s+Control\s+characteristic",
+    re.IGNORECASE,
+)
+_DAMAGED_ATTACKS_ADD_RE = re.compile(
+    r"add\s+(?P<value>\d+)\s+to\s+the\s+Attacks\s+characteristic\s+of\s+"
+    rf"{_DAMAGED_MODEL_POSSESSIVE_RE}\s+"
+    r"(?P<weapon_scope>melee\s+weapons|[^.]+)",
+    re.IGNORECASE,
+)
+_DAMAGED_ATTACKS_HALVE_RE = re.compile(
+    r"(?:the\s+Attacks\s+characteristics\s+of\s+all\s+of\s+its\s+weapons\s+are\s+halved|"
+    r"halve\s+the\s+Attacks\s+characteristic\s+of\s+that\s+model's\s+weapons)",
+    re.IGNORECASE,
+)
+_DAMAGED_SHOOTING_WEAPON_SELECTION_LIMIT_RE = re.compile(
+    rf"you\s+can\s+only\s+select\s+(?P<max>\w+)\s+of\s+the\s+"
+    rf"(?P<selection_group>C{_DAMAGED_APOSTROPHE_RE}tan\s+Powers\s+weapons)\s+"
+    r"in\s+your\s+Shooting\s+phase,\s+instead\s+of\s+(?P<baseline>\w+)",
+    re.IGNORECASE,
+)
+_DAMAGED_ABILITY_SELECTION_LIMIT_RE = re.compile(
+    r"you\s+can\s+only\s+select\s+(?P<max>\w+)\s+ability\s+when\s+using\s+its\s+"
+    r"(?P<selection_group>Relics\s+of\s+the\s+Matriarchs\s+ability),\s+"
+    r"instead\s+of\s+up\s+to\s+(?P<baseline>\w+)",
+    re.IGNORECASE,
+)
+_DAMAGED_IGNORABLE_REMAINDER_RE = re.compile(r"[\s,.;:]+|(?:\band\b)|(?:\bwhile\b)", re.IGNORECASE)
+_COUNT_WORDS = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
+}
 
 
 def build_wahapedia_canonical_bridge_artifacts(
@@ -268,6 +329,12 @@ def _bridge_datasheet(
             "leader_head": _raw_or_field(datasheet_row, "leader_head"),
             "leader_footer": _raw_or_field(datasheet_row, "leader_footer"),
             "damaged_description": _raw_or_field(datasheet_row, "damaged_description"),
+            "damaged_effects": _damaged_effects_json(
+                datasheet_id=datasheet_id,
+                damaged_description=_normalized_or_field(datasheet_row, "damaged_description"),
+                composition_entries=composition_entries,
+                source_id=datasheet_row.stable_source_id(),
+            ),
             "source_ids": _joined(_source_ids(datasheet_row, *keyword_source_ids)),
         }
     )
@@ -821,6 +888,248 @@ def _bridge_leader_links(
         )
 
 
+def _damaged_effects_json(
+    *,
+    datasheet_id: str,
+    damaged_description: str,
+    composition_entries: tuple[_CompositionEntry, ...],
+    source_id: str,
+) -> str:
+    effects = _damaged_effects_from_description(
+        datasheet_id=datasheet_id,
+        damaged_description=damaged_description,
+        composition_entries=composition_entries,
+        source_id=source_id,
+    )
+    if not effects:
+        return ""
+    return json.dumps([effect.to_payload() for effect in effects], sort_keys=True)
+
+
+def _damaged_effects_from_description(
+    *,
+    datasheet_id: str,
+    damaged_description: str,
+    composition_entries: tuple[_CompositionEntry, ...],
+    source_id: str,
+) -> tuple[DamagedEffectDefinition, ...]:
+    description = _normalize_damaged_description(damaged_description)
+    if not description:
+        return ()
+    range_match = _DAMAGED_RANGE_RE.search(description)
+    if range_match is None:
+        raise WahapediaBridgeError("DAMAGED section is missing a wounds-remaining range.")
+    model_profile_id = _damaged_model_profile_id(
+        model_name=range_match.group("model_name"),
+        composition_entries=composition_entries,
+    )
+    wounds_min = _positive_int_from_text(
+        "DAMAGED wounds_min",
+        range_match.group("wounds_min"),
+    )
+    wounds_max = _positive_int_from_text(
+        "DAMAGED wounds_max",
+        range_match.group("wounds_max"),
+    )
+    effects: list[DamagedEffectDefinition] = []
+    consumed_spans = [range_match.span()]
+    for match in _DAMAGED_OC_RE.finditer(description):
+        effects.append(
+            _damaged_effect(
+                datasheet_id=datasheet_id,
+                index=len(effects) + 1,
+                model_profile_id=model_profile_id,
+                wounds_min=wounds_min,
+                wounds_max=wounds_max,
+                effect_kind=DamagedEffectKind.OBJECTIVE_CONTROL_MODIFIER,
+                source_id=source_id,
+                modifier=-_positive_int_from_text(
+                    "DAMAGED Objective Control modifier",
+                    match.group("value"),
+                ),
+            )
+        )
+        consumed_spans.append(match.span())
+    for match in _DAMAGED_HIT_RE.finditer(description):
+        effects.append(
+            _damaged_effect(
+                datasheet_id=datasheet_id,
+                index=len(effects) + 1,
+                model_profile_id=model_profile_id,
+                wounds_min=wounds_min,
+                wounds_max=wounds_max,
+                effect_kind=DamagedEffectKind.HIT_ROLL_MODIFIER,
+                source_id=source_id,
+                modifier=-_positive_int_from_text(
+                    "DAMAGED Hit roll modifier",
+                    match.group("value"),
+                ),
+            )
+        )
+        consumed_spans.append(match.span())
+    for match in _DAMAGED_ATTACKS_ADD_RE.finditer(description):
+        weapon_scope_text = match.group("weapon_scope")
+        weapon_scope = (
+            DamagedWeaponScope.MELEE
+            if _canonical_text(weapon_scope_text) == "melee weapons"
+            else DamagedWeaponScope.NAMED
+        )
+        weapon_names = () if weapon_scope is DamagedWeaponScope.MELEE else (weapon_scope_text,)
+        effects.append(
+            _damaged_effect(
+                datasheet_id=datasheet_id,
+                index=len(effects) + 1,
+                model_profile_id=model_profile_id,
+                wounds_min=wounds_min,
+                wounds_max=wounds_max,
+                effect_kind=DamagedEffectKind.WEAPON_ATTACKS_MODIFIER,
+                source_id=source_id,
+                modifier=_positive_int_from_text(
+                    "DAMAGED Attacks modifier",
+                    match.group("value"),
+                ),
+                weapon_scope=weapon_scope,
+                weapon_names=weapon_names,
+            )
+        )
+        consumed_spans.append(match.span())
+    for match in _DAMAGED_ATTACKS_HALVE_RE.finditer(description):
+        effects.append(
+            _damaged_effect(
+                datasheet_id=datasheet_id,
+                index=len(effects) + 1,
+                model_profile_id=model_profile_id,
+                wounds_min=wounds_min,
+                wounds_max=wounds_max,
+                effect_kind=DamagedEffectKind.WEAPON_ATTACKS_HALVE,
+                source_id=source_id,
+                weapon_scope=DamagedWeaponScope.ALL,
+            )
+        )
+        consumed_spans.append(match.span())
+    for match in _DAMAGED_SHOOTING_WEAPON_SELECTION_LIMIT_RE.finditer(description):
+        effects.append(
+            _damaged_effect(
+                datasheet_id=datasheet_id,
+                index=len(effects) + 1,
+                model_profile_id=model_profile_id,
+                wounds_min=wounds_min,
+                wounds_max=wounds_max,
+                effect_kind=DamagedEffectKind.SHOOTING_WEAPON_SELECTION_LIMIT,
+                source_id=source_id,
+                max_selections=_positive_int_from_count_text(
+                    "DAMAGED shooting weapon max selections",
+                    match.group("max"),
+                ),
+                baseline_max_selections=_positive_int_from_count_text(
+                    "DAMAGED shooting weapon baseline max selections",
+                    match.group("baseline"),
+                ),
+                selection_group=_canonical_selection_group(match.group("selection_group")),
+            )
+        )
+        consumed_spans.append(match.span())
+    for match in _DAMAGED_ABILITY_SELECTION_LIMIT_RE.finditer(description):
+        effects.append(
+            _damaged_effect(
+                datasheet_id=datasheet_id,
+                index=len(effects) + 1,
+                model_profile_id=model_profile_id,
+                wounds_min=wounds_min,
+                wounds_max=wounds_max,
+                effect_kind=DamagedEffectKind.ABILITY_SELECTION_LIMIT,
+                source_id=source_id,
+                max_selections=_positive_int_from_count_text(
+                    "DAMAGED ability max selections",
+                    match.group("max"),
+                ),
+                baseline_max_selections=_positive_int_from_count_text(
+                    "DAMAGED ability baseline max selections",
+                    match.group("baseline"),
+                ),
+                selection_group=_canonical_selection_group(match.group("selection_group")),
+            )
+        )
+        consumed_spans.append(match.span())
+    if not effects:
+        raise WahapediaBridgeError("DAMAGED section has no supported effects.")
+    _raise_for_unparsed_damaged_text(description=description, consumed_spans=tuple(consumed_spans))
+    return tuple(effects)
+
+
+def _damaged_effect(
+    *,
+    datasheet_id: str,
+    index: int,
+    model_profile_id: str | None,
+    wounds_min: int,
+    wounds_max: int,
+    effect_kind: DamagedEffectKind,
+    source_id: str,
+    modifier: int | None = None,
+    weapon_scope: DamagedWeaponScope | None = None,
+    weapon_names: tuple[str, ...] = (),
+    max_selections: int | None = None,
+    baseline_max_selections: int | None = None,
+    selection_group: str | None = None,
+) -> DamagedEffectDefinition:
+    return DamagedEffectDefinition(
+        damaged_effect_id=f"{datasheet_id}:damaged:{index:03d}",
+        model_profile_id=model_profile_id,
+        wounds_min=wounds_min,
+        wounds_max=wounds_max,
+        effect_kind=effect_kind,
+        modifier=modifier,
+        weapon_scope=weapon_scope,
+        weapon_names=weapon_names,
+        max_selections=max_selections,
+        baseline_max_selections=baseline_max_selections,
+        selection_group=selection_group,
+        source_id=source_id,
+    )
+
+
+def _damaged_model_profile_id(
+    *,
+    model_name: str | None,
+    composition_entries: tuple[_CompositionEntry, ...],
+) -> str | None:
+    if model_name is None:
+        return None
+    requested_key = _name_key(model_name)
+    for entry in composition_entries:
+        if _name_key(entry.model_name) == requested_key:
+            return entry.model_profile_id
+    raise WahapediaBridgeError("DAMAGED section references an unknown model name.")
+
+
+def _normalize_damaged_description(value: str) -> str:
+    if type(value) is not str:
+        raise WahapediaBridgeError("DAMAGED description must be a string.")
+    without_header = _DAMAGED_HEADER_RE.sub("", value.strip())
+    return re.sub(r"\s+", " ", without_header).strip()
+
+
+def _raise_for_unparsed_damaged_text(
+    *,
+    description: str,
+    consumed_spans: tuple[tuple[int, int], ...],
+) -> None:
+    unconsumed_parts: list[str] = []
+    cursor = 0
+    for start, end in sorted(consumed_spans):
+        if start < cursor:
+            cursor = max(cursor, end)
+            continue
+        unconsumed_parts.append(description[cursor:start])
+        cursor = end
+    unconsumed_parts.append(description[cursor:])
+    remainder = "".join(unconsumed_parts)
+    stripped = _DAMAGED_IGNORABLE_REMAINDER_RE.sub("", remainder)
+    if stripped:
+        raise WahapediaBridgeError("DAMAGED section contains unsupported effect text.")
+
+
 def _rows_by_table(
     source_artifacts: tuple[WahapediaJsonArtifact, ...],
 ) -> dict[str, tuple[NormalizedSourceRow, ...]]:
@@ -891,6 +1200,7 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "leader_head",
             "leader_footer",
             "damaged_description",
+            "damaged_effects",
             "source_ids",
         ),
         "Datasheets_models": (
@@ -1033,6 +1343,13 @@ def _raw_or_field(row: NormalizedSourceRow, column_name: str) -> str:
     for text_field in row.text_fields:
         if text_field.column_name == column_name:
             return text_field.raw_text
+    return row.runtime_fields_payload().get(column_name, "")
+
+
+def _normalized_or_field(row: NormalizedSourceRow, column_name: str) -> str:
+    for text_field in row.text_fields:
+        if text_field.column_name == column_name:
+            return text_field.normalized_text
     return row.runtime_fields_payload().get(column_name, "")
 
 
@@ -1513,11 +1830,33 @@ def _slug(value: str) -> str:
     return slug
 
 
+def _canonical_text(value: str) -> str:
+    return " ".join(value.casefold().strip().split())
+
+
+def _canonical_selection_group(value: str) -> str:
+    return " ".join(value.strip().split())
+
+
 def _int_from_text(value: str) -> int:
     try:
         return int(value)
     except ValueError as exc:
         raise WahapediaBridgeError("Source value must be an integer.") from exc
+
+
+def _positive_int_from_text(field_name: str, value: str) -> int:
+    integer = _int_from_text(value)
+    if integer < 1:
+        raise WahapediaBridgeError(f"{field_name} must be at least 1.")
+    return integer
+
+
+def _positive_int_from_count_text(field_name: str, value: str) -> int:
+    count = _COUNT_WORDS.get(_canonical_text(value))
+    if count is not None:
+        return count
+    return _positive_int_from_text(field_name, value)
 
 
 def _validate_identifier(field_name: str, value: object) -> str:

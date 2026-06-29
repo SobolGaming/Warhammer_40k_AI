@@ -1,11 +1,18 @@
 from __future__ import annotations
 
 import hashlib
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from typing import cast
 
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+
+
+def contribution_values[TContribution, TValue](
+    contributions: tuple[TContribution, ...],
+    getter: Callable[[TContribution], tuple[TValue, ...]],
+) -> tuple[TValue, ...]:
+    return tuple(value for contribution in contributions for value in getter(contribution))
 
 
 def validate_tuple[T](
