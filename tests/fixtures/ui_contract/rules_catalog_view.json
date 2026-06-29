@@ -1,0 +1,1861 @@
+{
+  "army_rule_display_by_id": {
+    "core-discipline": {
+      "ability_descriptor_ids": [],
+      "army_rule_id": "core-discipline",
+      "content_scope": "matched_play",
+      "display_name": "Core Discipline",
+      "source_id": "army-rule:core-discipline"
+    }
+  },
+  "base_size_display_by_id": {
+    "base-size:core-boyz-like": {
+      "base_size_id": "base-size:core-boyz-like",
+      "diameter_mm": 32.0,
+      "kind": "circular",
+      "length_mm": null,
+      "width_mm": null
+    },
+    "base-size:core-character-leader": {
+      "base_size_id": "base-size:core-character-leader",
+      "diameter_mm": 40.0,
+      "kind": "circular",
+      "length_mm": null,
+      "width_mm": null
+    },
+    "base-size:core-character-support": {
+      "base_size_id": "base-size:core-character-support",
+      "diameter_mm": 40.0,
+      "kind": "circular",
+      "length_mm": null,
+      "width_mm": null
+    },
+    "base-size:core-deep-strike-model": {
+      "base_size_id": "base-size:core-deep-strike-model",
+      "diameter_mm": 32.0,
+      "kind": "circular",
+      "length_mm": null,
+      "width_mm": null
+    },
+    "base-size:core-intercessor-like": {
+      "base_size_id": "base-size:core-intercessor-like",
+      "diameter_mm": 32.0,
+      "kind": "circular",
+      "length_mm": null,
+      "width_mm": null
+    },
+    "base-size:core-transport": {
+      "base_size_id": "base-size:core-transport",
+      "diameter_mm": 100.0,
+      "kind": "circular",
+      "length_mm": null,
+      "width_mm": null
+    },
+    "base-size:core-vehicle-monster": {
+      "base_size_id": "base-size:core-vehicle-monster",
+      "diameter_mm": 120.0,
+      "kind": "circular",
+      "length_mm": null,
+      "width_mm": null
+    }
+  },
+  "catalog_id": "phase9a-canonical",
+  "datasheet_display_by_id": {
+    "core-boyz-like-infantry": {
+      "abilities": [],
+      "content_scope": "matched_play",
+      "datasheet_id": "core-boyz-like-infantry",
+      "display_name": "CORE Boyz-like Infantry",
+      "faction_keywords": [
+        "CORE Marines"
+      ],
+      "keywords": [
+        "Infantry"
+      ],
+      "model_profile_ids": [
+        "core-boyz-like"
+      ],
+      "source_ids": [
+        "datasheet:core-boyz-like-infantry"
+      ],
+      "wargear_option_ids": [
+        "core-boyz-like-infantry:default-wargear"
+      ]
+    },
+    "core-character-leader": {
+      "abilities": [],
+      "content_scope": "matched_play",
+      "datasheet_id": "core-character-leader",
+      "display_name": "CORE Character Leader",
+      "faction_keywords": [
+        "CORE Marines"
+      ],
+      "keywords": [
+        "Character",
+        "Infantry",
+        "Leader"
+      ],
+      "model_profile_ids": [
+        "core-character-leader"
+      ],
+      "source_ids": [
+        "datasheet:core-character-leader"
+      ],
+      "wargear_option_ids": [
+        "core-character-leader:default-wargear"
+      ]
+    },
+    "core-character-support": {
+      "abilities": [],
+      "content_scope": "matched_play",
+      "datasheet_id": "core-character-support",
+      "display_name": "CORE Character Support",
+      "faction_keywords": [
+        "CORE Marines"
+      ],
+      "keywords": [
+        "Character",
+        "Infantry",
+        "Support"
+      ],
+      "model_profile_ids": [
+        "core-character-support"
+      ],
+      "source_ids": [
+        "datasheet:core-character-support"
+      ],
+      "wargear_option_ids": [
+        "core-character-support:default-wargear"
+      ]
+    },
+    "core-deep-strike-unit": {
+      "abilities": [
+        {
+          "ability_id": "core-deep-strike",
+          "datasheet_id": "core-deep-strike-unit",
+          "display_name": "CORE Deep Strike",
+          "parameter_tokens": [],
+          "profile": {
+            "ability_id": "core-deep-strike",
+            "name": "CORE Deep Strike",
+            "parameter_tokens": [],
+            "source_id": "datasheet:core-deep-strike-unit:ability:deep-strike",
+            "support": "unsupported",
+            "timing_tags": [
+              "deployment",
+              "reserves"
+            ]
+          },
+          "source_id": "datasheet:core-deep-strike-unit:ability:deep-strike",
+          "support": "unsupported",
+          "timing_tags": [
+            "deployment",
+            "reserves"
+          ]
+        }
+      ],
+      "content_scope": "matched_play",
+      "datasheet_id": "core-deep-strike-unit",
+      "display_name": "CORE Deep Strike Unit",
+      "faction_keywords": [
+        "CORE Marines"
+      ],
+      "keywords": [
+        "Deep Strike",
+        "Infantry"
+      ],
+      "model_profile_ids": [
+        "core-deep-strike-model"
+      ],
+      "source_ids": [
+        "datasheet:core-deep-strike-unit"
+      ],
+      "wargear_option_ids": [
+        "core-deep-strike-unit:default-wargear"
+      ]
+    },
+    "core-intercessor-like-infantry": {
+      "abilities": [],
+      "content_scope": "matched_play",
+      "datasheet_id": "core-intercessor-like-infantry",
+      "display_name": "CORE Intercessor-like Infantry",
+      "faction_keywords": [
+        "CORE Marines"
+      ],
+      "keywords": [
+        "Battleline",
+        "Infantry"
+      ],
+      "model_profile_ids": [
+        "core-intercessor-like"
+      ],
+      "source_ids": [
+        "datasheet:core-intercessor-like-infantry"
+      ],
+      "wargear_option_ids": [
+        "core-intercessor-like-infantry:default-wargear"
+      ]
+    },
+    "core-transport": {
+      "abilities": [
+        {
+          "ability_id": "core-firing-deck",
+          "datasheet_id": "core-transport",
+          "display_name": "CORE Firing Deck",
+          "parameter_tokens": [
+            "2"
+          ],
+          "profile": {
+            "ability_id": "core-firing-deck",
+            "name": "CORE Firing Deck",
+            "parameter_tokens": [
+              "2"
+            ],
+            "source_id": "datasheet:core-transport:ability:firing-deck",
+            "support": "descriptor_only",
+            "timing_tags": [
+              "shooting"
+            ]
+          },
+          "source_id": "datasheet:core-transport:ability:firing-deck",
+          "support": "descriptor_only",
+          "timing_tags": [
+            "shooting"
+          ]
+        }
+      ],
+      "content_scope": "matched_play",
+      "datasheet_id": "core-transport",
+      "display_name": "CORE Transport",
+      "faction_keywords": [
+        "CORE Marines"
+      ],
+      "keywords": [
+        "Transport",
+        "Vehicle"
+      ],
+      "model_profile_ids": [
+        "core-transport"
+      ],
+      "source_ids": [
+        "datasheet:core-transport"
+      ],
+      "wargear_option_ids": [
+        "core-transport:default-wargear"
+      ]
+    },
+    "core-vehicle-monster": {
+      "abilities": [],
+      "content_scope": "matched_play",
+      "datasheet_id": "core-vehicle-monster",
+      "display_name": "CORE Vehicle Monster",
+      "faction_keywords": [
+        "CORE Marines"
+      ],
+      "keywords": [
+        "Monster",
+        "Vehicle"
+      ],
+      "model_profile_ids": [
+        "core-vehicle-monster"
+      ],
+      "source_ids": [
+        "datasheet:core-vehicle-monster"
+      ],
+      "wargear_option_ids": [
+        "core-vehicle-monster:default-wargear"
+      ]
+    }
+  },
+  "detachment_display_by_id": {
+    "core-combined-arms": {
+      "content_scope": "matched_play",
+      "detachment_id": "core-combined-arms",
+      "display_name": "CORE Combined Arms",
+      "enhancement_ids": [],
+      "faction_id": "core-marine-force",
+      "source_ids": [
+        "detachment:core-combined-arms"
+      ],
+      "stratagem_ids": []
+    }
+  },
+  "enhancement_display_by_id": {},
+  "faction_display_by_id": {
+    "core-marine-force": {
+      "army_rule_ids": [
+        "core-discipline"
+      ],
+      "content_scope": "matched_play",
+      "display_name": "CORE Marine Force",
+      "faction_id": "core-marine-force",
+      "faction_keywords": [
+        "CORE Marines"
+      ],
+      "source_ids": [
+        "faction:core-marine-force"
+      ]
+    }
+  },
+  "model_profile_display_by_id": {
+    "core-boyz-like": {
+      "base_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 7,
+          "characteristic": "leadership",
+          "display_value": "7+",
+          "final": 7,
+          "label": "LD",
+          "raw": 7,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "save",
+          "display_value": "6+",
+          "final": 6,
+          "label": "SV",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 5,
+          "characteristic": "toughness",
+          "display_value": "5",
+          "final": 5,
+          "label": "T",
+          "raw": 5,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 1,
+          "characteristic": "wounds",
+          "display_value": "1",
+          "final": 1,
+          "label": "W",
+          "raw": 1,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "base_size_id": "base-size:core-boyz-like",
+      "datasheet_id": "core-boyz-like-infantry",
+      "display_name": "CORE Boyz-like Infantry",
+      "model_profile_id": "core-boyz-like",
+      "source_ids": [
+        "datasheet:core-boyz-like-infantry:profile"
+      ]
+    },
+    "core-character-leader": {
+      "base_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 5,
+          "characteristic": "leadership",
+          "display_value": "5+",
+          "final": 5,
+          "label": "LD",
+          "raw": 5,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 1,
+          "characteristic": "objective_control",
+          "display_value": "1",
+          "final": 1,
+          "label": "OC",
+          "raw": 1,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 5,
+          "characteristic": "wounds",
+          "display_value": "5",
+          "final": 5,
+          "label": "W",
+          "raw": 5,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "base_size_id": "base-size:core-character-leader",
+      "datasheet_id": "core-character-leader",
+      "display_name": "CORE Character Leader",
+      "model_profile_id": "core-character-leader",
+      "source_ids": [
+        "datasheet:core-character-leader:profile"
+      ]
+    },
+    "core-character-support": {
+      "base_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 5,
+          "characteristic": "leadership",
+          "display_value": "5+",
+          "final": 5,
+          "label": "LD",
+          "raw": 5,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 1,
+          "characteristic": "objective_control",
+          "display_value": "1",
+          "final": 1,
+          "label": "OC",
+          "raw": 1,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "wounds",
+          "display_value": "4",
+          "final": 4,
+          "label": "W",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "base_size_id": "base-size:core-character-support",
+      "datasheet_id": "core-character-support",
+      "display_name": "CORE Character Support",
+      "model_profile_id": "core-character-support",
+      "source_ids": [
+        "datasheet:core-character-support:profile"
+      ]
+    },
+    "core-deep-strike-model": {
+      "base_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 10,
+          "characteristic": "movement",
+          "display_value": "10\"",
+          "final": 10,
+          "label": "M",
+          "raw": 10,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 1,
+          "characteristic": "objective_control",
+          "display_value": "1",
+          "final": 1,
+          "label": "OC",
+          "raw": 1,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "base_size_id": "base-size:core-deep-strike-model",
+      "datasheet_id": "core-deep-strike-unit",
+      "display_name": "CORE Deep Strike Model",
+      "model_profile_id": "core-deep-strike-model",
+      "source_ids": [
+        "datasheet:core-deep-strike-unit:profile"
+      ]
+    },
+    "core-intercessor-like": {
+      "base_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "base_size_id": "base-size:core-intercessor-like",
+      "datasheet_id": "core-intercessor-like-infantry",
+      "display_name": "CORE Intercessor-like Infantry",
+      "model_profile_id": "core-intercessor-like",
+      "source_ids": [
+        "datasheet:core-intercessor-like-infantry:profile"
+      ]
+    },
+    "core-transport": {
+      "base_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 12,
+          "characteristic": "movement",
+          "display_value": "12\"",
+          "final": 12,
+          "label": "M",
+          "raw": 12,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 9,
+          "characteristic": "toughness",
+          "display_value": "9",
+          "final": 9,
+          "label": "T",
+          "raw": 9,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 10,
+          "characteristic": "wounds",
+          "display_value": "10",
+          "final": 10,
+          "label": "W",
+          "raw": 10,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "base_size_id": "base-size:core-transport",
+      "datasheet_id": "core-transport",
+      "display_name": "CORE Transport",
+      "model_profile_id": "core-transport",
+      "source_ids": [
+        "datasheet:core-transport:profile"
+      ]
+    },
+    "core-vehicle-monster": {
+      "base_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 10,
+          "characteristic": "movement",
+          "display_value": "10\"",
+          "final": 10,
+          "label": "M",
+          "raw": 10,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "objective_control",
+          "display_value": "4",
+          "final": 4,
+          "label": "OC",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 10,
+          "characteristic": "toughness",
+          "display_value": "10",
+          "final": 10,
+          "label": "T",
+          "raw": 10,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 12,
+          "characteristic": "wounds",
+          "display_value": "12",
+          "final": 12,
+          "label": "W",
+          "raw": 12,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "base_size_id": "base-size:core-vehicle-monster",
+      "datasheet_id": "core-vehicle-monster",
+      "display_name": "CORE Vehicle Monster",
+      "model_profile_id": "core-vehicle-monster",
+      "source_ids": [
+        "datasheet:core-vehicle-monster:profile"
+      ]
+    }
+  },
+  "projection_schema": "rules-catalog-view-v2",
+  "ruleset_id": {
+    "edition": "11e",
+    "game": "warhammer_40000",
+    "version": "core-v2-phase9a"
+  },
+  "source_hash": "933733fb11cd1ad6e9be8838e4579c5854e50f02df6993337a34be1ce5357f46",
+  "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
+  "stratagem_display_by_id": {},
+  "wargear_display_by_id": {
+    "core-bolt-rifle": {
+      "display_name": "Core bolt rifle",
+      "profile": {
+        "name": "Core bolt rifle",
+        "source_ids": [],
+        "wargear_id": "core-bolt-rifle",
+        "weapon_profiles": [
+          {
+            "abilities": [
+              {
+                "ability_id": "rapid-fire:1",
+                "ability_kind": "rapid_fire",
+                "condition": null,
+                "name": "Rapid Fire 1",
+                "parameters": [
+                  {
+                    "name": "value",
+                    "value": 1
+                  }
+                ],
+                "target_keywords": [],
+                "timing": "attack_sequence"
+              }
+            ],
+            "armor_penetration": {
+              "applied_modifier_ids": [],
+              "base": -1,
+              "characteristic": "armor_penetration",
+              "final": -1,
+              "raw": -1,
+              "value_kind": "numeric"
+            },
+            "attack_profile": {
+              "dice_expression": null,
+              "fixed_attacks": 2
+            },
+            "damage_profile": {
+              "dice_expression": null,
+              "fixed_damage": 1
+            },
+            "keywords": [
+              "Assault",
+              "Rapid Fire"
+            ],
+            "name": "Core bolt rifle",
+            "profile_id": "core-bolt-rifle:standard",
+            "range_profile": {
+              "distance_inches": 24,
+              "kind": "distance"
+            },
+            "skill": {
+              "applied_modifier_ids": [],
+              "base": 3,
+              "characteristic": "ballistic_skill",
+              "final": 3,
+              "raw": 3,
+              "value_kind": "numeric"
+            },
+            "source_ids": [],
+            "strength": {
+              "applied_modifier_ids": [],
+              "base": 4,
+              "characteristic": "strength",
+              "final": 4,
+              "raw": 4,
+              "value_kind": "numeric"
+            }
+          }
+        ]
+      },
+      "wargear_id": "core-bolt-rifle",
+      "weapon_profile_ids": [
+        "core-bolt-rifle:standard"
+      ]
+    },
+    "core-drop-carbine": {
+      "display_name": "Core drop carbine",
+      "profile": {
+        "name": "Core drop carbine",
+        "source_ids": [],
+        "wargear_id": "core-drop-carbine",
+        "weapon_profiles": [
+          {
+            "abilities": [],
+            "armor_penetration": {
+              "applied_modifier_ids": [],
+              "base": 0,
+              "characteristic": "armor_penetration",
+              "final": 0,
+              "raw": 0,
+              "value_kind": "numeric"
+            },
+            "attack_profile": {
+              "dice_expression": null,
+              "fixed_attacks": 3
+            },
+            "damage_profile": {
+              "dice_expression": null,
+              "fixed_damage": 1
+            },
+            "keywords": [],
+            "name": "Core drop carbine",
+            "profile_id": "core-drop-carbine:standard",
+            "range_profile": {
+              "distance_inches": 18,
+              "kind": "distance"
+            },
+            "skill": {
+              "applied_modifier_ids": [],
+              "base": 3,
+              "characteristic": "ballistic_skill",
+              "final": 3,
+              "raw": 3,
+              "value_kind": "numeric"
+            },
+            "source_ids": [],
+            "strength": {
+              "applied_modifier_ids": [],
+              "base": 4,
+              "characteristic": "strength",
+              "final": 4,
+              "raw": 4,
+              "value_kind": "numeric"
+            }
+          }
+        ]
+      },
+      "wargear_id": "core-drop-carbine",
+      "weapon_profile_ids": [
+        "core-drop-carbine:standard"
+      ]
+    },
+    "core-heavy-cannon": {
+      "display_name": "Core heavy cannon",
+      "profile": {
+        "name": "Core heavy cannon",
+        "source_ids": [],
+        "wargear_id": "core-heavy-cannon",
+        "weapon_profiles": [
+          {
+            "abilities": [
+              {
+                "ability_id": "heavy:stationary-or-policy-defined",
+                "ability_kind": "heavy",
+                "condition": "stationary_or_policy_defined",
+                "name": "Heavy",
+                "parameters": [],
+                "target_keywords": [],
+                "timing": "movement_conditioned"
+              }
+            ],
+            "armor_penetration": {
+              "applied_modifier_ids": [],
+              "base": -2,
+              "characteristic": "armor_penetration",
+              "final": -2,
+              "raw": -2,
+              "value_kind": "numeric"
+            },
+            "attack_profile": {
+              "dice_expression": null,
+              "fixed_attacks": 2
+            },
+            "damage_profile": {
+              "dice_expression": null,
+              "fixed_damage": 3
+            },
+            "keywords": [
+              "Heavy"
+            ],
+            "name": "Core heavy cannon",
+            "profile_id": "core-heavy-cannon:standard",
+            "range_profile": {
+              "distance_inches": 48,
+              "kind": "distance"
+            },
+            "skill": {
+              "applied_modifier_ids": [],
+              "base": 4,
+              "characteristic": "ballistic_skill",
+              "final": 4,
+              "raw": 4,
+              "value_kind": "numeric"
+            },
+            "source_ids": [],
+            "strength": {
+              "applied_modifier_ids": [],
+              "base": 10,
+              "characteristic": "strength",
+              "final": 10,
+              "raw": 10,
+              "value_kind": "numeric"
+            }
+          }
+        ]
+      },
+      "wargear_id": "core-heavy-cannon",
+      "weapon_profile_ids": [
+        "core-heavy-cannon:standard"
+      ]
+    },
+    "core-leader-blade": {
+      "display_name": "Core leader blade",
+      "profile": {
+        "name": "Core leader blade",
+        "source_ids": [],
+        "wargear_id": "core-leader-blade",
+        "weapon_profiles": [
+          {
+            "abilities": [],
+            "armor_penetration": {
+              "applied_modifier_ids": [],
+              "base": -2,
+              "characteristic": "armor_penetration",
+              "final": -2,
+              "raw": -2,
+              "value_kind": "numeric"
+            },
+            "attack_profile": {
+              "dice_expression": null,
+              "fixed_attacks": 5
+            },
+            "damage_profile": {
+              "dice_expression": null,
+              "fixed_damage": 2
+            },
+            "keywords": [],
+            "name": "Core leader blade",
+            "profile_id": "core-leader-blade:standard",
+            "range_profile": {
+              "distance_inches": null,
+              "kind": "melee"
+            },
+            "skill": {
+              "applied_modifier_ids": [],
+              "base": 2,
+              "characteristic": "weapon_skill",
+              "final": 2,
+              "raw": 2,
+              "value_kind": "numeric"
+            },
+            "source_ids": [],
+            "strength": {
+              "applied_modifier_ids": [],
+              "base": 5,
+              "characteristic": "strength",
+              "final": 5,
+              "raw": 5,
+              "value_kind": "numeric"
+            }
+          }
+        ]
+      },
+      "wargear_id": "core-leader-blade",
+      "weapon_profile_ids": [
+        "core-leader-blade:standard"
+      ]
+    },
+    "core-mob-shoota": {
+      "display_name": "Core mob shoota",
+      "profile": {
+        "name": "Core mob shoota",
+        "source_ids": [],
+        "wargear_id": "core-mob-shoota",
+        "weapon_profiles": [
+          {
+            "abilities": [],
+            "armor_penetration": {
+              "applied_modifier_ids": [],
+              "base": 0,
+              "characteristic": "armor_penetration",
+              "final": 0,
+              "raw": 0,
+              "value_kind": "numeric"
+            },
+            "attack_profile": {
+              "dice_expression": null,
+              "fixed_attacks": 2
+            },
+            "damage_profile": {
+              "dice_expression": null,
+              "fixed_damage": 1
+            },
+            "keywords": [],
+            "name": "Core mob shoota",
+            "profile_id": "core-mob-shoota:standard",
+            "range_profile": {
+              "distance_inches": 18,
+              "kind": "distance"
+            },
+            "skill": {
+              "applied_modifier_ids": [],
+              "base": 5,
+              "characteristic": "ballistic_skill",
+              "final": 5,
+              "raw": 5,
+              "value_kind": "numeric"
+            },
+            "source_ids": [],
+            "strength": {
+              "applied_modifier_ids": [],
+              "base": 4,
+              "characteristic": "strength",
+              "final": 4,
+              "raw": 4,
+              "value_kind": "numeric"
+            }
+          }
+        ]
+      },
+      "wargear_id": "core-mob-shoota",
+      "weapon_profile_ids": [
+        "core-mob-shoota:standard"
+      ]
+    },
+    "core-transport-array": {
+      "display_name": "Core transport array",
+      "profile": {
+        "name": "Core transport array",
+        "source_ids": [],
+        "wargear_id": "core-transport-array",
+        "weapon_profiles": [
+          {
+            "abilities": [],
+            "armor_penetration": {
+              "applied_modifier_ids": [],
+              "base": 0,
+              "characteristic": "armor_penetration",
+              "final": 0,
+              "raw": 0,
+              "value_kind": "numeric"
+            },
+            "attack_profile": {
+              "dice_expression": null,
+              "fixed_attacks": 6
+            },
+            "damage_profile": {
+              "dice_expression": null,
+              "fixed_damage": 1
+            },
+            "keywords": [],
+            "name": "Core transport array",
+            "profile_id": "core-transport-array:standard",
+            "range_profile": {
+              "distance_inches": 24,
+              "kind": "distance"
+            },
+            "skill": {
+              "applied_modifier_ids": [],
+              "base": 4,
+              "characteristic": "ballistic_skill",
+              "final": 4,
+              "raw": 4,
+              "value_kind": "numeric"
+            },
+            "source_ids": [],
+            "strength": {
+              "applied_modifier_ids": [],
+              "base": 5,
+              "characteristic": "strength",
+              "final": 5,
+              "raw": 5,
+              "value_kind": "numeric"
+            }
+          }
+        ]
+      },
+      "wargear_id": "core-transport-array",
+      "weapon_profile_ids": [
+        "core-transport-array:standard"
+      ]
+    }
+  },
+  "wargear_option_display_by_id": {
+    "core-boyz-like-infantry:default-wargear": {
+      "allowed_wargear_ids": [
+        "core-mob-shoota"
+      ],
+      "datasheet_id": "core-boyz-like-infantry",
+      "default_wargear_ids": [
+        "core-mob-shoota"
+      ],
+      "max_selections": 1,
+      "min_selections": 1,
+      "model_profile_id": "core-boyz-like",
+      "option_id": "core-boyz-like-infantry:default-wargear"
+    },
+    "core-character-leader:default-wargear": {
+      "allowed_wargear_ids": [
+        "core-leader-blade"
+      ],
+      "datasheet_id": "core-character-leader",
+      "default_wargear_ids": [
+        "core-leader-blade"
+      ],
+      "max_selections": 1,
+      "min_selections": 1,
+      "model_profile_id": "core-character-leader",
+      "option_id": "core-character-leader:default-wargear"
+    },
+    "core-character-support:default-wargear": {
+      "allowed_wargear_ids": [
+        "core-leader-blade"
+      ],
+      "datasheet_id": "core-character-support",
+      "default_wargear_ids": [
+        "core-leader-blade"
+      ],
+      "max_selections": 1,
+      "min_selections": 1,
+      "model_profile_id": "core-character-support",
+      "option_id": "core-character-support:default-wargear"
+    },
+    "core-deep-strike-unit:default-wargear": {
+      "allowed_wargear_ids": [
+        "core-drop-carbine"
+      ],
+      "datasheet_id": "core-deep-strike-unit",
+      "default_wargear_ids": [
+        "core-drop-carbine"
+      ],
+      "max_selections": 1,
+      "min_selections": 1,
+      "model_profile_id": "core-deep-strike-model",
+      "option_id": "core-deep-strike-unit:default-wargear"
+    },
+    "core-intercessor-like-infantry:default-wargear": {
+      "allowed_wargear_ids": [
+        "core-bolt-rifle"
+      ],
+      "datasheet_id": "core-intercessor-like-infantry",
+      "default_wargear_ids": [
+        "core-bolt-rifle"
+      ],
+      "max_selections": 1,
+      "min_selections": 1,
+      "model_profile_id": "core-intercessor-like",
+      "option_id": "core-intercessor-like-infantry:default-wargear"
+    },
+    "core-transport:default-wargear": {
+      "allowed_wargear_ids": [
+        "core-transport-array"
+      ],
+      "datasheet_id": "core-transport",
+      "default_wargear_ids": [
+        "core-transport-array"
+      ],
+      "max_selections": 1,
+      "min_selections": 1,
+      "model_profile_id": "core-transport",
+      "option_id": "core-transport:default-wargear"
+    },
+    "core-vehicle-monster:default-wargear": {
+      "allowed_wargear_ids": [
+        "core-heavy-cannon"
+      ],
+      "datasheet_id": "core-vehicle-monster",
+      "default_wargear_ids": [
+        "core-heavy-cannon"
+      ],
+      "max_selections": 1,
+      "min_selections": 1,
+      "model_profile_id": "core-vehicle-monster",
+      "option_id": "core-vehicle-monster:default-wargear"
+    }
+  },
+  "weapon_profile_display_by_id": {
+    "core-bolt-rifle:standard": {
+      "display_name": "Core bolt rifle",
+      "profile": {
+        "abilities": [
+          {
+            "ability_id": "rapid-fire:1",
+            "ability_kind": "rapid_fire",
+            "condition": null,
+            "name": "Rapid Fire 1",
+            "parameters": [
+              {
+                "name": "value",
+                "value": 1
+              }
+            ],
+            "target_keywords": [],
+            "timing": "attack_sequence"
+          }
+        ],
+        "armor_penetration": {
+          "applied_modifier_ids": [],
+          "base": -1,
+          "characteristic": "armor_penetration",
+          "final": -1,
+          "raw": -1,
+          "value_kind": "numeric"
+        },
+        "attack_profile": {
+          "dice_expression": null,
+          "fixed_attacks": 2
+        },
+        "damage_profile": {
+          "dice_expression": null,
+          "fixed_damage": 1
+        },
+        "keywords": [
+          "Assault",
+          "Rapid Fire"
+        ],
+        "name": "Core bolt rifle",
+        "profile_id": "core-bolt-rifle:standard",
+        "range_profile": {
+          "distance_inches": 24,
+          "kind": "distance"
+        },
+        "skill": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "ballistic_skill",
+          "final": 3,
+          "raw": 3,
+          "value_kind": "numeric"
+        },
+        "source_ids": [],
+        "strength": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "strength",
+          "final": 4,
+          "raw": 4,
+          "value_kind": "numeric"
+        }
+      },
+      "wargear_id": "core-bolt-rifle",
+      "weapon_profile_id": "core-bolt-rifle:standard"
+    },
+    "core-drop-carbine:standard": {
+      "display_name": "Core drop carbine",
+      "profile": {
+        "abilities": [],
+        "armor_penetration": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "armor_penetration",
+          "final": 0,
+          "raw": 0,
+          "value_kind": "numeric"
+        },
+        "attack_profile": {
+          "dice_expression": null,
+          "fixed_attacks": 3
+        },
+        "damage_profile": {
+          "dice_expression": null,
+          "fixed_damage": 1
+        },
+        "keywords": [],
+        "name": "Core drop carbine",
+        "profile_id": "core-drop-carbine:standard",
+        "range_profile": {
+          "distance_inches": 18,
+          "kind": "distance"
+        },
+        "skill": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "ballistic_skill",
+          "final": 3,
+          "raw": 3,
+          "value_kind": "numeric"
+        },
+        "source_ids": [],
+        "strength": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "strength",
+          "final": 4,
+          "raw": 4,
+          "value_kind": "numeric"
+        }
+      },
+      "wargear_id": "core-drop-carbine",
+      "weapon_profile_id": "core-drop-carbine:standard"
+    },
+    "core-heavy-cannon:standard": {
+      "display_name": "Core heavy cannon",
+      "profile": {
+        "abilities": [
+          {
+            "ability_id": "heavy:stationary-or-policy-defined",
+            "ability_kind": "heavy",
+            "condition": "stationary_or_policy_defined",
+            "name": "Heavy",
+            "parameters": [],
+            "target_keywords": [],
+            "timing": "movement_conditioned"
+          }
+        ],
+        "armor_penetration": {
+          "applied_modifier_ids": [],
+          "base": -2,
+          "characteristic": "armor_penetration",
+          "final": -2,
+          "raw": -2,
+          "value_kind": "numeric"
+        },
+        "attack_profile": {
+          "dice_expression": null,
+          "fixed_attacks": 2
+        },
+        "damage_profile": {
+          "dice_expression": null,
+          "fixed_damage": 3
+        },
+        "keywords": [
+          "Heavy"
+        ],
+        "name": "Core heavy cannon",
+        "profile_id": "core-heavy-cannon:standard",
+        "range_profile": {
+          "distance_inches": 48,
+          "kind": "distance"
+        },
+        "skill": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "ballistic_skill",
+          "final": 4,
+          "raw": 4,
+          "value_kind": "numeric"
+        },
+        "source_ids": [],
+        "strength": {
+          "applied_modifier_ids": [],
+          "base": 10,
+          "characteristic": "strength",
+          "final": 10,
+          "raw": 10,
+          "value_kind": "numeric"
+        }
+      },
+      "wargear_id": "core-heavy-cannon",
+      "weapon_profile_id": "core-heavy-cannon:standard"
+    },
+    "core-leader-blade:standard": {
+      "display_name": "Core leader blade",
+      "profile": {
+        "abilities": [],
+        "armor_penetration": {
+          "applied_modifier_ids": [],
+          "base": -2,
+          "characteristic": "armor_penetration",
+          "final": -2,
+          "raw": -2,
+          "value_kind": "numeric"
+        },
+        "attack_profile": {
+          "dice_expression": null,
+          "fixed_attacks": 5
+        },
+        "damage_profile": {
+          "dice_expression": null,
+          "fixed_damage": 2
+        },
+        "keywords": [],
+        "name": "Core leader blade",
+        "profile_id": "core-leader-blade:standard",
+        "range_profile": {
+          "distance_inches": null,
+          "kind": "melee"
+        },
+        "skill": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "weapon_skill",
+          "final": 2,
+          "raw": 2,
+          "value_kind": "numeric"
+        },
+        "source_ids": [],
+        "strength": {
+          "applied_modifier_ids": [],
+          "base": 5,
+          "characteristic": "strength",
+          "final": 5,
+          "raw": 5,
+          "value_kind": "numeric"
+        }
+      },
+      "wargear_id": "core-leader-blade",
+      "weapon_profile_id": "core-leader-blade:standard"
+    },
+    "core-mob-shoota:standard": {
+      "display_name": "Core mob shoota",
+      "profile": {
+        "abilities": [],
+        "armor_penetration": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "armor_penetration",
+          "final": 0,
+          "raw": 0,
+          "value_kind": "numeric"
+        },
+        "attack_profile": {
+          "dice_expression": null,
+          "fixed_attacks": 2
+        },
+        "damage_profile": {
+          "dice_expression": null,
+          "fixed_damage": 1
+        },
+        "keywords": [],
+        "name": "Core mob shoota",
+        "profile_id": "core-mob-shoota:standard",
+        "range_profile": {
+          "distance_inches": 18,
+          "kind": "distance"
+        },
+        "skill": {
+          "applied_modifier_ids": [],
+          "base": 5,
+          "characteristic": "ballistic_skill",
+          "final": 5,
+          "raw": 5,
+          "value_kind": "numeric"
+        },
+        "source_ids": [],
+        "strength": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "strength",
+          "final": 4,
+          "raw": 4,
+          "value_kind": "numeric"
+        }
+      },
+      "wargear_id": "core-mob-shoota",
+      "weapon_profile_id": "core-mob-shoota:standard"
+    },
+    "core-transport-array:standard": {
+      "display_name": "Core transport array",
+      "profile": {
+        "abilities": [],
+        "armor_penetration": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "armor_penetration",
+          "final": 0,
+          "raw": 0,
+          "value_kind": "numeric"
+        },
+        "attack_profile": {
+          "dice_expression": null,
+          "fixed_attacks": 6
+        },
+        "damage_profile": {
+          "dice_expression": null,
+          "fixed_damage": 1
+        },
+        "keywords": [],
+        "name": "Core transport array",
+        "profile_id": "core-transport-array:standard",
+        "range_profile": {
+          "distance_inches": 24,
+          "kind": "distance"
+        },
+        "skill": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "ballistic_skill",
+          "final": 4,
+          "raw": 4,
+          "value_kind": "numeric"
+        },
+        "source_ids": [],
+        "strength": {
+          "applied_modifier_ids": [],
+          "base": 5,
+          "characteristic": "strength",
+          "final": 5,
+          "raw": 5,
+          "value_kind": "numeric"
+        }
+      },
+      "wargear_id": "core-transport-array",
+      "weapon_profile_id": "core-transport-array:standard"
+    }
+  }
+}

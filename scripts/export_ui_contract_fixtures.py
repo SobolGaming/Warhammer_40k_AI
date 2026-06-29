@@ -173,6 +173,9 @@ def build_ui_contract_bundle() -> UiContractBundle:
         ),
         "pending_movement_request.json": validate_json_value(cast(JsonValue, pending_movement)),
         "post_deployment_view.json": validate_json_value(cast(JsonValue, post_deployment_view)),
+        "rules_catalog_view.json": validate_json_value(
+            cast(JsonValue, initial_session.rules_catalog_view())
+        ),
         "visible_modifier_datacard_view.json": validate_json_value(
             cast(JsonValue, modifier_session.view(viewer_player_id=PLAYER_A))
         ),

@@ -9,6 +9,12 @@
       },
       "type": "object"
     },
+    "army_rule_display_by_id": {
+      "additionalProperties": {
+        "$ref": "#/$defs/army_rule_display"
+      },
+      "type": "object"
+    },
     "catalog_id": {
       "minLength": 1,
       "type": "string"
@@ -58,6 +64,12 @@
       "minLength": 1,
       "type": "string"
     },
+    "stratagem_display_by_id": {
+      "additionalProperties": {
+        "$ref": "#/$defs/stratagem_display"
+      },
+      "type": "object"
+    },
     "wargear_display_by_id": {
       "additionalProperties": {
         "$ref": "#/$defs/display_record"
@@ -89,6 +101,8 @@
     "weapon_profile_display_by_id",
     "faction_display_by_id",
     "detachment_display_by_id",
+    "army_rule_display_by_id",
+    "stratagem_display_by_id",
     "enhancement_display_by_id",
     "wargear_option_display_by_id",
     "base_size_display_by_id"
@@ -135,6 +149,42 @@
       ],
       "type": "object"
     },
+    "army_rule_display": {
+      "additionalProperties": false,
+      "properties": {
+        "ability_descriptor_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "army_rule_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "content_scope": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "display_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "army_rule_id",
+        "display_name",
+        "source_id",
+        "content_scope",
+        "ability_descriptor_ids"
+      ],
+      "type": "object"
+    },
     "display_record": {
       "additionalProperties": {
         "$ref": "#/$defs/json_value"
@@ -168,6 +218,55 @@
           "type": "object"
         }
       ]
+    },
+    "stratagem_display": {
+      "additionalProperties": false,
+      "properties": {
+        "ability_descriptor_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "command_point_cost": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "content_scope": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "display_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "stratagem_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "timing_tags": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "stratagem_id",
+        "display_name",
+        "source_id",
+        "content_scope",
+        "command_point_cost",
+        "timing_tags",
+        "ability_descriptor_ids"
+      ],
+      "type": "object"
     }
   }
 }

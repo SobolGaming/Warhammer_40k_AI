@@ -4,6 +4,7 @@ import json
 import re
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
 from typing import Protocol, cast
 
@@ -29,6 +30,9 @@ from scripts.export_ui_contract_fixtures import (
 )
 
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.projection import project_rules_catalog_view
+from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.detachment import StratagemDefinition
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -54,6 +58,7 @@ FIXTURE_FILES = (
     "initial_setup_view_player2.json",
     "pending_movement_request.json",
     "post_deployment_view.json",
+    "rules_catalog_view.json",
     "visible_modifier_datacard_view.json",
 )
 GAME_VIEW_FIXTURE_FILES = (
@@ -114,11 +119,31 @@ def test_ui_contract_schemas_validate_generated_and_live_payloads() -> None:
     session, _status = build_local_session_at_movement_request(
         game_id="ui-contract-schema-validation"
     )
-    _schema_validator("rules_catalog_view.schema.json", registry=registry).validate(
-        session.rules_catalog_view()
-    )
+    rules_catalog_validator = _schema_validator("rules_catalog_view.schema.json", registry=registry)
+    rules_catalog_validator.validate(_fixture("rules_catalog_view.json"))
+    rules_catalog_validator.validate(session.rules_catalog_view())
     _schema_validator("event_stream_delta.schema.json", registry=registry).validate(
         session.events_since(EventStreamCursor(0), viewer_player_id=PLAYER_A)
+    )
+
+
+def test_rules_catalog_schema_requires_catalog_card_detail_maps() -> None:
+    schema = _read_json(REPO_ROOT / Path("docs/api/rules_catalog_view.schema.json"))
+    properties = _json_object(schema["properties"])
+    required = {_json_string(value) for value in _json_list(schema["required"])}
+
+    assert {"army_rule_display_by_id", "stratagem_display_by_id"}.issubset(required)
+    assert (
+        _json_object(_json_object(properties["army_rule_display_by_id"])["additionalProperties"])[
+            "$ref"
+        ]
+        == "#/$defs/army_rule_display"
+    )
+    assert (
+        _json_object(_json_object(properties["stratagem_display_by_id"])["additionalProperties"])[
+            "$ref"
+        ]
+        == "#/$defs/stratagem_display"
     )
 
 
@@ -161,6 +186,54 @@ def test_ui_contract_fixtures_expose_stable_joinable_viewer_payloads() -> None:
                 assert model_id in model_display_by_id
                 model_display = _json_object(model_display_by_id[model_id])
                 assert model_display["unit_instance_id"] == unit_id
+
+
+def test_rules_catalog_card_maps_are_joinable_by_static_ids() -> None:
+    session, _status = build_local_session_at_movement_request(game_id="ui-contract-card-map-joins")
+    catalog_view = session.rules_catalog_view()
+    army_rule_display_by_id = catalog_view["army_rule_display_by_id"]
+    stratagem_display_by_id = catalog_view["stratagem_display_by_id"]
+
+    assert army_rule_display_by_id["core-discipline"] == {
+        "army_rule_id": "core-discipline",
+        "display_name": "Core Discipline",
+        "source_id": "army-rule:core-discipline",
+        "content_scope": "matched_play",
+        "ability_descriptor_ids": [],
+    }
+    for faction in catalog_view["faction_display_by_id"].values():
+        for rule_id in faction["army_rule_ids"]:
+            assert rule_id in army_rule_display_by_id
+
+    for detachment in catalog_view["detachment_display_by_id"].values():
+        for stratagem_id in detachment["stratagem_ids"]:
+            assert stratagem_id in stratagem_display_by_id
+
+
+def test_rules_catalog_stratagem_card_records_expose_stage1_details() -> None:
+    catalog_view = project_rules_catalog_view(catalog=_catalog_with_ui_contract_stratagem())
+    _schema_validator("rules_catalog_view.schema.json", registry=_schema_registry()).validate(
+        catalog_view
+    )
+
+    detachment = catalog_view["detachment_display_by_id"]["core-combined-arms"]
+    stratagem = catalog_view["stratagem_display_by_id"]["ui-contract-stratagem"]
+
+    assert detachment["stratagem_ids"] == ["ui-contract-stratagem"]
+    assert stratagem == {
+        "stratagem_id": "ui-contract-stratagem",
+        "display_name": "UI Contract Stratagem",
+        "source_id": "stratagem:ui-contract-stratagem",
+        "content_scope": "matched_play",
+        "command_point_cost": 1,
+        "timing_tags": ["fight", "shooting"],
+        "ability_descriptor_ids": ["ui-contract-stratagem-ability"],
+    }
+    for record in catalog_view["stratagem_display_by_id"].values():
+        assert type(record["command_point_cost"]) is int
+        assert record["timing_tags"]
+        assert record["source_id"]
+        assert record["display_name"]
 
 
 def test_hidden_data_is_redacted_but_legal_options_remain_explicit() -> None:
@@ -277,6 +350,35 @@ def _read_json(path: Path) -> dict[str, JsonValue]:
     payload = validate_json_value(json.loads(path.read_text(encoding="utf-8")))
     assert isinstance(payload, dict), f"{path} must contain a JSON object."
     return payload
+
+
+def _catalog_with_ui_contract_stratagem() -> ArmyCatalog:
+    base = ArmyCatalog.phase9a_canonical_content_pack()
+    stratagem = StratagemDefinition(
+        stratagem_id="ui-contract-stratagem",
+        name="UI Contract Stratagem",
+        source_id="stratagem:ui-contract-stratagem",
+        command_point_cost=1,
+        timing_tags=("fight", "shooting"),
+        ability_descriptor_ids=("ui-contract-stratagem-ability",),
+    )
+    detachment = replace(
+        base.detachments[0],
+        stratagem_ids=(stratagem.stratagem_id,),
+    )
+    return ArmyCatalog(
+        catalog_id="ui-contract-stratagem-catalog",
+        ruleset_id=base.ruleset_id,
+        source_package_id=base.source_package_id,
+        datasheets=base.datasheets,
+        wargear=base.wargear,
+        factions=base.factions,
+        army_rules=base.army_rules,
+        detachments=(detachment,),
+        enhancements=base.enhancements,
+        stratagems=(stratagem,),
+        source_ids=base.source_ids,
+    )
 
 
 def _schema_payloads() -> dict[str, Schema]:
