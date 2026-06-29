@@ -94,6 +94,8 @@ AURA_ALLEGIANCE_FRIENDLY = "friendly"
 TARGET_CONSTRAINT_THIS_MODEL_LEADING_UNIT = "this_model_leading_unit"
 TARGET_CONSTRAINT_THIS_MODEL_MAKES_ATTACK = "this_model_makes_attack"
 TARGET_CONSTRAINT_THIS_MODEL_DESTROYED_UNIT = "this_model_destroyed_unit"
+TARGET_CONSTRAINT_TARGET_UNIT_HAS_STATUS = "target_unit_has_status"
+TARGET_STATUS_BATTLE_SHOCKED = "battle_shocked"
 
 
 class RuleExecutionStatus(StrEnum):
@@ -1253,6 +1255,10 @@ def _canonical_keyword(keyword: str) -> str:
     return keyword.strip().upper().replace("_", " ").replace("-", " ")
 
 
+def _status_token(status: str) -> str:
+    return status.strip().lower().replace(" ", "_").replace("-", "_")
+
+
 def _clause_semantic_unavailable_reason(
     *,
     rule_ir: RuleIR,
@@ -1312,6 +1318,11 @@ def _target_constraint_unavailable_reason(
         TARGET_CONSTRAINT_THIS_MODEL_DESTROYED_UNIT,
     }:
         return _this_model_constraint_unavailable_reason(context=context)
+    if relationship == TARGET_CONSTRAINT_TARGET_UNIT_HAS_STATUS:
+        return _target_unit_status_constraint_unavailable_reason(
+            condition=condition,
+            context=context,
+        )
     if relationship != TARGET_CONSTRAINT_THIS_MODEL_LEADING_UNIT:
         return f"unsupported_target_constraint:{relationship}"
     state = context.state
@@ -1330,6 +1341,63 @@ def _target_constraint_unavailable_reason(
     if not state.unit_started_battle_as_attached_leader_or_support(source_unit_id):
         return f"condition_not_met:{TARGET_CONSTRAINT_THIS_MODEL_LEADING_UNIT}"
     return None
+
+
+def _target_unit_status_constraint_unavailable_reason(
+    *,
+    condition: RuleCondition,
+    context: RuleExecutionContext,
+) -> str | None:
+    parameters = parameter_payload(condition.parameters)
+    status = parameters.get("status")
+    if type(status) is not str:
+        raise GameLifecycleError("Target status constraint requires a status.")
+    status_token = _status_token(status)
+    if status_token != TARGET_STATUS_BATTLE_SHOCKED:
+        return f"unsupported_target_status:{status_token}"
+    if context.state is not None and context.target_unit_instance_ids:
+        battle_shocked_unit_ids = set(context.state.battle_shocked_unit_ids)
+        if all(unit_id in battle_shocked_unit_ids for unit_id in context.target_unit_instance_ids):
+            return None
+        return f"condition_not_met:{TARGET_CONSTRAINT_TARGET_UNIT_HAS_STATUS}"
+    payload_statuses = _target_unit_statuses_from_trigger_payload(
+        trigger_payload=context.trigger_payload,
+        status=status_token,
+    )
+    if type(payload_statuses) is str:
+        return payload_statuses
+    if status_token not in payload_statuses:
+        return f"condition_not_met:{TARGET_CONSTRAINT_TARGET_UNIT_HAS_STATUS}"
+    return None
+
+
+def _target_unit_statuses_from_trigger_payload(
+    *,
+    trigger_payload: JsonValue,
+    status: str,
+) -> tuple[str, ...] | str:
+    if not isinstance(trigger_payload, dict):
+        return "missing_input:target_unit_status"
+    raw_statuses = trigger_payload.get("target_unit_statuses")
+    raw_battle_shocked = trigger_payload.get("target_unit_is_battle_shocked")
+    if raw_statuses is None and raw_battle_shocked is None:
+        return "missing_input:target_unit_status"
+    status_tokens: list[str] = []
+    if raw_statuses is not None:
+        if not isinstance(raw_statuses, list):
+            return "malformed_input:target_unit_statuses"
+        for raw_status in raw_statuses:
+            if type(raw_status) is not str:
+                return "malformed_input:target_unit_statuses"
+            status_tokens.append(_status_token(raw_status))
+    if raw_battle_shocked is not None:
+        if type(raw_battle_shocked) is not bool:
+            return "malformed_input:target_unit_is_battle_shocked"
+        if status != TARGET_STATUS_BATTLE_SHOCKED:
+            return f"unsupported_target_status:{status}"
+        if raw_battle_shocked:
+            status_tokens.append(TARGET_STATUS_BATTLE_SHOCKED)
+    return tuple(sorted(set(status_tokens)))
 
 
 def _this_model_constraint_unavailable_reason(context: RuleExecutionContext) -> str | None:

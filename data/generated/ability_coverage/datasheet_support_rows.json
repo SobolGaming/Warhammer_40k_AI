@@ -46,7 +46,7 @@
       "chaos-daemons-bridge-catalog/000001114/wargear/000001114:instrument-of-chaos/000001114:instrument-of-chaos"
     ],
     "catalog_status": "Full",
-    "datasheet_ability_status": "Full",
+    "datasheet_ability_status": "Playable",
     "datasheet_id": "000001114",
     "datasheet_name": "Bloodletters",
     "detachment_ids": [
@@ -63,7 +63,7 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "notes": "`000001114:bane-of-cowards` Bane of Cowards: `generic_ir_executable` Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",

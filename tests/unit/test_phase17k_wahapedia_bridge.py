@@ -1651,7 +1651,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert flesh_hounds_support.datasheet_ability_status == "Full"
     assert flesh_hounds_support.faction_interaction_status == "Partial"
     assert bloodletters_support.overall == "Playable"
-    assert bloodletters_support.datasheet_ability_status == "Full"
+    assert bloodletters_support.datasheet_ability_status == "Playable"
     for support_row in support_rows:
         assert support_row.overall in DATASHEET_SUPPORT_OVERALL_VALUES
         assert support_row.faction_id in faction_ids
