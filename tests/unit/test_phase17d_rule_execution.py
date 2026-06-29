@@ -1,22 +1,36 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import replace
-from typing import cast
+from typing import Any, cast
 
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    CatalogJsonObject,
+    DatasheetAbilityDescriptor,
+)
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+    AbilityCatalogIndex,
     AbilityCatalogRecord,
     AbilityDefinition,
     AbilityExecutionContext,
     AbilityResolutionStatus,
     AbilitySourceKind,
     AbilityTimingDescriptor,
+    KeywordGate,
     default_ability_handler_registry,
+    execute_abilities_from_index,
+)
+from warhammer40k_core.engine.ability_catalog import (
+    build_player_ability_index,
+    catalog_ability_records_from_catalog,
 )
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
@@ -28,10 +42,15 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     UnitPlacement,
 )
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_restore_lost_wounds_after_destroying_unit,
+    catalog_wound_roll_reroll_permission_for_attack,
+)
 from warhammer40k_core.engine.command_points import (
     CommandPointSourceKind,
     initial_command_point_ledgers,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.effects import (
     EffectError,
     EffectExpiration,
@@ -50,20 +69,28 @@ from warhammer40k_core.engine.placement import create_deterministic_battlefield_
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     RuleExecutionRegistry,
+    RuleExecutionResult,
     RuleExecutionStatus,
+    RuleRuntimeBinding,
     default_rule_execution_registry,
     execute_rule_ir,
     rule_execution_status_from_token,
     rule_ir_from_execution_payload,
+    scoped_rule_ir_from_execution_payload,
 )
 from warhammer40k_core.engine.scoring import initial_victory_point_ledgers
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.rule_compiler import CompiledRuleSource, compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
+    RuleEffectKind,
+    RuleEffectSpec,
     RuleIR,
     RuleIRPayload,
     RuleParameter,
+    RuleTriggerKind,
     parameter_payload,
 )
 from warhammer40k_core.rules.source_data import RuleSourceText
@@ -190,6 +217,504 @@ def test_phase17d_generic_reroll_permission_executes() -> None:
     assert effect["parameters"] == [{"key": "roll_type", "value": "hit"}]
 
 
+def test_phase17d_champion_slayer_wound_reroll_only_applies_to_qualifying_melee_attack() -> None:
+    state = _battle_state_with_scenario()
+    unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
+    source_model_id = unit.own_models[0].model_instance_id
+    ability_index = _champion_slayer_ability_index(datasheet_id=unit.datasheet_id)
+
+    qualifying = catalog_wound_roll_reroll_permission_for_attack(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=(source_model_id,),
+        player_id="player-a",
+        attack_kind="melee",
+        target_keywords=("CHARACTER",),
+    )
+    ranged = catalog_wound_roll_reroll_permission_for_attack(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=(source_model_id,),
+        player_id="player-a",
+        attack_kind="ranged",
+        target_keywords=("CHARACTER",),
+    )
+    non_keyword_target = catalog_wound_roll_reroll_permission_for_attack(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=(source_model_id,),
+        player_id="player-a",
+        attack_kind="melee",
+        target_keywords=("INFANTRY",),
+    )
+
+    assert qualifying is not None
+    assert qualifying.eligible_roll_type == "attack_sequence.wound"
+    assert qualifying.timing_window == "attack_sequence.wound"
+    assert ranged is None
+    assert non_keyword_target is None
+
+
+def test_phase17d_champion_slayer_clause_records_share_source_identity_and_split_timings() -> None:
+    ability_index = _champion_slayer_ability_index(datasheet_id="core-intercessor-like-infantry")
+    wound_records = ability_index.records_for(TimingTriggerKind.AFTER_DICE_ROLL)
+    destroy_records = ability_index.records_for(TimingTriggerKind.AFTER_UNIT_DESTROYED)
+
+    assert len(wound_records) == 1
+    assert len(destroy_records) == 1
+    assert wound_records[0].definition.ability_id == destroy_records[0].definition.ability_id
+    assert wound_records[0].definition.source_id == destroy_records[0].definition.source_id
+    wound_payload = cast(dict[str, JsonValue], wound_records[0].definition.replay_payload)
+    destroy_payload = cast(dict[str, JsonValue], destroy_records[0].definition.replay_payload)
+    assert cast(str, wound_payload["runtime_clause_id"]).endswith(":clause:001")
+    assert cast(str, destroy_payload["runtime_clause_id"]).endswith(":clause:002")
+
+
+def test_phase17d_catalog_builder_emits_clause_records_for_compound_ability() -> None:
+    catalog = _catalog_with_champion_slayer_ability()
+
+    records = tuple(
+        record
+        for record in catalog_ability_records_from_catalog(catalog)
+        if record.definition.ability_id == "champion-slayer"
+    )
+    replay_payloads = tuple(
+        cast(dict[str, JsonValue], record.definition.replay_payload) for record in records
+    )
+
+    assert len(records) == 2
+    assert tuple(record.record_id for record in records) == (
+        f"{catalog.source_package_id}:catalog-ability:core-intercessor-like-infantry:"
+        "champion-slayer:phase17d:test:champion-slayer:clause:001",
+        f"{catalog.source_package_id}:catalog-ability:core-intercessor-like-infantry:"
+        "champion-slayer:phase17d:test:champion-slayer:clause:002",
+    )
+    assert {record.definition.source_id for record in records} == {"phase17d:test:champion-slayer"}
+    assert tuple(record.definition.timing.trigger_kind for record in records) == (
+        TimingTriggerKind.AFTER_DICE_ROLL,
+        TimingTriggerKind.AFTER_UNIT_DESTROYED,
+    )
+    assert tuple(cast(str, payload["runtime_clause_id"]) for payload in replay_payloads) == (
+        "phase17d:test:champion-slayer:clause:001",
+        "phase17d:test:champion-slayer:clause:002",
+    )
+
+
+@pytest.mark.parametrize(
+    ("raw_text", "expected_trigger_kind"),
+    [
+        (
+            (
+                "At the end of your opponent's turn, if this unit is not within Engagement "
+                "Range of one or more enemy units, you can remove it from the battlefield "
+                "and place it into Strategic Reserves."
+            ),
+            TimingTriggerKind.END_TURN,
+        ),
+        (
+            "This unit is eligible to declare a charge in a turn in  which it Advanced.",
+            TimingTriggerKind.PASSIVE_QUERY,
+        ),
+        (
+            "Daemonic Shadow (Aura): While a friendly Khorne Legiones Daemonica unit is "
+            'within 6" of this model, that unit is within your army\u2019s Shadow of Chaos.',
+            TimingTriggerKind.PASSIVE_QUERY,
+        ),
+        (
+            "The bearer has a Toughness characteristic of 5.",
+            TimingTriggerKind.PASSIVE_QUERY,
+        ),
+        (
+            "The bearer has the Feel No Pain 3+ ability against Psychic Attacks.",
+            TimingTriggerKind.PASSIVE_QUERY,
+        ),
+        (
+            "Weapons equipped by models in that unit have the [LANCE] ability.",
+            TimingTriggerKind.PASSIVE_QUERY,
+        ),
+        ("After a hit roll, re-roll hit rolls.", TimingTriggerKind.AFTER_DICE_ROLL),
+        ("Gain 1CP.", TimingTriggerKind.ANY_PHASE),
+    ],
+)
+def test_phase17d_catalog_builder_classifies_single_clause_generic_timing(
+    raw_text: str,
+    expected_trigger_kind: TimingTriggerKind,
+) -> None:
+    descriptor = _generic_catalog_descriptor(raw_text)
+
+    records = catalog_ability_records_from_catalog(_catalog_with_descriptor(descriptor))
+
+    assert len(records) == 1
+    assert records[0].definition.timing.trigger_kind is expected_trigger_kind
+    assert (
+        _json_object(records[0].definition.replay_payload)["rule_ir"] == descriptor.rule_ir_payload
+    )
+
+
+def test_phase17d_catalog_builder_rejects_malformed_generic_ir_descriptors() -> None:
+    missing_rule_ir = _generic_catalog_descriptor("Gain 1CP.", ability_id="missing-rule-ir")
+    object.__setattr__(missing_rule_ir, "rule_ir_payload", None)
+    invalid_rule_ir = _generic_catalog_descriptor("Gain 1CP.", ability_id="invalid-rule-ir")
+    invalid_payload = dict(cast(dict[str, JsonValue], invalid_rule_ir.rule_ir_payload))
+    invalid_payload["ir_hash"] = "stale"
+    object.__setattr__(invalid_rule_ir, "rule_ir_payload", invalid_payload)
+    unsupported_source = _generic_catalog_descriptor(
+        "Gain 1CP.",
+        ability_id="unsupported-source",
+        source_kind=CatalogAbilitySourceKind.CORE,
+    )
+    missing_wargear_source = _generic_catalog_descriptor(
+        "Gain 1CP.",
+        ability_id="missing-wargear-source",
+        source_kind=CatalogAbilitySourceKind.WARGEAR,
+        source_wargear_id="core-bolt-rifle",
+    )
+    object.__setattr__(missing_wargear_source, "source_wargear_id", None)
+
+    with pytest.raises(GameLifecycleError, match="missing rule_ir"):
+        catalog_ability_records_from_catalog(_catalog_with_descriptor(missing_rule_ir))
+    with pytest.raises(GameLifecycleError, match="invalid IR"):
+        catalog_ability_records_from_catalog(_catalog_with_descriptor(invalid_rule_ir))
+    with pytest.raises(GameLifecycleError, match="source kind is unsupported"):
+        catalog_ability_records_from_catalog(_catalog_with_descriptor(unsupported_source))
+    with pytest.raises(GameLifecycleError, match="missing source_wargear_id"):
+        catalog_ability_records_from_catalog(_catalog_with_descriptor(missing_wargear_source))
+
+
+def test_phase17d_player_ability_index_filters_selected_source_records() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    army = _mustered_armies()[0]
+    army = replace(
+        army,
+        detachment_selection=replace(
+            army.detachment_selection,
+            enhancement_ids=("selected-enhancement",),
+        ),
+    )
+    records = (
+        _ability_record("core", AbilitySourceKind.CORE),
+        _ability_record(
+            "keyword-infantry",
+            AbilitySourceKind.KEYWORD,
+            keyword_gate=KeywordGate(required_keywords=("Infantry",)),
+        ),
+        _ability_record(
+            "keyword-vehicle",
+            AbilitySourceKind.KEYWORD,
+            keyword_gate=KeywordGate(required_keywords=("Vehicle",)),
+        ),
+        _ability_record(
+            "faction-match",
+            AbilitySourceKind.FACTION,
+            faction_id="core-marine-force",
+        ),
+        _ability_record("faction-miss", AbilitySourceKind.FACTION, faction_id="other-faction"),
+        _ability_record(
+            "detachment-match",
+            AbilitySourceKind.DETACHMENT,
+            detachment_id="core-combined-arms",
+        ),
+        _ability_record(
+            "detachment-miss",
+            AbilitySourceKind.DETACHMENT,
+            detachment_id="other-detachment",
+        ),
+        _ability_record(
+            "enhancement-match",
+            AbilitySourceKind.ENHANCEMENT,
+            detachment_id="core-combined-arms",
+            ability_id="selected-enhancement",
+        ),
+        _ability_record(
+            "enhancement-miss",
+            AbilitySourceKind.ENHANCEMENT,
+            detachment_id="core-combined-arms",
+            ability_id="unselected-enhancement",
+        ),
+        _ability_record(
+            "datasheet-match",
+            AbilitySourceKind.DATASHEET,
+            datasheet_id="core-intercessor-like-infantry",
+        ),
+        _ability_record(
+            "datasheet-miss",
+            AbilitySourceKind.DATASHEET,
+            datasheet_id="other-datasheet",
+        ),
+        _ability_record("wargear-match", AbilitySourceKind.WARGEAR, wargear_id="core-bolt-rifle"),
+        _ability_record("wargear-miss", AbilitySourceKind.WARGEAR, wargear_id="other-wargear"),
+        _ability_record(
+            "weapon-profile-match",
+            AbilitySourceKind.WEAPON,
+            weapon_profile_id="core-bolt-rifle:standard",
+        ),
+        _ability_record(
+            "weapon-profile-miss",
+            AbilitySourceKind.WEAPON,
+            weapon_profile_id="other-profile",
+        ),
+        _ability_record(
+            "weapon-keyword-match",
+            AbilitySourceKind.WEAPON,
+            keyword_gate=KeywordGate(required_keywords=("Assault",)),
+        ),
+        _ability_record(
+            "weapon-keyword-miss",
+            AbilitySourceKind.WEAPON,
+            keyword_gate=KeywordGate(required_keywords=("Lance",)),
+        ),
+    )
+
+    with_catalog = {
+        record.record_id
+        for record in build_player_ability_index(records, army=army, catalog=catalog).all_records()
+    }
+    without_catalog = {
+        record.record_id for record in build_player_ability_index(records, army=army).all_records()
+    }
+
+    assert with_catalog == {
+        "core",
+        "datasheet-match",
+        "detachment-match",
+        "enhancement-match",
+        "faction-match",
+        "keyword-infantry",
+        "wargear-match",
+        "weapon-keyword-match",
+        "weapon-profile-match",
+    }
+    assert without_catalog == with_catalog - {
+        "weapon-keyword-match",
+        "weapon-profile-match",
+    }
+    with pytest.raises(GameLifecycleError, match="requires an ArmyDefinition"):
+        build_player_ability_index((), army=cast(ArmyDefinition, object()))
+    with pytest.raises(GameLifecycleError, match="catalog must be an ArmyCatalog"):
+        build_player_ability_index((), army=army, catalog=cast(ArmyCatalog, object()))
+
+
+def test_phase17d_champion_slayer_heal_only_applies_after_enemy_character_or_monster() -> None:
+    state = _battle_state_with_scenario()
+    unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
+    model = unit.own_models[0]
+    ability_index = _champion_slayer_ability_index(datasheet_id=unit.datasheet_id)
+    _set_model_wounds(state, model_instance_id=model.model_instance_id, wounds_remaining=1)
+    wounded_unit = _unit_by_id(state, unit.unit_instance_id)
+
+    resolved = catalog_restore_lost_wounds_after_destroying_unit(
+        state=state,
+        decisions=DecisionController(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        ability_index=ability_index,
+        unit=wounded_unit,
+        current_model_instance_ids=(model.model_instance_id,),
+        player_id="player-a",
+        destroyed_player_id="player-b",
+        destroyed_unit_keywords=("MONSTER",),
+        healing_amount=3,
+        source_event_id="event:enemy-monster-destroyed",
+    )
+
+    assert resolved is not None
+    effect, request = resolved
+    assert request is None
+    assert effect.amount == 1
+    assert len(effect.resolved_steps) == 1
+    assert effect.source_context == {
+        "catalog_record_id": (
+            "phase17d:test:catalog-ability:core-intercessor-like-infantry:"
+            "champion-slayer:phase17d:test:champion-slayer:clause:002"
+        ),
+        "clause_id": "phase17d:test:champion-slayer:clause:002",
+        "destroyed_unit_keywords": ["MONSTER"],
+        "effect_kind": "restore_lost_wounds",
+        "source_model_instance_id": model.model_instance_id,
+        "source_event_id": "event:enemy-monster-destroyed",
+    }
+    healed_unit = _unit_by_id(state, unit.unit_instance_id)
+    assert healed_unit.own_models[0].wounds_remaining == model.starting_wounds
+
+
+def test_phase17d_champion_slayer_heal_does_not_revive_after_source_model_is_full() -> None:
+    state = _battle_state_with_scenario()
+    unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
+    source_model = unit.own_models[0]
+    destroyed_model = unit.own_models[1]
+    ability_index = _champion_slayer_ability_index(datasheet_id=unit.datasheet_id)
+    _set_model_wounds(
+        state,
+        model_instance_id=source_model.model_instance_id,
+        wounds_remaining=source_model.starting_wounds - 1,
+    )
+    _destroy_model(state, model_instance_id=destroyed_model.model_instance_id)
+    wounded_unit = _unit_by_id(state, unit.unit_instance_id)
+
+    resolved = catalog_restore_lost_wounds_after_destroying_unit(
+        state=state,
+        decisions=DecisionController(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        ability_index=ability_index,
+        unit=wounded_unit,
+        current_model_instance_ids=(source_model.model_instance_id,),
+        player_id="player-a",
+        destroyed_player_id="player-b",
+        destroyed_unit_keywords=("CHARACTER",),
+        healing_amount=3,
+        source_event_id="event:enemy-character-destroyed",
+    )
+
+    assert resolved is not None
+    effect, request = resolved
+    assert request is None
+    assert effect.amount == 1
+    assert len(effect.resolved_steps) == 1
+    resolved_unit = _unit_by_id(state, unit.unit_instance_id)
+    assert resolved_unit.own_models[0].wounds_remaining == source_model.starting_wounds
+    assert resolved_unit.own_models[1].wounds_remaining == 0
+    assert state.battlefield_state is not None
+    assert destroyed_model.model_instance_id in state.battlefield_state.removed_model_ids
+
+
+def test_phase17d_champion_slayer_heal_ignores_other_wounded_model_when_source_full() -> None:
+    state = _battle_state_with_scenario()
+    unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
+    source_model = unit.own_models[0]
+    other_model = unit.own_models[1]
+    ability_index = _champion_slayer_ability_index(datasheet_id=unit.datasheet_id)
+    _set_model_wounds(
+        state,
+        model_instance_id=other_model.model_instance_id,
+        wounds_remaining=other_model.starting_wounds - 1,
+    )
+    wounded_unit = _unit_by_id(state, unit.unit_instance_id)
+
+    resolved = catalog_restore_lost_wounds_after_destroying_unit(
+        state=state,
+        decisions=DecisionController(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        ability_index=ability_index,
+        unit=wounded_unit,
+        current_model_instance_ids=(source_model.model_instance_id,),
+        player_id="player-a",
+        destroyed_player_id="player-b",
+        destroyed_unit_keywords=("MONSTER",),
+        healing_amount=3,
+        source_event_id="event:enemy-monster-destroyed",
+    )
+
+    resolved_unit = _unit_by_id(state, unit.unit_instance_id)
+    assert resolved is None
+    assert resolved_unit.own_models[0].wounds_remaining == source_model.starting_wounds
+    assert resolved_unit.own_models[1].wounds_remaining == other_model.starting_wounds - 1
+
+
+def test_phase17d_champion_slayer_heal_fails_closed_for_multiple_wounded_models() -> None:
+    state = _battle_state_with_scenario()
+    unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
+    source_model = unit.own_models[0]
+    other_model = unit.own_models[1]
+    ability_index = _champion_slayer_ability_index(datasheet_id=unit.datasheet_id)
+    _set_model_wounds(
+        state,
+        model_instance_id=source_model.model_instance_id,
+        wounds_remaining=source_model.starting_wounds - 1,
+    )
+    _set_model_wounds(
+        state,
+        model_instance_id=other_model.model_instance_id,
+        wounds_remaining=other_model.starting_wounds - 1,
+    )
+    wounded_unit = _unit_by_id(state, unit.unit_instance_id)
+
+    with pytest.raises(GameLifecycleError, match="multiple wounded models"):
+        catalog_restore_lost_wounds_after_destroying_unit(
+            state=state,
+            decisions=DecisionController(),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            ability_index=ability_index,
+            unit=wounded_unit,
+            current_model_instance_ids=(source_model.model_instance_id,),
+            player_id="player-a",
+            destroyed_player_id="player-b",
+            destroyed_unit_keywords=("MONSTER",),
+            healing_amount=3,
+            source_event_id="event:enemy-monster-destroyed",
+        )
+
+
+def test_phase17d_champion_slayer_restore_clause_executes_to_generic_payload() -> None:
+    state = _battle_state_with_scenario()
+    unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
+    ability_index = _champion_slayer_ability_index(datasheet_id=unit.datasheet_id)
+
+    results = execute_abilities_from_index(
+        registry=default_ability_handler_registry(),
+        index=ability_index,
+        context=AbilityExecutionContext(
+            game_id="phase17d-game",
+            player_id="player-a",
+            battle_round=1,
+            phase=None,
+            active_player_id="player-a",
+            trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED,
+            source_unit_instance_id=unit.unit_instance_id,
+            source_model_instance_id=unit.own_models[0].model_instance_id,
+            trigger_payload={"destroyed_unit_keywords": ["MONSTER"]},
+            state=state,
+        ),
+    )
+
+    assert len(results) == 1
+    assert results[0].status is AbilityResolutionStatus.APPLIED
+    replay_payload = cast(dict[str, JsonValue], results[0].replay_payload)
+    execution_payload = cast(dict[str, JsonValue], replay_payload["rule_execution"])
+    effect_payloads = cast(list[JsonValue], execution_payload["effect_payloads"])
+    first_effect_payload = cast(dict[str, JsonValue], effect_payloads[0])
+    effect = cast(dict[str, JsonValue], first_effect_payload["effect"])
+    assert effect["kind"] == "restore_lost_wounds"
+
+
+def test_phase17d_champion_slayer_heal_ignores_nonqualifying_destroyed_units() -> None:
+    state = _battle_state_with_scenario()
+    unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
+    model = unit.own_models[0]
+    ability_index = _champion_slayer_ability_index(datasheet_id=unit.datasheet_id)
+    _set_model_wounds(state, model_instance_id=model.model_instance_id, wounds_remaining=1)
+    wounded_unit = _unit_by_id(state, unit.unit_instance_id)
+
+    non_keyword = catalog_restore_lost_wounds_after_destroying_unit(
+        state=state,
+        decisions=DecisionController(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        ability_index=ability_index,
+        unit=wounded_unit,
+        current_model_instance_ids=(model.model_instance_id,),
+        player_id="player-a",
+        destroyed_player_id="player-b",
+        destroyed_unit_keywords=("INFANTRY",),
+        healing_amount=3,
+        source_event_id="event:enemy-infantry-destroyed",
+    )
+    friendly_destroyed = catalog_restore_lost_wounds_after_destroying_unit(
+        state=state,
+        decisions=DecisionController(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        ability_index=ability_index,
+        unit=wounded_unit,
+        current_model_instance_ids=(model.model_instance_id,),
+        player_id="player-a",
+        destroyed_player_id="player-a",
+        destroyed_unit_keywords=("CHARACTER",),
+        healing_amount=3,
+        source_event_id="event:friendly-character-destroyed",
+    )
+
+    assert non_keyword is None
+    assert friendly_destroyed is None
+    assert _unit_by_id(state, unit.unit_instance_id).own_models[0].wounds_remaining == 1
+
+
 def test_phase17d_generic_vp_scoring_rule_mutates_victory_point_ledger() -> None:
     state = _battle_state()
     event_log = EventLog()
@@ -309,6 +834,38 @@ def test_phase17d_duration_effect_records_generic_persisting_effect() -> None:
     assert payload["started_phase"] == "command"
     assert payload["expiration"]["expiration_kind"] == "end_phase"
     assert effect_payload["effect_kind"] == "generic_rule_execution"
+
+
+@pytest.mark.parametrize(
+    ("raw_text", "expected_expiration_kind"),
+    [
+        ("That unit gains Stealth until the end of the turn.", "end_turn"),
+        ("That unit gains Stealth until the end of the battle.", "end_of_battle"),
+    ],
+)
+def test_phase17d_duration_endpoint_variants_record_persisting_effects(
+    raw_text: str,
+    expected_expiration_kind: str,
+) -> None:
+    state = _battle_state_with_scenario()
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    compiled = _compiled(raw_text)
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=state,
+            target_unit_instance_ids=(target_unit_id,),
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert len(result.created_persisting_effects) == 1
+    assert (
+        result.created_persisting_effects[0].to_payload()["expiration"]["expiration_kind"]
+        == expected_expiration_kind
+    )
 
 
 def test_phase17d_phase_duration_requires_phase_before_mutation() -> None:
@@ -756,6 +1313,217 @@ def test_phase17d_execution_payload_and_registry_metadata_are_json_safe() -> Non
         rule_execution_status_from_token("not-a-status")
 
 
+def test_phase17d_rule_execution_registry_and_binding_validators_fail_fast() -> None:
+    compiled = _compiled("Add 1 to hit rolls for that unit.")
+    clause = compiled.rule_ir.clauses[0]
+    effect = clause.effects[0]
+    binding = RuleRuntimeBinding(
+        binding_id="phase17d:test-binding",
+        template_id=None,
+        effect_kinds=(RuleEffectKind.MODIFY_DICE_ROLL,),
+        handler=_noop_rule_handler,
+    )
+
+    assert binding.matches_clause(clause)
+    assert binding.matches_effect(clause=clause, effect=effect)
+    assert RuleExecutionRegistry.from_bindings((binding,)).all_bindings() == (binding,)
+    with pytest.raises(GameLifecycleError, match="state must be a GameState"):
+        _execution_context(state=cast(GameState, object()))
+    with pytest.raises(GameLifecycleError, match="event_log must be an EventLog"):
+        _execution_context(event_log=cast(EventLog, object()))
+    with pytest.raises(GameLifecycleError, match="trigger_kind must be RuleTriggerKind"):
+        RuleRuntimeBinding(
+            binding_id="phase17d:bad-trigger",
+            template_id=None,
+            effect_kinds=(RuleEffectKind.MODIFY_DICE_ROLL,),
+            handler=_noop_rule_handler,
+            trigger_kind=cast(RuleTriggerKind, "bad"),
+        )
+    with pytest.raises(GameLifecycleError, match="handler must be callable"):
+        RuleRuntimeBinding(
+            binding_id="phase17d:bad-handler",
+            template_id=None,
+            effect_kinds=(RuleEffectKind.MODIFY_DICE_ROLL,),
+            handler=cast(Any, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="requires a template, effect, or target"):
+        RuleRuntimeBinding(
+            binding_id="phase17d:no-match-surface",
+            template_id=None,
+            effect_kinds=(),
+            handler=_noop_rule_handler,
+        )
+    with pytest.raises(GameLifecycleError, match="clause match requires a RuleClause"):
+        binding.matches_clause(cast(RuleClause, object()))
+    with pytest.raises(GameLifecycleError, match="effect match requires RuleEffectSpec"):
+        binding.matches_effect(clause=clause, effect=cast(RuleEffectSpec, object()))
+    with pytest.raises(GameLifecycleError, match="bindings must be a tuple"):
+        RuleExecutionRegistry.from_bindings(cast(tuple[RuleRuntimeBinding, ...], []))
+    with pytest.raises(GameLifecycleError, match="binding IDs must be unique"):
+        RuleExecutionRegistry.from_bindings((binding, binding))
+    with pytest.raises(GameLifecycleError, match="binding must be RuleRuntimeBinding"):
+        RuleExecutionRegistry.empty().with_binding(cast(RuleRuntimeBinding, object()))
+    with pytest.raises(GameLifecycleError, match="requires RuleExecutionContext"):
+        execute_rule_ir(
+            rule_ir=compiled.rule_ir,
+            context=cast(RuleExecutionContext, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="requires RuleExecutionRegistry"):
+        execute_rule_ir(
+            rule_ir=compiled.rule_ir,
+            context=_execution_context(target_unit_instance_ids=("army-alpha:intercessor-unit-1",)),
+            registry=cast(RuleExecutionRegistry, object()),
+        )
+
+
+def test_phase17d_rule_execution_result_and_binding_shape_validators_fail_fast() -> None:
+    compiled = _compiled("Add 1 to hit rolls for that unit.")
+    rule_ir = compiled.rule_ir
+
+    with pytest.raises(GameLifecycleError, match="must contain effects"):
+        RuleExecutionResult(
+            rule_id=rule_ir.rule_id,
+            source_id=rule_ir.source_id,
+            rule_ir_hash=rule_ir.ir_hash(),
+            status=RuleExecutionStatus.APPLIED,
+            created_persisting_effects=cast(Any, (object(),)),
+        )
+    with pytest.raises(GameLifecycleError, match="event_records must contain events"):
+        RuleExecutionResult(
+            rule_id=rule_ir.rule_id,
+            source_id=rule_ir.source_id,
+            rule_ir_hash=rule_ir.ir_hash(),
+            status=RuleExecutionStatus.APPLIED,
+            event_records=cast(Any, (object(),)),
+        )
+    with pytest.raises(GameLifecycleError, match="Applied RuleExecutionResult"):
+        RuleExecutionResult(
+            rule_id=rule_ir.rule_id,
+            source_id=rule_ir.source_id,
+            rule_ir_hash=rule_ir.ir_hash(),
+            status=RuleExecutionStatus.APPLIED,
+            reason="not-allowed",
+        )
+    with pytest.raises(GameLifecycleError, match="Non-applied RuleExecutionResult"):
+        RuleExecutionResult(
+            rule_id=rule_ir.rule_id,
+            source_id=rule_ir.source_id,
+            rule_ir_hash=rule_ir.ir_hash(),
+            status=RuleExecutionStatus.INVALID,
+        )
+    with pytest.raises(GameLifecycleError, match="effect_payloads must be a tuple"):
+        RuleExecutionResult(
+            rule_id=rule_ir.rule_id,
+            source_id=rule_ir.source_id,
+            rule_ir_hash=rule_ir.ir_hash(),
+            status=RuleExecutionStatus.APPLIED,
+            effect_payloads=cast(Any, []),
+        )
+    with pytest.raises(GameLifecycleError, match="payload must be a JSON object"):
+        RuleExecutionResult(
+            rule_id=rule_ir.rule_id,
+            source_id=rule_ir.source_id,
+            rule_ir_hash=rule_ir.ir_hash(),
+            status=RuleExecutionStatus.APPLIED,
+            effect_payloads=cast(Any, ([],)),
+        )
+    with pytest.raises(GameLifecycleError, match="binding_id must be a string"):
+        RuleRuntimeBinding(
+            binding_id=cast(str, 1),
+            template_id=None,
+            effect_kinds=(RuleEffectKind.MODIFY_DICE_ROLL,),
+            handler=_noop_rule_handler,
+        )
+    with pytest.raises(GameLifecycleError, match="binding_id must not be empty"):
+        RuleRuntimeBinding(
+            binding_id="",
+            template_id=None,
+            effect_kinds=(RuleEffectKind.MODIFY_DICE_ROLL,),
+            handler=_noop_rule_handler,
+        )
+    with pytest.raises(GameLifecycleError, match="effect_kinds must be a tuple"):
+        RuleRuntimeBinding(
+            binding_id="phase17d:bad-effect-kind-tuple",
+            template_id=None,
+            effect_kinds=cast(Any, []),
+            handler=_noop_rule_handler,
+        )
+    with pytest.raises(GameLifecycleError, match="effect_kinds values must be RuleEffectKind"):
+        RuleRuntimeBinding(
+            binding_id="phase17d:bad-effect-kind-value",
+            template_id=None,
+            effect_kinds=cast(Any, ("bad",)),
+            handler=_noop_rule_handler,
+        )
+    with pytest.raises(GameLifecycleError, match="effect_kinds values must not be duplicated"):
+        RuleRuntimeBinding(
+            binding_id="phase17d:duplicate-effect-kind",
+            template_id=None,
+            effect_kinds=(
+                RuleEffectKind.MODIFY_DICE_ROLL,
+                RuleEffectKind.MODIFY_DICE_ROLL,
+            ),
+            handler=_noop_rule_handler,
+        )
+    with pytest.raises(GameLifecycleError, match="required_state_inputs must be a tuple"):
+        RuleRuntimeBinding(
+            binding_id="phase17d:bad-required-state-inputs",
+            template_id=None,
+            effect_kinds=(RuleEffectKind.MODIFY_DICE_ROLL,),
+            handler=_noop_rule_handler,
+            required_state_inputs=cast(Any, []),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="required_state_inputs must not contain duplicate",
+    ):
+        RuleRuntimeBinding(
+            binding_id="phase17d:duplicate-required-state-inputs",
+            template_id=None,
+            effect_kinds=(RuleEffectKind.MODIFY_DICE_ROLL,),
+            handler=_noop_rule_handler,
+            required_state_inputs=("state", "state"),
+        )
+
+
+def test_phase17d_target_only_clause_reports_missing_target_handler() -> None:
+    compiled = _compiled("Select one enemy unit.")
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(target_unit_instance_ids=("army-beta:intercessor-unit-2",)),
+        registry=RuleExecutionRegistry.empty(),
+    )
+
+    assert result.status is RuleExecutionStatus.UNSUPPORTED
+    assert result.reason == "missing_target_handler"
+
+
+def test_phase17d_runtime_clause_payload_scopes_rule_ir_or_fails_closed() -> None:
+    rule_ir = _champion_slayer_rule_ir()
+
+    scoped = scoped_rule_ir_from_execution_payload(
+        validate_json_value(
+            {
+                "rule_ir": rule_ir.to_payload(),
+                "runtime_clause_id": "phase17d:test:champion-slayer:clause:002",
+            }
+        )
+    )
+
+    assert len(scoped.clauses) == 1
+    assert scoped.clauses[0].clause_id == "phase17d:test:champion-slayer:clause:002"
+    with pytest.raises(GameLifecycleError, match="runtime_clause_id is unknown"):
+        scoped_rule_ir_from_execution_payload(
+            validate_json_value(
+                {
+                    "rule_ir": rule_ir.to_payload(),
+                    "runtime_clause_id": "phase17d:test:champion-slayer:clause:999",
+                }
+            )
+        )
+
+
 def test_phase17d_generic_persisting_effect_rejects_invalid_payload_shape() -> None:
     with pytest.raises(EffectError, match="JSON object"):
         generic_rule_persisting_effect(
@@ -972,6 +1740,191 @@ def _command_point_spend_rule_ir() -> RuleIR:
     return replace(compiled.rule_ir, clauses=(spend_clause,))
 
 
+def _champion_slayer_rule_ir() -> RuleIR:
+    return compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="phase17d:test:champion-slayer",
+            raw_text=(
+                "Each time this model makes a melee attack that targets a Character or Monster "
+                "unit, you can re-roll the Wound roll. Each time this model destroys an enemy "
+                "Character or Monster unit, this model regains up to D6 lost wounds."
+            ),
+        )
+    ).rule_ir
+
+
+def _catalog_with_champion_slayer_ability() -> ArmyCatalog:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    datasheet = catalog.datasheet_by_id("core-intercessor-like-infantry")
+    descriptor = _champion_slayer_descriptor()
+    updated_datasheet = replace(datasheet, abilities=(*datasheet.abilities, descriptor))
+    return replace(
+        catalog,
+        datasheets=tuple(
+            updated_datasheet
+            if candidate.datasheet_id == updated_datasheet.datasheet_id
+            else candidate
+            for candidate in catalog.datasheets
+        ),
+    )
+
+
+def _catalog_with_descriptor(descriptor: DatasheetAbilityDescriptor) -> ArmyCatalog:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    datasheet = catalog.datasheet_by_id("core-intercessor-like-infantry")
+    updated_datasheet = replace(datasheet, abilities=(descriptor,))
+    return replace(
+        catalog,
+        datasheets=tuple(
+            updated_datasheet
+            if candidate.datasheet_id == updated_datasheet.datasheet_id
+            else candidate
+            for candidate in catalog.datasheets
+        ),
+    )
+
+
+def _champion_slayer_descriptor() -> DatasheetAbilityDescriptor:
+    rule_ir = _champion_slayer_rule_ir()
+    return DatasheetAbilityDescriptor(
+        ability_id="champion-slayer",
+        name="Champion Slayer",
+        source_id="phase17d:test:champion-slayer",
+        support=CatalogAbilitySupport.GENERIC_RULE_IR,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description="Champion Slayer compound ability.",
+        rule_ir_payload=cast(CatalogJsonObject, rule_ir.to_payload()),
+        rule_ir_diagnostics=tuple(
+            cast(CatalogJsonObject, diagnostic.to_payload()) for diagnostic in rule_ir.diagnostics
+        ),
+    )
+
+
+def _generic_catalog_descriptor(
+    raw_text: str,
+    *,
+    ability_id: str | None = None,
+    source_kind: CatalogAbilitySourceKind = CatalogAbilitySourceKind.DATASHEET,
+    source_wargear_id: str | None = None,
+) -> DatasheetAbilityDescriptor:
+    source_suffix = hashlib.sha256(raw_text.encode()).hexdigest()[:12]
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id=f"phase17d:test:generic-catalog:{source_suffix}",
+            raw_text=raw_text,
+        )
+    ).rule_ir
+    resolved_ability_id = ability_id or f"generic-catalog-{source_suffix}"
+    return DatasheetAbilityDescriptor(
+        ability_id=resolved_ability_id,
+        name=f"Generic Catalog {source_suffix}",
+        source_id=rule_ir.source_id,
+        support=CatalogAbilitySupport.GENERIC_RULE_IR,
+        source_kind=source_kind,
+        source_wargear_id=source_wargear_id,
+        effect_description=raw_text,
+        rule_ir_payload=cast(CatalogJsonObject, rule_ir.to_payload()),
+        rule_ir_diagnostics=tuple(
+            cast(CatalogJsonObject, diagnostic.to_payload()) for diagnostic in rule_ir.diagnostics
+        ),
+    )
+
+
+def _champion_slayer_ability_index(*, datasheet_id: str) -> AbilityCatalogIndex:
+    rule_ir = _champion_slayer_rule_ir()
+    records = tuple(
+        _champion_slayer_clause_record(
+            rule_ir=rule_ir,
+            clause_index=clause_index,
+            datasheet_id=datasheet_id,
+            trigger_kind=trigger_kind,
+        )
+        for clause_index, trigger_kind in (
+            (0, TimingTriggerKind.AFTER_DICE_ROLL),
+            (1, TimingTriggerKind.AFTER_UNIT_DESTROYED),
+        )
+    )
+    return AbilityCatalogIndex.from_records(records)
+
+
+def _champion_slayer_clause_record(
+    *,
+    rule_ir: RuleIR,
+    clause_index: int,
+    datasheet_id: str,
+    trigger_kind: TimingTriggerKind,
+) -> AbilityCatalogRecord:
+    clause = rule_ir.clauses[clause_index]
+    return AbilityCatalogRecord(
+        record_id=(
+            f"phase17d:test:catalog-ability:{datasheet_id}:champion-slayer:{clause.clause_id}"
+        ),
+        definition=AbilityDefinition(
+            ability_id="champion-slayer",
+            name="Champion Slayer",
+            source_id="phase17d:test:champion-slayer",
+            when_descriptor="Catalog generic rule IR.",
+            effect_descriptor="Champion Slayer compound ability.",
+            restrictions_descriptor="Datasheet ability source kind: datasheet.",
+            timing=AbilityTimingDescriptor(trigger_kind=trigger_kind),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value(
+                {
+                    "rule_ir": rule_ir.to_payload(),
+                    "runtime_clause_id": clause.clause_id,
+                }
+            ),
+        ),
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id=datasheet_id,
+    )
+
+
+def _ability_record(
+    record_id: str,
+    source_kind: AbilitySourceKind,
+    *,
+    ability_id: str | None = None,
+    faction_id: str | None = None,
+    detachment_id: str | None = None,
+    datasheet_id: str | None = None,
+    wargear_id: str | None = None,
+    weapon_profile_id: str | None = None,
+    keyword_gate: KeywordGate | None = None,
+) -> AbilityCatalogRecord:
+    resolved_ability_id = ability_id or record_id
+    return AbilityCatalogRecord(
+        record_id=record_id,
+        definition=AbilityDefinition(
+            ability_id=resolved_ability_id,
+            name=record_id,
+            source_id=f"phase17d:test:{record_id}",
+            when_descriptor="test timing",
+            effect_descriptor="test effect",
+            restrictions_descriptor="test restrictions",
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
+            keyword_gate=KeywordGate() if keyword_gate is None else keyword_gate,
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+        ),
+        source_kind=source_kind,
+        faction_id=faction_id,
+        detachment_id=detachment_id,
+        datasheet_id=datasheet_id,
+        wargear_id=wargear_id,
+        weapon_profile_id=weapon_profile_id,
+    )
+
+
+def _noop_rule_handler(
+    rule_ir: RuleIR,
+    clause: RuleClause,
+    effect: RuleEffectSpec | None,
+    context: RuleExecutionContext,
+) -> RuleExecutionResult:
+    del effect, context
+    return RuleExecutionResult.applied(rule_ir, applied_clause_ids=(clause.clause_id,))
+
+
 def _execution_context(
     *,
     state: GameState | None = None,
@@ -1064,6 +2017,45 @@ def _battle_state_with_extra_friendly_unit() -> GameState:
         state.record_army_definition(army_definition)
     state.battlefield_state = scenario.battlefield_state
     return state
+
+
+def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
+    for army in state.army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id == unit_instance_id:
+                return unit
+    raise AssertionError(f"missing unit {unit_instance_id}")
+
+
+def _set_model_wounds(
+    state: GameState,
+    *,
+    model_instance_id: str,
+    wounds_remaining: int,
+) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    did_update = False
+    for army in state.army_definitions:
+        updated_units: list[UnitInstance] = []
+        for unit in army.units:
+            updated_models: list[ModelInstance] = []
+            for model in unit.own_models:
+                if model.model_instance_id != model_instance_id:
+                    updated_models.append(model)
+                    continue
+                updated_models.append(replace(model, wounds_remaining=wounds_remaining))
+                did_update = True
+            updated_units.append(replace(unit, own_models=tuple(updated_models)))
+        updated_armies.append(replace(army, units=tuple(updated_units)))
+    if not did_update:
+        raise AssertionError(f"missing model {model_instance_id}")
+    state.army_definitions = updated_armies
+
+
+def _destroy_model(state: GameState, *, model_instance_id: str) -> None:
+    _set_model_wounds(state, model_instance_id=model_instance_id, wounds_remaining=0)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_removed_models((model_instance_id,))
 
 
 def _scenario() -> BattlefieldScenario:

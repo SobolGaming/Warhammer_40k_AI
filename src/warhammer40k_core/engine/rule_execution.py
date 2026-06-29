@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from types import MappingProxyType
 from typing import Self, TypedDict, cast
@@ -83,6 +83,7 @@ TARGET_SCOPED_EFFECT_KINDS = (
     RuleEffectKind.PLACEMENT_PERMISSION,
     RuleEffectKind.PLACEMENT_RESTRICTION,
     RuleEffectKind.REROLL_PERMISSION,
+    RuleEffectKind.RESTORE_LOST_WOUNDS,
     RuleEffectKind.SET_CONTEXTUAL_STATUS,
     RuleEffectKind.SET_CHARACTERISTIC,
 )
@@ -90,6 +91,8 @@ AURA_ALLEGIANCE_ANY = "any"
 AURA_ALLEGIANCE_ENEMY = "enemy"
 AURA_ALLEGIANCE_FRIENDLY = "friendly"
 TARGET_CONSTRAINT_THIS_MODEL_LEADING_UNIT = "this_model_leading_unit"
+TARGET_CONSTRAINT_THIS_MODEL_MAKES_ATTACK = "this_model_makes_attack"
+TARGET_CONSTRAINT_THIS_MODEL_DESTROYED_UNIT = "this_model_destroyed_unit"
 
 
 class RuleExecutionStatus(StrEnum):
@@ -580,6 +583,7 @@ def default_rule_execution_registry() -> RuleExecutionRegistry:
                     RuleEffectKind.GRANT_WEAPON_ABILITY,
                     RuleEffectKind.PLACEMENT_PERMISSION,
                     RuleEffectKind.PLACEMENT_RESTRICTION,
+                    RuleEffectKind.RESTORE_LOST_WOUNDS,
                     RuleEffectKind.SET_CONTEXTUAL_STATUS,
                     RuleEffectKind.SET_CHARACTERISTIC,
                 ),
@@ -678,6 +682,26 @@ def rule_ir_from_execution_payload(payload: JsonValue) -> RuleIR:
     if not isinstance(rule_ir_payload, dict):
         raise GameLifecycleError("Generic rule execution payload requires rule_ir.")
     return RuleIR.from_payload(cast(RuleIRPayload, rule_ir_payload))
+
+
+def runtime_clause_id_from_execution_payload(payload: JsonValue) -> str | None:
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Generic rule execution payload must be a JSON object.")
+    value = payload.get("runtime_clause_id")
+    if value is None:
+        return None
+    return _validate_identifier("runtime_clause_id", value)
+
+
+def scoped_rule_ir_from_execution_payload(payload: JsonValue) -> RuleIR:
+    rule_ir = rule_ir_from_execution_payload(payload)
+    runtime_clause_id = runtime_clause_id_from_execution_payload(payload)
+    if runtime_clause_id is None:
+        return rule_ir
+    for clause in rule_ir.clauses:
+        if clause.clause_id == runtime_clause_id:
+            return replace(rule_ir, clauses=(clause,), diagnostics=clause.diagnostics)
+    raise GameLifecycleError("Generic rule execution payload runtime_clause_id is unknown.")
 
 
 def rule_execution_status_from_token(token: object) -> RuleExecutionStatus:
@@ -1281,6 +1305,11 @@ def _target_constraint_unavailable_reason(
     relationship = parameters.get("relationship")
     if type(relationship) is not str:
         raise GameLifecycleError("Target constraint condition requires a relationship.")
+    if relationship in {
+        TARGET_CONSTRAINT_THIS_MODEL_MAKES_ATTACK,
+        TARGET_CONSTRAINT_THIS_MODEL_DESTROYED_UNIT,
+    }:
+        return _this_model_constraint_unavailable_reason(context=context)
     if relationship != TARGET_CONSTRAINT_THIS_MODEL_LEADING_UNIT:
         return f"unsupported_target_constraint:{relationship}"
     state = context.state
@@ -1298,6 +1327,19 @@ def _target_constraint_unavailable_reason(
             return "source_model_unit_mismatch"
     if not state.unit_started_battle_as_attached_leader_or_support(source_unit_id):
         return f"condition_not_met:{TARGET_CONSTRAINT_THIS_MODEL_LEADING_UNIT}"
+    return None
+
+
+def _this_model_constraint_unavailable_reason(context: RuleExecutionContext) -> str | None:
+    source_model_id = context.source_model_instance_id
+    if source_model_id is None:
+        return "missing_input:source_model_instance_id"
+    state = context.state
+    source_unit_id = context.source_unit_instance_id
+    if state is not None:
+        model_unit_id = state.unit_instance_id_for_model(source_model_id)
+        if source_unit_id is not None and model_unit_id != source_unit_id:
+            return "source_model_unit_mismatch"
     return None
 
 

@@ -75,6 +75,16 @@ _IN_TURN_RE = re.compile(
     re.IGNORECASE,
 )
 _DESTROYED_UNIT_RE = re.compile(r"\bwhen\s+this\s+unit\s+is\s+destroyed\b", re.IGNORECASE)
+_THIS_MODEL_MELEE_ATTACK_TARGET_RE = re.compile(
+    r"\beach\s+time\s+this\s+model\s+makes\s+a\s+melee\s+attack\s+that\s+targets\s+"
+    r"(?:a|an)\s+(?P<keyword>Character\s+or\s+Monster)\s+unit\b",
+    re.IGNORECASE,
+)
+_THIS_MODEL_DESTROYS_ENEMY_KEYWORD_UNIT_RE = re.compile(
+    r"\beach\s+time\s+this\s+model\s+destroys\s+an\s+enemy\s+"
+    r"(?P<keyword>Character\s+or\s+Monster)\s+unit\b",
+    re.IGNORECASE,
+)
 _DESTROYED_MODEL_RE = re.compile(r"\bwhen\s+.*\bmodel\s+is\s+destroyed\b", re.IGNORECASE)
 _CHARGE_MOVE_END_RE = re.compile(
     r"\b(?:each\s+time|when)\s+(?P<subject>that\s+unit|this\s+unit|a\s+unit)\s+ends\s+"
@@ -100,6 +110,7 @@ _TARGET_RE = re.compile(
     re.IGNORECASE,
 )
 _THIS_UNIT_RE = re.compile(r"\bthis\s+unit\b", re.IGNORECASE)
+_THIS_MODEL_RE = re.compile(r"\bthis\s+model\b", re.IGNORECASE)
 _BEARER_APOSTROPHE_RE = r"'?"
 _BEARERS_UNIT_RE = re.compile(
     rf"\b(?:models\s+in\s+)?(?:the\s+)?bearer{_BEARER_APOSTROPHE_RE}s\s+unit\b|"
@@ -136,13 +147,14 @@ _SIGNED_ROLL_RE = re.compile(
 )
 _REROLL_ROLL_LIST_RE = re.compile(
     rf"\b(?:(?:you\s+)?can\s+)?(?:re-roll|reroll)\s+"
-    rf"(?P<rolls>(?:{_ROLL_TYPES})(?:\s*,\s*|\s+and\s+)"
+    rf"(?:the\s+)?(?P<rolls>(?:{_ROLL_TYPES})(?:\s*,\s*|\s+and\s+)"
     rf"(?:{_ROLL_TYPES})(?:(?:\s*,\s*|\s+and\s+)(?:{_ROLL_TYPES}))*)\s+rolls?\b"
     r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+unit)?",
     re.IGNORECASE,
 )
 _REROLL_RE = re.compile(
-    rf"\b(?:(?:you\s+)?can\s+)?(?:re-roll|reroll)\s+(?P<roll>{_ROLL_TYPES})\s+rolls?\b"
+    rf"\b(?:(?:you\s+)?can\s+)?(?:re-roll|reroll)\s+"
+    rf"(?:the\s+)?(?P<roll>{_ROLL_TYPES})\s+rolls?\b"
     r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+unit)?",
     re.IGNORECASE,
 )
@@ -231,6 +243,10 @@ _REMOVE_TO_STRATEGIC_RESERVES_RE = re.compile(
     r"place\s+it\s+into\s+Strategic\s+Reserves\b",
     re.IGNORECASE,
 )
+_RESTORE_LOST_WOUNDS_RE = re.compile(
+    r"\bthis\s+model\s+regains\s+up\s+to\s+(?P<amount>D6|D3|\d+)\s+lost\s+wounds\b",
+    re.IGNORECASE,
+)
 _DISTANCE_RELATION_RE = re.compile(
     r"\b(?:(?P<subject>this\s+unit|this\s+model|that\s+unit|selected\s+unit|"
     r"target\s+unit)\s+is\s+)?"
@@ -309,6 +325,10 @@ _RESIDUAL_CONNECTOR_TOKENS = frozenset(
         "your",
     }
 )
+_CLAUSE_TRIGGER_ANCHOR_RE = re.compile(
+    r"\b(?:each\s+time|when|after|at\s+the\s+(?:start|end)\s+of)\b",
+    re.IGNORECASE,
+)
 
 _CHARACTERISTIC_BY_LABEL = {
     "armor penetration": Characteristic.ARMOR_PENETRATION,
@@ -384,25 +404,73 @@ def parse_rule_ir(
 
 
 def _split_clause_text(normalized_text: str) -> tuple[_ClauseText, ...]:
-    clauses: list[_ClauseText] = []
+    coarse_clauses: list[_ClauseText] = []
     start = 0
     for index, character in enumerate(normalized_text):
-        if character not in {"\n", ";"}:
+        if character not in {"\n", ";", "."}:
             continue
+        if (
+            character == "."
+            and index + 1 < len(normalized_text)
+            and not normalized_text[index + 1].isspace()
+        ):
+            continue
+        split_end = index + 1 if character == "." else index
         _append_clause_span(
-            clauses=clauses, normalized_text=normalized_text, start=start, end=index
+            clauses=coarse_clauses,
+            normalized_text=normalized_text,
+            start=start,
+            end=split_end,
         )
         start = index + 1
     _append_clause_span(
-        clauses=clauses,
+        clauses=coarse_clauses,
         normalized_text=normalized_text,
         start=start,
         end=len(normalized_text),
     )
+    clauses = [
+        split_clause
+        for coarse_clause in coarse_clauses
+        for split_clause in _split_repeated_trigger_anchors(coarse_clause)
+    ]
     if not clauses:
         full_span = TextSpan(text=normalized_text, start=0, end=len(normalized_text))
         return (_ClauseText(span=full_span),)
     return tuple(clauses)
+
+
+def _split_repeated_trigger_anchors(clause_text: _ClauseText) -> tuple[_ClauseText, ...]:
+    anchors = tuple(_CLAUSE_TRIGGER_ANCHOR_RE.finditer(clause_text.text))
+    if len(anchors) < 2:
+        return (clause_text,)
+    clauses: list[_ClauseText] = []
+    start = clause_text.span.start
+    for anchor in anchors[1:]:
+        split_at = clause_text.span.start + anchor.start()
+        _append_clause_span(
+            clauses=clauses,
+            normalized_text=clause_text.span.text,
+            start=start - clause_text.span.start,
+            end=split_at - clause_text.span.start,
+        )
+        start = split_at
+    _append_clause_span(
+        clauses=clauses,
+        normalized_text=clause_text.span.text,
+        start=start - clause_text.span.start,
+        end=clause_text.span.end - clause_text.span.start,
+    )
+    return tuple(
+        _ClauseText(
+            span=TextSpan(
+                text=clause.span.text,
+                start=clause_text.span.start + clause.span.start,
+                end=clause_text.span.start + clause.span.end,
+            )
+        )
+        for clause in clauses
+    )
 
 
 def _append_clause_span(
@@ -452,6 +520,7 @@ def _compile_clause(
             *_parse_contextual_status_effects(clause_text),
             *_parse_weapon_ability_effects(clause_text),
             *_parse_placement_effects(clause_text),
+            *_parse_restore_lost_wounds_effects(clause_text),
         )
     )
     template_id = _template_id_for_clause(
@@ -500,6 +569,33 @@ def _compile_clause(
 
 
 def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
+    melee_target_match = _THIS_MODEL_MELEE_ATTACK_TARGET_RE.search(clause_text.text)
+    if melee_target_match is not None:
+        return RuleTrigger(
+            kind=RuleTriggerKind.DICE_ROLL,
+            source_span=_span_from_match(clause_text, melee_target_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("roll_type", "wound"),
+                    ("timing_window", "attack_sequence.wound"),
+                    ("attack_kind", "melee"),
+                    ("actor", "this_model"),
+                )
+            ),
+        )
+    destroys_enemy_match = _THIS_MODEL_DESTROYS_ENEMY_KEYWORD_UNIT_RE.search(clause_text.text)
+    if destroys_enemy_match is not None:
+        return RuleTrigger(
+            kind=RuleTriggerKind.UNIT_DESTROYED,
+            source_span=_span_from_match(clause_text, destroys_enemy_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("actor", "this_model"),
+                    ("destroyed_allegiance", "enemy"),
+                    ("destroyed_unit_kind", "unit"),
+                )
+            ),
+        )
     for match in _START_END_PHASE_RE.finditer(clause_text.text):
         return RuleTrigger(
             kind=RuleTriggerKind.TIMING_WINDOW,
@@ -636,7 +732,53 @@ def _parse_frequency_conditions(clause_text: _ClauseText) -> tuple[RuleCondition
 def _parse_keyword_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
     conditions: list[RuleCondition] = []
     target_match_ranges: list[tuple[int, int]] = []
+    for match in _THIS_MODEL_MELEE_ATTACK_TARGET_RE.finditer(clause_text.text):
+        target_match_ranges.append((match.start(), match.end()))
+        conditions.append(
+            RuleCondition(
+                kind=RuleConditionKind.TARGET_CONSTRAINT,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("relationship", "this_model_makes_attack"),
+                        ("attack_kind", "melee"),
+                        ("gate_subject", "attack_target"),
+                    )
+                ),
+            )
+        )
+        conditions.extend(
+            _keyword_any_gate_conditions_from_match(
+                clause_text=clause_text,
+                match=match,
+                gate_subject="attack_target",
+            )
+        )
+    for match in _THIS_MODEL_DESTROYS_ENEMY_KEYWORD_UNIT_RE.finditer(clause_text.text):
+        target_match_ranges.append((match.start(), match.end()))
+        conditions.append(
+            RuleCondition(
+                kind=RuleConditionKind.TARGET_CONSTRAINT,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("relationship", "this_model_destroyed_unit"),
+                        ("destroyed_allegiance", "enemy"),
+                        ("gate_subject", "destroyed_unit"),
+                    )
+                ),
+            )
+        )
+        conditions.extend(
+            _keyword_any_gate_conditions_from_match(
+                clause_text=clause_text,
+                match=match,
+                gate_subject="destroyed_unit",
+            )
+        )
     for match in _TARGET_RE.finditer(clause_text.text):
+        if _match_inside_ranges(match, target_match_ranges):
+            continue
         keyword_text = match.group("keyword")
         if keyword_text is None:
             continue
@@ -664,6 +806,27 @@ def _keyword_gate_conditions_from_match(
             parameters=parameters_from_pairs((("required_keyword", keyword),)),
         )
         for keyword in _keyword_sequence_tokens(match.group("keyword"))
+    )
+
+
+def _keyword_any_gate_conditions_from_match(
+    *,
+    clause_text: _ClauseText,
+    match: re.Match[str],
+    gate_subject: str,
+) -> tuple[RuleCondition, ...]:
+    keywords = _keyword_any_tokens(match.group("keyword"))
+    return (
+        RuleCondition(
+            kind=RuleConditionKind.KEYWORD_GATE,
+            source_span=_span_from_match(clause_text, match),
+            parameters=parameters_from_pairs(
+                (
+                    ("gate_subject", gate_subject),
+                    ("required_keyword_any", "|".join(keywords)),
+                )
+            ),
+        ),
     )
 
 
@@ -703,6 +866,16 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
             source_span=clause_text.span,
             parameters=parameters_from_pairs(_aura_target_parameter_pairs(clause_text)),
         )
+    if (
+        _THIS_MODEL_MELEE_ATTACK_TARGET_RE.search(clause_text.text) is not None
+        or _RESTORE_LOST_WOUNDS_RE.search(clause_text.text) is not None
+    ):
+        match = _THIS_MODEL_RE.search(clause_text.text)
+        if match is not None:
+            return RuleTargetSpec(
+                kind=RuleTargetKind.THIS_MODEL,
+                source_span=_span_from_match(clause_text, match),
+            )
     match = _TARGET_RE.search(clause_text.text)
     if match is not None:
         allegiance = _lower_group(match, "allegiance")
@@ -737,6 +910,12 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
     if match is not None:
         return RuleTargetSpec(
             kind=RuleTargetKind.SELECTED_UNIT,
+            source_span=_span_from_match(clause_text, match),
+        )
+    match = _THIS_MODEL_RE.search(clause_text.text)
+    if match is not None:
+        return RuleTargetSpec(
+            kind=RuleTargetKind.THIS_MODEL,
             source_span=_span_from_match(clause_text, match),
         )
     match = _PLAYER_RE.search(clause_text.text)
@@ -1088,6 +1267,27 @@ def _parse_placement_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, 
     return tuple(effects)
 
 
+def _parse_restore_lost_wounds_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
+    effects: list[RuleEffectSpec] = []
+    for match in _RESTORE_LOST_WOUNDS_RE.finditer(clause_text.text):
+        amount = match.group("amount").upper()
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.RESTORE_LOST_WOUNDS,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("target", "this_model"),
+                        ("amount", amount),
+                        ("cap", "lost_wounds"),
+                        ("optional", True),
+                    )
+                ),
+            )
+        )
+    return tuple(effects)
+
+
 def _residual_diagnostic(
     *,
     clause_text: _ClauseText,
@@ -1432,6 +1632,17 @@ def _keyword_sequence_tokens(value: str) -> tuple[str, ...]:
     if not tokens:
         raise RuleIRError("Keyword sequence must contain at least one keyword.")
     return tokens
+
+
+def _keyword_any_tokens(value: str) -> tuple[str, ...]:
+    tokens: list[str] = []
+    for raw_token in re.split(r"\s+or\s+|\s*,\s*", value.strip(), flags=re.IGNORECASE):
+        token = raw_token.strip()
+        if token:
+            tokens.append(_keyword_token(token))
+    if not tokens:
+        raise RuleIRError("Keyword any gate must contain at least one keyword.")
+    return tuple(dict.fromkeys(tokens))
 
 
 def _keyword_sequence_parameter_pairs(value: str) -> tuple[tuple[str, RuleParameterValue], ...]:
