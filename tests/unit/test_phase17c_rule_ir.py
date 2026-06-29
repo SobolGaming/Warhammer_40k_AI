@@ -350,6 +350,43 @@ def test_phase17c_advance_charge_eligibility_compiles_to_rule_exception_grant() 
     assert parameter_payload(effect.parameters) == {"ability": "can_advance_and_charge"}
 
 
+def test_phase17c_leading_model_advance_charge_rerolls_compile_to_two_permissions() -> None:
+    rule_ir = _compiled(
+        "While this model is leading a unit, you can re-roll  Advance and Charge rolls "
+        "made for that unit."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    reroll_effects = tuple(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.REROLL_PERMISSION
+    )
+
+    assert rule_ir.is_supported
+    assert any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters) == {"relationship": "this_model_leading_unit"}
+        for condition in clause.conditions
+    )
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.SELECTED_UNIT
+    assert tuple(parameter_payload(effect.parameters) for effect in reroll_effects) == (
+        {"roll_type": "advance"},
+        {"roll_type": "charge"},
+    )
+
+
+def test_phase17c_single_charge_reroll_permission_compiles_with_unit_target_suffix() -> None:
+    rule_ir = _compiled("This unit can re-roll Charge rolls made for this unit.").rule_ir
+    clause = rule_ir.clauses[0]
+    effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.REROLL_PERMISSION
+    )
+
+    assert rule_ir.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert parameter_payload(effect.parameters) == {"roll_type": "charge"}
+
+
 def test_phase17c_skullmaster_fury_compiles_to_charge_move_weapon_keyword_grant() -> None:
     rule_ir = _compiled(
         "While this model is leading a unit, each time that unit ends a Charge move, "

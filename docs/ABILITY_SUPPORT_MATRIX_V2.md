@@ -173,6 +173,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | Hook / consumer | Abilities / rules |
 | --- | --- |
 | `army-mustering:drukhari-corsairs-and-travelling-players` | Corsairs and Travelling Players |
+| `catalog-ir:advance-roll-reroll` | No current generated rows |
 | `catalog-ir:armor-penetration-characteristic-modifier` | No current generated rows |
 | `catalog-ir:armor-penetration-characteristic-query` | No current generated rows |
 | `catalog-ir:attacks-characteristic-modifier` | No current generated rows |
@@ -184,6 +185,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |
 | `catalog-ir:can-fallback-and-charge` | No current generated rows |
 | `catalog-ir:charge-roll-modifier` | Instrument of Chaos |
+| `catalog-ir:charge-roll-reroll` | No current generated rows |
 | `catalog-ir:critical-hit-value-modifier` | No current generated rows |
 | `catalog-ir:critical-wound-value-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-modifier` | No current generated rows |

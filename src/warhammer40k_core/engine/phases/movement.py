@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from itertools import combinations
+from types import MappingProxyType
 from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
@@ -29,6 +30,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     movement_mode_from_token,
 )
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.actions import (
     MissionActionState,
     MissionActionStatus,
@@ -73,6 +75,9 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacementPayload,
     geometry_model_for_placement,
     model_displacement_kind_from_token,
+)
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    catalog_advance_roll_reroll_permission_for_unit,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
@@ -293,6 +298,11 @@ _ADVANCE_REROLL_KEYWORD = "ADVANCE_REROLL"
 _ADVANCED_UNIT_CLEANUP_POINT = "end_of_turn"
 _FELL_BACK_UNIT_CLEANUP_POINT = "end_of_turn"
 _DESPERATE_ESCAPE_ROLL_TYPE = "desperate_escape_roll"
+
+
+def _empty_ability_indexes() -> Mapping[str, AbilityCatalogIndex]:
+    return MappingProxyType({})
+
 
 type _MovementProposalParseResult = (
     tuple[MovementProposalRequest, MovementProposalPayload] | LifecycleStatus
@@ -2400,6 +2410,9 @@ class MovementPhaseHandler:
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry = field(
         default_factory=StratagemCostModifierRegistry.empty
     )
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] = field(
+        default_factory=_empty_ability_indexes
+    )
     runtime_modifier_registry: RuntimeModifierRegistry = field(
         default_factory=RuntimeModifierRegistry.empty
     )
@@ -2445,6 +2458,11 @@ class MovementPhaseHandler:
             raise GameLifecycleError(
                 "MovementPhaseHandler stratagem_cost_modifier_registry must be a registry."
             )
+        object.__setattr__(
+            self,
+            "ability_indexes_by_player_id",
+            _validate_ability_index_mapping(self.ability_indexes_by_player_id),
+        )
         if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
             raise GameLifecycleError(
                 "MovementPhaseHandler runtime_modifier_registry must be a registry."
@@ -2678,6 +2696,10 @@ class MovementPhaseHandler:
                 reaction_queue=reaction_queue,
                 stratagem_index=self.stratagem_index,
                 advance_move_hooks=self.advance_move_hooks,
+                ability_index=_ability_index_for_player(
+                    self.ability_indexes_by_player_id,
+                    player_id=_active_player_id(state),
+                ),
                 runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE:
@@ -2689,6 +2711,10 @@ class MovementPhaseHandler:
                 reaction_queue=reaction_queue,
                 stratagem_index=self.stratagem_index,
                 advance_move_hooks=self.advance_move_hooks,
+                ability_index=_ability_index_for_player(
+                    self.ability_indexes_by_player_id,
+                    player_id=_active_player_id(state),
+                ),
                 runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
@@ -5234,6 +5260,7 @@ def _apply_movement_action_decision(  # noqa: RET503
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
     advance_move_hooks: AdvanceMoveHookRegistry,
+    ability_index: AbilityCatalogIndex,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
@@ -5355,6 +5382,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             selected_advance_move_grants=(),
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
+            ability_index=ability_index,
         )
 
     if action is MovementPhaseActionKind.FALL_BACK:
@@ -5530,6 +5558,7 @@ def _apply_advance_move_grant_decision(
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
     advance_move_hooks: AdvanceMoveHookRegistry,
+    ability_index: AbilityCatalogIndex,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
@@ -5627,6 +5656,7 @@ def _apply_advance_move_grant_decision(
         selected_advance_move_grants=selected_grants,
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
+        ability_index=ability_index,
     )
 
 
@@ -5760,6 +5790,7 @@ def _resolve_pending_movement_action_after_grants(
     selected_advance_move_grants: tuple[AdvanceMoveGrant, ...],
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    ability_index: AbilityCatalogIndex,
 ) -> LifecycleStatus | None:
     if pending_action.movement_phase_action is MovementPhaseActionKind.NORMAL_MOVE:
         return _request_movement_proposal(
@@ -5789,6 +5820,7 @@ def _resolve_pending_movement_action_after_grants(
             selected_advance_move_grants=selected_advance_move_grants,
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
+            ability_index=ability_index,
         )
     if pending_action.movement_phase_action is MovementPhaseActionKind.FALL_BACK:
         if pending_action.fall_back_mode is None:
@@ -5824,6 +5856,7 @@ def _resolve_pending_advance_action(
     selected_advance_move_grants: tuple[AdvanceMoveGrant, ...],
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    ability_index: AbilityCatalogIndex,
 ) -> LifecycleStatus | None:
     if pending_action.movement_phase_action is not MovementPhaseActionKind.ADVANCE:
         raise GameLifecycleError("Pending Advance resolution requires an Advance action.")
@@ -5835,6 +5868,7 @@ def _resolve_pending_advance_action(
         unit=unit,
         unit_placement=unit_placement,
         action_result=action_result,
+        ability_index=ability_index,
     )
     advance_roll_state = _roll_advance_dice(
         state=state,
@@ -7796,6 +7830,7 @@ def _advance_roll_request_for_action(
     unit: UnitInstance,
     unit_placement: UnitPlacement,
     action_result: DecisionResult,
+    ability_index: AbilityCatalogIndex,
 ) -> AdvanceRollRequest:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Advance roll requires a UnitInstance.")
@@ -7813,6 +7848,13 @@ def _advance_roll_request_for_action(
             unit_instance_id=unit_placement.unit_instance_id,
             player_id=unit_placement.player_id,
             keywords=unit.keywords,
+            ability_index=ability_index,
+            current_model_instance_ids=tuple(
+                sorted(
+                    model_placement.model_instance_id
+                    for model_placement in unit_placement.model_placements
+                )
+            ),
         ),
     )
 
@@ -7915,6 +7957,8 @@ def _advance_reroll_permission_for_unit(
     unit_instance_id: str,
     player_id: str,
     keywords: tuple[str, ...],
+    ability_index: AbilityCatalogIndex,
+    current_model_instance_ids: tuple[str, ...],
 ) -> RerollPermission | None:
     keyword_set = {_canonical_keyword(keyword) for keyword in keywords}
     if _ADVANCE_REROLL_KEYWORD in keyword_set:
@@ -7925,13 +7969,22 @@ def _advance_reroll_permission_for_unit(
             eligible_roll_type="advance_roll",
             component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
         )
-    return source_backed_reroll_permission_for_unit(
+    catalog_permission = catalog_advance_roll_reroll_permission_for_unit(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=current_model_instance_ids,
+        player_id=player_id,
+    )
+    source_backed_permission = source_backed_reroll_permission_for_unit(
         state=state,
         player_id=player_id,
         unit_instance_id=unit_instance_id,
         roll_type="advance_roll",
         timing_window="after_advance_roll",
     )
+    if catalog_permission is not None and source_backed_permission is not None:
+        raise GameLifecycleError("Multiple advance reroll permissions are available.")
+    return catalog_permission if catalog_permission is not None else source_backed_permission
 
 
 def _roll_desperate_escape_dice(
@@ -9104,6 +9157,38 @@ def _unit_has_deep_strike_keyword(unit: UnitInstance) -> bool:
 
 def _canonical_keyword(value: str) -> str:
     return _validate_identifier("keyword", value).upper().replace(" ", "_").replace("-", "_")
+
+
+def _validate_ability_index_mapping(indexes: object) -> Mapping[str, AbilityCatalogIndex]:
+    if not isinstance(indexes, Mapping):
+        raise GameLifecycleError("ability_indexes_by_player_id must be a mapping.")
+    mapped_indexes = cast(Mapping[object, object], indexes)
+    validated: dict[str, AbilityCatalogIndex] = {}
+    for raw_player_id, raw_index in mapped_indexes.items():
+        player_id = _validate_identifier("ability_indexes_by_player_id key", raw_player_id)
+        if type(raw_index) is not AbilityCatalogIndex:
+            raise GameLifecycleError(
+                "ability_indexes_by_player_id values must be AbilityCatalogIndex."
+            )
+        validated[player_id] = raw_index
+    return MappingProxyType(validated)
+
+
+def _ability_index_for_player(
+    indexes: object,
+    *,
+    player_id: str,
+) -> AbilityCatalogIndex:
+    player = _validate_identifier("player_id", player_id)
+    if not isinstance(indexes, Mapping):
+        raise GameLifecycleError("ability_indexes_by_player_id must be a mapping.")
+    mapped_indexes = cast(Mapping[str, AbilityCatalogIndex], indexes)
+    index = mapped_indexes.get(player)
+    if index is None:
+        return AbilityCatalogIndex.from_records(())
+    if type(index) is not AbilityCatalogIndex:
+        raise GameLifecycleError("ability index mapping contained an invalid value.")
+    return index
 
 
 def _validate_move_witness_matches_unit(

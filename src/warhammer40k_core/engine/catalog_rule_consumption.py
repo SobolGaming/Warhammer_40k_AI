@@ -6,6 +6,7 @@ from types import MappingProxyType
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_tokens
 from warhammer40k_core.engine.abilities import (
@@ -45,6 +46,7 @@ from warhammer40k_core.engine.unit_abilities import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
+    RuleConditionKind,
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
@@ -63,6 +65,8 @@ CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:save-roll-modifier"
 CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID = (
     "catalog-ir:invulnerable-save-roll-modifier"
 )
+CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:advance-roll-reroll"
+CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:charge-roll-reroll"
 CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID = "catalog-ir:feel-no-pain-roll"
 CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID = "catalog-ir:feel-no-pain-source"
 CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-hit-value-modifier"
@@ -97,6 +101,14 @@ _CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
         "critical_hit_value": CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
         "critical_wound": CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
         "critical_wound_value": CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
+    }
+)
+_CATALOG_IR_ROLL_REROLL_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
+    {
+        "advance": CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        "advance_roll": CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        "charge": CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+        "charge_roll": CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
     }
 )
 _CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
@@ -243,6 +255,7 @@ def catalog_advance_eligibility_hook_bindings(
 def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefinition, ...]:
     hook_ids = {
         *_CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS.values(),
+        *_CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.values(),
         *_CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.values(),
         CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
@@ -294,6 +307,89 @@ def catalog_charge_roll_modifiers_for_unit(
                     )
                 )
     return tuple(sorted(modifiers, key=lambda modifier: modifier.modifier_id))
+
+
+def catalog_advance_roll_reroll_permission_for_unit(
+    *,
+    ability_index: AbilityCatalogIndex,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+    player_id: str,
+) -> RerollPermission | None:
+    return _catalog_roll_reroll_permission_for_unit(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=current_model_instance_ids,
+        player_id=player_id,
+        roll_type="advance_roll",
+        timing_window="after_advance_roll",
+    )
+
+
+def catalog_charge_roll_reroll_permission_for_unit(
+    *,
+    ability_index: AbilityCatalogIndex,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+    player_id: str,
+) -> RerollPermission | None:
+    return _catalog_roll_reroll_permission_for_unit(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=current_model_instance_ids,
+        player_id=player_id,
+        roll_type="charge_roll",
+        timing_window="after_charge_roll",
+    )
+
+
+def _catalog_roll_reroll_permission_for_unit(
+    *,
+    ability_index: AbilityCatalogIndex,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+    player_id: str,
+    roll_type: str,
+    timing_window: str,
+) -> RerollPermission | None:
+    _validate_ability_index(ability_index)
+    _validate_unit(unit)
+    current_ids = _validate_current_model_instance_ids(current_model_instance_ids)
+    owning_player_id = _validate_identifier("player_id", player_id)
+    requested_roll_type = _validate_identifier("roll_type", roll_type)
+    requested_timing_window = _validate_identifier("timing_window", timing_window)
+    permissions: list[RerollPermission] = []
+    for record in _unit_scoped_generic_records(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=current_ids,
+        trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
+    ):
+        rule_ir = _rule_ir_from_record(record)
+        if not rule_ir.is_supported:
+            continue
+        for clause in rule_ir.clauses:
+            if not _clause_targets_roll_reroll_unit(clause):
+                continue
+            for effect_index, effect in enumerate(clause.effects):
+                if not _effect_is_roll_reroll_permission(
+                    effect,
+                    roll_type=requested_roll_type,
+                ):
+                    continue
+                permissions.append(
+                    _catalog_roll_reroll_permission(
+                        record=record,
+                        clause=clause,
+                        effect_index=effect_index,
+                        player_id=owning_player_id,
+                        roll_type=requested_roll_type,
+                        timing_window=requested_timing_window,
+                    )
+                )
+    if len(permissions) > 1:
+        raise GameLifecycleError("Multiple catalog roll reroll permissions are available.")
+    return permissions[0] if permissions else None
 
 
 def catalog_leadership_characteristic_for_unit(
@@ -464,10 +560,18 @@ def catalog_rule_ir_consumers_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
                 if _effect_is_feel_no_pain_grant(effect):
                     consumer_ids.add(CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID)
         if not _clause_targets_this_unit(clause):
+            if _clause_targets_roll_reroll_unit(clause):
+                for effect in clause.effects:
+                    reroll_consumer_id = _roll_reroll_consumer_id_for_effect(effect)
+                    if reroll_consumer_id is not None:
+                        consumer_ids.add(reroll_consumer_id)
             continue
         for effect in clause.effects:
             if _effect_is_charge_roll_modifier(effect):
                 consumer_ids.add(CATALOG_IR_CHARGE_ROLL_CONSUMER_ID)
+            reroll_consumer_id = _roll_reroll_consumer_id_for_effect(effect)
+            if reroll_consumer_id is not None:
+                consumer_ids.add(reroll_consumer_id)
             if _effect_is_leadership_set(effect):
                 consumer_ids.add(CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID)
             if _effect_is_turn_end_reserve_permission(effect):
@@ -635,6 +739,28 @@ def _clause_targets_this_model(clause: RuleClause) -> bool:
     return clause.target is not None and clause.target.kind is RuleTargetKind.THIS_MODEL
 
 
+def _clause_targets_roll_reroll_unit(clause: RuleClause) -> bool:
+    if _clause_targets_this_unit(clause):
+        return True
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    return (
+        clause.target is not None
+        and clause.target.kind is RuleTargetKind.SELECTED_UNIT
+        and _clause_has_leading_unit_relationship(clause)
+    )
+
+
+def _clause_has_leading_unit_relationship(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    return any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters).get("relationship") == "this_model_leading_unit"
+        for condition in clause.conditions
+    )
+
+
 def _effect_is_charge_roll_modifier(effect: RuleEffectSpec) -> bool:
     if type(effect) is not RuleEffectSpec:
         raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
@@ -643,6 +769,32 @@ def _effect_is_charge_roll_modifier(effect: RuleEffectSpec) -> bool:
     parameters = parameter_payload(effect.parameters)
     roll_type = parameters.get("roll_type")
     return roll_type in {"charge", "charge_roll"}
+
+
+def _effect_is_roll_reroll_permission(effect: RuleEffectSpec, *, roll_type: str) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.REROLL_PERMISSION:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    value = parameters.get("roll_type")
+    if type(value) is not str:
+        return False
+    return _CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.get(
+        _catalog_ir_lookup_token(value)
+    ) == _CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.get(_catalog_ir_lookup_token(roll_type))
+
+
+def _roll_reroll_consumer_id_for_effect(effect: RuleEffectSpec) -> str | None:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.REROLL_PERMISSION:
+        return None
+    parameters = parameter_payload(effect.parameters)
+    roll_type = parameters.get("roll_type")
+    if type(roll_type) is not str:
+        return None
+    return _CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.get(_catalog_ir_lookup_token(roll_type))
 
 
 def _effect_is_leadership_set(effect: RuleEffectSpec) -> bool:
@@ -735,6 +887,30 @@ def _feel_no_pain_source_from_effect(
         source_id=f"{record.record_id}:{clause.clause_id}:effect-{effect_index:03d}",
         threshold=_int_parameter(parameters, key="threshold"),
         attack_condition=_feel_no_pain_attack_condition_parameter(parameters),
+    )
+
+
+def _catalog_roll_reroll_permission(
+    *,
+    record: AbilityCatalogRecord,
+    clause: RuleClause,
+    effect_index: int,
+    player_id: str,
+    roll_type: str,
+    timing_window: str,
+) -> RerollPermission:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog reroll permission requires an ability record.")
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog reroll permission requires a rule clause.")
+    if type(effect_index) is not int or effect_index < 0:
+        raise GameLifecycleError("Catalog reroll permission effect_index must be non-negative.")
+    return RerollPermission(
+        source_id=f"{record.record_id}:{clause.clause_id}:effect-{effect_index:03d}:reroll",
+        timing_window=_validate_identifier("timing_window", timing_window),
+        owning_player_id=_validate_identifier("player_id", player_id),
+        eligible_roll_type=_validate_identifier("roll_type", roll_type),
+        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
     )
 
 
@@ -907,6 +1083,8 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
     parameters = parameter_payload(effect.parameters)
     if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
         return _catalog_ir_roll_modifier_hook_ids(parameters)
+    if effect.kind is RuleEffectKind.REROLL_PERMISSION:
+        return _catalog_ir_roll_reroll_hook_ids(parameters)
     if effect.kind is RuleEffectKind.SET_CHARACTERISTIC:
         characteristic = _characteristic_parameter(parameters, key="characteristic")
         return (_catalog_ir_characteristic_query_consumer_id(characteristic),)
@@ -934,6 +1112,14 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
 def _catalog_ir_roll_modifier_hook_ids(parameters: Mapping[str, object]) -> tuple[str, ...]:
     roll_type = _string_parameter(parameters, key="roll_type")
     consumer_id = _CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS.get(_catalog_ir_lookup_token(roll_type))
+    if consumer_id is None:
+        return ()
+    return (consumer_id,)
+
+
+def _catalog_ir_roll_reroll_hook_ids(parameters: Mapping[str, object]) -> tuple[str, ...]:
+    roll_type = _string_parameter(parameters, key="roll_type")
+    consumer_id = _CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.get(_catalog_ir_lookup_token(roll_type))
     if consumer_id is None:
         return ()
     return (consumer_id,)

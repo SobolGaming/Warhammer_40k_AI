@@ -34,6 +34,7 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionConditionKind,
     WargearOptionEffectKind,
 )
+from warhammer40k_core.core.dice import RerollComponentSelectionPolicy
 from warhammer40k_core.core.model_geometry_catalog import (
     GeometryMeasurementKind,
     GeometrySourceUnits,
@@ -48,6 +49,7 @@ from warhammer40k_core.core.weapon_profiles import (
 from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
+    AbilityCatalogRecord,
     AbilityExecutionContext,
     AbilityResolutionStatus,
     default_ability_handler_registry,
@@ -79,10 +81,12 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
     CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
     CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
     CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+    CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
     CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
     CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID,
@@ -93,7 +97,12 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
     CatalogAdvanceEligibilityRuntime,
+    _catalog_roll_reroll_permission,  # pyright: ignore[reportPrivateUsage]
+    _effect_is_roll_reroll_permission,  # pyright: ignore[reportPrivateUsage]
+    _roll_reroll_consumer_id_for_effect,  # pyright: ignore[reportPrivateUsage]
+    catalog_advance_roll_reroll_permission_for_unit,
     catalog_charge_roll_modifiers_for_unit,
+    catalog_charge_roll_reroll_permission_for_unit,
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
     catalog_rule_ir_registered_hook_ids,
@@ -148,6 +157,14 @@ from warhammer40k_core.engine.list_validation import (
     resolve_wargear_selections,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phases.charge import (
+    _charge_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.phases.movement import (
+    _ability_index_for_player,  # pyright: ignore[reportPrivateUsage]
+    _advance_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
+    _validate_ability_index_mapping,  # pyright: ignore[reportPrivateUsage]
+)
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
@@ -610,6 +627,8 @@ def test_phase17k_instrument_of_chaos_catalog_ir_modifies_charge_roll_result() -
         )
     with pytest.raises(GameLifecycleError, match="classification requires RuleIR"):
         catalog_rule_ir_consumers_for_rule(cast(RuleIR, object()))
+    with pytest.raises(GameLifecycleError, match="classification requires RuleIR"):
+        catalog_rule_ir_hook_ids_for_rule(cast(RuleIR, object()))
 
 
 def test_phase17k_daemonic_icon_catalog_ir_modifies_battle_shock_leadership() -> None:
@@ -920,6 +939,216 @@ def test_phase17k_datasheet_advance_charge_text_uses_generic_advance_eligibility
         "catalog_record_ids": [advance_charge_record.record_id],
         "source_rule_ids": [advance_charge_record.definition.source_id],
     }
+
+
+def test_phase17k_leading_model_reroll_text_uses_generic_advance_charge_rerolls() -> None:
+    package = _advance_charge_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    reroll_record = records_by_name["Lead the Hunt"]
+    replay_payload = reroll_record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
+    state = _battle_state_with_army(army=army, battlefield=battlefield)
+    current_model_ids = _current_model_ids(battlefield=battlefield, unit=unit)
+    advance_permission = catalog_advance_roll_reroll_permission_for_unit(
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        player_id=army.player_id,
+    )
+    charge_permission = catalog_charge_roll_reroll_permission_for_unit(
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        player_id=army.player_id,
+    )
+    advance_phase_permission = _advance_reroll_permission_for_unit(
+        state=state,
+        unit=unit,
+        unit_instance_id=unit.unit_instance_id,
+        player_id=army.player_id,
+        keywords=unit.keywords,
+        ability_index=player_index,
+        current_model_instance_ids=current_model_ids,
+    )
+    charge_phase_permission = _charge_reroll_permission_for_unit(
+        state=state,
+        player_id=army.player_id,
+        unit_instance_id=unit.unit_instance_id,
+        ability_index=player_index,
+    )
+    keyword_permission = _advance_reroll_permission_for_unit(
+        state=state,
+        unit=unit,
+        unit_instance_id=unit.unit_instance_id,
+        player_id=army.player_id,
+        keywords=("ADVANCE_REROLL",),
+        ability_index=AbilityCatalogIndex.from_records(()),
+        current_model_instance_ids=(),
+    )
+    empty_index = AbilityCatalogIndex.from_records(())
+    duplicate_index = AbilityCatalogIndex.from_records(
+        (
+            *player_index.all_records(),
+            replace(reroll_record, record_id=f"{reroll_record.record_id}:duplicate"),
+        )
+    )
+
+    assert reroll_record.definition.timing.trigger_kind is TimingTriggerKind.AFTER_DICE_ROLL
+    assert rule_ir.is_supported
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) == {
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    }
+    assert advance_permission is not None
+    assert advance_permission.eligible_roll_type == "advance_roll"
+    assert advance_permission.timing_window == "after_advance_roll"
+    assert advance_permission.owning_player_id == army.player_id
+    assert (
+        advance_permission.component_selection_policy is RerollComponentSelectionPolicy.WHOLE_ROLL
+    )
+    assert charge_permission is not None
+    assert charge_permission.eligible_roll_type == "charge_roll"
+    assert charge_permission.timing_window == "after_charge_roll"
+    assert charge_permission.owning_player_id == army.player_id
+    assert charge_permission.component_selection_policy is RerollComponentSelectionPolicy.WHOLE_ROLL
+    assert advance_phase_permission == advance_permission
+    assert charge_phase_permission == charge_permission
+    assert keyword_permission is not None
+    assert keyword_permission.source_id == f"{unit.unit_instance_id}:advance-reroll"
+    assert keyword_permission.eligible_roll_type == "advance_roll"
+    assert (
+        catalog_advance_roll_reroll_permission_for_unit(
+            ability_index=empty_index,
+            unit=unit,
+            current_model_instance_ids=current_model_ids,
+            player_id=army.player_id,
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="Multiple catalog roll reroll permissions"):
+        catalog_advance_roll_reroll_permission_for_unit(
+            ability_index=duplicate_index,
+            unit=unit,
+            current_model_instance_ids=current_model_ids,
+            player_id=army.player_id,
+        )
+    with pytest.raises(GameLifecycleError, match="requires an ability record"):
+        _catalog_roll_reroll_permission(
+            record=cast(AbilityCatalogRecord, object()),
+            clause=rule_ir.clauses[0],
+            effect_index=0,
+            player_id=army.player_id,
+            roll_type="advance_roll",
+            timing_window="after_advance_roll",
+        )
+    with pytest.raises(GameLifecycleError, match="requires a rule clause"):
+        _catalog_roll_reroll_permission(
+            record=reroll_record,
+            clause=cast(RuleClause, object()),
+            effect_index=0,
+            player_id=army.player_id,
+            roll_type="advance_roll",
+            timing_window="after_advance_roll",
+        )
+    with pytest.raises(GameLifecycleError, match="effect_index must be non-negative"):
+        _catalog_roll_reroll_permission(
+            record=reroll_record,
+            clause=rule_ir.clauses[0],
+            effect_index=-1,
+            player_id=army.player_id,
+            roll_type="advance_roll",
+            timing_window="after_advance_roll",
+        )
+
+
+def test_phase17k_catalog_ir_roll_reroll_classification_requires_supported_target() -> None:
+    this_unit_rule = _catalog_rule_ir(
+        (
+            _effect(RuleEffectKind.REROLL_PERMISSION, roll_type="advance"),
+            _effect(RuleEffectKind.REROLL_PERMISSION, roll_type="charge"),
+        ),
+        target_kind=RuleTargetKind.THIS_UNIT,
+    )
+    selected_unit_without_leader_rule = _catalog_rule_ir(
+        (_effect(RuleEffectKind.REROLL_PERMISSION, roll_type="advance"),),
+        target_kind=RuleTargetKind.SELECTED_UNIT,
+    )
+    unsupported_roll_rule = _catalog_rule_ir(
+        (_effect(RuleEffectKind.REROLL_PERMISSION, roll_type="damage"),),
+        target_kind=RuleTargetKind.THIS_UNIT,
+    )
+
+    assert catalog_rule_ir_consumers_for_rule(this_unit_rule) == (
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(this_unit_rule)) == {
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    }
+    assert catalog_rule_ir_consumers_for_rule(selected_unit_without_leader_rule) == ()
+    assert catalog_rule_ir_consumers_for_rule(unsupported_roll_rule) == ()
+    assert catalog_rule_ir_hook_ids_for_rule(unsupported_roll_rule) == ()
+
+
+def test_phase17k_catalog_ir_roll_reroll_effect_helpers_are_strict() -> None:
+    advance_effect = _effect(RuleEffectKind.REROLL_PERMISSION, roll_type="advance")
+    charge_effect = _effect(RuleEffectKind.REROLL_PERMISSION, roll_type="charge")
+    non_reroll_effect = _effect(RuleEffectKind.GRANT_ABILITY, ability="can_advance_and_charge")
+    malformed_effect = _effect(RuleEffectKind.REROLL_PERMISSION, roll_type=1)
+
+    assert _effect_is_roll_reroll_permission(advance_effect, roll_type="advance_roll")
+    assert not _effect_is_roll_reroll_permission(advance_effect, roll_type="charge_roll")
+    assert not _effect_is_roll_reroll_permission(non_reroll_effect, roll_type="advance_roll")
+    assert not _effect_is_roll_reroll_permission(malformed_effect, roll_type="advance_roll")
+    assert (
+        _roll_reroll_consumer_id_for_effect(advance_effect)
+        == CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID
+    )
+    assert (
+        _roll_reroll_consumer_id_for_effect(charge_effect)
+        == CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID
+    )
+    assert _roll_reroll_consumer_id_for_effect(non_reroll_effect) is None
+    assert _roll_reroll_consumer_id_for_effect(malformed_effect) is None
+    with pytest.raises(GameLifecycleError, match="requires RuleEffectSpec values"):
+        _effect_is_roll_reroll_permission(
+            cast(RuleEffectSpec, object()),
+            roll_type="advance_roll",
+        )
+    with pytest.raises(GameLifecycleError, match="requires RuleEffectSpec values"):
+        _roll_reroll_consumer_id_for_effect(cast(RuleEffectSpec, object()))
+
+
+def test_phase17k_movement_phase_ability_index_mapping_is_fail_fast() -> None:
+    index = AbilityCatalogIndex.from_records(())
+    validated = _validate_ability_index_mapping({"player-a": index})
+    present_index = _ability_index_for_player(validated, player_id="player-a")
+    missing_index = _ability_index_for_player(validated, player_id="player-b")
+
+    assert validated["player-a"] is index
+    assert present_index is index
+    assert tuple(missing_index.all_records()) == ()
+    with pytest.raises(GameLifecycleError, match="must be a mapping"):
+        _validate_ability_index_mapping(("player-a", index))
+    with pytest.raises(GameLifecycleError, match="values must be AbilityCatalogIndex"):
+        _validate_ability_index_mapping({"player-a": cast(AbilityCatalogIndex, object())})
+    with pytest.raises(GameLifecycleError, match="must be a mapping"):
+        _ability_index_for_player(("player-a", index), player_id="player-a")
+    with pytest.raises(GameLifecycleError, match="contained an invalid value"):
+        _ability_index_for_player(
+            {"player-a": cast(AbilityCatalogIndex, object())},
+            player_id="player-a",
+        )
 
 
 def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
@@ -1889,6 +2118,8 @@ def test_phase17k_catalog_ir_future_hooks_classify_supported_rule_ir_without_con
             _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="wound", delta=1),
             _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="invulnerable_save", delta=1),
             _effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="critical_hit", delta=-1),
+            _effect(RuleEffectKind.REROLL_PERMISSION, roll_type="advance_roll"),
+            _effect(RuleEffectKind.REROLL_PERMISSION, roll_type="charge_roll"),
             _effect(
                 RuleEffectKind.MODIFY_CHARACTERISTIC,
                 characteristic=Characteristic.TOUGHNESS.value,
@@ -1912,6 +2143,8 @@ def test_phase17k_catalog_ir_future_hooks_classify_supported_rule_ir_without_con
         CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
         CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
         CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
         "catalog-ir:toughness-characteristic-modifier",
         "catalog-ir:objective-control-characteristic-modifier",
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
@@ -1927,6 +2160,8 @@ def test_phase17k_catalog_ir_future_hooks_classify_supported_rule_ir_without_con
         CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
         CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
         CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
         "catalog-ir:movement-characteristic-query",
         "catalog-ir:toughness-characteristic-query",
         "catalog-ir:objective-control-characteristic-query",
@@ -3132,6 +3367,11 @@ def _advance_charge_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                         "test-advance-charge-unit,2,Datasheet,,Bounding Advance,"
                         "This unit is eligible to declare a charge in a turn in  which "
                         "it Advanced.,"
+                    ),
+                    (
+                        "test-advance-charge-unit,3,Datasheet,,Lead the Hunt,"
+                        '"While this model is leading a unit, you can re-roll  Advance '
+                        'and Charge rolls made for that unit.",'
                     ),
                 )
             ),

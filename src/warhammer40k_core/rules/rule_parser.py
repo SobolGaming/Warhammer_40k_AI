@@ -136,8 +136,17 @@ _SIGNED_ROLL_RE = re.compile(
     rf"(?:the\s+)?(?P<roll>{_ROLL_TYPES})\s+rolls?\b",
     re.IGNORECASE,
 )
+_REROLL_ROLL_LIST_RE = re.compile(
+    rf"\b(?:(?:you\s+)?can\s+)?(?:re-roll|reroll)\s+"
+    rf"(?P<rolls>(?:{_ROLL_TYPES})(?:\s*,\s*|\s+and\s+)"
+    rf"(?:{_ROLL_TYPES})(?:(?:\s*,\s*|\s+and\s+)(?:{_ROLL_TYPES}))*)\s+rolls?\b"
+    r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+unit)?",
+    re.IGNORECASE,
+)
 _REROLL_RE = re.compile(
-    rf"\b(?:re-roll|reroll)\s+(?P<roll>{_ROLL_TYPES})\s+rolls?\b", re.IGNORECASE
+    rf"\b(?:(?:you\s+)?can\s+)?(?:re-roll|reroll)\s+(?P<roll>{_ROLL_TYPES})\s+rolls?\b"
+    r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+unit)?",
+    re.IGNORECASE,
 )
 _CHARACTERISTIC_NAMES = (
     "Armor Penetration|AP|Attacks|Ballistic Skill|BS|Damage|Detection Range|Invulnerable Save|"
@@ -801,7 +810,20 @@ def _dice_modifier_effect(
 
 def _parse_reroll_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
+    list_spans: list[tuple[int, int]] = []
+    for match in _REROLL_ROLL_LIST_RE.finditer(clause_text.text):
+        list_spans.append((match.start(), match.end()))
+        for roll in _roll_list_values(match.group("rolls")):
+            effects.append(
+                RuleEffectSpec(
+                    kind=RuleEffectKind.REROLL_PERMISSION,
+                    source_span=_span_from_match(clause_text, match),
+                    parameters=parameters_from_pairs((("roll_type", _roll_type(roll)),)),
+                )
+            )
     for match in _REROLL_RE.finditer(clause_text.text):
+        if _match_is_within_any_span(match=match, spans=tuple(list_spans)):
+            continue
         effects.append(
             RuleEffectSpec(
                 kind=RuleEffectKind.REROLL_PERMISSION,
@@ -810,6 +832,23 @@ def _parse_reroll_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...
             )
         )
     return tuple(effects)
+
+
+def _roll_list_values(value: str) -> tuple[str, ...]:
+    rolls: list[str] = []
+    for raw_roll in re.split(r"\s*,\s*|\s+and\s+", value.strip(), flags=re.IGNORECASE):
+        roll = raw_roll.strip()
+        if roll:
+            rolls.append(roll)
+    return tuple(rolls)
+
+
+def _match_is_within_any_span(
+    *,
+    match: re.Match[str],
+    spans: tuple[tuple[int, int], ...],
+) -> bool:
+    return any(start <= match.start() and match.end() <= end for start, end in spans)
 
 
 def _parse_characteristic_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
