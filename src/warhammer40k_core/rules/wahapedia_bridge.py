@@ -126,16 +126,8 @@ _DAMAGED_HIT_RE = re.compile(
     r"subtract\s+(?P<value>\d+)\s+from\s+the\s+Hit\s+roll",
     re.IGNORECASE,
 )
-_DAMAGED_MODEL_POSSESSIVE_RE = (
-    r"this\s+model['"
-    "\N{RIGHT SINGLE QUOTATION MARK}"
-    r"]s"
-)
-_DAMAGED_APOSTROPHE_RE = (
-    r"['"
-    "\N{RIGHT SINGLE QUOTATION MARK}"
-    r"]"
-)
+_DAMAGED_MODEL_POSSESSIVE_RE = r"this\s+model'?s"
+_DAMAGED_APOSTROPHE_RE = r"'"
 _DAMAGED_OC_RE = re.compile(
     rf"subtract\s+(?P<value>\d+)\s+from\s+"
     rf"(?:{_DAMAGED_MODEL_POSSESSIVE_RE}|its)\s+"
@@ -339,7 +331,7 @@ def _bridge_datasheet(
             "damaged_description": _raw_or_field(datasheet_row, "damaged_description"),
             "damaged_effects": _damaged_effects_json(
                 datasheet_id=datasheet_id,
-                damaged_description=_raw_or_field(datasheet_row, "damaged_description"),
+                damaged_description=_normalized_or_field(datasheet_row, "damaged_description"),
                 composition_entries=composition_entries,
                 source_id=datasheet_row.stable_source_id(),
             ),
@@ -1351,6 +1343,13 @@ def _raw_or_field(row: NormalizedSourceRow, column_name: str) -> str:
     for text_field in row.text_fields:
         if text_field.column_name == column_name:
             return text_field.raw_text
+    return row.runtime_fields_payload().get(column_name, "")
+
+
+def _normalized_or_field(row: NormalizedSourceRow, column_name: str) -> str:
+    for text_field in row.text_fields:
+        if text_field.column_name == column_name:
+            return text_field.normalized_text
     return row.runtime_fields_payload().get(column_name, "")
 
 

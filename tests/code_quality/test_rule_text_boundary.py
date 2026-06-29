@@ -90,3 +90,24 @@ def test_damaged_descriptions_are_normalized_only_at_source_boundary() -> None:
         "DAMAGED raw text must become structured descriptors at the source boundary:\n"
         + "\n".join(violations)
     )
+
+
+def test_damaged_bridge_parser_uses_normalized_punctuation() -> None:
+    source = (SOURCE / "rules" / "wahapedia_bridge.py").read_text(encoding="utf-8")
+    forbidden_fragments = (
+        "RIGHT SINGLE QUOTATION MARK",
+        "LEFT SINGLE QUOTATION MARK",
+        "EN DASH",
+        "EM DASH",
+        "\\u2018",
+        "\\u2019",
+        "\\u2013",
+        "\\u2014",
+    )
+
+    violations = [fragment for fragment in forbidden_fragments if fragment in source]
+
+    assert not violations, (
+        "DAMAGED bridge parsing must consume SourceTextField.normalized_text; "
+        "smart punctuation belongs in source normalization:\n" + "\n".join(violations)
+    )

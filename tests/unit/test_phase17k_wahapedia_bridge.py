@@ -2560,7 +2560,8 @@ def test_phase17k_bridge_datasheet_source_ids_include_pdf_correction_source_id()
         ),
         (
             (
-                "DAMAGED: 1-7 WOUNDS REMAINING\nWhile this model has 1-7 wounds remaining, "
+                "DAMAGED: 1\N{EN DASH}7 WOUNDS REMAINING\n"
+                "While this model has 1\N{EN DASH}7 wounds remaining, "
                 "add 2 to the Attacks characteristic of this "
                 "model\N{RIGHT SINGLE QUOTATION MARK}s melee weapons."
             ),
