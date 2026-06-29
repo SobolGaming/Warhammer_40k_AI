@@ -18,6 +18,7 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
     AbilityTimingDescriptor,
     default_ability_handler_registry,
+    execute_abilities_from_index,
 )
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
@@ -275,6 +276,8 @@ def test_phase17d_champion_slayer_heal_only_applies_after_enemy_character_or_mon
     assert resolved is not None
     effect, request = resolved
     assert request is None
+    assert effect.amount == 1
+    assert len(effect.resolved_steps) == 1
     assert effect.source_context == {
         "catalog_record_id": (
             "phase17d:test:catalog-ability:core-intercessor-like-infantry:"
@@ -288,6 +291,78 @@ def test_phase17d_champion_slayer_heal_only_applies_after_enemy_character_or_mon
     }
     healed_unit = _unit_by_id(state, unit.unit_instance_id)
     assert healed_unit.own_models[0].wounds_remaining == model.starting_wounds
+
+
+def test_phase17d_champion_slayer_heal_does_not_revive_after_source_model_is_full() -> None:
+    state = _battle_state_with_scenario()
+    unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
+    source_model = unit.own_models[0]
+    destroyed_model = unit.own_models[1]
+    ability_index = _champion_slayer_ability_index(datasheet_id=unit.datasheet_id)
+    _set_model_wounds(
+        state,
+        model_instance_id=source_model.model_instance_id,
+        wounds_remaining=source_model.starting_wounds - 1,
+    )
+    _destroy_model(state, model_instance_id=destroyed_model.model_instance_id)
+    wounded_unit = _unit_by_id(state, unit.unit_instance_id)
+
+    resolved = catalog_restore_lost_wounds_after_destroying_unit(
+        state=state,
+        decisions=DecisionController(),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        ability_index=ability_index,
+        unit=wounded_unit,
+        current_model_instance_ids=(source_model.model_instance_id,),
+        player_id="player-a",
+        destroyed_player_id="player-b",
+        destroyed_unit_keywords=("CHARACTER",),
+        healing_amount=3,
+        source_event_id="event:enemy-character-destroyed",
+    )
+
+    assert resolved is not None
+    effect, request = resolved
+    assert request is None
+    assert effect.amount == 1
+    assert len(effect.resolved_steps) == 1
+    resolved_unit = _unit_by_id(state, unit.unit_instance_id)
+    assert resolved_unit.own_models[0].wounds_remaining == source_model.starting_wounds
+    assert resolved_unit.own_models[1].wounds_remaining == 0
+    assert state.battlefield_state is not None
+    assert destroyed_model.model_instance_id in state.battlefield_state.removed_model_ids
+
+
+def test_phase17d_champion_slayer_restore_clause_executes_to_generic_payload() -> None:
+    state = _battle_state_with_scenario()
+    unit = _unit_by_id(state, "army-alpha:intercessor-unit-1")
+    ability_index = _champion_slayer_ability_index(datasheet_id=unit.datasheet_id)
+
+    results = execute_abilities_from_index(
+        registry=default_ability_handler_registry(),
+        index=ability_index,
+        context=AbilityExecutionContext(
+            game_id="phase17d-game",
+            player_id="player-a",
+            battle_round=1,
+            phase=None,
+            active_player_id="player-a",
+            trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED,
+            source_unit_instance_id=unit.unit_instance_id,
+            source_model_instance_id=unit.own_models[0].model_instance_id,
+            trigger_payload={"destroyed_unit_keywords": ["MONSTER"]},
+            state=state,
+        ),
+    )
+
+    assert len(results) == 1
+    assert results[0].status is AbilityResolutionStatus.APPLIED
+    replay_payload = cast(dict[str, JsonValue], results[0].replay_payload)
+    execution_payload = cast(dict[str, JsonValue], replay_payload["rule_execution"])
+    effect_payloads = cast(list[JsonValue], execution_payload["effect_payloads"])
+    first_effect_payload = cast(dict[str, JsonValue], effect_payloads[0])
+    effect = cast(dict[str, JsonValue], first_effect_payload["effect"])
+    assert effect["kind"] == "restore_lost_wounds"
 
 
 def test_phase17d_champion_slayer_heal_ignores_nonqualifying_destroyed_units() -> None:
@@ -1300,6 +1375,12 @@ def _set_model_wounds(
     if not did_update:
         raise AssertionError(f"missing model {model_instance_id}")
     state.army_definitions = updated_armies
+
+
+def _destroy_model(state: GameState, *, model_instance_id: str) -> None:
+    _set_model_wounds(state, model_instance_id=model_instance_id, wounds_remaining=0)
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_removed_models((model_instance_id,))
 
 
 def _scenario() -> BattlefieldScenario:

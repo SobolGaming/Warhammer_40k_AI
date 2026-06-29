@@ -568,8 +568,13 @@ def catalog_restore_lost_wounds_after_destroying_unit(
     effect_parameters = parameter_payload(effect.parameters)
     if effect_parameters.get("amount") != "D6":
         raise GameLifecycleError("Catalog restore lost wounds requires a D6 amount.")
-    if not _this_model_restore_has_targetable_wounds(unit=unit, source_model_id=source_model_id):
+    missing_wounds = _this_model_restore_missing_wounds(
+        unit=unit,
+        source_model_id=source_model_id,
+    )
+    if missing_wounds == 0:
         return None
+    amount = min(amount, missing_wounds)
     healing_effect = HealingEffect(
         effect_id=f"{record.record_id}:{clause.clause_id}:effect-{effect_index:03d}:heal",
         target_unit_instance_id=unit.unit_instance_id,
@@ -1073,22 +1078,32 @@ def _validate_this_model_source_id(
     raise GameLifecycleError("Catalog this-model source is not owned by the unit.")
 
 
-def _this_model_restore_has_targetable_wounds(
+def _this_model_restore_missing_wounds(
     *,
     unit: UnitInstance,
     source_model_id: str,
-) -> bool:
+) -> int:
+    source_missing_wounds: int | None = None
     wounded_model_ids = tuple(
         model.model_instance_id
         for model in unit.own_models
         if model.is_alive and model.wounds_remaining < model.starting_wounds
     )
     if not wounded_model_ids:
-        return False
+        return 0
+    for model in unit.own_models:
+        if model.model_instance_id != source_model_id:
+            continue
+        source_missing_wounds = model.starting_wounds - model.wounds_remaining
+        break
+    if source_missing_wounds is None:
+        raise GameLifecycleError("Catalog this-model healing source model is missing.")
+    if source_missing_wounds <= 0:
+        return 0
     if wounded_model_ids == (source_model_id,):
-        return True
+        return source_missing_wounds
     if source_model_id not in wounded_model_ids:
-        return False
+        return 0
     raise GameLifecycleError("Catalog this-model healing cannot target multiple wounded models.")
 
 
