@@ -256,6 +256,10 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
         fall_back_timing = _catalog_fall_back_selection_timing_descriptor_for_clause(clause)
         if fall_back_timing is not None:
             return fall_back_timing
+    for clause in rule_ir.clauses:
+        battle_round_timing = _catalog_battle_round_timing_descriptor_for_clause(clause)
+        if battle_round_timing is not None:
+            return battle_round_timing
     turn_timing = _catalog_turn_timing_descriptor(rule_ir)
     if turn_timing is not None:
         return turn_timing
@@ -312,6 +316,14 @@ def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDe
         turn_timing = _catalog_turn_timing_descriptor_for_clause(clause)
         if turn_timing is not None:
             return turn_timing
+    battle_round_timing = _catalog_battle_round_timing_descriptor_for_clause(clause)
+    if battle_round_timing is not None:
+        return battle_round_timing
+    if clause.trigger is not None and clause.trigger.kind in {
+        RuleTriggerKind.UNIT_DESTROYED,
+        RuleTriggerKind.MODEL_DESTROYED,
+    }:
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED)
     if any(
         _effect_is_passive_rule_exception_grant(effect)
         or _effect_is_shadow_of_chaos_status(effect)
@@ -320,8 +332,6 @@ def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDe
         for effect in clause.effects
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
-    if clause.trigger is not None and clause.trigger.kind is RuleTriggerKind.UNIT_DESTROYED:
-        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED)
     if clause.trigger is None and any(
         effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY for effect in clause.effects
     ):
@@ -376,6 +386,23 @@ def _catalog_turn_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor 
             return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.END_TURN)
         if edge == "start":
             return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.START_TURN)
+    return None
+
+
+def _catalog_battle_round_timing_descriptor_for_clause(
+    clause: RuleClause,
+) -> AbilityTimingDescriptor | None:
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return None
+    parameters = parameter_payload(trigger.parameters)
+    if parameters.get("phase") != "battle_round":
+        return None
+    edge = parameters.get("edge")
+    if edge == "start":
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.START_BATTLE_ROUND)
+    if edge == "end":
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.END_BATTLE_ROUND)
     return None
 
 

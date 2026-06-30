@@ -57,6 +57,7 @@ def source_backed_reroll_permission_for_unit(
     state: object,
     player_id: str,
     unit_instance_id: str,
+    model_instance_id: str | None = None,
     roll_type: str,
     timing_window: str,
     target_unit_instance_id: str | None = None,
@@ -65,6 +66,7 @@ def source_backed_reroll_permission_for_unit(
         state=state,
         player_id=player_id,
         unit_instance_id=unit_instance_id,
+        model_instance_id=model_instance_id,
         roll_type=roll_type,
         timing_window=timing_window,
         target_unit_instance_id=target_unit_instance_id,
@@ -77,16 +79,25 @@ def source_backed_reroll_permission_context_for_unit(
     state: object,
     player_id: str,
     unit_instance_id: str,
+    model_instance_id: str | None = None,
     roll_type: str,
     timing_window: str,
     target_unit_instance_id: str | None = None,
 ) -> SourceBackedRerollPermissionContext | None:
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.tracked_targets import (
+        tracked_target_reroll_permission_context_for_unit,
+    )
 
     if type(state) is not GameState:
         raise GameLifecycleError("Source-backed reroll lookup requires GameState.")
     requested_player_id = _validate_identifier("player_id", player_id)
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    requested_model_id = (
+        None
+        if model_instance_id is None
+        else _validate_identifier("model_instance_id", model_instance_id)
+    )
     requested_roll_type = _validate_identifier("roll_type", roll_type)
     requested_timing_window = _validate_identifier("timing_window", timing_window)
     requested_target_unit_id = (
@@ -116,6 +127,17 @@ def source_backed_reroll_permission_context_for_unit(
         ):
             continue
         permissions.append(permission_context)
+    tracked_context = tracked_target_reroll_permission_context_for_unit(
+        state=state,
+        player_id=requested_player_id,
+        unit_instance_id=requested_unit_id,
+        model_instance_id=requested_model_id,
+        roll_type=requested_roll_type,
+        timing_window=requested_timing_window,
+        target_unit_instance_id=requested_target_unit_id,
+    )
+    if tracked_context is not None:
+        permissions.append(tracked_context)
     if len(permissions) > 1:
         raise GameLifecycleError("Multiple source-backed reroll permissions are available.")
     return permissions[0] if permissions else None

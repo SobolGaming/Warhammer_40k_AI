@@ -212,6 +212,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:detection-range-characteristic-query` | No current generated rows |
 | `catalog-ir:feel-no-pain-roll` | No current generated rows |
 | `catalog-ir:feel-no-pain-source` | Collar of Khorne |
+| `catalog-ir:first-death-return` | No current generated rows |
+| `catalog-ir:first-death-return-phase-end` | No current generated rows |
 | `catalog-ir:force-desperate-escape` | No current generated rows |
 | `catalog-ir:hit-roll-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
@@ -234,6 +236,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:strength-characteristic-query` | No current generated rows |
 | `catalog-ir:toughness-characteristic-modifier` | No current generated rows |
 | `catalog-ir:toughness-characteristic-query` | No current generated rows |
+| `catalog-ir:tracked-target-destroyed-reselect` | No current generated rows |
+| `catalog-ir:tracked-target-reroll` | No current generated rows |
+| `catalog-ir:tracked-target-selection` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:assault` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:blast` | No current generated rows |

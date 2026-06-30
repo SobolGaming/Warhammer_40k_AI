@@ -1310,6 +1310,80 @@ Required Phase 16E adapter-contract tests:
 - lifecycle/replay payload round-trip preserves the battle-start record;
 - viewer-scoped projection/event redaction for any future hidden setup completion information.
 
+## Catalog Tracked-Target Decisions
+
+Catalog tracked-target RuleIR uses the finite decision type `select_tracked_target`.
+The engine emits this request for supported prey/quarry target-selection clauses
+at battle-round start and for supported destroyed-target replacement clauses
+when the active tracked target is destroyed. Adapters answer only by selecting
+one pending option ID; the option ID is exactly the target unit instance ID.
+
+The request and option payloads include `submission_kind: "select_tracked_target"`,
+source rule/ability/clause/effect identity, `owner_scope` (`this_model` or
+`this_unit`), `tracked_target_role` (`prey` or `quarry`), target allegiance and
+scope, `replacement`, deterministic `legal_target_unit_ids`, source unit ID, and
+optional source model ID. Adapters must not create tracked-target records, expire
+records, infer replacement targets, or apply rerolls locally from option payloads.
+
+Accepted selections create a replay-safe `TrackedTargetRecord`. Replacement
+selections expire the previous active record for the same source/unit/model
+scope/role and record the replacement target. Attack-sequence rerolls are exposed
+only through the existing source-backed reroll decision path after the engine
+confirms the attacking model or unit matches the tracked-target owner scope and
+the attack targets the active tracked target.
+
+Malformed, stale, wrong-actor, non-option, option-payload drift, source drift,
+destroyed-target, target-legality drift, duplicate-active, or unsupported-shape
+submissions reject before mutation and do not pop the pending request. Current
+tracked-target choices are public table information; any future hidden target
+selection must add viewer-scoped pending requests, records, projections, and
+event deltas before becoming adapter-visible.
+
+Required tracked-target tests cover JSON-safe request payloads, valid selection,
+invalid non-option selection, model-scope and unit-scope reroll gates, destroyed
+target expiry, deterministic reselection, replay payload round-trip, and catalog
+consumer/hook IDs.
+
+## Catalog First-Death Return Decisions
+
+Catalog first-death return RuleIR is captured from `model_destroyed` events using
+structured trigger, frequency, D6 gate, Engagement Range restriction, and
+`RETURN_DESTROYED_TARGET` effect payloads. The destruction capture records a
+pending `PendingReturnOnDeath` with deterministic source IDs, destroyed unit/model
+IDs, destroyed-position event payload, phase, roll gate, placement anchor and
+preference, restore mode, and consumed key. The engine does not set the model or
+unit back up when the destruction event occurs.
+
+At the end of the same phase, the engine rolls the configured D6 gate. Failed
+rolls resolve the pending record without restoring anything. Successful rolls
+emit the parameterized decision type `submit_return_on_death_placement` with one
+fixed `submit_parameterized_payload` option. The request payload contains
+`submission_kind: "submit_return_on_death_placement"`, pending ID, source rule,
+destroyed unit/model IDs, `placement_anchor: "destroyed_position"`,
+`placement_preference: "as_close_as_possible"`, semantic
+`placement_kind: "battlefield_set_up"`, and
+`restriction.not_within_engagement_range_of_enemy_units: true`.
+
+The submitted payload must preserve `submission_kind` and include an
+`attempted_placement` `UnitPlacement` for the destroyed model or destroyed unit.
+The engine validates the pending record, actor, target unit/model set,
+return-to-battlefield placement kind, and not-within-enemy-Engagement-Range rule
+before restoring fixed remaining wounds or full-health models/units and placing
+them on the battlefield. Adapters must not restore wounds, alter removed-model
+state, choose dice results, or mutate battlefield placement locally.
+
+Malformed, stale, wrong-pending, wrong-actor, wrong-unit, wrong-model,
+placement-kind drift, pending-state drift, Engagement Range violations, and
+unsupported return shapes reject before mutation. Return pending records and
+placement choices are public table information in the current scope; future
+hidden destruction or set-back-up effects must be viewer-scoped before exposure.
+
+Required first-death return tests cover catalog consumer classification,
+destruction capture, once-only consumed-key behavior, phase-end deferral, failed
+roll resolution, successful placement request, Engagement Range rejection, fixed
+wounds restoration, full-health unit restoration, replay payload round-trip,
+stale pending rejection, and malformed IR fail-closed cases.
+
 ## Parameterized Proposals
 
 Parameterized proposals are used when the exact physical result cannot be safely enumerated as finite options.
@@ -1331,6 +1405,7 @@ The contract currently covers these proposal families:
 - Scout Move and Dedicated Transport Scout Move;
 - Charge Move, including charge-target selection, no-move choice, and PathWitness movement evidence;
 - Pile In and Consolidate movement, including no-move choices, fight movement target or objective context, and PathWitness movement evidence;
+- first-death return placement after a successful phase-end return roll;
 - ranged shooting declaration, when target/weapon/profile binding is not safely enumerable;
 - melee declaration, including one primary melee weapon per fighting model, optional `[EXTRA ATTACKS]` weapons, model-engaged target binding, and split melee attack counts;
 - Stratagem target or placement proposals introduced by Phase 12 and later phase gates.
@@ -1533,6 +1608,12 @@ Current placement proposal kinds:
 - `strategic_reserves_placement`;
 - `disembark_placement`;
 - `cult_ambush_placement`.
+
+First-death return placement uses the same `ParameterizedSubmission` wrapper and
+`UnitPlacement` shape, but its decision type is
+`submit_return_on_death_placement` because the pending record and restoration
+semantics are owned by the return-on-death engine path rather than reserve
+arrival.
 
 The request's `placement_kinds` field enumerates the legal physical placement methods available for that unit and state. The submitted payload must match the pending request.
 

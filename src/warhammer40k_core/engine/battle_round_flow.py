@@ -15,6 +15,7 @@ from warhammer40k_core.engine.cult_ambush import (
     resolve_cult_ambush_marker_removal_for_completed_moves,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.events import (
@@ -35,6 +36,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
     PhaseHandler,
 )
+from warhammer40k_core.engine.return_on_death import resolve_pending_return_on_death_phase_end
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.sticky_objective_control import (
     PhaseEndObjectiveControlContext,
@@ -225,6 +227,33 @@ class BattleRoundFlow:
             decisions=decisions,
             registry=self._unit_destroyed_hooks,
         )
+        pending_request = _pending_decision_request(decisions)
+        if pending_request is not None:
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=pending_request,
+                payload={
+                    "battle_round": state.battle_round,
+                    "phase": current_phase.value,
+                    "phase_body_status": "phase_end_unit_destroyed_rule_required",
+                    "request_id": pending_request.request_id,
+                },
+            )
+        return_request = resolve_pending_return_on_death_phase_end(
+            state=state,
+            decisions=decisions,
+        )
+        if return_request is not None:
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=return_request,
+                payload={
+                    "battle_round": state.battle_round,
+                    "phase": current_phase.value,
+                    "phase_body_status": "return_on_death_placement_required",
+                    "request_id": return_request.request_id,
+                },
+            )
         resolve_cult_ambush_marker_removal_for_completed_moves(
             state=state,
             decisions=decisions,
@@ -359,6 +388,11 @@ def _is_start_of_battle_round(state: GameState) -> bool:
 
 def _state_is_complete(state: GameState) -> bool:
     return state.stage is GameLifecycleStage.COMPLETE
+
+
+def _pending_decision_request(decisions: DecisionController) -> DecisionRequest | None:
+    pending_requests = decisions.queue.pending_requests
+    return pending_requests[0] if pending_requests else None
 
 
 def _is_placeholder_noop_status(status: LifecycleStatus) -> bool:
