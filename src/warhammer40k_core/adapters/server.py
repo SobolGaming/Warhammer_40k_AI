@@ -5,7 +5,9 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import ClassVar, TypedDict, cast
+from threading import RLock
+from types import TracebackType
+from typing import ClassVar, Protocol, TypedDict, cast
 from urllib.parse import parse_qs, urlparse
 
 from warhammer40k_core.adapters.contracts import AdapterGameSession
@@ -25,8 +27,23 @@ type SessionFactory = Callable[[], AdapterGameSession]
 type RulesCatalogProvider = Callable[[], RulesCatalogViewPayload]
 
 
+class _Lock(Protocol):
+    def __enter__(self) -> object: ...
+
+    def __exit__(
+        self,
+        t: type[BaseException] | None,
+        v: BaseException | None,
+        tb: TracebackType | None,
+    ) -> bool | None: ...
+
+
 def _empty_session_registry() -> dict[str, AdapterGameSession]:
     return {}
+
+
+def _server_lock() -> _Lock:
+    return RLock()
 
 
 class ServerErrorPayload(TypedDict):
@@ -34,9 +51,19 @@ class ServerErrorPayload(TypedDict):
     message: str
 
 
+class ServerLifecycleStatusPayload(TypedDict):
+    stage: str
+    status_kind: str
+    message: str | None
+    payload: JsonValue
+    pending_request_id: str | None
+    decision_type: str | None
+    actor_id: str | None
+
+
 class ServerGameStatusPayload(TypedDict):
     game_id: str
-    status: JsonValue
+    status: ServerLifecycleStatusPayload
 
 
 @dataclass(frozen=True, slots=True)
@@ -96,6 +123,7 @@ class AdapterGameServer:
         init=False,
         repr=False,
     )
+    _lock: _Lock = field(default_factory=_server_lock, init=False, repr=False)
 
     def handle(
         self,
@@ -105,33 +133,37 @@ class AdapterGameServer:
         query: Mapping[str, str] | None = None,
         body: JsonValue = None,
     ) -> ServerResponse:
-        try:
-            return self._handle(
-                method=_method(method),
-                path_segments=_path_segments(path),
-                query={} if query is None else query,
-                body=validate_json_value(body),
-            )
-        except ServerApiError as exc:
-            return exc.to_response()
-        except GameLifecycleError as exc:
-            return _error_response(
-                status_code=HTTPStatus.CONFLICT,
-                code="session_contract_rejected",
-                message=str(exc),
-            )
-        except ReplayArtifactError as exc:
-            return _error_response(
-                status_code=HTTPStatus.CONFLICT,
-                code="replay_export_rejected",
-                message=str(exc),
-            )
-        except EventLogError as exc:
-            return _error_response(
-                status_code=HTTPStatus.BAD_REQUEST,
-                code="malformed_json_payload",
-                message=str(exc),
-            )
+        # Phase 18E keeps the local dev server authoritative by serializing access to
+        # the in-memory session registry. A production server can replace this with
+        # an explicit session store or per-game actor loop.
+        with self._lock:
+            try:
+                return self._handle(
+                    method=_method(method),
+                    path_segments=_path_segments(path),
+                    query={} if query is None else query,
+                    body=validate_json_value(body),
+                )
+            except ServerApiError as exc:
+                return exc.to_response()
+            except GameLifecycleError as exc:
+                return _error_response(
+                    status_code=HTTPStatus.CONFLICT,
+                    code="session_contract_rejected",
+                    message=str(exc),
+                )
+            except ReplayArtifactError as exc:
+                return _error_response(
+                    status_code=HTTPStatus.CONFLICT,
+                    code="replay_export_rejected",
+                    message=str(exc),
+                )
+            except EventLogError as exc:
+                return _error_response(
+                    status_code=HTTPStatus.BAD_REQUEST,
+                    code="malformed_json_payload",
+                    message=str(exc),
+                )
 
     def _handle(
         self,
@@ -438,12 +470,35 @@ def _status_response(
 ) -> ServerResponse:
     payload: ServerGameStatusPayload = {
         "game_id": game_id,
-        "status": validate_json_value(status.to_payload()),
+        "status": _status_summary(status),
     }
     return ServerResponse(
         status_code=int(status_code),
         payload=validate_json_value(cast(JsonValue, payload)),
     )
+
+
+def _status_summary(status: LifecycleStatus) -> ServerLifecycleStatusPayload:
+    decision_request = status.decision_request
+    metadata_payload = (
+        status.payload
+        if status.status_kind
+        in {
+            LifecycleStatusKind.TERMINAL,
+            LifecycleStatusKind.INVALID,
+            LifecycleStatusKind.UNSUPPORTED,
+        }
+        else None
+    )
+    return {
+        "stage": status.stage.value,
+        "status_kind": status.status_kind.value,
+        "message": status.message,
+        "payload": metadata_payload,
+        "pending_request_id": None if decision_request is None else decision_request.request_id,
+        "decision_type": None if decision_request is None else decision_request.decision_type,
+        "actor_id": None if decision_request is None else decision_request.actor_id,
+    }
 
 
 def _error_response(*, status_code: HTTPStatus, code: str, message: str) -> ServerResponse:

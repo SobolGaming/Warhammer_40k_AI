@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from http.client import HTTPResponse
 from pathlib import Path
 from threading import Thread
@@ -27,6 +28,11 @@ from warhammer40k_core.adapters.server import (
     create_local_dev_http_server,
 )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+)
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
@@ -43,7 +49,6 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
-    LifecycleStatusPayload,
 )
 from warhammer40k_core.engine.replay import ReplayArtifactPayload, ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
@@ -73,7 +78,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
     _schema_validator("rules_catalog_view.schema.json").validate(rules_catalog)
 
     status_payload = _request(server, "POST", f"/games/{game_id}/advance")
-    first_request = _decision_from_status(status_payload)
+    first_request = _decision_from_status(server, game_id=game_id, payload=status_payload)
     assert first_request["decision_type"] == SECONDARY_MISSION_DECISION_TYPE
 
     player_a_view = _request(
@@ -108,7 +113,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
         option_id=FIXED_SECONDARY_OPTION_ID,
         result_id=f"{game_id}-secondary-a",
     )
-    second_request = _decision_from_status(status_payload)
+    second_request = _decision_from_status(server, game_id=game_id, payload=status_payload)
     status_payload = _submit_option(
         server,
         game_id=game_id,
@@ -116,7 +121,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
         option_id=FIXED_SECONDARY_OPTION_ID,
         result_id=f"{game_id}-secondary-b",
     )
-    deployment_request = _decision_from_status(status_payload)
+    deployment_request = _decision_from_status(server, game_id=game_id, payload=status_payload)
     status_payload = _submit_option(
         server,
         game_id=game_id,
@@ -124,7 +129,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
         option_id=_first_option_id(deployment_request),
         result_id=f"{game_id}-deployment-unit",
     )
-    placement_request = _decision_from_status(status_payload)
+    placement_request = _decision_from_status(server, game_id=game_id, payload=status_payload)
     assert placement_request["decision_type"] == SUBMIT_DEPLOYMENT_PLACEMENT
     placement_view = _request(
         server,
@@ -170,12 +175,79 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
     assert _field_list(support_profile, "detachment_faction_support_rows")
 
 
+def test_phase18e_mutation_response_does_not_expose_next_opponent_decision() -> None:
+    server = AdapterGameServer()
+    game_id = "phase18e-server-redacted-mutation"
+    _create_game(server, game_id=game_id)
+    status_payload = _request(server, "POST", f"/games/{game_id}/advance")
+    first_request = _decision_from_status(server, game_id=game_id, payload=status_payload)
+    assert _actor(first_request) == PLAYER_A
+
+    mutation_response = _submit_option(
+        server,
+        game_id=game_id,
+        request=first_request,
+        option_id=FIXED_SECONDARY_OPTION_ID,
+        result_id=f"{game_id}-secondary-a",
+    )
+    response_status = _field_object(mutation_response, "status")
+    assert _field_string(response_status, "status_kind") == "waiting_for_decision"
+    assert _field_string(response_status, "actor_id") == PLAYER_B
+    assert _field_string(response_status, "decision_type") == SECONDARY_MISSION_DECISION_TYPE
+    assert _field_string(response_status, "pending_request_id")
+    assert "decision_request" not in response_status
+    assert response_status["payload"] is None
+    assert not _contains_key(mutation_response, "options")
+    assert not _contains_key(mutation_response, "secret")
+
+    player_a_view = _request(
+        server,
+        "GET",
+        f"/games/{game_id}/view",
+        query={"viewer_player_id": PLAYER_A},
+    )
+    player_a_pending = _field_object(player_a_view, "pending_decision")
+    assert _field_list(player_a_pending, "options") == []
+    assert _field_object(player_a_pending, "payload") == {"hidden": True, "secret": True}
+
+    player_b_view = _request(
+        server,
+        "GET",
+        f"/games/{game_id}/view",
+        query={"viewer_player_id": PLAYER_B},
+    )
+    player_b_pending = _field_object(player_b_view, "pending_decision")
+    assert _field_string(player_b_pending, "request_id") == _field_string(
+        response_status, "pending_request_id"
+    )
+    assert _field_list(player_b_pending, "options")
+    assert _field_object(player_b_pending, "payload") != {"hidden": True, "secret": True}
+
+
+def test_phase18e_support_profile_generic_ir_datasheet_ability_is_playable() -> None:
+    server = AdapterGameServer()
+    game_id = "phase18e-server-generic-ir-support"
+    catalog = _catalog_with_selected_generic_ir_ability()
+    _create_game(server, game_id=game_id, catalog=catalog)
+
+    support_profile = _request(server, "GET", f"/games/{game_id}/support-profile")
+    rows = [
+        _json_object(row)
+        for row in _field_list(support_profile, "datasheet_support_rows")
+        if _field_string(_json_object(row), "ability_id") == "phase18e-generic-ir-no-consumer"
+    ]
+    assert len(rows) == 1
+    assert _field_string(rows[0], "catalog_support") == CatalogAbilitySupport.GENERIC_RULE_IR.value
+    assert _field_string(rows[0], "status") == "playable"
+    assert support_profile["overall_status"] == "playable"
+
+
 def test_phase18e_server_submission_rejections_are_typed() -> None:
     server = AdapterGameServer()
     game_id = "phase18e-server-rejections"
     _create_game(server, game_id=game_id)
     first_status = _request(server, "POST", f"/games/{game_id}/advance")
-    first_request = _decision_from_status(first_status)
+    first_request = _decision_from_status(server, game_id=game_id, payload=first_status)
 
     stale = _request_raw(
         server,
@@ -415,7 +487,7 @@ def test_phase18e_network_client_observes_server_owned_dice_through_events_and_v
     game_id = "phase18e-server-dice-stream"
     _create_game(server, game_id=game_id)
     status_payload = _advance_to_movement_selection(server, game_id=game_id)
-    movement_request = _decision_from_status(status_payload)
+    movement_request = _decision_from_status(server, game_id=game_id, payload=status_payload)
     assert movement_request["decision_type"] == SELECT_MOVEMENT_UNIT
 
     status_payload = _submit_option(
@@ -425,7 +497,7 @@ def test_phase18e_network_client_observes_server_owned_dice_through_events_and_v
         option_id=_first_option_id(movement_request),
         result_id=f"{game_id}-movement-unit",
     )
-    action_request = _decision_from_status(status_payload)
+    action_request = _decision_from_status(server, game_id=game_id, payload=status_payload)
     assert action_request["decision_type"] == SELECT_MOVEMENT_ACTION
     advance_body: dict[str, JsonValue] = {
         "actor_id": _actor(action_request),
@@ -514,20 +586,33 @@ def test_phase18e_legal_decision_choice_changes_next_rng_lineage_not_only_die_va
     assert left_manager.rng.to_payload()["history"] != right_manager.rng.to_payload()["history"]
 
 
-def _create_game(server: AdapterGameServer, *, game_id: str) -> None:
+def _create_game(
+    server: AdapterGameServer,
+    *,
+    game_id: str,
+    catalog: ArmyCatalog | None = None,
+) -> None:
     payload = _request(
         server,
         "POST",
         "/games",
-        body=_game_config_body(game_id=game_id),
+        body=_game_config_body(game_id=game_id, catalog=catalog),
         expected_status=201,
     )
     assert payload["game_id"] == game_id
     assert _status_kind(payload) == "advanced"
 
 
-def _game_config_body(*, game_id: str) -> dict[str, JsonValue]:
-    return {"config": validate_json_value(cast(JsonValue, _config(game_id=game_id).to_payload()))}
+def _game_config_body(
+    *,
+    game_id: str,
+    catalog: ArmyCatalog | None = None,
+) -> dict[str, JsonValue]:
+    return {
+        "config": validate_json_value(
+            cast(JsonValue, _config(game_id=game_id, catalog=catalog).to_payload())
+        )
+    }
 
 
 def _http_json(
@@ -564,7 +649,7 @@ def _advance_to_first_deployment_placement(
     game_id: str,
 ) -> dict[str, JsonValue]:
     status_payload = _request(server, "POST", f"/games/{game_id}/advance")
-    first_request = _decision_from_status(status_payload)
+    first_request = _decision_from_status(server, game_id=game_id, payload=status_payload)
     status_payload = _submit_option(
         server,
         game_id=game_id,
@@ -572,7 +657,7 @@ def _advance_to_first_deployment_placement(
         option_id=FIXED_SECONDARY_OPTION_ID,
         result_id=f"{game_id}-secondary-a",
     )
-    second_request = _decision_from_status(status_payload)
+    second_request = _decision_from_status(server, game_id=game_id, payload=status_payload)
     status_payload = _submit_option(
         server,
         game_id=game_id,
@@ -580,7 +665,7 @@ def _advance_to_first_deployment_placement(
         option_id=FIXED_SECONDARY_OPTION_ID,
         result_id=f"{game_id}-secondary-b",
     )
-    selection_request = _decision_from_status(status_payload)
+    selection_request = _decision_from_status(server, game_id=game_id, payload=status_payload)
     status_payload = _submit_option(
         server,
         game_id=game_id,
@@ -588,7 +673,7 @@ def _advance_to_first_deployment_placement(
         option_id=_first_option_id(selection_request),
         result_id=f"{game_id}-deployment-unit",
     )
-    return _decision_from_status(status_payload)
+    return _decision_from_status(server, game_id=game_id, payload=status_payload)
 
 
 def _advance_to_movement_selection(
@@ -598,7 +683,7 @@ def _advance_to_movement_selection(
 ) -> dict[str, JsonValue]:
     status_payload = _request(server, "POST", f"/games/{game_id}/advance")
     while True:
-        request = _decision_from_status(status_payload)
+        request = _decision_from_status(server, game_id=game_id, payload=status_payload)
         decision_type = request["decision_type"]
         if decision_type == SECONDARY_MISSION_DECISION_TYPE:
             status_payload = _submit_option(
@@ -750,12 +835,25 @@ def _request_raw(
     return server.handle(method=method, path=path, query=query, body=body)
 
 
-def _decision_from_status(payload: dict[str, JsonValue]) -> dict[str, JsonValue]:
-    status_payload = cast(LifecycleStatusPayload, _field_object(payload, "status"))
-    status = LifecycleStatus.from_payload(status_payload)
-    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    assert status.decision_request is not None
-    return cast(dict[str, JsonValue], status.decision_request.to_payload())
+def _decision_from_status(
+    server: AdapterGameServer,
+    *,
+    game_id: str,
+    payload: dict[str, JsonValue],
+) -> dict[str, JsonValue]:
+    status = _field_object(payload, "status")
+    assert _field_string(status, "status_kind") == "waiting_for_decision"
+    actor_id = _field_string(status, "actor_id")
+    request_id = _field_string(status, "pending_request_id")
+    view = _request(
+        server,
+        "GET",
+        f"/games/{game_id}/view",
+        query={"viewer_player_id": actor_id},
+    )
+    decision = _field_object(view, "pending_decision")
+    assert _field_string(decision, "request_id") == request_id
+    return decision
 
 
 def _decision_from_lifecycle_status(status: LifecycleStatus) -> DecisionRequest:
@@ -797,24 +895,46 @@ def _contains_key(value: JsonValue, key: str) -> bool:
     return False
 
 
-def _config(*, game_id: str) -> GameConfig:
+def _catalog_with_selected_generic_ir_ability() -> ArmyCatalog:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    added_ability = DatasheetAbilityDescriptor(
+        ability_id="phase18e-generic-ir-no-consumer",
+        name="Phase 18E Generic IR No Consumer",
+        source_id="phase18e:test:generic-ir-no-consumer",
+        support=CatalogAbilitySupport.GENERIC_RULE_IR,
+        source_kind=CatalogAbilitySourceKind.CORE,
+        effect_description="Structured generic IR without a phase host consumer.",
+        timing_tags=("command_phase",),
+        parameter_tokens=(),
+        rule_ir_payload={"kind": "phase18e_test_no_consumer"},
+    )
+    datasheets = tuple(
+        replace(datasheet, abilities=(*datasheet.abilities, added_ability))
+        if datasheet.datasheet_id == "core-intercessor-like-infantry"
+        else datasheet
+        for datasheet in catalog.datasheets
+    )
+    return replace(catalog, datasheets=datasheets)
+
+
+def _config(*, game_id: str, catalog: ArmyCatalog | None = None) -> GameConfig:
+    army_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
             descriptor_version="core-v2-phase18e-server-test"
         ),
-        army_catalog=catalog,
+        army_catalog=army_catalog,
         army_muster_requests=(
             _army_muster_request(
-                catalog=catalog,
+                catalog=army_catalog,
                 player_id=PLAYER_A,
                 army_id="army-alpha",
                 unit_selection_id="intercessor-unit-1",
             ),
             _army_muster_request(
-                catalog=catalog,
+                catalog=army_catalog,
                 player_id=PLAYER_B,
                 army_id="army-beta",
                 unit_selection_id="intercessor-unit-2",

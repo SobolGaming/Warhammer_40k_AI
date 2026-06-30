@@ -235,9 +235,10 @@ def _runtime_support_row(row: dict[str, JsonValue]) -> RuntimeSupportRowPayload:
 def _catalog_ability_status(support: CatalogAbilitySupport) -> AdapterSupportStatus:
     if support is CatalogAbilitySupport.UNSUPPORTED:
         return "unsupported"
-    if support is CatalogAbilitySupport.GENERIC_RULE_IR:
-        return "full"
-    if support is CatalogAbilitySupport.DESCRIPTOR_ONLY:
+    if support in {
+        CatalogAbilitySupport.GENERIC_RULE_IR,
+        CatalogAbilitySupport.DESCRIPTOR_ONLY,
+    }:
         return "playable"
     raise GameLifecycleError("Unknown CatalogAbilitySupport status.")
 
