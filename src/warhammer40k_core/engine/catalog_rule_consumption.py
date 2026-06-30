@@ -966,10 +966,7 @@ def _available_catalog_named_weapon_ability_choice_groups(
             unit=unit,
             current_model_instance_ids=current_model_ids,
         ):
-            rule_ir = _rule_ir_from_record(record)
-            if not rule_ir.is_supported:
-                continue
-            for clause in rule_ir.clauses:
+            for clause in _clauses_from_record(record):
                 group = _catalog_named_weapon_ability_choice_group_from_clause(
                     state=context.state,
                     army_catalog=context.army_catalog,
@@ -3138,10 +3135,9 @@ def _record_can_select_catalog_named_weapon_ability(record: AbilityCatalogRecord
         raise GameLifecycleError("Catalog named weapon ability choices require ability records.")
     if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
         return False
-    rule_ir = _rule_ir_from_record(record)
-    if not rule_ir.is_supported:
-        return False
-    return any(_clause_is_named_weapon_ability_choice(clause) for clause in rule_ir.clauses)
+    return any(
+        _clause_is_named_weapon_ability_choice(clause) for clause in _clauses_from_record(record)
+    )
 
 
 def _record_can_grant_advance_eligibility(

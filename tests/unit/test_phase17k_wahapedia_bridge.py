@@ -54,10 +54,14 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.abilities import (
+    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
+    AbilityDefinition,
     AbilityExecutionContext,
     AbilityResolutionStatus,
+    AbilitySourceKind,
+    AbilityTimingDescriptor,
     default_ability_handler_registry,
 )
 from warhammer40k_core.engine.ability_catalog import (
@@ -126,6 +130,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     _payload_string,  # pyright: ignore[reportPrivateUsage]
     _payload_string_tuple,  # pyright: ignore[reportPrivateUsage]
     _profile_with_catalog_weapon_keyword_grant,  # pyright: ignore[reportPrivateUsage]
+    _record_can_select_catalog_named_weapon_ability,  # pyright: ignore[reportPrivateUsage]
     _roll_reroll_consumer_id_for_effect,  # pyright: ignore[reportPrivateUsage]
     _selected_catalog_named_weapon_ability_grants,  # pyright: ignore[reportPrivateUsage]
     _validate_named_weapon_choice_option,  # pyright: ignore[reportPrivateUsage]
@@ -157,7 +162,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
     army_rule as adepta_sororitas_army_rule,
 )
@@ -240,6 +245,8 @@ from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
+    RuleDuration,
+    RuleDurationKind,
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
@@ -247,6 +254,8 @@ from warhammer40k_core.rules.rule_ir import (
     RuleParameterValue,
     RuleTargetKind,
     RuleTargetSpec,
+    RuleTrigger,
+    RuleTriggerKind,
     parameter_payload,
     parameters_from_pairs,
 )
@@ -1344,6 +1353,58 @@ def test_phase17k_named_weapon_ability_choice_records_and_modifies_profile() -> 
     )
     assert len(selected_events) == 1
     assert "object at 0x" not in json.dumps(decisions.to_payload(), sort_keys=True)
+
+
+def test_phase17k_named_weapon_choice_uses_runtime_clause_scoped_records() -> None:
+    package = _named_weapon_choice_package()
+    unit = _named_weapon_choice_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    rule_ir = _multi_clause_named_weapon_choice_rule_ir()
+    clause_001_record = _multi_clause_named_weapon_choice_record(
+        rule_ir=rule_ir,
+        clause_index=0,
+        datasheet_id=unit.datasheet_id,
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+    )
+    clause_002_record = _multi_clause_named_weapon_choice_record(
+        rule_ir=rule_ir,
+        clause_index=1,
+        datasheet_id=unit.datasheet_id,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+    )
+    ability_index = AbilityCatalogIndex.from_records((clause_001_record, clause_002_record))
+    state = _battle_state_with_army(
+        army=army,
+        battlefield=_bloodcrushers_battlefield_state(army=army, unit=unit),
+    )
+    _set_state_battle_phase(state, BattlePhase.SHOOTING)
+    request_context = _shooting_phase_start_request_context(
+        state=state,
+        decisions=DecisionController(),
+        army_catalog=package.army_catalog,
+    )
+
+    groups = _available_catalog_named_weapon_ability_choice_groups(
+        ability_indexes_by_player_id={army.player_id: ability_index},
+        armies=(army,),
+        context=request_context,
+    )
+    request = ShootingPhaseStartHookRegistry.from_bindings(
+        CatalogNamedWeaponAbilityChoiceRuntime(
+            ability_indexes_by_player_id={army.player_id: ability_index},
+            armies=(army,),
+        ).bindings()
+    ).next_request_for(request_context)
+
+    assert not _record_can_select_catalog_named_weapon_ability(clause_001_record)
+    assert _record_can_select_catalog_named_weapon_ability(clause_002_record)
+    assert len(groups) == 1
+    assert groups[0].record.record_id == clause_002_record.record_id
+    assert groups[0].clause.clause_id == rule_ir.clauses[1].clause_id
+    assert request is not None
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["catalog_record_id"] == clause_002_record.record_id
+    assert len(request.options) == 2
 
 
 def test_phase17k_named_weapon_ability_choice_rejects_availability_drift() -> None:
@@ -4334,6 +4395,118 @@ def _catalog_rule_ir(
                 effects=effects,
             ),
         ),
+    )
+
+
+def _multi_clause_named_weapon_choice_rule_ir() -> RuleIR:
+    span = TextSpan(text="catalog hook test", start=0, end=17)
+    return RuleIR(
+        rule_id="phase17k:test:multi-named-choice",
+        source_id="phase17k:test:multi-named-choice",
+        normalized_text=span.text,
+        parser_version="test-catalog-hook-parser",
+        clauses=(
+            RuleClause(
+                clause_id="phase17k:test:multi-named-choice:clause:001",
+                source_span=span,
+                trigger=RuleTrigger(
+                    kind=RuleTriggerKind.TIMING_WINDOW,
+                    source_span=span,
+                    parameters=parameters_from_pairs(
+                        (
+                            ("edge", "during"),
+                            ("owner", "active_player"),
+                            ("phase", "movement"),
+                        )
+                    ),
+                ),
+                target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=span),
+                effects=(
+                    _effect(
+                        RuleEffectKind.GRANT_ABILITY,
+                        ability="can_advance_and_charge",
+                    ),
+                ),
+                duration=RuleDuration(
+                    kind=RuleDurationKind.PERMANENT,
+                    source_span=span,
+                ),
+            ),
+            RuleClause(
+                clause_id="phase17k:test:multi-named-choice:clause:002",
+                source_span=span,
+                trigger=RuleTrigger(
+                    kind=RuleTriggerKind.TIMING_WINDOW,
+                    source_span=span,
+                    parameters=parameters_from_pairs(
+                        (
+                            ("edge", "during"),
+                            ("owner", "active_player"),
+                            ("phase", "shooting"),
+                        )
+                    ),
+                ),
+                target=RuleTargetSpec(kind=RuleTargetKind.THIS_MODEL, source_span=span),
+                effects=(
+                    _effect(
+                        RuleEffectKind.GRANT_WEAPON_ABILITY,
+                        selection_kind="select_one",
+                        selection_group_id="multi_clause_named_weapon_choice",
+                        selection_option_id="option_001_ignores_cover",
+                        selection_option_index=1,
+                        target_scope="this_model",
+                        weapon_name="Bolt of Change",
+                        weapon_ability="Ignores Cover",
+                    ),
+                    _effect(
+                        RuleEffectKind.GRANT_WEAPON_ABILITY,
+                        selection_kind="select_one",
+                        selection_group_id="multi_clause_named_weapon_choice",
+                        selection_option_id="option_002_lethal_hits",
+                        selection_option_index=2,
+                        target_scope="this_model",
+                        weapon_name="Bolt of Change",
+                        weapon_ability="Lethal Hits",
+                    ),
+                ),
+                duration=RuleDuration(
+                    kind=RuleDurationKind.UNTIL_TIMING_ENDPOINT,
+                    source_span=span,
+                    parameters=parameters_from_pairs((("endpoint", "phase"),)),
+                ),
+            ),
+        ),
+    )
+
+
+def _multi_clause_named_weapon_choice_record(
+    *,
+    rule_ir: RuleIR,
+    clause_index: int,
+    datasheet_id: str,
+    trigger_kind: TimingTriggerKind,
+) -> AbilityCatalogRecord:
+    clause = rule_ir.clauses[clause_index]
+    return AbilityCatalogRecord(
+        record_id=f"phase17k:test:catalog-ability:{datasheet_id}:multi-daemonspark:{clause.clause_id}",
+        definition=AbilityDefinition(
+            ability_id="multi-daemonspark",
+            name="Multi-Clause Daemonspark",
+            source_id="phase17k:test:multi-named-choice",
+            when_descriptor="Catalog generic rule IR.",
+            effect_descriptor="Multi-clause named weapon ability choice.",
+            restrictions_descriptor="Datasheet ability source kind: datasheet.",
+            timing=AbilityTimingDescriptor(trigger_kind=trigger_kind),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value(
+                {
+                    "rule_ir": rule_ir.to_payload(),
+                    "runtime_clause_id": clause.clause_id,
+                }
+            ),
+        ),
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id=datasheet_id,
     )
 
 
