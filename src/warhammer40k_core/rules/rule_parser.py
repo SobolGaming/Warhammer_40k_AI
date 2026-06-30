@@ -222,7 +222,9 @@ _SHOOT_ELIGIBILITY_AFTER_FALL_BACK_RE = re.compile(
 _FEEL_NO_PAIN_ABILITY_RE = re.compile(
     r"\b(?:gains?|have|has)\s+(?:the\s+)?Feel\s+No\s+Pain\s+"
     r"(?P<threshold>[2-6])\+\s+ability"
-    r"(?:\s+against\s+(?P<attack_condition>Psychic\s+Attacks?))?\b",
+    r"(?:\s+against\s+(?P<qualifier>"
+    r"Psychic\s+Attacks?(?:\s+and\s+mortal\s+wounds)?"
+    r"))?\b",
     re.IGNORECASE,
 )
 _SHADOW_OF_CHAOS_STATUS_RE = re.compile(
@@ -1298,11 +1300,9 @@ def _parse_grant_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSp
             ("ability", "Feel No Pain"),
             ("threshold", int(match.group("threshold"))),
         ]
-        attack_condition = match.group("attack_condition")
-        if attack_condition is not None:
-            parameter_pairs.append(
-                ("attack_condition", _feel_no_pain_attack_condition_token(attack_condition))
-            )
+        qualifier = match.group("qualifier")
+        if qualifier is not None:
+            parameter_pairs.extend(_feel_no_pain_qualifier_parameter_pairs(qualifier))
         effects.append(
             RuleEffectSpec(
                 kind=RuleEffectKind.GRANT_ABILITY,
@@ -1984,6 +1984,29 @@ def _feel_no_pain_attack_condition_token(value: str) -> str:
     if normalized in {"psychic attack", "psychic attacks"}:
         return "psychic_attack"
     raise RuleIRError(f"Unsupported Feel No Pain attack qualifier: {value}.")
+
+
+def _feel_no_pain_qualifier_parameter_pairs(
+    value: str,
+) -> tuple[tuple[str, RuleParameterValue], ...]:
+    parameter_pairs: list[tuple[str, RuleParameterValue]] = []
+    has_attack_condition = False
+    has_mortal_wound_scope = False
+    for raw_part in re.split(r"\s+and\s+", value.strip(), flags=re.IGNORECASE):
+        normalized = raw_part.strip().lower().replace("-", " ")
+        if normalized in {"psychic attack", "psychic attacks"}:
+            parameter_pairs.append(
+                ("attack_condition", _feel_no_pain_attack_condition_token(raw_part))
+            )
+            has_attack_condition = True
+        elif normalized == "mortal wounds":
+            parameter_pairs.append(("mortal_wounds", True))
+            has_mortal_wound_scope = True
+        elif normalized:
+            raise RuleIRError(f"Unsupported Feel No Pain attack qualifier: {value}.")
+    if has_mortal_wound_scope and not has_attack_condition:
+        raise RuleIRError(f"Unsupported Feel No Pain attack qualifier: {value}.")
+    return tuple(parameter_pairs)
 
 
 def _weapon_name_token(value: str) -> str:

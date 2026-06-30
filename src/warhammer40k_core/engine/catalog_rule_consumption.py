@@ -2492,6 +2492,7 @@ def _feel_no_pain_source_from_effect(
         source_id=f"{record.record_id}:{clause.clause_id}:effect-{effect_index:03d}",
         threshold=_int_parameter(parameters, key="threshold"),
         attack_condition=_feel_no_pain_attack_condition_parameter(parameters),
+        mortal_wounds=_optional_bool_parameter(parameters, key="mortal_wounds"),
     )
 
 
@@ -2741,6 +2742,15 @@ def _optional_positive_int_parameter(parameters: Mapping[str, object], *, key: s
         return None
     if type(value) is not int or value < 1:
         raise GameLifecycleError(f"Catalog rule parameter {key} must be a positive integer.")
+    return value
+
+
+def _optional_bool_parameter(parameters: Mapping[str, object], *, key: str) -> bool:
+    value = parameters.get(key)
+    if value is None:
+        return False
+    if type(value) is not bool:
+        raise GameLifecycleError(f"Catalog rule parameter {key} must be a bool.")
     return value
 
 

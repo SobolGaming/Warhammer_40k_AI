@@ -9567,6 +9567,12 @@ def test_phase13c_damage_mortal_wounds_and_feel_no_pain_hosts_round_trip() -> No
 
     source_a = FeelNoPainSource(source_id="feel-no-pain-a", threshold=5)
     source_b = FeelNoPainSource(source_id="feel-no-pain-b", threshold=6)
+    source_c = FeelNoPainSource(
+        source_id="feel-no-pain-psychic-mortal",
+        threshold=4,
+        attack_condition=FeelNoPainAttackCondition.PSYCHIC_ATTACK,
+        mortal_wounds=True,
+    )
     request = build_feel_no_pain_request(
         request_id="phase13c-fnp-request",
         defender_player_id="player-b",
@@ -9592,6 +9598,8 @@ def test_phase13c_damage_mortal_wounds_and_feel_no_pain_hosts_round_trip() -> No
 
     assert source_a.to_payload()["threshold"] == 5
     assert FeelNoPainSource.from_payload(source_a.to_payload()) == source_a
+    assert source_c.to_payload().get("mortal_wounds") is True
+    assert FeelNoPainSource.from_payload(source_c.to_payload()) == source_c
     assert decision.to_payload()["selected_source_id"] == source_a.source_id
     assert fnp_spec.roll_type == "attack_sequence.feel_no_pain"
     assert defender_model.model_instance_id in fnp_spec.reason
@@ -12485,6 +12493,77 @@ def test_phase13c_mortal_wounds_use_forced_feel_no_pain_per_wound() -> None:
         ).wounds_remaining
         == defender_model.wounds_remaining
     )
+
+
+def test_phase13c_mortal_wounds_use_psychic_attack_source_with_mortal_wound_scope() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    source = FeelNoPainSource(
+        source_id="phase13c-psychic-mortal-fnp",
+        threshold=5,
+        attack_condition=FeelNoPainAttackCondition.PSYCHIC_ATTACK,
+        mortal_wounds=True,
+    )
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=defender_model.model_instance_id,
+        sources=(source,),
+    )
+    fnp_spec = feel_no_pain_roll_spec(
+        source=source,
+        player_id="player-b",
+        model_instance_id=defender_model.model_instance_id,
+        wound_index=1,
+    )
+
+    application = apply_mortal_wounds_to_unit(
+        state=state,
+        target_unit_instance_id=defender.unit_instance_id,
+        mortal_wounds=1,
+        dice_manager=DiceRollManager(
+            "phase13c-psychic-mortal-fnp",
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase13c-psychic-mortal-fnp",
+                    spec=fnp_spec,
+                    value=5,
+                ),
+            ),
+        ),
+        defender_player_id="player-b",
+    )
+
+    assert application.ignored_mortal_wounds == 1
+    assert application.applications == ()
+    assert application.feel_no_pain_resolutions[0].source == source
+    assert application.feel_no_pain_resolutions[0].ignored_wounds == 1
+
+
+def test_phase13c_mortal_wounds_ignore_psychic_attack_source_without_mortal_wound_scope() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    source = FeelNoPainSource(
+        source_id="phase13c-psychic-only-mortal-fnp",
+        threshold=5,
+        attack_condition=FeelNoPainAttackCondition.PSYCHIC_ATTACK,
+    )
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=defender_model.model_instance_id,
+        sources=(source,),
+    )
+
+    application = apply_mortal_wounds_to_unit(
+        state=state,
+        target_unit_instance_id=defender.unit_instance_id,
+        mortal_wounds=1,
+    )
+
+    assert application.ignored_mortal_wounds == 0
+    assert application.feel_no_pain_resolutions == ()
+    assert application.applications[0].wounds_lost == 1
 
 
 def test_phase13d_direct_mortal_wound_helper_rejects_choice_routing_contexts() -> None:

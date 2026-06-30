@@ -678,6 +678,38 @@ def test_phase17c_bearer_feel_no_pain_qualifier_compiles_to_model_source_ir() ->
     }
 
 
+def test_phase17c_bearer_feel_no_pain_psychic_and_mortal_wounds_compiles_to_ir() -> None:
+    rule_ir = _compiled(
+        "The bearer has the Feel No Pain 3+ ability against Psychic Attacks and mortal wounds."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.GRANT_ABILITY
+    )
+
+    assert rule_ir.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert parameter_payload(effect.parameters) == {
+        "ability": "Feel No Pain",
+        "attack_condition": "psychic_attack",
+        "mortal_wounds": True,
+        "threshold": 3,
+    }
+
+
+def test_phase17c_bare_mortal_wounds_feel_no_pain_scope_is_not_unconditional() -> None:
+    rule_ir = _compiled("The bearer has the Feel No Pain 3+ ability against mortal wounds.").rule_ir
+
+    assert not rule_ir.is_supported
+    assert rule_ir.clauses[0].unsupported_reason is RuleUnsupportedReason.UNSUPPORTED_LANGUAGE
+    assert any(
+        diagnostic.reason is RuleUnsupportedReason.UNSUPPORTED_LANGUAGE
+        and "against mortal wounds" in diagnostic.source_span.text
+        for diagnostic in rule_ir.diagnostics
+    )
+
+
 def test_phase17c_advance_charge_eligibility_compiles_to_rule_exception_grant() -> None:
     rule_ir = _compiled(
         "This unit is eligible to declare a charge in a turn in  which it Advanced."

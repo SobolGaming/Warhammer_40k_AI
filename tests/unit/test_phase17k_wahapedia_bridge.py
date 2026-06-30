@@ -834,6 +834,7 @@ def test_phase17k_collar_of_khorne_catalog_ir_records_bearer_psychic_fnp_source(
     assert stored_sources == (recorded_sources[0][1],)
     assert stored_sources[0].threshold == 3
     assert stored_sources[0].attack_condition is FeelNoPainAttackCondition.PSYCHIC_ATTACK
+    assert stored_sources[0].mortal_wounds is True
     assert all(
         state.feel_no_pain_sources_for_model(model_instance_id=model.model_instance_id) == ()
         for model in unit.own_models
@@ -5503,7 +5504,8 @@ def _flesh_hounds_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                     ),
                     (
                         "test-flesh-hounds,3,Wargear,,Collar of Khorne,"
-                        "The bearer has the Feel No Pain 3+ ability against Psychic Attacks.,"
+                        "The bearer has the Feel No Pain 3+ ability against Psychic Attacks "
+                        "and mortal wounds.,"
                     ),
                     (
                         "test-flesh-hounds,4,Datasheet,,Hunters from the Warp,"

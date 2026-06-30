@@ -165,6 +165,7 @@ class FeelNoPainSourcePayload(TypedDict):
     source_id: str
     threshold: int
     attack_condition: NotRequired[str]
+    mortal_wounds: NotRequired[bool]
 
 
 class DestructionReactionSourcePayload(TypedDict):
@@ -1384,6 +1385,7 @@ class FeelNoPainSource:
     source_id: str
     threshold: int
     attack_condition: FeelNoPainAttackCondition | None = None
+    mortal_wounds: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1401,6 +1403,8 @@ class FeelNoPainSource:
             "attack_condition",
             feel_no_pain_attack_condition_from_token(self.attack_condition),
         )
+        if type(self.mortal_wounds) is not bool:
+            raise GameLifecycleError("FeelNoPainSource mortal_wounds must be a bool.")
 
     def to_payload(self) -> FeelNoPainSourcePayload:
         payload: FeelNoPainSourcePayload = {
@@ -1409,6 +1413,8 @@ class FeelNoPainSource:
         }
         if self.attack_condition is not None:
             payload["attack_condition"] = self.attack_condition.value
+        if self.mortal_wounds:
+            payload["mortal_wounds"] = self.mortal_wounds
         return payload
 
     @classmethod
@@ -1419,6 +1425,7 @@ class FeelNoPainSource:
             attack_condition=feel_no_pain_attack_condition_from_token(
                 payload.get("attack_condition")
             ),
+            mortal_wounds=payload.get("mortal_wounds", False),
         )
 
 
@@ -2986,7 +2993,7 @@ def _state_feel_no_pain_sources(
     return tuple(
         source
         for source in _validate_feel_no_pain_sources(sources)
-        if source.attack_condition is None
+        if source.attack_condition is None or source.mortal_wounds
     )
 
 
