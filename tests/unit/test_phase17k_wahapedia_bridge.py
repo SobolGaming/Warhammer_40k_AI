@@ -96,6 +96,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
     CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
     CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+    CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
     CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
     CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
@@ -114,6 +115,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SELECTED_EVENT,
     SELECT_CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SUBMISSION_KIND,
     CatalogAdvanceEligibilityRuntime,
+    CatalogFallBackEligibilityRuntime,
     CatalogNamedWeaponAbilityChoiceOption,
     CatalogNamedWeaponAbilityChoiceRuntime,
     CatalogWeaponKeywordGrant,
@@ -192,6 +194,10 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.tyranids impo
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
     army_rule as world_eaters_army_rule,
+)
+from warhammer40k_core.engine.fall_back_hooks import (
+    FallBackEligibilityContext,
+    FallBackEligibilityHookRegistry,
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
@@ -1007,6 +1013,60 @@ def test_phase17k_datasheet_advance_charge_text_uses_generic_advance_eligibility
         "ability_ids": [advance_charge_record.definition.ability_id],
         "catalog_record_ids": [advance_charge_record.record_id],
         "source_rule_ids": [advance_charge_record.definition.source_id],
+    }
+
+
+def test_phase17k_datasheet_fall_back_shoot_text_uses_generic_fall_back_eligibility() -> None:
+    package = _advance_charge_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    fall_back_shoot_record = records_by_name["Slip Away"]
+    replay_payload = fall_back_shoot_record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    runtime = CatalogFallBackEligibilityRuntime(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army,),
+    )
+    registry = FallBackEligibilityHookRegistry.from_bindings(runtime.bindings())
+    state = _battle_state_with_army(
+        army=army,
+        battlefield=_bloodcrushers_battlefield_state(army=army, unit=unit),
+    )
+
+    grants = registry.grants_for(
+        FallBackEligibilityContext(
+            state=state,
+            player_id=army.player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            movement_request_id="phase17k-fall-back-shoot-request",
+            movement_result_id="phase17k-fall-back-shoot-result",
+        )
+    )
+
+    assert fall_back_shoot_record.definition.timing.trigger_kind is TimingTriggerKind.PASSIVE_QUERY
+    assert rule_ir.is_supported
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) == {
+        CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+    }
+    assert tuple(binding.hook_id for binding in registry.all_bindings()) == (
+        CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+    )
+    assert len(grants) == 1
+    assert grants[0].hook_id == CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID
+    assert grants[0].can_shoot is True
+    assert grants[0].can_declare_charge is False
+    assert grants[0].replay_payload == {
+        "ability": "can_fall_back_and_shoot",
+        "ability_ids": [fall_back_shoot_record.definition.ability_id],
+        "catalog_record_ids": [fall_back_shoot_record.record_id],
+        "source_rule_ids": [fall_back_shoot_record.definition.source_id],
     }
 
 
@@ -2476,6 +2536,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| `catalog-ir:can-advance-and-charge` | No current generated rows |"
     ) in generated_markdown
     assert (
+        "| `catalog-ir:can-fallback-and-shoot` | No current generated rows |"
+    ) in generated_markdown
+    assert (
         "| `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |"
     ) in generated_markdown
     assert "| `core:command-reroll` | Command Re-roll |" in generated_markdown
@@ -3211,6 +3274,7 @@ def test_phase17k_catalog_ir_future_hooks_classify_supported_rule_ir_without_con
         CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
         CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
         CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+        CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
         CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
         CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
         CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
@@ -4893,6 +4957,10 @@ def _advance_charge_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                         "test-advance-charge-unit,4,Datasheet,,Pack Killers,"
                         '"While this model is leading a unit, melee weapons equipped by '
                         'models in that unit have the  [LETHAL HITS] ability.",'
+                    ),
+                    (
+                        "test-advance-charge-unit,5,Datasheet,,Slip Away,"
+                        "This unit is eligible to shoot in a turn in  which it Fell Back.,"
                     ),
                 )
             ),

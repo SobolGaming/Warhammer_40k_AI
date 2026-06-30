@@ -216,7 +216,10 @@ INITIAL_RULE_TEMPLATES: tuple[RuleTemplate, ...] = (
         template_id=GRANT_ABILITY_TEMPLATE_ID,
         family=RuleTemplateFamily.GRANT_ABILITY,
         description="Unit or model ability grants, usually with an explicit duration.",
-        canonical_patterns=("that unit gains <ability> until <endpoint>",),
+        canonical_patterns=(
+            "that unit gains <ability> until <endpoint>",
+            "this unit is eligible to shoot in a turn in which it Fell Back",
+        ),
     ),
     RuleTemplate(
         template_id=WEAPON_ABILITY_GRANT_TEMPLATE_ID,

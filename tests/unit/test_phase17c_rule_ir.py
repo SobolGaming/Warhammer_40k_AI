@@ -30,6 +30,7 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_support_rollup_for_rule_ir,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
     CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
@@ -688,6 +689,26 @@ def test_phase17c_advance_charge_eligibility_compiles_to_rule_exception_grant() 
     assert clause.target is not None
     assert clause.target.kind is RuleTargetKind.THIS_UNIT
     assert parameter_payload(effect.parameters) == {"ability": "can_advance_and_charge"}
+
+
+def test_phase17c_fall_back_shoot_eligibility_compiles_to_rule_exception_grant() -> None:
+    rule_ir = _compiled("This unit is eligible to shoot in a turn in  which it Fell Back.").rule_ir
+    clause = rule_ir.clauses[0]
+    effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.GRANT_ABILITY
+    )
+
+    assert rule_ir.is_supported
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert parameter_payload(effect.parameters) == {"ability": "can_fall_back_and_shoot"}
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+    )
 
 
 def test_phase17c_leading_model_advance_charge_rerolls_compile_to_two_permissions() -> None:

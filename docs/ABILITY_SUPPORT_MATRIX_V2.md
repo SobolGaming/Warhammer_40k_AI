@@ -184,6 +184,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:can-advance-and-shoot-and-charge` | No current generated rows |
 | `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |
 | `catalog-ir:can-fallback-and-charge` | No current generated rows |
+| `catalog-ir:can-fallback-and-shoot` | No current generated rows |
 | `catalog-ir:charge-roll-modifier` | Instrument of Chaos |
 | `catalog-ir:charge-roll-reroll` | No current generated rows |
 | `catalog-ir:critical-hit-value-modifier` | No current generated rows |

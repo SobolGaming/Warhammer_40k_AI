@@ -213,6 +213,12 @@ _CHARGE_ELIGIBILITY_AFTER_MOVE_RE = re.compile(
     r"(?P<movement>Advanced|Fell\s+Back)\b",
     re.IGNORECASE,
 )
+_SHOOT_ELIGIBILITY_AFTER_FALL_BACK_RE = re.compile(
+    r"\b(?:(?:this|that|selected|target)\s+unit\s+)?"
+    r"(?:is\s+)?eligible\s+to\s+shoot\s+in\s+a\s+turn\s+"
+    r"in\s+which\s+(?:it|this\s+unit|that\s+unit|the\s+unit)\s+Fell\s+Back\b",
+    re.IGNORECASE,
+)
 _FEEL_NO_PAIN_ABILITY_RE = re.compile(
     r"\b(?:gains?|have|has)\s+(?:the\s+)?Feel\s+No\s+Pain\s+"
     r"(?P<threshold>[2-6])\+\s+ability"
@@ -1267,6 +1273,14 @@ def _parse_resource_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, .
 
 def _parse_grant_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
+    for match in _SHOOT_ELIGIBILITY_AFTER_FALL_BACK_RE.finditer(clause_text.text):
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.GRANT_ABILITY,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs((("ability", "can_fall_back_and_shoot"),)),
+            )
+        )
     for match in _CHARGE_ELIGIBILITY_AFTER_MOVE_RE.finditer(clause_text.text):
         movement = " ".join(match.group("movement").lower().split())
         ability = (
