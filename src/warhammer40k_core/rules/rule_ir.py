@@ -94,6 +94,7 @@ class RuleTriggerKind(StrEnum):
 
 class RuleConditionKind(StrEnum):
     AURA = "aura"
+    DICE_ROLL_GATE = "dice_roll_gate"
     DICE_ROLL_TYPE = "dice_roll_type"
     DISTANCE_PREDICATE = "distance_predicate"
     FREQUENCY_LIMIT = "frequency_limit"
@@ -128,6 +129,7 @@ class RuleEffectKind(StrEnum):
     PLACEMENT_RESTRICTION = "placement_restriction"
     REROLL_PERMISSION = "reroll_permission"
     RESTORE_LOST_WOUNDS = "restore_lost_wounds"
+    RETURN_DESTROYED_TARGET = "return_destroyed_target"
     SELECT_TRACKED_TARGET = "select_tracked_target"
     SET_CONTEXTUAL_STATUS = "set_contextual_status"
     SET_CHARACTERISTIC = "set_characteristic"
