@@ -33,6 +33,8 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
+    CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+    CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
@@ -888,14 +890,20 @@ def test_phase17c_lord_of_change_named_weapon_choice_compiles_to_semantic_ir() -
             "weapon_name": "Bolt of Change",
         },
     )
-    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:ignores-cover",
+        "catalog-ir:weapon-keyword-grant:lethal-hits",
+        "catalog-ir:weapon-keyword-grant:sustained-hits",
+    )
     assert (
         ability_support_rollup_for_rule_ir(
             source_ability_id="source:daemonspark",
             ability_name="Daemonspark",
             rule_ir=rule_ir,
         ).overall_ability_support
-        is AbilityOverallSupport.PARSED
+        is AbilityOverallSupport.FULL
     )
 
 
@@ -931,7 +939,12 @@ def test_phase17c_named_weapon_choice_generalizes_to_multiple_weapon_names() -> 
             "weapon_names": "storm staff|prism cannon",
         },
     )
-    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:lethal-hits",
+        "catalog-ir:weapon-keyword-grant:sustained-hits",
+    )
 
 
 def test_phase17c_hunters_from_the_warp_compiles_to_turn_end_reserve_choice() -> None:

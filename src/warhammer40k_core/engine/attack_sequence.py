@@ -201,6 +201,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     MELTA_RULE_ID,
     PRECISION_RULE_ID,
     SNAP_SHOOTING_RULE_ID,
+    SUSTAINED_HITS_D3_VALUE,
     TWIN_LINKED_RULE_ID,
     DevastatingWoundsResolution,
     anti_keyword_critical_threshold,
@@ -210,6 +211,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     lethal_hits_applies,
     melta_damage_bonus,
     sustained_hits_generated_hits,
+    weapon_ability_value,
 )
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool, RangedAttackPoolPayload
 from warhammer40k_core.geometry.measurement import (
@@ -8194,13 +8196,32 @@ def _roll_hit(
         )
     else:
         minimum_success = 2
+    target_keywords = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=pool.target_unit_instance_id,
+    ).keywords
+    sustained_hits_d3_value: int | None = None
+    if unmodified == 6 and (
+        weapon_ability_value(
+            pool.weapon_profile,
+            AbilityKind.SUSTAINED_HITS,
+            target_keywords=target_keywords,
+        )
+        == SUSTAINED_HITS_D3_VALUE
+    ):
+        sustained_hits_d3_value = manager.roll_d3(
+            reason=(
+                "Sustained Hits D3 generated hits for "
+                f"{pool.weapon_profile_id} attack {attack_context_id}"
+            ),
+            roll_type="attack_sequence.sustained_hits.generated_hits",
+            actor_id=attacker_player_id,
+        ).value
     generated_hits = sustained_hits_generated_hits(
         pool.weapon_profile,
         critical_hit=unmodified == 6,
-        target_keywords=rules_unit_view_by_id(
-            state=state,
-            unit_instance_id=pool.target_unit_instance_id,
-        ).keywords,
+        target_keywords=target_keywords,
+        d3_value=sustained_hits_d3_value,
     )
     return HitRoll(
         target_number=skill,

@@ -40,6 +40,7 @@ from warhammer40k_core.engine.weapon_abilities import (
     HUNTER_RULE_ID,
     MELTA_RULE_ID,
     RAPID_FIRE_RULE_ID,
+    SUSTAINED_HITS_D3_VALUE,
     WEAPON_ABILITY_SELECTION_DECISION_TYPE,
     DevastatingWoundsResolution,
     anti_keyword_critical_threshold,
@@ -101,6 +102,27 @@ def test_phase13d_weapon_ability_helpers_use_structured_descriptors() -> None:
     assert cleave_rule_id(2) == f"{CLEAVE_RULE_ID}:2"
     assert melta_rule_id(3) == f"{MELTA_RULE_ID}:3"
     assert heavy_rule_id() == HEAVY_RULE_ID
+
+
+def test_phase13d_sustained_hits_d3_requires_resolved_d3_on_critical_hits() -> None:
+    descriptor = AbilityDescriptor.sustained_hits(SUSTAINED_HITS_D3_VALUE)
+    profile = _profile(
+        keywords=(WeaponKeyword.SUSTAINED_HITS,),
+        abilities=(descriptor,),
+    )
+
+    assert AbilityDescriptor.from_payload(descriptor.to_payload()).to_payload() == (
+        descriptor.to_payload()
+    )
+    assert descriptor.name == "Sustained Hits D3"
+    assert sustained_hits_generated_hits(profile, critical_hit=False) == 1
+    assert sustained_hits_generated_hits(profile, critical_hit=True, d3_value=2) == 3
+    with pytest.raises(GameLifecycleError, match="requires a resolved D3 value"):
+        sustained_hits_generated_hits(profile, critical_hit=True)
+    with pytest.raises(GameLifecycleError, match="must be an integer"):
+        weapon_ability_int_value(profile, AbilityKind.SUSTAINED_HITS)
+    with pytest.raises(WeaponProfileError, match="positive or D3"):
+        AbilityDescriptor.sustained_hits("D6")
 
 
 def test_phase13d_weapon_ability_helpers_fail_fast_on_incomplete_profiles() -> None:

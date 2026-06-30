@@ -48,6 +48,7 @@ SUSTAINED_HITS_RULE_ID = "weapon-ability:sustained-hits"
 TORRENT_RULE_ID = "weapon-ability:torrent"
 TWIN_LINKED_RULE_ID = "weapon-ability:twin-linked"
 WEAPON_ABILITY_SELECTION_DECISION_TYPE = "select_weapon_ability_instance"
+SUSTAINED_HITS_D3_VALUE = "D3"
 
 _PARAMETERIZED_KEYWORDS_BY_KIND = {
     AbilityKind.CLEAVE: WeaponKeyword.CLEAVE,
@@ -91,6 +92,28 @@ def weapon_ability_int_value(
     target_keywords: tuple[str, ...] = (),
     selected_ability_id: str | None = None,
 ) -> int | None:
+    value = weapon_ability_value(
+        profile,
+        ability_kind,
+        target_keywords=target_keywords,
+        selected_ability_id=selected_ability_id,
+    )
+    if value is None:
+        return None
+    if type(value) is not int:
+        raise GameLifecycleError("Weapon ability value parameter must be an integer.")
+    if value < 1:
+        raise GameLifecycleError("Weapon ability value parameter must be positive.")
+    return value
+
+
+def weapon_ability_value(
+    profile: WeaponProfile,
+    ability_kind: AbilityKind,
+    *,
+    target_keywords: tuple[str, ...] = (),
+    selected_ability_id: str | None = None,
+) -> int | str | None:
     _validate_weapon_profile(profile)
     _validate_ability_kind(ability_kind)
     _target_keyword_set(target_keywords)
@@ -115,11 +138,9 @@ def weapon_ability_int_value(
         descriptor = matching_descriptors[0] if matching_descriptors else None
     if descriptor is not None:
         value = _ability_parameter_value(descriptor)
-        if type(value) is not int:
-            raise GameLifecycleError("Weapon ability value parameter must be an integer.")
-        if value < 1:
-            raise GameLifecycleError("Weapon ability value parameter must be positive.")
-        return value
+        if type(value) is int or type(value) is str:
+            return value
+        raise GameLifecycleError("Weapon ability value parameter must be an integer or string.")
     if descriptors:
         return None
     if expected_keyword is not None and expected_keyword in profile.keywords:
@@ -405,14 +426,23 @@ def sustained_hits_generated_hits(
     *,
     critical_hit: bool,
     target_keywords: tuple[str, ...] = (),
+    d3_value: int | None = None,
 ) -> int:
-    value = weapon_ability_int_value(
+    value = weapon_ability_value(
         profile,
         AbilityKind.SUSTAINED_HITS,
         target_keywords=target_keywords,
     )
     if value is None or not critical_hit:
         return 1
+    if value == SUSTAINED_HITS_D3_VALUE:
+        if d3_value is None:
+            raise GameLifecycleError("Sustained Hits D3 requires a resolved D3 value.")
+        return 1 + _validate_positive_int("Sustained Hits D3 value", d3_value)
+    if type(value) is not int:
+        raise GameLifecycleError("Sustained Hits value parameter must be an integer or D3.")
+    if value < 1:
+        raise GameLifecycleError("Sustained Hits value parameter must be positive.")
     return 1 + value
 
 
