@@ -160,13 +160,13 @@ _REROLL_ROLL_LIST_RE = re.compile(
     rf"\b(?:(?:you\s+)?can\s+)?(?:re-roll|reroll)\s+"
     rf"(?:the\s+)?(?P<rolls>(?:{_ROLL_TYPES})(?:\s*,\s*|\s+and\s+)"
     rf"(?:{_ROLL_TYPES})(?:(?:\s*,\s*|\s+and\s+)(?:{_ROLL_TYPES}))*)\s+rolls?\b"
-    r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+unit)?",
+    r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+(?:unit|model))?",
     re.IGNORECASE,
 )
 _REROLL_RE = re.compile(
     rf"\b(?:(?:you\s+)?can\s+)?(?:re-roll|reroll)\s+"
     rf"(?:the\s+)?(?P<roll>{_ROLL_TYPES})\s+rolls?\b"
-    r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+unit)?",
+    r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+(?:unit|model))?",
     re.IGNORECASE,
 )
 _CHARACTERISTIC_NAMES = (

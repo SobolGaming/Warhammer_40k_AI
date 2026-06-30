@@ -1199,6 +1199,58 @@ def test_phase17k_leading_model_reroll_text_uses_generic_advance_charge_rerolls(
         )
 
 
+def test_phase17k_this_model_reroll_text_uses_generic_advance_charge_rerolls() -> None:
+    package = _model_reroll_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    reroll_record = records_by_name["Swift Instincts"]
+    replay_payload = reroll_record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
+    current_model_ids = _current_model_ids(battlefield=battlefield, unit=unit)
+    advance_permission = catalog_advance_roll_reroll_permission_for_unit(
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        player_id=army.player_id,
+    )
+    charge_permission = catalog_charge_roll_reroll_permission_for_unit(
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        player_id=army.player_id,
+    )
+    clause = rule_ir.clauses[0]
+
+    assert reroll_record.definition.timing.trigger_kind is TimingTriggerKind.AFTER_DICE_ROLL
+    assert rule_ir.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) == {
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    }
+    assert advance_permission is not None
+    assert advance_permission.eligible_roll_type == "advance_roll"
+    assert advance_permission.timing_window == "after_advance_roll"
+    assert advance_permission.owning_player_id == army.player_id
+    assert (
+        advance_permission.component_selection_policy is RerollComponentSelectionPolicy.WHOLE_ROLL
+    )
+    assert charge_permission is not None
+    assert charge_permission.eligible_roll_type == "charge_roll"
+    assert charge_permission.timing_window == "after_charge_roll"
+    assert charge_permission.owning_player_id == army.player_id
+    assert charge_permission.component_selection_policy is RerollComponentSelectionPolicy.WHOLE_ROLL
+
+
 def test_phase17k_leading_model_weapon_keyword_text_modifies_scoped_weapon_profiles() -> None:
     package = _advance_charge_package()
     unit = _advance_charge_unit(package=package)
@@ -4028,6 +4080,14 @@ def _advance_charge_package() -> CanonicalCatalogPackage:
     )
 
 
+def _model_reroll_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_model_reroll_bridge_artifacts(),
+    )
+
+
 def _named_weapon_choice_package() -> CanonicalCatalogPackage:
     return build_canonical_catalog_package(
         package_id=_catalog_package_id(),
@@ -4896,6 +4956,24 @@ def _advance_charge_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     )
 
 
+def _model_reroll_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_model_reroll_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-advance-charge-unit",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-advance-charge-unit",
+                model_name="Swift Hunter",
+                height=1.4,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:test:model-reroll:swift-hunter:height",
+                height_document_reference="Test Model Reroll Datasheet",
+            ),
+        ),
+    )
+
+
 def _named_weapon_choice_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     return build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=_named_weapon_choice_source_artifacts(),
@@ -4961,6 +5039,86 @@ def _advance_charge_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                     (
                         "test-advance-charge-unit,5,Datasheet,,Slip Away,"
                         "This unit is eligible to shoot in a turn in  which it Fell Back.,"
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-advance-charge-unit,Beasts,,false",
+                    "test-advance-charge-unit,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-advance-charge-unit,1,10,4,6,5,2,7,1,40mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    "test-advance-charge-unit,1,1,Swift claws,Melee,Melee,4,4,4,0,1,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    "test-advance-charge-unit,1,1 Swift Hunter",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _model_reroll_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Test Army Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-advance-charge-unit,Advance Charge Unit,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-advance-charge-unit,1,Faction,test-army-rule,"
+                        "Test Army Rule,Test rule text.,"
+                    ),
+                    (
+                        "test-advance-charge-unit,2,Datasheet,,Swift Instincts,"
+                        "You can re\u2011roll Advance and Charge rolls made for this model.,"
                     ),
                 )
             ),

@@ -2091,6 +2091,8 @@ def _clause_targets_roll_reroll_unit(clause: RuleClause) -> bool:
         return True
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    if _clause_targets_this_model(clause):
+        return True
     return (
         clause.target is not None
         and clause.target.kind is RuleTargetKind.SELECTED_UNIT

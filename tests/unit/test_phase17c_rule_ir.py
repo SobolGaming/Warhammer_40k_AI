@@ -30,7 +30,9 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_support_rollup_for_rule_ir,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+    CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
@@ -733,6 +735,34 @@ def test_phase17c_leading_model_advance_charge_rerolls_compile_to_two_permission
         {"roll_type": "advance"},
         {"roll_type": "charge"},
     )
+
+
+def test_phase17c_this_model_advance_charge_rerolls_compile_to_two_permissions() -> None:
+    raw_text = "You can re\u2011roll Advance and Charge rolls made for this model."
+    compiled = _compiled(raw_text)
+    clause = compiled.rule_ir.clauses[0]
+    reroll_effects = tuple(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.REROLL_PERMISSION
+    )
+
+    assert compiled.source_text.normalized_text == (
+        "You can re-roll Advance and Charge rolls made for this model."
+    )
+    assert compiled.rule_ir.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert tuple(parameter_payload(effect.parameters) for effect in reroll_effects) == (
+        {"roll_type": "advance"},
+        {"roll_type": "charge"},
+    )
+    assert catalog_rule_ir_consumers_for_rule(compiled.rule_ir) == (
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(compiled.rule_ir)) == {
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    }
 
 
 def test_phase17c_leading_model_scoped_weapon_keyword_grant_compiles_to_generic_scope() -> None:
