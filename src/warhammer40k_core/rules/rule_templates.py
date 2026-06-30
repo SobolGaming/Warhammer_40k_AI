@@ -25,6 +25,7 @@ class RuleTemplateFamily(StrEnum):
     REROLL_PERMISSION = "reroll_permission"
     RESOURCE_MODIFICATION = "resource_modification"
     SELECTED_TARGET_CONSTRAINT = "selected_target_constraint"
+    TRACKED_TARGET_SELECTION = "tracked_target_selection"
     TIMING_WINDOW = "timing_window"
 
 
@@ -82,6 +83,7 @@ KEYWORD_GATE_TEMPLATE_ID = "phase17c:keyword-gate"
 TIMING_WINDOW_TEMPLATE_ID = "phase17c:timing-window"
 DISTANCE_PREDICATE_TEMPLATE_ID = "phase17c:distance-predicate"
 SELECTED_TARGET_TEMPLATE_ID = "phase17c:selected-target-constraint"
+TRACKED_TARGET_SELECTION_TEMPLATE_ID = "phase17c:tracked-target-selection"
 DICE_ROLL_MODIFIER_TEMPLATE_ID = "phase17c:dice-roll-modifier"
 REROLL_PERMISSION_TEMPLATE_ID = "phase17c:reroll-permission"
 CHARACTERISTIC_MODIFIER_TEMPLATE_ID = "phase17c:characteristic-modifier"
@@ -164,6 +166,17 @@ INITIAL_RULE_TEMPLATES: tuple[RuleTemplate, ...] = (
         family=RuleTemplateFamily.SELECTED_TARGET_CONSTRAINT,
         description="Selected friendly, enemy, this-unit, selected-unit, or player target clauses.",
         canonical_patterns=("select one friendly unit", "select one enemy unit", "that unit"),
+    ),
+    RuleTemplate(
+        template_id=TRACKED_TARGET_SELECTION_TEMPLATE_ID,
+        family=RuleTemplateFamily.TRACKED_TARGET_SELECTION,
+        description=(
+            "Named target selections such as prey or quarry that can be replaced when destroyed."
+        ),
+        canonical_patterns=(
+            "select one enemy unit to be this model's prey",
+            "each time this model's quarry is destroyed, select one new enemy unit",
+        ),
     ),
     RuleTemplate(
         template_id=DICE_ROLL_MODIFIER_TEMPLATE_ID,

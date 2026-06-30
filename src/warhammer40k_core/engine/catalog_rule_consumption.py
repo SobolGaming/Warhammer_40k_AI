@@ -2318,6 +2318,8 @@ def _effect_is_roll_reroll_permission(effect: RuleEffectSpec, *, roll_type: str)
     if effect.kind is not RuleEffectKind.REROLL_PERMISSION:
         return False
     parameters = parameter_payload(effect.parameters)
+    if parameters.get("target_reference") == "tracked_target":
+        return False
     value = parameters.get("roll_type")
     if type(value) is not str:
         return False
@@ -2332,6 +2334,8 @@ def _roll_reroll_consumer_id_for_effect(effect: RuleEffectSpec) -> str | None:
     if effect.kind is not RuleEffectKind.REROLL_PERMISSION:
         return None
     parameters = parameter_payload(effect.parameters)
+    if parameters.get("target_reference") == "tracked_target":
+        return None
     roll_type = parameters.get("roll_type")
     if type(roll_type) is not str:
         return None
@@ -3090,6 +3094,8 @@ def _catalog_ir_roll_modifier_hook_ids(parameters: Mapping[str, object]) -> tupl
 
 
 def _catalog_ir_roll_reroll_hook_ids(parameters: Mapping[str, object]) -> tuple[str, ...]:
+    if parameters.get("target_reference") == "tracked_target":
+        return ()
     roll_type = _string_parameter(parameters, key="roll_type")
     consumer_id = _CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.get(_catalog_ir_lookup_token(roll_type))
     if consumer_id is None:

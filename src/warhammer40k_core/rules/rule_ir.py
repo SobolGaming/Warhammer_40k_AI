@@ -128,6 +128,7 @@ class RuleEffectKind(StrEnum):
     PLACEMENT_RESTRICTION = "placement_restriction"
     REROLL_PERMISSION = "reroll_permission"
     RESTORE_LOST_WOUNDS = "restore_lost_wounds"
+    SELECT_TRACKED_TARGET = "select_tracked_target"
     SET_CONTEXTUAL_STATUS = "set_contextual_status"
     SET_CHARACTERISTIC = "set_characteristic"
 
