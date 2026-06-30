@@ -79,6 +79,7 @@ from warhammer40k_core.engine.unit_abilities import (
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
+    RuleCondition,
     RuleConditionKind,
     RuleDurationKind,
     RuleEffectKind,
@@ -109,6 +110,13 @@ CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID = "catalog-ir:wound-roll-reroll"
 CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID = (
     "catalog-ir:destroyed-unit-restore-lost-wounds"
 )
+CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID = "catalog-ir:tracked-target-selection"
+CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID = "catalog-ir:tracked-target-reroll"
+CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID = (
+    "catalog-ir:tracked-target-destroyed-reselect"
+)
+CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID = "catalog-ir:first-death-return"
+CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID = "catalog-ir:first-death-return-phase-end"
 CATALOG_IR_FEEL_NO_PAIN_ROLL_CONSUMER_ID = "catalog-ir:feel-no-pain-roll"
 CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID = "catalog-ir:feel-no-pain-source"
 CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-hit-value-modifier"
@@ -794,6 +802,11 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         *_CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.values(),
         *_CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS.values(),
         CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,
+        CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
+        CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID,
+        CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID,
+        CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID,
+        CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
         CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
         CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
         CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
@@ -1797,6 +1810,14 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID)
     if _clause_is_structured_destroyed_unit_restore_clause(clause):
         consumer_ids.add(CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID)
+    if _clause_is_supported_tracked_target_selection(clause):
+        consumer_ids.add(CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID)
+    if _clause_is_supported_tracked_target_reroll(clause):
+        consumer_ids.add(CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID)
+    if _clause_is_supported_tracked_target_destroyed_reselect(clause):
+        consumer_ids.add(CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID)
+    if _clause_is_supported_first_death_return(clause):
+        consumer_ids.add(CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID)
     if not _clause_targets_this_unit(clause):
         if _clause_targets_roll_reroll_unit(clause):
             for effect in clause.effects:
@@ -1832,11 +1853,471 @@ def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
         raise GameLifecycleError("Catalog rule consumer classification requires RuleIR.")
     hook_ids: set[str] = set()
     for clause in rule_ir.clauses:
+        hook_ids.update(_catalog_ir_hook_ids_for_clause(clause))
         for effect in clause.effects:
             if _effect_is_charge_roll_modifier(effect):
                 hook_ids.add(CATALOG_IR_CHARGE_ROLL_CONSUMER_ID)
             hook_ids.update(_catalog_ir_hook_ids_for_effect(effect))
     return tuple(sorted(hook_ids))
+
+
+def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
+    hook_ids: set[str] = set()
+    if _clause_is_supported_tracked_target_selection(clause):
+        hook_ids.add(CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID)
+    if _clause_is_supported_tracked_target_reroll(clause):
+        hook_ids.add(CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID)
+    if _clause_is_supported_tracked_target_destroyed_reselect(clause):
+        hook_ids.add(CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID)
+    if _clause_is_supported_first_death_return(clause):
+        hook_ids.add(CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID)
+        hook_ids.add(CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID)
+    return tuple(sorted(hook_ids))
+
+
+def catalog_rule_clauses_from_record(record: AbilityCatalogRecord) -> tuple[RuleClause, ...]:
+    return _clauses_from_record(record)
+
+
+def catalog_rule_record_source_matches_unit(
+    *,
+    record: AbilityCatalogRecord,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+) -> bool:
+    return _record_source_matches_unit(
+        record=record,
+        unit=unit,
+        current_model_instance_ids=current_model_instance_ids,
+    )
+
+
+def catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+) -> tuple[str, ...]:
+    return _current_placed_alive_model_instance_ids_for_unit(state=state, unit=unit)
+
+
+def catalog_rule_record_current_wargear_bearer_model_ids(
+    *,
+    record: AbilityCatalogRecord,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    return _record_current_wargear_bearer_model_ids(
+        record=record,
+        unit=unit,
+        current_model_instance_ids=current_model_instance_ids,
+    )
+
+
+def catalog_rule_unit_scoped_generic_records(
+    *,
+    ability_index: AbilityCatalogIndex,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+    trigger_kind: TimingTriggerKind,
+) -> tuple[AbilityCatalogRecord, ...]:
+    return _unit_scoped_generic_records(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=current_model_instance_ids,
+        trigger_kind=trigger_kind,
+    )
+
+
+def catalog_rule_clause_is_supported_tracked_target_selection(clause: RuleClause) -> bool:
+    return _clause_is_supported_tracked_target_selection(clause)
+
+
+def catalog_rule_clause_is_supported_tracked_target_destroyed_reselect(
+    clause: RuleClause,
+) -> bool:
+    return _clause_is_supported_tracked_target_destroyed_reselect(clause)
+
+
+def catalog_rule_tracked_target_supported_roll_types_for_clause(
+    clause: RuleClause,
+) -> tuple[str, ...]:
+    return _tracked_target_supported_roll_types_for_clause(clause)
+
+
+def catalog_rule_tracked_target_supported_attack_kinds_for_clause(
+    clause: RuleClause,
+) -> tuple[str, ...]:
+    return _tracked_target_supported_attack_kinds_for_clause(clause)
+
+
+def catalog_rule_tracked_target_supported_attack_roll_pairs_for_clause(
+    clause: RuleClause,
+) -> tuple[tuple[str, str], ...]:
+    return _tracked_target_supported_attack_roll_pairs_for_clause(clause)
+
+
+def catalog_rule_clause_is_supported_first_death_return(clause: RuleClause) -> bool:
+    return _clause_is_supported_first_death_return(clause)
+
+
+def _clause_is_supported_tracked_target_selection(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Tracked-target consumer classification requires RuleClause.")
+    if not clause.is_supported:
+        return False
+    if clause.target is None or clause.target.kind not in {
+        RuleTargetKind.ENEMY_UNIT,
+        RuleTargetKind.FRIENDLY_UNIT,
+    }:
+        return False
+    selection_effects = tuple(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.SELECT_TRACKED_TARGET
+    )
+    if len(selection_effects) != 1:
+        return False
+    parameters = parameter_payload(selection_effects[0].parameters)
+    return (
+        parameters.get("selection_kind") == "select_one"
+        and parameters.get("target_lifecycle") == "until_destroyed"
+        and parameters.get("target_scope") in {"enemy_unit", "friendly_unit"}
+        and parameters.get("target_allegiance") in {"enemy", "friendly"}
+        and parameters.get("tracked_target_owner") in {"this_model", "this_unit"}
+        and parameters.get("tracked_target_role") in {"prey", "quarry"}
+        and type(parameters.get("replacement")) is bool
+        and (
+            (clause.target.kind is RuleTargetKind.ENEMY_UNIT)
+            == (parameters.get("target_allegiance") == "enemy")
+        )
+        and (
+            (clause.target.kind is RuleTargetKind.ENEMY_UNIT)
+            == (parameters.get("target_scope") == "enemy_unit")
+        )
+    )
+
+
+def _clause_is_supported_tracked_target_reroll(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Tracked-target consumer classification requires RuleClause.")
+    if not clause.is_supported:
+        return False
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.DICE_ROLL:
+        return False
+    trigger_parameters = parameter_payload(trigger.parameters)
+    if trigger_parameters.get("target_reference") != "tracked_target":
+        return False
+    if trigger_parameters.get("tracked_target_owner") not in {"this_model", "this_unit"}:
+        return False
+    if trigger_parameters.get("tracked_target_role") not in {"prey", "quarry"}:
+        return False
+    if trigger_parameters.get("attack_kind") not in {"melee", "ranged"}:
+        return False
+    if trigger_parameters.get("actor") not in {"this_model", "model_in_this_models_unit"}:
+        return False
+    if not any(
+        _condition_is_tracked_target_attack_constraint(
+            condition,
+            trigger_parameters=trigger_parameters,
+        )
+        for condition in clause.conditions
+    ):
+        return False
+    reroll_effects = tuple(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.REROLL_PERMISSION
+    )
+    if not reroll_effects or len(reroll_effects) != len(clause.effects):
+        return False
+    return all(
+        _effect_is_supported_tracked_target_reroll(effect, trigger_parameters=trigger_parameters)
+        for effect in reroll_effects
+    )
+
+
+def _condition_is_tracked_target_attack_constraint(
+    condition: RuleCondition,
+    *,
+    trigger_parameters: Mapping[str, object],
+) -> bool:
+    if condition.kind is not RuleConditionKind.TARGET_CONSTRAINT:
+        return False
+    parameters = parameter_payload(condition.parameters)
+    return (
+        parameters.get("relationship") == "attack_targets_tracked_target"
+        and parameters.get("target_reference") == "tracked_target"
+        and parameters.get("tracked_target_owner") == trigger_parameters.get("tracked_target_owner")
+        and parameters.get("tracked_target_role") == trigger_parameters.get("tracked_target_role")
+        and parameters.get("gate_subject") == "attack_target"
+        and parameters.get("attack_kind") == trigger_parameters.get("attack_kind")
+        and parameters.get("actor") == trigger_parameters.get("actor")
+    )
+
+
+def _effect_is_supported_tracked_target_reroll(
+    effect: RuleEffectSpec,
+    *,
+    trigger_parameters: Mapping[str, object],
+) -> bool:
+    parameters = parameter_payload(effect.parameters)
+    roll_type = parameters.get("roll_type")
+    return (
+        parameters.get("target_reference") == "tracked_target"
+        and parameters.get("tracked_target_owner") == trigger_parameters.get("tracked_target_owner")
+        and parameters.get("tracked_target_role") == trigger_parameters.get("tracked_target_role")
+        and roll_type in {"hit", "wound"}
+        and _trigger_supports_tracked_target_roll_type(
+            trigger_parameters=trigger_parameters,
+            roll_type=roll_type,
+        )
+    )
+
+
+def _trigger_supports_tracked_target_roll_type(
+    *,
+    trigger_parameters: Mapping[str, object],
+    roll_type: object,
+) -> bool:
+    if type(roll_type) is not str:
+        return False
+    single_roll_type = trigger_parameters.get("roll_type")
+    if single_roll_type == roll_type:
+        return True
+    roll_types = trigger_parameters.get("roll_types")
+    if type(roll_types) is str:
+        return roll_type in set(roll_types.split("|"))
+    return False
+
+
+def _tracked_target_supported_roll_types_for_clause(clause: RuleClause) -> tuple[str, ...]:
+    supported = {
+        roll_type for _, roll_type in _tracked_target_supported_attack_roll_pairs_for_clause(clause)
+    }
+    return tuple(
+        roll_type
+        for roll_type in ("attack_sequence.hit", "attack_sequence.wound")
+        if roll_type in supported
+    )
+
+
+def _tracked_target_supported_attack_kinds_for_clause(clause: RuleClause) -> tuple[str, ...]:
+    supported = {
+        attack_kind
+        for attack_kind, _ in _tracked_target_supported_attack_roll_pairs_for_clause(clause)
+    }
+    return tuple(kind for kind in ("melee", "ranged") if kind in supported)
+
+
+def _tracked_target_supported_attack_roll_pairs_for_clause(
+    clause: RuleClause,
+) -> tuple[tuple[str, str], ...]:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Tracked-target attack-roll pair derivation requires RuleClause.")
+    if not _clause_is_supported_tracked_target_reroll(clause):
+        return ()
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.DICE_ROLL:
+        return ()
+    trigger_parameters = parameter_payload(trigger.parameters)
+    attack_kind = trigger_parameters.get("attack_kind")
+    if attack_kind not in {"melee", "ranged"}:
+        return ()
+    supported: set[tuple[str, str]] = set()
+    for effect in clause.effects:
+        if effect.kind is not RuleEffectKind.REROLL_PERMISSION:
+            continue
+        if not _effect_is_supported_tracked_target_reroll(
+            effect,
+            trigger_parameters=trigger_parameters,
+        ):
+            continue
+        roll_type = parameter_payload(effect.parameters).get("roll_type")
+        if roll_type == "hit":
+            supported.add((str(attack_kind), "attack_sequence.hit"))
+        elif roll_type == "wound":
+            supported.add((str(attack_kind), "attack_sequence.wound"))
+    return tuple(
+        (candidate_attack_kind, candidate_roll_type)
+        for candidate_attack_kind in ("melee", "ranged")
+        for candidate_roll_type in ("attack_sequence.hit", "attack_sequence.wound")
+        if (candidate_attack_kind, candidate_roll_type) in supported
+    )
+
+
+def _clause_is_supported_tracked_target_destroyed_reselect(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Tracked-target consumer classification requires RuleClause.")
+    if not clause.is_supported:
+        return False
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.UNIT_DESTROYED:
+        return False
+    trigger_parameters = parameter_payload(trigger.parameters)
+    if trigger_parameters.get("timing_window") != "tracked_target_destroyed":
+        return False
+    if trigger_parameters.get("tracked_target_owner") not in {"this_model", "this_unit"}:
+        return False
+    if trigger_parameters.get("tracked_target_role") not in {"prey", "quarry"}:
+        return False
+    if not any(
+        _condition_is_tracked_target_destroyed_constraint(condition)
+        for condition in clause.conditions
+    ):
+        return False
+    if not _clause_is_supported_tracked_target_selection(clause):
+        return False
+    selection_effect = next(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.SELECT_TRACKED_TARGET
+    )
+    parameters = parameter_payload(selection_effect.parameters)
+    return (
+        parameters.get("replacement") is True
+        and parameters.get("tracked_target_owner") == trigger_parameters.get("tracked_target_owner")
+        and parameters.get("tracked_target_role") == trigger_parameters.get("tracked_target_role")
+    )
+
+
+def _condition_is_tracked_target_destroyed_constraint(condition: RuleCondition) -> bool:
+    if condition.kind is not RuleConditionKind.TARGET_CONSTRAINT:
+        return False
+    parameters = parameter_payload(condition.parameters)
+    return (
+        parameters.get("relationship") == "tracked_target_destroyed"
+        and parameters.get("target_reference") == "tracked_target"
+        and parameters.get("tracked_target_owner") in {"this_model", "this_unit"}
+        and parameters.get("tracked_target_role") in {"prey", "quarry"}
+        and parameters.get("gate_subject") == "destroyed_unit"
+    )
+
+
+def _clause_is_supported_first_death_return(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("First-death return classification requires RuleClause.")
+    if not clause.is_supported:
+        return False
+    trigger = clause.trigger
+    if trigger is None or trigger.kind not in {
+        RuleTriggerKind.MODEL_DESTROYED,
+        RuleTriggerKind.UNIT_DESTROYED,
+    }:
+        return False
+    trigger_parameters = parameter_payload(trigger.parameters)
+    if trigger_parameters.get("event_order") != "first":
+        return False
+    if trigger_parameters.get("resolution_timing") != "phase_end":
+        return False
+    if trigger_parameters.get("timing_window") != "phase_end_after_destroyed":
+        return False
+    if not _clause_has_supported_first_death_frequency_limit(clause):
+        return False
+    if not _clause_has_supported_first_death_roll_gate(clause):
+        return False
+    if not _clause_has_engagement_range_return_restriction(clause):
+        return False
+    return_effects = tuple(
+        effect for effect in clause.effects if effect.kind is RuleEffectKind.RETURN_DESTROYED_TARGET
+    )
+    if len(return_effects) != 1 or len(clause.effects) != 1:
+        return False
+    return _first_death_return_target_shape_matches(
+        clause=clause,
+        effect=return_effects[0],
+        trigger_parameters=trigger_parameters,
+    ) and _effect_is_supported_first_death_return(return_effects[0])
+
+
+def _clause_has_supported_first_death_frequency_limit(clause: RuleClause) -> bool:
+    for condition in clause.conditions:
+        if condition.kind is not RuleConditionKind.FREQUENCY_LIMIT:
+            continue
+        parameters = parameter_payload(condition.parameters)
+        if (
+            parameters.get("event") == "target_destroyed"
+            and parameters.get("event_order") == "first"
+            and parameters.get("scope") == "battle"
+        ):
+            return True
+    return False
+
+
+def _clause_has_supported_first_death_roll_gate(clause: RuleClause) -> bool:
+    for condition in clause.conditions:
+        if condition.kind is not RuleConditionKind.DICE_ROLL_GATE:
+            continue
+        parameters = parameter_payload(condition.parameters)
+        roll_count = parameters.get("roll_count")
+        success_threshold = parameters.get("success_threshold")
+        if (
+            parameters.get("comparison") == "greater_or_equal"
+            and parameters.get("roll_expression") == "D6"
+            and type(roll_count) is int
+            and roll_count == 1
+            and type(success_threshold) is int
+            and 2 <= success_threshold <= 6
+        ):
+            return True
+    return False
+
+
+def _clause_has_engagement_range_return_restriction(clause: RuleClause) -> bool:
+    for condition in clause.conditions:
+        if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE:
+            continue
+        parameters = parameter_payload(condition.parameters)
+        if (
+            parameters.get("predicate") == "within_engagement_range"
+            and parameters.get("range_kind") == "engagement_range"
+            and parameters.get("negated") is True
+            and parameters.get("object_allegiance") == "enemy"
+            and parameters.get("object_kind") == "unit"
+            and parameters.get("object_quantity") == "one_or_more"
+        ):
+            return True
+    return False
+
+
+def _effect_is_supported_first_death_return(effect: RuleEffectSpec) -> bool:
+    parameters = parameter_payload(effect.parameters)
+    restore_mode = parameters.get("restore_wounds_mode")
+    wounds_remaining = parameters.get("wounds_remaining")
+    if (
+        parameters.get("action") != "set_back_up"
+        or parameters.get("placement_kind") != "battlefield_set_up"
+        or parameters.get("placement_anchor") != "destroyed_position"
+        or parameters.get("placement_preference") != "as_close_as_possible"
+        or parameters.get("target_lifecycle") != "destroyed"
+        or parameters.get("target_scope") not in {"destroyed_model", "destroyed_unit"}
+    ):
+        return False
+    if restore_mode == "fixed_remaining":
+        return type(wounds_remaining) is int and wounds_remaining > 0
+    if restore_mode == "full_health":
+        return wounds_remaining is None
+    return False
+
+
+def _first_death_return_target_shape_matches(
+    *,
+    clause: RuleClause,
+    effect: RuleEffectSpec,
+    trigger_parameters: Mapping[str, object],
+) -> bool:
+    if clause.trigger is None or clause.target is None:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    if clause.trigger.kind is RuleTriggerKind.MODEL_DESTROYED:
+        return (
+            trigger_parameters.get("destroyed_target") == "this_model"
+            and clause.target.kind is RuleTargetKind.THIS_MODEL
+            and parameters.get("target") == "this_model"
+            and parameters.get("target_scope") == "destroyed_model"
+        )
+    if clause.trigger.kind is RuleTriggerKind.UNIT_DESTROYED:
+        return (
+            trigger_parameters.get("destroyed_target") == "this_unit"
+            and clause.target.kind is RuleTargetKind.THIS_UNIT
+            and parameters.get("target") == "this_unit"
+            and parameters.get("target_scope") == "destroyed_unit"
+        )
+    return False
 
 
 def _unit_scoped_generic_records(

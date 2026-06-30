@@ -59,6 +59,7 @@ from warhammer40k_core.engine.enhancement_effects import (
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content import bundle_payloads as _bundle_payloads
 from warhammer40k_core.engine.faction_content import bundle_validation as _bundle_validation
+from warhammer40k_core.engine.faction_content import catalog_runtime_hooks
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventHandlerBinding,
@@ -170,9 +171,12 @@ EMPTY_NAMED_HANDLERS: Mapping[str, FactionRuleNamedHandler] = MappingProxyType({
 _BundleSummaryPayload = _bundle_payloads.RuntimeContentBundleSummaryPayload
 _Phase17FExecutionRecord = faction_execution_2026_27.Phase17FExecutionRecord
 _summary_hash = _bundle_validation.summary_hash
+_combine_unique_values = _bundle_validation.combine_unique_values
 _validate_identifier = _bundle_validation.validate_identifier
 _validate_identifier_tuple = _bundle_validation.validate_identifier_tuple
+_validate_index_mapping = _bundle_validation.validate_index_mapping
 _validate_tuple = _bundle_validation.validate_tuple
+_merge_records = _bundle_validation.merge_records
 _contribution_values = _bundle_validation.contribution_values
 
 
@@ -1316,9 +1320,15 @@ class RuntimeContentBundle:
             )
         )
         battle_round_start_hook_registry = BattleRoundStartHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.battle_round_start_hook_bindings,
+            (
+                *catalog_runtime_hooks.battle_round_start_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.battle_round_start_hook_bindings,
+                ),
             )
         )
         turn_end_hook_registry = TurnEndHookRegistry.from_bindings(
@@ -1358,9 +1368,15 @@ class RuntimeContentBundle:
             )
         )
         unit_destroyed_hook_registry = UnitDestroyedHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.unit_destroyed_hook_bindings,
+            (
+                *catalog_runtime_hooks.unit_destroyed_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.unit_destroyed_hook_bindings,
+                ),
             )
         )
         battle_shock_hook_registry = BattleShockHookRegistry.from_bindings(
@@ -1509,10 +1525,16 @@ class RuntimeContentBundle:
         )
         phase_end_objective_control_hook_registry = (
             PhaseEndObjectiveControlHookRegistry.from_bindings(
-                tuple(
-                    binding
-                    for contribution in validated_contributions
-                    for binding in contribution.phase_end_objective_control_hook_bindings
+                (
+                    *catalog_runtime_hooks.phase_end_objective_control_hook_bindings(
+                        ability_indexes_by_player_id=ability_indexes_by_player_id,
+                        armies=validated_armies,
+                    ),
+                    *tuple(
+                        binding
+                        for contribution in validated_contributions
+                        for binding in contribution.phase_end_objective_control_hook_bindings
+                    ),
                 )
             )
         )
@@ -1805,22 +1827,6 @@ def _validate_contributions(contributions: object) -> tuple[RuntimeContentContri
     return tuple(validated)
 
 
-def _combine_unique_values[T](
-    field_name: str,
-    values: tuple[T, ...],
-    identifier_for: Callable[[T], str],
-) -> tuple[T, ...]:
-    seen: set[str] = set()
-    combined: list[T] = []
-    for value in values:
-        identifier = _validate_identifier(f"{field_name} id", identifier_for(value))
-        if identifier in seen:
-            raise GameLifecycleError(f"Runtime content {field_name} IDs must be unique.")
-        seen.add(identifier)
-        combined.append(value)
-    return tuple(combined)
-
-
 def _validate_armies(armies: object) -> tuple[ArmyDefinition, ...]:
     if type(armies) is not tuple:
         raise GameLifecycleError("Runtime content bundle armies must be a tuple.")
@@ -1967,31 +1973,3 @@ def _validate_named_handlers(value: object) -> Mapping[str, FactionRuleNamedHand
             raise GameLifecycleError("Runtime content named handler IDs must be unique.")
         validated[handler_id] = cast(FactionRuleNamedHandler, raw_handler)
     return MappingProxyType(validated)
-
-
-def _validate_index_mapping[T](
-    field_name: str,
-    value: object,
-    expected_type: type[T],
-) -> Mapping[str, T]:
-    if not isinstance(value, Mapping):
-        raise GameLifecycleError(f"Runtime content {field_name} must be a mapping.")
-    validated: dict[str, T] = {}
-    for raw_player_id, index in cast(Mapping[object, object], value).items():
-        player_id = _validate_identifier("player_id", raw_player_id)
-        if type(index) is not expected_type:
-            raise GameLifecycleError(f"Runtime content {field_name} contains invalid index.")
-        validated[player_id] = index
-    return MappingProxyType(dict(sorted(validated.items())))
-
-
-def _merge_records[T](
-    field_name: str,
-    base_records: object,
-    contribution_records: tuple[T, ...],
-    expected_type: type[T],
-) -> tuple[T, ...]:
-    return (
-        *_validate_tuple(f"base {field_name}", base_records, expected_type),
-        *_validate_tuple(f"contribution {field_name}", contribution_records, expected_type),
-    )

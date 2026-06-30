@@ -1,0 +1,58 @@
+from __future__ import annotations
+
+from collections.abc import Mapping
+
+from warhammer40k_core.engine.abilities import AbilityCatalogIndex
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battle_round_hooks import BattleRoundStartHookBinding
+from warhammer40k_core.engine.catalog_return_on_death_runtime import (
+    catalog_return_on_death_phase_end_hook_bindings,
+    catalog_return_on_death_unit_destroyed_hook_bindings,
+)
+from warhammer40k_core.engine.catalog_tracked_target_runtime import (
+    catalog_tracked_target_battle_round_start_hook_bindings,
+    catalog_tracked_target_unit_destroyed_hook_bindings,
+)
+from warhammer40k_core.engine.sticky_objective_control import (
+    PhaseEndObjectiveControlHookBinding,
+)
+from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedHookBinding
+
+
+def battle_round_start_hook_bindings(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[BattleRoundStartHookBinding, ...]:
+    return catalog_tracked_target_battle_round_start_hook_bindings(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
+    )
+
+
+def unit_destroyed_hook_bindings(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[UnitDestroyedHookBinding, ...]:
+    return (
+        *catalog_return_on_death_unit_destroyed_hook_bindings(
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            armies=armies,
+        ),
+        *catalog_tracked_target_unit_destroyed_hook_bindings(
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            armies=armies,
+        ),
+    )
+
+
+def phase_end_objective_control_hook_bindings(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[PhaseEndObjectiveControlHookBinding, ...]:
+    return catalog_return_on_death_phase_end_hook_bindings(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
+    )

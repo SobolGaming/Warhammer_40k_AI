@@ -1701,6 +1701,114 @@ def test_shooting_dice_reroll_branch_accepts_source_backed_wound_payload() -> No
         )
 
 
+def test_source_backed_attack_reroll_revalidates_current_source_context() -> None:
+    state = _battle_state()
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    attacker = _unit_for_player(state, player_id="player-a")
+    defender = _unit_for_player(state, player_id="player-b")
+    wargear_id = attacker.wargear_selections[0].wargear_ids[0]
+    weapon_profile = _weapon_profile_by_wargear(
+        wargear_id=wargear_id,
+        weapon_profile_id=None,
+    )
+    target_model_ids = tuple(model.model_instance_id for model in defender.own_models)
+    attack_pool = RangedAttackPool(
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        wargear_id=wargear_id,
+        weapon_profile_id=weapon_profile.profile_id,
+        weapon_profile=weapon_profile,
+        target_unit_instance_id=defender.unit_instance_id,
+        shooting_type=ShootingType.NORMAL,
+        attacks=1,
+        target_visible_model_ids=target_model_ids,
+        target_in_range_model_ids=target_model_ids,
+    )
+    attack_sequence = AttackSequence.start(
+        sequence_id="drukhari-test:source-drift-sequence",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(attack_pool,),
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(attacker.unit_instance_id,),
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=(attack_pool,),
+        attack_sequence=attack_sequence,
+    )
+    decisions = DecisionController()
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    wound_roll_state = manager.roll_fixed(
+        attack_sequence_wound_roll_spec(
+            weapon_profile_id=weapon_profile.profile_id,
+            attack_context_id=attack_sequence.attack_context_id(),
+            attacker_player_id="player-a",
+        ),
+        [1],
+    )
+    permission = RerollPermission(
+        source_id=SOURCE_RULE_ID,
+        timing_window="attack_sequence.wound",
+        owning_player_id="player-a",
+        eligible_roll_type="attack_sequence.wound",
+        component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+    )
+    source_payload = validate_json_value(
+        {
+            "effect_kind": "drukhari_test_source_backed_wound_reroll",
+            "target_unit_instance_id": defender.unit_instance_id,
+        }
+    )
+    state.record_persisting_effect(
+        _persisting_effect(
+            effect_id="drukhari-test:source-drift-effect",
+            unit_instance_id=attacker.unit_instance_id,
+            owner_player_id="player-a",
+            effect_payload=source_backed_reroll_permission_effect_payload(
+                target_unit_instance_ids=(attacker.unit_instance_id,),
+                permission=permission,
+                source_payload=source_payload,
+            ),
+        )
+    )
+    request = manager.build_reroll_request(
+        wound_roll_state,
+        request_id="drukhari-test:source-drift-reroll-request",
+        actor_id="player-a",
+        permission=permission,
+        extra_payload={
+            "source_rule_id": SOURCE_RULE_ID,
+            "attack_context": {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.SHOOTING.value,
+                "unit_instance_id": attacker.unit_instance_id,
+                "attack_context_id": attack_sequence.attack_context_id(),
+                "weapon_profile_id": weapon_profile.profile_id,
+                "target_unit_instance_id": defender.unit_instance_id,
+                "wound_roll_state": validate_json_value(wound_roll_state.to_payload()),
+                "source_payload": source_payload,
+            },
+        },
+    )
+    decisions.request_decision(request)
+    result = DecisionResult.for_request(
+        result_id="drukhari-test:source-drift-reroll-result",
+        request=request,
+        selected_option_id="reroll:0",
+    )
+    decisions.submit_result(result)
+    state.persisting_effects.clear()
+
+    with pytest.raises(GameLifecycleError, match="source context drift"):
+        _shooting_phase_handler(ShootingUnitSelectedGrantRegistry.empty()).apply_decision(
+            state=state,
+            result=result,
+            decisions=decisions,
+        )
+
+
 def test_hatred_eternal_selected_to_fight_grant_spends_pain_token_and_unlocks_hit_reroll() -> None:
     lifecycle, units = _fight_lifecycle(
         alpha_unit_ids=("attacker",),

@@ -137,6 +137,10 @@ from warhammer40k_core.engine.reserves import (
     reserve_origin_from_token,
     resolve_unarrived_reserve_destruction,
 )
+from warhammer40k_core.engine.return_on_death import (
+    PendingReturnOnDeath,
+    PendingReturnOnDeathPayload,
+)
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
     FinalScoringResult,
@@ -177,6 +181,12 @@ from warhammer40k_core.engine.sticky_objective_control import (
     sticky_objective_control_state_is_expired,
 )
 from warhammer40k_core.engine.stratagems import StratagemUseRecord, StratagemUseRecordPayload
+from warhammer40k_core.engine.tracked_targets import (
+    TrackedTargetOwnerScope,
+    TrackedTargetRecord,
+    TrackedTargetRecordPayload,
+    TrackedTargetRole,
+)
 from warhammer40k_core.engine.transports import (
     DisembarkedUnitState,
     DisembarkedUnitStatePayload,
@@ -324,6 +334,9 @@ class GameStatePayload(TypedDict):
     end_turn_cleanup_states: list[EndTurnCleanupStatePayload]
     scoring_window_states: list[ScoringWindowStatePayload]
     persisting_effects: list[PersistingEffectPayload]
+    tracked_target_records: list[TrackedTargetRecordPayload]
+    pending_return_on_death: list[PendingReturnOnDeathPayload]
+    return_on_death_consumed_keys: list[str]
     secondary_mission_choices: list[SecondaryMissionChoicePayload]
     tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
     prebattle_action_records: list[PreBattleActionRecordPayload]
@@ -610,6 +623,18 @@ def _new_tactical_secondary_replacement_player_ids() -> list[str]:
 
 
 def _new_persisting_effects() -> list[PersistingEffect]:
+    return []
+
+
+def _new_tracked_target_records() -> list[TrackedTargetRecord]:
+    return []
+
+
+def _new_pending_return_on_death() -> list[PendingReturnOnDeath]:
+    return []
+
+
+def _new_return_on_death_consumed_keys() -> list[str]:
     return []
 
 
@@ -1239,6 +1264,15 @@ class GameState:
         default_factory=_new_scoring_window_states
     )
     persisting_effects: list[PersistingEffect] = field(default_factory=_new_persisting_effects)
+    tracked_target_records: list[TrackedTargetRecord] = field(
+        default_factory=_new_tracked_target_records
+    )
+    pending_return_on_death: list[PendingReturnOnDeath] = field(
+        default_factory=_new_pending_return_on_death
+    )
+    return_on_death_consumed_keys: list[str] = field(
+        default_factory=_new_return_on_death_consumed_keys
+    )
     secondary_mission_choices: list[SecondaryMissionChoice] = field(
         default_factory=_new_secondary_mission_choices
     )
@@ -1492,6 +1526,26 @@ class GameState:
             army_definitions=self.army_definitions,
             starting_strength_records=self.starting_strength_records,
             player_ids=self.player_ids,
+        )
+        self.tracked_target_records = _validate_tracked_target_records(
+            self.tracked_target_records,
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+            player_ids=self.player_ids,
+        )
+        self.pending_return_on_death = _validate_pending_return_on_death(
+            self.pending_return_on_death,
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+            player_ids=self.player_ids,
+        )
+        self.return_on_death_consumed_keys = list(
+            _validate_identifier_tuple(
+                "GameState return_on_death_consumed_keys",
+                tuple(self.return_on_death_consumed_keys),
+                min_length=0,
+                sort_values=True,
+            )
         )
         self.secondary_mission_choices = _validate_secondary_choices(
             self.secondary_mission_choices,
@@ -3017,6 +3071,205 @@ class GameState:
             if effect.applies_to_unit(requested_unit_id)
         )
 
+    def record_tracked_target(self, record: TrackedTargetRecord) -> None:
+        if type(record) is not TrackedTargetRecord:
+            raise GameLifecycleError("Tracked target record must be TrackedTargetRecord.")
+        owner_by_unit_id = _known_rules_unit_owner_ids(
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+        )
+        if record.owner_player_id not in self.player_ids:
+            raise GameLifecycleError("Tracked target owner_player_id is not in this game.")
+        if record.source_unit_instance_id not in owner_by_unit_id:
+            raise GameLifecycleError("Tracked target source unit is unknown.")
+        if owner_by_unit_id[record.source_unit_instance_id] != record.owner_player_id:
+            raise GameLifecycleError("Tracked target source unit owner drift.")
+        if record.target_unit_instance_id not in owner_by_unit_id:
+            raise GameLifecycleError("Tracked target unit is unknown.")
+        if (
+            record.target_allegiance == "enemy"
+            and owner_by_unit_id[record.target_unit_instance_id] == record.owner_player_id
+        ):
+            raise GameLifecycleError("Tracked target enemy target is friendly.")
+        if (
+            record.target_allegiance == "friendly"
+            and owner_by_unit_id[record.target_unit_instance_id] != record.owner_player_id
+        ):
+            raise GameLifecycleError("Tracked target friendly target is enemy.")
+        if record.owner_scope is TrackedTargetOwnerScope.THIS_MODEL:
+            source_model_ids = _model_ids_for_unit(
+                army_definitions=self.army_definitions,
+                unit_instance_id=record.source_unit_instance_id,
+            )
+            if record.source_model_instance_id not in source_model_ids:
+                raise GameLifecycleError("Tracked target source model is not in source unit.")
+        if record.target_unit_instance_id in self._destroyed_unit_instance_ids():
+            raise GameLifecycleError("Tracked target cannot select a destroyed target.")
+        if any(stored.record_id == record.record_id for stored in self.tracked_target_records):
+            raise GameLifecycleError("Tracked target record_id already exists.")
+        if record.active and any(
+            stored.active and stored.active_key() == record.active_key()
+            for stored in self.tracked_target_records
+        ):
+            raise GameLifecycleError("Tracked target active source key already exists.")
+        self.tracked_target_records.append(record)
+        self.tracked_target_records = _validate_tracked_target_records(
+            self.tracked_target_records,
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+            player_ids=self.player_ids,
+        )
+
+    def active_tracked_target_for(
+        self,
+        *,
+        source_rule_id: str,
+        source_unit_instance_id: str,
+        source_model_instance_id: str | None,
+        owner_scope: TrackedTargetOwnerScope,
+        role: TrackedTargetRole,
+    ) -> TrackedTargetRecord | None:
+        requested_rule = _validate_identifier("source_rule_id", source_rule_id)
+        requested_unit = _validate_identifier("source_unit_instance_id", source_unit_instance_id)
+        requested_model = _validate_optional_identifier(
+            "source_model_instance_id",
+            source_model_instance_id,
+        )
+        if type(owner_scope) is not TrackedTargetOwnerScope:
+            raise GameLifecycleError("Tracked target owner_scope must be TrackedTargetOwnerScope.")
+        if type(role) is not TrackedTargetRole:
+            raise GameLifecycleError("Tracked target role must be TrackedTargetRole.")
+        matches = tuple(
+            record
+            for record in self.tracked_target_records
+            if record.active
+            and record.source_rule_id == requested_rule
+            and record.source_unit_instance_id == requested_unit
+            and record.source_model_instance_id == requested_model
+            and record.owner_scope is owner_scope
+            and record.role is role
+        )
+        if len(matches) > 1:
+            raise GameLifecycleError("Tracked target active source key is duplicated.")
+        return matches[0] if matches else None
+
+    def expire_tracked_target(self, record_id: str) -> TrackedTargetRecord:
+        requested_id = _validate_identifier("record_id", record_id)
+        updated: list[TrackedTargetRecord] = []
+        expired: TrackedTargetRecord | None = None
+        for record in self.tracked_target_records:
+            if record.record_id != requested_id:
+                updated.append(record)
+                continue
+            expired = record.inactive()
+            updated.append(expired)
+        if expired is None:
+            raise GameLifecycleError("Tracked target record_id is unknown.")
+        self.tracked_target_records = _validate_tracked_target_records(
+            updated,
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+            player_ids=self.player_ids,
+        )
+        return expired
+
+    def tracked_targets_for_destroyed_unit(
+        self,
+        *,
+        destroyed_unit_instance_id: str,
+    ) -> tuple[TrackedTargetRecord, ...]:
+        requested_unit = _validate_identifier(
+            "destroyed_unit_instance_id",
+            destroyed_unit_instance_id,
+        )
+        return tuple(
+            sorted(
+                (
+                    record
+                    for record in self.tracked_target_records
+                    if record.active and record.target_unit_instance_id == requested_unit
+                ),
+                key=lambda record: record.record_id,
+            )
+        )
+
+    def record_pending_return_on_death(self, pending: PendingReturnOnDeath) -> None:
+        if type(pending) is not PendingReturnOnDeath:
+            raise GameLifecycleError("pending return-on-death must be PendingReturnOnDeath.")
+        owner_by_unit_id = _known_rules_unit_owner_ids(
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+        )
+        if pending.owner_player_id not in self.player_ids:
+            raise GameLifecycleError("Return-on-death owner_player_id is not in this game.")
+        if pending.destroyed_unit_instance_id not in owner_by_unit_id:
+            raise GameLifecycleError("Return-on-death destroyed unit is unknown.")
+        if owner_by_unit_id[pending.destroyed_unit_instance_id] != pending.owner_player_id:
+            raise GameLifecycleError("Return-on-death owner drift.")
+        if any(stored.pending_id == pending.pending_id for stored in self.pending_return_on_death):
+            raise GameLifecycleError("Return-on-death pending_id already exists.")
+        if any(
+            not stored.resolved and stored.consumed_key() == pending.consumed_key()
+            for stored in self.pending_return_on_death
+        ):
+            raise GameLifecycleError("Return-on-death pending entry already exists.")
+        if pending.consumed_key() in set(self.return_on_death_consumed_keys):
+            raise GameLifecycleError("Return-on-death consumed key already exists.")
+        self.pending_return_on_death.append(pending)
+        self.pending_return_on_death = _validate_pending_return_on_death(
+            self.pending_return_on_death,
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+            player_ids=self.player_ids,
+        )
+        self.return_on_death_consumed_keys = list(
+            _validate_identifier_tuple(
+                "GameState return_on_death_consumed_keys",
+                (*self.return_on_death_consumed_keys, pending.consumed_key()),
+                min_length=0,
+                sort_values=True,
+            )
+        )
+
+    def pending_return_on_death_by_id(self, pending_id: str) -> PendingReturnOnDeath:
+        requested_id = _validate_identifier("pending_id", pending_id)
+        for pending in self.pending_return_on_death:
+            if pending.pending_id == requested_id:
+                return pending
+        raise GameLifecycleError("Return-on-death pending_id is unknown.")
+
+    def resolve_pending_return_on_death(self, pending_id: str) -> PendingReturnOnDeath:
+        requested_id = _validate_identifier("pending_id", pending_id)
+        updated: list[PendingReturnOnDeath] = []
+        resolved: PendingReturnOnDeath | None = None
+        for pending in self.pending_return_on_death:
+            if pending.pending_id != requested_id:
+                updated.append(pending)
+                continue
+            resolved = pending.mark_resolved()
+            updated.append(resolved)
+        if resolved is None:
+            raise GameLifecycleError("Return-on-death pending_id is unknown.")
+        self.pending_return_on_death = _validate_pending_return_on_death(
+            updated,
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+            player_ids=self.player_ids,
+        )
+        return resolved
+
+    def _destroyed_unit_instance_ids(self) -> set[str]:
+        if self.battlefield_state is None:
+            return set()
+        removed_model_ids = set(self.battlefield_state.removed_model_ids)
+        destroyed: set[str] = set()
+        for army in self.army_definitions:
+            for unit in army.units:
+                model_ids = {model.model_instance_id for model in unit.own_models}
+                if model_ids and model_ids <= removed_model_ids:
+                    destroyed.add(unit.unit_instance_id)
+        return destroyed
+
     def remove_persisting_effects_by_id(
         self,
         effect_ids: tuple[str, ...],
@@ -4439,6 +4692,13 @@ class GameState:
             ],
             "scoring_window_states": [state.to_payload() for state in self.scoring_window_states],
             "persisting_effects": [effect.to_payload() for effect in self.persisting_effects],
+            "tracked_target_records": [
+                record.to_payload() for record in self.tracked_target_records
+            ],
+            "pending_return_on_death": [
+                pending.to_payload() for pending in self.pending_return_on_death
+            ],
+            "return_on_death_consumed_keys": list(self.return_on_death_consumed_keys),
             "secondary_mission_choices": [
                 choice.to_payload() for choice in self.secondary_mission_choices
             ],
@@ -4777,6 +5037,15 @@ class GameState:
             persisting_effects=[
                 PersistingEffect.from_payload(effect) for effect in payload["persisting_effects"]
             ],
+            tracked_target_records=[
+                TrackedTargetRecord.from_payload(record)
+                for record in payload["tracked_target_records"]
+            ],
+            pending_return_on_death=[
+                PendingReturnOnDeath.from_payload(pending)
+                for pending in payload["pending_return_on_death"]
+            ],
+            return_on_death_consumed_keys=list(payload["return_on_death_consumed_keys"]),
             secondary_mission_choices=[
                 SecondaryMissionChoice.from_payload(choice)
                 for choice in payload["secondary_mission_choices"]
@@ -6877,6 +7146,93 @@ def _validate_persisting_effects(
     return sorted(validated, key=lambda effect: effect.effect_id)
 
 
+def _validate_tracked_target_records(
+    records: object,
+    *,
+    army_definitions: list[ArmyDefinition],
+    starting_strength_records: list[StartingStrengthRecord],
+    player_ids: tuple[str, ...],
+) -> list[TrackedTargetRecord]:
+    if not isinstance(records, list):
+        raise GameLifecycleError("GameState tracked_target_records must be a list.")
+    owner_by_unit_id = _known_rules_unit_owner_ids(
+        army_definitions=army_definitions,
+        starting_strength_records=starting_strength_records,
+    )
+    validated: list[TrackedTargetRecord] = []
+    seen_ids: set[str] = set()
+    seen_active_keys: set[
+        tuple[str, str, str | None, TrackedTargetOwnerScope, TrackedTargetRole]
+    ] = set()
+    for record in cast(list[object], records):
+        if type(record) is not TrackedTargetRecord:
+            raise GameLifecycleError(
+                "GameState tracked_target_records must contain TrackedTargetRecord values."
+            )
+        if record.record_id in seen_ids:
+            raise GameLifecycleError("GameState tracked_target_records must be unique.")
+        seen_ids.add(record.record_id)
+        if record.owner_player_id not in player_ids:
+            raise GameLifecycleError("TrackedTargetRecord owner_player_id is not in this game.")
+        if record.source_unit_instance_id not in owner_by_unit_id:
+            raise GameLifecycleError("TrackedTargetRecord source unit is unknown.")
+        if record.target_unit_instance_id not in owner_by_unit_id:
+            raise GameLifecycleError("TrackedTargetRecord target unit is unknown.")
+        if record.owner_scope is TrackedTargetOwnerScope.THIS_MODEL:
+            source_model_ids = _model_ids_for_unit(
+                army_definitions=army_definitions,
+                unit_instance_id=record.source_unit_instance_id,
+            )
+            if record.source_model_instance_id not in source_model_ids:
+                raise GameLifecycleError("TrackedTargetRecord source model is unknown.")
+        if record.active:
+            active_key = record.active_key()
+            if active_key in seen_active_keys:
+                raise GameLifecycleError("GameState tracked_target_records active key duplicated.")
+            seen_active_keys.add(active_key)
+        validated.append(record)
+    return sorted(validated, key=lambda record: record.record_id)
+
+
+def _validate_pending_return_on_death(
+    records: object,
+    *,
+    army_definitions: list[ArmyDefinition],
+    starting_strength_records: list[StartingStrengthRecord],
+    player_ids: tuple[str, ...],
+) -> list[PendingReturnOnDeath]:
+    if not isinstance(records, list):
+        raise GameLifecycleError("GameState pending_return_on_death must be a list.")
+    owner_by_unit_id = _known_rules_unit_owner_ids(
+        army_definitions=army_definitions,
+        starting_strength_records=starting_strength_records,
+    )
+    validated: list[PendingReturnOnDeath] = []
+    seen_ids: set[str] = set()
+    seen_open_consumed_keys: set[str] = set()
+    for pending in cast(list[object], records):
+        if type(pending) is not PendingReturnOnDeath:
+            raise GameLifecycleError(
+                "GameState pending_return_on_death must contain PendingReturnOnDeath values."
+            )
+        if pending.pending_id in seen_ids:
+            raise GameLifecycleError("GameState pending_return_on_death must be unique.")
+        seen_ids.add(pending.pending_id)
+        if pending.owner_player_id not in player_ids:
+            raise GameLifecycleError("PendingReturnOnDeath owner_player_id is not in this game.")
+        if pending.destroyed_unit_instance_id not in owner_by_unit_id:
+            raise GameLifecycleError("PendingReturnOnDeath destroyed unit is unknown.")
+        if owner_by_unit_id[pending.destroyed_unit_instance_id] != pending.owner_player_id:
+            raise GameLifecycleError("PendingReturnOnDeath owner drift.")
+        if not pending.resolved:
+            consumed_key = pending.consumed_key()
+            if consumed_key in seen_open_consumed_keys:
+                raise GameLifecycleError("PendingReturnOnDeath open key duplicated.")
+            seen_open_consumed_keys.add(consumed_key)
+        validated.append(pending)
+    return sorted(validated, key=lambda pending: pending.pending_id)
+
+
 def _known_rules_unit_ids(
     *,
     army_definitions: list[ArmyDefinition],
@@ -6885,6 +7241,19 @@ def _known_rules_unit_ids(
     return {unit.unit_instance_id for army in army_definitions for unit in army.units} | {
         record.unit_instance_id for record in starting_strength_records
     }
+
+
+def _model_ids_for_unit(
+    *,
+    army_definitions: list[ArmyDefinition],
+    unit_instance_id: str,
+) -> set[str]:
+    requested_unit = _validate_identifier("unit_instance_id", unit_instance_id)
+    for army in army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id == requested_unit:
+                return {model.model_instance_id for model in unit.own_models}
+    return set()
 
 
 def _known_rules_unit_owner_ids(
@@ -7058,6 +7427,12 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"{field_name} must not be empty.")
     return stripped
+
+
+def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(field_name, value)
 
 
 def _validate_descriptor_hash(field_name: str, value: object) -> str:

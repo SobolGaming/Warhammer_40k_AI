@@ -2785,6 +2785,10 @@ def _continue_pending_destroyed_transport_disembark(
     )
     if mandatory_status is not None:
         return sequence_without_pending, allocated_model_ids, mandatory_status
+    destroyed_model_placement = _destroyed_model_placement_payload(
+        state=state,
+        model_instance_id=pending.damage_application.model_instance_id,
+    )
     remove_destroyed_model_from_battlefield(
         state=state,
         model_instance_id=pending.damage_application.model_instance_id,
@@ -2798,6 +2802,7 @@ def _continue_pending_destroyed_transport_disembark(
         saving_throw=None,
         saving_throw_payload=pending.saving_throw_payload,
         feel_no_pain=pending.feel_no_pain,
+        destroyed_model_placement=destroyed_model_placement,
     )
     reaction_status = _destruction_reaction_status_if_needed(
         state=state,
@@ -4255,6 +4260,10 @@ def _continue_deadly_demise_after_mortal_wound_feel_no_pain(
     )
     if status is not None:
         return attack_sequence, already_allocated_model_ids, status
+    destroyed_model_placement = _destroyed_model_placement_payload(
+        state=state,
+        model_instance_id=damage.model_instance_id,
+    )
     remove_destroyed_model_from_battlefield(
         state=state,
         model_instance_id=damage.model_instance_id,
@@ -4268,6 +4277,7 @@ def _continue_deadly_demise_after_mortal_wound_feel_no_pain(
         saving_throw=None,
         saving_throw_payload=validate_json_value(source_context["saving_throw"]),
         feel_no_pain=feel_no_pain,
+        destroyed_model_placement=destroyed_model_placement,
     )
     reaction_status = _destruction_reaction_status_if_needed(
         state=state,
@@ -5700,10 +5710,16 @@ def _apply_damage_after_feel_no_pain(
     if mandatory_status is not None:
         return attack_sequence, allocated_model_ids, mandatory_status
     if damage is not None and damage.destroyed:
+        destroyed_model_placement = _destroyed_model_placement_payload(
+            state=state,
+            model_instance_id=damage.model_instance_id,
+        )
         remove_destroyed_model_from_battlefield(
             state=state,
             model_instance_id=damage.model_instance_id,
         )
+    else:
+        destroyed_model_placement = None
     destroyed_emission = _emit_damage_event(
         state=state,
         decisions=decisions,
@@ -5713,6 +5729,7 @@ def _apply_damage_after_feel_no_pain(
         saving_throw=None,
         saving_throw_payload=saving_throw_payload,
         feel_no_pain=resolution,
+        destroyed_model_placement=destroyed_model_placement,
     )
     reaction_status = _destruction_reaction_status_if_needed(
         state=state,
@@ -6370,6 +6387,10 @@ def _resolve_deadly_demise_secondary_destroyed_models(
         )
         if mandatory_status is not None:
             return mandatory_status
+        destroyed_model_placement = _destroyed_model_placement_payload(
+            state=state,
+            model_instance_id=secondary_damage.model_instance_id,
+        )
         remove_destroyed_model_from_battlefield(
             state=state,
             model_instance_id=secondary_damage.model_instance_id,
@@ -6383,6 +6404,7 @@ def _resolve_deadly_demise_secondary_destroyed_models(
             saving_throw=None,
             saving_throw_payload=None,
             feel_no_pain=secondary_feel_no_pain,
+            destroyed_model_placement=destroyed_model_placement,
         )
         reaction_status = _destruction_reaction_status_if_needed(
             state=state,
@@ -6537,6 +6559,10 @@ def _continue_deadly_demise_after_secondary_destruction_reaction(
     )
     if status is not None:
         return attack_sequence, already_allocated_model_ids, status
+    destroyed_model_placement = _destroyed_model_placement_payload(
+        state=state,
+        model_instance_id=damage.model_instance_id,
+    )
     remove_destroyed_model_from_battlefield(
         state=state,
         model_instance_id=damage.model_instance_id,
@@ -6550,6 +6576,7 @@ def _continue_deadly_demise_after_secondary_destruction_reaction(
         saving_throw=None,
         saving_throw_payload=validate_json_value(source_context["saving_throw"]),
         feel_no_pain=feel_no_pain,
+        destroyed_model_placement=destroyed_model_placement,
     )
     reaction_status = _destruction_reaction_status_if_needed(
         state=state,
@@ -6940,6 +6967,7 @@ def _roll_hit_and_wound(
             decisions=decisions,
             roll_state=hit_roll.roll_state,
             attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            attacker_model_instance_id=pool.attacker_model_instance_id,
             target_unit_instance_id=pool.target_unit_instance_id,
             attack_context_id=attack_context_id,
             source_phase=attack_sequence.source_phase,
@@ -7048,6 +7076,7 @@ def _roll_hit_and_wound(
             roll_state=wound_roll.roll_state,
             pool=pool,
             attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            attacker_model_instance_id=pool.attacker_model_instance_id,
             attacker_keywords=rules_unit_view_by_id(
                 state=state,
                 unit_instance_id=attack_sequence.attacking_unit_instance_id,
@@ -7304,6 +7333,7 @@ def _request_source_backed_hit_reroll_if_available(
     decisions: DecisionController,
     roll_state: DiceRollState | None,
     attacking_unit_instance_id: str,
+    attacker_model_instance_id: str | None = None,
     target_unit_instance_id: str | None = None,
     attack_context_id: str,
     source_phase: BattlePhase,
@@ -7324,8 +7354,10 @@ def _request_source_backed_hit_reroll_if_available(
         state=state,
         player_id=actor_id,
         unit_instance_id=attacking_unit_instance_id,
+        model_instance_id=attacker_model_instance_id,
         roll_type=roll_state.original_result.spec.roll_type,
         timing_window="attack_sequence.hit",
+        attack_kind=_source_backed_attack_kind_for_phase(source_phase),
         target_unit_instance_id=target_unit_instance_id,
     )
     if permission_context is None:
@@ -7466,20 +7498,16 @@ def apply_source_backed_attack_dice_reroll_decision(
     current_pool = attack_sequence.current_pool()
     if _payload_string(attack_context, key="weapon_profile_id") != current_pool.weapon_profile_id:
         raise GameLifecycleError(f"{phase_label} dice reroll weapon profile drift.")
-    if roll_type == "attack_sequence.hit":
-        current_permission_context = source_backed_reroll_permission_context_for_unit(
-            state=state,
-            player_id=attack_sequence.attacker_player_id,
-            unit_instance_id=attack_sequence.attacking_unit_instance_id,
-            roll_type=roll_type,
-            timing_window=roll_type,
-            target_unit_instance_id=current_pool.target_unit_instance_id,
-        )
-        if (
-            current_permission_context is None
-            or current_permission_context.permission.source_id != source_rule_id
-        ):
-            raise GameLifecycleError(f"{phase_label} dice reroll source context drift.")
+    _validate_current_source_backed_attack_reroll_context_if_required(
+        state=state,
+        attack_sequence=attack_sequence,
+        current_pool=current_pool,
+        roll_type=roll_type,
+        attack_kind=_source_backed_attack_kind_for_phase(expected_phase),
+        source_rule_id=source_rule_id,
+        attack_context=attack_context,
+        phase_label=phase_label,
+    )
     initial_roll_payload = _nested_payload_object(attack_context, key=roll_state_key)
     initial_roll_state = DiceRollState.from_payload(
         cast(DiceRollStatePayload, initial_roll_payload)
@@ -7497,6 +7525,42 @@ def apply_source_backed_attack_dice_reroll_decision(
         result=result,
         record_decision=False,
     )
+
+
+def _validate_current_source_backed_attack_reroll_context_if_required(
+    *,
+    state: GameState,
+    attack_sequence: AttackSequence,
+    current_pool: RangedAttackPool,
+    roll_type: str,
+    attack_kind: str,
+    source_rule_id: str,
+    attack_context: dict[str, JsonValue],
+    phase_label: str,
+) -> None:
+    source_payload_value = attack_context.get("source_payload")
+    if source_payload_value is None:
+        return
+    source_payload = _payload_object(source_payload_value)
+    current_permission_context = source_backed_reroll_permission_context_for_unit(
+        state=state,
+        player_id=attack_sequence.attacker_player_id,
+        unit_instance_id=attack_sequence.attacking_unit_instance_id,
+        model_instance_id=current_pool.attacker_model_instance_id,
+        roll_type=roll_type,
+        timing_window=roll_type,
+        attack_kind=attack_kind,
+        target_unit_instance_id=current_pool.target_unit_instance_id,
+    )
+    if current_permission_context is None:
+        raise GameLifecycleError(f"{phase_label} dice reroll source context drift.")
+    if current_permission_context.permission.source_id != source_rule_id:
+        raise GameLifecycleError(f"{phase_label} dice reroll source context drift.")
+    if (
+        source_payload.get("effect_kind") == "tracked_target_reroll"
+        and current_permission_context.source_payload != source_payload
+    ):
+        raise GameLifecycleError(f"{phase_label} dice reroll source payload drift.")
 
 
 def _source_backed_attack_context_id_matches_active_pool(
@@ -7519,6 +7583,14 @@ def _source_backed_attack_context_id_matches_active_pool(
     return False
 
 
+def _source_backed_attack_kind_for_phase(source_phase: BattlePhase) -> str:
+    if source_phase is BattlePhase.SHOOTING:
+        return "ranged"
+    if source_phase is BattlePhase.FIGHT:
+        return "melee"
+    raise GameLifecycleError("Source-backed attack rerolls require Shooting or Fight phase.")
+
+
 def _request_source_backed_wound_reroll_if_available(
     *,
     state: GameState,
@@ -7526,6 +7598,7 @@ def _request_source_backed_wound_reroll_if_available(
     roll_state: DiceRollState | None,
     pool: RangedAttackPool,
     attacking_unit_instance_id: str,
+    attacker_model_instance_id: str | None = None,
     attacker_keywords: tuple[str, ...],
     attack_context_id: str,
     source_phase: BattlePhase,
@@ -7545,8 +7618,11 @@ def _request_source_backed_wound_reroll_if_available(
         state=state,
         player_id=actor_id,
         unit_instance_id=attacking_unit_instance_id,
+        model_instance_id=attacker_model_instance_id,
         roll_type=roll_state.original_result.spec.roll_type,
         timing_window="attack_sequence.wound",
+        attack_kind=_source_backed_attack_kind_for_phase(source_phase),
+        target_unit_instance_id=pool.target_unit_instance_id,
     )
     if permission_context is None:
         return None
@@ -8444,6 +8520,7 @@ def _emit_damage_event(
     saving_throw: SavingThrow | None,
     saving_throw_payload: JsonValue | None = None,
     feel_no_pain: FeelNoPainResolution | None = None,
+    destroyed_model_placement: JsonValue | None = None,
 ) -> DestroyedModelEmission | None:
     if saving_throw is not None and saving_throw_payload is not None:
         raise GameLifecycleError("Damage event saving throw payload is ambiguous.")
@@ -8498,6 +8575,7 @@ def _emit_damage_event(
                 "damage_event_id": damage_event.event_id,
                 "removal_record": removal_record.to_payload(),
                 "transition_batch": transition_batch.to_payload(),
+                "destroyed_model_placement": validate_json_value(destroyed_model_placement),
                 "destroyed_model_rules_triggered": True,
             },
         )
@@ -8524,6 +8602,22 @@ def _destroyed_model_removal_record(
         source_rule_id=DAMAGE_ALLOCATION_RULE_ID,
         source_event_id=source_event_id,
     )
+
+
+def _destroyed_model_placement_payload(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> JsonValue:
+    if state.battlefield_state is None:
+        raise GameLifecycleError("Destroyed model placement capture requires battlefield state.")
+    try:
+        placement = state.battlefield_state.model_placement_by_id(model_instance_id)
+    except PlacementError as exc:
+        raise GameLifecycleError(
+            "Destroyed model placement capture requires placed model."
+        ) from exc
+    return validate_json_value(placement.to_payload())
 
 
 def _emit_event(

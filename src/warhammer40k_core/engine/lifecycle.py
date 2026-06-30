@@ -197,6 +197,11 @@ from warhammer40k_core.engine.reserve_declarations import (
     invalid_reserve_declaration_status,
 )
 from warhammer40k_core.engine.reserves import ReserveStatus
+from warhammer40k_core.engine.return_on_death import (
+    SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+    apply_return_on_death_placement_decision,
+    invalid_return_on_death_placement_status,
+)
 from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
     SequencingDecision,
@@ -242,6 +247,11 @@ from warhammer40k_core.engine.stratagems import (
     stratagem_selection_from_target_proposal_result,
     stratagem_window_decline_allowed,
     stratagem_window_decline_event_payload,
+)
+from warhammer40k_core.engine.tracked_targets import (
+    SELECT_TRACKED_TARGET_DECISION_TYPE,
+    apply_select_tracked_target_decision,
+    invalid_select_tracked_target_status,
 )
 from warhammer40k_core.engine.transports import (
     TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND,
@@ -685,6 +695,31 @@ class GameLifecycle:
                 state=state,
                 request=cult_ambush_placement_request,
                 result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SELECT_TRACKED_TARGET_DECISION_TYPE
+        ):
+            invalid_status = invalid_select_tracked_target_status(
+                state=state,
+                request=pending_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type == SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE
+        ):
+            invalid_status = invalid_return_on_death_placement_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
             )
             if invalid_status is not None:
                 return invalid_status
@@ -1241,6 +1276,23 @@ class GameLifecycle:
                 result=result,
             )
         record = self.decision_controller.submit_result(result)
+        if record.request.decision_type == SELECT_TRACKED_TARGET_DECISION_TYPE:
+            apply_select_tracked_target_decision(
+                state=state,
+                request=record.request,
+                result=result,
+                decisions_event_log=self.decision_controller.event_log,
+            )
+            return self.advance_until_decision_or_terminal()
+        if record.request.decision_type == SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE:
+            apply_return_on_death_placement_decision(
+                state=state,
+                decisions=self.decision_controller,
+                request=record.request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+            )
+            return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _SETUP_DECISION_TYPES:
             self._setup_flow.apply_decision(
                 state=state,

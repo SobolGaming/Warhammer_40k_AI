@@ -40,8 +40,13 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,
+    CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID,
+    CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+    CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID,
+    CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID,
+    CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
     _feel_no_pain_source_from_effect,  # pyright: ignore[reportPrivateUsage]
@@ -417,15 +422,23 @@ def test_phase17c_prey_selection_reselection_and_attack_gate_compile_to_semantic
         "tracked_target_owner": "this_model",
         "tracked_target_role": "prey",
     }
-    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
-    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == ()
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID,
+        CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID,
+        CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID,
+        CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID,
+        CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
+    )
     assert (
         ability_support_rollup_for_rule_ir(
             source_ability_id="source:prey",
             ability_name="Prey",
             rule_ir=rule_ir,
         ).overall_ability_support
-        is AbilityOverallSupport.PARSED
+        is AbilityOverallSupport.FULL
     )
 
 
@@ -480,8 +493,16 @@ def test_phase17c_quarry_selection_supports_this_model_hit_and_wound_rerolls() -
         "tracked_target_owner": "this_model",
         "tracked_target_role": "quarry",
     }
-    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
-    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == ()
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID,
+        CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID,
+        CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID,
+        CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID,
+        CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
+    )
 
 
 def test_phase17c_first_death_return_fixed_wounds_compiles_to_semantic_ir() -> None:
@@ -542,15 +563,20 @@ def test_phase17c_first_death_return_fixed_wounds_compiles_to_semantic_ir() -> N
         "target_scope": "destroyed_model",
         "wounds_remaining": 3,
     }
-    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
-    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == ()
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID,
+        CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
+    )
     assert (
         ability_support_rollup_for_rule_ir(
             source_ability_id="source:first-death-return",
             ability_name="First Death Return",
             rule_ir=rule_ir,
         ).overall_ability_support
-        is AbilityOverallSupport.PARSED
+        is AbilityOverallSupport.FULL
     )
 
 
@@ -589,8 +615,347 @@ def test_phase17c_first_death_return_full_health_unit_variant_is_semantic_ir() -
         "target_lifecycle": "destroyed",
         "target_scope": "destroyed_unit",
     }
-    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
-    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == ()
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID,
+        CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
+    )
+
+
+def test_phase17c_malformed_tracked_target_ir_fails_closed_for_catalog_consumers() -> None:
+    rule_ir = _compiled(PREY_TARGET_TEXT).rule_ir
+    selection_clause, attack_clause, reselection_clause = rule_ir.clauses
+    selection_effect = selection_clause.effects[0]
+    attack_effect = attack_clause.effects[0]
+    attack_trigger = attack_clause.trigger
+    reselection_trigger = reselection_clause.trigger
+    assert attack_trigger is not None
+    assert reselection_trigger is not None
+    malformed_clauses = (
+        replace(selection_clause, target=None),
+        replace(selection_clause, effects=()),
+        replace(
+            selection_clause,
+            effects=(
+                replace(
+                    selection_effect,
+                    parameters=_parameters_with_value(
+                        selection_effect.parameters,
+                        key="replacement",
+                        value="true",
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            selection_clause,
+            effects=(
+                replace(
+                    selection_effect,
+                    parameters=_parameters_with_value(
+                        selection_effect.parameters,
+                        key="target_scope",
+                        value="friendly_unit",
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            attack_clause,
+            trigger=_trigger_with_parameter(
+                attack_trigger,
+                key="target_reference",
+                value="other_target",
+            ),
+        ),
+        replace(
+            attack_clause,
+            trigger=_trigger_with_parameter(
+                attack_trigger,
+                key="tracked_target_owner",
+                value="other_owner",
+            ),
+        ),
+        replace(
+            attack_clause,
+            trigger=_trigger_with_parameter(
+                attack_trigger,
+                key="tracked_target_role",
+                value="other_role",
+            ),
+        ),
+        replace(
+            attack_clause,
+            trigger=_trigger_with_parameter(attack_trigger, key="attack_kind", value="psychic"),
+        ),
+        replace(
+            attack_clause,
+            trigger=_trigger_with_parameter(attack_trigger, key="actor", value="other_actor"),
+        ),
+        replace(attack_clause, conditions=()),
+        replace(attack_clause, effects=(attack_effect, selection_effect)),
+        replace(
+            attack_clause,
+            effects=(
+                replace(
+                    attack_effect,
+                    parameters=_parameters_with_value(
+                        attack_effect.parameters,
+                        key="roll_type",
+                        value="save",
+                    ),
+                ),
+            ),
+        ),
+    )
+    malformed_reselection_clauses = (
+        replace(
+            reselection_clause,
+            trigger=_trigger_with_parameter(
+                reselection_trigger,
+                key="timing_window",
+                value="other_window",
+            ),
+        ),
+        replace(reselection_clause, conditions=()),
+    )
+
+    for clause in malformed_clauses:
+        malformed_rule_ir = replace(rule_ir, clauses=(clause,))
+        assert catalog_rule_ir_consumers_for_rule(malformed_rule_ir) == ()
+        assert catalog_rule_ir_hook_ids_for_rule(malformed_rule_ir) == ()
+    for clause in malformed_reselection_clauses:
+        malformed_rule_ir = replace(rule_ir, clauses=(clause,))
+        assert CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID not in (
+            catalog_rule_ir_consumers_for_rule(malformed_rule_ir)
+        )
+        assert CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID not in (
+            catalog_rule_ir_hook_ids_for_rule(malformed_rule_ir)
+        )
+
+
+def test_phase17c_malformed_first_death_return_ir_fails_closed_for_catalog_consumers() -> None:
+    rule_ir = _compiled(FIRST_DEATH_RETURN_TEXT).rule_ir
+    clause = rule_ir.clauses[0]
+    trigger = clause.trigger
+    assert trigger is not None
+    frequency_conditions = tuple(
+        condition
+        for condition in clause.conditions
+        if condition.kind is not RuleConditionKind.FREQUENCY_LIMIT
+    )
+    dice_gate = next(
+        condition
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.DICE_ROLL_GATE
+    )
+    distance_conditions = tuple(
+        condition
+        for condition in clause.conditions
+        if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE
+    )
+    effect = clause.effects[0]
+    malformed_clauses = (
+        replace(clause, trigger=None),
+        replace(
+            clause, trigger=_trigger_with_parameter(trigger, key="event_order", value="second")
+        ),
+        replace(
+            clause,
+            trigger=_trigger_with_parameter(trigger, key="resolution_timing", value="immediate"),
+        ),
+        replace(
+            clause,
+            trigger=_trigger_with_parameter(trigger, key="timing_window", value="phase_start"),
+        ),
+        replace(clause, conditions=frequency_conditions),
+        replace(
+            clause,
+            conditions=(
+                *tuple(
+                    condition
+                    for condition in clause.conditions
+                    if condition.kind is not RuleConditionKind.DICE_ROLL_GATE
+                ),
+                replace(
+                    dice_gate,
+                    parameters=_parameters_with_value(
+                        dice_gate.parameters,
+                        key="roll_count",
+                        value=0,
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            clause,
+            conditions=(
+                *tuple(
+                    condition
+                    for condition in clause.conditions
+                    if condition.kind is not RuleConditionKind.DICE_ROLL_GATE
+                ),
+                replace(
+                    dice_gate,
+                    parameters=_parameters_with_value(
+                        dice_gate.parameters,
+                        key="roll_count",
+                        value=2,
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            clause,
+            conditions=(
+                *tuple(
+                    condition
+                    for condition in clause.conditions
+                    if condition.kind is not RuleConditionKind.DICE_ROLL_GATE
+                ),
+                replace(
+                    dice_gate,
+                    parameters=_parameters_with_value(
+                        dice_gate.parameters,
+                        key="success_threshold",
+                        value=7,
+                    ),
+                ),
+            ),
+        ),
+        replace(clause, conditions=distance_conditions),
+        replace(clause, effects=(effect, effect)),
+        replace(
+            clause,
+            effects=(
+                replace(
+                    effect,
+                    parameters=_parameters_with_value(
+                        effect.parameters,
+                        key="wounds_remaining",
+                        value=0,
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            clause,
+            effects=(
+                replace(
+                    effect,
+                    parameters=_parameters_with_value(
+                        _parameters_with_value(
+                            effect.parameters,
+                            key="restore_wounds_mode",
+                            value="full_health",
+                        ),
+                        key="wounds_remaining",
+                        value=1,
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            clause,
+            effects=(
+                replace(
+                    effect,
+                    parameters=_parameters_with_value(
+                        effect.parameters,
+                        key="restore_wounds_mode",
+                        value="unsupported",
+                    ),
+                ),
+            ),
+        ),
+    )
+
+    for malformed_clause in malformed_clauses:
+        malformed_rule_ir = replace(rule_ir, clauses=(malformed_clause,))
+        assert catalog_rule_ir_consumers_for_rule(malformed_rule_ir) == ()
+        assert catalog_rule_ir_hook_ids_for_rule(malformed_rule_ir) == ()
+
+
+def test_phase17c_first_death_return_target_shape_mismatches_fail_closed() -> None:
+    model_rule_ir = _compiled(FIRST_DEATH_RETURN_TEXT).rule_ir
+    model_clause = model_rule_ir.clauses[0]
+    model_effect = model_clause.effects[0]
+    assert model_clause.target is not None
+
+    unit_rule_ir = _compiled(FIRST_DEATH_RETURN_FULL_HEALTH_TEXT).rule_ir
+    unit_clause = unit_rule_ir.clauses[0]
+    unit_effect = unit_clause.effects[0]
+    unit_trigger = unit_clause.trigger
+    assert unit_clause.target is not None
+    assert unit_trigger is not None
+
+    malformed_cases = (
+        (
+            model_rule_ir,
+            replace(
+                model_clause,
+                target=replace(model_clause.target, kind=RuleTargetKind.THIS_UNIT),
+            ),
+        ),
+        (
+            model_rule_ir,
+            replace(
+                model_clause,
+                effects=(
+                    replace(
+                        model_effect,
+                        parameters=_parameters_with_value(
+                            _parameters_with_value(
+                                model_effect.parameters,
+                                key="target",
+                                value="this_unit",
+                            ),
+                            key="target_scope",
+                            value="destroyed_unit",
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        (
+            unit_rule_ir,
+            replace(
+                unit_clause,
+                trigger=_trigger_with_parameter(
+                    unit_trigger,
+                    key="destroyed_target",
+                    value="this_model",
+                ),
+            ),
+        ),
+        (
+            unit_rule_ir,
+            replace(
+                unit_clause,
+                effects=(
+                    replace(
+                        unit_effect,
+                        parameters=_parameters_with_value(
+                            _parameters_with_value(
+                                unit_effect.parameters,
+                                key="target",
+                                value="this_model",
+                            ),
+                            key="target_scope",
+                            value="destroyed_model",
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+
+    for base_rule_ir, malformed_clause in malformed_cases:
+        malformed_rule_ir = replace(base_rule_ir, clauses=(malformed_clause,))
+        assert catalog_rule_ir_consumers_for_rule(malformed_rule_ir) == ()
+        assert catalog_rule_ir_hook_ids_for_rule(malformed_rule_ir) == ()
 
 
 def test_phase17c_descriptor_without_rule_ir_has_no_clause_rollup() -> None:
@@ -1978,6 +2343,32 @@ def _condition_payload(
     )
     assert len(matches) == 1
     return parameter_payload(matches[0].parameters)
+
+
+def _parameters_with_value(
+    parameters: tuple[RuleParameter, ...],
+    *,
+    key: str,
+    value: RuleParameterValue,
+) -> tuple[RuleParameter, ...]:
+    payload = parameter_payload(parameters)
+    payload[key] = value
+    return tuple(
+        RuleParameter(key=parameter_key, value=payload[parameter_key])
+        for parameter_key in sorted(payload)
+    )
+
+
+def _trigger_with_parameter(
+    trigger: RuleTrigger,
+    *,
+    key: str,
+    value: RuleParameterValue,
+) -> RuleTrigger:
+    return replace(
+        trigger,
+        parameters=_parameters_with_value(trigger.parameters, key=key, value=value),
+    )
 
 
 def _descriptor_from_rule_ir(rule_ir: RuleIR) -> DatasheetAbilityDescriptor:
