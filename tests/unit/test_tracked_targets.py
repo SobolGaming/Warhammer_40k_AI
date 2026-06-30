@@ -37,6 +37,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStag
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.scoring import initial_victory_point_ledgers
 from warhammer40k_core.engine.source_backed_rerolls import (
+    SourceBackedRerollPermissionContext,
     source_backed_reroll_permission_context_for_unit,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
@@ -59,6 +60,12 @@ PREY_TARGET_TEXT = (
     "prey. Each time a model in this model's unit makes a melee attack that targets "
     "its prey, you can re-roll the Wound roll. Each time this model's prey is "
     "destroyed, select one new enemy unit to be this model's prey."
+)
+MIXED_QUARRY_TARGET_TEXT = (
+    "At the start of the first battle round, select one enemy unit to be this model's "
+    "quarry. Each time this model makes a melee attack that targets its quarry, "
+    "re-roll Hit rolls. Each time this model makes a ranged attack that targets its "
+    "quarry, re-roll Wound rolls."
 )
 
 
@@ -89,8 +96,43 @@ def test_tracked_target_initial_selection_request_payload_is_json_safe() -> None
     assert isinstance(request.payload, dict)
     assert request.payload["submission_kind"] == SELECT_TRACKED_TARGET_DECISION_TYPE
     assert request.payload["source_rule_id"] == record.definition.source_id
+    assert request.payload["supported_attack_roll_pairs"] == [
+        {"attack_kind": "melee", "roll_type": "attack_sequence.wound"}
+    ]
     assert request.payload["supported_attack_kinds"] == ["melee"]
     assert request.payload["supported_roll_types"] == ["attack_sequence.wound"]
+
+
+def test_tracked_target_selection_preserves_attack_roll_pair_correlation() -> None:
+    state = _battle_state_with_scenario(beta_unit_count=2)
+    record = _tracked_target_catalog_record(
+        trigger_kind=TimingTriggerKind.START_BATTLE_ROUND,
+        raw_text=MIXED_QUARRY_TARGET_TEXT,
+        source_id="rule:mixed-quarry",
+    )
+    runtime = CatalogTrackedTargetRuntime(
+        ability_indexes_by_player_id={
+            "player-a": AbilityCatalogIndex.from_records((record,)),
+            "player-b": AbilityCatalogIndex.from_records(()),
+        },
+        armies=tuple(state.army_definitions),
+    )
+
+    request = runtime.battle_round_start_request(
+        BattleRoundStartRequestContext(state=state, decisions=DecisionController())
+    )
+
+    assert request is not None
+    assert isinstance(request.payload, dict)
+    assert request.payload["supported_attack_roll_pairs"] == [
+        {"attack_kind": "melee", "roll_type": "attack_sequence.hit"},
+        {"attack_kind": "ranged", "roll_type": "attack_sequence.wound"},
+    ]
+    assert request.payload["supported_attack_kinds"] == ["melee", "ranged"]
+    assert request.payload["supported_roll_types"] == [
+        "attack_sequence.hit",
+        "attack_sequence.wound",
+    ]
 
 
 def test_tracked_target_runtime_empty_indexes_have_no_hooks() -> None:
@@ -165,8 +207,7 @@ def test_tracked_target_runtime_fail_fast_and_empty_selection_paths() -> None:
             source_model_instance_id=active_source_unit.own_models[0].model_instance_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.PREY,
-            supported_attack_kinds=("melee",),
-            supported_roll_types=("attack_sequence.wound",),
+            supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
             target_allegiance="enemy",
             target_scope="enemy_unit",
             replacement=False,
@@ -192,8 +233,7 @@ def test_tracked_target_runtime_fail_fast_and_empty_selection_paths() -> None:
             source_model_instance_id=source_model_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.PREY,
-            supported_attack_kinds=("melee",),
-            supported_roll_types=("attack_sequence.wound",),
+            supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
             target_allegiance="enemy",
             target_scope="enemy_unit",
             replacement=False,
@@ -213,8 +253,7 @@ def test_tracked_target_runtime_fail_fast_and_empty_selection_paths() -> None:
             source_model_instance_id=source_model_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.PREY,
-            supported_attack_kinds=("melee",),
-            supported_roll_types=("attack_sequence.wound",),
+            supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
             target_allegiance="enemy",
             target_scope="friendly_unit",
             replacement=False,
@@ -231,8 +270,7 @@ def test_tracked_target_runtime_fail_fast_and_empty_selection_paths() -> None:
             source_model_instance_id=source_model_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.PREY,
-            supported_attack_kinds=("melee",),
-            supported_roll_types=("attack_sequence.wound",),
+            supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
             target_allegiance="enemy",
             target_scope="enemy_unit",
             replacement=cast(bool, "yes"),
@@ -256,8 +294,7 @@ def test_tracked_target_selection_records_active_target_and_round_trips() -> Non
         source_model_instance_id=source_model_id,
         owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
         role=TrackedTargetRole.PREY,
-        supported_attack_kinds=("melee",),
-        supported_roll_types=("attack_sequence.wound",),
+        supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
         target_allegiance="enemy",
         target_scope="enemy_unit",
         replacement=False,
@@ -307,8 +344,7 @@ def test_tracked_target_selection_rejects_non_option_before_mutation() -> None:
         source_model_instance_id=source_model_id,
         owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
         role=TrackedTargetRole.PREY,
-        supported_attack_kinds=("melee",),
-        supported_roll_types=("attack_sequence.wound",),
+        supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
         target_allegiance="enemy",
         target_scope="enemy_unit",
         replacement=False,
@@ -349,8 +385,7 @@ def test_tracked_target_invalid_status_accepts_valid_and_rejects_stale_targets()
         source_model_instance_id=source_model_id,
         owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
         role=TrackedTargetRole.PREY,
-        supported_attack_kinds=("melee",),
-        supported_roll_types=("attack_sequence.wound",),
+        supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
         target_allegiance="enemy",
         target_scope="enemy_unit",
         replacement=False,
@@ -475,8 +510,10 @@ def test_tracked_target_quarry_reroll_applies_to_hit_and_wound_rolls() -> None:
             source_model_instance_id=source_model_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.QUARRY,
-            supported_attack_kinds=("melee",),
-            supported_roll_types=("attack_sequence.hit", "attack_sequence.wound"),
+            supported_attack_roll_pairs=(
+                ("melee", "attack_sequence.hit"),
+                ("melee", "attack_sequence.wound"),
+            ),
             target_unit_instance_id=target_unit_id,
             target_allegiance="enemy",
             target_lifecycle="until_destroyed",
@@ -529,8 +566,7 @@ def test_tracked_target_supported_roll_types_drive_rerolls_not_role_label() -> N
             source_model_instance_id=source_model_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.QUARRY,
-            supported_attack_kinds=("melee",),
-            supported_roll_types=("attack_sequence.wound",),
+            supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
             target_unit_instance_id=target_unit_id,
             target_allegiance="enemy",
             target_lifecycle="until_destroyed",
@@ -586,8 +622,7 @@ def test_tracked_target_supported_attack_kinds_gate_source_backed_rerolls() -> N
             source_model_instance_id=source_model_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.QUARRY,
-            supported_attack_kinds=("melee",),
-            supported_roll_types=("attack_sequence.wound",),
+            supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
             target_unit_instance_id=target_unit_id,
             target_allegiance="enemy",
             target_lifecycle="until_destroyed",
@@ -640,8 +675,7 @@ def test_tracked_target_supported_attack_kinds_gate_source_backed_rerolls() -> N
             source_model_instance_id=ranged_source_model_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.QUARRY,
-            supported_attack_kinds=("ranged",),
-            supported_roll_types=("attack_sequence.wound",),
+            supported_attack_roll_pairs=(("ranged", "attack_sequence.wound"),),
             target_unit_instance_id=ranged_target_unit_id,
             target_allegiance="enemy",
             target_lifecycle="until_destroyed",
@@ -678,6 +712,70 @@ def test_tracked_target_supported_attack_kinds_gate_source_backed_rerolls() -> N
         )
         is not None
     )
+
+
+def test_tracked_target_attack_roll_pairs_do_not_grant_cross_product_rerolls() -> None:
+    state = _battle_state_with_scenario()
+    source_unit = state.army_definitions[0].units[0]
+    source_model_id = source_unit.own_models[0].model_instance_id
+    target_unit_id = state.army_definitions[1].units[0].unit_instance_id
+    state.record_tracked_target(
+        TrackedTargetRecord(
+            record_id="record:mixed-pairs",
+            source_rule_id="rule:mixed-pairs",
+            source_ability_id="ability:mixed-pairs",
+            source_clause_id="clause:select",
+            source_effect_index=0,
+            owner_player_id="player-a",
+            source_unit_instance_id=source_unit.unit_instance_id,
+            source_model_instance_id=source_model_id,
+            owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
+            role=TrackedTargetRole.QUARRY,
+            supported_attack_roll_pairs=(
+                ("melee", "attack_sequence.hit"),
+                ("ranged", "attack_sequence.wound"),
+            ),
+            target_unit_instance_id=target_unit_id,
+            target_allegiance="enemy",
+            target_lifecycle="until_destroyed",
+            selected_battle_round=1,
+            selection_request_id="request:mixed-pairs",
+            selection_result_id="result:mixed-pairs",
+            active=True,
+        )
+    )
+
+    def permission_context(
+        *, attack_kind: str, roll_type: str
+    ) -> SourceBackedRerollPermissionContext | None:
+        return source_backed_reroll_permission_context_for_unit(
+            state=state,
+            player_id="player-a",
+            unit_instance_id=source_unit.unit_instance_id,
+            model_instance_id=source_model_id,
+            roll_type=roll_type,
+            timing_window=roll_type,
+            attack_kind=attack_kind,
+            target_unit_instance_id=target_unit_id,
+        )
+
+    melee_hit_context = permission_context(
+        attack_kind="melee",
+        roll_type="attack_sequence.hit",
+    )
+    ranged_wound_context = permission_context(
+        attack_kind="ranged",
+        roll_type="attack_sequence.wound",
+    )
+
+    assert melee_hit_context is not None
+    assert melee_hit_context.source_payload["supported_attack_roll_pairs"] == [
+        {"attack_kind": "melee", "roll_type": "attack_sequence.hit"},
+        {"attack_kind": "ranged", "roll_type": "attack_sequence.wound"},
+    ]
+    assert ranged_wound_context is not None
+    assert permission_context(attack_kind="melee", roll_type="attack_sequence.wound") is None
+    assert permission_context(attack_kind="ranged", roll_type="attack_sequence.hit") is None
 
 
 def test_tracked_target_reroll_rejects_duplicate_internal_permissions() -> None:
@@ -722,8 +820,7 @@ def test_tracked_target_defensive_validation_rejects_malformed_records_and_paylo
             source_model_instance_id=None,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.PREY,
-            supported_attack_kinds=("melee",),
-            supported_roll_types=("attack_sequence.wound",),
+            supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
             target_unit_instance_id="unit-b",
             target_allegiance="enemy",
             target_lifecycle="until_destroyed",
@@ -744,8 +841,7 @@ def test_tracked_target_defensive_validation_rejects_malformed_records_and_paylo
             source_model_instance_id="model-a",
             owner_scope=TrackedTargetOwnerScope.THIS_UNIT,
             role=TrackedTargetRole.PREY,
-            supported_attack_kinds=("melee",),
-            supported_roll_types=("attack_sequence.wound",),
+            supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
             target_unit_instance_id="unit-b",
             target_allegiance="enemy",
             target_lifecycle="until_destroyed",
@@ -775,6 +871,22 @@ def test_tracked_target_defensive_validation_rejects_malformed_records_and_paylo
         lambda: tracked_targets_module._payload_identifier_list(  # pyright: ignore[reportPrivateUsage]
             {"legal_target_unit_ids": "unit-b"},
             key="legal_target_unit_ids",
+        ),
+        lambda: tracked_targets_module._payload_supported_attack_roll_pairs(  # pyright: ignore[reportPrivateUsage]
+            {"supported_attack_roll_pairs": [{"attack_kind": "melee"}]},
+            key="supported_attack_roll_pairs",
+        ),
+        lambda: tracked_targets_module._validate_supported_attack_roll_pairs(  # pyright: ignore[reportPrivateUsage]
+            cast(tuple[object, ...], [])
+        ),
+        lambda: tracked_targets_module._validate_supported_attack_roll_pairs(  # pyright: ignore[reportPrivateUsage]
+            ()
+        ),
+        lambda: tracked_targets_module._validate_supported_attack_roll_pairs(  # pyright: ignore[reportPrivateUsage]
+            (("melee",),)
+        ),
+        lambda: tracked_targets_module._validate_supported_attack_roll_pairs(  # pyright: ignore[reportPrivateUsage]
+            (("melee", "attack_sequence.hit"), ("melee", "attack_sequence.hit"))
         ),
         lambda: tracked_targets_module._validate_supported_attack_kinds(  # pyright: ignore[reportPrivateUsage]
             cast(tuple[object, ...], [])
@@ -847,8 +959,7 @@ def test_tracked_target_runtime_reselection_defensive_paths() -> None:
         source_model_instance_id=source_unit.own_models[0].model_instance_id,
         owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
         role=TrackedTargetRole.PREY,
-        supported_attack_kinds=("melee",),
-        supported_roll_types=("attack_sequence.wound",),
+        supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
         target_unit_instance_id=destroyed_target.unit_instance_id,
         target_allegiance="enemy",
         target_lifecycle="until_destroyed",
@@ -961,8 +1072,7 @@ def test_tracked_target_destroyed_target_expires_and_requests_reselection() -> N
             source_model_instance_id=source_model_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.PREY,
-            supported_attack_kinds=("melee",),
-            supported_roll_types=("attack_sequence.wound",),
+            supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
             target_unit_instance_id=destroyed_target.unit_instance_id,
             target_allegiance="enemy",
             target_lifecycle="until_destroyed",
@@ -1051,8 +1161,7 @@ def _record_selection(
             source_model_instance_id=source_model_instance_id,
             owner_scope=owner_scope,
             role=TrackedTargetRole.PREY,
-            supported_attack_kinds=("melee",),
-            supported_roll_types=("attack_sequence.wound",),
+            supported_attack_roll_pairs=(("melee", "attack_sequence.wound"),),
             target_unit_instance_id=target_unit_instance_id,
             target_allegiance="enemy",
             target_lifecycle="until_destroyed",
@@ -1151,10 +1260,12 @@ def _muster_request(
 def _tracked_target_catalog_record(
     *,
     trigger_kind: TimingTriggerKind = TimingTriggerKind.AFTER_UNIT_DESTROYED,
+    raw_text: str = PREY_TARGET_TEXT,
+    source_id: str = "rule:tracked-target",
 ) -> AbilityCatalogRecord:
     source = RuleSourceText.from_raw(
-        source_id="rule:tracked-target",
-        raw_text=PREY_TARGET_TEXT,
+        source_id=source_id,
+        raw_text=raw_text,
     )
     rule_ir = compile_rule_source_text(source).rule_ir
     return AbilityCatalogRecord(

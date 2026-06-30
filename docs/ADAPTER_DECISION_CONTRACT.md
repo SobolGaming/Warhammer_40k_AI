@@ -1321,19 +1321,21 @@ one pending option ID; the option ID is exactly the target unit instance ID.
 The request and option payloads include `submission_kind: "select_tracked_target"`,
 source rule/ability/clause/effect identity, `owner_scope` (`this_model` or
 `this_unit`), `tracked_target_role` (`prey` or `quarry`),
-`supported_attack_kinds` (`melee`, `ranged`, or both), `supported_roll_types`,
-target allegiance and scope, `replacement`, deterministic `legal_target_unit_ids`,
-source unit ID, and optional source model ID. Adapters must not create
-tracked-target records, expire records, infer replacement targets, or apply
-rerolls locally from option payloads.
+`supported_attack_roll_pairs` as the authoritative attack-kind/roll-type
+permission list, convenience projections `supported_attack_kinds` (`melee`,
+`ranged`, or both) and `supported_roll_types`, target allegiance and scope,
+`replacement`, deterministic `legal_target_unit_ids`, source unit ID, and
+optional source model ID. Adapters must not create tracked-target records,
+expire records, infer replacement targets, or apply rerolls locally from option
+payloads.
 
 Accepted selections create a replay-safe `TrackedTargetRecord`. Replacement
 selections expire the previous active record for the same source/unit/model
 scope/role and record the replacement target. Attack-sequence rerolls are exposed
 only through the existing source-backed reroll decision path after the engine
 confirms the attacking model or unit matches the tracked-target owner scope and
-the attack kind, roll type, and target unit match the active tracked-target
-record.
+the exact `(attack_kind, roll_type)` pair and target unit match the active
+tracked-target record.
 
 Malformed, stale, wrong-actor, non-option, option-payload drift, source drift,
 destroyed-target, target-legality drift, duplicate-active, or unsupported-shape

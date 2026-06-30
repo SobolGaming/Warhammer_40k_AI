@@ -44,6 +44,7 @@ class TrackedTargetRecordPayload(TypedDict):
     source_model_instance_id: str | None
     owner_scope: str
     role: str
+    supported_attack_roll_pairs: list[JsonValue]
     supported_attack_kinds: list[str]
     supported_roll_types: list[str]
     target_unit_instance_id: str
@@ -67,8 +68,7 @@ class TrackedTargetRecord:
     source_model_instance_id: str | None
     owner_scope: TrackedTargetOwnerScope
     role: TrackedTargetRole
-    supported_attack_kinds: tuple[str, ...]
-    supported_roll_types: tuple[str, ...]
+    supported_attack_roll_pairs: tuple[tuple[str, str], ...]
     target_unit_instance_id: str
     target_allegiance: str
     target_lifecycle: str
@@ -121,13 +121,8 @@ class TrackedTargetRecord:
         object.__setattr__(self, "role", _role_from_token(self.role))
         object.__setattr__(
             self,
-            "supported_attack_kinds",
-            _validate_supported_attack_kinds(self.supported_attack_kinds),
-        )
-        object.__setattr__(
-            self,
-            "supported_roll_types",
-            _validate_supported_roll_types(self.supported_roll_types),
+            "supported_attack_roll_pairs",
+            _validate_supported_attack_roll_pairs(self.supported_attack_roll_pairs),
         )
         if (
             self.owner_scope is TrackedTargetOwnerScope.THIS_MODEL
@@ -197,6 +192,7 @@ class TrackedTargetRecord:
         )
 
     def to_payload(self) -> TrackedTargetRecordPayload:
+        attack_roll_pairs = self.supported_attack_roll_pairs
         return {
             "record_id": self.record_id,
             "source_rule_id": self.source_rule_id,
@@ -208,8 +204,9 @@ class TrackedTargetRecord:
             "source_model_instance_id": self.source_model_instance_id,
             "owner_scope": self.owner_scope.value,
             "role": self.role.value,
-            "supported_attack_kinds": list(self.supported_attack_kinds),
-            "supported_roll_types": list(self.supported_roll_types),
+            "supported_attack_roll_pairs": _attack_roll_pair_payloads(attack_roll_pairs),
+            "supported_attack_kinds": list(_supported_attack_kinds_for_pairs(attack_roll_pairs)),
+            "supported_roll_types": list(_supported_roll_types_for_pairs(attack_roll_pairs)),
             "target_unit_instance_id": self.target_unit_instance_id,
             "target_allegiance": self.target_allegiance,
             "target_lifecycle": self.target_lifecycle,
@@ -221,6 +218,19 @@ class TrackedTargetRecord:
 
     @classmethod
     def from_payload(cls, payload: TrackedTargetRecordPayload) -> TrackedTargetRecord:
+        attack_roll_pairs = _validate_supported_attack_roll_pair_payloads(
+            payload["supported_attack_roll_pairs"],
+            key="supported_attack_roll_pairs",
+        )
+        _assert_supported_pair_projection_matches(
+            supported_attack_roll_pairs=attack_roll_pairs,
+            supported_attack_kinds=_validate_supported_attack_kinds(
+                tuple(payload["supported_attack_kinds"])
+            ),
+            supported_roll_types=_validate_supported_roll_types(
+                tuple(payload["supported_roll_types"])
+            ),
+        )
         return cls(
             record_id=payload["record_id"],
             source_rule_id=payload["source_rule_id"],
@@ -232,8 +242,7 @@ class TrackedTargetRecord:
             source_model_instance_id=payload["source_model_instance_id"],
             owner_scope=_owner_scope_from_token(payload["owner_scope"]),
             role=_role_from_token(payload["role"]),
-            supported_attack_kinds=tuple(payload["supported_attack_kinds"]),
-            supported_roll_types=tuple(payload["supported_roll_types"]),
+            supported_attack_roll_pairs=attack_roll_pairs,
             target_unit_instance_id=payload["target_unit_instance_id"],
             target_allegiance=payload["target_allegiance"],
             target_lifecycle=payload["target_lifecycle"],
@@ -256,8 +265,7 @@ def build_select_tracked_target_request(
     source_model_instance_id: str | None,
     owner_scope: TrackedTargetOwnerScope,
     role: TrackedTargetRole,
-    supported_attack_kinds: tuple[str, ...],
-    supported_roll_types: tuple[str, ...],
+    supported_attack_roll_pairs: tuple[tuple[str, str], ...],
     target_allegiance: str,
     target_scope: str,
     replacement: bool,
@@ -278,8 +286,9 @@ def build_select_tracked_target_request(
     )
     scope = _owner_scope_from_token(owner_scope)
     tracked_role = _role_from_token(role)
-    attack_kinds = _validate_supported_attack_kinds(supported_attack_kinds)
-    roll_types = _validate_supported_roll_types(supported_roll_types)
+    attack_roll_pairs = _validate_supported_attack_roll_pairs(supported_attack_roll_pairs)
+    attack_kinds = _supported_attack_kinds_for_pairs(attack_roll_pairs)
+    roll_types = _supported_roll_types_for_pairs(attack_roll_pairs)
     allegiance = _validate_supported_token(
         "target_allegiance",
         target_allegiance,
@@ -322,6 +331,7 @@ def build_select_tracked_target_request(
             "source_effect_index": source_effect,
             "owner_scope": scope.value,
             "tracked_target_role": tracked_role.value,
+            "supported_attack_roll_pairs": _attack_roll_pair_payloads(attack_roll_pairs),
             "supported_attack_kinds": list(attack_kinds),
             "supported_roll_types": list(roll_types),
             "target_allegiance": allegiance,
@@ -394,6 +404,10 @@ def apply_select_tracked_target_decision(
         raise GameLifecycleError("Tracked target selected unit is no longer legal.")
     owner_scope = _owner_scope_from_token(_payload_string(request_payload, key="owner_scope"))
     role = _role_from_token(_payload_string(request_payload, key="tracked_target_role"))
+    supported_attack_roll_pairs = _payload_supported_attack_roll_pairs(
+        request_payload,
+        key="supported_attack_roll_pairs",
+    )
     supported_roll_types = _payload_supported_roll_types(
         request_payload,
         key="supported_roll_types",
@@ -401,6 +415,11 @@ def apply_select_tracked_target_decision(
     supported_attack_kinds = _payload_supported_attack_kinds(
         request_payload,
         key="supported_attack_kinds",
+    )
+    _assert_supported_pair_projection_matches(
+        supported_attack_roll_pairs=supported_attack_roll_pairs,
+        supported_attack_kinds=supported_attack_kinds,
+        supported_roll_types=supported_roll_types,
     )
     replacement = _payload_bool(request_payload, key="replacement")
     source_rule_id = _payload_string(request_payload, key="source_rule_id")
@@ -431,8 +450,7 @@ def apply_select_tracked_target_decision(
         source_model_instance_id=source_model_id,
         owner_scope=owner_scope,
         role=role,
-        supported_attack_kinds=supported_attack_kinds,
-        supported_roll_types=supported_roll_types,
+        supported_attack_roll_pairs=supported_attack_roll_pairs,
         target_unit_instance_id=target_unit_id,
         target_allegiance=_payload_string(request_payload, key="target_allegiance"),
         target_lifecycle="until_destroyed",
@@ -557,12 +575,13 @@ def tracked_target_reroll_permission_context_for_unit(
             continue
         if requested_attack_kind is None:
             continue
-        if requested_attack_kind not in record.supported_attack_kinds:
-            continue
-        if requested_roll_type not in record.supported_roll_types:
+        if (requested_attack_kind, requested_roll_type) not in set(
+            record.supported_attack_roll_pairs
+        ):
             continue
         if requested_timing != requested_roll_type:
             continue
+        supported_attack_roll_pairs = record.supported_attack_roll_pairs
         permission = RerollPermission(
             source_id=f"{record.record_id}:{requested_roll_type}:reroll",
             timing_window=requested_timing,
@@ -583,8 +602,17 @@ def tracked_target_reroll_permission_context_for_unit(
                     "source_model_instance_id": record.source_model_instance_id,
                     "owner_scope": record.owner_scope.value,
                     "tracked_target_role": record.role.value,
-                    "supported_attack_kinds": list(record.supported_attack_kinds),
-                    "supported_roll_types": list(record.supported_roll_types),
+                    "supported_attack_roll_pairs": _attack_roll_pair_payloads(
+                        supported_attack_roll_pairs
+                    ),
+                    "supported_attack_kinds": list(
+                        _supported_attack_kinds_for_pairs(supported_attack_roll_pairs)
+                    ),
+                    "supported_roll_types": list(
+                        _supported_roll_types_for_pairs(supported_attack_roll_pairs)
+                    ),
+                    "attack_kind": requested_attack_kind,
+                    "roll_type": requested_roll_type,
                     "target_unit_instance_id": record.target_unit_instance_id,
                 },
             )
@@ -639,6 +667,7 @@ def _assert_payload_context_matches(
         "source_effect_index",
         "owner_scope",
         "tracked_target_role",
+        "supported_attack_roll_pairs",
         "supported_attack_kinds",
         "supported_roll_types",
         "target_allegiance",
@@ -687,6 +716,17 @@ def _payload_identifier_list(payload: dict[str, JsonValue], *, key: str) -> tupl
     if not isinstance(value, list):
         raise GameLifecycleError(f"Tracked target payload {key} must be a list.")
     return tuple(_validate_identifier(key, item) for item in value)
+
+
+def _payload_supported_attack_roll_pairs(
+    payload: dict[str, JsonValue],
+    *,
+    key: str,
+) -> tuple[tuple[str, str], ...]:
+    value = payload.get(key)
+    if not isinstance(value, list):
+        raise GameLifecycleError(f"Tracked target payload {key} must be a list.")
+    return _validate_supported_attack_roll_pair_payloads(value, key=key)
 
 
 def _payload_supported_roll_types(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
@@ -747,6 +787,110 @@ def _validate_supported_attack_kind(field_name: str, value: object) -> str:
         value,
         supported=TRACKED_TARGET_SUPPORTED_ATTACK_KINDS,
     )
+
+
+def _validate_supported_attack_roll_pairs(
+    attack_roll_pairs: tuple[object, ...],
+) -> tuple[tuple[str, str], ...]:
+    if type(attack_roll_pairs) is not tuple:
+        raise GameLifecycleError("Tracked target supported_attack_roll_pairs must be a tuple.")
+    validated: list[tuple[str, str]] = []
+    for pair in attack_roll_pairs:
+        if type(pair) is not tuple:
+            raise GameLifecycleError(
+                "Tracked target supported_attack_roll_pairs entries must be two-item tuples."
+            )
+        pair_tuple = cast(tuple[object, ...], pair)
+        if len(pair_tuple) != 2:
+            raise GameLifecycleError(
+                "Tracked target supported_attack_roll_pairs entries must be two-item tuples."
+            )
+        attack_kind = _validate_supported_attack_kind(
+            "supported_attack_roll_pairs.attack_kind",
+            pair_tuple[0],
+        )
+        roll_type = _validate_supported_token(
+            "supported_attack_roll_pairs.roll_type",
+            pair_tuple[1],
+            supported=TRACKED_TARGET_SUPPORTED_ROLL_TYPES,
+        )
+        validated.append((attack_kind, roll_type))
+    if not validated:
+        raise GameLifecycleError("Tracked target supported_attack_roll_pairs must not be empty.")
+    if len(set(validated)) != len(validated):
+        raise GameLifecycleError("Tracked target supported_attack_roll_pairs must be unique.")
+    supported = set(validated)
+    return tuple(
+        (attack_kind, roll_type)
+        for attack_kind in TRACKED_TARGET_SUPPORTED_ATTACK_KINDS
+        for roll_type in TRACKED_TARGET_SUPPORTED_ROLL_TYPES
+        if (attack_kind, roll_type) in supported
+    )
+
+
+def _validate_supported_attack_roll_pair_payloads(
+    value: object,
+    *,
+    key: str,
+) -> tuple[tuple[str, str], ...]:
+    if not isinstance(value, list):
+        raise GameLifecycleError(f"Tracked target payload {key} must be a list.")
+    pairs: list[tuple[object, object]] = []
+    for item in cast(list[object], value):
+        if not isinstance(item, dict):
+            raise GameLifecycleError(f"Tracked target payload {key} entries must be objects.")
+        pair_payload = cast(dict[object, object], item)
+        if set(pair_payload) != {"attack_kind", "roll_type"}:
+            raise GameLifecycleError(
+                f"Tracked target payload {key} entries must contain attack_kind and roll_type."
+            )
+        pairs.append((pair_payload["attack_kind"], pair_payload["roll_type"]))
+    return _validate_supported_attack_roll_pairs(tuple(pairs))
+
+
+def _attack_roll_pair_payloads(
+    attack_roll_pairs: tuple[tuple[str, str], ...],
+) -> list[JsonValue]:
+    payloads: list[JsonValue] = []
+    for attack_kind, roll_type in attack_roll_pairs:
+        payloads.append(validate_json_value({"attack_kind": attack_kind, "roll_type": roll_type}))
+    return payloads
+
+
+def _supported_attack_kinds_for_pairs(
+    attack_roll_pairs: tuple[tuple[str, str], ...],
+) -> tuple[str, ...]:
+    supported = {attack_kind for attack_kind, _ in attack_roll_pairs}
+    return tuple(
+        attack_kind
+        for attack_kind in TRACKED_TARGET_SUPPORTED_ATTACK_KINDS
+        if attack_kind in supported
+    )
+
+
+def _supported_roll_types_for_pairs(
+    attack_roll_pairs: tuple[tuple[str, str], ...],
+) -> tuple[str, ...]:
+    supported = {roll_type for _, roll_type in attack_roll_pairs}
+    return tuple(
+        roll_type for roll_type in TRACKED_TARGET_SUPPORTED_ROLL_TYPES if roll_type in supported
+    )
+
+
+def _assert_supported_pair_projection_matches(
+    *,
+    supported_attack_roll_pairs: tuple[tuple[str, str], ...],
+    supported_attack_kinds: tuple[str, ...],
+    supported_roll_types: tuple[str, ...],
+) -> None:
+    if _supported_attack_kinds_for_pairs(supported_attack_roll_pairs) != supported_attack_kinds:
+        raise GameLifecycleError(
+            "Tracked target supported_attack_kinds drift from attack-roll pairs."
+        )
+    if _supported_roll_types_for_pairs(supported_attack_roll_pairs) != supported_roll_types:
+        raise GameLifecycleError(
+            "Tracked target supported_roll_types drift from attack-roll pairs."
+        )
 
 
 def _validate_supported_attack_kinds(attack_kinds: tuple[object, ...]) -> tuple[str, ...]:

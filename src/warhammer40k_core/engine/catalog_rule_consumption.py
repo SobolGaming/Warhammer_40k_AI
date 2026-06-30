@@ -1950,6 +1950,12 @@ def catalog_rule_tracked_target_supported_attack_kinds_for_clause(
     return _tracked_target_supported_attack_kinds_for_clause(clause)
 
 
+def catalog_rule_tracked_target_supported_attack_roll_pairs_for_clause(
+    clause: RuleClause,
+) -> tuple[tuple[str, str], ...]:
+    return _tracked_target_supported_attack_roll_pairs_for_clause(clause)
+
+
 def catalog_rule_clause_is_supported_first_death_return(clause: RuleClause) -> bool:
     return _clause_is_supported_first_death_return(clause)
 
@@ -2082,15 +2088,39 @@ def _trigger_supports_tracked_target_roll_type(
 
 
 def _tracked_target_supported_roll_types_for_clause(clause: RuleClause) -> tuple[str, ...]:
+    supported = {
+        roll_type for _, roll_type in _tracked_target_supported_attack_roll_pairs_for_clause(clause)
+    }
+    return tuple(
+        roll_type
+        for roll_type in ("attack_sequence.hit", "attack_sequence.wound")
+        if roll_type in supported
+    )
+
+
+def _tracked_target_supported_attack_kinds_for_clause(clause: RuleClause) -> tuple[str, ...]:
+    supported = {
+        attack_kind
+        for attack_kind, _ in _tracked_target_supported_attack_roll_pairs_for_clause(clause)
+    }
+    return tuple(kind for kind in ("melee", "ranged") if kind in supported)
+
+
+def _tracked_target_supported_attack_roll_pairs_for_clause(
+    clause: RuleClause,
+) -> tuple[tuple[str, str], ...]:
     if type(clause) is not RuleClause:
-        raise GameLifecycleError("Tracked-target roll-type derivation requires RuleClause.")
+        raise GameLifecycleError("Tracked-target attack-roll pair derivation requires RuleClause.")
     if not _clause_is_supported_tracked_target_reroll(clause):
         return ()
     trigger = clause.trigger
     if trigger is None or trigger.kind is not RuleTriggerKind.DICE_ROLL:
         return ()
     trigger_parameters = parameter_payload(trigger.parameters)
-    supported: set[str] = set()
+    attack_kind = trigger_parameters.get("attack_kind")
+    if attack_kind not in {"melee", "ranged"}:
+        return ()
+    supported: set[tuple[str, str]] = set()
     for effect in clause.effects:
         if effect.kind is not RuleEffectKind.REROLL_PERMISSION:
             continue
@@ -2101,28 +2131,15 @@ def _tracked_target_supported_roll_types_for_clause(clause: RuleClause) -> tuple
             continue
         roll_type = parameter_payload(effect.parameters).get("roll_type")
         if roll_type == "hit":
-            supported.add("attack_sequence.hit")
+            supported.add((str(attack_kind), "attack_sequence.hit"))
         elif roll_type == "wound":
-            supported.add("attack_sequence.wound")
+            supported.add((str(attack_kind), "attack_sequence.wound"))
     return tuple(
-        roll_type
-        for roll_type in ("attack_sequence.hit", "attack_sequence.wound")
-        if roll_type in supported
+        (candidate_attack_kind, candidate_roll_type)
+        for candidate_attack_kind in ("melee", "ranged")
+        for candidate_roll_type in ("attack_sequence.hit", "attack_sequence.wound")
+        if (candidate_attack_kind, candidate_roll_type) in supported
     )
-
-
-def _tracked_target_supported_attack_kinds_for_clause(clause: RuleClause) -> tuple[str, ...]:
-    if type(clause) is not RuleClause:
-        raise GameLifecycleError("Tracked-target attack-kind derivation requires RuleClause.")
-    if not _clause_is_supported_tracked_target_reroll(clause):
-        return ()
-    trigger = clause.trigger
-    if trigger is None or trigger.kind is not RuleTriggerKind.DICE_ROLL:
-        return ()
-    attack_kind = parameter_payload(trigger.parameters).get("attack_kind")
-    if attack_kind not in {"melee", "ranged"}:
-        return ()
-    return tuple(kind for kind in ("melee", "ranged") if kind == attack_kind)
 
 
 def _clause_is_supported_tracked_target_destroyed_reselect(clause: RuleClause) -> bool:
