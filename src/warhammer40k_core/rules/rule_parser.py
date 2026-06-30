@@ -39,6 +39,7 @@ from warhammer40k_core.rules.rule_templates import (
     PLACEMENT_TEMPLATE_ID,
     REROLL_PERMISSION_TEMPLATE_ID,
     RESOURCE_MODIFIER_TEMPLATE_ID,
+    RETURN_ON_DEATH_TEMPLATE_ID,
     SELECTED_TARGET_TEMPLATE_ID,
     TIMING_WINDOW_TEMPLATE_ID,
     TRACKED_TARGET_SELECTION_TEMPLATE_ID,
@@ -83,6 +84,25 @@ _IN_TURN_RE = re.compile(
     re.IGNORECASE,
 )
 _DESTROYED_UNIT_RE = re.compile(r"\bwhen\s+this\s+unit\s+is\s+destroyed\b", re.IGNORECASE)
+_FIRST_DEATH_RETURN_TRIGGER_RE = re.compile(
+    r"\bthe\s+first\s+time\s+(?P<target>this\s+model|this\s+unit)\s+is\s+destroyed,\s+"
+    r"at\s+the\s+end\s+of\s+the\s+phase\b",
+    re.IGNORECASE,
+)
+_RETURN_ON_DEATH_ROLL_GATE_RE = re.compile(
+    r"\broll\s+(?:(?P<roll_count>one|a|an|\d+)\s+)?"
+    r"(?P<roll_expression>(?:\d+)?D\d+(?:[+-]\d+)?)\s*:\s*"
+    r"on\s+a\s+(?P<success_threshold>\d+)\+(?=[\s,.;)]|$)",
+    re.IGNORECASE,
+)
+_RETURN_ON_DEATH_SET_UP_RE = re.compile(
+    r"\bset\s+(?P<target>this\s+model|this\s+unit)\s+back\s+up\s+on\s+the\s+battlefield\s+"
+    r"as\s+close\s+as\s+possible\s+to\s+where\s+it\s+was\s+destroyed\s+and\s+"
+    r"not\s+within\s+Engagement\s+Range\s+of\s+one\s+or\s+more\s+enemy\s+units,\s+"
+    r"(?:(?:with\s+(?P<wounds_remaining>\d+)\s+wounds?\s+remaining)|"
+    r"(?P<full_health>at\s+full\s+health))\b",
+    re.IGNORECASE,
+)
 _THIS_MODEL_MELEE_ATTACK_TARGET_RE = re.compile(
     r"\beach\s+time\s+this\s+model\s+makes\s+a\s+melee\s+attack\s+that\s+targets\s+"
     r"(?:a|an)\s+(?P<keyword>Character\s+or\s+Monster)\s+unit\b",
@@ -629,6 +649,7 @@ def _compile_clause(
             *_parse_aura_conditions(clause_text),
             *_parse_leading_unit_conditions(clause_text),
             *_parse_tracked_target_conditions(clause_text),
+            *_parse_return_on_death_conditions(clause_text),
             *_parse_frequency_conditions(clause_text),
             *_parse_keyword_conditions(clause_text),
             *_parse_distance_conditions(clause_text, parsed_text),
@@ -644,6 +665,7 @@ def _compile_clause(
             *_parse_characteristic_effects(clause_text),
             *_parse_resource_effects(clause_text),
             *_parse_tracked_target_selection_effects(clause_text),
+            *_parse_return_on_death_effects(clause_text),
             *_parse_grant_ability_effects(clause_text),
             *_parse_contextual_status_effects(clause_text),
             *_parse_weapon_ability_effects(clause_text),
@@ -748,6 +770,26 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                     ("timing_window", "tracked_target_destroyed"),
                     ("tracked_target_owner", _tracked_target_owner_token(tracked_destroyed_match)),
                     ("tracked_target_role", _lower_group(tracked_destroyed_match, "role")),
+                )
+            ),
+        )
+    first_death_return_match = _FIRST_DEATH_RETURN_TRIGGER_RE.search(clause_text.text)
+    if first_death_return_match is not None:
+        target = _return_on_death_target_token(first_death_return_match.group("target"))
+        trigger_kind = (
+            RuleTriggerKind.MODEL_DESTROYED
+            if target == "this_model"
+            else RuleTriggerKind.UNIT_DESTROYED
+        )
+        return RuleTrigger(
+            kind=trigger_kind,
+            source_span=_span_from_match(clause_text, first_death_return_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("destroyed_target", target),
+                    ("event_order", "first"),
+                    ("resolution_timing", "phase_end"),
+                    ("timing_window", "phase_end_after_destroyed"),
                 )
             ),
         )
@@ -954,6 +996,42 @@ def _parse_tracked_target_conditions(clause_text: _ClauseText) -> tuple[RuleCond
     return tuple(conditions)
 
 
+def _parse_return_on_death_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
+    trigger_match = _FIRST_DEATH_RETURN_TRIGGER_RE.search(clause_text.text)
+    roll_match = _RETURN_ON_DEATH_ROLL_GATE_RE.search(clause_text.text)
+    setup_match = _RETURN_ON_DEATH_SET_UP_RE.search(clause_text.text)
+    if trigger_match is None or roll_match is None or setup_match is None:
+        return ()
+    return (
+        RuleCondition(
+            kind=RuleConditionKind.FREQUENCY_LIMIT,
+            source_span=_span_from_match(clause_text, trigger_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("event", "target_destroyed"),
+                    ("event_order", "first"),
+                    ("scope", "battle"),
+                )
+            ),
+        ),
+        RuleCondition(
+            kind=RuleConditionKind.DICE_ROLL_GATE,
+            source_span=_span_from_match(clause_text, roll_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("comparison", "greater_or_equal"),
+                    ("roll_count", _roll_count_value(roll_match.group("roll_count"))),
+                    (
+                        "roll_expression",
+                        _dice_expression_token(roll_match.group("roll_expression")),
+                    ),
+                    ("success_threshold", int(roll_match.group("success_threshold"))),
+                )
+            ),
+        ),
+    )
+
+
 def _parse_frequency_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
     conditions: list[RuleCondition] = []
     for match in _ONCE_PER_RE.finditer(clause_text.text):
@@ -1152,6 +1230,16 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
                 kind=RuleTargetKind.THIS_MODEL,
                 source_span=_span_from_match(clause_text, match),
             )
+    return_on_death_match = _FIRST_DEATH_RETURN_TRIGGER_RE.search(clause_text.text)
+    if (
+        return_on_death_match is not None
+        and _RETURN_ON_DEATH_SET_UP_RE.search(clause_text.text) is not None
+    ):
+        target = _return_on_death_target_token(return_on_death_match.group("target"))
+        return RuleTargetSpec(
+            kind=RuleTargetKind.THIS_MODEL if target == "this_model" else RuleTargetKind.THIS_UNIT,
+            source_span=_span_from_match(clause_text, return_on_death_match),
+        )
     tracked_selection_match = _TRACKED_TARGET_SELECTION_RE.search(clause_text.text)
     if tracked_selection_match is not None:
         allegiance = _lower_group(tracked_selection_match, "allegiance")
@@ -1405,6 +1493,61 @@ def _tracked_target_owner_token(match: re.Match[str]) -> str:
     raise RuleIRError(f"Unsupported tracked-target owner: {match.group('owner')}.")
 
 
+def _return_on_death_effect_parameter_pairs(
+    match: re.Match[str],
+) -> tuple[tuple[str, RuleParameterValue], ...]:
+    target = _return_on_death_target_token(match.group("target"))
+    pairs: list[tuple[str, RuleParameterValue]] = [
+        ("action", "set_back_up"),
+        ("placement_anchor", "destroyed_position"),
+        ("placement_kind", "battlefield_set_up"),
+        ("placement_preference", "as_close_as_possible"),
+        ("target", target),
+        ("target_lifecycle", "destroyed"),
+        ("target_scope", "destroyed_model" if target == "this_model" else "destroyed_unit"),
+    ]
+    wounds_remaining = match.group("wounds_remaining")
+    if wounds_remaining is not None:
+        pairs.extend(
+            (
+                ("restore_wounds_mode", "fixed_remaining"),
+                ("wounds_remaining", int(wounds_remaining)),
+            )
+        )
+        return tuple(pairs)
+    if match.group("full_health") is not None:
+        pairs.append(("restore_wounds_mode", "full_health"))
+        return tuple(pairs)
+    raise RuleIRError("Return-on-death setup must define remaining wounds or full health.")
+
+
+def _return_on_death_target_token(value: str) -> str:
+    token = " ".join(value.lower().split())
+    if token == "this model":
+        return "this_model"
+    if token == "this unit":
+        return "this_unit"
+    raise RuleIRError(f"Unsupported return-on-death target: {value}.")
+
+
+def _roll_count_value(value: str | None) -> int:
+    if value is None:
+        return 1
+    token = value.lower().strip()
+    if token in {"one", "a", "an"}:
+        return 1
+    if token.isdecimal():
+        return int(token)
+    raise RuleIRError(f"Unsupported roll count in rule language: {value}.")
+
+
+def _dice_expression_token(value: str) -> str:
+    token = value.upper().strip()
+    if not token:
+        raise RuleIRError("Dice expression must not be empty.")
+    return token
+
+
 def _match_is_within_any_span(
     *,
     match: re.Match[str],
@@ -1508,6 +1651,25 @@ def _parse_tracked_target_selection_effects(clause_text: _ClauseText) -> tuple[R
             )
         )
     return tuple(effects)
+
+
+def _parse_return_on_death_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
+    trigger_match = _FIRST_DEATH_RETURN_TRIGGER_RE.search(clause_text.text)
+    roll_match = _RETURN_ON_DEATH_ROLL_GATE_RE.search(clause_text.text)
+    setup_match = _RETURN_ON_DEATH_SET_UP_RE.search(clause_text.text)
+    if trigger_match is None or roll_match is None or setup_match is None:
+        return ()
+    trigger_target = _return_on_death_target_token(trigger_match.group("target"))
+    setup_target = _return_on_death_target_token(setup_match.group("target"))
+    if setup_target != trigger_target:
+        raise RuleIRError("Return-on-death trigger and setup target must match.")
+    return (
+        RuleEffectSpec(
+            kind=RuleEffectKind.RETURN_DESTROYED_TARGET,
+            source_span=_span_from_match(clause_text, setup_match),
+            parameters=parameters_from_pairs(_return_on_death_effect_parameter_pairs(setup_match)),
+        ),
+    )
 
 
 def _parse_grant_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
@@ -1964,6 +2126,8 @@ def _template_id_for_clause(
             RuleEffectKind.ADD_VICTORY_POINTS,
         }:
             candidates.append(RESOURCE_MODIFIER_TEMPLATE_ID)
+        elif effect.kind is RuleEffectKind.RETURN_DESTROYED_TARGET:
+            candidates.append(RETURN_ON_DEATH_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.SELECT_TRACKED_TARGET:
             candidates.append(TRACKED_TARGET_SELECTION_TEMPLATE_ID)
         elif effect.kind in {

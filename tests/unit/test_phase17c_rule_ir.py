@@ -106,6 +106,18 @@ QUARRY_TARGET_TEXT = (
     "re-roll the Hit roll and you can re-roll the Wound roll. Each time this model's "
     "quarry is destroyed, select one new enemy unit to be this model's quarry."
 )
+FIRST_DEATH_RETURN_TEXT = (
+    "The first time this model is destroyed, at the end of the phase, roll one D6: on "
+    "a 2+, set this model back up on the battlefield as close as possible to where it "
+    "was destroyed and not within Engagement Range of one or more enemy units, with "
+    "3 wounds remaining."
+)
+FIRST_DEATH_RETURN_FULL_HEALTH_TEXT = (
+    "The first time this unit is destroyed, at the end of the phase, roll one D6: on "
+    "a 5+, set this unit back up on the battlefield as close as possible to where it "
+    "was destroyed and not within Engagement Range of one or more enemy units, at "
+    "full health."
+)
 
 
 def test_phase17c_normalized_source_text_compiles_to_stable_rule_ir() -> None:
@@ -467,6 +479,115 @@ def test_phase17c_quarry_selection_supports_this_model_hit_and_wound_rerolls() -
         "target_scope": "enemy_unit",
         "tracked_target_owner": "this_model",
         "tracked_target_role": "quarry",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == ()
+
+
+def test_phase17c_first_death_return_fixed_wounds_compiles_to_semantic_ir() -> None:
+    rule_ir = _compiled(FIRST_DEATH_RETURN_TEXT).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    assert len(rule_ir.clauses) == 1
+    assert clause.template_id == "phase17c:first-death-return"
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.MODEL_DESTROYED
+    assert parameter_payload(clause.trigger.parameters) == {
+        "destroyed_target": "this_model",
+        "event_order": "first",
+        "resolution_timing": "phase_end",
+        "timing_window": "phase_end_after_destroyed",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert _condition_payload(clause, RuleConditionKind.FREQUENCY_LIMIT) == {
+        "event": "target_destroyed",
+        "event_order": "first",
+        "scope": "battle",
+    }
+    assert _condition_payload(clause, RuleConditionKind.DICE_ROLL_GATE) == {
+        "comparison": "greater_or_equal",
+        "roll_count": 1,
+        "roll_expression": "D6",
+        "success_threshold": 2,
+    }
+    distance = next(
+        condition
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.DISTANCE_PREDICATE
+    )
+    assert parameter_payload(distance.parameters) == {
+        "distance_inches": None,
+        "negated": True,
+        "object_allegiance": "enemy",
+        "object_kind": "unit",
+        "object_quantity": "one_or_more",
+        "predicate": "within_engagement_range",
+        "qualifier": None,
+        "range_kind": "engagement_range",
+    }
+    assert tuple(effect.kind for effect in clause.effects) == (
+        RuleEffectKind.RETURN_DESTROYED_TARGET,
+    )
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "action": "set_back_up",
+        "placement_anchor": "destroyed_position",
+        "placement_kind": "battlefield_set_up",
+        "placement_preference": "as_close_as_possible",
+        "restore_wounds_mode": "fixed_remaining",
+        "target": "this_model",
+        "target_lifecycle": "destroyed",
+        "target_scope": "destroyed_model",
+        "wounds_remaining": 3,
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == ()
+    assert (
+        ability_support_rollup_for_rule_ir(
+            source_ability_id="source:first-death-return",
+            ability_name="First Death Return",
+            rule_ir=rule_ir,
+        ).overall_ability_support
+        is AbilityOverallSupport.PARSED
+    )
+
+
+def test_phase17c_first_death_return_full_health_unit_variant_is_semantic_ir() -> None:
+    rule_ir = _compiled(FIRST_DEATH_RETURN_FULL_HEALTH_TEXT).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.UNIT_DESTROYED
+    assert parameter_payload(clause.trigger.parameters) == {
+        "destroyed_target": "this_unit",
+        "event_order": "first",
+        "resolution_timing": "phase_end",
+        "timing_window": "phase_end_after_destroyed",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert _condition_payload(clause, RuleConditionKind.DICE_ROLL_GATE) == {
+        "comparison": "greater_or_equal",
+        "roll_count": 1,
+        "roll_expression": "D6",
+        "success_threshold": 5,
+    }
+    assert tuple(effect.kind for effect in clause.effects) == (
+        RuleEffectKind.RETURN_DESTROYED_TARGET,
+    )
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "action": "set_back_up",
+        "placement_anchor": "destroyed_position",
+        "placement_kind": "battlefield_set_up",
+        "placement_preference": "as_close_as_possible",
+        "restore_wounds_mode": "full_health",
+        "target": "this_unit",
+        "target_lifecycle": "destroyed",
+        "target_scope": "destroyed_unit",
     }
     assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
     assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == ()

@@ -24,6 +24,7 @@ class RuleTemplateFamily(StrEnum):
     PLACEMENT_PERMISSION_RESTRICTION = "placement_permission_restriction"
     REROLL_PERMISSION = "reroll_permission"
     RESOURCE_MODIFICATION = "resource_modification"
+    RETURN_ON_DEATH = "return_on_death"
     SELECTED_TARGET_CONSTRAINT = "selected_target_constraint"
     TRACKED_TARGET_SELECTION = "tracked_target_selection"
     TIMING_WINDOW = "timing_window"
@@ -91,6 +92,7 @@ CHARACTERISTIC_SET_TEMPLATE_ID = "phase17c:characteristic-set"
 CONTEXTUAL_STATUS_TEMPLATE_ID = "phase17c:contextual-status"
 DESPERATE_ESCAPE_TEMPLATE_ID = "phase17c:desperate-escape-requirement"
 RESOURCE_MODIFIER_TEMPLATE_ID = "phase17c:resource-modifier"
+RETURN_ON_DEATH_TEMPLATE_ID = "phase17c:first-death-return"
 GRANT_ABILITY_TEMPLATE_ID = "phase17c:grant-ability"
 WEAPON_ABILITY_GRANT_TEMPLATE_ID = "phase17c:weapon-ability-grant"
 MOVEMENT_DISTANCE_TEMPLATE_ID = "phase17c:movement-distance-modifier"
@@ -224,6 +226,17 @@ INITIAL_RULE_TEMPLATES: tuple[RuleTemplate, ...] = (
         family=RuleTemplateFamily.RESOURCE_MODIFICATION,
         description="Command Point and Victory Point resource modification clauses.",
         canonical_patterns=("gain <n>CP", "score <n>VP"),
+    ),
+    RuleTemplate(
+        template_id=RETURN_ON_DEATH_TEMPLATE_ID,
+        family=RuleTemplateFamily.RETURN_ON_DEATH,
+        description=(
+            "First-destruction return effects gated by a dice roll and resolved at phase end."
+        ),
+        canonical_patterns=(
+            "The first time this model is destroyed, at the end of the phase, roll one D6",
+            "set this unit back up on the battlefield at full health",
+        ),
     ),
     RuleTemplate(
         template_id=GRANT_ABILITY_TEMPLATE_ID,
