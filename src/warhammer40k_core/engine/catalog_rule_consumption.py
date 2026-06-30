@@ -1589,10 +1589,7 @@ def _catalog_roll_reroll_permission_for_unit(
         current_model_instance_ids=current_ids,
         trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
     ):
-        rule_ir = _rule_ir_from_record(record)
-        if not rule_ir.is_supported:
-            continue
-        for clause in rule_ir.clauses:
+        for clause in _clauses_from_record(record):
             if not _clause_targets_roll_reroll_unit(clause):
                 continue
             for effect_index, effect in enumerate(clause.effects):
@@ -1902,8 +1899,10 @@ def _matching_advance_eligibility_records(
         current_model_instance_ids=current_model_ids,
         trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
     ):
-        rule_ir = _rule_ir_from_record(record)
-        if _rule_ir_grants_advance_eligibility(rule_ir, ability=requested_ability):
+        if any(
+            _clause_grants_advance_eligibility(clause, ability=requested_ability)
+            for clause in _clauses_from_record(record)
+        ):
             matching_records.append(record)
     return tuple(sorted(matching_records, key=lambda record: record.record_id))
 
@@ -1929,8 +1928,10 @@ def _matching_fall_back_eligibility_records(
         current_model_instance_ids=current_model_ids,
         trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
     ):
-        rule_ir = _rule_ir_from_record(record)
-        if _rule_ir_grants_fall_back_eligibility(rule_ir, ability=requested_ability):
+        if any(
+            _clause_grants_fall_back_eligibility(clause, ability=requested_ability)
+            for clause in _clauses_from_record(record)
+        ):
             matching_records.append(record)
     return tuple(sorted(matching_records, key=lambda record: record.record_id))
 
@@ -2415,33 +2416,21 @@ def _effect_is_shadow_of_chaos_status(effect: RuleEffectSpec) -> bool:
     )
 
 
-def _rule_ir_grants_advance_eligibility(rule_ir: RuleIR, *, ability: str) -> bool:
-    if type(rule_ir) is not RuleIR:
-        raise GameLifecycleError("Catalog advance eligibility requires RuleIR.")
-    if not rule_ir.is_supported:
-        return False
+def _clause_grants_advance_eligibility(clause: RuleClause, *, ability: str) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog advance eligibility requires RuleClause.")
     requested_ability = _validate_identifier("ability", ability)
-    return any(
-        _clause_targets_this_unit(clause)
-        and any(
-            _effect_grants_ability(effect, ability=requested_ability) for effect in clause.effects
-        )
-        for clause in rule_ir.clauses
+    return _clause_targets_this_unit(clause) and any(
+        _effect_grants_ability(effect, ability=requested_ability) for effect in clause.effects
     )
 
 
-def _rule_ir_grants_fall_back_eligibility(rule_ir: RuleIR, *, ability: str) -> bool:
-    if type(rule_ir) is not RuleIR:
-        raise GameLifecycleError("Catalog Fall Back eligibility requires RuleIR.")
-    if not rule_ir.is_supported:
-        return False
+def _clause_grants_fall_back_eligibility(clause: RuleClause, *, ability: str) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog Fall Back eligibility requires RuleClause.")
     requested_ability = _validate_identifier("ability", ability)
-    return any(
-        _clause_targets_this_unit(clause)
-        and any(
-            _effect_grants_ability(effect, ability=requested_ability) for effect in clause.effects
-        )
-        for clause in rule_ir.clauses
+    return _clause_targets_this_unit(clause) and any(
+        _effect_grants_ability(effect, ability=requested_ability) for effect in clause.effects
     )
 
 
@@ -3347,7 +3336,10 @@ def _record_can_grant_advance_eligibility(
         raise GameLifecycleError("Catalog advance eligibility requires ability records.")
     if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
         return False
-    return _rule_ir_grants_advance_eligibility(_rule_ir_from_record(record), ability=ability)
+    return any(
+        _clause_grants_advance_eligibility(clause, ability=ability)
+        for clause in _clauses_from_record(record)
+    )
 
 
 def _record_can_grant_fall_back_eligibility(
@@ -3359,7 +3351,10 @@ def _record_can_grant_fall_back_eligibility(
         raise GameLifecycleError("Catalog Fall Back eligibility requires ability records.")
     if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
         return False
-    return _rule_ir_grants_fall_back_eligibility(_rule_ir_from_record(record), ability=ability)
+    return any(
+        _clause_grants_fall_back_eligibility(clause, ability=ability)
+        for clause in _clauses_from_record(record)
+    )
 
 
 def _army_for_player(armies: tuple[ArmyDefinition, ...], *, player_id: str) -> ArmyDefinition:
