@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import TYPE_CHECKING, TypedDict, cast
@@ -31,6 +32,7 @@ from warhammer40k_core.engine.movement_proposals import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.geometry.pose import Pose
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.decision_controller import DecisionController
@@ -43,6 +45,10 @@ RETURN_ON_DEATH_ROLL_RESOLVED_EVENT_TYPE = "return_on_death_roll_resolved"
 RETURN_ON_DEATH_FAILED_ROLL_EVENT_TYPE = "return_on_death_failed_roll"
 RETURN_ON_DEATH_SET_BACK_UP_REQUESTED_EVENT_TYPE = "return_on_death_set_back_up_requested"
 RETURN_ON_DEATH_SET_BACK_UP_COMPLETED_EVENT_TYPE = "return_on_death_set_back_up_completed"
+RETURN_ON_DEATH_CLOSEST_PLACEMENT_TOLERANCE_INCHES = 1e-6
+RETURN_ON_DEATH_CLOSEST_CANDIDATE_STEP_INCHES = 0.25
+RETURN_ON_DEATH_CLOSEST_CANDIDATE_STEPS = 32
+RETURN_ON_DEATH_CLOSEST_CANDIDATE_DIRECTIONS = 16
 
 
 class ReturnDestroyedTargetScope(StrEnum):
@@ -565,6 +571,25 @@ def _assert_destroyed_position_anchor(
         ruleset_descriptor=ruleset_descriptor,
         owner_player_id=pending.owner_player_id,
     ):
+        nearest_legal = _nearest_legal_destroyed_anchor_candidate(
+            state=state,
+            anchor=anchor,
+            ruleset_descriptor=ruleset_descriptor,
+            owner_player_id=pending.owner_player_id,
+        )
+        if nearest_legal is None:
+            raise GameLifecycleError(
+                "Return-on-death closest legal placement proof is unavailable."
+            )
+        attempted_distance = attempted_anchor.pose.distance_2d_to(anchor.pose)
+        nearest_distance = nearest_legal.pose.distance_2d_to(anchor.pose)
+        if (
+            attempted_distance
+            > nearest_distance + RETURN_ON_DEATH_CLOSEST_PLACEMENT_TOLERANCE_INCHES
+        ):
+            raise GameLifecycleError(
+                "Return-on-death placement must be as close as possible to destroyed position."
+            )
         return
     raise GameLifecycleError("Return-on-death placement must use destroyed position when legal.")
 
@@ -589,6 +614,35 @@ def _placement_for_model(*, placement: UnitPlacement, model_instance_id: str) ->
         if model_placement.model_instance_id == requested_model_id:
             return model_placement
     raise GameLifecycleError("Return-on-death placement is missing destroyed anchor model.")
+
+
+def _nearest_legal_destroyed_anchor_candidate(
+    *,
+    state: GameState,
+    anchor: ModelPlacement,
+    ruleset_descriptor: RulesetDescriptor,
+    owner_player_id: str,
+) -> ModelPlacement | None:
+    for step in range(1, RETURN_ON_DEATH_CLOSEST_CANDIDATE_STEPS + 1):
+        distance = step * RETURN_ON_DEATH_CLOSEST_CANDIDATE_STEP_INCHES
+        for direction_index in range(RETURN_ON_DEATH_CLOSEST_CANDIDATE_DIRECTIONS):
+            angle = math.tau * (direction_index / RETURN_ON_DEATH_CLOSEST_CANDIDATE_DIRECTIONS)
+            candidate = anchor.with_pose(
+                Pose.at(
+                    x=anchor.pose.position.x + (math.cos(angle) * distance),
+                    y=anchor.pose.position.y + (math.sin(angle) * distance),
+                    z=anchor.pose.position.z,
+                    facing_degrees=anchor.pose.facing.degrees,
+                )
+            )
+            if not _model_placement_within_enemy_engagement_range(
+                state=state,
+                model_placement=candidate,
+                ruleset_descriptor=ruleset_descriptor,
+                owner_player_id=owner_player_id,
+            ):
+                return candidate
+    return None
 
 
 def _assert_not_within_enemy_engagement_range(

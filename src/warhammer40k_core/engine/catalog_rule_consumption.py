@@ -1944,6 +1944,12 @@ def catalog_rule_tracked_target_supported_roll_types_for_clause(
     return _tracked_target_supported_roll_types_for_clause(clause)
 
 
+def catalog_rule_tracked_target_supported_attack_kinds_for_clause(
+    clause: RuleClause,
+) -> tuple[str, ...]:
+    return _tracked_target_supported_attack_kinds_for_clause(clause)
+
+
 def catalog_rule_clause_is_supported_first_death_return(clause: RuleClause) -> bool:
     return _clause_is_supported_first_death_return(clause)
 
@@ -2003,7 +2009,11 @@ def _clause_is_supported_tracked_target_reroll(clause: RuleClause) -> bool:
     if trigger_parameters.get("actor") not in {"this_model", "model_in_this_models_unit"}:
         return False
     if not any(
-        _condition_is_tracked_target_attack_constraint(condition) for condition in clause.conditions
+        _condition_is_tracked_target_attack_constraint(
+            condition,
+            trigger_parameters=trigger_parameters,
+        )
+        for condition in clause.conditions
     ):
         return False
     reroll_effects = tuple(
@@ -2017,18 +2027,22 @@ def _clause_is_supported_tracked_target_reroll(clause: RuleClause) -> bool:
     )
 
 
-def _condition_is_tracked_target_attack_constraint(condition: RuleCondition) -> bool:
+def _condition_is_tracked_target_attack_constraint(
+    condition: RuleCondition,
+    *,
+    trigger_parameters: Mapping[str, object],
+) -> bool:
     if condition.kind is not RuleConditionKind.TARGET_CONSTRAINT:
         return False
     parameters = parameter_payload(condition.parameters)
     return (
         parameters.get("relationship") == "attack_targets_tracked_target"
         and parameters.get("target_reference") == "tracked_target"
-        and parameters.get("tracked_target_owner") in {"this_model", "this_unit"}
-        and parameters.get("tracked_target_role") in {"prey", "quarry"}
+        and parameters.get("tracked_target_owner") == trigger_parameters.get("tracked_target_owner")
+        and parameters.get("tracked_target_role") == trigger_parameters.get("tracked_target_role")
         and parameters.get("gate_subject") == "attack_target"
-        and parameters.get("attack_kind") in {"melee", "ranged"}
-        and parameters.get("actor") in {"this_model", "model_in_this_models_unit"}
+        and parameters.get("attack_kind") == trigger_parameters.get("attack_kind")
+        and parameters.get("actor") == trigger_parameters.get("actor")
     )
 
 
@@ -2095,6 +2109,20 @@ def _tracked_target_supported_roll_types_for_clause(clause: RuleClause) -> tuple
         for roll_type in ("attack_sequence.hit", "attack_sequence.wound")
         if roll_type in supported
     )
+
+
+def _tracked_target_supported_attack_kinds_for_clause(clause: RuleClause) -> tuple[str, ...]:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Tracked-target attack-kind derivation requires RuleClause.")
+    if not _clause_is_supported_tracked_target_reroll(clause):
+        return ()
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.DICE_ROLL:
+        return ()
+    attack_kind = parameter_payload(trigger.parameters).get("attack_kind")
+    if attack_kind not in {"melee", "ranged"}:
+        return ()
+    return tuple(kind for kind in ("melee", "ranged") if kind == attack_kind)
 
 
 def _clause_is_supported_tracked_target_destroyed_reselect(clause: RuleClause) -> bool:

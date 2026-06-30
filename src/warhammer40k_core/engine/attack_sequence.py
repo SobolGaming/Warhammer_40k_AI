@@ -7357,6 +7357,7 @@ def _request_source_backed_hit_reroll_if_available(
         model_instance_id=attacker_model_instance_id,
         roll_type=roll_state.original_result.spec.roll_type,
         timing_window="attack_sequence.hit",
+        attack_kind=_source_backed_attack_kind_for_phase(source_phase),
         target_unit_instance_id=target_unit_instance_id,
     )
     if permission_context is None:
@@ -7502,6 +7503,7 @@ def apply_source_backed_attack_dice_reroll_decision(
         attack_sequence=attack_sequence,
         current_pool=current_pool,
         roll_type=roll_type,
+        attack_kind=_source_backed_attack_kind_for_phase(expected_phase),
         source_rule_id=source_rule_id,
         attack_context=attack_context,
         phase_label=phase_label,
@@ -7531,6 +7533,7 @@ def _validate_current_source_backed_attack_reroll_context_if_required(
     attack_sequence: AttackSequence,
     current_pool: RangedAttackPool,
     roll_type: str,
+    attack_kind: str,
     source_rule_id: str,
     attack_context: dict[str, JsonValue],
     phase_label: str,
@@ -7546,6 +7549,7 @@ def _validate_current_source_backed_attack_reroll_context_if_required(
         model_instance_id=current_pool.attacker_model_instance_id,
         roll_type=roll_type,
         timing_window=roll_type,
+        attack_kind=attack_kind,
         target_unit_instance_id=current_pool.target_unit_instance_id,
     )
     if current_permission_context is None:
@@ -7579,6 +7583,14 @@ def _source_backed_attack_context_id_matches_active_pool(
     return False
 
 
+def _source_backed_attack_kind_for_phase(source_phase: BattlePhase) -> str:
+    if source_phase is BattlePhase.SHOOTING:
+        return "ranged"
+    if source_phase is BattlePhase.FIGHT:
+        return "melee"
+    raise GameLifecycleError("Source-backed attack rerolls require Shooting or Fight phase.")
+
+
 def _request_source_backed_wound_reroll_if_available(
     *,
     state: GameState,
@@ -7609,6 +7621,7 @@ def _request_source_backed_wound_reroll_if_available(
         model_instance_id=attacker_model_instance_id,
         roll_type=roll_state.original_result.spec.roll_type,
         timing_window="attack_sequence.wound",
+        attack_kind=_source_backed_attack_kind_for_phase(source_phase),
         target_unit_instance_id=pool.target_unit_instance_id,
     )
     if permission_context is None:

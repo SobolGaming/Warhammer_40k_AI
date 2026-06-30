@@ -1320,17 +1320,20 @@ one pending option ID; the option ID is exactly the target unit instance ID.
 
 The request and option payloads include `submission_kind: "select_tracked_target"`,
 source rule/ability/clause/effect identity, `owner_scope` (`this_model` or
-`this_unit`), `tracked_target_role` (`prey` or `quarry`), target allegiance and
-scope, `replacement`, deterministic `legal_target_unit_ids`, source unit ID, and
-optional source model ID. Adapters must not create tracked-target records, expire
-records, infer replacement targets, or apply rerolls locally from option payloads.
+`this_unit`), `tracked_target_role` (`prey` or `quarry`),
+`supported_attack_kinds` (`melee`, `ranged`, or both), `supported_roll_types`,
+target allegiance and scope, `replacement`, deterministic `legal_target_unit_ids`,
+source unit ID, and optional source model ID. Adapters must not create
+tracked-target records, expire records, infer replacement targets, or apply
+rerolls locally from option payloads.
 
 Accepted selections create a replay-safe `TrackedTargetRecord`. Replacement
 selections expire the previous active record for the same source/unit/model
 scope/role and record the replacement target. Attack-sequence rerolls are exposed
 only through the existing source-backed reroll decision path after the engine
 confirms the attacking model or unit matches the tracked-target owner scope and
-the attack targets the active tracked target.
+the attack kind, roll type, and target unit match the active tracked-target
+record.
 
 Malformed, stale, wrong-actor, non-option, option-payload drift, source drift,
 destroyed-target, target-legality drift, duplicate-active, or unsupported-shape
@@ -1367,10 +1370,12 @@ destroyed unit/model IDs, `placement_anchor: "destroyed_position"`,
 The submitted payload must preserve `submission_kind` and include an
 `attempted_placement` `UnitPlacement` for the destroyed model or destroyed unit.
 The engine validates the pending record, actor, target unit/model set,
-return-to-battlefield placement kind, and not-within-enemy-Engagement-Range rule
-before restoring fixed remaining wounds or full-health models/units and placing
-them on the battlefield. Adapters must not restore wounds, alter removed-model
-state, choose dice results, or mutate battlefield placement locally.
+return-to-battlefield placement kind, destroyed-position anchor, as-close-as-possible
+proof when the destroyed position is inside enemy Engagement Range, and the
+not-within-enemy-Engagement-Range rule before restoring fixed remaining wounds or
+full-health models/units and placing them on the battlefield. Adapters must not restore
+wounds, alter removed-model state, choose dice results, or mutate battlefield placement
+locally.
 
 Malformed, stale, wrong-pending, wrong-actor, wrong-unit, wrong-model,
 placement-kind drift, pending-state drift, Engagement Range violations, and

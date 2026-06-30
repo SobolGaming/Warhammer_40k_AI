@@ -60,6 +60,7 @@ def source_backed_reroll_permission_for_unit(
     model_instance_id: str | None = None,
     roll_type: str,
     timing_window: str,
+    attack_kind: str | None = None,
     target_unit_instance_id: str | None = None,
 ) -> RerollPermission | None:
     context = source_backed_reroll_permission_context_for_unit(
@@ -69,6 +70,7 @@ def source_backed_reroll_permission_for_unit(
         model_instance_id=model_instance_id,
         roll_type=roll_type,
         timing_window=timing_window,
+        attack_kind=attack_kind,
         target_unit_instance_id=target_unit_instance_id,
     )
     return None if context is None else context.permission
@@ -82,6 +84,7 @@ def source_backed_reroll_permission_context_for_unit(
     model_instance_id: str | None = None,
     roll_type: str,
     timing_window: str,
+    attack_kind: str | None = None,
     target_unit_instance_id: str | None = None,
 ) -> SourceBackedRerollPermissionContext | None:
     from warhammer40k_core.engine.game_state import GameState
@@ -100,6 +103,9 @@ def source_backed_reroll_permission_context_for_unit(
     )
     requested_roll_type = _validate_identifier("roll_type", roll_type)
     requested_timing_window = _validate_identifier("timing_window", timing_window)
+    requested_attack_kind = (
+        None if attack_kind is None else _validate_attack_kind("attack_kind", attack_kind)
+    )
     requested_target_unit_id = (
         None
         if target_unit_instance_id is None
@@ -134,6 +140,7 @@ def source_backed_reroll_permission_context_for_unit(
         model_instance_id=requested_model_id,
         roll_type=requested_roll_type,
         timing_window=requested_timing_window,
+        attack_kind=requested_attack_kind,
         target_unit_instance_id=requested_target_unit_id,
     )
     if tracked_context is not None:
@@ -195,6 +202,13 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"Source-backed reroll {field_name} must not be empty.")
     return stripped
+
+
+def _validate_attack_kind(field_name: str, value: object) -> str:
+    token = _validate_identifier(field_name, value)
+    if token not in {"melee", "ranged"}:
+        raise GameLifecycleError(f"Source-backed reroll unsupported {field_name}: {token}.")
+    return token
 
 
 def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:

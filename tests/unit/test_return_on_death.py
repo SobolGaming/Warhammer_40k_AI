@@ -248,6 +248,52 @@ def test_return_on_death_rejects_far_placement_when_destroyed_position_is_legal(
     assert set(_beta_unit(state).own_model_ids()) <= set(state.battlefield_state.removed_model_ids)
 
 
+def test_return_on_death_rejects_far_placement_when_illegal_anchor_has_closer_candidate() -> None:
+    state = _battle_state_with_destroyed_beta_unit()
+    beta = _beta_unit(state)
+    anchor = _destroyed_model_placement_for_model(
+        model_instance_id=beta.own_models[0].model_instance_id,
+    ).with_pose(_first_alpha_model_pose(state))
+    pending = replace(
+        _pending_return_on_death(state=state, success_threshold=2),
+        destroyed_position_payload=_destroyed_position_payload_for_placement(anchor),
+    )
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    assert return_on_death_module._model_placement_within_enemy_engagement_range(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        model_placement=anchor,
+        ruleset_descriptor=descriptor,
+        owner_player_id=pending.owner_player_id,
+    )
+    closest = return_on_death_module._nearest_legal_destroyed_anchor_candidate(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        anchor=anchor,
+        ruleset_descriptor=descriptor,
+        owner_player_id=pending.owner_player_id,
+    )
+    far_placement = _unit_placement_for_unit(state=state, unit=beta, x=20.0, y=20.0)
+    far_anchor = return_on_death_module._placement_for_model(  # pyright: ignore[reportPrivateUsage]
+        placement=far_placement,
+        model_instance_id=anchor.model_instance_id,
+    )
+    assert closest is not None
+    assert closest.pose.distance_2d_to(anchor.pose) < far_anchor.pose.distance_2d_to(anchor.pose)
+    state.record_pending_return_on_death(pending)
+    request = build_return_on_death_placement_request(state=state, pending=pending)
+    result = _placement_result(request=request, placement=far_placement)
+
+    status = invalid_return_on_death_placement_status(
+        state=state,
+        request=request,
+        result=result,
+        ruleset_descriptor=descriptor,
+    )
+
+    assert status is not None
+    assert state.battlefield_state is not None
+    assert set(beta.own_model_ids()) <= set(state.battlefield_state.removed_model_ids)
+
+
 def test_return_on_death_rejects_zero_fixed_wounds_before_runtime_mutation() -> None:
     state = _battle_state_with_destroyed_beta_unit()
     with pytest.raises(GameLifecycleError, match="wounds_remaining"):
@@ -1103,6 +1149,24 @@ def _destroyed_position_payload_for_model(*, model_instance_id: str) -> JsonValu
     destroyed_placement_payload = _destroyed_model_placement_for_model(
         model_instance_id=model_instance_id,
     ).to_payload()
+    return _destroyed_position_payload_for_placement_payload(
+        model_instance_id=model_instance_id,
+        destroyed_placement_payload=cast(JsonValue, destroyed_placement_payload),
+    )
+
+
+def _destroyed_position_payload_for_placement(placement: ModelPlacement) -> JsonValue:
+    return _destroyed_position_payload_for_placement_payload(
+        model_instance_id=placement.model_instance_id,
+        destroyed_placement_payload=cast(JsonValue, placement.to_payload()),
+    )
+
+
+def _destroyed_position_payload_for_placement_payload(
+    *,
+    model_instance_id: str,
+    destroyed_placement_payload: JsonValue,
+) -> JsonValue:
     return cast(
         JsonValue,
         {
