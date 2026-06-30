@@ -1,0 +1,101 @@
+[
+  {
+    "allowed_base_faction_ids": [
+      "chaos-space-marines"
+    ],
+    "display_name": "Cult of the Dark Gods",
+    "enforcement_id": "army_mustering:_append_cult_of_dark_gods_violations",
+    "enforcement_surface": "army_mustering/list_validation/army_factory",
+    "faction_id": "chaos-space-marines",
+    "notes": "Allows selected cult datasheets in Heretic Astartes armies, enforces battle-size points caps, and replaces faction keywords during army creation.",
+    "rule_id": "army-mustering:cult-of-the-dark-gods",
+    "source_id": "phase17g:chaos-space-marines:cult-of-the-dark-gods",
+    "support_stage": "full",
+    "tests_evidence": "tests/unit/test_phase9c_mustering.py::test_phase17g_cult_of_dark_gods_allows_cult_units_and_replaces_faction_keywords; tests/unit/test_phase9c_mustering.py::test_phase17g_cult_of_dark_gods_points_cap_scales_by_battle_size"
+  },
+  {
+    "allowed_base_faction_ids": [
+      "chaos-knights",
+      "chaos-space-marines"
+    ],
+    "display_name": "Daemonic Pact",
+    "enforcement_id": "army_mustering:_append_daemonic_pact_violations",
+    "enforcement_surface": "army_mustering/list_validation",
+    "faction_id": "chaos-daemons",
+    "notes": "Allows LEGIONES DAEMONICA allies for Chaos Knights or Heretic Astartes armies, enforces battle-size points caps, god Battleline ratios, base-model keywords, and allied Warlord/Enhancement restrictions.",
+    "rule_id": "army-mustering:daemonic-pact",
+    "source_id": "phase17g:chaos-daemons:daemonic-pact",
+    "support_stage": "full",
+    "tests_evidence": "tests/unit/test_phase9c_mustering.py::test_phase17g_daemonic_pact_allows_legiones_daemonica_allies; tests/unit/test_phase9c_mustering.py::test_phase17g_daemonic_pact_reports_roster_violations; tests/unit/test_phase9c_mustering.py::test_phase17g_daemonic_pact_points_cap_scales_by_battle_size"
+  },
+  {
+    "allowed_base_faction_ids": [
+      "chaos"
+    ],
+    "display_name": "Dreadblades",
+    "enforcement_id": "army_mustering:_append_dreadblades_violations",
+    "enforcement_surface": "army_mustering/list_validation",
+    "faction_id": "chaos-knights",
+    "notes": "Allows Chaos armies to include either one TITANIC Chaos Knights model or up to three WAR DOG models, and forbids allied Enhancements and Warlords.",
+    "rule_id": "army-mustering:dreadblades",
+    "source_id": "phase17g:chaos-knights:dreadblades",
+    "support_stage": "full",
+    "tests_evidence": "tests/unit/test_phase9c_mustering.py::test_phase17g_dreadblades_allows_one_titanic_or_three_war_dogs_for_chaos_armies; tests/unit/test_phase9c_mustering.py::test_phase17g_dreadblades_reports_roster_violations"
+  },
+  {
+    "allowed_base_faction_ids": [
+      "drukhari"
+    ],
+    "display_name": "Corsairs and Travelling Players",
+    "enforcement_id": "army_mustering:_append_drukhari_corsairs_and_travelling_players_violations",
+    "enforcement_surface": "army_mustering/list_validation",
+    "faction_id": "drukhari",
+    "notes": "Allows non-DRUKHARI HARLEQUINS and ANHRATHE allies under Incursion, Strike Force, and Onslaught caps; forbids allied Warlords and Enhancements.",
+    "rule_id": "army-mustering:drukhari-corsairs-and-travelling-players",
+    "source_id": "phase17g:drukhari:corsairs-and-travelling-players",
+    "support_stage": "full",
+    "tests_evidence": "tests/unit/test_phase9c_mustering.py::test_phase17g_drukhari_corsairs_and_travelling_players_allows_allies; tests/unit/test_phase9c_mustering.py::test_phase17g_drukhari_corsairs_reports_roster_violations; tests/unit/test_phase9c_mustering.py::test_phase17g_drukhari_corsairs_rejects_other_faction_allies"
+  },
+  {
+    "allowed_base_faction_ids": [
+      "imperium"
+    ],
+    "display_name": "Freeblades",
+    "enforcement_id": "army_mustering:_append_freeblades_violations",
+    "enforcement_surface": "army_mustering/list_validation",
+    "faction_id": "imperial-knights",
+    "notes": "Allows Imperium armies to include either one TITANIC Imperial Knights model or up to three ARMIGER models, and forbids allied Enhancements and Warlords.",
+    "rule_id": "army-mustering:freeblades",
+    "source_id": "phase17g:imperial-knights:freeblades",
+    "support_stage": "full",
+    "tests_evidence": "tests/unit/test_phase9c_mustering.py::test_phase17g_freeblades_allows_one_titanic_or_three_armigers_for_imperium_armies; tests/unit/test_phase9c_mustering.py::test_phase17g_freeblades_reports_roster_violations; tests/unit/test_phase9c_mustering.py::test_phase17g_freeblades_rejects_non_imperium_faction_access"
+  },
+  {
+    "allowed_base_faction_ids": [
+      "chaos-daemons"
+    ],
+    "display_name": "Shadow Legion Thralls of the First Prince",
+    "enforcement_id": "army_mustering:_append_shadow_legion_violations",
+    "enforcement_surface": "army_mustering/list_validation/army_factory",
+    "faction_id": "chaos-daemons",
+    "notes": "Enforces Shadow Legion detachment restrictions, Heretic Astartes Thralls allow-list and points caps, forbidden Daemon Prince/Epic Hero selections, and grants Shadow Legion, Undivided, and Deep Strike keywords.",
+    "rule_id": "army-mustering:shadow-legion-thralls-of-the-first-prince",
+    "source_id": "phase17g:chaos-daemons:shadow-legion:thralls-of-the-first-prince",
+    "support_stage": "full",
+    "tests_evidence": "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py::test_shadow_legion_mustering_grants_keywords_and_deep_strike; tests/unit/test_phase17g_chaos_daemons_shadow_legion.py::test_shadow_legion_roster_reports_thralls_and_forbidden_units"
+  },
+  {
+    "allowed_base_faction_ids": [
+      "space-marines"
+    ],
+    "display_name": "Space Marine Chapters",
+    "enforcement_id": "army_mustering:_append_space_marine_chapter_violations",
+    "enforcement_surface": "army_mustering/list_validation",
+    "faction_id": "space-marines",
+    "notes": "Enforces one-Chapter roster restrictions plus Black Templars, Space Wolves, and Deathwatch forbidden-unit gates for Adeptus Astartes armies.",
+    "rule_id": "army-mustering:space-marine-chapters",
+    "source_id": "phase17g:space-marines:space-marine-chapters",
+    "support_stage": "full",
+    "tests_evidence": "tests/unit/test_phase17g_space_marines_army_rule.py::test_space_marine_chapters_enforce_black_templars_and_space_wolves; tests/unit/test_phase17g_space_marines_army_rule.py::test_space_marine_chapters_enforce_deathwatch_restrictions"
+  }
+]

@@ -12,10 +12,13 @@ import pytest
 from tools.generate_ability_support_matrix import (
     BLOODLETTERS_HEIGHT_OVERRIDES,
     DATASHEET_SUPPORT_OVERALL_VALUES,
+    MUSTERING_SUPPORT_STAGE_VALUES,
     ability_support_matrix_rows,
     datasheet_support_rows,
     datasheet_support_rows_payload,
     faction_support_markdown_files,
+    mustering_support_rows,
+    mustering_support_rows_payload,
     support_matrix_markdown,
 )
 
@@ -52,6 +55,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
+from warhammer40k_core.engine import army_mustering
 from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -2393,6 +2397,7 @@ def test_phase17k_movement_phase_ability_index_mapping_is_fail_fast() -> None:
 def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     rows = ability_support_matrix_rows()
     support_rows = datasheet_support_rows()
+    mustering_rows = mustering_support_rows()
     snapshot = json.loads(
         (
             Path(__file__).resolve().parents[2]
@@ -2419,6 +2424,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
             / "generated"
             / "ability_coverage"
             / "datasheet_support_rows.json"
+        ).read_text(encoding="utf-8")
+    )
+    mustering_support_snapshot = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "data"
+            / "generated"
+            / "ability_coverage"
+            / "mustering_support_rows.json"
         ).read_text(encoding="utf-8")
     )
     markdown_snapshot = (
@@ -2463,6 +2477,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert ability_coverage_rows_payload(rows) == snapshot
     assert ability_coverage_category_rows_payload(category_rows) == category_snapshot
     assert datasheet_support_rows_payload(support_rows) == datasheet_support_snapshot
+    assert mustering_support_rows_payload(mustering_rows) == mustering_support_snapshot
     assert generated_markdown == markdown_snapshot
     assert generated_faction_markdown == faction_markdown_snapshot
     assert "## Factions" in generated_markdown
@@ -2520,6 +2535,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     support_rows_by_datasheet_id = {row.datasheet_id: row for row in support_rows}
     flesh_hounds_support = support_rows_by_datasheet_id["000001112"]
     bloodletters_support = support_rows_by_datasheet_id["000001114"]
+    known_mustering_source_ids = {
+        value
+        for name, value in vars(army_mustering).items()
+        if name.endswith("_SOURCE_ID") and type(value) is str
+    }
+    represented_mustering_source_ids = {row.source_id for row in mustering_rows}
+    army_mustering_rule_ids = tuple(
+        row.rule_id for row in mustering_rows if row.rule_id.startswith("army-mustering:")
+    )
 
     assert "## Datasheet / Unit Support" in chaos_daemons_markdown
     assert "### Datasheet Ability Details" in chaos_daemons_markdown
@@ -2551,6 +2575,18 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         assert set(support_row.supported_detachment_ids).issubset(set(support_row.detachment_ids))
         if support_row.overall != "Full":
             assert support_row.notes or support_row.ability_coverage_row_ids
+    for mustering_row in mustering_rows:
+        assert mustering_row.source_id
+        assert mustering_row.support_stage in MUSTERING_SUPPORT_STAGE_VALUES
+    assert known_mustering_source_ids.issubset(represented_mustering_source_ids)
+    assert "army-mustering:drukhari-corsairs-and-travelling-players" in army_mustering_rule_ids
+    assert len(army_mustering_rule_ids) > 1
+    assert "## Mustering / List Construction Support" in generated_markdown
+    assert (
+        "| Space Marine Chapters | `army-mustering:space-marine-chapters` | "
+        "`phase17g:space-marines:space-marine-chapters` |"
+    ) in generated_markdown
+    assert generated_markdown.count("army-mustering:drukhari-corsairs-and-travelling-players") == 1
     assert "| Grey Knights - Gate of Infinity | Named army-rule handler |" in generated_markdown
     assert (
         "| Adepta Sororitas - Acts of Faith | "

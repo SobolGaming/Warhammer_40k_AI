@@ -6,6 +6,8 @@ This matrix summarizes the category-first support artifact in
 `data/generated/ability_coverage/ability_support_category_rows.json`.
 The raw per-ability rows remain available in
 `data/generated/ability_coverage/ability_coverage_rows.json`.
+Pregame mustering and list-construction rows are generated separately in
+`data/generated/ability_coverage/mustering_support_rows.json`.
 
 Support stages:
 
@@ -119,6 +121,20 @@ Faction army rules are grouped by faction-specific runtime consumers.
 | Drukhari - Power from Pain | Named army-rule handler plus faction-resource ledger | README, faction integration note, adapter contract, and generated matrix | Focused faction runtime tests | Full | Implements Pain token gain at own Command phase start, enemy unit destruction, and enemy Battle-shock failure, plus optional Lithe Agility empowerment for Advance and Charge rerolls and Hatred Eternal selected-to-shoot/selected-to-fight empowerment for attack hit rerolls. |
 | Drukhari - Corsairs and Travelling Players | Shared mustering/list-validation host | README, faction integration note, and generated matrix | Focused mustering tests | Full | Allows non-DRUKHARI HARLEQUINS and ANHRATHE allies under Incursion, Strike Force, and Onslaught caps; forbids allied Warlords and Enhancements. No player-facing decision or phase runtime hook is introduced. |
 
+## Mustering / List Construction Support
+
+This generated section reports pregame army-list rules enforced by `army_mustering.py`, `list_validation.py`, and army creation helpers. These rows are separate from the Runtime Hook Inventory, which is limited to phase/query hooks, modifiers, effects, handlers, and runtime consumers.
+
+| Rule | Rule ID | Source ID | Faction / allowed base factions | Enforcement surface | Support stage | Enforcement ID | Tests / evidence | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Cult of the Dark Gods | `army-mustering:cult-of-the-dark-gods` | `phase17g:chaos-space-marines:cult-of-the-dark-gods` | faction `chaos-space-marines`; allowed base `chaos-space-marines` | `army_mustering/list_validation/army_factory` | `full` | `army_mustering:_append_cult_of_dark_gods_violations` | tests/unit/test_phase9c_mustering.py::test_phase17g_cult_of_dark_gods_allows_cult_units_and_replaces_faction_keywords; tests/unit/test_phase9c_mustering.py::test_phase17g_cult_of_dark_gods_points_cap_scales_by_battle_size | Allows selected cult datasheets in Heretic Astartes armies, enforces battle-size points caps, and replaces faction keywords during army creation. |
+| Daemonic Pact | `army-mustering:daemonic-pact` | `phase17g:chaos-daemons:daemonic-pact` | faction `chaos-daemons`; allowed base `chaos-knights`, `chaos-space-marines` | `army_mustering/list_validation` | `full` | `army_mustering:_append_daemonic_pact_violations` | tests/unit/test_phase9c_mustering.py::test_phase17g_daemonic_pact_allows_legiones_daemonica_allies; tests/unit/test_phase9c_mustering.py::test_phase17g_daemonic_pact_reports_roster_violations; tests/unit/test_phase9c_mustering.py::test_phase17g_daemonic_pact_points_cap_scales_by_battle_size | Allows LEGIONES DAEMONICA allies for Chaos Knights or Heretic Astartes armies, enforces battle-size points caps, god Battleline ratios, base-model keywords, and allied Warlord/Enhancement restrictions. |
+| Dreadblades | `army-mustering:dreadblades` | `phase17g:chaos-knights:dreadblades` | faction `chaos-knights`; allowed base `chaos` | `army_mustering/list_validation` | `full` | `army_mustering:_append_dreadblades_violations` | tests/unit/test_phase9c_mustering.py::test_phase17g_dreadblades_allows_one_titanic_or_three_war_dogs_for_chaos_armies; tests/unit/test_phase9c_mustering.py::test_phase17g_dreadblades_reports_roster_violations | Allows Chaos armies to include either one TITANIC Chaos Knights model or up to three WAR DOG models, and forbids allied Enhancements and Warlords. |
+| Corsairs and Travelling Players | `army-mustering:drukhari-corsairs-and-travelling-players` | `phase17g:drukhari:corsairs-and-travelling-players` | faction `drukhari`; allowed base `drukhari` | `army_mustering/list_validation` | `full` | `army_mustering:_append_drukhari_corsairs_and_travelling_players_violations` | tests/unit/test_phase9c_mustering.py::test_phase17g_drukhari_corsairs_and_travelling_players_allows_allies; tests/unit/test_phase9c_mustering.py::test_phase17g_drukhari_corsairs_reports_roster_violations; tests/unit/test_phase9c_mustering.py::test_phase17g_drukhari_corsairs_rejects_other_faction_allies | Allows non-DRUKHARI HARLEQUINS and ANHRATHE allies under Incursion, Strike Force, and Onslaught caps; forbids allied Warlords and Enhancements. |
+| Freeblades | `army-mustering:freeblades` | `phase17g:imperial-knights:freeblades` | faction `imperial-knights`; allowed base `imperium` | `army_mustering/list_validation` | `full` | `army_mustering:_append_freeblades_violations` | tests/unit/test_phase9c_mustering.py::test_phase17g_freeblades_allows_one_titanic_or_three_armigers_for_imperium_armies; tests/unit/test_phase9c_mustering.py::test_phase17g_freeblades_reports_roster_violations; tests/unit/test_phase9c_mustering.py::test_phase17g_freeblades_rejects_non_imperium_faction_access | Allows Imperium armies to include either one TITANIC Imperial Knights model or up to three ARMIGER models, and forbids allied Enhancements and Warlords. |
+| Shadow Legion Thralls of the First Prince | `army-mustering:shadow-legion-thralls-of-the-first-prince` | `phase17g:chaos-daemons:shadow-legion:thralls-of-the-first-prince` | faction `chaos-daemons`; allowed base `chaos-daemons` | `army_mustering/list_validation/army_factory` | `full` | `army_mustering:_append_shadow_legion_violations` | tests/unit/test_phase17g_chaos_daemons_shadow_legion.py::test_shadow_legion_mustering_grants_keywords_and_deep_strike; tests/unit/test_phase17g_chaos_daemons_shadow_legion.py::test_shadow_legion_roster_reports_thralls_and_forbidden_units | Enforces Shadow Legion detachment restrictions, Heretic Astartes Thralls allow-list and points caps, forbidden Daemon Prince/Epic Hero selections, and grants Shadow Legion, Undivided, and Deep Strike keywords. |
+| Space Marine Chapters | `army-mustering:space-marine-chapters` | `phase17g:space-marines:space-marine-chapters` | faction `space-marines`; allowed base `space-marines` | `army_mustering/list_validation` | `full` | `army_mustering:_append_space_marine_chapter_violations` | tests/unit/test_phase17g_space_marines_army_rule.py::test_space_marine_chapters_enforce_black_templars_and_space_wolves; tests/unit/test_phase17g_space_marines_army_rule.py::test_space_marine_chapters_enforce_deathwatch_restrictions | Enforces one-Chapter roster restrictions plus Black Templars, Space Wolves, and Deathwatch forbidden-unit gates for Adeptus Astartes armies. |
+
 ## Factions
 
 Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into generated per-faction files under `docs/factions/`. The exact rows expose their coverage row IDs, source IDs, timing/category metadata, and current support status. Supported detachment counts report semantic engine support, not just source-row intake.
@@ -168,11 +184,10 @@ Broad CORE V1-to-CORE V2 category forecasting is intentionally deferred until cu
 
 ## Runtime Hook Inventory
 
-This bottom inventory lists the hook, modifier, effect, handler, and runtime consumer IDs currently surfaced by generated category rows, Core Stratagem records, or registered runtime-content contributions.
+This bottom inventory lists the hook, modifier, effect, handler, and runtime consumer IDs currently surfaced by generated category rows, Core Stratagem records, or registered runtime-content contributions. Pregame mustering/list construction enforcement is reported in the Mustering / List Construction Support section instead of this phase/query inventory.
 
 | Hook / consumer | Abilities / rules |
 | --- | --- |
-| `army-mustering:drukhari-corsairs-and-travelling-players` | Corsairs and Travelling Players |
 | `catalog-ir:advance-roll-reroll` | No current generated rows |
 | `catalog-ir:armor-penetration-characteristic-modifier` | No current generated rows |
 | `catalog-ir:armor-penetration-characteristic-query` | No current generated rows |

@@ -33,7 +33,15 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_coverage_rows_from_catalog,
     ability_coverage_rows_payload,
 )
-from warhammer40k_core.engine.army_mustering import SPACE_MARINE_CHAPTERS_SOURCE_ID
+from warhammer40k_core.engine.army_mustering import (
+    CULT_OF_DARK_GODS_SOURCE_ID,
+    DAEMONIC_PACT_SOURCE_ID,
+    DREADBLADES_SOURCE_ID,
+    DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_SOURCE_ID,
+    FREEBLADES_SOURCE_ID,
+    SHADOW_LEGION_SOURCE_ID,
+    SPACE_MARINE_CHAPTERS_SOURCE_ID,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_ir_registered_hook_ids
 from warhammer40k_core.engine.faction_content.bundle import (
     DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID,
@@ -155,6 +163,18 @@ DATASHEET_SUPPORT_OVERALL_VALUES = frozenset(
 DATASHEET_SUPPORT_COMPONENT_VALUES = frozenset(
     (*DATASHEET_SUPPORT_OVERALL_VALUES, DATASHEET_SUPPORT_NONE)
 )
+MUSTERING_SUPPORT_FULL = "full"
+MUSTERING_SUPPORT_PARTIAL = "partial"
+MUSTERING_SUPPORT_SOURCE_ONLY = "source_only"
+MUSTERING_SUPPORT_UNKNOWN = "unknown"
+MUSTERING_SUPPORT_STAGE_VALUES = frozenset(
+    (
+        MUSTERING_SUPPORT_FULL,
+        MUSTERING_SUPPORT_PARTIAL,
+        MUSTERING_SUPPORT_SOURCE_ONLY,
+        MUSTERING_SUPPORT_UNKNOWN,
+    )
+)
 _DATASHEET_ABILITY_FULL_STAGES = frozenset((AbilityCoverageSupportStage.ENGINE_CONSUMED,))
 _DATASHEET_ABILITY_PLAYABLE_STAGES = frozenset((AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,))
 _DATASHEET_ABILITY_PARTIAL_STAGES = frozenset((AbilityCoverageSupportStage.DESCRIPTOR_ONLY,))
@@ -241,6 +261,110 @@ class DetachmentRuleSupportRow:
 class RuntimeHookInventoryRow:
     hook_id: str
     ability_or_rule_labels: tuple[str, ...]
+
+
+class MusteringSupportRowPayload(TypedDict):
+    rule_id: str
+    display_name: str
+    faction_id: str | None
+    allowed_base_faction_ids: list[str]
+    source_id: str
+    enforcement_surface: str
+    support_stage: str
+    enforcement_id: str
+    tests_evidence: str
+    notes: str
+
+
+@dataclass(frozen=True)
+class MusteringSupportRow:
+    rule_id: str
+    display_name: str
+    faction_id: str | None
+    allowed_base_faction_ids: tuple[str, ...]
+    source_id: str
+    enforcement_surface: str
+    support_stage: str
+    enforcement_id: str
+    tests_evidence: str
+    notes: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "rule_id",
+            _validate_mustering_text("MusteringSupportRow rule_id", self.rule_id),
+        )
+        if not self.rule_id.startswith("army-mustering:"):
+            raise ValueError("MusteringSupportRow rule_id must use army-mustering namespace.")
+        object.__setattr__(
+            self,
+            "display_name",
+            _validate_mustering_text("MusteringSupportRow display_name", self.display_name),
+        )
+        if self.faction_id is not None:
+            object.__setattr__(
+                self,
+                "faction_id",
+                _validate_mustering_text("MusteringSupportRow faction_id", self.faction_id),
+            )
+        object.__setattr__(
+            self,
+            "allowed_base_faction_ids",
+            _validate_mustering_text_tuple(
+                "MusteringSupportRow allowed_base_faction_ids",
+                self.allowed_base_faction_ids,
+            ),
+        )
+        if self.faction_id is None and not self.allowed_base_faction_ids:
+            raise ValueError("MusteringSupportRow requires faction_id or allowed_base_faction_ids.")
+        object.__setattr__(
+            self,
+            "source_id",
+            _validate_mustering_text("MusteringSupportRow source_id", self.source_id),
+        )
+        object.__setattr__(
+            self,
+            "enforcement_surface",
+            _validate_mustering_text(
+                "MusteringSupportRow enforcement_surface",
+                self.enforcement_surface,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "support_stage",
+            _validate_mustering_support_stage(self.support_stage),
+        )
+        object.__setattr__(
+            self,
+            "enforcement_id",
+            _validate_mustering_text("MusteringSupportRow enforcement_id", self.enforcement_id),
+        )
+        object.__setattr__(
+            self,
+            "tests_evidence",
+            _validate_mustering_text("MusteringSupportRow tests_evidence", self.tests_evidence),
+        )
+        object.__setattr__(
+            self,
+            "notes",
+            _validate_mustering_text("MusteringSupportRow notes", self.notes),
+        )
+
+    def to_payload(self) -> MusteringSupportRowPayload:
+        return {
+            "rule_id": self.rule_id,
+            "display_name": self.display_name,
+            "faction_id": self.faction_id,
+            "allowed_base_faction_ids": list(self.allowed_base_faction_ids),
+            "source_id": self.source_id,
+            "enforcement_surface": self.enforcement_surface,
+            "support_stage": self.support_stage,
+            "enforcement_id": self.enforcement_id,
+            "tests_evidence": self.tests_evidence,
+            "notes": self.notes,
+        }
 
 
 class DatasheetSupportRowPayload(TypedDict):
@@ -672,14 +796,17 @@ def main() -> None:
         package=package,
         ability_rows=rows,
     )
+    mustering_rows = mustering_support_rows()
     row_payloads = ability_coverage_rows_payload(rows)
     category_payloads = ability_coverage_category_rows_payload(category_rows)
     datasheet_payloads = datasheet_support_rows_payload(datasheet_rows)
+    mustering_payloads = mustering_support_rows_payload(mustering_rows)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     _write_json(output_dir / "ability_coverage_rows.json", row_payloads)
     _write_json(output_dir / "ability_support_category_rows.json", category_payloads)
     _write_json(output_dir / "datasheet_support_rows.json", datasheet_payloads)
+    _write_json(output_dir / "mustering_support_rows.json", mustering_payloads)
     docs_path.write_text(support_matrix_markdown(category_payloads), encoding="utf-8")
     faction_docs_dir.mkdir(parents=True, exist_ok=True)
     for filename, markdown in faction_support_markdown_files(
@@ -715,6 +842,172 @@ def datasheet_support_rows_payload(
     for row in rows:
         if type(row) is not DatasheetSupportRow:
             raise ValueError("Datasheet support payloads require DatasheetSupportRow values.")
+    return [row.to_payload() for row in rows]
+
+
+def mustering_support_rows() -> tuple[MusteringSupportRow, ...]:
+    rows = (
+        MusteringSupportRow(
+            rule_id="army-mustering:daemonic-pact",
+            display_name="Daemonic Pact",
+            faction_id="chaos-daemons",
+            allowed_base_faction_ids=("chaos-knights", "chaos-space-marines"),
+            source_id=DAEMONIC_PACT_SOURCE_ID,
+            enforcement_surface="army_mustering/list_validation",
+            support_stage=MUSTERING_SUPPORT_FULL,
+            enforcement_id="army_mustering:_append_daemonic_pact_violations",
+            tests_evidence=(
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_phase17g_daemonic_pact_allows_legiones_daemonica_allies; "
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_phase17g_daemonic_pact_reports_roster_violations; "
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_phase17g_daemonic_pact_points_cap_scales_by_battle_size"
+            ),
+            notes=(
+                "Allows LEGIONES DAEMONICA allies for Chaos Knights or Heretic Astartes "
+                "armies, enforces battle-size points caps, god Battleline ratios, base-model "
+                "keywords, and allied Warlord/Enhancement restrictions."
+            ),
+        ),
+        MusteringSupportRow(
+            rule_id="army-mustering:dreadblades",
+            display_name="Dreadblades",
+            faction_id="chaos-knights",
+            allowed_base_faction_ids=("chaos",),
+            source_id=DREADBLADES_SOURCE_ID,
+            enforcement_surface="army_mustering/list_validation",
+            support_stage=MUSTERING_SUPPORT_FULL,
+            enforcement_id="army_mustering:_append_dreadblades_violations",
+            tests_evidence=(
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_phase17g_dreadblades_allows_one_titanic_or_three_war_dogs_for_chaos_armies; "
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_phase17g_dreadblades_reports_roster_violations"
+            ),
+            notes=(
+                "Allows Chaos armies to include either one TITANIC Chaos Knights model or up "
+                "to three WAR DOG models, and forbids allied Enhancements and Warlords."
+            ),
+        ),
+        MusteringSupportRow(
+            rule_id="army-mustering:cult-of-the-dark-gods",
+            display_name="Cult of the Dark Gods",
+            faction_id="chaos-space-marines",
+            allowed_base_faction_ids=("chaos-space-marines",),
+            source_id=CULT_OF_DARK_GODS_SOURCE_ID,
+            enforcement_surface="army_mustering/list_validation/army_factory",
+            support_stage=MUSTERING_SUPPORT_FULL,
+            enforcement_id="army_mustering:_append_cult_of_dark_gods_violations",
+            tests_evidence=(
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_phase17g_cult_of_dark_gods_allows_cult_units_and_replaces_faction_keywords; "
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_phase17g_cult_of_dark_gods_points_cap_scales_by_battle_size"
+            ),
+            notes=(
+                "Allows selected cult datasheets in Heretic Astartes armies, enforces "
+                "battle-size points caps, and replaces faction keywords during army creation."
+            ),
+        ),
+        MusteringSupportRow(
+            rule_id="army-mustering:drukhari-corsairs-and-travelling-players",
+            display_name="Corsairs and Travelling Players",
+            faction_id="drukhari",
+            allowed_base_faction_ids=("drukhari",),
+            source_id=DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_SOURCE_ID,
+            enforcement_surface="army_mustering/list_validation",
+            support_stage=MUSTERING_SUPPORT_FULL,
+            enforcement_id="army_mustering:_append_drukhari_corsairs_and_travelling_players_violations",
+            tests_evidence=(
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_phase17g_drukhari_corsairs_and_travelling_players_allows_allies; "
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_phase17g_drukhari_corsairs_reports_roster_violations; "
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_phase17g_drukhari_corsairs_rejects_other_faction_allies"
+            ),
+            notes=(
+                "Allows non-DRUKHARI HARLEQUINS and ANHRATHE allies under Incursion, Strike "
+                "Force, and Onslaught caps; forbids allied Warlords and Enhancements."
+            ),
+        ),
+        MusteringSupportRow(
+            rule_id="army-mustering:freeblades",
+            display_name="Freeblades",
+            faction_id="imperial-knights",
+            allowed_base_faction_ids=("imperium",),
+            source_id=FREEBLADES_SOURCE_ID,
+            enforcement_surface="army_mustering/list_validation",
+            support_stage=MUSTERING_SUPPORT_FULL,
+            enforcement_id="army_mustering:_append_freeblades_violations",
+            tests_evidence=(
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_phase17g_freeblades_allows_one_titanic_or_three_armigers_for_"
+                "imperium_armies; "
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_phase17g_freeblades_reports_roster_violations; "
+                "tests/unit/test_phase9c_mustering.py::"
+                "test_phase17g_freeblades_rejects_non_imperium_faction_access"
+            ),
+            notes=(
+                "Allows Imperium armies to include either one TITANIC Imperial Knights model "
+                "or up to three ARMIGER models, and forbids allied Enhancements and Warlords."
+            ),
+        ),
+        MusteringSupportRow(
+            rule_id="army-mustering:shadow-legion-thralls-of-the-first-prince",
+            display_name="Shadow Legion Thralls of the First Prince",
+            faction_id="chaos-daemons",
+            allowed_base_faction_ids=("chaos-daemons",),
+            source_id=SHADOW_LEGION_SOURCE_ID,
+            enforcement_surface="army_mustering/list_validation/army_factory",
+            support_stage=MUSTERING_SUPPORT_FULL,
+            enforcement_id="army_mustering:_append_shadow_legion_violations",
+            tests_evidence=(
+                "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py::"
+                "test_shadow_legion_mustering_grants_keywords_and_deep_strike; "
+                "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py::"
+                "test_shadow_legion_roster_reports_thralls_and_forbidden_units"
+            ),
+            notes=(
+                "Enforces Shadow Legion detachment restrictions, Heretic Astartes Thralls "
+                "allow-list and points caps, forbidden Daemon Prince/Epic Hero selections, "
+                "and grants Shadow Legion, Undivided, and Deep Strike keywords."
+            ),
+        ),
+        MusteringSupportRow(
+            rule_id="army-mustering:space-marine-chapters",
+            display_name="Space Marine Chapters",
+            faction_id="space-marines",
+            allowed_base_faction_ids=("space-marines",),
+            source_id=SPACE_MARINE_CHAPTERS_SOURCE_ID,
+            enforcement_surface="army_mustering/list_validation",
+            support_stage=MUSTERING_SUPPORT_FULL,
+            enforcement_id="army_mustering:_append_space_marine_chapter_violations",
+            tests_evidence=(
+                "tests/unit/test_phase17g_space_marines_army_rule.py::"
+                "test_space_marine_chapters_enforce_black_templars_and_space_wolves; "
+                "tests/unit/test_phase17g_space_marines_army_rule.py::"
+                "test_space_marine_chapters_enforce_deathwatch_restrictions"
+            ),
+            notes=(
+                "Enforces one-Chapter roster restrictions plus Black Templars, Space Wolves, "
+                "and Deathwatch forbidden-unit gates for Adeptus Astartes armies."
+            ),
+        ),
+    )
+    return tuple(sorted(rows, key=lambda row: row.rule_id))
+
+
+def mustering_support_rows_payload(
+    rows: tuple[MusteringSupportRow, ...],
+) -> list[MusteringSupportRowPayload]:
+    if type(rows) is not tuple:
+        raise ValueError("Mustering support rows must be a tuple.")
+    for row in rows:
+        if type(row) is not MusteringSupportRow:
+            raise ValueError("Mustering support payloads require MusteringSupportRow values.")
     return [row.to_payload() for row in rows]
 
 
@@ -1267,6 +1560,24 @@ def _component(status: str, *notes: str) -> _ComponentEvidence:
     if status not in DATASHEET_SUPPORT_COMPONENT_VALUES:
         raise ValueError(f"Unsupported datasheet support status: {status}.")
     return _ComponentEvidence(status=status, notes=tuple(note for note in notes if note))
+
+
+def _validate_mustering_text(field_name: str, value: str) -> str:
+    if type(value) is not str or not value.strip():
+        raise ValueError(f"{field_name} must be a non-empty string.")
+    return value
+
+
+def _validate_mustering_text_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise ValueError(f"{field_name} must be a tuple.")
+    return tuple(_validate_mustering_text(field_name, value) for value in values)
+
+
+def _validate_mustering_support_stage(value: str) -> str:
+    if type(value) is not str or value not in MUSTERING_SUPPORT_STAGE_VALUES:
+        raise ValueError("MusteringSupportRow support_stage is not supported.")
+    return value
 
 
 def _missing_note(prefix: str, values: Iterable[str]) -> str:
@@ -1833,6 +2144,8 @@ def support_matrix_markdown(
         "`data/generated/ability_coverage/ability_support_category_rows.json`.",
         "The raw per-ability rows remain available in",
         "`data/generated/ability_coverage/ability_coverage_rows.json`.",
+        "Pregame mustering and list-construction rows are generated separately in",
+        "`data/generated/ability_coverage/mustering_support_rows.json`.",
         "",
         "Support stages:",
         "",
@@ -2296,7 +2609,9 @@ def _runtime_hook_inventory_markdown(
         (
             "This bottom inventory lists the hook, modifier, effect, handler, and runtime "
             "consumer IDs currently surfaced by generated category rows, Core Stratagem "
-            "records, or registered runtime-content contributions."
+            "records, or registered runtime-content contributions. Pregame mustering/list "
+            "construction enforcement is reported in the Mustering / List Construction "
+            "Support section instead of this phase/query inventory."
         ),
         "",
         "| Hook / consumer | Abilities / rules |",
@@ -2783,7 +3098,13 @@ def _add_inventory_entry(
     hook_id: str,
     label: str,
 ) -> None:
+    if _is_mustering_report_id(hook_id):
+        return
     inventory.setdefault(hook_id, set()).add(label)
+
+
+def _is_mustering_report_id(identifier: str) -> bool:
+    return identifier.startswith("army-mustering:")
 
 
 def _hook_ability_or_rule_labels_text(labels: tuple[str, ...]) -> str:
@@ -3459,6 +3780,7 @@ def _structured_support_sections_markdown() -> list[str]:
             ),
         )
     )
+    lines.extend(_mustering_support_markdown(mustering_support_rows()))
     lines.extend(_faction_index_section_markdown())
     lines.extend(
         _support_section_markdown(
@@ -3555,6 +3877,59 @@ def _coverage_kind_count(
     kind: Phase17ECoverageKind,
 ) -> int:
     return sum(1 for row in rows if row.coverage_kind is kind)
+
+
+def _mustering_support_markdown(rows: tuple[MusteringSupportRow, ...]) -> list[str]:
+    if type(rows) is not tuple:
+        raise ValueError("Mustering support Markdown requires a tuple.")
+    for row in rows:
+        if type(row) is not MusteringSupportRow:
+            raise ValueError("Mustering support Markdown requires MusteringSupportRow values.")
+    lines = [
+        "",
+        "## Mustering / List Construction Support",
+        "",
+        (
+            "This generated section reports pregame army-list rules enforced by "
+            "`army_mustering.py`, `list_validation.py`, and army creation helpers. These "
+            "rows are separate from the Runtime Hook Inventory, which is limited to "
+            "phase/query hooks, modifiers, effects, handlers, and runtime consumers."
+        ),
+        "",
+        (
+            "| Rule | Rule ID | Source ID | Faction / allowed base factions | "
+            "Enforcement surface | Support stage | Enforcement ID | Tests / evidence | Notes |"
+        ),
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for row in rows:
+        lines.append(
+            "| "
+            + " | ".join(
+                (
+                    _markdown_text(row.display_name),
+                    f"`{_markdown_text(row.rule_id)}`",
+                    f"`{_markdown_text(row.source_id)}`",
+                    _mustering_scope_text(row),
+                    f"`{_markdown_text(row.enforcement_surface)}`",
+                    f"`{_markdown_text(row.support_stage)}`",
+                    f"`{_markdown_text(row.enforcement_id)}`",
+                    _markdown_text(row.tests_evidence),
+                    _markdown_text(row.notes),
+                )
+            )
+            + " |"
+        )
+    return lines
+
+
+def _mustering_scope_text(row: MusteringSupportRow) -> str:
+    scope_parts: list[str] = []
+    if row.faction_id is not None:
+        scope_parts.append(f"faction {_inline_code_list((row.faction_id,))}")
+    if row.allowed_base_faction_ids:
+        scope_parts.append(f"allowed base {_inline_code_list(row.allowed_base_faction_ids)}")
+    return "; ".join(scope_parts)
 
 
 def _support_section_markdown(
