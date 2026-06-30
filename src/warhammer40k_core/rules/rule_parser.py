@@ -41,6 +41,7 @@ from warhammer40k_core.rules.rule_templates import (
     RESOURCE_MODIFIER_TEMPLATE_ID,
     SELECTED_TARGET_TEMPLATE_ID,
     TIMING_WINDOW_TEMPLATE_ID,
+    TRACKED_TARGET_SELECTION_TEMPLATE_ID,
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
     rule_template_by_id,
 )
@@ -66,6 +67,12 @@ _START_END_TURN_RE = re.compile(
     rf"(?P<owner>{_TIMING_OWNER_PATTERN})\s+turn\b",
     re.IGNORECASE,
 )
+_BATTLE_ROUND_ORDINAL_PATTERN = r"first|second|third|fourth|fifth|\d+(?:st|nd|rd|th)?"
+_START_END_BATTLE_ROUND_RE = re.compile(
+    r"\bat\s+the\s+(?P<edge>start|end)\s+of\s+the\s+"
+    rf"(?P<ordinal>{_BATTLE_ROUND_ORDINAL_PATTERN})\s+battle\s+round\b",
+    re.IGNORECASE,
+)
 _IN_PHASE_RE = re.compile(
     rf"\b(?:in|during)\s+(?:(?P<owner>{_TIMING_OWNER_PATTERN})\s+)?"
     rf"(?P<phase>{_PHASES})\s+phase\b",
@@ -84,6 +91,24 @@ _THIS_MODEL_MELEE_ATTACK_TARGET_RE = re.compile(
 _THIS_MODEL_DESTROYS_ENEMY_KEYWORD_UNIT_RE = re.compile(
     r"\beach\s+time\s+this\s+model\s+destroys\s+an\s+enemy\s+"
     r"(?P<keyword>Character\s+or\s+Monster)\s+unit\b",
+    re.IGNORECASE,
+)
+_TRACKED_TARGET_ROLE_PATTERN = "prey|quarry"
+_TRACKED_TARGET_SELECTION_RE = re.compile(
+    r"\bselect\s+one\s+(?P<replacement>new\s+)?(?P<allegiance>enemy|friendly)\s+unit\s+"
+    r"to\s+be\s+(?P<owner>this\s+model|this\s+unit)'s\s+"
+    rf"(?P<role>{_TRACKED_TARGET_ROLE_PATTERN})\b",
+    re.IGNORECASE,
+)
+_TRACKED_TARGET_ATTACK_RE = re.compile(
+    r"\beach\s+time\s+(?P<actor>this\s+model|a\s+model\s+in\s+this\s+model's\s+unit)\s+"
+    r"makes\s+a\s+(?P<attack_kind>melee|ranged)\s+attack\s+that\s+targets\s+its\s+"
+    rf"(?P<role>{_TRACKED_TARGET_ROLE_PATTERN})\b",
+    re.IGNORECASE,
+)
+_TRACKED_TARGET_DESTROYED_RE = re.compile(
+    r"\beach\s+time\s+(?P<owner>this\s+model|this\s+unit)'s\s+"
+    rf"(?P<role>{_TRACKED_TARGET_ROLE_PATTERN})\s+is\s+destroyed\b",
     re.IGNORECASE,
 )
 _DESTROYED_MODEL_RE = re.compile(r"\bwhen\s+.*\bmodel\s+is\s+destroyed\b", re.IGNORECASE)
@@ -113,13 +138,17 @@ _LEADING_UNIT_RE = re.compile(
     re.IGNORECASE,
 )
 _TARGET_RE = re.compile(
-    r"\b(?:select\s+)?(?:one\s+)?(?P<allegiance>friendly|enemy)\s+"
+    r"\b(?:select\s+)?(?:one\s+)?(?:new\s+)?(?P<allegiance>friendly|enemy)\s+"
     r"(?:(?P<keyword>[A-Z][A-Z0-9_'-]*(?:\s+[A-Z0-9_'-]+){0,5})\s+)?"
     r"(?:model|unit)\b",
     re.IGNORECASE,
 )
 _THIS_UNIT_RE = re.compile(r"\bthis\s+unit\b", re.IGNORECASE)
 _THIS_MODEL_RE = re.compile(r"\bthis\s+model\b", re.IGNORECASE)
+_THIS_MODEL_UNIT_RE = re.compile(
+    r"\b(?:a\s+)?models?\s+in\s+this\s+model's\s+unit\b",
+    re.IGNORECASE,
+)
 _BEARER_APOSTROPHE_RE = r"'?"
 _BEARERS_UNIT_RE = re.compile(
     rf"\b(?:models\s+in\s+)?(?:the\s+)?bearer{_BEARER_APOSTROPHE_RE}s\s+unit\b|"
@@ -599,6 +628,7 @@ def _compile_clause(
         (
             *_parse_aura_conditions(clause_text),
             *_parse_leading_unit_conditions(clause_text),
+            *_parse_tracked_target_conditions(clause_text),
             *_parse_frequency_conditions(clause_text),
             *_parse_keyword_conditions(clause_text),
             *_parse_distance_conditions(clause_text, parsed_text),
@@ -613,6 +643,7 @@ def _compile_clause(
             *_parse_reroll_effects(clause_text),
             *_parse_characteristic_effects(clause_text),
             *_parse_resource_effects(clause_text),
+            *_parse_tracked_target_selection_effects(clause_text),
             *_parse_grant_ability_effects(clause_text),
             *_parse_contextual_status_effects(clause_text),
             *_parse_weapon_ability_effects(clause_text),
@@ -691,6 +722,46 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                     ("actor", "this_model"),
                     ("destroyed_allegiance", "enemy"),
                     ("destroyed_unit_kind", "unit"),
+                )
+            ),
+        )
+    tracked_attack_match = _TRACKED_TARGET_ATTACK_RE.search(clause_text.text)
+    if tracked_attack_match is not None:
+        return RuleTrigger(
+            kind=RuleTriggerKind.DICE_ROLL,
+            source_span=_span_from_match(clause_text, tracked_attack_match),
+            parameters=parameters_from_pairs(
+                _tracked_target_attack_trigger_parameter_pairs(
+                    clause_text=clause_text,
+                    match=tracked_attack_match,
+                )
+            ),
+        )
+    tracked_destroyed_match = _TRACKED_TARGET_DESTROYED_RE.search(clause_text.text)
+    if tracked_destroyed_match is not None:
+        return RuleTrigger(
+            kind=RuleTriggerKind.UNIT_DESTROYED,
+            source_span=_span_from_match(clause_text, tracked_destroyed_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("destroyed_unit_kind", "unit"),
+                    ("timing_window", "tracked_target_destroyed"),
+                    ("tracked_target_owner", _tracked_target_owner_token(tracked_destroyed_match)),
+                    ("tracked_target_role", _lower_group(tracked_destroyed_match, "role")),
+                )
+            ),
+        )
+    for match in _START_END_BATTLE_ROUND_RE.finditer(clause_text.text):
+        edge = _lower_group(match, "edge")
+        return RuleTrigger(
+            kind=RuleTriggerKind.TIMING_WINDOW,
+            source_span=_span_from_match(clause_text, match),
+            parameters=parameters_from_pairs(
+                (
+                    ("battle_round", _battle_round_number(match.group("ordinal"))),
+                    ("edge", edge),
+                    ("phase", "battle_round"),
+                    ("timing_window", f"battle_round_{edge}"),
                 )
             ),
         )
@@ -844,6 +915,45 @@ def _parse_leading_unit_conditions(clause_text: _ClauseText) -> tuple[RuleCondit
     )
 
 
+def _parse_tracked_target_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
+    conditions: list[RuleCondition] = []
+    for match in _TRACKED_TARGET_ATTACK_RE.finditer(clause_text.text):
+        conditions.append(
+            RuleCondition(
+                kind=RuleConditionKind.TARGET_CONSTRAINT,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("actor", _tracked_attack_actor_token(match.group("actor"))),
+                        ("attack_kind", _lower_group(match, "attack_kind")),
+                        ("gate_subject", "attack_target"),
+                        ("relationship", "attack_targets_tracked_target"),
+                        ("target_reference", "tracked_target"),
+                        ("tracked_target_owner", "this_model"),
+                        ("tracked_target_role", _lower_group(match, "role")),
+                    )
+                ),
+            )
+        )
+    for match in _TRACKED_TARGET_DESTROYED_RE.finditer(clause_text.text):
+        conditions.append(
+            RuleCondition(
+                kind=RuleConditionKind.TARGET_CONSTRAINT,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("gate_subject", "destroyed_unit"),
+                        ("relationship", "tracked_target_destroyed"),
+                        ("target_reference", "tracked_target"),
+                        ("tracked_target_owner", _tracked_target_owner_token(match)),
+                        ("tracked_target_role", _lower_group(match, "role")),
+                    )
+                ),
+            )
+        )
+    return tuple(conditions)
+
+
 def _parse_frequency_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
     conditions: list[RuleCondition] = []
     for match in _ONCE_PER_RE.finditer(clause_text.text):
@@ -860,6 +970,8 @@ def _parse_frequency_conditions(clause_text: _ClauseText) -> tuple[RuleCondition
 def _parse_keyword_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
     conditions: list[RuleCondition] = []
     target_match_ranges: list[tuple[int, int]] = []
+    for match in _TRACKED_TARGET_SELECTION_RE.finditer(clause_text.text):
+        target_match_ranges.append((match.start(), match.end()))
     for match in _ENEMY_UNIT_FALLS_BACK_NEAR_ABILITY_RE.finditer(clause_text.text):
         target_match_ranges.append((match.start(), match.end()))
         excluded_keywords = match.group("excluded_keywords")
@@ -1040,6 +1152,17 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
                 kind=RuleTargetKind.THIS_MODEL,
                 source_span=_span_from_match(clause_text, match),
             )
+    tracked_selection_match = _TRACKED_TARGET_SELECTION_RE.search(clause_text.text)
+    if tracked_selection_match is not None:
+        allegiance = _lower_group(tracked_selection_match, "allegiance")
+        target_kind = (
+            RuleTargetKind.FRIENDLY_UNIT if allegiance == "friendly" else RuleTargetKind.ENEMY_UNIT
+        )
+        return RuleTargetSpec(
+            kind=target_kind,
+            source_span=_span_from_match(clause_text, tracked_selection_match),
+            parameters=parameters_from_pairs((("allegiance", allegiance),)),
+        )
     match = _TARGET_RE.search(clause_text.text)
     if match is not None:
         allegiance = _lower_group(match, "allegiance")
@@ -1054,6 +1177,13 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
             kind=target_kind,
             source_span=_span_from_match(clause_text, match),
             parameters=parameters_from_pairs(tuple(pairs)),
+        )
+    match = _THIS_MODEL_UNIT_RE.search(clause_text.text)
+    if match is not None:
+        return RuleTargetSpec(
+            kind=RuleTargetKind.THIS_UNIT,
+            source_span=_span_from_match(clause_text, match),
+            parameters=parameters_from_pairs((("scope", "this_models_unit"),)),
         )
     match = _THIS_UNIT_RE.search(clause_text.text)
     if match is not None:
@@ -1161,6 +1291,7 @@ def _dice_modifier_effect(
 def _parse_reroll_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
     list_spans: list[tuple[int, int]] = []
+    tracked_target_pairs = _tracked_target_reroll_parameter_pairs(clause_text)
     for match in _REROLL_ROLL_LIST_RE.finditer(clause_text.text):
         list_spans.append((match.start(), match.end()))
         for roll in _roll_list_values(match.group("rolls")):
@@ -1168,7 +1299,9 @@ def _parse_reroll_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...
                 RuleEffectSpec(
                     kind=RuleEffectKind.REROLL_PERMISSION,
                     source_span=_span_from_match(clause_text, match),
-                    parameters=parameters_from_pairs((("roll_type", _roll_type(roll)),)),
+                    parameters=parameters_from_pairs(
+                        (("roll_type", _roll_type(roll)), *tracked_target_pairs)
+                    ),
                 )
             )
     for match in _REROLL_RE.finditer(clause_text.text):
@@ -1178,7 +1311,9 @@ def _parse_reroll_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...
             RuleEffectSpec(
                 kind=RuleEffectKind.REROLL_PERMISSION,
                 source_span=_span_from_match(clause_text, match),
-                parameters=parameters_from_pairs((("roll_type", _roll_type(match.group("roll"))),)),
+                parameters=parameters_from_pairs(
+                    (("roll_type", _roll_type(match.group("roll"))), *tracked_target_pairs)
+                ),
             )
         )
     return tuple(effects)
@@ -1191,6 +1326,83 @@ def _roll_list_values(value: str) -> tuple[str, ...]:
         if roll:
             rolls.append(roll)
     return tuple(rolls)
+
+
+def _tracked_target_attack_trigger_parameter_pairs(
+    *,
+    clause_text: _ClauseText,
+    match: re.Match[str],
+) -> tuple[tuple[str, RuleParameterValue], ...]:
+    roll_types = _roll_types_for_reroll_language(clause_text.text)
+    pairs: list[tuple[str, RuleParameterValue]] = [
+        ("actor", _tracked_attack_actor_token(match.group("actor"))),
+        ("attack_kind", _lower_group(match, "attack_kind")),
+        ("target_reference", "tracked_target"),
+        ("tracked_target_owner", "this_model"),
+        ("tracked_target_role", _lower_group(match, "role")),
+    ]
+    if len(roll_types) == 1:
+        roll_type = roll_types[0]
+        pairs.extend(
+            (
+                ("roll_type", roll_type),
+                ("timing_window", f"attack_sequence.{roll_type}"),
+            )
+        )
+    elif roll_types:
+        pairs.extend(
+            (
+                ("roll_types", "|".join(roll_types)),
+                ("timing_window", "attack_sequence.roll"),
+            )
+        )
+    else:
+        pairs.append(("timing_window", "attack_sequence.attack"))
+    return tuple(pairs)
+
+
+def _tracked_target_reroll_parameter_pairs(
+    clause_text: _ClauseText,
+) -> tuple[tuple[str, RuleParameterValue], ...]:
+    match = _TRACKED_TARGET_ATTACK_RE.search(clause_text.text)
+    if match is None:
+        return ()
+    return (
+        ("target_reference", "tracked_target"),
+        ("tracked_target_owner", "this_model"),
+        ("tracked_target_role", _lower_group(match, "role")),
+    )
+
+
+def _roll_types_for_reroll_language(text: str) -> tuple[str, ...]:
+    roll_types: list[str] = []
+    list_spans: list[tuple[int, int]] = []
+    for match in _REROLL_ROLL_LIST_RE.finditer(text):
+        list_spans.append((match.start(), match.end()))
+        roll_types.extend(_roll_type(roll) for roll in _roll_list_values(match.group("rolls")))
+    for match in _REROLL_RE.finditer(text):
+        if _match_is_within_any_span(match=match, spans=tuple(list_spans)):
+            continue
+        roll_types.append(_roll_type(match.group("roll")))
+    return tuple(dict.fromkeys(roll_types))
+
+
+def _tracked_attack_actor_token(actor: str) -> str:
+    token = " ".join(actor.lower().split())
+    if token == "this model":
+        return "this_model"
+    if token == "a model in this model's unit":
+        return "model_in_this_models_unit"
+    raise RuleIRError(f"Unsupported tracked-target attack actor: {actor}.")
+
+
+def _tracked_target_owner_token(match: re.Match[str]) -> str:
+    owner = " ".join(match.group("owner").lower().split())
+    if owner == "this model":
+        return "this_model"
+    if owner == "this unit":
+        return "this_unit"
+    raise RuleIRError(f"Unsupported tracked-target owner: {match.group('owner')}.")
 
 
 def _match_is_within_any_span(
@@ -1268,6 +1480,31 @@ def _parse_resource_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, .
                 kind=RuleEffectKind.ADD_VICTORY_POINTS,
                 source_span=_span_from_match(clause_text, match),
                 parameters=parameters_from_pairs((("delta", int(match.group("value"))),)),
+            )
+        )
+    return tuple(effects)
+
+
+def _parse_tracked_target_selection_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
+    effects: list[RuleEffectSpec] = []
+    for match in _TRACKED_TARGET_SELECTION_RE.finditer(clause_text.text):
+        allegiance = _lower_group(match, "allegiance")
+        replacement = match.group("replacement") is not None
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.SELECT_TRACKED_TARGET,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("replacement", replacement),
+                        ("selection_kind", "select_one"),
+                        ("target_allegiance", allegiance),
+                        ("target_lifecycle", "until_destroyed"),
+                        ("target_scope", f"{allegiance}_unit"),
+                        ("tracked_target_owner", _tracked_target_owner_token(match)),
+                        ("tracked_target_role", _lower_group(match, "role")),
+                    )
+                ),
             )
         )
     return tuple(effects)
@@ -1727,6 +1964,8 @@ def _template_id_for_clause(
             RuleEffectKind.ADD_VICTORY_POINTS,
         }:
             candidates.append(RESOURCE_MODIFIER_TEMPLATE_ID)
+        elif effect.kind is RuleEffectKind.SELECT_TRACKED_TARGET:
+            candidates.append(TRACKED_TARGET_SELECTION_TEMPLATE_ID)
         elif effect.kind in {
             RuleEffectKind.PLACEMENT_PERMISSION,
             RuleEffectKind.PLACEMENT_RESTRICTION,
@@ -1872,6 +2111,28 @@ def _owner_token(owner: str | None) -> str | None:
     if lowered == "your":
         return "active_player"
     return None
+
+
+def _battle_round_number(value: str) -> int:
+    token = value.lower().strip()
+    ordinal_numbers = {
+        "first": 1,
+        "second": 2,
+        "third": 3,
+        "fourth": 4,
+        "fifth": 5,
+    }
+    ordinal = ordinal_numbers.get(token)
+    if ordinal is not None:
+        return ordinal
+    suffixes = ("st", "nd", "rd", "th")
+    for suffix in suffixes:
+        if token.endswith(suffix):
+            token = token[: -len(suffix)]
+            break
+    if token.isdecimal():
+        return int(token)
+    raise RuleIRError(f"Unsupported battle round ordinal in rule language: {value}.")
 
 
 def _roll_type(value: str) -> str:

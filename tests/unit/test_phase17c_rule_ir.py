@@ -94,6 +94,18 @@ CHAMPION_SLAYER_TEXT = (
     "you can re-roll the Wound roll. Each time this model destroys an enemy Character or "
     "Monster unit, this model regains up to D6 lost wounds."
 )
+PREY_TARGET_TEXT = (
+    "At the start of the first battle round, select one enemy unit to be this model\u2019s "
+    "prey. Each time a model in this model\u2019s unit makes a melee attack that targets "
+    "its prey, you can re\u2011roll the Wound roll. Each time this model\u2019s prey is "
+    "destroyed, select one new enemy unit to be this model\u2019s prey."
+)
+QUARRY_TARGET_TEXT = (
+    "At the start of the first battle round, select one enemy unit to be this model's "
+    "quarry. Each time this model makes a melee attack that targets its quarry, you can "
+    "re-roll the Hit roll and you can re-roll the Wound roll. Each time this model's "
+    "quarry is destroyed, select one new enemy unit to be this model's quarry."
+)
 
 
 def test_phase17c_normalized_source_text_compiles_to_stable_rule_ir() -> None:
@@ -295,6 +307,169 @@ def test_phase17c_champion_slayer_clause_coverage_rolls_up_partial_and_full() ->
     assert full_rollup.overall_ability_support is AbilityOverallSupport.FULL
     assert descriptor_rollup is not None
     assert descriptor_rollup.to_payload() == full_rollup.to_payload()
+
+
+def test_phase17c_prey_selection_reselection_and_attack_gate_compile_to_semantic_ir() -> None:
+    rule_ir = _compiled(PREY_TARGET_TEXT).rule_ir
+    selection_clause = rule_ir.clauses[0]
+    attack_clause = rule_ir.clauses[1]
+    reselection_clause = rule_ir.clauses[2]
+
+    assert rule_ir.is_supported
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    assert len(rule_ir.clauses) == 3
+    assert selection_clause.template_id == "phase17c:tracked-target-selection"
+    assert selection_clause.trigger is not None
+    assert selection_clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(selection_clause.trigger.parameters) == {
+        "battle_round": 1,
+        "edge": "start",
+        "phase": "battle_round",
+        "timing_window": "battle_round_start",
+    }
+    assert selection_clause.target is not None
+    assert selection_clause.target.kind is RuleTargetKind.ENEMY_UNIT
+    assert parameter_payload(selection_clause.target.parameters) == {"allegiance": "enemy"}
+    assert tuple(effect.kind for effect in selection_clause.effects) == (
+        RuleEffectKind.SELECT_TRACKED_TARGET,
+    )
+    assert parameter_payload(selection_clause.effects[0].parameters) == {
+        "replacement": False,
+        "selection_kind": "select_one",
+        "target_allegiance": "enemy",
+        "target_lifecycle": "until_destroyed",
+        "target_scope": "enemy_unit",
+        "tracked_target_owner": "this_model",
+        "tracked_target_role": "prey",
+    }
+
+    assert attack_clause.trigger is not None
+    assert attack_clause.trigger.kind is RuleTriggerKind.DICE_ROLL
+    assert parameter_payload(attack_clause.trigger.parameters) == {
+        "actor": "model_in_this_models_unit",
+        "attack_kind": "melee",
+        "roll_type": "wound",
+        "target_reference": "tracked_target",
+        "timing_window": "attack_sequence.wound",
+        "tracked_target_owner": "this_model",
+        "tracked_target_role": "prey",
+    }
+    assert attack_clause.target is not None
+    assert attack_clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert parameter_payload(attack_clause.target.parameters) == {"scope": "this_models_unit"}
+    assert _condition_payload(attack_clause, RuleConditionKind.TARGET_CONSTRAINT) == {
+        "actor": "model_in_this_models_unit",
+        "attack_kind": "melee",
+        "gate_subject": "attack_target",
+        "relationship": "attack_targets_tracked_target",
+        "target_reference": "tracked_target",
+        "tracked_target_owner": "this_model",
+        "tracked_target_role": "prey",
+    }
+    assert tuple(effect.kind for effect in attack_clause.effects) == (
+        RuleEffectKind.REROLL_PERMISSION,
+    )
+    assert parameter_payload(attack_clause.effects[0].parameters) == {
+        "roll_type": "wound",
+        "target_reference": "tracked_target",
+        "tracked_target_owner": "this_model",
+        "tracked_target_role": "prey",
+    }
+
+    assert reselection_clause.trigger is not None
+    assert reselection_clause.trigger.kind is RuleTriggerKind.UNIT_DESTROYED
+    assert parameter_payload(reselection_clause.trigger.parameters) == {
+        "destroyed_unit_kind": "unit",
+        "timing_window": "tracked_target_destroyed",
+        "tracked_target_owner": "this_model",
+        "tracked_target_role": "prey",
+    }
+    assert reselection_clause.target is not None
+    assert reselection_clause.target.kind is RuleTargetKind.ENEMY_UNIT
+    assert _condition_payload(reselection_clause, RuleConditionKind.TARGET_CONSTRAINT) == {
+        "gate_subject": "destroyed_unit",
+        "relationship": "tracked_target_destroyed",
+        "target_reference": "tracked_target",
+        "tracked_target_owner": "this_model",
+        "tracked_target_role": "prey",
+    }
+    assert tuple(effect.kind for effect in reselection_clause.effects) == (
+        RuleEffectKind.SELECT_TRACKED_TARGET,
+    )
+    assert parameter_payload(reselection_clause.effects[0].parameters) == {
+        "replacement": True,
+        "selection_kind": "select_one",
+        "target_allegiance": "enemy",
+        "target_lifecycle": "until_destroyed",
+        "target_scope": "enemy_unit",
+        "tracked_target_owner": "this_model",
+        "tracked_target_role": "prey",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == ()
+    assert (
+        ability_support_rollup_for_rule_ir(
+            source_ability_id="source:prey",
+            ability_name="Prey",
+            rule_ir=rule_ir,
+        ).overall_ability_support
+        is AbilityOverallSupport.PARSED
+    )
+
+
+def test_phase17c_quarry_selection_supports_this_model_hit_and_wound_rerolls() -> None:
+    rule_ir = _compiled(QUARRY_TARGET_TEXT).rule_ir
+    selection_clause = rule_ir.clauses[0]
+    attack_clause = rule_ir.clauses[1]
+    reselection_clause = rule_ir.clauses[2]
+
+    assert rule_ir.is_supported
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    assert parameter_payload(selection_clause.effects[0].parameters)["tracked_target_role"] == (
+        "quarry"
+    )
+    assert attack_clause.trigger is not None
+    assert attack_clause.trigger.kind is RuleTriggerKind.DICE_ROLL
+    assert parameter_payload(attack_clause.trigger.parameters) == {
+        "actor": "this_model",
+        "attack_kind": "melee",
+        "roll_types": "hit|wound",
+        "target_reference": "tracked_target",
+        "timing_window": "attack_sequence.roll",
+        "tracked_target_owner": "this_model",
+        "tracked_target_role": "quarry",
+    }
+    assert attack_clause.target is not None
+    assert attack_clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert tuple(effect.kind for effect in attack_clause.effects) == (
+        RuleEffectKind.REROLL_PERMISSION,
+        RuleEffectKind.REROLL_PERMISSION,
+    )
+    assert tuple(parameter_payload(effect.parameters) for effect in attack_clause.effects) == (
+        {
+            "roll_type": "hit",
+            "target_reference": "tracked_target",
+            "tracked_target_owner": "this_model",
+            "tracked_target_role": "quarry",
+        },
+        {
+            "roll_type": "wound",
+            "target_reference": "tracked_target",
+            "tracked_target_owner": "this_model",
+            "tracked_target_role": "quarry",
+        },
+    )
+    assert parameter_payload(reselection_clause.effects[0].parameters) == {
+        "replacement": True,
+        "selection_kind": "select_one",
+        "target_allegiance": "enemy",
+        "target_lifecycle": "until_destroyed",
+        "target_scope": "enemy_unit",
+        "tracked_target_owner": "this_model",
+        "tracked_target_role": "quarry",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == ()
 
 
 def test_phase17c_descriptor_without_rule_ir_has_no_clause_rollup() -> None:
