@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import shutil
 import subprocess
 from pathlib import Path, PurePosixPath
 
@@ -15,7 +16,6 @@ _FORBIDDEN_TRACKED_SOURCE_PATTERNS = (
 )
 _TRACKED_FACTION_PACK_PDF_PATTERN = "data/raw/faction_packs/*.pdf"
 _ROOT = Path(__file__).resolve().parents[2]
-_GIT = Path("/usr/bin/git")
 _OFFICIAL_WARHAMMER_40000_DOWNLOADS_PAGE = (
     "https://www.warhammer-community.com/en-gb/downloads/warhammer-40000/"
 )
@@ -95,8 +95,10 @@ def _assert_tracked_faction_pack_pdfs_match_manifest(tracked_files: tuple[str, .
 
 
 def _git_tracked_files() -> tuple[str, ...]:
+    git = shutil.which("git")
+    assert git is not None, "Official source redistribution policy test requires git on PATH."
     result = subprocess.run(
-        [str(_GIT), "ls-files"],
+        [git, "ls-files"],
         check=True,
         capture_output=True,
         cwd=_ROOT,

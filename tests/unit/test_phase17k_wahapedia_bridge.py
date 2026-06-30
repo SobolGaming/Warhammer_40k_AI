@@ -42,7 +42,7 @@ from warhammer40k_core.core.model_geometry_catalog import (
     GeometryMeasurementKind,
     GeometrySourceUnits,
 )
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AbilityKind,
@@ -54,10 +54,14 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.abilities import (
+    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
     AbilityCatalogRecord,
+    AbilityDefinition,
     AbilityExecutionContext,
     AbilityResolutionStatus,
+    AbilitySourceKind,
+    AbilityTimingDescriptor,
     default_ability_handler_registry,
 )
 from warhammer40k_core.engine.ability_catalog import (
@@ -101,20 +105,42 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
     CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_NAMED_WEAPON_ABILITY_CHOICE_EFFECT_KIND,
+    CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SELECTED_EVENT,
+    SELECT_CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SUBMISSION_KIND,
     CatalogAdvanceEligibilityRuntime,
+    CatalogNamedWeaponAbilityChoiceOption,
+    CatalogNamedWeaponAbilityChoiceRuntime,
     CatalogWeaponKeywordGrant,
     CatalogWeaponKeywordGrantRuntime,
+    _available_catalog_named_weapon_ability_choice_groups,  # pyright: ignore[reportPrivateUsage]
     _catalog_roll_reroll_permission,  # pyright: ignore[reportPrivateUsage]
     _catalog_weapon_keyword_grant_from_effect,  # pyright: ignore[reportPrivateUsage]
+    _clause_is_named_weapon_ability_choice,  # pyright: ignore[reportPrivateUsage]
+    _effect_is_named_weapon_ability_choice_option,  # pyright: ignore[reportPrivateUsage]
     _effect_is_roll_reroll_permission,  # pyright: ignore[reportPrivateUsage]
+    _named_weapon_ability_choice_option_from_effect,  # pyright: ignore[reportPrivateUsage]
+    _optional_named_weapon_names,  # pyright: ignore[reportPrivateUsage]
+    _payload_object,  # pyright: ignore[reportPrivateUsage]
+    _payload_string,  # pyright: ignore[reportPrivateUsage]
+    _payload_string_tuple,  # pyright: ignore[reportPrivateUsage]
     _profile_with_catalog_weapon_keyword_grant,  # pyright: ignore[reportPrivateUsage]
+    _record_can_select_catalog_named_weapon_ability,  # pyright: ignore[reportPrivateUsage]
     _roll_reroll_consumer_id_for_effect,  # pyright: ignore[reportPrivateUsage]
+    _selected_catalog_named_weapon_ability_grants,  # pyright: ignore[reportPrivateUsage]
+    _validate_named_weapon_choice_option,  # pyright: ignore[reportPrivateUsage]
+    _validate_named_weapon_choice_target_scope,  # pyright: ignore[reportPrivateUsage]
+    _validate_named_weapon_names,  # pyright: ignore[reportPrivateUsage]
+    _weapon_ability_choice_has_supported_runtime_shape,  # pyright: ignore[reportPrivateUsage]
     _weapon_ability_descriptor_for_grant,  # pyright: ignore[reportPrivateUsage]
+    _weapon_ability_descriptor_for_selected_choice_payload,  # pyright: ignore[reportPrivateUsage]
     _weapon_keyword_grant_consumer_ids_for_effect,  # pyright: ignore[reportPrivateUsage]
+    _weapon_names_from_parameters,  # pyright: ignore[reportPrivateUsage]
     _weapon_scope_matches_profile,  # pyright: ignore[reportPrivateUsage]
     catalog_advance_roll_reroll_permission_for_unit,
     catalog_charge_roll_modifiers_for_unit,
@@ -135,6 +161,8 @@ from warhammer40k_core.engine.damage_allocation import FeelNoPainAttackCondition
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
     army_rule as adepta_sororitas_army_rule,
 )
@@ -174,7 +202,13 @@ from warhammer40k_core.engine.list_validation import (
     WargearSelection,
     resolve_wargear_selections,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.phases.charge import (
     _charge_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
 )
@@ -187,6 +221,13 @@ from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
 )
+from warhammer40k_core.engine.shooting_phase_start_hooks import (
+    SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
+    ShootingPhaseStartHookRegistry,
+    ShootingPhaseStartRequestContext,
+    ShootingPhaseStartResultContext,
+)
+from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
@@ -204,6 +245,8 @@ from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
+    RuleDuration,
+    RuleDurationKind,
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
@@ -211,6 +254,8 @@ from warhammer40k_core.rules.rule_ir import (
     RuleParameterValue,
     RuleTargetKind,
     RuleTargetSpec,
+    RuleTrigger,
+    RuleTriggerKind,
     parameter_payload,
     parameters_from_pairs,
 )
@@ -1169,6 +1214,651 @@ def test_phase17k_leading_model_weapon_keyword_text_modifies_scoped_weapon_profi
     assert modified_ranged == ranged_profile
 
 
+def test_phase17k_named_weapon_ability_choice_records_and_modifies_profile() -> None:
+    package = _named_weapon_choice_package()
+    unit = _named_weapon_choice_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    choice_record = records_by_name["Daemonspark"]
+    replay_payload = choice_record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
+    state = _battle_state_with_army(army=army, battlefield=battlefield)
+    _set_state_battle_phase(state, BattlePhase.SHOOTING)
+    decisions = DecisionController()
+    runtime = CatalogNamedWeaponAbilityChoiceRuntime(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army,),
+    )
+    registry = ShootingPhaseStartHookRegistry.from_bindings(runtime.bindings())
+    request_context = _shooting_phase_start_request_context(
+        state=state,
+        decisions=decisions,
+        army_catalog=package.army_catalog,
+    )
+    request = registry.next_request_for(request_context)
+
+    assert request is not None
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:ignores-cover",
+        "catalog-ir:weapon-keyword-grant:lethal-hits",
+        "catalog-ir:weapon-keyword-grant:sustained-hits",
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) == {
+        CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:ignores-cover",
+        "catalog-ir:weapon-keyword-grant:lethal-hits",
+        "catalog-ir:weapon-keyword-grant:sustained-hits",
+    }
+    assert request.decision_type == SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE
+    assert request.actor_id == army.player_id
+    assert type(request).from_payload(request.to_payload()).to_payload() == request.to_payload()
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["submission_kind"] == (
+        SELECT_CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SUBMISSION_KIND
+    )
+    assert request_payload["weapon_names"] == ["Bolt of Change"]
+    assert request_payload["target_model_instance_ids"] == [unit.own_models[0].model_instance_id]
+    assert tuple(option.label for option in request.options) == (
+        "Ignores Cover for Bolt of Change",
+        "Lethal Hits for Bolt of Change",
+        "Sustained Hits D3 for Bolt of Change",
+    )
+    sustained_option = next(
+        option
+        for option in request.options
+        if cast(dict[str, JsonValue], option.payload)["selected_named_weapon_ability_choice"]
+        == {
+            "option_id": option.option_id,
+            "selection_option_id": "option_003_sustained_hits_d3",
+            "selection_option_index": 3,
+            "selected_weapon_ability": "Sustained Hits",
+            "keyword": "Sustained Hits",
+            "ability_descriptor": AbilityDescriptor.sustained_hits("D3").to_payload(),
+            "weapon_ability_value": "D3",
+        }
+    )
+    result = DecisionResult.for_request(
+        result_id="phase17k-named-weapon-choice-sustained-d3",
+        request=request,
+        selected_option_id=sustained_option.option_id,
+    )
+    decisions.request_decision(request)
+    record = decisions.submit_result(result)
+    handled = registry.apply_result(
+        ShootingPhaseStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=record.request,
+            result=record.result,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            army_catalog=package.army_catalog,
+            shooting_target_restriction_hooks=ShootingTargetRestrictionHookRegistry.empty(),
+        )
+    )
+    bolt_profile = _weapon_profile_by_name(package.army_catalog, "Bolt of Change")
+    other_profile = replace(
+        bolt_profile,
+        profile_id=f"{bolt_profile.profile_id}:other",
+        name="Infernal Gateway",
+    )
+    modifier_registry = RuntimeModifierRegistry.from_bindings(
+        weapon_profile_modifier_bindings=catalog_weapon_profile_modifier_bindings(
+            ability_indexes_by_player_id={army.player_id: player_index},
+            armies=(army,),
+        )
+    )
+    shooting_context = WeaponProfileModifierContext(
+        state=state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=unit.unit_instance_id,
+        attacker_model_instance_id=unit.own_models[0].model_instance_id,
+        target_unit_instance_id="phase17k-target-unit",
+        weapon_profile=bolt_profile,
+    )
+    modified_bolt = modifier_registry.modified_weapon_profile(shooting_context)
+
+    assert handled is True
+    effects = state.persisting_effects_for_unit(unit.unit_instance_id)
+    assert len(effects) == 1
+    effect_payload = cast(dict[str, JsonValue], effects[0].effect_payload)
+    assert effect_payload["effect_kind"] == CATALOG_NAMED_WEAPON_ABILITY_CHOICE_EFFECT_KIND
+    assert effect_payload["weapon_ability_value"] == "D3"
+    assert WeaponKeyword.SUSTAINED_HITS in modified_bolt.keywords
+    assert any(
+        ability.to_payload() == AbilityDescriptor.sustained_hits("D3").to_payload()
+        for ability in modified_bolt.abilities
+    )
+    assert (
+        modifier_registry.modified_weapon_profile(
+            replace(shooting_context, source_phase=BattlePhase.FIGHT)
+        )
+        == bolt_profile
+    )
+    assert (
+        modifier_registry.modified_weapon_profile(
+            replace(shooting_context, weapon_profile=other_profile)
+        )
+        == other_profile
+    )
+    selected_events = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SELECTED_EVENT
+    )
+    assert len(selected_events) == 1
+    assert "object at 0x" not in json.dumps(decisions.to_payload(), sort_keys=True)
+
+
+def test_phase17k_named_weapon_choice_uses_runtime_clause_scoped_records() -> None:
+    package = _named_weapon_choice_package()
+    unit = _named_weapon_choice_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    rule_ir = _multi_clause_named_weapon_choice_rule_ir()
+    clause_001_record = _multi_clause_named_weapon_choice_record(
+        rule_ir=rule_ir,
+        clause_index=0,
+        datasheet_id=unit.datasheet_id,
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+    )
+    clause_002_record = _multi_clause_named_weapon_choice_record(
+        rule_ir=rule_ir,
+        clause_index=1,
+        datasheet_id=unit.datasheet_id,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+    )
+    ability_index = AbilityCatalogIndex.from_records((clause_001_record, clause_002_record))
+    state = _battle_state_with_army(
+        army=army,
+        battlefield=_bloodcrushers_battlefield_state(army=army, unit=unit),
+    )
+    _set_state_battle_phase(state, BattlePhase.SHOOTING)
+    request_context = _shooting_phase_start_request_context(
+        state=state,
+        decisions=DecisionController(),
+        army_catalog=package.army_catalog,
+    )
+
+    groups = _available_catalog_named_weapon_ability_choice_groups(
+        ability_indexes_by_player_id={army.player_id: ability_index},
+        armies=(army,),
+        context=request_context,
+    )
+    request = ShootingPhaseStartHookRegistry.from_bindings(
+        CatalogNamedWeaponAbilityChoiceRuntime(
+            ability_indexes_by_player_id={army.player_id: ability_index},
+            armies=(army,),
+        ).bindings()
+    ).next_request_for(request_context)
+
+    assert not _record_can_select_catalog_named_weapon_ability(clause_001_record)
+    assert _record_can_select_catalog_named_weapon_ability(clause_002_record)
+    assert len(groups) == 1
+    assert groups[0].record.record_id == clause_002_record.record_id
+    assert groups[0].clause.clause_id == rule_ir.clauses[1].clause_id
+    assert request is not None
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["catalog_record_id"] == clause_002_record.record_id
+    assert len(request.options) == 2
+
+
+def test_phase17k_named_weapon_ability_choice_rejects_availability_drift() -> None:
+    package = _named_weapon_choice_package()
+    unit = _named_weapon_choice_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
+    state = _battle_state_with_army(army=army, battlefield=battlefield)
+    _set_state_battle_phase(state, BattlePhase.SHOOTING)
+    decisions = DecisionController()
+    registry = ShootingPhaseStartHookRegistry.from_bindings(
+        CatalogNamedWeaponAbilityChoiceRuntime(
+            ability_indexes_by_player_id={army.player_id: player_index},
+            armies=(army,),
+        ).bindings()
+    )
+    request = registry.next_request_for(
+        _shooting_phase_start_request_context(
+            state=state,
+            decisions=decisions,
+            army_catalog=package.army_catalog,
+        )
+    )
+    assert request is not None
+    result = DecisionResult.for_request(
+        result_id="phase17k-named-weapon-choice-drift",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    decisions.request_decision(request)
+    record = decisions.submit_result(result)
+    state.battlefield_state = battlefield.with_removed_models(
+        (unit.own_models[0].model_instance_id,)
+    )
+
+    handled = registry.apply_result(
+        ShootingPhaseStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=record.request,
+            result=record.result,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            army_catalog=package.army_catalog,
+            shooting_target_restriction_hooks=ShootingTargetRestrictionHookRegistry.empty(),
+        )
+    )
+
+    assert not isinstance(handled, bool)
+    assert handled.status_kind is LifecycleStatusKind.INVALID
+    invalid_payload = cast(dict[str, JsonValue], handled.payload)
+    assert invalid_payload["invalid_reason"] == ("catalog_named_weapon_ability_choice_unavailable")
+    assert state.persisting_effects_for_unit(unit.unit_instance_id) == ()
+
+
+def test_phase17k_named_weapon_ability_choice_rejects_submission_drifts() -> None:
+    package = _named_weapon_choice_package()
+    unit = _named_weapon_choice_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    state = _battle_state_with_army(
+        army=army,
+        battlefield=_bloodcrushers_battlefield_state(army=army, unit=unit),
+    )
+    _set_state_battle_phase(state, BattlePhase.SHOOTING)
+    decisions = DecisionController()
+    runtime = CatalogNamedWeaponAbilityChoiceRuntime(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army,),
+    )
+    registry = ShootingPhaseStartHookRegistry.from_bindings(runtime.bindings())
+    request = registry.next_request_for(
+        _shooting_phase_start_request_context(
+            state=state,
+            decisions=decisions,
+            army_catalog=package.army_catalog,
+        )
+    )
+    assert request is not None
+    selected_option = request.options[0]
+
+    def apply(payload: JsonValue, selected_option_id: str = selected_option.option_id) -> object:
+        return registry.apply_result(
+            ShootingPhaseStartResultContext(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=DecisionResult(
+                    result_id=f"phase17k-drift-{len(decisions.event_log.records)}",
+                    request_id=request.request_id,
+                    decision_type=request.decision_type,
+                    actor_id=request.actor_id,
+                    selected_option_id=selected_option_id,
+                    payload=payload,
+                ),
+                ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+                army_catalog=package.army_catalog,
+                shooting_target_restriction_hooks=ShootingTargetRestrictionHookRegistry.empty(),
+            )
+        )
+
+    wrong_kind_payload = dict(cast(dict[str, JsonValue], selected_option.payload))
+    wrong_kind_payload["submission_kind"] = "wrong_named_weapon_choice_submission"
+
+    def invalid_reason(value: object) -> JsonValue:
+        assert not isinstance(value, bool)
+        status = cast(LifecycleStatus, value)
+        assert status.status_kind is LifecycleStatusKind.INVALID
+        return cast(dict[str, JsonValue], status.payload)["invalid_reason"]
+
+    wrong_kind = apply(wrong_kind_payload)
+    assert invalid_reason(wrong_kind) == (
+        "catalog_named_weapon_ability_choice_submission_kind_drift"
+    )
+
+    option_drift = apply(
+        selected_option.payload,
+        selected_option_id=f"{selected_option.option_id}:missing",
+    )
+    assert invalid_reason(option_drift) == ("catalog_named_weapon_ability_choice_option_drift")
+
+    payload_drift = dict(cast(dict[str, JsonValue], selected_option.payload))
+    payload_drift["weapon_names"] = ["Changed Weapon"]
+    drifted = apply(payload_drift)
+    assert invalid_reason(drifted) == ("catalog_named_weapon_ability_choice_payload_drift")
+
+    wrong_hook_request = replace(
+        request,
+        payload={
+            **cast(dict[str, JsonValue], request.payload),
+            "hook_id": "phase17k-other-hook",
+        },
+    )
+    ignored = registry.apply_result(
+        ShootingPhaseStartResultContext(
+            state=state,
+            decisions=decisions,
+            request=wrong_hook_request,
+            result=DecisionResult.for_request(
+                result_id="phase17k-wrong-hook",
+                request=request,
+                selected_option_id=selected_option.option_id,
+            ),
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            army_catalog=package.army_catalog,
+            shooting_target_restriction_hooks=ShootingTargetRestrictionHookRegistry.empty(),
+        )
+    )
+    assert ignored is False
+    assert state.persisting_effects_for_unit(unit.unit_instance_id) == ()
+
+
+def test_phase17k_named_weapon_ability_choice_helpers_cover_invalid_paths() -> None:
+    package = _named_weapon_choice_package()
+    unit = _named_weapon_choice_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    record = next(
+        record for record in player_index.all_records() if record.definition.name == "Daemonspark"
+    )
+    replay_payload = record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    clause = rule_ir.clauses[0]
+    state = _battle_state_with_army(
+        army=army,
+        battlefield=_bloodcrushers_battlefield_state(army=army, unit=unit),
+    )
+    _set_state_battle_phase(state, BattlePhase.SHOOTING)
+    request_context = _shooting_phase_start_request_context(
+        state=state,
+        decisions=DecisionController(),
+        army_catalog=package.army_catalog,
+    )
+    runtime = CatalogNamedWeaponAbilityChoiceRuntime(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army,),
+    )
+
+    assert runtime.bindings()
+    assert _available_catalog_named_weapon_ability_choice_groups(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army,),
+        context=request_context,
+    )
+    with pytest.raises(GameLifecycleError, match="missing player ability index"):
+        CatalogNamedWeaponAbilityChoiceRuntime(ability_indexes_by_player_id={}, armies=(army,))
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        runtime.request_handler(cast(ShootingPhaseStartRequestContext, object()))
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        runtime.result_handler(cast(ShootingPhaseStartResultContext, object()))
+    with pytest.raises(GameLifecycleError, match="require context"):
+        _available_catalog_named_weapon_ability_choice_groups(
+            ability_indexes_by_player_id={army.player_id: player_index},
+            armies=(army,),
+            context=cast(ShootingPhaseStartRequestContext, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="index is missing player"):
+        _available_catalog_named_weapon_ability_choice_groups(
+            ability_indexes_by_player_id={},
+            armies=(army,),
+            context=request_context,
+        )
+
+    option = _named_weapon_ability_choice_option_from_effect(
+        record=record,
+        unit=unit,
+        clause=clause,
+        effect_index=0,
+        effect=clause.effects[0],
+    )
+    assert option is not None
+    assert option.label == "Ignores Cover"
+    assert _validate_named_weapon_choice_option(option) is option
+    assert _clause_is_named_weapon_ability_choice(clause)
+    assert _effect_is_named_weapon_ability_choice_option(clause.effects[0])
+    assert (
+        _named_weapon_ability_choice_option_from_effect(
+            record=record,
+            unit=unit,
+            clause=clause,
+            effect_index=0,
+            effect=_effect(RuleEffectKind.MODIFY_DICE_ROLL, roll_type="hit", delta=1),
+        )
+        is None
+    )
+    assert (
+        _named_weapon_ability_choice_option_from_effect(
+            record=record,
+            unit=unit,
+            clause=clause,
+            effect_index=0,
+            effect=_effect(RuleEffectKind.GRANT_WEAPON_ABILITY, weapon_scope="all"),
+        )
+        is None
+    )
+    assert (
+        _named_weapon_ability_choice_option_from_effect(
+            record=record,
+            unit=unit,
+            clause=clause,
+            effect_index=0,
+            effect=_effect(
+                RuleEffectKind.GRANT_WEAPON_ABILITY,
+                weapon_ability="Sustained Hits",
+                weapon_name="Bolt of Change",
+                target_scope="this_model",
+                selection_kind="select_one",
+                selection_group_id="group",
+                selection_option_id="option",
+                selection_option_index=1,
+            ),
+        )
+        is None
+    )
+
+    with pytest.raises(GameLifecycleError, match="requires an ability record"):
+        _named_weapon_ability_choice_option_from_effect(
+            record=cast(AbilityCatalogRecord, object()),
+            unit=unit,
+            clause=clause,
+            effect_index=0,
+            effect=clause.effects[0],
+        )
+    with pytest.raises(GameLifecycleError, match="requires a rule clause"):
+        _named_weapon_ability_choice_option_from_effect(
+            record=record,
+            unit=unit,
+            clause=cast(RuleClause, object()),
+            effect_index=0,
+            effect=clause.effects[0],
+        )
+    with pytest.raises(GameLifecycleError, match="effect_index must be non-negative"):
+        _named_weapon_ability_choice_option_from_effect(
+            record=record,
+            unit=unit,
+            clause=clause,
+            effect_index=-1,
+            effect=clause.effects[0],
+        )
+    with pytest.raises(GameLifecycleError, match="requires a rule effect"):
+        _named_weapon_ability_choice_option_from_effect(
+            record=record,
+            unit=unit,
+            clause=clause,
+            effect_index=0,
+            effect=cast(RuleEffectSpec, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="requires RuleClause values"):
+        _clause_is_named_weapon_ability_choice(cast(RuleClause, object()))
+    with pytest.raises(GameLifecycleError, match="requires RuleEffectSpec values"):
+        _effect_is_named_weapon_ability_choice_option(cast(RuleEffectSpec, object()))
+
+    assert _optional_named_weapon_names({"weapon_names": "Bolt of Change|Infernal Gateway"}) == (
+        "Bolt of Change",
+        "Infernal Gateway",
+    )
+    assert _optional_named_weapon_names({"weapon_name": "Bolt of Change"}) == ("Bolt of Change",)
+    with pytest.raises(GameLifecycleError, match="requires weapon names"):
+        _weapon_names_from_parameters({})
+    with pytest.raises(GameLifecycleError, match="must be a tuple"):
+        _validate_named_weapon_names(["Bolt of Change"])
+    with pytest.raises(GameLifecycleError, match="must contain strings"):
+        _validate_named_weapon_names((1,))
+    with pytest.raises(GameLifecycleError, match="must not be empty"):
+        _validate_named_weapon_names(("  ",))
+    with pytest.raises(GameLifecycleError, match="must not duplicate names"):
+        _validate_named_weapon_names(("Bolt-of-Change", "bolt of change"))
+    with pytest.raises(GameLifecycleError, match="target_scope must be a string"):
+        _validate_named_weapon_choice_target_scope(1)
+    with pytest.raises(GameLifecycleError, match="Unsupported"):
+        _validate_named_weapon_choice_target_scope("selected_unit")
+    with pytest.raises(GameLifecycleError, match="requires option values"):
+        _validate_named_weapon_choice_option(object())
+
+    base_choice_parameters = {
+        "selection_kind": "select_one",
+        "selection_group_id": "group",
+        "selection_option_id": "option",
+        "selection_option_index": 1,
+        "target_scope": "this_model",
+        "weapon_name": "Bolt of Change",
+        "weapon_ability_value": "D3",
+    }
+    assert _weapon_ability_choice_has_supported_runtime_shape(
+        base_choice_parameters,
+        keyword=WeaponKeyword.SUSTAINED_HITS,
+    )
+    for malformed_parameters in (
+        {**base_choice_parameters, "selection_kind": "choose_any"},
+        {**base_choice_parameters, "selection_group_id": 1},
+        {**base_choice_parameters, "selection_option_index": 0},
+        {key: value for key, value in base_choice_parameters.items() if key != "weapon_name"},
+    ):
+        assert not _weapon_ability_choice_has_supported_runtime_shape(
+            malformed_parameters,
+            keyword=WeaponKeyword.SUSTAINED_HITS,
+        )
+    with pytest.raises(GameLifecycleError, match="Unsupported"):
+        _weapon_ability_choice_has_supported_runtime_shape(
+            {**base_choice_parameters, "target_scope": "selected_unit"},
+            keyword=WeaponKeyword.SUSTAINED_HITS,
+        )
+    assert (
+        _weapon_ability_descriptor_for_selected_choice_payload(
+            payload={"keyword": "Lethal Hits"},
+            keyword=WeaponKeyword.LETHAL_HITS,
+        )
+        == AbilityDescriptor.lethal_hits()
+    )
+
+    with pytest.raises(GameLifecycleError, match="payload must be an object"):
+        _payload_object([])
+    with pytest.raises(GameLifecycleError, match="payload weapon_names must be a string"):
+        _payload_string({"weapon_names": ["Bolt of Change"]}, key="weapon_names")
+    with pytest.raises(GameLifecycleError, match="payload weapon_names must be a list"):
+        _payload_string_tuple({"weapon_names": "Bolt of Change"}, key="weapon_names")
+    with pytest.raises(GameLifecycleError, match="payload weapon_names must contain strings"):
+        _payload_string_tuple({"weapon_names": [1]}, key="weapon_names")
+    with pytest.raises(GameLifecycleError, match="must not duplicate values"):
+        _payload_string_tuple({"weapon_names": ["Bolt", "Bolt"]}, key="weapon_names")
+    with pytest.raises(GameLifecycleError, match="must not be empty"):
+        _payload_string_tuple({"weapon_names": []}, key="weapon_names")
+
+    bolt_profile = _weapon_profile_by_name(package.army_catalog, "Bolt of Change")
+    context = WeaponProfileModifierContext(
+        state=state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=unit.unit_instance_id,
+        attacker_model_instance_id=unit.own_models[0].model_instance_id,
+        target_unit_instance_id="phase17k-target-unit",
+        weapon_profile=bolt_profile,
+    )
+    for effect in (
+        _phase17k_named_choice_effect(
+            effect_id="phase17k-non-object-payload",
+            unit=unit,
+            owner_player_id=army.player_id,
+            payload=None,
+        ),
+        _phase17k_named_choice_effect(
+            effect_id="phase17k-other-effect-kind",
+            unit=unit,
+            owner_player_id=army.player_id,
+            payload={"effect_kind": "other"},
+        ),
+        _phase17k_named_choice_effect(
+            effect_id="phase17k-other-target-model",
+            unit=unit,
+            owner_player_id=army.player_id,
+            payload={
+                "effect_kind": CATALOG_NAMED_WEAPON_ABILITY_CHOICE_EFFECT_KIND,
+                "target_model_instance_ids": ["other-model"],
+                "weapon_names": ["Bolt of Change"],
+                "keyword": "Lethal Hits",
+            },
+        ),
+        _phase17k_named_choice_effect(
+            effect_id="phase17k-other-weapon",
+            unit=unit,
+            owner_player_id=army.player_id,
+            payload={
+                "effect_kind": CATALOG_NAMED_WEAPON_ABILITY_CHOICE_EFFECT_KIND,
+                "target_model_instance_ids": [unit.own_models[0].model_instance_id],
+                "weapon_names": ["Other Weapon"],
+                "keyword": "Lethal Hits",
+            },
+        ),
+    ):
+        state.record_persisting_effect(effect)
+    assert _selected_catalog_named_weapon_ability_grants(context) == ()
+
+    with pytest.raises(GameLifecycleError, match="weapon ability value must be positive or D3"):
+        CatalogNamedWeaponAbilityChoiceOption(
+            option_id="phase17k-bad-value",
+            selection_option_id="option",
+            selection_option_index=1,
+            keyword=WeaponKeyword.SUSTAINED_HITS,
+            weapon_ability_value="D6",
+            ability=None,
+            effect_index=0,
+        )
+    with pytest.raises(GameLifecycleError, match="must be a positive integer"):
+        CatalogNamedWeaponAbilityChoiceOption(
+            option_id="phase17k-bad-index",
+            selection_option_id="option",
+            selection_option_index=0,
+            keyword=WeaponKeyword.LETHAL_HITS,
+            weapon_ability_value=None,
+            ability=None,
+            effect_index=0,
+        )
+    with pytest.raises(GameLifecycleError, match="ability must be a descriptor"):
+        CatalogNamedWeaponAbilityChoiceOption(
+            option_id="phase17k-bad-ability",
+            selection_option_id="option",
+            selection_option_index=1,
+            keyword=WeaponKeyword.LETHAL_HITS,
+            weapon_ability_value=None,
+            ability=cast(AbilityDescriptor, object()),
+            effect_index=0,
+        )
+    with pytest.raises(GameLifecycleError, match="effect_index must be non-negative"):
+        CatalogNamedWeaponAbilityChoiceOption(
+            option_id="phase17k-bad-effect-index",
+            selection_option_id="option",
+            selection_option_index=1,
+            keyword=WeaponKeyword.LETHAL_HITS,
+            weapon_ability_value=None,
+            ability=None,
+            effect_index=-1,
+        )
+
+
 def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values() -> None:
     package = _advance_charge_package()
     unit = _advance_charge_unit(package=package)
@@ -1370,12 +2060,12 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
         _weapon_keyword_grant_consumer_ids_for_effect(cast(RuleEffectSpec, object()))
     with pytest.raises(GameLifecycleError, match="cannot infer Hunter targets"):
         _weapon_ability_descriptor_for_grant(parameters={}, keyword=WeaponKeyword.HUNTER)
-    with pytest.raises(GameLifecycleError, match="must be a positive integer"):
+    with pytest.raises(GameLifecycleError, match="positive or D3"):
         _weapon_ability_descriptor_for_grant(
             parameters={},
             keyword=WeaponKeyword.SUSTAINED_HITS,
         )
-    with pytest.raises(GameLifecycleError, match="must be a positive integer"):
+    with pytest.raises(GameLifecycleError, match="positive or D3"):
         _weapon_ability_descriptor_for_grant(
             parameters={"weapon_ability_value": 0},
             keyword=WeaponKeyword.SUSTAINED_HITS,
@@ -3274,6 +3964,14 @@ def _advance_charge_package() -> CanonicalCatalogPackage:
     )
 
 
+def _named_weapon_choice_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_named_weapon_choice_bridge_artifacts(),
+    )
+
+
 def _bloodcrushers_unit(
     *,
     package: CanonicalCatalogPackage,
@@ -3362,6 +4060,30 @@ def _advance_charge_unit(
             model_profile_selections=(
                 ModelProfileSelection(
                     model_profile_id="test-advance-charge-unit:swift-hunter",
+                    model_count=1,
+                ),
+            ),
+        ),
+        datasheet=datasheet,
+    )
+
+
+def _named_weapon_choice_unit(
+    *,
+    package: CanonicalCatalogPackage,
+) -> UnitInstance:
+    datasheet = package.army_catalog.datasheet_by_id("test-lord-of-change")
+    return UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-daemons",
+        selection=UnitMusterSelection(
+            unit_selection_id="lord-of-change-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="test-lord-of-change:lord-of-change",
                     model_count=1,
                 ),
             ),
@@ -3594,6 +4316,56 @@ def _current_model_ids(
     )
 
 
+def _set_state_battle_phase(state: GameState, phase: BattlePhase) -> None:
+    state.battle_phase_index = tuple(state.battle_phase_sequence).index(phase)
+
+
+def _shooting_phase_start_request_context(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    army_catalog: ArmyCatalog,
+) -> ShootingPhaseStartRequestContext:
+    return ShootingPhaseStartRequestContext(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=army_catalog,
+        shooting_target_restriction_hooks=ShootingTargetRestrictionHookRegistry.empty(),
+    )
+
+
+def _weapon_profile_by_name(catalog: ArmyCatalog, name: str) -> WeaponProfile:
+    for wargear in catalog.wargear:
+        for profile in wargear.weapon_profiles:
+            if profile.name == name:
+                return profile
+    raise AssertionError(f"Missing weapon profile: {name}.")
+
+
+def _phase17k_named_choice_effect(
+    *,
+    effect_id: str,
+    unit: UnitInstance,
+    owner_player_id: str,
+    payload: JsonValue,
+) -> PersistingEffect:
+    return PersistingEffect(
+        effect_id=effect_id,
+        source_rule_id="phase17k:named-choice:test",
+        owner_player_id=owner_player_id,
+        target_unit_instance_ids=(unit.unit_instance_id,),
+        started_battle_round=1,
+        started_phase=BattlePhaseKind.SHOOTING,
+        expiration=EffectExpiration.end_phase(
+            battle_round=1,
+            phase=BattlePhaseKind.SHOOTING,
+            player_id=owner_player_id,
+        ),
+        effect_payload=payload,
+    )
+
+
 def _model_bearing_wargear(
     unit: UnitInstance,
     wargear_id: str,
@@ -3623,6 +4395,118 @@ def _catalog_rule_ir(
                 effects=effects,
             ),
         ),
+    )
+
+
+def _multi_clause_named_weapon_choice_rule_ir() -> RuleIR:
+    span = TextSpan(text="catalog hook test", start=0, end=17)
+    return RuleIR(
+        rule_id="phase17k:test:multi-named-choice",
+        source_id="phase17k:test:multi-named-choice",
+        normalized_text=span.text,
+        parser_version="test-catalog-hook-parser",
+        clauses=(
+            RuleClause(
+                clause_id="phase17k:test:multi-named-choice:clause:001",
+                source_span=span,
+                trigger=RuleTrigger(
+                    kind=RuleTriggerKind.TIMING_WINDOW,
+                    source_span=span,
+                    parameters=parameters_from_pairs(
+                        (
+                            ("edge", "during"),
+                            ("owner", "active_player"),
+                            ("phase", "movement"),
+                        )
+                    ),
+                ),
+                target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=span),
+                effects=(
+                    _effect(
+                        RuleEffectKind.GRANT_ABILITY,
+                        ability="can_advance_and_charge",
+                    ),
+                ),
+                duration=RuleDuration(
+                    kind=RuleDurationKind.PERMANENT,
+                    source_span=span,
+                ),
+            ),
+            RuleClause(
+                clause_id="phase17k:test:multi-named-choice:clause:002",
+                source_span=span,
+                trigger=RuleTrigger(
+                    kind=RuleTriggerKind.TIMING_WINDOW,
+                    source_span=span,
+                    parameters=parameters_from_pairs(
+                        (
+                            ("edge", "during"),
+                            ("owner", "active_player"),
+                            ("phase", "shooting"),
+                        )
+                    ),
+                ),
+                target=RuleTargetSpec(kind=RuleTargetKind.THIS_MODEL, source_span=span),
+                effects=(
+                    _effect(
+                        RuleEffectKind.GRANT_WEAPON_ABILITY,
+                        selection_kind="select_one",
+                        selection_group_id="multi_clause_named_weapon_choice",
+                        selection_option_id="option_001_ignores_cover",
+                        selection_option_index=1,
+                        target_scope="this_model",
+                        weapon_name="Bolt of Change",
+                        weapon_ability="Ignores Cover",
+                    ),
+                    _effect(
+                        RuleEffectKind.GRANT_WEAPON_ABILITY,
+                        selection_kind="select_one",
+                        selection_group_id="multi_clause_named_weapon_choice",
+                        selection_option_id="option_002_lethal_hits",
+                        selection_option_index=2,
+                        target_scope="this_model",
+                        weapon_name="Bolt of Change",
+                        weapon_ability="Lethal Hits",
+                    ),
+                ),
+                duration=RuleDuration(
+                    kind=RuleDurationKind.UNTIL_TIMING_ENDPOINT,
+                    source_span=span,
+                    parameters=parameters_from_pairs((("endpoint", "phase"),)),
+                ),
+            ),
+        ),
+    )
+
+
+def _multi_clause_named_weapon_choice_record(
+    *,
+    rule_ir: RuleIR,
+    clause_index: int,
+    datasheet_id: str,
+    trigger_kind: TimingTriggerKind,
+) -> AbilityCatalogRecord:
+    clause = rule_ir.clauses[clause_index]
+    return AbilityCatalogRecord(
+        record_id=f"phase17k:test:catalog-ability:{datasheet_id}:multi-daemonspark:{clause.clause_id}",
+        definition=AbilityDefinition(
+            ability_id="multi-daemonspark",
+            name="Multi-Clause Daemonspark",
+            source_id="phase17k:test:multi-named-choice",
+            when_descriptor="Catalog generic rule IR.",
+            effect_descriptor="Multi-clause named weapon ability choice.",
+            restrictions_descriptor="Datasheet ability source kind: datasheet.",
+            timing=AbilityTimingDescriptor(trigger_kind=trigger_kind),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value(
+                {
+                    "rule_ir": rule_ir.to_payload(),
+                    "runtime_clause_id": clause.clause_id,
+                }
+            ),
+        ),
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id=datasheet_id,
     )
 
 
@@ -3948,6 +4832,24 @@ def _advance_charge_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     )
 
 
+def _named_weapon_choice_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_named_weapon_choice_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-lord-of-change",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-lord-of-change",
+                model_name="Lord of Change",
+                height=5.5,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:test:lord-of-change:height",
+                height_document_reference="Test Lord of Change Datasheet",
+            ),
+        ),
+    )
+
+
 def _advance_charge_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     return (
         _artifact_from_csv(
@@ -4029,6 +4931,91 @@ def _advance_charge_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                 (
                     "datasheet_id,line,description",
                     "test-advance-charge-unit,1,1 Swift Hunter",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _named_weapon_choice_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-daemons-rule,test-faction,Test Daemons Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-lord-of-change,Lord of Change,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-lord-of-change,1,Faction,test-daemons-rule,"
+                        "Test Daemons Rule,Test rule text.,"
+                    ),
+                    (
+                        "test-lord-of-change,2,Datasheet,,Daemonspark,"
+                        '"In your Shooting phase, select one of the following abilities: '
+                        "[IGNORES COVER]; [LETHAL HITS]; [SUSTAINED HITS D3]. "
+                        "Until the end of the phase, this model's Bolt of Change has "
+                        'that ability.",'
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-lord-of-change,Character,,false",
+                    "test-lord-of-change,Monster,,false",
+                    "test-lord-of-change,Psyker,,false",
+                    "test-lord-of-change,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-lord-of-change,1,12,10,6,5,20,6,5,100mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    "test-lord-of-change,1,1,Bolt of Change,Ranged,18,9,2,9,-2,3,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    "test-lord-of-change,1,1 Lord of Change",
                 )
             ),
         ),

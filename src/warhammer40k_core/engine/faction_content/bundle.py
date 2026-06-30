@@ -6,6 +6,7 @@ from types import MappingProxyType
 from typing import cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.engine import catalog_turn_end_reserves
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityCatalogRecord,
@@ -38,10 +39,8 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_advance_eligibility_hook_bindings,
+    catalog_named_weapon_ability_choice_hook_bindings,
     catalog_weapon_profile_modifier_bindings,
-)
-from warhammer40k_core.engine.catalog_turn_end_reserves import (
-    catalog_turn_end_reserve_hook_bindings,
 )
 from warhammer40k_core.engine.charge_declaration_hooks import (
     ChargeDeclarationHookBinding,
@@ -57,11 +56,9 @@ from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectRegistry,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content import bundle_payloads as _bundle_payloads
 from warhammer40k_core.engine.faction_content import bundle_validation as _bundle_validation
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
-from warhammer40k_core.engine.faction_content.bundle_payloads import (
-    RuntimeContentBundleSummaryPayload,
-)
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventHandlerBinding,
     RuntimeContentEventHandlerRegistry,
@@ -165,15 +162,12 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedMortalWoundHookBinding,
     UnitMoveCompletedMortalWoundHookRegistry,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    faction_execution_2026_27,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
-    Phase17FExecutionRecord,
-)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import faction_execution_2026_27
 
 DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID = "runtime-content:module-default"
 EMPTY_NAMED_HANDLERS: Mapping[str, FactionRuleNamedHandler] = MappingProxyType({})
+_BundleSummaryPayload = _bundle_payloads.RuntimeContentBundleSummaryPayload
+_Phase17FExecutionRecord = faction_execution_2026_27.Phase17FExecutionRecord
 _summary_hash = _bundle_validation.summary_hash
 _validate_identifier = _bundle_validation.validate_identifier
 _validate_identifier_tuple = _bundle_validation.validate_identifier_tuple
@@ -1224,7 +1218,7 @@ class RuntimeContentBundle:
         base_ability_handler_registry: AbilityHandlerRegistry | None = None,
         base_stratagem_handler_registry: StratagemHandlerRegistry | None = None,
         base_rule_execution_registry: RuleExecutionRegistry | None = None,
-        faction_execution_records: tuple[Phase17FExecutionRecord, ...] | None = None,
+        faction_execution_records: tuple[_Phase17FExecutionRecord, ...] | None = None,
         include_unselected_faction_execution_records: bool = False,
     ) -> RuntimeContentBundle:
         if type(activation) is not RuntimeContentActivation:
@@ -1328,7 +1322,7 @@ class RuntimeContentBundle:
         )
         turn_end_hook_registry = TurnEndHookRegistry.from_bindings(
             (
-                *catalog_turn_end_reserve_hook_bindings(
+                *catalog_turn_end_reserves.catalog_turn_end_reserve_hook_bindings(
                     ability_indexes_by_player_id=ability_indexes_by_player_id,
                     armies=validated_armies,
                 ),
@@ -1351,9 +1345,15 @@ class RuntimeContentBundle:
             )
         )
         shooting_phase_start_hook_registry = ShootingPhaseStartHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.shooting_phase_start_hook_bindings,
+            (
+                *catalog_named_weapon_ability_choice_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.shooting_phase_start_hook_bindings,
+                ),
             )
         )
         unit_destroyed_hook_registry = UnitDestroyedHookRegistry.from_bindings(
@@ -1613,7 +1613,7 @@ class RuntimeContentBundle:
             contribution_ids=contribution_ids,
         )
 
-    def to_summary_payload(self) -> RuntimeContentBundleSummaryPayload:
+    def to_summary_payload(self) -> _BundleSummaryPayload:
         payload = {
             "activation": cast(
                 dict[str, JsonValue], validate_json_value(self.activation.to_payload())
@@ -1782,7 +1782,7 @@ class RuntimeContentBundle:
         payload["bundle_summary_hash"] = _summary_hash(
             cast(Mapping[str, JsonValue], validate_json_value(payload))
         )
-        return cast(RuntimeContentBundleSummaryPayload, validate_json_value(payload))
+        return cast(_BundleSummaryPayload, validate_json_value(payload))
 
 
 def _validate_contributions(
@@ -1929,9 +1929,9 @@ def _merged_named_handlers(
 
 def _selected_faction_execution_records(
     *,
-    available_records: tuple[Phase17FExecutionRecord, ...],
+    available_records: tuple[_Phase17FExecutionRecord, ...],
     selected_execution_record_ids: tuple[str, ...],
-) -> tuple[Phase17FExecutionRecord, ...]:
+) -> tuple[_Phase17FExecutionRecord, ...]:
     selected_ids = set(
         _validate_identifier_tuple(
             "selected_execution_record_ids",
@@ -1940,11 +1940,11 @@ def _selected_faction_execution_records(
     )
     if not selected_ids:
         return ()
-    records_by_id: dict[str, Phase17FExecutionRecord] = {}
+    records_by_id: dict[str, _Phase17FExecutionRecord] = {}
     for record in _validate_tuple(
         "faction_execution_records",
         available_records,
-        Phase17FExecutionRecord,
+        _Phase17FExecutionRecord,
     ):
         if record.execution_id in records_by_id:
             raise GameLifecycleError("Runtime content faction execution record IDs must be unique.")

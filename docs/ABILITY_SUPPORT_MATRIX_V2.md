@@ -205,6 +205,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon |
 | `catalog-ir:movement-characteristic-modifier` | No current generated rows |
 | `catalog-ir:movement-characteristic-query` | No current generated rows |
+| `catalog-ir:named-weapon-ability-choice` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |

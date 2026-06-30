@@ -5,10 +5,12 @@ from dataclasses import dataclass, replace
 from types import MappingProxyType
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
 from warhammer40k_core.core.modifiers import RollModifier
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     RangeProfileKind,
@@ -39,16 +41,27 @@ from warhammer40k_core.engine.damage_allocation import (
     feel_no_pain_attack_condition_from_token,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle_validation import (
     validate_identifier as _validate_identifier,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
+)
+from warhammer40k_core.engine.shooting_phase_start_hooks import (
+    SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
+    ShootingPhaseStartHookBinding,
+    ShootingPhaseStartRequestContext,
+    ShootingPhaseStartResultContext,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_abilities import (
@@ -58,10 +71,11 @@ from warhammer40k_core.engine.unit_abilities import (
     feel_no_pain_profile_for_unit,
     fights_first_source_id_for_unit,
 )
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleConditionKind,
+    RuleDurationKind,
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
@@ -95,6 +109,7 @@ CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID = "catalog-ir:feel-no-pain-source"
 CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-hit-value-modifier"
 CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-wound-value-modifier"
 CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID = "catalog-ir:weapon-keyword-grant"
+CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID = "catalog-ir:named-weapon-ability-choice"
 CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-advance-and-charge"
 CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-fallback-and-charge"
 CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID = (
@@ -102,6 +117,11 @@ CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID = (
 )
 CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID = "catalog-ir:can-be-placed-in-reserves"
 CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID = "catalog-ir:shadow-of-chaos-aura"
+CATALOG_NAMED_WEAPON_ABILITY_CHOICE_EFFECT_KIND = "catalog_named_weapon_ability_choice"
+CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SELECTED_EVENT = "catalog_named_weapon_ability_choice_selected"
+SELECT_CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SUBMISSION_KIND = (
+    "select_catalog_named_weapon_ability_choice"
+)
 DEADLY_DEMISE_TRIGGER_ROLL_THRESHOLD = 6
 DEADLY_DEMISE_RANGE_INCHES = 6.0
 CORE_FIGHTS_FIRST_SOURCE_ID = "gw-11e-core-abilities:core:fights-first"
@@ -290,6 +310,116 @@ class CatalogWeaponKeywordGrant:
 
 
 @dataclass(frozen=True, slots=True)
+class CatalogNamedWeaponAbilityChoiceOption:
+    option_id: str
+    selection_option_id: str
+    selection_option_index: int
+    keyword: WeaponKeyword
+    weapon_ability_value: int | str | None
+    ability: AbilityDescriptor | None
+    effect_index: int
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "option_id", _validate_identifier("option_id", self.option_id))
+        object.__setattr__(
+            self,
+            "selection_option_id",
+            _validate_identifier("selection_option_id", self.selection_option_id),
+        )
+        object.__setattr__(
+            self,
+            "selection_option_index",
+            _validate_positive_int("selection_option_index", self.selection_option_index),
+        )
+        object.__setattr__(self, "keyword", _weapon_keyword_from_value(self.keyword))
+        if self.weapon_ability_value is not None:
+            _validate_weapon_ability_choice_value(self.weapon_ability_value)
+        if self.ability is not None and type(self.ability) is not AbilityDescriptor:
+            raise GameLifecycleError(
+                "Catalog named weapon ability choice ability must be a descriptor."
+            )
+        if type(self.effect_index) is not int or self.effect_index < 0:
+            raise GameLifecycleError(
+                "Catalog named weapon ability choice effect_index must be non-negative."
+            )
+
+    @property
+    def label(self) -> str:
+        if self.weapon_ability_value is None:
+            return self.keyword.value
+        return f"{self.keyword.value} {self.weapon_ability_value}"
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogNamedWeaponAbilityChoiceGroup:
+    record: AbilityCatalogRecord
+    unit: UnitInstance
+    clause: RuleClause
+    selection_group_id: str
+    target_scope: str
+    weapon_names: tuple[str, ...]
+    target_model_instance_ids: tuple[str, ...]
+    options: tuple[CatalogNamedWeaponAbilityChoiceOption, ...]
+
+    def __post_init__(self) -> None:
+        if type(self.record) is not AbilityCatalogRecord:
+            raise GameLifecycleError(
+                "Catalog named weapon ability choice requires an ability record."
+            )
+        _validate_unit(self.unit)
+        if type(self.clause) is not RuleClause:
+            raise GameLifecycleError("Catalog named weapon ability choice requires a rule clause.")
+        object.__setattr__(
+            self,
+            "selection_group_id",
+            _validate_identifier("selection_group_id", self.selection_group_id),
+        )
+        object.__setattr__(
+            self,
+            "target_scope",
+            _validate_named_weapon_choice_target_scope(self.target_scope),
+        )
+        object.__setattr__(
+            self,
+            "weapon_names",
+            _validate_named_weapon_names(self.weapon_names),
+        )
+        object.__setattr__(
+            self,
+            "target_model_instance_ids",
+            _validate_current_model_instance_ids(self.target_model_instance_ids),
+        )
+        if type(self.options) is not tuple or not self.options:
+            raise GameLifecycleError("Catalog named weapon ability choice requires finite options.")
+        option_values = tuple(
+            _validate_named_weapon_choice_option(option) for option in self.options
+        )
+        if len({option.option_id for option in option_values}) != len(option_values):
+            raise GameLifecycleError(
+                "Catalog named weapon ability choice options must not duplicate IDs."
+            )
+        group_ids = {option.selection_option_id for option in option_values}
+        if len(group_ids) != len(option_values):
+            raise GameLifecycleError(
+                "Catalog named weapon ability choice selection options must be unique."
+            )
+        object.__setattr__(
+            self,
+            "options",
+            tuple(sorted(option_values, key=lambda option: option.option_id)),
+        )
+
+    @property
+    def sort_key(self) -> tuple[str, str, str, str]:
+        return (
+            self.unit.unit_instance_id,
+            self.record.record_id,
+            self.clause.clause_id,
+            self.selection_group_id,
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class CatalogWeaponKeywordGrantRuntime:
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
     armies: tuple[ArmyDefinition, ...]
@@ -304,7 +434,10 @@ class CatalogWeaponKeywordGrantRuntime:
         object.__setattr__(self, "armies", armies)
 
     def bindings(self) -> tuple[WeaponProfileModifierBinding, ...]:
-        if not _has_catalog_weapon_keyword_grant_records(self.ability_indexes_by_player_id):
+        if not (
+            _has_catalog_weapon_keyword_grant_records(self.ability_indexes_by_player_id)
+            or _has_catalog_named_weapon_ability_choice_records(self.ability_indexes_by_player_id)
+        ):
             return ()
         return (
             WeaponProfileModifierBinding(
@@ -338,7 +471,164 @@ class CatalogWeaponKeywordGrantRuntime:
             ):
                 continue
             profile = _profile_with_catalog_weapon_keyword_grant(profile=profile, grant=grant)
+        for grant in _selected_catalog_named_weapon_ability_grants(context):
+            profile = _profile_with_catalog_weapon_keyword_grant(profile=profile, grant=grant)
         return profile
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogNamedWeaponAbilityChoiceRuntime:
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
+    armies: tuple[ArmyDefinition, ...]
+
+    def __post_init__(self) -> None:
+        indexes = _validate_ability_index_mapping(self.ability_indexes_by_player_id)
+        armies = _validate_armies(self.armies)
+        missing_ids = {army.player_id for army in armies} - set(indexes)
+        if missing_ids:
+            raise GameLifecycleError(
+                "Catalog named weapon ability choices missing player ability index."
+            )
+        object.__setattr__(self, "ability_indexes_by_player_id", MappingProxyType(dict(indexes)))
+        object.__setattr__(self, "armies", armies)
+
+    def bindings(self) -> tuple[ShootingPhaseStartHookBinding, ...]:
+        if not _has_catalog_named_weapon_ability_choice_records(self.ability_indexes_by_player_id):
+            return ()
+        return (
+            ShootingPhaseStartHookBinding(
+                hook_id=CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+                source_id=CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+                request_handler=self.request_handler,
+                result_handler=self.result_handler,
+            ),
+        )
+
+    def request_handler(self, context: ShootingPhaseStartRequestContext) -> DecisionRequest | None:
+        if type(context) is not ShootingPhaseStartRequestContext:
+            raise GameLifecycleError("Catalog named weapon ability choice requires context.")
+        groups = _available_catalog_named_weapon_ability_choice_groups(
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            armies=self.armies,
+            context=context,
+        )
+        if not groups:
+            return None
+        group = groups[0]
+        common_payload = _named_weapon_ability_choice_request_payload(
+            state=context.state,
+            group=group,
+        )
+        return DecisionRequest(
+            request_id=context.state.next_decision_request_id(),
+            decision_type=SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
+            actor_id=context.state.active_player_id,
+            payload=validate_json_value(common_payload),
+            options=tuple(
+                DecisionOption(
+                    option_id=option.option_id,
+                    label=_named_weapon_ability_choice_option_label(
+                        group=group,
+                        option=option,
+                    ),
+                    payload=validate_json_value(
+                        _named_weapon_ability_choice_option_payload(
+                            state=context.state,
+                            group=group,
+                            option=option,
+                        )
+                    ),
+                )
+                for option in group.options
+            ),
+        )
+
+    def result_handler(
+        self,
+        context: ShootingPhaseStartResultContext,
+    ) -> bool | LifecycleStatus:
+        if type(context) is not ShootingPhaseStartResultContext:
+            raise GameLifecycleError("Catalog named weapon ability choice requires context.")
+        request_payload = _payload_object(context.request.payload)
+        if request_payload.get("hook_id") != CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID:
+            return False
+        result_payload = _payload_object(context.result.payload)
+        if (
+            result_payload.get("submission_kind")
+            != SELECT_CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SUBMISSION_KIND
+        ):
+            return _catalog_named_weapon_ability_choice_invalid_status(
+                state=context.state,
+                actor_id=context.result.actor_id,
+                invalid_reason="catalog_named_weapon_ability_choice_submission_kind_drift",
+            )
+        groups = _available_catalog_named_weapon_ability_choice_groups(
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            armies=self.armies,
+            context=ShootingPhaseStartRequestContext(
+                state=context.state,
+                decisions=context.decisions,
+                ruleset_descriptor=context.ruleset_descriptor,
+                army_catalog=context.army_catalog,
+                shooting_target_restriction_hooks=context.shooting_target_restriction_hooks,
+            ),
+        )
+        if not groups:
+            return _catalog_named_weapon_ability_choice_invalid_status(
+                state=context.state,
+                actor_id=context.result.actor_id,
+                invalid_reason="catalog_named_weapon_ability_choice_unavailable",
+            )
+        group = groups[0]
+        option_by_id = {option.option_id: option for option in group.options}
+        option = option_by_id.get(context.result.selected_option_id)
+        if option is None:
+            return _catalog_named_weapon_ability_choice_invalid_status(
+                state=context.state,
+                actor_id=context.result.actor_id,
+                invalid_reason="catalog_named_weapon_ability_choice_option_drift",
+            )
+        expected_payload = _named_weapon_ability_choice_option_payload(
+            state=context.state,
+            group=group,
+            option=option,
+        )
+        if result_payload != expected_payload:
+            return _catalog_named_weapon_ability_choice_invalid_status(
+                state=context.state,
+                actor_id=context.result.actor_id,
+                invalid_reason="catalog_named_weapon_ability_choice_payload_drift",
+            )
+        effect = _named_weapon_ability_choice_persisting_effect(
+            state=context.state,
+            result_id=context.result.result_id,
+            group=group,
+            option=option,
+        )
+        context.state.record_persisting_effect(effect)
+        context.decisions.event_log.append(
+            CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SELECTED_EVENT,
+            validate_json_value(
+                {
+                    "game_id": context.state.game_id,
+                    "battle_round": context.state.battle_round,
+                    "phase": BattlePhase.SHOOTING.value,
+                    "active_player_id": context.state.active_player_id,
+                    "request_id": context.request.request_id,
+                    "result_id": context.result.result_id,
+                    "selected_option_id": context.result.selected_option_id,
+                    "persisting_effect_id": effect.effect_id,
+                    "catalog_record_id": group.record.record_id,
+                    "source_rule_id": group.record.definition.source_id,
+                    "unit_instance_id": group.unit.unit_instance_id,
+                    "selection_group_id": group.selection_group_id,
+                    "selected_weapon_ability": option.keyword.value,
+                    "weapon_names": list(group.weapon_names),
+                    "target_model_instance_ids": list(group.target_model_instance_ids),
+                }
+            ),
+        )
+        return True
 
 
 def catalog_advance_eligibility_hook_bindings(
@@ -347,6 +637,17 @@ def catalog_advance_eligibility_hook_bindings(
     armies: tuple[ArmyDefinition, ...],
 ) -> tuple[AdvanceEligibilityHookBinding, ...]:
     return CatalogAdvanceEligibilityRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
+    ).bindings()
+
+
+def catalog_named_weapon_ability_choice_hook_bindings(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[ShootingPhaseStartHookBinding, ...]:
+    return CatalogNamedWeaponAbilityChoiceRuntime(
         ability_indexes_by_player_id=ability_indexes_by_player_id,
         armies=armies,
     ).bindings()
@@ -373,6 +674,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
         CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
     }
     for characteristic in Characteristic:
         hook_ids.add(_catalog_ir_characteristic_query_consumer_id(characteristic))
@@ -638,6 +940,509 @@ def catalog_weapon_keyword_grants_for_unit(
     return tuple(sorted(grants, key=lambda grant: grant.source_id))
 
 
+def _available_catalog_named_weapon_ability_choice_groups(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+    context: ShootingPhaseStartRequestContext,
+) -> tuple[CatalogNamedWeaponAbilityChoiceGroup, ...]:
+    if type(context) is not ShootingPhaseStartRequestContext:
+        raise GameLifecycleError("Catalog named weapon ability choices require context.")
+    active_player_id = _validate_identifier("active_player_id", context.state.active_player_id)
+    army = _army_for_player(armies, player_id=active_player_id)
+    index = ability_indexes_by_player_id.get(active_player_id)
+    if index is None:
+        raise GameLifecycleError("Catalog named weapon ability choice index is missing player.")
+    groups: list[CatalogNamedWeaponAbilityChoiceGroup] = []
+    for unit in army.units:
+        current_model_ids = _current_placed_alive_model_instance_ids_for_unit(
+            state=context.state,
+            unit=unit,
+        )
+        if not current_model_ids:
+            continue
+        for record in _unit_scoped_generic_records_for_all_timings(
+            ability_index=index,
+            unit=unit,
+            current_model_instance_ids=current_model_ids,
+        ):
+            for clause in _clauses_from_record(record):
+                group = _catalog_named_weapon_ability_choice_group_from_clause(
+                    state=context.state,
+                    army_catalog=context.army_catalog,
+                    record=record,
+                    unit=unit,
+                    current_model_instance_ids=current_model_ids,
+                    clause=clause,
+                )
+                if group is not None:
+                    groups.append(group)
+    return tuple(sorted(groups, key=lambda group: group.sort_key))
+
+
+def _catalog_named_weapon_ability_choice_group_from_clause(
+    *,
+    state: GameState,
+    army_catalog: ArmyCatalog,
+    record: AbilityCatalogRecord,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+    clause: RuleClause,
+) -> CatalogNamedWeaponAbilityChoiceGroup | None:
+    _validate_game_state(state)
+    if type(army_catalog) is not ArmyCatalog:
+        raise GameLifecycleError("Catalog named weapon ability choice requires an ArmyCatalog.")
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog named weapon ability choice requires an ability record.")
+    _validate_unit(unit)
+    current_ids = _validate_current_model_instance_ids(current_model_instance_ids)
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog named weapon ability choice requires a rule clause.")
+    if not _clause_is_named_weapon_ability_choice(clause):
+        return None
+    options: list[CatalogNamedWeaponAbilityChoiceOption] = []
+    selection_group_id: str | None = None
+    target_scope: str | None = None
+    weapon_names: tuple[str, ...] | None = None
+    for effect_index, effect in enumerate(clause.effects):
+        option = _named_weapon_ability_choice_option_from_effect(
+            record=record,
+            unit=unit,
+            clause=clause,
+            effect_index=effect_index,
+            effect=effect,
+        )
+        if option is None:
+            return None
+        parameters = parameter_payload(effect.parameters)
+        effect_group_id = _required_string_parameter(parameters, key="selection_group_id")
+        effect_target_scope = _validate_named_weapon_choice_target_scope(
+            _required_string_parameter(parameters, key="target_scope")
+        )
+        effect_weapon_names = _weapon_names_from_parameters(parameters)
+        if selection_group_id is None:
+            selection_group_id = effect_group_id
+            target_scope = effect_target_scope
+            weapon_names = effect_weapon_names
+        elif (
+            selection_group_id != effect_group_id
+            or target_scope != effect_target_scope
+            or weapon_names != effect_weapon_names
+        ):
+            raise GameLifecycleError(
+                "Catalog named weapon ability choice option group shape drift."
+            )
+        options.append(option)
+    if selection_group_id is None or target_scope is None or weapon_names is None:
+        return None
+    target_model_ids = _named_weapon_ability_choice_target_model_ids(
+        army_catalog=army_catalog,
+        record=record,
+        unit=unit,
+        current_model_instance_ids=current_ids,
+        target_scope=target_scope,
+        weapon_names=weapon_names,
+    )
+    if not target_model_ids:
+        return None
+    if _catalog_named_weapon_ability_choice_group_resolved(
+        state=state,
+        unit_instance_id=unit.unit_instance_id,
+        catalog_record_id=record.record_id,
+        clause_id=clause.clause_id,
+        selection_group_id=selection_group_id,
+    ):
+        return None
+    return CatalogNamedWeaponAbilityChoiceGroup(
+        record=record,
+        unit=unit,
+        clause=clause,
+        selection_group_id=selection_group_id,
+        target_scope=target_scope,
+        weapon_names=weapon_names,
+        target_model_instance_ids=target_model_ids,
+        options=tuple(options),
+    )
+
+
+def _named_weapon_ability_choice_option_from_effect(
+    *,
+    record: AbilityCatalogRecord,
+    unit: UnitInstance,
+    clause: RuleClause,
+    effect_index: int,
+    effect: RuleEffectSpec,
+) -> CatalogNamedWeaponAbilityChoiceOption | None:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog named weapon ability choice requires an ability record.")
+    _validate_unit(unit)
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog named weapon ability choice requires a rule clause.")
+    if type(effect_index) is not int or effect_index < 0:
+        raise GameLifecycleError(
+            "Catalog named weapon ability choice effect_index must be non-negative."
+        )
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog named weapon ability choice requires a rule effect.")
+    if effect.kind is not RuleEffectKind.GRANT_WEAPON_ABILITY:
+        return None
+    parameters = parameter_payload(effect.parameters)
+    keyword = _weapon_keyword_from_parameters(parameters)
+    if keyword is None:
+        return None
+    if not _weapon_ability_choice_has_supported_runtime_shape(parameters, keyword=keyword):
+        return None
+    selection_group_id = _required_string_parameter(parameters, key="selection_group_id")
+    selection_option_id = _required_string_parameter(parameters, key="selection_option_id")
+    return CatalogNamedWeaponAbilityChoiceOption(
+        option_id=(
+            f"{CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID}:"
+            f"{unit.unit_instance_id}:{record.record_id}:{clause.clause_id}:"
+            f"{selection_group_id}:{selection_option_id}"
+        ),
+        selection_option_id=selection_option_id,
+        selection_option_index=_required_positive_int_parameter(
+            parameters,
+            key="selection_option_index",
+        ),
+        keyword=keyword,
+        weapon_ability_value=_optional_weapon_ability_choice_value_parameter(parameters),
+        ability=_weapon_ability_descriptor_for_grant(parameters=parameters, keyword=keyword),
+        effect_index=effect_index,
+    )
+
+
+def _named_weapon_ability_choice_target_model_ids(
+    *,
+    army_catalog: ArmyCatalog,
+    record: AbilityCatalogRecord,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+    target_scope: str,
+    weapon_names: tuple[str, ...],
+) -> tuple[str, ...]:
+    current_ids = _validate_current_model_instance_ids(current_model_instance_ids)
+    target_scope = _validate_named_weapon_choice_target_scope(target_scope)
+    names = _validate_named_weapon_names(weapon_names)
+    if target_scope == "this_model" and record.source_kind is AbilitySourceKind.WARGEAR:
+        candidate_ids = _record_current_wargear_bearer_model_ids(
+            record=record,
+            unit=unit,
+            current_model_instance_ids=current_ids,
+        )
+    else:
+        candidate_ids = current_ids
+    if not candidate_ids:
+        return ()
+    target_ids = tuple(
+        sorted(
+            model.model_instance_id
+            for model in unit.own_models
+            if model.model_instance_id in candidate_ids
+            and model.is_alive
+            and _model_has_named_weapon(
+                army_catalog=army_catalog,
+                model=model,
+                weapon_names=names,
+            )
+        )
+    )
+    if not target_ids:
+        raise GameLifecycleError(
+            "Catalog named weapon ability choice target models lack the named weapon."
+        )
+    return target_ids
+
+
+def _model_has_named_weapon(
+    *,
+    army_catalog: ArmyCatalog,
+    model: ModelInstance,
+    weapon_names: tuple[str, ...],
+) -> bool:
+    if type(army_catalog) is not ArmyCatalog:
+        raise GameLifecycleError("Catalog named weapon lookup requires an ArmyCatalog.")
+    if type(model) is not ModelInstance:
+        raise GameLifecycleError("Catalog named weapon lookup requires a model instance.")
+    requested_tokens = {_weapon_name_match_token(name) for name in weapon_names}
+    for wargear_id in model.wargear_ids:
+        wargear = _catalog_wargear_by_id(army_catalog, wargear_id=wargear_id)
+        for profile in wargear.weapon_profiles:
+            if _weapon_name_match_token(profile.name) in requested_tokens:
+                return True
+    return False
+
+
+def _catalog_wargear_by_id(army_catalog: ArmyCatalog, *, wargear_id: str) -> Wargear:
+    requested_wargear_id = _validate_identifier("wargear_id", wargear_id)
+    for wargear in army_catalog.wargear:
+        if wargear.wargear_id == requested_wargear_id:
+            return wargear
+    raise GameLifecycleError("Catalog named weapon lookup found unknown wargear.")
+
+
+def _current_placed_alive_model_instance_ids_for_unit(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+) -> tuple[str, ...]:
+    _validate_game_state(state)
+    _validate_unit(unit)
+    if state.battlefield_state is None:
+        return ()
+    placed_model_ids = frozenset(state.battlefield_state.placed_model_ids())
+    return tuple(
+        sorted(
+            model.model_instance_id
+            for model in unit.own_models
+            if model.is_alive and model.model_instance_id in placed_model_ids
+        )
+    )
+
+
+def _catalog_named_weapon_ability_choice_group_resolved(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    catalog_record_id: str,
+    clause_id: str,
+    selection_group_id: str,
+) -> bool:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    requested_record_id = _validate_identifier("catalog_record_id", catalog_record_id)
+    requested_clause_id = _validate_identifier("clause_id", clause_id)
+    requested_group_id = _validate_identifier("selection_group_id", selection_group_id)
+    for effect in state.persisting_effects_for_unit(requested_unit_id):
+        if not isinstance(effect.effect_payload, dict):
+            continue
+        payload = cast(dict[str, object], effect.effect_payload)
+        if payload.get("effect_kind") != CATALOG_NAMED_WEAPON_ABILITY_CHOICE_EFFECT_KIND:
+            continue
+        if (
+            payload.get("catalog_record_id") == requested_record_id
+            and payload.get("clause_id") == requested_clause_id
+            and payload.get("selection_group_id") == requested_group_id
+        ):
+            return True
+    return False
+
+
+def _named_weapon_ability_choice_request_payload(
+    *,
+    state: GameState,
+    group: CatalogNamedWeaponAbilityChoiceGroup,
+) -> dict[str, object]:
+    return {
+        **_named_weapon_ability_choice_base_payload(state=state, group=group),
+        "available_named_weapon_ability_option_ids": [option.option_id for option in group.options],
+        "available_named_weapon_ability_choices": [
+            _named_weapon_ability_choice_selection_payload(option) for option in group.options
+        ],
+    }
+
+
+def _named_weapon_ability_choice_option_payload(
+    *,
+    state: GameState,
+    group: CatalogNamedWeaponAbilityChoiceGroup,
+    option: CatalogNamedWeaponAbilityChoiceOption,
+) -> dict[str, object]:
+    return {
+        **_named_weapon_ability_choice_base_payload(state=state, group=group),
+        "selected_named_weapon_ability_choice": (
+            _named_weapon_ability_choice_selection_payload(option)
+        ),
+    }
+
+
+def _named_weapon_ability_choice_base_payload(
+    *,
+    state: GameState,
+    group: CatalogNamedWeaponAbilityChoiceGroup,
+) -> dict[str, object]:
+    return {
+        "submission_kind": SELECT_CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SUBMISSION_KIND,
+        "hook_id": CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "phase": BattlePhase.SHOOTING.value,
+        "active_player_id": state.active_player_id,
+        "catalog_record_id": group.record.record_id,
+        "ability_id": group.record.definition.ability_id,
+        "ability_name": group.record.definition.name,
+        "source_rule_id": group.record.definition.source_id,
+        "unit_instance_id": group.unit.unit_instance_id,
+        "clause_id": group.clause.clause_id,
+        "selection_group_id": group.selection_group_id,
+        "target_scope": group.target_scope,
+        "weapon_names": list(group.weapon_names),
+        "target_model_instance_ids": list(group.target_model_instance_ids),
+    }
+
+
+def _named_weapon_ability_choice_selection_payload(
+    option: CatalogNamedWeaponAbilityChoiceOption,
+) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "option_id": option.option_id,
+        "selection_option_id": option.selection_option_id,
+        "selection_option_index": option.selection_option_index,
+        "selected_weapon_ability": option.keyword.value,
+        "keyword": option.keyword.value,
+        "ability_descriptor": None if option.ability is None else option.ability.to_payload(),
+    }
+    if option.weapon_ability_value is not None:
+        payload["weapon_ability_value"] = option.weapon_ability_value
+    return payload
+
+
+def _named_weapon_ability_choice_option_label(
+    *,
+    group: CatalogNamedWeaponAbilityChoiceGroup,
+    option: CatalogNamedWeaponAbilityChoiceOption,
+) -> str:
+    weapon_label = ", ".join(group.weapon_names)
+    return f"{option.label} for {weapon_label}"
+
+
+def _named_weapon_ability_choice_persisting_effect(
+    *,
+    state: GameState,
+    result_id: str,
+    group: CatalogNamedWeaponAbilityChoiceGroup,
+    option: CatalogNamedWeaponAbilityChoiceOption,
+) -> PersistingEffect:
+    result = _validate_identifier("result_id", result_id)
+    selected_payload = _named_weapon_ability_choice_selection_payload(option)
+    payload = {
+        **_named_weapon_ability_choice_option_payload(
+            state=state,
+            group=group,
+            option=option,
+        ),
+        **selected_payload,
+        "effect_kind": CATALOG_NAMED_WEAPON_ABILITY_CHOICE_EFFECT_KIND,
+    }
+    return PersistingEffect(
+        effect_id=f"{result}:catalog-named-weapon-ability-choice",
+        source_rule_id=group.record.definition.source_id,
+        owner_player_id=_validate_identifier("active_player_id", state.active_player_id),
+        target_unit_instance_ids=(group.unit.unit_instance_id,),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhaseKind.SHOOTING,
+        expiration=EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=BattlePhaseKind.SHOOTING,
+            player_id=_validate_identifier("active_player_id", state.active_player_id),
+        ),
+        effect_payload=validate_json_value(payload),
+    )
+
+
+def _selected_catalog_named_weapon_ability_grants(
+    context: WeaponProfileModifierContext,
+) -> tuple[CatalogWeaponKeywordGrant, ...]:
+    if type(context) is not WeaponProfileModifierContext:
+        raise GameLifecycleError("Catalog named weapon ability grants require context.")
+    if context.source_phase is not BattlePhase.SHOOTING:
+        return ()
+    profile_token = _weapon_name_match_token(context.weapon_profile.name)
+    grants: list[CatalogWeaponKeywordGrant] = []
+    for effect in context.state.persisting_effects_for_unit(context.attacking_unit_instance_id):
+        if not isinstance(effect.effect_payload, dict):
+            continue
+        payload = cast(dict[str, object], effect.effect_payload)
+        if payload.get("effect_kind") != CATALOG_NAMED_WEAPON_ABILITY_CHOICE_EFFECT_KIND:
+            continue
+        target_model_ids = _payload_string_tuple(payload, key="target_model_instance_ids")
+        if context.attacker_model_instance_id not in target_model_ids:
+            continue
+        weapon_names = _payload_string_tuple(payload, key="weapon_names")
+        if profile_token not in {_weapon_name_match_token(name) for name in weapon_names}:
+            continue
+        keyword = _weapon_keyword_from_value(_payload_string(payload, key="keyword"))
+        ability = _weapon_ability_descriptor_for_selected_choice_payload(
+            payload=payload,
+            keyword=keyword,
+        )
+        grants.append(
+            CatalogWeaponKeywordGrant(
+                source_id=f"{effect.effect_id}:{keyword.value}",
+                keyword=keyword,
+                weapon_scope="all",
+                ability=ability,
+            )
+        )
+    return tuple(sorted(grants, key=lambda grant: grant.source_id))
+
+
+def _weapon_ability_descriptor_for_selected_choice_payload(
+    *,
+    payload: Mapping[str, object],
+    keyword: WeaponKeyword,
+) -> AbilityDescriptor | None:
+    parameters: dict[str, object] = {"weapon_ability": keyword.value}
+    if "weapon_ability_value" in payload:
+        parameters["weapon_ability_value"] = payload["weapon_ability_value"]
+    return _weapon_ability_descriptor_for_grant(parameters=parameters, keyword=keyword)
+
+
+def _catalog_named_weapon_ability_choice_invalid_status(
+    *,
+    state: GameState,
+    actor_id: str | None,
+    invalid_reason: str,
+) -> LifecycleStatus:
+    return LifecycleStatus.invalid(
+        stage=GameLifecycleStage.BATTLE,
+        message="Catalog named weapon ability choice is no longer valid.",
+        payload=validate_json_value(
+            {
+                "game_id": state.game_id,
+                "player_id": actor_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.SHOOTING.value,
+                "invalid_reason": _validate_identifier("invalid_reason", invalid_reason),
+            }
+        ),
+    )
+
+
+def _payload_object(payload: object) -> dict[str, object]:
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Catalog named weapon ability choice payload must be an object.")
+    return cast(dict[str, object], payload)
+
+
+def _payload_string(payload: Mapping[str, object], *, key: str) -> str:
+    value = payload.get(key)
+    if type(value) is not str:
+        raise GameLifecycleError(f"Catalog named weapon payload {key} must be a string.")
+    return _validate_identifier(key, value)
+
+
+def _payload_string_tuple(payload: Mapping[str, object], *, key: str) -> tuple[str, ...]:
+    value = payload.get(key)
+    if type(value) is not list:
+        raise GameLifecycleError(f"Catalog named weapon payload {key} must be a list.")
+    items = cast(list[object], value)
+    values: list[str] = []
+    seen: set[str] = set()
+    for item in items:
+        if type(item) is not str:
+            raise GameLifecycleError(f"Catalog named weapon payload {key} must contain strings.")
+        resolved = _validate_identifier(key, item)
+        if resolved in seen:
+            raise GameLifecycleError(
+                f"Catalog named weapon payload {key} must not duplicate values."
+            )
+        seen.add(resolved)
+        values.append(resolved)
+    if not values:
+        raise GameLifecycleError(f"Catalog named weapon payload {key} must not be empty.")
+    return tuple(values)
+
+
 def _catalog_roll_reroll_permission_for_unit(
     *,
     ability_index: AbilityCatalogIndex,
@@ -864,6 +1669,9 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
                 consumer_ids.add(CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID)
     if _clause_targets_shadow_of_chaos_aura(clause):
         consumer_ids.add(CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID)
+    if _clause_is_named_weapon_ability_choice(clause):
+        for effect in clause.effects:
+            consumer_ids.update(_weapon_keyword_grant_consumer_ids_for_effect(effect))
     if _clause_is_structured_wound_reroll_clause(clause):
         consumer_ids.add(CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID)
     if _clause_is_structured_destroyed_unit_restore_clause(clause):
@@ -1296,6 +2104,47 @@ def _clause_targets_weapon_keyword_grant_unit(clause: RuleClause) -> bool:
     )
 
 
+def _clause_is_named_weapon_ability_choice(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    if clause.trigger is None or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return False
+    trigger_parameters = parameter_payload(clause.trigger.parameters)
+    if (
+        trigger_parameters.get("edge") != "during"
+        or trigger_parameters.get("owner") != "active_player"
+        or trigger_parameters.get("phase") != BattlePhase.SHOOTING.value
+    ):
+        return False
+    if (
+        clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT
+        or parameter_payload(clause.duration.parameters).get("endpoint") != "phase"
+    ):
+        return False
+    if clause.target is None or clause.target.kind not in {
+        RuleTargetKind.THIS_MODEL,
+        RuleTargetKind.THIS_UNIT,
+    }:
+        return False
+    if len(clause.effects) < 2:
+        return False
+    return all(_effect_is_named_weapon_ability_choice_option(effect) for effect in clause.effects)
+
+
+def _effect_is_named_weapon_ability_choice_option(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.GRANT_WEAPON_ABILITY:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    keyword = _weapon_keyword_from_parameters(parameters)
+    return keyword is not None and _weapon_ability_choice_has_supported_runtime_shape(
+        parameters,
+        keyword=keyword,
+    )
+
+
 def _effect_is_charge_roll_modifier(effect: RuleEffectSpec) -> bool:
     if type(effect) is not RuleEffectSpec:
         raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
@@ -1341,6 +2190,12 @@ def _weapon_keyword_grant_consumer_ids_for_effect(effect: RuleEffectSpec) -> tup
     keyword = _weapon_keyword_from_parameters(parameters)
     if keyword is None:
         return ()
+    if _weapon_ability_choice_has_supported_runtime_shape(parameters, keyword=keyword):
+        return (
+            CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+            CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+            _catalog_ir_weapon_keyword_grant_consumer_id(keyword.value),
+        )
     if not _weapon_keyword_grant_has_supported_runtime_shape(parameters, keyword=keyword):
         return ()
     return (
@@ -1574,6 +2429,30 @@ def _weapon_keyword_grant_has_supported_runtime_shape(
     return keyword is not WeaponKeyword.HUNTER
 
 
+def _weapon_ability_choice_has_supported_runtime_shape(
+    parameters: Mapping[str, object],
+    *,
+    keyword: WeaponKeyword,
+) -> bool:
+    if parameters.get("selection_kind") != "select_one":
+        return False
+    for key in ("selection_group_id", "selection_option_id", "target_scope"):
+        if type(parameters.get(key)) is not str:
+            return False
+    selection_index = parameters.get("selection_option_index")
+    if type(selection_index) is not int or selection_index < 1:
+        return False
+    if _optional_named_weapon_names(parameters) is None:
+        return False
+    if _optional_named_weapon_choice_target_scope(parameters) is None:
+        return False
+    if keyword in _VALUE_REQUIRED_WEAPON_KEYWORDS:
+        if keyword is WeaponKeyword.SUSTAINED_HITS:
+            return _optional_weapon_ability_choice_value_parameter(parameters) is not None
+        return _optional_positive_int_parameter(parameters, key="weapon_ability_value") is not None
+    return keyword is not WeaponKeyword.HUNTER
+
+
 def _weapon_ability_descriptor_for_grant(
     *,
     parameters: Mapping[str, object],
@@ -1587,7 +2466,10 @@ def _weapon_ability_descriptor_for_grant(
         return AbilityDescriptor.heavy()
     if keyword is WeaponKeyword.SUSTAINED_HITS:
         return AbilityDescriptor.sustained_hits(
-            _required_positive_int_parameter(parameters, key="weapon_ability_value")
+            _required_weapon_ability_choice_value_parameter(
+                parameters,
+                key="weapon_ability_value",
+            )
         )
     if keyword is WeaponKeyword.RAPID_FIRE:
         return AbilityDescriptor.rapid_fire(
@@ -1673,6 +2555,12 @@ def _required_positive_int_parameter(parameters: Mapping[str, object], *, key: s
     return value
 
 
+def _validate_positive_int(field_name: str, value: object) -> int:
+    if type(value) is not int or value < 1:
+        raise GameLifecycleError(f"Catalog rule parameter {field_name} must be a positive integer.")
+    return value
+
+
 def _optional_positive_int_parameter(parameters: Mapping[str, object], *, key: str) -> int | None:
     value = parameters.get(key)
     if value is None:
@@ -1680,6 +2568,116 @@ def _optional_positive_int_parameter(parameters: Mapping[str, object], *, key: s
     if type(value) is not int or value < 1:
         raise GameLifecycleError(f"Catalog rule parameter {key} must be a positive integer.")
     return value
+
+
+def _required_string_parameter(parameters: Mapping[str, object], *, key: str) -> str:
+    value = parameters.get(key)
+    if type(value) is not str:
+        raise GameLifecycleError(f"Catalog rule parameter {key} must be a string.")
+    return _validate_identifier(key, value)
+
+
+def _required_weapon_ability_choice_value_parameter(
+    parameters: Mapping[str, object],
+    *,
+    key: str,
+) -> int | str:
+    value = _optional_weapon_ability_choice_value_parameter(parameters)
+    if value is None:
+        raise GameLifecycleError(f"Catalog rule parameter {key} must be positive or D3.")
+    return value
+
+
+def _optional_weapon_ability_choice_value_parameter(
+    parameters: Mapping[str, object],
+) -> int | str | None:
+    value = parameters.get("weapon_ability_value")
+    if value is None:
+        return None
+    return _validate_weapon_ability_choice_value(value)
+
+
+def _validate_weapon_ability_choice_value(value: object) -> int | str:
+    if type(value) is int and value >= 1:
+        return value
+    if type(value) is str and value == "D3":
+        return value
+    raise GameLifecycleError("Catalog rule weapon ability value must be positive or D3.")
+
+
+def _optional_named_weapon_names(parameters: Mapping[str, object]) -> tuple[str, ...] | None:
+    names = parameters.get("weapon_names")
+    if type(names) is str:
+        return _validate_named_weapon_names(tuple(name for name in names.split("|") if name))
+    name = parameters.get("weapon_name")
+    if type(name) is str:
+        return _validate_named_weapon_names((name,))
+    return None
+
+
+def _weapon_names_from_parameters(parameters: Mapping[str, object]) -> tuple[str, ...]:
+    names = _optional_named_weapon_names(parameters)
+    if names is None:
+        raise GameLifecycleError("Catalog named weapon ability choice requires weapon names.")
+    return names
+
+
+def _validate_named_weapon_names(values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Catalog named weapon names must be a tuple.")
+    names: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not str:
+            raise GameLifecycleError("Catalog named weapon names must contain strings.")
+        name = value.strip()
+        if not name:
+            raise GameLifecycleError("Catalog named weapon names must not be empty.")
+        token = _weapon_name_match_token(name)
+        if token in seen:
+            raise GameLifecycleError("Catalog named weapon names must not duplicate names.")
+        seen.add(token)
+        names.append(name)
+    if not names:
+        raise GameLifecycleError("Catalog named weapon names must not be empty.")
+    return tuple(names)
+
+
+def _optional_named_weapon_choice_target_scope(
+    parameters: Mapping[str, object],
+) -> str | None:
+    value = parameters.get("target_scope")
+    if type(value) is not str:
+        return None
+    return _validate_named_weapon_choice_target_scope(value)
+
+
+def _validate_named_weapon_choice_target_scope(value: object) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError(
+            "Catalog named weapon ability choice target_scope must be a string."
+        )
+    scope = value.strip()
+    if scope in {"this_model", "models_in_this_unit"}:
+        return scope
+    raise GameLifecycleError("Unsupported catalog named weapon ability choice target scope.")
+
+
+def _validate_named_weapon_choice_option(
+    option: object,
+) -> CatalogNamedWeaponAbilityChoiceOption:
+    if type(option) is not CatalogNamedWeaponAbilityChoiceOption:
+        raise GameLifecycleError("Catalog named weapon ability choice requires option values.")
+    return option
+
+
+def _weapon_name_match_token(value: str) -> str:
+    if type(value) is not str:
+        raise GameLifecycleError("Catalog named weapon name must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError("Catalog named weapon name must not be empty.")
+    return " ".join(stripped.casefold().replace("-", " ").split())
 
 
 def _weapon_scope_matches_profile(*, weapon_scope: str, profile: WeaponProfile) -> bool:
@@ -1877,6 +2875,9 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
     if effect.kind is RuleEffectKind.MODIFY_MOVE_DISTANCE:
         return (_catalog_ir_characteristic_modifier_consumer_id(Characteristic.MOVEMENT),)
     if effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY:
+        consumer_ids = _weapon_keyword_grant_consumer_ids_for_effect(effect)
+        if consumer_ids:
+            return consumer_ids
         keyword = _string_parameter(parameters, key="weapon_ability")
         return (
             CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
@@ -2104,6 +3105,16 @@ def _has_catalog_weapon_keyword_grant_records(
     )
 
 
+def _has_catalog_named_weapon_ability_choice_records(
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+) -> bool:
+    return any(
+        _record_can_select_catalog_named_weapon_ability(record)
+        for index in ability_indexes_by_player_id.values()
+        for record in index.all_records()
+    )
+
+
 def _record_can_grant_catalog_weapon_keyword(record: AbilityCatalogRecord) -> bool:
     if type(record) is not AbilityCatalogRecord:
         raise GameLifecycleError("Catalog weapon keyword grants require ability records.")
@@ -2116,6 +3127,16 @@ def _record_can_grant_catalog_weapon_keyword(record: AbilityCatalogRecord) -> bo
         _clause_targets_weapon_keyword_grant_unit(clause)
         and any(_weapon_keyword_grant_consumer_ids_for_effect(effect) for effect in clause.effects)
         for clause in rule_ir.clauses
+    )
+
+
+def _record_can_select_catalog_named_weapon_ability(record: AbilityCatalogRecord) -> bool:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog named weapon ability choices require ability records.")
+    if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
+        return False
+    return any(
+        _clause_is_named_weapon_ability_choice(clause) for clause in _clauses_from_record(record)
     )
 
 

@@ -213,11 +213,12 @@ class AbilityDescriptor:
     @classmethod
     def sustained_hits(
         cls,
-        value: int,
+        value: int | str,
         *,
         target_keywords: tuple[str, ...] = (),
         target_keyword_match_mode: TargetKeywordMatchMode | None = None,
     ) -> Self:
+        resolved_value = _validate_sustained_hits_value(value)
         canonical_target_keywords, resolved_match_mode = _canonical_target_keyword_gate(
             target_keywords,
             explicit_match_mode=target_keyword_match_mode,
@@ -228,11 +229,11 @@ class AbilityDescriptor:
         )
         name_suffix = _target_keyword_name_suffix(canonical_target_keywords, resolved_match_mode)
         return cls(
-            ability_id=f"sustained-hits:{value}{id_suffix}",
-            name=f"Sustained Hits {value}{name_suffix}",
+            ability_id=f"sustained-hits:{resolved_value}{id_suffix}",
+            name=f"Sustained Hits {resolved_value}{name_suffix}",
             ability_kind=AbilityKind.SUSTAINED_HITS,
             parameters=_parameters_with_target_keyword_match_mode(
-                (AbilityParameter.integer(value),),
+                (AbilityParameter(name="value", value=resolved_value),),
                 target_keyword_match_mode=resolved_match_mode,
                 target_keywords=canonical_target_keywords,
             ),
@@ -1217,12 +1218,20 @@ def _validate_supported_ability_shape(
     condition: AbilityCondition | None,
 ) -> None:
     if ability_kind in {
-        AbilityKind.SUSTAINED_HITS,
         AbilityKind.CLEAVE,
         AbilityKind.MELTA,
         AbilityKind.RAPID_FIRE,
     }:
         _validate_single_positive_int_parameter(ability_kind, parameters)
+        _validate_target_keyword_match_mode_parameter(parameters, target_keywords=target_keywords)
+        if timing is not AbilityTiming.ATTACK_SEQUENCE:
+            raise WeaponProfileError("Parameterized weapon abilities must use attack timing.")
+        if condition is not None:
+            raise WeaponProfileError("Parameterized weapon abilities must not include a condition.")
+        return
+
+    if ability_kind is AbilityKind.SUSTAINED_HITS:
+        _validate_sustained_hits_value_parameter(parameters)
         _validate_target_keyword_match_mode_parameter(parameters, target_keywords=target_keywords)
         if timing is not AbilityTiming.ATTACK_SEQUENCE:
             raise WeaponProfileError("Parameterized weapon abilities must use attack timing.")
@@ -1304,6 +1313,26 @@ def _validate_single_positive_int_parameter(
     value = value_parameters[0].value
     if type(value) is not int or value < 1:
         raise WeaponProfileError(f"{ability_kind.value} ability value parameter must be positive.")
+
+
+def _validate_sustained_hits_value_parameter(parameters: tuple[AbilityParameter, ...]) -> None:
+    _validate_parameter_names(
+        "sustained_hits ability",
+        parameters,
+        allowed_names=frozenset({"value", TARGET_KEYWORD_MATCH_MODE_PARAMETER}),
+    )
+    value_parameters = tuple(parameter for parameter in parameters if parameter.name == "value")
+    if len(value_parameters) != 1:
+        raise WeaponProfileError("sustained_hits ability must include one value parameter.")
+    _validate_sustained_hits_value(value_parameters[0].value)
+
+
+def _validate_sustained_hits_value(value: object) -> int | str:
+    if type(value) is int and value >= 1:
+        return value
+    if type(value) is str and value == "D3":
+        return value
+    raise WeaponProfileError("sustained_hits ability value parameter must be positive or D3.")
 
 
 def _validate_parameter_names(

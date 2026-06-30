@@ -33,7 +33,10 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_DESPERATE_ESCAPE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
+    CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+    CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
+    catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -52,6 +55,7 @@ from warhammer40k_core.rules.rule_ir import (
     RuleCondition,
     RuleConditionKind,
     RuleDuration,
+    RuleDurationKind,
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
@@ -831,6 +835,116 @@ def test_phase17c_skullmaster_fury_compiles_to_charge_move_weapon_keyword_grant(
         "weapon_ability": "Devastating Wounds",
         "weapon_name": "Juggernaut's bladed horns",
     }
+
+
+def test_phase17c_lord_of_change_named_weapon_choice_compiles_to_semantic_ir() -> None:
+    rule_ir = _compiled(
+        "In your Shooting phase, select one of the following abilities: [IGNORES COVER]; "
+        "[LETHAL HITS]; [SUSTAINED HITS D3]. Until the end of the phase, this model's "
+        "Bolt of Change has that ability."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    assert len(rule_ir.clauses) == 1
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "during",
+        "owner": "active_player",
+        "phase": "shooting",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert clause.duration is not None
+    assert clause.duration.kind is RuleDurationKind.UNTIL_TIMING_ENDPOINT
+    assert parameter_payload(clause.duration.parameters) == {"endpoint": "phase"}
+    assert tuple(parameter_payload(effect.parameters) for effect in clause.effects) == (
+        {
+            "selection_group_id": "weapon_ability_choice_0024",
+            "selection_kind": "select_one",
+            "selection_option_id": "option_001_ignores_cover",
+            "selection_option_index": 1,
+            "target_scope": "this_model",
+            "weapon_ability": "Ignores Cover",
+            "weapon_name": "Bolt of Change",
+        },
+        {
+            "selection_group_id": "weapon_ability_choice_0024",
+            "selection_kind": "select_one",
+            "selection_option_id": "option_002_lethal_hits",
+            "selection_option_index": 2,
+            "target_scope": "this_model",
+            "weapon_ability": "Lethal Hits",
+            "weapon_name": "Bolt of Change",
+        },
+        {
+            "selection_group_id": "weapon_ability_choice_0024",
+            "selection_kind": "select_one",
+            "selection_option_id": "option_003_sustained_hits_d3",
+            "selection_option_index": 3,
+            "target_scope": "this_model",
+            "weapon_ability": "Sustained Hits",
+            "weapon_ability_value": "D3",
+            "weapon_name": "Bolt of Change",
+        },
+    )
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:ignores-cover",
+        "catalog-ir:weapon-keyword-grant:lethal-hits",
+        "catalog-ir:weapon-keyword-grant:sustained-hits",
+    )
+    assert (
+        ability_support_rollup_for_rule_ir(
+            source_ability_id="source:daemonspark",
+            ability_name="Daemonspark",
+            rule_ir=rule_ir,
+        ).overall_ability_support
+        is AbilityOverallSupport.FULL
+    )
+
+
+def test_phase17c_named_weapon_choice_generalizes_to_multiple_weapon_names() -> None:
+    rule_ir = _compiled(
+        "In your Shooting phase, select one of the following abilities: [LETHAL HITS]; "
+        "[SUSTAINED HITS 1]. Until the end of the phase, this unit's storm staff and "
+        "prism cannon have that ability."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert tuple(parameter_payload(effect.parameters) for effect in clause.effects) == (
+        {
+            "selection_group_id": "weapon_ability_choice_0024",
+            "selection_kind": "select_one",
+            "selection_option_id": "option_001_lethal_hits",
+            "selection_option_index": 1,
+            "target_scope": "models_in_this_unit",
+            "weapon_ability": "Lethal Hits",
+            "weapon_names": "storm staff|prism cannon",
+        },
+        {
+            "selection_group_id": "weapon_ability_choice_0024",
+            "selection_kind": "select_one",
+            "selection_option_id": "option_002_sustained_hits_1",
+            "selection_option_index": 2,
+            "target_scope": "models_in_this_unit",
+            "weapon_ability": "Sustained Hits",
+            "weapon_ability_value": 1,
+            "weapon_names": "storm staff|prism cannon",
+        },
+    )
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+        CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
+        "catalog-ir:weapon-keyword-grant:lethal-hits",
+        "catalog-ir:weapon-keyword-grant:sustained-hits",
+    )
 
 
 def test_phase17c_hunters_from_the_warp_compiles_to_turn_end_reserve_choice() -> None:
