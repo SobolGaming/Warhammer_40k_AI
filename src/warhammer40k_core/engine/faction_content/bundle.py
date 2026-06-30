@@ -39,6 +39,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_advance_eligibility_hook_bindings,
+    catalog_fall_back_eligibility_hook_bindings,
     catalog_named_weapon_ability_choice_hook_bindings,
     catalog_weapon_profile_modifier_bindings,
 )
@@ -1387,9 +1388,15 @@ class RuntimeContentBundle:
             )
         )
         fall_back_hook_registry = FallBackEligibilityHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.fall_back_hook_bindings,
+            (
+                *catalog_fall_back_eligibility_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.fall_back_hook_bindings,
+                ),
             )
         )
         movement_end_surge_hook_registry = MovementEndSurgeHookRegistry.from_bindings(
@@ -1785,9 +1792,7 @@ class RuntimeContentBundle:
         return cast(_BundleSummaryPayload, validate_json_value(payload))
 
 
-def _validate_contributions(
-    contributions: object,
-) -> tuple[RuntimeContentContribution, ...]:
+def _validate_contributions(contributions: object) -> tuple[RuntimeContentContribution, ...]:
     if type(contributions) is not tuple:
         raise GameLifecycleError("Runtime content contributions must be a tuple.")
     validated: list[RuntimeContentContribution] = []
@@ -1837,12 +1842,11 @@ def _ability_indexes_by_player_id(
     catalog: ArmyCatalog,
     records: tuple[AbilityCatalogRecord, ...],
 ) -> Mapping[str, AbilityCatalogIndex]:
-    return MappingProxyType(
-        {
-            army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
-            for army in armies
-        }
-    )
+    indexes = {
+        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+        for army in armies
+    }
+    return MappingProxyType(indexes)
 
 
 def _stratagem_indexes_by_player_id(
@@ -1851,19 +1855,18 @@ def _stratagem_indexes_by_player_id(
     catalog: ArmyCatalog,
     records: tuple[StratagemCatalogRecord, ...],
 ) -> Mapping[str, StratagemCatalogIndex]:
-    return MappingProxyType(
-        {
-            army.player_id: build_player_stratagem_index(
-                records,
-                detachment_ids=army.detachment_selection.detachment_ids,
-                stratagem_ids=_selected_stratagem_ids_for_army(
-                    army=army,
-                    catalog=catalog,
-                ),
-            )
-            for army in armies
-        }
-    )
+    indexes = {
+        army.player_id: build_player_stratagem_index(
+            records,
+            detachment_ids=army.detachment_selection.detachment_ids,
+            stratagem_ids=_selected_stratagem_ids_for_army(
+                army=army,
+                catalog=catalog,
+            ),
+        )
+        for army in armies
+    }
+    return MappingProxyType(indexes)
 
 
 def _selected_stratagem_ids_for_army(
@@ -1932,20 +1935,15 @@ def _selected_faction_execution_records(
     available_records: tuple[_Phase17FExecutionRecord, ...],
     selected_execution_record_ids: tuple[str, ...],
 ) -> tuple[_Phase17FExecutionRecord, ...]:
-    selected_ids = set(
-        _validate_identifier_tuple(
-            "selected_execution_record_ids",
-            selected_execution_record_ids,
-        )
-    )
+    ids = _validate_identifier_tuple("selected_execution_record_ids", selected_execution_record_ids)
+    selected_ids = set(ids)
     if not selected_ids:
         return ()
     records_by_id: dict[str, _Phase17FExecutionRecord] = {}
-    for record in _validate_tuple(
-        "faction_execution_records",
-        available_records,
-        _Phase17FExecutionRecord,
-    ):
+    records = _validate_tuple(
+        "faction_execution_records", available_records, _Phase17FExecutionRecord
+    )
+    for record in records:
         if record.execution_id in records_by_id:
             raise GameLifecycleError("Runtime content faction execution record IDs must be unique.")
         records_by_id[record.execution_id] = record

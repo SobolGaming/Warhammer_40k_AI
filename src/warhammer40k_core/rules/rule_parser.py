@@ -160,13 +160,13 @@ _REROLL_ROLL_LIST_RE = re.compile(
     rf"\b(?:(?:you\s+)?can\s+)?(?:re-roll|reroll)\s+"
     rf"(?:the\s+)?(?P<rolls>(?:{_ROLL_TYPES})(?:\s*,\s*|\s+and\s+)"
     rf"(?:{_ROLL_TYPES})(?:(?:\s*,\s*|\s+and\s+)(?:{_ROLL_TYPES}))*)\s+rolls?\b"
-    r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+unit)?",
+    r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+(?:unit|model))?",
     re.IGNORECASE,
 )
 _REROLL_RE = re.compile(
     rf"\b(?:(?:you\s+)?can\s+)?(?:re-roll|reroll)\s+"
     rf"(?:the\s+)?(?P<roll>{_ROLL_TYPES})\s+rolls?\b"
-    r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+unit)?",
+    r"(?:\s+made\s+for\s+(?:this|that|selected|target)\s+(?:unit|model))?",
     re.IGNORECASE,
 )
 _CHARACTERISTIC_NAMES = (
@@ -211,6 +211,12 @@ _CHARGE_ELIGIBILITY_AFTER_MOVE_RE = re.compile(
     r"(?:is\s+)?eligible\s+to\s+declare\s+a\s+charge\s+in\s+a\s+turn\s+"
     r"in\s+which\s+(?:it|this\s+unit|that\s+unit|the\s+unit)\s+"
     r"(?P<movement>Advanced|Fell\s+Back)\b",
+    re.IGNORECASE,
+)
+_SHOOT_ELIGIBILITY_AFTER_FALL_BACK_RE = re.compile(
+    r"\b(?:(?:this|that|selected|target)\s+unit\s+)?"
+    r"(?:is\s+)?eligible\s+to\s+shoot\s+in\s+a\s+turn\s+"
+    r"in\s+which\s+(?:it|this\s+unit|that\s+unit|the\s+unit)\s+Fell\s+Back\b",
     re.IGNORECASE,
 )
 _FEEL_NO_PAIN_ABILITY_RE = re.compile(
@@ -1267,6 +1273,14 @@ def _parse_resource_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, .
 
 def _parse_grant_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
+    for match in _SHOOT_ELIGIBILITY_AFTER_FALL_BACK_RE.finditer(clause_text.text):
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.GRANT_ABILITY,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs((("ability", "can_fall_back_and_shoot"),)),
+            )
+        )
     for match in _CHARGE_ELIGIBILITY_AFTER_MOVE_RE.finditer(clause_text.text):
         movement = " ".join(match.group("movement").lower().split())
         ability = (

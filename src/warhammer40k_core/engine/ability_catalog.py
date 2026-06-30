@@ -414,6 +414,7 @@ def _effect_is_passive_rule_exception_grant(effect: RuleEffectSpec) -> bool:
     return parameters.get("ability") in {
         "can_advance_and_charge",
         "can_fall_back_and_charge",
+        "can_fall_back_and_shoot",
         "can_advance_and_shoot_and_charge",
     }
 

@@ -96,6 +96,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
     CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
     CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+    CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
     CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID,
     CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
@@ -114,6 +115,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SELECTED_EVENT,
     SELECT_CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SUBMISSION_KIND,
     CatalogAdvanceEligibilityRuntime,
+    CatalogFallBackEligibilityRuntime,
     CatalogNamedWeaponAbilityChoiceOption,
     CatalogNamedWeaponAbilityChoiceRuntime,
     CatalogWeaponKeywordGrant,
@@ -192,6 +194,10 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.tyranids impo
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.world_eaters import (
     army_rule as world_eaters_army_rule,
+)
+from warhammer40k_core.engine.fall_back_hooks import (
+    FallBackEligibilityContext,
+    FallBackEligibilityHookRegistry,
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
@@ -1010,6 +1016,106 @@ def test_phase17k_datasheet_advance_charge_text_uses_generic_advance_eligibility
     }
 
 
+def test_phase17k_datasheet_fall_back_shoot_text_uses_generic_fall_back_eligibility() -> None:
+    package = _advance_charge_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    fall_back_shoot_record = records_by_name["Slip Away"]
+    replay_payload = fall_back_shoot_record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    runtime = CatalogFallBackEligibilityRuntime(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army,),
+    )
+    registry = FallBackEligibilityHookRegistry.from_bindings(runtime.bindings())
+    state = _battle_state_with_army(
+        army=army,
+        battlefield=_bloodcrushers_battlefield_state(army=army, unit=unit),
+    )
+
+    grants = registry.grants_for(
+        FallBackEligibilityContext(
+            state=state,
+            player_id=army.player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            movement_request_id="phase17k-fall-back-shoot-request",
+            movement_result_id="phase17k-fall-back-shoot-result",
+        )
+    )
+
+    assert fall_back_shoot_record.definition.timing.trigger_kind is TimingTriggerKind.PASSIVE_QUERY
+    assert rule_ir.is_supported
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) == {
+        CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+    }
+    assert tuple(binding.hook_id for binding in registry.all_bindings()) == (
+        CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+    )
+    assert len(grants) == 1
+    assert grants[0].hook_id == CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID
+    assert grants[0].can_shoot is True
+    assert grants[0].can_declare_charge is False
+    assert grants[0].replay_payload == {
+        "ability": "can_fall_back_and_shoot",
+        "ability_ids": [fall_back_shoot_record.definition.ability_id],
+        "catalog_record_ids": [fall_back_shoot_record.record_id],
+        "source_rule_ids": [fall_back_shoot_record.definition.source_id],
+    }
+
+
+def test_phase17k_fall_back_shoot_runtime_uses_scoped_catalog_clause_record() -> None:
+    package = _split_fall_back_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    split_records = tuple(
+        record
+        for record in player_index.all_records()
+        if record.definition.name == "Split Slip Away"
+    )
+    unrelated_record = _record_by_runtime_clause_suffix(split_records, suffix=":clause:001")
+    fall_back_record = _record_by_runtime_clause_suffix(split_records, suffix=":clause:002")
+    runtime = CatalogFallBackEligibilityRuntime(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army,),
+    )
+    registry = FallBackEligibilityHookRegistry.from_bindings(runtime.bindings())
+    state = _battle_state_with_army(
+        army=army,
+        battlefield=_bloodcrushers_battlefield_state(army=army, unit=unit),
+    )
+
+    grants = registry.grants_for(
+        FallBackEligibilityContext(
+            state=state,
+            player_id=army.player_id,
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            movement_request_id="phase17k-split-fall-back-shoot-request",
+            movement_result_id="phase17k-split-fall-back-shoot-result",
+        )
+    )
+
+    assert len(split_records) == 2
+    assert unrelated_record.definition.timing.trigger_kind is TimingTriggerKind.PASSIVE_QUERY
+    assert fall_back_record.definition.timing.trigger_kind is TimingTriggerKind.PASSIVE_QUERY
+    assert len(grants) == 1
+    assert grants[0].hook_id == CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID
+    grant_payload = grants[0].replay_payload
+    assert isinstance(grant_payload, dict)
+    catalog_record_ids = grant_payload["catalog_record_ids"]
+    assert isinstance(catalog_record_ids, list)
+    assert catalog_record_ids == [fall_back_record.record_id]
+    assert unrelated_record.record_id not in catalog_record_ids
+
+
 def test_phase17k_leading_model_reroll_text_uses_generic_advance_charge_rerolls() -> None:
     package = _advance_charge_package()
     unit = _advance_charge_unit(package=package)
@@ -1137,6 +1243,99 @@ def test_phase17k_leading_model_reroll_text_uses_generic_advance_charge_rerolls(
             roll_type="advance_roll",
             timing_window="after_advance_roll",
         )
+
+
+def test_phase17k_this_model_reroll_text_uses_generic_advance_charge_rerolls() -> None:
+    package = _model_reroll_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    reroll_record = records_by_name["Swift Instincts"]
+    replay_payload = reroll_record.definition.replay_payload
+    assert isinstance(replay_payload, dict)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
+    current_model_ids = _current_model_ids(battlefield=battlefield, unit=unit)
+    advance_permission = catalog_advance_roll_reroll_permission_for_unit(
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        player_id=army.player_id,
+    )
+    charge_permission = catalog_charge_roll_reroll_permission_for_unit(
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        player_id=army.player_id,
+    )
+    clause = rule_ir.clauses[0]
+
+    assert reroll_record.definition.timing.trigger_kind is TimingTriggerKind.AFTER_DICE_ROLL
+    assert rule_ir.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    )
+    assert set(catalog_rule_ir_hook_ids_for_rule(rule_ir)) == {
+        CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
+        CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
+    }
+    assert advance_permission is not None
+    assert advance_permission.eligible_roll_type == "advance_roll"
+    assert advance_permission.timing_window == "after_advance_roll"
+    assert advance_permission.owning_player_id == army.player_id
+    assert (
+        advance_permission.component_selection_policy is RerollComponentSelectionPolicy.WHOLE_ROLL
+    )
+    assert charge_permission is not None
+    assert charge_permission.eligible_roll_type == "charge_roll"
+    assert charge_permission.timing_window == "after_charge_roll"
+    assert charge_permission.owning_player_id == army.player_id
+    assert charge_permission.component_selection_policy is RerollComponentSelectionPolicy.WHOLE_ROLL
+
+
+def test_phase17k_model_reroll_runtime_uses_scoped_catalog_clause_record() -> None:
+    package = _split_model_reroll_package()
+    unit = _advance_charge_unit(package=package)
+    army = _flesh_hounds_army(package=package, unit=unit)
+    player_index = _player_ability_index(package=package, army=army)
+    split_records = tuple(
+        record
+        for record in player_index.all_records()
+        if record.definition.name == "Split Swift Instincts"
+    )
+    unrelated_record = _record_by_runtime_clause_suffix(split_records, suffix=":clause:001")
+    reroll_record = _record_by_runtime_clause_suffix(split_records, suffix=":clause:002")
+    battlefield = _bloodcrushers_battlefield_state(army=army, unit=unit)
+    current_model_ids = _current_model_ids(battlefield=battlefield, unit=unit)
+
+    advance_permission = catalog_advance_roll_reroll_permission_for_unit(
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        player_id=army.player_id,
+    )
+    charge_permission = catalog_charge_roll_reroll_permission_for_unit(
+        ability_index=player_index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        player_id=army.player_id,
+    )
+
+    assert len(split_records) == 2
+    assert unrelated_record.definition.timing.trigger_kind is TimingTriggerKind.AFTER_DICE_ROLL
+    assert reroll_record.definition.timing.trigger_kind is TimingTriggerKind.AFTER_DICE_ROLL
+    assert advance_permission is not None
+    assert advance_permission.eligible_roll_type == "advance_roll"
+    assert advance_permission.source_id.startswith(f"{reroll_record.record_id}:")
+    assert not advance_permission.source_id.startswith(f"{unrelated_record.record_id}:")
+    assert charge_permission is not None
+    assert charge_permission.eligible_roll_type == "charge_roll"
+    assert charge_permission.source_id.startswith(f"{reroll_record.record_id}:")
+    assert not charge_permission.source_id.startswith(f"{unrelated_record.record_id}:")
 
 
 def test_phase17k_leading_model_weapon_keyword_text_modifies_scoped_weapon_profiles() -> None:
@@ -2476,6 +2675,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| `catalog-ir:can-advance-and-charge` | No current generated rows |"
     ) in generated_markdown
     assert (
+        "| `catalog-ir:can-fallback-and-shoot` | No current generated rows |"
+    ) in generated_markdown
+    assert (
         "| `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |"
     ) in generated_markdown
     assert "| `core:command-reroll` | Command Re-roll |" in generated_markdown
@@ -3211,6 +3413,7 @@ def test_phase17k_catalog_ir_future_hooks_classify_supported_rule_ir_without_con
         CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,
         CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID,
         CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+        CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
         CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID,
         CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
         CATALOG_IR_CHARGE_ROLL_REROLL_CONSUMER_ID,
@@ -3964,6 +4167,30 @@ def _advance_charge_package() -> CanonicalCatalogPackage:
     )
 
 
+def _model_reroll_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_model_reroll_bridge_artifacts(),
+    )
+
+
+def _split_fall_back_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_split_fall_back_bridge_artifacts(),
+    )
+
+
+def _split_model_reroll_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_split_model_reroll_bridge_artifacts(),
+    )
+
+
 def _named_weapon_choice_package() -> CanonicalCatalogPackage:
     return build_canonical_catalog_package(
         package_id=_catalog_package_id(),
@@ -4314,6 +4541,24 @@ def _current_model_ids(
         placement.model_instance_id
         for placement in battlefield.unit_placement_by_id(unit.unit_instance_id).model_placements
     )
+
+
+def _record_by_runtime_clause_suffix(
+    records: tuple[AbilityCatalogRecord, ...],
+    *,
+    suffix: str,
+) -> AbilityCatalogRecord:
+    matches = tuple(record for record in records if _runtime_clause_id(record).endswith(suffix))
+    assert len(matches) == 1
+    return matches[0]
+
+
+def _runtime_clause_id(record: AbilityCatalogRecord) -> str:
+    payload = record.definition.replay_payload
+    assert isinstance(payload, dict)
+    value = payload.get("runtime_clause_id")
+    assert type(value) is str
+    return value
 
 
 def _set_state_battle_phase(state: GameState, phase: BattlePhase) -> None:
@@ -4832,6 +5077,75 @@ def _advance_charge_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     )
 
 
+def _model_reroll_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_model_reroll_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-advance-charge-unit",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-advance-charge-unit",
+                model_name="Swift Hunter",
+                height=1.4,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:test:model-reroll:swift-hunter:height",
+                height_document_reference="Test Model Reroll Datasheet",
+            ),
+        ),
+    )
+
+
+def _split_fall_back_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return _single_advance_charge_ability_bridge_artifacts(
+        ability_name="Split Slip Away",
+        description=(
+            "Models in this unit have a Leadership characteristic of 6+. "
+            "This unit is eligible to shoot in a turn in which it Fell Back."
+        ),
+        height_source_id="geometry-review:test:split-fall-back:swift-hunter:height",
+        height_document_reference="Test Split Fall Back Datasheet",
+    )
+
+
+def _split_model_reroll_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return _single_advance_charge_ability_bridge_artifacts(
+        ability_name="Split Swift Instincts",
+        description=(
+            "After a Hit roll, re-roll Hit rolls. "
+            "You can re\u2011roll Advance and Charge rolls made for this model."
+        ),
+        height_source_id="geometry-review:test:split-model-reroll:swift-hunter:height",
+        height_document_reference="Test Split Model Reroll Datasheet",
+    )
+
+
+def _single_advance_charge_ability_bridge_artifacts(
+    *,
+    ability_name: str,
+    description: str,
+    height_source_id: str,
+    height_document_reference: str,
+) -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_single_advance_charge_ability_source_artifacts(
+            ability_name=ability_name,
+            description=description,
+        ),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-advance-charge-unit",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-advance-charge-unit",
+                model_name="Swift Hunter",
+                height=1.4,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id=height_source_id,
+                height_document_reference=height_document_reference,
+            ),
+        ),
+    )
+
+
 def _named_weapon_choice_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     return build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=_named_weapon_choice_source_artifacts(),
@@ -4893,6 +5207,101 @@ def _advance_charge_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                         "test-advance-charge-unit,4,Datasheet,,Pack Killers,"
                         '"While this model is leading a unit, melee weapons equipped by '
                         'models in that unit have the  [LETHAL HITS] ability.",'
+                    ),
+                    (
+                        "test-advance-charge-unit,5,Datasheet,,Slip Away,"
+                        "This unit is eligible to shoot in a turn in  which it Fell Back.,"
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-advance-charge-unit,Beasts,,false",
+                    "test-advance-charge-unit,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-advance-charge-unit,1,10,4,6,5,2,7,1,40mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    "test-advance-charge-unit,1,1,Swift claws,Melee,Melee,4,4,4,0,1,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    "test-advance-charge-unit,1,1 Swift Hunter",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _model_reroll_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return _single_advance_charge_ability_source_artifacts(
+        ability_name="Swift Instincts",
+        description="You can re\u2011roll Advance and Charge rolls made for this model.",
+    )
+
+
+def _single_advance_charge_ability_source_artifacts(
+    *,
+    ability_name: str,
+    description: str,
+) -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Test Army Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-advance-charge-unit,Advance Charge Unit,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-advance-charge-unit,1,Faction,test-army-rule,"
+                        "Test Army Rule,Test rule text.,"
+                    ),
+                    (
+                        "test-advance-charge-unit,2,Datasheet,,"
+                        f'{_csv_field(ability_name)},"{_csv_field(description)}",'
                     ),
                 )
             ),

@@ -47,6 +47,11 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle_validation import (
     validate_identifier as _validate_identifier,
 )
+from warhammer40k_core.engine.fall_back_hooks import (
+    FallBackEligibilityContext,
+    FallBackEligibilityGrant,
+    FallBackEligibilityHookBinding,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -112,6 +117,7 @@ CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID = "catalog-ir:weapon-keyword-grant"
 CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID = "catalog-ir:named-weapon-ability-choice"
 CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-advance-and-charge"
 CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-fallback-and-charge"
+CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID = "catalog-ir:can-fallback-and-shoot"
 CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID = (
     "catalog-ir:can-advance-and-shoot-and-charge"
 )
@@ -165,11 +171,21 @@ _CATALOG_IR_RULE_EXCEPTION_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
         "can_advance_and_charge": CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID,
         "can_fallback_and_charge": CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
         "can_fall_back_and_charge": CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+        "can_fallback_and_shoot": CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+        "can_fall_back_and_shoot": CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
         "can_advance_and_shoot_and_charge": (
             CATALOG_IR_CAN_ADVANCE_AND_SHOOT_AND_CHARGE_CONSUMER_ID
         ),
         "can_be_placed_in_reserves": CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
         "turn_end_reserves": CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+    }
+)
+_CATALOG_IR_FALL_BACK_ELIGIBILITY_GRANT_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
+    {
+        "can_fallback_and_charge": CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+        "can_fall_back_and_charge": CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+        "can_fallback_and_shoot": CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+        "can_fall_back_and_shoot": CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
     }
 )
 _CATALOG_IR_ADVANCE_ELIGIBILITY_GRANT_CONSUMER_IDS: Mapping[str, str] = MappingProxyType(
@@ -277,6 +293,103 @@ class CatalogAdvanceEligibilityRuntime:
         if not matching_records:
             return None
         return AdvanceEligibilityGrant(
+            hook_id=hook_id,
+            source_id=hook_id,
+            can_shoot=can_shoot,
+            can_declare_charge=can_declare_charge,
+            replay_payload={
+                "catalog_record_ids": [record.record_id for record in matching_records],
+                "source_rule_ids": [record.definition.source_id for record in matching_records],
+                "ability_ids": [record.definition.ability_id for record in matching_records],
+                "ability": ability,
+            },
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogFallBackEligibilityRuntime:
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
+    armies: tuple[ArmyDefinition, ...]
+
+    def __post_init__(self) -> None:
+        indexes = _validate_ability_index_mapping(self.ability_indexes_by_player_id)
+        armies = _validate_armies(self.armies)
+        missing_ids = {army.player_id for army in armies} - set(indexes)
+        if missing_ids:
+            raise GameLifecycleError("Catalog Fall Back eligibility missing player ability index.")
+        object.__setattr__(self, "ability_indexes_by_player_id", MappingProxyType(dict(indexes)))
+        object.__setattr__(self, "armies", armies)
+
+    def bindings(self) -> tuple[FallBackEligibilityHookBinding, ...]:
+        bindings: list[FallBackEligibilityHookBinding] = []
+        if _has_fall_back_eligibility_records(
+            self.ability_indexes_by_player_id,
+            ability="can_fall_back_and_charge",
+        ):
+            bindings.append(
+                FallBackEligibilityHookBinding(
+                    hook_id=CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+                    source_id=CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+                    handler=self.fall_back_and_charge_handler,
+                )
+            )
+        if _has_fall_back_eligibility_records(
+            self.ability_indexes_by_player_id,
+            ability="can_fall_back_and_shoot",
+        ):
+            bindings.append(
+                FallBackEligibilityHookBinding(
+                    hook_id=CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+                    source_id=CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+                    handler=self.fall_back_and_shoot_handler,
+                )
+            )
+        return tuple(bindings)
+
+    def fall_back_and_charge_handler(
+        self,
+        context: FallBackEligibilityContext,
+    ) -> FallBackEligibilityGrant | None:
+        return self._grant_for(
+            context=context,
+            ability="can_fall_back_and_charge",
+            hook_id=CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID,
+            can_shoot=False,
+            can_declare_charge=True,
+        )
+
+    def fall_back_and_shoot_handler(
+        self,
+        context: FallBackEligibilityContext,
+    ) -> FallBackEligibilityGrant | None:
+        return self._grant_for(
+            context=context,
+            ability="can_fall_back_and_shoot",
+            hook_id=CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
+            can_shoot=True,
+            can_declare_charge=False,
+        )
+
+    def _grant_for(
+        self,
+        *,
+        context: FallBackEligibilityContext,
+        ability: str,
+        hook_id: str,
+        can_shoot: bool,
+        can_declare_charge: bool,
+    ) -> FallBackEligibilityGrant | None:
+        if type(context) is not FallBackEligibilityContext:
+            raise GameLifecycleError("Catalog Fall Back eligibility requires context.")
+        matching_records = _matching_fall_back_eligibility_records(
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            armies=self.armies,
+            context=context,
+            ability=ability,
+        )
+        if not matching_records:
+            return None
+        return FallBackEligibilityGrant(
             hook_id=hook_id,
             source_id=hook_id,
             can_shoot=can_shoot,
@@ -637,6 +750,17 @@ def catalog_advance_eligibility_hook_bindings(
     armies: tuple[ArmyDefinition, ...],
 ) -> tuple[AdvanceEligibilityHookBinding, ...]:
     return CatalogAdvanceEligibilityRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
+    ).bindings()
+
+
+def catalog_fall_back_eligibility_hook_bindings(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[FallBackEligibilityHookBinding, ...]:
+    return CatalogFallBackEligibilityRuntime(
         ability_indexes_by_player_id=ability_indexes_by_player_id,
         armies=armies,
     ).bindings()
@@ -1465,10 +1589,7 @@ def _catalog_roll_reroll_permission_for_unit(
         current_model_instance_ids=current_ids,
         trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL,
     ):
-        rule_ir = _rule_ir_from_record(record)
-        if not rule_ir.is_supported:
-            continue
-        for clause in rule_ir.clauses:
+        for clause in _clauses_from_record(record):
             if not _clause_targets_roll_reroll_unit(clause):
                 continue
             for effect_index, effect in enumerate(clause.effects):
@@ -1700,6 +1821,9 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         advance_consumer_id = _advance_eligibility_consumer_id_for_effect(effect)
         if advance_consumer_id is not None:
             consumer_ids.add(advance_consumer_id)
+        fall_back_consumer_id = _fall_back_eligibility_consumer_id_for_effect(effect)
+        if fall_back_consumer_id is not None:
+            consumer_ids.add(fall_back_consumer_id)
     return tuple(sorted(consumer_ids))
 
 
@@ -1775,8 +1899,39 @@ def _matching_advance_eligibility_records(
         current_model_instance_ids=current_model_ids,
         trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
     ):
-        rule_ir = _rule_ir_from_record(record)
-        if _rule_ir_grants_advance_eligibility(rule_ir, ability=requested_ability):
+        if any(
+            _clause_grants_advance_eligibility(clause, ability=requested_ability)
+            for clause in _clauses_from_record(record)
+        ):
+            matching_records.append(record)
+    return tuple(sorted(matching_records, key=lambda record: record.record_id))
+
+
+def _matching_fall_back_eligibility_records(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+    context: FallBackEligibilityContext,
+    ability: str,
+) -> tuple[AbilityCatalogRecord, ...]:
+    requested_ability = _validate_identifier("ability", ability)
+    army = _army_for_player(armies, player_id=context.player_id)
+    unit = _unit_in_army_by_id(army, unit_instance_id=context.unit_instance_id)
+    index = ability_indexes_by_player_id.get(context.player_id)
+    if index is None:
+        raise GameLifecycleError("Catalog Fall Back eligibility index is missing player.")
+    current_model_ids = _current_model_instance_ids_for_unit(state=context.state, unit=unit)
+    matching_records: list[AbilityCatalogRecord] = []
+    for record in _unit_scoped_generic_records(
+        ability_index=index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+    ):
+        if any(
+            _clause_grants_fall_back_eligibility(clause, ability=requested_ability)
+            for clause in _clauses_from_record(record)
+        ):
             matching_records.append(record)
     return tuple(sorted(matching_records, key=lambda record: record.record_id))
 
@@ -1937,6 +2092,8 @@ def _clause_targets_roll_reroll_unit(clause: RuleClause) -> bool:
         return True
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    if _clause_targets_this_model(clause):
+        return True
     return (
         clause.target is not None
         and clause.target.kind is RuleTargetKind.SELECTED_UNIT
@@ -2259,18 +2416,21 @@ def _effect_is_shadow_of_chaos_status(effect: RuleEffectSpec) -> bool:
     )
 
 
-def _rule_ir_grants_advance_eligibility(rule_ir: RuleIR, *, ability: str) -> bool:
-    if type(rule_ir) is not RuleIR:
-        raise GameLifecycleError("Catalog advance eligibility requires RuleIR.")
-    if not rule_ir.is_supported:
-        return False
+def _clause_grants_advance_eligibility(clause: RuleClause, *, ability: str) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog advance eligibility requires RuleClause.")
     requested_ability = _validate_identifier("ability", ability)
-    return any(
-        _clause_targets_this_unit(clause)
-        and any(
-            _effect_grants_ability(effect, ability=requested_ability) for effect in clause.effects
-        )
-        for clause in rule_ir.clauses
+    return _clause_targets_this_unit(clause) and any(
+        _effect_grants_ability(effect, ability=requested_ability) for effect in clause.effects
+    )
+
+
+def _clause_grants_fall_back_eligibility(clause: RuleClause, *, ability: str) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog Fall Back eligibility requires RuleClause.")
+    requested_ability = _validate_identifier("ability", ability)
+    return _clause_targets_this_unit(clause) and any(
+        _effect_grants_ability(effect, ability=requested_ability) for effect in clause.effects
     )
 
 
@@ -2284,6 +2444,20 @@ def _advance_eligibility_consumer_id_for_effect(effect: RuleEffectSpec) -> str |
     if type(ability) is not str:
         return None
     return _CATALOG_IR_ADVANCE_ELIGIBILITY_GRANT_CONSUMER_IDS.get(_catalog_ir_lookup_token(ability))
+
+
+def _fall_back_eligibility_consumer_id_for_effect(effect: RuleEffectSpec) -> str | None:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.GRANT_ABILITY:
+        return None
+    parameters = parameter_payload(effect.parameters)
+    ability = parameters.get("ability")
+    if type(ability) is not str:
+        return None
+    return _CATALOG_IR_FALL_BACK_ELIGIBILITY_GRANT_CONSUMER_IDS.get(
+        _catalog_ir_lookup_token(ability)
+    )
 
 
 def _effect_grants_ability(effect: RuleEffectSpec, *, ability: str) -> bool:
@@ -3095,6 +3269,19 @@ def _has_advance_eligibility_records(
     )
 
 
+def _has_fall_back_eligibility_records(
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    *,
+    ability: str,
+) -> bool:
+    requested_ability = _validate_identifier("ability", ability)
+    return any(
+        _record_can_grant_fall_back_eligibility(record, ability=requested_ability)
+        for index in ability_indexes_by_player_id.values()
+        for record in index.all_records()
+    )
+
+
 def _has_catalog_weapon_keyword_grant_records(
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
 ) -> bool:
@@ -3149,7 +3336,25 @@ def _record_can_grant_advance_eligibility(
         raise GameLifecycleError("Catalog advance eligibility requires ability records.")
     if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
         return False
-    return _rule_ir_grants_advance_eligibility(_rule_ir_from_record(record), ability=ability)
+    return any(
+        _clause_grants_advance_eligibility(clause, ability=ability)
+        for clause in _clauses_from_record(record)
+    )
+
+
+def _record_can_grant_fall_back_eligibility(
+    record: AbilityCatalogRecord,
+    *,
+    ability: str,
+) -> bool:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog Fall Back eligibility requires ability records.")
+    if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
+        return False
+    return any(
+        _clause_grants_fall_back_eligibility(clause, ability=ability)
+        for clause in _clauses_from_record(record)
+    )
 
 
 def _army_for_player(armies: tuple[ArmyDefinition, ...], *, player_id: str) -> ArmyDefinition:
