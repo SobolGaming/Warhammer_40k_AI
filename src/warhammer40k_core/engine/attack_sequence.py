@@ -7539,8 +7539,6 @@ def _validate_current_source_backed_attack_reroll_context_if_required(
     if source_payload_value is None:
         return
     source_payload = _payload_object(source_payload_value)
-    if source_payload.get("effect_kind") != "tracked_target_reroll":
-        return
     current_permission_context = source_backed_reroll_permission_context_for_unit(
         state=state,
         player_id=attack_sequence.attacker_player_id,
@@ -7554,7 +7552,10 @@ def _validate_current_source_backed_attack_reroll_context_if_required(
         raise GameLifecycleError(f"{phase_label} dice reroll source context drift.")
     if current_permission_context.permission.source_id != source_rule_id:
         raise GameLifecycleError(f"{phase_label} dice reroll source context drift.")
-    if current_permission_context.source_payload != source_payload:
+    if (
+        source_payload.get("effect_kind") == "tracked_target_reroll"
+        and current_permission_context.source_payload != source_payload
+    ):
         raise GameLifecycleError(f"{phase_label} dice reroll source payload drift.")
 
 

@@ -18,6 +18,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_record_current_wargear_bearer_model_ids,
     catalog_rule_record_source_matches_unit,
+    catalog_rule_tracked_target_supported_roll_types_for_clause,
     catalog_rule_unit_scoped_generic_records,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -303,6 +304,9 @@ def _build_request_from_effect(
     source_model_instance_id: str | None,
 ) -> DecisionRequest | None:
     parameters = parameter_payload(effect.parameters)
+    supported_roll_types = _supported_roll_types_for_selection_effect(record=record, effect=effect)
+    if not supported_roll_types:
+        return None
     return build_select_tracked_target_request(
         state=context.state,
         actor_player_id=actor_player_id,
@@ -314,9 +318,36 @@ def _build_request_from_effect(
         source_model_instance_id=source_model_instance_id,
         owner_scope=TrackedTargetOwnerScope(str(parameters["tracked_target_owner"])),
         role=TrackedTargetRole(str(parameters["tracked_target_role"])),
+        supported_roll_types=supported_roll_types,
         target_allegiance=str(parameters["target_allegiance"]),
         target_scope=str(parameters["target_scope"]),
         replacement=bool(parameters["replacement"]),
+    )
+
+
+def _supported_roll_types_for_selection_effect(
+    *,
+    record: AbilityCatalogRecord,
+    effect: RuleEffectSpec,
+) -> tuple[str, ...]:
+    selection_parameters = parameter_payload(effect.parameters)
+    tracked_owner = selection_parameters.get("tracked_target_owner")
+    tracked_role = selection_parameters.get("tracked_target_role")
+    supported: set[str] = set()
+    for clause in catalog_rule_clauses_from_record(record):
+        trigger = clause.trigger
+        if trigger is None or trigger.kind is not RuleTriggerKind.DICE_ROLL:
+            continue
+        trigger_parameters = parameter_payload(trigger.parameters)
+        if trigger_parameters.get("tracked_target_owner") != tracked_owner:
+            continue
+        if trigger_parameters.get("tracked_target_role") != tracked_role:
+            continue
+        supported.update(catalog_rule_tracked_target_supported_roll_types_for_clause(clause))
+    return tuple(
+        roll_type
+        for roll_type in ("attack_sequence.hit", "attack_sequence.wound")
+        if roll_type in supported
     )
 
 

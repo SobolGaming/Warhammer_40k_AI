@@ -19,6 +19,7 @@ SELECT_TRACKED_TARGET_DECISION_TYPE = "select_tracked_target"
 TRACKED_TARGET_SELECTED_EVENT_TYPE = "tracked_target_selected"
 TRACKED_TARGET_REPLACED_EVENT_TYPE = "tracked_target_replaced"
 TRACKED_TARGET_EXPIRED_EVENT_TYPE = "tracked_target_expired"
+TRACKED_TARGET_SUPPORTED_ROLL_TYPES = ("attack_sequence.hit", "attack_sequence.wound")
 
 
 class TrackedTargetRole(StrEnum):
@@ -42,6 +43,7 @@ class TrackedTargetRecordPayload(TypedDict):
     source_model_instance_id: str | None
     owner_scope: str
     role: str
+    supported_roll_types: list[str]
     target_unit_instance_id: str
     target_allegiance: str
     target_lifecycle: str
@@ -63,6 +65,7 @@ class TrackedTargetRecord:
     source_model_instance_id: str | None
     owner_scope: TrackedTargetOwnerScope
     role: TrackedTargetRole
+    supported_roll_types: tuple[str, ...]
     target_unit_instance_id: str
     target_allegiance: str
     target_lifecycle: str
@@ -113,6 +116,11 @@ class TrackedTargetRecord:
         )
         object.__setattr__(self, "owner_scope", _owner_scope_from_token(self.owner_scope))
         object.__setattr__(self, "role", _role_from_token(self.role))
+        object.__setattr__(
+            self,
+            "supported_roll_types",
+            _validate_supported_roll_types(self.supported_roll_types),
+        )
         if (
             self.owner_scope is TrackedTargetOwnerScope.THIS_MODEL
             and self.source_model_instance_id is None
@@ -192,6 +200,7 @@ class TrackedTargetRecord:
             "source_model_instance_id": self.source_model_instance_id,
             "owner_scope": self.owner_scope.value,
             "role": self.role.value,
+            "supported_roll_types": list(self.supported_roll_types),
             "target_unit_instance_id": self.target_unit_instance_id,
             "target_allegiance": self.target_allegiance,
             "target_lifecycle": self.target_lifecycle,
@@ -214,6 +223,7 @@ class TrackedTargetRecord:
             source_model_instance_id=payload["source_model_instance_id"],
             owner_scope=_owner_scope_from_token(payload["owner_scope"]),
             role=_role_from_token(payload["role"]),
+            supported_roll_types=tuple(payload["supported_roll_types"]),
             target_unit_instance_id=payload["target_unit_instance_id"],
             target_allegiance=payload["target_allegiance"],
             target_lifecycle=payload["target_lifecycle"],
@@ -236,6 +246,7 @@ def build_select_tracked_target_request(
     source_model_instance_id: str | None,
     owner_scope: TrackedTargetOwnerScope,
     role: TrackedTargetRole,
+    supported_roll_types: tuple[str, ...],
     target_allegiance: str,
     target_scope: str,
     replacement: bool,
@@ -256,6 +267,7 @@ def build_select_tracked_target_request(
     )
     scope = _owner_scope_from_token(owner_scope)
     tracked_role = _role_from_token(role)
+    roll_types = _validate_supported_roll_types(supported_roll_types)
     allegiance = _validate_supported_token(
         "target_allegiance",
         target_allegiance,
@@ -298,6 +310,7 @@ def build_select_tracked_target_request(
             "source_effect_index": source_effect,
             "owner_scope": scope.value,
             "tracked_target_role": tracked_role.value,
+            "supported_roll_types": list(roll_types),
             "target_allegiance": allegiance,
             "target_scope": scope_token,
             "replacement": replacement,
@@ -368,6 +381,10 @@ def apply_select_tracked_target_decision(
         raise GameLifecycleError("Tracked target selected unit is no longer legal.")
     owner_scope = _owner_scope_from_token(_payload_string(request_payload, key="owner_scope"))
     role = _role_from_token(_payload_string(request_payload, key="tracked_target_role"))
+    supported_roll_types = _payload_supported_roll_types(
+        request_payload,
+        key="supported_roll_types",
+    )
     replacement = _payload_bool(request_payload, key="replacement")
     source_rule_id = _payload_string(request_payload, key="source_rule_id")
     source_unit_id = _payload_string(request_payload, key="source_unit_instance_id")
@@ -397,6 +414,7 @@ def apply_select_tracked_target_decision(
         source_model_instance_id=source_model_id,
         owner_scope=owner_scope,
         role=role,
+        supported_roll_types=supported_roll_types,
         target_unit_instance_id=target_unit_id,
         target_allegiance=_payload_string(request_payload, key="target_allegiance"),
         target_lifecycle="until_destroyed",
@@ -515,7 +533,7 @@ def tracked_target_reroll_permission_context_for_unit(
             continue
         if record.target_unit_instance_id != requested_target:
             continue
-        if requested_roll_type not in _tracked_target_roll_types_for_record(record):
+        if requested_roll_type not in record.supported_roll_types:
             continue
         if requested_timing != requested_roll_type:
             continue
@@ -539,6 +557,7 @@ def tracked_target_reroll_permission_context_for_unit(
                     "source_model_instance_id": record.source_model_instance_id,
                     "owner_scope": record.owner_scope.value,
                     "tracked_target_role": record.role.value,
+                    "supported_roll_types": list(record.supported_roll_types),
                     "target_unit_instance_id": record.target_unit_instance_id,
                 },
             )
@@ -546,14 +565,6 @@ def tracked_target_reroll_permission_context_for_unit(
     if len(contexts) > 1:
         raise GameLifecycleError("Multiple tracked-target reroll permissions are available.")
     return contexts[0] if contexts else None
-
-
-def _tracked_target_roll_types_for_record(record: TrackedTargetRecord) -> tuple[str, ...]:
-    if record.role is TrackedTargetRole.PREY:
-        return ("attack_sequence.wound",)
-    if record.role is TrackedTargetRole.QUARRY:
-        return ("attack_sequence.hit", "attack_sequence.wound")
-    raise GameLifecycleError("Tracked target role has no reroll mapping.")
 
 
 def _legal_target_unit_ids(
@@ -601,6 +612,7 @@ def _assert_payload_context_matches(
         "source_effect_index",
         "owner_scope",
         "tracked_target_role",
+        "supported_roll_types",
         "target_allegiance",
         "target_scope",
         "replacement",
@@ -649,6 +661,13 @@ def _payload_identifier_list(payload: dict[str, JsonValue], *, key: str) -> tupl
     return tuple(_validate_identifier(key, item) for item in value)
 
 
+def _payload_supported_roll_types(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
+    value = payload.get(key)
+    if not isinstance(value, list):
+        raise GameLifecycleError(f"Tracked target payload {key} must be a list.")
+    return _validate_supported_roll_types(tuple(value))
+
+
 def _role_from_token(token: object) -> TrackedTargetRole:
     if type(token) is TrackedTargetRole:
         return token
@@ -681,6 +700,28 @@ def _validate_supported_token(
     if token not in set(supported):
         raise GameLifecycleError(f"Unsupported tracked target {field_name}: {token}.")
     return token
+
+
+def _validate_supported_roll_types(roll_types: tuple[object, ...]) -> tuple[str, ...]:
+    if type(roll_types) is not tuple:
+        raise GameLifecycleError("Tracked target supported_roll_types must be a tuple.")
+    validated = tuple(
+        _validate_supported_token(
+            "supported_roll_types",
+            roll_type,
+            supported=TRACKED_TARGET_SUPPORTED_ROLL_TYPES,
+        )
+        for roll_type in roll_types
+    )
+    if not validated:
+        raise GameLifecycleError("Tracked target supported_roll_types must not be empty.")
+    if len(set(validated)) != len(validated):
+        raise GameLifecycleError("Tracked target supported_roll_types must be unique.")
+    return tuple(
+        roll_type
+        for roll_type in TRACKED_TARGET_SUPPORTED_ROLL_TYPES
+        if roll_type in set(validated)
+    )
 
 
 def _validate_identifier(field_name: str, value: object) -> str:

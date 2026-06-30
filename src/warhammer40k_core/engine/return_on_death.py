@@ -10,6 +10,8 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldRuntimeState,
+    ModelPlacement,
+    ModelPlacementPayload,
     PlacementError,
     UnitPlacement,
     geometry_model_for_placement,
@@ -521,6 +523,12 @@ def _validate_return_on_death_placement(
         expected_ids = {model.model_instance_id for model in unit.own_models}
         if model_ids != expected_ids:
             raise GameLifecycleError("Return-on-death unit placement must include all models.")
+    _assert_destroyed_position_anchor(
+        state=state,
+        pending=pending,
+        placement=placement,
+        ruleset_descriptor=ruleset_descriptor,
+    )
     if pending.engagement_range_restriction:
         _assert_not_within_enemy_engagement_range(
             state=state,
@@ -530,6 +538,59 @@ def _validate_return_on_death_placement(
         )
 
 
+def _assert_destroyed_position_anchor(
+    *,
+    state: GameState,
+    pending: PendingReturnOnDeath,
+    placement: UnitPlacement,
+    ruleset_descriptor: RulesetDescriptor,
+) -> None:
+    anchor = _destroyed_model_placement_from_pending(pending)
+    if anchor.unit_instance_id != pending.destroyed_unit_instance_id:
+        raise GameLifecycleError("Return-on-death destroyed position unit drift.")
+    if (
+        pending.target_scope is ReturnDestroyedTargetScope.DESTROYED_MODEL
+        and anchor.model_instance_id != pending.destroyed_model_instance_id
+    ):
+        raise GameLifecycleError("Return-on-death destroyed position model drift.")
+    attempted_anchor = _placement_for_model(
+        placement=placement,
+        model_instance_id=anchor.model_instance_id,
+    )
+    if attempted_anchor.pose == anchor.pose:
+        return
+    if _model_placement_within_enemy_engagement_range(
+        state=state,
+        model_placement=anchor,
+        ruleset_descriptor=ruleset_descriptor,
+        owner_player_id=pending.owner_player_id,
+    ):
+        return
+    raise GameLifecycleError("Return-on-death placement must use destroyed position when legal.")
+
+
+def _destroyed_model_placement_from_pending(pending: PendingReturnOnDeath) -> ModelPlacement:
+    payload = _payload_object(pending.destroyed_position_payload)
+    if _payload_string(payload, key="source") != "model_destroyed_event":
+        raise GameLifecycleError("Return-on-death requires destroyed model placement evidence.")
+    event_payload = _payload_object(payload.get("model_destroyed_payload"))
+    destroyed_placement_payload = _payload_object(event_payload.get("destroyed_model_placement"))
+    for key in ("army_id", "player_id", "unit_instance_id", "model_instance_id", "pose"):
+        if key not in destroyed_placement_payload:
+            raise GameLifecycleError("Return-on-death destroyed model placement is incomplete.")
+    if not isinstance(destroyed_placement_payload["pose"], dict):
+        raise GameLifecycleError("Return-on-death destroyed model placement pose must be object.")
+    return ModelPlacement.from_payload(cast(ModelPlacementPayload, destroyed_placement_payload))
+
+
+def _placement_for_model(*, placement: UnitPlacement, model_instance_id: str) -> ModelPlacement:
+    requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
+    for model_placement in placement.model_placements:
+        if model_placement.model_instance_id == requested_model_id:
+            return model_placement
+    raise GameLifecycleError("Return-on-death placement is missing destroyed anchor model.")
+
+
 def _assert_not_within_enemy_engagement_range(
     *,
     state: GameState,
@@ -537,6 +598,42 @@ def _assert_not_within_enemy_engagement_range(
     ruleset_descriptor: RulesetDescriptor,
     owner_player_id: str,
 ) -> None:
+    if _placement_within_enemy_engagement_range(
+        state=state,
+        placement=placement,
+        ruleset_descriptor=ruleset_descriptor,
+        owner_player_id=owner_player_id,
+    ):
+        raise GameLifecycleError("Return-on-death placement is within Engagement Range.")
+
+
+def _model_placement_within_enemy_engagement_range(
+    *,
+    state: GameState,
+    model_placement: ModelPlacement,
+    ruleset_descriptor: RulesetDescriptor,
+    owner_player_id: str,
+) -> bool:
+    return _placement_within_enemy_engagement_range(
+        state=state,
+        placement=UnitPlacement(
+            army_id=model_placement.army_id,
+            player_id=model_placement.player_id,
+            unit_instance_id=model_placement.unit_instance_id,
+            model_placements=(model_placement,),
+        ),
+        ruleset_descriptor=ruleset_descriptor,
+        owner_player_id=owner_player_id,
+    )
+
+
+def _placement_within_enemy_engagement_range(
+    *,
+    state: GameState,
+    placement: UnitPlacement,
+    ruleset_descriptor: RulesetDescriptor,
+    owner_player_id: str,
+) -> bool:
     battlefield = state.battlefield_state
     if battlefield is None:
         raise GameLifecycleError("Return-on-death engagement check requires battlefield_state.")
@@ -567,9 +664,8 @@ def _assert_not_within_enemy_engagement_range(
                     )
                     for returned_model in returned_models
                 ):
-                    raise GameLifecycleError(
-                        "Return-on-death placement is within Engagement Range."
-                    )
+                    return True
+    return False
 
 
 def _restore_returned_target(

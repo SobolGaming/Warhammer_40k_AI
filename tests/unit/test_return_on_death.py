@@ -93,7 +93,7 @@ def test_return_on_death_failed_roll_resolves_without_restoring_target() -> None
     assert set(_beta_unit(state).own_model_ids()) <= set(state.battlefield_state.removed_model_ids)
 
 
-def test_return_on_death_success_requests_placement_and_rejects_engagement_range() -> None:
+def test_return_on_death_success_requests_placement_and_rejects_invalid_submission() -> None:
     state = _battle_state_with_destroyed_beta_unit()
     pending = _pending_return_on_death(state=state, success_threshold=2)
     state.record_pending_return_on_death(pending)
@@ -141,7 +141,7 @@ def test_return_on_death_full_health_restores_unit_and_battlefield_placement() -
     request = build_return_on_death_placement_request(state=state, pending=pending)
     result = _placement_result(
         request=request,
-        placement=_unit_placement_for_unit(state=state, unit=_beta_unit(state), x=20.0, y=20.0),
+        placement=_unit_placement_at_destroyed_position(state=state, unit=_beta_unit(state)),
     )
 
     resolved = apply_return_on_death_placement_decision(
@@ -177,12 +177,10 @@ def test_return_on_death_fixed_wounds_restores_exact_remaining_wounds() -> None:
     assert destroyed_model_id is not None
     result = _placement_result(
         request=request,
-        placement=_unit_placement_for_model(
+        placement=_unit_placement_for_model_at_destroyed_position(
             state=state,
             unit=_beta_unit(state),
             model_instance_id=destroyed_model_id,
-            x=20.0,
-            y=20.0,
         ),
     )
 
@@ -211,6 +209,28 @@ def test_return_on_death_stale_pending_submission_rejects_before_mutation() -> N
     state.record_pending_return_on_death(pending)
     request = build_return_on_death_placement_request(state=state, pending=pending)
     state.resolve_pending_return_on_death(pending.pending_id)
+    result = _placement_result(
+        request=request,
+        placement=_unit_placement_for_unit(state=state, unit=_beta_unit(state), x=20.0, y=20.0),
+    )
+
+    status = invalid_return_on_death_placement_status(
+        state=state,
+        request=request,
+        result=result,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+    )
+
+    assert status is not None
+    assert state.battlefield_state is not None
+    assert set(_beta_unit(state).own_model_ids()) <= set(state.battlefield_state.removed_model_ids)
+
+
+def test_return_on_death_rejects_far_placement_when_destroyed_position_is_legal() -> None:
+    state = _battle_state_with_destroyed_beta_unit()
+    pending = _pending_return_on_death(state=state, success_threshold=2)
+    state.record_pending_return_on_death(pending)
+    request = build_return_on_death_placement_request(state=state, pending=pending)
     result = _placement_result(
         request=request,
         placement=_unit_placement_for_unit(state=state, unit=_beta_unit(state), x=20.0, y=20.0),
@@ -644,6 +664,74 @@ def test_return_on_death_decision_and_restore_defensive_paths() -> None:
             placement=placement,
             ruleset_descriptor=descriptor,
         )
+    with pytest.raises(GameLifecycleError, match="destroyed model placement evidence"):
+        return_on_death_module._validate_return_on_death_placement(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            pending=replace(pending, destroyed_position_payload={"source": "test"}),
+            placement=_unit_placement_at_destroyed_position(state=state, unit=_beta_unit(state)),
+            ruleset_descriptor=descriptor,
+        )
+    with pytest.raises(GameLifecycleError, match="destroyed position unit drift"):
+        return_on_death_module._assert_destroyed_position_anchor(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            pending=replace(pending, destroyed_unit_instance_id="unit:other"),
+            placement=_unit_placement_at_destroyed_position(state=state, unit=_beta_unit(state)),
+            ruleset_descriptor=descriptor,
+        )
+    model_pending = _pending_return_on_death(
+        state=state,
+        target_scope=ReturnDestroyedTargetScope.DESTROYED_MODEL,
+        restore_mode=ReturnRestoreWoundsMode.FIXED_REMAINING,
+        wounds_remaining=1,
+    )
+    model_pending_model_id = model_pending.destroyed_model_instance_id
+    assert model_pending_model_id is not None
+    with pytest.raises(GameLifecycleError, match="destroyed position model drift"):
+        return_on_death_module._assert_destroyed_position_anchor(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            pending=replace(
+                model_pending,
+                destroyed_model_instance_id=_beta_unit(state).own_models[1].model_instance_id,
+            ),
+            placement=_unit_placement_for_model_at_destroyed_position(
+                state=state,
+                unit=_beta_unit(state),
+                model_instance_id=model_pending_model_id,
+            ),
+            ruleset_descriptor=descriptor,
+        )
+    with pytest.raises(GameLifecycleError, match="missing destroyed anchor model"):
+        return_on_death_module._placement_for_model(  # pyright: ignore[reportPrivateUsage]
+            placement=_unit_placement_at_destroyed_position(state=state, unit=_beta_unit(state)),
+            model_instance_id="model:missing",
+        )
+    incomplete_payload = cast(
+        JsonValue,
+        {
+            "source": "model_destroyed_event",
+            "model_destroyed_payload": {"destroyed_model_placement": {"army_id": "army-beta"}},
+        },
+    )
+    with pytest.raises(GameLifecycleError, match="destroyed model placement is incomplete"):
+        return_on_death_module._destroyed_model_placement_from_pending(  # pyright: ignore[reportPrivateUsage]
+            replace(pending, destroyed_position_payload=incomplete_payload)
+        )
+    anchor_payload = _destroyed_model_placement_for_model(
+        model_instance_id=_beta_unit(state).own_models[0].model_instance_id,
+    ).to_payload()
+    malformed_pose_payload = cast(
+        JsonValue,
+        {
+            "source": "model_destroyed_event",
+            "model_destroyed_payload": {
+                "destroyed_model_placement": {**anchor_payload, "pose": "not-an-object"}
+            },
+        },
+    )
+    with pytest.raises(GameLifecycleError, match="placement pose must be object"):
+        return_on_death_module._destroyed_model_placement_from_pending(  # pyright: ignore[reportPrivateUsage]
+            replace(pending, destroyed_position_payload=malformed_pose_payload)
+        )
     with pytest.raises(GameLifecycleError, match="currently supports exactly one D6"):
         return_on_death_module._return_on_death_roll_spec(  # pyright: ignore[reportPrivateUsage]
             state=state,
@@ -861,7 +949,9 @@ def _pending_return_on_death(
             if target_scope is ReturnDestroyedTargetScope.DESTROYED_MODEL
             else None
         ),
-        destroyed_position_payload={"source": "test"},
+        destroyed_position_payload=_destroyed_position_payload_for_model(
+            model_instance_id=beta.own_models[0].model_instance_id,
+        ),
         trigger_battle_round=1,
         trigger_phase="command",
         resolution_timing="phase_end",
@@ -976,6 +1066,62 @@ def _return_on_death_record() -> AbilityCatalogRecord:
     )
 
 
+def _unit_placement_at_destroyed_position(*, state: GameState, unit: UnitInstance) -> UnitPlacement:
+    anchor = _destroyed_model_placement_for_model(
+        model_instance_id=unit.own_models[0].model_instance_id,
+    )
+    base_placement = _unit_placement_for_unit(
+        state=state,
+        unit=unit,
+        x=anchor.pose.position.x,
+        y=anchor.pose.position.y,
+    )
+    return base_placement.with_model_placements(
+        tuple(
+            anchor if placement.model_instance_id == anchor.model_instance_id else placement
+            for placement in base_placement.model_placements
+        )
+    )
+
+
+def _unit_placement_for_model_at_destroyed_position(
+    *,
+    state: GameState,
+    unit: UnitInstance,
+    model_instance_id: str,
+) -> UnitPlacement:
+    anchor = _destroyed_model_placement_for_model(model_instance_id=model_instance_id)
+    return UnitPlacement(
+        army_id=anchor.army_id,
+        player_id=anchor.player_id,
+        unit_instance_id=unit.unit_instance_id,
+        model_placements=(anchor,),
+    )
+
+
+def _destroyed_position_payload_for_model(*, model_instance_id: str) -> JsonValue:
+    destroyed_placement_payload = _destroyed_model_placement_for_model(
+        model_instance_id=model_instance_id,
+    ).to_payload()
+    return cast(
+        JsonValue,
+        {
+            "source": "model_destroyed_event",
+            "model_destroyed_event_id": "event:test-destroyed-position",
+            "model_destroyed_payload": {
+                "model_instance_id": model_instance_id,
+                "destroyed_model_placement": destroyed_placement_payload,
+            },
+        },
+    )
+
+
+def _destroyed_model_placement_for_model(*, model_instance_id: str) -> ModelPlacement:
+    source_state = _battle_state_with_scenario()
+    assert source_state.battlefield_state is not None
+    return source_state.battlefield_state.model_placement_by_id(model_instance_id)
+
+
 def _unit_placement_for_unit(
     *,
     state: GameState,
@@ -999,33 +1145,6 @@ def _unit_placement_for_unit(
                 pose=Pose.at(x + (index * 2.0), y),
             )
             for index, model in enumerate(unit.own_models)
-        ),
-    )
-
-
-def _unit_placement_for_model(
-    *,
-    state: GameState,
-    unit: UnitInstance,
-    model_instance_id: str,
-    x: float,
-    y: float,
-) -> UnitPlacement:
-    army = next(
-        army for army in state.army_definitions if any(stored == unit for stored in army.units)
-    )
-    return UnitPlacement(
-        army_id=army.army_id,
-        player_id=army.player_id,
-        unit_instance_id=unit.unit_instance_id,
-        model_placements=(
-            ModelPlacement(
-                army_id=army.army_id,
-                player_id=army.player_id,
-                unit_instance_id=unit.unit_instance_id,
-                model_instance_id=model_instance_id,
-                pose=Pose.at(x, y),
-            ),
         ),
     )
 

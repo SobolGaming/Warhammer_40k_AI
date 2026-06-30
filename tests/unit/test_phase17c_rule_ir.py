@@ -801,6 +801,24 @@ def test_phase17c_malformed_first_death_return_ir_fails_closed_for_catalog_consu
                     dice_gate,
                     parameters=_parameters_with_value(
                         dice_gate.parameters,
+                        key="roll_count",
+                        value=2,
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            clause,
+            conditions=(
+                *tuple(
+                    condition
+                    for condition in clause.conditions
+                    if condition.kind is not RuleConditionKind.DICE_ROLL_GATE
+                ),
+                replace(
+                    dice_gate,
+                    parameters=_parameters_with_value(
+                        dice_gate.parameters,
                         key="success_threshold",
                         value=7,
                     ),
@@ -856,6 +874,86 @@ def test_phase17c_malformed_first_death_return_ir_fails_closed_for_catalog_consu
 
     for malformed_clause in malformed_clauses:
         malformed_rule_ir = replace(rule_ir, clauses=(malformed_clause,))
+        assert catalog_rule_ir_consumers_for_rule(malformed_rule_ir) == ()
+        assert catalog_rule_ir_hook_ids_for_rule(malformed_rule_ir) == ()
+
+
+def test_phase17c_first_death_return_target_shape_mismatches_fail_closed() -> None:
+    model_rule_ir = _compiled(FIRST_DEATH_RETURN_TEXT).rule_ir
+    model_clause = model_rule_ir.clauses[0]
+    model_effect = model_clause.effects[0]
+    assert model_clause.target is not None
+
+    unit_rule_ir = _compiled(FIRST_DEATH_RETURN_FULL_HEALTH_TEXT).rule_ir
+    unit_clause = unit_rule_ir.clauses[0]
+    unit_effect = unit_clause.effects[0]
+    unit_trigger = unit_clause.trigger
+    assert unit_clause.target is not None
+    assert unit_trigger is not None
+
+    malformed_cases = (
+        (
+            model_rule_ir,
+            replace(
+                model_clause,
+                target=replace(model_clause.target, kind=RuleTargetKind.THIS_UNIT),
+            ),
+        ),
+        (
+            model_rule_ir,
+            replace(
+                model_clause,
+                effects=(
+                    replace(
+                        model_effect,
+                        parameters=_parameters_with_value(
+                            _parameters_with_value(
+                                model_effect.parameters,
+                                key="target",
+                                value="this_unit",
+                            ),
+                            key="target_scope",
+                            value="destroyed_unit",
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        (
+            unit_rule_ir,
+            replace(
+                unit_clause,
+                trigger=_trigger_with_parameter(
+                    unit_trigger,
+                    key="destroyed_target",
+                    value="this_model",
+                ),
+            ),
+        ),
+        (
+            unit_rule_ir,
+            replace(
+                unit_clause,
+                effects=(
+                    replace(
+                        unit_effect,
+                        parameters=_parameters_with_value(
+                            _parameters_with_value(
+                                unit_effect.parameters,
+                                key="target",
+                                value="this_model",
+                            ),
+                            key="target_scope",
+                            value="destroyed_model",
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+
+    for base_rule_ir, malformed_clause in malformed_cases:
+        malformed_rule_ir = replace(base_rule_ir, clauses=(malformed_clause,))
         assert catalog_rule_ir_consumers_for_rule(malformed_rule_ir) == ()
         assert catalog_rule_ir_hook_ids_for_rule(malformed_rule_ir) == ()
 

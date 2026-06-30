@@ -1938,6 +1938,12 @@ def catalog_rule_clause_is_supported_tracked_target_destroyed_reselect(
     return _clause_is_supported_tracked_target_destroyed_reselect(clause)
 
 
+def catalog_rule_tracked_target_supported_roll_types_for_clause(
+    clause: RuleClause,
+) -> tuple[str, ...]:
+    return _tracked_target_supported_roll_types_for_clause(clause)
+
+
 def catalog_rule_clause_is_supported_first_death_return(clause: RuleClause) -> bool:
     return _clause_is_supported_first_death_return(clause)
 
@@ -2061,6 +2067,36 @@ def _trigger_supports_tracked_target_roll_type(
     return False
 
 
+def _tracked_target_supported_roll_types_for_clause(clause: RuleClause) -> tuple[str, ...]:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Tracked-target roll-type derivation requires RuleClause.")
+    if not _clause_is_supported_tracked_target_reroll(clause):
+        return ()
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.DICE_ROLL:
+        return ()
+    trigger_parameters = parameter_payload(trigger.parameters)
+    supported: set[str] = set()
+    for effect in clause.effects:
+        if effect.kind is not RuleEffectKind.REROLL_PERMISSION:
+            continue
+        if not _effect_is_supported_tracked_target_reroll(
+            effect,
+            trigger_parameters=trigger_parameters,
+        ):
+            continue
+        roll_type = parameter_payload(effect.parameters).get("roll_type")
+        if roll_type == "hit":
+            supported.add("attack_sequence.hit")
+        elif roll_type == "wound":
+            supported.add("attack_sequence.wound")
+    return tuple(
+        roll_type
+        for roll_type in ("attack_sequence.hit", "attack_sequence.wound")
+        if roll_type in supported
+    )
+
+
 def _clause_is_supported_tracked_target_destroyed_reselect(clause: RuleClause) -> bool:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Tracked-target consumer classification requires RuleClause.")
@@ -2136,7 +2172,11 @@ def _clause_is_supported_first_death_return(clause: RuleClause) -> bool:
     )
     if len(return_effects) != 1 or len(clause.effects) != 1:
         return False
-    return _effect_is_supported_first_death_return(return_effects[0])
+    return _first_death_return_target_shape_matches(
+        clause=clause,
+        effect=return_effects[0],
+        trigger_parameters=trigger_parameters,
+    ) and _effect_is_supported_first_death_return(return_effects[0])
 
 
 def _clause_has_supported_first_death_frequency_limit(clause: RuleClause) -> bool:
@@ -2164,7 +2204,7 @@ def _clause_has_supported_first_death_roll_gate(clause: RuleClause) -> bool:
             parameters.get("comparison") == "greater_or_equal"
             and parameters.get("roll_expression") == "D6"
             and type(roll_count) is int
-            and roll_count > 0
+            and roll_count == 1
             and type(success_threshold) is int
             and 2 <= success_threshold <= 6
         ):
@@ -2206,6 +2246,32 @@ def _effect_is_supported_first_death_return(effect: RuleEffectSpec) -> bool:
         return type(wounds_remaining) is int and wounds_remaining > 0
     if restore_mode == "full_health":
         return wounds_remaining is None
+    return False
+
+
+def _first_death_return_target_shape_matches(
+    *,
+    clause: RuleClause,
+    effect: RuleEffectSpec,
+    trigger_parameters: Mapping[str, object],
+) -> bool:
+    if clause.trigger is None or clause.target is None:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    if clause.trigger.kind is RuleTriggerKind.MODEL_DESTROYED:
+        return (
+            trigger_parameters.get("destroyed_target") == "this_model"
+            and clause.target.kind is RuleTargetKind.THIS_MODEL
+            and parameters.get("target") == "this_model"
+            and parameters.get("target_scope") == "destroyed_model"
+        )
+    if clause.trigger.kind is RuleTriggerKind.UNIT_DESTROYED:
+        return (
+            trigger_parameters.get("destroyed_target") == "this_unit"
+            and clause.target.kind is RuleTargetKind.THIS_UNIT
+            and parameters.get("target") == "this_unit"
+            and parameters.get("target_scope") == "destroyed_unit"
+        )
     return False
 
 

@@ -86,6 +86,7 @@ def test_tracked_target_initial_selection_request_payload_is_json_safe() -> None
     assert isinstance(request.payload, dict)
     assert request.payload["submission_kind"] == SELECT_TRACKED_TARGET_DECISION_TYPE
     assert request.payload["source_rule_id"] == record.definition.source_id
+    assert request.payload["supported_roll_types"] == ["attack_sequence.wound"]
 
 
 def test_tracked_target_runtime_empty_indexes_have_no_hooks() -> None:
@@ -160,6 +161,7 @@ def test_tracked_target_runtime_fail_fast_and_empty_selection_paths() -> None:
             source_model_instance_id=active_source_unit.own_models[0].model_instance_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.PREY,
+            supported_roll_types=("attack_sequence.wound",),
             target_allegiance="enemy",
             target_scope="enemy_unit",
             replacement=False,
@@ -185,6 +187,7 @@ def test_tracked_target_runtime_fail_fast_and_empty_selection_paths() -> None:
             source_model_instance_id=source_model_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.PREY,
+            supported_roll_types=("attack_sequence.wound",),
             target_allegiance="enemy",
             target_scope="enemy_unit",
             replacement=False,
@@ -204,6 +207,7 @@ def test_tracked_target_runtime_fail_fast_and_empty_selection_paths() -> None:
             source_model_instance_id=source_model_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.PREY,
+            supported_roll_types=("attack_sequence.wound",),
             target_allegiance="enemy",
             target_scope="friendly_unit",
             replacement=False,
@@ -220,6 +224,7 @@ def test_tracked_target_runtime_fail_fast_and_empty_selection_paths() -> None:
             source_model_instance_id=source_model_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.PREY,
+            supported_roll_types=("attack_sequence.wound",),
             target_allegiance="enemy",
             target_scope="enemy_unit",
             replacement=cast(bool, "yes"),
@@ -243,6 +248,7 @@ def test_tracked_target_selection_records_active_target_and_round_trips() -> Non
         source_model_instance_id=source_model_id,
         owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
         role=TrackedTargetRole.PREY,
+        supported_roll_types=("attack_sequence.wound",),
         target_allegiance="enemy",
         target_scope="enemy_unit",
         replacement=False,
@@ -292,6 +298,7 @@ def test_tracked_target_selection_rejects_non_option_before_mutation() -> None:
         source_model_instance_id=source_model_id,
         owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
         role=TrackedTargetRole.PREY,
+        supported_roll_types=("attack_sequence.wound",),
         target_allegiance="enemy",
         target_scope="enemy_unit",
         replacement=False,
@@ -332,6 +339,7 @@ def test_tracked_target_invalid_status_accepts_valid_and_rejects_stale_targets()
         source_model_instance_id=source_model_id,
         owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
         role=TrackedTargetRole.PREY,
+        supported_roll_types=("attack_sequence.wound",),
         target_allegiance="enemy",
         target_scope="enemy_unit",
         replacement=False,
@@ -452,6 +460,7 @@ def test_tracked_target_quarry_reroll_applies_to_hit_and_wound_rolls() -> None:
             source_model_instance_id=source_model_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.QUARRY,
+            supported_roll_types=("attack_sequence.hit", "attack_sequence.wound"),
             target_unit_instance_id=target_unit_id,
             target_allegiance="enemy",
             target_lifecycle="until_destroyed",
@@ -483,6 +492,60 @@ def test_tracked_target_quarry_reroll_applies_to_hit_and_wound_rolls() -> None:
 
     assert hit_context is not None
     assert wound_context is not None
+
+
+def test_tracked_target_supported_roll_types_drive_rerolls_not_role_label() -> None:
+    state = _battle_state_with_scenario()
+    source_unit = state.army_definitions[0].units[0]
+    source_model_id = source_unit.own_models[0].model_instance_id
+    target_unit_id = state.army_definitions[1].units[0].unit_instance_id
+    state.record_tracked_target(
+        TrackedTargetRecord(
+            record_id="record:quarry-wound-only",
+            source_rule_id="rule:quarry",
+            source_ability_id="ability:quarry",
+            source_clause_id="clause:select",
+            source_effect_index=0,
+            owner_player_id="player-a",
+            source_unit_instance_id=source_unit.unit_instance_id,
+            source_model_instance_id=source_model_id,
+            owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
+            role=TrackedTargetRole.QUARRY,
+            supported_roll_types=("attack_sequence.wound",),
+            target_unit_instance_id=target_unit_id,
+            target_allegiance="enemy",
+            target_lifecycle="until_destroyed",
+            selected_battle_round=1,
+            selection_request_id="request:quarry-wound-only",
+            selection_result_id="result:quarry-wound-only",
+            active=True,
+        )
+    )
+
+    assert (
+        tracked_target_reroll_permission_context_for_unit(
+            state=state,
+            player_id="player-a",
+            unit_instance_id=source_unit.unit_instance_id,
+            model_instance_id=source_model_id,
+            roll_type="attack_sequence.hit",
+            timing_window="attack_sequence.hit",
+            target_unit_instance_id=target_unit_id,
+        )
+        is None
+    )
+    assert (
+        tracked_target_reroll_permission_context_for_unit(
+            state=state,
+            player_id="player-a",
+            unit_instance_id=source_unit.unit_instance_id,
+            model_instance_id=source_model_id,
+            roll_type="attack_sequence.wound",
+            timing_window="attack_sequence.wound",
+            target_unit_instance_id=target_unit_id,
+        )
+        is not None
+    )
 
 
 def test_tracked_target_reroll_rejects_duplicate_internal_permissions() -> None:
@@ -526,6 +589,7 @@ def test_tracked_target_defensive_validation_rejects_malformed_records_and_paylo
             source_model_instance_id=None,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.PREY,
+            supported_roll_types=("attack_sequence.wound",),
             target_unit_instance_id="unit-b",
             target_allegiance="enemy",
             target_lifecycle="until_destroyed",
@@ -546,6 +610,7 @@ def test_tracked_target_defensive_validation_rejects_malformed_records_and_paylo
             source_model_instance_id="model-a",
             owner_scope=TrackedTargetOwnerScope.THIS_UNIT,
             role=TrackedTargetRole.PREY,
+            supported_roll_types=("attack_sequence.wound",),
             target_unit_instance_id="unit-b",
             target_allegiance="enemy",
             target_lifecycle="until_destroyed",
@@ -575,6 +640,15 @@ def test_tracked_target_defensive_validation_rejects_malformed_records_and_paylo
         lambda: tracked_targets_module._payload_identifier_list(  # pyright: ignore[reportPrivateUsage]
             {"legal_target_unit_ids": "unit-b"},
             key="legal_target_unit_ids",
+        ),
+        lambda: tracked_targets_module._validate_supported_roll_types(  # pyright: ignore[reportPrivateUsage]
+            cast(tuple[object, ...], [])
+        ),
+        lambda: tracked_targets_module._validate_supported_roll_types(  # pyright: ignore[reportPrivateUsage]
+            ()
+        ),
+        lambda: tracked_targets_module._validate_supported_roll_types(  # pyright: ignore[reportPrivateUsage]
+            ("attack_sequence.hit", "attack_sequence.hit")
         ),
         lambda: tracked_targets_module._role_from_token(1),  # pyright: ignore[reportPrivateUsage]
         lambda: tracked_targets_module._role_from_token(  # pyright: ignore[reportPrivateUsage]
@@ -629,6 +703,7 @@ def test_tracked_target_runtime_reselection_defensive_paths() -> None:
         source_model_instance_id=source_unit.own_models[0].model_instance_id,
         owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
         role=TrackedTargetRole.PREY,
+        supported_roll_types=("attack_sequence.wound",),
         target_unit_instance_id=destroyed_target.unit_instance_id,
         target_allegiance="enemy",
         target_lifecycle="until_destroyed",
@@ -741,6 +816,7 @@ def test_tracked_target_destroyed_target_expires_and_requests_reselection() -> N
             source_model_instance_id=source_model_id,
             owner_scope=TrackedTargetOwnerScope.THIS_MODEL,
             role=TrackedTargetRole.PREY,
+            supported_roll_types=("attack_sequence.wound",),
             target_unit_instance_id=destroyed_target.unit_instance_id,
             target_allegiance="enemy",
             target_lifecycle="until_destroyed",
@@ -829,6 +905,7 @@ def _record_selection(
             source_model_instance_id=source_model_instance_id,
             owner_scope=owner_scope,
             role=TrackedTargetRole.PREY,
+            supported_roll_types=("attack_sequence.wound",),
             target_unit_instance_id=target_unit_instance_id,
             target_allegiance="enemy",
             target_lifecycle="until_destroyed",
