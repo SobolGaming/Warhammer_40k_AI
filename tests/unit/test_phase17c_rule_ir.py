@@ -13,6 +13,11 @@ from warhammer40k_core.core.datasheet import (
     CatalogJsonObject,
     DatasheetAbilityDescriptor,
 )
+from warhammer40k_core.engine.abilities import (
+    AbilityCatalogRecord,
+    AbilityDefinition,
+    AbilityTimingDescriptor,
+)
 from warhammer40k_core.engine.ability_coverage import (
     AbilityClauseCoverageRow,
     AbilityCoverageAbilityDatasheetPair,
@@ -39,10 +44,12 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
+    _feel_no_pain_source_from_effect,  # pyright: ignore[reportPrivateUsage]
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_compiler import (
     CompiledRuleSource,
@@ -708,6 +715,50 @@ def test_phase17c_bare_mortal_wounds_feel_no_pain_scope_is_not_unconditional() -
         and "against mortal wounds" in diagnostic.source_span.text
         for diagnostic in rule_ir.diagnostics
     )
+
+
+def test_phase17c_structured_fnp_mortal_scope_without_attack_condition_fails_closed() -> None:
+    source_text = "The bearer has the Feel No Pain 3+ ability against mortal wounds."
+    source_span = TextSpan(text=source_text, start=0, end=len(source_text))
+    effect = RuleEffectSpec(
+        kind=RuleEffectKind.GRANT_ABILITY,
+        source_span=source_span,
+        parameters=(
+            RuleParameter(key="ability", value="Feel No Pain"),
+            RuleParameter(key="threshold", value=3),
+            RuleParameter(key="mortal_wounds", value=True),
+        ),
+    )
+    clause = RuleClause(
+        clause_id="phase17c:test:structured-fnp-mortal-only:clause:001",
+        template_id="phase17c:test:structured-fnp-mortal-only",
+        source_span=source_span,
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_MODEL, source_span=source_span),
+        effects=(effect,),
+    )
+    record = AbilityCatalogRecord(
+        record_id="phase17c:test:structured-fnp-mortal-only",
+        definition=AbilityDefinition(
+            ability_id="phase17c:test:structured-fnp-mortal-only",
+            name="Structured Feel No Pain Mortal Only",
+            source_id="phase17c:test:structured-fnp-mortal-only:source",
+            when_descriptor="Passive query.",
+            effect_descriptor="Malformed structured FNP source.",
+            restrictions_descriptor="None.",
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY),
+        ),
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="FeelNoPainSource mortal_wounds scope requires an attack condition",
+    ):
+        _feel_no_pain_source_from_effect(
+            record=record,
+            clause=clause,
+            effect_index=0,
+            effect=effect,
+        )
 
 
 def test_phase17c_advance_charge_eligibility_compiles_to_rule_exception_grant() -> None:

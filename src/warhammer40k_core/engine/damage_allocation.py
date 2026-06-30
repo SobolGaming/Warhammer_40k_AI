@@ -1405,6 +1405,10 @@ class FeelNoPainSource:
         )
         if type(self.mortal_wounds) is not bool:
             raise GameLifecycleError("FeelNoPainSource mortal_wounds must be a bool.")
+        if self.mortal_wounds and self.attack_condition is None:
+            raise GameLifecycleError(
+                "FeelNoPainSource mortal_wounds scope requires an attack condition."
+            )
 
     def to_payload(self) -> FeelNoPainSourcePayload:
         payload: FeelNoPainSourcePayload = {
