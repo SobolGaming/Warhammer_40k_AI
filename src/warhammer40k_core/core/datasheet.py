@@ -63,6 +63,7 @@ class WargearOptionConditionKind(StrEnum):
 
 class WargearOptionEffectKind(StrEnum):
     ADD_WARGEAR = "add_wargear"
+    REPLACE_WARGEAR = "replace_wargear"
 
 
 class AttachmentRole(StrEnum):
@@ -128,6 +129,7 @@ class DatasheetWargearOptionEffectPayload(TypedDict):
     wargear_id: str
     model_count: int
     wargear_count: int
+    replaced_wargear_id: NotRequired[str]
 
 
 class DatasheetWargearOptionPayload(TypedDict):
@@ -432,9 +434,11 @@ class DatasheetWargearOptionEffect:
     wargear_id: str
     model_count: int
     wargear_count: int
+    replaced_wargear_id: str | None = None
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, "kind", wargear_option_effect_kind_from_token(self.kind))
+        kind = wargear_option_effect_kind_from_token(self.kind)
+        object.__setattr__(self, "kind", kind)
         object.__setattr__(
             self,
             "wargear_id",
@@ -453,14 +457,35 @@ class DatasheetWargearOptionEffect:
                 self.wargear_count,
             ),
         )
+        replaced_wargear_id = _validate_optional_identifier(
+            "DatasheetWargearOptionEffect replaced_wargear_id",
+            self.replaced_wargear_id,
+        )
+        if kind is WargearOptionEffectKind.ADD_WARGEAR and replaced_wargear_id is not None:
+            raise DatasheetCatalogError(
+                "ADD_WARGEAR DatasheetWargearOptionEffect must not include replaced_wargear_id."
+            )
+        if kind is WargearOptionEffectKind.REPLACE_WARGEAR:
+            if replaced_wargear_id is None:
+                raise DatasheetCatalogError(
+                    "REPLACE_WARGEAR DatasheetWargearOptionEffect requires replaced_wargear_id."
+                )
+            if replaced_wargear_id == self.wargear_id:
+                raise DatasheetCatalogError(
+                    "REPLACE_WARGEAR DatasheetWargearOptionEffect replacement must differ."
+                )
+        object.__setattr__(self, "replaced_wargear_id", replaced_wargear_id)
 
     def to_payload(self) -> DatasheetWargearOptionEffectPayload:
-        return {
+        payload: DatasheetWargearOptionEffectPayload = {
             "kind": self.kind.value,
             "wargear_id": self.wargear_id,
             "model_count": self.model_count,
             "wargear_count": self.wargear_count,
         }
+        if self.replaced_wargear_id is not None:
+            payload["replaced_wargear_id"] = self.replaced_wargear_id
+        return payload
 
     @classmethod
     def from_payload(cls, payload: DatasheetWargearOptionEffectPayload) -> Self:
@@ -469,6 +494,7 @@ class DatasheetWargearOptionEffect:
             wargear_id=payload["wargear_id"],
             model_count=payload["model_count"],
             wargear_count=payload["wargear_count"],
+            replaced_wargear_id=payload.get("replaced_wargear_id"),
         )
 
 
@@ -994,6 +1020,21 @@ class DatasheetDefinition:
                 raise DatasheetCatalogError(
                     "DatasheetDefinition wargear option references an unknown model profile."
                 )
+        known_wargear_ids = {
+            wargear_id
+            for option in wargear_options
+            for wargear_id in (*option.default_wargear_ids, *option.allowed_wargear_ids)
+        }
+        for option in wargear_options:
+            for effect in option.effects:
+                if (
+                    effect.replaced_wargear_id is not None
+                    and effect.replaced_wargear_id not in known_wargear_ids
+                ):
+                    raise DatasheetCatalogError(
+                        "DatasheetDefinition wargear replacement effect references an "
+                        "unknown wargear option."
+                    )
         abilities = _validate_ability_descriptor_tuple(
             "DatasheetDefinition abilities",
             self.abilities,
@@ -1527,13 +1568,22 @@ def _validate_wargear_option_effect_tuple(
         sorted(
             validated,
             key=lambda effect: (
-                effect.kind.value,
+                _wargear_option_effect_sort_order(effect.kind),
                 effect.wargear_id,
                 effect.model_count,
                 effect.wargear_count,
+                effect.replaced_wargear_id or "",
             ),
         )
     )
+
+
+def _wargear_option_effect_sort_order(kind: WargearOptionEffectKind) -> int:
+    if kind is WargearOptionEffectKind.REPLACE_WARGEAR:
+        return 0
+    if kind is WargearOptionEffectKind.ADD_WARGEAR:
+        return 1
+    raise DatasheetCatalogError("Unsupported WargearOptionEffectKind sort order.")
 
 
 def _validate_ability_descriptor_tuple(

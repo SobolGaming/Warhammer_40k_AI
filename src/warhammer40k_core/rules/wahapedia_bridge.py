@@ -112,6 +112,14 @@ _OPTION_RE = re.compile(
     r"(?P<forbidden>.+?) can be equipped with 1 (?P<granted>.+?)\.$",
     re.IGNORECASE,
 )
+_REPLACEMENT_WITH_REQUIRED_CHOICES_RE = re.compile(
+    r"^This model's (?P<replaced>.+?) can be replaced with 1 (?P<required>.+?) "
+    r"and one of the following:\n(?P<choices>(?:- 1 .+?(?:\n|$))+)$",
+    re.IGNORECASE,
+)
+_OPTION_CHOICE_RE = re.compile(r"^- 1 (?P<name>.+?)\.?$", re.IGNORECASE)
+_LOADOUT_RE = re.compile(r"[^.]+? (?:is|are) equipped with: (?P<items>[^.]+)\.?", re.IGNORECASE)
+_WEAPON_PROFILE_SUFFIX_RE = re.compile(r"^(?P<base>.+?)\s+-\s+(?P<profile>.+)$")
 _DAMAGED_HEADER_RE = re.compile(
     r"^\s*DAMAGED:\s*\d+\s*-\s*\d+\s+WOUNDS\s+REMAINING\s*",
     re.IGNORECASE,
@@ -400,6 +408,9 @@ def _bridge_datasheet(
         context=context,
         datasheet_id=datasheet_id,
         composition_entries=composition_entries,
+        default_wargear_name_keys=_loadout_wargear_name_keys(
+            _normalized_or_field(datasheet_row, "loadout")
+        ),
         bridged_rows=bridged_rows,
     )
     _bridge_abilities(
@@ -669,16 +680,26 @@ def _bridge_wargear(
     context: _BridgeContext,
     datasheet_id: str,
     composition_entries: tuple[_CompositionEntry, ...],
+    default_wargear_name_keys: frozenset[str],
     bridged_rows: dict[str, list[dict[str, str]]],
 ) -> dict[str, str]:
     wargear_ids_by_name: dict[str, str] = {}
     model_profile_ids = tuple(entry.model_profile_id for entry in composition_entries)
+    emitted_default_wargear_ids: set[str] = set()
     for row in _rows_matching(
         context.rows_by_table, "Datasheets_wargear", "datasheet_id", datasheet_id
     ):
         name = _required_field(row, "name")
-        wargear_id = f"{datasheet_id}:{_slug(name)}"
+        base_name = _base_wargear_name(name)
+        profile_name = _weapon_profile_name(name)
+        wargear_id = f"{datasheet_id}:{_slug(base_name)}"
+        wargear_ids_by_name[_name_key(base_name)] = wargear_id
         wargear_ids_by_name[_name_key(name)] = wargear_id
+        is_default_loadout = (
+            not default_wargear_name_keys or _name_key(base_name) in default_wargear_name_keys
+        ) and wargear_id not in emitted_default_wargear_ids
+        if is_default_loadout:
+            emitted_default_wargear_ids.add(wargear_id)
         bridged_rows["Datasheets_wargear"].append(
             {
                 "datasheet_id": datasheet_id,
@@ -686,7 +707,11 @@ def _bridge_wargear(
                 "line_in_wargear": _required_field(row, "line_in_wargear"),
                 "name": _raw_or_field(row, "name"),
                 "wargear_id": wargear_id,
-                "weapon_profile_id": f"{wargear_id}:standard",
+                "weapon_profile_id": (
+                    f"{wargear_id}:standard"
+                    if profile_name is None
+                    else f"{wargear_id}:{_slug(profile_name)}"
+                ),
                 "model_profile_ids": _joined(model_profile_ids),
                 "range": _required_field(row, "range"),
                 "a": _required_field(row, "A"),
@@ -697,7 +722,7 @@ def _bridge_wargear(
                 "d": _required_field(row, "D"),
                 "weapon_keywords": _joined(_weapon_keywords(_required_field(row, "description"))),
                 "weapon_abilities": _weapon_abilities_payload(_required_field(row, "description")),
-                "default_loadout": "true",
+                "default_loadout": "true" if is_default_loadout else "false",
                 "source_ids": _joined(_source_ids(row)),
             }
         )
@@ -838,6 +863,17 @@ def _bridge_options(
         description = _required_field(row, "description")
         if description == "None":
             continue
+        replacement_match = _REPLACEMENT_WITH_REQUIRED_CHOICES_RE.fullmatch(description)
+        if replacement_match is not None:
+            _bridge_replacement_option(
+                row=row,
+                datasheet_id=datasheet_id,
+                model_profile_id=_single_model_profile_id(composition_entries),
+                wargear_ids_by_name=wargear_ids_by_name,
+                match=replacement_match,
+                bridged_rows=bridged_rows,
+            )
+            continue
         match = _OPTION_RE.fullmatch(description)
         if match is None:
             raise WahapediaBridgeError("Unsupported wargear option row shape.")
@@ -862,11 +898,88 @@ def _bridge_options(
                 "condition_wargear_ids": forbidden_wargear_id,
                 "effect_kind": WargearOptionEffectKind.ADD_WARGEAR.value,
                 "effect_wargear_id": granted_wargear_id,
+                "effect_replaced_wargear_id": "",
                 "effect_model_count": "1",
                 "effect_wargear_count": "1",
                 "source_ids": _joined(_source_ids(row)),
             }
         )
+
+
+def _bridge_replacement_option(
+    *,
+    row: NormalizedSourceRow,
+    datasheet_id: str,
+    model_profile_id: str,
+    wargear_ids_by_name: dict[str, str],
+    match: re.Match[str],
+    bridged_rows: dict[str, list[dict[str, str]]],
+) -> None:
+    replaced_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("replaced"))
+    required_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("required"))
+    choice_names = _replacement_choice_names(match.group("choices"))
+    choice_wargear_ids = tuple(
+        _required_wargear_id(wargear_ids_by_name, choice_name) for choice_name in choice_names
+    )
+    source_line = _required_field(row, "line")
+    for choice_index, (choice_name, choice_wargear_id) in enumerate(
+        zip(choice_names, choice_wargear_ids, strict=True),
+        start=1,
+    ):
+        other_choice_ids = tuple(
+            other_id for other_id in choice_wargear_ids if other_id != choice_wargear_id
+        )
+        option_id = (
+            f"{datasheet_id}:{_slug(match.group('required'))}-{_slug(choice_name)}:"
+            f"option-{source_line}"
+        )
+        common_fields = {
+            "datasheet_id": datasheet_id,
+            "description": _raw_or_field(row, "description"),
+            "option_id": option_id,
+            "model_profile_id": model_profile_id,
+            "default_wargear_ids": "",
+            "allowed_wargear_ids": _joined((required_wargear_id, choice_wargear_id)),
+            "min_selections": "0",
+            "max_selections": "2",
+            "condition_kind": (
+                WargearOptionConditionKind.MODEL_NOT_EQUIPPED_WITH.value if other_choice_ids else ""
+            ),
+            "condition_wargear_ids": _joined(other_choice_ids),
+            "effect_model_count": "1",
+            "effect_wargear_count": "1",
+            "source_ids": _joined(_source_ids(row)),
+        }
+        bridged_rows["Datasheets_options"].append(
+            {
+                **common_fields,
+                "line": f"{source_line}.{choice_index}.1",
+                "effect_kind": WargearOptionEffectKind.REPLACE_WARGEAR.value,
+                "effect_wargear_id": required_wargear_id,
+                "effect_replaced_wargear_id": replaced_wargear_id,
+            }
+        )
+        bridged_rows["Datasheets_options"].append(
+            {
+                **common_fields,
+                "line": f"{source_line}.{choice_index}.2",
+                "effect_kind": WargearOptionEffectKind.ADD_WARGEAR.value,
+                "effect_wargear_id": choice_wargear_id,
+                "effect_replaced_wargear_id": "",
+            }
+        )
+
+
+def _replacement_choice_names(choices_text: str) -> tuple[str, ...]:
+    choice_names: list[str] = []
+    for line in choices_text.splitlines():
+        match = _OPTION_CHOICE_RE.fullmatch(line.strip())
+        if match is None:
+            raise WahapediaBridgeError("Unsupported replacement wargear choice row shape.")
+        choice_names.append(match.group("name"))
+    if not choice_names:
+        raise WahapediaBridgeError("Replacement wargear option has no choices.")
+    return tuple(choice_names)
 
 
 def _bridge_leader_links(
@@ -1267,6 +1380,7 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "condition_wargear_ids",
             "effect_kind",
             "effect_wargear_id",
+            "effect_replaced_wargear_id",
             "effect_model_count",
             "effect_wargear_count",
             "source_ids",
@@ -1823,6 +1937,37 @@ def _required_wargear_id(wargear_ids_by_name: dict[str, str], wargear_name: str)
     if wargear_id is None:
         raise WahapediaBridgeError("Wargear option references an unknown wargear item.")
     return wargear_id
+
+
+def _single_model_profile_id(composition_entries: tuple[_CompositionEntry, ...]) -> str:
+    if len(composition_entries) != 1:
+        raise WahapediaBridgeError("This-model wargear replacement requires one model profile.")
+    return composition_entries[0].model_profile_id
+
+
+def _loadout_wargear_name_keys(loadout: str) -> frozenset[str]:
+    stripped = " ".join(loadout.strip().split())
+    if not stripped:
+        return frozenset()
+    matches = tuple(_LOADOUT_RE.finditer(stripped))
+    if not matches:
+        raise WahapediaBridgeError("Unsupported datasheet loadout row shape.")
+    item_names = tuple(
+        item.strip() for match in matches for item in match.group("items").split(";")
+    )
+    if not item_names or any(not item_name for item_name in item_names):
+        raise WahapediaBridgeError("Datasheet loadout contains an empty wargear item.")
+    return frozenset(_name_key(item_name) for item_name in item_names)
+
+
+def _base_wargear_name(name: str) -> str:
+    match = _WEAPON_PROFILE_SUFFIX_RE.fullmatch(name)
+    return name if match is None else match.group("base")
+
+
+def _weapon_profile_name(name: str) -> str | None:
+    match = _WEAPON_PROFILE_SUFFIX_RE.fullmatch(name)
+    return None if match is None else match.group("profile")
 
 
 def _joined(values: tuple[str, ...]) -> str:

@@ -2676,17 +2676,14 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Bloodthirster",
             datasheet_id="000002582",
             source_basis="PDF pages 16-17; supersedes Wahapedia.",
-            ir_coverage="Bridge/catalog blocked",
+            ir_coverage="IR parsed; host needed",
             supported_semantics="Deep Strike and The Shadow of Chaos are consumed.",
             semantics_needed=(
                 "Deadly Demise descriptor consumer evidence; Daemon Lord of Khorne hit-roll "
                 "aura host; Greater Daemon of Khorne Shadow aura host; Relentless Carnage "
                 "end-of-Fight mortal wounds."
             ),
-            catalog_blockers=(
-                "Wargear option replacement row is not represented by current additive "
-                "wargear-option semantics."
-            ),
+            catalog_blockers="No known catalog blocker.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Flesh Hounds",

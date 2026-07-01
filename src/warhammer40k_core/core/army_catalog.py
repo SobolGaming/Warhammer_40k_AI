@@ -884,6 +884,14 @@ def _validate_datasheet_wargear_links(
             for wargear_id in (*option.default_wargear_ids, *option.allowed_wargear_ids):
                 if wargear_id not in wargear_ids:
                     raise ArmyCatalogError("ArmyCatalog datasheet references unknown wargear.")
+            for effect in option.effects:
+                if (
+                    effect.replaced_wargear_id is not None
+                    and effect.replaced_wargear_id not in wargear_ids
+                ):
+                    raise ArmyCatalogError(
+                        "ArmyCatalog datasheet replacement effect references unknown wargear."
+                    )
 
 
 def _validate_faction_rule_links(

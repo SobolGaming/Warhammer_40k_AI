@@ -468,6 +468,106 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
     assert package.to_payload() == type(package).from_payload(package.to_payload()).to_payload()
 
 
+def test_phase17k_bloodthirster_bridge_supports_replacement_wargear_loadouts() -> None:
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_bloodthirster_bridge_artifacts(),
+    )
+    datasheet = package.army_catalog.datasheet_by_id("000002582")
+    wargear_by_id = {wargear.wargear_id: wargear for wargear in package.army_catalog.wargear}
+    options_by_id = {option.option_id: option for option in datasheet.wargear_options}
+    model_profile_id = "000002582:bloodthirster"
+    hellfire_breath_id = "000002582:hellfire-breath"
+    great_axe_id = "000002582:great-axe-of-khorne"
+    axe_id = "000002582:axe-of-khorne"
+    bloodflail_id = "000002582:bloodflail"
+    lash_id = "000002582:lash-of-khorne"
+    bloodflail_option_id = "000002582:axe-of-khorne-bloodflail:option-1"
+    lash_option_id = "000002582:axe-of-khorne-lash-of-khorne:option-1"
+
+    assert wargear_by_id[great_axe_id].name == "Great axe of Khorne"
+    assert tuple(profile.name for profile in wargear_by_id[great_axe_id].weapon_profiles) == (
+        "Great axe of Khorne - strike",
+        "Great axe of Khorne - sweep",
+    )
+    assert tuple(profile.name for profile in wargear_by_id[axe_id].weapon_profiles) == (
+        "Axe of Khorne - strike",
+        "Axe of Khorne - sweep",
+    )
+    assert _resolved_bloodthirster_model_wargear(package, requested_selections=()) == (
+        hellfire_breath_id,
+        great_axe_id,
+    )
+
+    bloodflail_option = options_by_id[bloodflail_option_id]
+    lash_option = options_by_id[lash_option_id]
+    assert bloodflail_option.default_wargear_ids == ()
+    assert bloodflail_option.allowed_wargear_ids == (axe_id, bloodflail_id)
+    assert bloodflail_option.max_selections == 2
+    assert bloodflail_option.effects[0].kind is WargearOptionEffectKind.REPLACE_WARGEAR
+    assert bloodflail_option.effects[0].wargear_id == axe_id
+    assert bloodflail_option.effects[0].replaced_wargear_id == great_axe_id
+    assert bloodflail_option.effects[1].kind is WargearOptionEffectKind.ADD_WARGEAR
+    assert bloodflail_option.effects[1].wargear_id == bloodflail_id
+    assert (
+        bloodflail_option.conditions[0].kind is WargearOptionConditionKind.MODEL_NOT_EQUIPPED_WITH
+    )
+    assert bloodflail_option.conditions[0].wargear_ids == (lash_id,)
+
+    assert _resolved_bloodthirster_model_wargear(
+        package,
+        requested_selections=(
+            WargearSelection(
+                option_id=bloodflail_option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(axe_id, bloodflail_id),
+            ),
+        ),
+    ) == (hellfire_breath_id, axe_id, bloodflail_id)
+    assert _resolved_bloodthirster_model_wargear(
+        package,
+        requested_selections=(
+            WargearSelection(
+                option_id=lash_option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(axe_id, lash_id),
+            ),
+        ),
+    ) == (hellfire_breath_id, axe_id, lash_id)
+
+    with pytest.raises(ListValidationError, match="replacement count"):
+        resolve_wargear_selections(
+            catalog=package.army_catalog,
+            datasheet=datasheet,
+            requested_selections=(
+                WargearSelection(
+                    option_id=bloodflail_option_id,
+                    model_profile_id=model_profile_id,
+                    wargear_ids=(bloodflail_id,),
+                ),
+            ),
+        )
+    with pytest.raises(ListValidationError, match="structured wargear option condition"):
+        resolve_wargear_selections(
+            catalog=package.army_catalog,
+            datasheet=datasheet,
+            requested_selections=(
+                WargearSelection(
+                    option_id=bloodflail_option_id,
+                    model_profile_id=model_profile_id,
+                    wargear_ids=(axe_id, bloodflail_id),
+                ),
+                WargearSelection(
+                    option_id=lash_option_id,
+                    model_profile_id=model_profile_id,
+                    wargear_ids=(axe_id, lash_id),
+                ),
+            ),
+        )
+    assert lash_option.allowed_wargear_ids == (axe_id, lash_id)
+
+
 def test_phase17k_bloodcrushers_runtime_instances_manifest_model_wargear_and_abilities() -> None:
     package = build_canonical_catalog_package(
         package_id=_catalog_package_id(),
@@ -4167,7 +4267,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in chaos_daemons_markdown
     assert (
         "| Bloodthirster (`000002582`) | PDF pages 16-17; supersedes Wahapedia. | "
-        "Bridge/catalog blocked |"
+        "IR parsed; host needed |"
     ) in chaos_daemons_markdown
     assert (
         "| Skull Altar (`000001588`) | PDF pages 36-37; supersedes Wahapedia. | "
@@ -6032,6 +6132,33 @@ def _bloodcrushers_unit(
     )
 
 
+def _resolved_bloodthirster_model_wargear(
+    package: CanonicalCatalogPackage,
+    *,
+    requested_selections: tuple[WargearSelection, ...],
+) -> tuple[str, ...]:
+    datasheet = package.army_catalog.datasheet_by_id("000002582")
+    unit = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-khorne",
+        selection=UnitMusterSelection(
+            unit_selection_id="bloodthirster-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="000002582:bloodthirster",
+                    model_count=1,
+                ),
+            ),
+            wargear_selections=requested_selections,
+        ),
+        datasheet=datasheet,
+    )
+    return unit.own_models[0].wargear_ids
+
+
 def _flesh_hounds_unit(
     *,
     package: CanonicalCatalogPackage,
@@ -6893,6 +7020,24 @@ def _bloodcrushers_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
         source_artifacts=_wahapedia_source_artifacts(),
         bridge_package_id=_bridge_package_id(),
         datasheet_ids=("000001115",),
+    )
+
+
+def _bloodthirster_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000002582",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000002582",
+                model_name="Bloodthirster",
+                height=5.75,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:bloodthirster:height",
+                height_document_reference="Chaos Daemons Faction Pack p.16-17",
+            ),
+        ),
     )
 
 

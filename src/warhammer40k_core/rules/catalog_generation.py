@@ -81,6 +81,7 @@ class CatalogGenerationError(ValueError):
 
 SourceArtifact = WahapediaJsonArtifact | PatchedSourceArtifact | OverlaySourceArtifact
 
+_WEAPON_PROFILE_SUFFIX_RE = re.compile(r"^(?P<base>.+?)\s+-\s+(?P<profile>.+)$")
 _BASE_SIZE_BLOCKERS = frozenset(
     {
         "",
@@ -211,7 +212,7 @@ def _army_catalog_from_rows(
     option_rows = rows_by_table.get("Datasheets_options", ())
     ability_rows = rows_by_table.get("Datasheets_abilities", ())
     leader_rows = rows_by_table.get("Datasheets_leader", ())
-    wargear = tuple(_wargear_from_row(row) for row in wargear_rows)
+    wargear = _wargear_from_rows(wargear_rows)
     army_rules = tuple(_army_rule_from_faction_row(row) for row in faction_rows)
     factions = tuple(_faction_from_row(row) for row in faction_rows)
     geometry_by_profile_id = {record.model_profile_id: record for record in geometry_records}
@@ -280,7 +281,7 @@ def _datasheet_from_row(
                 for wargear_row in wargear_rows
                 for option in _default_wargear_options_from_row(wargear_row)
             ),
-            *tuple(_structured_wargear_option_from_row(row) for row in option_rows),
+            *_structured_wargear_options_from_rows(option_rows),
         ),
         abilities=tuple(_ability_descriptor_from_row(row) for row in ability_rows),
         damaged_effects=_damaged_effects_from_row(row),
@@ -382,10 +383,31 @@ def _default_wargear_options_from_row(
     return tuple(options)
 
 
-def _structured_wargear_option_from_row(row: NormalizedSourceRow) -> DatasheetWargearOption:
+def _structured_wargear_options_from_rows(
+    rows: tuple[NormalizedSourceRow, ...],
+) -> tuple[DatasheetWargearOption, ...]:
+    rows_by_option_id: dict[str, list[NormalizedSourceRow]] = {}
+    for row in rows:
+        option_id = _required_field(row=row, column_name="option_id")
+        rows_by_option_id.setdefault(option_id, []).append(row)
+    return tuple(
+        _structured_wargear_option_from_rows(tuple(option_rows))
+        for option_rows in rows_by_option_id.values()
+    )
+
+
+def _structured_wargear_option_from_rows(
+    rows: tuple[NormalizedSourceRow, ...],
+) -> DatasheetWargearOption:
+    if not rows:
+        raise CatalogGenerationError("Structured wargear option row group must not be empty.")
+    row = rows[0]
+    _validate_grouped_option_rows(rows)
     allowed_wargear_ids = _required_split_field(row=row, column_name="allowed_wargear_ids")
     conditions = _wargear_option_conditions_from_row(row)
-    effects = _wargear_option_effects_from_row(row)
+    effects = tuple(
+        effect for grouped_row in rows for effect in _wargear_option_effects_from_row(grouped_row)
+    )
     return DatasheetWargearOption(
         option_id=_required_field(row=row, column_name="option_id"),
         model_profile_id=_required_field(row=row, column_name="model_profile_id"),
@@ -393,20 +415,85 @@ def _structured_wargear_option_from_row(row: NormalizedSourceRow) -> DatasheetWa
         allowed_wargear_ids=allowed_wargear_ids,
         min_selections=_required_non_negative_int(row=row, column_name="min_selections"),
         max_selections=_required_positive_int(row=row, column_name="max_selections"),
-        source_ids=_source_ids_from_row(row),
+        source_ids=_deduplicated_ids(
+            tuple(
+                source_id for grouped_row in rows for source_id in _source_ids_from_row(grouped_row)
+            )
+        ),
         conditions=conditions,
         effects=effects,
     )
 
 
-def _wargear_from_row(row: NormalizedSourceRow) -> Wargear:
-    profile_id = _optional_field(row=row, column_name="weapon_profile_id")
+def _wargear_from_rows(rows: tuple[NormalizedSourceRow, ...]) -> tuple[Wargear, ...]:
+    rows_by_wargear_id: dict[str, list[NormalizedSourceRow]] = {}
+    for row in rows:
+        wargear_id = _required_field(row=row, column_name="wargear_id")
+        rows_by_wargear_id.setdefault(wargear_id, []).append(row)
+    return tuple(
+        _wargear_from_row_group(tuple(wargear_rows)) for wargear_rows in rows_by_wargear_id.values()
+    )
+
+
+def _wargear_from_row_group(rows: tuple[NormalizedSourceRow, ...]) -> Wargear:
+    if not rows:
+        raise CatalogGenerationError("Wargear row group must not be empty.")
+    row = rows[0]
+    _validate_grouped_wargear_rows(rows)
     return Wargear(
         wargear_id=_required_field(row=row, column_name="wargear_id"),
-        name=_required_field(row=row, column_name="name"),
-        weapon_profiles=() if profile_id is None else (_weapon_profile_from_row(row),),
-        source_ids=_source_ids_from_row(row),
+        name=_base_wargear_name(_required_field(row=row, column_name="name")),
+        weapon_profiles=tuple(
+            _weapon_profile_from_row(grouped_row)
+            for grouped_row in rows
+            if _optional_field(row=grouped_row, column_name="weapon_profile_id") is not None
+        ),
+        source_ids=_deduplicated_ids(
+            tuple(
+                source_id for grouped_row in rows for source_id in _source_ids_from_row(grouped_row)
+            )
+        ),
     )
+
+
+def _validate_grouped_wargear_rows(rows: tuple[NormalizedSourceRow, ...]) -> None:
+    first = rows[0]
+    expected_wargear_id = _required_field(row=first, column_name="wargear_id")
+    expected_name = _base_wargear_name(_required_field(row=first, column_name="name"))
+    for row in rows[1:]:
+        if _required_field(row=row, column_name="wargear_id") != expected_wargear_id:
+            raise CatalogGenerationError("Grouped wargear rows must share wargear_id.")
+        if _base_wargear_name(_required_field(row=row, column_name="name")) != expected_name:
+            raise CatalogGenerationError("Grouped wargear rows must share base wargear name.")
+
+
+def _validate_grouped_option_rows(rows: tuple[NormalizedSourceRow, ...]) -> None:
+    first = rows[0]
+    grouped_columns = (
+        "option_id",
+        "model_profile_id",
+        "default_wargear_ids",
+        "allowed_wargear_ids",
+        "min_selections",
+        "max_selections",
+        "condition_kind",
+        "condition_wargear_ids",
+    )
+    expected = {
+        column_name: _optional_field(row=first, column_name=column_name)
+        for column_name in grouped_columns
+    }
+    for row in rows[1:]:
+        for column_name, expected_value in expected.items():
+            if _optional_field(row=row, column_name=column_name) != expected_value:
+                raise CatalogGenerationError(
+                    "Grouped wargear option rows must share option metadata."
+                )
+
+
+def _base_wargear_name(name: str) -> str:
+    match = _WEAPON_PROFILE_SUFFIX_RE.fullmatch(name)
+    return name if match is None else match.group("base")
 
 
 def _weapon_profile_from_row(row: NormalizedSourceRow) -> WeaponProfile:
@@ -477,6 +564,7 @@ def _wargear_option_effects_from_row(
             wargear_id=_required_field(row=row, column_name="effect_wargear_id"),
             model_count=_required_positive_int(row=row, column_name="effect_model_count"),
             wargear_count=_required_positive_int(row=row, column_name="effect_wargear_count"),
+            replaced_wargear_id=_optional_field(row=row, column_name="effect_replaced_wargear_id"),
         ),
     )
 
