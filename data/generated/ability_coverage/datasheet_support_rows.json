@@ -8,7 +8,7 @@
       "chaos-daemons-bridge-catalog/000001115/wargear/000001115:instrument-of-chaos/000001115:instrument-of-chaos"
     ],
     "catalog_status": "Full",
-    "datasheet_ability_status": "Blocked",
+    "datasheet_ability_status": "Full",
     "datasheet_id": "000001115",
     "datasheet_name": "Bloodcrushers",
     "detachment_ids": [
@@ -25,15 +25,15 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "`000001115:brass-stampede` Brass Stampede: diagnostics `unsupported_language` `000001115:brass-stampede` Brass Stampede: `ir_compiled_unsupported` Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
-    "overall": "Blocked",
+    "notes": "Faction army rule consumed; detachment support 4/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `shadow-legion`.",
+    "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
       "cavalcade-of-chaos",
       "daemonic-incursion",
       "shadow-legion"
     ],
-    "tests_evidence": "Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:leadership-characteristic-query`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:leadership-characteristic-query`, `catalog-ir:unit-move-completed-mortal-wounds`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },

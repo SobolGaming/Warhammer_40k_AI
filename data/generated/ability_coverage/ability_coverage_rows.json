@@ -195,20 +195,20 @@
     "ability_id": "000001115:brass-stampede",
     "ability_name": "Brass Stampede",
     "catalog_id": "chaos-daemons-bridge-catalog",
-    "catalog_support": "unsupported",
+    "catalog_support": "generic_rule_ir",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none",
     "datasheet_id": "000001115",
     "datasheet_name": "Bloodcrushers",
-    "diagnostic_reasons": [
-      "unsupported_language"
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:unit-move-completed-mortal-wounds"
     ],
-    "runtime_consumer_ids": [],
     "semantic_categories": [
-      "unknown.ability_text"
+      "datasheet.rule_ir.inflict_mortal_wounds.enemy_unit"
     ],
     "source_kind": "datasheet",
     "source_wargear_id": null,
-    "support_stage": "ir_compiled_unsupported"
+    "support_stage": "engine_consumed"
   },
   {
     "ability_id": "000008433",

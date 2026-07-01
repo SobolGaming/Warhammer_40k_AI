@@ -7,7 +7,11 @@ from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
-from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    RerollComponentSelectionPolicy,
+    RerollPermission,
+)
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.core.wargear import Wargear
@@ -38,7 +42,11 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedHookBinding,
     successful_hit_target_unit_ids_for_sequence,
 )
-from warhammer40k_core.engine.battlefield_state import PlacementError
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldScenario,
+    PlacementError,
+    geometry_model_for_placement,
+)
 from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
     DestructionReactionSource,
@@ -65,7 +73,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
@@ -85,6 +93,12 @@ from warhammer40k_core.engine.unit_abilities import (
     fights_first_source_id_for_unit,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.unit_move_completed_hooks import (
+    UnitMoveCompletedContext,
+    UnitMoveCompletedMortalWoundEffect,
+    UnitMoveCompletedMortalWoundHookBinding,
+)
+from warhammer40k_core.geometry.volume import Model as GeometryModel
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleCondition,
@@ -132,6 +146,9 @@ CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-woun
 CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID = "catalog-ir:weapon-keyword-grant"
 CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID = "catalog-ir:named-weapon-ability-choice"
 CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID = "catalog-ir:post-shoot-hit-target-status"
+CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID = (
+    "catalog-ir:unit-move-completed-mortal-wounds"
+)
 CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-advance-and-charge"
 CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-fallback-and-charge"
 CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID = "catalog-ir:can-fallback-and-shoot"
@@ -146,6 +163,9 @@ CATALOG_POST_SHOOT_HIT_TARGET_STATUS_EFFECT_KIND = "catalog_post_shoot_hit_targe
 CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SELECTED_EVENT = (
     "catalog_post_shoot_hit_target_status_selected"
 )
+CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_SELECTED_EVENT = (
+    "catalog_unit_move_completed_mortal_wounds_target_selected"
+)
 SELECT_CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SUBMISSION_KIND = (
     "select_catalog_named_weapon_ability_choice"
 )
@@ -154,6 +174,12 @@ SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE = (
 )
 SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SUBMISSION_KIND = (
     "select_catalog_post_shoot_hit_target_status"
+)
+SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE = (
+    "select_catalog_unit_move_completed_mortal_wounds_target"
+)
+SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_SUBMISSION_KIND = (
+    "select_catalog_unit_move_completed_mortal_wounds_target"
 )
 DEADLY_DEMISE_TRIGGER_ROLL_THRESHOLD = 6
 DEADLY_DEMISE_RANGE_INCHES = 6.0
@@ -646,6 +672,116 @@ class CatalogPostShootHitTargetStatusGroup:
 
 
 @dataclass(frozen=True, slots=True)
+class CatalogUnitMoveCompletedMortalWoundsTargetOption:
+    option_id: str
+    target_unit_instance_id: str
+    target_player_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "option_id", _validate_identifier("option_id", self.option_id))
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier("target_unit_instance_id", self.target_unit_instance_id),
+        )
+        object.__setattr__(
+            self,
+            "target_player_id",
+            _validate_identifier("target_player_id", self.target_player_id),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogUnitMoveCompletedMortalWoundsGroup:
+    record: AbilityCatalogRecord
+    source_unit: UnitInstance
+    source_rules_unit_instance_id: str
+    player_id: str
+    clause: RuleClause
+    effect_index: int
+    roll_threshold: int
+    mortal_wounds_expression: DiceExpression
+    roll_model_instance_ids: tuple[str, ...]
+    trigger_event_id: str
+    movement_action: str
+    options: tuple[CatalogUnitMoveCompletedMortalWoundsTargetOption, ...]
+
+    def __post_init__(self) -> None:
+        if type(self.record) is not AbilityCatalogRecord:
+            raise GameLifecycleError("Catalog move-completed mortal wounds requires a record.")
+        _validate_unit(self.source_unit)
+        object.__setattr__(
+            self,
+            "source_rules_unit_instance_id",
+            _validate_identifier(
+                "source_rules_unit_instance_id",
+                self.source_rules_unit_instance_id,
+            ),
+        )
+        object.__setattr__(self, "player_id", _validate_identifier("player_id", self.player_id))
+        if type(self.clause) is not RuleClause:
+            raise GameLifecycleError("Catalog move-completed mortal wounds requires a clause.")
+        if type(self.effect_index) is not int or self.effect_index < 0:
+            raise GameLifecycleError(
+                "Catalog move-completed mortal wounds effect_index must be non-negative."
+            )
+        if (
+            type(self.roll_threshold) is not int
+            or self.roll_threshold < 2
+            or self.roll_threshold > 6
+        ):
+            raise GameLifecycleError(
+                "Catalog move-completed mortal wounds roll_threshold must be 2-6."
+            )
+        if type(self.mortal_wounds_expression) is not DiceExpression:
+            raise GameLifecycleError(
+                "Catalog move-completed mortal wounds requires DiceExpression."
+            )
+        object.__setattr__(
+            self,
+            "roll_model_instance_ids",
+            _validate_current_model_instance_ids(self.roll_model_instance_ids),
+        )
+        object.__setattr__(
+            self,
+            "trigger_event_id",
+            _validate_identifier("trigger_event_id", self.trigger_event_id),
+        )
+        object.__setattr__(
+            self,
+            "movement_action",
+            _validate_identifier("movement_action", self.movement_action),
+        )
+        if type(self.options) is not tuple or not self.options:
+            raise GameLifecycleError(
+                "Catalog move-completed mortal wounds requires target options."
+            )
+        options = tuple(
+            _validate_unit_move_completed_mortal_wounds_target_option(option)
+            for option in self.options
+        )
+        if len({option.option_id for option in options}) != len(options):
+            raise GameLifecycleError(
+                "Catalog move-completed mortal wounds options must not duplicate IDs."
+            )
+        object.__setattr__(
+            self,
+            "options",
+            tuple(sorted(options, key=lambda option: option.option_id)),
+        )
+
+    @property
+    def sort_key(self) -> tuple[str, str, str, int, str]:
+        return (
+            self.source_rules_unit_instance_id,
+            self.record.record_id,
+            self.clause.clause_id,
+            self.effect_index,
+            self.trigger_event_id,
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class CatalogWeaponKeywordGrantRuntime:
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
     armies: tuple[ArmyDefinition, ...]
@@ -972,6 +1108,174 @@ class CatalogPostShootHitTargetStatusRuntime:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class CatalogUnitMoveCompletedMortalWoundsRuntime:
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
+    armies: tuple[ArmyDefinition, ...]
+
+    def __post_init__(self) -> None:
+        indexes = _validate_ability_index_mapping(self.ability_indexes_by_player_id)
+        armies = _validate_armies(self.armies)
+        missing_ids = {army.player_id for army in armies} - set(indexes)
+        if missing_ids:
+            raise GameLifecycleError(
+                "Catalog move-completed mortal wounds missing player ability index."
+            )
+        object.__setattr__(self, "ability_indexes_by_player_id", MappingProxyType(dict(indexes)))
+        object.__setattr__(self, "armies", armies)
+
+    def bindings(self) -> tuple[UnitMoveCompletedMortalWoundHookBinding, ...]:
+        if not _has_catalog_unit_move_completed_mortal_wounds_records(
+            self.ability_indexes_by_player_id
+        ):
+            return ()
+        return (
+            UnitMoveCompletedMortalWoundHookBinding(
+                hook_id=CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
+                source_id=CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
+                handler=self.effect_handler,
+                request_handler=self.request_handler,
+            ),
+        )
+
+    def request_handler(self, context: UnitMoveCompletedContext) -> LifecycleStatus | None:
+        if type(context) is not UnitMoveCompletedContext:
+            raise GameLifecycleError("Catalog move-completed mortal wounds requires context.")
+        decisions = _unit_move_completed_decisions(context)
+        groups = _available_catalog_unit_move_completed_mortal_wounds_groups(
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            armies=self.armies,
+            context=context,
+        )
+        if not groups:
+            return None
+        selected_group_keys = _selected_unit_move_completed_mortal_wounds_group_keys(decisions)
+        unresolved_groups = tuple(
+            group
+            for group in groups
+            if _unit_move_completed_mortal_wounds_group_key(group) not in selected_group_keys
+        )
+        if not unresolved_groups:
+            return None
+        group = unresolved_groups[0]
+        request = DecisionRequest(
+            request_id=context.state.next_decision_request_id(),
+            decision_type=SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
+            actor_id=context.triggering_player_id,
+            payload=validate_json_value(
+                _unit_move_completed_mortal_wounds_target_request_payload(
+                    state=context.state,
+                    group=group,
+                )
+            ),
+            options=tuple(
+                DecisionOption(
+                    option_id=option.option_id,
+                    label=_unit_move_completed_mortal_wounds_target_option_label(option),
+                    payload=validate_json_value(
+                        _unit_move_completed_mortal_wounds_target_option_payload(
+                            state=context.state,
+                            group=group,
+                            option=option,
+                        )
+                    ),
+                )
+                for option in group.options
+            ),
+        )
+        decisions.request_decision(request)
+        decisions.event_log.append(
+            "catalog_unit_move_completed_mortal_wounds_target_requested",
+            validate_json_value(
+                {
+                    "game_id": context.state.game_id,
+                    "battle_round": context.state.battle_round,
+                    "phase": BattlePhase.CHARGE.value,
+                    "active_player_id": context.state.active_player_id,
+                    "player_id": context.triggering_player_id,
+                    "hook_id": CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
+                    "request_id": request.request_id,
+                    "catalog_record_id": group.record.record_id,
+                    "source_rule_id": group.record.definition.source_id,
+                    "source_rules_unit_instance_id": group.source_rules_unit_instance_id,
+                    "source_unit_instance_id": group.source_unit.unit_instance_id,
+                    "clause_id": group.clause.clause_id,
+                    "effect_index": group.effect_index,
+                    "trigger_event_id": group.trigger_event_id,
+                    "movement_action": group.movement_action,
+                    "available_target_unit_instance_ids": [
+                        option.target_unit_instance_id for option in group.options
+                    ],
+                    "phase_body_status": (
+                        "catalog_unit_move_completed_mortal_wounds_target_pending"
+                    ),
+                }
+            ),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=request,
+            payload=validate_json_value(
+                {
+                    "phase": BattlePhase.CHARGE.value,
+                    "battle_round": context.state.battle_round,
+                    "active_player_id": context.state.active_player_id,
+                    "player_id": context.triggering_player_id,
+                    "pending_request_id": request.request_id,
+                    "phase_body_status": (
+                        "catalog_unit_move_completed_mortal_wounds_target_pending"
+                    ),
+                }
+            ),
+        )
+
+    def effect_handler(
+        self,
+        context: UnitMoveCompletedContext,
+    ) -> tuple[UnitMoveCompletedMortalWoundEffect, ...]:
+        if type(context) is not UnitMoveCompletedContext:
+            raise GameLifecycleError("Catalog move-completed mortal wounds requires context.")
+        decisions = _unit_move_completed_decisions(context)
+        selected_targets = _selected_unit_move_completed_mortal_wounds_targets(decisions)
+        if not selected_targets:
+            return ()
+        effects: list[UnitMoveCompletedMortalWoundEffect] = []
+        for group in _available_catalog_unit_move_completed_mortal_wounds_groups(
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            armies=self.armies,
+            context=context,
+        ):
+            selected = selected_targets.get(_unit_move_completed_mortal_wounds_group_key(group))
+            if selected is None:
+                continue
+            option_by_target = {option.target_unit_instance_id: option for option in group.options}
+            option = option_by_target.get(selected.target_unit_instance_id)
+            if option is None:
+                raise GameLifecycleError(
+                    "Catalog move-completed mortal wounds selected target drifted."
+                )
+            for roll_model_id in group.roll_model_instance_ids:
+                effects.append(
+                    UnitMoveCompletedMortalWoundEffect(
+                        hook_id=CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
+                        source_id=CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
+                        source_rule_id=group.record.definition.source_id,
+                        target_unit_instance_id=option.target_unit_instance_id,
+                        target_player_id=option.target_player_id,
+                        rolling_player_id=context.triggering_player_id,
+                        trigger_event_id=context.trigger_event_id,
+                        roll_threshold=group.roll_threshold,
+                        mortal_wounds_expression=group.mortal_wounds_expression,
+                        replay_payload=_unit_move_completed_mortal_wounds_effect_payload(
+                            group=group,
+                            option=option,
+                            roll_model_instance_id=roll_model_id,
+                        ),
+                    )
+                )
+        return tuple(effects)
+
+
 def catalog_advance_eligibility_hook_bindings(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
@@ -1016,6 +1320,17 @@ def catalog_post_shoot_hit_target_status_hook_bindings(
     ).bindings()
 
 
+def catalog_unit_move_completed_mortal_wound_hook_bindings(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[UnitMoveCompletedMortalWoundHookBinding, ...]:
+    return CatalogUnitMoveCompletedMortalWoundsRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
+    ).bindings()
+
+
 def catalog_weapon_profile_modifier_bindings(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
@@ -1044,6 +1359,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
         CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
         CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
+        CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
     }
     for characteristic in Characteristic:
         hook_ids.add(_catalog_ir_characteristic_query_consumer_id(characteristic))
@@ -1479,6 +1795,142 @@ def _available_catalog_post_shoot_hit_target_status_groups(
     return tuple(sorted(groups, key=lambda group: group.sort_key))
 
 
+def _available_catalog_unit_move_completed_mortal_wounds_groups(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+    context: UnitMoveCompletedContext,
+) -> tuple[CatalogUnitMoveCompletedMortalWoundsGroup, ...]:
+    if type(context) is not UnitMoveCompletedContext:
+        raise GameLifecycleError("Catalog move-completed mortal wounds requires context.")
+    if (
+        context.completed_phase is not BattlePhase.CHARGE
+        or context.movement_action != "charge_move"
+    ):
+        return ()
+    source_rules_unit = rules_unit_view_by_id(
+        state=context.state,
+        unit_instance_id=context.triggering_unit_instance_id,
+    )
+    if source_rules_unit.owner_player_id != context.triggering_player_id:
+        raise GameLifecycleError("Catalog move-completed mortal wounds source owner drifted.")
+    index = ability_indexes_by_player_id.get(context.triggering_player_id)
+    if index is None:
+        raise GameLifecycleError("Catalog move-completed mortal wounds index is missing player.")
+    source_roll_model_ids = _placed_alive_model_instance_ids_for_rules_unit(
+        state=context.state,
+        rules_unit_instance_id=source_rules_unit.unit_instance_id,
+    )
+    if not source_roll_model_ids:
+        return ()
+    target_candidates = _unit_move_completed_mortal_wounds_target_candidates(
+        state=context.state,
+        ruleset_descriptor=context.ruleset_descriptor,
+        source_rules_unit_instance_id=source_rules_unit.unit_instance_id,
+    )
+    if not target_candidates:
+        return ()
+    source_roll_model_id_set = frozenset(source_roll_model_ids)
+    groups: list[CatalogUnitMoveCompletedMortalWoundsGroup] = []
+    for component in source_rules_unit.components:
+        component_model_ids = tuple(
+            sorted(
+                model.model_instance_id
+                for model in component.unit.own_models
+                if model.is_alive and model.model_instance_id in source_roll_model_id_set
+            )
+        )
+        if not component_model_ids:
+            continue
+        for record in _unit_scoped_generic_records(
+            ability_index=index,
+            unit=component.unit,
+            current_model_instance_ids=component_model_ids,
+            trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+        ):
+            for clause in _clauses_from_record(record):
+                group = _catalog_unit_move_completed_mortal_wounds_group_from_clause(
+                    context=context,
+                    record=record,
+                    source_unit=component.unit,
+                    source_rules_unit_instance_id=source_rules_unit.unit_instance_id,
+                    roll_model_instance_ids=source_roll_model_ids,
+                    target_candidates=target_candidates,
+                    clause=clause,
+                )
+                if group is not None:
+                    groups.append(group)
+    return tuple(sorted(groups, key=lambda group: group.sort_key))
+
+
+def _catalog_unit_move_completed_mortal_wounds_group_from_clause(
+    *,
+    context: UnitMoveCompletedContext,
+    record: AbilityCatalogRecord,
+    source_unit: UnitInstance,
+    source_rules_unit_instance_id: str,
+    roll_model_instance_ids: tuple[str, ...],
+    target_candidates: tuple[tuple[str, str], ...],
+    clause: RuleClause,
+) -> CatalogUnitMoveCompletedMortalWoundsGroup | None:
+    if type(context) is not UnitMoveCompletedContext:
+        raise GameLifecycleError("Catalog move-completed mortal wounds requires context.")
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog move-completed mortal wounds requires a record.")
+    _validate_unit(source_unit)
+    source_rules_unit_id = _validate_identifier(
+        "source_rules_unit_instance_id",
+        source_rules_unit_instance_id,
+    )
+    roll_model_ids = _validate_current_model_instance_ids(roll_model_instance_ids)
+    if type(target_candidates) is not tuple:
+        raise GameLifecycleError("Catalog move-completed mortal wounds targets must be a tuple.")
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog move-completed mortal wounds requires a clause.")
+    if not _clause_is_supported_unit_move_completed_mortal_wounds(clause):
+        return None
+    supported_effects = tuple(
+        (effect_index, effect)
+        for effect_index, effect in enumerate(clause.effects)
+        if _effect_is_supported_unit_move_completed_mortal_wounds(effect)
+    )
+    if len(supported_effects) != 1:
+        raise GameLifecycleError(
+            "Catalog move-completed mortal wounds requires one supported effect."
+        )
+    effect_index, effect = supported_effects[0]
+    parameters = parameter_payload(effect.parameters)
+    return CatalogUnitMoveCompletedMortalWoundsGroup(
+        record=record,
+        source_unit=source_unit,
+        source_rules_unit_instance_id=source_rules_unit_id,
+        player_id=context.triggering_player_id,
+        clause=clause,
+        effect_index=effect_index,
+        roll_threshold=_int_parameter(parameters, key="success_threshold"),
+        mortal_wounds_expression=_catalog_mortal_wounds_dice_expression(
+            _string_parameter(parameters, key="mortal_wounds_expression")
+        ),
+        roll_model_instance_ids=roll_model_ids,
+        trigger_event_id=context.trigger_event_id,
+        movement_action=context.movement_action,
+        options=tuple(
+            CatalogUnitMoveCompletedMortalWoundsTargetOption(
+                option_id=_unit_move_completed_mortal_wounds_target_option_id(
+                    record=record,
+                    source_rules_unit_instance_id=source_rules_unit_id,
+                    clause=clause,
+                    effect_index=effect_index,
+                    target_unit_instance_id=target_unit_id,
+                ),
+                target_unit_instance_id=target_unit_id,
+                target_player_id=target_player_id,
+            )
+            for target_unit_id, target_player_id in target_candidates
+        ),
+    )
+
+
 def _catalog_post_shoot_hit_target_status_groups_from_clause(
     *,
     context: AttackSequenceCompletedContext,
@@ -1656,6 +2108,106 @@ def _post_shoot_hit_target_status_target_is_eligible(
     return target.owner_player_id != attacker_id and bool(target.alive_models())
 
 
+def _unit_move_completed_mortal_wounds_target_candidates(
+    *,
+    state: GameState,
+    ruleset_descriptor: RulesetDescriptor,
+    source_rules_unit_instance_id: str,
+) -> tuple[tuple[str, str], ...]:
+    _validate_game_state(state)
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Catalog move-completed mortal wounds requires ruleset.")
+    source_rules_unit_id = _validate_identifier(
+        "source_rules_unit_instance_id",
+        source_rules_unit_instance_id,
+    )
+    source_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=source_rules_unit_id,
+    )
+    source_models = _placed_alive_geometry_models_for_rules_unit(
+        state=state,
+        rules_unit_instance_id=source_rules_unit.unit_instance_id,
+    )
+    if not source_models:
+        return ()
+    candidates: list[tuple[str, str]] = []
+    for target_rules_unit in _rules_unit_views_for_other_players(
+        state=state,
+        player_id=source_rules_unit.owner_player_id,
+    ):
+        target_models = _placed_alive_geometry_models_for_rules_unit(
+            state=state,
+            rules_unit_instance_id=target_rules_unit.unit_instance_id,
+        )
+        if not target_models:
+            continue
+        if any(
+            source_model.is_within_engagement_range(
+                target_model,
+                horizontal_inches=ruleset_descriptor.engagement_policy.horizontal_inches,
+                vertical_inches=ruleset_descriptor.engagement_policy.vertical_inches,
+            )
+            for source_model in source_models
+            for target_model in target_models
+        ):
+            candidates.append(
+                (
+                    target_rules_unit.unit_instance_id,
+                    target_rules_unit.owner_player_id,
+                )
+            )
+    return tuple(sorted(candidates))
+
+
+def _unit_move_completed_mortal_wounds_target_is_eligible(
+    *,
+    state: GameState,
+    ruleset_descriptor: RulesetDescriptor,
+    source_rules_unit_instance_id: str,
+    target_unit_instance_id: str,
+    target_player_id: str,
+) -> bool:
+    target_unit_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    target_player = _validate_identifier("target_player_id", target_player_id)
+    return (
+        target_unit_id,
+        target_player,
+    ) in _unit_move_completed_mortal_wounds_target_candidates(
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+        source_rules_unit_instance_id=source_rules_unit_instance_id,
+    )
+
+
+def _unit_move_completed_mortal_wounds_target_option_id(
+    *,
+    record: AbilityCatalogRecord,
+    source_rules_unit_instance_id: str,
+    clause: RuleClause,
+    effect_index: int,
+    target_unit_instance_id: str,
+) -> str:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog move-completed mortal wounds requires a record.")
+    source_rules_unit_id = _validate_identifier(
+        "source_rules_unit_instance_id",
+        source_rules_unit_instance_id,
+    )
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog move-completed mortal wounds requires a clause.")
+    if type(effect_index) is not int or effect_index < 0:
+        raise GameLifecycleError(
+            "Catalog move-completed mortal wounds effect_index must be non-negative."
+        )
+    target_unit_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    return (
+        f"{CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID}:"
+        f"{source_rules_unit_id}:{record.record_id}:{clause.clause_id}:"
+        f"effect-{effect_index:03d}:target-{target_unit_id}"
+    )
+
+
 def _post_shoot_hit_target_status_option_id(
     *,
     record: AbilityCatalogRecord,
@@ -1773,6 +2325,92 @@ def _current_placed_alive_model_instance_ids_for_unit(
             if model.is_alive and model.model_instance_id in placed_model_ids
         )
     )
+
+
+def _placed_alive_model_instance_ids_for_rules_unit(
+    *,
+    state: GameState,
+    rules_unit_instance_id: str,
+) -> tuple[str, ...]:
+    _validate_game_state(state)
+    rules_unit_id = _validate_identifier("rules_unit_instance_id", rules_unit_instance_id)
+    if state.battlefield_state is None:
+        return ()
+    placed_model_ids = frozenset(state.battlefield_state.placed_model_ids())
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=rules_unit_id)
+    return tuple(
+        sorted(
+            model.model_instance_id
+            for model in rules_unit.alive_models()
+            if model.model_instance_id in placed_model_ids
+        )
+    )
+
+
+def _placed_alive_geometry_models_for_rules_unit(
+    *,
+    state: GameState,
+    rules_unit_instance_id: str,
+) -> tuple[GeometryModel, ...]:
+    _validate_game_state(state)
+    rules_unit_id = _validate_identifier("rules_unit_instance_id", rules_unit_instance_id)
+    if state.battlefield_state is None:
+        return ()
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    model_by_id = {
+        model.model_instance_id: model
+        for model in rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=rules_unit_id,
+        ).alive_models()
+    }
+    models: list[GeometryModel] = []
+    for model_id in _placed_alive_model_instance_ids_for_rules_unit(
+        state=state,
+        rules_unit_instance_id=rules_unit_id,
+    ):
+        placement = state.battlefield_state.model_placement_by_id(model_id)
+        model = model_by_id.get(model_id)
+        if model is None:
+            raise GameLifecycleError(
+                "Catalog move-completed mortal wounds model placement drifted."
+            )
+        if scenario.model_instance_for_placement(placement).model_instance_id != model_id:
+            raise GameLifecycleError(
+                "Catalog move-completed mortal wounds placement references wrong model."
+            )
+        models.append(geometry_model_for_placement(model=model, placement=placement))
+    return tuple(models)
+
+
+def _rules_unit_views_for_other_players(
+    *,
+    state: GameState,
+    player_id: str,
+) -> tuple[RulesUnitView, ...]:
+    _validate_game_state(state)
+    owning_player_id = _validate_identifier("player_id", player_id)
+    views: list[RulesUnitView] = []
+    for army in state.army_definitions:
+        if army.player_id == owning_player_id:
+            continue
+        attached_component_ids: set[str] = set()
+        for attached_unit in army.attached_units:
+            views.append(
+                rules_unit_view_by_id(
+                    state=state,
+                    unit_instance_id=attached_unit.attached_unit_instance_id,
+                )
+            )
+            attached_component_ids.update(attached_unit.component_unit_instance_ids)
+        for unit in army.units:
+            if unit.unit_instance_id in attached_component_ids:
+                continue
+            views.append(rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id))
+    return tuple(sorted(views, key=lambda view: view.unit_instance_id))
 
 
 def _catalog_named_weapon_ability_choice_group_resolved(
@@ -1933,7 +2571,119 @@ def _post_shoot_hit_target_status_option_label(
     return f"Deny {group.status_label} to {option.target_unit_instance_id}"
 
 
+def _unit_move_completed_mortal_wounds_target_request_payload(
+    *,
+    state: GameState,
+    group: CatalogUnitMoveCompletedMortalWoundsGroup,
+) -> dict[str, object]:
+    return {
+        **_unit_move_completed_mortal_wounds_target_base_payload(state=state, group=group),
+        "available_target_unit_instance_ids": [
+            option.target_unit_instance_id for option in group.options
+        ],
+        "available_unit_move_completed_mortal_wounds_target_options": [
+            _unit_move_completed_mortal_wounds_target_selection_payload(option)
+            for option in group.options
+        ],
+    }
+
+
+def _unit_move_completed_mortal_wounds_target_option_payload(
+    *,
+    state: GameState,
+    group: CatalogUnitMoveCompletedMortalWoundsGroup,
+    option: CatalogUnitMoveCompletedMortalWoundsTargetOption,
+) -> dict[str, object]:
+    return {
+        **_unit_move_completed_mortal_wounds_target_base_payload(state=state, group=group),
+        "selected_unit_move_completed_mortal_wounds_target": (
+            _unit_move_completed_mortal_wounds_target_selection_payload(option)
+        ),
+    }
+
+
+def _unit_move_completed_mortal_wounds_target_base_payload(
+    *,
+    state: GameState,
+    group: CatalogUnitMoveCompletedMortalWoundsGroup,
+) -> dict[str, object]:
+    return {
+        "submission_kind": (
+            SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_SUBMISSION_KIND
+        ),
+        "hook_id": CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "phase": BattlePhase.CHARGE.value,
+        "active_player_id": state.active_player_id,
+        "player_id": group.player_id,
+        "catalog_record_id": group.record.record_id,
+        "ability_id": group.record.definition.ability_id,
+        "ability_name": group.record.definition.name,
+        "source_rule_id": group.record.definition.source_id,
+        "source_rules_unit_instance_id": group.source_rules_unit_instance_id,
+        "source_unit_instance_id": group.source_unit.unit_instance_id,
+        "clause_id": group.clause.clause_id,
+        "effect_index": group.effect_index,
+        "roll_threshold": group.roll_threshold,
+        "roll_expression": "D6",
+        "roll_count_scope": "each_model_in_this_unit",
+        "mortal_wounds_expression": group.mortal_wounds_expression.canonical(),
+        "roll_model_instance_ids": list(group.roll_model_instance_ids),
+        "trigger_event_id": group.trigger_event_id,
+        "movement_action": group.movement_action,
+    }
+
+
+def _unit_move_completed_mortal_wounds_target_selection_payload(
+    option: CatalogUnitMoveCompletedMortalWoundsTargetOption,
+) -> dict[str, object]:
+    return {
+        "option_id": option.option_id,
+        "target_unit_instance_id": option.target_unit_instance_id,
+        "target_player_id": option.target_player_id,
+    }
+
+
+def _unit_move_completed_mortal_wounds_target_option_label(
+    option: CatalogUnitMoveCompletedMortalWoundsTargetOption,
+) -> str:
+    return f"Inflict mortal wounds on {option.target_unit_instance_id}"
+
+
+def _unit_move_completed_mortal_wounds_effect_payload(
+    *,
+    group: CatalogUnitMoveCompletedMortalWoundsGroup,
+    option: CatalogUnitMoveCompletedMortalWoundsTargetOption,
+    roll_model_instance_id: str,
+) -> JsonValue:
+    roll_model_id = _validate_identifier("roll_model_instance_id", roll_model_instance_id)
+    return validate_json_value(
+        {
+            "effect_kind": "catalog_unit_move_completed_mortal_wounds",
+            "catalog_record_id": group.record.record_id,
+            "ability_id": group.record.definition.ability_id,
+            "ability_name": group.record.definition.name,
+            "catalog_source_rule_id": group.record.definition.source_id,
+            "player_id": group.player_id,
+            "source_rules_unit_instance_id": group.source_rules_unit_instance_id,
+            "source_unit_instance_id": group.source_unit.unit_instance_id,
+            "clause_id": group.clause.clause_id,
+            "effect_index": group.effect_index,
+            "roll_model_instance_id": roll_model_id,
+            "roll_threshold": group.roll_threshold,
+            "roll_expression": "D6",
+            "mortal_wounds_expression": group.mortal_wounds_expression.canonical(),
+            "target_unit_instance_id": option.target_unit_instance_id,
+            "target_player_id": option.target_player_id,
+            "trigger_event_id": group.trigger_event_id,
+            "movement_action": group.movement_action,
+        }
+    )
+
+
 type _PostShootHitTargetStatusGroupKey = tuple[str, str, str, str, int, str, str, str]
+type _UnitMoveCompletedMortalWoundsGroupKey = tuple[str, str, str, str, int, str]
 
 
 def _post_shoot_hit_target_status_group_key(
@@ -1986,6 +2736,70 @@ def _resolved_post_shoot_hit_target_status_group_keys(
             )
         )
     return frozenset(keys)
+
+
+def _unit_move_completed_mortal_wounds_group_key(
+    group: CatalogUnitMoveCompletedMortalWoundsGroup,
+) -> _UnitMoveCompletedMortalWoundsGroupKey:
+    if type(group) is not CatalogUnitMoveCompletedMortalWoundsGroup:
+        raise GameLifecycleError("Catalog move-completed mortal wounds requires a group.")
+    return (
+        group.trigger_event_id,
+        group.source_rules_unit_instance_id,
+        group.record.record_id,
+        group.clause.clause_id,
+        group.effect_index,
+        group.movement_action,
+    )
+
+
+def _selected_unit_move_completed_mortal_wounds_group_keys(
+    decisions: DecisionController,
+) -> frozenset[_UnitMoveCompletedMortalWoundsGroupKey]:
+    return frozenset(_selected_unit_move_completed_mortal_wounds_targets(decisions))
+
+
+def _selected_unit_move_completed_mortal_wounds_targets(
+    decisions: DecisionController,
+) -> Mapping[
+    _UnitMoveCompletedMortalWoundsGroupKey,
+    CatalogUnitMoveCompletedMortalWoundsTargetOption,
+]:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError(
+            "Catalog move-completed mortal wounds selected lookup requires decisions."
+        )
+    selected: dict[
+        _UnitMoveCompletedMortalWoundsGroupKey,
+        CatalogUnitMoveCompletedMortalWoundsTargetOption,
+    ] = {}
+    for event in decisions.event_log.records:
+        if event.event_type != CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_SELECTED_EVENT:
+            continue
+        payload = event.payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError(
+                "Catalog move-completed mortal wounds selected event payload must be an object."
+            )
+        payload_object = cast(dict[str, object], payload)
+        selected[
+            (
+                _payload_string(payload_object, key="trigger_event_id"),
+                _payload_string(payload_object, key="source_rules_unit_instance_id"),
+                _payload_string(payload_object, key="catalog_record_id"),
+                _payload_string(payload_object, key="clause_id"),
+                _payload_int(payload_object, key="effect_index"),
+                _payload_string(payload_object, key="movement_action"),
+            )
+        ] = CatalogUnitMoveCompletedMortalWoundsTargetOption(
+            option_id=_payload_string(payload_object, key="selected_option_id"),
+            target_unit_instance_id=_payload_string(
+                payload_object,
+                key="target_unit_instance_id",
+            ),
+            target_player_id=_payload_string(payload_object, key="target_player_id"),
+        )
+    return MappingProxyType(selected)
 
 
 def _named_weapon_ability_choice_selection_payload(
@@ -2132,6 +2946,96 @@ def apply_catalog_post_shoot_hit_target_status_result(
                     payload,
                     key="attack_sequence_completed_event_id",
                 ),
+            }
+        ),
+    )
+    return None
+
+
+def invalid_catalog_unit_move_completed_mortal_wounds_target_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    invalid_status = _catalog_unit_move_completed_mortal_wounds_target_finite_invalid_status(
+        state=state,
+        request=request,
+        result=result,
+        invalid_reason="invalid_catalog_unit_move_completed_mortal_wounds_target_result",
+    )
+    if invalid_status is not None:
+        return invalid_status
+    drift_reason = _catalog_unit_move_completed_mortal_wounds_target_drift_reason(
+        state=state,
+        request=request,
+        result=result,
+        ruleset_descriptor=ruleset_descriptor,
+    )
+    if drift_reason is None:
+        return None
+    return _catalog_unit_move_completed_mortal_wounds_target_invalid_status(
+        state=state,
+        actor_id=result.actor_id,
+        invalid_reason=drift_reason,
+    )
+
+
+def apply_catalog_unit_move_completed_mortal_wounds_target_result(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    ruleset_descriptor: RulesetDescriptor,
+) -> LifecycleStatus | None:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Catalog move-completed mortal wounds apply requires decisions.")
+    if type(result) is not DecisionResult:
+        raise GameLifecycleError("Catalog move-completed mortal wounds apply requires result.")
+    record = decisions.record_for_result(result)
+    invalid_status = invalid_catalog_unit_move_completed_mortal_wounds_target_status(
+        state=state,
+        request=record.request,
+        result=record.result,
+        ruleset_descriptor=ruleset_descriptor,
+    )
+    if invalid_status is not None:
+        return invalid_status
+    payload = _payload_object(record.result.payload)
+    selected_payload = _unit_move_completed_mortal_wounds_selected_payload(payload)
+    decisions.event_log.append(
+        CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_SELECTED_EVENT,
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.CHARGE.value,
+                "active_player_id": state.active_player_id,
+                "player_id": record.result.actor_id,
+                "request_id": record.request.request_id,
+                "result_id": record.result.result_id,
+                "selected_option_id": record.result.selected_option_id,
+                "hook_id": CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
+                "catalog_record_id": _payload_string(payload, key="catalog_record_id"),
+                "source_rule_id": _payload_string(payload, key="source_rule_id"),
+                "source_rules_unit_instance_id": _payload_string(
+                    payload,
+                    key="source_rules_unit_instance_id",
+                ),
+                "source_unit_instance_id": _payload_string(
+                    payload,
+                    key="source_unit_instance_id",
+                ),
+                "clause_id": _payload_string(payload, key="clause_id"),
+                "effect_index": _payload_int(payload, key="effect_index"),
+                "trigger_event_id": _payload_string(payload, key="trigger_event_id"),
+                "movement_action": _payload_string(payload, key="movement_action"),
+                "target_unit_instance_id": _payload_string(
+                    selected_payload,
+                    key="target_unit_instance_id",
+                ),
+                "target_player_id": _payload_string(selected_payload, key="target_player_id"),
             }
         ),
     )
@@ -2413,6 +3317,175 @@ def _catalog_post_shoot_hit_target_status_drift_reason(
     return None
 
 
+def _catalog_unit_move_completed_mortal_wounds_target_invalid_status(
+    *,
+    state: GameState,
+    actor_id: str | None,
+    invalid_reason: str,
+) -> LifecycleStatus:
+    return LifecycleStatus.invalid(
+        stage=GameLifecycleStage.BATTLE,
+        message="Catalog move-completed mortal wounds target choice is no longer valid.",
+        payload=validate_json_value(
+            {
+                "game_id": state.game_id,
+                "player_id": actor_id,
+                "battle_round": state.battle_round,
+                "phase": (
+                    None if state.current_battle_phase is None else state.current_battle_phase.value
+                ),
+                "invalid_reason": _validate_identifier("invalid_reason", invalid_reason),
+            }
+        ),
+    )
+
+
+def _catalog_unit_move_completed_mortal_wounds_target_finite_invalid_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    invalid_reason: str,
+) -> LifecycleStatus | None:
+    if result.request_id != request.request_id:
+        return _catalog_unit_move_completed_mortal_wounds_target_invalid_field_status(
+            state=state,
+            invalid_reason=invalid_reason,
+            field="request_id",
+        )
+    if result.decision_type != request.decision_type:
+        return _catalog_unit_move_completed_mortal_wounds_target_invalid_field_status(
+            state=state,
+            invalid_reason=invalid_reason,
+            field="decision_type",
+        )
+    if result.actor_id != request.actor_id:
+        return _catalog_unit_move_completed_mortal_wounds_target_invalid_field_status(
+            state=state,
+            invalid_reason=invalid_reason,
+            field="actor_id",
+        )
+    selected_option = next(
+        (option for option in request.options if option.option_id == result.selected_option_id),
+        None,
+    )
+    if selected_option is None:
+        return _catalog_unit_move_completed_mortal_wounds_target_invalid_field_status(
+            state=state,
+            invalid_reason=invalid_reason,
+            field="selected_option_id",
+        )
+    if result.payload != selected_option.payload:
+        return _catalog_unit_move_completed_mortal_wounds_target_invalid_field_status(
+            state=state,
+            invalid_reason=invalid_reason,
+            field="payload",
+        )
+    return None
+
+
+def _catalog_unit_move_completed_mortal_wounds_target_invalid_field_status(
+    *,
+    state: GameState,
+    invalid_reason: str,
+    field: str,
+) -> LifecycleStatus:
+    return LifecycleStatus.invalid(
+        stage=state.stage,
+        message="Catalog move-completed mortal wounds target result is invalid.",
+        payload=validate_json_value(
+            {
+                "invalid_reason": _validate_identifier("invalid_reason", invalid_reason),
+                "field": _validate_identifier("field", field),
+            }
+        ),
+    )
+
+
+def _catalog_unit_move_completed_mortal_wounds_target_drift_reason(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    ruleset_descriptor: RulesetDescriptor,
+) -> str | None:
+    if (
+        request.decision_type
+        != SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE
+    ):
+        return "request_decision_type_drift"
+    if (
+        result.decision_type
+        != SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE
+    ):
+        return "result_decision_type_drift"
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Catalog move-completed mortal wounds requires ruleset.")
+    request_payload = _optional_payload_object(request.payload)
+    if request_payload is None:
+        return "request_payload_not_object"
+    result_payload = _optional_payload_object(result.payload)
+    if result_payload is None:
+        return "payload_not_object"
+    if result_payload.get("submission_kind") != (
+        SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_SUBMISSION_KIND
+    ):
+        return "submission_kind_drift"
+    if result_payload.get("hook_id") != CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID:
+        return "hook_id_drift"
+    if request_payload.get("hook_id") != CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID:
+        return "request_hook_id_drift"
+    if state.current_battle_phase is not BattlePhase.CHARGE:
+        return "phase_drift"
+    if result_payload.get("game_id") != state.game_id:
+        return "game_id_drift"
+    if request_payload.get("game_id") != state.game_id:
+        return "request_game_id_drift"
+    if result_payload.get("battle_round") != state.battle_round:
+        return "battle_round_drift"
+    if request_payload.get("battle_round") != state.battle_round:
+        return "request_battle_round_drift"
+    if result_payload.get("phase") != BattlePhase.CHARGE.value:
+        return "payload_phase_drift"
+    if request_payload.get("phase") != BattlePhase.CHARGE.value:
+        return "request_phase_drift"
+    if result_payload.get("active_player_id") != state.active_player_id:
+        return "active_player_drift"
+    if request_payload.get("active_player_id") != state.active_player_id:
+        return "request_active_player_drift"
+    actor_id = _validate_identifier("actor_id", result.actor_id)
+    if result_payload.get("player_id") != actor_id:
+        return "actor_player_drift"
+    selected_payload = result_payload.get("selected_unit_move_completed_mortal_wounds_target")
+    if not isinstance(selected_payload, dict):
+        return "selected_payload_not_object"
+    selected_payload_object = cast(dict[str, object], selected_payload)
+    if selected_payload_object.get("option_id") != result.selected_option_id:
+        return "selected_option_payload_drift"
+    selected_target_id = selected_payload_object.get("target_unit_instance_id")
+    selected_target_player_id = selected_payload_object.get("target_player_id")
+    if type(selected_target_id) is not str or type(selected_target_player_id) is not str:
+        return "selected_target_payload_drift"
+    source_rules_unit_id = result_payload.get("source_rules_unit_instance_id")
+    if type(source_rules_unit_id) is not str:
+        return "source_rules_unit_payload_drift"
+    source_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=source_rules_unit_id,
+    )
+    if source_rules_unit.owner_player_id != actor_id:
+        return "source_rules_unit_owner_drift"
+    if not _unit_move_completed_mortal_wounds_target_is_eligible(
+        state=state,
+        ruleset_descriptor=ruleset_descriptor,
+        source_rules_unit_instance_id=source_rules_unit_id,
+        target_unit_instance_id=selected_target_id,
+        target_player_id=selected_target_player_id,
+    ):
+        return "target_drift"
+    return None
+
+
 def _payload_object(payload: object) -> dict[str, object]:
     if not isinstance(payload, dict):
         raise GameLifecycleError("Catalog named weapon ability choice payload must be an object.")
@@ -2445,6 +3518,17 @@ def _post_shoot_hit_target_status_selected_payload(
     selected_payload = payload.get("selected_post_shoot_hit_target_status")
     if not isinstance(selected_payload, dict):
         raise GameLifecycleError("Catalog post-shoot status selected payload must be an object.")
+    return cast(dict[str, object], selected_payload)
+
+
+def _unit_move_completed_mortal_wounds_selected_payload(
+    payload: Mapping[str, object],
+) -> dict[str, object]:
+    selected_payload = payload.get("selected_unit_move_completed_mortal_wounds_target")
+    if not isinstance(selected_payload, dict):
+        raise GameLifecycleError(
+            "Catalog move-completed mortal wounds selected payload must be an object."
+        )
     return cast(dict[str, object], selected_payload)
 
 
@@ -2707,6 +3791,8 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
             consumer_ids.update(_weapon_keyword_grant_consumer_ids_for_effect(effect))
     if _clause_is_supported_post_shoot_hit_target_status_denial(clause):
         consumer_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID)
+    if _clause_is_supported_unit_move_completed_mortal_wounds(clause):
+        consumer_ids.add(CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID)
     if _clause_is_structured_wound_reroll_clause(clause):
         consumer_ids.add(CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID)
     if _clause_is_structured_destroyed_unit_restore_clause(clause):
@@ -2775,6 +3861,8 @@ def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         hook_ids.add(CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID)
     if _clause_is_supported_post_shoot_hit_target_status_denial(clause):
         hook_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID)
+    if _clause_is_supported_unit_move_completed_mortal_wounds(clause):
+        hook_ids.add(CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID)
     return tuple(sorted(hook_ids))
 
 
@@ -2845,6 +3933,12 @@ def catalog_rule_clause_is_supported_post_shoot_hit_target_status_denial(
     clause: RuleClause,
 ) -> bool:
     return _clause_is_supported_post_shoot_hit_target_status_denial(clause)
+
+
+def catalog_rule_clause_is_supported_unit_move_completed_mortal_wounds(
+    clause: RuleClause,
+) -> bool:
+    return _clause_is_supported_unit_move_completed_mortal_wounds(clause)
 
 
 def catalog_rule_tracked_target_supported_roll_types_for_clause(
@@ -3733,6 +4827,76 @@ def _effect_is_supported_status_denial(effect: RuleEffectSpec) -> bool:
     )
 
 
+def _clause_is_supported_unit_move_completed_mortal_wounds(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    if not clause.is_supported:
+        return False
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return False
+    trigger_parameters = parameter_payload(trigger.parameters)
+    if (
+        trigger_parameters.get("edge") != "after"
+        or trigger_parameters.get("phase") != BattlePhase.CHARGE.value
+        or trigger_parameters.get("timing_window") != "charge_move_end"
+        or trigger_parameters.get("subject") != "this_unit"
+    ):
+        return False
+    if clause.target is None or clause.target.kind is not RuleTargetKind.ENEMY_UNIT:
+        return False
+    if not _clause_has_selected_enemy_unit_engagement_range_target(clause):
+        return False
+    return (
+        len(clause.effects) == 1
+        and len(
+            tuple(
+                effect
+                for effect in clause.effects
+                if _effect_is_supported_unit_move_completed_mortal_wounds(effect)
+            )
+        )
+        == 1
+    )
+
+
+def _clause_has_selected_enemy_unit_engagement_range_target(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    for condition in clause.conditions:
+        if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE:
+            continue
+        parameters = parameter_payload(condition.parameters)
+        if (
+            parameters.get("predicate") == "within_engagement_range"
+            and parameters.get("range_kind") == "engagement_range"
+            and parameters.get("negated") is False
+            and parameters.get("object_kind") == "unit"
+            and parameters.get("object_reference") == "this"
+        ):
+            return True
+    return False
+
+
+def _effect_is_supported_unit_move_completed_mortal_wounds(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.INFLICT_MORTAL_WOUNDS:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    success_threshold = parameters.get("success_threshold")
+    return (
+        parameters.get("damage_kind") == "mortal_wounds"
+        and parameters.get("mortal_wounds_expression") == "D3"
+        and parameters.get("roll_count") == 1
+        and parameters.get("roll_count_scope") == "each_model_in_this_unit"
+        and parameters.get("roll_expression") == "D6"
+        and type(success_threshold) is int
+        and 2 <= success_threshold <= 6
+        and parameters.get("target_scope") == "selected_enemy_unit"
+    )
+
+
 def _effect_is_charge_roll_modifier(effect: RuleEffectSpec) -> bool:
     if type(effect) is not RuleEffectSpec:
         raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
@@ -4298,6 +5462,33 @@ def _validate_post_shoot_hit_target_status_option(
     return option
 
 
+def _validate_unit_move_completed_mortal_wounds_target_option(
+    option: object,
+) -> CatalogUnitMoveCompletedMortalWoundsTargetOption:
+    if type(option) is not CatalogUnitMoveCompletedMortalWoundsTargetOption:
+        raise GameLifecycleError(
+            "Catalog move-completed mortal wounds requires target option values."
+        )
+    return option
+
+
+def _unit_move_completed_decisions(context: UnitMoveCompletedContext) -> DecisionController:
+    if type(context) is not UnitMoveCompletedContext:
+        raise GameLifecycleError("Catalog move-completed mortal wounds requires context.")
+    if context.decisions is None:
+        raise GameLifecycleError(
+            "Catalog move-completed mortal wounds requires DecisionController context."
+        )
+    return context.decisions
+
+
+def _catalog_mortal_wounds_dice_expression(token: str) -> DiceExpression:
+    normalized = _string_identifier("mortal_wounds_expression", token).upper()
+    if normalized == "D3":
+        return DiceExpression(quantity=1, sides=3)
+    raise GameLifecycleError("Unsupported catalog move-completed mortal wounds expression.")
+
+
 def _weapon_name_match_token(value: str) -> str:
     if type(value) is not str:
         raise GameLifecycleError("Catalog named weapon name must be a string.")
@@ -4778,6 +5969,16 @@ def _has_catalog_post_shoot_hit_target_status_records(
     )
 
 
+def _has_catalog_unit_move_completed_mortal_wounds_records(
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+) -> bool:
+    return any(
+        _record_can_select_catalog_unit_move_completed_mortal_wounds_target(record)
+        for index in ability_indexes_by_player_id.values()
+        for record in index.all_records()
+    )
+
+
 def _record_can_grant_catalog_weapon_keyword(record: AbilityCatalogRecord) -> bool:
     if type(record) is not AbilityCatalogRecord:
         raise GameLifecycleError("Catalog weapon keyword grants require ability records.")
@@ -4812,6 +6013,21 @@ def _record_can_select_catalog_post_shoot_hit_target_status(
         return False
     return any(
         _clause_is_supported_post_shoot_hit_target_status_denial(clause)
+        for clause in _clauses_from_record(record)
+    )
+
+
+def _record_can_select_catalog_unit_move_completed_mortal_wounds_target(
+    record: AbilityCatalogRecord,
+) -> bool:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError(
+            "Catalog move-completed mortal wounds choices require ability records."
+        )
+    if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
+        return False
+    return any(
+        _clause_is_supported_unit_move_completed_mortal_wounds(clause)
         for clause in _clauses_from_record(record)
     )
 

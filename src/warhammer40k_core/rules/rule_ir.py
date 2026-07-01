@@ -121,6 +121,7 @@ class RuleEffectKind(StrEnum):
     FORCE_DESPERATE_ESCAPE_TESTS = "force_desperate_escape_tests"
     GRANT_ABILITY = "grant_ability"
     GRANT_WEAPON_ABILITY = "grant_weapon_ability"
+    INFLICT_MORTAL_WOUNDS = "inflict_mortal_wounds"
     MODIFY_CHARACTERISTIC = "modify_characteristic"
     MODIFY_COMMAND_POINTS = "modify_command_points"
     MODIFY_DICE_ROLL = "modify_dice_roll"

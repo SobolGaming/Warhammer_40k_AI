@@ -238,6 +238,39 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000001115:brass-stampede",
+        "ability_name": "Brass Stampede",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none",
+        "datasheet_id": "000001115",
+        "datasheet_name": "Bloodcrushers",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Brass Stampede"
+    ],
+    "category_id": "datasheet.rule_ir.inflict_mortal_wounds.enemy_unit",
+    "category_name": "Datasheet Rule Ir Inflict Mortal Wounds Enemy Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none"
+    ],
+    "datasheet_names": [
+      "Bloodcrushers"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:unit-move-completed-mortal-wounds"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001112:hunters-from-the-warp",
         "ability_name": "Hunters from the Warp",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001112/datasheet/000001112:hunters-from-the-warp/none",
@@ -1040,37 +1073,6 @@
     },
     "support_stages": [
       "engine_consumed"
-    ]
-  },
-  {
-    "ability_datasheet_pairs": [
-      {
-        "ability_id": "000001115:brass-stampede",
-        "ability_name": "Brass Stampede",
-        "coverage_row_id": "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none",
-        "datasheet_id": "000001115",
-        "datasheet_name": "Bloodcrushers",
-        "source_kind": "datasheet"
-      }
-    ],
-    "ability_names": [
-      "Brass Stampede"
-    ],
-    "category_id": "unknown.ability_text",
-    "category_name": "Unknown Abilities",
-    "coverage_row_count": 1,
-    "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000001115/datasheet/000001115:brass-stampede/none"
-    ],
-    "datasheet_names": [
-      "Bloodcrushers"
-    ],
-    "runtime_consumer_ids": [],
-    "source_kind_counts": {
-      "datasheet": 1
-    },
-    "support_stages": [
-      "ir_compiled_unsupported"
     ]
   },
   {

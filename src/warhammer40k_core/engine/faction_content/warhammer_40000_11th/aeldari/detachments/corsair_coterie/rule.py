@@ -90,6 +90,7 @@ def relentless_raiders_mortal_wound_effects(
                 UnitMoveCompletedMortalWoundEffect(
                     hook_id=RELENTLESS_RAIDERS_HOOK_ID,
                     source_id=SOURCE_RULE_ID,
+                    source_rule_id=SOURCE_RULE_ID,
                     target_unit_instance_id=context.triggering_unit_instance_id,
                     target_player_id=context.triggering_player_id,
                     rolling_player_id=army.player_id,

@@ -255,6 +255,10 @@ def _catalog_ability_source_kind(source_kind: CatalogAbilitySourceKind) -> Abili
 
 def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
     for clause in rule_ir.clauses:
+        charge_move_timing = _catalog_charge_move_end_timing_descriptor_for_clause(clause)
+        if charge_move_timing is not None:
+            return charge_move_timing
+    for clause in rule_ir.clauses:
         fall_back_timing = _catalog_fall_back_selection_timing_descriptor_for_clause(clause)
         if fall_back_timing is not None:
             return fall_back_timing
@@ -315,6 +319,9 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
 def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDescriptor:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog timing descriptor requires a RuleClause.")
+    charge_move_timing = _catalog_charge_move_end_timing_descriptor_for_clause(clause)
+    if charge_move_timing is not None:
+        return charge_move_timing
     fall_back_timing = _catalog_fall_back_selection_timing_descriptor_for_clause(clause)
     if fall_back_timing is not None:
         return fall_back_timing
@@ -355,6 +362,26 @@ def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDe
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_DICE_ROLL)
     return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE)
+
+
+def _catalog_charge_move_end_timing_descriptor_for_clause(
+    clause: RuleClause,
+) -> AbilityTimingDescriptor | None:
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return None
+    parameters = parameter_payload(trigger.parameters)
+    if (
+        parameters.get("edge") == "after"
+        and parameters.get("phase") == "charge"
+        and parameters.get("timing_window") == "charge_move_end"
+        and parameters.get("subject") in {"this_unit", "that_unit", "a_unit"}
+    ):
+        return AbilityTimingDescriptor(
+            trigger_kind=TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+            phase=battle_phase_kind_from_token("charge"),
+        )
+    return None
 
 
 def _catalog_fall_back_selection_timing_descriptor_for_clause(

@@ -240,6 +240,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:tracked-target-destroyed-reselect` | No current generated rows |
 | `catalog-ir:tracked-target-reroll` | No current generated rows |
 | `catalog-ir:tracked-target-selection` | No current generated rows |
+| `catalog-ir:unit-move-completed-mortal-wounds` | Brass Stampede |
 | `catalog-ir:weapon-keyword-grant` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:assault` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:blast` | No current generated rows |
