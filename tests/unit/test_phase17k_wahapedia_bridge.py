@@ -4130,6 +4130,45 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     )
 
     assert "## Datasheet / Unit Support" in chaos_daemons_markdown
+    assert "### Khorne" in chaos_daemons_markdown
+    for khorne_datasheet_id in (
+        "000001104",
+        "000001105",
+        "000001106",
+        "000001111",
+        "000001112",
+        "000001114",
+        "000001115",
+        "000001116",
+        "000001455",
+        "000001456",
+        "000001588",
+        "000002582",
+    ):
+        assert f"(`{khorne_datasheet_id}`)" in chaos_daemons_markdown
+    assert (
+        "Wahapedia-only discontinued Khorne-labeled rows, including An'ggrath the Unbound "
+        "and Chaos Lord On Juggernaut, are excluded"
+    ) in chaos_daemons_markdown
+    assert "PDF Karanak datasheet supersedes the duplicate Wahapedia Karanak row" in (
+        chaos_daemons_markdown
+    )
+    assert (
+        "| Bloodcrushers (`000001115`) | PDF pages 30-31; supersedes Wahapedia. | "
+        "All consumed | Deep Strike, Brass Stampede move-completed mortal wounds"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Bloodletters (`000001114`) | PDF pages 28-29; supersedes Wahapedia. | "
+        "IR parsed; host needed |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Bloodthirster (`000002582`) | PDF pages 16-17; supersedes Wahapedia. | "
+        "Bridge/catalog blocked |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Skull Altar (`000001588`) | PDF pages 36-37; supersedes Wahapedia. | "
+        "Bridge/catalog blocked |"
+    ) in chaos_daemons_markdown
     assert "### Datasheet Ability Details" in chaos_daemons_markdown
     assert "Flesh Hounds (`000001112`) | `Playable` | Full | Full | Full | Full | Full" in (
         chaos_daemons_markdown
