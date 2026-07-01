@@ -1259,6 +1259,7 @@ class CatalogUnitMoveCompletedMortalWoundsRuntime:
                     UnitMoveCompletedMortalWoundEffect(
                         hook_id=CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
                         source_id=CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
+                        source_rule_id=group.record.definition.source_id,
                         target_unit_instance_id=option.target_unit_instance_id,
                         target_player_id=option.target_player_id,
                         rolling_player_id=context.triggering_player_id,

@@ -112,6 +112,7 @@ class UnitMoveCompletedContext:
 class UnitMoveCompletedMortalWoundEffect:
     hook_id: str
     source_id: str
+    source_rule_id: str
     target_unit_instance_id: str
     target_player_id: str
     rolling_player_id: str
@@ -123,6 +124,11 @@ class UnitMoveCompletedMortalWoundEffect:
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_identifier("source_rule_id", self.source_rule_id),
+        )
         object.__setattr__(
             self,
             "target_unit_instance_id",
@@ -407,7 +413,7 @@ def _resolve_mortal_wound_effect(
             expression=DiceExpression(quantity=1, sides=6),
             reason=(
                 "Unit move completed mortal wound trigger "
-                f"{effect.source_id} for {effect.target_unit_instance_id}"
+                f"{effect.source_rule_id} for {effect.target_unit_instance_id}"
             ),
             roll_type="unit_move_completed_mortal_wounds.trigger",
             actor_id=effect.rolling_player_id,
@@ -423,7 +429,7 @@ def _resolve_mortal_wound_effect(
         "movement_action": movement_action,
         "hook_id": effect.hook_id,
         "effect_key": _effect_key(effect),
-        "source_rule_id": effect.source_id,
+        "source_rule_id": effect.source_rule_id,
         "target_unit_instance_id": effect.target_unit_instance_id,
         "target_player_id": effect.target_player_id,
         "rolling_player_id": effect.rolling_player_id,
@@ -449,7 +455,7 @@ def _resolve_mortal_wound_effect(
             expression=effect.mortal_wounds_expression,
             reason=(
                 "Unit move completed mortal wounds "
-                f"{effect.source_id} for {effect.target_unit_instance_id}"
+                f"{effect.source_rule_id} for {effect.target_unit_instance_id}"
             ),
             roll_type="unit_move_completed_mortal_wounds.damage",
             actor_id=effect.rolling_player_id,
@@ -467,7 +473,7 @@ def _resolve_mortal_wound_effect(
             f"{effect.hook_id}:{effect.target_unit_instance_id}:"
             f"{_effect_digest(effect)}"
         ),
-        source_rule_id=effect.source_id,
+        source_rule_id=effect.source_rule_id,
         source_context=source_context,
         target_unit_instance_id=effect.target_unit_instance_id,
         defender_player_id=effect.target_player_id,
@@ -495,7 +501,7 @@ def _resolve_mortal_wound_effect(
             payload={
                 "phase": completed_phase.value,
                 "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
-                "source_rule_id": effect.source_id,
+                "source_rule_id": effect.source_rule_id,
                 "trigger_event_id": effect.trigger_event_id,
                 "target_unit_instance_id": effect.target_unit_instance_id,
             },
@@ -562,6 +568,7 @@ def _effect_key(effect: UnitMoveCompletedMortalWoundEffect) -> str:
         "trigger_event_id": effect.trigger_event_id,
         "hook_id": effect.hook_id,
         "source_id": effect.source_id,
+        "source_rule_id": effect.source_rule_id,
         "target_unit_instance_id": effect.target_unit_instance_id,
         "target_player_id": effect.target_player_id,
         "rolling_player_id": effect.rolling_player_id,

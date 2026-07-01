@@ -3933,6 +3933,7 @@ def test_unit_move_completed_mortal_wound_hooks_resolve_and_validate() -> None:
             UnitMoveCompletedMortalWoundEffect(
                 hook_id="move-hook",
                 source_id="move-source",
+                source_rule_id="move-source",
                 target_unit_instance_id=context.triggering_unit_instance_id,
                 target_player_id=context.triggering_player_id,
                 rolling_player_id="player-a",
@@ -4002,6 +4003,7 @@ def test_unit_move_completed_mortal_wound_hooks_resolve_and_validate() -> None:
         UnitMoveCompletedMortalWoundEffect(
             hook_id="move-hook",
             source_id="move-source",
+            source_rule_id="move-source",
             target_unit_instance_id=_ENEMY_UNIT_ID,
             target_player_id="player-b",
             rolling_player_id="player-a",
@@ -4033,6 +4035,7 @@ def test_unit_move_completed_mortal_wound_hooks_resolve_and_validate() -> None:
                         UnitMoveCompletedMortalWoundEffect(
                             hook_id="drifted-hook",
                             source_id="move-source",
+                            source_rule_id="move-source",
                             target_unit_instance_id=_ENEMY_UNIT_ID,
                             target_player_id="player-b",
                             rolling_player_id="player-a",
@@ -4144,6 +4147,7 @@ def test_unit_move_completed_hook_context_and_event_validation_paths() -> None:
         UnitMoveCompletedMortalWoundEffect(
             hook_id="move-hook",
             source_id="move-source",
+            source_rule_id="move-source",
             target_unit_instance_id=_ENEMY_UNIT_ID,
             target_player_id="player-b",
             rolling_player_id="player-a",
@@ -4199,6 +4203,7 @@ def test_unit_move_completed_hook_context_and_event_validation_paths() -> None:
                         UnitMoveCompletedMortalWoundEffect(
                             hook_id="move-hook",
                             source_id="other-source",
+                            source_rule_id="move-source",
                             target_unit_instance_id=_ENEMY_UNIT_ID,
                             target_player_id="player-b",
                             rolling_player_id="player-a",
@@ -4220,6 +4225,7 @@ def test_unit_move_completed_hook_context_and_event_validation_paths() -> None:
                         UnitMoveCompletedMortalWoundEffect(
                             hook_id="move-hook",
                             source_id="move-source",
+                            source_rule_id="move-source",
                             target_unit_instance_id=_ENEMY_UNIT_ID,
                             target_player_id="player-b",
                             rolling_player_id="player-a",

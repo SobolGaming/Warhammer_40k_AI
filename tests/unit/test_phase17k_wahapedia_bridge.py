@@ -2703,10 +2703,15 @@ def test_phase17k_charge_end_catalog_mortal_wounds_selects_target_and_rolls_per_
     assert len(rolled_events) == len(unit.own_models)
     rolled_model_ids: set[str] = set()
     for event in rolled_events:
+        payload = cast(dict[str, JsonValue], event.payload)
+        assert payload["hook_id"] == CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID
+        assert payload["source_rule_id"] == record.definition.source_id
+        assert payload["source_rule_id"] != CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID
         replay_payload = cast(
             dict[str, JsonValue],
-            cast(dict[str, JsonValue], event.payload)["replay_payload"],
+            payload["replay_payload"],
         )
+        assert replay_payload["catalog_source_rule_id"] == record.definition.source_id
         roll_model_id = replay_payload["roll_model_instance_id"]
         assert type(roll_model_id) is str
         rolled_model_ids.add(roll_model_id)
