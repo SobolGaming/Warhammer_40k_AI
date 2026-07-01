@@ -6,7 +6,7 @@ from dataclasses import replace
 from datetime import date
 from functools import lru_cache
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import pytest
 from tools.generate_ability_support_matrix import (
@@ -87,6 +87,16 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityHookRegistry,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_sequence import (
+    AttackSequence,
+    AttackSequenceEvent,
+    AttackSequenceStep,
+)
+from warhammer40k_core.engine.attack_sequence_completion_hooks import (
+    AttackSequenceCompletedContext,
+    AttackSequenceCompletedHookRegistry,
+    successful_hit_target_unit_ids_for_sequence,
+)
 from warhammer40k_core.engine.battle_shock import collect_battle_shock_test_requests
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
@@ -111,43 +121,61 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+    CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
     CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_NAMED_WEAPON_ABILITY_CHOICE_EFFECT_KIND,
     CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SELECTED_EVENT,
+    CATALOG_POST_SHOOT_HIT_TARGET_STATUS_EFFECT_KIND,
+    CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SELECTED_EVENT,
     SELECT_CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SUBMISSION_KIND,
+    SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE,
+    SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SUBMISSION_KIND,
     CatalogAdvanceEligibilityRuntime,
     CatalogFallBackEligibilityRuntime,
     CatalogNamedWeaponAbilityChoiceOption,
     CatalogNamedWeaponAbilityChoiceRuntime,
+    CatalogPostShootHitTargetStatusRuntime,
     CatalogWeaponKeywordGrant,
     CatalogWeaponKeywordGrantRuntime,
     _available_catalog_named_weapon_ability_choice_groups,  # pyright: ignore[reportPrivateUsage]
+    _available_catalog_post_shoot_hit_target_status_groups,  # pyright: ignore[reportPrivateUsage]
+    _catalog_post_shoot_hit_target_status_groups_from_clause,  # pyright: ignore[reportPrivateUsage]
     _catalog_roll_reroll_permission,  # pyright: ignore[reportPrivateUsage]
     _catalog_weapon_keyword_grant_from_effect,  # pyright: ignore[reportPrivateUsage]
     _clause_is_named_weapon_ability_choice,  # pyright: ignore[reportPrivateUsage]
+    _clause_is_supported_post_shoot_hit_target_status_denial,  # pyright: ignore[reportPrivateUsage]
     _effect_is_named_weapon_ability_choice_option,  # pyright: ignore[reportPrivateUsage]
     _effect_is_roll_reroll_permission,  # pyright: ignore[reportPrivateUsage]
+    _effect_is_supported_status_denial,  # pyright: ignore[reportPrivateUsage]
     _named_weapon_ability_choice_option_from_effect,  # pyright: ignore[reportPrivateUsage]
     _optional_named_weapon_names,  # pyright: ignore[reportPrivateUsage]
     _payload_object,  # pyright: ignore[reportPrivateUsage]
     _payload_string,  # pyright: ignore[reportPrivateUsage]
     _payload_string_tuple,  # pyright: ignore[reportPrivateUsage]
+    _post_shoot_hit_target_status_attack_sequence_from_payload,  # pyright: ignore[reportPrivateUsage]
+    _post_shoot_hit_target_status_option_id,  # pyright: ignore[reportPrivateUsage]
+    _post_shoot_hit_target_status_selected_payload,  # pyright: ignore[reportPrivateUsage]
+    _post_shoot_status_source_model_ids,  # pyright: ignore[reportPrivateUsage]
     _profile_with_catalog_weapon_keyword_grant,  # pyright: ignore[reportPrivateUsage]
     _record_can_select_catalog_named_weapon_ability,  # pyright: ignore[reportPrivateUsage]
+    _record_can_select_catalog_post_shoot_hit_target_status,  # pyright: ignore[reportPrivateUsage]
     _roll_reroll_consumer_id_for_effect,  # pyright: ignore[reportPrivateUsage]
     _selected_catalog_named_weapon_ability_grants,  # pyright: ignore[reportPrivateUsage]
     _validate_named_weapon_choice_option,  # pyright: ignore[reportPrivateUsage]
     _validate_named_weapon_choice_target_scope,  # pyright: ignore[reportPrivateUsage]
     _validate_named_weapon_names,  # pyright: ignore[reportPrivateUsage]
+    _validate_non_empty_text,  # pyright: ignore[reportPrivateUsage]
+    _validate_post_shoot_hit_target_status_option,  # pyright: ignore[reportPrivateUsage]
     _weapon_ability_choice_has_supported_runtime_shape,  # pyright: ignore[reportPrivateUsage]
     _weapon_ability_descriptor_for_grant,  # pyright: ignore[reportPrivateUsage]
     _weapon_ability_descriptor_for_selected_choice_payload,  # pyright: ignore[reportPrivateUsage]
     _weapon_keyword_grant_consumer_ids_for_effect,  # pyright: ignore[reportPrivateUsage]
     _weapon_names_from_parameters,  # pyright: ignore[reportPrivateUsage]
     _weapon_scope_matches_profile,  # pyright: ignore[reportPrivateUsage]
+    apply_catalog_post_shoot_hit_target_status_result,
     catalog_advance_roll_reroll_permission_for_unit,
     catalog_charge_roll_modifiers_for_unit,
     catalog_charge_roll_reroll_permission_for_unit,
@@ -156,6 +184,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_ir_registered_hook_ids,
     catalog_weapon_keyword_grants_for_unit,
     catalog_weapon_profile_modifier_bindings,
+    invalid_catalog_post_shoot_hit_target_status_status,
     record_catalog_feel_no_pain_sources_for_unit,
 )
 from warhammer40k_core.engine.catalog_turn_end_reserves import (
@@ -227,6 +256,7 @@ from warhammer40k_core.engine.phases.movement import (
     _advance_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
     _validate_ability_index_mapping,  # pyright: ignore[reportPrivateUsage]
 )
+from warhammer40k_core.engine.phases.shooting import ShootingPhaseHandler, ShootingPhaseState
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
@@ -237,6 +267,8 @@ from warhammer40k_core.engine.shooting_phase_start_hooks import (
     ShootingPhaseStartRequestContext,
     ShootingPhaseStartResultContext,
 )
+from warhammer40k_core.engine.shooting_types import ShootingType
+from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
@@ -247,6 +279,7 @@ from warhammer40k_core.engine.turn_end_hooks import (
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitFactory, UnitInstance
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
+from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
@@ -1609,6 +1642,1051 @@ def test_phase17k_named_weapon_choice_uses_runtime_clause_scoped_records() -> No
     request_payload = cast(dict[str, JsonValue], request.payload)
     assert request_payload["catalog_record_id"] == clause_002_record.record_id
     assert len(request.options) == 2
+
+
+def test_phase17k_post_shoot_hit_target_cover_denial_records_and_applies_effect() -> None:
+    package = _post_shoot_cover_denial_package()
+    unit = _named_weapon_choice_unit(package=package)
+    target_unit = _named_weapon_choice_unit(
+        package=package,
+        army_id="army-opponent",
+        unit_selection_id="enemy-lord-of-change-1",
+    )
+    army = _flesh_hounds_army(package=package, unit=unit)
+    enemy_army = _flesh_hounds_army(
+        package=package,
+        unit=target_unit,
+        army_id="army-opponent",
+        player_id="player-opponent",
+    )
+    player_index = _player_ability_index(package=package, army=army)
+    enemy_player_index = _player_ability_index(package=package, army=enemy_army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    cover_record = records_by_name["Purge and Cleanse"]
+    replay_payload = cast(dict[str, JsonValue], cover_record.definition.replay_payload)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    battlefield = _flesh_hounds_battlefield_state(
+        army=army,
+        unit=unit,
+        enemy_army=enemy_army,
+        enemy_unit=target_unit,
+        enemy_x=24.0,
+    )
+    state = _battle_state_with_armies(
+        armies=(army, enemy_army),
+        battlefield=battlefield,
+        active_player_id=army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    decisions = DecisionController()
+    attack_sequence = _completed_post_shoot_attack_sequence(
+        package=package,
+        attacker=unit,
+        target=target_unit,
+    )
+    _emit_successful_hit(
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        successful=True,
+    )
+    completed_event = decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "attacker_player_id": army.player_id,
+            "attacking_unit_instance_id": unit.unit_instance_id,
+        },
+    )
+    context = AttackSequenceCompletedContext(
+        state=state,
+        decisions=decisions,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        source_phase=BattlePhase.SHOOTING,
+        attack_sequence=attack_sequence,
+        attack_sequence_completed_event_id=completed_event.event_id,
+    )
+    runtime = CatalogPostShootHitTargetStatusRuntime(
+        ability_indexes_by_player_id={
+            army.player_id: player_index,
+            enemy_army.player_id: enemy_player_index,
+        },
+        armies=(army, enemy_army),
+    )
+
+    groups = _available_catalog_post_shoot_hit_target_status_groups(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army, enemy_army),
+        context=context,
+    )
+    status = runtime.request_handler(context)
+
+    assert _record_can_select_catalog_post_shoot_hit_target_status(cover_record)
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
+    )
+    assert len(groups) == 1
+    assert groups[0].record.record_id == cover_record.record_id
+    assert groups[0].clause.clause_id == rule_ir.clauses[0].clause_id
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = decisions.queue.peek_next()
+    assert request is not None
+    assert request.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE
+    assert request.actor_id == army.player_id
+    assert type(request).from_payload(request.to_payload()).to_payload() == request.to_payload()
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["submission_kind"] == (
+        SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SUBMISSION_KIND
+    )
+    assert request_payload["catalog_record_id"] == cover_record.record_id
+    assert request_payload["status"] == "benefit_of_cover"
+    assert request_payload["available_target_unit_instance_ids"] == [target_unit.unit_instance_id]
+    assert tuple(option.label for option in request.options) == (
+        f"Deny Benefit of Cover to {target_unit.unit_instance_id}",
+    )
+
+    result = DecisionResult.for_request(
+        result_id="phase17k-post-shoot-cover-denial",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    assert (
+        invalid_catalog_post_shoot_hit_target_status_status(
+            state=state,
+            request=request,
+            result=result,
+        )
+        is None
+    )
+    decisions.submit_result(result)
+    apply_status = apply_catalog_post_shoot_hit_target_status_result(
+        state=state,
+        decisions=decisions,
+        result=result,
+    )
+    effects = state.persisting_effects_for_unit(target_unit.unit_instance_id)
+
+    assert apply_status is None
+    assert len(effects) == 1
+    effect_payload = cast(dict[str, JsonValue], effects[0].effect_payload)
+    assert effect_payload["effect_kind"] == CATALOG_POST_SHOOT_HIT_TARGET_STATUS_EFFECT_KIND
+    assert effect_payload["benefit_of_cover_denied"] is True
+    assert effect_payload["catalog_record_id"] == cover_record.record_id
+    selected_events = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SELECTED_EVENT
+    )
+    assert len(selected_events) == 1
+    assert "object at 0x" not in json.dumps(decisions.to_payload(), sort_keys=True)
+
+    stale_state = _battle_state_with_armies(
+        armies=(army, enemy_army),
+        battlefield=battlefield,
+        active_player_id=army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    stale_status = invalid_catalog_post_shoot_hit_target_status_status(
+        state=stale_state,
+        request=request,
+        result=result,
+    )
+    assert stale_status is not None
+    stale_payload = cast(dict[str, JsonValue], stale_status.payload)
+    assert stale_payload["invalid_reason"] == "phase_drift"
+
+    drifted_payload = dict(cast(dict[str, JsonValue], request.options[0].payload))
+    drifted_payload["status"] = "changed"
+    drift_status = invalid_catalog_post_shoot_hit_target_status_status(
+        state=state,
+        request=request,
+        result=DecisionResult(
+            result_id="phase17k-post-shoot-cover-denial-drift",
+            request_id=request.request_id,
+            decision_type=request.decision_type,
+            actor_id=request.actor_id,
+            selected_option_id=request.options[0].option_id,
+            payload=drifted_payload,
+        ),
+    )
+    assert drift_status is not None
+    drift_payload = cast(dict[str, JsonValue], drift_status.payload)
+    assert drift_payload["field"] == "payload"
+
+    malformed_status = invalid_catalog_post_shoot_hit_target_status_status(
+        state=state,
+        request=request,
+        result=DecisionResult(
+            result_id="phase17k-post-shoot-cover-denial-malformed",
+            request_id=request.request_id,
+            decision_type=request.decision_type,
+            actor_id=request.actor_id,
+            selected_option_id="phase17k-missing-option",
+            payload=request.options[0].payload,
+        ),
+    )
+    assert malformed_status is not None
+    malformed_payload = cast(dict[str, JsonValue], malformed_status.payload)
+    assert malformed_payload["field"] == "selected_option_id"
+
+    base_request_payload = cast(dict[str, JsonValue], request.payload)
+    base_option_payload = cast(dict[str, JsonValue], request.options[0].payload)
+
+    def invalid_reason_for_payload(
+        *,
+        expected_reason: str,
+        option_payload: dict[str, JsonValue],
+        request_payload: dict[str, JsonValue] | JsonValue | None = None,
+    ) -> str:
+        updated_request = replace(
+            request,
+            payload=validate_json_value(
+                base_request_payload if request_payload is None else request_payload
+            ),
+            options=(
+                replace(
+                    request.options[0],
+                    payload=validate_json_value(option_payload),
+                ),
+            ),
+        )
+        status = invalid_catalog_post_shoot_hit_target_status_status(
+            state=state,
+            request=updated_request,
+            result=DecisionResult(
+                result_id=f"phase17k-post-shoot-cover-denial-{expected_reason}",
+                request_id=updated_request.request_id,
+                decision_type=updated_request.decision_type,
+                actor_id=updated_request.actor_id,
+                selected_option_id=updated_request.options[0].option_id,
+                payload=validate_json_value(option_payload),
+            ),
+        )
+        assert status is not None
+        payload = cast(dict[str, JsonValue], status.payload)
+        return cast(str, payload["invalid_reason"])
+
+    for key, value, expected_reason in (
+        ("submission_kind", "changed", "submission_kind_drift"),
+        ("hook_id", "changed", "hook_id_drift"),
+        ("game_id", "changed", "game_id_drift"),
+        ("battle_round", 2, "battle_round_drift"),
+        ("phase", "fight", "payload_phase_drift"),
+        ("active_player_id", enemy_army.player_id, "active_player_drift"),
+        ("player_id", enemy_army.player_id, "actor_player_drift"),
+    ):
+        payload = dict(base_option_payload)
+        payload[key] = cast(JsonValue, value)
+        assert (
+            invalid_reason_for_payload(
+                expected_reason=expected_reason,
+                option_payload=payload,
+            )
+            == expected_reason
+        )
+
+    for key, value, expected_reason in (
+        ("hook_id", "changed", "request_hook_id_drift"),
+        ("game_id", "changed", "request_game_id_drift"),
+        ("battle_round", 2, "request_battle_round_drift"),
+        ("phase", "fight", "request_phase_drift"),
+        ("active_player_id", enemy_army.player_id, "request_active_player_drift"),
+    ):
+        payload = dict(base_request_payload)
+        payload[key] = cast(JsonValue, value)
+        assert (
+            invalid_reason_for_payload(
+                expected_reason=expected_reason,
+                option_payload=dict(base_option_payload),
+                request_payload=payload,
+            )
+            == expected_reason
+        )
+
+    assert (
+        invalid_reason_for_payload(
+            expected_reason="request_payload_not_object",
+            option_payload=dict(base_option_payload),
+            request_payload="not-an-object",
+        )
+        == "request_payload_not_object"
+    )
+
+    selected_not_object_payload = dict(base_option_payload)
+    selected_not_object_payload["selected_post_shoot_hit_target_status"] = "not-an-object"
+    assert (
+        invalid_reason_for_payload(
+            expected_reason="selected_payload_not_object",
+            option_payload=selected_not_object_payload,
+        )
+        == "selected_payload_not_object"
+    )
+
+    selected_option_drift_payload = dict(base_option_payload)
+    selected_payload = dict(
+        cast(
+            dict[str, JsonValue],
+            selected_option_drift_payload["selected_post_shoot_hit_target_status"],
+        )
+    )
+    selected_payload["option_id"] = "changed"
+    selected_option_drift_payload["selected_post_shoot_hit_target_status"] = selected_payload
+    assert (
+        invalid_reason_for_payload(
+            expected_reason="selected_option_payload_drift",
+            option_payload=selected_option_drift_payload,
+        )
+        == "selected_option_payload_drift"
+    )
+
+    selected_target_type_payload = dict(base_option_payload)
+    selected_payload = dict(
+        cast(
+            dict[str, JsonValue],
+            selected_target_type_payload["selected_post_shoot_hit_target_status"],
+        )
+    )
+    selected_payload["target_unit_instance_id"] = 1
+    selected_target_type_payload["selected_post_shoot_hit_target_status"] = selected_payload
+    assert (
+        invalid_reason_for_payload(
+            expected_reason="selected_target_payload_drift",
+            option_payload=selected_target_type_payload,
+        )
+        == "selected_target_payload_drift"
+    )
+
+    target_drift_payload = dict(base_option_payload)
+    selected_payload = dict(
+        cast(dict[str, JsonValue], target_drift_payload["selected_post_shoot_hit_target_status"])
+    )
+    selected_payload["target_unit_instance_id"] = unit.unit_instance_id
+    target_drift_payload["selected_post_shoot_hit_target_status"] = selected_payload
+    assert (
+        invalid_reason_for_payload(
+            expected_reason="target_drift",
+            option_payload=target_drift_payload,
+        )
+        == "target_drift"
+    )
+
+    for key, value, expected_reason in (
+        ("source_phase", BattlePhase.FIGHT.value, "attack_sequence_phase_drift"),
+        ("sequence_id", "changed-sequence", "attack_sequence_id_drift"),
+        ("attacker_player_id", enemy_army.player_id, "attack_sequence_attacker_drift"),
+        ("attacking_unit_instance_id", target_unit.unit_instance_id, "attack_sequence_unit_drift"),
+    ):
+        payload = dict(base_option_payload)
+        attack_sequence_payload = dict(cast(dict[str, JsonValue], payload["attack_sequence"]))
+        attack_sequence_payload[key] = value
+        payload["attack_sequence"] = attack_sequence_payload
+        assert (
+            invalid_reason_for_payload(
+                expected_reason=expected_reason,
+                option_payload=payload,
+            )
+            == expected_reason
+        )
+
+    assert successful_hit_target_unit_ids_for_sequence(
+        decisions=decisions,
+        sequence=attack_sequence,
+        attacker_model_instance_id=unit.own_models[0].model_instance_id,
+        wargear_ids=(attack_sequence.attack_pools[0].wargear_id,),
+        weapon_profile_ids=(attack_sequence.attack_pools[0].weapon_profile_id,),
+    ) == (target_unit.unit_instance_id,)
+    assert (
+        successful_hit_target_unit_ids_for_sequence(
+            decisions=decisions,
+            sequence=attack_sequence,
+            attacker_model_instance_id="phase17k-other-model",
+        )
+        == ()
+    )
+    assert (
+        successful_hit_target_unit_ids_for_sequence(
+            decisions=decisions,
+            sequence=attack_sequence,
+            wargear_ids=("phase17k-other-wargear",),
+        )
+        == ()
+    )
+    assert (
+        successful_hit_target_unit_ids_for_sequence(
+            decisions=decisions,
+            sequence=attack_sequence,
+            weapon_profile_ids=("phase17k-other-profile",),
+        )
+        == ()
+    )
+
+
+def test_phase17k_post_shoot_hit_target_status_requires_successful_hit_not_wound() -> None:
+    package = _post_shoot_cover_denial_package()
+    unit = _named_weapon_choice_unit(package=package)
+    target_unit = _named_weapon_choice_unit(
+        package=package,
+        army_id="army-opponent",
+        unit_selection_id="enemy-lord-of-change-1",
+    )
+    army = _flesh_hounds_army(package=package, unit=unit)
+    enemy_army = _flesh_hounds_army(
+        package=package,
+        unit=target_unit,
+        army_id="army-opponent",
+        player_id="player-opponent",
+    )
+    player_index = _player_ability_index(package=package, army=army)
+    enemy_player_index = _player_ability_index(package=package, army=enemy_army)
+    battlefield = _flesh_hounds_battlefield_state(
+        army=army,
+        unit=unit,
+        enemy_army=enemy_army,
+        enemy_unit=target_unit,
+        enemy_x=24.0,
+    )
+    state = _battle_state_with_armies(
+        armies=(army, enemy_army),
+        battlefield=battlefield,
+        active_player_id=army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    attack_sequence = _completed_post_shoot_attack_sequence(
+        package=package,
+        attacker=unit,
+        target=target_unit,
+    )
+    runtime = CatalogPostShootHitTargetStatusRuntime(
+        ability_indexes_by_player_id={
+            army.player_id: player_index,
+            enemy_army.player_id: enemy_player_index,
+        },
+        armies=(army, enemy_army),
+    )
+
+    miss_decisions = DecisionController()
+    _emit_successful_hit(
+        decisions=miss_decisions,
+        attack_sequence=attack_sequence,
+        successful=False,
+    )
+    miss_completed_event = miss_decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "attacker_player_id": army.player_id,
+            "attacking_unit_instance_id": unit.unit_instance_id,
+        },
+    )
+    miss_context = AttackSequenceCompletedContext(
+        state=state,
+        decisions=miss_decisions,
+        dice_manager=DiceRollManager(state.game_id, event_log=miss_decisions.event_log),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        source_phase=BattlePhase.SHOOTING,
+        attack_sequence=attack_sequence,
+        attack_sequence_completed_event_id=miss_completed_event.event_id,
+    )
+
+    assert (
+        successful_hit_target_unit_ids_for_sequence(
+            decisions=miss_decisions,
+            sequence=attack_sequence,
+        )
+        == ()
+    )
+    assert (
+        _available_catalog_post_shoot_hit_target_status_groups(
+            ability_indexes_by_player_id={army.player_id: player_index},
+            armies=(army, enemy_army),
+            context=miss_context,
+        )
+        == ()
+    )
+    assert runtime.request_handler(miss_context) is None
+    assert miss_decisions.queue.pending_requests == ()
+
+    failed_wound_decisions = DecisionController()
+    _emit_successful_hit(
+        decisions=failed_wound_decisions,
+        attack_sequence=attack_sequence,
+        successful=True,
+    )
+    _emit_wound_result(
+        decisions=failed_wound_decisions,
+        attack_sequence=attack_sequence,
+        successful=False,
+    )
+    failed_wound_completed_event = failed_wound_decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "attacker_player_id": army.player_id,
+            "attacking_unit_instance_id": unit.unit_instance_id,
+        },
+    )
+    failed_wound_context = AttackSequenceCompletedContext(
+        state=state,
+        decisions=failed_wound_decisions,
+        dice_manager=DiceRollManager(state.game_id, event_log=failed_wound_decisions.event_log),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        source_phase=BattlePhase.SHOOTING,
+        attack_sequence=attack_sequence,
+        attack_sequence_completed_event_id=failed_wound_completed_event.event_id,
+    )
+    failed_wound_groups = _available_catalog_post_shoot_hit_target_status_groups(
+        ability_indexes_by_player_id={army.player_id: player_index},
+        armies=(army, enemy_army),
+        context=failed_wound_context,
+    )
+    failed_wound_status = runtime.request_handler(failed_wound_context)
+
+    assert successful_hit_target_unit_ids_for_sequence(
+        decisions=failed_wound_decisions,
+        sequence=attack_sequence,
+    ) == (target_unit.unit_instance_id,)
+    assert len(failed_wound_groups) == 1
+    assert failed_wound_status is not None
+    assert failed_wound_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert failed_wound_decisions.queue.peek_next().decision_type == (
+        SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE
+    )
+
+
+def test_phase17k_post_shoot_hit_target_status_processes_all_source_groups() -> None:
+    package = _post_shoot_cover_denial_package()
+    unit = _named_weapon_choice_unit(package=package, model_count=2)
+    target_unit = _named_weapon_choice_unit(
+        package=package,
+        army_id="army-opponent",
+        unit_selection_id="enemy-lord-of-change-1",
+    )
+    army = _flesh_hounds_army(package=package, unit=unit)
+    enemy_army = _flesh_hounds_army(
+        package=package,
+        unit=target_unit,
+        army_id="army-opponent",
+        player_id="player-opponent",
+    )
+    player_index = _player_ability_index(package=package, army=army)
+    enemy_player_index = _player_ability_index(package=package, army=enemy_army)
+    battlefield = _flesh_hounds_battlefield_state(
+        army=army,
+        unit=unit,
+        enemy_army=enemy_army,
+        enemy_unit=target_unit,
+        enemy_x=24.0,
+    )
+    state = _battle_state_with_armies(
+        armies=(army, enemy_army),
+        battlefield=battlefield,
+        active_player_id=army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    decisions = DecisionController()
+    attacker_model_ids = tuple(sorted(model.model_instance_id for model in unit.own_models))
+    attack_sequence = _completed_post_shoot_attack_sequence(
+        package=package,
+        attacker=unit,
+        target=target_unit,
+        attacker_model_instance_ids=attacker_model_ids,
+    )
+    for pool_index in range(len(attack_sequence.attack_pools)):
+        _emit_successful_hit(
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            successful=True,
+            pool_index=pool_index,
+        )
+    decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "attacker_player_id": army.player_id,
+            "attacking_unit_instance_id": unit.unit_instance_id,
+        },
+    )
+    state.shooting_phase_state = ShootingPhaseState(
+        battle_round=state.battle_round,
+        active_player_id=army.player_id,
+        shot_unit_ids=(unit.unit_instance_id,),
+        attack_pools=attack_sequence.attack_pools,
+        pending_completed_attack_sequence=attack_sequence,
+    )
+    handler = ShootingPhaseHandler(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=package.army_catalog,
+        stratagem_index=StratagemCatalogIndex.from_records(()),
+        attack_sequence_completed_hooks=AttackSequenceCompletedHookRegistry.from_bindings(
+            CatalogPostShootHitTargetStatusRuntime(
+                ability_indexes_by_player_id={
+                    army.player_id: player_index,
+                    enemy_army.player_id: enemy_player_index,
+                },
+                armies=(army, enemy_army),
+            ).bindings()
+        ),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+
+    first_status = handler.begin_phase(state=state, decisions=decisions)
+    assert first_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    first_request = decisions.queue.peek_next()
+    first_payload = cast(dict[str, JsonValue], first_request.payload)
+    assert first_payload["source_model_instance_id"] == attacker_model_ids[0]
+    assert _pending_completed_attack_sequence_for_test(state) == attack_sequence
+
+    first_result = DecisionResult.for_request(
+        result_id="phase17k-post-shoot-cover-denial-source-001",
+        request=first_request,
+        selected_option_id=first_request.options[0].option_id,
+    )
+    decisions.submit_result(first_result)
+    assert handler.apply_decision(state=state, result=first_result, decisions=decisions) is None
+
+    second_status = handler.begin_phase(state=state, decisions=decisions)
+    assert second_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    second_request = decisions.queue.peek_next()
+    second_payload = cast(dict[str, JsonValue], second_request.payload)
+    assert second_request.request_id != first_request.request_id
+    assert second_request.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE
+    assert second_payload["source_model_instance_id"] == attacker_model_ids[1]
+    assert _pending_completed_attack_sequence_for_test(state) == attack_sequence
+
+    second_result = DecisionResult.for_request(
+        result_id="phase17k-post-shoot-cover-denial-source-002",
+        request=second_request,
+        selected_option_id=second_request.options[0].option_id,
+    )
+    decisions.submit_result(second_result)
+    assert handler.apply_decision(state=state, result=second_result, decisions=decisions) is None
+
+    completion_status = handler.begin_phase(state=state, decisions=decisions)
+    assert completion_status.status_kind is LifecycleStatusKind.ADVANCED
+    assert _pending_completed_attack_sequence_for_test(state) is None
+    selected_events = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SELECTED_EVENT
+    )
+    requested_events = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "catalog_post_shoot_hit_target_status_requested"
+    )
+    effects = state.persisting_effects_for_unit(target_unit.unit_instance_id)
+
+    assert len(requested_events) == 2
+    assert len(selected_events) == 2
+    assert [
+        cast(dict[str, JsonValue], event.payload)["source_model_instance_id"]
+        for event in selected_events
+    ] == list(attacker_model_ids)
+    assert len(effects) == 2
+    assert all(
+        cast(dict[str, JsonValue], effect.effect_payload)["effect_kind"]
+        == CATALOG_POST_SHOOT_HIT_TARGET_STATUS_EFFECT_KIND
+        for effect in effects
+    )
+    assert "object at 0x" not in json.dumps(decisions.to_payload(), sort_keys=True)
+
+
+def test_phase17k_post_shoot_hit_target_status_uses_runtime_clause_scoped_records() -> None:
+    package = _post_shoot_cover_denial_package()
+    unit = _named_weapon_choice_unit(package=package)
+    target_unit = _named_weapon_choice_unit(
+        package=package,
+        army_id="army-opponent",
+        unit_selection_id="enemy-lord-of-change-1",
+    )
+    army = _flesh_hounds_army(package=package, unit=unit)
+    enemy_army = _flesh_hounds_army(
+        package=package,
+        unit=target_unit,
+        army_id="army-opponent",
+        player_id="player-opponent",
+    )
+    rule_ir = _multi_clause_post_shoot_cover_denial_rule_ir()
+    clause_001_record = _multi_clause_post_shoot_cover_denial_record(
+        rule_ir=rule_ir,
+        clause_index=0,
+        datasheet_id=unit.datasheet_id,
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+    )
+    clause_002_record = _multi_clause_post_shoot_cover_denial_record(
+        rule_ir=rule_ir,
+        clause_index=1,
+        datasheet_id=unit.datasheet_id,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+    )
+    ability_index = AbilityCatalogIndex.from_records((clause_001_record, clause_002_record))
+    enemy_ability_index = AbilityCatalogIndex.from_records(())
+    battlefield = _flesh_hounds_battlefield_state(
+        army=army,
+        unit=unit,
+        enemy_army=enemy_army,
+        enemy_unit=target_unit,
+        enemy_x=24.0,
+    )
+    state = _battle_state_with_armies(
+        armies=(army, enemy_army),
+        battlefield=battlefield,
+        active_player_id=army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    decisions = DecisionController()
+    attack_sequence = _completed_post_shoot_attack_sequence(
+        package=package,
+        attacker=unit,
+        attacker_player_id=army.player_id,
+        target=target_unit,
+    )
+    _emit_successful_hit(
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        successful=True,
+    )
+    completed_event = decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "attacker_player_id": army.player_id,
+            "attacking_unit_instance_id": unit.unit_instance_id,
+        },
+    )
+    context = AttackSequenceCompletedContext(
+        state=state,
+        decisions=decisions,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        source_phase=BattlePhase.SHOOTING,
+        attack_sequence=attack_sequence,
+        attack_sequence_completed_event_id=completed_event.event_id,
+    )
+
+    groups = _available_catalog_post_shoot_hit_target_status_groups(
+        ability_indexes_by_player_id={army.player_id: ability_index},
+        armies=(army, enemy_army),
+        context=context,
+    )
+    status = CatalogPostShootHitTargetStatusRuntime(
+        ability_indexes_by_player_id={
+            army.player_id: ability_index,
+            enemy_army.player_id: enemy_ability_index,
+        },
+        armies=(army, enemy_army),
+    ).request_handler(context)
+
+    assert not _record_can_select_catalog_post_shoot_hit_target_status(clause_001_record)
+    assert _record_can_select_catalog_post_shoot_hit_target_status(clause_002_record)
+    assert len(groups) == 1
+    assert groups[0].record.record_id == clause_002_record.record_id
+    assert groups[0].clause.clause_id == rule_ir.clauses[1].clause_id
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = decisions.queue.peek_next()
+    assert request is not None
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["catalog_record_id"] == clause_002_record.record_id
+    assert len(request.options) == 1
+
+
+def test_phase17k_post_shoot_hit_target_status_fail_fast_validation_paths() -> None:
+    package = _post_shoot_cover_denial_package()
+    unit = _named_weapon_choice_unit(package=package)
+    target_unit = _named_weapon_choice_unit(
+        package=package,
+        army_id="army-opponent",
+        unit_selection_id="enemy-lord-of-change-1",
+    )
+    army = _flesh_hounds_army(package=package, unit=unit)
+    enemy_army = _flesh_hounds_army(
+        package=package,
+        unit=target_unit,
+        army_id="army-opponent",
+        player_id="player-opponent",
+    )
+    player_index = _player_ability_index(package=package, army=army)
+    enemy_player_index = _player_ability_index(package=package, army=enemy_army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    cover_record = records_by_name["Purge and Cleanse"]
+    replay_payload = cast(dict[str, JsonValue], cover_record.definition.replay_payload)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    clause = rule_ir.clauses[0]
+    current_model_ids = (unit.own_models[0].model_instance_id,)
+    battlefield = _flesh_hounds_battlefield_state(
+        army=army,
+        unit=unit,
+        enemy_army=enemy_army,
+        enemy_unit=target_unit,
+        enemy_x=24.0,
+    )
+    state = _battle_state_with_armies(
+        armies=(army, enemy_army),
+        battlefield=battlefield,
+        active_player_id=army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    decisions = DecisionController()
+    attack_sequence = _completed_post_shoot_attack_sequence(
+        package=package,
+        attacker=unit,
+        target=target_unit,
+    )
+    completed_event = decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "attacker_player_id": army.player_id,
+            "attacking_unit_instance_id": unit.unit_instance_id,
+        },
+    )
+    context = AttackSequenceCompletedContext(
+        state=state,
+        decisions=decisions,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        source_phase=BattlePhase.SHOOTING,
+        attack_sequence=attack_sequence,
+        attack_sequence_completed_event_id=completed_event.event_id,
+    )
+
+    assert (
+        CatalogPostShootHitTargetStatusRuntime(
+            ability_indexes_by_player_id={
+                army.player_id: player_index,
+                enemy_army.player_id: enemy_player_index,
+            },
+            armies=(army, enemy_army),
+        )
+        .bindings()[0]
+        .hook_id
+        == CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID
+    )
+    assert (
+        CatalogPostShootHitTargetStatusRuntime(
+            ability_indexes_by_player_id={
+                army.player_id: AbilityCatalogIndex.from_records(()),
+                enemy_army.player_id: AbilityCatalogIndex.from_records(()),
+            },
+            armies=(army, enemy_army),
+        ).bindings()
+        == ()
+    )
+    assert (
+        _available_catalog_post_shoot_hit_target_status_groups(
+            ability_indexes_by_player_id={army.player_id: player_index},
+            armies=(army, enemy_army),
+            context=context,
+        )
+        == ()
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        _available_catalog_post_shoot_hit_target_status_groups(
+            ability_indexes_by_player_id={army.player_id: player_index},
+            armies=(army, enemy_army),
+            context=cast(Any, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="index is missing player"):
+        _available_catalog_post_shoot_hit_target_status_groups(
+            ability_indexes_by_player_id={},
+            armies=(army, enemy_army),
+            context=context,
+        )
+    with pytest.raises(GameLifecycleError, match="requires an ability record"):
+        _catalog_post_shoot_hit_target_status_groups_from_clause(
+            context=context,
+            record=cast(Any, object()),
+            unit=unit,
+            current_model_instance_ids=current_model_ids,
+            clause=clause,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a rule clause"):
+        _catalog_post_shoot_hit_target_status_groups_from_clause(
+            context=context,
+            record=cover_record,
+            unit=unit,
+            current_model_instance_ids=current_model_ids,
+            clause=cast(Any, object()),
+        )
+
+    def clause_with_trigger_parameter(key: str, value: RuleParameterValue) -> RuleClause:
+        assert clause.trigger is not None
+        parameters = dict(parameter_payload(clause.trigger.parameters))
+        parameters[key] = value
+        return replace(
+            clause,
+            trigger=replace(
+                clause.trigger,
+                parameters=parameters_from_pairs(
+                    tuple(
+                        (parameter_key, parameter_value)
+                        for parameter_key, parameter_value in parameters.items()
+                    )
+                ),
+            ),
+        )
+
+    this_unit_clause = clause_with_trigger_parameter("subject", "this_unit")
+    assert _post_shoot_status_source_model_ids(
+        record=cover_record,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        clause=this_unit_clause,
+        attack_sequence=attack_sequence,
+    ) == (None,)
+    with pytest.raises(GameLifecycleError, match="requires an ability record"):
+        _post_shoot_status_source_model_ids(
+            record=cast(Any, object()),
+            unit=unit,
+            current_model_instance_ids=current_model_ids,
+            clause=clause,
+            attack_sequence=attack_sequence,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a triggered clause"):
+        _post_shoot_status_source_model_ids(
+            record=cover_record,
+            unit=unit,
+            current_model_instance_ids=current_model_ids,
+            clause=replace(clause, trigger=None),
+            attack_sequence=attack_sequence,
+        )
+    with pytest.raises(GameLifecycleError, match="requires an AttackSequence"):
+        _post_shoot_status_source_model_ids(
+            record=cover_record,
+            unit=unit,
+            current_model_instance_ids=current_model_ids,
+            clause=clause,
+            attack_sequence=cast(Any, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="unsupported subject"):
+        _post_shoot_status_source_model_ids(
+            record=cover_record,
+            unit=unit,
+            current_model_instance_ids=current_model_ids,
+            clause=clause_with_trigger_parameter("subject", "unsupported_subject"),
+            attack_sequence=attack_sequence,
+        )
+    with pytest.raises(GameLifecycleError, match="requires an ability record"):
+        _post_shoot_hit_target_status_option_id(
+            record=cast(Any, object()),
+            unit=unit,
+            clause=clause,
+            effect_index=0,
+            status="benefit_of_cover",
+            source_model_instance_id=unit.own_models[0].model_instance_id,
+            target_unit_instance_id=target_unit.unit_instance_id,
+        )
+    with pytest.raises(GameLifecycleError, match="requires a rule clause"):
+        _post_shoot_hit_target_status_option_id(
+            record=cover_record,
+            unit=unit,
+            clause=cast(Any, object()),
+            effect_index=0,
+            status="benefit_of_cover",
+            source_model_instance_id=unit.own_models[0].model_instance_id,
+            target_unit_instance_id=target_unit.unit_instance_id,
+        )
+    with pytest.raises(GameLifecycleError, match="effect_index must be non-negative"):
+        _post_shoot_hit_target_status_option_id(
+            record=cover_record,
+            unit=unit,
+            clause=clause,
+            effect_index=-1,
+            status="benefit_of_cover",
+            source_model_instance_id=unit.own_models[0].model_instance_id,
+            target_unit_instance_id=target_unit.unit_instance_id,
+        )
+
+    assert not _clause_is_supported_post_shoot_hit_target_status_denial(
+        clause_with_trigger_parameter("edge", "during")
+    )
+    assert not _clause_is_supported_post_shoot_hit_target_status_denial(
+        clause_with_trigger_parameter("subject", "unsupported_subject")
+    )
+    assert not _clause_is_supported_post_shoot_hit_target_status_denial(
+        replace(clause, duration=None)
+    )
+    assert not _clause_is_supported_post_shoot_hit_target_status_denial(
+        replace(
+            clause,
+            target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=clause.source_span),
+        )
+    )
+    assert not _effect_is_supported_status_denial(
+        _effect(RuleEffectKind.GRANT_ABILITY, ability="can_advance_and_charge")
+    )
+    with pytest.raises(GameLifecycleError, match="requires RuleClause values"):
+        _clause_is_supported_post_shoot_hit_target_status_denial(cast(Any, object()))
+    with pytest.raises(GameLifecycleError, match="requires RuleEffectSpec values"):
+        _effect_is_supported_status_denial(cast(Any, object()))
+    with pytest.raises(GameLifecycleError, match="selected payload must be an object"):
+        _post_shoot_hit_target_status_selected_payload({})
+    with pytest.raises(GameLifecycleError, match="payload requires attack_sequence"):
+        _post_shoot_hit_target_status_attack_sequence_from_payload({})
+    with pytest.raises(GameLifecycleError, match="requires option values"):
+        _validate_post_shoot_hit_target_status_option(cast(Any, object()))
+    with pytest.raises(GameLifecycleError, match="requires a field name"):
+        _validate_non_empty_text("", "Benefit of Cover")
+    with pytest.raises(GameLifecycleError, match="status_label must be a string"):
+        _validate_non_empty_text("status_label", 1)
+    with pytest.raises(GameLifecycleError, match="status_label must not be empty"):
+        _validate_non_empty_text("status_label", " ")
+
+    with pytest.raises(GameLifecycleError, match="wargear_ids must be a tuple"):
+        successful_hit_target_unit_ids_for_sequence(
+            decisions=decisions,
+            sequence=attack_sequence,
+            wargear_ids=cast(Any, ["bolt-of-change"]),
+        )
+    with pytest.raises(GameLifecycleError, match="wargear_ids must not duplicate IDs"):
+        successful_hit_target_unit_ids_for_sequence(
+            decisions=decisions,
+            sequence=attack_sequence,
+            wargear_ids=("bolt-of-change", "bolt-of-change"),
+        )
+
+    def assert_hit_lookup_raises(payload: JsonValue, match: str) -> None:
+        lookup_decisions = DecisionController()
+        lookup_decisions.event_log.append("attack_sequence_step", payload)
+        with pytest.raises(GameLifecycleError, match=match):
+            successful_hit_target_unit_ids_for_sequence(
+                decisions=lookup_decisions,
+                sequence=attack_sequence,
+            )
+
+    assert_hit_lookup_raises("not-an-object", "payload must be an object")
+    assert_hit_lookup_raises(
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": 0,
+            "payload": "not-an-object",
+        },
+        "hit payload must be an object",
+    )
+    assert_hit_lookup_raises(
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": "zero",
+            "payload": {"successful": True},
+        },
+        "pool_index must be an int",
+    )
+    assert_hit_lookup_raises(
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": 99,
+            "payload": {"successful": True},
+        },
+        "pool_index is out of range",
+    )
 
 
 def test_phase17k_named_weapon_ability_choice_rejects_availability_drift() -> None:
@@ -4236,6 +5314,14 @@ def _named_weapon_choice_package() -> CanonicalCatalogPackage:
     )
 
 
+def _post_shoot_cover_denial_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_post_shoot_cover_denial_bridge_artifacts(),
+    )
+
+
 def _bloodcrushers_unit(
     *,
     package: CanonicalCatalogPackage,
@@ -4335,20 +5421,23 @@ def _advance_charge_unit(
 def _named_weapon_choice_unit(
     *,
     package: CanonicalCatalogPackage,
+    army_id: str = "army-daemons",
+    unit_selection_id: str = "lord-of-change-1",
+    model_count: int = 1,
 ) -> UnitInstance:
     datasheet = package.army_catalog.datasheet_by_id("test-lord-of-change")
     return UnitFactory(
         catalog=package.army_catalog,
         model_geometries=package.model_geometries,
     ).instantiate_unit(
-        army_id="army-daemons",
+        army_id=army_id,
         selection=UnitMusterSelection(
-            unit_selection_id="lord-of-change-1",
+            unit_selection_id=unit_selection_id,
             datasheet_id=datasheet.datasheet_id,
             model_profile_selections=(
                 ModelProfileSelection(
                     model_profile_id="test-lord-of-change:lord-of-change",
-                    model_count=1,
+                    model_count=model_count,
                 ),
             ),
         ),
@@ -4602,6 +5691,12 @@ def _set_state_battle_phase(state: GameState, phase: BattlePhase) -> None:
     state.battle_phase_index = tuple(state.battle_phase_sequence).index(phase)
 
 
+def _pending_completed_attack_sequence_for_test(state: GameState) -> AttackSequence | None:
+    shooting_state = state.shooting_phase_state
+    assert shooting_state is not None
+    return shooting_state.pending_completed_attack_sequence
+
+
 def _shooting_phase_start_request_context(
     *,
     state: GameState,
@@ -4623,6 +5718,99 @@ def _weapon_profile_by_name(catalog: ArmyCatalog, name: str) -> WeaponProfile:
             if profile.name == name:
                 return profile
     raise AssertionError(f"Missing weapon profile: {name}.")
+
+
+def _wargear_id_for_weapon_profile(catalog: ArmyCatalog, weapon_profile_id: str) -> str:
+    for wargear in catalog.wargear:
+        for profile in wargear.weapon_profiles:
+            if profile.profile_id == weapon_profile_id:
+                return wargear.wargear_id
+    raise AssertionError(f"Missing wargear for weapon profile: {weapon_profile_id}.")
+
+
+def _completed_post_shoot_attack_sequence(
+    *,
+    package: CanonicalCatalogPackage,
+    attacker: UnitInstance,
+    attacker_player_id: str = "player-daemons",
+    target: UnitInstance,
+    attacker_model_instance_ids: tuple[str, ...] | None = None,
+) -> AttackSequence:
+    bolt_profile = _weapon_profile_by_name(package.army_catalog, "Bolt of Change")
+    target_model_ids = tuple(model.model_instance_id for model in target.own_models)
+    attacker_model_ids = (
+        (attacker.own_models[0].model_instance_id,)
+        if attacker_model_instance_ids is None
+        else attacker_model_instance_ids
+    )
+    wargear_id = _wargear_id_for_weapon_profile(package.army_catalog, bolt_profile.profile_id)
+    attack_pools = tuple(
+        RangedAttackPool(
+            attacker_model_instance_id=attacker_model_id,
+            wargear_id=wargear_id,
+            weapon_profile_id=bolt_profile.profile_id,
+            weapon_profile=bolt_profile,
+            target_unit_instance_id=target.unit_instance_id,
+            shooting_type=ShootingType.NORMAL,
+            attacks=1,
+            target_visible_model_ids=target_model_ids,
+            target_in_range_model_ids=target_model_ids,
+        )
+        for attacker_model_id in attacker_model_ids
+    )
+    return AttackSequence(
+        sequence_id="phase17k-post-shoot-cover-denial-sequence",
+        attacker_player_id=attacker_player_id,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=attack_pools,
+        source_phase=BattlePhase.SHOOTING,
+        used_pool_indices=tuple(range(len(attack_pools))),
+        pool_index=len(attack_pools),
+    )
+
+
+def _emit_successful_hit(
+    *,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    successful: bool,
+    pool_index: int = 0,
+) -> None:
+    decisions.event_log.append(
+        "attack_sequence_step",
+        AttackSequenceEvent(
+            step=AttackSequenceStep.HIT,
+            sequence_id=attack_sequence.sequence_id,
+            attack_context_id=(
+                f"{attack_sequence.sequence_id}:pool-{pool_index + 1:03d}:attack-001"
+            ),
+            pool_index=pool_index,
+            attack_index=0,
+            payload={"successful": successful},
+        ).to_payload(),
+    )
+
+
+def _emit_wound_result(
+    *,
+    decisions: DecisionController,
+    attack_sequence: AttackSequence,
+    successful: bool,
+    pool_index: int = 0,
+) -> None:
+    decisions.event_log.append(
+        "attack_sequence_step",
+        AttackSequenceEvent(
+            step=AttackSequenceStep.WOUND,
+            sequence_id=attack_sequence.sequence_id,
+            attack_context_id=(
+                f"{attack_sequence.sequence_id}:pool-{pool_index + 1:03d}:attack-001"
+            ),
+            pool_index=pool_index,
+            attack_index=0,
+            payload={"successful": successful},
+        ).to_payload(),
+    )
 
 
 def _phase17k_named_choice_effect(
@@ -4777,6 +5965,112 @@ def _multi_clause_named_weapon_choice_record(
             source_id="phase17k:test:multi-named-choice",
             when_descriptor="Catalog generic rule IR.",
             effect_descriptor="Multi-clause named weapon ability choice.",
+            restrictions_descriptor="Datasheet ability source kind: datasheet.",
+            timing=AbilityTimingDescriptor(trigger_kind=trigger_kind),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value(
+                {
+                    "rule_ir": rule_ir.to_payload(),
+                    "runtime_clause_id": clause.clause_id,
+                }
+            ),
+        ),
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id=datasheet_id,
+    )
+
+
+def _multi_clause_post_shoot_cover_denial_rule_ir() -> RuleIR:
+    span = TextSpan(text="catalog hook test", start=0, end=17)
+    return RuleIR(
+        rule_id="phase17k:test:multi-post-shoot-cover-denial",
+        source_id="phase17k:test:multi-post-shoot-cover-denial",
+        normalized_text=span.text,
+        parser_version="test-catalog-hook-parser",
+        clauses=(
+            RuleClause(
+                clause_id="phase17k:test:multi-post-shoot-cover-denial:clause:001",
+                source_span=span,
+                trigger=RuleTrigger(
+                    kind=RuleTriggerKind.TIMING_WINDOW,
+                    source_span=span,
+                    parameters=parameters_from_pairs(
+                        (
+                            ("edge", "during"),
+                            ("owner", "active_player"),
+                            ("phase", "movement"),
+                        )
+                    ),
+                ),
+                target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=span),
+                effects=(
+                    _effect(
+                        RuleEffectKind.GRANT_ABILITY,
+                        ability="can_advance_and_charge",
+                    ),
+                ),
+                duration=RuleDuration(
+                    kind=RuleDurationKind.PERMANENT,
+                    source_span=span,
+                ),
+            ),
+            RuleClause(
+                clause_id="phase17k:test:multi-post-shoot-cover-denial:clause:002",
+                source_span=span,
+                trigger=RuleTrigger(
+                    kind=RuleTriggerKind.TIMING_WINDOW,
+                    source_span=span,
+                    parameters=parameters_from_pairs(
+                        (
+                            ("edge", "after"),
+                            ("owner", "active_player"),
+                            ("phase", "shooting"),
+                            ("subject", "this_model"),
+                            ("timing_window", "just_after_friendly_unit_has_shot"),
+                            ("target_relationship", "hit_by_those_attacks"),
+                        )
+                    ),
+                ),
+                target=RuleTargetSpec(kind=RuleTargetKind.ENEMY_UNIT, source_span=span),
+                effects=(
+                    _effect(
+                        RuleEffectKind.SET_CONTEXTUAL_STATUS,
+                        status="benefit_of_cover",
+                        status_label="Benefit of Cover",
+                        operation="deny",
+                        target_scope="selected_unit",
+                        rules_context="status_denial",
+                    ),
+                ),
+                duration=RuleDuration(
+                    kind=RuleDurationKind.UNTIL_TIMING_ENDPOINT,
+                    source_span=span,
+                    parameters=parameters_from_pairs((("endpoint", "phase"),)),
+                ),
+            ),
+        ),
+    )
+
+
+def _multi_clause_post_shoot_cover_denial_record(
+    *,
+    rule_ir: RuleIR,
+    clause_index: int,
+    datasheet_id: str,
+    trigger_kind: TimingTriggerKind,
+) -> AbilityCatalogRecord:
+    clause = rule_ir.clauses[clause_index]
+    return AbilityCatalogRecord(
+        record_id=(
+            f"phase17k:test:catalog-ability:{datasheet_id}:multi-purge-and-cleanse:"
+            f"{clause.clause_id}"
+        ),
+        definition=AbilityDefinition(
+            ability_id="multi-purge-and-cleanse",
+            name="Multi-Clause Purge and Cleanse",
+            source_id="phase17k:test:multi-post-shoot-cover-denial",
+            when_descriptor="Catalog generic rule IR.",
+            effect_descriptor="Multi-clause post-shoot hit-target status denial.",
             restrictions_descriptor="Datasheet ability source kind: datasheet.",
             timing=AbilityTimingDescriptor(trigger_kind=trigger_kind),
             handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -5201,6 +6495,24 @@ def _named_weapon_choice_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]
     )
 
 
+def _post_shoot_cover_denial_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_post_shoot_cover_denial_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("test-lord-of-change",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-lord-of-change",
+                model_name="Lord of Change",
+                height=5.5,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:test:lord-of-change:height",
+                height_document_reference="Test Lord of Change Datasheet",
+            ),
+        ),
+    )
+
+
 def _advance_charge_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     return (
         _artifact_from_csv(
@@ -5462,6 +6774,90 @@ def _named_weapon_choice_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]
                 (
                     "datasheet_id,line,description",
                     "test-lord-of-change,1,1 Lord of Change",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _post_shoot_cover_denial_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-daemons-rule,test-faction,Test Daemons Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-lord-of-change,Lord of Change,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-lord-of-change,1,Faction,test-daemons-rule,"
+                        "Test Daemons Rule,Test rule text.,"
+                    ),
+                    (
+                        "test-lord-of-change,2,Datasheet,,Purge and Cleanse,"
+                        '"In your Shooting phase, after this model has shot, select one '
+                        "enemy unit hit by one or more of those attacks. Until the end "
+                        'of the phase, that unit cannot have the Benefit of Cover.",'
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-lord-of-change,Character,,false",
+                    "test-lord-of-change,Monster,,false",
+                    "test-lord-of-change,Psyker,,false",
+                    "test-lord-of-change,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-lord-of-change,1,12,10,6,5,20,6,5,100mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    "test-lord-of-change,1,1,Bolt of Change,Ranged,18,9,2,9,-2,3,",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    "test-lord-of-change,1,1-2 Lord of Change",
                 )
             ),
         ),

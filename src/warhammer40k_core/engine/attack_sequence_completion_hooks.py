@@ -4,7 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, cast
 
-from warhammer40k_core.engine.attack_sequence import AttackSequence
+from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequenceStep
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
@@ -126,6 +126,63 @@ def attack_sequence_completed_event_id(
     raise GameLifecycleError("Completed attack sequence event is missing.")
 
 
+def successful_hit_target_unit_ids_for_sequence(
+    *,
+    decisions: DecisionController,
+    sequence: AttackSequence,
+    attacker_model_instance_id: str | None = None,
+    wargear_ids: tuple[str, ...] = (),
+    weapon_profile_ids: tuple[str, ...] = (),
+) -> tuple[str, ...]:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Attack sequence hit target lookup requires decisions.")
+    if type(sequence) is not AttackSequence:
+        raise GameLifecycleError("Attack sequence hit target lookup requires sequence.")
+    requested_model_id = (
+        None
+        if attacker_model_instance_id is None
+        else _validate_identifier("attacker_model_instance_id", attacker_model_instance_id)
+    )
+    requested_wargear_ids = _validate_optional_identifier_tuple("wargear_ids", wargear_ids)
+    requested_weapon_profile_ids = _validate_optional_identifier_tuple(
+        "weapon_profile_ids",
+        weapon_profile_ids,
+    )
+    target_ids: set[str] = set()
+    for record in decisions.event_log.records:
+        if record.event_type != "attack_sequence_step":
+            continue
+        payload = record.payload
+        if type(payload) is not dict:
+            raise GameLifecycleError("Attack sequence step event payload must be an object.")
+        if payload.get("sequence_id") != sequence.sequence_id:
+            continue
+        if payload.get("step") != AttackSequenceStep.HIT.value:
+            continue
+        step_payload = payload.get("payload")
+        if type(step_payload) is not dict:
+            raise GameLifecycleError("Attack sequence hit payload must be an object.")
+        if step_payload.get("successful") is not True:
+            continue
+        pool_index = payload.get("pool_index")
+        if type(pool_index) is not int:
+            raise GameLifecycleError("Attack sequence hit event pool_index must be an int.")
+        if pool_index < 0 or pool_index >= len(sequence.attack_pools):
+            raise GameLifecycleError("Attack sequence hit event pool_index is out of range.")
+        pool = sequence.attack_pools[pool_index]
+        if requested_model_id is not None and pool.attacker_model_instance_id != requested_model_id:
+            continue
+        if requested_wargear_ids and pool.wargear_id not in requested_wargear_ids:
+            continue
+        if (
+            requested_weapon_profile_ids
+            and pool.weapon_profile_id not in requested_weapon_profile_ids
+        ):
+            continue
+        target_ids.add(pool.target_unit_instance_id)
+    return tuple(sorted(target_ids))
+
+
 def _validate_hook_bindings(
     value: object,
 ) -> tuple[AttackSequenceCompletedHookBinding, ...]:
@@ -153,6 +210,25 @@ def _validate_identifier(field_name: str, value: object) -> str:
     if not stripped:
         raise GameLifecycleError(f"Attack sequence completion hook {field_name} must not be empty.")
     return stripped
+
+
+def _validate_optional_identifier_tuple(
+    field_name: str,
+    value: object,
+) -> tuple[str, ...]:
+    if type(value) is not tuple:
+        raise GameLifecycleError(f"Attack sequence completion hook {field_name} must be a tuple.")
+    validated: list[str] = []
+    seen: set[str] = set()
+    for item in cast(tuple[object, ...], value):
+        identifier = _validate_identifier(field_name, item)
+        if identifier in seen:
+            raise GameLifecycleError(
+                f"Attack sequence completion hook {field_name} must not duplicate IDs."
+            )
+        seen.add(identifier)
+        validated.append(identifier)
+    return tuple(sorted(validated))
 
 
 def _battle_phase_from_token(token: object) -> BattlePhase:

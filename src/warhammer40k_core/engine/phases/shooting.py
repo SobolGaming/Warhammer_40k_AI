@@ -30,7 +30,6 @@ from warhammer40k_core.engine.attack_sequence import (
     SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackSequence,
     AttackSequencePayload,
-    AttackSequenceStep,
     apply_allocation_order_decision,
     apply_attack_weapon_group_decision,
     apply_damage_allocation_model_decision,
@@ -54,12 +53,17 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
     AttackSequenceCompletedHookRegistry,
     attack_sequence_completed_event_id,
+    successful_hit_target_unit_ids_for_sequence,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     PlacementError,
     UnitPlacement,
     geometry_model_for_placement,
+)
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE,
+    apply_catalog_post_shoot_hit_target_status_result,
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
@@ -252,6 +256,7 @@ class ShootingPhaseStatePayload(TypedDict):
     skipped_unit_ids: list[str]
     active_selection: ShootingUnitSelectionPayload | None
     selected_shooting_type: ShootingTypeSelectionPayload | None
+    pending_completed_attack_sequence: AttackSequencePayload | None
     attack_pools: list[RangedAttackPoolPayload]
     attack_sequence: AttackSequencePayload | None
     allocated_model_ids_this_phase: list[str]
@@ -458,6 +463,7 @@ class ShootingPhaseState:
     skipped_unit_ids: tuple[str, ...] = ()
     active_selection: ShootingUnitSelection | None = None
     selected_shooting_type: ShootingTypeSelection | None = None
+    pending_completed_attack_sequence: AttackSequence | None = None
     attack_pools: tuple[RangedAttackPool, ...] = ()
     attack_sequence: AttackSequence | None = None
     allocated_model_ids_this_phase: tuple[str, ...] = ()
@@ -531,6 +537,20 @@ class ShootingPhaseState:
                 != self.active_selection.unit_instance_id
             ):
                 raise GameLifecycleError("Shooting selected_shooting_type unit drift.")
+        if self.pending_completed_attack_sequence is not None:
+            if type(self.pending_completed_attack_sequence) is not AttackSequence:
+                raise GameLifecycleError(
+                    "ShootingPhaseState pending_completed_attack_sequence must be an "
+                    "AttackSequence."
+                )
+            if self.active_selection is not None:
+                raise GameLifecycleError(
+                    "Shooting pending completed attack sequence requires no active selection."
+                )
+            if self.selected_shooting_type is not None:
+                raise GameLifecycleError(
+                    "Shooting pending completed attack sequence requires no selected shooting type."
+                )
         object.__setattr__(
             self,
             "attack_pools",
@@ -543,6 +563,10 @@ class ShootingPhaseState:
                 )
             if self.active_selection is not None:
                 raise GameLifecycleError("Shooting attack_sequence requires no active_selection.")
+            if self.pending_completed_attack_sequence is not None:
+                raise GameLifecycleError(
+                    "Shooting cannot have active and pending completed attack sequences."
+                )
         object.__setattr__(
             self,
             "allocated_model_ids_this_phase",
@@ -555,6 +579,10 @@ class ShootingPhaseState:
             raise GameLifecycleError("Completed Shooting phase cannot have active_selection.")
         if self.phase_complete and self.attack_sequence is not None:
             raise GameLifecycleError("Completed Shooting phase cannot have attack_sequence.")
+        if self.phase_complete and self.pending_completed_attack_sequence is not None:
+            raise GameLifecycleError(
+                "Completed Shooting phase cannot have pending completed attack sequence."
+            )
 
     def with_unit_selection(self, selection: ShootingUnitSelection) -> Self:
         if type(selection) is not ShootingUnitSelection:
@@ -580,6 +608,7 @@ class ShootingPhaseState:
             skipped_unit_ids=self.skipped_unit_ids,
             active_selection=selection,
             selected_shooting_type=None,
+            pending_completed_attack_sequence=self.pending_completed_attack_sequence,
             attack_pools=self.attack_pools,
             attack_sequence=self.attack_sequence,
             allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
@@ -609,6 +638,7 @@ class ShootingPhaseState:
             skipped_unit_ids=self.skipped_unit_ids,
             active_selection=self.active_selection,
             selected_shooting_type=selection,
+            pending_completed_attack_sequence=self.pending_completed_attack_sequence,
             attack_pools=self.attack_pools,
             attack_sequence=self.attack_sequence,
             allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
@@ -654,6 +684,7 @@ class ShootingPhaseState:
             skipped_unit_ids=self.skipped_unit_ids,
             active_selection=None,
             selected_shooting_type=None,
+            pending_completed_attack_sequence=self.pending_completed_attack_sequence,
             attack_pools=(*self.attack_pools, *attack_pools),
             attack_sequence=attack_sequence,
             allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
@@ -674,9 +705,33 @@ class ShootingPhaseState:
             skipped_unit_ids=self.skipped_unit_ids,
             active_selection=self.active_selection,
             selected_shooting_type=self.selected_shooting_type,
+            pending_completed_attack_sequence=self.pending_completed_attack_sequence,
             attack_pools=self.attack_pools,
             attack_sequence=attack_sequence,
             allocated_model_ids_this_phase=allocated_model_ids_this_phase,
+        )
+
+    def with_pending_completed_attack_sequence(
+        self,
+        attack_sequence: AttackSequence | None,
+    ) -> Self:
+        if attack_sequence is not None and type(attack_sequence) is not AttackSequence:
+            raise GameLifecycleError(
+                "Shooting pending completed attack sequence must be an AttackSequence."
+            )
+        return type(self)(
+            battle_round=self.battle_round,
+            active_player_id=self.active_player_id,
+            phase_complete=self.phase_complete,
+            selected_unit_ids=self.selected_unit_ids,
+            shot_unit_ids=self.shot_unit_ids,
+            skipped_unit_ids=self.skipped_unit_ids,
+            active_selection=self.active_selection,
+            selected_shooting_type=self.selected_shooting_type,
+            pending_completed_attack_sequence=attack_sequence,
+            attack_pools=self.attack_pools,
+            attack_sequence=self.attack_sequence,
+            allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
         )
 
     def with_phase_complete(self, *, skipped_unit_ids: tuple[str, ...] = ()) -> Self:
@@ -686,6 +741,10 @@ class ShootingPhaseState:
             raise GameLifecycleError("Shooting completion requires no selected shooting type.")
         if self.attack_sequence is not None:
             raise GameLifecycleError("Shooting completion requires no active attack sequence.")
+        if self.pending_completed_attack_sequence is not None:
+            raise GameLifecycleError(
+                "Shooting completion requires no pending completed attack sequence."
+            )
         skipped_ids = _validate_identifier_tuple("skipped_unit_ids", skipped_unit_ids)
         return type(self)(
             battle_round=self.battle_round,
@@ -696,6 +755,7 @@ class ShootingPhaseState:
             skipped_unit_ids=tuple(sorted({*self.skipped_unit_ids, *skipped_ids})),
             active_selection=None,
             selected_shooting_type=None,
+            pending_completed_attack_sequence=None,
             attack_pools=self.attack_pools,
             attack_sequence=None,
             allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
@@ -717,6 +777,11 @@ class ShootingPhaseState:
                 if self.selected_shooting_type is None
                 else self.selected_shooting_type.to_payload()
             ),
+            "pending_completed_attack_sequence": (
+                None
+                if self.pending_completed_attack_sequence is None
+                else self.pending_completed_attack_sequence.to_payload()
+            ),
             "attack_pools": [pool.to_payload() for pool in self.attack_pools],
             "attack_sequence": (
                 None if self.attack_sequence is None else self.attack_sequence.to_payload()
@@ -728,6 +793,7 @@ class ShootingPhaseState:
     def from_payload(cls, payload: ShootingPhaseStatePayload) -> Self:
         active_selection = payload["active_selection"]
         selected_shooting_type = payload["selected_shooting_type"]
+        pending_completed_attack_sequence = payload["pending_completed_attack_sequence"]
         return cls(
             battle_round=payload["battle_round"],
             active_player_id=payload["active_player_id"],
@@ -744,6 +810,11 @@ class ShootingPhaseState:
                 None
                 if selected_shooting_type is None
                 else ShootingTypeSelection.from_payload(selected_shooting_type)
+            ),
+            pending_completed_attack_sequence=(
+                None
+                if pending_completed_attack_sequence is None
+                else AttackSequence.from_payload(pending_completed_attack_sequence)
             ),
             attack_pools=tuple(
                 RangedAttackPool.from_payload(pool) for pool in payload["attack_pools"]
@@ -1058,6 +1129,18 @@ class ShootingPhaseHandler:
             if phase_start_status is not None:
                 return phase_start_status
         shooting_state = _ensure_shooting_phase_state(state=state)
+        if shooting_state.pending_completed_attack_sequence is not None:
+            completion_status = _resolve_completed_shooting_attack_sequence_continuation(
+                handler=self,
+                state=state,
+                decisions=decisions,
+                completed_sequence=shooting_state.pending_completed_attack_sequence,
+            )
+            if completion_status is not None:
+                return completion_status
+            shooting_state = _ensure_shooting_phase_state(state=state)
+            state.shooting_phase_state = shooting_state.with_pending_completed_attack_sequence(None)
+            shooting_state = state.shooting_phase_state
         if shooting_state.attack_sequence is not None:
             completed_candidate = shooting_state.attack_sequence
             target_stratagem_status = _request_after_unit_selected_as_target_stratagem_if_available(
@@ -1086,55 +1169,23 @@ class ShootingPhaseHandler:
             if status is not None:
                 return status
             if attack_sequence is None:
-                completion_hook_status = (
-                    self.attack_sequence_completed_hooks.resolve_completed_sequence(
-                        AttackSequenceCompletedContext(
-                            state=state,
-                            decisions=decisions,
-                            dice_manager=DiceRollManager(
-                                state.game_id,
-                                event_log=decisions.event_log,
-                            ),
-                            runtime_modifier_registry=self.runtime_modifier_registry,
-                            source_phase=BattlePhase.SHOOTING,
-                            attack_sequence=completed_candidate,
-                            attack_sequence_completed_event_id=(
-                                attack_sequence_completed_event_id(
-                                    decisions=decisions,
-                                    attack_sequence=completed_candidate,
-                                )
-                            ),
-                        )
-                    )
+                shooting_state = shooting_state.with_pending_completed_attack_sequence(
+                    completed_candidate
                 )
-                if completion_hook_status is not None:
-                    return completion_hook_status
-                stratagem_status = _request_friendly_unit_has_shot_stratagem_if_available(
+                state.shooting_phase_state = shooting_state
+                completion_status = _resolve_completed_shooting_attack_sequence_continuation(
+                    handler=self,
                     state=state,
                     decisions=decisions,
-                    stratagem_index=self.stratagem_index,
-                    stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
                     completed_sequence=completed_candidate,
                 )
-                if stratagem_status is not None:
-                    return stratagem_status
-                enemy_stratagem_status = _request_enemy_unit_has_shot_stratagem_if_available(
-                    state=state,
-                    decisions=decisions,
-                    stratagem_index=self.stratagem_index,
-                    stratagem_cost_modifier_registry=self.stratagem_cost_modifier_registry,
-                    completed_sequence=completed_candidate,
+                if completion_status is not None:
+                    return completion_status
+                shooting_state = _ensure_shooting_phase_state(state=state)
+                state.shooting_phase_state = shooting_state.with_pending_completed_attack_sequence(
+                    None
                 )
-                if enemy_stratagem_status is not None:
-                    return enemy_stratagem_status
-                surge_status = _request_shooting_end_surge_if_available(
-                    state=state,
-                    decisions=decisions,
-                    registry=self.shooting_end_surge_hooks,
-                    completed_sequence=completed_candidate,
-                )
-                if surge_status is not None:
-                    return surge_status
+                shooting_state = state.shooting_phase_state
         if shooting_state.phase_complete:
             decisions.event_log.append(
                 "shooting_phase_completed",
@@ -1562,6 +1613,12 @@ class ShootingPhaseHandler:
             if phase_start_result:
                 return None
             raise GameLifecycleError("Shooting phase start faction rule result was not handled.")
+        if result.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE:
+            return apply_catalog_post_shoot_hit_target_status_result(
+                state=state,
+                decisions=decisions,
+                result=result,
+            )
         if result.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE:
             return _apply_shooting_unit_selection_decision(
                 state=state,
@@ -1967,6 +2024,60 @@ def _request_after_unit_selected_as_target_stratagem_if_available(
             },
         )
     return None
+
+
+def _resolve_completed_shooting_attack_sequence_continuation(
+    *,
+    handler: ShootingPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    completed_sequence: AttackSequence,
+) -> LifecycleStatus | None:
+    if type(handler) is not ShootingPhaseHandler:
+        raise GameLifecycleError("Completed shooting continuation requires a handler.")
+    if type(completed_sequence) is not AttackSequence:
+        raise GameLifecycleError("Completed shooting continuation requires an AttackSequence.")
+    completed_event_id = attack_sequence_completed_event_id(
+        decisions=decisions,
+        attack_sequence=completed_sequence,
+    )
+    completion_hook_status = handler.attack_sequence_completed_hooks.resolve_completed_sequence(
+        AttackSequenceCompletedContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=handler.runtime_modifier_registry,
+            source_phase=BattlePhase.SHOOTING,
+            attack_sequence=completed_sequence,
+            attack_sequence_completed_event_id=completed_event_id,
+        )
+    )
+    if completion_hook_status is not None:
+        return completion_hook_status
+    stratagem_status = _request_friendly_unit_has_shot_stratagem_if_available(
+        state=state,
+        decisions=decisions,
+        stratagem_index=handler.stratagem_index,
+        stratagem_cost_modifier_registry=handler.stratagem_cost_modifier_registry,
+        completed_sequence=completed_sequence,
+    )
+    if stratagem_status is not None:
+        return stratagem_status
+    enemy_stratagem_status = _request_enemy_unit_has_shot_stratagem_if_available(
+        state=state,
+        decisions=decisions,
+        stratagem_index=handler.stratagem_index,
+        stratagem_cost_modifier_registry=handler.stratagem_cost_modifier_registry,
+        completed_sequence=completed_sequence,
+    )
+    if enemy_stratagem_status is not None:
+        return enemy_stratagem_status
+    return _request_shooting_end_surge_if_available(
+        state=state,
+        decisions=decisions,
+        registry=handler.shooting_end_surge_hooks,
+        completed_sequence=completed_sequence,
+    )
 
 
 def _request_friendly_unit_has_shot_stratagem_if_available(
@@ -2442,29 +2553,10 @@ def _successful_hit_target_unit_ids_for_sequence(
     decisions: DecisionController,
     sequence: AttackSequence,
 ) -> tuple[str, ...]:
-    target_ids: set[str] = set()
-    for record in decisions.event_log.records:
-        if record.event_type != "attack_sequence_step":
-            continue
-        payload = record.payload
-        if not isinstance(payload, dict):
-            continue
-        if payload.get("sequence_id") != sequence.sequence_id:
-            continue
-        if payload.get("step") != AttackSequenceStep.HIT.value:
-            continue
-        step_payload = payload.get("payload")
-        if not isinstance(step_payload, dict):
-            raise GameLifecycleError("Attack sequence hit payload must be an object.")
-        if step_payload.get("successful") is not True:
-            continue
-        pool_index = payload.get("pool_index")
-        if type(pool_index) is not int:
-            raise GameLifecycleError("Attack sequence hit event pool_index must be an int.")
-        if pool_index < 0 or pool_index >= len(sequence.attack_pools):
-            raise GameLifecycleError("Attack sequence hit event pool_index is out of range.")
-        target_ids.add(sequence.attack_pools[pool_index].target_unit_instance_id)
-    return tuple(sorted(target_ids))
+    return successful_hit_target_unit_ids_for_sequence(
+        decisions=decisions,
+        sequence=sequence,
+    )
 
 
 def _destroyed_target_unit_ids_for_sequence(

@@ -32,6 +32,12 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityHookBinding,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequencePayload
+from warhammer40k_core.engine.attack_sequence_completion_hooks import (
+    AttackSequenceCompletedContext,
+    AttackSequenceCompletedHookBinding,
+    successful_hit_target_unit_ids_for_sequence,
+)
 from warhammer40k_core.engine.battlefield_state import PlacementError
 from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
@@ -42,6 +48,7 @@ from warhammer40k_core.engine.damage_allocation import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle_validation import (
@@ -58,6 +65,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
@@ -123,6 +131,7 @@ CATALOG_IR_CRITICAL_HIT_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-hit-va
 CATALOG_IR_CRITICAL_WOUND_VALUE_MODIFIER_CONSUMER_ID = "catalog-ir:critical-wound-value-modifier"
 CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID = "catalog-ir:weapon-keyword-grant"
 CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID = "catalog-ir:named-weapon-ability-choice"
+CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID = "catalog-ir:post-shoot-hit-target-status"
 CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-advance-and-charge"
 CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-fallback-and-charge"
 CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID = "catalog-ir:can-fallback-and-shoot"
@@ -133,8 +142,18 @@ CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID = "catalog-ir:can-be-placed-in-
 CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID = "catalog-ir:shadow-of-chaos-aura"
 CATALOG_NAMED_WEAPON_ABILITY_CHOICE_EFFECT_KIND = "catalog_named_weapon_ability_choice"
 CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SELECTED_EVENT = "catalog_named_weapon_ability_choice_selected"
+CATALOG_POST_SHOOT_HIT_TARGET_STATUS_EFFECT_KIND = "catalog_post_shoot_hit_target_status"
+CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SELECTED_EVENT = (
+    "catalog_post_shoot_hit_target_status_selected"
+)
 SELECT_CATALOG_NAMED_WEAPON_ABILITY_CHOICE_SUBMISSION_KIND = (
     "select_catalog_named_weapon_ability_choice"
+)
+SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE = (
+    "select_catalog_post_shoot_hit_target_status"
+)
+SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SUBMISSION_KIND = (
+    "select_catalog_post_shoot_hit_target_status"
 )
 DEADLY_DEMISE_TRIGGER_ROLL_THRESHOLD = 6
 DEADLY_DEMISE_RANGE_INCHES = 6.0
@@ -541,6 +560,92 @@ class CatalogNamedWeaponAbilityChoiceGroup:
 
 
 @dataclass(frozen=True, slots=True)
+class CatalogPostShootHitTargetStatusOption:
+    option_id: str
+    target_unit_instance_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "option_id", _validate_identifier("option_id", self.option_id))
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier("target_unit_instance_id", self.target_unit_instance_id),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogPostShootHitTargetStatusGroup:
+    record: AbilityCatalogRecord
+    unit: UnitInstance
+    clause: RuleClause
+    effect_index: int
+    status: str
+    status_label: str
+    target_scope: str
+    source_model_instance_id: str | None
+    attack_sequence: AttackSequence
+    attack_sequence_completed_event_id: str
+    options: tuple[CatalogPostShootHitTargetStatusOption, ...]
+
+    def __post_init__(self) -> None:
+        if type(self.record) is not AbilityCatalogRecord:
+            raise GameLifecycleError("Catalog post-shoot status requires an ability record.")
+        _validate_unit(self.unit)
+        if type(self.clause) is not RuleClause:
+            raise GameLifecycleError("Catalog post-shoot status requires a rule clause.")
+        if type(self.effect_index) is not int or self.effect_index < 0:
+            raise GameLifecycleError("Catalog post-shoot status effect_index must be non-negative.")
+        object.__setattr__(self, "status", _validate_identifier("status", self.status))
+        object.__setattr__(
+            self,
+            "status_label",
+            _validate_non_empty_text("status_label", self.status_label),
+        )
+        object.__setattr__(
+            self,
+            "target_scope",
+            _validate_identifier("target_scope", self.target_scope),
+        )
+        if self.source_model_instance_id is not None:
+            object.__setattr__(
+                self,
+                "source_model_instance_id",
+                _validate_identifier("source_model_instance_id", self.source_model_instance_id),
+            )
+        if type(self.attack_sequence) is not AttackSequence:
+            raise GameLifecycleError("Catalog post-shoot status requires an AttackSequence.")
+        object.__setattr__(
+            self,
+            "attack_sequence_completed_event_id",
+            _validate_identifier(
+                "attack_sequence_completed_event_id",
+                self.attack_sequence_completed_event_id,
+            ),
+        )
+        if type(self.options) is not tuple or not self.options:
+            raise GameLifecycleError("Catalog post-shoot status requires finite options.")
+        option_values = tuple(
+            _validate_post_shoot_hit_target_status_option(option) for option in self.options
+        )
+        if len({option.option_id for option in option_values}) != len(option_values):
+            raise GameLifecycleError("Catalog post-shoot status options must not duplicate IDs.")
+        object.__setattr__(
+            self,
+            "options",
+            tuple(sorted(option_values, key=lambda option: option.option_id)),
+        )
+
+    @property
+    def sort_key(self) -> tuple[str, str, str, str]:
+        return (
+            self.unit.unit_instance_id,
+            self.record.record_id,
+            self.clause.clause_id,
+            "" if self.source_model_instance_id is None else self.source_model_instance_id,
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class CatalogWeaponKeywordGrantRuntime:
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
     armies: tuple[ArmyDefinition, ...]
@@ -752,6 +857,121 @@ class CatalogNamedWeaponAbilityChoiceRuntime:
         return True
 
 
+@dataclass(frozen=True, slots=True)
+class CatalogPostShootHitTargetStatusRuntime:
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
+    armies: tuple[ArmyDefinition, ...]
+
+    def __post_init__(self) -> None:
+        indexes = _validate_ability_index_mapping(self.ability_indexes_by_player_id)
+        armies = _validate_armies(self.armies)
+        missing_ids = {army.player_id for army in armies} - set(indexes)
+        if missing_ids:
+            raise GameLifecycleError("Catalog post-shoot status missing player ability index.")
+        object.__setattr__(self, "ability_indexes_by_player_id", MappingProxyType(dict(indexes)))
+        object.__setattr__(self, "armies", armies)
+
+    def bindings(self) -> tuple[AttackSequenceCompletedHookBinding, ...]:
+        if not _has_catalog_post_shoot_hit_target_status_records(self.ability_indexes_by_player_id):
+            return ()
+        return (
+            AttackSequenceCompletedHookBinding(
+                hook_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
+                source_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
+                handler=self.request_handler,
+            ),
+        )
+
+    def request_handler(self, context: AttackSequenceCompletedContext) -> LifecycleStatus | None:
+        if type(context) is not AttackSequenceCompletedContext:
+            raise GameLifecycleError("Catalog post-shoot status requires context.")
+        groups = _available_catalog_post_shoot_hit_target_status_groups(
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            armies=self.armies,
+            context=context,
+        )
+        if not groups:
+            return None
+        resolved_group_keys = _resolved_post_shoot_hit_target_status_group_keys(context.decisions)
+        unresolved_groups = tuple(
+            group
+            for group in groups
+            if _post_shoot_hit_target_status_group_key(group) not in resolved_group_keys
+        )
+        if not unresolved_groups:
+            return None
+        group = unresolved_groups[0]
+        common_payload = _post_shoot_hit_target_status_request_payload(
+            state=context.state,
+            group=group,
+        )
+        request = DecisionRequest(
+            request_id=context.state.next_decision_request_id(),
+            decision_type=SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE,
+            actor_id=context.attack_sequence.attacker_player_id,
+            payload=validate_json_value(common_payload),
+            options=tuple(
+                DecisionOption(
+                    option_id=option.option_id,
+                    label=_post_shoot_hit_target_status_option_label(
+                        group=group,
+                        option=option,
+                    ),
+                    payload=validate_json_value(
+                        _post_shoot_hit_target_status_option_payload(
+                            state=context.state,
+                            group=group,
+                            option=option,
+                        )
+                    ),
+                )
+                for option in group.options
+            ),
+        )
+        context.decisions.request_decision(request)
+        context.decisions.event_log.append(
+            "catalog_post_shoot_hit_target_status_requested",
+            validate_json_value(
+                {
+                    "game_id": context.state.game_id,
+                    "battle_round": context.state.battle_round,
+                    "phase": BattlePhase.SHOOTING.value,
+                    "active_player_id": context.state.active_player_id,
+                    "player_id": context.attack_sequence.attacker_player_id,
+                    "hook_id": CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
+                    "request_id": request.request_id,
+                    "catalog_record_id": group.record.record_id,
+                    "source_rule_id": group.record.definition.source_id,
+                    "clause_id": group.clause.clause_id,
+                    "status": group.status,
+                    "source_model_instance_id": group.source_model_instance_id,
+                    "attack_sequence_id": group.attack_sequence.sequence_id,
+                    "attack_sequence_completed_event_id": (
+                        group.attack_sequence_completed_event_id
+                    ),
+                    "available_target_unit_instance_ids": [
+                        option.target_unit_instance_id for option in group.options
+                    ],
+                    "phase_body_status": "catalog_post_shoot_hit_target_status_pending",
+                }
+            ),
+        )
+        return LifecycleStatus.waiting_for_decision(
+            stage=GameLifecycleStage.BATTLE,
+            decision_request=request,
+            payload=validate_json_value(
+                {
+                    "phase": BattlePhase.SHOOTING.value,
+                    "battle_round": context.state.battle_round,
+                    "active_player_id": context.state.active_player_id,
+                    "player_id": context.attack_sequence.attacker_player_id,
+                    "pending_request_id": request.request_id,
+                    "phase_body_status": "catalog_post_shoot_hit_target_status_pending",
+                }
+            ),
+        )
+
+
 def catalog_advance_eligibility_hook_bindings(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
@@ -785,6 +1005,17 @@ def catalog_named_weapon_ability_choice_hook_bindings(
     ).bindings()
 
 
+def catalog_post_shoot_hit_target_status_hook_bindings(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> tuple[AttackSequenceCompletedHookBinding, ...]:
+    return CatalogPostShootHitTargetStatusRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=armies,
+    ).bindings()
+
+
 def catalog_weapon_profile_modifier_bindings(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
@@ -812,6 +1043,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
         CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+        CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
     }
     for characteristic in Characteristic:
         hook_ids.add(_catalog_ir_characteristic_query_consumer_id(characteristic))
@@ -1202,6 +1434,134 @@ def _catalog_named_weapon_ability_choice_group_from_clause(
     )
 
 
+def _available_catalog_post_shoot_hit_target_status_groups(
+    *,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+    context: AttackSequenceCompletedContext,
+) -> tuple[CatalogPostShootHitTargetStatusGroup, ...]:
+    if type(context) is not AttackSequenceCompletedContext:
+        raise GameLifecycleError("Catalog post-shoot status requires context.")
+    if context.source_phase is not BattlePhase.SHOOTING:
+        return ()
+    player_id = _validate_identifier("player_id", context.attack_sequence.attacker_player_id)
+    army = _army_for_player(armies, player_id=player_id)
+    unit = _unit_in_army_by_id(
+        army,
+        unit_instance_id=context.attack_sequence.attacking_unit_instance_id,
+    )
+    index = ability_indexes_by_player_id.get(player_id)
+    if index is None:
+        raise GameLifecycleError("Catalog post-shoot status index is missing player.")
+    current_model_ids = _current_placed_alive_model_instance_ids_for_unit(
+        state=context.state,
+        unit=unit,
+    )
+    if not current_model_ids:
+        return ()
+    groups: list[CatalogPostShootHitTargetStatusGroup] = []
+    for record in _unit_scoped_generic_records(
+        ability_index=index,
+        unit=unit,
+        current_model_instance_ids=current_model_ids,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+    ):
+        for clause in _clauses_from_record(record):
+            groups.extend(
+                _catalog_post_shoot_hit_target_status_groups_from_clause(
+                    context=context,
+                    record=record,
+                    unit=unit,
+                    current_model_instance_ids=current_model_ids,
+                    clause=clause,
+                )
+            )
+    return tuple(sorted(groups, key=lambda group: group.sort_key))
+
+
+def _catalog_post_shoot_hit_target_status_groups_from_clause(
+    *,
+    context: AttackSequenceCompletedContext,
+    record: AbilityCatalogRecord,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+    clause: RuleClause,
+) -> tuple[CatalogPostShootHitTargetStatusGroup, ...]:
+    _validate_game_state(context.state)
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog post-shoot status requires an ability record.")
+    _validate_unit(unit)
+    current_ids = _validate_current_model_instance_ids(current_model_instance_ids)
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog post-shoot status requires a rule clause.")
+    if not _clause_is_supported_post_shoot_hit_target_status_denial(clause):
+        return ()
+    supported_effects = tuple(
+        (effect_index, effect)
+        for effect_index, effect in enumerate(clause.effects)
+        if _effect_is_supported_status_denial(effect)
+    )
+    if len(supported_effects) != 1:
+        raise GameLifecycleError("Catalog post-shoot status requires one supported effect.")
+    effect_index, effect = supported_effects[0]
+    parameters = parameter_payload(effect.parameters)
+    status = _required_string_parameter(parameters, key="status")
+    status_label = _required_string_parameter(parameters, key="status_label")
+    target_scope = _required_string_parameter(parameters, key="target_scope")
+    source_model_ids = _post_shoot_status_source_model_ids(
+        record=record,
+        unit=unit,
+        current_model_instance_ids=current_ids,
+        clause=clause,
+        attack_sequence=context.attack_sequence,
+    )
+    groups: list[CatalogPostShootHitTargetStatusGroup] = []
+    for source_model_id in source_model_ids:
+        hit_target_ids = successful_hit_target_unit_ids_for_sequence(
+            decisions=context.decisions,
+            sequence=context.attack_sequence,
+            attacker_model_instance_id=source_model_id,
+        )
+        options = tuple(
+            CatalogPostShootHitTargetStatusOption(
+                option_id=_post_shoot_hit_target_status_option_id(
+                    record=record,
+                    unit=unit,
+                    clause=clause,
+                    effect_index=effect_index,
+                    status=status,
+                    source_model_instance_id=source_model_id,
+                    target_unit_instance_id=target_unit_id,
+                ),
+                target_unit_instance_id=target_unit_id,
+            )
+            for target_unit_id in hit_target_ids
+            if _post_shoot_hit_target_status_target_is_eligible(
+                state=context.state,
+                attacker_player_id=context.attack_sequence.attacker_player_id,
+                target_unit_instance_id=target_unit_id,
+            )
+        )
+        if not options:
+            continue
+        groups.append(
+            CatalogPostShootHitTargetStatusGroup(
+                record=record,
+                unit=unit,
+                clause=clause,
+                effect_index=effect_index,
+                status=status,
+                status_label=status_label,
+                target_scope=target_scope,
+                source_model_instance_id=source_model_id,
+                attack_sequence=context.attack_sequence,
+                attack_sequence_completed_event_id=context.attack_sequence_completed_event_id,
+                options=options,
+            )
+        )
+    return tuple(sorted(groups, key=lambda group: group.sort_key))
+
+
 def _named_weapon_ability_choice_option_from_effect(
     *,
     record: AbilityCatalogRecord,
@@ -1246,6 +1606,84 @@ def _named_weapon_ability_choice_option_from_effect(
         weapon_ability_value=_optional_weapon_ability_choice_value_parameter(parameters),
         ability=_weapon_ability_descriptor_for_grant(parameters=parameters, keyword=keyword),
         effect_index=effect_index,
+    )
+
+
+def _post_shoot_status_source_model_ids(
+    *,
+    record: AbilityCatalogRecord,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+    clause: RuleClause,
+    attack_sequence: AttackSequence,
+) -> tuple[str | None, ...]:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog post-shoot status requires an ability record.")
+    _validate_unit(unit)
+    current_ids = _validate_current_model_instance_ids(current_model_instance_ids)
+    if type(clause) is not RuleClause or clause.trigger is None:
+        raise GameLifecycleError("Catalog post-shoot status requires a triggered clause.")
+    if type(attack_sequence) is not AttackSequence:
+        raise GameLifecycleError("Catalog post-shoot status requires an AttackSequence.")
+    trigger_parameters = parameter_payload(clause.trigger.parameters)
+    subject = _required_string_parameter(trigger_parameters, key="subject")
+    if subject == "this_unit":
+        return (None,)
+    if subject not in {"this_model", "bearer"}:
+        raise GameLifecycleError("Catalog post-shoot status has unsupported subject.")
+    candidate_ids = (
+        _record_current_wargear_bearer_model_ids(
+            record=record,
+            unit=unit,
+            current_model_instance_ids=current_ids,
+        )
+        if record.source_kind is AbilitySourceKind.WARGEAR
+        else current_ids
+    )
+    shot_model_ids = {pool.attacker_model_instance_id for pool in attack_sequence.attack_pools}
+    return tuple(model_id for model_id in candidate_ids if model_id in shot_model_ids)
+
+
+def _post_shoot_hit_target_status_target_is_eligible(
+    *,
+    state: GameState,
+    attacker_player_id: str,
+    target_unit_instance_id: str,
+) -> bool:
+    attacker_id = _validate_identifier("attacker_player_id", attacker_player_id)
+    target_id = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    target = rules_unit_view_by_id(state=state, unit_instance_id=target_id)
+    return target.owner_player_id != attacker_id and bool(target.alive_models())
+
+
+def _post_shoot_hit_target_status_option_id(
+    *,
+    record: AbilityCatalogRecord,
+    unit: UnitInstance,
+    clause: RuleClause,
+    effect_index: int,
+    status: str,
+    source_model_instance_id: str | None,
+    target_unit_instance_id: str,
+) -> str:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog post-shoot status requires an ability record.")
+    _validate_unit(unit)
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog post-shoot status requires a rule clause.")
+    if type(effect_index) is not int or effect_index < 0:
+        raise GameLifecycleError("Catalog post-shoot status effect_index must be non-negative.")
+    source_token = (
+        "unit"
+        if source_model_instance_id is None
+        else _validate_identifier("source_model_instance_id", source_model_instance_id)
+    )
+    target_token = _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    return (
+        f"{CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID}:{unit.unit_instance_id}:"
+        f"{record.record_id}:{clause.clause_id}:effect-{effect_index:03d}:"
+        f"source-{source_token}:target-{target_token}:"
+        f"{_validate_identifier('status', status)}"
     )
 
 
@@ -1417,6 +1855,139 @@ def _named_weapon_ability_choice_base_payload(
     }
 
 
+def _post_shoot_hit_target_status_request_payload(
+    *,
+    state: GameState,
+    group: CatalogPostShootHitTargetStatusGroup,
+) -> dict[str, object]:
+    return {
+        **_post_shoot_hit_target_status_base_payload(state=state, group=group),
+        "available_target_unit_instance_ids": [
+            option.target_unit_instance_id for option in group.options
+        ],
+        "available_post_shoot_hit_target_status_options": [
+            _post_shoot_hit_target_status_selection_payload(option) for option in group.options
+        ],
+    }
+
+
+def _post_shoot_hit_target_status_option_payload(
+    *,
+    state: GameState,
+    group: CatalogPostShootHitTargetStatusGroup,
+    option: CatalogPostShootHitTargetStatusOption,
+) -> dict[str, object]:
+    return {
+        **_post_shoot_hit_target_status_base_payload(state=state, group=group),
+        "selected_post_shoot_hit_target_status": (
+            _post_shoot_hit_target_status_selection_payload(option)
+        ),
+    }
+
+
+def _post_shoot_hit_target_status_base_payload(
+    *,
+    state: GameState,
+    group: CatalogPostShootHitTargetStatusGroup,
+) -> dict[str, object]:
+    return {
+        "submission_kind": SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SUBMISSION_KIND,
+        "hook_id": CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
+        "game_id": state.game_id,
+        "battle_round": state.battle_round,
+        "phase": BattlePhase.SHOOTING.value,
+        "active_player_id": state.active_player_id,
+        "player_id": group.attack_sequence.attacker_player_id,
+        "catalog_record_id": group.record.record_id,
+        "ability_id": group.record.definition.ability_id,
+        "ability_name": group.record.definition.name,
+        "source_rule_id": group.record.definition.source_id,
+        "unit_instance_id": group.unit.unit_instance_id,
+        "source_model_instance_id": group.source_model_instance_id,
+        "clause_id": group.clause.clause_id,
+        "effect_index": group.effect_index,
+        "status": group.status,
+        "status_label": group.status_label,
+        "operation": "deny",
+        "target_scope": group.target_scope,
+        "attack_sequence_id": group.attack_sequence.sequence_id,
+        "attack_sequence_completed_event_id": group.attack_sequence_completed_event_id,
+        "attack_sequence": group.attack_sequence.to_payload(),
+    }
+
+
+def _post_shoot_hit_target_status_selection_payload(
+    option: CatalogPostShootHitTargetStatusOption,
+) -> dict[str, object]:
+    return {
+        "option_id": option.option_id,
+        "target_unit_instance_id": option.target_unit_instance_id,
+    }
+
+
+def _post_shoot_hit_target_status_option_label(
+    *,
+    group: CatalogPostShootHitTargetStatusGroup,
+    option: CatalogPostShootHitTargetStatusOption,
+) -> str:
+    return f"Deny {group.status_label} to {option.target_unit_instance_id}"
+
+
+type _PostShootHitTargetStatusGroupKey = tuple[str, str, str, str, int, str, str, str]
+
+
+def _post_shoot_hit_target_status_group_key(
+    group: CatalogPostShootHitTargetStatusGroup,
+) -> _PostShootHitTargetStatusGroupKey:
+    if type(group) is not CatalogPostShootHitTargetStatusGroup:
+        raise GameLifecycleError("Catalog post-shoot status requires a group.")
+    return (
+        group.attack_sequence_completed_event_id,
+        group.attack_sequence.sequence_id,
+        group.record.record_id,
+        group.clause.clause_id,
+        group.effect_index,
+        group.status,
+        group.unit.unit_instance_id,
+        "" if group.source_model_instance_id is None else group.source_model_instance_id,
+    )
+
+
+def _resolved_post_shoot_hit_target_status_group_keys(
+    decisions: DecisionController,
+) -> frozenset[_PostShootHitTargetStatusGroupKey]:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Catalog post-shoot status resolution lookup requires decisions.")
+    keys: set[_PostShootHitTargetStatusGroupKey] = set()
+    for event in decisions.event_log.records:
+        if event.event_type != CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SELECTED_EVENT:
+            continue
+        payload = event.payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError(
+                "Catalog post-shoot status selected event payload must be an object."
+            )
+        payload_object = cast(dict[str, object], payload)
+        source_model_id = payload_object.get("source_model_instance_id")
+        if source_model_id is not None and type(source_model_id) is not str:
+            raise GameLifecycleError(
+                "Catalog post-shoot status selected event source_model_instance_id is invalid."
+            )
+        keys.add(
+            (
+                _payload_string(payload_object, key="attack_sequence_completed_event_id"),
+                _payload_string(payload_object, key="attack_sequence_id"),
+                _payload_string(payload_object, key="catalog_record_id"),
+                _payload_string(payload_object, key="clause_id"),
+                _payload_int(payload_object, key="effect_index"),
+                _payload_string(payload_object, key="status"),
+                _payload_string(payload_object, key="unit_instance_id"),
+                "" if source_model_id is None else source_model_id,
+            )
+        )
+    return frozenset(keys)
+
+
 def _named_weapon_ability_choice_selection_payload(
     option: CatalogNamedWeaponAbilityChoiceOption,
 ) -> dict[str, object]:
@@ -1473,6 +2044,146 @@ def _named_weapon_ability_choice_persisting_effect(
             player_id=_validate_identifier("active_player_id", state.active_player_id),
         ),
         effect_payload=validate_json_value(payload),
+    )
+
+
+def invalid_catalog_post_shoot_hit_target_status_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    invalid_status = _catalog_post_shoot_hit_target_status_finite_invalid_status(
+        state=state,
+        request=request,
+        result=result,
+        invalid_reason="invalid_catalog_post_shoot_hit_target_status_result",
+    )
+    if invalid_status is not None:
+        return invalid_status
+    drift_reason = _catalog_post_shoot_hit_target_status_drift_reason(
+        state=state,
+        request=request,
+        result=result,
+    )
+    if drift_reason is None:
+        return None
+    return _catalog_post_shoot_hit_target_status_invalid_status(
+        state=state,
+        actor_id=result.actor_id,
+        invalid_reason=drift_reason,
+    )
+
+
+def apply_catalog_post_shoot_hit_target_status_result(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Catalog post-shoot status apply requires decisions.")
+    if type(result) is not DecisionResult:
+        raise GameLifecycleError("Catalog post-shoot status apply requires DecisionResult.")
+    record = decisions.record_for_result(result)
+    invalid_status = invalid_catalog_post_shoot_hit_target_status_status(
+        state=state,
+        request=record.request,
+        result=record.result,
+    )
+    if invalid_status is not None:
+        return invalid_status
+    payload = _payload_object(record.result.payload)
+    _post_shoot_hit_target_status_attack_sequence_from_payload(payload)
+    selected_payload = _post_shoot_hit_target_status_selected_payload(payload)
+    effect = _post_shoot_hit_target_status_persisting_effect(
+        state=state,
+        result_id=record.result.result_id,
+        payload=payload,
+        selected_payload=selected_payload,
+    )
+    state.record_persisting_effect(effect)
+    decisions.event_log.append(
+        CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SELECTED_EVENT,
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.SHOOTING.value,
+                "active_player_id": state.active_player_id,
+                "player_id": record.result.actor_id,
+                "request_id": record.request.request_id,
+                "result_id": record.result.result_id,
+                "selected_option_id": record.result.selected_option_id,
+                "persisting_effect_id": effect.effect_id,
+                "catalog_record_id": _payload_string(payload, key="catalog_record_id"),
+                "source_rule_id": _payload_string(payload, key="source_rule_id"),
+                "unit_instance_id": _payload_string(payload, key="unit_instance_id"),
+                "source_model_instance_id": payload.get("source_model_instance_id"),
+                "clause_id": _payload_string(payload, key="clause_id"),
+                "effect_index": _payload_int(payload, key="effect_index"),
+                "status": _payload_string(payload, key="status"),
+                "target_unit_instance_id": _payload_string(
+                    selected_payload,
+                    key="target_unit_instance_id",
+                ),
+                "attack_sequence_id": _payload_string(payload, key="attack_sequence_id"),
+                "attack_sequence_completed_event_id": _payload_string(
+                    payload,
+                    key="attack_sequence_completed_event_id",
+                ),
+            }
+        ),
+    )
+    return None
+
+
+def _post_shoot_hit_target_status_persisting_effect(
+    *,
+    state: GameState,
+    result_id: str,
+    payload: Mapping[str, object],
+    selected_payload: Mapping[str, object],
+) -> PersistingEffect:
+    result = _validate_identifier("result_id", result_id)
+    status = _payload_string(payload, key="status")
+    target_unit_id = _payload_string(selected_payload, key="target_unit_instance_id")
+    owner_player_id = _payload_string(payload, key="player_id")
+    effect_payload = {
+        "effect_kind": CATALOG_POST_SHOOT_HIT_TARGET_STATUS_EFFECT_KIND,
+        "catalog_record_id": _payload_string(payload, key="catalog_record_id"),
+        "ability_id": _payload_string(payload, key="ability_id"),
+        "ability_name": _payload_string(payload, key="ability_name"),
+        "source_rule_id": _payload_string(payload, key="source_rule_id"),
+        "unit_instance_id": _payload_string(payload, key="unit_instance_id"),
+        "source_model_instance_id": payload.get("source_model_instance_id"),
+        "clause_id": _payload_string(payload, key="clause_id"),
+        "effect_index": _payload_int(payload, key="effect_index"),
+        "status": status,
+        "status_label": _payload_string(payload, key="status_label"),
+        "operation": _payload_string(payload, key="operation"),
+        "target_scope": _payload_string(payload, key="target_scope"),
+        "target_unit_instance_id": target_unit_id,
+        "attack_sequence_id": _payload_string(payload, key="attack_sequence_id"),
+        "attack_sequence_completed_event_id": _payload_string(
+            payload,
+            key="attack_sequence_completed_event_id",
+        ),
+        "benefit_of_cover_denied": status == "benefit_of_cover",
+    }
+    return PersistingEffect(
+        effect_id=f"{result}:catalog-post-shoot-hit-target-status:{target_unit_id}:{status}",
+        source_rule_id=_payload_string(payload, key="source_rule_id"),
+        owner_player_id=owner_player_id,
+        target_unit_instance_ids=(target_unit_id,),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhaseKind.SHOOTING,
+        expiration=EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=BattlePhaseKind.SHOOTING,
+            player_id=_validate_identifier("active_player_id", state.active_player_id),
+        ),
+        effect_payload=validate_json_value(effect_payload),
     )
 
 
@@ -1545,9 +2256,172 @@ def _catalog_named_weapon_ability_choice_invalid_status(
     )
 
 
+def _catalog_post_shoot_hit_target_status_invalid_status(
+    *,
+    state: GameState,
+    actor_id: str | None,
+    invalid_reason: str,
+) -> LifecycleStatus:
+    return LifecycleStatus.invalid(
+        stage=GameLifecycleStage.BATTLE,
+        message="Catalog post-shoot hit target status choice is no longer valid.",
+        payload=validate_json_value(
+            {
+                "game_id": state.game_id,
+                "player_id": actor_id,
+                "battle_round": state.battle_round,
+                "phase": (
+                    None if state.current_battle_phase is None else state.current_battle_phase.value
+                ),
+                "invalid_reason": _validate_identifier("invalid_reason", invalid_reason),
+            }
+        ),
+    )
+
+
+def _catalog_post_shoot_hit_target_status_finite_invalid_status(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+    invalid_reason: str,
+) -> LifecycleStatus | None:
+    if result.request_id != request.request_id:
+        return _catalog_post_shoot_hit_target_status_invalid_field_status(
+            state=state,
+            invalid_reason=invalid_reason,
+            field="request_id",
+        )
+    if result.decision_type != request.decision_type:
+        return _catalog_post_shoot_hit_target_status_invalid_field_status(
+            state=state,
+            invalid_reason=invalid_reason,
+            field="decision_type",
+        )
+    if result.actor_id != request.actor_id:
+        return _catalog_post_shoot_hit_target_status_invalid_field_status(
+            state=state,
+            invalid_reason=invalid_reason,
+            field="actor_id",
+        )
+    selected_option = next(
+        (option for option in request.options if option.option_id == result.selected_option_id),
+        None,
+    )
+    if selected_option is None:
+        return _catalog_post_shoot_hit_target_status_invalid_field_status(
+            state=state,
+            invalid_reason=invalid_reason,
+            field="selected_option_id",
+        )
+    if result.payload != selected_option.payload:
+        return _catalog_post_shoot_hit_target_status_invalid_field_status(
+            state=state,
+            invalid_reason=invalid_reason,
+            field="payload",
+        )
+    return None
+
+
+def _catalog_post_shoot_hit_target_status_invalid_field_status(
+    *,
+    state: GameState,
+    invalid_reason: str,
+    field: str,
+) -> LifecycleStatus:
+    return LifecycleStatus.invalid(
+        stage=state.stage,
+        message="Catalog post-shoot hit target status result is invalid.",
+        payload=validate_json_value(
+            {
+                "invalid_reason": _validate_identifier("invalid_reason", invalid_reason),
+                "field": _validate_identifier("field", field),
+            }
+        ),
+    )
+
+
+def _catalog_post_shoot_hit_target_status_drift_reason(
+    *,
+    state: GameState,
+    request: DecisionRequest,
+    result: DecisionResult,
+) -> str | None:
+    if request.decision_type != SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE:
+        return "request_decision_type_drift"
+    if result.decision_type != SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE:
+        return "result_decision_type_drift"
+    request_payload = _optional_payload_object(request.payload)
+    if request_payload is None:
+        return "request_payload_not_object"
+    result_payload = _optional_payload_object(result.payload)
+    if result_payload is None:
+        return "payload_not_object"
+    if result_payload.get("submission_kind") != (
+        SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SUBMISSION_KIND
+    ):
+        return "submission_kind_drift"
+    if result_payload.get("hook_id") != CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID:
+        return "hook_id_drift"
+    if request_payload.get("hook_id") != CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID:
+        return "request_hook_id_drift"
+    if state.current_battle_phase is not BattlePhase.SHOOTING:
+        return "phase_drift"
+    if result_payload.get("game_id") != state.game_id:
+        return "game_id_drift"
+    if request_payload.get("game_id") != state.game_id:
+        return "request_game_id_drift"
+    if result_payload.get("battle_round") != state.battle_round:
+        return "battle_round_drift"
+    if request_payload.get("battle_round") != state.battle_round:
+        return "request_battle_round_drift"
+    if result_payload.get("phase") != BattlePhase.SHOOTING.value:
+        return "payload_phase_drift"
+    if request_payload.get("phase") != BattlePhase.SHOOTING.value:
+        return "request_phase_drift"
+    if result_payload.get("active_player_id") != state.active_player_id:
+        return "active_player_drift"
+    if request_payload.get("active_player_id") != state.active_player_id:
+        return "request_active_player_drift"
+    actor_id = _validate_identifier("actor_id", result.actor_id)
+    if result_payload.get("player_id") != actor_id:
+        return "actor_player_drift"
+    selected_payload = result_payload.get("selected_post_shoot_hit_target_status")
+    if not isinstance(selected_payload, dict):
+        return "selected_payload_not_object"
+    selected_payload_object = cast(dict[str, object], selected_payload)
+    if selected_payload_object.get("option_id") != result.selected_option_id:
+        return "selected_option_payload_drift"
+    selected_target_id = selected_payload_object.get("target_unit_instance_id")
+    if type(selected_target_id) is not str:
+        return "selected_target_payload_drift"
+    if not _post_shoot_hit_target_status_target_is_eligible(
+        state=state,
+        attacker_player_id=actor_id,
+        target_unit_instance_id=selected_target_id,
+    ):
+        return "target_drift"
+    attack_sequence = _post_shoot_hit_target_status_attack_sequence_from_payload(result_payload)
+    if attack_sequence.source_phase is not BattlePhase.SHOOTING:
+        return "attack_sequence_phase_drift"
+    if attack_sequence.sequence_id != result_payload.get("attack_sequence_id"):
+        return "attack_sequence_id_drift"
+    if attack_sequence.attacker_player_id != actor_id:
+        return "attack_sequence_attacker_drift"
+    if attack_sequence.attacking_unit_instance_id != result_payload.get("unit_instance_id"):
+        return "attack_sequence_unit_drift"
+    return None
+
+
 def _payload_object(payload: object) -> dict[str, object]:
     if not isinstance(payload, dict):
         raise GameLifecycleError("Catalog named weapon ability choice payload must be an object.")
+    return cast(dict[str, object], payload)
+
+
+def _optional_payload_object(payload: object) -> dict[str, object] | None:
+    if not isinstance(payload, dict):
+        return None
     return cast(dict[str, object], payload)
 
 
@@ -1556,6 +2430,31 @@ def _payload_string(payload: Mapping[str, object], *, key: str) -> str:
     if type(value) is not str:
         raise GameLifecycleError(f"Catalog named weapon payload {key} must be a string.")
     return _validate_identifier(key, value)
+
+
+def _payload_int(payload: Mapping[str, object], *, key: str) -> int:
+    value = payload.get(key)
+    if type(value) is not int:
+        raise GameLifecycleError(f"Catalog named weapon payload {key} must be an integer.")
+    return value
+
+
+def _post_shoot_hit_target_status_selected_payload(
+    payload: Mapping[str, object],
+) -> dict[str, object]:
+    selected_payload = payload.get("selected_post_shoot_hit_target_status")
+    if not isinstance(selected_payload, dict):
+        raise GameLifecycleError("Catalog post-shoot status selected payload must be an object.")
+    return cast(dict[str, object], selected_payload)
+
+
+def _post_shoot_hit_target_status_attack_sequence_from_payload(
+    payload: Mapping[str, object],
+) -> AttackSequence:
+    attack_sequence_payload = payload.get("attack_sequence")
+    if not isinstance(attack_sequence_payload, dict):
+        raise GameLifecycleError("Catalog post-shoot status payload requires attack_sequence.")
+    return AttackSequence.from_payload(cast(AttackSequencePayload, attack_sequence_payload))
 
 
 def _payload_string_tuple(payload: Mapping[str, object], *, key: str) -> tuple[str, ...]:
@@ -1806,6 +2705,8 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if _clause_is_named_weapon_ability_choice(clause):
         for effect in clause.effects:
             consumer_ids.update(_weapon_keyword_grant_consumer_ids_for_effect(effect))
+    if _clause_is_supported_post_shoot_hit_target_status_denial(clause):
+        consumer_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID)
     if _clause_is_structured_wound_reroll_clause(clause):
         consumer_ids.add(CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID)
     if _clause_is_structured_destroyed_unit_restore_clause(clause):
@@ -1872,6 +2773,8 @@ def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if _clause_is_supported_first_death_return(clause):
         hook_ids.add(CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID)
         hook_ids.add(CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID)
+    if _clause_is_supported_post_shoot_hit_target_status_denial(clause):
+        hook_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID)
     return tuple(sorted(hook_ids))
 
 
@@ -1936,6 +2839,12 @@ def catalog_rule_clause_is_supported_tracked_target_destroyed_reselect(
     clause: RuleClause,
 ) -> bool:
     return _clause_is_supported_tracked_target_destroyed_reselect(clause)
+
+
+def catalog_rule_clause_is_supported_post_shoot_hit_target_status_denial(
+    clause: RuleClause,
+) -> bool:
+    return _clause_is_supported_post_shoot_hit_target_status_denial(clause)
 
 
 def catalog_rule_tracked_target_supported_roll_types_for_clause(
@@ -2783,6 +3692,47 @@ def _effect_is_named_weapon_ability_choice_option(effect: RuleEffectSpec) -> boo
     )
 
 
+def _clause_is_supported_post_shoot_hit_target_status_denial(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    if clause.trigger is None or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return False
+    trigger_parameters = parameter_payload(clause.trigger.parameters)
+    if (
+        trigger_parameters.get("edge") != "after"
+        or trigger_parameters.get("owner") != "active_player"
+        or trigger_parameters.get("phase") != BattlePhase.SHOOTING.value
+        or trigger_parameters.get("timing_window") != "just_after_friendly_unit_has_shot"
+        or trigger_parameters.get("target_relationship") != "hit_by_those_attacks"
+    ):
+        return False
+    if trigger_parameters.get("subject") not in {"this_model", "this_unit", "bearer"}:
+        return False
+    if (
+        clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT
+        or parameter_payload(clause.duration.parameters).get("endpoint") != "phase"
+    ):
+        return False
+    if clause.target is None or clause.target.kind is not RuleTargetKind.ENEMY_UNIT:
+        return False
+    return sum(1 for effect in clause.effects if _effect_is_supported_status_denial(effect)) == 1
+
+
+def _effect_is_supported_status_denial(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return (
+        parameters.get("rules_context") == "status_denial"
+        and parameters.get("operation") == "deny"
+        and parameters.get("status") == "benefit_of_cover"
+        and parameters.get("target_scope") in {"selected_unit", "models_in_selected_unit"}
+    )
+
+
 def _effect_is_charge_roll_modifier(effect: RuleEffectSpec) -> bool:
     if type(effect) is not RuleEffectSpec:
         raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
@@ -3340,6 +4290,14 @@ def _validate_named_weapon_choice_option(
     return option
 
 
+def _validate_post_shoot_hit_target_status_option(
+    option: object,
+) -> CatalogPostShootHitTargetStatusOption:
+    if type(option) is not CatalogPostShootHitTargetStatusOption:
+        raise GameLifecycleError("Catalog post-shoot status requires option values.")
+    return option
+
+
 def _weapon_name_match_token(value: str) -> str:
     if type(value) is not str:
         raise GameLifecycleError("Catalog named weapon name must be a string.")
@@ -3711,6 +4669,17 @@ def _validate_current_model_instance_ids(values: object) -> tuple[str, ...]:
     return tuple(sorted(validated))
 
 
+def _validate_non_empty_text(field_name: str, value: object) -> str:
+    if type(field_name) is not str or not field_name:
+        raise GameLifecycleError("Catalog rule text validation requires a field name.")
+    if type(value) is not str:
+        raise GameLifecycleError(f"Catalog rule {field_name} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"Catalog rule {field_name} must not be empty.")
+    return stripped
+
+
 def _validate_keyword_tokens(field_name: str, values: object) -> tuple[str, ...]:
     if type(field_name) is not str or not field_name:
         raise GameLifecycleError("Catalog rule keyword validation requires a field name.")
@@ -3799,6 +4768,16 @@ def _has_catalog_named_weapon_ability_choice_records(
     )
 
 
+def _has_catalog_post_shoot_hit_target_status_records(
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+) -> bool:
+    return any(
+        _record_can_select_catalog_post_shoot_hit_target_status(record)
+        for index in ability_indexes_by_player_id.values()
+        for record in index.all_records()
+    )
+
+
 def _record_can_grant_catalog_weapon_keyword(record: AbilityCatalogRecord) -> bool:
     if type(record) is not AbilityCatalogRecord:
         raise GameLifecycleError("Catalog weapon keyword grants require ability records.")
@@ -3821,6 +4800,19 @@ def _record_can_select_catalog_named_weapon_ability(record: AbilityCatalogRecord
         return False
     return any(
         _clause_is_named_weapon_ability_choice(clause) for clause in _clauses_from_record(record)
+    )
+
+
+def _record_can_select_catalog_post_shoot_hit_target_status(
+    record: AbilityCatalogRecord,
+) -> bool:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Catalog post-shoot status choices require ability records.")
+    if record.definition.handler_id != GENERIC_RULE_IR_ABILITY_HANDLER_ID:
+        return False
+    return any(
+        _clause_is_supported_post_shoot_hit_target_status_denial(clause)
+        for clause in _clauses_from_record(record)
     )
 
 

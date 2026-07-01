@@ -25,11 +25,13 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
+    RuleDurationKind,
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
     RuleIRError,
     RuleIRPayload,
+    RuleTargetKind,
     RuleTriggerKind,
     parameter_payload,
 )
@@ -257,6 +259,10 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
         if fall_back_timing is not None:
             return fall_back_timing
     for clause in rule_ir.clauses:
+        post_shoot_timing = _catalog_post_shoot_timing_descriptor_for_clause(clause)
+        if post_shoot_timing is not None:
+            return post_shoot_timing
+    for clause in rule_ir.clauses:
         battle_round_timing = _catalog_battle_round_timing_descriptor_for_clause(clause)
         if battle_round_timing is not None:
             return battle_round_timing
@@ -312,6 +318,9 @@ def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDe
     fall_back_timing = _catalog_fall_back_selection_timing_descriptor_for_clause(clause)
     if fall_back_timing is not None:
         return fall_back_timing
+    post_shoot_timing = _catalog_post_shoot_timing_descriptor_for_clause(clause)
+    if post_shoot_timing is not None:
+        return post_shoot_timing
     if _clause_has_turn_end_reserve_permission(clause):
         turn_timing = _catalog_turn_timing_descriptor_for_clause(clause)
         if turn_timing is not None:
@@ -365,6 +374,39 @@ def _catalog_fall_back_selection_timing_descriptor_for_clause(
             phase=battle_phase_kind_from_token("movement"),
         )
     return None
+
+
+def _catalog_post_shoot_timing_descriptor_for_clause(
+    clause: RuleClause,
+) -> AbilityTimingDescriptor | None:
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return None
+    parameters = parameter_payload(trigger.parameters)
+    if (
+        parameters.get("edge") != "after"
+        or parameters.get("owner") != "active_player"
+        or parameters.get("phase") != "shooting"
+        or parameters.get("timing_window") != "just_after_friendly_unit_has_shot"
+        or parameters.get("target_relationship") != "hit_by_those_attacks"
+    ):
+        return None
+    if parameters.get("subject") not in {"this_model", "this_unit", "bearer"}:
+        return None
+    if clause.target is None or clause.target.kind is not RuleTargetKind.ENEMY_UNIT:
+        return None
+    if (
+        clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT
+        or parameter_payload(clause.duration.parameters).get("endpoint") != "phase"
+    ):
+        return None
+    if not any(_effect_is_status_denial(effect) for effect in clause.effects):
+        return None
+    return AbilityTimingDescriptor(
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+        phase=battle_phase_kind_from_token("shooting"),
+    )
 
 
 def _catalog_turn_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor | None:
@@ -454,6 +496,15 @@ def _effect_is_shadow_of_chaos_status(effect: RuleEffectSpec) -> bool:
         parameters.get("status") == "within_shadow_of_chaos"
         and parameters.get("rules_context") == "shadow_of_chaos"
         and parameters.get("owner") == "your_army"
+    )
+
+
+def _effect_is_status_denial(effect: RuleEffectSpec) -> bool:
+    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return (
+        parameters.get("rules_context") == "status_denial" and parameters.get("operation") == "deny"
     )
 
 

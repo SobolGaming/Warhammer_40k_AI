@@ -28,6 +28,7 @@ from warhammer40k_core.engine.core_stratagem_effects import (
     effect_payload_int,
     unit_effect_hit_roll_modifier,
     unit_effect_invulnerable_save,
+    unit_effects_deny_benefit_of_cover,
     unit_effects_grant_benefit_of_cover,
 )
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -511,12 +512,19 @@ def test_phase13d_core_stratagem_effect_helpers_read_typed_payloads() -> None:
         effect_kind_value=FIRE_OVERWATCH_EFFECT_KIND,
         payload={},
     )
+    cover_denial = _effect(
+        effect_id="phase13d-effect-cover-denial",
+        effect_kind_value="catalog_post_shoot_hit_target_status",
+        payload={"benefit_of_cover_denied": True},
+    )
 
     assert effect_kind(go_to_ground) == GO_TO_GROUND_EFFECT_KIND
     assert effect_payload_bool(go_to_ground, "benefit_of_cover")
     assert not effect_payload_bool(overwatch, "benefit_of_cover")
+    assert effect_payload_bool(cover_denial, "benefit_of_cover_denied")
     assert effect_payload_int(overwatch, "hit_roll_modifier", 3) == 3
     assert unit_effects_grant_benefit_of_cover((go_to_ground, smokescreen, overwatch))
+    assert unit_effects_deny_benefit_of_cover((go_to_ground, smokescreen, cover_denial))
     assert unit_effect_hit_roll_modifier((go_to_ground, smokescreen, overwatch)) == -1
     assert unit_effect_invulnerable_save((go_to_ground, smokescreen, overwatch)) == 6
     assert unit_effect_invulnerable_save((smokescreen, overwatch)) is None

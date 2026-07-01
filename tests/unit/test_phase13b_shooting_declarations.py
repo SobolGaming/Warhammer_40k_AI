@@ -94,6 +94,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_POST_SHOOT_HIT_TARGET_STATUS_EFFECT_KIND,
     record_core_feel_no_pain_sources_for_unit,
 )
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
@@ -6679,6 +6680,65 @@ def test_phase14e_benefit_of_cover_worsens_ballistic_skill_before_hit_roll() -> 
     assert payload["target_number"] == 4
     assert payload["modifier"] == 0
     assert payload["successful"] is False
+
+
+def test_phase17_post_shoot_cover_denial_suppresses_cover_hit_penalty() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    state.record_persisting_effect(_phase13f_cover_effect(defender.unit_instance_id))
+    state.record_persisting_effect(
+        _phase17_post_shoot_cover_denial_effect(defender.unit_instance_id)
+    )
+    weapon_profile = _first_weapon_profile(lifecycle, attacker)
+    attack_context_id = "phase17-cover-denial-hit-skill:pool-001:attack-001"
+    hit_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Hit roll for {weapon_profile.profile_id} attack {attack_context_id}",
+        roll_type="attack_sequence.hit",
+        actor_id="player-a",
+    )
+
+    resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=_ruleset(),
+        attack_sequence=AttackSequence.start(
+            sequence_id="phase17-cover-denial-hit-skill",
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            "phase17-cover-denial-hit-skill",
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id="phase17-cover-denial-hit",
+                    spec=hit_spec,
+                    value=3,
+                ),
+            ),
+        ),
+    )
+    hit_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.HIT,
+    )
+    payload = cast(dict[str, object], hit_payload["payload"])
+
+    assert payload["target_number"] == 3
+    assert payload["modifier"] == 0
+    assert payload["successful"] is True
 
 
 def test_hit_roll_bonus_cap_applies_after_ballistic_skill_modifier() -> None:
@@ -14061,12 +14121,46 @@ def test_shooting_phase_state_fails_fast_on_drift() -> None:
         result_id="phase13b-state-type-result",
     )
     selected_with_type = selected.with_shooting_type_selection(shooting_type_selection)
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    pending_attack_pool = _attack_pool_for_test(
+        attacker=attacker,
+        defender=defender,
+        weapon_profile=_first_weapon_profile(lifecycle, attacker),
+        attacks=1,
+    )
+    completed_sequence = AttackSequence(
+        sequence_id="phase13b-pending-completed-sequence",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(pending_attack_pool,),
+        source_phase=BattlePhase.SHOOTING,
+        used_pool_indices=(0,),
+        pool_index=1,
+    )
+    pending_completed_state = ShootingPhaseState(
+        battle_round=1,
+        active_player_id="player-a",
+        shot_unit_ids=(attacker.unit_instance_id,),
+        attack_pools=(pending_attack_pool,),
+        pending_completed_attack_sequence=completed_sequence,
+    )
 
     assert ShootingUnitSelection.from_payload(selection.to_payload()) == selection
     assert ShootingTypeSelection.from_payload(shooting_type_selection.to_payload()) == (
         shooting_type_selection
     )
     assert ShootingPhaseState.from_payload(selected_with_type.to_payload()) == selected_with_type
+    assert ShootingPhaseState.from_payload(pending_completed_state.to_payload()) == (
+        pending_completed_state
+    )
+    assert (
+        pending_completed_state.with_pending_completed_attack_sequence(
+            None
+        ).pending_completed_attack_sequence
+        is None
+    )
 
     with pytest.raises(GameLifecycleError, match="phase_complete"):
         ShootingPhaseState(
@@ -14171,6 +14265,29 @@ def test_shooting_phase_state_fails_fast_on_drift() -> None:
             active_player_id="player-a",
             attack_sequence=cast(AttackSequence, object()),
         )
+    with pytest.raises(GameLifecycleError, match="pending_completed_attack_sequence must be"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            pending_completed_attack_sequence=cast(AttackSequence, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="requires no active selection"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            selected_unit_ids=("army-alpha:intercessor-1",),
+            active_selection=selection,
+            pending_completed_attack_sequence=completed_sequence,
+        )
+    with pytest.raises(GameLifecycleError, match="active and pending completed"):
+        ShootingPhaseState(
+            battle_round=1,
+            active_player_id="player-a",
+            attack_sequence=completed_sequence,
+            pending_completed_attack_sequence=completed_sequence,
+        )
+    with pytest.raises(GameLifecycleError, match="pending completed attack sequence"):
+        pending_completed_state.with_phase_complete()
     with pytest.raises(GameLifecycleError, match="Completed Shooting phase"):
         ShootingPhaseState(
             battle_round=1,
@@ -15819,6 +15936,28 @@ def _phase13f_cover_effect(target_unit_instance_id: str) -> PersistingEffect:
         effect_payload={
             "effect_kind": GO_TO_GROUND_EFFECT_KIND,
             "benefit_of_cover": True,
+        },
+    )
+
+
+def _phase17_post_shoot_cover_denial_effect(target_unit_instance_id: str) -> PersistingEffect:
+    return PersistingEffect(
+        effect_id="phase17-post-shoot-cover-denial",
+        source_rule_id="phase17:test:post-shoot-cover-denial",
+        owner_player_id="player-a",
+        target_unit_instance_ids=(target_unit_instance_id,),
+        started_battle_round=1,
+        started_phase=BattlePhase.SHOOTING,
+        expiration=EffectExpiration.end_phase(
+            battle_round=1,
+            phase=BattlePhase.SHOOTING,
+            player_id="player-a",
+        ),
+        effect_payload={
+            "effect_kind": CATALOG_POST_SHOOT_HIT_TARGET_STATUS_EFFECT_KIND,
+            "benefit_of_cover_denied": True,
+            "status": "benefit_of_cover",
+            "operation": "deny",
         },
     )
 
