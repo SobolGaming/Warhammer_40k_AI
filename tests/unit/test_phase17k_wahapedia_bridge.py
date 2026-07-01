@@ -4131,6 +4131,10 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
 
     assert "## Datasheet / Unit Support" in chaos_daemons_markdown
     assert "### Khorne" in chaos_daemons_markdown
+    assert "### Tzeentch" in chaos_daemons_markdown
+    assert "### Nurgle" in chaos_daemons_markdown
+    assert "### Slaanesh" in chaos_daemons_markdown
+    assert "### Undivided" in chaos_daemons_markdown
     for khorne_datasheet_id in (
         "000001104",
         "000001105",
@@ -4169,6 +4173,125 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| Skull Altar (`000001588`) | PDF pages 36-37; supersedes Wahapedia. | "
         "Bridge/catalog blocked |"
     ) in chaos_daemons_markdown
+    for pdf_review_datasheet_id in (
+        "000001117",
+        "000001120",
+        "000001118",
+        "000001463",
+        "000001464",
+        "000001119",
+        "000001462",
+        "000002583",
+        "000002584",
+        "000001125",
+        "000001126",
+        "000001127",
+        "000001128",
+        "000001465",
+        "000001130",
+        "000001467",
+        "000001469",
+        "000001129",
+        "000001468",
+        "000001466",
+        "000001132",
+        "000001133",
+        "000001134",
+        "000001135",
+        "000001470",
+        "000001648",
+        "000001137",
+        "000001589",
+        "000001136",
+        "000001649",
+        "000001647",
+        "000004100",
+        "000001144",
+        "000001138",
+        "000001142",
+        "000001143",
+        "000001145",
+        "000001148",
+        "000001151",
+        "000001149",
+        "000002758",
+    ):
+        assert f"(`{pdf_review_datasheet_id}`)" in chaos_daemons_markdown
+    assert "Faction Pack pages 38-63" in chaos_daemons_markdown
+    assert "Faction Pack pages 64-87" in chaos_daemons_markdown
+    assert "Faction Pack pages 88-111" in chaos_daemons_markdown
+    assert "Faction Pack pages 112-119" in chaos_daemons_markdown
+    assert (
+        "| Burning Chariot (`000001128`) | PDF pages 62-63; supersedes Wahapedia. | All consumed |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Great Unclean One (`000001130`) | PDF pages 66-67; supersedes Wahapedia. | "
+        "Bridge/catalog blocked |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Tormentbringer (`000004100`) | PDF pages 100-101; supersedes Wahapedia "
+        "and older chariot row 000001141. | Unsupported IR |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Daemon Prince of Chaos (`000001149`) | PDF pages 116-117; supersedes "
+        "Wahapedia. | Bridge/catalog blocked |"
+    ) in chaos_daemons_markdown
+    assert "### Wahapedia-only rows excluded from PDF review" in chaos_daemons_markdown
+    for excluded_wahapedia_id in (
+        "000001329",
+        "000004040",
+        "000001333",
+        "000004039",
+        "000004069",
+        "000001336",
+        "000001337",
+        "000001340",
+        "000004041",
+        "000004055",
+        "000004056",
+        "000004061",
+        "000004070",
+        "000001139",
+        "000001141",
+        "000001146",
+        "000001147",
+        "000001332",
+        "000004042",
+        "000004071",
+        "000004101",
+        "000001150",
+        "000001338",
+        "000001339",
+        "000004036",
+        "000004037",
+        "000004038",
+        "000004043",
+        "000004044",
+        "000004045",
+        "000004046",
+        "000004047",
+        "000004048",
+        "000004049",
+        "000004050",
+        "000004051",
+        "000004052",
+        "000004053",
+        "000004054",
+        "000004057",
+        "000004058",
+        "000004059",
+        "000004060",
+        "000004062",
+        "000004063",
+        "000004064",
+        "000004065",
+        "000004066",
+        "000004067",
+        "000004068",
+        "000004072",
+        "000004073",
+    ):
+        assert f"(`{excluded_wahapedia_id}`)" in chaos_daemons_markdown
     assert "### Datasheet Ability Details" in chaos_daemons_markdown
     assert "Flesh Hounds (`000001112`) | `Playable` | Full | Full | Full | Full | Full" in (
         chaos_daemons_markdown
