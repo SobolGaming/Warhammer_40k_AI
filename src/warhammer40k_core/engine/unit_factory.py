@@ -19,6 +19,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptorPayload,
     DatasheetDefinition,
     DatasheetWargearOption,
+    DatasheetWargearOptionEffect,
     ModelProfileDefinition,
     WargearOptionConditionKind,
     WargearOptionEffectKind,
@@ -488,6 +489,7 @@ def _model_wargear_ids_by_model_id(
         model.model_instance_id: [] for model in own_models
     }
 
+    structured_selections: list[tuple[DatasheetWargearOption, WargearSelection]] = []
     for selection in wargear_selections:
         option = options_by_id.get(selection.option_id)
         if option is None:
@@ -495,12 +497,7 @@ def _model_wargear_ids_by_model_id(
         if not selection.wargear_ids:
             continue
         if option.effects:
-            _apply_structured_wargear_selection_to_models(
-                option=option,
-                selection=selection,
-                models=models_by_profile.get(option.model_profile_id, ()),
-                wargear_by_model_id=wargear_by_model_id,
-            )
+            structured_selections.append((option, selection))
             continue
         if selection.wargear_ids != option.default_wargear_ids:
             raise UnitFactoryError(
@@ -508,6 +505,14 @@ def _model_wargear_ids_by_model_id(
             )
         for model in models_by_profile.get(option.model_profile_id, ()):
             wargear_by_model_id[model.model_instance_id].extend(selection.wargear_ids)
+
+    for option, selection in structured_selections:
+        _apply_structured_wargear_selection_to_models(
+            option=option,
+            selection=selection,
+            models=models_by_profile.get(option.model_profile_id, ()),
+            wargear_by_model_id=wargear_by_model_id,
+        )
 
     return {
         model_id: tuple(wargear_ids)
@@ -524,26 +529,97 @@ def _apply_structured_wargear_selection_to_models(
 ) -> None:
     selected_wargear = list(selection.wargear_ids)
     for effect in option.effects:
-        if effect.kind is not WargearOptionEffectKind.ADD_WARGEAR:
-            raise UnitFactoryError("Unsupported structured wargear option effect.")
-        if effect.wargear_id not in selected_wargear:
-            continue
-        candidates = tuple(
-            model
-            for model in models
-            if _model_satisfies_wargear_option_conditions(
+        if effect.kind is WargearOptionEffectKind.ADD_WARGEAR:
+            _apply_add_wargear_effect_to_models(
                 option=option,
-                current_wargear_ids=tuple(wargear_by_model_id[model.model_instance_id]),
+                effect=effect,
+                selected_wargear=tuple(selected_wargear),
+                models=models,
+                wargear_by_model_id=wargear_by_model_id,
             )
+            continue
+        if effect.kind is WargearOptionEffectKind.REPLACE_WARGEAR:
+            _apply_replace_wargear_effect_to_models(
+                option=option,
+                effect=effect,
+                selected_wargear=tuple(selected_wargear),
+                models=models,
+                wargear_by_model_id=wargear_by_model_id,
+            )
+            continue
+        raise UnitFactoryError("Unsupported structured wargear option effect.")
+
+
+def _apply_add_wargear_effect_to_models(
+    *,
+    option: DatasheetWargearOption,
+    effect: DatasheetWargearOptionEffect,
+    selected_wargear: tuple[str, ...],
+    models: tuple[ModelInstance, ...],
+    wargear_by_model_id: dict[str, list[str]],
+) -> None:
+    if effect.wargear_id not in selected_wargear:
+        return
+    candidates = _eligible_wargear_effect_models(
+        option=option,
+        models=models,
+        wargear_by_model_id=wargear_by_model_id,
+    )
+    if len(candidates) < effect.model_count:
+        raise UnitFactoryError(
+            "Structured wargear option has fewer eligible model bearers than required."
         )
-        if len(candidates) < effect.model_count:
-            raise UnitFactoryError(
-                "Structured wargear option has fewer eligible model bearers than required."
-            )
-        for model in candidates[: effect.model_count]:
-            wargear_by_model_id[model.model_instance_id].extend(
-                effect.wargear_id for _index in range(effect.wargear_count)
-            )
+    for model in candidates[: effect.model_count]:
+        wargear_by_model_id[model.model_instance_id].extend(
+            effect.wargear_id for _index in range(effect.wargear_count)
+        )
+
+
+def _apply_replace_wargear_effect_to_models(
+    *,
+    option: DatasheetWargearOption,
+    effect: DatasheetWargearOptionEffect,
+    selected_wargear: tuple[str, ...],
+    models: tuple[ModelInstance, ...],
+    wargear_by_model_id: dict[str, list[str]],
+) -> None:
+    if effect.wargear_id not in selected_wargear:
+        return
+    if effect.replaced_wargear_id is None:
+        raise UnitFactoryError("Structured wargear replacement target is missing.")
+    candidates = tuple(
+        model
+        for model in _eligible_wargear_effect_models(
+            option=option,
+            models=models,
+            wargear_by_model_id=wargear_by_model_id,
+        )
+        if effect.replaced_wargear_id in wargear_by_model_id[model.model_instance_id]
+    )
+    if len(candidates) < effect.model_count:
+        raise UnitFactoryError(
+            "Structured wargear replacement has fewer eligible model bearers than required."
+        )
+    for model in candidates[: effect.model_count]:
+        model_wargear = wargear_by_model_id[model.model_instance_id]
+        model_wargear.remove(effect.replaced_wargear_id)
+        model_wargear.extend(effect.wargear_id for _index in range(effect.wargear_count))
+
+
+def _eligible_wargear_effect_models(
+    *,
+    option: DatasheetWargearOption,
+    models: tuple[ModelInstance, ...],
+    wargear_by_model_id: dict[str, list[str]],
+) -> tuple[ModelInstance, ...]:
+    return tuple(
+        model
+        for model in models
+        if _model_satisfies_wargear_option_conditions(
+            option=option,
+            current_wargear_ids=tuple(wargear_by_model_id[model.model_instance_id]),
+        )
+    )
 
 
 def _model_satisfies_wargear_option_conditions(

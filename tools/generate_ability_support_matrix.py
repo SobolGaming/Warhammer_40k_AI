@@ -2676,17 +2676,14 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Bloodthirster",
             datasheet_id="000002582",
             source_basis="PDF pages 16-17; supersedes Wahapedia.",
-            ir_coverage="Bridge/catalog blocked",
+            ir_coverage="IR parsed; host needed",
             supported_semantics="Deep Strike and The Shadow of Chaos are consumed.",
             semantics_needed=(
                 "Deadly Demise descriptor consumer evidence; Daemon Lord of Khorne hit-roll "
                 "aura host; Greater Daemon of Khorne Shadow aura host; Relentless Carnage "
                 "end-of-Fight mortal wounds."
             ),
-            catalog_blockers=(
-                "Wargear option replacement row is not represented by current additive "
-                "wargear-option semantics."
-            ),
+            catalog_blockers="No known catalog blocker.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Flesh Hounds",
@@ -2750,8 +2747,8 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "Fortification hit-roll and Desperate Escape exceptions."
             ),
             catalog_blockers=(
-                "PDF declares no equipment and no wargear options; current Wahapedia bridge "
-                "source has an empty wargear row and needs PDF-backed normalization."
+                "No-equipment/no-option source rows are normalized; Hull footprint geometry "
+                "still requires an explicit geometry override."
             ),
         ),
         DatasheetGroupReviewRow(
@@ -3016,15 +3013,15 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "hit-roll and Desperate Escape exceptions."
             ),
             catalog_blockers=(
-                "PDF declares no equipment and no wargear options; current Wahapedia bridge "
-                "source has an empty wargear row and needs PDF-backed normalization."
+                "No-equipment/no-option source rows are normalized; Hull footprint geometry "
+                "still requires an explicit geometry override."
             ),
         ),
         DatasheetGroupReviewRow(
             datasheet="Great Unclean One",
             datasheet_id="000001130",
             source_basis="PDF pages 66-67; supersedes Wahapedia.",
-            ir_coverage="Bridge/catalog blocked",
+            ir_coverage="Unsupported IR",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D6, Feel No Pain 6+, The Shadow of Chaos, and "
                 "Daemon Lord of Nurgle Toughness modifier semantics are structured paths."
@@ -3033,10 +3030,7 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "Greater Daemon of Nurgle Shadow aura host; Nurgle's Rot Toughness debuff "
                 "host; Reverberating Summons Plaguebearer revival."
             ),
-            catalog_blockers=(
-                "Wargear option replacement rows are not represented by current additive "
-                "wargear-option semantics."
-            ),
+            catalog_blockers="No known catalog blocker.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Horticulous Slimux",

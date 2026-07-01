@@ -1059,6 +1059,14 @@ def _validate_wargear_option_semantics(
         for effect in option.effects:
             if effect.kind is WargearOptionEffectKind.ADD_WARGEAR:
                 _validate_add_wargear_effect_count(selection=selection, effect=effect)
+            elif effect.kind is WargearOptionEffectKind.REPLACE_WARGEAR:
+                _validate_replace_wargear_effect_count(
+                    selection=selection,
+                    effect=effect,
+                    selected_for_profile=selected_for_profile,
+                )
+            else:
+                raise ListValidationError("Unsupported structured wargear option effect.")
 
 
 def _validate_add_wargear_effect_count(
@@ -1076,6 +1084,33 @@ def _validate_add_wargear_effect_count(
     if selected_wargear_count != effect.wargear_count:
         raise ListValidationError(
             "WargearSelection does not satisfy a structured wargear option effect count."
+        )
+
+
+def _validate_replace_wargear_effect_count(
+    *,
+    selection: WargearSelection,
+    effect: DatasheetWargearOptionEffect,
+    selected_for_profile: set[str],
+) -> None:
+    if effect.model_count != 1:
+        raise ListValidationError(
+            "WargearSelection structured wargear option replacement model count is unsupported."
+        )
+    if effect.replaced_wargear_id is None:
+        raise ListValidationError(
+            "WargearSelection structured wargear option replacement target is missing."
+        )
+    if effect.replaced_wargear_id not in selected_for_profile:
+        raise ListValidationError(
+            "WargearSelection structured wargear option replacement target is not selected."
+        )
+    selected_wargear_count = sum(
+        1 for wargear_id in selection.wargear_ids if wargear_id == effect.wargear_id
+    )
+    if selected_wargear_count != effect.wargear_count:
+        raise ListValidationError(
+            "WargearSelection does not satisfy a structured wargear option replacement count."
         )
 
 

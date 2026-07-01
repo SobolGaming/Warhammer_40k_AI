@@ -468,6 +468,281 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
     assert package.to_payload() == type(package).from_payload(package.to_payload()).to_payload()
 
 
+def test_phase17k_bloodthirster_bridge_supports_replacement_wargear_loadouts() -> None:
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_bloodthirster_bridge_artifacts(),
+    )
+    datasheet = package.army_catalog.datasheet_by_id("000002582")
+    wargear_by_id = {wargear.wargear_id: wargear for wargear in package.army_catalog.wargear}
+    options_by_id = {option.option_id: option for option in datasheet.wargear_options}
+    model_profile_id = "000002582:bloodthirster"
+    hellfire_breath_id = "000002582:hellfire-breath"
+    great_axe_id = "000002582:great-axe-of-khorne"
+    axe_id = "000002582:axe-of-khorne"
+    bloodflail_id = "000002582:bloodflail"
+    lash_id = "000002582:lash-of-khorne"
+    bloodflail_option_id = "000002582:axe-of-khorne-bloodflail:option-1"
+    lash_option_id = "000002582:axe-of-khorne-lash-of-khorne:option-1"
+
+    assert wargear_by_id[great_axe_id].name == "Great axe of Khorne"
+    assert tuple(profile.name for profile in wargear_by_id[great_axe_id].weapon_profiles) == (
+        "Great axe of Khorne - strike",
+        "Great axe of Khorne - sweep",
+    )
+    assert tuple(profile.name for profile in wargear_by_id[axe_id].weapon_profiles) == (
+        "Axe of Khorne - strike",
+        "Axe of Khorne - sweep",
+    )
+    assert _resolved_bloodthirster_model_wargear(package, requested_selections=()) == (
+        hellfire_breath_id,
+        great_axe_id,
+    )
+
+    bloodflail_option = options_by_id[bloodflail_option_id]
+    lash_option = options_by_id[lash_option_id]
+    assert bloodflail_option.default_wargear_ids == ()
+    assert bloodflail_option.allowed_wargear_ids == (axe_id, bloodflail_id)
+    assert bloodflail_option.max_selections == 2
+    assert bloodflail_option.effects[0].kind is WargearOptionEffectKind.REPLACE_WARGEAR
+    assert bloodflail_option.effects[0].wargear_id == axe_id
+    assert bloodflail_option.effects[0].replaced_wargear_id == great_axe_id
+    assert bloodflail_option.effects[1].kind is WargearOptionEffectKind.ADD_WARGEAR
+    assert bloodflail_option.effects[1].wargear_id == bloodflail_id
+    assert (
+        bloodflail_option.conditions[0].kind is WargearOptionConditionKind.MODEL_NOT_EQUIPPED_WITH
+    )
+    assert bloodflail_option.conditions[0].wargear_ids == (lash_id,)
+
+    assert _resolved_bloodthirster_model_wargear(
+        package,
+        requested_selections=(
+            WargearSelection(
+                option_id=bloodflail_option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(axe_id, bloodflail_id),
+            ),
+        ),
+    ) == (hellfire_breath_id, axe_id, bloodflail_id)
+    assert _resolved_bloodthirster_model_wargear(
+        package,
+        requested_selections=(
+            WargearSelection(
+                option_id=lash_option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(axe_id, lash_id),
+            ),
+        ),
+    ) == (hellfire_breath_id, axe_id, lash_id)
+
+    with pytest.raises(ListValidationError, match="replacement count"):
+        resolve_wargear_selections(
+            catalog=package.army_catalog,
+            datasheet=datasheet,
+            requested_selections=(
+                WargearSelection(
+                    option_id=bloodflail_option_id,
+                    model_profile_id=model_profile_id,
+                    wargear_ids=(bloodflail_id,),
+                ),
+            ),
+        )
+    with pytest.raises(ListValidationError, match="structured wargear option condition"):
+        resolve_wargear_selections(
+            catalog=package.army_catalog,
+            datasheet=datasheet,
+            requested_selections=(
+                WargearSelection(
+                    option_id=bloodflail_option_id,
+                    model_profile_id=model_profile_id,
+                    wargear_ids=(axe_id, bloodflail_id),
+                ),
+                WargearSelection(
+                    option_id=lash_option_id,
+                    model_profile_id=model_profile_id,
+                    wargear_ids=(axe_id, lash_id),
+                ),
+            ),
+        )
+    assert lash_option.allowed_wargear_ids == (axe_id, lash_id)
+
+
+def test_phase17k_great_unclean_one_bridge_supports_single_replacement_wargear() -> None:
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_great_unclean_one_bridge_artifacts(),
+    )
+    datasheet = package.army_catalog.datasheet_by_id("000001130")
+    wargear_by_id = {wargear.wargear_id: wargear for wargear in package.army_catalog.wargear}
+    options_by_id = {option.option_id: option for option in datasheet.wargear_options}
+    abilities_by_name = {ability.name: ability for ability in datasheet.abilities}
+    model_profile_id = "000001130:great-unclean-one"
+    plague_flail_id = "000001130:plague-flail"
+    putrid_vomit_id = "000001130:putrid-vomit"
+    bilesword_id = "000001130:bilesword"
+    bileblade_id = "000001130:bileblade"
+    doomsday_bell_id = "000001130:doomsday-bell"
+    bileblade_option_id = "000001130:bileblade:option-1"
+    doomsday_bell_option_id = "000001130:doomsday-bell:option-2"
+
+    assert _resolved_great_unclean_one_model_wargear(package, requested_selections=()) == (
+        plague_flail_id,
+        putrid_vomit_id,
+        bilesword_id,
+    )
+
+    bileblade_option = options_by_id[bileblade_option_id]
+    doomsday_bell_option = options_by_id[doomsday_bell_option_id]
+    assert bileblade_option.default_wargear_ids == ()
+    assert bileblade_option.allowed_wargear_ids == (bileblade_id,)
+    assert bileblade_option.max_selections == 1
+    assert bileblade_option.conditions == ()
+    assert bileblade_option.effects[0].kind is WargearOptionEffectKind.REPLACE_WARGEAR
+    assert bileblade_option.effects[0].wargear_id == bileblade_id
+    assert bileblade_option.effects[0].replaced_wargear_id == plague_flail_id
+    assert doomsday_bell_option.effects[0].kind is WargearOptionEffectKind.REPLACE_WARGEAR
+    assert doomsday_bell_option.effects[0].wargear_id == doomsday_bell_id
+    assert doomsday_bell_option.effects[0].replaced_wargear_id == bilesword_id
+    assert wargear_by_id[doomsday_bell_id].weapon_profiles[0].keywords == (
+        WeaponKeyword.LETHAL_HITS,
+    )
+    assert "000001130:reverberating-summons" not in wargear_by_id
+    reverberating_summons = abilities_by_name["Reverberating Summons"]
+    assert reverberating_summons.source_kind is CatalogAbilitySourceKind.WARGEAR
+    assert reverberating_summons.source_wargear_id == doomsday_bell_id
+
+    assert _resolved_great_unclean_one_model_wargear(
+        package,
+        requested_selections=(
+            WargearSelection(
+                option_id=bileblade_option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(bileblade_id,),
+            ),
+        ),
+    ) == (putrid_vomit_id, bilesword_id, bileblade_id)
+    assert _resolved_great_unclean_one_model_wargear(
+        package,
+        requested_selections=(
+            WargearSelection(
+                option_id=bileblade_option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(bileblade_id,),
+            ),
+            WargearSelection(
+                option_id=doomsday_bell_option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(doomsday_bell_id,),
+            ),
+        ),
+    ) == (putrid_vomit_id, bileblade_id, doomsday_bell_id)
+    reverberating_record = AbilityCatalogRecord(
+        record_id="phase17k:test:great-unclean-one:reverberating-summons",
+        definition=AbilityDefinition(
+            ability_id=reverberating_summons.ability_id,
+            name=reverberating_summons.name,
+            source_id=reverberating_summons.source_id,
+            when_descriptor="Catalog bridge wargear profile source test.",
+            effect_descriptor=reverberating_summons.effect_description,
+            restrictions_descriptor=(
+                f"Selected wargear required: {reverberating_summons.source_wargear_id}."
+            ),
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
+            replay_payload=validate_json_value(
+                {
+                    "source_wargear_id": reverberating_summons.source_wargear_id,
+                }
+            ),
+        ),
+        source_kind=AbilitySourceKind.WARGEAR,
+        datasheet_id=datasheet.datasheet_id,
+        wargear_id=reverberating_summons.source_wargear_id,
+    )
+    default_unit = _great_unclean_one_unit(package=package, requested_selections=())
+    doomsday_bell_unit = _great_unclean_one_unit(
+        package=package,
+        requested_selections=(
+            WargearSelection(
+                option_id=doomsday_bell_option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(doomsday_bell_id,),
+            ),
+        ),
+    )
+    default_records_by_name = {
+        record.definition.name: record
+        for record in build_player_ability_index(
+            (reverberating_record,),
+            army=_flesh_hounds_army(
+                package=package,
+                unit=default_unit,
+                army_id="army-nurgle",
+                player_id="player-nurgle-default",
+            ),
+            catalog=package.army_catalog,
+        ).all_records()
+    }
+    doomsday_records_by_name = {
+        record.definition.name: record
+        for record in build_player_ability_index(
+            (reverberating_record,),
+            army=_flesh_hounds_army(
+                package=package,
+                unit=doomsday_bell_unit,
+                army_id="army-nurgle",
+                player_id="player-nurgle-doomsday",
+            ),
+            catalog=package.army_catalog,
+        ).all_records()
+    }
+    assert "Reverberating Summons" not in default_records_by_name
+    assert doomsday_records_by_name["Reverberating Summons"].wargear_id == doomsday_bell_id
+
+
+def test_phase17k_bridge_rejects_unowned_wargear_profile_ability() -> None:
+    with pytest.raises(
+        WahapediaBridgeError,
+        match="Wargear profile ability must map to exactly one wargear item",
+    ):
+        build_wahapedia_canonical_bridge_artifacts(
+            source_artifacts=_unowned_wargear_profile_ability_source_artifacts(),
+            bridge_package_id=_bridge_package_id(),
+            datasheet_ids=("test-wargear-profile-owner",),
+            height_overrides=(
+                ModelHeightOverride(
+                    datasheet_id="test-wargear-profile-owner",
+                    model_name="Profile Bearer",
+                    height=1.0,
+                    height_units=GeometrySourceUnits.INCHES,
+                    height_source_id="test-source:wargear-profile-owner-height",
+                    height_document_reference="test-doc:wargear-profile-owner-height",
+                ),
+            ),
+        )
+
+
+def test_phase17k_bridge_supports_pdf_declared_no_equipment_and_no_wargear_options() -> None:
+    artifacts = _no_equipment_daemon_fortification_bridge_artifacts()
+    wargear_rows = _optional_artifact_rows(artifacts, "Datasheets_wargear")
+    option_rows = _optional_artifact_rows(artifacts, "Datasheets_options")
+    model_rows = _artifact_by_table(artifacts, "Datasheets_models").rows
+    model_fields_by_datasheet_id = {
+        row.runtime_fields_payload()["datasheet_id"]: row.runtime_fields_payload()
+        for row in model_rows
+    }
+
+    for datasheet_id in ("000001470", "000001588"):
+        assert not any(
+            row.runtime_fields_payload()["datasheet_id"] == datasheet_id for row in wargear_rows
+        )
+        assert not any(
+            row.runtime_fields_payload()["datasheet_id"] == datasheet_id for row in option_rows
+        )
+        assert model_fields_by_datasheet_id[datasheet_id]["base_size"] == "Hull"
+
+
 def test_phase17k_bloodcrushers_runtime_instances_manifest_model_wargear_and_abilities() -> None:
     package = build_canonical_catalog_package(
         package_id=_catalog_package_id(),
@@ -4167,7 +4442,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in chaos_daemons_markdown
     assert (
         "| Bloodthirster (`000002582`) | PDF pages 16-17; supersedes Wahapedia. | "
-        "Bridge/catalog blocked |"
+        "IR parsed; host needed |"
     ) in chaos_daemons_markdown
     assert (
         "| Skull Altar (`000001588`) | PDF pages 36-37; supersedes Wahapedia. | "
@@ -4226,7 +4501,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in chaos_daemons_markdown
     assert (
         "| Great Unclean One (`000001130`) | PDF pages 66-67; supersedes Wahapedia. | "
-        "Bridge/catalog blocked |"
+        "Unsupported IR |"
     ) in chaos_daemons_markdown
     assert (
         "| Tormentbringer (`000004100`) | PDF pages 100-101; supersedes Wahapedia "
@@ -6032,6 +6307,74 @@ def _bloodcrushers_unit(
     )
 
 
+def _resolved_bloodthirster_model_wargear(
+    package: CanonicalCatalogPackage,
+    *,
+    requested_selections: tuple[WargearSelection, ...],
+) -> tuple[str, ...]:
+    datasheet = package.army_catalog.datasheet_by_id("000002582")
+    unit = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-khorne",
+        selection=UnitMusterSelection(
+            unit_selection_id="bloodthirster-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="000002582:bloodthirster",
+                    model_count=1,
+                ),
+            ),
+            wargear_selections=requested_selections,
+        ),
+        datasheet=datasheet,
+    )
+    return unit.own_models[0].wargear_ids
+
+
+def _resolved_great_unclean_one_model_wargear(
+    package: CanonicalCatalogPackage,
+    *,
+    requested_selections: tuple[WargearSelection, ...],
+) -> tuple[str, ...]:
+    return (
+        _great_unclean_one_unit(
+            package=package,
+            requested_selections=requested_selections,
+        )
+        .own_models[0]
+        .wargear_ids
+    )
+
+
+def _great_unclean_one_unit(
+    package: CanonicalCatalogPackage,
+    *,
+    requested_selections: tuple[WargearSelection, ...],
+) -> UnitInstance:
+    datasheet = package.army_catalog.datasheet_by_id("000001130")
+    return UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-nurgle",
+        selection=UnitMusterSelection(
+            unit_selection_id="great-unclean-one-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="000001130:great-unclean-one",
+                    model_count=1,
+                ),
+            ),
+            wargear_selections=requested_selections,
+        ),
+        datasheet=datasheet,
+    )
+
+
 def _flesh_hounds_unit(
     *,
     package: CanonicalCatalogPackage,
@@ -6893,6 +7236,68 @@ def _bloodcrushers_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
         source_artifacts=_wahapedia_source_artifacts(),
         bridge_package_id=_bridge_package_id(),
         datasheet_ids=("000001115",),
+    )
+
+
+def _bloodthirster_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000002582",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000002582",
+                model_name="Bloodthirster",
+                height=5.75,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:bloodthirster:height",
+                height_document_reference="Chaos Daemons Faction Pack p.16-17",
+            ),
+        ),
+    )
+
+
+def _great_unclean_one_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000001130",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000001130",
+                model_name="Great Unclean One",
+                height=5.25,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:great-unclean-one:height",
+                height_document_reference="Chaos Daemons Faction Pack p.66-67",
+            ),
+        ),
+    )
+
+
+def _no_equipment_daemon_fortification_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000001470", "000001588"),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000001470",
+                model_name="Feculent Gnarlmaw",
+                height=5.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:feculent-gnarlmaw:height",
+                height_document_reference="Chaos Daemons Faction Pack p.86-87",
+            ),
+            ModelHeightOverride(
+                datasheet_id="000001588",
+                model_name="Skull Altar",
+                height=4.75,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:skull-altar:height",
+                height_document_reference="Chaos Daemons Faction Pack p.36-37",
+            ),
+        ),
     )
 
 
@@ -8229,6 +8634,86 @@ def _unsupported_wargear_rule_source_artifacts() -> tuple[WahapediaJsonArtifact,
     )
 
 
+def _unowned_wargear_profile_ability_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Test Army Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-wargear-profile-owner,Wargear Profile Owner,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-wargear-profile-owner,1,Faction,test-army-rule,"
+                        "Test Army Rule,Test rule text.,"
+                    ),
+                    (
+                        "test-wargear-profile-owner,2,Wargear profile,,Summoning Horn,"
+                        "Return one destroyed model.,"
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-wargear-profile-owner,Infantry,,false",
+                    "test-wargear-profile-owner,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    "test-wargear-profile-owner,1,1,Rotten bell,Ranged,12,1,3,4,0,1,[Lethal Hits]",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-wargear-profile-owner,1,6,4,3,-,2,7,1,32mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    "test-wargear-profile-owner,1,1 Profile Bearer",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
 def _artifact_from_csv(table_name: str, csv_text: str) -> WahapediaJsonArtifact:
     return WahapediaJsonArtifact.from_csv_table(
         source_package_id=_bridge_package_id(),
@@ -8261,6 +8746,16 @@ def _artifact_by_table(
         if artifact.source_table == table_name:
             return artifact
     raise AssertionError(f"Missing artifact table: {table_name}.")
+
+
+def _optional_artifact_rows(
+    artifacts: tuple[WahapediaJsonArtifact, ...],
+    table_name: str,
+) -> tuple[NormalizedSourceRow, ...]:
+    for artifact in artifacts:
+        if artifact.source_table == table_name:
+            return artifact.rows
+    return ()
 
 
 def _row_by_id(artifact: WahapediaJsonArtifact, row_id: str) -> NormalizedSourceRow:
