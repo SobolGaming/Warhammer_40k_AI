@@ -58,6 +58,7 @@ from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CatalogMovementTransitPermission,
     catalog_movement_transit_permissions_for_model,
+    catalog_rule_ir_consumers_for_rule,
 )
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.list_validation import (
@@ -661,6 +662,79 @@ def test_generic_rule_ir_movement_transit_permissions_are_consumed_by_model_cont
             model_keyword_any=("MONSTER", "VEHICLE"),
             terrain_height_max_inches=-1.0,
         )
+
+
+def test_malformed_passive_query_movement_transit_ir_fails_closed_at_runtime() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    army = muster_army(
+        catalog=catalog,
+        request=_muster_request(
+            catalog,
+            unit_selections=(
+                _unit_selection(
+                    unit_selection_id="transport-1",
+                    datasheet_id="core-transport",
+                    model_profile_id="core-transport",
+                    model_count=1,
+                ),
+            ),
+        ),
+    )
+    unit = army.units[0]
+    model_instance_id = unit.own_models[0].model_instance_id
+    current_model_instance_ids = unit.own_model_ids()
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="phase12d:test:malformed-move-over-friendly-monster-vehicle-terrain",
+            raw_text=(
+                "Each time this model makes a Normal or Advance move, it can move over "
+                'friendly Monster and Vehicle models and terrain features that are 4" '
+                "or less in height as if they were not there."
+            ),
+        )
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    malformed_rule_irs = (
+        replace(rule_ir, clauses=(replace(clause, target=None),)),
+        replace(rule_ir, clauses=(replace(clause, trigger=None),)),
+    )
+
+    for index, malformed_rule_ir in enumerate(malformed_rule_irs, start=1):
+        record = _ability_record(
+            f"malformed-semantic-move-over-{index}",
+            trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            source_kind=AbilitySourceKind.DATASHEET,
+            datasheet_id=unit.datasheet_id,
+            replay_payload=cast(JsonValue, {"rule_ir": malformed_rule_ir.to_payload()}),
+        )
+        ability_index = AbilityCatalogIndex.from_records(
+            (*eleventh_edition_ability_catalog_records(), record)
+        )
+        direct_permissions = catalog_movement_transit_permissions_for_model(
+            ability_index=ability_index,
+            unit=unit,
+            model_instance_id=model_instance_id,
+            current_model_instance_ids=current_model_instance_ids,
+            movement_mode=MovementMode.NORMAL.value,
+        )
+        legality_context = MovementLegalityContext.from_keywords(
+            keywords=unit.keywords,
+            ruleset_descriptor=descriptor,
+            movement_mode=MovementMode.NORMAL,
+            movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+            displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+            ability_index=ability_index,
+            unit=unit,
+            model_instance_id=model_instance_id,
+            current_model_instance_ids=current_model_instance_ids,
+        )
+
+        assert catalog_rule_ir_consumers_for_rule(malformed_rule_ir) == ()
+        assert direct_permissions == ()
+        assert not legality_context.capabilities.can_move_over_friendly_vehicle_monster_models
+        assert legality_context.capabilities.terrain_as_if_absent_height_inches is None
 
 
 def test_player_ability_index_filters_selected_sources() -> None:

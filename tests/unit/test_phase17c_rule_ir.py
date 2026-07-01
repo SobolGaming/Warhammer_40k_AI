@@ -52,6 +52,8 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
     _feel_no_pain_source_from_effect,  # pyright: ignore[reportPrivateUsage]
+    _movement_mode_tokens_or_none,  # pyright: ignore[reportPrivateUsage]
+    _movement_transit_permission_from_clause,  # pyright: ignore[reportPrivateUsage]
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
 )
@@ -691,6 +693,103 @@ def test_phase17c_move_over_permission_supports_single_move_mode_and_decimal_hei
     assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
         CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
     )
+
+
+def test_phase17c_movement_transit_consumer_normalizes_mode_order() -> None:
+    rule_ir = _compiled(MOVE_OVER_MONSTER_VEHICLE_TERRAIN_TEXT).rule_ir
+    clause = rule_ir.clauses[0]
+    trigger = clause.trigger
+    effect = clause.effects[0]
+    assert trigger is not None
+
+    reordered_clause = replace(
+        clause,
+        trigger=_trigger_with_parameter(
+            trigger,
+            key="movement_modes",
+            value="normal|advance",
+        ),
+        effects=(
+            replace(
+                effect,
+                parameters=_parameters_with_value(
+                    effect.parameters,
+                    key="movement_modes",
+                    value="normal|advance",
+                ),
+            ),
+        ),
+    )
+    reordered_rule_ir = replace(rule_ir, clauses=(reordered_clause,))
+
+    assert catalog_rule_ir_consumers_for_rule(reordered_rule_ir) == (
+        CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(reordered_rule_ir) == (
+        CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
+    )
+
+
+def test_phase17c_movement_transit_consumer_fails_closed_for_malformed_mode_tokens() -> None:
+    rule_ir = _compiled(MOVE_OVER_MONSTER_VEHICLE_TERRAIN_TEXT).rule_ir
+    clause = rule_ir.clauses[0]
+    trigger = clause.trigger
+    assert trigger is not None
+
+    malformed_values: tuple[RuleParameterValue, ...] = (
+        1,
+        "",
+        "normal|normal",
+        "normal|fall_back",
+    )
+
+    for malformed_value in malformed_values:
+        malformed_rule_ir = replace(
+            rule_ir,
+            clauses=(
+                replace(
+                    clause,
+                    trigger=_trigger_with_parameter(
+                        trigger,
+                        key="movement_modes",
+                        value=malformed_value,
+                    ),
+                ),
+            ),
+        )
+
+        assert catalog_rule_ir_consumers_for_rule(malformed_rule_ir) == ()
+        assert catalog_rule_ir_hook_ids_for_rule(malformed_rule_ir) == ()
+    assert _movement_mode_tokens_or_none(cast(tuple[str, ...], "normal")) is None
+    assert _movement_mode_tokens_or_none(()) is None
+
+
+def test_phase17c_movement_transit_clause_extraction_rejects_wrong_types() -> None:
+    rule_ir = _compiled(MOVE_OVER_MONSTER_VEHICLE_TERRAIN_TEXT).rule_ir
+    clause = rule_ir.clauses[0]
+    record = AbilityCatalogRecord(
+        record_id="phase17c:test:movement-transit",
+        definition=AbilityDefinition(
+            ability_id="phase17c:test:movement-transit",
+            name="Movement Transit",
+            source_id="phase17c:test:movement-transit:source",
+            when_descriptor="Passive query.",
+            effect_descriptor="Movement transit permission.",
+            restrictions_descriptor="None.",
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY),
+        ),
+    )
+
+    with pytest.raises(GameLifecycleError, match="ability record"):
+        _movement_transit_permission_from_clause(
+            record=cast(AbilityCatalogRecord, object()),
+            clause=clause,
+        )
+    with pytest.raises(GameLifecycleError, match="RuleClause"):
+        _movement_transit_permission_from_clause(
+            record=record,
+            clause=cast(RuleClause, object()),
+        )
 
 
 def test_phase17c_malformed_movement_transit_ir_fails_closed_for_catalog_consumers() -> None:

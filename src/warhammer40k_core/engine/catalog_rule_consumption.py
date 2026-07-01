@@ -3999,14 +3999,9 @@ def catalog_movement_transit_permissions_for_model(
         ):
             continue
         for clause in _clauses_from_record(record):
-            for effect in clause.effects:
-                permission = _movement_transit_permission_from_effect(
-                    record=record,
-                    clause=clause,
-                    effect=effect,
-                )
-                if permission is not None and permission.applies_to_movement_mode(requested_mode):
-                    permissions.append(permission)
+            permission = _movement_transit_permission_from_clause(record=record, clause=clause)
+            if permission is not None and permission.applies_to_movement_mode(requested_mode):
+                permissions.append(permission)
     return tuple(
         sorted(
             permissions,
@@ -4355,10 +4350,11 @@ def _clause_is_supported_movement_transit_permission(clause: RuleClause) -> bool
     permission_parameters = _supported_movement_transit_effect_parameters(effects[0])
     if permission_parameters is None:
         return False
-    movement_modes = trigger_parameters.get("movement_modes")
-    return (
-        type(movement_modes) is str and tuple(movement_modes.split("|")) == permission_parameters[0]
-    )
+    movement_modes_value = trigger_parameters.get("movement_modes")
+    if type(movement_modes_value) is not str:
+        return False
+    movement_modes = _movement_mode_tokens_or_none(tuple(movement_modes_value.split("|")))
+    return movement_modes is not None and movement_modes == permission_parameters[0]
 
 
 def _clause_has_supported_first_death_frequency_limit(clause: RuleClause) -> bool:
@@ -4454,6 +4450,34 @@ def _movement_transit_permission_from_effect(
         model_keyword_any=model_keyword_any,
         terrain_height_max_inches=terrain_height_max_inches,
     )
+
+
+def _movement_transit_permission_from_clause(
+    *,
+    record: AbilityCatalogRecord,
+    clause: RuleClause,
+) -> CatalogMovementTransitPermission | None:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Movement transit permission requires an ability record.")
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Movement transit permission requires a RuleClause.")
+    if not _clause_is_supported_movement_transit_permission(clause):
+        return None
+    effects = tuple(
+        effect
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION
+    )
+    if len(effects) != 1:
+        raise GameLifecycleError("Supported movement transit clause must have one effect.")
+    permission = _movement_transit_permission_from_effect(
+        record=record,
+        clause=clause,
+        effect=effects[0],
+    )
+    if permission is None:
+        raise GameLifecycleError("Supported movement transit clause must produce a permission.")
+    return permission
 
 
 def _supported_movement_transit_effect_parameters(
@@ -6096,12 +6120,37 @@ def _validate_movement_mode_tokens(values: object) -> tuple[str, ...]:
     return tuple(sorted(validated))
 
 
+def _movement_mode_tokens_or_none(values: object) -> tuple[str, ...] | None:
+    if type(values) is not tuple:
+        return None
+    validated: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        token = _movement_mode_token_or_none(value)
+        if token is None or token in seen:
+            return None
+        seen.add(token)
+        validated.append(token)
+    if not validated:
+        return None
+    return tuple(sorted(validated))
+
+
 def _movement_mode_token(value: object) -> str:
     if type(value) is not str or not value.strip():
         raise GameLifecycleError("Catalog movement mode token must be a string.")
     token = value.strip().lower().replace(" ", "_").replace("-", "_")
     if token not in {"advance", "normal"}:
         raise GameLifecycleError("Catalog movement mode token is unsupported.")
+    return token
+
+
+def _movement_mode_token_or_none(value: object) -> str | None:
+    if type(value) is not str or not value.strip():
+        return None
+    token = value.strip().lower().replace(" ", "_").replace("-", "_")
+    if token not in {"advance", "normal"}:
+        return None
     return token
 
 
