@@ -258,6 +258,17 @@ class DetachmentRuleSupportRow:
 
 
 @dataclass(frozen=True)
+class DatasheetGroupReviewRow:
+    datasheet: str
+    datasheet_id: str
+    source_basis: str
+    ir_coverage: str
+    supported_semantics: str
+    semantics_needed: str
+    catalog_blockers: str
+
+
+@dataclass(frozen=True)
 class RuntimeHookInventoryRow:
     hook_id: str
     ability_or_rule_labels: tuple[str, ...]
@@ -2360,13 +2371,19 @@ def _faction_datasheet_support_markdown(
             "prevents safe play."
         ),
         "",
-        (
-            "| Datasheet | Overall | Catalog | Models / geometry | Wargear | "
-            "Weapon keywords | Datasheet abilities | Faction / detachment interactions | "
-            "Tests / evidence | Notes |"
-        ),
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
+    if faction_row.faction_id == "chaos-daemons":
+        lines.extend(_chaos_daemons_khorne_review_markdown())
+    lines.extend(
+        (
+            (
+                "| Datasheet | Overall | Catalog | Models / geometry | Wargear | "
+                "Weapon keywords | Datasheet abilities | Faction / detachment interactions | "
+                "Tests / evidence | Notes |"
+            ),
+            "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+        )
+    )
     if not sorted_rows:
         lines.append(
             "| "
@@ -2464,6 +2481,221 @@ def _faction_datasheet_support_markdown(
                 + " |"
             )
     return lines
+
+
+def _chaos_daemons_khorne_review_markdown() -> list[str]:
+    lines = [
+        "### Khorne",
+        "",
+        (
+            "This source-review table covers Chaos Daemons datasheets that carry the "
+            "`Khorne` keyword. The 11th edition Chaos Daemons Faction Pack pages 14-37 "
+            "are authoritative for this 11th edition review. Wahapedia-only discontinued "
+            "Khorne-labeled rows, including An'ggrath the Unbound and Chaos Lord On "
+            "Juggernaut, are excluded. The PDF Karanak datasheet supersedes the duplicate "
+            "Wahapedia Karanak row, so it is not counted separately. "
+            "`All consumed` means every known non-core datasheet or wargear ability is "
+            "currently consumed by a named runtime host. `IR parsed; host needed` means "
+            "the rule text compiles to supported structured IR but at least one compiled "
+            "semantic still has no phase/query consumer. `Unsupported IR` means at least "
+            "one known ability still compiles with unsupported diagnostics. "
+            "`Bridge/catalog blocked` means a source-shape or catalog-normalization gap "
+            "blocks safe generated catalog use even when some ability text can be reviewed."
+        ),
+        "",
+        (
+            "| Datasheet | Source basis | IR coverage | Supported semantics | "
+            "IR semantics still needed | Bridge / catalog blockers |"
+        ),
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
+    for row in sorted(
+        _chaos_daemons_khorne_review_rows(),
+        key=lambda review_row: (review_row.datasheet.lower(), review_row.datasheet_id),
+    ):
+        lines.append(
+            "| "
+            + " | ".join(
+                (
+                    f"{_markdown_text(row.datasheet)} (`{_markdown_text(row.datasheet_id)}`)",
+                    _markdown_text(row.source_basis),
+                    _markdown_text(row.ir_coverage),
+                    _markdown_text(row.supported_semantics),
+                    _markdown_text(row.semantics_needed),
+                    _markdown_text(row.catalog_blockers),
+                )
+            )
+            + " |"
+        )
+    lines.append("")
+    return lines
+
+
+def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
+    return (
+        DatasheetGroupReviewRow(
+            datasheet="Bloodcrushers",
+            datasheet_id="000001115",
+            source_basis="PDF pages 30-31; supersedes Wahapedia.",
+            ir_coverage="All consumed",
+            supported_semantics=(
+                "Deep Strike, Brass Stampede move-completed mortal wounds, The Shadow of "
+                "Chaos, Daemonic Icon Leadership, and Instrument of Chaos charge modifier."
+            ),
+            semantics_needed="None.",
+            catalog_blockers="No known datasheet-level blockers.",
+        ),
+        DatasheetGroupReviewRow(
+            datasheet="Bloodletters",
+            datasheet_id="000001114",
+            source_basis="PDF pages 28-29; supersedes Wahapedia.",
+            ir_coverage="IR parsed; host needed",
+            supported_semantics=(
+                "Deep Strike, The Shadow of Chaos, Daemonic Icon Leadership, and "
+                "Instrument of Chaos charge modifier are consumed."
+            ),
+            semantics_needed=(
+                "Bane of Cowards compiles to Desperate Escape test and roll-modifier IR, "
+                "but still needs a phase/query consumer."
+            ),
+            catalog_blockers="No known catalog blocker.",
+        ),
+        DatasheetGroupReviewRow(
+            datasheet="Bloodmaster",
+            datasheet_id="000001455",
+            source_basis="PDF pages 20-21; supersedes Wahapedia.",
+            ir_coverage="Unsupported IR",
+            supported_semantics=(
+                "Deep Strike and The Shadow of Chaos are consumed; Bloodmaster wound "
+                "modifier compiles to generic IR."
+            ),
+            semantics_needed=(
+                "A Gory Path unsupported diagnostics; Bloodmaster selected-unit wound "
+                "modifier host; Leader row consumer evidence."
+            ),
+            catalog_blockers="Representative height remains unreviewed outside this report.",
+        ),
+        DatasheetGroupReviewRow(
+            datasheet="Bloodthirster",
+            datasheet_id="000002582",
+            source_basis="PDF pages 16-17; supersedes Wahapedia.",
+            ir_coverage="Bridge/catalog blocked",
+            supported_semantics="Deep Strike and The Shadow of Chaos are consumed.",
+            semantics_needed=(
+                "Deadly Demise descriptor consumer evidence; Daemon Lord of Khorne hit-roll "
+                "aura host; Greater Daemon of Khorne Shadow aura host; Relentless Carnage "
+                "end-of-Fight mortal wounds."
+            ),
+            catalog_blockers=(
+                "Wargear option replacement row is not represented by current additive "
+                "wargear-option semantics."
+            ),
+        ),
+        DatasheetGroupReviewRow(
+            datasheet="Flesh Hounds",
+            datasheet_id="000001112",
+            source_basis="PDF pages 32-33; supersedes Wahapedia.",
+            ir_coverage="All consumed",
+            supported_semantics=(
+                "Deep Strike, Hunters from the Warp reserve placement, The Shadow of Chaos, "
+                "and Collar of Khorne Feel No Pain."
+            ),
+            semantics_needed="None.",
+            catalog_blockers="No known datasheet-level blockers.",
+        ),
+        DatasheetGroupReviewRow(
+            datasheet="Karanak",
+            datasheet_id="000001104",
+            source_basis="PDF pages 26-27; supersedes Wahapedia and duplicate row 000004102.",
+            ir_coverage="IR parsed; host needed",
+            supported_semantics=(
+                "Deep Strike, Pack Leader Advance/Charge rerolls, Prey of the Blood God "
+                "tracked-target rerolls/reselect, The Shadow of Chaos, and Brass Collar of "
+                "Bloody Vengeance Feel No Pain."
+            ),
+            semantics_needed="Leader row consumer evidence.",
+            catalog_blockers="Representative height remains unreviewed outside this report.",
+        ),
+        DatasheetGroupReviewRow(
+            datasheet="Rendmaster On Blood Throne",
+            datasheet_id="000001111",
+            source_basis="PDF pages 24-25; supersedes Wahapedia.",
+            ir_coverage="Unsupported IR",
+            supported_semantics=(
+                "Deep Strike, Champion Slayer wound rerolls and lost-wound restoration, "
+                "and The Shadow of Chaos."
+            ),
+            semantics_needed="Blood Throne aura/targeted bonus unsupported diagnostics.",
+            catalog_blockers="Representative height remains unreviewed outside this report.",
+        ),
+        DatasheetGroupReviewRow(
+            datasheet="Skarbrand",
+            datasheet_id="000001105",
+            source_basis="PDF pages 14-15; supersedes Wahapedia.",
+            ir_coverage="IR parsed; host needed",
+            supported_semantics=(
+                "Deep Strike, Murderlust Advance-and-Charge, and The Shadow of Chaos."
+            ),
+            semantics_needed=(
+                "Deadly Demise descriptor consumer evidence; Greater Daemon of Khorne "
+                "Shadow aura host; Rage Embodied characteristic-modifier aura host."
+            ),
+            catalog_blockers="Representative height remains unreviewed outside this report.",
+        ),
+        DatasheetGroupReviewRow(
+            datasheet="Skull Altar",
+            datasheet_id="000001588",
+            source_basis="PDF pages 36-37; supersedes Wahapedia.",
+            ir_coverage="Bridge/catalog blocked",
+            supported_semantics="Infiltrators and The Shadow of Chaos are known structured paths.",
+            semantics_needed=(
+                "Shadow of Khorne aura; Cover and Fortification datasheet terrain semantics; "
+                "Fortification hit-roll and Desperate Escape exceptions."
+            ),
+            catalog_blockers=(
+                "PDF declares no equipment and no wargear options; current Wahapedia bridge "
+                "source has an empty wargear row and needs PDF-backed normalization."
+            ),
+        ),
+        DatasheetGroupReviewRow(
+            datasheet="Skull Cannon",
+            datasheet_id="000001116",
+            source_basis="PDF pages 34-35; supersedes Wahapedia.",
+            ir_coverage="Unsupported IR",
+            supported_semantics="Deep Strike and The Shadow of Chaos are consumed.",
+            semantics_needed="Skulls of the Fallen Battle-shock trigger unsupported diagnostics.",
+            catalog_blockers="Representative height remains unreviewed outside this report.",
+        ),
+        DatasheetGroupReviewRow(
+            datasheet="Skullmaster",
+            datasheet_id="000001456",
+            source_basis="PDF pages 22-23; supersedes Wahapedia.",
+            ir_coverage="Unsupported IR",
+            supported_semantics=(
+                "Deep Strike and The Shadow of Chaos are consumed; Skullmaster's Fury "
+                "compiles to generic weapon-ability grant IR."
+            ),
+            semantics_needed=(
+                "Devastating Charge unsupported diagnostics; Skullmaster's Fury runtime host; "
+                "Leader row consumer evidence."
+            ),
+            catalog_blockers="Representative height remains unreviewed outside this report.",
+        ),
+        DatasheetGroupReviewRow(
+            datasheet="Skulltaker",
+            datasheet_id="000001106",
+            source_basis="PDF pages 18-19; supersedes Wahapedia.",
+            ir_coverage="Unsupported IR",
+            supported_semantics=(
+                "Deep Strike, Lord of Decapitations Devastating Wounds grant, and The Shadow "
+                "of Chaos."
+            ),
+            semantics_needed=(
+                "Skulls for Khorne unsupported diagnostics; Leader row consumer evidence."
+            ),
+            catalog_blockers="Representative height remains unreviewed outside this report.",
+        ),
+    )
 
 
 def _datasheet_label(row: DatasheetSupportRow) -> str:
