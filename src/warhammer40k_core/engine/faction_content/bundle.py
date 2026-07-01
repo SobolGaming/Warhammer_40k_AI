@@ -42,6 +42,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_fall_back_eligibility_hook_bindings,
     catalog_named_weapon_ability_choice_hook_bindings,
     catalog_post_shoot_hit_target_status_hook_bindings,
+    catalog_unit_move_completed_mortal_wound_hook_bindings,
     catalog_weapon_profile_modifier_bindings,
 )
 from warhammer40k_core.engine.charge_declaration_hooks import (
@@ -1430,10 +1431,16 @@ class RuntimeContentBundle:
         )
         unit_move_completed_mortal_wound_hook_registry = (
             UnitMoveCompletedMortalWoundHookRegistry.from_bindings(
-                _contribution_values(
-                    validated_contributions,
-                    lambda contribution: (
-                        contribution.unit_move_completed_mortal_wound_hook_bindings
+                (
+                    *catalog_unit_move_completed_mortal_wound_hook_bindings(
+                        ability_indexes_by_player_id=ability_indexes_by_player_id,
+                        armies=validated_armies,
+                    ),
+                    *_contribution_values(
+                        validated_contributions,
+                        lambda contribution: (
+                            contribution.unit_move_completed_mortal_wound_hook_bindings
+                        ),
                     ),
                 )
             )

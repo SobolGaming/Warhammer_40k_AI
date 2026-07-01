@@ -36,6 +36,10 @@ type UnitMoveCompletedMortalWoundHandler = Callable[
     ["UnitMoveCompletedContext"],
     tuple["UnitMoveCompletedMortalWoundEffect", ...],
 ]
+type UnitMoveCompletedMortalWoundRequestHandler = Callable[
+    ["UnitMoveCompletedContext"],
+    LifecycleStatus | None,
+]
 
 UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_SOURCE_KIND = "unit_move_completed_mortal_wounds"
 UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_PENDING_EVENT = "unit_move_completed_mortal_wounds_pending"
@@ -55,6 +59,7 @@ class UnitMoveCompletedContext:
     triggering_unit_instance_id: str
     triggering_player_id: str
     movement_action: str
+    decisions: DecisionController | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -97,6 +102,10 @@ class UnitMoveCompletedContext:
             "movement_action",
             _validate_identifier("movement_action", self.movement_action),
         )
+        if self.decisions is not None and type(self.decisions) is not DecisionController:
+            raise GameLifecycleError(
+                "Unit move completed context decisions must be a DecisionController."
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -150,14 +159,23 @@ class UnitMoveCompletedMortalWoundEffect:
 class UnitMoveCompletedMortalWoundHookBinding:
     hook_id: str
     source_id: str
-    handler: UnitMoveCompletedMortalWoundHandler
+    handler: UnitMoveCompletedMortalWoundHandler | None = None
+    request_handler: UnitMoveCompletedMortalWoundRequestHandler | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
-        if not callable(self.handler):
+        if self.handler is not None and not callable(self.handler):
             raise GameLifecycleError(
                 "UnitMoveCompletedMortalWoundHookBinding handler must be callable."
+            )
+        if self.request_handler is not None and not callable(self.request_handler):
+            raise GameLifecycleError(
+                "UnitMoveCompletedMortalWoundHookBinding request_handler must be callable."
+            )
+        if self.handler is None and self.request_handler is None:
+            raise GameLifecycleError(
+                "UnitMoveCompletedMortalWoundHookBinding requires a handler or request_handler."
             )
 
 
@@ -190,6 +208,8 @@ class UnitMoveCompletedMortalWoundHookRegistry:
             raise GameLifecycleError("Unit move completed hooks require a context.")
         effects: list[UnitMoveCompletedMortalWoundEffect] = []
         for binding in self.bindings:
+            if binding.handler is None:
+                continue
             handler_effects = binding.handler(context)
             if type(handler_effects) is not tuple:
                 raise GameLifecycleError(
@@ -222,6 +242,22 @@ class UnitMoveCompletedMortalWoundHookRegistry:
                 ),
             )
         )
+
+    def request_status_for(self, context: UnitMoveCompletedContext) -> LifecycleStatus | None:
+        if type(context) is not UnitMoveCompletedContext:
+            raise GameLifecycleError("Unit move completed hooks require a context.")
+        for binding in self.bindings:
+            if binding.request_handler is None:
+                continue
+            status = binding.request_handler(context)
+            if status is None:
+                continue
+            if type(status) is not LifecycleStatus:
+                raise GameLifecycleError(
+                    "Unit move completed request handlers must return LifecycleStatus or None."
+                )
+            return status
+        return None
 
 
 def resolve_unit_move_completed_mortal_wound_hooks(
@@ -271,7 +307,11 @@ def resolve_unit_move_completed_mortal_wound_hooks(
             triggering_unit_instance_id=triggering_unit_id,
             triggering_player_id=triggering_player_id,
             movement_action=movement_action,
+            decisions=decisions,
         )
+        request_status = registry.request_status_for(context)
+        if request_status is not None:
+            return request_status
         for effect in registry.effects_for(context):
             if _effect_key(effect) in processed_effect_keys:
                 continue

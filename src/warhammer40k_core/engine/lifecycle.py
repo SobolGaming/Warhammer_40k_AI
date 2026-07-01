@@ -30,7 +30,10 @@ from warhammer40k_core.engine.battle_round_hooks import (
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
 from warhammer40k_core.engine.catalog_rule_consumption import (
     SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE,
+    SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
+    apply_catalog_unit_move_completed_mortal_wounds_target_result,
     invalid_catalog_post_shoot_hit_target_status_status,
+    invalid_catalog_unit_move_completed_mortal_wounds_target_status,
 )
 from warhammer40k_core.engine.charge_declaration_hooks import (
     SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
@@ -331,6 +334,7 @@ _CHARGE_DECISION_TYPES = frozenset(
     (
         SELECT_CHARGING_UNIT_DECISION_TYPE,
         SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
+        SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
     )
 )
@@ -978,6 +982,20 @@ class GameLifecycle:
             type(result) is DecisionResult
             and pending_request is not None
             and pending_request.decision_type
+            == SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE
+        ):
+            invalid_status = invalid_catalog_unit_move_completed_mortal_wounds_target_status(
+                state=state,
+                request=pending_request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type
             == SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE
         ):
             invalid_status = invalid_shooting_phase_start_faction_rule_status(
@@ -1511,6 +1529,19 @@ class GameLifecycle:
             )
             if charge_status is not None:
                 return charge_status
+            return self.advance_until_decision_or_terminal()
+        if (
+            record.request.decision_type
+            == SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE
+        ):
+            target_status = apply_catalog_unit_move_completed_mortal_wounds_target_result(
+                state=state,
+                decisions=self.decision_controller,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+            )
+            if target_status is not None:
+                return target_status
             return self.advance_until_decision_or_terminal()
         if (
             record.request.decision_type == DICE_REROLL_DECISION_TYPE

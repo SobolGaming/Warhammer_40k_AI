@@ -360,6 +360,14 @@ _RESTORE_LOST_WOUNDS_RE = re.compile(
     r"\bthis\s+model\s+regains\s+up\s+to\s+(?P<amount>D6|D3|\d+)\s+lost\s+wounds\b",
     re.IGNORECASE,
 )
+_PER_MODEL_MORTAL_WOUNDS_RE = re.compile(
+    r"\broll\s+(?:(?P<roll_count>one|a|an|\d+)\s+)?"
+    r"(?P<roll_expression>(?:\d+)?D\d+(?:[+-]\d+)?)\s+for\s+each\s+model\s+"
+    r"in\s+this\s+unit:\s+for\s+each\s+(?P<success_threshold>[2-6])\+,\s+"
+    r"(?P<target>that\s+enemy\s+unit|that\s+unit|selected\s+unit|target\s+unit)\s+"
+    r"suffers\s+(?P<mortal_wounds>D6|D3|\d+)\s+mortal\s+wounds\b",
+    re.IGNORECASE,
+)
 _DISTANCE_RELATION_RE = re.compile(
     r"\b(?:(?P<subject>this\s+unit|this\s+model|that\s+unit|selected\s+unit|"
     r"target\s+unit)\s+is\s+)?"
@@ -719,6 +727,7 @@ def _compile_clause(
             *_parse_weapon_ability_effects(clause_text),
             *_parse_placement_effects(clause_text),
             *_parse_restore_lost_wounds_effects(clause_text),
+            *_parse_mortal_wound_effects(clause_text),
             *_parse_desperate_escape_effects(clause_text),
         )
     )
@@ -1179,7 +1188,7 @@ def _parse_keyword_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, 
         if _match_inside_ranges(match, target_match_ranges):
             continue
         keyword_text = match.group("keyword")
-        if keyword_text is None:
+        if keyword_text is None or _target_keyword_text_is_structural_relation(keyword_text):
             continue
         target_match_ranges.append((match.start(), match.end()))
         conditions.extend(_keyword_gate_conditions_from_match(clause_text=clause_text, match=match))
@@ -1205,6 +1214,16 @@ def _keyword_gate_conditions_from_match(
             parameters=parameters_from_pairs((("required_keyword", keyword),)),
         )
         for keyword in _keyword_sequence_tokens(match.group("keyword"))
+    )
+
+
+def _target_keyword_text_is_structural_relation(value: str) -> bool:
+    token = " ".join(value.lower().split())
+    return (
+        " within " in f" {token} "
+        or " engagement range" in token
+        or " objective marker range" in token
+        or " hit by " in f" {token} "
     )
 
 
@@ -1323,7 +1342,9 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
         )
         pairs: list[tuple[str, RuleParameterValue]] = [("allegiance", allegiance)]
         keyword_text = match.group("keyword")
-        if keyword_text is not None:
+        if keyword_text is not None and not _target_keyword_text_is_structural_relation(
+            keyword_text
+        ):
             pairs.extend(_keyword_sequence_parameter_pairs(keyword_text))
         return RuleTargetSpec(
             kind=target_kind,
@@ -1610,6 +1631,13 @@ def _dice_expression_token(value: str) -> str:
     if not token:
         raise RuleIRError("Dice expression must not be empty.")
     return token
+
+
+def _mortal_wounds_target_scope_token(value: str) -> str:
+    token = " ".join(value.lower().split())
+    if token in {"that enemy unit", "that unit", "selected unit", "target unit"}:
+        return "selected_enemy_unit"
+    raise RuleIRError(f"Unsupported mortal-wounds target: {value}.")
 
 
 def _match_is_within_any_span(
@@ -2024,6 +2052,38 @@ def _parse_restore_lost_wounds_effects(clause_text: _ClauseText) -> tuple[RuleEf
     return tuple(effects)
 
 
+def _parse_mortal_wound_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
+    effects: list[RuleEffectSpec] = []
+    for match in _PER_MODEL_MORTAL_WOUNDS_RE.finditer(clause_text.text):
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.INFLICT_MORTAL_WOUNDS,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("damage_kind", "mortal_wounds"),
+                        (
+                            "mortal_wounds_expression",
+                            _dice_expression_token(match.group("mortal_wounds")),
+                        ),
+                        ("roll_count", _roll_count_value(match.group("roll_count"))),
+                        ("roll_count_scope", "each_model_in_this_unit"),
+                        (
+                            "roll_expression",
+                            _dice_expression_token(match.group("roll_expression")),
+                        ),
+                        ("success_threshold", int(match.group("success_threshold"))),
+                        (
+                            "target_scope",
+                            _mortal_wounds_target_scope_token(match.group("target")),
+                        ),
+                    )
+                ),
+            )
+        )
+    return tuple(effects)
+
+
 def _parse_desperate_escape_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
     for match in _DESPERATE_ESCAPE_TESTS_RE.finditer(clause_text.text):
@@ -2217,6 +2277,8 @@ def _template_id_for_clause(
             candidates.append(RETURN_ON_DEATH_TEMPLATE_ID)
         elif effect.kind is RuleEffectKind.SELECT_TRACKED_TARGET:
             candidates.append(TRACKED_TARGET_SELECTION_TEMPLATE_ID)
+        elif effect.kind is RuleEffectKind.INFLICT_MORTAL_WOUNDS:
+            candidates.append(TIMING_WINDOW_TEMPLATE_ID)
         elif effect.kind in {
             RuleEffectKind.PLACEMENT_PERMISSION,
             RuleEffectKind.PLACEMENT_RESTRICTION,
