@@ -35,6 +35,7 @@ from warhammer40k_core.core.datasheet import (
     DamagedEffectKind,
     DamagedWeaponScope,
     DatasheetDefinition,
+    DatasheetMusteringOptionEffectKind,
     DatasheetWargearOption,
     DatasheetWargearOptionEffect,
     WargearOptionConditionKind,
@@ -246,8 +247,10 @@ from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ListValidationError,
     ModelProfileSelection,
+    MusteringOptionSelection,
     UnitMusterSelection,
     WargearSelection,
+    resolve_mustering_option_selections,
     resolve_wargear_selections,
 )
 from warhammer40k_core.engine.phase import (
@@ -699,6 +702,144 @@ def test_phase17k_great_unclean_one_bridge_supports_single_replacement_wargear()
     }
     assert "Reverberating Summons" not in default_records_by_name
     assert doomsday_records_by_name["Reverberating Summons"].wargear_id == doomsday_bell_id
+
+
+def test_phase17k_soul_grinder_bridge_supports_warpclaw_replacement_wargear() -> None:
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_soul_grinder_bridge_artifacts(),
+    )
+    datasheet = package.army_catalog.datasheet_by_id("000001151")
+    options_by_id = {option.option_id: option for option in datasheet.wargear_options}
+    mustering_options_by_id = {option.option_id: option for option in datasheet.mustering_options}
+    model_profile_id = "000001151:soul-grinder"
+    harvester_cannon_id = "000001151:harvester-cannon"
+    iron_claw_id = "000001151:iron-claw"
+    warpsword_id = "000001151:warpsword"
+    warpclaw_id = "000001151:warpclaw"
+    torrent_id = "000001151:torrent-of-burning-blood"
+    scream_id = "000001151:scream-of-despair"
+    warpclaw_option_id = "000001151:warpclaw:option-1"
+    khorne_allegiance_option_id = "000001151:daemonic-allegiance:khorne"
+    slaanesh_allegiance_option_id = "000001151:daemonic-allegiance:slaanesh"
+
+    with pytest.raises(ListValidationError, match="required option group"):
+        resolve_mustering_option_selections(datasheet=datasheet, requested_selections=())
+
+    khorne_allegiance = mustering_options_by_id[khorne_allegiance_option_id]
+    assert khorne_allegiance.required is True
+    assert khorne_allegiance.selection_group_id == "000001151:daemonic-allegiance"
+    assert khorne_allegiance.effects[0].kind is DatasheetMusteringOptionEffectKind.ADD_KEYWORD
+    assert khorne_allegiance.effects[0].keyword == "KHORNE"
+    assert khorne_allegiance.effects[1].kind is DatasheetMusteringOptionEffectKind.ADD_WARGEAR
+    assert khorne_allegiance.effects[1].wargear_id == torrent_id
+
+    khorne_unit = _soul_grinder_unit(
+        package,
+        requested_wargear_selections=(),
+        mustering_option_selections=(
+            MusteringOptionSelection(option_id=khorne_allegiance_option_id),
+        ),
+    )
+    assert "KHORNE" in khorne_unit.keywords
+    assert khorne_unit.own_models[0].wargear_ids == (
+        harvester_cannon_id,
+        iron_claw_id,
+        warpsword_id,
+        torrent_id,
+    )
+
+    warpclaw_option = options_by_id[warpclaw_option_id]
+    assert warpclaw_option.default_wargear_ids == ()
+    assert warpclaw_option.allowed_wargear_ids == (warpclaw_id,)
+    assert warpclaw_option.max_selections == 1
+    assert warpclaw_option.conditions == ()
+    assert warpclaw_option.effects[0].kind is WargearOptionEffectKind.REPLACE_WARGEAR
+    assert warpclaw_option.effects[0].wargear_id == warpclaw_id
+    assert warpclaw_option.effects[0].replaced_wargear_id == warpsword_id
+
+    assert _resolved_soul_grinder_model_wargear(
+        package,
+        requested_wargear_selections=(
+            WargearSelection(
+                option_id=warpclaw_option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(warpclaw_id,),
+            ),
+        ),
+        mustering_option_selections=(
+            MusteringOptionSelection(option_id=slaanesh_allegiance_option_id),
+        ),
+    ) == (harvester_cannon_id, iron_claw_id, warpclaw_id, scream_id)
+
+
+def test_phase17k_daemon_prince_bridge_supports_daemonic_allegiance_choices() -> None:
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_daemon_prince_bridge_artifacts(),
+    )
+    for datasheet_id, model_profile_id in (
+        ("000001149", "000001149:daemon-prince-of-chaos"),
+        ("000002758", "000002758:daemon-prince-of-chaos-with-wings"),
+    ):
+        datasheet = package.army_catalog.datasheet_by_id(datasheet_id)
+        options_by_id = {option.option_id: option for option in datasheet.mustering_options}
+        nurgle_option_id = f"{datasheet_id}:daemonic-allegiance:nurgle"
+        tzeentch_option_id = f"{datasheet_id}:daemonic-allegiance:tzeentch"
+        abilities_by_name = {ability.name: ability for ability in datasheet.abilities}
+
+        with pytest.raises(ListValidationError, match="required option group"):
+            resolve_mustering_option_selections(datasheet=datasheet, requested_selections=())
+        assert set(options_by_id) == {
+            f"{datasheet_id}:daemonic-allegiance:khorne",
+            nurgle_option_id,
+            f"{datasheet_id}:daemonic-allegiance:slaanesh",
+            tzeentch_option_id,
+        }
+        nurgle_option = options_by_id[nurgle_option_id]
+        assert nurgle_option.selection_group_id == f"{datasheet_id}:daemonic-allegiance"
+        assert nurgle_option.model_profile_id == model_profile_id
+        assert nurgle_option.required is True
+        assert tuple(effect.kind for effect in nurgle_option.effects) == (
+            DatasheetMusteringOptionEffectKind.ADD_KEYWORD,
+        )
+        assert nurgle_option.effects[0].keyword == "NURGLE"
+        assert "Daemon Prince of Tzeentch" in abilities_by_name
+        assert (
+            abilities_by_name["Daemon Prince of Tzeentch"].source_kind
+            is CatalogAbilitySourceKind.DATASHEET
+        )
+
+        unit = UnitFactory(
+            catalog=package.army_catalog,
+            model_geometries=package.model_geometries,
+        ).instantiate_unit(
+            army_id="army-daemons",
+            selection=UnitMusterSelection(
+                unit_selection_id=f"{datasheet_id}-prince-1",
+                datasheet_id=datasheet.datasheet_id,
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id=model_profile_id,
+                        model_count=1,
+                    ),
+                ),
+                mustering_option_selections=(
+                    MusteringOptionSelection(option_id=tzeentch_option_id),
+                ),
+            ),
+            datasheet=datasheet,
+        )
+        assert "TZEENTCH" in unit.keywords
+        assert unit.mustering_option_selections == (
+            MusteringOptionSelection(option_id=tzeentch_option_id),
+        )
+        assert unit.own_models[0].wargear_ids == (
+            f"{datasheet_id}:infernal-cannon",
+            f"{datasheet_id}:hellforged-weapons",
+        )
 
 
 def test_phase17k_bridge_rejects_unowned_wargear_profile_ability() -> None:
@@ -4509,7 +4650,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in chaos_daemons_markdown
     assert (
         "| Daemon Prince of Chaos (`000001149`) | PDF pages 116-117; supersedes "
-        "Wahapedia. | Bridge/catalog blocked |"
+        "Wahapedia. | Unsupported IR |"
     ) in chaos_daemons_markdown
     assert "### Wahapedia-only rows excluded from PDF review" in chaos_daemons_markdown
     for excluded_wahapedia_id in (
@@ -6375,6 +6516,51 @@ def _great_unclean_one_unit(
     )
 
 
+def _resolved_soul_grinder_model_wargear(
+    package: CanonicalCatalogPackage,
+    *,
+    requested_wargear_selections: tuple[WargearSelection, ...],
+    mustering_option_selections: tuple[MusteringOptionSelection, ...],
+) -> tuple[str, ...]:
+    return (
+        _soul_grinder_unit(
+            package,
+            requested_wargear_selections=requested_wargear_selections,
+            mustering_option_selections=mustering_option_selections,
+        )
+        .own_models[0]
+        .wargear_ids
+    )
+
+
+def _soul_grinder_unit(
+    package: CanonicalCatalogPackage,
+    *,
+    requested_wargear_selections: tuple[WargearSelection, ...],
+    mustering_option_selections: tuple[MusteringOptionSelection, ...],
+) -> UnitInstance:
+    datasheet = package.army_catalog.datasheet_by_id("000001151")
+    return UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-daemons",
+        selection=UnitMusterSelection(
+            unit_selection_id="soul-grinder-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="000001151:soul-grinder",
+                    model_count=1,
+                ),
+            ),
+            wargear_selections=requested_wargear_selections,
+            mustering_option_selections=mustering_option_selections,
+        ),
+        datasheet=datasheet,
+    )
+
+
 def _flesh_hounds_unit(
     *,
     package: CanonicalCatalogPackage,
@@ -7270,6 +7456,50 @@ def _great_unclean_one_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                 height_units=GeometrySourceUnits.INCHES,
                 height_source_id="geometry-review:chaos-daemons:great-unclean-one:height",
                 height_document_reference="Chaos Daemons Faction Pack p.66-67",
+            ),
+        ),
+    )
+
+
+def _soul_grinder_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000001151",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000001151",
+                model_name="Soul Grinder",
+                height=6.5,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:soul-grinder:height",
+                height_document_reference="Chaos Daemons Faction Pack p.114-115",
+            ),
+        ),
+    )
+
+
+def _daemon_prince_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000001149", "000002758"),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000001149",
+                model_name="Daemon Prince of Chaos",
+                height=4.75,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:daemon-prince:height",
+                height_document_reference="Chaos Daemons Faction Pack p.116-117",
+            ),
+            ModelHeightOverride(
+                datasheet_id="000002758",
+                model_name="Daemon Prince of Chaos with Wings",
+                height=5.5,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id=("geometry-review:chaos-daemons:daemon-prince-with-wings:height"),
+                height_document_reference="Chaos Daemons Faction Pack p.118-119",
             ),
         ),
     )

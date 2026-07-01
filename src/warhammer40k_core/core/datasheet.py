@@ -66,6 +66,11 @@ class WargearOptionEffectKind(StrEnum):
     REPLACE_WARGEAR = "replace_wargear"
 
 
+class DatasheetMusteringOptionEffectKind(StrEnum):
+    ADD_KEYWORD = "add_keyword"
+    ADD_WARGEAR = "add_wargear"
+
+
 class AttachmentRole(StrEnum):
     LEADER = "leader"
     SUPPORT = "support"
@@ -144,6 +149,24 @@ class DatasheetWargearOptionPayload(TypedDict):
     effects: NotRequired[list[DatasheetWargearOptionEffectPayload]]
 
 
+class DatasheetMusteringOptionEffectPayload(TypedDict):
+    kind: str
+    keyword: str | None
+    wargear_id: str | None
+    model_count: int | None
+    wargear_count: int | None
+
+
+class DatasheetMusteringOptionPayload(TypedDict):
+    option_id: str
+    selection_group_id: str
+    label: str
+    model_profile_id: str | None
+    required: bool
+    source_ids: list[str]
+    effects: list[DatasheetMusteringOptionEffectPayload]
+
+
 class DatasheetAbilityDescriptorPayload(TypedDict):
     ability_id: str
     name: str
@@ -187,6 +210,7 @@ class DatasheetDefinitionPayload(TypedDict):
     model_profiles: list[ModelProfileDefinitionPayload]
     composition: list[UnitCompositionDefinitionPayload]
     wargear_options: list[DatasheetWargearOptionPayload]
+    mustering_options: list[DatasheetMusteringOptionPayload]
     abilities: list[DatasheetAbilityDescriptorPayload]
     damaged_effects: list[DamagedEffectDefinitionPayload]
     attachment_eligibilities: list[AttachmentEligibilityPayload]
@@ -619,6 +643,163 @@ class DatasheetWargearOption:
 
 
 @dataclass(frozen=True, slots=True)
+class DatasheetMusteringOptionEffect:
+    kind: DatasheetMusteringOptionEffectKind
+    keyword: str | None = None
+    wargear_id: str | None = None
+    model_count: int | None = None
+    wargear_count: int | None = None
+
+    def __post_init__(self) -> None:
+        kind = datasheet_mustering_option_effect_kind_from_token(self.kind)
+        object.__setattr__(self, "kind", kind)
+        keyword = _validate_optional_identifier(
+            "DatasheetMusteringOptionEffect keyword",
+            self.keyword,
+        )
+        wargear_id = _validate_optional_identifier(
+            "DatasheetMusteringOptionEffect wargear_id",
+            self.wargear_id,
+        )
+        model_count = _validate_optional_positive_int(
+            "DatasheetMusteringOptionEffect model_count",
+            self.model_count,
+        )
+        wargear_count = _validate_optional_positive_int(
+            "DatasheetMusteringOptionEffect wargear_count",
+            self.wargear_count,
+        )
+        if kind is DatasheetMusteringOptionEffectKind.ADD_KEYWORD:
+            if keyword is None:
+                raise DatasheetCatalogError(
+                    "ADD_KEYWORD DatasheetMusteringOptionEffect requires keyword."
+                )
+            if wargear_id is not None or model_count is not None or wargear_count is not None:
+                raise DatasheetCatalogError(
+                    "ADD_KEYWORD DatasheetMusteringOptionEffect must not include wargear data."
+                )
+        if kind is DatasheetMusteringOptionEffectKind.ADD_WARGEAR:
+            if wargear_id is None:
+                raise DatasheetCatalogError(
+                    "ADD_WARGEAR DatasheetMusteringOptionEffect requires wargear_id."
+                )
+            if keyword is not None:
+                raise DatasheetCatalogError(
+                    "ADD_WARGEAR DatasheetMusteringOptionEffect must not include keyword."
+                )
+            if model_count is None or wargear_count is None:
+                raise DatasheetCatalogError(
+                    "ADD_WARGEAR DatasheetMusteringOptionEffect requires effect counts."
+                )
+        object.__setattr__(self, "keyword", keyword)
+        object.__setattr__(self, "wargear_id", wargear_id)
+        object.__setattr__(self, "model_count", model_count)
+        object.__setattr__(self, "wargear_count", wargear_count)
+
+    def to_payload(self) -> DatasheetMusteringOptionEffectPayload:
+        return {
+            "kind": self.kind.value,
+            "keyword": self.keyword,
+            "wargear_id": self.wargear_id,
+            "model_count": self.model_count,
+            "wargear_count": self.wargear_count,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DatasheetMusteringOptionEffectPayload) -> Self:
+        return cls(
+            kind=datasheet_mustering_option_effect_kind_from_token(payload["kind"]),
+            keyword=payload["keyword"],
+            wargear_id=payload["wargear_id"],
+            model_count=payload["model_count"],
+            wargear_count=payload["wargear_count"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class DatasheetMusteringOption:
+    option_id: str
+    selection_group_id: str
+    label: str
+    effects: tuple[DatasheetMusteringOptionEffect, ...]
+    model_profile_id: str | None = None
+    required: bool = False
+    source_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "option_id",
+            _validate_unprefixed_identifier(
+                "DatasheetMusteringOption option_id",
+                self.option_id,
+                "mustering-option:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "selection_group_id",
+            _validate_identifier(
+                "DatasheetMusteringOption selection_group_id",
+                self.selection_group_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "label",
+            _validate_identifier("DatasheetMusteringOption label", self.label),
+        )
+        object.__setattr__(
+            self,
+            "model_profile_id",
+            _validate_optional_identifier(
+                "DatasheetMusteringOption model_profile_id",
+                self.model_profile_id,
+            ),
+        )
+        if type(self.required) is not bool:
+            raise DatasheetCatalogError("DatasheetMusteringOption required must be a bool.")
+        effects = _validate_mustering_option_effect_tuple(
+            "DatasheetMusteringOption effects",
+            self.effects,
+        )
+        object.__setattr__(self, "effects", effects)
+        object.__setattr__(
+            self,
+            "source_ids",
+            _validate_identifier_tuple(
+                "DatasheetMusteringOption source_ids",
+                self.source_ids,
+            ),
+        )
+
+    def to_payload(self) -> DatasheetMusteringOptionPayload:
+        return {
+            "option_id": self.option_id,
+            "selection_group_id": self.selection_group_id,
+            "label": self.label,
+            "model_profile_id": self.model_profile_id,
+            "required": self.required,
+            "source_ids": list(self.source_ids),
+            "effects": [effect.to_payload() for effect in self.effects],
+        }
+
+    @classmethod
+    def from_payload(cls, payload: DatasheetMusteringOptionPayload) -> Self:
+        return cls(
+            option_id=payload["option_id"],
+            selection_group_id=payload["selection_group_id"],
+            label=payload["label"],
+            model_profile_id=payload["model_profile_id"],
+            required=payload["required"],
+            source_ids=tuple(payload["source_ids"]),
+            effects=tuple(
+                DatasheetMusteringOptionEffect.from_payload(effect) for effect in payload["effects"]
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class DatasheetAbilityDescriptor:
     ability_id: str
     name: str
@@ -967,6 +1148,7 @@ class DatasheetDefinition:
     model_profiles: tuple[ModelProfileDefinition, ...]
     composition: tuple[UnitCompositionDefinition, ...]
     wargear_options: tuple[DatasheetWargearOption, ...] = ()
+    mustering_options: tuple[DatasheetMusteringOption, ...] = ()
     abilities: tuple[DatasheetAbilityDescriptor, ...] = ()
     damaged_effects: tuple[DamagedEffectDefinition, ...] = ()
     attachment_eligibilities: tuple[AttachmentEligibility, ...] = ()
@@ -1035,6 +1217,28 @@ class DatasheetDefinition:
                         "DatasheetDefinition wargear replacement effect references an "
                         "unknown wargear option."
                     )
+        mustering_options = _validate_mustering_option_tuple(
+            "DatasheetDefinition mustering_options",
+            self.mustering_options,
+        )
+        selection_group_requirement: dict[str, bool] = {}
+        for mustering_option in mustering_options:
+            existing_required = selection_group_requirement.get(mustering_option.selection_group_id)
+            if existing_required is None:
+                selection_group_requirement[mustering_option.selection_group_id] = (
+                    mustering_option.required
+                )
+            elif existing_required != mustering_option.required:
+                raise DatasheetCatalogError(
+                    "DatasheetDefinition mustering option group requirement must be consistent."
+                )
+            if (
+                mustering_option.model_profile_id is not None
+                and mustering_option.model_profile_id not in model_profile_ids
+            ):
+                raise DatasheetCatalogError(
+                    "DatasheetDefinition mustering option references an unknown model profile."
+                )
         abilities = _validate_ability_descriptor_tuple(
             "DatasheetDefinition abilities",
             self.abilities,
@@ -1069,6 +1273,11 @@ class DatasheetDefinition:
             self,
             "wargear_options",
             tuple(sorted(wargear_options, key=lambda option: option.option_id)),
+        )
+        object.__setattr__(
+            self,
+            "mustering_options",
+            tuple(sorted(mustering_options, key=lambda option: option.option_id)),
         )
         object.__setattr__(
             self,
@@ -1115,6 +1324,7 @@ class DatasheetDefinition:
             "model_profiles": [profile.to_payload() for profile in self.model_profiles],
             "composition": [part.to_payload() for part in self.composition],
             "wargear_options": [option.to_payload() for option in self.wargear_options],
+            "mustering_options": [option.to_payload() for option in self.mustering_options],
             "abilities": [ability.to_payload() for ability in self.abilities],
             "damaged_effects": [effect.to_payload() for effect in self.damaged_effects],
             "attachment_eligibilities": [
@@ -1139,6 +1349,10 @@ class DatasheetDefinition:
             ),
             wargear_options=tuple(
                 DatasheetWargearOption.from_payload(option) for option in payload["wargear_options"]
+            ),
+            mustering_options=tuple(
+                DatasheetMusteringOption.from_payload(option)
+                for option in payload["mustering_options"]
             ),
             abilities=tuple(
                 DatasheetAbilityDescriptor.from_payload(ability) for ability in payload["abilities"]
@@ -1236,6 +1450,21 @@ def wargear_option_effect_kind_from_token(token: object) -> WargearOptionEffectK
         return WargearOptionEffectKind(token)
     except ValueError as exc:
         raise DatasheetCatalogError(f"Unsupported WargearOptionEffectKind token: {token}.") from exc
+
+
+def datasheet_mustering_option_effect_kind_from_token(
+    token: object,
+) -> DatasheetMusteringOptionEffectKind:
+    if type(token) is DatasheetMusteringOptionEffectKind:
+        return token
+    if type(token) is not str:
+        raise DatasheetCatalogError("DatasheetMusteringOptionEffectKind token must be a string.")
+    try:
+        return DatasheetMusteringOptionEffectKind(token)
+    except ValueError as exc:
+        raise DatasheetCatalogError(
+            f"Unsupported DatasheetMusteringOptionEffectKind token: {token}."
+        ) from exc
 
 
 def attachment_role_from_token(token: object) -> AttachmentRole:
@@ -1584,6 +1813,56 @@ def _wargear_option_effect_sort_order(kind: WargearOptionEffectKind) -> int:
     if kind is WargearOptionEffectKind.ADD_WARGEAR:
         return 1
     raise DatasheetCatalogError("Unsupported WargearOptionEffectKind sort order.")
+
+
+def _validate_mustering_option_tuple(
+    field_name: str,
+    values: tuple[DatasheetMusteringOption, ...],
+) -> tuple[DatasheetMusteringOption, ...]:
+    if type(values) is not tuple:
+        raise DatasheetCatalogError(f"{field_name} must be a tuple.")
+    seen: set[str] = set()
+    validated: list[DatasheetMusteringOption] = []
+    for value in values:
+        if type(value) is not DatasheetMusteringOption:
+            raise DatasheetCatalogError(f"{field_name} must contain mustering option values.")
+        if value.option_id in seen:
+            raise DatasheetCatalogError(f"{field_name} must not contain duplicate option IDs.")
+        seen.add(value.option_id)
+        validated.append(value)
+    return tuple(validated)
+
+
+def _validate_mustering_option_effect_tuple(
+    field_name: str,
+    values: tuple[DatasheetMusteringOptionEffect, ...],
+) -> tuple[DatasheetMusteringOptionEffect, ...]:
+    if type(values) is not tuple:
+        raise DatasheetCatalogError(f"{field_name} must be a tuple.")
+    if not values:
+        raise DatasheetCatalogError(f"{field_name} must not be empty.")
+    validated: list[DatasheetMusteringOptionEffect] = []
+    for value in values:
+        if type(value) is not DatasheetMusteringOptionEffect:
+            raise DatasheetCatalogError(f"{field_name} must contain mustering option effects.")
+        validated.append(value)
+    return tuple(sorted(validated, key=_mustering_option_effect_sort_key))
+
+
+def _mustering_option_effect_sort_key(
+    effect: DatasheetMusteringOptionEffect,
+) -> tuple[int, str, str, int, int]:
+    if effect.kind is DatasheetMusteringOptionEffectKind.ADD_KEYWORD:
+        return (0, effect.keyword or "", "", 0, 0)
+    if effect.kind is DatasheetMusteringOptionEffectKind.ADD_WARGEAR:
+        return (
+            1,
+            "",
+            effect.wargear_id or "",
+            effect.model_count or 0,
+            effect.wargear_count or 0,
+        )
+    raise DatasheetCatalogError("Unsupported DatasheetMusteringOptionEffectKind sort order.")
 
 
 def _validate_ability_descriptor_tuple(

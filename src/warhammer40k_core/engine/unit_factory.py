@@ -18,6 +18,9 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptor,
     DatasheetAbilityDescriptorPayload,
     DatasheetDefinition,
+    DatasheetMusteringOption,
+    DatasheetMusteringOptionEffect,
+    DatasheetMusteringOptionEffectKind,
     DatasheetWargearOption,
     DatasheetWargearOptionEffect,
     ModelProfileDefinition,
@@ -27,10 +30,13 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.engine.list_validation import (
     ListValidationError,
+    MusteringOptionSelection,
+    MusteringOptionSelectionPayload,
     UnitMusterSelection,
     WargearSelection,
     WargearSelectionPayload,
     resolve_model_profile_selections,
+    resolve_mustering_option_selections,
     resolve_wargear_selections,
 )
 from warhammer40k_core.geometry.model_geometry import (
@@ -70,6 +76,7 @@ class UnitInstancePayload(TypedDict):
     datasheet_source_ids: list[str]
     own_models: list[ModelInstancePayload]
     wargear_selections: list[WargearSelectionPayload]
+    mustering_option_selections: list[MusteringOptionSelectionPayload]
 
 
 @dataclass(frozen=True, slots=True)
@@ -214,6 +221,7 @@ class UnitInstance:
     datasheet_source_ids: tuple[str, ...]
     own_models: tuple[ModelInstance, ...]
     wargear_selections: tuple[WargearSelection, ...]
+    mustering_option_selections: tuple[MusteringOptionSelection, ...] = ()
     damaged_effects: tuple[DamagedEffectDefinition, ...] = ()
 
     def __post_init__(self) -> None:
@@ -284,6 +292,15 @@ class UnitInstance:
             self.wargear_selections,
         )
         object.__setattr__(self, "wargear_selections", wargear_selections)
+        mustering_option_selections = _validate_mustering_option_selection_tuple(
+            "UnitInstance mustering_option_selections",
+            self.mustering_option_selections,
+        )
+        object.__setattr__(
+            self,
+            "mustering_option_selections",
+            mustering_option_selections,
+        )
 
     def stable_identity(self) -> str:
         return f"unit:{self.unit_instance_id}"
@@ -306,6 +323,9 @@ class UnitInstance:
             "datasheet_source_ids": list(self.datasheet_source_ids),
             "own_models": [model.to_payload() for model in self.own_models],
             "wargear_selections": [selection.to_payload() for selection in self.wargear_selections],
+            "mustering_option_selections": [
+                selection.to_payload() for selection in self.mustering_option_selections
+            ],
         }
 
     @classmethod
@@ -329,6 +349,10 @@ class UnitInstance:
             wargear_selections=tuple(
                 WargearSelection.from_payload(selection)
                 for selection in payload["wargear_selections"]
+            ),
+            mustering_option_selections=tuple(
+                MusteringOptionSelection.from_payload(selection)
+                for selection in payload["mustering_option_selections"]
             ),
         )
 
@@ -371,6 +395,10 @@ class UnitFactory:
                 datasheet=datasheet,
                 selections=selection.model_profile_selections,
             )
+            selected_mustering_options = resolve_mustering_option_selections(
+                datasheet=datasheet,
+                requested_selections=selection.mustering_option_selections,
+            )
             wargear_selections = resolve_wargear_selections(
                 catalog=self.catalog,
                 datasheet=datasheet,
@@ -395,6 +423,7 @@ class UnitFactory:
             datasheet=datasheet,
             own_models=tuple(own_models),
             wargear_selections=wargear_selections,
+            selected_mustering_options=selected_mustering_options,
         )
         own_models = [
             replace(model, wargear_ids=model_wargear_ids[model.model_instance_id])
@@ -404,13 +433,20 @@ class UnitFactory:
             unit_instance_id=f"{army_id}:{selection.unit_selection_id}",
             datasheet_id=datasheet.datasheet_id,
             name=datasheet.name,
-            keywords=datasheet.keywords.keywords,
+            keywords=_keywords_with_mustering_effects(
+                base_keywords=datasheet.keywords.keywords,
+                selected_mustering_options=selected_mustering_options,
+            ),
             faction_keywords=datasheet.keywords.faction_keywords,
             datasheet_abilities=datasheet.abilities,
             damaged_effects=datasheet.damaged_effects,
             datasheet_source_ids=datasheet.source_ids,
             own_models=tuple(own_models),
             wargear_selections=wargear_selections,
+            mustering_option_selections=tuple(
+                MusteringOptionSelection(option_id=option.option_id)
+                for option in selected_mustering_options
+            ),
         )
 
     def _catalog_datasheet(self, datasheet: DatasheetDefinition) -> DatasheetDefinition:
@@ -477,6 +513,7 @@ def _model_wargear_ids_by_model_id(
     datasheet: DatasheetDefinition,
     own_models: tuple[ModelInstance, ...],
     wargear_selections: tuple[WargearSelection, ...],
+    selected_mustering_options: tuple[DatasheetMusteringOption, ...],
 ) -> dict[str, tuple[str, ...]]:
     options_by_id = {option.option_id: option for option in datasheet.wargear_options}
     models_by_profile: dict[str, tuple[ModelInstance, ...]] = {}
@@ -511,6 +548,17 @@ def _model_wargear_ids_by_model_id(
             option=option,
             selection=selection,
             models=models_by_profile.get(option.model_profile_id, ()),
+            wargear_by_model_id=wargear_by_model_id,
+        )
+
+    for mustering_option in selected_mustering_options:
+        _apply_mustering_option_wargear_effects_to_models(
+            option=mustering_option,
+            models=(
+                own_models
+                if mustering_option.model_profile_id is None
+                else models_by_profile.get(mustering_option.model_profile_id, ())
+            ),
             wargear_by_model_id=wargear_by_model_id,
         )
 
@@ -634,6 +682,60 @@ def _model_satisfies_wargear_option_conditions(
         ):
             return False
     return True
+
+
+def _apply_mustering_option_wargear_effects_to_models(
+    *,
+    option: DatasheetMusteringOption,
+    models: tuple[ModelInstance, ...],
+    wargear_by_model_id: dict[str, list[str]],
+) -> None:
+    for effect in option.effects:
+        if effect.kind is DatasheetMusteringOptionEffectKind.ADD_KEYWORD:
+            continue
+        if effect.kind is DatasheetMusteringOptionEffectKind.ADD_WARGEAR:
+            _apply_mustering_add_wargear_effect_to_models(
+                effect=effect,
+                models=models,
+                wargear_by_model_id=wargear_by_model_id,
+            )
+            continue
+        raise UnitFactoryError("Unsupported mustering option effect.")
+
+
+def _apply_mustering_add_wargear_effect_to_models(
+    *,
+    effect: DatasheetMusteringOptionEffect,
+    models: tuple[ModelInstance, ...],
+    wargear_by_model_id: dict[str, list[str]],
+) -> None:
+    if effect.model_count != 1 or effect.wargear_count != 1:
+        raise UnitFactoryError("Mustering option wargear effects support one model bearer.")
+    if effect.wargear_id is None:
+        raise UnitFactoryError("Mustering option wargear effect is missing wargear_id.")
+    if not models:
+        raise UnitFactoryError("Mustering option has no eligible model bearers.")
+    model = sorted(models, key=lambda item: item.model_instance_id)[0]
+    wargear_by_model_id[model.model_instance_id].append(effect.wargear_id)
+
+
+def _keywords_with_mustering_effects(
+    *,
+    base_keywords: tuple[str, ...],
+    selected_mustering_options: tuple[DatasheetMusteringOption, ...],
+) -> tuple[str, ...]:
+    keywords = set(base_keywords)
+    for option in selected_mustering_options:
+        for effect in option.effects:
+            if effect.kind is DatasheetMusteringOptionEffectKind.ADD_KEYWORD:
+                if effect.keyword is None:
+                    raise UnitFactoryError("Mustering option keyword effect is missing keyword.")
+                keywords.add(effect.keyword)
+                continue
+            if effect.kind is DatasheetMusteringOptionEffectKind.ADD_WARGEAR:
+                continue
+            raise UnitFactoryError("Unsupported mustering option effect.")
+    return tuple(sorted(keywords))
 
 
 def _model_geometry_for_profile(
@@ -838,6 +940,25 @@ def _validate_wargear_selection_tuple(
     for value in raw_values:
         if type(value) is not WargearSelection:
             raise UnitFactoryError(f"{field_name} must contain WargearSelection values.")
+        if value.option_id in seen:
+            raise UnitFactoryError(f"{field_name} must not contain duplicate option IDs.")
+        seen.add(value.option_id)
+        validated.append(value)
+    return tuple(sorted(validated, key=lambda selection: selection.option_id))
+
+
+def _validate_mustering_option_selection_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[MusteringOptionSelection, ...]:
+    if type(values) is not tuple:
+        raise UnitFactoryError(f"{field_name} must be a tuple.")
+    validated: list[MusteringOptionSelection] = []
+    seen: set[str] = set()
+    raw_values = cast(tuple[object, ...], values)
+    for value in raw_values:
+        if type(value) is not MusteringOptionSelection:
+            raise UnitFactoryError(f"{field_name} must contain MusteringOptionSelection values.")
         if value.option_id in seen:
             raise UnitFactoryError(f"{field_name} must not contain duplicate option IDs.")
         seen.add(value.option_id)
