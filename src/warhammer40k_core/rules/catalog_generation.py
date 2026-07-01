@@ -23,6 +23,9 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptor,
     DatasheetDefinition,
     DatasheetKeywordSet,
+    DatasheetMusteringOption,
+    DatasheetMusteringOptionEffect,
+    DatasheetMusteringOptionEffectKind,
     DatasheetWargearOption,
     DatasheetWargearOptionCondition,
     DatasheetWargearOptionEffect,
@@ -210,6 +213,7 @@ def _army_catalog_from_rows(
     wargear_rows = _required_rows(rows_by_table=rows_by_table, table_name="Datasheets_wargear")
     model_rows = _required_rows(rows_by_table=rows_by_table, table_name="Datasheets_models")
     option_rows = rows_by_table.get("Datasheets_options", ())
+    mustering_option_rows = rows_by_table.get("Datasheets_mustering_options", ())
     ability_rows = rows_by_table.get("Datasheets_abilities", ())
     leader_rows = rows_by_table.get("Datasheets_leader", ())
     wargear = _wargear_from_rows(wargear_rows)
@@ -222,6 +226,11 @@ def _army_catalog_from_rows(
             model_rows=_rows_matching(model_rows, "datasheet_id", row.source_row_id),
             wargear_rows=_rows_matching(wargear_rows, "datasheet_id", row.source_row_id),
             option_rows=_rows_matching(option_rows, "datasheet_id", row.source_row_id),
+            mustering_option_rows=_rows_matching(
+                mustering_option_rows,
+                "datasheet_id",
+                row.source_row_id,
+            ),
             ability_rows=_rows_matching(ability_rows, "datasheet_id", row.source_row_id),
             leader_rows=leader_rows,
             geometry_by_profile_id=geometry_by_profile_id,
@@ -254,6 +263,7 @@ def _datasheet_from_row(
     model_rows: tuple[NormalizedSourceRow, ...],
     wargear_rows: tuple[NormalizedSourceRow, ...],
     option_rows: tuple[NormalizedSourceRow, ...],
+    mustering_option_rows: tuple[NormalizedSourceRow, ...],
     ability_rows: tuple[NormalizedSourceRow, ...],
     leader_rows: tuple[NormalizedSourceRow, ...],
     geometry_by_profile_id: dict[str, ModelGeometryCatalogRecord],
@@ -283,6 +293,7 @@ def _datasheet_from_row(
             ),
             *_structured_wargear_options_from_rows(option_rows),
         ),
+        mustering_options=_mustering_options_from_rows(mustering_option_rows),
         abilities=tuple(_ability_descriptor_from_row(row) for row in ability_rows),
         damaged_effects=_damaged_effects_from_row(row),
         attachment_eligibilities=_attachment_eligibilities_from_rows(
@@ -422,6 +433,80 @@ def _structured_wargear_option_from_rows(
         ),
         conditions=conditions,
         effects=effects,
+    )
+
+
+def _mustering_options_from_rows(
+    rows: tuple[NormalizedSourceRow, ...],
+) -> tuple[DatasheetMusteringOption, ...]:
+    rows_by_option_id: dict[str, list[NormalizedSourceRow]] = {}
+    for row in rows:
+        option_id = _required_field(row=row, column_name="option_id")
+        rows_by_option_id.setdefault(option_id, []).append(row)
+    return tuple(
+        _mustering_option_from_rows(tuple(option_rows))
+        for option_rows in rows_by_option_id.values()
+    )
+
+
+def _mustering_option_from_rows(
+    rows: tuple[NormalizedSourceRow, ...],
+) -> DatasheetMusteringOption:
+    if not rows:
+        raise CatalogGenerationError("Mustering option row group must not be empty.")
+    row = rows[0]
+    _validate_grouped_mustering_option_rows(rows)
+    return DatasheetMusteringOption(
+        option_id=_required_field(row=row, column_name="option_id"),
+        selection_group_id=_required_field(row=row, column_name="selection_group_id"),
+        label=_required_field(row=row, column_name="label"),
+        model_profile_id=_optional_field(row=row, column_name="model_profile_id"),
+        required=_required_bool(row=row, column_name="required"),
+        source_ids=_deduplicated_ids(
+            tuple(
+                source_id for grouped_row in rows for source_id in _source_ids_from_row(grouped_row)
+            )
+        ),
+        effects=tuple(_mustering_option_effect_from_row(grouped_row) for grouped_row in rows),
+    )
+
+
+def _validate_grouped_mustering_option_rows(rows: tuple[NormalizedSourceRow, ...]) -> None:
+    first = rows[0]
+    grouped_columns = (
+        "option_id",
+        "selection_group_id",
+        "label",
+        "model_profile_id",
+        "required",
+    )
+    expected = {
+        column_name: _optional_field(row=first, column_name=column_name)
+        for column_name in grouped_columns
+    }
+    for row in rows[1:]:
+        for column_name, expected_value in expected.items():
+            if _optional_field(row=row, column_name=column_name) != expected_value:
+                raise CatalogGenerationError(
+                    "Grouped mustering option rows must share option metadata."
+                )
+
+
+def _mustering_option_effect_from_row(
+    row: NormalizedSourceRow,
+) -> DatasheetMusteringOptionEffect:
+    try:
+        kind = DatasheetMusteringOptionEffectKind(
+            _required_field(row=row, column_name="effect_kind")
+        )
+    except ValueError as exc:
+        raise CatalogGenerationError("Unsupported mustering option effect kind.") from exc
+    return DatasheetMusteringOptionEffect(
+        kind=kind,
+        keyword=_optional_field(row=row, column_name="effect_keyword"),
+        wargear_id=_optional_field(row=row, column_name="effect_wargear_id"),
+        model_count=_optional_positive_int(row=row, column_name="effect_model_count"),
+        wargear_count=_optional_positive_int(row=row, column_name="effect_wargear_count"),
     )
 
 
@@ -606,7 +691,7 @@ def _ability_source_kind_from_row(row: NormalizedSourceRow) -> CatalogAbilitySou
         return CatalogAbilitySourceKind.CORE
     if ability_type == "faction":
         return CatalogAbilitySourceKind.FACTION
-    if ability_type == "datasheet":
+    if ability_type in {"datasheet", "primarch"}:
         return CatalogAbilitySourceKind.DATASHEET
     if ability_type == "wargear":
         return CatalogAbilitySourceKind.WARGEAR
@@ -1279,8 +1364,27 @@ def _required_non_negative_int(row: NormalizedSourceRow, column_name: str) -> in
     return value
 
 
+def _optional_positive_int(row: NormalizedSourceRow, column_name: str) -> int | None:
+    value = _optional_field(row=row, column_name=column_name)
+    if value is None:
+        return None
+    integer = _int_from_text(value)
+    if integer < 1:
+        raise CatalogGenerationError(f"Source row {column_name} must be at least 1.")
+    return integer
+
+
 def _required_int(row: NormalizedSourceRow, column_name: str) -> int:
     return _int_from_text(_required_field(row=row, column_name=column_name))
+
+
+def _required_bool(row: NormalizedSourceRow, column_name: str) -> bool:
+    value = _required_field(row=row, column_name=column_name).casefold()
+    if value == "true":
+        return True
+    if value == "false":
+        return False
+    raise CatalogGenerationError(f"Source row {column_name} must be true or false.")
 
 
 def _required_number(row: NormalizedSourceRow, column_name: str) -> float:

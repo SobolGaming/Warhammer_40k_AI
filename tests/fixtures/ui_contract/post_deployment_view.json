@@ -2906,7 +2906,7 @@
     "player-b"
   ],
   "projection_schema": "game-view-v3-phase18a",
-  "projection_state_hash": "22d16b9b5d9b50fe70c45f1bc2b70a79c009794824706083bdeae2d5608d7419",
+  "projection_state_hash": "6e1f6fbb3c2407b770c23c82dfc06bfbce7ee6c1894ac56699b71874573ef358",
   "public_command_point_ledgers": [
     {
       "command_points": 1,
@@ -3028,7 +3028,7 @@
       "game": "warhammer_40000",
       "version": "core-v2-phase9a"
     },
-    "source_hash": "4717257cad7f7116f81adc917eceb13d634fb31ff362ed4058267c88c2333740",
+    "source_hash": "283f63d96d2cbd59d076be5ef0928196a7dbbe2517aa3fca04c71deeb8e657ca",
     "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
   },
   "stage": "battle",

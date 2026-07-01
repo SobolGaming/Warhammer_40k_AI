@@ -17,6 +17,9 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptor,
     DatasheetDefinition,
     DatasheetKeywordSet,
+    DatasheetMusteringOption,
+    DatasheetMusteringOptionEffect,
+    DatasheetMusteringOptionEffectKind,
     UnitCompositionDefinition,
 )
 from warhammer40k_core.core.detachment import (
@@ -54,6 +57,7 @@ from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ListValidationError,
     ModelProfileSelection,
+    MusteringOptionSelection,
     UnitMusterSelection,
     WargearSelection,
     battle_size_from_token,
@@ -91,6 +95,7 @@ def _unit_selection(
     model_profile_id: str = "core-intercessor-like",
     model_count: int = 5,
     wargear_selections: tuple[WargearSelection, ...] = (),
+    mustering_option_selections: tuple[MusteringOptionSelection, ...] = (),
 ) -> UnitMusterSelection:
     return UnitMusterSelection(
         unit_selection_id=unit_selection_id,
@@ -102,6 +107,7 @@ def _unit_selection(
             ),
         ),
         wargear_selections=wargear_selections,
+        mustering_option_selections=mustering_option_selections,
     )
 
 
@@ -414,6 +420,30 @@ def _daemonic_pact_catalog() -> ArmyCatalog:
             name="Skull Cannon",
             keywords=("Khorne", "Vehicle"),
             faction_keywords=("Legiones Daemonica",),
+        ),
+        replace(
+            _phase17g_datasheet(
+                base_datasheet,
+                datasheet_id="phase17g-soul-grinder",
+                name="Soul Grinder",
+                keywords=("Monster", "Vehicle"),
+                faction_keywords=("Legiones Daemonica",),
+            ),
+            mustering_options=(
+                DatasheetMusteringOption(
+                    option_id="phase17g-soul-grinder:daemonic-allegiance:khorne",
+                    selection_group_id="phase17g-soul-grinder:daemonic-allegiance",
+                    label="Khorne",
+                    required=True,
+                    source_ids=("phase17k:soul-grinder:daemonic-allegiance",),
+                    effects=(
+                        DatasheetMusteringOptionEffect(
+                            kind=DatasheetMusteringOptionEffectKind.ADD_KEYWORD,
+                            keyword="KHORNE",
+                        ),
+                    ),
+                ),
+            ),
         ),
     )
     factions = (
@@ -2514,6 +2544,120 @@ def test_phase17g_daemonic_pact_reports_roster_violations() -> None:
         "daemonic_pact_points_limit_exceeded",
         "daemonic_pact_warlord_forbidden",
     }
+
+
+def test_phase17g_daemonic_pact_counts_selected_mustering_god_keywords() -> None:
+    catalog = _daemonic_pact_catalog()
+    detachment_selection = DetachmentSelection(
+        faction_id="chaos-space-marines",
+        detachment_ids=("phase17g-csm-detachment",),
+    )
+    warlord_selection = WarlordSelection(
+        unit_selection_id="legionaries",
+        source_id="phase17g:warlord",
+    )
+    khorne_soul_grinder = _unit_selection(
+        unit_selection_id="soul-grinder",
+        datasheet_id="phase17g-soul-grinder",
+        mustering_option_selections=(
+            MusteringOptionSelection(
+                option_id="phase17g-soul-grinder:daemonic-allegiance:khorne",
+            ),
+        ),
+    )
+    unsupported_request = _muster_request(
+        catalog,
+        detachment_selection=detachment_selection,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="legionaries",
+                datasheet_id="phase17g-chaos-legionaries",
+            ),
+            khorne_soul_grinder,
+        ),
+        unit_points=(
+            _unit_points("legionaries", 100),
+            _unit_points("soul-grinder", 150),
+        ),
+        warlord_selection=warlord_selection,
+    )
+    supported_request = replace(
+        unsupported_request,
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="legionaries",
+                datasheet_id="phase17g-chaos-legionaries",
+            ),
+            _unit_selection(
+                unit_selection_id="bloodletters",
+                datasheet_id="phase17g-bloodletters",
+            ),
+            khorne_soul_grinder,
+        ),
+        unit_points=(
+            _unit_points("legionaries", 100),
+            _unit_points("bloodletters", 0),
+            _unit_points("soul-grinder", 150),
+        ),
+    )
+
+    unsupported_report = validate_roster_legality(
+        catalog=catalog,
+        request=unsupported_request,
+    )
+    supported_report = validate_roster_legality(
+        catalog=catalog,
+        request=supported_request,
+    )
+
+    unsupported_violations = {
+        violation.violation_code: violation for violation in unsupported_report.violations
+    }
+    assert unsupported_violations["daemonic_pact_god_ratio_exceeded"].unit_selection_id == (
+        "soul-grinder"
+    )
+    assert "daemonic_pact_god_ratio_exceeded" not in {
+        violation.violation_code for violation in supported_report.violations
+    }
+
+
+def test_phase17g_roster_legality_reports_missing_required_mustering_option() -> None:
+    catalog = _daemonic_pact_catalog()
+    request = _muster_request(
+        catalog,
+        detachment_selection=DetachmentSelection(
+            faction_id="chaos-space-marines",
+            detachment_ids=("phase17g-csm-detachment",),
+        ),
+        unit_selections=(
+            _unit_selection(
+                unit_selection_id="legionaries",
+                datasheet_id="phase17g-chaos-legionaries",
+            ),
+            _unit_selection(
+                unit_selection_id="soul-grinder",
+                datasheet_id="phase17g-soul-grinder",
+            ),
+        ),
+        unit_points=(
+            _unit_points("legionaries", 100),
+            _unit_points("soul-grinder", 150),
+        ),
+        warlord_selection=WarlordSelection(
+            unit_selection_id="legionaries",
+            source_id="phase17g:warlord",
+        ),
+    )
+
+    report = validate_roster_legality(catalog=catalog, request=request)
+
+    violation = next(
+        violation
+        for violation in report.violations
+        if violation.violation_code == "mustering_option_selection_invalid"
+    )
+    assert violation.unit_selection_id == "soul-grinder"
+    assert "required option group" in violation.message
 
 
 @pytest.mark.parametrize(

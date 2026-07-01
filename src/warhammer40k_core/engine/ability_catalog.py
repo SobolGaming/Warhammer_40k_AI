@@ -88,12 +88,7 @@ def build_player_ability_index(
         raise GameLifecycleError("Player Ability index catalog must be an ArmyCatalog.")
     validated_records = AbilityCatalogIndex.from_records(records).all_records()
     selected_datasheet_ids = frozenset(unit.datasheet_id for unit in army.units)
-    selected_wargear_ids = frozenset(
-        wargear_id
-        for unit in army.units
-        for selection in unit.wargear_selections
-        for wargear_id in selection.wargear_ids
-    )
+    selected_wargear_ids = _selected_unit_wargear_ids(army)
     selected_weapon_profile_ids = (
         _selected_weapon_profile_ids(catalog=catalog, wargear_ids=selected_wargear_ids)
         if catalog is not None
@@ -125,6 +120,17 @@ def build_player_ability_index(
             continue
         player_records.append(record)
     return AbilityCatalogIndex.from_records(tuple(player_records))
+
+
+def _selected_unit_wargear_ids(army: ArmyDefinition) -> frozenset[str]:
+    if type(army) is not ArmyDefinition:
+        raise GameLifecycleError("Selected wargear lookup requires an ArmyDefinition.")
+    return frozenset(
+        wargear_id
+        for unit in army.units
+        for model in unit.own_models
+        for wargear_id in model.wargear_ids
+    )
 
 
 def _record_from_source_row(row: source_data.SourceAbilityRow) -> AbilityCatalogRecord:

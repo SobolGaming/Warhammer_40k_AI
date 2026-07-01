@@ -19,6 +19,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
     DatasheetDefinitionPayload,
     DatasheetKeywordSet,
+    DatasheetMusteringOptionEffectKind,
     DatasheetWargearOption,
     ModelProfileDefinition,
     UnitCompositionDefinition,
@@ -891,6 +892,15 @@ def _validate_datasheet_wargear_links(
                 ):
                     raise ArmyCatalogError(
                         "ArmyCatalog datasheet replacement effect references unknown wargear."
+                    )
+        for mustering_option in datasheet.mustering_options:
+            for mustering_effect in mustering_option.effects:
+                if (
+                    mustering_effect.kind is DatasheetMusteringOptionEffectKind.ADD_WARGEAR
+                    and mustering_effect.wargear_id not in wargear_ids
+                ):
+                    raise ArmyCatalogError(
+                        "ArmyCatalog datasheet mustering option references unknown wargear."
                     )
 
 

@@ -3348,56 +3348,50 @@ def _chaos_daemons_undivided_review_rows() -> tuple[DatasheetGroupReviewRow, ...
             datasheet="Daemon Prince of Chaos",
             datasheet_id="000001149",
             source_basis="PDF pages 116-117; supersedes Wahapedia.",
-            ir_coverage="Bridge/catalog blocked",
+            ir_coverage="Unsupported IR",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D3, The Shadow of Chaos, Daemonic Lord Lone "
-                "Operative condition, and Prince of Darkness Stealth aura semantics are "
-                "structured paths."
+                "Operative condition, Prince of Darkness Stealth aura, and Daemonic "
+                "Allegiance keyword choice semantics are structured paths."
             ),
             semantics_needed=(
-                "Daemonic Allegiance characteristic choice; Unholy Vigour once-per-battle "
+                "Daemonic Allegiance characteristic modifiers; Unholy Vigour once-per-battle "
                 "invulnerable-save timing; aura runtime hosts."
             ),
-            catalog_blockers=(
-                "Daemonic Allegiance keyword and characteristic choice is not represented "
-                "by current catalog semantics."
-            ),
+            catalog_blockers="No known catalog blocker.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Daemon Prince of Chaos with Wings",
             datasheet_id="000002758",
             source_basis="PDF pages 118-119; supersedes Wahapedia.",
-            ir_coverage="Bridge/catalog blocked",
+            ir_coverage="Unsupported IR",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D3, The Shadow of Chaos, Malefic Destruction "
                 "Attacks modifier, and Harbinger of Death named weapon ability choice "
-                "semantics are structured paths."
+                "semantics are structured paths. Daemonic Allegiance keyword choice is "
+                "represented as a mustering option."
             ),
             semantics_needed=(
-                "Daemonic Allegiance characteristic choice; Fight-start host for Malefic "
+                "Daemonic Allegiance characteristic modifiers; Fight-start host for Malefic "
                 "Destruction and Harbinger of Death."
             ),
-            catalog_blockers=(
-                "Daemonic Allegiance keyword and characteristic choice is not represented "
-                "by current catalog semantics."
-            ),
+            catalog_blockers="No known catalog blocker.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Soul Grinder",
             datasheet_id="000001151",
             source_basis="PDF pages 114-115; supersedes Wahapedia.",
-            ir_coverage="Bridge/catalog blocked",
+            ir_coverage="Unsupported IR",
             supported_semantics=(
-                "Deep Strike, Deadly Demise D3, and The Shadow of Chaos are known structured paths."
+                "Deep Strike, Deadly Demise D3, The Shadow of Chaos, and the "
+                "warpsword-to-warpclaw replacement option are known structured paths. "
+                "Daemonic Allegiance keyword and additional equipment choice is "
+                "represented as a mustering option."
             ),
             semantics_needed=(
-                "Scuttling Walker movement through friendly Monster/Vehicle models and "
-                "terrain; Daemonic Allegiance keyword and equipment choice."
+                "Scuttling Walker movement through friendly Monster/Vehicle models and terrain."
             ),
-            catalog_blockers=(
-                "Daemonic Allegiance choice and warpsword-to-warpclaw replacement option "
-                "are not represented by current catalog semantics."
-            ),
+            catalog_blockers="No known catalog blocker.",
         ),
     )
 

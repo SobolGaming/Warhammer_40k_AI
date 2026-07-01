@@ -1391,6 +1391,22 @@ WAHAPEDIA_TABLE_SCHEMAS = (
         optional_text_columns=("button",),
     ),
     WahapediaTableSchema(
+        table_name="Datasheets_mustering_options",
+        source_row_id_columns=("datasheet_id", "line"),
+        text_columns=("description",),
+        required_columns=(
+            "datasheet_id",
+            "line",
+            "description",
+            "option_id",
+            "selection_group_id",
+            "label",
+            "model_profile_id",
+            "required",
+            "effect_kind",
+        ),
+    ),
+    WahapediaTableSchema(
         table_name="Datasheets_stratagems",
         source_row_id_columns=("datasheet_id", "stratagem_id"),
         text_columns=(),

@@ -18,6 +18,7 @@ from warhammer40k_core.core.datasheet import (
     DamagedEffectDefinition,
     DamagedEffectKind,
     DamagedWeaponScope,
+    DatasheetMusteringOptionEffectKind,
     WargearOptionConditionKind,
     WargearOptionEffectKind,
 )
@@ -122,6 +123,13 @@ _SINGLE_REPLACEMENT_RE = re.compile(
     re.IGNORECASE,
 )
 _OPTION_CHOICE_RE = re.compile(r"^- 1 (?P<name>.+?)\.?$", re.IGNORECASE)
+_DAEMONIC_ALLEGIANCE_ADDITIONAL_WARGEAR_RE = re.compile(
+    r"\b(?P<keyword>KHORNE|TZEENTCH|NURGLE|SLAANESH)\s*-\s*"
+    r"This model is additionally equipped with:\s*(?P<wargear>.+?)"
+    r"(?=(?:\s+\b(?:KHORNE|TZEENTCH|NURGLE|SLAANESH)\s*-\s*"
+    r"This model is additionally equipped with:)|\s*$)",
+    re.IGNORECASE | re.DOTALL,
+)
 _LOADOUT_RE = re.compile(r"[^.]+? (?:is|are) equipped with: (?P<items>[^.]+)\.?", re.IGNORECASE)
 _WEAPON_PROFILE_SUFFIX_RE = re.compile(r"^(?P<base>.+?)\s+-\s+(?P<profile>.+)$")
 _DAMAGED_HEADER_RE = re.compile(
@@ -182,6 +190,7 @@ _COUNT_WORDS = {
     "nine": 9,
     "ten": 10,
 }
+_DAEMONIC_ALLEGIANCE_KEYWORDS = ("KHORNE", "TZEENTCH", "NURGLE", "SLAANESH")
 
 
 def build_wahapedia_canonical_bridge_artifacts(
@@ -420,6 +429,13 @@ def _bridge_datasheet(
     _bridge_abilities(
         context=context,
         datasheet_id=datasheet_id,
+        wargear_ids_by_name=wargear_ids_by_name,
+        bridged_rows=bridged_rows,
+    )
+    _bridge_daemonic_allegiance_options(
+        context=context,
+        datasheet_id=datasheet_id,
+        composition_entries=composition_entries,
         wargear_ids_by_name=wargear_ids_by_name,
         bridged_rows=bridged_rows,
     )
@@ -947,6 +963,122 @@ def _bridge_options(
         )
 
 
+def _bridge_daemonic_allegiance_options(
+    *,
+    context: _BridgeContext,
+    datasheet_id: str,
+    composition_entries: tuple[_CompositionEntry, ...],
+    wargear_ids_by_name: dict[str, str],
+    bridged_rows: dict[str, list[dict[str, str]]],
+) -> None:
+    rows: list[NormalizedSourceRow] = []
+    for row in _rows_matching(
+        context.rows_by_table,
+        "Datasheets_abilities",
+        "datasheet_id",
+        datasheet_id,
+    ):
+        if _name_key(_resolved_ability_name(context=context, ability_row=row)) == (
+            "daemonic-allegiance"
+        ):
+            rows.append(row)
+    if not rows:
+        return
+    if len(rows) != 1:
+        raise WahapediaBridgeError("Datasheet has multiple Daemonic Allegiance rows.")
+    row = rows[0]
+    source_rows: tuple[NormalizedSourceRow, ...] = (row,)
+    description_source_row = row
+    if _required_field(row, "ability_id"):
+        ability_source = _ability_source_row(context=context, ability_row=row)
+        source_rows = (row, ability_source)
+        description_source_row = ability_source
+    description = _normalized_or_field(description_source_row, "description")
+    _validate_daemonic_allegiance_keywords(description)
+    additional_wargear_by_keyword = _daemonic_allegiance_additional_wargear_by_keyword(description)
+    model_profile_id = _single_model_profile_id(composition_entries)
+    selection_group_id = f"{datasheet_id}:daemonic-allegiance"
+    source_line = _required_field(row, "line")
+    for index, keyword in enumerate(_DAEMONIC_ALLEGIANCE_KEYWORDS, start=1):
+        option_id = f"{selection_group_id}:{_slug(keyword)}"
+        common_fields = {
+            "datasheet_id": datasheet_id,
+            "description": _raw_or_field(description_source_row, "description"),
+            "option_id": option_id,
+            "selection_group_id": selection_group_id,
+            "label": keyword,
+            "model_profile_id": model_profile_id,
+            "required": "true",
+            "source_ids": _joined(_source_ids(*source_rows)),
+        }
+        bridged_rows["Datasheets_mustering_options"].append(
+            {
+                **common_fields,
+                "line": f"{source_line}.{index}.1",
+                "effect_kind": DatasheetMusteringOptionEffectKind.ADD_KEYWORD.value,
+                "effect_keyword": keyword,
+                "effect_wargear_id": "",
+                "effect_model_count": "",
+                "effect_wargear_count": "",
+            }
+        )
+        additional_wargear_name = additional_wargear_by_keyword.get(keyword)
+        if additional_wargear_name is None:
+            continue
+        bridged_rows["Datasheets_mustering_options"].append(
+            {
+                **common_fields,
+                "line": f"{source_line}.{index}.2",
+                "effect_kind": DatasheetMusteringOptionEffectKind.ADD_WARGEAR.value,
+                "effect_keyword": "",
+                "effect_wargear_id": _required_wargear_id(
+                    wargear_ids_by_name,
+                    additional_wargear_name,
+                ),
+                "effect_model_count": "1",
+                "effect_wargear_count": "1",
+            }
+        )
+
+
+def _validate_daemonic_allegiance_keywords(description: str) -> None:
+    present = {
+        match.group(0).upper()
+        for match in re.finditer(
+            r"\b(?:KHORNE|TZEENTCH|NURGLE|SLAANESH)\b",
+            description,
+            re.IGNORECASE,
+        )
+    }
+    if present != set(_DAEMONIC_ALLEGIANCE_KEYWORDS):
+        raise WahapediaBridgeError("Daemonic Allegiance row must declare all four allegiances.")
+
+
+def _daemonic_allegiance_additional_wargear_by_keyword(description: str) -> dict[str, str]:
+    matches = tuple(_DAEMONIC_ALLEGIANCE_ADDITIONAL_WARGEAR_RE.finditer(description))
+    if not matches:
+        if "additionally equipped with" in description.casefold():
+            raise WahapediaBridgeError("Unsupported Daemonic Allegiance additional wargear shape.")
+        return {}
+    by_keyword: dict[str, str] = {}
+    for match in matches:
+        keyword = match.group("keyword").upper()
+        if keyword in by_keyword:
+            raise WahapediaBridgeError("Daemonic Allegiance additional wargear duplicates keyword.")
+        by_keyword[keyword] = match.group("wargear").strip().removesuffix(".").strip()
+    if set(by_keyword) != set(_DAEMONIC_ALLEGIANCE_KEYWORDS):
+        raise WahapediaBridgeError(
+            "Daemonic Allegiance additional wargear must define all allegiances."
+        )
+    return by_keyword
+
+
+def _resolved_ability_name(*, context: _BridgeContext, ability_row: NormalizedSourceRow) -> str:
+    if _required_field(ability_row, "ability_id"):
+        return _raw_or_field(_ability_source_row(context=context, ability_row=ability_row), "name")
+    return _raw_or_field(ability_row, "name")
+
+
 def _bridge_replacement_with_required_choices_option(
     *,
     row: NormalizedSourceRow,
@@ -1344,6 +1476,7 @@ def _empty_bridge_rows() -> dict[str, list[dict[str, str]]]:
         "Datasheets_models": [],
         "Datasheets_wargear": [],
         "Datasheets_options": [],
+        "Datasheets_mustering_options": [],
         "Datasheets_abilities": [],
         "Datasheets_leader": [],
         "Datasheets_unit_composition": [],
@@ -1459,6 +1592,22 @@ def _columns_for_table(table_name: str) -> tuple[str, ...]:
             "effect_kind",
             "effect_wargear_id",
             "effect_replaced_wargear_id",
+            "effect_model_count",
+            "effect_wargear_count",
+            "source_ids",
+        ),
+        "Datasheets_mustering_options": (
+            "datasheet_id",
+            "line",
+            "description",
+            "option_id",
+            "selection_group_id",
+            "label",
+            "model_profile_id",
+            "required",
+            "effect_kind",
+            "effect_keyword",
+            "effect_wargear_id",
             "effect_model_count",
             "effect_wargear_count",
             "source_ids",
@@ -1583,7 +1732,7 @@ def _ability_source_kind(ability_type: str) -> CatalogAbilitySourceKind:
         return CatalogAbilitySourceKind.DATASHEET
     if normalized in {"wargear", "wargear profile"}:
         return CatalogAbilitySourceKind.WARGEAR
-    if normalized.startswith(("special", "fortification")):
+    if normalized == "primarch" or normalized.startswith(("special", "fortification")):
         return CatalogAbilitySourceKind.DATASHEET
     raise WahapediaBridgeError("Unsupported datasheet ability type.")
 

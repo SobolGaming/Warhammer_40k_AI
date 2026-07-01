@@ -7,6 +7,7 @@ from typing import Self, TypedDict, cast
 from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogError
 from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
+    DatasheetMusteringOption,
     DatasheetWargearOption,
     DatasheetWargearOptionEffect,
     UnitCompositionDefinition,
@@ -98,6 +99,10 @@ class WargearSelectionPayload(TypedDict):
     wargear_ids: list[str]
 
 
+class MusteringOptionSelectionPayload(TypedDict):
+    option_id: str
+
+
 class DetachmentSelectionPayload(TypedDict):
     faction_id: str
     detachment_ids: list[str]
@@ -110,6 +115,7 @@ class UnitMusterSelectionPayload(TypedDict):
     datasheet_id: str
     model_profile_selections: list[ModelProfileSelectionPayload]
     wargear_selections: list[WargearSelectionPayload]
+    mustering_option_selections: list[MusteringOptionSelectionPayload]
 
 
 class AttachmentDeclarationPayload(TypedDict):
@@ -316,6 +322,29 @@ class WargearSelection:
 
 
 @dataclass(frozen=True, slots=True)
+class MusteringOptionSelection:
+    option_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "option_id",
+            _validate_unprefixed_identifier(
+                "MusteringOptionSelection option_id",
+                self.option_id,
+                "mustering-option:",
+            ),
+        )
+
+    def to_payload(self) -> MusteringOptionSelectionPayload:
+        return {"option_id": self.option_id}
+
+    @classmethod
+    def from_payload(cls, payload: MusteringOptionSelectionPayload) -> Self:
+        return cls(option_id=payload["option_id"])
+
+
+@dataclass(frozen=True, slots=True)
 class DetachmentSelection:
     faction_id: str
     detachment_ids: tuple[str, ...]
@@ -385,6 +414,7 @@ class UnitMusterSelection:
     datasheet_id: str
     model_profile_selections: tuple[ModelProfileSelection, ...]
     wargear_selections: tuple[WargearSelection, ...] = ()
+    mustering_option_selections: tuple[MusteringOptionSelection, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -415,8 +445,18 @@ class UnitMusterSelection:
             self.wargear_selections,
         )
         _validate_unique_wargear_selections(wargear_selections)
+        mustering_option_selections = _validate_mustering_option_selection_tuple(
+            "UnitMusterSelection mustering_option_selections",
+            self.mustering_option_selections,
+        )
+        _validate_unique_mustering_option_selections(mustering_option_selections)
         object.__setattr__(self, "model_profile_selections", model_profile_selections)
         object.__setattr__(self, "wargear_selections", wargear_selections)
+        object.__setattr__(
+            self,
+            "mustering_option_selections",
+            mustering_option_selections,
+        )
 
     def to_payload(self) -> UnitMusterSelectionPayload:
         return {
@@ -426,6 +466,9 @@ class UnitMusterSelection:
                 selection.to_payload() for selection in self.model_profile_selections
             ],
             "wargear_selections": [selection.to_payload() for selection in self.wargear_selections],
+            "mustering_option_selections": [
+                selection.to_payload() for selection in self.mustering_option_selections
+            ],
         }
 
     @classmethod
@@ -440,6 +483,10 @@ class UnitMusterSelection:
             wargear_selections=tuple(
                 WargearSelection.from_payload(selection)
                 for selection in payload["wargear_selections"]
+            ),
+            mustering_option_selections=tuple(
+                MusteringOptionSelection.from_payload(selection)
+                for selection in payload["mustering_option_selections"]
             ),
         )
 
@@ -884,6 +931,49 @@ def resolve_wargear_selections(
     return resolved_tuple
 
 
+def resolve_mustering_option_selections(
+    *,
+    datasheet: DatasheetDefinition,
+    requested_selections: tuple[MusteringOptionSelection, ...],
+) -> tuple[DatasheetMusteringOption, ...]:
+    if type(datasheet) is not DatasheetDefinition:
+        raise ListValidationError("datasheet must be a DatasheetDefinition.")
+    requested_selections = _validate_mustering_option_selection_tuple(
+        "requested_selections",
+        requested_selections,
+    )
+    _validate_unique_mustering_option_selections(requested_selections)
+    options_by_id = {option.option_id: option for option in datasheet.mustering_options}
+    requested_by_id = {selection.option_id: selection for selection in requested_selections}
+    unknown_requested = tuple(sorted(set(requested_by_id).difference(options_by_id)))
+    if unknown_requested:
+        raise ListValidationError(
+            "MusteringOptionSelection references an unknown datasheet option."
+        )
+    selected_options = tuple(
+        options_by_id[selection.option_id] for selection in requested_selections
+    )
+    groups_by_id: dict[str, tuple[DatasheetMusteringOption, ...]] = {}
+    for option in datasheet.mustering_options:
+        group_options = groups_by_id.get(option.selection_group_id, ())
+        groups_by_id[option.selection_group_id] = (*group_options, option)
+    selected_by_group: dict[str, tuple[DatasheetMusteringOption, ...]] = {}
+    for option in selected_options:
+        group_options = selected_by_group.get(option.selection_group_id, ())
+        selected_by_group[option.selection_group_id] = (*group_options, option)
+    for selection_group_id, group_options in groups_by_id.items():
+        selected = selected_by_group.get(selection_group_id, ())
+        if len(selected) > 1:
+            raise ListValidationError(
+                "MusteringOptionSelection includes multiple options from one group."
+            )
+        if group_options[0].required and not selected:
+            raise ListValidationError(
+                "MusteringOptionSelection is missing a required option group."
+            )
+    return tuple(sorted(selected_options, key=lambda option: option.option_id))
+
+
 def _catalog_datasheet_by_id(catalog: ArmyCatalog, datasheet_id: str) -> DatasheetDefinition:
     try:
         return catalog.datasheet_by_id(datasheet_id)
@@ -1165,6 +1255,31 @@ def _validate_unique_wargear_selections(
     for selection in selections:
         if selection.option_id in seen:
             raise ListValidationError("WargearSelection option_ids must be unique.")
+        seen.add(selection.option_id)
+
+
+def _validate_mustering_option_selection_tuple(
+    field_name: str,
+    values: object,
+) -> tuple[MusteringOptionSelection, ...]:
+    if type(values) is not tuple:
+        raise ListValidationError(f"{field_name} must be a tuple.")
+    validated: list[MusteringOptionSelection] = []
+    raw_values = cast(tuple[object, ...], values)
+    for value in raw_values:
+        if type(value) is not MusteringOptionSelection:
+            raise ListValidationError(f"{field_name} must contain MusteringOptionSelection values.")
+        validated.append(value)
+    return tuple(validated)
+
+
+def _validate_unique_mustering_option_selections(
+    selections: tuple[MusteringOptionSelection, ...],
+) -> None:
+    seen: set[str] = set()
+    for selection in selections:
+        if selection.option_id in seen:
+            raise ListValidationError("MusteringOptionSelection option_ids must be unique.")
         seen.add(selection.option_id)
 
 
