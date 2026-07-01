@@ -2728,6 +2728,10 @@ class MovementPhaseHandler:
                 advance_move_hooks=self.advance_move_hooks,
                 advance_eligibility_hooks=self.advance_eligibility_hooks,
                 fall_back_hooks=self.fall_back_hooks,
+                ability_index=_ability_index_for_player(
+                    self.ability_indexes_by_player_id,
+                    player_id=_active_player_id(state),
+                ),
                 runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE:
@@ -6142,6 +6146,7 @@ def _apply_movement_proposal_decision(
     advance_move_hooks: AdvanceMoveHookRegistry,
     advance_eligibility_hooks: AdvanceEligibilityHookRegistry,
     fall_back_hooks: FallBackEligibilityHookRegistry,
+    ability_index: AbilityCatalogIndex,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
@@ -6204,6 +6209,7 @@ def _apply_movement_proposal_decision(
                 unit_instance_id=proposal_request.unit_instance_id,
             ),
             runtime_modifier_registry=runtime_modifier_registry,
+            ability_index=ability_index,
             temporary_movement_keywords=_temporary_movement_keywords_for_unit(
                 state=state,
                 player_id=active_player_id,
@@ -6309,6 +6315,7 @@ def _apply_movement_proposal_decision(
                 unit_instance_id=proposal_request.unit_instance_id,
             ),
             runtime_modifier_registry=runtime_modifier_registry,
+            ability_index=ability_index,
             temporary_movement_keywords=_temporary_movement_keywords_for_unit(
                 state=state,
                 player_id=active_player_id,
@@ -6451,6 +6458,7 @@ def _apply_movement_proposal_decision(
                 unit_instance_id=proposal_request.unit_instance_id,
             ),
             runtime_modifier_registry=runtime_modifier_registry,
+            ability_index=ability_index,
             temporary_movement_keywords=_temporary_movement_keywords_for_unit(
                 state=state,
                 player_id=active_player_id,
@@ -8106,6 +8114,7 @@ def resolve_normal_move(
     objective_markers: tuple[ObjectiveMarker, ...] = (),
     movement_bonus_inches: int = 0,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    ability_index: AbilityCatalogIndex | None = None,
     temporary_movement_keywords: tuple[str, ...] = (),
 ) -> NormalMoveResolution:
     resolved = _resolve_unit_move(
@@ -8130,6 +8139,7 @@ def resolve_normal_move(
         rollback_on_endpoint_coherency=True,
         hover_mode_states=hover_mode_states,
         runtime_modifier_registry=runtime_modifier_registry,
+        ability_index=ability_index,
         temporary_movement_keywords=temporary_movement_keywords,
     )
     return NormalMoveResolution(
@@ -8158,6 +8168,7 @@ def resolve_advance_move(
     objective_markers: tuple[ObjectiveMarker, ...] = (),
     movement_bonus_inches: int = 0,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    ability_index: AbilityCatalogIndex | None = None,
     temporary_movement_keywords: tuple[str, ...] = (),
 ) -> AdvanceMoveResolution:
     if type(advance_roll) is not AdvanceRollResult:
@@ -8184,6 +8195,7 @@ def resolve_advance_move(
         rollback_on_endpoint_coherency=True,
         hover_mode_states=hover_mode_states,
         runtime_modifier_registry=runtime_modifier_registry,
+        ability_index=ability_index,
         temporary_movement_keywords=temporary_movement_keywords,
     )
     movement_payload = {
@@ -8219,6 +8231,7 @@ def resolve_fall_back_move(
     objective_markers: tuple[ObjectiveMarker, ...] = (),
     movement_bonus_inches: int = 0,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    ability_index: AbilityCatalogIndex | None = None,
     temporary_movement_keywords: tuple[str, ...] = (),
 ) -> FallBackActionResult:
     forced_source_ids = _validate_identifier_tuple(
@@ -8257,6 +8270,7 @@ def resolve_fall_back_move(
         rollback_on_endpoint_coherency=False,
         hover_mode_states=hover_mode_states,
         runtime_modifier_registry=runtime_modifier_registry,
+        ability_index=ability_index,
         temporary_movement_keywords=temporary_movement_keywords,
     )
     desperate_escape_requirements = _desperate_escape_requirements_for_fall_back(
@@ -8310,6 +8324,7 @@ def _resolve_unit_move(
     rollback_on_endpoint_coherency: bool,
     hover_mode_states: tuple[HoverModeState, ...],
     runtime_modifier_registry: RuntimeModifierRegistry | None,
+    ability_index: AbilityCatalogIndex | None,
     temporary_movement_keywords: tuple[str, ...],
 ) -> _ResolvedUnitMove:
     if type(scenario) is not BattlefieldScenario:
@@ -8428,6 +8443,13 @@ def _resolve_unit_move(
             movement_mode=movement_mode,
             movement_phase_action=movement_phase_action,
             displacement_kind=displacement_kind,
+            ability_index=ability_index,
+            unit=unit,
+            model_instance_id=placement.model_instance_id,
+            current_model_instance_ids=tuple(
+                model_placement.model_instance_id
+                for model_placement in unit_placement.model_placements
+            ),
         )
         path_result = legality_context.to_path_validation_context(
             moving_model=moving_model,

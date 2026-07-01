@@ -298,6 +298,12 @@ def _catalog_timing_descriptor(rule_ir: RuleIR) -> AbilityTimingDescriptor:
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
     if any(
+        effect.kind is RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+    ):
+        return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)
+    if any(
         _effect_is_feel_no_pain_grant(effect)
         for clause in rule_ir.clauses
         for effect in clause.effects
@@ -351,6 +357,7 @@ def _catalog_timing_descriptor_for_clause(clause: RuleClause) -> AbilityTimingDe
         or _effect_is_shadow_of_chaos_status(effect)
         or _effect_is_feel_no_pain_grant(effect)
         or effect.kind is RuleEffectKind.SET_CHARACTERISTIC
+        or effect.kind is RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION
         for effect in clause.effects
     ):
         return AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY)

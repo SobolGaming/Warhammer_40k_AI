@@ -63,6 +63,50 @@ def test_fly_resolves_as_capability_not_movement_action() -> None:
     )
 
 
+def test_movement_capability_payload_rejects_semantic_permission_drift() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    payload = MovementCapabilitySet.from_keywords(
+        ("Vehicle",),
+        ruleset_descriptor=descriptor,
+    ).to_payload()
+
+    with pytest.raises(MovementLegalityError, match="payload must be a mapping"):
+        MovementCapabilitySet.from_payload(object())
+    with pytest.raises(MovementLegalityError, match="must be a bool"):
+        MovementCapabilitySet.from_payload(
+            {
+                **payload,
+                "can_move_over_friendly_vehicle_monster_models": "yes",
+            }
+        )
+    with pytest.raises(MovementLegalityError, match="must be a number"):
+        MovementCapabilitySet.from_payload(
+            {
+                **payload,
+                "terrain_as_if_absent_height_inches": "high",
+            }
+        )
+    with pytest.raises(MovementLegalityError, match="must be finite"):
+        MovementCapabilitySet.from_payload(
+            {
+                **payload,
+                "terrain_as_if_absent_height_inches": float("inf"),
+            }
+        )
+    with pytest.raises(MovementLegalityError, match="must not be negative"):
+        MovementCapabilitySet.from_payload(
+            {
+                **payload,
+                "terrain_as_if_absent_height_inches": -1.0,
+            }
+        )
+    with pytest.raises(MovementLegalityError, match="must not contain duplicate"):
+        MovementCapabilitySet.from_keywords(
+            ("Vehicle", "vehicle"),
+            ruleset_descriptor=descriptor,
+        )
+
+
 def test_movement_action_and_fall_back_mode_tokens_are_strict() -> None:
     assert movement_mode_for_phase_action(MovementPhaseActionKind.REMAIN_STATIONARY) is None
     assert movement_mode_for_phase_action(MovementPhaseActionKind.ADVANCE) is MovementMode.ADVANCE

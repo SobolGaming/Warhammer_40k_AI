@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, replace
+from math import isfinite
 from types import MappingProxyType
 from typing import TYPE_CHECKING, cast
 
@@ -149,6 +150,7 @@ CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID = "catalog-ir:post-shoot-hit
 CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID = (
     "catalog-ir:unit-move-completed-mortal-wounds"
 )
+CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID = "catalog-ir:movement-transit-permission"
 CATALOG_IR_CAN_ADVANCE_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-advance-and-charge"
 CATALOG_IR_CAN_FALLBACK_AND_CHARGE_CONSUMER_ID = "catalog-ir:can-fallback-and-charge"
 CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID = "catalog-ir:can-fallback-and-shoot"
@@ -260,6 +262,48 @@ class CatalogRuleIrHookDefinition:
             raise GameLifecycleError("Catalog IR hook definition hook_id must be a non-empty str.")
         if self.hook_id != self.hook_id.strip():
             raise GameLifecycleError("Catalog IR hook definition hook_id must be stripped.")
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogMovementTransitPermission:
+    record_id: str
+    ability_id: str
+    source_rule_id: str
+    clause_id: str
+    movement_modes: tuple[str, ...]
+    model_keyword_any: tuple[str, ...]
+    terrain_height_max_inches: float
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "record_id", _validate_identifier("record_id", self.record_id))
+        object.__setattr__(self, "ability_id", _validate_identifier("ability_id", self.ability_id))
+        object.__setattr__(
+            self,
+            "source_rule_id",
+            _validate_identifier("source_rule_id", self.source_rule_id),
+        )
+        object.__setattr__(self, "clause_id", _validate_identifier("clause_id", self.clause_id))
+        object.__setattr__(
+            self,
+            "movement_modes",
+            _validate_movement_mode_tokens(self.movement_modes),
+        )
+        object.__setattr__(
+            self,
+            "model_keyword_any",
+            _validate_keyword_tokens("model_keyword_any", self.model_keyword_any),
+        )
+        object.__setattr__(
+            self,
+            "terrain_height_max_inches",
+            _validate_non_negative_float(
+                "terrain_height_max_inches",
+                self.terrain_height_max_inches,
+            ),
+        )
+
+    def applies_to_movement_mode(self, movement_mode: str) -> bool:
+        return _movement_mode_token(movement_mode) in set(self.movement_modes)
 
 
 @dataclass(frozen=True, slots=True)
@@ -1360,6 +1404,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
         CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
         CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
+        CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
     }
     for characteristic in Characteristic:
         hook_ids.add(_catalog_ir_characteristic_query_consumer_id(characteristic))
@@ -3793,6 +3838,8 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID)
     if _clause_is_supported_unit_move_completed_mortal_wounds(clause):
         consumer_ids.add(CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID)
+    if _clause_is_supported_movement_transit_permission(clause):
+        consumer_ids.add(CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID)
     if _clause_is_structured_wound_reroll_clause(clause):
         consumer_ids.add(CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID)
     if _clause_is_structured_destroyed_unit_restore_clause(clause):
@@ -3859,6 +3906,8 @@ def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if _clause_is_supported_first_death_return(clause):
         hook_ids.add(CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID)
         hook_ids.add(CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID)
+    if _clause_is_supported_movement_transit_permission(clause):
+        hook_ids.add(CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID)
     if _clause_is_supported_post_shoot_hit_target_status_denial(clause):
         hook_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID)
     if _clause_is_supported_unit_move_completed_mortal_wounds(clause):
@@ -3916,6 +3965,52 @@ def catalog_rule_unit_scoped_generic_records(
         unit=unit,
         current_model_instance_ids=current_model_instance_ids,
         trigger_kind=trigger_kind,
+    )
+
+
+def catalog_movement_transit_permissions_for_model(
+    *,
+    ability_index: AbilityCatalogIndex,
+    unit: UnitInstance,
+    model_instance_id: str,
+    current_model_instance_ids: tuple[str, ...],
+    movement_mode: str,
+) -> tuple[CatalogMovementTransitPermission, ...]:
+    _validate_ability_index(ability_index)
+    _validate_unit(unit)
+    moving_model_id = _validate_identifier("model_instance_id", model_instance_id)
+    current_ids = _validate_current_model_instance_ids(current_model_instance_ids)
+    if moving_model_id not in current_ids:
+        raise GameLifecycleError("Catalog movement transit model must be current evidence.")
+    requested_mode = _movement_mode_token(movement_mode)
+    permissions: list[CatalogMovementTransitPermission] = []
+    for record in _unit_scoped_generic_records(
+        ability_index=ability_index,
+        unit=unit,
+        current_model_instance_ids=current_ids,
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+    ):
+        if record.source_kind is AbilitySourceKind.WARGEAR and moving_model_id not in set(
+            _record_current_wargear_bearer_model_ids(
+                record=record,
+                unit=unit,
+                current_model_instance_ids=current_ids,
+            )
+        ):
+            continue
+        for clause in _clauses_from_record(record):
+            permission = _movement_transit_permission_from_clause(record=record, clause=clause)
+            if permission is not None and permission.applies_to_movement_mode(requested_mode):
+                permissions.append(permission)
+    return tuple(
+        sorted(
+            permissions,
+            key=lambda permission: (
+                permission.record_id,
+                permission.clause_id,
+                permission.source_rule_id,
+            ),
+        )
     )
 
 
@@ -4227,6 +4322,41 @@ def _clause_is_supported_first_death_return(clause: RuleClause) -> bool:
     ) and _effect_is_supported_first_death_return(return_effects[0])
 
 
+def _clause_is_supported_movement_transit_permission(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Movement transit permission classification requires RuleClause.")
+    if not clause.is_supported:
+        return False
+    if clause.target is None or clause.target.kind is not RuleTargetKind.THIS_MODEL:
+        return False
+    trigger = clause.trigger
+    if trigger is None or trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return False
+    trigger_parameters = parameter_payload(trigger.parameters)
+    if (
+        trigger_parameters.get("timing_window") != "model_makes_move"
+        or trigger_parameters.get("subject") != "this_model"
+        or trigger_parameters.get("phase") != "movement"
+        or trigger_parameters.get("edge") != "during"
+    ):
+        return False
+    effects = tuple(
+        effect
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION
+    )
+    if len(effects) != 1 or len(clause.effects) != 1:
+        return False
+    permission_parameters = _supported_movement_transit_effect_parameters(effects[0])
+    if permission_parameters is None:
+        return False
+    movement_modes_value = trigger_parameters.get("movement_modes")
+    if type(movement_modes_value) is not str:
+        return False
+    movement_modes = _movement_mode_tokens_or_none(tuple(movement_modes_value.split("|")))
+    return movement_modes is not None and movement_modes == permission_parameters[0]
+
+
 def _clause_has_supported_first_death_frequency_limit(clause: RuleClause) -> bool:
     for condition in clause.conditions:
         if condition.kind is not RuleConditionKind.FREQUENCY_LIMIT:
@@ -4295,6 +4425,91 @@ def _effect_is_supported_first_death_return(effect: RuleEffectSpec) -> bool:
     if restore_mode == "full_health":
         return wounds_remaining is None
     return False
+
+
+def _movement_transit_permission_from_effect(
+    *,
+    record: AbilityCatalogRecord,
+    clause: RuleClause,
+    effect: RuleEffectSpec,
+) -> CatalogMovementTransitPermission | None:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Movement transit permission requires an ability record.")
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Movement transit permission requires a RuleClause.")
+    supported = _supported_movement_transit_effect_parameters(effect)
+    if supported is None:
+        return None
+    movement_modes, model_keyword_any, terrain_height_max_inches = supported
+    return CatalogMovementTransitPermission(
+        record_id=record.record_id,
+        ability_id=record.definition.ability_id,
+        source_rule_id=record.definition.source_id,
+        clause_id=clause.clause_id,
+        movement_modes=movement_modes,
+        model_keyword_any=model_keyword_any,
+        terrain_height_max_inches=terrain_height_max_inches,
+    )
+
+
+def _movement_transit_permission_from_clause(
+    *,
+    record: AbilityCatalogRecord,
+    clause: RuleClause,
+) -> CatalogMovementTransitPermission | None:
+    if type(record) is not AbilityCatalogRecord:
+        raise GameLifecycleError("Movement transit permission requires an ability record.")
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Movement transit permission requires a RuleClause.")
+    if not _clause_is_supported_movement_transit_permission(clause):
+        return None
+    effects = tuple(
+        effect
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION
+    )
+    if len(effects) != 1:
+        raise GameLifecycleError("Supported movement transit clause must have one effect.")
+    permission = _movement_transit_permission_from_effect(
+        record=record,
+        clause=clause,
+        effect=effects[0],
+    )
+    if permission is None:
+        raise GameLifecycleError("Supported movement transit clause must produce a permission.")
+    return permission
+
+
+def _supported_movement_transit_effect_parameters(
+    effect: RuleEffectSpec,
+) -> tuple[tuple[str, ...], tuple[str, ...], float] | None:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Movement transit permission requires RuleEffectSpec.")
+    if effect.kind is not RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION:
+        return None
+    parameters = parameter_payload(effect.parameters)
+    if (
+        parameters.get("permission") != "move_over_as_if_not_there"
+        or parameters.get("model_allegiance") != "friendly"
+        or parameters.get("terrain_scope") != "terrain_features"
+    ):
+        return None
+    movement_modes_value = parameters.get("movement_modes")
+    model_keyword_any_value = parameters.get("model_keyword_any")
+    if type(movement_modes_value) is not str or type(model_keyword_any_value) is not str:
+        return None
+    movement_modes = _validate_movement_mode_tokens(tuple(movement_modes_value.split("|")))
+    model_keyword_any = _validate_keyword_tokens(
+        "model_keyword_any",
+        tuple(model_keyword_any_value.split("|")),
+    )
+    if set(model_keyword_any) != {"MONSTER", "VEHICLE"}:
+        return None
+    terrain_height_max_inches = _validate_non_negative_float(
+        "terrain_height_max_inches",
+        parameters.get("terrain_height_max_inches"),
+    )
+    return movement_modes, model_keyword_any, terrain_height_max_inches
 
 
 def _first_death_return_target_shape_matches(
@@ -5887,6 +6102,67 @@ def _validate_keyword_tokens(field_name: str, values: object) -> tuple[str, ...]
         seen.add(token)
         validated.append(token)
     return tuple(validated)
+
+
+def _validate_movement_mode_tokens(values: object) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Catalog movement mode tokens must be a tuple.")
+    validated: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        token = _movement_mode_token(value)
+        if token in seen:
+            raise GameLifecycleError("Catalog movement mode tokens must not duplicate values.")
+        seen.add(token)
+        validated.append(token)
+    if not validated:
+        raise GameLifecycleError("Catalog movement mode tokens must not be empty.")
+    return tuple(sorted(validated))
+
+
+def _movement_mode_tokens_or_none(values: object) -> tuple[str, ...] | None:
+    if type(values) is not tuple:
+        return None
+    validated: list[str] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        token = _movement_mode_token_or_none(value)
+        if token is None or token in seen:
+            return None
+        seen.add(token)
+        validated.append(token)
+    if not validated:
+        return None
+    return tuple(sorted(validated))
+
+
+def _movement_mode_token(value: object) -> str:
+    if type(value) is not str or not value.strip():
+        raise GameLifecycleError("Catalog movement mode token must be a string.")
+    token = value.strip().lower().replace(" ", "_").replace("-", "_")
+    if token not in {"advance", "normal"}:
+        raise GameLifecycleError("Catalog movement mode token is unsupported.")
+    return token
+
+
+def _movement_mode_token_or_none(value: object) -> str | None:
+    if type(value) is not str or not value.strip():
+        return None
+    token = value.strip().lower().replace(" ", "_").replace("-", "_")
+    if token not in {"advance", "normal"}:
+        return None
+    return token
+
+
+def _validate_non_negative_float(field_name: str, value: object) -> float:
+    if type(field_name) is not str or not field_name:
+        raise GameLifecycleError("Float validation requires a field name.")
+    if not isinstance(value, int | float) or type(value) is bool:
+        raise GameLifecycleError(f"Catalog rule {field_name} must be numeric.")
+    numeric = float(value)
+    if not isfinite(numeric) or numeric < 0.0:
+        raise GameLifecycleError(f"Catalog rule {field_name} must be finite and non-negative.")
+    return numeric
 
 
 def _validate_healing_amount(value: object) -> int:
