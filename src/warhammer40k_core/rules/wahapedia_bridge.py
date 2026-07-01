@@ -117,6 +117,10 @@ _REPLACEMENT_WITH_REQUIRED_CHOICES_RE = re.compile(
     r"and one of the following:\n(?P<choices>(?:- 1 .+?(?:\n|$))+)$",
     re.IGNORECASE,
 )
+_SINGLE_REPLACEMENT_RE = re.compile(
+    r"^This model's (?P<replaced>.+?) can be replaced with 1 (?P<replacement>.+?)\.?$",
+    re.IGNORECASE,
+)
 _OPTION_CHOICE_RE = re.compile(r"^- 1 (?P<name>.+?)\.?$", re.IGNORECASE)
 _LOADOUT_RE = re.compile(r"[^.]+? (?:is|are) equipped with: (?P<items>[^.]+)\.?", re.IGNORECASE)
 _WEAPON_PROFILE_SUFFIX_RE = re.compile(r"^(?P<base>.+?)\s+-\s+(?P<profile>.+)$")
@@ -680,26 +684,33 @@ def _bridge_wargear(
     context: _BridgeContext,
     datasheet_id: str,
     composition_entries: tuple[_CompositionEntry, ...],
-    default_wargear_name_keys: frozenset[str],
+    default_wargear_name_keys: frozenset[str] | None,
     bridged_rows: dict[str, list[dict[str, str]]],
 ) -> dict[str, str]:
     wargear_ids_by_name: dict[str, str] = {}
     model_profile_ids = tuple(entry.model_profile_id for entry in composition_entries)
     emitted_default_wargear_ids: set[str] = set()
+    non_weapon_keyword_name_keys = _wargear_profile_ability_name_keys(
+        context=context,
+        datasheet_id=datasheet_id,
+    )
     for row in _rows_matching(
         context.rows_by_table, "Datasheets_wargear", "datasheet_id", datasheet_id
     ):
-        name = _required_field(row, "name")
+        name = _required_wargear_name(row=row, default_wargear_name_keys=default_wargear_name_keys)
+        if name is None:
+            continue
         base_name = _base_wargear_name(name)
         profile_name = _weapon_profile_name(name)
         wargear_id = f"{datasheet_id}:{_slug(base_name)}"
         wargear_ids_by_name[_name_key(base_name)] = wargear_id
         wargear_ids_by_name[_name_key(name)] = wargear_id
         is_default_loadout = (
-            not default_wargear_name_keys or _name_key(base_name) in default_wargear_name_keys
+            default_wargear_name_keys is None or _name_key(base_name) in default_wargear_name_keys
         ) and wargear_id not in emitted_default_wargear_ids
         if is_default_loadout:
             emitted_default_wargear_ids.add(wargear_id)
+        description = _required_field(row, "description")
         bridged_rows["Datasheets_wargear"].append(
             {
                 "datasheet_id": datasheet_id,
@@ -720,8 +731,16 @@ def _bridge_wargear(
                 "s": _required_field(row, "S"),
                 "ap": _required_field(row, "AP"),
                 "d": _required_field(row, "D"),
-                "weapon_keywords": _joined(_weapon_keywords(_required_field(row, "description"))),
-                "weapon_abilities": _weapon_abilities_payload(_required_field(row, "description")),
+                "weapon_keywords": _joined(
+                    _weapon_keywords(
+                        description,
+                        ignored_name_keys=non_weapon_keyword_name_keys,
+                    )
+                ),
+                "weapon_abilities": _weapon_abilities_payload(
+                    description,
+                    ignored_name_keys=non_weapon_keyword_name_keys,
+                ),
                 "default_loadout": "true" if is_default_loadout else "false",
                 "source_ids": _joined(_source_ids(row)),
             }
@@ -865,12 +884,23 @@ def _bridge_options(
             continue
         replacement_match = _REPLACEMENT_WITH_REQUIRED_CHOICES_RE.fullmatch(description)
         if replacement_match is not None:
-            _bridge_replacement_option(
+            _bridge_replacement_with_required_choices_option(
                 row=row,
                 datasheet_id=datasheet_id,
                 model_profile_id=_single_model_profile_id(composition_entries),
                 wargear_ids_by_name=wargear_ids_by_name,
                 match=replacement_match,
+                bridged_rows=bridged_rows,
+            )
+            continue
+        single_replacement_match = _SINGLE_REPLACEMENT_RE.fullmatch(description)
+        if single_replacement_match is not None:
+            _bridge_single_replacement_option(
+                row=row,
+                datasheet_id=datasheet_id,
+                model_profile_id=_single_model_profile_id(composition_entries),
+                wargear_ids_by_name=wargear_ids_by_name,
+                match=single_replacement_match,
                 bridged_rows=bridged_rows,
             )
             continue
@@ -906,7 +936,7 @@ def _bridge_options(
         )
 
 
-def _bridge_replacement_option(
+def _bridge_replacement_with_required_choices_option(
     *,
     row: NormalizedSourceRow,
     datasheet_id: str,
@@ -968,6 +998,43 @@ def _bridge_replacement_option(
                 "effect_replaced_wargear_id": "",
             }
         )
+
+
+def _bridge_single_replacement_option(
+    *,
+    row: NormalizedSourceRow,
+    datasheet_id: str,
+    model_profile_id: str,
+    wargear_ids_by_name: dict[str, str],
+    match: re.Match[str],
+    bridged_rows: dict[str, list[dict[str, str]]],
+) -> None:
+    replaced_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("replaced"))
+    replacement_wargear_id = _required_wargear_id(wargear_ids_by_name, match.group("replacement"))
+    bridged_rows["Datasheets_options"].append(
+        {
+            "datasheet_id": datasheet_id,
+            "line": _required_field(row, "line"),
+            "description": _raw_or_field(row, "description"),
+            "option_id": (
+                f"{datasheet_id}:{_slug(match.group('replacement'))}:option-"
+                f"{_required_field(row, 'line')}"
+            ),
+            "model_profile_id": model_profile_id,
+            "default_wargear_ids": "",
+            "allowed_wargear_ids": replacement_wargear_id,
+            "min_selections": "0",
+            "max_selections": "1",
+            "condition_kind": "",
+            "condition_wargear_ids": "",
+            "effect_kind": WargearOptionEffectKind.REPLACE_WARGEAR.value,
+            "effect_wargear_id": replacement_wargear_id,
+            "effect_replaced_wargear_id": replaced_wargear_id,
+            "effect_model_count": "1",
+            "effect_wargear_count": "1",
+            "source_ids": _joined(_source_ids(row)),
+        }
+    )
 
 
 def _replacement_choice_names(choices_text: str) -> tuple[str, ...]:
@@ -1503,7 +1570,7 @@ def _ability_source_kind(ability_type: str) -> CatalogAbilitySourceKind:
         return CatalogAbilitySourceKind.FACTION
     if normalized == "datasheet":
         return CatalogAbilitySourceKind.DATASHEET
-    if normalized == "wargear":
+    if normalized in {"wargear", "wargear profile"}:
         return CatalogAbilitySourceKind.WARGEAR
     if normalized.startswith(("special", "fortification")):
         return CatalogAbilitySourceKind.DATASHEET
@@ -1672,13 +1739,20 @@ def _skill_value(row: NormalizedSourceRow) -> str:
     return f"{raw_skill}+"
 
 
-def _weapon_keywords(description: str) -> tuple[str, ...]:
+def _weapon_keywords(
+    description: str,
+    *,
+    ignored_name_keys: frozenset[str],
+) -> tuple[str, ...]:
     return tuple(
         sorted(
             _deduplicated(
                 [
                     entry.keyword.value
-                    for entry in _weapon_keyword_entries(description)
+                    for entry in _weapon_keyword_entries(
+                        description,
+                        ignored_name_keys=ignored_name_keys,
+                    )
                     if entry.keyword is not None
                 ]
             )
@@ -1686,9 +1760,18 @@ def _weapon_keywords(description: str) -> tuple[str, ...]:
     )
 
 
-def _weapon_abilities_payload(description: str) -> str:
+def _weapon_abilities_payload(
+    description: str,
+    *,
+    ignored_name_keys: frozenset[str],
+) -> str:
     abilities = tuple(
-        entry.ability for entry in _weapon_keyword_entries(description) if entry.ability is not None
+        entry.ability
+        for entry in _weapon_keyword_entries(
+            description,
+            ignored_name_keys=ignored_name_keys,
+        )
+        if entry.ability is not None
     )
     if not abilities:
         return ""
@@ -1710,11 +1793,17 @@ def _weapon_abilities_payload(description: str) -> str:
     )
 
 
-def _weapon_keyword_entries(description: str) -> tuple[_WeaponKeywordEntry, ...]:
+def _weapon_keyword_entries(
+    description: str,
+    *,
+    ignored_name_keys: frozenset[str],
+) -> tuple[_WeaponKeywordEntry, ...]:
     if not description.strip():
         return ()
     entries: list[_WeaponKeywordEntry] = []
     for raw_item in _weapon_keyword_items(description):
+        if _name_key(raw_item) in ignored_name_keys:
+            continue
         entries.append(_weapon_keyword_entry(raw_item))
     return tuple(entries)
 
@@ -1939,16 +2028,46 @@ def _required_wargear_id(wargear_ids_by_name: dict[str, str], wargear_name: str)
     return wargear_id
 
 
+def _wargear_profile_ability_name_keys(
+    *,
+    context: _BridgeContext,
+    datasheet_id: str,
+) -> frozenset[str]:
+    return frozenset(
+        _name_key(_required_field(row, "name"))
+        for row in _rows_matching(
+            context.rows_by_table,
+            "Datasheets_abilities",
+            "datasheet_id",
+            datasheet_id,
+        )
+        if _required_field(row, "type") == "Wargear profile"
+    )
+
+
+def _required_wargear_name(
+    *,
+    row: NormalizedSourceRow,
+    default_wargear_name_keys: frozenset[str] | None,
+) -> str | None:
+    name = row.runtime_fields_payload().get("name", "").strip()
+    if name:
+        return name
+    if default_wargear_name_keys == frozenset():
+        return None
+    raise WahapediaBridgeError("Required source column is empty: name.")
+
+
 def _single_model_profile_id(composition_entries: tuple[_CompositionEntry, ...]) -> str:
     if len(composition_entries) != 1:
         raise WahapediaBridgeError("This-model wargear replacement requires one model profile.")
     return composition_entries[0].model_profile_id
 
 
-def _loadout_wargear_name_keys(loadout: str) -> frozenset[str]:
+def _loadout_wargear_name_keys(loadout: str) -> frozenset[str] | None:
     stripped = " ".join(loadout.strip().split())
     if not stripped:
-        return frozenset()
+        return None
     matches = tuple(_LOADOUT_RE.finditer(stripped))
     if not matches:
         raise WahapediaBridgeError("Unsupported datasheet loadout row shape.")
@@ -1957,7 +2076,13 @@ def _loadout_wargear_name_keys(loadout: str) -> frozenset[str]:
     )
     if not item_names or any(not item_name for item_name in item_names):
         raise WahapediaBridgeError("Datasheet loadout contains an empty wargear item.")
-    return frozenset(_name_key(item_name) for item_name in item_names)
+    item_keys = tuple(_name_key(item_name) for item_name in item_names)
+    nothing_key = _name_key("nothing")
+    if item_keys == (nothing_key,):
+        return frozenset()
+    if nothing_key in item_keys:
+        raise WahapediaBridgeError("Datasheet loadout mixes nothing with wargear items.")
+    return frozenset(item_keys)
 
 
 def _base_wargear_name(name: str) -> str:

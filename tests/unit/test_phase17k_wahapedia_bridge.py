@@ -568,6 +568,93 @@ def test_phase17k_bloodthirster_bridge_supports_replacement_wargear_loadouts() -
     assert lash_option.allowed_wargear_ids == (axe_id, lash_id)
 
 
+def test_phase17k_great_unclean_one_bridge_supports_single_replacement_wargear() -> None:
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_great_unclean_one_bridge_artifacts(),
+    )
+    datasheet = package.army_catalog.datasheet_by_id("000001130")
+    wargear_by_id = {wargear.wargear_id: wargear for wargear in package.army_catalog.wargear}
+    options_by_id = {option.option_id: option for option in datasheet.wargear_options}
+    model_profile_id = "000001130:great-unclean-one"
+    plague_flail_id = "000001130:plague-flail"
+    putrid_vomit_id = "000001130:putrid-vomit"
+    bilesword_id = "000001130:bilesword"
+    bileblade_id = "000001130:bileblade"
+    doomsday_bell_id = "000001130:doomsday-bell"
+    bileblade_option_id = "000001130:bileblade:option-1"
+    doomsday_bell_option_id = "000001130:doomsday-bell:option-2"
+
+    assert _resolved_great_unclean_one_model_wargear(package, requested_selections=()) == (
+        plague_flail_id,
+        putrid_vomit_id,
+        bilesword_id,
+    )
+
+    bileblade_option = options_by_id[bileblade_option_id]
+    doomsday_bell_option = options_by_id[doomsday_bell_option_id]
+    assert bileblade_option.default_wargear_ids == ()
+    assert bileblade_option.allowed_wargear_ids == (bileblade_id,)
+    assert bileblade_option.max_selections == 1
+    assert bileblade_option.conditions == ()
+    assert bileblade_option.effects[0].kind is WargearOptionEffectKind.REPLACE_WARGEAR
+    assert bileblade_option.effects[0].wargear_id == bileblade_id
+    assert bileblade_option.effects[0].replaced_wargear_id == plague_flail_id
+    assert doomsday_bell_option.effects[0].kind is WargearOptionEffectKind.REPLACE_WARGEAR
+    assert doomsday_bell_option.effects[0].wargear_id == doomsday_bell_id
+    assert doomsday_bell_option.effects[0].replaced_wargear_id == bilesword_id
+    assert wargear_by_id[doomsday_bell_id].weapon_profiles[0].keywords == (
+        WeaponKeyword.LETHAL_HITS,
+    )
+
+    assert _resolved_great_unclean_one_model_wargear(
+        package,
+        requested_selections=(
+            WargearSelection(
+                option_id=bileblade_option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(bileblade_id,),
+            ),
+        ),
+    ) == (putrid_vomit_id, bilesword_id, bileblade_id)
+    assert _resolved_great_unclean_one_model_wargear(
+        package,
+        requested_selections=(
+            WargearSelection(
+                option_id=bileblade_option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(bileblade_id,),
+            ),
+            WargearSelection(
+                option_id=doomsday_bell_option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(doomsday_bell_id,),
+            ),
+        ),
+    ) == (putrid_vomit_id, bileblade_id, doomsday_bell_id)
+
+
+def test_phase17k_bridge_supports_pdf_declared_no_equipment_and_no_wargear_options() -> None:
+    artifacts = _no_equipment_daemon_fortification_bridge_artifacts()
+    wargear_rows = _optional_artifact_rows(artifacts, "Datasheets_wargear")
+    option_rows = _optional_artifact_rows(artifacts, "Datasheets_options")
+    model_rows = _artifact_by_table(artifacts, "Datasheets_models").rows
+    model_fields_by_datasheet_id = {
+        row.runtime_fields_payload()["datasheet_id"]: row.runtime_fields_payload()
+        for row in model_rows
+    }
+
+    for datasheet_id in ("000001470", "000001588"):
+        assert not any(
+            row.runtime_fields_payload()["datasheet_id"] == datasheet_id for row in wargear_rows
+        )
+        assert not any(
+            row.runtime_fields_payload()["datasheet_id"] == datasheet_id for row in option_rows
+        )
+        assert model_fields_by_datasheet_id[datasheet_id]["base_size"] == "Hull"
+
+
 def test_phase17k_bloodcrushers_runtime_instances_manifest_model_wargear_and_abilities() -> None:
     package = build_canonical_catalog_package(
         package_id=_catalog_package_id(),
@@ -4326,7 +4413,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in chaos_daemons_markdown
     assert (
         "| Great Unclean One (`000001130`) | PDF pages 66-67; supersedes Wahapedia. | "
-        "Bridge/catalog blocked |"
+        "Unsupported IR |"
     ) in chaos_daemons_markdown
     assert (
         "| Tormentbringer (`000004100`) | PDF pages 100-101; supersedes Wahapedia "
@@ -6159,6 +6246,33 @@ def _resolved_bloodthirster_model_wargear(
     return unit.own_models[0].wargear_ids
 
 
+def _resolved_great_unclean_one_model_wargear(
+    package: CanonicalCatalogPackage,
+    *,
+    requested_selections: tuple[WargearSelection, ...],
+) -> tuple[str, ...]:
+    datasheet = package.army_catalog.datasheet_by_id("000001130")
+    unit = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-nurgle",
+        selection=UnitMusterSelection(
+            unit_selection_id="great-unclean-one-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="000001130:great-unclean-one",
+                    model_count=1,
+                ),
+            ),
+            wargear_selections=requested_selections,
+        ),
+        datasheet=datasheet,
+    )
+    return unit.own_models[0].wargear_ids
+
+
 def _flesh_hounds_unit(
     *,
     package: CanonicalCatalogPackage,
@@ -7036,6 +7150,50 @@ def _bloodthirster_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                 height_units=GeometrySourceUnits.INCHES,
                 height_source_id="geometry-review:chaos-daemons:bloodthirster:height",
                 height_document_reference="Chaos Daemons Faction Pack p.16-17",
+            ),
+        ),
+    )
+
+
+def _great_unclean_one_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000001130",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000001130",
+                model_name="Great Unclean One",
+                height=5.25,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:great-unclean-one:height",
+                height_document_reference="Chaos Daemons Faction Pack p.66-67",
+            ),
+        ),
+    )
+
+
+def _no_equipment_daemon_fortification_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000001470", "000001588"),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000001470",
+                model_name="Feculent Gnarlmaw",
+                height=5.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:feculent-gnarlmaw:height",
+                height_document_reference="Chaos Daemons Faction Pack p.86-87",
+            ),
+            ModelHeightOverride(
+                datasheet_id="000001588",
+                model_name="Skull Altar",
+                height=4.75,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:skull-altar:height",
+                height_document_reference="Chaos Daemons Faction Pack p.36-37",
             ),
         ),
     )
@@ -8406,6 +8564,16 @@ def _artifact_by_table(
         if artifact.source_table == table_name:
             return artifact
     raise AssertionError(f"Missing artifact table: {table_name}.")
+
+
+def _optional_artifact_rows(
+    artifacts: tuple[WahapediaJsonArtifact, ...],
+    table_name: str,
+) -> tuple[NormalizedSourceRow, ...]:
+    for artifact in artifacts:
+        if artifact.source_table == table_name:
+            return artifact.rows
+    return ()
 
 
 def _row_by_id(artifact: WahapediaJsonArtifact, row_id: str) -> NormalizedSourceRow:
