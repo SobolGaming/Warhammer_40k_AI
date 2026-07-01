@@ -764,6 +764,7 @@ def _bridge_abilities(
         name = _raw_or_field(row, "name")
         description = _raw_or_field(row, "description")
         description_source_row = row
+        ability_type = _required_field(row, "type")
         if ability_id:
             ability_source = _ability_source_row(context=context, ability_row=row)
             source_rows = (row, ability_source)
@@ -773,13 +774,21 @@ def _bridge_abilities(
         else:
             ability_id = f"{datasheet_id}:{_slug(name)}"
         parameter = _raw_or_field(row, "parameter")
-        source_kind = _ability_source_kind(_required_field(row, "type"))
+        source_kind = _ability_source_kind(ability_type)
         source_wargear_id = ""
         rule_ir_payload = ""
         rule_ir_diagnostics = ""
         support = CatalogAbilitySupport.DESCRIPTOR_ONLY
         if source_kind is CatalogAbilitySourceKind.WARGEAR:
-            source_wargear_id = f"{datasheet_id}:{_slug(name)}"
+            source_wargear_id = (
+                _wargear_profile_ability_source_wargear_id(
+                    context=context,
+                    datasheet_id=datasheet_id,
+                    ability_name=name,
+                )
+                if _is_wargear_profile_ability_type(ability_type)
+                else f"{datasheet_id}:{_slug(name)}"
+            )
         if source_kind in {CatalogAbilitySourceKind.DATASHEET, CatalogAbilitySourceKind.WARGEAR}:
             source_text = _rule_source_text_from_row_field(
                 row=description_source_row,
@@ -840,7 +849,9 @@ def _bridge_abilities(
                 "source_ids": _joined(_source_ids(*source_rows)),
             }
         )
-        if source_kind is CatalogAbilitySourceKind.WARGEAR:
+        if source_kind is CatalogAbilitySourceKind.WARGEAR and not _is_wargear_profile_ability_type(
+            ability_type
+        ):
             wargear_id = source_wargear_id
             wargear_ids_by_name[_name_key(name)] = wargear_id
             bridged_rows["Datasheets_wargear"].append(
@@ -1577,6 +1588,10 @@ def _ability_source_kind(ability_type: str) -> CatalogAbilitySourceKind:
     raise WahapediaBridgeError("Unsupported datasheet ability type.")
 
 
+def _is_wargear_profile_ability_type(ability_type: str) -> bool:
+    return _validate_identifier("ability_type", ability_type).lower() == "wargear profile"
+
+
 def _mustering_warlord_value(*, normalized_description: str) -> str | None:
     normalized = _validate_identifier("normalized_description", normalized_description).upper()
     if "CANNOT BE YOUR WARLORD" in normalized:
@@ -2045,6 +2060,33 @@ def _wargear_profile_ability_name_keys(
     )
 
 
+def _wargear_profile_ability_source_wargear_id(
+    *,
+    context: _BridgeContext,
+    datasheet_id: str,
+    ability_name: str,
+) -> str:
+    ability_key = _name_key(ability_name)
+    candidate_ids: list[str] = []
+    for row in _rows_matching(
+        context.rows_by_table,
+        "Datasheets_wargear",
+        "datasheet_id",
+        datasheet_id,
+    ):
+        wargear_name = row.runtime_fields_payload().get("name", "").strip()
+        if not wargear_name:
+            continue
+        description = _required_field(row, "description")
+        if ability_key not in _weapon_description_item_name_keys(description):
+            continue
+        candidate_ids.append(f"{datasheet_id}:{_slug(_base_wargear_name(wargear_name))}")
+    owners = tuple(_deduplicated(candidate_ids))
+    if len(owners) != 1:
+        raise WahapediaBridgeError("Wargear profile ability must map to exactly one wargear item.")
+    return owners[0]
+
+
 def _required_wargear_name(
     *,
     row: NormalizedSourceRow,
@@ -2083,6 +2125,12 @@ def _loadout_wargear_name_keys(loadout: str) -> frozenset[str] | None:
     if nothing_key in item_keys:
         raise WahapediaBridgeError("Datasheet loadout mixes nothing with wargear items.")
     return frozenset(item_keys)
+
+
+def _weapon_description_item_name_keys(description: str) -> frozenset[str]:
+    if not description.strip():
+        return frozenset()
+    return frozenset(_name_key(item) for item in _weapon_keyword_items(description))
 
 
 def _base_wargear_name(name: str) -> str:

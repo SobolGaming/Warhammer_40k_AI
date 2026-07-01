@@ -577,6 +577,7 @@ def test_phase17k_great_unclean_one_bridge_supports_single_replacement_wargear()
     datasheet = package.army_catalog.datasheet_by_id("000001130")
     wargear_by_id = {wargear.wargear_id: wargear for wargear in package.army_catalog.wargear}
     options_by_id = {option.option_id: option for option in datasheet.wargear_options}
+    abilities_by_name = {ability.name: ability for ability in datasheet.abilities}
     model_profile_id = "000001130:great-unclean-one"
     plague_flail_id = "000001130:plague-flail"
     putrid_vomit_id = "000001130:putrid-vomit"
@@ -607,6 +608,10 @@ def test_phase17k_great_unclean_one_bridge_supports_single_replacement_wargear()
     assert wargear_by_id[doomsday_bell_id].weapon_profiles[0].keywords == (
         WeaponKeyword.LETHAL_HITS,
     )
+    assert "000001130:reverberating-summons" not in wargear_by_id
+    reverberating_summons = abilities_by_name["Reverberating Summons"]
+    assert reverberating_summons.source_kind is CatalogAbilitySourceKind.WARGEAR
+    assert reverberating_summons.source_wargear_id == doomsday_bell_id
 
     assert _resolved_great_unclean_one_model_wargear(
         package,
@@ -633,6 +638,89 @@ def test_phase17k_great_unclean_one_bridge_supports_single_replacement_wargear()
             ),
         ),
     ) == (putrid_vomit_id, bileblade_id, doomsday_bell_id)
+    reverberating_record = AbilityCatalogRecord(
+        record_id="phase17k:test:great-unclean-one:reverberating-summons",
+        definition=AbilityDefinition(
+            ability_id=reverberating_summons.ability_id,
+            name=reverberating_summons.name,
+            source_id=reverberating_summons.source_id,
+            when_descriptor="Catalog bridge wargear profile source test.",
+            effect_descriptor=reverberating_summons.effect_description,
+            restrictions_descriptor=(
+                f"Selected wargear required: {reverberating_summons.source_wargear_id}."
+            ),
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
+            replay_payload=validate_json_value(
+                {
+                    "source_wargear_id": reverberating_summons.source_wargear_id,
+                }
+            ),
+        ),
+        source_kind=AbilitySourceKind.WARGEAR,
+        datasheet_id=datasheet.datasheet_id,
+        wargear_id=reverberating_summons.source_wargear_id,
+    )
+    default_unit = _great_unclean_one_unit(package=package, requested_selections=())
+    doomsday_bell_unit = _great_unclean_one_unit(
+        package=package,
+        requested_selections=(
+            WargearSelection(
+                option_id=doomsday_bell_option_id,
+                model_profile_id=model_profile_id,
+                wargear_ids=(doomsday_bell_id,),
+            ),
+        ),
+    )
+    default_records_by_name = {
+        record.definition.name: record
+        for record in build_player_ability_index(
+            (reverberating_record,),
+            army=_flesh_hounds_army(
+                package=package,
+                unit=default_unit,
+                army_id="army-nurgle",
+                player_id="player-nurgle-default",
+            ),
+            catalog=package.army_catalog,
+        ).all_records()
+    }
+    doomsday_records_by_name = {
+        record.definition.name: record
+        for record in build_player_ability_index(
+            (reverberating_record,),
+            army=_flesh_hounds_army(
+                package=package,
+                unit=doomsday_bell_unit,
+                army_id="army-nurgle",
+                player_id="player-nurgle-doomsday",
+            ),
+            catalog=package.army_catalog,
+        ).all_records()
+    }
+    assert "Reverberating Summons" not in default_records_by_name
+    assert doomsday_records_by_name["Reverberating Summons"].wargear_id == doomsday_bell_id
+
+
+def test_phase17k_bridge_rejects_unowned_wargear_profile_ability() -> None:
+    with pytest.raises(
+        WahapediaBridgeError,
+        match="Wargear profile ability must map to exactly one wargear item",
+    ):
+        build_wahapedia_canonical_bridge_artifacts(
+            source_artifacts=_unowned_wargear_profile_ability_source_artifacts(),
+            bridge_package_id=_bridge_package_id(),
+            datasheet_ids=("test-wargear-profile-owner",),
+            height_overrides=(
+                ModelHeightOverride(
+                    datasheet_id="test-wargear-profile-owner",
+                    model_name="Profile Bearer",
+                    height=1.0,
+                    height_units=GeometrySourceUnits.INCHES,
+                    height_source_id="test-source:wargear-profile-owner-height",
+                    height_document_reference="test-doc:wargear-profile-owner-height",
+                ),
+            ),
+        )
 
 
 def test_phase17k_bridge_supports_pdf_declared_no_equipment_and_no_wargear_options() -> None:
@@ -6251,8 +6339,23 @@ def _resolved_great_unclean_one_model_wargear(
     *,
     requested_selections: tuple[WargearSelection, ...],
 ) -> tuple[str, ...]:
+    return (
+        _great_unclean_one_unit(
+            package=package,
+            requested_selections=requested_selections,
+        )
+        .own_models[0]
+        .wargear_ids
+    )
+
+
+def _great_unclean_one_unit(
+    package: CanonicalCatalogPackage,
+    *,
+    requested_selections: tuple[WargearSelection, ...],
+) -> UnitInstance:
     datasheet = package.army_catalog.datasheet_by_id("000001130")
-    unit = UnitFactory(
+    return UnitFactory(
         catalog=package.army_catalog,
         model_geometries=package.model_geometries,
     ).instantiate_unit(
@@ -6270,7 +6373,6 @@ def _resolved_great_unclean_one_model_wargear(
         ),
         datasheet=datasheet,
     )
-    return unit.own_models[0].wargear_ids
 
 
 def _flesh_hounds_unit(
@@ -8524,6 +8626,86 @@ def _unsupported_wargear_rule_source_artifacts() -> tuple[WahapediaJsonArtifact,
         _artifact_from_csv(
             "Datasheets_unit_composition",
             "\n".join(("datasheet_id,line,description", "test-unsupported-unit,1,1 Alpha")),
+        ),
+        _artifact_from_csv(
+            "Factions",
+            "\n".join(("id,name", "test-faction,Test Faction")),
+        ),
+    )
+
+
+def _unowned_wargear_profile_ability_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return (
+        _artifact_from_csv(
+            "Abilities",
+            "\n".join(
+                (
+                    "id,faction_id,name,description",
+                    "test-army-rule,test-faction,Test Army Rule,Test rule text.",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets",
+            "\n".join(
+                (
+                    "id,name,faction_id",
+                    "test-wargear-profile-owner,Wargear Profile Owner,test-faction",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_abilities",
+            "\n".join(
+                (
+                    "datasheet_id,line,type,ability_id,name,description,parameter",
+                    (
+                        "test-wargear-profile-owner,1,Faction,test-army-rule,"
+                        "Test Army Rule,Test rule text.,"
+                    ),
+                    (
+                        "test-wargear-profile-owner,2,Wargear profile,,Summoning Horn,"
+                        "Return one destroyed model.,"
+                    ),
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_keywords",
+            "\n".join(
+                (
+                    "datasheet_id,keyword,model,is_faction_keyword",
+                    "test-wargear-profile-owner,Infantry,,false",
+                    "test-wargear-profile-owner,Test Faction,,true",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_wargear",
+            "\n".join(
+                (
+                    "datasheet_id,line,line_in_wargear,name,type,range,A,BS_WS,S,AP,D,description",
+                    "test-wargear-profile-owner,1,1,Rotten bell,Ranged,12,1,3,4,0,1,[Lethal Hits]",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_models",
+            "\n".join(
+                (
+                    "datasheet_id,line,M,T,Sv,inv_sv,W,Ld,OC,base_size",
+                    "test-wargear-profile-owner,1,6,4,3,-,2,7,1,32mm",
+                )
+            ),
+        ),
+        _artifact_from_csv(
+            "Datasheets_unit_composition",
+            "\n".join(
+                (
+                    "datasheet_id,line,description",
+                    "test-wargear-profile-owner,1,1 Profile Bearer",
+                )
+            ),
         ),
         _artifact_from_csv(
             "Factions",
