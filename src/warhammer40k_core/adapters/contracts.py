@@ -17,8 +17,10 @@ if TYPE_CHECKING:
         EventStreamDeltaPayload,
     )
     from warhammer40k_core.adapters.projection import GameViewPayload, RulesCatalogViewPayload
+    from warhammer40k_core.adapters.support_profile import SupportProfilePayload
     from warhammer40k_core.engine.game_state import GameConfig
     from warhammer40k_core.engine.phase import LifecycleStatus
+    from warhammer40k_core.engine.replay import ReplayArtifactPayload
 
 
 @runtime_checkable
@@ -66,6 +68,14 @@ class AdapterGameSession(Protocol):
         result_id: str,
     ) -> LifecycleStatus:
         """Submit a JSON-safe parameterized proposal payload."""
+        ...
+
+    def replay_artifact(self, *, artifact_id: str) -> ReplayArtifactPayload:
+        """Export a deterministic replay artifact for this session."""
+        ...
+
+    def support_profile(self) -> SupportProfilePayload:
+        """Describe selected roster/catalog/runtime support for this session."""
         ...
 
 

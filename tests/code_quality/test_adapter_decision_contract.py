@@ -79,10 +79,12 @@ SESSION_PROTOCOL_METHODS = frozenset(
     (
         "advance_until_decision_or_terminal",
         "events_since",
+        "replay_artifact",
         "rules_catalog_view",
         "start",
         "submit_option",
         "submit_parameterized_payload",
+        "support_profile",
         "view",
     )
 )
