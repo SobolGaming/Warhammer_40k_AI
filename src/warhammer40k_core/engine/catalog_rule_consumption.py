@@ -892,7 +892,15 @@ class CatalogPostShootHitTargetStatusRuntime:
         )
         if not groups:
             return None
-        group = groups[0]
+        resolved_group_keys = _resolved_post_shoot_hit_target_status_group_keys(context.decisions)
+        unresolved_groups = tuple(
+            group
+            for group in groups
+            if _post_shoot_hit_target_status_group_key(group) not in resolved_group_keys
+        )
+        if not unresolved_groups:
+            return None
+        group = unresolved_groups[0]
         common_payload = _post_shoot_hit_target_status_request_payload(
             state=context.state,
             group=group,
@@ -1923,6 +1931,61 @@ def _post_shoot_hit_target_status_option_label(
     option: CatalogPostShootHitTargetStatusOption,
 ) -> str:
     return f"Deny {group.status_label} to {option.target_unit_instance_id}"
+
+
+type _PostShootHitTargetStatusGroupKey = tuple[str, str, str, str, int, str, str, str]
+
+
+def _post_shoot_hit_target_status_group_key(
+    group: CatalogPostShootHitTargetStatusGroup,
+) -> _PostShootHitTargetStatusGroupKey:
+    if type(group) is not CatalogPostShootHitTargetStatusGroup:
+        raise GameLifecycleError("Catalog post-shoot status requires a group.")
+    return (
+        group.attack_sequence_completed_event_id,
+        group.attack_sequence.sequence_id,
+        group.record.record_id,
+        group.clause.clause_id,
+        group.effect_index,
+        group.status,
+        group.unit.unit_instance_id,
+        "" if group.source_model_instance_id is None else group.source_model_instance_id,
+    )
+
+
+def _resolved_post_shoot_hit_target_status_group_keys(
+    decisions: DecisionController,
+) -> frozenset[_PostShootHitTargetStatusGroupKey]:
+    if type(decisions) is not DecisionController:
+        raise GameLifecycleError("Catalog post-shoot status resolution lookup requires decisions.")
+    keys: set[_PostShootHitTargetStatusGroupKey] = set()
+    for event in decisions.event_log.records:
+        if event.event_type != CATALOG_POST_SHOOT_HIT_TARGET_STATUS_SELECTED_EVENT:
+            continue
+        payload = event.payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError(
+                "Catalog post-shoot status selected event payload must be an object."
+            )
+        payload_object = cast(dict[str, object], payload)
+        source_model_id = payload_object.get("source_model_instance_id")
+        if source_model_id is not None and type(source_model_id) is not str:
+            raise GameLifecycleError(
+                "Catalog post-shoot status selected event source_model_instance_id is invalid."
+            )
+        keys.add(
+            (
+                _payload_string(payload_object, key="attack_sequence_completed_event_id"),
+                _payload_string(payload_object, key="attack_sequence_id"),
+                _payload_string(payload_object, key="catalog_record_id"),
+                _payload_string(payload_object, key="clause_id"),
+                _payload_int(payload_object, key="effect_index"),
+                _payload_string(payload_object, key="status"),
+                _payload_string(payload_object, key="unit_instance_id"),
+                "" if source_model_id is None else source_model_id,
+            )
+        )
+    return frozenset(keys)
 
 
 def _named_weapon_ability_choice_selection_payload(
