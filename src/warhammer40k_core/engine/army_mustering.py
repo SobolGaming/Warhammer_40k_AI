@@ -12,6 +12,7 @@ from warhammer40k_core.core.datasheet import (
     AttachmentRole,
     DatasheetAbilityDescriptor,
     DatasheetDefinition,
+    DatasheetMusteringOptionEffectKind,
 )
 from warhammer40k_core.core.detachment import EnhancementDefinition, EnhancementSubtype
 from warhammer40k_core.core.faction import FactionDefinition
@@ -33,6 +34,7 @@ from warhammer40k_core.engine.list_validation import (
     dreadblades_datasheet_allowed_for_faction,
     drukhari_corsairs_and_travelling_players_datasheet_allowed_for_faction,
     freeblades_datasheet_allowed_for_faction,
+    resolve_mustering_option_selections,
     shadow_legion_thralls_datasheet_allowed_for_faction,
     validate_detachment_selection,
     validate_unit_selection_for_army,
@@ -1144,20 +1146,36 @@ def validate_roster_legality(
 
     violations: list[RosterLegalityViolation] = []
     datasheets_by_selection_id: dict[str, DatasheetDefinition] = {}
+    effective_keywords_by_selection_id: dict[str, frozenset[str]] = {}
     selection_by_id = {
         selection.unit_selection_id: selection for selection in request.unit_selections
     }
     for selection in request.unit_selections:
         try:
-            datasheets_by_selection_id[selection.unit_selection_id] = (
-                validate_unit_selection_for_army(
-                    catalog=catalog,
-                    selection=selection,
-                    faction=faction,
-                    detachment_selection=request.detachment_selection,
-                    battle_size=request.battle_size,
-                )
+            datasheet = validate_unit_selection_for_army(
+                catalog=catalog,
+                selection=selection,
+                faction=faction,
+                detachment_selection=request.detachment_selection,
+                battle_size=request.battle_size,
             )
+            datasheets_by_selection_id[selection.unit_selection_id] = datasheet
+            try:
+                effective_keywords_by_selection_id[selection.unit_selection_id] = (
+                    _effective_unit_keywords(datasheet=datasheet, selection=selection)
+                )
+            except ListValidationError as exc:
+                violations.append(
+                    RosterLegalityViolation(
+                        violation_code="mustering_option_selection_invalid",
+                        message=str(exc),
+                        unit_selection_id=selection.unit_selection_id,
+                        source_id="phase17k:mustering-options",
+                    )
+                )
+                effective_keywords_by_selection_id[selection.unit_selection_id] = (
+                    _datasheet_keyword_set(datasheet)
+                )
         except ListValidationError as exc:
             violations.append(
                 RosterLegalityViolation(
@@ -1177,6 +1195,9 @@ def validate_roster_legality(
             )
             if inspection_datasheet is not None:
                 datasheets_by_selection_id[selection.unit_selection_id] = inspection_datasheet
+                effective_keywords_by_selection_id[selection.unit_selection_id] = (
+                    _datasheet_keyword_set(inspection_datasheet)
+                )
 
     _append_unit_point_violations(
         catalog=catalog,
@@ -1213,6 +1234,7 @@ def validate_roster_legality(
         request=request,
         faction=faction,
         datasheets_by_selection_id=datasheets_by_selection_id,
+        effective_keywords_by_selection_id=effective_keywords_by_selection_id,
         violations=violations,
     )
     _append_dreadblades_violations(
@@ -1827,6 +1849,7 @@ def _append_daemonic_pact_violations(
     request: ArmyMusterRequest,
     faction: FactionDefinition,
     datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    effective_keywords_by_selection_id: dict[str, frozenset[str]],
     violations: list[RosterLegalityViolation],
 ) -> None:
     pact_selection_ids = tuple(
@@ -1871,6 +1894,7 @@ def _append_daemonic_pact_violations(
     _append_daemonic_pact_god_ratio_violations(
         pact_selection_ids=pact_selection_ids,
         datasheets_by_selection_id=datasheets_by_selection_id,
+        effective_keywords_by_selection_id=effective_keywords_by_selection_id,
         violations=violations,
     )
 
@@ -1953,16 +1977,23 @@ def _append_daemonic_pact_god_ratio_violations(
     *,
     pact_selection_ids: tuple[str, ...],
     datasheets_by_selection_id: dict[str, DatasheetDefinition],
+    effective_keywords_by_selection_id: dict[str, frozenset[str]],
     violations: list[RosterLegalityViolation],
 ) -> None:
     for god_keyword in DAEMONIC_PACT_GOD_KEYWORDS:
         battleline_count = 0
         non_battleline_selection_ids: list[str] = []
         for selection_id in pact_selection_ids:
-            datasheet = datasheets_by_selection_id[selection_id]
-            if not _datasheet_has_keyword(datasheet, god_keyword):
+            if selection_id not in datasheets_by_selection_id:
+                raise ArmyMusteringError("Daemonic Pact datasheet lookup is missing selection.")
+            if selection_id not in effective_keywords_by_selection_id:
+                raise ArmyMusteringError(
+                    "Daemonic Pact effective keyword lookup is missing selection."
+                )
+            unit_keywords = effective_keywords_by_selection_id[selection_id]
+            if not _keyword_set_has_keyword(unit_keywords, god_keyword):
                 continue
-            if _datasheet_has_keyword(datasheet, "BATTLELINE"):
+            if _keyword_set_has_keyword(unit_keywords, "BATTLELINE"):
                 battleline_count += 1
             else:
                 non_battleline_selection_ids.append(selection_id)
@@ -2927,11 +2958,46 @@ def _unit_selection_model_count(selection: UnitMusterSelection) -> int:
     return sum(part.model_count for part in selection.model_profile_selections)
 
 
+def _effective_unit_keywords(
+    *,
+    datasheet: DatasheetDefinition,
+    selection: UnitMusterSelection,
+) -> frozenset[str]:
+    if type(datasheet) is not DatasheetDefinition:
+        raise ArmyMusteringError("Effective keyword lookup requires DatasheetDefinition.")
+    if type(selection) is not UnitMusterSelection:
+        raise ArmyMusteringError("Effective keyword lookup requires UnitMusterSelection.")
+    keywords = set(_datasheet_keyword_set(datasheet))
+    for option in resolve_mustering_option_selections(
+        datasheet=datasheet,
+        requested_selections=selection.mustering_option_selections,
+    ):
+        for effect in option.effects:
+            if effect.kind is DatasheetMusteringOptionEffectKind.ADD_KEYWORD:
+                if effect.keyword is None:
+                    raise ArmyMusteringError("Mustering keyword effect is missing keyword.")
+                keywords.add(_canonical_keyword(effect.keyword))
+                continue
+            if effect.kind is DatasheetMusteringOptionEffectKind.ADD_WARGEAR:
+                continue
+            raise ArmyMusteringError("Unsupported mustering option effect.")
+    return frozenset(keywords)
+
+
+def _datasheet_keyword_set(datasheet: DatasheetDefinition) -> frozenset[str]:
+    if type(datasheet) is not DatasheetDefinition:
+        raise ArmyMusteringError("Datasheet keyword lookup requires DatasheetDefinition.")
+    return frozenset(_canonical_keyword(keyword) for keyword in datasheet.keywords.keywords)
+
+
+def _keyword_set_has_keyword(keywords: frozenset[str], keyword: str) -> bool:
+    if type(keywords) is not frozenset:
+        raise ArmyMusteringError("Keyword-set lookup requires frozenset.")
+    return _canonical_keyword(keyword) in keywords
+
+
 def _datasheet_has_keyword(datasheet: DatasheetDefinition, keyword: str) -> bool:
-    requested_keyword = _canonical_keyword(keyword)
-    return requested_keyword in {
-        _canonical_keyword(stored_keyword) for stored_keyword in datasheet.keywords.keywords
-    }
+    return _keyword_set_has_keyword(_datasheet_keyword_set(datasheet), keyword)
 
 
 def _datasheet_has_faction_keyword(datasheet: DatasheetDefinition, keyword: str) -> bool:

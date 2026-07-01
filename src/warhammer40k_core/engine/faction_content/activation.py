@@ -185,8 +185,8 @@ class RuntimeContentActivation:
             unit_ids.update(attached.attached_unit_instance_id for attached in army.attached_units)
             for unit in army.units:
                 datasheet_ids.add(unit.datasheet_id)
-                for selection in unit.wargear_selections:
-                    wargear_ids.update(selection.wargear_ids)
+                for model in unit.own_models:
+                    wargear_ids.update(model.wargear_ids)
         weapon_profile_ids = _selected_weapon_profile_ids(catalog=catalog, wargear_ids=wargear_ids)
         weapon_keywords = _selected_weapon_keywords(catalog=catalog, wargear_ids=wargear_ids)
         loaded_ids = (

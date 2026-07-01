@@ -208,6 +208,7 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
     army_rule as adepta_sororitas_army_rule,
 )
@@ -772,6 +773,111 @@ def test_phase17k_soul_grinder_bridge_supports_warpclaw_replacement_wargear() ->
             MusteringOptionSelection(option_id=slaanesh_allegiance_option_id),
         ),
     ) == (harvester_cannon_id, iron_claw_id, warpclaw_id, scream_id)
+
+
+def test_phase17k_player_ability_index_uses_mustering_added_wargear() -> None:
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_soul_grinder_bridge_artifacts(),
+    )
+    datasheet = package.army_catalog.datasheet_by_id("000001151")
+    torrent_id = "000001151:torrent-of-burning-blood"
+    khorne_allegiance_option_id = "000001151:daemonic-allegiance:khorne"
+    slaanesh_allegiance_option_id = "000001151:daemonic-allegiance:slaanesh"
+    torrent_record = AbilityCatalogRecord(
+        record_id="phase17k:test:soul-grinder:torrent-of-burning-blood",
+        definition=AbilityDefinition(
+            ability_id="phase17k:soul-grinder:torrent-of-burning-blood",
+            name="Torrent of Burning Blood Gate",
+            source_id="phase17k:test:soul-grinder:torrent-of-burning-blood",
+            when_descriptor="Catalog bridge mustering-added wargear source test.",
+            effect_descriptor="Synthetic wargear-source ability for mustering-added wargear.",
+            restrictions_descriptor=f"Selected wargear required: {torrent_id}.",
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
+            replay_payload=validate_json_value({"source_wargear_id": torrent_id}),
+        ),
+        source_kind=AbilitySourceKind.WARGEAR,
+        datasheet_id=datasheet.datasheet_id,
+        wargear_id=torrent_id,
+    )
+    khorne_unit = _soul_grinder_unit(
+        package,
+        requested_wargear_selections=(),
+        mustering_option_selections=(
+            MusteringOptionSelection(option_id=khorne_allegiance_option_id),
+        ),
+    )
+    slaanesh_unit = _soul_grinder_unit(
+        package,
+        requested_wargear_selections=(),
+        mustering_option_selections=(
+            MusteringOptionSelection(option_id=slaanesh_allegiance_option_id),
+        ),
+    )
+
+    khorne_records_by_name = {
+        record.definition.name: record
+        for record in build_player_ability_index(
+            (torrent_record,),
+            army=_flesh_hounds_army(
+                package=package,
+                unit=khorne_unit,
+                player_id="player-khorne-soul-grinder",
+            ),
+            catalog=package.army_catalog,
+        ).all_records()
+    }
+    slaanesh_records_by_name = {
+        record.definition.name: record
+        for record in build_player_ability_index(
+            (torrent_record,),
+            army=_flesh_hounds_army(
+                package=package,
+                unit=slaanesh_unit,
+                player_id="player-slaanesh-soul-grinder",
+            ),
+            catalog=package.army_catalog,
+        ).all_records()
+    }
+
+    assert khorne_records_by_name["Torrent of Burning Blood Gate"].wargear_id == torrent_id
+    assert "Torrent of Burning Blood Gate" not in slaanesh_records_by_name
+
+
+def test_phase17k_runtime_content_activation_uses_mustering_added_wargear() -> None:
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_soul_grinder_bridge_artifacts(),
+    )
+    torrent_id = "000001151:torrent-of-burning-blood"
+    khorne_unit = _soul_grinder_unit(
+        package,
+        requested_wargear_selections=(),
+        mustering_option_selections=(
+            MusteringOptionSelection(option_id="000001151:daemonic-allegiance:khorne"),
+        ),
+    )
+    slaanesh_unit = _soul_grinder_unit(
+        package,
+        requested_wargear_selections=(),
+        mustering_option_selections=(
+            MusteringOptionSelection(option_id="000001151:daemonic-allegiance:slaanesh"),
+        ),
+    )
+
+    khorne_activation = RuntimeContentActivation.from_armies(
+        armies=(_flesh_hounds_army(package=package, unit=khorne_unit),),
+        catalog=package.army_catalog,
+    )
+    slaanesh_activation = RuntimeContentActivation.from_armies(
+        armies=(_flesh_hounds_army(package=package, unit=slaanesh_unit),),
+        catalog=package.army_catalog,
+    )
+
+    assert torrent_id in khorne_activation.selected_wargear_ids
+    assert torrent_id not in slaanesh_activation.selected_wargear_ids
 
 
 def test_phase17k_daemon_prince_bridge_supports_daemonic_allegiance_choices() -> None:
