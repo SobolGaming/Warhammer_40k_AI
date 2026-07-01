@@ -24,6 +24,11 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
     model_displacement_kind_from_token,
 )
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    CatalogMovementTransitPermission,
+    catalog_movement_transit_permissions_for_model,
+)
+from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pathing import (
     PathValidationContext,
     PathWitness,
@@ -63,6 +68,8 @@ class MovementCapabilitySetPayload(TypedDict):
     can_move_through_terrain: bool
     ignores_vertical_distance: bool
     blocks_friendly_vehicle_monster_pass_through: bool
+    can_move_over_friendly_vehicle_monster_models: bool
+    terrain_as_if_absent_height_inches: float | None
 
 
 class EngagementMovementPolicyPayload(TypedDict):
@@ -109,6 +116,13 @@ _VEHICLE_MONSTER_ENEMY_TRANSIT_MOVEMENT_MODES = frozenset(
     }
 )
 
+_MOVEMENT_TRANSIT_PERMISSION_MODES = frozenset(
+    {
+        MovementMode.NORMAL,
+        MovementMode.ADVANCE,
+    }
+)
+
 
 @dataclass(frozen=True, slots=True)
 class MovementCapabilitySet:
@@ -128,6 +142,8 @@ class MovementCapabilitySet:
     can_move_through_terrain: bool
     ignores_vertical_distance: bool
     blocks_friendly_vehicle_monster_pass_through: bool
+    can_move_over_friendly_vehicle_monster_models: bool
+    terrain_as_if_absent_height_inches: float | None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -161,8 +177,20 @@ class MovementCapabilitySet:
                 "blocks_friendly_vehicle_monster_pass_through",
                 self.blocks_friendly_vehicle_monster_pass_through,
             ),
+            (
+                "can_move_over_friendly_vehicle_monster_models",
+                self.can_move_over_friendly_vehicle_monster_models,
+            ),
         ):
             _validate_bool(f"MovementCapabilitySet {field_name}", value)
+        object.__setattr__(
+            self,
+            "terrain_as_if_absent_height_inches",
+            _validate_optional_non_negative_number(
+                "MovementCapabilitySet terrain_as_if_absent_height_inches",
+                self.terrain_as_if_absent_height_inches,
+            ),
+        )
 
     @classmethod
     def from_keywords(
@@ -172,6 +200,10 @@ class MovementCapabilitySet:
         ruleset_descriptor: object,
         ability_index: AbilityCatalogIndex | None = None,
         ability_registry: AbilityHandlerRegistry | None = None,
+        movement_mode: object | None = None,
+        unit: UnitInstance | None = None,
+        model_instance_id: str | None = None,
+        current_model_instance_ids: tuple[str, ...] = (),
     ) -> Self:
         descriptor = _validate_ruleset_descriptor(ruleset_descriptor)
         normalized_keywords = _validate_keyword_tuple(
@@ -187,6 +219,13 @@ class MovementCapabilitySet:
                 keywords=normalized_keywords,
                 registry=ability_registry,
             )
+        )
+        catalog_permissions = _catalog_movement_transit_permissions(
+            ability_index=resolved_ability_index,
+            unit=unit,
+            model_instance_id=model_instance_id,
+            current_model_instance_ids=current_model_instance_ids,
+            movement_mode=movement_mode,
         )
         has_fly = "has_fly" in flags
         is_titanic = "is_titanic" in flags
@@ -225,6 +264,8 @@ class MovementCapabilitySet:
             blocks_friendly_vehicle_monster_pass_through=(
                 "blocks_friendly_vehicle_monster_pass_through" in flags
             ),
+            can_move_over_friendly_vehicle_monster_models=bool(catalog_permissions),
+            terrain_as_if_absent_height_inches=_max_terrain_height(catalog_permissions),
         )
 
     def to_payload(self) -> MovementCapabilitySetPayload:
@@ -247,6 +288,10 @@ class MovementCapabilitySet:
             "blocks_friendly_vehicle_monster_pass_through": (
                 self.blocks_friendly_vehicle_monster_pass_through
             ),
+            "can_move_over_friendly_vehicle_monster_models": (
+                self.can_move_over_friendly_vehicle_monster_models
+            ),
+            "terrain_as_if_absent_height_inches": self.terrain_as_if_absent_height_inches,
         }
 
     @classmethod
@@ -273,6 +318,10 @@ class MovementCapabilitySet:
             blocks_friendly_vehicle_monster_pass_through=raw_payload[
                 "blocks_friendly_vehicle_monster_pass_through"
             ],
+            can_move_over_friendly_vehicle_monster_models=raw_payload[
+                "can_move_over_friendly_vehicle_monster_models"
+            ],
+            terrain_as_if_absent_height_inches=raw_payload["terrain_as_if_absent_height_inches"],
         )
 
 
@@ -468,6 +517,9 @@ class MovementLegalityContext:
         displacement_kind: object,
         ability_index: AbilityCatalogIndex | None = None,
         ability_registry: AbilityHandlerRegistry | None = None,
+        unit: UnitInstance | None = None,
+        model_instance_id: str | None = None,
+        current_model_instance_ids: tuple[str, ...] = (),
     ) -> Self:
         descriptor = _validate_ruleset_descriptor(ruleset_descriptor)
         mode = movement_mode_from_token(movement_mode)
@@ -481,6 +533,10 @@ class MovementLegalityContext:
                 ruleset_descriptor=descriptor,
                 ability_index=ability_index,
                 ability_registry=ability_registry,
+                movement_mode=mode,
+                unit=unit,
+                model_instance_id=model_instance_id,
+                current_model_instance_ids=current_model_instance_ids,
             ),
             engagement_policy=EngagementMovementPolicy.from_ruleset_descriptor(
                 descriptor,
@@ -560,8 +616,10 @@ class MovementLegalityContext:
             self.engagement_policy.may_transit_enemy_engagement or fly_transit_applies
         )
         friendly_vehicle_monster_blockers = friendly_vehicle_monster_model_ids
-        if not self.capabilities.blocks_friendly_vehicle_monster_pass_through or (
-            fly_transit_applies and self.capabilities.can_move_through_models
+        if (
+            self.capabilities.can_move_over_friendly_vehicle_monster_models
+            or not self.capabilities.blocks_friendly_vehicle_monster_pass_through
+            or (fly_transit_applies and self.capabilities.can_move_through_models)
         ):
             friendly_vehicle_monster_blockers = ()
         enemy_vehicle_monster_blockers: tuple[str, ...] = ()
@@ -609,6 +667,9 @@ class MovementLegalityContext:
             contact_footprint_available=contact_footprint_available,
             can_traverse_ruins_walls=self.capabilities.can_traverse_ruins_walls,
             can_move_through_terrain=self.capabilities.can_move_through_terrain,
+            terrain_as_if_absent_height_inches=(
+                self.capabilities.terrain_as_if_absent_height_inches
+            ),
             has_fly=self.capabilities.has_fly,
             sample_interval_inches=sample_interval_inches,
         )
@@ -774,6 +835,50 @@ def _keywords_allow_ruins_wall_traversal(
     return False
 
 
+def _catalog_movement_transit_permissions(
+    *,
+    ability_index: AbilityCatalogIndex,
+    unit: UnitInstance | None,
+    model_instance_id: str | None,
+    current_model_instance_ids: tuple[str, ...],
+    movement_mode: object | None,
+) -> tuple[CatalogMovementTransitPermission, ...]:
+    if (
+        unit is None
+        or model_instance_id is None
+        or movement_mode is None
+        or not current_model_instance_ids
+    ):
+        return ()
+    mode = movement_mode_from_token(movement_mode)
+    if mode not in _MOVEMENT_TRANSIT_PERMISSION_MODES:
+        return ()
+    return catalog_movement_transit_permissions_for_model(
+        ability_index=ability_index,
+        unit=unit,
+        model_instance_id=model_instance_id,
+        current_model_instance_ids=current_model_instance_ids,
+        movement_mode=mode.value,
+    )
+
+
+def _max_terrain_height(
+    permissions: tuple[CatalogMovementTransitPermission, ...],
+) -> float | None:
+    if type(permissions) is not tuple:
+        raise MovementLegalityError("Movement transit permissions must be a tuple.")
+    if not permissions:
+        return None
+    heights: list[float] = []
+    for permission in permissions:
+        if type(permission) is not CatalogMovementTransitPermission:
+            raise MovementLegalityError(
+                "Movement transit permissions must contain catalog permissions."
+            )
+        heights.append(permission.terrain_height_max_inches)
+    return max(heights)
+
+
 def _validate_optional_movement_phase_action(value: object | None) -> str | None:
     if value is None:
         return None
@@ -824,6 +929,15 @@ def _validate_optional_identifier(field_name: str, value: object | None) -> str 
 def _validate_bool(field_name: str, value: object) -> None:
     if type(value) is not bool:
         raise MovementLegalityError(f"{field_name} must be a bool.")
+
+
+def _validate_optional_non_negative_number(
+    field_name: str,
+    value: object | None,
+) -> float | None:
+    if value is None:
+        return None
+    return _validate_non_negative_number(field_name, value)
 
 
 def _validate_non_negative_number(field_name: str, value: object) -> float:

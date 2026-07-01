@@ -43,6 +43,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID,
     CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
+    CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
     CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID,
@@ -123,6 +124,11 @@ FIRST_DEATH_RETURN_FULL_HEALTH_TEXT = (
     "a 5+, set this unit back up on the battlefield as close as possible to where it "
     "was destroyed and not within Engagement Range of one or more enemy units, at "
     "full health."
+)
+MOVE_OVER_MONSTER_VEHICLE_TERRAIN_TEXT = (
+    "Each time this model makes a Normal or Advance move, it can move over friendly "
+    'Monster and Vehicle models and terrain features that are 4" or less in height '
+    "as if they were not there."
 )
 
 
@@ -623,6 +629,169 @@ def test_phase17c_first_death_return_full_health_unit_variant_is_semantic_ir() -
         CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID,
         CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
     )
+
+
+def test_phase17c_move_over_friendly_monsters_vehicles_and_terrain_compiles_to_semantic_ir() -> (
+    None
+):
+    rule_ir = _compiled(MOVE_OVER_MONSTER_VEHICLE_TERRAIN_TEXT).rule_ir
+    clause = rule_ir.clauses[0]
+    assert clause.trigger is not None
+    assert clause.target is not None
+
+    assert rule_ir.is_supported
+    assert len(rule_ir.clauses) == 1
+    assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "during",
+        "movement_modes": "advance|normal",
+        "phase": "movement",
+        "subject": "this_model",
+        "timing_window": "model_makes_move",
+    }
+    assert clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert tuple(effect.kind for effect in clause.effects) == (
+        RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION,
+    )
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "model_allegiance": "friendly",
+        "model_keyword_any": "MONSTER|VEHICLE",
+        "movement_modes": "advance|normal",
+        "permission": "move_over_as_if_not_there",
+        "terrain_height_max_inches": 4.0,
+        "terrain_scope": "terrain_features",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
+    )
+
+
+def test_phase17c_move_over_permission_supports_single_move_mode_and_decimal_height() -> None:
+    rule_ir = _compiled(
+        "Each time this model makes a Normal move, it can move over friendly "
+        'Vehicle and Monster models and terrain features that are 3.5" or less '
+        "in height as if they were not there."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    assert clause.trigger is not None
+
+    assert rule_ir.is_supported
+    assert parameter_payload(clause.trigger.parameters)["movement_modes"] == "normal"
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "model_allegiance": "friendly",
+        "model_keyword_any": "MONSTER|VEHICLE",
+        "movement_modes": "normal",
+        "permission": "move_over_as_if_not_there",
+        "terrain_height_max_inches": 3.5,
+        "terrain_scope": "terrain_features",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
+    )
+
+
+def test_phase17c_malformed_movement_transit_ir_fails_closed_for_catalog_consumers() -> None:
+    rule_ir = _compiled(MOVE_OVER_MONSTER_VEHICLE_TERRAIN_TEXT).rule_ir
+    clause = rule_ir.clauses[0]
+    trigger = clause.trigger
+    target = clause.target
+    effect = clause.effects[0]
+    assert trigger is not None
+    assert target is not None
+
+    malformed_clauses = (
+        replace(clause, target=None),
+        replace(clause, target=replace(target, kind=RuleTargetKind.THIS_UNIT)),
+        replace(clause, trigger=None),
+        replace(clause, trigger=_trigger_with_parameter(trigger, key="edge", value="after")),
+        replace(clause, trigger=_trigger_with_parameter(trigger, key="phase", value="shooting")),
+        replace(
+            clause,
+            trigger=_trigger_with_parameter(
+                trigger,
+                key="subject",
+                value="this_unit",
+            ),
+        ),
+        replace(
+            clause,
+            trigger=_trigger_with_parameter(
+                trigger,
+                key="timing_window",
+                value="unit_makes_move",
+            ),
+        ),
+        replace(
+            clause,
+            trigger=_trigger_with_parameter(
+                trigger,
+                key="movement_modes",
+                value="normal",
+            ),
+        ),
+        replace(clause, effects=()),
+        replace(clause, effects=(effect, effect)),
+        replace(
+            clause,
+            effects=(
+                replace(
+                    effect,
+                    parameters=_parameters_with_value(
+                        effect.parameters,
+                        key="permission",
+                        value="unsupported_permission",
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            clause,
+            effects=(
+                replace(
+                    effect,
+                    parameters=_parameters_with_value(
+                        effect.parameters,
+                        key="model_allegiance",
+                        value="enemy",
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            clause,
+            effects=(
+                replace(
+                    effect,
+                    parameters=_parameters_with_value(
+                        effect.parameters,
+                        key="terrain_scope",
+                        value="battlefield",
+                    ),
+                ),
+            ),
+        ),
+        replace(
+            clause,
+            effects=(
+                replace(
+                    effect,
+                    parameters=_parameters_with_value(
+                        effect.parameters,
+                        key="model_keyword_any",
+                        value="INFANTRY|VEHICLE",
+                    ),
+                ),
+            ),
+        ),
+    )
+
+    for malformed_clause in malformed_clauses:
+        malformed_rule_ir = replace(rule_ir, clauses=(malformed_clause,))
+        assert catalog_rule_ir_consumers_for_rule(malformed_rule_ir) == ()
+        assert catalog_rule_ir_hook_ids_for_rule(malformed_rule_ir) == ()
 
 
 def test_phase17c_malformed_tracked_target_ir_fails_closed_for_catalog_consumers() -> None:

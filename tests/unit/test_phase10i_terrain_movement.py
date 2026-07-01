@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from typing import cast
 
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
@@ -136,6 +137,53 @@ def test_low_wall_can_be_moved_over_as_if_not_there() -> None:
 
     assert result.is_valid
     assert result.segments[0].traversal_mode.value == "freely_traversable"
+
+
+def test_semantic_permission_moves_over_terrain_features_at_or_below_height_limit() -> None:
+    mover = _model("mover", 1.0, 1.0)
+    base_context = _normal_legality_context(keywords=("VEHICLE",))
+    context = replace(
+        base_context,
+        capabilities=replace(
+            base_context.capabilities,
+            can_move_over_friendly_vehicle_monster_models=True,
+            terrain_as_if_absent_height_inches=4.0,
+        ),
+    )
+    allowed_wall = ObstacleVolume(
+        terrain_id="allowed-wall",
+        bottom_center=Point3(3.0, 1.0, 0.0),
+        width=1.0,
+        depth=1.0,
+        height=4.0,
+    )
+    too_tall_wall = ObstacleVolume(
+        terrain_id="too-tall-wall",
+        bottom_center=Point3(3.0, 1.0, 0.0),
+        width=1.0,
+        depth=1.0,
+        height=4.1,
+    )
+
+    allowed_result = _terrain_context(
+        context,
+        moving_model=mover,
+        terrain=(allowed_wall,),
+        end_pose=Pose.at(5.0, 1.0),
+    ).validate()
+    too_tall_result = _terrain_context(
+        context,
+        moving_model=mover,
+        terrain=(too_tall_wall,),
+        end_pose=Pose.at(5.0, 1.0),
+    ).validate()
+
+    assert allowed_result.is_valid
+    assert allowed_result.segments[0].terrain_id == "allowed-wall"
+    assert allowed_result.segments[0].traversal_mode.value == "freely_traversable"
+    assert not too_tall_result.is_valid
+    assert too_tall_result.violations[0].violation_code == "terrain_feature_transit_forbidden"
+    assert too_tall_result.violations[0].terrain_id == "too-tall-wall"
 
 
 def test_model_can_climb_tall_terrain_by_paying_vertical_distance() -> None:

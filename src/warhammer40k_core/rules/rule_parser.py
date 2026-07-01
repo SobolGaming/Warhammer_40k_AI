@@ -137,6 +137,11 @@ _CHARGE_MOVE_END_RE = re.compile(
     r"a\s+charge\s+move\b",
     re.IGNORECASE,
 )
+_THIS_MODEL_NORMAL_OR_ADVANCE_MOVE_RE = re.compile(
+    r"\beach\s+time\s+this\s+model\s+makes\s+a\s+"
+    r"(?P<modes>Normal(?:\s+or\s+Advance)?|Advance(?:\s+or\s+Normal)?)\s+move\b",
+    re.IGNORECASE,
+)
 _ENEMY_UNIT_FALLS_BACK_NEAR_ABILITY_RE = re.compile(
     r"\beach\s+time\s+an?\s+enemy\s+unit"
     r"(?:\s+\(excluding\s+(?P<excluded_keywords>[^)]+)\))?\s+"
@@ -306,6 +311,15 @@ _TARGET_BATTLE_SHOCKED_RE = re.compile(
 _DESPERATE_ESCAPE_TESTS_RE = re.compile(
     r"\bmodels\s+in\s+(?:that\s+enemy|that|the\s+target|the\s+selected)\s+unit\s+"
     r"must\s+take\s+Desperate\s+Escape\s+tests\b",
+    re.IGNORECASE,
+)
+_MOVE_OVER_FRIENDLY_MONSTER_VEHICLE_AND_TERRAIN_RE = re.compile(
+    r"\bit\s+can\s+move\s+over\s+friendly\s+"
+    r"(?P<first_model_keyword>Monster|Vehicle)\s+and\s+"
+    r"(?P<second_model_keyword>Monster|Vehicle)\s+models\s+and\s+"
+    r"terrain\s+features\s+that\s+are\s+"
+    r"(?P<height>\d+(?:\.\d+)?)(?:\")?\s+or\s+less\s+in\s+height\s+"
+    r"as\s+if\s+they\s+were\s+not\s+there\b",
     re.IGNORECASE,
 )
 _WEAPON_KEYWORD_PATTERN = "|".join(
@@ -729,6 +743,7 @@ def _compile_clause(
             *_parse_restore_lost_wounds_effects(clause_text),
             *_parse_mortal_wound_effects(clause_text),
             *_parse_desperate_escape_effects(clause_text),
+            *_parse_movement_transit_permission_effects(clause_text),
         )
     )
     template_id = _template_id_for_clause(
@@ -954,6 +969,22 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                     ("phase", "charge"),
                     ("timing_window", "charge_move_end"),
                     ("subject", _lower_group(charge_move_end_match, "subject")),
+                )
+            ),
+        )
+    normal_or_advance_move_match = _THIS_MODEL_NORMAL_OR_ADVANCE_MOVE_RE.search(clause_text.text)
+    if normal_or_advance_move_match is not None:
+        movement_modes = _movement_modes_token(normal_or_advance_move_match.group("modes"))
+        return RuleTrigger(
+            kind=RuleTriggerKind.TIMING_WINDOW,
+            source_span=_span_from_match(clause_text, normal_or_advance_move_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("edge", "during"),
+                    ("phase", "movement"),
+                    ("timing_window", "model_makes_move"),
+                    ("subject", "this_model"),
+                    ("movement_modes", movement_modes),
                 )
             ),
         )
@@ -2103,6 +2134,40 @@ def _parse_desperate_escape_effects(clause_text: _ClauseText) -> tuple[RuleEffec
     return tuple(effects)
 
 
+def _parse_movement_transit_permission_effects(
+    clause_text: _ClauseText,
+) -> tuple[RuleEffectSpec, ...]:
+    effects: list[RuleEffectSpec] = []
+    trigger_match = _THIS_MODEL_NORMAL_OR_ADVANCE_MOVE_RE.search(clause_text.text)
+    if trigger_match is None:
+        return ()
+    movement_modes = _movement_modes_token(trigger_match.group("modes"))
+    for match in _MOVE_OVER_FRIENDLY_MONSTER_VEHICLE_AND_TERRAIN_RE.finditer(clause_text.text):
+        keywords = _model_keyword_any_token(
+            match.group("first_model_keyword"),
+            match.group("second_model_keyword"),
+        )
+        if keywords != "MONSTER|VEHICLE":
+            continue
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("permission", "move_over_as_if_not_there"),
+                        ("movement_modes", movement_modes),
+                        ("model_allegiance", "friendly"),
+                        ("model_keyword_any", keywords),
+                        ("terrain_scope", "terrain_features"),
+                        ("terrain_height_max_inches", float(match.group("height"))),
+                    )
+                ),
+            )
+        )
+    return tuple(effects)
+
+
 def _residual_diagnostic(
     *,
     clause_text: _ClauseText,
@@ -2517,6 +2582,28 @@ def _keyword_any_tokens(value: str) -> tuple[str, ...]:
     if not tokens:
         raise RuleIRError("Keyword any gate must contain at least one keyword.")
     return tuple(dict.fromkeys(tokens))
+
+
+def _model_keyword_any_token(first: str, second: str) -> str:
+    tokens = tuple(dict.fromkeys((_singular_keyword_token(first), _singular_keyword_token(second))))
+    if len(tokens) != 2:
+        raise RuleIRError("Model keyword-any token requires two distinct keywords.")
+    return "|".join(sorted(tokens))
+
+
+def _movement_modes_token(value: str) -> str:
+    tokens: list[str] = []
+    for raw_token in re.split(r"\s+or\s+|\s+and\s+|\s*,\s*", value.strip(), flags=re.IGNORECASE):
+        token = raw_token.strip()
+        if token:
+            tokens.append(token.lower().replace(" ", "_").replace("-", "_"))
+    if not tokens:
+        raise RuleIRError("Movement modes token must contain at least one mode.")
+    unique_tokens = tuple(dict.fromkeys(tokens))
+    allowed_tokens = {"advance", "normal"}
+    if not set(unique_tokens).issubset(allowed_tokens):
+        raise RuleIRError("Movement modes token contains unsupported movement modes.")
+    return "|".join(sorted(unique_tokens))
 
 
 def _keyword_list_tokens(value: str) -> tuple[str, ...]:

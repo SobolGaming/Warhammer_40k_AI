@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from typing import cast
 
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
@@ -107,6 +108,34 @@ def test_vehicle_cannot_transit_friendly_vehicle_or_monster_blocker() -> None:
     assert not result.is_valid
     assert result.violations[0].violation_code == "friendly_vehicle_monster_transit_forbidden"
     assert result.violations[0].blocker_id == "friendly-vehicle"
+
+
+def test_semantic_permission_allows_vehicle_to_move_over_friendly_vehicle_blocker() -> None:
+    mover = _model("mover", 1.0, 1.0, radius=0.7)
+    friendly_vehicle = _model("friendly-vehicle", 3.0, 1.0, radius=0.9)
+    base_context = _normal_legality_context(keywords=("VEHICLE",))
+    context = replace(
+        base_context,
+        capabilities=replace(
+            base_context.capabilities,
+            can_move_over_friendly_vehicle_monster_models=True,
+            terrain_as_if_absent_height_inches=4.0,
+        ),
+    )
+
+    path_context = _path_context(
+        context,
+        moving_model=mover,
+        friendly_models=(friendly_vehicle,),
+        friendly_vehicle_monster_model_ids=("friendly-vehicle",),
+        end_pose=Pose.at(5.0, 1.0),
+    )
+    result = path_context.validate()
+
+    assert context.capabilities.blocks_friendly_vehicle_monster_pass_through
+    assert context.capabilities.can_move_over_friendly_vehicle_monster_models
+    assert path_context.friendly_vehicle_monster_model_ids == ()
+    assert result.is_valid
 
 
 def test_fly_normal_move_can_transit_enemy_models_and_engagement_range() -> None:

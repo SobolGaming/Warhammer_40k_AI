@@ -182,6 +182,7 @@ class TerrainPathLegalityContextPayload(TypedDict):
     contact_footprint_available: bool
     can_traverse_ruins_walls: bool
     can_move_through_terrain: bool
+    terrain_as_if_absent_height_inches: float | None
     has_fly: bool
     sample_interval_inches: float
 
@@ -1035,6 +1036,7 @@ class TerrainPathLegalityContext:
     contact_footprint_available: bool = True
     can_traverse_ruins_walls: bool = False
     can_move_through_terrain: bool = False
+    terrain_as_if_absent_height_inches: float | None = None
     has_fly: bool = False
     sample_interval_inches: float = 0.5
 
@@ -1084,6 +1086,14 @@ class TerrainPathLegalityContext:
         _validate_bool(
             "TerrainPathLegalityContext can_move_through_terrain",
             self.can_move_through_terrain,
+        )
+        object.__setattr__(
+            self,
+            "terrain_as_if_absent_height_inches",
+            _validate_optional_non_negative_number(
+                "TerrainPathLegalityContext terrain_as_if_absent_height_inches",
+                self.terrain_as_if_absent_height_inches,
+            ),
         )
         _validate_bool("TerrainPathLegalityContext has_fly", self.has_fly)
         object.__setattr__(
@@ -1272,6 +1282,8 @@ class TerrainPathLegalityContext:
             and feature_policy.freely_moved_over_height_inches is not None
         ):
             free_height = feature_policy.freely_moved_over_height_inches
+        if self.terrain_as_if_absent_height_inches is not None:
+            free_height = max(free_height, self.terrain_as_if_absent_height_inches)
         if terrain.height <= free_height:
             return TerrainTraversalMode.FREELY_TRAVERSABLE
         if type(terrain) is ObstacleVolume:
@@ -1411,6 +1423,7 @@ class TerrainPathLegalityContext:
             "contact_footprint_available": self.contact_footprint_available,
             "can_traverse_ruins_walls": self.can_traverse_ruins_walls,
             "can_move_through_terrain": self.can_move_through_terrain,
+            "terrain_as_if_absent_height_inches": self.terrain_as_if_absent_height_inches,
             "has_fly": self.has_fly,
             "sample_interval_inches": self.sample_interval_inches,
         }
@@ -1432,6 +1445,7 @@ class TerrainPathLegalityContext:
             contact_footprint_available=payload["contact_footprint_available"],
             can_traverse_ruins_walls=payload["can_traverse_ruins_walls"],
             can_move_through_terrain=payload["can_move_through_terrain"],
+            terrain_as_if_absent_height_inches=payload["terrain_as_if_absent_height_inches"],
             has_fly=payload["has_fly"],
             sample_interval_inches=payload["sample_interval_inches"],
         )

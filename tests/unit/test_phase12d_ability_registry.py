@@ -55,6 +55,10 @@ from warhammer40k_core.engine.ability_catalog import (
 )
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    CatalogMovementTransitPermission,
+    catalog_movement_transit_permissions_for_model,
+)
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -68,6 +72,8 @@ from warhammer40k_core.engine.movement_legality import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_abilities as source_data,
 )
@@ -460,6 +466,201 @@ def test_keyword_gated_movement_capabilities_are_dispatched_from_ability_index()
     assert len(registry_results) == 1
     assert registry_results[0].status is AbilityResolutionStatus.APPLIED
     assert registry_results[0].source_id.endswith(":keyword-vehicle")
+
+
+def test_generic_rule_ir_movement_transit_permissions_are_consumed_by_model_context() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    army = muster_army(
+        catalog=catalog,
+        request=_muster_request(
+            catalog,
+            unit_selections=(
+                _unit_selection(
+                    unit_selection_id="transport-1",
+                    datasheet_id="core-transport",
+                    model_profile_id="core-transport",
+                    model_count=1,
+                ),
+            ),
+        ),
+    )
+    unit = army.units[0]
+    model_instance_id = unit.own_models[0].model_instance_id
+    current_model_instance_ids = unit.own_model_ids()
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="phase12d:test:move-over-friendly-monster-vehicle-terrain",
+            raw_text=(
+                "Each time this model makes a Normal or Advance move, it can move over "
+                'friendly Monster and Vehicle models and terrain features that are 4" '
+                "or less in height as if they were not there."
+            ),
+        )
+    ).rule_ir
+    matching_record = _ability_record(
+        "semantic-move-over",
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+        handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id=unit.datasheet_id,
+        replay_payload=cast(JsonValue, {"rule_ir": rule_ir.to_payload()}),
+    )
+    mismatched_record = _ability_record(
+        "semantic-move-over-mismatch",
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+        handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id="core-intercessor-like-infantry",
+        replay_payload=cast(JsonValue, {"rule_ir": rule_ir.to_payload()}),
+    )
+    matching_index = AbilityCatalogIndex.from_records(
+        (*eleventh_edition_ability_catalog_records(), matching_record)
+    )
+    mismatched_index = AbilityCatalogIndex.from_records(
+        (*eleventh_edition_ability_catalog_records(), mismatched_record)
+    )
+    direct_permissions = catalog_movement_transit_permissions_for_model(
+        ability_index=matching_index,
+        unit=unit,
+        model_instance_id=model_instance_id,
+        current_model_instance_ids=current_model_instance_ids,
+        movement_mode=MovementMode.NORMAL.value,
+    )
+
+    normal_context = MovementLegalityContext.from_keywords(
+        keywords=unit.keywords,
+        ruleset_descriptor=descriptor,
+        movement_mode=MovementMode.NORMAL,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+        ability_index=matching_index,
+        unit=unit,
+        model_instance_id=model_instance_id,
+        current_model_instance_ids=current_model_instance_ids,
+    )
+    advance_context = MovementLegalityContext.from_keywords(
+        keywords=unit.keywords,
+        ruleset_descriptor=descriptor,
+        movement_mode=MovementMode.ADVANCE,
+        movement_phase_action=MovementPhaseActionKind.ADVANCE,
+        displacement_kind=ModelDisplacementKind.ADVANCE,
+        ability_index=matching_index,
+        unit=unit,
+        model_instance_id=model_instance_id,
+        current_model_instance_ids=current_model_instance_ids,
+    )
+    fall_back_context = MovementLegalityContext.from_keywords(
+        keywords=unit.keywords,
+        ruleset_descriptor=descriptor,
+        movement_mode=MovementMode.FALL_BACK,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        displacement_kind=ModelDisplacementKind.FALL_BACK,
+        ability_index=matching_index,
+        unit=unit,
+        model_instance_id=model_instance_id,
+        current_model_instance_ids=current_model_instance_ids,
+    )
+    missing_model_context = MovementLegalityContext.from_keywords(
+        keywords=unit.keywords,
+        ruleset_descriptor=descriptor,
+        movement_mode=MovementMode.NORMAL,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+        ability_index=matching_index,
+        unit=unit,
+        model_instance_id=None,
+        current_model_instance_ids=current_model_instance_ids,
+    )
+    missing_evidence_context = MovementLegalityContext.from_keywords(
+        keywords=unit.keywords,
+        ruleset_descriptor=descriptor,
+        movement_mode=MovementMode.NORMAL,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+        ability_index=matching_index,
+        unit=unit,
+        model_instance_id=model_instance_id,
+        current_model_instance_ids=(),
+    )
+    mismatched_context = MovementLegalityContext.from_keywords(
+        keywords=unit.keywords,
+        ruleset_descriptor=descriptor,
+        movement_mode=MovementMode.NORMAL,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+        ability_index=mismatched_index,
+        unit=unit,
+        model_instance_id=model_instance_id,
+        current_model_instance_ids=current_model_instance_ids,
+    )
+
+    assert normal_context.capabilities.is_vehicle
+    assert normal_context.capabilities.blocks_friendly_vehicle_monster_pass_through
+    assert normal_context.capabilities.can_move_over_friendly_vehicle_monster_models
+    assert normal_context.capabilities.terrain_as_if_absent_height_inches == 4.0
+    assert advance_context.capabilities.can_move_over_friendly_vehicle_monster_models
+    assert advance_context.capabilities.terrain_as_if_absent_height_inches == 4.0
+    assert not fall_back_context.capabilities.can_move_over_friendly_vehicle_monster_models
+    assert fall_back_context.capabilities.terrain_as_if_absent_height_inches is None
+    assert mismatched_context.capabilities.is_vehicle
+    assert not mismatched_context.capabilities.can_move_over_friendly_vehicle_monster_models
+    assert mismatched_context.capabilities.terrain_as_if_absent_height_inches is None
+    assert not missing_model_context.capabilities.can_move_over_friendly_vehicle_monster_models
+    assert missing_model_context.capabilities.terrain_as_if_absent_height_inches is None
+    assert not missing_evidence_context.capabilities.can_move_over_friendly_vehicle_monster_models
+    assert missing_evidence_context.capabilities.terrain_as_if_absent_height_inches is None
+    assert len(direct_permissions) == 1
+    assert direct_permissions[0].ability_id == "semantic-move-over"
+    assert direct_permissions[0].movement_modes == ("advance", "normal")
+    assert direct_permissions[0].model_keyword_any == ("MONSTER", "VEHICLE")
+    assert direct_permissions[0].terrain_height_max_inches == 4.0
+    with pytest.raises(GameLifecycleError, match="current evidence"):
+        catalog_movement_transit_permissions_for_model(
+            ability_index=matching_index,
+            unit=unit,
+            model_instance_id="missing-model",
+            current_model_instance_ids=current_model_instance_ids,
+            movement_mode=MovementMode.NORMAL.value,
+        )
+    with pytest.raises(GameLifecycleError, match="unsupported"):
+        catalog_movement_transit_permissions_for_model(
+            ability_index=matching_index,
+            unit=unit,
+            model_instance_id=model_instance_id,
+            current_model_instance_ids=current_model_instance_ids,
+            movement_mode=MovementMode.FALL_BACK.value,
+        )
+    with pytest.raises(GameLifecycleError, match="must not duplicate values"):
+        CatalogMovementTransitPermission(
+            record_id="record",
+            ability_id="ability",
+            source_rule_id="source",
+            clause_id="clause",
+            movement_modes=("normal", "normal"),
+            model_keyword_any=("MONSTER", "VEHICLE"),
+            terrain_height_max_inches=4.0,
+        )
+    with pytest.raises(GameLifecycleError, match="must not be empty"):
+        CatalogMovementTransitPermission(
+            record_id="record",
+            ability_id="ability",
+            source_rule_id="source",
+            clause_id="clause",
+            movement_modes=(),
+            model_keyword_any=("MONSTER", "VEHICLE"),
+            terrain_height_max_inches=4.0,
+        )
+    with pytest.raises(GameLifecycleError, match="finite and non-negative"):
+        CatalogMovementTransitPermission(
+            record_id="record",
+            ability_id="ability",
+            source_rule_id="source",
+            clause_id="clause",
+            movement_modes=("normal",),
+            model_keyword_any=("MONSTER", "VEHICLE"),
+            terrain_height_max_inches=-1.0,
+        )
 
 
 def test_player_ability_index_filters_selected_sources() -> None:
