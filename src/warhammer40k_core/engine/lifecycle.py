@@ -28,6 +28,10 @@ from warhammer40k_core.engine.battle_round_hooks import (
     SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE,
+    invalid_catalog_post_shoot_hit_target_status_status,
+)
 from warhammer40k_core.engine.charge_declaration_hooks import (
     SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
 )
@@ -308,6 +312,7 @@ _SHOOTING_DECISION_TYPES = frozenset(
     (
         SELECT_SHOOTING_UNIT_DECISION_TYPE,
         SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
+        SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE,
         SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
         SELECT_SHOOTING_TYPE_DECISION_TYPE,
         SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
@@ -976,6 +981,19 @@ class GameLifecycle:
             == SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE
         ):
             invalid_status = invalid_shooting_phase_start_faction_rule_status(
+                state=state,
+                request=pending_request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type
+            == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE
+        ):
+            invalid_status = invalid_catalog_post_shoot_hit_target_status_status(
                 state=state,
                 request=pending_request,
                 result=result,

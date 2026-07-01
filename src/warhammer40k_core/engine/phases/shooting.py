@@ -30,7 +30,6 @@ from warhammer40k_core.engine.attack_sequence import (
     SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
     AttackSequence,
     AttackSequencePayload,
-    AttackSequenceStep,
     apply_allocation_order_decision,
     apply_attack_weapon_group_decision,
     apply_damage_allocation_model_decision,
@@ -54,12 +53,17 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
     AttackSequenceCompletedHookRegistry,
     attack_sequence_completed_event_id,
+    successful_hit_target_unit_ids_for_sequence,
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     PlacementError,
     UnitPlacement,
     geometry_model_for_placement,
+)
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE,
+    apply_catalog_post_shoot_hit_target_status_result,
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
@@ -1562,6 +1566,12 @@ class ShootingPhaseHandler:
             if phase_start_result:
                 return None
             raise GameLifecycleError("Shooting phase start faction rule result was not handled.")
+        if result.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE:
+            return apply_catalog_post_shoot_hit_target_status_result(
+                state=state,
+                decisions=decisions,
+                result=result,
+            )
         if result.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE:
             return _apply_shooting_unit_selection_decision(
                 state=state,
@@ -2442,29 +2452,10 @@ def _successful_hit_target_unit_ids_for_sequence(
     decisions: DecisionController,
     sequence: AttackSequence,
 ) -> tuple[str, ...]:
-    target_ids: set[str] = set()
-    for record in decisions.event_log.records:
-        if record.event_type != "attack_sequence_step":
-            continue
-        payload = record.payload
-        if not isinstance(payload, dict):
-            continue
-        if payload.get("sequence_id") != sequence.sequence_id:
-            continue
-        if payload.get("step") != AttackSequenceStep.HIT.value:
-            continue
-        step_payload = payload.get("payload")
-        if not isinstance(step_payload, dict):
-            raise GameLifecycleError("Attack sequence hit payload must be an object.")
-        if step_payload.get("successful") is not True:
-            continue
-        pool_index = payload.get("pool_index")
-        if type(pool_index) is not int:
-            raise GameLifecycleError("Attack sequence hit event pool_index must be an int.")
-        if pool_index < 0 or pool_index >= len(sequence.attack_pools):
-            raise GameLifecycleError("Attack sequence hit event pool_index is out of range.")
-        target_ids.add(sequence.attack_pools[pool_index].target_unit_instance_id)
-    return tuple(sorted(target_ids))
+    return successful_hit_target_unit_ids_for_sequence(
+        decisions=decisions,
+        sequence=sequence,
+    )
 
 
 def _destroyed_target_unit_ids_for_sequence(

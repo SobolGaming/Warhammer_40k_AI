@@ -51,6 +51,11 @@ def unit_effects_grant_benefit_of_cover(effects: tuple[PersistingEffect, ...]) -
     )
 
 
+def unit_effects_deny_benefit_of_cover(effects: tuple[PersistingEffect, ...]) -> bool:
+    _validate_effect_tuple(effects)
+    return any(effect_payload_bool(effect, "benefit_of_cover_denied") for effect in effects)
+
+
 def unit_effect_hit_roll_modifier(effects: tuple[PersistingEffect, ...]) -> int:
     _validate_effect_tuple(effects)
     modifier = 0

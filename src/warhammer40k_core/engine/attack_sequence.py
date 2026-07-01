@@ -54,6 +54,7 @@ from warhammer40k_core.engine.core_stratagem_effects import (
     GO_TO_GROUND_EFFECT_KIND,
     unit_effect_hit_roll_modifier,
     unit_effect_invulnerable_save,
+    unit_effects_deny_benefit_of_cover,
     unit_effects_grant_benefit_of_cover,
 )
 from warhammer40k_core.engine.damage_allocation import (
@@ -5507,7 +5508,13 @@ def _save_options_for_allocation(
         pool=pool,
         allocated_model_id=allocated_model_id,
     )
-    if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.IGNORES_COVER):
+    if has_weapon_keyword(
+        pool.weapon_profile,
+        WeaponKeyword.IGNORES_COVER,
+    ) or _target_has_effect_cover_denial(
+        state=state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+    ):
         cover_result = None
     elif _target_has_effect_cover(
         state=state,
@@ -8640,12 +8647,23 @@ def _target_has_effect_cover(*, state: GameState, target_unit_instance_id: str) 
     )
 
 
+def _target_has_effect_cover_denial(*, state: GameState, target_unit_instance_id: str) -> bool:
+    return unit_effects_deny_benefit_of_cover(
+        state.persisting_effects_for_unit(target_unit_instance_id)
+    )
+
+
 def _benefit_of_cover_ballistic_skill_penalty(
     *,
     state: GameState,
     pool: RangedAttackPool,
 ) -> int:
     if has_weapon_keyword(pool.weapon_profile, WeaponKeyword.IGNORES_COVER):
+        return 0
+    if _target_has_effect_cover_denial(
+        state=state,
+        target_unit_instance_id=pool.target_unit_instance_id,
+    ):
         return 0
     if BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids:
         return 1

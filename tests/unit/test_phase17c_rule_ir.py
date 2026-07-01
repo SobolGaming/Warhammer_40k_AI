@@ -44,6 +44,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+    CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
     CATALOG_IR_TRACKED_TARGET_DESTROYED_RESELECT_CONSUMER_ID,
     CATALOG_IR_TRACKED_TARGET_REROLL_CONSUMER_ID,
     CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
@@ -1700,6 +1701,77 @@ def test_phase17c_lord_of_change_named_weapon_choice_compiles_to_semantic_ir() -
         ).overall_ability_support
         is AbilityOverallSupport.FULL
     )
+
+
+def test_phase17c_post_shoot_hit_target_cover_denial_compiles_to_semantic_ir() -> None:
+    rule_ir = _compiled(
+        "In your Shooting phase, after this model has shot, select one enemy unit hit by "
+        "one or more of those attacks. Until the end of the phase, that unit cannot have "
+        "the Benefit of Cover."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    effect = clause.effects[0]
+
+    assert rule_ir.is_supported
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    assert len(rule_ir.clauses) == 1
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "after",
+        "owner": "active_player",
+        "phase": "shooting",
+        "subject": "this_model",
+        "target_relationship": "hit_by_those_attacks",
+        "timing_window": "just_after_friendly_unit_has_shot",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.ENEMY_UNIT
+    assert clause.duration is not None
+    assert clause.duration.kind is RuleDurationKind.UNTIL_TIMING_ENDPOINT
+    assert parameter_payload(clause.duration.parameters) == {"endpoint": "phase"}
+    assert effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS
+    assert parameter_payload(effect.parameters) == {
+        "operation": "deny",
+        "rules_context": "status_denial",
+        "status": "benefit_of_cover",
+        "status_label": "Benefit of Cover",
+        "target_scope": "selected_unit",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
+    )
+    assert (
+        ability_support_rollup_for_rule_ir(
+            source_ability_id="source:cover-denial",
+            ability_name="Cover Denial",
+            rule_ir=rule_ir,
+        ).overall_ability_support
+        is AbilityOverallSupport.FULL
+    )
+
+
+def test_phase17c_contextual_status_denial_is_not_cover_specific() -> None:
+    rule_ir = _compiled(
+        "In your Shooting phase, after this model has shot, select one enemy unit hit by "
+        "one or more of those attacks. Until the end of the phase, that unit cannot have "
+        "Objective Secured."
+    ).rule_ir
+    effect = rule_ir.clauses[0].effects[0]
+
+    assert rule_ir.is_supported
+    assert parameter_payload(effect.parameters) == {
+        "operation": "deny",
+        "rules_context": "status_denial",
+        "status": "objective_secured",
+        "status_label": "Objective Secured",
+        "target_scope": "selected_unit",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == ()
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == ()
 
 
 def test_phase17c_named_weapon_choice_generalizes_to_multiple_weapon_names() -> None:

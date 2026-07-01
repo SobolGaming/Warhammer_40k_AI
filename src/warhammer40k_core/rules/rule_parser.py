@@ -144,6 +144,14 @@ _ENEMY_UNIT_FALLS_BACK_NEAR_ABILITY_RE = re.compile(
     r"with\s+this\s+ability\s+Falls\s+Back\b",
     re.IGNORECASE,
 )
+_POST_SHOOT_HIT_TARGET_SELECTION_RE = re.compile(
+    r"\b(?:(?:in|during)\s+your\s+Shooting\s+phase,\s*)?"
+    r"(?:(?:after|each\s+time)\s+)?"
+    r"(?P<subject>this\s+model|this\s+unit|the\s+bearer|bearer)\s+has\s+shot,\s+"
+    r"select\s+one\s+enemy\s+unit\s+(?:that\s+was\s+)?hit\s+by\s+one\s+or\s+more\s+of\s+"
+    r"those\s+attacks\b",
+    re.IGNORECASE,
+)
 _WHEN_DOING_SO_RE = re.compile(r"\bwhen\s+doing\s+so\b", re.IGNORECASE)
 _SETUP_RE = re.compile(r"\b(?:deployment|before\s+the\s+battle|set\s+up)\b", re.IGNORECASE)
 _DICE_TRIGGER_RE = re.compile(
@@ -279,6 +287,15 @@ _FEEL_NO_PAIN_ABILITY_RE = re.compile(
 _SHADOW_OF_CHAOS_STATUS_RE = re.compile(
     r"\b(?:that|selected|target)\s+unit\s+is\s+within\s+your\s+"
     r"army's\s+Shadow\s+of\s+Chaos\b",
+    re.IGNORECASE,
+)
+_CONTEXTUAL_STATUS_DENIAL_RE = re.compile(
+    r"\b(?P<subject>"
+    r"that\s+enemy\s+unit|that\s+unit|selected\s+unit|target\s+unit|"
+    r"models\s+in\s+that\s+enemy\s+unit|models\s+in\s+that\s+unit|"
+    r"models\s+in\s+the\s+selected\s+unit|models\s+in\s+the\s+target\s+unit"
+    r")\s+cannot\s+have\s+(?:the\s+)?"
+    r"(?P<status>[A-Z][A-Za-z0-9 +'_-]+?)(?=\s*(?:\.|,|;|$))",
     re.IGNORECASE,
 )
 _TARGET_BATTLE_SHOCKED_RE = re.compile(
@@ -539,6 +556,7 @@ def _split_clause_text(normalized_text: str) -> tuple[_ClauseText, ...]:
         for split_clause in _split_repeated_trigger_anchors(coarse_clause)
     ]
     clauses = list(_merge_ability_choice_application_clauses(normalized_text, tuple(clauses)))
+    clauses = list(_merge_post_shoot_hit_target_status_clauses(normalized_text, tuple(clauses)))
     if not clauses:
         full_span = TextSpan(text=normalized_text, start=0, end=len(normalized_text))
         return (_ClauseText(span=full_span),)
@@ -567,6 +585,36 @@ def _merge_ability_choice_application_clauses(
             index + 1 < len(clauses)
             and _ABILITY_CHOICE_PREFIX_RE.search(current.text) is not None
             and _THAT_ABILITY_APPLICATION_RE.search(clauses[index + 1].text) is not None
+        ):
+            next_clause = clauses[index + 1]
+            merged.append(
+                _ClauseText(
+                    span=TextSpan(
+                        text=normalized_text[current.span.start : next_clause.span.end],
+                        start=current.span.start,
+                        end=next_clause.span.end,
+                    )
+                )
+            )
+            index += 2
+            continue
+        merged.append(current)
+        index += 1
+    return tuple(merged)
+
+
+def _merge_post_shoot_hit_target_status_clauses(
+    normalized_text: str,
+    clauses: tuple[_ClauseText, ...],
+) -> tuple[_ClauseText, ...]:
+    merged: list[_ClauseText] = []
+    index = 0
+    while index < len(clauses):
+        current = clauses[index]
+        if (
+            index + 1 < len(clauses)
+            and _POST_SHOOT_HIT_TARGET_SELECTION_RE.search(current.text) is not None
+            and _CONTEXTUAL_STATUS_DENIAL_RE.search(clauses[index + 1].text) is not None
         ):
             next_clause = clauses[index + 1]
             merged.append(
@@ -790,6 +838,22 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                     ("event_order", "first"),
                     ("resolution_timing", "phase_end"),
                     ("timing_window", "phase_end_after_destroyed"),
+                )
+            ),
+        )
+    post_shoot_match = _POST_SHOOT_HIT_TARGET_SELECTION_RE.search(clause_text.text)
+    if post_shoot_match is not None:
+        return RuleTrigger(
+            kind=RuleTriggerKind.TIMING_WINDOW,
+            source_span=_span_from_match(clause_text, post_shoot_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("edge", "after"),
+                    ("owner", "active_player"),
+                    ("phase", "shooting"),
+                    ("subject", _post_shoot_subject_token(post_shoot_match.group("subject"))),
+                    ("timing_window", "just_after_friendly_unit_has_shot"),
+                    ("target_relationship", "hit_by_those_attacks"),
                 )
             ),
         )
@@ -1745,6 +1809,29 @@ def _parse_contextual_status_effects(clause_text: _ClauseText) -> tuple[RuleEffe
                 ),
             )
         )
+    for match in _CONTEXTUAL_STATUS_DENIAL_RE.finditer(clause_text.text):
+        if _span_matches_existing_effect(
+            clause_text=clause_text,
+            match=match,
+            effects=tuple(effects),
+        ):
+            continue
+        status_label = _ability_token(match.group("status"))
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.SET_CONTEXTUAL_STATUS,
+                source_span=_span_from_match(clause_text, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("status", _catalog_like_token(status_label)),
+                        ("status_label", status_label),
+                        ("operation", "deny"),
+                        ("target_scope", _contextual_status_target_scope_token(match)),
+                        ("rules_context", "status_denial"),
+                    )
+                ),
+            )
+        )
     return tuple(effects)
 
 
@@ -2305,6 +2392,22 @@ def _roll_type(value: str) -> str:
 
 def _subject_token(value: str) -> str:
     return value.lower().replace(" ", "_").replace("-", "_")
+
+
+def _post_shoot_subject_token(value: str) -> str:
+    token = _subject_token(value.removeprefix("the "))
+    if token in {"bearer", "this_model", "this_unit"}:
+        return token
+    raise RuleIRError(f"Unsupported post-shoot subject in rule language: {value}.")
+
+
+def _contextual_status_target_scope_token(match: re.Match[str]) -> str:
+    subject = _subject_token(match.group("subject").removeprefix("the "))
+    if subject.startswith("models_in_"):
+        return "models_in_selected_unit"
+    if subject in {"that_enemy_unit", "that_unit", "selected_unit", "target_unit"}:
+        return "selected_unit"
+    raise RuleIRError(f"Unsupported contextual status target in rule language: {subject}.")
 
 
 def _range_kind_token(value: str) -> str:
