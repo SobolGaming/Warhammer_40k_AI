@@ -15,6 +15,7 @@ from warhammer40k_core.engine.battlefield_state import (
     battlefield_placement_kind_from_token,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveState
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -249,21 +250,16 @@ class ReserveArrivalDistanceHookRegistry:
 def _validate_hook_bindings(
     value: object,
 ) -> tuple[ReserveArrivalDistanceHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("ReserveArrivalDistanceHookRegistry bindings must be a tuple.")
-    bindings: list[ReserveArrivalDistanceHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not ReserveArrivalDistanceHookBinding:
-            raise GameLifecycleError(
-                "ReserveArrivalDistanceHookRegistry bindings must contain "
-                "ReserveArrivalDistanceHookBinding values."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("ReserveArrivalDistanceHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.RESERVE_ARRIVAL_DISTANCE,
+        binding_type=ReserveArrivalDistanceHookBinding,
+        registry_name="ReserveArrivalDistanceHookRegistry",
+        invalid_binding_message=(
+            "ReserveArrivalDistanceHookRegistry bindings must contain "
+            "ReserveArrivalDistanceHookBinding values."
+        ),
+    )
 
 
 def _validate_tuple[T](

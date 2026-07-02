@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.shooting_types import ShootingType, shooting_type_from_token
 
@@ -275,41 +276,29 @@ def _validate_restriction_for_binding(
 def _validate_shooting_target_restriction_bindings(
     value: object,
 ) -> tuple[ShootingTargetRestrictionHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("ShootingTargetRestrictionHookRegistry bindings must be a tuple.")
-    bindings: list[ShootingTargetRestrictionHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not ShootingTargetRestrictionHookBinding:
-            raise GameLifecycleError(
-                "ShootingTargetRestrictionHookRegistry bindings contain invalid values."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError(
-                "ShootingTargetRestrictionHookRegistry hook IDs must be unique."
-            )
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.SHOOTING_TARGET_RESTRICTION,
+        binding_type=ShootingTargetRestrictionHookBinding,
+        registry_name="ShootingTargetRestrictionHookRegistry",
+        invalid_binding_message=(
+            "ShootingTargetRestrictionHookRegistry bindings contain invalid values."
+        ),
+    )
 
 
 def _validate_charge_target_restriction_bindings(
     value: object,
 ) -> tuple[ChargeTargetRestrictionHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("ChargeTargetRestrictionHookRegistry bindings must be a tuple.")
-    bindings: list[ChargeTargetRestrictionHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not ChargeTargetRestrictionHookBinding:
-            raise GameLifecycleError(
-                "ChargeTargetRestrictionHookRegistry bindings contain invalid values."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("ChargeTargetRestrictionHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.CHARGE_TARGET_RESTRICTION,
+        binding_type=ChargeTargetRestrictionHookBinding,
+        registry_name="ChargeTargetRestrictionHookRegistry",
+        invalid_binding_message=(
+            "ChargeTargetRestrictionHookRegistry bindings contain invalid values."
+        ),
+    )
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, cast
+from typing import TYPE_CHECKING, Self
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 
 if TYPE_CHECKING:
@@ -154,20 +155,15 @@ class BattleRoundStartHookRegistry:
 
 
 def _validate_hook_bindings(value: object) -> tuple[BattleRoundStartHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("BattleRoundStartHookRegistry bindings must be a tuple.")
-    bindings: list[BattleRoundStartHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not BattleRoundStartHookBinding:
-            raise GameLifecycleError(
-                "BattleRoundStartHookRegistry bindings must contain BattleRoundStartHookBinding."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("BattleRoundStartHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.BATTLE_ROUND_START,
+        binding_type=BattleRoundStartHookBinding,
+        registry_name="BattleRoundStartHookRegistry",
+        invalid_binding_message=(
+            "BattleRoundStartHookRegistry bindings must contain BattleRoundStartHookBinding."
+        ),
+    )
 
 
 def _validate_start_battle_round(state: GameState) -> None:

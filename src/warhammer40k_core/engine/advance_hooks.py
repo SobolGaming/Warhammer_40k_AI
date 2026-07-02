@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 if TYPE_CHECKING:
@@ -208,20 +209,15 @@ class AdvanceMoveHookRegistry:
 
 
 def _validate_hook_bindings(value: object) -> tuple[AdvanceMoveHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("AdvanceMoveHookRegistry bindings must be a tuple.")
-    bindings: list[AdvanceMoveHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not AdvanceMoveHookBinding:
-            raise GameLifecycleError(
-                "AdvanceMoveHookRegistry bindings must contain AdvanceMoveHookBinding values."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("AdvanceMoveHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.ADVANCE_MOVE,
+        binding_type=AdvanceMoveHookBinding,
+        registry_name="AdvanceMoveHookRegistry",
+        invalid_binding_message=(
+            "AdvanceMoveHookRegistry bindings must contain AdvanceMoveHookBinding values."
+        ),
+    )
 
 
 def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:

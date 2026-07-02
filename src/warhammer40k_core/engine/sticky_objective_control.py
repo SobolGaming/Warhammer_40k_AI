@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
     ObjectiveControlResult,
@@ -335,22 +336,15 @@ def _scored_opponent_ids(
 def _validate_hook_bindings(
     value: object,
 ) -> tuple[PhaseEndObjectiveControlHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("PhaseEndObjectiveControlHookRegistry bindings must be a tuple.")
-    bindings: list[PhaseEndObjectiveControlHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not PhaseEndObjectiveControlHookBinding:
-            raise GameLifecycleError(
-                "PhaseEndObjectiveControlHookRegistry bindings must contain hook bindings."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError(
-                "PhaseEndObjectiveControlHookRegistry hook IDs must be unique."
-            )
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.PHASE_END_OBJECTIVE_CONTROL,
+        binding_type=PhaseEndObjectiveControlHookBinding,
+        registry_name="PhaseEndObjectiveControlHookRegistry",
+        invalid_binding_message=(
+            "PhaseEndObjectiveControlHookRegistry bindings must contain hook bindings."
+        ),
+    )
 
 
 def _validate_sticky_states(

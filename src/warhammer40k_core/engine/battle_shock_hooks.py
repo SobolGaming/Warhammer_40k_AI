@@ -15,6 +15,7 @@ from warhammer40k_core.engine.battle_shock import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 if TYPE_CHECKING:
@@ -312,20 +313,15 @@ class BattleShockHookRegistry:
 
 
 def _validate_hook_bindings(value: object) -> tuple[BattleShockHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("BattleShockHookRegistry bindings must be a tuple.")
-    bindings: list[BattleShockHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not BattleShockHookBinding:
-            raise GameLifecycleError(
-                "BattleShockHookRegistry bindings must contain BattleShockHookBinding values."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("BattleShockHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.BATTLE_SHOCK,
+        binding_type=BattleShockHookBinding,
+        registry_name="BattleShockHookRegistry",
+        invalid_binding_message=(
+            "BattleShockHookRegistry bindings must contain BattleShockHookBinding values."
+        ),
+    )
 
 
 def _validate_roll_modifier_tuple(value: object) -> tuple[RollModifier, ...]:

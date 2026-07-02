@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, cast
+from typing import TYPE_CHECKING, Self
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 
 if TYPE_CHECKING:
@@ -142,18 +143,13 @@ class TurnEndHookRegistry:
 
 
 def _validate_hook_bindings(value: object) -> tuple[TurnEndHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("TurnEndHookRegistry bindings must be a tuple.")
-    bindings: list[TurnEndHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not TurnEndHookBinding:
-            raise GameLifecycleError("TurnEndHookRegistry requires hook bindings.")
-        if binding.hook_id in seen:
-            raise GameLifecycleError("TurnEndHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.TURN_END,
+        binding_type=TurnEndHookBinding,
+        registry_name="TurnEndHookRegistry",
+        invalid_binding_message="TurnEndHookRegistry requires hook bindings.",
+    )
 
 
 def _validate_turn_end_context(state: GameState, completed_phase: BattlePhase) -> None:

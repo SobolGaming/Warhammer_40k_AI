@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, cast
+from typing import TYPE_CHECKING, Self
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, SetupStep
 
 if TYPE_CHECKING:
@@ -158,20 +159,15 @@ class BattleFormationHookRegistry:
 
 
 def _validate_hook_bindings(value: object) -> tuple[BattleFormationHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("BattleFormationHookRegistry bindings must be a tuple.")
-    bindings: list[BattleFormationHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not BattleFormationHookBinding:
-            raise GameLifecycleError(
-                "BattleFormationHookRegistry bindings must contain BattleFormationHookBinding."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("BattleFormationHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.BATTLE_FORMATION,
+        binding_type=BattleFormationHookBinding,
+        registry_name="BattleFormationHookRegistry",
+        invalid_binding_message=(
+            "BattleFormationHookRegistry bindings must contain BattleFormationHookBinding."
+        ),
+    )
 
 
 def _validate_declare_battle_formations_step(state: GameState) -> None:
