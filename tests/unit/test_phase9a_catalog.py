@@ -20,6 +20,9 @@ from warhammer40k_core.core.datasheet import (
     BaseSizeKind,
     CatalogAbilitySupport,
     DatasheetCatalogError,
+    DatasheetKeywordSet,
+    DatasheetMusteringOptionEffect,
+    DatasheetMusteringOptionEffectKind,
     DatasheetWargearOption,
 )
 from warhammer40k_core.core.detachment import (
@@ -29,6 +32,7 @@ from warhammer40k_core.core.detachment import (
     EnhancementSubtype,
     StratagemDefinition,
 )
+from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset import RulesetId
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
@@ -165,7 +169,7 @@ def test_army_catalog_round_trips_canonical_phase9a_content_pack() -> None:
     infantry_profile = infantry.model_profile_by_id("core-intercessor-like")
 
     assert len(catalog.datasheets) == 7
-    assert catalog.faction_by_id("core-marine-force").faction_keywords == ("CORE Marines",)
+    assert catalog.faction_by_id("core-marine-force").faction_keywords == ("CORE MARINES",)
     assert catalog.detachments[0].detachment_point_cost == 1
     assert catalog.detachments[0].force_disposition_ids == ("purge-the-foe",)
     assert "core-intercessor-like-infantry" in catalog.detachments[0].unit_datasheet_ids
@@ -185,6 +189,39 @@ def test_army_catalog_round_trips_canonical_phase9a_content_pack() -> None:
     assert "<" not in blob
     assert "object at 0x" not in blob
     assert ArmyCatalog.from_payload(payload).to_payload() == catalog.to_payload()
+
+
+def test_catalog_keyword_tokens_are_canonicalized_at_data_boundary() -> None:
+    keywords = DatasheetKeywordSet(
+        keywords=("Infantry", "Battleline"),
+        faction_keywords=("Astra Militarum",),
+    )
+    faction = FactionDefinition(
+        faction_id="astra-militarum",
+        name="Astra Militarum",
+        faction_keywords=("Astra Militarum",),
+    )
+    enhancement = EnhancementDefinition(
+        enhancement_id="test-enhancement",
+        name="Test Enhancement",
+        source_id="phase9a:test-enhancement",
+        target_required_keywords=("Character",),
+        target_required_faction_keywords=("Adeptus Astartes",),
+    )
+    mustering_keyword_effect = DatasheetMusteringOptionEffect(
+        kind=DatasheetMusteringOptionEffectKind.ADD_KEYWORD,
+        keyword="Jump Pack",
+    )
+
+    assert keywords.keywords == ("BATTLELINE", "INFANTRY")
+    assert keywords.faction_keywords == ("ASTRA MILITARUM",)
+    assert faction.faction_keywords == ("ASTRA MILITARUM",)
+    assert enhancement.target_required_keywords == ("CHARACTER",)
+    assert enhancement.target_required_faction_keywords == ("ADEPTUS ASTARTES",)
+    assert mustering_keyword_effect.keyword == "JUMP PACK"
+
+    with pytest.raises(DatasheetCatalogError, match="must not contain duplicates"):
+        DatasheetKeywordSet(keywords=("Infantry", "INFANTRY"))
 
 
 def test_datasheet_catalog_keeps_base_facts_as_core_catalog_data() -> None:

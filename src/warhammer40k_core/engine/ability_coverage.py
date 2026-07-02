@@ -913,7 +913,7 @@ def _descriptor_is_shadow_of_chaos(ability: DatasheetAbilityDescriptor) -> bool:
         raise GameLifecycleError("Shadow of Chaos descriptor matching requires a descriptor.")
     return (
         ability.source_kind is CatalogAbilitySourceKind.FACTION
-        and ability.name.strip().casefold() == "the shadow of chaos"
+        and ability.ability_id == _SHADOW_OF_CHAOS_CATALOG_ABILITY_ID
     )
 
 
@@ -1048,6 +1048,7 @@ _CATEGORY_NAMES: Mapping[str, str] = {
 _SHADOW_OF_CHAOS_RUNTIME_CONSUMER_ID = (
     "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
 )
+_SHADOW_OF_CHAOS_CATALOG_ABILITY_ID = "000008433"
 
 
 def _category_name(category_id: str) -> str:

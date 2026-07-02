@@ -1654,6 +1654,7 @@ def _bondsman_ability() -> DatasheetAbilityDescriptor:
         source_id="phase17g:imperial-knights:paladins-duty",
         support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
         source_kind=CatalogAbilitySourceKind.DATASHEET,
+        parameter_tokens=("bondsman",),
         effect_description=(
             "While a model is affected by this ability, weapons equipped by that model "
             "have the LETHAL HITS ability, and melee weapons equipped by that model "

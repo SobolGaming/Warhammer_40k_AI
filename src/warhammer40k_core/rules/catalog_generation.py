@@ -72,6 +72,7 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
+from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRError, RuleIRPayload
 from warhammer40k_core.rules.source_catalog import SourceArtifactHash
 from warhammer40k_core.rules.source_overlay import OverlaySourceArtifact
 from warhammer40k_core.rules.source_patch import PatchedSourceArtifact
@@ -674,7 +675,7 @@ def _ability_descriptor_from_row(row: NormalizedSourceRow) -> DatasheetAbilityDe
         timing_tags=_optional_split_field(row, "timing_tags"),
         parameter_tokens=_optional_split_field(row, "parameter_tokens"),
         source_wargear_id=_optional_field(row=row, column_name="source_wargear_id"),
-        rule_ir_payload=_rule_ir_payload_from_row(row),
+        rule_ir_payload=_rule_ir_payload_from_row(row, ability_support=ability_support),
         rule_ir_diagnostics=_rule_ir_diagnostics_from_row(row),
     )
 
@@ -698,7 +699,11 @@ def _ability_source_kind_from_row(row: NormalizedSourceRow) -> CatalogAbilitySou
     raise CatalogGenerationError("Unsupported datasheet ability type.")
 
 
-def _rule_ir_payload_from_row(row: NormalizedSourceRow) -> CatalogJsonObject | None:
+def _rule_ir_payload_from_row(
+    row: NormalizedSourceRow,
+    *,
+    ability_support: CatalogAbilitySupport,
+) -> CatalogJsonObject | None:
     value = _optional_field(row=row, column_name="rule_ir_payload")
     if value is None:
         return None
@@ -710,7 +715,13 @@ def _rule_ir_payload_from_row(row: NormalizedSourceRow) -> CatalogJsonObject | N
         ) from exc
     if type(payload) is not dict:
         raise CatalogGenerationError("Datasheet ability rule_ir_payload must be a JSON object.")
-    return cast(CatalogJsonObject, payload)
+    catalog_payload = cast(CatalogJsonObject, payload)
+    if ability_support is CatalogAbilitySupport.GENERIC_RULE_IR:
+        try:
+            RuleIR.from_payload(cast(RuleIRPayload, catalog_payload))
+        except (KeyError, TypeError, RuleIRError) as exc:
+            raise CatalogGenerationError("Datasheet ability rule_ir_payload is invalid.") from exc
+    return catalog_payload
 
 
 def _rule_ir_diagnostics_from_row(row: NormalizedSourceRow) -> tuple[CatalogJsonObject, ...]:

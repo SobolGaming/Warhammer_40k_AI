@@ -265,7 +265,7 @@ def test_martial_katah_is_not_available_for_non_custodes_armies() -> None:
     assert grants == ()
 
 
-def test_martial_katah_ability_name_allows_rule_without_faction_keyword() -> None:
+def test_martial_katah_source_id_allows_rule_without_faction_keyword() -> None:
     state = _battle_state()
     _mark_player_as_adeptus_custodes(
         state,
@@ -285,8 +285,8 @@ def test_martial_katah_ability_name_allows_rule_without_faction_keyword() -> Non
             unit_instance_id=unit.unit_instance_id,
             fight_type=FightTypeKind.NORMAL.value,
             ordering_band=FightOrderingBandKind.REMAINING_COMBATS.value,
-            request_id="martial-katah-ability-name-request",
-            result_id="martial-katah-ability-name-result",
+            request_id="martial-katah-source-id-request",
+            result_id="martial-katah-source-id-result",
         )
     )
 
@@ -467,7 +467,7 @@ def _martial_katah_ability() -> DatasheetAbilityDescriptor:
     return DatasheetAbilityDescriptor(
         ability_id="adeptus-custodes-test-martial-katah",
         name="Martial Ka'tah",
-        source_id="adeptus-custodes-test:martial-katah",
+        source_id=army_rule.SOURCE_RULE_ID,
         support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
         source_kind=CatalogAbilitySourceKind.DATASHEET,
         effect_description="Select Dacatarai or Rendax when this unit is selected to fight.",

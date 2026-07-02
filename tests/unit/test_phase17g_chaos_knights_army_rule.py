@@ -945,7 +945,7 @@ def _mark_player_faction_only_as_chaos_knights(state: GameState, *, player_id: s
 
 
 def _chaos_knights_unit(unit: UnitInstance) -> UnitInstance:
-    return replace(unit, faction_keywords=("Chaos Knights",))
+    return replace(unit, faction_keywords=("CHAOS KNIGHTS",))
 
 
 def _record_harbingers_selection(

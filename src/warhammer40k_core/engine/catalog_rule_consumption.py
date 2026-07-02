@@ -4180,9 +4180,11 @@ def _trigger_supports_tracked_target_roll_type(
     if single_roll_type == roll_type:
         return True
     roll_types = trigger_parameters.get("roll_types")
-    if type(roll_types) is str:
-        return roll_type in set(roll_types.split("|"))
-    return False
+    if roll_types is None:
+        return False
+    if type(roll_types) is not tuple:
+        raise GameLifecycleError("Catalog tracked-target roll_types must be a tuple.")
+    return roll_type in roll_types
 
 
 def _tracked_target_supported_roll_types_for_clause(clause: RuleClause) -> tuple[str, ...]:
@@ -4351,9 +4353,11 @@ def _clause_is_supported_movement_transit_permission(clause: RuleClause) -> bool
     if permission_parameters is None:
         return False
     movement_modes_value = trigger_parameters.get("movement_modes")
-    if type(movement_modes_value) is not str:
+    if movement_modes_value is None:
         return False
-    movement_modes = _movement_mode_tokens_or_none(tuple(movement_modes_value.split("|")))
+    if type(movement_modes_value) is not tuple:
+        raise GameLifecycleError("Catalog movement trigger movement_modes must be a tuple.")
+    movement_modes = _movement_mode_tokens_or_none(movement_modes_value)
     return movement_modes is not None and movement_modes == permission_parameters[0]
 
 
@@ -4496,13 +4500,12 @@ def _supported_movement_transit_effect_parameters(
         return None
     movement_modes_value = parameters.get("movement_modes")
     model_keyword_any_value = parameters.get("model_keyword_any")
-    if type(movement_modes_value) is not str or type(model_keyword_any_value) is not str:
+    if movement_modes_value is None or model_keyword_any_value is None:
         return None
-    movement_modes = _validate_movement_mode_tokens(tuple(movement_modes_value.split("|")))
-    model_keyword_any = _validate_keyword_tokens(
-        "model_keyword_any",
-        tuple(model_keyword_any_value.split("|")),
-    )
+    if type(movement_modes_value) is not tuple or type(model_keyword_any_value) is not tuple:
+        raise GameLifecycleError("Catalog movement transit parameters must be tuples.")
+    movement_modes = _validate_movement_mode_tokens(movement_modes_value)
+    model_keyword_any = _validate_keyword_tokens("model_keyword_any", model_keyword_any_value)
     if set(model_keyword_any) != {"MONSTER", "VEHICLE"}:
         return None
     terrain_height_max_inches = _validate_non_negative_float(
@@ -4922,14 +4925,16 @@ def _clause_required_keyword_any(
         if parameters.get("gate_subject") != gate_subject:
             continue
         value = parameters.get("required_keyword_any")
-        if type(value) is not str:
+        if value is None:
             continue
+        if type(value) is not tuple:
+            raise GameLifecycleError("Catalog keyword-any condition must be a tuple.")
         required_keywords.extend(_keyword_tuple_from_any_parameter(value))
     return tuple(dict.fromkeys(required_keywords))
 
 
-def _keyword_tuple_from_any_parameter(value: str) -> tuple[str, ...]:
-    keywords = tuple(keyword for keyword in value.split("|") if keyword)
+def _keyword_tuple_from_any_parameter(value: tuple[object, ...]) -> tuple[str, ...]:
+    keywords = _validate_keyword_tokens("required_keyword_any", value)
     if not keywords:
         raise GameLifecycleError("Catalog keyword-any condition is empty.")
     return keywords
@@ -5498,30 +5503,15 @@ def _optional_weapon_scope_parameter(parameters: Mapping[str, object]) -> str | 
     value = parameters.get("weapon_scope")
     if value is not None:
         return _weapon_scope_from_token(value)
-    weapon_name = parameters.get("weapon_name")
-    if type(weapon_name) is str:
-        return _generic_weapon_scope_from_token(weapon_name)
     return None
 
 
 def _weapon_scope_from_token(value: object) -> str:
     if type(value) is not str:
         raise GameLifecycleError("Catalog weapon keyword grant weapon_scope must be a string.")
-    scope = _generic_weapon_scope_from_token(value)
-    if scope is None:
+    if value not in {"all", "melee", "ranged"}:
         raise GameLifecycleError("Unsupported catalog weapon keyword grant scope.")
-    return scope
-
-
-def _generic_weapon_scope_from_token(value: str) -> str | None:
-    normalized = " ".join(value.strip().lower().replace("-", " ").split())
-    if normalized in {"melee", "melee weapon", "melee weapons"}:
-        return "melee"
-    if normalized in {"ranged", "ranged weapon", "ranged weapons"}:
-        return "ranged"
-    if normalized in {"all", "weapon", "weapons", "all weapon", "all weapons"}:
-        return "all"
-    return None
+    return value
 
 
 def _weapon_keyword_from_value(value: object) -> WeaponKeyword:
@@ -5605,8 +5595,12 @@ def _validate_weapon_ability_choice_value(value: object) -> int | str:
 
 def _optional_named_weapon_names(parameters: Mapping[str, object]) -> tuple[str, ...] | None:
     names = parameters.get("weapon_names")
-    if type(names) is str:
-        return _validate_named_weapon_names(tuple(name for name in names.split("|") if name))
+    if type(names) is tuple:
+        return _validate_named_weapon_names(cast(tuple[object, ...], names))
+    if names is not None:
+        raise GameLifecycleError(
+            "Catalog named weapon ability choice weapon_names must be a tuple."
+        )
     name = parameters.get("weapon_name")
     if type(name) is str:
         return _validate_named_weapon_names((name,))

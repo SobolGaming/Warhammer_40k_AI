@@ -8,7 +8,7 @@ from warhammer40k_core.core.content_scope import (
     CatalogContentScopeError,
     catalog_content_scope_from_token,
 )
-from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
 
 
 class FactionCatalogError(ValueError):
@@ -127,6 +127,7 @@ class FactionDefinition:
         faction_keywords = _validate_identifier_tuple(
             "FactionDefinition faction_keywords",
             self.faction_keywords,
+            canonicalize_keywords=True,
         )
         if not faction_keywords:
             raise FactionCatalogError("FactionDefinition faction_keywords must not be empty.")
@@ -184,13 +185,20 @@ def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str)
     return identifier
 
 
-def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
+def _validate_identifier_tuple(
+    field_name: str,
+    values: tuple[str, ...],
+    *,
+    canonicalize_keywords: bool = False,
+) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise FactionCatalogError(f"{field_name} must be a tuple.")
     seen: set[str] = set()
     validated: list[str] = []
     for value in values:
         identifier = _validate_identifier(f"{field_name} value", value)
+        if canonicalize_keywords:
+            identifier = canonical_keyword_token(identifier)
         if identifier in seen:
             raise FactionCatalogError(f"{field_name} must not contain duplicates.")
         seen.add(identifier)

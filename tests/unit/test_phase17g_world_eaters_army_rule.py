@@ -1321,7 +1321,7 @@ def _world_eaters_catalog() -> ArmyCatalog:
             FactionDefinition(
                 faction_id=army_rule.WORLD_EATERS_FACTION_ID,
                 name="World Eaters",
-                faction_keywords=("World Eaters",),
+                faction_keywords=("WORLD EATERS",),
                 source_ids=("gw-11e-world-eaters-faction-pack-2026-06:faction:world-eaters",),
             ),
         ),
@@ -1348,8 +1348,8 @@ def _world_eaters_datasheet(base_datasheet: DatasheetDefinition) -> DatasheetDef
         datasheet_id=WORLD_EATERS_DATASHEET_ID,
         name="Khorne Berzerkers",
         keywords=DatasheetKeywordSet(
-            keywords=("Infantry", "Battleline"),
-            faction_keywords=("World Eaters",),
+            keywords=("INFANTRY", "BATTLELINE"),
+            faction_keywords=("WORLD EATERS",),
         ),
         wargear_options=(
             *base_datasheet.wargear_options,
@@ -1382,6 +1382,18 @@ def _battle_ready_lifecycle() -> GameLifecycle:
     state = _require_state(lifecycle)
     for army in _mustered_armies(config):
         state.record_army_definition(army)
+    state.army_definitions = [
+        replace(
+            army,
+            units=tuple(
+                replace(unit, keywords=tuple(keyword.upper() for keyword in unit.keywords))
+                for unit in army.units
+            ),
+        )
+        if army.player_id == "player-b"
+        else army
+        for army in state.army_definitions
+    ]
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase17g-world-eaters-battlefield",
         armies=tuple(state.army_definitions),

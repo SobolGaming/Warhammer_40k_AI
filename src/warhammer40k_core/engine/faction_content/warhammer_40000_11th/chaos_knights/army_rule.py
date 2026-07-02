@@ -966,10 +966,7 @@ def _unit_has_harbingers(unit: UnitInstance) -> bool:
         raise GameLifecycleError("Harbingers of Dread requires a UnitInstance.")
     if _unit_has_keyword(unit, CHAOS_KNIGHTS_FACTION_KEYWORD):
         return True
-    return any(
-        _canonical_keyword(ability.name) == _canonical_keyword("Harbingers of Dread")
-        for ability in unit.datasheet_abilities
-    )
+    return any(ability.source_id == SOURCE_RULE_ID for ability in unit.datasheet_abilities)
 
 
 def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
@@ -1013,11 +1010,8 @@ def _chaos_knights_army_for_player(
 
 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
-    requested_keyword = _canonical_keyword(keyword)
-    return any(
-        _canonical_keyword(stored_keyword) == requested_keyword
-        for stored_keyword in (*unit.keywords, *unit.faction_keywords)
-    )
+    requested_keyword = _validate_identifier("keyword", keyword)
+    return requested_keyword in (*unit.keywords, *unit.faction_keywords)
 
 
 def _dread_from_token(token: object) -> DreadAbility:
@@ -1075,7 +1069,3 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     if value < 1:
         raise GameLifecycleError(f"Harbingers of Dread {field_name} must be positive.")
     return value
-
-
-def _canonical_keyword(value: str) -> str:
-    return _validate_identifier("keyword", value).replace("_", " ").replace("-", " ").upper()

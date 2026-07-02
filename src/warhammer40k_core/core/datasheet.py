@@ -17,7 +17,7 @@ from warhammer40k_core.core.content_scope import (
     CatalogContentScopeError,
     catalog_content_scope_from_token,
 )
-from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
 
 
 class DatasheetCatalogError(ValueError):
@@ -397,7 +397,11 @@ class DatasheetKeywordSet:
         object.__setattr__(
             self,
             "keywords",
-            _validate_identifier_tuple("DatasheetKeywordSet keywords", self.keywords),
+            _validate_identifier_tuple(
+                "DatasheetKeywordSet keywords",
+                self.keywords,
+                canonicalize_keywords=True,
+            ),
         )
         object.__setattr__(
             self,
@@ -405,6 +409,7 @@ class DatasheetKeywordSet:
             _validate_identifier_tuple(
                 "DatasheetKeywordSet faction_keywords",
                 self.faction_keywords,
+                canonicalize_keywords=True,
             ),
         )
 
@@ -675,6 +680,7 @@ class DatasheetMusteringOptionEffect:
                 raise DatasheetCatalogError(
                     "ADD_KEYWORD DatasheetMusteringOptionEffect requires keyword."
                 )
+            keyword = canonical_keyword_token(keyword)
             if wargear_id is not None or model_count is not None or wargear_count is not None:
                 raise DatasheetCatalogError(
                     "ADD_KEYWORD DatasheetMusteringOptionEffect must not include wargear data."
@@ -1526,6 +1532,7 @@ def _validate_identifier_tuple(
     values: tuple[str, ...],
     *,
     min_length: int = 0,
+    canonicalize_keywords: bool = False,
 ) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise DatasheetCatalogError(f"{field_name} must be a tuple.")
@@ -1533,6 +1540,8 @@ def _validate_identifier_tuple(
     validated: list[str] = []
     for value in values:
         identifier = _validate_identifier(f"{field_name} value", value)
+        if canonicalize_keywords:
+            identifier = canonical_keyword_token(identifier)
         if identifier in seen:
             raise DatasheetCatalogError(f"{field_name} must not contain duplicates.")
         seen.add(identifier)

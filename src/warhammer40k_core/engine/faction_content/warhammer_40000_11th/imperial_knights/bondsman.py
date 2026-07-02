@@ -33,7 +33,7 @@ BONDSMAN_SOURCE_RULE_ID = "phase17g:imperial-knights:bondsman"
 IMPERIAL_KNIGHTS_FACTION_ID = "imperial-knights"
 IMPERIAL_KNIGHTS_FACTION_KEYWORD = "IMPERIAL KNIGHTS"
 ARMIGER_KEYWORD = "ARMIGER"
-BONDSMAN_ABILITY_NAME = "Bondsman"
+BONDSMAN_DESCRIPTOR_TOKEN = "bondsman"
 BONDSMAN_RANGE_INCHES = 12.0
 BONDSMAN_SELECTION_KIND = "imperial_knights_bondsman_application"
 BONDSMAN_EFFECT_KIND = "imperial_knights_bondsman"
@@ -521,14 +521,10 @@ def _bondsman_abilities_for_unit(
 def _ability_has_bondsman_tag(ability: DatasheetAbilityDescriptor) -> bool:
     if type(ability) is not DatasheetAbilityDescriptor:
         raise GameLifecycleError("Bondsman tag lookup requires ability descriptor.")
-    bondsman_token = _normalise_rule_token(BONDSMAN_ABILITY_NAME)
-    descriptor_tokens = {
-        _normalise_rule_token(token) for token in (*ability.timing_tags, *ability.parameter_tokens)
-    }
-    if bondsman_token in descriptor_tokens:
+    if ability.source_id == BONDSMAN_SOURCE_RULE_ID:
         return True
-    name_token = _normalise_rule_token(ability.name)
-    return name_token == bondsman_token or name_token.endswith(bondsman_token)
+    descriptor_tokens = (*ability.timing_tags, *ability.parameter_tokens)
+    return BONDSMAN_DESCRIPTOR_TOKEN in descriptor_tokens
 
 
 def _source_model_used_bondsman_this_command_phase(
@@ -802,15 +798,13 @@ def _imperial_knights_army_for_player(
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Bondsman unit keyword check requires UnitInstance.")
-    requested_keyword = _canonical_keyword(keyword)
-    return requested_keyword in {_canonical_keyword(item) for item in unit.keywords}
+    return _validate_identifier("keyword", keyword) in unit.keywords
 
 
 def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Bondsman faction keyword check requires UnitInstance.")
-    requested_keyword = _canonical_keyword(keyword)
-    return requested_keyword in {_canonical_keyword(item) for item in unit.faction_keywords}
+    return _validate_identifier("keyword", keyword) in unit.faction_keywords
 
 
 def _validate_game_state(state: object) -> GameState:
@@ -822,11 +816,3 @@ def _validate_game_state(state: object) -> GameState:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _canonical_keyword(value: str) -> str:
-    return _validate_identifier("keyword", value).upper().replace("_", " ")
-
-
-def _normalise_rule_token(value: str) -> str:
-    return "".join(character for character in value.upper() if character.isalnum())

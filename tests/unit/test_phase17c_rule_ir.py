@@ -325,7 +325,7 @@ def test_phase17c_champion_slayer_clause_one_has_melee_target_gate_and_wound_rer
     }
     assert _condition_payload(clause, RuleConditionKind.KEYWORD_GATE) == {
         "gate_subject": "attack_target",
-        "required_keyword_any": "CHARACTER|MONSTER",
+        "required_keyword_any": ("CHARACTER", "MONSTER"),
     }
     assert tuple(effect.kind for effect in clause.effects) == (RuleEffectKind.REROLL_PERMISSION,)
     assert parameter_payload(clause.effects[0].parameters) == {"roll_type": "wound"}
@@ -350,7 +350,7 @@ def test_phase17c_champion_slayer_clause_two_has_destroyed_unit_gate_and_heal() 
     }
     assert _condition_payload(clause, RuleConditionKind.KEYWORD_GATE) == {
         "gate_subject": "destroyed_unit",
-        "required_keyword_any": "CHARACTER|MONSTER",
+        "required_keyword_any": ("CHARACTER", "MONSTER"),
     }
     assert tuple(effect.kind for effect in clause.effects) == (RuleEffectKind.RESTORE_LOST_WOUNDS,)
     assert parameter_payload(clause.effects[0].parameters) == {
@@ -535,7 +535,7 @@ def test_phase17c_quarry_selection_supports_this_model_hit_and_wound_rerolls() -
     assert parameter_payload(attack_clause.trigger.parameters) == {
         "actor": "this_model",
         "attack_kind": "melee",
-        "roll_types": "hit|wound",
+        "roll_types": ("hit", "wound"),
         "target_reference": "tracked_target",
         "timing_window": "attack_sequence.roll",
         "tracked_target_owner": "this_model",
@@ -714,7 +714,7 @@ def test_phase17c_move_over_friendly_monsters_vehicles_and_terrain_compiles_to_s
     assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
     assert parameter_payload(clause.trigger.parameters) == {
         "edge": "during",
-        "movement_modes": "advance|normal",
+        "movement_modes": ("advance", "normal"),
         "phase": "movement",
         "subject": "this_model",
         "timing_window": "model_makes_move",
@@ -725,8 +725,8 @@ def test_phase17c_move_over_friendly_monsters_vehicles_and_terrain_compiles_to_s
     )
     assert parameter_payload(clause.effects[0].parameters) == {
         "model_allegiance": "friendly",
-        "model_keyword_any": "MONSTER|VEHICLE",
-        "movement_modes": "advance|normal",
+        "model_keyword_any": ("MONSTER", "VEHICLE"),
+        "movement_modes": ("advance", "normal"),
         "permission": "move_over_as_if_not_there",
         "terrain_height_max_inches": 4.0,
         "terrain_scope": "terrain_features",
@@ -749,11 +749,11 @@ def test_phase17c_move_over_permission_supports_single_move_mode_and_decimal_hei
     assert clause.trigger is not None
 
     assert rule_ir.is_supported
-    assert parameter_payload(clause.trigger.parameters)["movement_modes"] == "normal"
+    assert parameter_payload(clause.trigger.parameters)["movement_modes"] == ("normal",)
     assert parameter_payload(clause.effects[0].parameters) == {
         "model_allegiance": "friendly",
-        "model_keyword_any": "MONSTER|VEHICLE",
-        "movement_modes": "normal",
+        "model_keyword_any": ("MONSTER", "VEHICLE"),
+        "movement_modes": ("normal",),
         "permission": "move_over_as_if_not_there",
         "terrain_height_max_inches": 3.5,
         "terrain_scope": "terrain_features",
@@ -775,7 +775,7 @@ def test_phase17c_movement_transit_consumer_normalizes_mode_order() -> None:
         trigger=_trigger_with_parameter(
             trigger,
             key="movement_modes",
-            value="normal|advance",
+            value=("normal", "advance"),
         ),
         effects=(
             replace(
@@ -783,7 +783,7 @@ def test_phase17c_movement_transit_consumer_normalizes_mode_order() -> None:
                 parameters=_parameters_with_value(
                     effect.parameters,
                     key="movement_modes",
-                    value="normal|advance",
+                    value=("normal", "advance"),
                 ),
             ),
         ),
@@ -805,10 +805,8 @@ def test_phase17c_movement_transit_consumer_fails_closed_for_malformed_mode_toke
     assert trigger is not None
 
     malformed_values: tuple[RuleParameterValue, ...] = (
-        1,
-        "",
-        "normal|normal",
-        "normal|fall_back",
+        ("normal", "normal"),
+        ("normal", "fall_back"),
     )
 
     for malformed_value in malformed_values:
@@ -896,7 +894,7 @@ def test_phase17c_malformed_movement_transit_ir_fails_closed_for_catalog_consume
             trigger=_trigger_with_parameter(
                 trigger,
                 key="movement_modes",
-                value="normal",
+                value=("fall_back",),
             ),
         ),
         replace(clause, effects=()),
@@ -948,7 +946,7 @@ def test_phase17c_malformed_movement_transit_ir_fails_closed_for_catalog_consume
                     parameters=_parameters_with_value(
                         effect.parameters,
                         key="model_keyword_any",
-                        value="INFANTRY|VEHICLE",
+                        value=("INFANTRY", "VEHICLE"),
                     ),
                 ),
             ),
@@ -2129,7 +2127,7 @@ def test_phase17c_named_weapon_choice_generalizes_to_multiple_weapon_names() -> 
             "selection_option_index": 1,
             "target_scope": "models_in_this_unit",
             "weapon_ability": "Lethal Hits",
-            "weapon_names": "storm staff|prism cannon",
+            "weapon_names": ("storm staff", "prism cannon"),
         },
         {
             "selection_group_id": "weapon_ability_choice_0024",
@@ -2139,7 +2137,7 @@ def test_phase17c_named_weapon_choice_generalizes_to_multiple_weapon_names() -> 
             "target_scope": "models_in_this_unit",
             "weapon_ability": "Sustained Hits",
             "weapon_ability_value": 1,
-            "weapon_names": "storm staff|prism cannon",
+            "weapon_names": ("storm staff", "prism cannon"),
         },
     )
     assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
@@ -2331,7 +2329,7 @@ def test_phase17c_aura_target_faction_keyword_sequence_compiles_to_keyword_gates
     assert parameter_payload(target.parameters) == {
         "allegiance": "friendly",
         "eligible_target": "aura_units",
-        "required_keyword_sequence": "KHORNE|LEGIONES_DAEMONICA",
+        "required_keyword_sequence": ("KHORNE", "LEGIONES_DAEMONICA"),
     }
     assert tuple(
         parameter_payload(condition.parameters)["required_keyword"] for condition in keyword_gates
@@ -2372,7 +2370,7 @@ def test_phase17c_shadow_of_chaos_aura_compiles_to_contextual_status(
     assert parameter_payload(target.parameters) == {
         "allegiance": "friendly",
         "eligible_target": "aura_units",
-        "required_keyword_sequence": f"{allegiance.upper()}|LEGIONES_DAEMONICA",
+        "required_keyword_sequence": (allegiance.upper(), "LEGIONES_DAEMONICA"),
     }
     assert {
         parameter_payload(condition.parameters)["required_keyword"] for condition in keyword_gates
@@ -2563,6 +2561,27 @@ def test_phase17c_rule_ir_structural_validators_are_fail_fast() -> None:
     )
     stale_payload = rule_ir.to_payload()
     stale_payload["ir_hash"] = "stale"
+    raw_roll_types_payload = cast(Any, rule_ir.to_payload())
+    raw_roll_types_payload["clauses"][0]["effects"][0]["parameters"] = [
+        {"key": "roll_types", "value": "hit|wound"}
+    ]
+    raw_weapon_scope_payload = cast(Any, rule_ir.to_payload())
+    raw_weapon_scope_payload["clauses"][0]["effects"][0]["parameters"] = [
+        {"key": "weapon_scope", "value": "all weapons"}
+    ]
+    raw_keyword_sequence_payload = cast(
+        Any,
+        _compiled(
+            "Daemon Lord of Khorne (Aura): While a friendly Khorne Legiones Daemonica "
+            'unit is within 6" of this model, each time a model in that unit makes a '
+            "melee attack, add 1 to the Hit roll."
+        ).rule_ir.to_payload(),
+    )
+    raw_keyword_sequence_payload["clauses"][0]["target"]["parameters"] = [
+        {"key": "allegiance", "value": "friendly"},
+        {"key": "eligible_target", "value": "aura_units"},
+        {"key": "required_keyword_sequence", "value": "KHORNE|LEGIONES_DAEMONICA"},
+    ]
 
     assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
     with pytest.raises(RuleIRError, match="blocking must be a boolean"):
@@ -2611,6 +2630,12 @@ def test_phase17c_rule_ir_structural_validators_are_fail_fast() -> None:
         )
     with pytest.raises(RuleIRError, match="ir_hash is stale"):
         RuleIR.from_payload(stale_payload)
+    with pytest.raises(RuleIRError, match="roll_types must be a string tuple"):
+        RuleIR.from_payload(cast(RuleIRPayload, raw_roll_types_payload))
+    with pytest.raises(RuleIRError, match="required_keyword_sequence must be a string tuple"):
+        RuleIR.from_payload(cast(RuleIRPayload, raw_keyword_sequence_payload))
+    with pytest.raises(RuleIRError, match="weapon_scope must be all, melee, or ranged"):
+        RuleIR.from_payload(cast(RuleIRPayload, raw_weapon_scope_payload))
     with pytest.raises(RuleIRError, match="RuleParameter key must be a string"):
         RuleParameter(key=cast(str, 1), value=1)
     with pytest.raises(RuleIRError, match="RuleParameter key must not be empty"):

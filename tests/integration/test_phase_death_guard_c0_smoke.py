@@ -71,7 +71,7 @@ def test_phase_death_guard_c0_plague_marines_manifest_from_patched_catalog() -> 
     model = unit.own_models[0]
 
     assert unit.datasheet_id == "dg-plague-marines"
-    assert unit.faction_keywords == ("Death Guard",)
+    assert unit.faction_keywords == ("DEATH GUARD",)
     assert unit.wargear_selections[0].wargear_ids == ("dg-plague-bolter",)
     assert len(unit.own_models) == 5
     assert model.model_profile_id == "dg-plague-marine"

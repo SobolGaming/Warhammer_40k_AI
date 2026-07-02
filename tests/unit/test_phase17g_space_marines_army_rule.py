@@ -1165,7 +1165,7 @@ def test_oath_wound_modifier_applies_only_for_codex_detachment_target() -> None:
         replace(
             army,
             units=tuple(
-                replace(unit, faction_keywords=(*unit.faction_keywords, "Dark Angels"))
+                replace(unit, faction_keywords=(*unit.faction_keywords, "DARK ANGELS"))
                 if unit.unit_instance_id == SPACE_MARINES_UNIT_ID
                 else unit
                 for unit in army.units
@@ -1365,8 +1365,8 @@ def _space_marines_lifecycle_catalog() -> ArmyCatalog:
                 base_datasheet,
                 datasheet_id=SPACE_MARINES_DATASHEET_ID,
                 name="Intercessor Squad",
-                keywords=("Infantry", "Battleline"),
-                faction_keywords=("Adeptus Astartes",),
+                keywords=("INFANTRY", "BATTLELINE"),
+                faction_keywords=("ADEPTUS ASTARTES",),
             ),
         ),
         factions=(
@@ -1374,7 +1374,7 @@ def _space_marines_lifecycle_catalog() -> ArmyCatalog:
             FactionDefinition(
                 faction_id=army_rule.SPACE_MARINES_FACTION_ID,
                 name="Space Marines",
-                faction_keywords=("Adeptus Astartes",),
+                faction_keywords=("ADEPTUS ASTARTES",),
                 source_ids=("phase17g:space-marines:faction",),
             ),
         ),
@@ -1410,13 +1410,13 @@ def _space_marines_roster_catalog() -> ArmyCatalog:
             FactionDefinition(
                 faction_id=army_rule.SPACE_MARINES_FACTION_ID,
                 name="Space Marines",
-                faction_keywords=("Adeptus Astartes",),
+                faction_keywords=("ADEPTUS ASTARTES",),
                 source_ids=("phase17g:space-marines:faction",),
             ),
             FactionDefinition(
                 faction_id="agents-of-the-imperium",
                 name="Agents of the Imperium",
-                faction_keywords=("Agents of the Imperium",),
+                faction_keywords=("AGENTS OF THE IMPERIUM",),
                 source_ids=("phase17g:agents-of-the-imperium:faction",),
             ),
         ),
@@ -1439,53 +1439,53 @@ def _roster_datasheet_payloads() -> dict[str, RosterDatasheetPayload]:
     return {
         "black-templars-crusaders": {
             "name": "Black Templars Crusaders",
-            "keywords": ("Character", "Infantry"),
-            "faction_keywords": ("Adeptus Astartes", "Black Templars"),
+            "keywords": ("CHARACTER", "INFANTRY"),
+            "faction_keywords": ("ADEPTUS ASTARTES", "BLACK TEMPLARS"),
         },
         "librarian": {
             "name": "Librarian",
-            "keywords": ("Character", "Infantry", "Psyker"),
-            "faction_keywords": ("Adeptus Astartes",),
+            "keywords": ("CHARACTER", "INFANTRY", "PSYKER"),
+            "faction_keywords": ("ADEPTUS ASTARTES",),
         },
         "gladiator-lancer": {
             "name": "Gladiator Lancer",
-            "keywords": ("Vehicle",),
-            "faction_keywords": ("Adeptus Astartes",),
+            "keywords": ("VEHICLE",),
+            "faction_keywords": ("ADEPTUS ASTARTES",),
         },
         "space-wolves-pack": {
             "name": "Space Wolves Pack",
-            "keywords": ("Character", "Infantry"),
-            "faction_keywords": ("Adeptus Astartes", "Space Wolves"),
+            "keywords": ("CHARACTER", "INFANTRY"),
+            "faction_keywords": ("ADEPTUS ASTARTES", "SPACE WOLVES"),
         },
         "apothecary": {
             "name": "Apothecary",
-            "keywords": ("Character", "Infantry"),
-            "faction_keywords": ("Adeptus Astartes",),
+            "keywords": ("CHARACTER", "INFANTRY"),
+            "faction_keywords": ("ADEPTUS ASTARTES",),
         },
         "deathwatch-veterans": {
             "name": "Deathwatch Veterans",
-            "keywords": ("Character", "Infantry"),
-            "faction_keywords": ("Adeptus Astartes", "Deathwatch"),
+            "keywords": ("CHARACTER", "INFANTRY"),
+            "faction_keywords": ("ADEPTUS ASTARTES", "DEATHWATCH"),
         },
         "intercessors": {
             "name": "Intercessor Squad",
-            "keywords": ("Character", "Infantry"),
-            "faction_keywords": ("Adeptus Astartes",),
+            "keywords": ("CHARACTER", "INFANTRY"),
+            "faction_keywords": ("ADEPTUS ASTARTES",),
         },
         "agents-deathwatch": {
             "name": "Deathwatch Imperial Agent",
-            "keywords": ("Character", "Infantry", "Deathwatch"),
-            "faction_keywords": ("Agents of the Imperium", "Deathwatch"),
+            "keywords": ("CHARACTER", "INFANTRY", "DEATHWATCH"),
+            "faction_keywords": ("AGENTS OF THE IMPERIUM", "DEATHWATCH"),
         },
         "kill-team-cassius": {
             "name": "Kill Team Cassius",
-            "keywords": ("Character", "Infantry", "Deathwatch"),
-            "faction_keywords": ("Agents of the Imperium", "Deathwatch"),
+            "keywords": ("CHARACTER", "INFANTRY", "DEATHWATCH"),
+            "faction_keywords": ("AGENTS OF THE IMPERIUM", "DEATHWATCH"),
         },
         "tactical-squad": {
             "name": "Tactical Squad",
-            "keywords": ("Character", "Infantry"),
-            "faction_keywords": ("Adeptus Astartes",),
+            "keywords": ("CHARACTER", "INFANTRY"),
+            "faction_keywords": ("ADEPTUS ASTARTES",),
         },
     }
 

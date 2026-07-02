@@ -5,7 +5,7 @@ import json
 from dataclasses import dataclass
 from enum import StrEnum
 from math import isfinite
-from typing import Self, TypedDict
+from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.parsed_tokens import TextSpan, TextSpanPayload
@@ -15,12 +15,13 @@ class RuleIRError(ValueError):
     """Raised when Phase 17C rule IR data violates source-boundary invariants."""
 
 
-type RuleParameterValue = str | int | float | bool | None
+type RuleParameterValue = str | int | float | bool | None | tuple[str, ...]
+type RuleParameterPayloadValue = str | int | float | bool | None | list[str]
 
 
 class RuleParameterPayload(TypedDict):
     key: str
-    value: RuleParameterValue
+    value: RuleParameterPayloadValue
 
 
 class RuleTriggerPayload(TypedDict):
@@ -161,14 +162,21 @@ class RuleParameter:
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "key", _validate_identifier("RuleParameter key", self.key))
-        _validate_parameter_value("RuleParameter value", self.value)
+        object.__setattr__(
+            self,
+            "value",
+            _validate_parameter_value("RuleParameter value", self.value),
+        )
 
     def to_payload(self) -> RuleParameterPayload:
-        return {"key": self.key, "value": self.value}
+        value = list(self.value) if type(self.value) is tuple else self.value
+        return {"key": self.key, "value": cast(RuleParameterPayloadValue, value)}
 
     @classmethod
     def from_payload(cls, payload: RuleParameterPayload) -> Self:
-        return cls(key=payload["key"], value=payload["value"])
+        raw_value = payload["value"]
+        value = tuple(raw_value) if type(raw_value) is list else raw_value
+        return cls(key=payload["key"], value=cast(RuleParameterValue, value))
 
 
 @dataclass(frozen=True, slots=True)
@@ -683,7 +691,21 @@ def _validate_parameter_value(field_name: str, value: object) -> RuleParameterVa
         if not isfinite(value):
             raise RuleIRError(f"{field_name} float must be finite.")
         return value
-    raise RuleIRError(f"{field_name} must be JSON scalar data.")
+    if type(value) is tuple:
+        return _validate_parameter_string_tuple(field_name, cast(tuple[object, ...], value))
+    raise RuleIRError(f"{field_name} must be JSON scalar data or a string tuple.")
+
+
+def _validate_parameter_string_tuple(
+    field_name: str,
+    value: tuple[object, ...],
+) -> tuple[str, ...]:
+    validated: list[str] = []
+    for item in value:
+        if type(item) is not str or not item.strip():
+            raise RuleIRError(f"{field_name} tuple values must be non-empty strings.")
+        validated.append(item.strip())
+    return tuple(validated)
 
 
 def _validate_span_object(field_name: str, span: object) -> TextSpan:
@@ -703,11 +725,31 @@ def _validate_parameters(
     for parameter in parameters:
         if type(parameter) is not RuleParameter:
             raise RuleIRError(f"{field_name} must contain RuleParameter values.")
+        _validate_typed_parameter_shape(parameter)
         if parameter.key in seen:
             raise RuleIRError(f"{field_name} must not contain duplicate keys.")
         seen.add(parameter.key)
         validated.append(parameter)
     return tuple(sorted(validated, key=lambda parameter: parameter.key))
+
+
+def _validate_typed_parameter_shape(parameter: RuleParameter) -> None:
+    tuple_parameter_keys = {
+        "model_keyword_any",
+        "movement_modes",
+        "required_keyword_any",
+        "required_keyword_sequence",
+        "roll_types",
+        "weapon_names",
+    }
+    if parameter.key in tuple_parameter_keys:
+        if type(parameter.value) is not tuple:
+            raise RuleIRError(f"RuleParameter {parameter.key} must be a string tuple.")
+        if not parameter.value:
+            raise RuleIRError(f"RuleParameter {parameter.key} must not be empty.")
+        return
+    if parameter.key == "weapon_scope" and parameter.value not in {"all", "melee", "ranged"}:
+        raise RuleIRError("RuleParameter weapon_scope must be all, melee, or ranged.")
 
 
 def _validate_component_tuple[T](

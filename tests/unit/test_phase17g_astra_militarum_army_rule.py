@@ -166,7 +166,7 @@ def test_non_astra_selected_detachment_with_astra_keyword_units_gets_no_request(
     army = state.army_definition_for_player("player-a")
     assert army is not None
     assert army.detachment_selection.faction_id == NON_ASTRA_FACTION_ID
-    assert any("Astra Militarum" in unit.faction_keywords for unit in army.units)
+    assert any("ASTRA MILITARUM" in unit.faction_keywords for unit in army.units)
 
     request = army_rule.voice_of_command_request(
         CommandPhaseStartRequestContext(
@@ -1009,7 +1009,7 @@ def test_voice_of_command_fail_fast_context_and_profile_guards() -> None:
     with pytest.raises(GameLifecycleError, match="positive integer"):
         army_rule.VoiceOfCommandOrdersProfile(
             orders_per_battle_round=0,
-            eligible_target_keywords=("Regiment",),
+            eligible_target_keywords=("REGIMENT",),
             allowed_order_ids=(army_rule.VoiceOfCommandOrder.MOVE_MOVE_MOVE,),
         )
     lifecycle = _battle_ready_lifecycle(orders_per_battle_round=1)
@@ -1024,7 +1024,7 @@ def test_voice_of_command_fail_fast_context_and_profile_guards() -> None:
             officer_unit=cast(UnitInstance, object()),
             officer_profile=army_rule.VoiceOfCommandOrdersProfile(
                 orders_per_battle_round=1,
-                eligible_target_keywords=("Regiment",),
+                eligible_target_keywords=("REGIMENT",),
                 allowed_order_ids=(army_rule.VoiceOfCommandOrder.MOVE_MOVE_MOVE,),
             ),
             target_rules_unit=rules_unit,
@@ -1044,7 +1044,7 @@ def test_voice_of_command_fail_fast_context_and_profile_guards() -> None:
             officer_unit=officer,
             officer_profile=army_rule.VoiceOfCommandOrdersProfile(
                 orders_per_battle_round=1,
-                eligible_target_keywords=("Regiment",),
+                eligible_target_keywords=("REGIMENT",),
                 allowed_order_ids=(army_rule.VoiceOfCommandOrder.MOVE_MOVE_MOVE,),
             ),
             target_rules_unit=cast(RulesUnitView, object()),
@@ -1056,7 +1056,7 @@ def test_voice_of_command_fail_fast_context_and_profile_guards() -> None:
             officer_unit=officer,
             officer_profile=army_rule.VoiceOfCommandOrdersProfile(
                 orders_per_battle_round=1,
-                eligible_target_keywords=("Regiment",),
+                eligible_target_keywords=("REGIMENT",),
                 allowed_order_ids=(army_rule.VoiceOfCommandOrder.MOVE_MOVE_MOVE,),
             ),
             target_rules_unit=rules_unit,
@@ -1069,7 +1069,7 @@ def test_voice_of_command_fail_fast_context_and_profile_guards() -> None:
         officer_orders_payload={
             "profile_kind": "phase17g:unsupported-orders-profile",
             "orders_per_battle_round": 1,
-            "eligible_target_keywords": ["Regiment"],
+            "eligible_target_keywords": ["REGIMENT"],
             "allowed_order_ids": [army_rule.VoiceOfCommandOrder.MOVE_MOVE_MOVE.value],
         },
     )
@@ -1312,7 +1312,7 @@ def _catalog_with_non_astra_auxiliary_detachment(catalog: ArmyCatalog) -> ArmyCa
             FactionDefinition(
                 faction_id=NON_ASTRA_FACTION_ID,
                 name="Non-Astra Auxiliary Force",
-                faction_keywords=("Astra Militarum", "Non-Astra"),
+                faction_keywords=("ASTRA MILITARUM", "NON-ASTRA"),
                 source_ids=("phase17g:astra:non-astra:faction",),
             ),
         ),
@@ -1410,30 +1410,30 @@ def _astra_lifecycle_catalog(
                 base_datasheet,
                 datasheet_id=OFFICER_DATASHEET_ID,
                 name="Cadian Castellan",
-                keywords=("Character", "Infantry", "Officer"),
-                faction_keywords=("Astra Militarum",),
+                keywords=("CHARACTER", "INFANTRY", "OFFICER"),
+                faction_keywords=("ASTRA MILITARUM",),
                 abilities=(_orders_ability(order_payload),),
             ),
             _datasheet(
                 base_datasheet,
                 datasheet_id=INFANTRY_DATASHEET_ID,
                 name="Cadian Shock Troops",
-                keywords=("Infantry", "Regiment"),
-                faction_keywords=("Astra Militarum",),
+                keywords=("INFANTRY", "REGIMENT"),
+                faction_keywords=("ASTRA MILITARUM",),
             ),
             _datasheet(
                 base_datasheet,
                 datasheet_id=SQUADRON_DATASHEET_ID,
                 name="Armoured Sentinel",
-                keywords=("Vehicle", "Squadron"),
-                faction_keywords=("Astra Militarum",),
+                keywords=("VEHICLE", "SQUADRON"),
+                faction_keywords=("ASTRA MILITARUM",),
             ),
             _datasheet(
                 base_datasheet,
                 datasheet_id=UNORDERABLE_DATASHEET_ID,
                 name="Munitorum Servitors",
-                keywords=("Infantry",),
-                faction_keywords=("Astra Militarum",),
+                keywords=("INFANTRY",),
+                faction_keywords=("ASTRA MILITARUM",),
             ),
         ),
         factions=(
@@ -1441,7 +1441,7 @@ def _astra_lifecycle_catalog(
             FactionDefinition(
                 faction_id=army_rule.ASTRA_MILITARUM_FACTION_ID,
                 name="Astra Militarum",
-                faction_keywords=("Astra Militarum",),
+                faction_keywords=("ASTRA MILITARUM",),
                 source_ids=("phase17g:astra:faction",),
             ),
         ),
@@ -1469,7 +1469,7 @@ def _orders_profile_payload(*, orders_per_battle_round: int) -> dict[str, JsonVa
     return {
         "profile_kind": army_rule.ORDERS_PROFILE_KIND,
         "orders_per_battle_round": orders_per_battle_round,
-        "eligible_target_keywords": ["Regiment", "Squadron"],
+        "eligible_target_keywords": ["REGIMENT", "SQUADRON"],
         "allowed_order_ids": [order.value for order in army_rule.VoiceOfCommandOrder],
     }
 
@@ -1478,7 +1478,7 @@ def _orders_ability(rule_ir_payload: dict[str, JsonValue] | None) -> DatasheetAb
     return DatasheetAbilityDescriptor(
         ability_id="phase17g-astra-orders",
         name="Orders",
-        source_id="phase17g:astra:datasheet:orders",
+        source_id=army_rule.SOURCE_RULE_ID,
         support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
         source_kind=CatalogAbilitySourceKind.DATASHEET,
         effect_description="voice-of-command-orders-profile",

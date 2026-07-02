@@ -76,7 +76,6 @@ SOURCE_RULE_ID = "phase17f:phase17e:astra-militarum:army-rule"
 ASTRA_MILITARUM_FACTION_ID = "astra-militarum"
 ASTRA_MILITARUM_FACTION_KEYWORD = "ASTRA MILITARUM"
 OFFICER_KEYWORD = "OFFICER"
-ORDERS_ABILITY_NAME = "Orders"
 VOICE_OF_COMMAND_EFFECT_KIND = "astra_militarum_voice_of_command_order"
 VOICE_OF_COMMAND_ISSUE_STATE_KIND = "astra_militarum_voice_of_command_order_issued"
 VOICE_OF_COMMAND_DONE_STATE_KIND = "astra_militarum_voice_of_command_command_phase_done"
@@ -717,9 +716,7 @@ def _voice_of_command_orders_profile_for_unit(
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Voice of Command profile lookup requires UnitInstance.")
     order_abilities = tuple(
-        ability
-        for ability in unit.datasheet_abilities
-        if _normalise_rule_token(ability.name) == _normalise_rule_token(ORDERS_ABILITY_NAME)
+        ability for ability in unit.datasheet_abilities if _ability_has_orders_profile(ability)
     )
     if len(order_abilities) > 1:
         raise GameLifecycleError("Voice of Command found multiple Orders abilities.")
@@ -729,6 +726,15 @@ def _voice_of_command_orders_profile_for_unit(
     if ability.rule_ir_payload is None:
         raise GameLifecycleError("Voice of Command Orders ability requires rule_ir_payload.")
     return _orders_profile_from_ability(ability)
+
+
+def _ability_has_orders_profile(ability: DatasheetAbilityDescriptor) -> bool:
+    if type(ability) is not DatasheetAbilityDescriptor:
+        raise GameLifecycleError("Voice of Command Orders profile requires ability descriptor.")
+    if ability.rule_ir_payload is None:
+        return ability.source_id == SOURCE_RULE_ID
+    payload = _catalog_payload_object(ability.rule_ir_payload)
+    return ability.source_id == SOURCE_RULE_ID or payload.get("profile_kind") == ORDERS_PROFILE_KIND
 
 
 def _orders_profile_from_ability(
@@ -1178,12 +1184,9 @@ def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
 
 
 def _keyword_token_in(*, values: tuple[str, ...], expected: str) -> bool:
-    normalised_expected = _normalise_rule_token(expected)
-    return any(_normalise_rule_token(value) == normalised_expected for value in values)
-
-
-def _normalise_rule_token(value: str) -> str:
-    return "".join(character for character in value.upper() if character.isalnum())
+    if type(values) is not tuple:
+        raise GameLifecycleError("Voice of Command keyword values must be a tuple.")
+    return _validate_identifier("keyword", expected) in values
 
 
 def _battlefield_state(state: GameState) -> BattlefieldRuntimeState:
@@ -1269,10 +1272,9 @@ def _validate_identifier_tuple(
     seen: set[str] = set()
     for value in values:
         identifier = _validate_identifier(f"{field_name} value", value)
-        normalised = _normalise_rule_token(identifier)
-        if normalised in seen:
+        if identifier in seen:
             raise GameLifecycleError(f"Voice of Command {field_name} must not contain duplicates.")
-        seen.add(normalised)
+        seen.add(identifier)
         validated.append(identifier)
     if len(validated) < min_length:
         raise GameLifecycleError(

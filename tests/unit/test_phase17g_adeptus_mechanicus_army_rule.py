@@ -838,8 +838,8 @@ def _remove_doctrina_abilities(state: GameState, *, player_id: str) -> None:
 def _doctrina_ability() -> DatasheetAbilityDescriptor:
     return DatasheetAbilityDescriptor(
         ability_id="adeptus-mechanicus-test-doctrina-imperatives",
-        name=army_rule.DOCTRINA_IMPERATIVES_ABILITY_NAME,
-        source_id="adeptus-mechanicus-test:doctrina-imperatives",
+        name="Doctrina Imperatives",
+        source_id=army_rule.SOURCE_RULE_ID,
         support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
         source_kind=CatalogAbilitySourceKind.DATASHEET,
         effect_description="Select a Doctrina Imperative at the start of the battle round.",

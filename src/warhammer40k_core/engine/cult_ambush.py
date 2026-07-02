@@ -86,7 +86,6 @@ CULT_AMBUSH_MARKER_REMOVAL_DISTANCE_INCHES = 8.0
 CULT_AMBUSH_INGRESS_WHOLLY_WITHIN_INCHES = 3.0
 
 _CULT_AMBUSH_ABILITY_IDS = {"cult-ambush"}
-_CULT_AMBUSH_ABILITY_NAMES = {"CULT AMBUSH", "Cult Ambush"}
 _RESURGENCE_POINTS_BY_BATTLE_SIZE = {
     BattleSize.INCURSION: 6,
     BattleSize.STRIKE_FORCE: 10,
@@ -1375,8 +1374,7 @@ def _unit_has_cult_ambush_ability(unit: UnitInstance) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Cult Ambush eligibility requires UnitInstance.")
     return any(
-        ability.ability_id in _CULT_AMBUSH_ABILITY_IDS or ability.name in _CULT_AMBUSH_ABILITY_NAMES
-        for ability in unit.datasheet_abilities
+        ability.ability_id in _CULT_AMBUSH_ABILITY_IDS for ability in unit.datasheet_abilities
     )
 
 

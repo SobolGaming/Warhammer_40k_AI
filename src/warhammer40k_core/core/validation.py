@@ -35,6 +35,10 @@ def validate_identifier(
     return stripped
 
 
+def canonical_keyword_token(value: str) -> str:
+    return value.upper()
+
+
 @dataclass(frozen=True, slots=True)
 class IdentifierValidator:
     error_factory: ValidationErrorFactory

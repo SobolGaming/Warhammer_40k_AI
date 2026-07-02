@@ -230,6 +230,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_chil
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.imperial_knights import (
     army_rule as imperial_knights_army_rule,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.orks import (
+    army_rule as orks_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons import (
     army_rule as thousand_sons_army_rule,
 )
@@ -387,14 +390,14 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
 
     assert datasheet.name == "Bloodcrushers"
     assert datasheet.keywords.keywords == (
-        "Bloodcrushers",
-        "Chaos",
-        "Daemon",
-        "Khorne",
-        "Mounted",
+        "BLOODCRUSHERS",
+        "CHAOS",
+        "DAEMON",
+        "KHORNE",
+        "MOUNTED",
     )
-    assert "Shadow Legion" not in datasheet.keywords.keywords
-    assert datasheet.keywords.faction_keywords == ("Legiones Daemonica",)
+    assert "SHADOW LEGION" not in datasheet.keywords.keywords
+    assert datasheet.keywords.faction_keywords == ("LEGIONES DAEMONICA",)
     assert composition_by_id["000001115:bloodhunter"].min_models == 1
     assert composition_by_id["000001115:bloodhunter"].max_models == 1
     assert composition_by_id["000001115:bloodcrushers"].min_models == 2
@@ -477,6 +480,50 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
         "roll_type": "charge",
     }
     assert package.to_payload() == type(package).from_payload(package.to_payload()).to_payload()
+
+
+def test_phase17k_bridged_title_case_keywords_support_exact_runtime_keyword_gate() -> None:
+    source_keywords = tuple(
+        row.runtime_fields_payload()["keyword"]
+        for row in _artifact_by_table(
+            _wahapedia_source_artifacts(),
+            "Datasheets_keywords",
+        ).rows
+        if row.runtime_fields_payload()["datasheet_id"] == "000000004"
+    )
+    assert "Orks" in source_keywords
+    assert "Infantry" in source_keywords
+
+    package = build_canonical_catalog_package(
+        package_id=_catalog_package_id(),
+        catalog_version=_catalog_version(),
+        source_artifacts=_weirdboy_bridge_artifacts(),
+    )
+    datasheet = package.army_catalog.datasheet_by_id("000000004")
+    assert datasheet.keywords.faction_keywords == ("ORKS",)
+    assert "INFANTRY" in datasheet.keywords.keywords
+
+    unit = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    ).instantiate_unit(
+        army_id="army-orks",
+        selection=UnitMusterSelection(
+            unit_selection_id="weirdboy-1",
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="000000004:weirdboy",
+                    model_count=1,
+                ),
+            ),
+        ),
+        datasheet=datasheet,
+    )
+
+    assert unit.faction_keywords == ("ORKS",)
+    assert "INFANTRY" in unit.keywords
+    assert orks_army_rule._unit_has_waaagh(unit)  # pyright: ignore[reportPrivateUsage]
 
 
 def test_phase17k_bloodthirster_bridge_supports_replacement_wargear_loadouts() -> None:
@@ -4013,11 +4060,15 @@ def test_phase17k_named_weapon_ability_choice_helpers_cover_invalid_paths() -> N
     with pytest.raises(GameLifecycleError, match="requires RuleEffectSpec values"):
         _effect_is_named_weapon_ability_choice_option(cast(RuleEffectSpec, object()))
 
-    assert _optional_named_weapon_names({"weapon_names": "Bolt of Change|Infernal Gateway"}) == (
+    assert _optional_named_weapon_names(
+        {"weapon_names": ("Bolt of Change", "Infernal Gateway")}
+    ) == (
         "Bolt of Change",
         "Infernal Gateway",
     )
     assert _optional_named_weapon_names({"weapon_name": "Bolt of Change"}) == ("Bolt of Change",)
+    with pytest.raises(GameLifecycleError, match="weapon_names must be a tuple"):
+        _optional_named_weapon_names({"weapon_names": "Bolt of Change|Infernal Gateway"})
     with pytest.raises(GameLifecycleError, match="requires weapon names"):
         _weapon_names_from_parameters({})
     with pytest.raises(GameLifecycleError, match="must be a tuple"):
@@ -4199,7 +4250,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
     grant = CatalogWeaponKeywordGrant(
         source_id="phase17k-helper-grant",
         keyword=cast(WeaponKeyword, "Lance"),
-        weapon_scope="all weapons",
+        weapon_scope="all",
     )
     updated_profile = _profile_with_catalog_weapon_keyword_grant(
         profile=melee_profile,
@@ -4289,7 +4340,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
     assert _weapon_scope_matches_profile(weapon_scope="all", profile=melee_profile)
     assert _weapon_scope_matches_profile(weapon_scope="melee", profile=melee_profile)
     assert not _weapon_scope_matches_profile(weapon_scope="ranged", profile=melee_profile)
-    assert _weapon_scope_matches_profile(weapon_scope="ranged weapons", profile=ranged_profile)
+    assert _weapon_scope_matches_profile(weapon_scope="ranged", profile=ranged_profile)
     assert not _weapon_scope_matches_profile(weapon_scope="melee", profile=ranged_profile)
     for keyword, parameters, expected_kind in (
         (WeaponKeyword.DEVASTATING_WOUNDS, {}, AbilityKind.DEVASTATING_WOUNDS),
@@ -4402,6 +4453,8 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
         )
     with pytest.raises(GameLifecycleError, match="Unsupported catalog weapon keyword grant scope"):
         _weapon_scope_matches_profile(weapon_scope="bad scope", profile=melee_profile)
+    with pytest.raises(GameLifecycleError, match="Unsupported catalog weapon keyword grant scope"):
+        _weapon_scope_matches_profile(weapon_scope="ranged weapons", profile=ranged_profile)
 
 
 def test_phase17k_catalog_ir_roll_reroll_classification_requires_supported_target() -> None:
@@ -7537,6 +7590,24 @@ def _bloodcrushers_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
         source_artifacts=_wahapedia_source_artifacts(),
         bridge_package_id=_bridge_package_id(),
         datasheet_ids=("000001115",),
+    )
+
+
+def _weirdboy_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_wahapedia_source_artifacts(),
+        bridge_package_id=_bridge_package_id(),
+        datasheet_ids=("000000004",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000000004",
+                model_name="Weirdboy",
+                height=1.8,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:orks:weirdboy:height",
+                height_document_reference="Phase 17K Orks bridge regression fixture",
+            ),
+        ),
     )
 
 

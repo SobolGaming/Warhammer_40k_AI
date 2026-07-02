@@ -3546,6 +3546,7 @@ def _lithe_agility_ability() -> DatasheetAbilityDescriptor:
         source_id="drukhari-test:lithe-agility",
         support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
         source_kind=CatalogAbilitySourceKind.DATASHEET,
+        parameter_tokens=(LITHE_AGILITY_ABILITY_KEY,),
         effect_description="When empowered, this unit can re-roll Advance and Charge rolls.",
     )
 
@@ -3557,6 +3558,7 @@ def _hatred_eternal_ability() -> DatasheetAbilityDescriptor:
         source_id="drukhari-test:hatred-eternal",
         support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
         source_kind=CatalogAbilitySourceKind.DATASHEET,
+        parameter_tokens=(HATRED_ETERNAL_ABILITY_KEY,),
         effect_description="When empowered, this unit can re-roll hit rolls.",
     )
 
