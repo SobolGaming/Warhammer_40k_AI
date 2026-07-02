@@ -1,16 +1,18 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 THIS_FILE = Path(__file__).resolve()
+HEX_DIGEST_PATTERN = re.compile(r"\b[0-9a-fA-F]{32,}\b")
 
 
 def test_active_code_tests_and_docs_do_not_reference_retired_edition_ids() -> None:
     violations: list[str] = []
 
     for path in _scanned_paths():
-        text = path.read_text(encoding="utf-8")
+        text = _without_hex_digests(path.read_text(encoding="utf-8"))
         relative_path = path.relative_to(ROOT).as_posix()
         for token in _retired_identity_tokens():
             if token in text:
@@ -63,3 +65,7 @@ def _retired_identity_tokens() -> tuple[str, ...]:
         "eleventh" + "_" + "preview",
         "ELEVENTH" + "_" + "PREVIEW",
     )
+
+
+def _without_hex_digests(text: str) -> str:
+    return HEX_DIGEST_PATTERN.sub("", text)

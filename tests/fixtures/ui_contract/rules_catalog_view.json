@@ -67,10 +67,10 @@
       "datasheet_id": "core-boyz-like-infantry",
       "display_name": "CORE Boyz-like Infantry",
       "faction_keywords": [
-        "CORE Marines"
+        "CORE MARINES"
       ],
       "keywords": [
-        "Infantry"
+        "INFANTRY"
       ],
       "model_profile_ids": [
         "core-boyz-like"
@@ -88,12 +88,12 @@
       "datasheet_id": "core-character-leader",
       "display_name": "CORE Character Leader",
       "faction_keywords": [
-        "CORE Marines"
+        "CORE MARINES"
       ],
       "keywords": [
-        "Character",
-        "Infantry",
-        "Leader"
+        "CHARACTER",
+        "INFANTRY",
+        "LEADER"
       ],
       "model_profile_ids": [
         "core-character-leader"
@@ -111,12 +111,12 @@
       "datasheet_id": "core-character-support",
       "display_name": "CORE Character Support",
       "faction_keywords": [
-        "CORE Marines"
+        "CORE MARINES"
       ],
       "keywords": [
-        "Character",
-        "Infantry",
-        "Support"
+        "CHARACTER",
+        "INFANTRY",
+        "SUPPORT"
       ],
       "model_profile_ids": [
         "core-character-support"
@@ -158,11 +158,11 @@
       "datasheet_id": "core-deep-strike-unit",
       "display_name": "CORE Deep Strike Unit",
       "faction_keywords": [
-        "CORE Marines"
+        "CORE MARINES"
       ],
       "keywords": [
-        "Deep Strike",
-        "Infantry"
+        "DEEP STRIKE",
+        "INFANTRY"
       ],
       "model_profile_ids": [
         "core-deep-strike-model"
@@ -180,11 +180,11 @@
       "datasheet_id": "core-intercessor-like-infantry",
       "display_name": "CORE Intercessor-like Infantry",
       "faction_keywords": [
-        "CORE Marines"
+        "CORE MARINES"
       ],
       "keywords": [
-        "Battleline",
-        "Infantry"
+        "BATTLELINE",
+        "INFANTRY"
       ],
       "model_profile_ids": [
         "core-intercessor-like"
@@ -228,11 +228,11 @@
       "datasheet_id": "core-transport",
       "display_name": "CORE Transport",
       "faction_keywords": [
-        "CORE Marines"
+        "CORE MARINES"
       ],
       "keywords": [
-        "Transport",
-        "Vehicle"
+        "TRANSPORT",
+        "VEHICLE"
       ],
       "model_profile_ids": [
         "core-transport"
@@ -250,11 +250,11 @@
       "datasheet_id": "core-vehicle-monster",
       "display_name": "CORE Vehicle Monster",
       "faction_keywords": [
-        "CORE Marines"
+        "CORE MARINES"
       ],
       "keywords": [
-        "Monster",
-        "Vehicle"
+        "MONSTER",
+        "VEHICLE"
       ],
       "model_profile_ids": [
         "core-vehicle-monster"
@@ -290,7 +290,7 @@
       "display_name": "CORE Marine Force",
       "faction_id": "core-marine-force",
       "faction_keywords": [
-        "CORE Marines"
+        "CORE MARINES"
       ],
       "source_ids": [
         "faction:core-marine-force"
@@ -1068,7 +1068,7 @@
     "game": "warhammer_40000",
     "version": "core-v2-phase9a"
   },
-  "source_hash": "283f63d96d2cbd59d076be5ef0928196a7dbbe2517aa3fca04c71deeb8e657ca",
+  "source_hash": "ac418e15c6ffd7cc300656d6c4a26a1fe83b97a216fd3df4fb56aae2a313751f",
   "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
   "stratagem_display_by_id": {},
   "wargear_display_by_id": {

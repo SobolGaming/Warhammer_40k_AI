@@ -9,7 +9,7 @@ from warhammer40k_core.core.content_scope import (
     CatalogContentScopeError,
     catalog_content_scope_from_token,
 )
-from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
 
 
 class DetachmentCatalogError(ValueError):
@@ -123,6 +123,7 @@ class EnhancementDefinition:
             _validate_identifier_tuple(
                 "EnhancementDefinition target_required_keywords",
                 self.target_required_keywords,
+                canonicalize_keywords=True,
             ),
         )
         object.__setattr__(
@@ -131,6 +132,7 @@ class EnhancementDefinition:
             _validate_identifier_tuple(
                 "EnhancementDefinition target_required_faction_keywords",
                 self.target_required_faction_keywords,
+                canonicalize_keywords=True,
             ),
         )
 
@@ -427,13 +429,20 @@ def _validate_enhancement_subtype_tuple(
     return tuple(sorted(validated, key=lambda subtype: subtype.value))
 
 
-def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:
+def _validate_identifier_tuple(
+    field_name: str,
+    values: tuple[str, ...],
+    *,
+    canonicalize_keywords: bool = False,
+) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise DetachmentCatalogError(f"{field_name} must be a tuple.")
     seen: set[str] = set()
     validated: list[str] = []
     for value in values:
         identifier = _validate_identifier(f"{field_name} value", value)
+        if canonicalize_keywords:
+            identifier = canonical_keyword_token(identifier)
         if identifier in seen:
             raise DetachmentCatalogError(f"{field_name} must not contain duplicates.")
         seen.add(identifier)

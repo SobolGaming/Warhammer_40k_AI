@@ -71,7 +71,7 @@ def test_phase17b_representative_datasheets_generate_deterministic_catalog_recor
     assert package.to_json_bytes() == second_package.to_json_bytes()
     assert CanonicalCatalogPackage.from_payload(payload).to_payload() == package.to_payload()
     assert math.isclose(datasheet.model_profiles[0].base_size.diameter_mm or 0.0, 32.0)
-    assert datasheet.keywords.faction_keywords == ("Death Guard",)
+    assert datasheet.keywords.faction_keywords == ("DEATH GUARD",)
     assert geometry_record.footprint.source_units is GeometrySourceUnits.MILLIMETERS
     assert geometry_record.footprint.canonical_units.value == "inches"
     assert geometry_record.footprint.coordinate_frame is GeometryCoordinateFrame.MODEL_CENTERED_Z_UP

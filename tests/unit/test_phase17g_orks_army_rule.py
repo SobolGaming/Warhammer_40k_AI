@@ -502,8 +502,8 @@ def _orks_lifecycle_catalog() -> ArmyCatalog:
                 base_datasheet,
                 datasheet_id=ORKS_DATASHEET_ID,
                 name="Boyz",
-                keywords=("INFANTRY", "BATTLELINE"),
-                faction_keywords=("ORKS",),
+                keywords=("Infantry", "Battleline"),
+                faction_keywords=("Orks",),
             ),
         ),
         factions=(
@@ -511,7 +511,7 @@ def _orks_lifecycle_catalog() -> ArmyCatalog:
             FactionDefinition(
                 faction_id=army_rule.ORKS_FACTION_ID,
                 name="Orks",
-                faction_keywords=("ORKS",),
+                faction_keywords=("Orks",),
                 source_ids=("phase17g:orks:faction",),
             ),
         ),

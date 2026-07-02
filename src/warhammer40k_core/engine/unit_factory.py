@@ -28,7 +28,7 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionEffectKind,
 )
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
-from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
 from warhammer40k_core.engine.list_validation import (
     ListValidationError,
     MusteringOptionSelection,
@@ -248,7 +248,12 @@ class UnitInstance:
         object.__setattr__(
             self,
             "keywords",
-            _validate_identifier_tuple("UnitInstance keywords", self.keywords, min_length=0),
+            _validate_identifier_tuple(
+                "UnitInstance keywords",
+                self.keywords,
+                min_length=0,
+                canonicalize_keywords=True,
+            ),
         )
         object.__setattr__(
             self,
@@ -257,6 +262,7 @@ class UnitInstance:
                 "UnitInstance faction_keywords",
                 self.faction_keywords,
                 min_length=0,
+                canonicalize_keywords=True,
             ),
         )
         object.__setattr__(
@@ -972,6 +978,7 @@ def _validate_identifier_tuple(
     values: object,
     *,
     min_length: int,
+    canonicalize_keywords: bool = False,
 ) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise UnitFactoryError(f"{field_name} must be a tuple.")
@@ -980,6 +987,8 @@ def _validate_identifier_tuple(
     raw_values = cast(tuple[object, ...], values)
     for value in raw_values:
         identifier = _validate_identifier(f"{field_name} value", value)
+        if canonicalize_keywords:
+            identifier = canonical_keyword_token(identifier)
         if identifier in seen:
             raise UnitFactoryError(f"{field_name} must not contain duplicates.")
         seen.add(identifier)
