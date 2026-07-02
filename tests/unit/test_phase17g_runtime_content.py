@@ -95,6 +95,11 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FightActivationAbilityHookBinding,
     FightActivationAbilityOption,
 )
+from warhammer40k_core.engine.fight_unit_selected_hooks import (
+    FightUnitSelectedContext,
+    FightUnitSelectedEffectGrant,
+    FightUnitSelectedHookBinding,
+)
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -700,6 +705,54 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
     assert "<" not in encoded
 
 
+def test_runtime_content_contribution_stores_hooks_in_canonical_tuple() -> None:
+    def fall_back_handler(
+        _context: FallBackEligibilityContext,
+    ) -> FallBackEligibilityGrant | None:
+        return None
+
+    fall_back_binding = FallBackEligibilityHookBinding(
+        hook_id="combined:shared-hook",
+        source_id="combined:fall-back-source",
+        handler=fall_back_handler,
+    )
+
+    def fight_unit_selected_handler(
+        _context: FightUnitSelectedContext,
+    ) -> tuple[FightUnitSelectedEffectGrant, ...]:
+        return ()
+
+    fight_unit_selected_binding = FightUnitSelectedHookBinding(
+        hook_id="combined:shared-hook",
+        source_id="combined:fight-unit-selected-source",
+        handler=fight_unit_selected_handler,
+    )
+
+    legacy_contribution = RuntimeContentContribution(fall_back_hook_bindings=(fall_back_binding,))
+    canonical_contribution = RuntimeContentContribution(
+        hook_bindings=(fight_unit_selected_binding, fall_back_binding)
+    )
+
+    assert legacy_contribution.hook_bindings == (fall_back_binding,)
+    assert canonical_contribution.hook_bindings == (
+        fall_back_binding,
+        fight_unit_selected_binding,
+    )
+    assert canonical_contribution.fall_back_hook_bindings == (fall_back_binding,)
+    assert canonical_contribution.fight_unit_selected_hook_bindings == (
+        fight_unit_selected_binding,
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="hook binding IDs must be unique per lifecycle event",
+    ):
+        RuntimeContentContribution(
+            hook_bindings=(fall_back_binding,),
+            fall_back_hook_bindings=(fall_back_binding,),
+        )
+
+
 def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_duplicates() -> None:
     ability_record = _ability_record(
         ability_id="combined-ability",
@@ -761,6 +814,17 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
         handler=fight_activation_ability_handler,
     )
 
+    def fight_unit_selected_handler(
+        _context: FightUnitSelectedContext,
+    ) -> tuple[FightUnitSelectedEffectGrant, ...]:
+        return ()
+
+    fight_unit_selected_binding = FightUnitSelectedHookBinding(
+        hook_id="combined:fight-unit-selected-hook",
+        source_id="combined:fight-unit-selected-source",
+        handler=fight_unit_selected_handler,
+    )
+
     def hit_roll_modifier_handler(_context: HitRollModifierContext) -> int:
         return 0
 
@@ -789,6 +853,7 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
                 fall_back_hook_bindings=(fall_back_binding,),
                 enhancement_effect_bindings=(enhancement_effect_binding,),
                 fight_activation_ability_hook_bindings=(fight_activation_ability_binding,),
+                hook_bindings=(fight_unit_selected_binding,),
                 hit_roll_modifier_bindings=(hit_roll_modifier_binding,),
                 wound_roll_modifier_bindings=(wound_roll_modifier_binding,),
             ),
@@ -809,6 +874,7 @@ def test_runtime_content_contribution_combiner_merges_surfaces_and_rejects_dupli
     assert combined.fall_back_hook_bindings == (fall_back_binding,)
     assert combined.enhancement_effect_bindings == (enhancement_effect_binding,)
     assert combined.fight_activation_ability_hook_bindings == (fight_activation_ability_binding,)
+    assert combined.fight_unit_selected_hook_bindings == (fight_unit_selected_binding,)
     assert combined.hit_roll_modifier_bindings == (hit_roll_modifier_binding,)
     assert combined.wound_roll_modifier_bindings == (wound_roll_modifier_binding,)
     assert tuple(combined.faction_named_handlers) == ("combined:named-handler",)

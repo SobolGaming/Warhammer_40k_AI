@@ -69,6 +69,13 @@ from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventIndex,
     RuntimeContentEventSubscription,
 )
+from warhammer40k_core.engine.faction_content.hooks import (
+    HOOK_BINDING_COMBINE_NAME_BY_EVENT,
+    AnyHookBinding,
+    hook_bindings_for_event,
+    lifecycle_event_for_hook_binding,
+    validate_any_hook_bindings,
+)
 from warhammer40k_core.engine.faction_content.stratagem_handlers import (
     StratagemHandlerBinding,
     StratagemHandlerRegistry,
@@ -95,6 +102,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedHookBinding,
     FightUnitSelectedHookRegistry,
 )
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHookBinding,
     MortalWoundFeelNoPainContinuationHookRegistry,
@@ -182,7 +190,19 @@ _merge_records = _bundle_validation.merge_records
 _contribution_values = _bundle_validation.contribution_values
 
 
-@dataclass(frozen=True, slots=True)
+def _validate_contribution_tuple[ValueT](
+    field_name: str,
+    value: object,
+    expected_type: type[ValueT],
+) -> tuple[ValueT, ...]:
+    return _validate_tuple(
+        f"RuntimeContentContribution {field_name}",
+        value,
+        expected_type,
+    )
+
+
+@dataclass(frozen=True, slots=True, init=False)
 class RuntimeContentContribution:
     contribution_id: str = DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID
     ability_records: tuple[AbilityCatalogRecord, ...] = ()
@@ -192,55 +212,8 @@ class RuntimeContentContribution:
     rule_runtime_bindings: tuple[RuleRuntimeBinding, ...] = ()
     event_subscriptions: tuple[RuntimeContentEventSubscription, ...] = ()
     event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = ()
-    battle_formation_hook_bindings: tuple[BattleFormationHookBinding, ...] = ()
-    battle_round_start_hook_bindings: tuple[BattleRoundStartHookBinding, ...] = ()
-    turn_end_hook_bindings: tuple[TurnEndHookBinding, ...] = ()
-    command_phase_start_hook_bindings: tuple[CommandPhaseStartHookBinding, ...] = ()
-    fight_phase_start_hook_bindings: tuple[FightPhaseStartHookBinding, ...] = ()
-    shooting_phase_start_hook_bindings: tuple[ShootingPhaseStartHookBinding, ...] = ()
-    unit_destroyed_hook_bindings: tuple[UnitDestroyedHookBinding, ...] = ()
-    battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = ()
-    advance_eligibility_hook_bindings: tuple[AdvanceEligibilityHookBinding, ...] = ()
-    advance_move_hook_bindings: tuple[AdvanceMoveHookBinding, ...] = ()
-    fall_back_hook_bindings: tuple[FallBackEligibilityHookBinding, ...] = ()
-    movement_end_surge_hook_bindings: tuple[MovementEndSurgeHookBinding, ...] = ()
-    reserve_arrival_distance_hook_bindings: tuple[
-        ReserveArrivalDistanceHookBinding,
-        ...,
-    ] = ()
-    unit_move_completed_mortal_wound_hook_bindings: tuple[
-        UnitMoveCompletedMortalWoundHookBinding,
-        ...,
-    ] = ()
-    mortal_wound_feel_no_pain_hook_bindings: tuple[
-        MortalWoundFeelNoPainContinuationHookBinding,
-        ...,
-    ] = ()
-    charge_declaration_hook_bindings: tuple[ChargeDeclarationHookBinding, ...] = ()
-    shooting_target_restriction_hook_bindings: tuple[
-        ShootingTargetRestrictionHookBinding,
-        ...,
-    ] = ()
-    charge_target_restriction_hook_bindings: tuple[
-        ChargeTargetRestrictionHookBinding,
-        ...,
-    ] = ()
-    shooting_unit_selected_hook_bindings: tuple[ShootingUnitSelectedHookBinding, ...] = ()
-    shooting_unit_selected_grant_hook_bindings: tuple[
-        ShootingUnitSelectedGrantBinding,
-        ...,
-    ] = ()
-    attack_sequence_completed_hook_bindings: tuple[
-        AttackSequenceCompletedHookBinding,
-        ...,
-    ] = ()
-    shooting_end_surge_hook_bindings: tuple[ShootingEndSurgeHookBinding, ...] = ()
+    hook_bindings: tuple[AnyHookBinding, ...] = ()
     enhancement_effect_bindings: tuple[EnhancementEffectBinding, ...] = ()
-    fight_activation_ability_hook_bindings: tuple[FightActivationAbilityHookBinding, ...] = ()
-    fight_unit_selected_hook_bindings: tuple[FightUnitSelectedHookBinding, ...] = ()
-    fight_unit_selected_grant_hook_bindings: tuple[FightUnitSelectedGrantBinding, ...] = ()
-    phase_end_objective_control_hook_bindings: tuple[PhaseEndObjectiveControlHookBinding, ...] = ()
-    stratagem_cost_choice_hook_bindings: tuple[StratagemCostChoiceHookBinding, ...] = ()
     stratagem_cost_modifier_bindings: tuple[StratagemCostModifierBinding, ...] = ()
     unit_characteristic_modifier_bindings: tuple[UnitCharacteristicModifierBinding, ...] = ()
     hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = ()
@@ -252,412 +225,621 @@ class RuntimeContentContribution:
     weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = ()
     faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = EMPTY_NAMED_HANDLERS
 
-    def __post_init__(self) -> None:
+    def __init__(
+        self,
+        contribution_id: str = DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID,
+        *,
+        ability_records: tuple[AbilityCatalogRecord, ...] = (),
+        stratagem_records: tuple[StratagemCatalogRecord, ...] = (),
+        ability_handler_bindings: tuple[AbilityHandlerBinding, ...] = (),
+        stratagem_handler_bindings: tuple[StratagemHandlerBinding, ...] = (),
+        rule_runtime_bindings: tuple[RuleRuntimeBinding, ...] = (),
+        event_subscriptions: tuple[RuntimeContentEventSubscription, ...] = (),
+        event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = (),
+        hook_bindings: tuple[AnyHookBinding, ...] = (),
+        battle_formation_hook_bindings: tuple[BattleFormationHookBinding, ...] = (),
+        battle_round_start_hook_bindings: tuple[BattleRoundStartHookBinding, ...] = (),
+        turn_end_hook_bindings: tuple[TurnEndHookBinding, ...] = (),
+        command_phase_start_hook_bindings: tuple[CommandPhaseStartHookBinding, ...] = (),
+        fight_phase_start_hook_bindings: tuple[FightPhaseStartHookBinding, ...] = (),
+        shooting_phase_start_hook_bindings: tuple[ShootingPhaseStartHookBinding, ...] = (),
+        unit_destroyed_hook_bindings: tuple[UnitDestroyedHookBinding, ...] = (),
+        battle_shock_hook_bindings: tuple[BattleShockHookBinding, ...] = (),
+        advance_eligibility_hook_bindings: tuple[AdvanceEligibilityHookBinding, ...] = (),
+        advance_move_hook_bindings: tuple[AdvanceMoveHookBinding, ...] = (),
+        fall_back_hook_bindings: tuple[FallBackEligibilityHookBinding, ...] = (),
+        movement_end_surge_hook_bindings: tuple[MovementEndSurgeHookBinding, ...] = (),
+        reserve_arrival_distance_hook_bindings: tuple[ReserveArrivalDistanceHookBinding, ...] = (),
+        unit_move_completed_mortal_wound_hook_bindings: tuple[
+            UnitMoveCompletedMortalWoundHookBinding,
+            ...,
+        ] = (),
+        mortal_wound_feel_no_pain_hook_bindings: tuple[
+            MortalWoundFeelNoPainContinuationHookBinding,
+            ...,
+        ] = (),
+        charge_declaration_hook_bindings: tuple[ChargeDeclarationHookBinding, ...] = (),
+        shooting_target_restriction_hook_bindings: tuple[
+            ShootingTargetRestrictionHookBinding,
+            ...,
+        ] = (),
+        charge_target_restriction_hook_bindings: tuple[
+            ChargeTargetRestrictionHookBinding,
+            ...,
+        ] = (),
+        shooting_unit_selected_hook_bindings: tuple[ShootingUnitSelectedHookBinding, ...] = (),
+        shooting_unit_selected_grant_hook_bindings: tuple[
+            ShootingUnitSelectedGrantBinding,
+            ...,
+        ] = (),
+        attack_sequence_completed_hook_bindings: tuple[
+            AttackSequenceCompletedHookBinding,
+            ...,
+        ] = (),
+        shooting_end_surge_hook_bindings: tuple[ShootingEndSurgeHookBinding, ...] = (),
+        fight_activation_ability_hook_bindings: tuple[
+            FightActivationAbilityHookBinding,
+            ...,
+        ] = (),
+        fight_unit_selected_hook_bindings: tuple[FightUnitSelectedHookBinding, ...] = (),
+        fight_unit_selected_grant_hook_bindings: tuple[FightUnitSelectedGrantBinding, ...] = (),
+        phase_end_objective_control_hook_bindings: tuple[
+            PhaseEndObjectiveControlHookBinding,
+            ...,
+        ] = (),
+        stratagem_cost_choice_hook_bindings: tuple[StratagemCostChoiceHookBinding, ...] = (),
+        enhancement_effect_bindings: tuple[EnhancementEffectBinding, ...] = (),
+        stratagem_cost_modifier_bindings: tuple[StratagemCostModifierBinding, ...] = (),
+        unit_characteristic_modifier_bindings: tuple[UnitCharacteristicModifierBinding, ...] = (),
+        hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = (),
+        wound_roll_modifier_bindings: tuple[WoundRollModifierBinding, ...] = (),
+        save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = (),
+        movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = (),
+        objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = (),
+        charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = (),
+        weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = (),
+        faction_named_handlers: Mapping[str, FactionRuleNamedHandler] = EMPTY_NAMED_HANDLERS,
+    ) -> None:
         object.__setattr__(
             self,
             "contribution_id",
-            _validate_identifier("contribution_id", self.contribution_id),
+            _validate_identifier("contribution_id", contribution_id),
         )
         object.__setattr__(
             self,
             "ability_records",
-            _validate_tuple(
-                "RuntimeContentContribution ability_records",
-                self.ability_records,
-                AbilityCatalogRecord,
-            ),
+            _validate_contribution_tuple("ability_records", ability_records, AbilityCatalogRecord),
         )
         object.__setattr__(
             self,
             "stratagem_records",
-            _validate_tuple(
-                "RuntimeContentContribution stratagem_records",
-                self.stratagem_records,
+            _validate_contribution_tuple(
+                "stratagem_records",
+                stratagem_records,
                 StratagemCatalogRecord,
             ),
         )
         object.__setattr__(
             self,
             "ability_handler_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution ability_handler_bindings",
-                self.ability_handler_bindings,
+            _validate_contribution_tuple(
+                "ability_handler_bindings",
+                ability_handler_bindings,
                 AbilityHandlerBinding,
             ),
         )
         object.__setattr__(
             self,
             "stratagem_handler_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution stratagem_handler_bindings",
-                self.stratagem_handler_bindings,
+            _validate_contribution_tuple(
+                "stratagem_handler_bindings",
+                stratagem_handler_bindings,
                 StratagemHandlerBinding,
             ),
         )
         object.__setattr__(
             self,
             "rule_runtime_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution rule_runtime_bindings",
-                self.rule_runtime_bindings,
+            _validate_contribution_tuple(
+                "rule_runtime_bindings",
+                rule_runtime_bindings,
                 RuleRuntimeBinding,
             ),
         )
         object.__setattr__(
             self,
             "event_subscriptions",
-            _validate_tuple(
-                "RuntimeContentContribution event_subscriptions",
-                self.event_subscriptions,
+            _validate_contribution_tuple(
+                "event_subscriptions",
+                event_subscriptions,
                 RuntimeContentEventSubscription,
             ),
         )
         object.__setattr__(
             self,
             "event_handler_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution event_handler_bindings",
-                self.event_handler_bindings,
+            _validate_contribution_tuple(
+                "event_handler_bindings",
+                event_handler_bindings,
                 RuntimeContentEventHandlerBinding,
             ),
         )
-        object.__setattr__(
-            self,
-            "battle_formation_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution battle_formation_hook_bindings",
-                self.battle_formation_hook_bindings,
-                BattleFormationHookBinding,
+        validated_hook_bindings = validate_any_hook_bindings(hook_bindings)
+        legacy_hook_bindings = cast(
+            tuple[AnyHookBinding, ...],
+            (
+                *_validate_contribution_tuple(
+                    "battle_formation_hook_bindings",
+                    battle_formation_hook_bindings,
+                    BattleFormationHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "battle_round_start_hook_bindings",
+                    battle_round_start_hook_bindings,
+                    BattleRoundStartHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "turn_end_hook_bindings",
+                    turn_end_hook_bindings,
+                    TurnEndHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "command_phase_start_hook_bindings",
+                    command_phase_start_hook_bindings,
+                    CommandPhaseStartHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "fight_phase_start_hook_bindings",
+                    fight_phase_start_hook_bindings,
+                    FightPhaseStartHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "shooting_phase_start_hook_bindings",
+                    shooting_phase_start_hook_bindings,
+                    ShootingPhaseStartHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "unit_destroyed_hook_bindings",
+                    unit_destroyed_hook_bindings,
+                    UnitDestroyedHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "battle_shock_hook_bindings",
+                    battle_shock_hook_bindings,
+                    BattleShockHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "advance_eligibility_hook_bindings",
+                    advance_eligibility_hook_bindings,
+                    AdvanceEligibilityHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "advance_move_hook_bindings",
+                    advance_move_hook_bindings,
+                    AdvanceMoveHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "fall_back_hook_bindings",
+                    fall_back_hook_bindings,
+                    FallBackEligibilityHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "movement_end_surge_hook_bindings",
+                    movement_end_surge_hook_bindings,
+                    MovementEndSurgeHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "reserve_arrival_distance_hook_bindings",
+                    reserve_arrival_distance_hook_bindings,
+                    ReserveArrivalDistanceHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "unit_move_completed_mortal_wound_hook_bindings",
+                    unit_move_completed_mortal_wound_hook_bindings,
+                    UnitMoveCompletedMortalWoundHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "mortal_wound_feel_no_pain_hook_bindings",
+                    mortal_wound_feel_no_pain_hook_bindings,
+                    MortalWoundFeelNoPainContinuationHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "charge_declaration_hook_bindings",
+                    charge_declaration_hook_bindings,
+                    ChargeDeclarationHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "shooting_target_restriction_hook_bindings",
+                    shooting_target_restriction_hook_bindings,
+                    ShootingTargetRestrictionHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "charge_target_restriction_hook_bindings",
+                    charge_target_restriction_hook_bindings,
+                    ChargeTargetRestrictionHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "shooting_unit_selected_hook_bindings",
+                    shooting_unit_selected_hook_bindings,
+                    ShootingUnitSelectedHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "shooting_unit_selected_grant_hook_bindings",
+                    shooting_unit_selected_grant_hook_bindings,
+                    ShootingUnitSelectedGrantBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "attack_sequence_completed_hook_bindings",
+                    attack_sequence_completed_hook_bindings,
+                    AttackSequenceCompletedHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "shooting_end_surge_hook_bindings",
+                    shooting_end_surge_hook_bindings,
+                    ShootingEndSurgeHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "fight_activation_ability_hook_bindings",
+                    fight_activation_ability_hook_bindings,
+                    FightActivationAbilityHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "fight_unit_selected_hook_bindings",
+                    fight_unit_selected_hook_bindings,
+                    FightUnitSelectedHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "fight_unit_selected_grant_hook_bindings",
+                    fight_unit_selected_grant_hook_bindings,
+                    FightUnitSelectedGrantBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "phase_end_objective_control_hook_bindings",
+                    phase_end_objective_control_hook_bindings,
+                    PhaseEndObjectiveControlHookBinding,
+                ),
+                *_validate_contribution_tuple(
+                    "stratagem_cost_choice_hook_bindings",
+                    stratagem_cost_choice_hook_bindings,
+                    StratagemCostChoiceHookBinding,
+                ),
             ),
         )
         object.__setattr__(
             self,
-            "battle_round_start_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution battle_round_start_hook_bindings",
-                self.battle_round_start_hook_bindings,
-                BattleRoundStartHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "turn_end_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution turn_end_hook_bindings",
-                self.turn_end_hook_bindings,
-                TurnEndHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "command_phase_start_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution command_phase_start_hook_bindings",
-                self.command_phase_start_hook_bindings,
-                CommandPhaseStartHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "fight_phase_start_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution fight_phase_start_hook_bindings",
-                self.fight_phase_start_hook_bindings,
-                FightPhaseStartHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "shooting_phase_start_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution shooting_phase_start_hook_bindings",
-                self.shooting_phase_start_hook_bindings,
-                ShootingPhaseStartHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "battle_shock_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution battle_shock_hook_bindings",
-                self.battle_shock_hook_bindings,
-                BattleShockHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "unit_destroyed_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution unit_destroyed_hook_bindings",
-                self.unit_destroyed_hook_bindings,
-                UnitDestroyedHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "advance_eligibility_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution advance_eligibility_hook_bindings",
-                self.advance_eligibility_hook_bindings,
-                AdvanceEligibilityHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "advance_move_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution advance_move_hook_bindings",
-                self.advance_move_hook_bindings,
-                AdvanceMoveHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "fall_back_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution fall_back_hook_bindings",
-                self.fall_back_hook_bindings,
-                FallBackEligibilityHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "movement_end_surge_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution movement_end_surge_hook_bindings",
-                self.movement_end_surge_hook_bindings,
-                MovementEndSurgeHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "reserve_arrival_distance_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution reserve_arrival_distance_hook_bindings",
-                self.reserve_arrival_distance_hook_bindings,
-                ReserveArrivalDistanceHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "unit_move_completed_mortal_wound_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution unit_move_completed_mortal_wound_hook_bindings",
-                self.unit_move_completed_mortal_wound_hook_bindings,
-                UnitMoveCompletedMortalWoundHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "mortal_wound_feel_no_pain_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution mortal_wound_feel_no_pain_hook_bindings",
-                self.mortal_wound_feel_no_pain_hook_bindings,
-                MortalWoundFeelNoPainContinuationHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "charge_declaration_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution charge_declaration_hook_bindings",
-                self.charge_declaration_hook_bindings,
-                ChargeDeclarationHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "shooting_target_restriction_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution shooting_target_restriction_hook_bindings",
-                self.shooting_target_restriction_hook_bindings,
-                ShootingTargetRestrictionHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "charge_target_restriction_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution charge_target_restriction_hook_bindings",
-                self.charge_target_restriction_hook_bindings,
-                ChargeTargetRestrictionHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "shooting_end_surge_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution shooting_end_surge_hook_bindings",
-                self.shooting_end_surge_hook_bindings,
-                ShootingEndSurgeHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "shooting_unit_selected_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution shooting_unit_selected_hook_bindings",
-                self.shooting_unit_selected_hook_bindings,
-                ShootingUnitSelectedHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "shooting_unit_selected_grant_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution shooting_unit_selected_grant_hook_bindings",
-                self.shooting_unit_selected_grant_hook_bindings,
-                ShootingUnitSelectedGrantBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "attack_sequence_completed_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution attack_sequence_completed_hook_bindings",
-                self.attack_sequence_completed_hook_bindings,
-                AttackSequenceCompletedHookBinding,
-            ),
+            "hook_bindings",
+            validate_any_hook_bindings((*validated_hook_bindings, *legacy_hook_bindings)),
         )
         object.__setattr__(
             self,
             "enhancement_effect_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution enhancement_effect_bindings",
-                self.enhancement_effect_bindings,
+            _validate_contribution_tuple(
+                "enhancement_effect_bindings",
+                enhancement_effect_bindings,
                 EnhancementEffectBinding,
             ),
         )
         object.__setattr__(
             self,
-            "fight_activation_ability_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution fight_activation_ability_hook_bindings",
-                self.fight_activation_ability_hook_bindings,
-                FightActivationAbilityHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "fight_unit_selected_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution fight_unit_selected_hook_bindings",
-                self.fight_unit_selected_hook_bindings,
-                FightUnitSelectedHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "fight_unit_selected_grant_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution fight_unit_selected_grant_hook_bindings",
-                self.fight_unit_selected_grant_hook_bindings,
-                FightUnitSelectedGrantBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "phase_end_objective_control_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution phase_end_objective_control_hook_bindings",
-                self.phase_end_objective_control_hook_bindings,
-                PhaseEndObjectiveControlHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "stratagem_cost_choice_hook_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution stratagem_cost_choice_hook_bindings",
-                self.stratagem_cost_choice_hook_bindings,
-                StratagemCostChoiceHookBinding,
-            ),
-        )
-        object.__setattr__(
-            self,
             "stratagem_cost_modifier_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution stratagem_cost_modifier_bindings",
-                self.stratagem_cost_modifier_bindings,
+            _validate_contribution_tuple(
+                "stratagem_cost_modifier_bindings",
+                stratagem_cost_modifier_bindings,
                 StratagemCostModifierBinding,
             ),
         )
         object.__setattr__(
             self,
             "unit_characteristic_modifier_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution unit_characteristic_modifier_bindings",
-                self.unit_characteristic_modifier_bindings,
+            _validate_contribution_tuple(
+                "unit_characteristic_modifier_bindings",
+                unit_characteristic_modifier_bindings,
                 UnitCharacteristicModifierBinding,
             ),
         )
         object.__setattr__(
             self,
             "hit_roll_modifier_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution hit_roll_modifier_bindings",
-                self.hit_roll_modifier_bindings,
+            _validate_contribution_tuple(
+                "hit_roll_modifier_bindings",
+                hit_roll_modifier_bindings,
                 HitRollModifierBinding,
             ),
         )
         object.__setattr__(
             self,
             "wound_roll_modifier_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution wound_roll_modifier_bindings",
-                self.wound_roll_modifier_bindings,
+            _validate_contribution_tuple(
+                "wound_roll_modifier_bindings",
+                wound_roll_modifier_bindings,
                 WoundRollModifierBinding,
             ),
         )
         object.__setattr__(
             self,
             "save_option_modifier_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution save_option_modifier_bindings",
-                self.save_option_modifier_bindings,
+            _validate_contribution_tuple(
+                "save_option_modifier_bindings",
+                save_option_modifier_bindings,
                 SaveOptionModifierBinding,
             ),
         )
         object.__setattr__(
             self,
             "movement_budget_modifier_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution movement_budget_modifier_bindings",
-                self.movement_budget_modifier_bindings,
+            _validate_contribution_tuple(
+                "movement_budget_modifier_bindings",
+                movement_budget_modifier_bindings,
                 MovementBudgetModifierBinding,
             ),
         )
         object.__setattr__(
             self,
             "objective_control_modifier_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution objective_control_modifier_bindings",
-                self.objective_control_modifier_bindings,
+            _validate_contribution_tuple(
+                "objective_control_modifier_bindings",
+                objective_control_modifier_bindings,
                 ObjectiveControlModifierBinding,
             ),
         )
         object.__setattr__(
             self,
             "charge_roll_modifier_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution charge_roll_modifier_bindings",
-                self.charge_roll_modifier_bindings,
+            _validate_contribution_tuple(
+                "charge_roll_modifier_bindings",
+                charge_roll_modifier_bindings,
                 ChargeRollModifierBinding,
             ),
         )
         object.__setattr__(
             self,
             "weapon_profile_modifier_bindings",
-            _validate_tuple(
-                "RuntimeContentContribution weapon_profile_modifier_bindings",
-                self.weapon_profile_modifier_bindings,
+            _validate_contribution_tuple(
+                "weapon_profile_modifier_bindings",
+                weapon_profile_modifier_bindings,
                 WeaponProfileModifierBinding,
             ),
         )
         object.__setattr__(
             self,
             "faction_named_handlers",
-            _validate_named_handlers(self.faction_named_handlers),
+            _validate_named_handlers(faction_named_handlers),
+        )
+
+    @property
+    def battle_formation_hook_bindings(self) -> tuple[BattleFormationHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.BATTLE_FORMATION,
+            BattleFormationHookBinding,
+        )
+
+    @property
+    def battle_round_start_hook_bindings(self) -> tuple[BattleRoundStartHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.BATTLE_ROUND_START,
+            BattleRoundStartHookBinding,
+        )
+
+    @property
+    def turn_end_hook_bindings(self) -> tuple[TurnEndHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.TURN_END,
+            TurnEndHookBinding,
+        )
+
+    @property
+    def command_phase_start_hook_bindings(self) -> tuple[CommandPhaseStartHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.COMMAND_PHASE_START,
+            CommandPhaseStartHookBinding,
+        )
+
+    @property
+    def fight_phase_start_hook_bindings(self) -> tuple[FightPhaseStartHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.FIGHT_PHASE_START,
+            FightPhaseStartHookBinding,
+        )
+
+    @property
+    def shooting_phase_start_hook_bindings(self) -> tuple[ShootingPhaseStartHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.SHOOTING_PHASE_START,
+            ShootingPhaseStartHookBinding,
+        )
+
+    @property
+    def unit_destroyed_hook_bindings(self) -> tuple[UnitDestroyedHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.UNIT_DESTROYED,
+            UnitDestroyedHookBinding,
+        )
+
+    @property
+    def battle_shock_hook_bindings(self) -> tuple[BattleShockHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.BATTLE_SHOCK,
+            BattleShockHookBinding,
+        )
+
+    @property
+    def advance_eligibility_hook_bindings(self) -> tuple[AdvanceEligibilityHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.ADVANCE_ELIGIBILITY,
+            AdvanceEligibilityHookBinding,
+        )
+
+    @property
+    def advance_move_hook_bindings(self) -> tuple[AdvanceMoveHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.ADVANCE_MOVE,
+            AdvanceMoveHookBinding,
+        )
+
+    @property
+    def fall_back_hook_bindings(self) -> tuple[FallBackEligibilityHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.FALL_BACK_ELIGIBILITY,
+            FallBackEligibilityHookBinding,
+        )
+
+    @property
+    def movement_end_surge_hook_bindings(self) -> tuple[MovementEndSurgeHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.MOVEMENT_END_SURGE,
+            MovementEndSurgeHookBinding,
+        )
+
+    @property
+    def reserve_arrival_distance_hook_bindings(
+        self,
+    ) -> tuple[ReserveArrivalDistanceHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.RESERVE_ARRIVAL_DISTANCE,
+            ReserveArrivalDistanceHookBinding,
+        )
+
+    @property
+    def unit_move_completed_mortal_wound_hook_bindings(
+        self,
+    ) -> tuple[UnitMoveCompletedMortalWoundHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.UNIT_MOVE_COMPLETED_MORTAL_WOUND,
+            UnitMoveCompletedMortalWoundHookBinding,
+        )
+
+    @property
+    def mortal_wound_feel_no_pain_hook_bindings(
+        self,
+    ) -> tuple[MortalWoundFeelNoPainContinuationHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.MORTAL_WOUND_FEEL_NO_PAIN_CONTINUATION,
+            MortalWoundFeelNoPainContinuationHookBinding,
+        )
+
+    @property
+    def charge_declaration_hook_bindings(self) -> tuple[ChargeDeclarationHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.CHARGE_DECLARATION,
+            ChargeDeclarationHookBinding,
+        )
+
+    @property
+    def shooting_target_restriction_hook_bindings(
+        self,
+    ) -> tuple[ShootingTargetRestrictionHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.SHOOTING_TARGET_RESTRICTION,
+            ShootingTargetRestrictionHookBinding,
+        )
+
+    @property
+    def charge_target_restriction_hook_bindings(
+        self,
+    ) -> tuple[ChargeTargetRestrictionHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.CHARGE_TARGET_RESTRICTION,
+            ChargeTargetRestrictionHookBinding,
+        )
+
+    @property
+    def shooting_unit_selected_hook_bindings(self) -> tuple[ShootingUnitSelectedHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.SHOOTING_UNIT_SELECTED,
+            ShootingUnitSelectedHookBinding,
+        )
+
+    @property
+    def shooting_unit_selected_grant_hook_bindings(
+        self,
+    ) -> tuple[ShootingUnitSelectedGrantBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.SHOOTING_UNIT_SELECTED_GRANT,
+            ShootingUnitSelectedGrantBinding,
+        )
+
+    @property
+    def attack_sequence_completed_hook_bindings(
+        self,
+    ) -> tuple[AttackSequenceCompletedHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.ATTACK_SEQUENCE_COMPLETED,
+            AttackSequenceCompletedHookBinding,
+        )
+
+    @property
+    def shooting_end_surge_hook_bindings(self) -> tuple[ShootingEndSurgeHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.SHOOTING_END_SURGE,
+            ShootingEndSurgeHookBinding,
+        )
+
+    @property
+    def fight_activation_ability_hook_bindings(
+        self,
+    ) -> tuple[FightActivationAbilityHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.FIGHT_ACTIVATION_ABILITY,
+            FightActivationAbilityHookBinding,
+        )
+
+    @property
+    def fight_unit_selected_hook_bindings(self) -> tuple[FightUnitSelectedHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.FIGHT_UNIT_SELECTED,
+            FightUnitSelectedHookBinding,
+        )
+
+    @property
+    def fight_unit_selected_grant_hook_bindings(
+        self,
+    ) -> tuple[FightUnitSelectedGrantBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.FIGHT_UNIT_SELECTED_GRANT,
+            FightUnitSelectedGrantBinding,
+        )
+
+    @property
+    def phase_end_objective_control_hook_bindings(
+        self,
+    ) -> tuple[PhaseEndObjectiveControlHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.PHASE_END_OBJECTIVE_CONTROL,
+            PhaseEndObjectiveControlHookBinding,
+        )
+
+    @property
+    def stratagem_cost_choice_hook_bindings(self) -> tuple[StratagemCostChoiceHookBinding, ...]:
+        return hook_bindings_for_event(
+            self.hook_bindings,
+            LifecycleHookEvent.STRATAGEM_COST_CHOICE,
+            StratagemCostChoiceHookBinding,
         )
 
     def with_contribution_id(self, contribution_id: str) -> RuntimeContentContribution:
@@ -675,6 +857,27 @@ def _combine_contribution_values[T](
         _contribution_values(contributions, getter),
         identifier_for,
     )
+
+
+def _combine_hook_bindings(
+    contributions: tuple[RuntimeContentContribution, ...],
+) -> tuple[AnyHookBinding, ...]:
+    combined: list[AnyHookBinding] = []
+    for event, field_name in HOOK_BINDING_COMBINE_NAME_BY_EVENT.items():
+        event_bindings = tuple(
+            binding
+            for contribution in contributions
+            for binding in contribution.hook_bindings
+            if lifecycle_event_for_hook_binding(binding) == event
+        )
+        combined.extend(
+            _combine_unique_values(
+                field_name,
+                event_bindings,
+                lambda binding: binding.hook_id,
+            )
+        )
+    return validate_any_hook_bindings(tuple(combined))
 
 
 def combine_runtime_content_contributions(
@@ -727,165 +930,7 @@ def combine_runtime_content_contributions(
             lambda contribution: contribution.event_handler_bindings,
             lambda binding: binding.handler_id,
         ),
-        battle_formation_hook_bindings=_combine_contribution_values(
-            validated_contributions,
-            "battle formation hook binding",
-            lambda contribution: contribution.battle_formation_hook_bindings,
-            lambda binding: binding.hook_id,
-        ),
-        battle_round_start_hook_bindings=_combine_contribution_values(
-            validated_contributions,
-            "battle-round start hook binding",
-            lambda contribution: contribution.battle_round_start_hook_bindings,
-            lambda binding: binding.hook_id,
-        ),
-        turn_end_hook_bindings=_combine_contribution_values(
-            validated_contributions,
-            "turn-end hook binding",
-            lambda contribution: contribution.turn_end_hook_bindings,
-            lambda binding: binding.hook_id,
-        ),
-        command_phase_start_hook_bindings=_combine_contribution_values(
-            validated_contributions,
-            "Command-phase start hook binding",
-            lambda contribution: contribution.command_phase_start_hook_bindings,
-            lambda binding: binding.hook_id,
-        ),
-        fight_phase_start_hook_bindings=_combine_contribution_values(
-            validated_contributions,
-            "Fight-phase start hook binding",
-            lambda contribution: contribution.fight_phase_start_hook_bindings,
-            lambda binding: binding.hook_id,
-        ),
-        shooting_phase_start_hook_bindings=_combine_contribution_values(
-            validated_contributions,
-            "Shooting-phase start hook binding",
-            lambda contribution: contribution.shooting_phase_start_hook_bindings,
-            lambda binding: binding.hook_id,
-        ),
-        unit_destroyed_hook_bindings=_combine_contribution_values(
-            validated_contributions,
-            "Unit-destroyed hook binding",
-            lambda contribution: contribution.unit_destroyed_hook_bindings,
-            lambda binding: binding.hook_id,
-        ),
-        battle_shock_hook_bindings=_combine_contribution_values(
-            validated_contributions,
-            "Battle-shock hook binding",
-            lambda contribution: contribution.battle_shock_hook_bindings,
-            lambda binding: binding.hook_id,
-        ),
-        advance_eligibility_hook_bindings=_combine_contribution_values(
-            validated_contributions,
-            "Advance eligibility hook binding",
-            lambda contribution: contribution.advance_eligibility_hook_bindings,
-            lambda binding: binding.hook_id,
-        ),
-        advance_move_hook_bindings=_combine_contribution_values(
-            validated_contributions,
-            "Advance hook binding",
-            lambda contribution: contribution.advance_move_hook_bindings,
-            lambda binding: binding.hook_id,
-        ),
-        fall_back_hook_bindings=_combine_contribution_values(
-            validated_contributions,
-            "Fall Back eligibility hook binding",
-            lambda contribution: contribution.fall_back_hook_bindings,
-            lambda binding: binding.hook_id,
-        ),
-        movement_end_surge_hook_bindings=_combine_contribution_values(
-            validated_contributions,
-            "movement-end surge hook binding",
-            lambda contribution: contribution.movement_end_surge_hook_bindings,
-            lambda binding: binding.hook_id,
-        ),
-        reserve_arrival_distance_hook_bindings=_combine_contribution_values(
-            validated_contributions,
-            "reserve arrival distance hook binding",
-            lambda contribution: contribution.reserve_arrival_distance_hook_bindings,
-            lambda binding: binding.hook_id,
-        ),
-        unit_move_completed_mortal_wound_hook_bindings=_combine_unique_values(
-            "unit move completed mortal wound hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.unit_move_completed_mortal_wound_hook_bindings
-            ),
-            lambda binding: binding.hook_id,
-        ),
-        mortal_wound_feel_no_pain_hook_bindings=_combine_unique_values(
-            "mortal wound Feel No Pain hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.mortal_wound_feel_no_pain_hook_bindings
-            ),
-            lambda binding: binding.hook_id,
-        ),
-        charge_declaration_hook_bindings=_combine_unique_values(
-            "charge declaration hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.charge_declaration_hook_bindings
-            ),
-            lambda binding: binding.hook_id,
-        ),
-        shooting_target_restriction_hook_bindings=_combine_unique_values(
-            "shooting target restriction hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.shooting_target_restriction_hook_bindings
-            ),
-            lambda binding: binding.hook_id,
-        ),
-        charge_target_restriction_hook_bindings=_combine_unique_values(
-            "charge target restriction hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.charge_target_restriction_hook_bindings
-            ),
-            lambda binding: binding.hook_id,
-        ),
-        shooting_end_surge_hook_bindings=_combine_unique_values(
-            "shooting-end surge hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.shooting_end_surge_hook_bindings
-            ),
-            lambda binding: binding.hook_id,
-        ),
-        shooting_unit_selected_hook_bindings=_combine_unique_values(
-            "shooting-unit-selected hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.shooting_unit_selected_hook_bindings
-            ),
-            lambda binding: binding.hook_id,
-        ),
-        shooting_unit_selected_grant_hook_bindings=_combine_unique_values(
-            "shooting-unit-selected grant hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.shooting_unit_selected_grant_hook_bindings
-            ),
-            lambda binding: binding.hook_id,
-        ),
-        attack_sequence_completed_hook_bindings=_combine_unique_values(
-            "attack-sequence-completed hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.attack_sequence_completed_hook_bindings
-            ),
-            lambda binding: binding.hook_id,
-        ),
+        hook_bindings=_combine_hook_bindings(validated_contributions),
         enhancement_effect_bindings=_combine_unique_values(
             "enhancement effect binding",
             tuple(
@@ -894,42 +939,6 @@ def combine_runtime_content_contributions(
                 for binding in contribution.enhancement_effect_bindings
             ),
             lambda binding: binding.effect_id,
-        ),
-        fight_activation_ability_hook_bindings=_combine_unique_values(
-            "Fight activation ability hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.fight_activation_ability_hook_bindings
-            ),
-            lambda binding: binding.hook_id,
-        ),
-        fight_unit_selected_grant_hook_bindings=_combine_unique_values(
-            "fight-unit-selected grant hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.fight_unit_selected_grant_hook_bindings
-            ),
-            lambda binding: binding.hook_id,
-        ),
-        phase_end_objective_control_hook_bindings=_combine_unique_values(
-            "phase-end objective-control hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.phase_end_objective_control_hook_bindings
-            ),
-            lambda binding: binding.hook_id,
-        ),
-        stratagem_cost_choice_hook_bindings=_combine_unique_values(
-            "Stratagem cost choice hook binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.stratagem_cost_choice_hook_bindings
-            ),
-            lambda binding: binding.hook_id,
         ),
         stratagem_cost_modifier_bindings=_combine_unique_values(
             "Stratagem cost modifier binding",

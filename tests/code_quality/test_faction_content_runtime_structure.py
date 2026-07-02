@@ -243,6 +243,7 @@ def test_scaffold_contributions_have_stable_ids_and_placeholders_are_empty() -> 
             or contribution.rule_runtime_bindings
             or contribution.event_subscriptions
             or contribution.event_handler_bindings
+            or contribution.hook_bindings
             or contribution.battle_formation_hook_bindings
             or contribution.battle_shock_hook_bindings
             or contribution.fall_back_hook_bindings
