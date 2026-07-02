@@ -241,7 +241,7 @@ def test_hidden_data_is_redacted_but_legal_options_remain_explicit() -> None:
     initial_pending = _json_object(initial_player_b["pending_decision"])
 
     assert initial_pending["request_id"] == "decision-request-000001"
-    assert initial_pending["decision_type"] == "select_secondary_missions"
+    assert initial_pending["decision_type"] == "hidden_decision"
     assert initial_pending["payload"] == {"hidden": True, "secret": True}
     assert initial_pending["options"] == []
 

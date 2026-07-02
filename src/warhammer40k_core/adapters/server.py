@@ -17,6 +17,10 @@ from warhammer40k_core.adapters.projection import (
     DecisionRequestViewPayload,
     RulesCatalogViewPayload,
 )
+from warhammer40k_core.adapters.redaction import (
+    decision_request_hidden_from_viewer,
+    redacted_decision_type_for_hidden_viewer,
+)
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.engine.event_log import EventLogError, JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameConfigPayload
@@ -189,6 +193,7 @@ class AdapterGameServer:
             return _status_response(
                 game_id=game_id,
                 status=session.advance_until_decision_or_terminal(),
+                viewer_player_id=_optional_query_string(query, key="viewer_player_id"),
             )
         if method == "GET" and path_segments == ("games", game_id, "view"):
             return ServerResponse(
@@ -271,6 +276,7 @@ class AdapterGameServer:
             game_id=config.game_id,
             status=status,
             status_code=HTTPStatus.CREATED,
+            viewer_player_id=None,
         )
 
     def _submit_option(
@@ -301,7 +307,7 @@ class AdapterGameServer:
             option_id=option_id,
             result_id=_required_string(payload, key="result_id"),
         )
-        return _status_response(game_id=game_id, status=status)
+        return _status_response(game_id=game_id, status=status, viewer_player_id=actor_id)
 
     def _submit_parameterized_payload(
         self,
@@ -337,7 +343,12 @@ class AdapterGameServer:
             if status.status_kind is LifecycleStatusKind.INVALID
             else HTTPStatus.OK
         )
-        return _status_response(game_id=game_id, status=status, status_code=status_code)
+        return _status_response(
+            game_id=game_id,
+            status=status,
+            status_code=status_code,
+            viewer_player_id=actor_id,
+        )
 
     def _session(self, game_id: str) -> AdapterGameSession:
         session = self._sessions.get(game_id)
@@ -466,11 +477,12 @@ def _status_response(
     *,
     game_id: str,
     status: LifecycleStatus,
+    viewer_player_id: str | None,
     status_code: HTTPStatus = HTTPStatus.OK,
 ) -> ServerResponse:
     payload: ServerGameStatusPayload = {
         "game_id": game_id,
-        "status": _status_summary(status),
+        "status": _status_summary(status, viewer_player_id=viewer_player_id),
     }
     return ServerResponse(
         status_code=int(status_code),
@@ -478,8 +490,20 @@ def _status_response(
     )
 
 
-def _status_summary(status: LifecycleStatus) -> ServerLifecycleStatusPayload:
+def _status_summary(
+    status: LifecycleStatus,
+    *,
+    viewer_player_id: str | None,
+) -> ServerLifecycleStatusPayload:
     decision_request = status.decision_request
+    hidden_pending = (
+        False
+        if decision_request is None
+        else decision_request_hidden_from_viewer(
+            request=decision_request,
+            viewer_player_id=viewer_player_id,
+        )
+    )
     metadata_payload = (
         status.payload
         if status.status_kind
@@ -495,9 +519,19 @@ def _status_summary(status: LifecycleStatus) -> ServerLifecycleStatusPayload:
         "status_kind": status.status_kind.value,
         "message": status.message,
         "payload": metadata_payload,
-        "pending_request_id": None if decision_request is None else decision_request.request_id,
-        "decision_type": None if decision_request is None else decision_request.decision_type,
-        "actor_id": None if decision_request is None else decision_request.actor_id,
+        "pending_request_id": (
+            None if decision_request is None or hidden_pending else decision_request.request_id
+        ),
+        "decision_type": (
+            None
+            if decision_request is None
+            else redacted_decision_type_for_hidden_viewer()
+            if hidden_pending
+            else decision_request.decision_type
+        ),
+        "actor_id": (
+            None if decision_request is None or hidden_pending else decision_request.actor_id
+        ),
     }
 
 
@@ -560,6 +594,12 @@ def _query_string(query: Mapping[str, str], *, key: str) -> str:
             code="missing_query_parameter",
             message=f"Missing required query parameter: {key}.",
         )
+    return _validate_identifier(key, query[key])
+
+
+def _optional_query_string(query: Mapping[str, str], *, key: str) -> str | None:
+    if key not in query:
+        return None
     return _validate_identifier(key, query[key])
 
 

@@ -3,6 +3,10 @@ from __future__ import annotations
 import hashlib
 from typing import TypedDict
 
+from warhammer40k_core.adapters.redaction import (
+    decision_request_hidden_from_viewer,
+    redacted_decision_type_for_hidden_viewer,
+)
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import BaseSizeDefinition, DatasheetAbilityDescriptor
@@ -975,10 +979,10 @@ def _decision_request_view(
     *,
     viewer_player_id: str,
 ) -> DecisionRequestViewPayload:
-    if _secret_request_hidden_from_viewer(request=request, viewer_player_id=viewer_player_id):
+    if decision_request_hidden_from_viewer(request=request, viewer_player_id=viewer_player_id):
         return {
             "request_id": request.request_id,
-            "decision_type": _redacted_decision_type(request.decision_type),
+            "decision_type": redacted_decision_type_for_hidden_viewer(),
             "actor_id": request.actor_id,
             "payload": {
                 "secret": True,
@@ -1002,7 +1006,7 @@ def _proposal_view(
     *,
     viewer_player_id: str,
 ) -> JsonValue:
-    if _secret_request_hidden_from_viewer(request=request, viewer_player_id=viewer_player_id):
+    if decision_request_hidden_from_viewer(request=request, viewer_player_id=viewer_player_id):
         return None
     if not request.is_parameterized_submission_request():
         return None
@@ -1038,34 +1042,6 @@ def _pending_request(lifecycle: GameLifecycle) -> DecisionRequest | None:
     if not pending_requests:
         return None
     return pending_requests[0]
-
-
-def _secret_request_hidden_from_viewer(
-    *,
-    request: DecisionRequest,
-    viewer_player_id: str,
-) -> bool:
-    if request.actor_id == viewer_player_id:
-        return False
-    payload = request.payload
-    if not isinstance(payload, dict):
-        return False
-    secret = payload.get("secret")
-    if secret is None:
-        return False
-    if type(secret) is not bool:
-        raise GameLifecycleError("Secret DecisionRequest payload flag must be a bool.")
-    return secret
-
-
-def _redacted_decision_type(decision_type: str) -> str:
-    if decision_type in {
-        "draw_tactical_secondary_missions",
-        "discard_tactical_secondary_mission",
-        "start_mission_action",
-    }:
-        return "hidden_decision"
-    return decision_type
 
 
 def _validate_viewer(*, state: GameState, viewer_player_id: object) -> str:

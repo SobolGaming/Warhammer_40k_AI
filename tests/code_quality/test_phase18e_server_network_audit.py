@@ -38,6 +38,25 @@ ENGINE_DICE_MODULES = frozenset(
         "warhammer40k_core.engine.dice",
     }
 )
+REDACTION_CONSUMER_MODULES = (
+    SRC / "adapters" / "projection.py",
+    SRC / "adapters" / "event_stream.py",
+    SRC / "adapters" / "server.py",
+)
+LOCAL_REDACTION_HELPER_NAMES = frozenset(
+    {
+        "_redacted_decision_type",
+        "_redact_decision_type_for_hidden_viewer",
+        "_secret_request_hidden_from_viewer",
+    }
+)
+LEGACY_HIDDEN_DECISION_TYPES = frozenset(
+    {
+        "discard_tactical_secondary_mission",
+        "draw_tactical_secondary_missions",
+        "start_mission_action",
+    }
+)
 
 
 def test_phase18e_server_network_modules_do_not_bypass_session_facade() -> None:
@@ -93,4 +112,33 @@ def test_phase18e_client_network_headless_modules_do_not_own_dice_rng() -> None:
                     violations.append(f"{path}: calls {node.func.id}")
             if isinstance(node, ast.Name) and node.id in {"DiceRollManager", "RandomSource"}:
                 violations.append(f"{path}: references forbidden dice/RNG owner {node.id}")
+    assert not violations
+
+
+def test_adapter_hidden_decision_redaction_is_centralized() -> None:
+    violations: list[str] = []
+    for path in REDACTION_CONSUMER_MODULES:
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        imports_shared_redaction = False
+        for node in ast.walk(tree):
+            if (
+                isinstance(node, ast.ImportFrom)
+                and node.module == "warhammer40k_core.adapters.redaction"
+            ):
+                imports_shared_redaction = True
+            if isinstance(node, ast.FunctionDef) and node.name in LOCAL_REDACTION_HELPER_NAMES:
+                violations.append(f"{path}: defines local hidden-decision helper {node.name}")
+            if isinstance(node, ast.Set):
+                hidden_type_literals = {
+                    element.value
+                    for element in node.elts
+                    if isinstance(element, ast.Constant) and type(element.value) is str
+                } & LEGACY_HIDDEN_DECISION_TYPES
+                if hidden_type_literals:
+                    violations.append(
+                        f"{path}: defines local hidden-decision type set "
+                        f"{sorted(hidden_type_literals)}"
+                    )
+        if not imports_shared_redaction:
+            violations.append(f"{path}: does not import adapters.redaction")
     assert not violations

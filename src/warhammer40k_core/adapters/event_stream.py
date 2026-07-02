@@ -3,6 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TypedDict, cast
 
+from warhammer40k_core.adapters.redaction import (
+    decision_request_payload_hidden_from_viewer,
+    redacted_decision_type_for_hidden_viewer,
+)
 from warhammer40k_core.engine.event_log import (
     EventLog,
     EventRecordPayload,
@@ -139,7 +143,7 @@ def _public_decision_request_payload(
     viewer_player_id: str,
 ) -> JsonValue:
     request_payload = _json_object("decision_requested payload", payload)
-    if _secret_request_hidden_from_viewer(
+    if decision_request_payload_hidden_from_viewer(
         request_payload=request_payload,
         viewer_player_id=viewer_player_id,
     ):
@@ -154,7 +158,7 @@ def _public_decision_record_payload(
 ) -> JsonValue:
     record_payload = _json_object("decision_recorded payload", payload)
     request_payload = _json_object("decision_recorded request payload", record_payload["request"])
-    if not _secret_request_hidden_from_viewer(
+    if not decision_request_payload_hidden_from_viewer(
         request_payload=request_payload,
         viewer_player_id=viewer_player_id,
     ):
@@ -243,36 +247,10 @@ def _public_hidden_player_event_payload(
     }
 
 
-def _secret_request_hidden_from_viewer(
-    *,
-    request_payload: dict[str, JsonValue],
-    viewer_player_id: str,
-) -> bool:
-    actor_id = _optional_string(request_payload, key="actor_id")
-    body = request_payload["payload"]
-    if not isinstance(body, dict):
-        return False
-    secret = body.get("secret")
-    if secret is None:
-        return False
-    if type(secret) is not bool:
-        raise GameLifecycleError("Secret DecisionRequest payload flag must be a bool.")
-    return secret and actor_id != viewer_player_id
-
-
 def _redacted_request_payload(request_payload: dict[str, JsonValue]) -> JsonValue:
-    decision_type = _required_string(request_payload, key="decision_type")
-    if _redact_decision_type_for_hidden_viewer(decision_type):
-        return {
-            "request_id": _required_string(request_payload, key="request_id"),
-            "decision_type": "hidden_decision",
-            "actor_id": _optional_string(request_payload, key="actor_id"),
-            "secret": True,
-            "hidden": True,
-        }
     return {
         "request_id": _required_string(request_payload, key="request_id"),
-        "decision_type": decision_type,
+        "decision_type": redacted_decision_type_for_hidden_viewer(),
         "actor_id": _optional_string(request_payload, key="actor_id"),
         "secret": True,
         "hidden": True,
@@ -280,24 +258,13 @@ def _redacted_request_payload(request_payload: dict[str, JsonValue]) -> JsonValu
 
 
 def _redacted_result_payload(result_payload: dict[str, JsonValue]) -> JsonValue:
-    decision_type = _required_string(result_payload, key="decision_type")
-    if _redact_decision_type_for_hidden_viewer(decision_type):
-        decision_type = "hidden_decision"
     return {
         "result_id": _required_string(result_payload, key="result_id"),
         "request_id": _required_string(result_payload, key="request_id"),
-        "decision_type": decision_type,
+        "decision_type": redacted_decision_type_for_hidden_viewer(),
         "actor_id": _optional_string(result_payload, key="actor_id"),
         "secret": True,
         "hidden": True,
-    }
-
-
-def _redact_decision_type_for_hidden_viewer(decision_type: str) -> bool:
-    return decision_type in {
-        "draw_tactical_secondary_missions",
-        "discard_tactical_secondary_mission",
-        "start_mission_action",
     }
 
 

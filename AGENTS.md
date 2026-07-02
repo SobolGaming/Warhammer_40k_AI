@@ -133,6 +133,8 @@ Any new decision type, finite option family, proposal kind, adapter-visible payl
 
 Hidden or secret pending decisions, proposal requests, decision records, domain events, projections, and adapter event deltas must remain viewer-scoped. They must not leak hidden opponent information through payloads, metadata, counts, option lists, event details, or derived fields.
 
+Hidden-information redaction logic must live in exactly one shared adapters module; projection, event-stream, and server code must consume it rather than defining local hidden-type sets. HTTP responses, status summaries, error payloads, and all other transport-level metadata are adapter-visible payloads and must be viewer-scoped exactly like projections and event deltas.
+
 Tests for new decision work must cover valid submission, stale/drift/malformed invalid submission, replay/payload round-trip, deterministic JSON-safe records, and viewer-scoped projection/event redaction when visibility can differ by viewer.
 
 ## Architecture boundaries

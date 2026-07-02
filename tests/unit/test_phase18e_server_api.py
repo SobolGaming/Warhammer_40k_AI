@@ -95,6 +95,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
     )
     _schema_validator("game_view.schema.json").validate(player_a_view)
     player_b_pending = _field_object(player_b_view, "pending_decision")
+    assert _field_string(player_b_pending, "decision_type") == "hidden_decision"
     assert _field_list(player_b_pending, "options") == []
     assert _field_object(player_b_pending, "payload") == {"hidden": True, "secret": True}
 
@@ -179,7 +180,16 @@ def test_phase18e_mutation_response_does_not_expose_next_opponent_decision() -> 
     server = AdapterGameServer()
     game_id = "phase18e-server-redacted-mutation"
     _create_game(server, game_id=game_id)
-    status_payload = _request(server, "POST", f"/games/{game_id}/advance")
+    status_payload = _request(
+        server,
+        "POST",
+        f"/games/{game_id}/advance",
+        query={"viewer_player_id": PLAYER_A},
+    )
+    first_status = _field_object(status_payload, "status")
+    assert _field_string(first_status, "actor_id") == PLAYER_A
+    assert _field_string(first_status, "decision_type") == SECONDARY_MISSION_DECISION_TYPE
+    assert _field_string(first_status, "pending_request_id")
     first_request = _decision_from_status(server, game_id=game_id, payload=status_payload)
     assert _actor(first_request) == PLAYER_A
 
@@ -192,9 +202,9 @@ def test_phase18e_mutation_response_does_not_expose_next_opponent_decision() -> 
     )
     response_status = _field_object(mutation_response, "status")
     assert _field_string(response_status, "status_kind") == "waiting_for_decision"
-    assert _field_string(response_status, "actor_id") == PLAYER_B
-    assert _field_string(response_status, "decision_type") == SECONDARY_MISSION_DECISION_TYPE
-    assert _field_string(response_status, "pending_request_id")
+    assert response_status["actor_id"] is None
+    assert _field_string(response_status, "decision_type") == "hidden_decision"
+    assert response_status["pending_request_id"] is None
     assert "decision_request" not in response_status
     assert response_status["payload"] is None
     assert not _contains_key(mutation_response, "options")
@@ -207,6 +217,7 @@ def test_phase18e_mutation_response_does_not_expose_next_opponent_decision() -> 
         query={"viewer_player_id": PLAYER_A},
     )
     player_a_pending = _field_object(player_a_view, "pending_decision")
+    assert _field_string(player_a_pending, "decision_type") == "hidden_decision"
     assert _field_list(player_a_pending, "options") == []
     assert _field_object(player_a_pending, "payload") == {"hidden": True, "secret": True}
 
@@ -217,11 +228,39 @@ def test_phase18e_mutation_response_does_not_expose_next_opponent_decision() -> 
         query={"viewer_player_id": PLAYER_B},
     )
     player_b_pending = _field_object(player_b_view, "pending_decision")
-    assert _field_string(player_b_pending, "request_id") == _field_string(
-        response_status, "pending_request_id"
-    )
+    assert _field_string(player_b_pending, "decision_type") == SECONDARY_MISSION_DECISION_TYPE
     assert _field_list(player_b_pending, "options")
     assert _field_object(player_b_pending, "payload") != {"hidden": True, "secret": True}
+
+
+def test_phase18e_status_response_redacts_secret_pending_for_non_actor_viewers() -> None:
+    non_actor_server = AdapterGameServer()
+    non_actor_game_id = "phase18e-server-redacted-status"
+    _create_game(non_actor_server, game_id=non_actor_game_id)
+    non_actor_status_payload = _request(
+        non_actor_server,
+        "POST",
+        f"/games/{non_actor_game_id}/advance",
+        query={"viewer_player_id": PLAYER_B},
+    )
+    non_actor_status = _field_object(non_actor_status_payload, "status")
+    assert _field_string(non_actor_status, "status_kind") == "waiting_for_decision"
+    assert non_actor_status["pending_request_id"] is None
+    assert _field_string(non_actor_status, "decision_type") == "hidden_decision"
+    assert non_actor_status["actor_id"] is None
+
+    no_viewer_server = AdapterGameServer()
+    no_viewer_game_id = "phase18e-server-redacted-status-no-viewer"
+    _create_game(no_viewer_server, game_id=no_viewer_game_id)
+    no_viewer_status_payload = _request(
+        no_viewer_server,
+        "POST",
+        f"/games/{no_viewer_game_id}/advance",
+    )
+    no_viewer_status = _field_object(no_viewer_status_payload, "status")
+    assert no_viewer_status["pending_request_id"] is None
+    assert _field_string(no_viewer_status, "decision_type") == "hidden_decision"
+    assert no_viewer_status["actor_id"] is None
 
 
 def test_phase18e_support_profile_generic_ir_datasheet_ability_is_playable() -> None:
@@ -843,17 +882,33 @@ def _decision_from_status(
 ) -> dict[str, JsonValue]:
     status = _field_object(payload, "status")
     assert _field_string(status, "status_kind") == "waiting_for_decision"
-    actor_id = _field_string(status, "actor_id")
-    request_id = _field_string(status, "pending_request_id")
-    view = _request(
-        server,
-        "GET",
-        f"/games/{game_id}/view",
-        query={"viewer_player_id": actor_id},
-    )
-    decision = _field_object(view, "pending_decision")
-    assert _field_string(decision, "request_id") == request_id
-    return decision
+    actor_id = _optional_field_string(status, "actor_id")
+    request_id = _optional_field_string(status, "pending_request_id")
+    if actor_id is not None and request_id is not None:
+        view = _request(
+            server,
+            "GET",
+            f"/games/{game_id}/view",
+            query={"viewer_player_id": actor_id},
+        )
+        decision = _field_object(view, "pending_decision")
+        assert _field_string(decision, "request_id") == request_id
+        return decision
+    for viewer_player_id in (PLAYER_A, PLAYER_B):
+        view = _request(
+            server,
+            "GET",
+            f"/games/{game_id}/view",
+            query={"viewer_player_id": viewer_player_id},
+        )
+        pending = view["pending_decision"]
+        if pending is None:
+            continue
+        decision = _json_object(pending)
+        if _field_string(decision, "decision_type") == "hidden_decision":
+            continue
+        return decision
+    raise AssertionError("No actor-visible pending decision found.")
 
 
 def _decision_from_lifecycle_status(status: LifecycleStatus) -> DecisionRequest:
@@ -878,6 +933,13 @@ def _actor(request: dict[str, JsonValue]) -> str:
 
 def _status_kind(payload: dict[str, JsonValue]) -> str:
     return _field_string(_field_object(payload, "status"), "status_kind")
+
+
+def _optional_field_string(payload: dict[str, JsonValue], key: str) -> str | None:
+    value = payload[key]
+    if value is None:
+        return None
+    return _json_string(value)
 
 
 def _error_code(response: ServerResponse) -> str:
