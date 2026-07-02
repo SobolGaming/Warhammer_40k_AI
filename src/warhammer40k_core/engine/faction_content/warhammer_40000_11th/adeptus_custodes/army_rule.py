@@ -40,7 +40,6 @@ RENDAX_HOOK_ID = f"{HOOK_ID}:rendax"
 WEAPON_PROFILE_MODIFIER_ID = f"{HOOK_ID}:weapon-profile"
 
 MARTIAL_KATAH_EFFECT_KIND = "adeptus_custodes_martial_katah"
-MARTIAL_KATAH_ABILITY_NAME = "Martial Ka'tah"
 
 
 class MartialKatahStance(StrEnum):
@@ -298,10 +297,7 @@ def _unit_has_martial_katah(unit: UnitInstance) -> bool:
         for keyword in unit.faction_keywords
     ):
         return True
-    return any(
-        _canonical_rule_token(ability.name) == _canonical_rule_token(MARTIAL_KATAH_ABILITY_NAME)
-        for ability in unit.datasheet_abilities
-    )
+    return any(ability.source_id == SOURCE_RULE_ID for ability in unit.datasheet_abilities)
 
 
 def _martial_katah_payload(payload: JsonValue) -> dict[str, JsonValue]:
@@ -384,10 +380,6 @@ def _battle_phase_from_token(token: object) -> BattlePhase:
         return BattlePhase(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported Martial Ka'tah phase: {token}.") from exc
-
-
-def _canonical_rule_token(value: str) -> str:
-    return " ".join(_validate_identifier("rule token", value).upper().split())
 
 
 def _json_object(field_name: str, value: JsonValue) -> dict[str, object]:

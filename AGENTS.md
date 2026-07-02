@@ -50,6 +50,7 @@ Do not add AI/ranker/training logic before the deterministic rules core, decisio
 - Endpoint-only movement validation is invalid except for explicit teleport/set-up placement.
 - Raw rule text is normalized once at the data boundary.
 - Runtime engine code consumes structured descriptors, not ad hoc string parsing.
+- Runtime code must not gate behavior on rule or ability display names, normalized rule-text tokens, or locally re-normalized keyword strings. Behavior gates use stable source rule IDs, descriptor IDs, or canonical keyword tokens carried by the catalog.
 - Physical battlefield operations use explicit model-group APIs.
 - Attached units are first-class rules units.
 - Entity IDs, action IDs, event IDs, and replay payloads are deterministic and serializable.

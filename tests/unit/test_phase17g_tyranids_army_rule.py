@@ -1222,15 +1222,15 @@ def _tyranids_lifecycle_catalog() -> ArmyCatalog:
                 base_datasheet,
                 datasheet_id=TYRANIDS_WARRIORS_DATASHEET_ID,
                 name="Tyranid Warriors",
-                keywords=("Infantry", "Synapse"),
-                faction_keywords=("Tyranids",),
+                keywords=("INFANTRY", "SYNAPSE"),
+                faction_keywords=("TYRANIDS",),
             ),
             _datasheet(
                 base_datasheet,
                 datasheet_id=TYRANIDS_GAUNTS_DATASHEET_ID,
                 name="Termagants",
-                keywords=("Infantry",),
-                faction_keywords=("Tyranids",),
+                keywords=("INFANTRY",),
+                faction_keywords=("TYRANIDS",),
             ),
         ),
         factions=(
@@ -1238,7 +1238,7 @@ def _tyranids_lifecycle_catalog() -> ArmyCatalog:
             FactionDefinition(
                 faction_id=army_rule.TYRANIDS_FACTION_ID,
                 name="Tyranids",
-                faction_keywords=("Tyranids",),
+                faction_keywords=("TYRANIDS",),
                 source_ids=("phase17g:tyranids:faction",),
             ),
         ),

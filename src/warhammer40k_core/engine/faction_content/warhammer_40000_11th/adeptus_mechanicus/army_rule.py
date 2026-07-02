@@ -57,7 +57,6 @@ PROTECTOR_HIT_MODIFIER_ID = f"{HOOK_ID}:protector:melee-hit-roll"
 ADEPTUS_MECHANICUS_FACTION_ID = "adeptus-mechanicus"
 ADEPTUS_MECHANICUS_FACTION_KEYWORD = "ADEPTUS MECHANICUS"
 BATTLELINE_KEYWORD = "BATTLELINE"
-DOCTRINA_IMPERATIVES_ABILITY_NAME = "Doctrina Imperatives"
 DOCTRINA_EFFECT_KIND = "adeptus_mechanicus_doctrina_imperatives_active"
 DOCTRINA_SELECTION_KIND = "adeptus_mechanicus_doctrina_imperatives_selection"
 DOCTRINA_SELECTION_STATE_KIND = "adeptus_mechanicus_doctrina_imperatives_selected"
@@ -684,7 +683,7 @@ def _rules_unit_has_doctrina_imperatives(rules_unit: RulesUnitView) -> bool:
 def _unit_has_doctrina_imperatives(unit: UnitInstance) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Doctrina Imperatives ability lookup requires UnitInstance.")
-    return _unit_has_named_ability(unit, DOCTRINA_IMPERATIVES_ABILITY_NAME)
+    return any(ability.source_id == SOURCE_RULE_ID for ability in unit.datasheet_abilities)
 
 
 def _rules_unit_has_battleline_or_nearby_admech_battleline(
@@ -956,25 +955,10 @@ def _rules_unit_has_faction_keyword(rules_unit: RulesUnitView, keyword: str) -> 
     return _keyword_token_in(values=rules_unit.faction_keywords, expected=keyword)
 
 
-def _unit_has_named_ability(unit: UnitInstance, ability_name: str) -> bool:
-    if type(unit) is not UnitInstance:
-        raise GameLifecycleError("Doctrina Imperatives ability lookup requires UnitInstance.")
-    requested_name = _normalise_rule_token(_validate_identifier("ability_name", ability_name))
-    return any(
-        _normalise_rule_token(ability.name) == requested_name
-        for ability in unit.datasheet_abilities
-    )
-
-
 def _keyword_token_in(*, values: tuple[str, ...], expected: str) -> bool:
     if type(values) is not tuple:
         raise GameLifecycleError("Doctrina Imperatives keyword values must be a tuple.")
-    normalised_expected = _normalise_rule_token(_validate_identifier("expected", expected))
-    return any(_normalise_rule_token(value) == normalised_expected for value in values)
-
-
-def _normalise_rule_token(value: str) -> str:
-    return "".join(character for character in value.upper() if character.isalnum())
+    return _validate_identifier("expected", expected) in values
 
 
 def _imperative_from_token(token: object) -> DoctrinaImperative:

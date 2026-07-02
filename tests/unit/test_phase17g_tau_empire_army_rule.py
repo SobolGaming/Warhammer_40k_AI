@@ -224,7 +224,7 @@ def test_non_tau_selected_detachment_with_tau_keyword_units_gets_no_request() ->
     army = state.army_definition_for_player("player-a")
     assert army is not None
     assert army.detachment_selection.faction_id == NON_TAU_FACTION_ID
-    assert any("T'au Empire" in unit.faction_keywords for unit in army.units)
+    assert any("T'AU EMPIRE" in unit.faction_keywords for unit in army.units)
 
     request = army_rule.for_the_greater_good_request(
         ShootingPhaseStartRequestContext(
@@ -736,8 +736,6 @@ def test_for_the_greater_good_internal_guards_reject_invalid_state_and_payloads(
         army_rule._validate_identifier("field", " ")
     with pytest.raises(GameLifecycleError, match="skill must be non-negative int"):
         army_rule._validate_non_negative_int("skill", -1)
-    with pytest.raises(GameLifecycleError, match="token must be a string"):
-        army_rule._normalise_rule_token(cast(str, object()))
 
     active_player_id = state.active_player_id
     state.active_player_id = None
@@ -889,36 +887,36 @@ def _tau_lifecycle_catalog() -> ArmyCatalog:
                 base_datasheet,
                 datasheet_id=MARKER_OBSERVER_DATASHEET_ID,
                 name="Pathfinder Team",
-                keywords=("Infantry", "Markerlight"),
-                faction_keywords=("T'au Empire",),
+                keywords=("INFANTRY", "MARKERLIGHT"),
+                faction_keywords=("T'AU EMPIRE",),
             ),
             _datasheet(
                 base_datasheet,
                 datasheet_id=OBSERVER_DATASHEET_ID,
                 name="Strike Team",
-                keywords=("Infantry",),
-                faction_keywords=("T'au Empire",),
+                keywords=("INFANTRY",),
+                faction_keywords=("T'AU EMPIRE",),
             ),
             _datasheet(
                 base_datasheet,
                 datasheet_id=GUIDED_DATASHEET_ID,
                 name="Breacher Team",
-                keywords=("Infantry",),
-                faction_keywords=("T'au Empire",),
+                keywords=("INFANTRY",),
+                faction_keywords=("T'AU EMPIRE",),
             ),
             _datasheet(
                 base_datasheet,
                 datasheet_id=FORTIFICATION_DATASHEET_ID,
                 name="Tidewall Gunrig",
-                keywords=("Fortification",),
-                faction_keywords=("T'au Empire",),
+                keywords=("FORTIFICATION",),
+                faction_keywords=("T'AU EMPIRE",),
             ),
             _datasheet(
                 base_datasheet,
                 datasheet_id=BATTLE_SHOCKED_DATASHEET_ID,
                 name="Stealth Battlesuits",
-                keywords=("Infantry",),
-                faction_keywords=("T'au Empire",),
+                keywords=("INFANTRY",),
+                faction_keywords=("T'AU EMPIRE",),
             ),
         ),
         factions=(
@@ -926,13 +924,13 @@ def _tau_lifecycle_catalog() -> ArmyCatalog:
             FactionDefinition(
                 faction_id=army_rule.TAU_EMPIRE_FACTION_ID,
                 name="T'au Empire",
-                faction_keywords=("T'au Empire",),
+                faction_keywords=("T'AU EMPIRE",),
                 source_ids=("phase17g:tau:faction",),
             ),
             FactionDefinition(
                 faction_id=NON_TAU_FACTION_ID,
                 name="Non-Tau Auxiliary Force",
-                faction_keywords=("T'au Empire", "Non-Tau"),
+                faction_keywords=("T'AU EMPIRE", "NON-TAU"),
                 source_ids=("phase17g:tau:non-tau:faction",),
             ),
         ),
@@ -997,7 +995,7 @@ def _for_the_greater_good_ability() -> DatasheetAbilityDescriptor:
     return DatasheetAbilityDescriptor(
         ability_id="phase17g-tau-for-the-greater-good",
         name="For the Greater Good",
-        source_id="phase17g:tau:datasheet:for-the-greater-good",
+        source_id=army_rule.SOURCE_RULE_ID,
         support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
         source_kind=CatalogAbilitySourceKind.DATASHEET,
         effect_description="tau-army-rule",

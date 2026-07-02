@@ -1327,7 +1327,7 @@ def _keyword_any_gate_conditions_from_match(
             parameters=parameters_from_pairs(
                 (
                     ("gate_subject", gate_subject),
-                    ("required_keyword_any", "|".join(keywords)),
+                    ("required_keyword_any", keywords),
                 )
             ),
         ),
@@ -1637,7 +1637,7 @@ def _tracked_target_attack_trigger_parameter_pairs(
     elif roll_types:
         pairs.extend(
             (
-                ("roll_types", "|".join(roll_types)),
+                ("roll_types", roll_types),
                 ("timing_window", "attack_sequence.roll"),
             )
         )
@@ -2228,7 +2228,7 @@ def _parse_movement_transit_permission_effects(
             match.group("first_model_keyword"),
             match.group("second_model_keyword"),
         )
-        if keywords != "MONSTER|VEHICLE":
+        if keywords != ("MONSTER", "VEHICLE"):
             continue
         effects.append(
             RuleEffectSpec(
@@ -2682,14 +2682,14 @@ def _keyword_any_tokens(value: str) -> tuple[str, ...]:
     return tuple(dict.fromkeys(tokens))
 
 
-def _model_keyword_any_token(first: str, second: str) -> str:
+def _model_keyword_any_token(first: str, second: str) -> tuple[str, ...]:
     tokens = tuple(dict.fromkeys((_singular_keyword_token(first), _singular_keyword_token(second))))
     if len(tokens) != 2:
         raise RuleIRError("Model keyword-any token requires two distinct keywords.")
-    return "|".join(sorted(tokens))
+    return tuple(sorted(tokens))
 
 
-def _movement_modes_token(value: str) -> str:
+def _movement_modes_token(value: str) -> tuple[str, ...]:
     tokens: list[str] = []
     for raw_token in re.split(r"\s+or\s+|\s+and\s+|\s*,\s*", value.strip(), flags=re.IGNORECASE):
         token = raw_token.strip()
@@ -2701,7 +2701,7 @@ def _movement_modes_token(value: str) -> str:
     allowed_tokens = {"advance", "normal"}
     if not set(unique_tokens).issubset(allowed_tokens):
         raise RuleIRError("Movement modes token contains unsupported movement modes.")
-    return "|".join(sorted(unique_tokens))
+    return tuple(sorted(unique_tokens))
 
 
 def _keyword_list_tokens(value: str) -> tuple[str, ...]:
@@ -2819,7 +2819,7 @@ def _weapon_name_parameter_pairs(
         raise RuleIRError("Named weapon ability grant requires weapon names.")
     if len(weapon_names) == 1:
         return (("weapon_name", weapon_names[0]),)
-    return (("weapon_names", "|".join(weapon_names)),)
+    return (("weapon_names", weapon_names),)
 
 
 def _weapon_owner_target_scope_token(value: str) -> str:

@@ -4013,11 +4013,15 @@ def test_phase17k_named_weapon_ability_choice_helpers_cover_invalid_paths() -> N
     with pytest.raises(GameLifecycleError, match="requires RuleEffectSpec values"):
         _effect_is_named_weapon_ability_choice_option(cast(RuleEffectSpec, object()))
 
-    assert _optional_named_weapon_names({"weapon_names": "Bolt of Change|Infernal Gateway"}) == (
+    assert _optional_named_weapon_names(
+        {"weapon_names": ("Bolt of Change", "Infernal Gateway")}
+    ) == (
         "Bolt of Change",
         "Infernal Gateway",
     )
     assert _optional_named_weapon_names({"weapon_name": "Bolt of Change"}) == ("Bolt of Change",)
+    with pytest.raises(GameLifecycleError, match="weapon_names must be a tuple"):
+        _optional_named_weapon_names({"weapon_names": "Bolt of Change|Infernal Gateway"})
     with pytest.raises(GameLifecycleError, match="requires weapon names"):
         _weapon_names_from_parameters({})
     with pytest.raises(GameLifecycleError, match="must be a tuple"):
@@ -4199,7 +4203,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
     grant = CatalogWeaponKeywordGrant(
         source_id="phase17k-helper-grant",
         keyword=cast(WeaponKeyword, "Lance"),
-        weapon_scope="all weapons",
+        weapon_scope="all",
     )
     updated_profile = _profile_with_catalog_weapon_keyword_grant(
         profile=melee_profile,
@@ -4289,7 +4293,7 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
     assert _weapon_scope_matches_profile(weapon_scope="all", profile=melee_profile)
     assert _weapon_scope_matches_profile(weapon_scope="melee", profile=melee_profile)
     assert not _weapon_scope_matches_profile(weapon_scope="ranged", profile=melee_profile)
-    assert _weapon_scope_matches_profile(weapon_scope="ranged weapons", profile=ranged_profile)
+    assert _weapon_scope_matches_profile(weapon_scope="ranged", profile=ranged_profile)
     assert not _weapon_scope_matches_profile(weapon_scope="melee", profile=ranged_profile)
     for keyword, parameters, expected_kind in (
         (WeaponKeyword.DEVASTATING_WOUNDS, {}, AbilityKind.DEVASTATING_WOUNDS),
@@ -4402,6 +4406,8 @@ def test_phase17k_catalog_weapon_keyword_grant_helpers_cover_scopes_and_values()
         )
     with pytest.raises(GameLifecycleError, match="Unsupported catalog weapon keyword grant scope"):
         _weapon_scope_matches_profile(weapon_scope="bad scope", profile=melee_profile)
+    with pytest.raises(GameLifecycleError, match="Unsupported catalog weapon keyword grant scope"):
+        _weapon_scope_matches_profile(weapon_scope="ranged weapons", profile=ranged_profile)
 
 
 def test_phase17k_catalog_ir_roll_reroll_classification_requires_supported_target() -> None:

@@ -815,34 +815,23 @@ def _unit_has_shadow_in_the_warp(unit: UnitInstance) -> bool:
         raise GameLifecycleError("Shadow in the Warp requires a UnitInstance.")
     if _unit_has_faction_keyword(unit, TYRANIDS_FACTION_KEYWORD):
         return True
-    return any(
-        _canonical_keyword(ability.name) == _canonical_keyword("Shadow in the Warp")
-        for ability in unit.datasheet_abilities
-    )
+    return any(ability.source_id == SOURCE_RULE_ID for ability in unit.datasheet_abilities)
 
 
 def _unit_has_synapse(unit: UnitInstance) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Synapse requires a UnitInstance.")
-    return _unit_has_keyword(unit, SYNAPSE_KEYWORD) or any(
-        _canonical_keyword(ability.name) == _canonical_keyword("Synapse")
-        for ability in unit.datasheet_abilities
-    )
+    return _unit_has_keyword(unit, SYNAPSE_KEYWORD)
 
 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
-    canonical = _canonical_keyword(keyword)
-    return any(
-        _canonical_keyword(stored_keyword) == canonical
-        for stored_keyword in (*unit.keywords, *unit.faction_keywords)
-    )
+    requested_keyword = _validate_identifier("keyword", keyword)
+    return requested_keyword in (*unit.keywords, *unit.faction_keywords)
 
 
 def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
-    canonical = _canonical_keyword(keyword)
-    return any(
-        _canonical_keyword(stored_keyword) == canonical for stored_keyword in unit.faction_keywords
-    )
+    requested_keyword = _validate_identifier("keyword", keyword)
+    return requested_keyword in unit.faction_keywords
 
 
 def _strength_with_plus_one(strength: CharacteristicValue) -> CharacteristicValue:
@@ -928,7 +917,3 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     if value < 1:
         raise GameLifecycleError(f"Tyranids army rule {field_name} must be positive.")
     return value
-
-
-def _canonical_keyword(value: str) -> str:
-    return _validate_identifier("keyword", value).replace("_", " ").replace("-", " ").upper()

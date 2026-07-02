@@ -103,7 +103,6 @@ SOURCE_RULE_ID = "phase17f:phase17e:thousand-sons:army-rule"
 THOUSAND_SONS_FACTION_ID = "thousand-sons"
 THOUSAND_SONS_FACTION_KEYWORD = "THOUSAND SONS"
 SCINTILLATING_LEGIONS_KEYWORD = "SCINTILLATING LEGIONS"
-CABAL_OF_SORCERERS_ABILITY_NAME = "Cabal of Sorcerers"
 CABAL_SELECTION_KIND = "thousand_sons_cabal_of_sorcerers_ritual"
 CABAL_DONE_STATE_KIND = "thousand_sons_cabal_of_sorcerers_shooting_phase_done"
 CABAL_ATTEMPT_STATE_KIND = "thousand_sons_cabal_of_sorcerers_ritual_attempt"
@@ -1686,7 +1685,7 @@ def _thousand_sons_army_for_player(
 def _unit_has_cabal_of_sorcerers(unit: UnitInstance) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Cabal of Sorcerers ability check requires UnitInstance.")
-    return _unit_has_named_ability(unit, CABAL_OF_SORCERERS_ABILITY_NAME) or _unit_has_keyword(
+    return _unit_has_rule_source(unit, SOURCE_RULE_ID) or _unit_has_keyword(
         unit.faction_keywords,
         THOUSAND_SONS_FACTION_KEYWORD,
     )
@@ -1704,19 +1703,19 @@ def _rules_unit_has_thousand_sons_or_scintillating(rules_unit: RulesUnitView) ->
     )
 
 
-def _unit_has_named_ability(unit: UnitInstance, ability_name: str) -> bool:
-    requested_name = _normalise_rule_token(_validate_identifier("ability_name", ability_name))
+def _unit_has_rule_source(unit: UnitInstance, source_rule_id: str) -> bool:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Cabal of Sorcerers ability check requires UnitInstance.")
+    requested_source_rule_id = _validate_identifier("source_rule_id", source_rule_id)
     return any(
-        _normalise_rule_token(ability.name) == requested_name
-        for ability in unit.datasheet_abilities
+        ability.source_id == requested_source_rule_id for ability in unit.datasheet_abilities
     )
 
 
 def _unit_has_keyword(keywords: tuple[str, ...], keyword: str) -> bool:
     if type(keywords) is not tuple:
         raise GameLifecycleError("Cabal of Sorcerers keyword list must be a tuple.")
-    requested = _normalise_rule_token(_validate_identifier("keyword", keyword))
-    return any(_normalise_rule_token(stored) == requested for stored in keywords)
+    return _validate_identifier("keyword", keyword) in keywords
 
 
 def _psychic_roll_has_doubles_or_triples(values: tuple[int, ...]) -> bool:
@@ -1871,12 +1870,6 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     if value < 1:
         raise GameLifecycleError(f"Cabal of Sorcerers {field_name} must be positive.")
     return value
-
-
-def _normalise_rule_token(value: str) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError("Cabal of Sorcerers token must be a string.")
-    return " ".join(value.upper().replace("_", " ").replace("-", " ").split())
 
 
 RITUALS = (
