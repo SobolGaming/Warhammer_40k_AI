@@ -56,20 +56,32 @@ class CompiledRuleSource:
         }
 
     @classmethod
-    def from_payload(cls, payload: CompiledRuleSourcePayload) -> Self:
+    def from_payload(
+        cls,
+        payload: CompiledRuleSourcePayload,
+        *,
+        source_keyword_sequence_parts: tuple[str, ...],
+    ) -> Self:
         source_text = RuleSourceText.from_payload(payload["source_text"])
         compiled = cls(
             source_text=source_text,
             rule_ir=RuleIR.from_payload(payload["rule_ir"]),
             compiler_version=payload["compiler_version"],
         )
-        expected = compile_rule_source_text(source_text)
+        expected = compile_rule_source_text(
+            source_text,
+            source_keyword_sequence_parts=source_keyword_sequence_parts,
+        )
         if compiled.rule_ir.to_payload() != expected.rule_ir.to_payload():
             raise RuleCompilerError("CompiledRuleSource payload contains stale rule_ir.")
         return compiled
 
 
-def compile_rule_source_text(source_text: RuleSourceText) -> CompiledRuleSource:
+def compile_rule_source_text(
+    source_text: RuleSourceText,
+    *,
+    source_keyword_sequence_parts: tuple[str, ...],
+) -> CompiledRuleSource:
     if type(source_text) is not RuleSourceText:
         raise RuleCompilerError("Rule compiler requires RuleSourceText.")
     return CompiledRuleSource(
@@ -77,16 +89,25 @@ def compile_rule_source_text(source_text: RuleSourceText) -> CompiledRuleSource:
         rule_ir=parse_rule_ir(
             source_id=source_text.source_id,
             parsed_text=source_text.parsed_tokens,
+            source_keyword_sequence_parts=source_keyword_sequence_parts,
         ),
     )
 
 
 def compile_rule_source_texts(
     source_texts: tuple[RuleSourceText, ...],
+    *,
+    source_keyword_sequence_parts: tuple[str, ...],
 ) -> tuple[CompiledRuleSource, ...]:
     if type(source_texts) is not tuple:
         raise RuleCompilerError("Rule compiler source_texts must be a tuple.")
-    compiled = tuple(compile_rule_source_text(source_text) for source_text in source_texts)
+    compiled = tuple(
+        compile_rule_source_text(
+            source_text,
+            source_keyword_sequence_parts=source_keyword_sequence_parts,
+        )
+        for source_text in source_texts
+    )
     seen: set[str] = set()
     for source in compiled:
         if source.source_text.source_id in seen:
@@ -100,6 +121,7 @@ def compile_normalized_rule_text(
     source_id: str,
     normalized_text: str,
     parsed_tokens: ParsedRuleText,
+    source_keyword_sequence_parts: tuple[str, ...],
 ) -> RuleIR:
     if type(parsed_tokens) is not ParsedRuleText:
         raise RuleCompilerError(
@@ -107,7 +129,11 @@ def compile_normalized_rule_text(
         )
     if parsed_tokens.normalized_text != normalized_text:
         raise RuleCompilerError("compile_normalized_rule_text parsed tokens are stale.")
-    return parse_rule_ir(source_id=source_id, parsed_text=parsed_tokens)
+    return parse_rule_ir(
+        source_id=source_id,
+        parsed_text=parsed_tokens,
+        source_keyword_sequence_parts=source_keyword_sequence_parts,
+    )
 
 
 def compile_normalized_rule_text_payload(
@@ -115,6 +141,7 @@ def compile_normalized_rule_text_payload(
     source_id: str,
     normalized_text: str,
     parsed_tokens: ParsedRuleTextPayload,
+    source_keyword_sequence_parts: tuple[str, ...],
 ) -> RuleIR:
     try:
         parsed = ParsedRuleText.from_payload(parsed_tokens)
@@ -124,6 +151,7 @@ def compile_normalized_rule_text_payload(
         source_id=source_id,
         normalized_text=normalized_text,
         parsed_tokens=parsed,
+        source_keyword_sequence_parts=source_keyword_sequence_parts,
     )
 
 

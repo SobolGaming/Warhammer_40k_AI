@@ -54,12 +54,18 @@ from warhammer40k_core.engine.tracked_targets import (
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
+)
 
 PREY_TARGET_TEXT = (
     "At the start of the first battle round, select one enemy unit to be this model's "
     "prey. Each time a model in this model's unit makes a melee attack that targets "
     "its prey, you can re-roll the Wound roll. Each time this model's prey is "
     "destroyed, select one new enemy unit to be this model's prey."
+)
+SOURCE_KEYWORD_SEQUENCE_PARTS = (
+    datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
 )
 MIXED_QUARRY_TARGET_TEXT = (
     "At the start of the first battle round, select one enemy unit to be this model's "
@@ -1267,7 +1273,10 @@ def _tracked_target_catalog_record(
         source_id=source_id,
         raw_text=raw_text,
     )
-    rule_ir = compile_rule_source_text(source).rule_ir
+    rule_ir = compile_rule_source_text(
+        source,
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    ).rule_ir
     return AbilityCatalogRecord(
         record_id="record:tracked-target",
         definition=AbilityDefinition(

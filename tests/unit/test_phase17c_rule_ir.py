@@ -59,15 +59,27 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
-from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.parsed_tokens import (
+    ParsedRuleText,
+    ParsedRuleTextPayload,
+    TextSpan,
+)
 from warhammer40k_core.rules.rule_compiler import (
     CompiledRuleSource,
     RuleCompilerError,
-    compile_normalized_rule_text,
-    compile_normalized_rule_text_payload,
-    compile_rule_source_text,
-    compile_rule_source_texts,
     compiler_identity_payload,
+)
+from warhammer40k_core.rules.rule_compiler import (
+    compile_normalized_rule_text as _compile_normalized_rule_text,
+)
+from warhammer40k_core.rules.rule_compiler import (
+    compile_normalized_rule_text_payload as _compile_normalized_rule_text_payload,
+)
+from warhammer40k_core.rules.rule_compiler import (
+    compile_rule_source_text as _compile_rule_source_text,
+)
+from warhammer40k_core.rules.rule_compiler import (
+    compile_rule_source_texts as _compile_rule_source_texts,
 )
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -97,6 +109,58 @@ from warhammer40k_core.rules.rule_ir import (
     rule_unsupported_reason_from_token,
 )
 from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
+)
+
+SOURCE_KEYWORD_SEQUENCE_PARTS = (
+    datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+)
+
+
+def compile_rule_source_text(source_text: RuleSourceText) -> CompiledRuleSource:
+    return _compile_rule_source_text(
+        source_text,
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    )
+
+
+def compile_rule_source_texts(
+    source_texts: tuple[RuleSourceText, ...],
+) -> tuple[CompiledRuleSource, ...]:
+    return _compile_rule_source_texts(
+        source_texts,
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    )
+
+
+def compile_normalized_rule_text(
+    *,
+    source_id: str,
+    normalized_text: str,
+    parsed_tokens: ParsedRuleText,
+) -> RuleIR:
+    return _compile_normalized_rule_text(
+        source_id=source_id,
+        normalized_text=normalized_text,
+        parsed_tokens=parsed_tokens,
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    )
+
+
+def compile_normalized_rule_text_payload(
+    *,
+    source_id: str,
+    normalized_text: str,
+    parsed_tokens: ParsedRuleTextPayload,
+) -> RuleIR:
+    return _compile_normalized_rule_text_payload(
+        source_id=source_id,
+        normalized_text=normalized_text,
+        parsed_tokens=parsed_tokens,
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    )
+
 
 CHAMPION_SLAYER_TEXT = (
     "Each time this model makes a melee attack that targets a Character or Monster unit, "
@@ -153,7 +217,11 @@ def test_phase17c_normalized_source_text_compiles_to_stable_rule_ir() -> None:
     assert compiled.to_payload() == second_compiled.to_payload()
     assert RuleIR.from_payload(payload).to_payload() == compiled.rule_ir.to_payload()
     assert (
-        CompiledRuleSource.from_payload(compiled.to_payload()).to_payload() == compiled.to_payload()
+        CompiledRuleSource.from_payload(
+            compiled.to_payload(),
+            source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+        ).to_payload()
+        == compiled.to_payload()
     )
     assert compiled.rule_ir.is_supported
     assert compiled.rule_ir.parser_version == "phase17c-rule-parser-v1"
@@ -2422,7 +2490,10 @@ def test_phase17c_compiler_payload_boundary_is_fail_fast() -> None:
             parsed_tokens=cast(Any, object()),
         )
     with pytest.raises(RuleCompilerError, match="payload contains stale rule_ir"):
-        CompiledRuleSource.from_payload(stale_compiled_payload)
+        CompiledRuleSource.from_payload(
+            stale_compiled_payload,
+            source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+        )
     with pytest.raises(RuleCompilerError, match="source_text must be RuleSourceText"):
         CompiledRuleSource(
             source_text=cast(RuleSourceText, object()),

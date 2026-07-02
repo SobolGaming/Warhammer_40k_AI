@@ -123,3 +123,59 @@ source_modules = [
   "warhammer40k_core.engine",
 ]
 forbidden_modules = ["warhammer40k_core.adapters"]
+
+[[tool.importlinter.contracts]]
+name = "Rules must not import engine or adapters"
+type = "forbidden"
+source_modules = ["warhammer40k_core.rules"]
+forbidden_modules = [
+  "warhammer40k_core.engine",
+  "warhammer40k_core.adapters",
+]
+
+[[tool.importlinter.contracts]]
+name = "Interfaces may only import adapters and engine"
+type = "forbidden"
+source_modules = ["warhammer40k_core.interfaces"]
+forbidden_modules = [
+  "warhammer40k_core.core",
+  "warhammer40k_core.geometry",
+  "warhammer40k_core.rules",
+  "warhammer40k_core.profiling",
+]
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "Profiling may not import adapters or interfaces"
+type = "forbidden"
+source_modules = ["warhammer40k_core.profiling"]
+forbidden_modules = [
+  "warhammer40k_core.adapters",
+  "warhammer40k_core.interfaces",
+]
+
+[[tool.importlinter.contracts]]
+name = "No runtime package imports profiling"
+type = "forbidden"
+source_modules = [
+  "warhammer40k_core.core",
+  "warhammer40k_core.geometry",
+  "warhammer40k_core.rules",
+  "warhammer40k_core.engine",
+  "warhammer40k_core.adapters",
+  "warhammer40k_core.interfaces",
+]
+forbidden_modules = ["warhammer40k_core.profiling"]
+
+[[tool.importlinter.contracts]]
+name = "No runtime package imports interfaces"
+type = "forbidden"
+source_modules = [
+  "warhammer40k_core.core",
+  "warhammer40k_core.geometry",
+  "warhammer40k_core.rules",
+  "warhammer40k_core.engine",
+  "warhammer40k_core.adapters",
+  "warhammer40k_core.profiling",
+]
+forbidden_modules = ["warhammer40k_core.interfaces"]

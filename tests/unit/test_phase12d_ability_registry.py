@@ -78,6 +78,13 @@ from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_abilities as source_data,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
+)
+
+SOURCE_KEYWORD_SEQUENCE_PARTS = (
+    datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+)
 
 
 def test_source_backed_core_ability_rows_include_phase12d_families() -> None:
@@ -497,7 +504,8 @@ def test_generic_rule_ir_movement_transit_permissions_are_consumed_by_model_cont
                 'friendly Monster and Vehicle models and terrain features that are 4" '
                 "or less in height as if they were not there."
             ),
-        )
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
     ).rule_ir
     matching_record = _ability_record(
         "semantic-move-over",
@@ -692,7 +700,8 @@ def test_malformed_passive_query_movement_transit_ir_fails_closed_at_runtime() -
                 'friendly Monster and Vehicle models and terrain features that are 4" '
                 "or less in height as if they were not there."
             ),
-        )
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
     ).rule_ir
     clause = rule_ir.clauses[0]
     malformed_rule_irs = (

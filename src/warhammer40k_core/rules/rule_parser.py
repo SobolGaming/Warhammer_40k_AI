@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_tokens
@@ -45,9 +46,6 @@ from warhammer40k_core.rules.rule_templates import (
     TRACKED_TARGET_SELECTION_TEMPLATE_ID,
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
     rule_template_by_id,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    datasheet_keyword_lexicon_2026_06_14,
 )
 
 RULE_PARSER_VERSION = "phase17c-rule-parser-v1"
@@ -489,9 +487,36 @@ _CHARACTERISTIC_BY_LABEL = {
     "wounds": Characteristic.WOUNDS,
     "ws": Characteristic.WEAPON_SKILL,
 }
-_SOURCE_KEYWORD_SEQUENCE_PARTS = (
-    datasheet_keyword_lexicon_2026_06_14.canonical_datasheet_keyword_sequence_parts()
-)
+
+
+@dataclass(frozen=True, slots=True)
+class _RuleParserContext:
+    source_keyword_sequence_parts: tuple[str, ...]
+
+
+def _validate_source_keyword_sequence_parts(value: object) -> tuple[str, ...]:
+    if type(value) is not tuple:
+        raise RuleIRError("Rule parser source_keyword_sequence_parts must be a tuple.")
+    if not value:
+        raise RuleIRError("Rule parser source_keyword_sequence_parts must not be empty.")
+    parts: list[str] = []
+    for raw_part in cast(tuple[object, ...], value):
+        if type(raw_part) is not str:
+            raise RuleIRError("Rule parser source_keyword_sequence_parts must contain strings.")
+        canonical = " ".join(raw_part.strip().upper().replace("-", " ").split())
+        if not canonical:
+            raise RuleIRError(
+                "Rule parser source_keyword_sequence_parts must not contain empty strings."
+            )
+        if canonical != raw_part:
+            raise RuleIRError(
+                "Rule parser source_keyword_sequence_parts must contain canonical uppercase "
+                "source keyword sequences."
+            )
+        parts.append(canonical)
+    if len(set(parts)) != len(parts):
+        raise RuleIRError("Rule parser source_keyword_sequence_parts must not duplicate values.")
+    return tuple(parts)
 
 
 @dataclass(frozen=True, slots=True)
@@ -511,18 +536,25 @@ def parse_rule_ir(
     *,
     source_id: str,
     parsed_text: ParsedRuleText,
+    source_keyword_sequence_parts: tuple[str, ...],
     rule_id: str | None = None,
 ) -> RuleIR:
     if type(source_id) is not str or not source_id.strip():
         raise RuleIRError("Rule parser source_id must be a non-empty string.")
     if type(parsed_text) is not ParsedRuleText:
         raise RuleIRError("Rule parser parsed_text must be ParsedRuleText.")
+    parser_context = _RuleParserContext(
+        source_keyword_sequence_parts=_validate_source_keyword_sequence_parts(
+            source_keyword_sequence_parts
+        )
+    )
     compiled_clauses = tuple(
         _compile_clause(
             source_id=source_id.strip(),
             clause_index=index,
             clause_text=clause_text,
             parsed_text=parsed_text,
+            parser_context=parser_context,
         )
         for index, clause_text in enumerate(
             _split_clause_text(parsed_text.normalized_text), start=1
@@ -712,6 +744,7 @@ def _compile_clause(
     clause_index: int,
     clause_text: _ClauseText,
     parsed_text: ParsedRuleText,
+    parser_context: _RuleParserContext,
 ) -> RuleClause:
     trigger = _parse_trigger(clause_text)
     conditions = _dedupe_conditions(
@@ -721,12 +754,16 @@ def _compile_clause(
             *_parse_tracked_target_conditions(clause_text),
             *_parse_return_on_death_conditions(clause_text),
             *_parse_frequency_conditions(clause_text),
-            *_parse_keyword_conditions(clause_text),
-            *_parse_distance_conditions(clause_text, parsed_text),
+            *_parse_keyword_conditions(clause_text, parser_context=parser_context),
+            *_parse_distance_conditions(
+                clause_text,
+                parsed_text,
+                parser_context=parser_context,
+            ),
             *_parse_status_conditions(clause_text),
         )
     )
-    target = _parse_target(clause_text)
+    target = _parse_target(clause_text, parser_context=parser_context)
     duration = _parse_duration(clause_text)
     effects = _dedupe_effects(
         (
@@ -1149,7 +1186,11 @@ def _parse_frequency_conditions(clause_text: _ClauseText) -> tuple[RuleCondition
     return tuple(conditions)
 
 
-def _parse_keyword_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, ...]:
+def _parse_keyword_conditions(
+    clause_text: _ClauseText,
+    *,
+    parser_context: _RuleParserContext,
+) -> tuple[RuleCondition, ...]:
     conditions: list[RuleCondition] = []
     target_match_ranges: list[tuple[int, int]] = []
     for match in _TRACKED_TARGET_SELECTION_RE.finditer(clause_text.text):
@@ -1222,13 +1263,23 @@ def _parse_keyword_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, 
         if keyword_text is None or _target_keyword_text_is_structural_relation(keyword_text):
             continue
         target_match_ranges.append((match.start(), match.end()))
-        conditions.extend(_keyword_gate_conditions_from_match(clause_text=clause_text, match=match))
+        conditions.extend(
+            _keyword_gate_conditions_from_match(
+                clause_text=clause_text,
+                match=match,
+                parser_context=parser_context,
+            )
+        )
     for pattern in (_HAS_KEYWORD_RE, _KEYWORD_UNIT_RE):
         for match in pattern.finditer(clause_text.text):
             if pattern is _KEYWORD_UNIT_RE and _match_inside_ranges(match, target_match_ranges):
                 continue
             conditions.extend(
-                _keyword_gate_conditions_from_match(clause_text=clause_text, match=match)
+                _keyword_gate_conditions_from_match(
+                    clause_text=clause_text,
+                    match=match,
+                    parser_context=parser_context,
+                )
             )
     return tuple(conditions)
 
@@ -1237,6 +1288,7 @@ def _keyword_gate_conditions_from_match(
     *,
     clause_text: _ClauseText,
     match: re.Match[str],
+    parser_context: _RuleParserContext,
 ) -> tuple[RuleCondition, ...]:
     return tuple(
         RuleCondition(
@@ -1244,7 +1296,10 @@ def _keyword_gate_conditions_from_match(
             source_span=_span_from_match(clause_text, match),
             parameters=parameters_from_pairs((("required_keyword", keyword),)),
         )
-        for keyword in _keyword_sequence_tokens(match.group("keyword"))
+        for keyword in _keyword_sequence_tokens(
+            match.group("keyword"),
+            parser_context=parser_context,
+        )
     )
 
 
@@ -1282,6 +1337,8 @@ def _keyword_any_gate_conditions_from_match(
 def _parse_distance_conditions(
     clause_text: _ClauseText,
     parsed_text: ParsedRuleText,
+    *,
+    parser_context: _RuleParserContext,
 ) -> tuple[RuleCondition, ...]:
     conditions: list[RuleCondition] = []
     for token in parsed_text.distance_predicates:
@@ -1292,7 +1349,10 @@ def _parse_distance_conditions(
             ("predicate", token.kind.value),
             ("distance_inches", token.distance_inches),
             ("qualifier", token.qualifier),
-            *_distance_relation_parameter_pairs(relation_match),
+            *_distance_relation_parameter_pairs(
+                relation_match,
+                parser_context=parser_context,
+            ),
         )
         conditions.append(
             RuleCondition(
@@ -1327,12 +1387,21 @@ def _parse_status_conditions(clause_text: _ClauseText) -> tuple[RuleCondition, .
     return tuple(conditions)
 
 
-def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
+def _parse_target(
+    clause_text: _ClauseText,
+    *,
+    parser_context: _RuleParserContext,
+) -> RuleTargetSpec | None:
     if _AURA_RE.search(clause_text.text) is not None:
         return RuleTargetSpec(
             kind=RuleTargetKind.AURA_UNITS,
             source_span=clause_text.span,
-            parameters=parameters_from_pairs(_aura_target_parameter_pairs(clause_text)),
+            parameters=parameters_from_pairs(
+                _aura_target_parameter_pairs(
+                    clause_text,
+                    parser_context=parser_context,
+                )
+            ),
         )
     if (
         _THIS_MODEL_MELEE_ATTACK_TARGET_RE.search(clause_text.text) is not None
@@ -1376,7 +1445,12 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
         if keyword_text is not None and not _target_keyword_text_is_structural_relation(
             keyword_text
         ):
-            pairs.extend(_keyword_sequence_parameter_pairs(keyword_text))
+            pairs.extend(
+                _keyword_sequence_parameter_pairs(
+                    keyword_text,
+                    parser_context=parser_context,
+                )
+            )
         return RuleTargetSpec(
             kind=target_kind,
             source_span=_span_from_match(clause_text, match),
@@ -1431,6 +1505,8 @@ def _parse_target(clause_text: _ClauseText) -> RuleTargetSpec | None:
 
 def _aura_target_parameter_pairs(
     clause_text: _ClauseText,
+    *,
+    parser_context: _RuleParserContext,
 ) -> tuple[tuple[str, RuleParameterValue], ...]:
     pairs: list[tuple[str, RuleParameterValue]] = [("eligible_target", "aura_units")]
     match = _TARGET_RE.search(clause_text.text)
@@ -1440,7 +1516,12 @@ def _aura_target_parameter_pairs(
     pairs.append(("allegiance", _lower_group(match, "allegiance")))
     keyword_text = match.group("keyword")
     if keyword_text is not None:
-        pairs.extend(_keyword_sequence_parameter_pairs(keyword_text))
+        pairs.extend(
+            _keyword_sequence_parameter_pairs(
+                keyword_text,
+                parser_context=parser_context,
+            )
+        )
     return tuple(pairs)
 
 
@@ -2420,6 +2501,8 @@ def _distance_relation_match_for_token(
 
 def _distance_relation_parameter_pairs(
     match: re.Match[str] | None,
+    *,
+    parser_context: _RuleParserContext,
 ) -> tuple[tuple[str, RuleParameterValue], ...]:
     if match is None:
         return ()
@@ -2439,7 +2522,12 @@ def _distance_relation_parameter_pairs(
         pairs.append(("object_allegiance", allegiance.lower()))
     keyword_text = match.group("keyword")
     if keyword_text is not None:
-        pairs.extend(_keyword_sequence_parameter_pairs(keyword_text))
+        pairs.extend(
+            _keyword_sequence_parameter_pairs(
+                keyword_text,
+                parser_context=parser_context,
+            )
+        )
     object_owner = match.group("object_owner")
     if object_owner is not None:
         pairs.append(("object_owner", _subject_token(object_owner)))
@@ -2563,11 +2651,21 @@ def _keyword_token(value: str) -> str:
     return value.strip().upper().replace(" ", "_").replace("-", "_")
 
 
-def _keyword_sequence_tokens(value: str) -> tuple[str, ...]:
+def _keyword_sequence_tokens(
+    value: str,
+    *,
+    parser_context: _RuleParserContext,
+) -> tuple[str, ...]:
     normalized = " ".join(value.strip().upper().replace("-", " ").split())
     if not normalized:
         raise RuleIRError("Keyword sequence must not be empty.")
-    tokens = tuple(_keyword_token(token) for token in _split_source_keyword_sequence(normalized))
+    tokens = tuple(
+        _keyword_token(token)
+        for token in _split_source_keyword_sequence(
+            normalized,
+            parser_context=parser_context,
+        )
+    )
     if not tokens:
         raise RuleIRError("Keyword sequence must contain at least one keyword.")
     return tokens
@@ -2624,18 +2722,26 @@ def _singular_keyword_token(value: str) -> str:
     return token
 
 
-def _keyword_sequence_parameter_pairs(value: str) -> tuple[tuple[str, RuleParameterValue], ...]:
-    tokens = _keyword_sequence_tokens(value)
+def _keyword_sequence_parameter_pairs(
+    value: str,
+    *,
+    parser_context: _RuleParserContext,
+) -> tuple[tuple[str, RuleParameterValue], ...]:
+    tokens = _keyword_sequence_tokens(value, parser_context=parser_context)
     if len(tokens) == 1:
         return (("required_keyword", tokens[0]),)
     return (("required_keyword_sequence", "|".join(tokens)),)
 
 
-def _split_source_keyword_sequence(value: str) -> tuple[str, ...]:
+def _split_source_keyword_sequence(
+    value: str,
+    *,
+    parser_context: _RuleParserContext,
+) -> tuple[str, ...]:
     remaining = value
     tokens: list[str] = []
     while remaining:
-        match = _longest_source_keyword_prefix(remaining)
+        match = _longest_source_keyword_prefix(remaining, parser_context=parser_context)
         if match is None:
             tokens.append(remaining)
             break
@@ -2644,8 +2750,12 @@ def _split_source_keyword_sequence(value: str) -> tuple[str, ...]:
     return tuple(tokens)
 
 
-def _longest_source_keyword_prefix(value: str) -> str | None:
-    for keyword in _SOURCE_KEYWORD_SEQUENCE_PARTS:
+def _longest_source_keyword_prefix(
+    value: str,
+    *,
+    parser_context: _RuleParserContext,
+) -> str | None:
+    for keyword in parser_context.source_keyword_sequence_parts:
         if value == keyword or value.startswith(f"{keyword} "):
             return keyword
     return None

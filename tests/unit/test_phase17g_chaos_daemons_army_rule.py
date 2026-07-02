@@ -69,6 +69,9 @@ from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
@@ -79,6 +82,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
 )
 
 CHAOS_DAEMONS_TEST_DATASHEET_ID = "phase17g-manifestation-daemon"
+SOURCE_KEYWORD_SEQUENCE_PARTS = (
+    datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+)
 
 
 def test_shadow_of_chaos_marks_no_mans_land_when_daemons_control_half_objectives() -> None:
@@ -657,7 +663,8 @@ def _semantic_shadow_aura_ability(*, allegiance: str) -> DatasheetAbilityDescrip
                 'unit is within 6" of this model, that unit is within your army\u2019s Shadow '
                 "of Chaos."
             ),
-        )
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
     )
     if not compiled.rule_ir.is_supported:
         raise AssertionError("semantic Shadow of Chaos aura must compile")

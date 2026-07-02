@@ -324,6 +324,9 @@ from warhammer40k_core.rules.rule_ir import (
 )
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27 as faction_detachment_source,
 )
 from warhammer40k_core.rules.source_reference_generation import build_source_reference_catalog
@@ -339,6 +342,10 @@ from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaCsvTable,
     WahapediaJsonArtifact,
     WahapediaJsonArtifactPayload,
+)
+
+SOURCE_KEYWORD_SEQUENCE_PARTS = (
+    datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
 )
 
 _WAHAPEDIA_10E_JSON = (
@@ -4464,7 +4471,8 @@ def test_phase17k_catalog_ir_shadow_of_chaos_aura_classifies_contextual_status()
                 "Daemonic Shadow (Aura): While a friendly Khorne Legiones Daemonica unit "
                 'is within 6" of this model, that unit is within your army\u2019s Shadow of Chaos.'
             ),
-        )
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
     ).rule_ir
 
     assert rule_ir.is_supported
@@ -7403,7 +7411,8 @@ def _charge_end_mortal_wounds_rule_ir() -> RuleIR:
                 "Engagement Range of this unit and roll one D6 for each model in this unit: "
                 "for each 4+, that enemy unit suffers D3 mortal wounds."
             ),
-        )
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
     ).rule_ir
 
 
