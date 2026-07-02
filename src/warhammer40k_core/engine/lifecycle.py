@@ -3330,13 +3330,13 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
     except PlacementError as exc:
         raise GameLifecycleError("Lifecycle state movement_phase_state is invalid.") from exc
 
-    try:
-        placed_army = scenario.battlefield_state.placed_army_for_player(state.active_player_id)
-        active_player_unit_ids: set[str] = {
+    placed_army = scenario.battlefield_state.placed_army_for_player_or_none(state.active_player_id)
+    if placed_army is None:
+        active_player_unit_ids: set[str] = set()
+    else:
+        active_player_unit_ids = {
             placement.unit_instance_id for placement in placed_army.unit_placements
         }
-    except PlacementError:
-        active_player_unit_ids = set()
     active_player_embarked_unit_ids = _embarked_unit_ids_for_player(
         state=state,
         player_id=state.active_player_id,
@@ -3687,12 +3687,9 @@ def _state_requires_mustered_armies(state: GameState) -> bool:
         return True
     if state.setup_step_index is None:
         return True
-    try:
-        muster_step_index = state.setup_sequence.index(SetupStep.MUSTER_ARMIES)
-    except ValueError as exc:
-        raise GameLifecycleError(
-            "Lifecycle state setup sequence must include MUSTER_ARMIES."
-        ) from exc
+    muster_step_index = _setup_step_index_or_none(state, SetupStep.MUSTER_ARMIES)
+    if muster_step_index is None:
+        raise GameLifecycleError("Lifecycle state setup sequence must include MUSTER_ARMIES.")
     return state.setup_step_index > muster_step_index
 
 
@@ -3701,9 +3698,8 @@ def _state_requires_battlefield_state(state: GameState) -> bool:
         return True
     if state.setup_step_index is None:
         return True
-    try:
-        create_step_index = state.setup_sequence.index(SetupStep.CREATE_BATTLEFIELD)
-    except ValueError:
+    create_step_index = _setup_step_index_or_none(state, SetupStep.CREATE_BATTLEFIELD)
+    if create_step_index is None:
         return False
     return state.setup_step_index > create_step_index
 
@@ -3713,9 +3709,8 @@ def _state_requires_deployed_battlefield_state(state: GameState) -> bool:
         return True
     if state.setup_step_index is None:
         return True
-    try:
-        deploy_step_index = state.setup_sequence.index(SetupStep.DEPLOY_ARMIES)
-    except ValueError:
+    deploy_step_index = _setup_step_index_or_none(state, SetupStep.DEPLOY_ARMIES)
+    if deploy_step_index is None:
         return False
     return state.setup_step_index > deploy_step_index
 
@@ -3725,9 +3720,8 @@ def _state_allows_battlefield_state(state: GameState) -> bool:
         return True
     if state.setup_step_index is None:
         return True
-    try:
-        create_step_index = state.setup_sequence.index(SetupStep.CREATE_BATTLEFIELD)
-    except ValueError:
+    create_step_index = _setup_step_index_or_none(state, SetupStep.CREATE_BATTLEFIELD)
+    if create_step_index is None:
         return False
     return state.setup_step_index >= create_step_index
 
@@ -3737,8 +3731,14 @@ def _state_is_before_deploy_armies(state: GameState) -> bool:
         return False
     if state.setup_step_index is None:
         return False
-    try:
-        deploy_step_index = state.setup_sequence.index(SetupStep.DEPLOY_ARMIES)
-    except ValueError:
+    deploy_step_index = _setup_step_index_or_none(state, SetupStep.DEPLOY_ARMIES)
+    if deploy_step_index is None:
         return False
     return state.setup_step_index < deploy_step_index
+
+
+def _setup_step_index_or_none(state: GameState, step: SetupStep) -> int | None:
+    for index, candidate in enumerate(state.setup_sequence):
+        if candidate is step:
+            return index
+    return None

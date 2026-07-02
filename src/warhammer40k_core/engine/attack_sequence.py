@@ -7757,9 +7757,8 @@ def _target_unit_within_any_objective_marker_range(
 ) -> bool:
     if state.mission_setup is None or state.battlefield_state is None:
         return False
-    try:
-        unit_placement = state.battlefield_state.unit_placement_by_id(target_unit_instance_id)
-    except PlacementError:
+    unit_placement = state.battlefield_state.unit_placement_or_none(target_unit_instance_id)
+    if unit_placement is None:
         return False
     target_models = tuple(
         geometry_model_for_placement(

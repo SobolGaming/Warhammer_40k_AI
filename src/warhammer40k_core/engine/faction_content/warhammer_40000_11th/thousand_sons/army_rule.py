@@ -1465,9 +1465,8 @@ def _model_has_placement(
 ) -> bool:
     if state.battlefield_state is None:
         raise GameLifecycleError("Cabal of Sorcerers requires battlefield_state.")
-    try:
-        placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)
-    except PlacementError:
+    placement = state.battlefield_state.unit_placement_or_none(unit_instance_id)
+    if placement is None:
         return False
     return any(
         model_placement.model_instance_id == model.model_instance_id
@@ -1578,11 +1577,10 @@ def _alive_geometry_models_for_rules_unit(
 ) -> tuple[GeometryModel, ...]:
     models: list[GeometryModel] = []
     for component in rules_unit.components:
-        try:
-            placement = scenario.battlefield_state.unit_placement_by_id(
-                component.unit.unit_instance_id
-            )
-        except PlacementError:
+        placement = scenario.battlefield_state.unit_placement_or_none(
+            component.unit.unit_instance_id
+        )
+        if placement is None:
             continue
         for model_placement in placement.model_placements:
             model = scenario.model_instance_for_placement(model_placement)

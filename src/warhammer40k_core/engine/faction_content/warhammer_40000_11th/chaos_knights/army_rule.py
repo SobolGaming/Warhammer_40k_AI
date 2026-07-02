@@ -20,7 +20,6 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
-    PlacementError,
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
@@ -854,9 +853,8 @@ def _unit_geometry_models(
         armies=tuple(state.army_definitions),
         battlefield_state=state.battlefield_state,
     )
-    try:
-        unit_placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)
-    except PlacementError:
+    unit_placement = state.battlefield_state.unit_placement_or_none(unit_instance_id)
+    if unit_placement is None:
         return ()
     return tuple(
         geometry_model_for_placement(
@@ -897,9 +895,8 @@ def _current_battlefield_model_ids(
 ) -> tuple[str, ...]:
     if state.battlefield_state is None:
         raise GameLifecycleError("Harbingers of Dread strength lookup requires battlefield_state.")
-    try:
-        placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
-    except PlacementError:
+    placement = state.battlefield_state.unit_placement_or_none(unit.unit_instance_id)
+    if placement is None:
         return ()
     unit_model_by_id = {model.model_instance_id: model for model in unit.own_models}
     current_model_ids: list[str] = []

@@ -12,7 +12,6 @@ from warhammer40k_core.core.faction_aliases import CHAOS_DAEMONS_FACTION_ID
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
-    PlacementError,
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.damage_allocation import (
@@ -992,11 +991,10 @@ def _alive_geometry_models_for_rules_unit(
         raise GameLifecycleError("Malice Made Manifest model lookup requires battlefield_state.")
     models: list[GeometryModel] = []
     for component in rules_unit.components:
-        try:
-            unit_placement = state.battlefield_state.unit_placement_by_id(
-                component.unit.unit_instance_id
-            )
-        except PlacementError:
+        unit_placement = state.battlefield_state.unit_placement_or_none(
+            component.unit.unit_instance_id
+        )
+        if unit_placement is None:
             continue
         for model_placement in unit_placement.model_placements:
             model = scenario.model_instance_for_placement(model_placement)
@@ -1106,9 +1104,7 @@ def _unit_can_enter_strategic_reserves(
         raise GameLifecycleError("Fade to Darkness requires battlefield_state.")
     if state.reserve_state_for_unit(unit_instance_id) is not None:
         return False
-    try:
-        state.battlefield_state.unit_placement_by_id(unit_instance_id)
-    except PlacementError:
+    if not state.battlefield_state.is_unit_placed(unit_instance_id):
         return False
     return not unit_within_enemy_engagement_range(state=state, unit_instance_id=unit_instance_id)
 

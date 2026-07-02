@@ -802,9 +802,8 @@ def _mission_action_start_options(
         raise GameLifecycleError("Mission Action start requires MissionSetup.")
     if action.target_policy not in _SUPPORTED_MISSION_ACTION_TARGET_POLICIES:
         raise GameLifecycleError("Unsupported Mission Action target policy.")
-    try:
-        placed_army = battlefield_state.placed_army_for_player(player_id)
-    except PlacementError:
+    placed_army = battlefield_state.placed_army_for_player_or_none(player_id)
+    if placed_army is None:
         return ()
     scenario = BattlefieldScenario(
         armies=tuple(state.army_definitions),
@@ -988,9 +987,8 @@ def _trappable_terrain_target_ids_by_unit(
     )
     if not candidate_features:
         return {}
-    try:
-        placed_army = battlefield_state.placed_army_for_player(requested_player)
-    except PlacementError:
+    placed_army = battlefield_state.placed_army_for_player_or_none(requested_player)
+    if placed_army is None:
         return {}
     targets_by_unit: dict[str, set[str]] = {}
     for unit_placement in placed_army.unit_placements:
@@ -1077,9 +1075,8 @@ def _terrain_area_target_ids_by_unit(
     )
     if not candidate_features:
         return {}
-    try:
-        placed_army = battlefield_state.placed_army_for_player(requested_player)
-    except PlacementError:
+    placed_army = battlefield_state.placed_army_for_player_or_none(requested_player)
+    if placed_army is None:
         return {}
     targets_by_unit: dict[str, set[str]] = {}
     for unit_placement in placed_army.unit_placements:

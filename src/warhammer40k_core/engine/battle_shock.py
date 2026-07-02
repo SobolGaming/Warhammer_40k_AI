@@ -19,7 +19,7 @@ from warhammer40k_core.core.dice import (
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState, PlacementError
+from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_leadership_characteristic_for_unit,
 )
@@ -857,9 +857,8 @@ def _current_battlefield_model_ids(
     unit: UnitInstance,
     battlefield_state: BattlefieldRuntimeState,
 ) -> tuple[str, ...]:
-    try:
-        placement = battlefield_state.unit_placement_by_id(unit.unit_instance_id)
-    except PlacementError:
+    placement = battlefield_state.unit_placement_or_none(unit.unit_instance_id)
+    if placement is None:
         return ()
     unit_model_by_id = {model.model_instance_id: model for model in unit.own_models}
     current_ids: list[str] = []
