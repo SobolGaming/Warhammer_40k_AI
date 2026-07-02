@@ -931,8 +931,8 @@ def _validate_and_apply_revival(
         placement=placement,
     )
 
-    state.army_definitions = list(hypothetical_armies)
-    state.battlefield_state = hypothetical_battlefield
+    state.replace_army_definitions(list(hypothetical_armies))
+    state.replace_battlefield_state(hypothetical_battlefield)
     return BattlefieldTransitionBatch(
         placements=(
             ModelPlacementRecord(
@@ -1448,11 +1448,13 @@ def _replace_model_wounds(
     model_instance_id: str,
     wounds_remaining: int,
 ) -> None:
-    state.army_definitions = list(
-        _army_definitions_with_model_wounds(
-            armies=tuple(state.army_definitions),
-            model_instance_id=model_instance_id,
-            wounds_remaining=wounds_remaining,
+    state.replace_army_definitions(
+        list(
+            _army_definitions_with_model_wounds(
+                armies=tuple(state.army_definitions),
+                model_instance_id=model_instance_id,
+                wounds_remaining=wounds_remaining,
+            )
         )
     )
 

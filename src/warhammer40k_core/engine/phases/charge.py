@@ -922,7 +922,7 @@ class ChargePhaseHandler:
             charge_target_restriction_hooks=self.charge_target_restriction_hooks,
         )
         if not legal_unit_ids:
-            state.charge_phase_state = charge_state.with_phase_complete()
+            state.replace_charge_phase_state(charge_state.with_phase_complete())
             decisions.event_log.append(
                 "charge_phase_completed",
                 _charge_phase_status_payload(
@@ -1331,8 +1331,8 @@ def _apply_charging_unit_selection_decision(
     if result.selected_option_id == COMPLETE_CHARGE_PHASE_OPTION_ID:
         payload = _decision_payload_object(result.payload)
         skipped_unit_ids = _payload_identifier_list(payload, key="skipped_unit_ids")
-        state.charge_phase_state = charge_state.with_phase_complete(
-            skipped_unit_ids=skipped_unit_ids,
+        state.replace_charge_phase_state(
+            charge_state.with_phase_complete(skipped_unit_ids=skipped_unit_ids)
         )
         decisions.event_log.append(
             "charge_phase_completion_declared",
@@ -1361,7 +1361,7 @@ def _apply_charging_unit_selection_decision(
         request_id=result.request_id,
         result_id=result.result_id,
     )
-    state.charge_phase_state = charge_state.with_unit_selection(selection)
+    state.replace_charge_phase_state(charge_state.with_unit_selection(selection))
     decisions.event_log.append(
         "charging_unit_selected",
         validate_json_value(
@@ -1829,7 +1829,7 @@ def _resolve_charge_roll_state(
     charge_state = state.charge_phase_state
     if charge_state is None:
         raise GameLifecycleError("Charge roll requires charge_phase_state.")
-    state.charge_phase_state = charge_state.with_charge_roll_result(roll_result)
+    state.replace_charge_phase_state(charge_state.with_charge_roll_result(roll_result))
     decisions.event_log.append(
         "charge_roll_resolved",
         phase15a_charge_roll_payload(roll_result=roll_result),
@@ -2152,7 +2152,9 @@ def _apply_charge_move_proposal_decision(
     if pending_distance is None:
         raise GameLifecycleError("Charge Move proposal requires pending distance state.")
     if proposal.is_no_move_choice:
-        state.charge_phase_state = charge_state.with_charge_move_resolved(proposal.unit_instance_id)
+        state.replace_charge_phase_state(
+            charge_state.with_charge_move_resolved(proposal.unit_instance_id)
+        )
         decisions.event_log.append(
             "charge_move_declined",
             validate_json_value(
@@ -2207,9 +2209,11 @@ def _apply_charge_move_proposal_decision(
     state.replace_battlefield_state(
         battlefield_state.with_unit_placement(resolution.attempted_placement)
     )
-    state.charge_phase_state = charge_state.with_charge_move_resolved(
-        proposal.unit_instance_id,
-        selected_target_unit_instance_ids=resolution.selected_target_unit_instance_ids,
+    state.replace_charge_phase_state(
+        charge_state.with_charge_move_resolved(
+            proposal.unit_instance_id,
+            selected_target_unit_instance_ids=resolution.selected_target_unit_instance_ids,
+        )
     )
     effect = _record_fights_first_effect_if_needed(
         state=state,
@@ -3077,11 +3081,12 @@ def _ensure_charge_phase_state(*, state: GameState) -> ChargePhaseState:
     active_player_id = _active_player_id(state)
     if current is not None:
         return current
-    state.charge_phase_state = ChargePhaseState(
+    charge_state = ChargePhaseState(
         battle_round=state.battle_round,
         active_player_id=active_player_id,
     )
-    return state.charge_phase_state
+    state.replace_charge_phase_state(charge_state)
+    return charge_state
 
 
 def _validate_charge_phase_state(state: GameState) -> None:

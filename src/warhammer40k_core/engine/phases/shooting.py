@@ -1140,8 +1140,8 @@ class ShootingPhaseHandler:
             if completion_status is not None:
                 return completion_status
             shooting_state = _ensure_shooting_phase_state(state=state)
-            state.shooting_phase_state = shooting_state.with_pending_completed_attack_sequence(None)
-            shooting_state = state.shooting_phase_state
+            shooting_state = shooting_state.with_pending_completed_attack_sequence(None)
+            state.replace_shooting_phase_state(shooting_state)
         if shooting_state.attack_sequence is not None:
             completed_candidate = shooting_state.attack_sequence
             target_stratagem_status = _request_after_unit_selected_as_target_stratagem_if_available(
@@ -1166,14 +1166,14 @@ class ShootingPhaseHandler:
                 attack_sequence=attack_sequence,
                 allocated_model_ids_this_phase=allocated_model_ids,
             )
-            state.shooting_phase_state = shooting_state
+            state.replace_shooting_phase_state(shooting_state)
             if status is not None:
                 return status
             if attack_sequence is None:
                 shooting_state = shooting_state.with_pending_completed_attack_sequence(
                     completed_candidate
                 )
-                state.shooting_phase_state = shooting_state
+                state.replace_shooting_phase_state(shooting_state)
                 completion_status = _resolve_completed_shooting_attack_sequence_continuation(
                     handler=self,
                     state=state,
@@ -1183,10 +1183,8 @@ class ShootingPhaseHandler:
                 if completion_status is not None:
                     return completion_status
                 shooting_state = _ensure_shooting_phase_state(state=state)
-                state.shooting_phase_state = shooting_state.with_pending_completed_attack_sequence(
-                    None
-                )
-                shooting_state = state.shooting_phase_state
+                shooting_state = shooting_state.with_pending_completed_attack_sequence(None)
+                state.replace_shooting_phase_state(shooting_state)
         if shooting_state.phase_complete:
             decisions.event_log.append(
                 "shooting_phase_completed",
@@ -1248,7 +1246,7 @@ class ShootingPhaseHandler:
             shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
         )
         if not legal_unit_ids:
-            state.shooting_phase_state = shooting_state.with_phase_complete()
+            state.replace_shooting_phase_state(shooting_state.with_phase_complete())
             decisions.event_log.append(
                 "shooting_phase_completed",
                 _shooting_phase_status_payload(
@@ -1319,13 +1317,13 @@ class ShootingPhaseHandler:
             stratagem_index=self.stratagem_index,
             runtime_modifier_registry=self.runtime_modifier_registry,
         )
-        state.out_of_phase_shooting_state = out_of_phase_state.with_attack_sequence_update(
+        completed_state = out_of_phase_state.with_attack_sequence_update(
             attack_sequence=attack_sequence,
             allocated_model_ids=allocated_model_ids,
         )
+        state.replace_out_of_phase_shooting_state(completed_state)
         if status is not None:
             return status
-        completed_state = state.out_of_phase_shooting_state
         if completed_state.attack_sequence is not None:
             raise GameLifecycleError("Out-of-phase shooting completion state drift.")
         completion_hook_status = self.attack_sequence_completed_hooks.resolve_completed_sequence(
@@ -1844,7 +1842,7 @@ def _complete_out_of_phase_shooting(
             "removed_grant_effects": [effect.to_payload() for effect in removed_grant_effects],
         },
     )
-    state.out_of_phase_shooting_state = None
+    state.replace_out_of_phase_shooting_state(None)
     return LifecycleStatus.advanced(
         stage=GameLifecycleStage.BATTLE,
         payload={
@@ -2918,16 +2916,18 @@ def request_out_of_phase_shooting_declaration(
         request_id=source_decision_request_id,
         result_id=source_decision_result_id,
     )
-    state.out_of_phase_shooting_state = OutOfPhaseShootingState(
-        battle_round=state.battle_round,
-        player_id=player_id,
-        parent_phase=parent_phase,
-        source_rule_id=source_rule_id,
-        source_decision_request_id=source_decision_request_id,
-        source_decision_result_id=source_decision_result_id,
-        source_context=source_context,
-        selected_unit_instance_id=selected_rules_unit_id,
-        target_unit_ids=target_unit_ids,
+    state.replace_out_of_phase_shooting_state(
+        OutOfPhaseShootingState(
+            battle_round=state.battle_round,
+            player_id=player_id,
+            parent_phase=parent_phase,
+            source_rule_id=source_rule_id,
+            source_decision_request_id=source_decision_request_id,
+            source_decision_result_id=source_decision_result_id,
+            source_context=source_context,
+            selected_unit_instance_id=selected_rules_unit_id,
+            target_unit_ids=target_unit_ids,
+        )
     )
     grant_status = _request_shooting_unit_selected_grant_decision_if_available(
         state=state,
@@ -3201,8 +3201,8 @@ def _apply_shooting_unit_selection_decision(
             army_catalog=army_catalog,
             shooting_target_restriction_hooks=shooting_target_restriction_hooks,
         )
-        state.shooting_phase_state = shooting_state.with_phase_complete(
-            skipped_unit_ids=skipped_unit_ids,
+        state.replace_shooting_phase_state(
+            shooting_state.with_phase_complete(skipped_unit_ids=skipped_unit_ids)
         )
         decisions.event_log.append(
             "shooting_phase_completion_declared",
@@ -3232,7 +3232,7 @@ def _apply_shooting_unit_selection_decision(
         request_id=result.request_id,
         result_id=result.result_id,
     )
-    state.shooting_phase_state = shooting_state.with_unit_selection(selection)
+    state.replace_shooting_phase_state(shooting_state.with_unit_selection(selection))
     decisions.event_log.append(
         "shooting_unit_selected",
         {
@@ -3462,8 +3462,10 @@ def _apply_shooting_unit_selected_grant_decision(
         and not out_of_phase_state.attack_pools
         and out_of_phase_state.attack_sequence is None
     ):
-        state.out_of_phase_shooting_state = out_of_phase_state.with_grant_effect_ids(
-            tuple(effect.effect_id for effect in persisting_effects)
+        state.replace_out_of_phase_shooting_state(
+            out_of_phase_state.with_grant_effect_ids(
+                tuple(effect.effect_id for effect in persisting_effects)
+            )
         )
         if ruleset_descriptor is None or army_catalog is None:
             return None
@@ -3751,7 +3753,7 @@ def _apply_shooting_type_selection_decision(
         request_id=result.request_id,
         result_id=result.result_id,
     )
-    state.shooting_phase_state = shooting_state.with_shooting_type_selection(selection)
+    state.replace_shooting_phase_state(shooting_state.with_shooting_type_selection(selection))
     decisions.event_log.append(
         "shooting_type_selected",
         validate_json_value(
@@ -3817,10 +3819,12 @@ def _apply_shooting_declaration_decision(
         attacking_unit_instance_id=proposal.unit_instance_id,
         attack_pools=attack_pools,
     )
-    state.shooting_phase_state = shooting_state.with_declaration(
-        attack_pools=attack_pools,
-        ineligible_unit_instance_ids=ineligible_unit_ids,
-        attack_sequence=attack_sequence,
+    state.replace_shooting_phase_state(
+        shooting_state.with_declaration(
+            attack_pools=attack_pools,
+            ineligible_unit_instance_ids=ineligible_unit_ids,
+            attack_sequence=attack_sequence,
+        )
     )
     ranged_attack_history_record = _record_ranged_attack_history_for_declaration(
         state=state,
@@ -3907,9 +3911,11 @@ def _apply_out_of_phase_shooting_declaration_decision(
         attacking_unit_instance_id=proposal.unit_instance_id,
         attack_pools=attack_pools,
     )
-    state.out_of_phase_shooting_state = out_of_phase_state.with_declaration(
-        attack_pools=attack_pools,
-        attack_sequence=attack_sequence,
+    state.replace_out_of_phase_shooting_state(
+        out_of_phase_state.with_declaration(
+            attack_pools=attack_pools,
+            attack_sequence=attack_sequence,
+        )
     )
     ranged_attack_history_record = _record_ranged_attack_history_for_declaration(
         state=state,
@@ -4081,9 +4087,11 @@ def _apply_attack_sequence_decision(
             already_allocated_model_ids=out_of_phase_state.allocated_model_ids,
             stratagem_index=stratagem_index,
         )
-        state.out_of_phase_shooting_state = out_of_phase_state.with_attack_sequence_update(
-            attack_sequence=attack_sequence,
-            allocated_model_ids=allocated_model_ids,
+        state.replace_out_of_phase_shooting_state(
+            out_of_phase_state.with_attack_sequence_update(
+                attack_sequence=attack_sequence,
+                allocated_model_ids=allocated_model_ids,
+            )
         )
         return status
     shooting_state = state.shooting_phase_state
@@ -4098,9 +4106,11 @@ def _apply_attack_sequence_decision(
         already_allocated_model_ids=shooting_state.allocated_model_ids_this_phase,
         stratagem_index=stratagem_index,
     )
-    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
-        attack_sequence=attack_sequence,
-        allocated_model_ids_this_phase=allocated_model_ids,
+    state.replace_shooting_phase_state(
+        shooting_state.with_attack_sequence_update(
+            attack_sequence=attack_sequence,
+            allocated_model_ids_this_phase=allocated_model_ids,
+        )
     )
     return status
 
@@ -4113,25 +4123,29 @@ def _apply_attack_sequence_selection_decision(
 ) -> None:
     out_of_phase_state = state.out_of_phase_shooting_state
     if out_of_phase_state is not None and out_of_phase_state.attack_sequence is not None:
-        state.out_of_phase_shooting_state = out_of_phase_state.with_attack_sequence_update(
-            attack_sequence=_apply_attack_sequence_selection_to_sequence(
-                attack_sequence=out_of_phase_state.attack_sequence,
-                result=result,
-                decisions=decisions,
-            ),
-            allocated_model_ids=out_of_phase_state.allocated_model_ids,
+        state.replace_out_of_phase_shooting_state(
+            out_of_phase_state.with_attack_sequence_update(
+                attack_sequence=_apply_attack_sequence_selection_to_sequence(
+                    attack_sequence=out_of_phase_state.attack_sequence,
+                    result=result,
+                    decisions=decisions,
+                ),
+                allocated_model_ids=out_of_phase_state.allocated_model_ids,
+            )
         )
         return
     shooting_state = state.shooting_phase_state
     if shooting_state is None or shooting_state.attack_sequence is None:
         raise GameLifecycleError("Attack sequence selection requires active attack_sequence.")
-    state.shooting_phase_state = shooting_state.with_attack_sequence_update(
-        attack_sequence=_apply_attack_sequence_selection_to_sequence(
-            attack_sequence=shooting_state.attack_sequence,
-            result=result,
-            decisions=decisions,
-        ),
-        allocated_model_ids_this_phase=shooting_state.allocated_model_ids_this_phase,
+    state.replace_shooting_phase_state(
+        shooting_state.with_attack_sequence_update(
+            attack_sequence=_apply_attack_sequence_selection_to_sequence(
+                attack_sequence=shooting_state.attack_sequence,
+                result=result,
+                decisions=decisions,
+            ),
+            allocated_model_ids_this_phase=shooting_state.allocated_model_ids_this_phase,
+        )
     )
 
 
@@ -6835,11 +6849,12 @@ def _ensure_shooting_phase_state(*, state: GameState) -> ShootingPhaseState:
     active_player_id = _active_player_id(state)
     if current is not None:
         return current
-    state.shooting_phase_state = ShootingPhaseState(
+    shooting_state = ShootingPhaseState(
         battle_round=state.battle_round,
         active_player_id=active_player_id,
     )
-    return state.shooting_phase_state
+    state.replace_shooting_phase_state(shooting_state)
+    return shooting_state
 
 
 def _validate_shooting_phase_state(state: GameState) -> None:

@@ -180,7 +180,7 @@ class CommandPhaseHandler:
             )
 
         if not command_state.tactical_secondary_resolved:
-            state.command_step_state = command_state.with_tactical_secondary_resolved()
+            state.replace_command_step_state(command_state.with_tactical_secondary_resolved())
             command_state = _command_step_state(state)
 
         if not command_state.battle_shock_step_resolved:
@@ -213,7 +213,9 @@ class CommandPhaseHandler:
             )
             if replacement_status is not None:
                 return replacement_status
-            state.command_step_state = command_state.with_tactical_secondary_replacement_resolved()
+            state.replace_command_step_state(
+                command_state.with_tactical_secondary_replacement_resolved()
+            )
 
         return LifecycleStatus.advanced(
             stage=GameLifecycleStage.BATTLE,
@@ -355,7 +357,7 @@ def _apply_tactical_secondary_draw(
         },
     )
     command_state = _command_step_state(state)
-    state.command_step_state = command_state.with_tactical_secondary_resolved()
+    state.replace_command_step_state(command_state.with_tactical_secondary_resolved())
 
 
 def _apply_tactical_secondary_replacement(
@@ -381,9 +383,9 @@ def _apply_tactical_secondary_replacement(
             secondary_mission_id=None,
             result=result,
         )
-        state.command_step_state = _command_step_state(
-            state
-        ).with_tactical_secondary_replacement_resolved()
+        state.replace_command_step_state(
+            _command_step_state(state).with_tactical_secondary_replacement_resolved()
+        )
         decisions.event_log.append(
             "tactical_secondary_replacement_declined",
             {
@@ -429,9 +431,9 @@ def _apply_tactical_secondary_replacement(
         source_result_id=result.result_id,
         draw_count=1,
     )
-    state.command_step_state = _command_step_state(
-        state
-    ).with_tactical_secondary_replacement_resolved()
+    state.replace_command_step_state(
+        _command_step_state(state).with_tactical_secondary_replacement_resolved()
+    )
     decisions.event_log.append(
         "tactical_secondary_mission_replaced",
         {
@@ -799,11 +801,12 @@ def _ensure_command_step_state(
     active_player_id: str,
 ) -> CommandStepState:
     if state.command_step_state is None:
-        state.command_step_state = CommandStepState.start(
+        command_state = CommandStepState.start(
             battle_round=state.battle_round,
             active_player_id=active_player_id,
         )
-        return state.command_step_state
+        state.replace_command_step_state(command_state)
+        return command_state
     command_state = state.command_step_state
     if command_state.active_player_id != active_player_id:
         raise GameLifecycleError("CommandStepState active player drift.")
@@ -849,7 +852,7 @@ def _resolve_command_step_start(
             active_player_id=active_player_id,
         )
     )
-    state.command_step_state = _command_step_state(state).with_command_points_granted()
+    state.replace_command_step_state(_command_step_state(state).with_command_points_granted())
     decisions.event_log.append(
         "command_step_started",
         {
@@ -931,7 +934,7 @@ def _resolve_command_phase_scoring_hooks(
             "timing": "command_step_after_cp_before_battle_shock",
         },
     )
-    state.command_step_state = _command_step_state(state).with_scoring_hooks_resolved()
+    state.replace_command_step_state(_command_step_state(state).with_scoring_hooks_resolved())
 
 
 def _request_tactical_secondary_draw(
@@ -1160,7 +1163,7 @@ def _resolve_battle_shock_step(
     if army is None:
         raise GameLifecycleError("Battle-shock step requires active player's army.")
 
-    state.command_step_state = _command_step_state(state).enter_battle_shock_step()
+    state.replace_command_step_state(_command_step_state(state).enter_battle_shock_step())
     phase_start_battle_shocked_unit_ids = tuple(state.battle_shocked_unit_ids)
     forced_below_starting_strength_unit_ids = (
         battle_shock_hooks.forced_below_starting_strength_unit_ids(
@@ -1275,7 +1278,7 @@ def _resolve_battle_shock_step(
                 phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
             )
         )
-    state.command_step_state = _command_step_state(state).with_battle_shock_step_resolved()
+    state.replace_command_step_state(_command_step_state(state).with_battle_shock_step_resolved())
     decisions.event_log.append(
         "battle_shock_step_completed",
         {

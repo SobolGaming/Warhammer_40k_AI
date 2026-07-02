@@ -2079,6 +2079,41 @@ class GameState:
         self._record_starting_attached_unit_records_for_army(army_definition)
         self._record_static_core_ability_sources_for_army(army_definition)
 
+    def replace_army_definitions(self, army_definitions: list[ArmyDefinition]) -> None:
+        self.army_definitions = _validate_army_definitions(
+            army_definitions,
+            player_ids=self.player_ids,
+        )
+
+    def replace_command_step_state(self, command_step_state: CommandStepState | None) -> None:
+        self.command_step_state = _validate_optional_command_step_state(command_step_state)
+
+    def replace_movement_phase_state(
+        self,
+        movement_phase_state: MovementPhaseState | None,
+    ) -> None:
+        self.movement_phase_state = _validate_optional_movement_phase_state(movement_phase_state)
+
+    def replace_charge_phase_state(self, charge_phase_state: ChargePhaseState | None) -> None:
+        self.charge_phase_state = _validate_optional_charge_phase_state(charge_phase_state)
+
+    def replace_fight_phase_state(self, fight_phase_state: FightPhaseState | None) -> None:
+        self.fight_phase_state = _validate_optional_fight_phase_state(fight_phase_state)
+
+    def replace_shooting_phase_state(
+        self,
+        shooting_phase_state: ShootingPhaseState | None,
+    ) -> None:
+        self.shooting_phase_state = _validate_optional_shooting_phase_state(shooting_phase_state)
+
+    def replace_out_of_phase_shooting_state(
+        self,
+        out_of_phase_shooting_state: OutOfPhaseShootingState | None,
+    ) -> None:
+        self.out_of_phase_shooting_state = _validate_optional_out_of_phase_shooting_state(
+            out_of_phase_shooting_state
+        )
+
     def record_faction_rule_state(self, state: FactionRuleState) -> None:
         if type(state) is not FactionRuleState:
             raise GameLifecycleError("GameState faction rule state must be FactionRuleState.")
