@@ -65,6 +65,11 @@ from warhammer40k_core.engine.decision_controller import (
     DecisionController,
     DecisionControllerPayload,
 )
+from warhammer40k_core.engine.decision_dispatch import (
+    DecisionDispatchHandler,
+    DecisionDispatchRegistry,
+)
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.deployment import (
@@ -500,6 +505,7 @@ class GameLifecycle:
     _runtime_content_bundle: RuntimeContentBundle | None = None
     _runtime_content_audit: Mapping[str, JsonValue] | None = None
     _runtime_content_activation_input_hash: str | None = None
+    _decision_dispatch_registry: DecisionDispatchRegistry = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         if type(self.parameterized_movement_proposals) is not bool:
@@ -508,6 +514,7 @@ class GameLifecycle:
             )
         if not self.parameterized_movement_proposals:
             raise GameLifecycleError("GameLifecycle requires parameterized movement proposals.")
+        self._decision_dispatch_registry = self._build_decision_dispatch_registry()
 
     @property
     def config(self) -> GameConfig:
@@ -1331,20 +1338,13 @@ class GameLifecycle:
             )
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _SETUP_DECISION_TYPES:
-            self._setup_flow.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-                config=self._require_config(),
-            )
-            return self.advance_until_decision_or_terminal()
+            return self._decision_dispatch_registry.handler_for(
+                record.request.decision_type
+            ).applier(record, result)
         if record.request.decision_type in _BATTLE_ROUND_DECISION_TYPES:
-            self._require_battle_round_flow().apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            return self.advance_until_decision_or_terminal()
+            return self._decision_dispatch_registry.handler_for(
+                record.request.decision_type
+            ).applier(record, result)
         if record.request.decision_type == SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE:
             return self._apply_stratagem_cost_choice_and_resume(
                 request=record.request,
@@ -2135,6 +2135,69 @@ class GameLifecycle:
             BattlePhase.CHARGE: self._charge_phase_handler,
             BattlePhase.FIGHT: self._fight_phase_handler,
         }
+
+    def _build_decision_dispatch_registry(self) -> DecisionDispatchRegistry:
+        return DecisionDispatchRegistry.from_handlers(
+            (
+                *(
+                    DecisionDispatchHandler(
+                        decision_type=decision_type,
+                        pre_validator=self._pre_validate_setup_decision,
+                        applier=self._apply_setup_decision,
+                    )
+                    for decision_type in _SETUP_DECISION_TYPES
+                ),
+                *(
+                    DecisionDispatchHandler(
+                        decision_type=decision_type,
+                        pre_validator=self._pre_validate_battle_round_decision,
+                        applier=self._apply_battle_round_decision,
+                    )
+                    for decision_type in _BATTLE_ROUND_DECISION_TYPES
+                ),
+            )
+        )
+
+    def _pre_validate_setup_decision(
+        self,
+        _request: DecisionRequest,
+        _result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        return None
+
+    def _apply_setup_decision(
+        self,
+        _record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        self._setup_flow.apply_decision(
+            state=state,
+            result=result,
+            decisions=self.decision_controller,
+            config=self._require_config(),
+        )
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_battle_round_decision(
+        self,
+        _request: DecisionRequest,
+        _result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        return None
+
+    def _apply_battle_round_decision(
+        self,
+        _record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        self._require_battle_round_flow().apply_decision(
+            state=state,
+            result=result,
+            decisions=self.decision_controller,
+        )
+        return self.advance_until_decision_or_terminal()
 
     def pending_decision_request(self) -> DecisionRequest | None:
         return self._pending_decision_request()
