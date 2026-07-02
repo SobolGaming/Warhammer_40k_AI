@@ -15,6 +15,7 @@ instructions, and then compiled into 11th Edition catalog records.
 - [Phase 17G Semantic Execution Gate](#phase-17g-semantic-execution-gate)
 - [Phase 17H Datasheet, Wargear, and Weapon Execution Gate](#phase-17h-datasheet-wargear-and-weapon-execution-gate)
 - [Phase 17I Coverage and Unsupported Audit Gate](#phase-17i-coverage-and-unsupported-audit-gate)
+- [Phase 17I Blocked Row Classification Report](#phase-17i-blocked-row-classification-report)
 - [Faction Execution Status Matrix](#faction-execution-status-matrix)
   - [Death Guard Execution Status](#death-guard-execution-status)
   - [Orks Execution Status](#orks-execution-status)
@@ -400,6 +401,44 @@ Required outputs:
 - unsupported descriptors grouped by reason;
 - static audit proving runtime code does not parse raw source text;
 - package hashes and coverage totals suitable for CI artifacts.
+
+## Phase 17I Blocked Row Classification Report
+
+WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
+
+- package ID: `gw-11e-phase17i-blocked-row-classification-2026-27`
+- path:
+  `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blocked_row_classification_2026_27.py`
+- source title:
+  `Warhammer 40,000 11th Edition Phase 17I Blocked Row Classification`
+- source version: `2026-27`
+- source date: `2026-07-02`
+- upstream identity: `gw-11e-phase17f-faction-execution-2026-27`
+- source edition: `11th`
+- schema version: `core-v2-phase17i-blocked-row-classification-v1`
+- source-payload SHA-256 checksum:
+  `1d65364988b7c9d09f8d78ca42659de55e98b6b75c6655a901c6359b93730a31`
+- upstream Phase 17F checksum:
+  `760fc82b5a159390b942b348f2d77a618162710b2955fff4e5315cc7329b28e1`
+- bridge source version: `10th-edition-2026-06-14`
+- bridge JSON source:
+  `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
+
+The report emits 2061 classification rows, one for every Phase 17F row blocked
+as `blocked_structured_semantics_required`. It compiles 1969 rows from Wahapedia
+bridge descriptions through Phase 17C and marks 92 rows as
+`source_text_not_available` metadata-only rows. Each row records the existing
+Phase 17C template IDs and template families that can already express clauses,
+unsupported diagnostic reason tokens, and missing capability families grouped by
+frequency. The current missing-capability summary starts with
+`generic_ir_execution_binding`, `unrepresented_rule_language`,
+`stratagem_activation_and_targeting`, `stratagem_effect_execution`, and
+`enhancement_assignment_effect`.
+
+The payload does not emit raw rule text. It emits source IDs, template IDs,
+template family tokens, diagnostic reason tokens, and capability family tokens
+only, so runtime engine code remains forbidden from consuming source text or
+re-parsing rule prose.
 
 ## Faction Execution Status Matrix
 

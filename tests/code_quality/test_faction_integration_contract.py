@@ -4,6 +4,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_blocked_row_classification_2026_27 as blocked_classification_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27 as faction_coverage_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -201,6 +204,45 @@ def test_faction_integration_records_phase17g_17h_17i_roadmap_split() -> None:
     assert "unsupported descriptors grouped by reason" in document
 
 
+def test_faction_integration_records_phase17i_blocked_row_classification_report() -> None:
+    document = FACTION_INTEGRATION_PATH.read_text(encoding="utf-8")
+    normalized_document = " ".join(document.split())
+    identity = blocked_classification_source.source_package_identity_payload()
+    report = blocked_classification_source.phase17i_blocked_row_classification_report()
+
+    assert "## Phase 17I Blocked Row Classification Report" in document
+    assert identity["source_package_id"] in document
+    assert (
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "faction_blocked_row_classification_2026_27.py"
+    ) in document
+    assert identity["source_title"] in document
+    assert identity["source_version"] in document
+    assert identity["source_date"] in document
+    assert identity["upstream_identity"] in document
+    assert f"source edition: `{identity['source_edition']}`" in document
+    assert identity["imported_at_schema_version"] in document
+    assert identity["source_payload_checksum_sha256"] in document
+    assert identity["upstream_payload_checksum_sha256"] in document
+    assert identity["wahapedia_source_version"] in document
+    bridge_edition_dir, bridge_year, bridge_month, bridge_day = identity[
+        "wahapedia_source_version"
+    ].rsplit("-", maxsplit=3)
+    bridge_source_path = (
+        "data/source_snapshots/wahapedia/"
+        f"{bridge_edition_dir}/{bridge_year}-{bridge_month}-{bridge_day}/json"
+    )
+    assert bridge_source_path in document
+    assert f"emits {report.structured_blocked_count} classification rows" in (normalized_document)
+    assert f"compiles {report.source_text_matched_count} rows" in normalized_document
+    assert f"marks {report.source_text_missing_count} rows as" in normalized_document
+    assert "`source_text_not_available` metadata-only rows" in document
+    assert "existing Phase 17C template IDs and template families" in normalized_document
+    assert "`generic_ir_execution_binding`" in document
+    assert "`unrepresented_rule_language`" in document
+    assert "The payload does not emit raw rule text" in document
+
+
 def test_faction_integration_table_of_contents_links_every_execution_section() -> None:
     document = FACTION_INTEGRATION_PATH.read_text(encoding="utf-8")
 
@@ -214,6 +256,10 @@ def test_faction_integration_table_of_contents_links_every_execution_section() -
     assert (
         "- [Phase 17I Coverage and Unsupported Audit Gate]"
         "(#phase-17i-coverage-and-unsupported-audit-gate)"
+    ) in document
+    assert (
+        "- [Phase 17I Blocked Row Classification Report]"
+        "(#phase-17i-blocked-row-classification-report)"
     ) in document
     assert "- [Faction Execution Status Matrix](#faction-execution-status-matrix)" in document
     for faction_row in faction_detachment_source.faction_rows():
