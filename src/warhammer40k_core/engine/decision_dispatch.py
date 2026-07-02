@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
+from types import MappingProxyType
 
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -29,7 +30,7 @@ class DecisionDispatchHandler:
 
 @dataclass(frozen=True, slots=True)
 class DecisionDispatchRegistry:
-    _handlers_by_decision_type: dict[str, DecisionDispatchHandler]
+    _handlers_by_decision_type: Mapping[str, DecisionDispatchHandler]
 
     @classmethod
     def from_handlers(cls, handlers: Iterable[DecisionDispatchHandler]) -> DecisionDispatchRegistry:
@@ -40,7 +41,7 @@ class DecisionDispatchRegistry:
             if handler.decision_type in handlers_by_decision_type:
                 raise GameLifecycleError("Decision dispatch registry has duplicate decision types.")
             handlers_by_decision_type[handler.decision_type] = handler
-        return cls(_handlers_by_decision_type=handlers_by_decision_type)
+        return cls(_handlers_by_decision_type=MappingProxyType(handlers_by_decision_type))
 
     def handler_for(self, decision_type: str) -> DecisionDispatchHandler:
         if type(decision_type) is not str:
