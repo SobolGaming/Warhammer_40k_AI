@@ -3137,11 +3137,7 @@ def _enemy_unit_ids_for_placement(
 
 
 def _unit_is_placed(*, scenario: BattlefieldScenario, unit_instance_id: str) -> bool:
-    try:
-        scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
-    except PlacementError:
-        return False
-    return True
+    return scenario.battlefield_state.is_unit_placed(unit_instance_id)
 
 
 def _unit_by_id(*, scenario: BattlefieldScenario, unit_instance_id: str) -> UnitInstance:

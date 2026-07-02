@@ -1104,11 +1104,7 @@ def _battlefield_has_unit_placement(
     battlefield: BattlefieldRuntimeState,
     unit_instance_id: str,
 ) -> bool:
-    try:
-        battlefield.unit_placement_by_id(unit_instance_id)
-    except PlacementError:
-        return False
-    return True
+    return battlefield.is_unit_placed(unit_instance_id)
 
 
 def _battlefield_with_returned_model_new_component(

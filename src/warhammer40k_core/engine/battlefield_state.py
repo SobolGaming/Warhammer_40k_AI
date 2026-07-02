@@ -860,14 +860,20 @@ class BattlefieldRuntimeState:
             for model_id in placed_army.placed_model_ids()
         )
 
-    def placed_army_for_player(self, player_id: str) -> PlacedArmy:
+    def placed_army_for_player_or_none(self, player_id: str) -> PlacedArmy | None:
         requested_player_id = _validate_identifier("player_id", player_id)
         for placed_army in self.placed_armies:
             if placed_army.player_id == requested_player_id:
                 return placed_army
+        return None
+
+    def placed_army_for_player(self, player_id: str) -> PlacedArmy:
+        placed_army = self.placed_army_for_player_or_none(player_id)
+        if placed_army is not None:
+            return placed_army
         raise PlacementError("BattlefieldRuntimeState player_id is not placed.")
 
-    def unit_placement_by_id(self, unit_instance_id: str) -> UnitPlacement:
+    def unit_placement_or_none(self, unit_instance_id: str) -> UnitPlacement | None:
         requested_unit_id = _validate_unprefixed_identifier(
             "unit_instance_id",
             unit_instance_id,
@@ -877,9 +883,18 @@ class BattlefieldRuntimeState:
             for unit_placement in placed_army.unit_placements:
                 if unit_placement.unit_instance_id == requested_unit_id:
                     return unit_placement
+        return None
+
+    def is_unit_placed(self, unit_instance_id: str) -> bool:
+        return self.unit_placement_or_none(unit_instance_id) is not None
+
+    def unit_placement_by_id(self, unit_instance_id: str) -> UnitPlacement:
+        unit_placement = self.unit_placement_or_none(unit_instance_id)
+        if unit_placement is not None:
+            return unit_placement
         raise PlacementError("BattlefieldRuntimeState unit_instance_id is not placed.")
 
-    def model_placement_by_id(self, model_instance_id: str) -> ModelPlacement:
+    def model_placement_or_none(self, model_instance_id: str) -> ModelPlacement | None:
         requested_model_id = _validate_unprefixed_identifier(
             "model_instance_id",
             model_instance_id,
@@ -890,6 +905,12 @@ class BattlefieldRuntimeState:
                 for model_placement in unit_placement.model_placements:
                     if model_placement.model_instance_id == requested_model_id:
                         return model_placement
+        return None
+
+    def model_placement_by_id(self, model_instance_id: str) -> ModelPlacement:
+        model_placement = self.model_placement_or_none(model_instance_id)
+        if model_placement is not None:
+            return model_placement
         raise PlacementError("BattlefieldRuntimeState model_instance_id is not placed.")
 
     def with_unit_placement(self, updated_unit_placement: UnitPlacement) -> Self:

@@ -66,6 +66,7 @@ Forbidden by default:
 - unparenthesized multi-exception handlers such as `except A, B:`
 - `except ...: pass`
 - catching an error and returning `None`, `True`, `False`, or a default value to keep going
+- catching a typed domain error and returning an empty, False, or None default to keep going. Where absence is a legal domain state (Strategic Reserves, embarked cargo, destroyed units), use an explicit presence-query API on the owning state object; exceptions are not control flow.
 - using `getattr(obj, "required_field", default)` to tolerate incomplete domain objects
 
 Allowed exception handling must catch a specific exception, preserve context, and either re-raise a typed domain error or return a typed invalid/unsupported result.

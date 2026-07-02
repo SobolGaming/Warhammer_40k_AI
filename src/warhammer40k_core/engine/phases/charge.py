@@ -3125,9 +3125,8 @@ def _active_player_placed_unit_ids(*, state: GameState, player_id: str) -> tuple
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Charge phase requires battlefield_state.")
-    try:
-        placed_army = battlefield_state.placed_army_for_player(player_id)
-    except PlacementError:
+    placed_army = battlefield_state.placed_army_for_player_or_none(player_id)
+    if placed_army is None:
         return ()
     return tuple(sorted(placement.unit_instance_id for placement in placed_army.unit_placements))
 

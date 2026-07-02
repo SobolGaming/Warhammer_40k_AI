@@ -20,7 +20,6 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
-    PlacementError,
     SpatialIndexState,
     UnitPlacement,
     geometry_model_for_placement,
@@ -904,10 +903,7 @@ def _unit_placement_or_none(
     scenario: BattlefieldScenario,
     unit_instance_id: str,
 ) -> UnitPlacement | None:
-    try:
-        return scenario.battlefield_state.unit_placement_by_id(unit_instance_id)
-    except PlacementError:
-        return None
+    return scenario.battlefield_state.unit_placement_or_none(unit_instance_id)
 
 
 def _unit_placements_for_rules_unit_or_none(

@@ -3,7 +3,6 @@ from __future__ import annotations
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
-    PlacementError,
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.game_state import GameState
@@ -44,9 +43,8 @@ def _unit_geometry_models(
         armies=tuple(state.army_definitions),
         battlefield_state=state.battlefield_state,
     )
-    try:
-        unit_placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)
-    except PlacementError:
+    unit_placement = state.battlefield_state.unit_placement_or_none(unit_instance_id)
+    if unit_placement is None:
         return ()
     return tuple(
         geometry_model_for_placement(

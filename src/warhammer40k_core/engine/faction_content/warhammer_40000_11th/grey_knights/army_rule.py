@@ -341,9 +341,8 @@ def _rules_unit_can_enter_strategic_reserves(
         unit_instance_id = component.unit.unit_instance_id
         if state.reserve_state_for_unit(unit_instance_id) is not None:
             return False
-        try:
-            placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)
-        except PlacementError:
+        placement = state.battlefield_state.unit_placement_or_none(unit_instance_id)
+        if placement is None:
             return False
         if placement.player_id != rules_unit_view.owner_player_id:
             raise GameLifecycleError(

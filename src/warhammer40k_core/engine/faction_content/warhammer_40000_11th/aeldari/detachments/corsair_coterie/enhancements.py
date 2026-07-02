@@ -11,7 +11,6 @@ from warhammer40k_core.engine.battle_formation_hooks import (
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
-    PlacementError,
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
@@ -829,9 +828,7 @@ def _webway_pathstone_unit_can_enter_reserves(
         raise GameLifecycleError("Webway Pathstone requires battlefield_state.")
     if state.reserve_state_for_unit(unit_instance_id) is not None:
         return False
-    try:
-        state.battlefield_state.unit_placement_by_id(unit_instance_id)
-    except PlacementError:
+    if not state.battlefield_state.is_unit_placed(unit_instance_id):
         return False
     return not unit_within_enemy_engagement_range(state=state, unit_instance_id=unit_instance_id)
 
@@ -1189,9 +1186,8 @@ def _unit_geometry_models(
         armies=tuple(state.army_definitions),
         battlefield_state=state.battlefield_state,
     )
-    try:
-        unit_placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)
-    except PlacementError:
+    unit_placement = state.battlefield_state.unit_placement_or_none(unit_instance_id)
+    if unit_placement is None:
         return ()
     return tuple(
         geometry_model_for_placement(
@@ -1218,9 +1214,8 @@ def _geometry_model_for_model(
         armies=tuple(state.army_definitions),
         battlefield_state=state.battlefield_state,
     )
-    try:
-        placement = state.battlefield_state.model_placement_by_id(model_instance_id)
-    except PlacementError:
+    placement = state.battlefield_state.model_placement_or_none(model_instance_id)
+    if placement is None:
         return None
     model = scenario.model_instance_for_placement(placement)
     if not model.is_alive:

@@ -12,7 +12,6 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battlefield_state import PlacementError
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
     catalog_rule_ir_consumers_for_rule,
@@ -350,9 +349,7 @@ def _unit_can_enter_strategic_reserves(
         raise GameLifecycleError("Catalog turn-end reserves require battlefield_state.")
     if state.reserve_state_for_unit(unit_instance_id) is not None:
         return False
-    try:
-        state.battlefield_state.unit_placement_by_id(unit_instance_id)
-    except PlacementError:
+    if not state.battlefield_state.is_unit_placed(unit_instance_id):
         return False
     return not unit_within_enemy_engagement_range(state=state, unit_instance_id=unit_instance_id)
 
@@ -500,9 +497,8 @@ def _current_model_instance_ids(
         raise GameLifecycleError("Catalog turn-end reserves require GameState.")
     if state.battlefield_state is None:
         raise GameLifecycleError("Catalog turn-end reserves require battlefield_state.")
-    try:
-        placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
-    except PlacementError:
+    placement = state.battlefield_state.unit_placement_or_none(unit.unit_instance_id)
+    if placement is None:
         return frozenset()
     return frozenset(
         model_placement.model_instance_id for model_placement in placement.model_placements

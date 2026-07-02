@@ -9352,9 +9352,8 @@ def _remaining_move_units_unit_ids(
         scenario.assert_all_mustered_models_placed_or_accounted(accounted_ids)
     except PlacementError as exc:
         raise GameLifecycleError("Movement phase requires complete placed armies.") from exc
-    try:
-        placed_army = scenario.battlefield_state.placed_army_for_player(player_id)
-    except PlacementError:
+    placed_army = scenario.battlefield_state.placed_army_for_player_or_none(player_id)
+    if placed_army is None:
         return ()
     return tuple(
         placement.unit_instance_id

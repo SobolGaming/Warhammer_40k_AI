@@ -325,6 +325,8 @@ def test_battlefield_state_and_scenario_fail_fast_on_invalid_shapes() -> None:
     placement_state = scenario.battlefield_state
     placed_army = placement_state.placed_armies[0]
     other_army = placement_state.placed_armies[1]
+    unit_placement = placed_army.unit_placements[0]
+    model_placement = unit_placement.model_placements[0]
 
     with pytest.raises(PlacementError, match="stable identity prefix"):
         BattlefieldRuntimeState(
@@ -355,6 +357,19 @@ def test_battlefield_state_and_scenario_fail_fast_on_invalid_shapes() -> None:
                 _placed_army_with_player(other_army, player_id=placed_army.player_id),
             ),
         )
+
+    assert placement_state.placed_army_for_player_or_none(placed_army.player_id) == placed_army
+    assert placement_state.placed_army_for_player_or_none("missing-player") is None
+    assert placement_state.unit_placement_or_none(unit_placement.unit_instance_id) == (
+        unit_placement
+    )
+    assert placement_state.unit_placement_or_none("army-alpha:missing-unit") is None
+    assert placement_state.is_unit_placed(unit_placement.unit_instance_id)
+    assert not placement_state.is_unit_placed("army-alpha:missing-unit")
+    assert placement_state.model_placement_or_none(model_placement.model_instance_id) == (
+        model_placement
+    )
+    assert placement_state.model_placement_or_none("army-alpha:missing-unit:001") is None
 
     with pytest.raises(PlacementError, match="player_id is not placed"):
         placement_state.placed_army_for_player("missing-player")
