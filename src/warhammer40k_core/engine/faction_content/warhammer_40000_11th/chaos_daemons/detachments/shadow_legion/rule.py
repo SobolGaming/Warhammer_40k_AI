@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from warhammer40k_core.core.faction_aliases import CHAOS_DAEMONS_FACTION_ID
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind
 from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityContext,
@@ -512,10 +513,4 @@ def _canonical_name(value: str) -> str:
     )
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Shadow Legion {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Shadow Legion {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

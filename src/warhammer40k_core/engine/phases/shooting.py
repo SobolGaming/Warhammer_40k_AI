@@ -14,6 +14,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     battle_phase_kind_from_token,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
@@ -7163,13 +7164,7 @@ def _validate_attack_pools(values: object) -> tuple[RangedAttackPool, ...]:
     return tuple(pools)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

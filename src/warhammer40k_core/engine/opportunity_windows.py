@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_request import (
     DecisionError,
     DecisionOption,
@@ -1125,13 +1126,7 @@ def _validate_optional_trigger_kind(
         raise OpportunityWindowError(f"{field_name} must be a supported trigger kind.") from exc
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise OpportunityWindowError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise OpportunityWindowError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(OpportunityWindowError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

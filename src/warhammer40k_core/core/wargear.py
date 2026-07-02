@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
     WeaponProfileError,
@@ -75,13 +76,7 @@ class Wargear:
         )
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise WargearError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise WargearError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(WargearError)
 
 
 def _validate_wargear_id(value: object) -> str:

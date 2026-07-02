@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import cast
 
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.advance_hooks import (
     AdvanceMoveContext,
@@ -866,10 +867,4 @@ def _canonical_keyword(value: str) -> str:
     return value.strip().replace("_", " ").replace("-", " ").upper()
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Aeldari Agile Manoeuvres {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Aeldari Agile Manoeuvres {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

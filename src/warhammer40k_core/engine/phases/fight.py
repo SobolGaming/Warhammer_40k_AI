@@ -14,6 +14,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     FightTypeKind,
     RulesetDescriptor,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
     ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
@@ -4039,10 +4040,4 @@ def _next_player_id(*, player_ids: tuple[str, ...], current_player_id: str) -> s
     return player_ids[(index + 1) % len(player_ids)]
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

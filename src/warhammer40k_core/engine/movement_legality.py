@@ -14,6 +14,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     TerrainMovementPolicy,
     TerrainMovementPolicyPayload,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityHandlerRegistry,
@@ -513,7 +514,7 @@ class MovementLegalityContext:
         keywords: tuple[str, ...],
         ruleset_descriptor: object,
         movement_mode: object,
-        movement_phase_action: object | None,
+        movement_phase_action: str | None,
         displacement_kind: object,
         ability_index: AbilityCatalogIndex | None = None,
         ability_registry: AbilityHandlerRegistry | None = None,
@@ -883,8 +884,6 @@ def _validate_optional_movement_phase_action(value: object | None) -> str | None
     if value is None:
         return None
     if type(value) is not str:
-        value = getattr(value, "value", None)
-    if type(value) is not str:
         raise MovementLegalityError("movement_phase_action must be None or a string token.")
     action = value.strip()
     if action not in {"remain_stationary", "normal_move", "advance", "fall_back"}:
@@ -911,13 +910,7 @@ def _validate_keyword(field_name: str, value: object) -> str:
     return identifier.upper().replace(" ", "_").replace("-", "_")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise MovementLegalityError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise MovementLegalityError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(MovementLegalityError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

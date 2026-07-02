@@ -76,6 +76,7 @@ from warhammer40k_core.rules.source_catalog import SourceArtifactHash
 from warhammer40k_core.rules.source_overlay import OverlaySourceArtifact
 from warhammer40k_core.rules.source_patch import PatchedSourceArtifact
 from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow, WahapediaJsonArtifact
+from warhammer40k_core.rules.weapon_profile_names import WEAPON_PROFILE_SUFFIX_RE
 
 
 class CatalogGenerationError(ValueError):
@@ -84,7 +85,6 @@ class CatalogGenerationError(ValueError):
 
 SourceArtifact = WahapediaJsonArtifact | PatchedSourceArtifact | OverlaySourceArtifact
 
-_WEAPON_PROFILE_SUFFIX_RE = re.compile(r"^(?P<base>.+?)\s+-\s+(?P<profile>.+)$")
 _BASE_SIZE_BLOCKERS = frozenset(
     {
         "",
@@ -577,7 +577,7 @@ def _validate_grouped_option_rows(rows: tuple[NormalizedSourceRow, ...]) -> None
 
 
 def _base_wargear_name(name: str) -> str:
-    match = _WEAPON_PROFILE_SUFFIX_RE.fullmatch(name)
+    match = WEAPON_PROFILE_SUFFIX_RE.fullmatch(name)
     return name if match is None else match.group("base")
 
 

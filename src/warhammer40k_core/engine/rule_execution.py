@@ -10,6 +10,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     battle_phase_kind_from_token,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     UnitPlacement,
@@ -533,14 +534,14 @@ class RuleExecutionRegistry:
 
     def binding_for_clause(self, clause: RuleClause) -> RuleRuntimeBinding | None:
         if _is_aura_clause(clause):
-            for binding in self._bindings.values():
+            for binding in self.all_bindings():
                 if binding.template_id == RULE_IR_AURA_TEMPLATE_ID and binding.matches_clause(
                     clause
                 ):
                     return binding
             return None
         if not clause.effects and clause.target is not None:
-            for binding in self._bindings.values():
+            for binding in self.all_bindings():
                 if binding.effect_kinds:
                     continue
                 if binding.template_id is not None and binding.template_id != clause.template_id:
@@ -556,7 +557,7 @@ class RuleExecutionRegistry:
         clause: RuleClause,
         effect: RuleEffectSpec,
     ) -> RuleRuntimeBinding | None:
-        for binding in self._bindings.values():
+        for binding in self.all_bindings():
             if binding.matches_effect(clause, effect):
                 return binding
         return None
@@ -570,7 +571,7 @@ class RuleExecutionRegistry:
         return execute_rule_ir(rule_ir=rule_ir, context=context, registry=self)
 
     def to_payload(self) -> list[RuleRuntimeBindingPayload]:
-        return [binding.to_payload() for binding in self._bindings.values()]
+        return [binding.to_payload() for binding in self.all_bindings()]
 
 
 def default_rule_execution_registry() -> RuleExecutionRegistry:
@@ -1739,13 +1740,7 @@ def _json_object(value: object) -> dict[str, JsonValue]:
     return validated
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

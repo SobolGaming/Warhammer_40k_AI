@@ -5,6 +5,7 @@ import json
 from dataclasses import dataclass
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.data_package import (
     CatalogVersion,
     CatalogVersionPayload,
@@ -297,13 +298,7 @@ def _validate_source_artifact_hash_tuple(
     return tuple(sorted(hashes, key=lambda item: item.artifact_name))
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise SourceReferenceError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise SourceReferenceError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(SourceReferenceError)
 
 
 def _data_package_id_from_payload(payload: DataPackageIdPayload) -> DataPackageId:

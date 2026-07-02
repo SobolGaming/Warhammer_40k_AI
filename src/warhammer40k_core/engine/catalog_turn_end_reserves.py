@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import cast
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -597,10 +598,4 @@ def _validate_armies(value: object) -> tuple[ArmyDefinition, ...]:
     return tuple(sorted(armies, key=lambda army: army.player_id))
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Catalog turn-end reserve {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Catalog turn-end reserve {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

@@ -10,6 +10,11 @@ from warhammer40k_core.core.unit import (
     UnitPayload,
     movement_status_from_token,
 )
+from warhammer40k_core.core.unit_model_collection import (
+    alive_models_for_units,
+    all_models_for_units,
+)
+from warhammer40k_core.core.validation import IdentifierValidator
 
 
 class AttachedUnitError(ValueError):
@@ -69,10 +74,10 @@ class AttachedUnit:
         return tuple(unit.unit_id for unit in self.units())
 
     def all_models(self) -> tuple[UnitMember, ...]:
-        return tuple(member for unit in self.units() for member in unit.own_models)
+        return all_models_for_units(self.units())
 
     def alive_models(self) -> tuple[UnitMember, ...]:
-        return tuple(member for unit in self.units() for member in unit.alive_own_models())
+        return alive_models_for_units(self.units())
 
     @property
     def movement_status(self) -> MovementStatus:
@@ -105,13 +110,7 @@ class AttachedUnit:
         )
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise AttachedUnitError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise AttachedUnitError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(AttachedUnitError)
 
 
 def _validate_attached_unit_id(value: object) -> str:

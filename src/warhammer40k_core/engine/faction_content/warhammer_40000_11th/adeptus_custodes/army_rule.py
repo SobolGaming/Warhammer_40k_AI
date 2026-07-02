@@ -9,6 +9,7 @@ from warhammer40k_core.core.faction_aliases import (
     faction_reference_matches,
 )
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     RangeProfileKind,
@@ -395,13 +396,7 @@ def _json_object(field_name: str, value: JsonValue) -> dict[str, object]:
     return cast(dict[str, object], value)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Martial Ka'tah {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Martial Ka'tah {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:

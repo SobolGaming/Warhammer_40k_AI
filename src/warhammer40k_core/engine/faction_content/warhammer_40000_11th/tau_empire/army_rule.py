@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
@@ -854,13 +855,7 @@ def _payload_bool(payload: dict[str, JsonValue], *, key: str) -> bool:
     return value
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"For the Greater Good {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"For the Greater Good {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_non_negative_int(field_name: str, value: object) -> int:

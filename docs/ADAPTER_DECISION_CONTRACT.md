@@ -118,8 +118,10 @@ The shared contract uses these objects and payloads:
 - `WindowPass`: replay-safe prompt-suppression record keyed by window ID,
   player, revision, and legal-action fingerprint. A matching pass can suppress
   another prompt only while the legal action fingerprint is unchanged.
-- `InterfaceIntent`: adapter-captured proactive intent. It is not a mutation and
-  not a decision record. It may materialize into a normal `DecisionResult` only
+- `InterfaceIntent`: adapter-captured proactive intent. This adapter capture
+  surface is deferred to Phase 18D and is not implemented by current adapters.
+  It is not a mutation and not a decision record. When Phase 18D implements the
+  adapter surface, an intent may materialize into a normal `DecisionResult` only
   when the current pending request matches its window timing, state hash, source,
   action, targets, and expiration.
 - `SequencingDecision`: finite order choice for simultaneous rule conflicts after active-player or roll-off ownership is determined.
@@ -198,13 +200,15 @@ They must still answer by selecting one pending option ID or by submitting the
 host's parameterized payload. They must not apply the action, spend resources,
 move models, reveal hidden data, or suppress replay events locally.
 
-Human-facing adapters may capture proactive declarations as `InterfaceIntent`
-records. An intent can be queued by the adapter while no matching engine window
-is open, but it is advisory only. It materializes into a `DecisionResult` only if
-the current pending request matches the intended timing, player, state hash,
-source, action ID, targets, and expiration. Stale, expired, wrong-context,
-malformed, or unavailable intents are rejected without consuming the pending
-request and without mutating authoritative state.
+Human-facing adapter capture of proactive declarations as `InterfaceIntent`
+records is deferred to Phase 18D. Current adapters must not expose an
+`InterfaceIntent` capture surface. When Phase 18D implements that surface, an
+intent may be queued by the adapter while no matching engine window is open, but
+it remains advisory only. It materializes into a `DecisionResult` only if the
+current pending request matches the intended timing, player, state hash, source,
+action ID, targets, and expiration. Stale, expired, wrong-context, malformed, or
+unavailable intents are rejected without consuming the pending request and
+without mutating authoritative state.
 
 Fast-rolled or repeated equivalent triggers should be batched inside one
 opportunity window when the rules permit it. `TriggerBatchingMode` records

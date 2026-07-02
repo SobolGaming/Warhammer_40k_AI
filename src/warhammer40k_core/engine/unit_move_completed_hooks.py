@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Self, cast
 
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
     MortalWoundApplicationProgress,
@@ -674,10 +675,4 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
     )
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

@@ -66,10 +66,9 @@ def submit_parameterized_payload(
 def _pending_request(lifecycle: GameLifecycle, *, request_id: str | None = None) -> DecisionRequest:
     if type(lifecycle) is not GameLifecycle:
         raise GameLifecycleError("Adapter submission requires a GameLifecycle.")
-    pending_requests = lifecycle.decision_controller.queue.pending_requests
-    if not pending_requests:
+    pending_request = lifecycle.pending_decision_request()
+    if pending_request is None:
         raise GameLifecycleError("Adapter submission requires a pending DecisionRequest.")
-    pending_request = pending_requests[0]
     if request_id is None:
         return pending_request
     expected_request_id = _validate_request_id(request_id)

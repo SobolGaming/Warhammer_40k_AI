@@ -11,6 +11,7 @@ from warhammer40k_core.core.datasheet import (
 )
 from warhammer40k_core.core.detachment import DetachmentDefinition, EnhancementDefinition
 from warhammer40k_core.core.faction import FactionDefinition
+from warhammer40k_core.core.validation import FixedMessageIdentifierValidator
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
@@ -877,13 +878,11 @@ def _validate_identifier_tuple(values: tuple[str, ...]) -> tuple[str, ...]:
     return tuple(normalized)
 
 
-def _validate_identifier(value: object) -> str:
-    if type(value) is not str:
-        raise ArmyPointsError("identifier must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise ArmyPointsError("identifier must not be empty.")
-    return stripped
+_validate_identifier = FixedMessageIdentifierValidator(
+    ArmyPointsError,
+    string_message="identifier must be a string.",
+    empty_message="identifier must not be empty.",
+)
 
 
 def _validate_positive_int(value: object) -> int:

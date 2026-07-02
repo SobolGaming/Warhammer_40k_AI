@@ -16,6 +16,7 @@ from warhammer40k_core.core.datasheet import (
 )
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear
 
 
@@ -1335,13 +1336,7 @@ def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str)
     return identifier
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise ListValidationError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise ListValidationError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(ListValidationError)
 
 
 def battle_size_from_token(token: object) -> BattleSize:

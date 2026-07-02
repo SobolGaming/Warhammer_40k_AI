@@ -7,6 +7,7 @@ from types import MappingProxyType
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, muster_army
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json
@@ -429,13 +430,7 @@ def _validate_reason_mapping(
     return MappingProxyType(dict(sorted(reasons.items())))
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Runtime content {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Runtime content {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_optional_identifier(field_name: str, value: object) -> str:

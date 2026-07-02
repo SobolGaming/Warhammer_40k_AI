@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from types import MappingProxyType, ModuleType
 from typing import Self, cast
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import (
     DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID,
@@ -281,13 +282,7 @@ def _module_family_from_token(token: object) -> RuntimeContentModuleFamily:
         raise GameLifecycleError(f"Unsupported RuntimeContentModuleFamily token: {token}.") from exc
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Runtime content {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Runtime content {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_module_path(field_name: str, value: object) -> str:

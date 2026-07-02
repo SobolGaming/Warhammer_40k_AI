@@ -40,6 +40,7 @@ from warhammer40k_core.core.terrain_layouts import (
     TerrainLayoutTemplate,
     TerrainLayoutTemplatePayload,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 
 
 class MissionPackError(ValueError):
@@ -3612,13 +3613,7 @@ def _validate_identifier_tuple(
     return tuple(validated)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise MissionPackError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise MissionPackError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(MissionPackError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

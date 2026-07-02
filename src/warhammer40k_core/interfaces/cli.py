@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import TypedDict, cast
 
 from warhammer40k_core.adapters.contracts import (
     AdapterGameSession,
     FiniteOptionSubmission,
     ParameterizedSubmission,
 )
+from warhammer40k_core.adapters.projection import DecisionRequestViewPayload
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
@@ -28,23 +29,35 @@ class CliDecisionPromptPayload(TypedDict):
     options: list[CliDecisionOptionPayload]
 
 
-def render_decision_request_for_cli(request: DecisionRequest) -> CliDecisionPromptPayload:
-    if type(request) is not DecisionRequest:
-        raise GameLifecycleError("CLI decision rendering requires a DecisionRequest.")
+def render_pending_decision_for_cli(
+    *,
+    session: AdapterGameSession,
+    viewer_player_id: str,
+) -> CliDecisionPromptPayload:
+    view = session.view(viewer_player_id=viewer_player_id)
+    pending_decision = view["pending_decision"]
+    if pending_decision is None:
+        raise GameLifecycleError("CLI decision rendering requires a visible pending decision.")
+    return render_decision_view_for_cli(pending_decision)
+
+
+def render_decision_view_for_cli(
+    pending_decision: DecisionRequestViewPayload,
+) -> CliDecisionPromptPayload:
     return {
-        "request_id": request.request_id,
-        "decision_type": request.decision_type,
-        "actor_id": request.actor_id,
-        "is_parameterized": request.is_parameterized_submission_request(),
-        "prompt": _prompt_text(request),
+        "request_id": _decision_view_string(pending_decision, key="request_id"),
+        "decision_type": _decision_view_string(pending_decision, key="decision_type"),
+        "actor_id": _decision_view_optional_string(pending_decision, key="actor_id"),
+        "is_parameterized": _decision_view_bool(pending_decision, key="is_parameterized"),
+        "prompt": _prompt_text(pending_decision),
         "options": [
             {
                 "index": index,
-                "option_id": option.option_id,
-                "label": option.label,
-                "payload": option.payload,
+                "option_id": _decision_option_string(option, key="option_id"),
+                "label": _decision_option_string(option, key="label"),
+                "payload": validate_json_value(option["payload"]),
             }
-            for index, option in enumerate(request.options, start=1)
+            for index, option in enumerate(pending_decision["options"], start=1)
         ],
     }
 
@@ -140,9 +153,55 @@ def _option_id_for_cli_prompt(*, prompt: CliDecisionPromptPayload, choice: str) 
     raise GameLifecycleError("CLI finite choice does not match a pending option.")
 
 
-def _prompt_text(request: DecisionRequest) -> str:
-    actor = "unassigned actor" if request.actor_id is None else request.actor_id
-    return f"{actor}: {request.decision_type}"
+def _prompt_text(pending_decision: DecisionRequestViewPayload) -> str:
+    actor_id = _decision_view_optional_string(pending_decision, key="actor_id")
+    actor = "unassigned actor" if actor_id is None else actor_id
+    return f"{actor}: {_decision_view_string(pending_decision, key='decision_type')}"
+
+
+def _decision_view_string(pending_decision: DecisionRequestViewPayload, *, key: str) -> str:
+    value = cast(dict[str, object], pending_decision)[key]
+    if type(value) is not str:
+        raise GameLifecycleError(f"CLI decision view {key} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"CLI decision view {key} must not be empty.")
+    return stripped
+
+
+def _decision_view_optional_string(
+    pending_decision: DecisionRequestViewPayload,
+    *,
+    key: str,
+) -> str | None:
+    value = cast(dict[str, object], pending_decision)[key]
+    if value is None:
+        return None
+    if type(value) is not str:
+        raise GameLifecycleError(f"CLI decision view {key} must be null or a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"CLI decision view {key} must not be empty.")
+    return stripped
+
+
+def _decision_view_bool(pending_decision: DecisionRequestViewPayload, *, key: str) -> bool:
+    value = cast(dict[str, object], pending_decision)[key]
+    if type(value) is not bool:
+        raise GameLifecycleError(f"CLI decision view {key} must be a boolean.")
+    return value
+
+
+def _decision_option_string(option: object, *, key: str) -> str:
+    if not isinstance(option, dict):
+        raise GameLifecycleError("CLI decision view options must be mappings.")
+    value = cast(dict[str, object], option)[key]
+    if type(value) is not str:
+        raise GameLifecycleError(f"CLI decision view option {key} must be a string.")
+    stripped = value.strip()
+    if not stripped:
+        raise GameLifecycleError(f"CLI decision view option {key} must not be empty.")
+    return stripped
 
 
 def _validate_cli_choice(value: object) -> str:

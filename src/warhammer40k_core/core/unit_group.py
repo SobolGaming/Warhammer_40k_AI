@@ -12,6 +12,10 @@ from warhammer40k_core.core.unit import (
     UnitPayload,
     movement_status_from_token,
 )
+from warhammer40k_core.core.unit_model_collection import (
+    alive_models_for_units,
+    all_models_for_units,
+)
 
 
 class UnitGroupError(ValueError):
@@ -94,10 +98,10 @@ class UnitGroup:
         return tuple(unit.unit_id for unit in self.units())
 
     def all_models(self) -> tuple[UnitMember, ...]:
-        return tuple(member for unit in self.units() for member in unit.own_models)
+        return all_models_for_units(self.units())
 
     def alive_models(self) -> tuple[UnitMember, ...]:
-        return tuple(member for unit in self.units() for member in unit.alive_own_models())
+        return alive_models_for_units(self.units())
 
     def all_model_ids(self) -> tuple[str, ...]:
         return tuple(member.model_id for member in self.all_models())

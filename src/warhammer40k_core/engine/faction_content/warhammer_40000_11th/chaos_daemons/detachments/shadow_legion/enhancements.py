@@ -9,6 +9,7 @@ from warhammer40k_core.core.datasheet import (
 )
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.faction_aliases import CHAOS_DAEMONS_FACTION_ID
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -1306,13 +1307,7 @@ def _payload_string_tuple(payload: dict[str, JsonValue], *, key: str) -> tuple[s
     return tuple(parsed)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Fade to Darkness {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Fade to Darkness {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _canonical_keyword(value: str) -> str:

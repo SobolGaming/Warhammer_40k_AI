@@ -6,6 +6,7 @@ import re
 import unicodedata
 from dataclasses import dataclass
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.text_normalization import (
     TextNormalizationError,
     normalize_rule_text,
@@ -229,13 +230,11 @@ def _row(
     )
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise FactionDetachmentSourceError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not _IDENTIFIER_RE.fullmatch(stripped):
-        raise FactionDetachmentSourceError(f"{field_name} must be a slug identifier.")
-    return stripped
+_validate_identifier = IdentifierValidator(
+    FactionDetachmentSourceError,
+    pattern=_IDENTIFIER_RE,
+    pattern_message="{field_name} must be a slug identifier.",
+)
 
 
 def _validate_force_disposition_id(value: object) -> str:

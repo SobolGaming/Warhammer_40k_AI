@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
+
 
 class RuleTemplateError(ValueError):
     """Raised when Phase 17C language template metadata is invalid."""
@@ -123,13 +125,7 @@ def rule_template_family_from_token(token: object) -> RuleTemplateFamily:
         raise RuleTemplateError(f"Unsupported RuleTemplateFamily token: {token}.") from exc
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise RuleTemplateError(f"RuleTemplate {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise RuleTemplateError(f"RuleTemplate {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(RuleTemplateError)
 
 
 def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:

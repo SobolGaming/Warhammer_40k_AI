@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Self, cast
 
 from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battle_shock import (
     BattleShockResult,
     BattleShockTestReason,
@@ -381,10 +382,4 @@ def _battle_phase_from_token(token: object) -> BattlePhase:
         raise GameLifecycleError(f"Unsupported Battle-shock hook phase: {token}.") from exc
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Battle-shock hook {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Battle-shock hook {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

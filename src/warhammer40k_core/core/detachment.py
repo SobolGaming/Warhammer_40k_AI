@@ -9,6 +9,7 @@ from warhammer40k_core.core.content_scope import (
     CatalogContentScopeError,
     catalog_content_scope_from_token,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 
 
 class DetachmentCatalogError(ValueError):
@@ -381,13 +382,7 @@ class DetachmentDefinition:
         )
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise DetachmentCatalogError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise DetachmentCatalogError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(DetachmentCatalogError)
 
 
 def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str) -> str:

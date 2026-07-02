@@ -289,7 +289,6 @@ class GameLifecyclePayload(TypedDict):
     runtime_content_audit: NotRequired[dict[str, JsonValue]]
 
 
-MAX_LIFECYCLE_TRANSITIONS = 128
 _MOVEMENT_PROPOSAL_DECISION_TYPES = frozenset(
     (
         MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -598,7 +597,9 @@ class GameLifecycle:
         )
 
     def advance_until_decision_or_terminal(self) -> LifecycleStatus:
-        for _transition_index in range(MAX_LIFECYCLE_TRANSITIONS):
+        self._require_state()
+        transition_limit = self._require_config().max_lifecycle_transitions
+        for _transition_index in range(transition_limit):
             status = self._advance_once()
             if status.status_kind in (
                 LifecycleStatusKind.WAITING_FOR_DECISION,
@@ -2134,6 +2135,9 @@ class GameLifecycle:
             BattlePhase.CHARGE: self._charge_phase_handler,
             BattlePhase.FIGHT: self._fight_phase_handler,
         }
+
+    def pending_decision_request(self) -> DecisionRequest | None:
+        return self._pending_decision_request()
 
     def _pending_decision_request(self) -> DecisionRequest | None:
         pending_requests = self.decision_controller.queue.pending_requests

@@ -13,6 +13,7 @@ from warhammer40k_core.core.deployment_zones import (
     DeploymentZonePolygon,
     DeploymentZoneShape,
 )
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.base import (
     BaseShape,
@@ -42,6 +43,14 @@ def _model(model_id: str, x: float, y: float, z: float = 0.0) -> Model:
         base=CircularBase(radius=0.5),
         volume=ModelVolume(height=2.0),
     )
+
+
+def _engagement_horizontal_inches() -> float:
+    return RulesetDescriptor.warhammer_40000_eleventh().engagement_policy.horizontal_inches
+
+
+def _engagement_vertical_inches() -> float:
+    return RulesetDescriptor.warhammer_40000_eleventh().engagement_policy.vertical_inches
 
 
 def test_base_overlap_and_distance_are_deterministic() -> None:
@@ -211,9 +220,17 @@ def test_model_range_and_engagement_use_2_5d_volume_distance() -> None:
 
     assert math.isclose(first.base_distance_to(second), 2.0)
     assert math.isclose(first.range_to(second), 2.0)
-    assert first.is_within_engagement_range(second)
+    assert first.is_within_engagement_range(
+        second,
+        horizontal_inches=_engagement_horizontal_inches(),
+        vertical_inches=_engagement_vertical_inches(),
+    )
     assert math.isclose(first.range_to(elevated), 6.0)
-    assert not first.is_within_engagement_range(elevated)
+    assert not first.is_within_engagement_range(
+        elevated,
+        horizontal_inches=_engagement_horizontal_inches(),
+        vertical_inches=_engagement_vertical_inches(),
+    )
 
 
 def test_terrain_volume_intersects_model_footprints_and_height() -> None:

@@ -9,6 +9,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptor,
 )
 from warhammer40k_core.core.ruleset_descriptor import battle_phase_kind_from_token
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -664,13 +665,7 @@ def _wargear_by_id(*, catalog: ArmyCatalog, wargear_id: str) -> Wargear:
     raise GameLifecycleError("Player Ability index references unknown wargear.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _canonical_keyword(value: str) -> str:

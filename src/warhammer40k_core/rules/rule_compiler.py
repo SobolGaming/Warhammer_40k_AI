@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.parsed_tokens import (
     ParsedRuleText,
     ParsedRuleTextPayload,
@@ -163,10 +164,4 @@ def compiler_identity_payload() -> dict[str, str]:
     }
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise RuleCompilerError(f"Rule compiler {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise RuleCompilerError(f"Rule compiler {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(RuleCompilerError)

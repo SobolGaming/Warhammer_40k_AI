@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Self, TypedDict, cast
 from warhammer40k_core.core.dice import DiceRollState, DiceRollStatePayload
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     RangeProfileKind,
     WeaponKeyword,
@@ -3526,13 +3527,7 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
     return tuple(sorted(identifiers))
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

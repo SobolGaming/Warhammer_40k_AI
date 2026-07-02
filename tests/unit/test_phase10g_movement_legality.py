@@ -50,6 +50,14 @@ def test_fly_resolves_as_capability_not_movement_action() -> None:
     )
     with pytest.raises(GameLifecycleError, match="Unsupported MovementPhaseActionKind"):
         movement_phase_action_kind_from_token("fly")
+    with pytest.raises(MovementLegalityError, match="movement_phase_action"):
+        MovementLegalityContext.from_keywords(
+            keywords=("INFANTRY",),
+            ruleset_descriptor=descriptor,
+            movement_mode=MovementMode.NORMAL,
+            movement_phase_action=cast(str, _EnumLikeAction()),
+            displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+        )
 
     payload = capabilities.to_payload()
     encoded = json.dumps(payload, sort_keys=True)
@@ -61,6 +69,10 @@ def test_fly_resolves_as_capability_not_movement_action() -> None:
         MovementCapabilitySet.from_payload(cast(MovementCapabilitySetPayload, decoded)).to_payload()
         == payload
     )
+
+
+class _EnumLikeAction:
+    value = MovementPhaseActionKind.NORMAL_MOVE.value
 
 
 def test_movement_capability_payload_rejects_semantic_permission_drift() -> None:
@@ -397,7 +409,9 @@ def _legality_context(
         keywords=keywords,
         ruleset_descriptor=descriptor,
         movement_mode=movement_mode,
-        movement_phase_action=movement_phase_action,
+        movement_phase_action=None
+        if movement_phase_action is None
+        else movement_phase_action.value,
         displacement_kind=displacement_kind,
     )
 

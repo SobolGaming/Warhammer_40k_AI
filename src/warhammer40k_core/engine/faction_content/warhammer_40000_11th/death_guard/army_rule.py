@@ -6,6 +6,7 @@ from enum import StrEnum
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_formation_hooks import (
     SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
@@ -623,13 +624,7 @@ def _canonical_keyword(value: str) -> str:
     return value.strip().replace("_", " ").replace("-", " ").upper()
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Nurgle's Gift {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Nurgle's Gift {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_game_state(state: object) -> None:

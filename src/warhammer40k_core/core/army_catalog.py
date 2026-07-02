@@ -41,6 +41,7 @@ from warhammer40k_core.core.faction import (
     FactionDefinitionPayload,
 )
 from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPayload
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear, WargearError, WargearPayload
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
@@ -702,13 +703,7 @@ def _melee_wargear(
     )
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise ArmyCatalogError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise ArmyCatalogError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(ArmyCatalogError)
 
 
 def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str) -> str:

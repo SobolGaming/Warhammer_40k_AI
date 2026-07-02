@@ -19,6 +19,7 @@ from warhammer40k_core.core.model_geometry_catalog import (
     ModelGeometryImportDiagnostic,
     ModelGeometryImportDiagnosticPayload,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.rules.data_package import (
@@ -280,10 +281,4 @@ def _sha256_payload(payload: object) -> str:
     return hashlib.sha256(canonical).hexdigest()
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise CanonicalCatalogPackageError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise CanonicalCatalogPackageError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(CanonicalCatalogPackageError)

@@ -15,6 +15,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     terrain_traversal_mode_from_token,
 )
 from warhammer40k_core.core.unit_group import UnitGroup, UnitGroupPayload
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.collision import CollisionSet, CollisionSetPayload
 from warhammer40k_core.geometry.movement_envelope import (
@@ -374,6 +375,8 @@ class PathValidationContext:
     witness: PathWitness
     battlefield_width_inches: float
     battlefield_depth_inches: float
+    enemy_engagement_horizontal_inches: float
+    enemy_engagement_vertical_inches: float
     friendly_models: tuple[Model, ...] = ()
     enemy_models: tuple[Model, ...] = ()
     terrain: tuple[TerrainVolume, ...] = ()
@@ -383,8 +386,6 @@ class PathValidationContext:
     may_transit_enemy_models: bool = False
     may_transit_enemy_engagement: bool = False
     may_end_in_enemy_engagement: bool = False
-    enemy_engagement_horizontal_inches: float = 2.0
-    enemy_engagement_vertical_inches: float = 5.0
     sample_interval_inches: float = 0.5
     movement_distance_budget_inches: float | None = None
 
@@ -1866,13 +1867,7 @@ def _straight_line_pose_path(*, start_pose: Pose, end_pose: Pose) -> tuple[Pose,
     return (start, end)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GeometryError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GeometryError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GeometryError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

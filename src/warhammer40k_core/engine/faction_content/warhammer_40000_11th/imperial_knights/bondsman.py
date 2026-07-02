@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.datasheet import DatasheetAbilityDescriptor
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
@@ -820,13 +821,7 @@ def _validate_game_state(state: object) -> GameState:
     return state
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Bondsman {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Bondsman {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _canonical_keyword(value: str) -> str:

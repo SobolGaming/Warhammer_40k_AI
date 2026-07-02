@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_request import (
     DecisionError,
     DecisionRequest,
@@ -76,10 +77,4 @@ def _validate_request(request: object) -> DecisionRequest:
     return request
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise DecisionError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise DecisionError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(DecisionError)

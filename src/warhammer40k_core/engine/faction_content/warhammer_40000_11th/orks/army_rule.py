@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import AttackProfile, RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityContext,
@@ -620,10 +621,4 @@ def _validate_game_state(state: object) -> None:
         raise GameLifecycleError("Waaagh! requires GameState.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Waaagh! {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Waaagh! {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

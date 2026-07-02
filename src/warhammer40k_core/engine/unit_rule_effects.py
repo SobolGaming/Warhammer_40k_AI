@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.phase import GameLifecycleError
 
@@ -95,10 +96,4 @@ def _validated_effects(effects: tuple[PersistingEffect, ...]) -> tuple[Persistin
     return effects
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Rule effect {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Rule effect {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

@@ -10,6 +10,7 @@ from warhammer40k_core.adapters.redaction import (
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import BaseSizeDefinition, DatasheetAbilityDescriptor
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.decision_request import (
     DecisionOptionPayload,
@@ -1038,10 +1039,7 @@ def _metadata_bearing_proposal_request(
 
 
 def _pending_request(lifecycle: GameLifecycle) -> DecisionRequest | None:
-    pending_requests = lifecycle.decision_controller.queue.pending_requests
-    if not pending_requests:
-        return None
-    return pending_requests[0]
+    return lifecycle.pending_decision_request()
 
 
 def _validate_viewer(*, state: GameState, viewer_player_id: object) -> str:
@@ -1055,10 +1053,4 @@ def _validate_viewer(*, state: GameState, viewer_player_id: object) -> str:
     return viewer
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

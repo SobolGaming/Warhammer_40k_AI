@@ -46,7 +46,7 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import LifecycleStatus, LifecycleStatusKind
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
-from warhammer40k_core.interfaces.cli import render_decision_request_for_cli, submit_cli_choice
+from warhammer40k_core.interfaces.cli import render_pending_decision_for_cli, submit_cli_choice
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
@@ -100,7 +100,10 @@ def test_local_game_session_satisfies_shared_adapter_session_protocol() -> None:
 def test_cli_ui_network_and_headless_finite_producers_submit_through_session() -> None:
     cli_session, cli_status = _fresh_started_session(game_id="phase18c-cli-producer-game")
     cli_request = _decision_request(cli_status)
-    cli_prompt = render_decision_request_for_cli(cli_request)
+    cli_prompt = render_pending_decision_for_cli(
+        session=cli_session,
+        viewer_player_id=cast(str, cli_request.actor_id),
+    )
     cli_follow_up = submit_cli_choice(
         session=cli_session,
         prompt=cli_prompt,

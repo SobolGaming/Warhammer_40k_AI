@@ -8,6 +8,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     battle_phase_kind_from_token,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
 
@@ -355,13 +356,7 @@ def _validate_optional_phase(field_name: str, value: object | None) -> BattlePha
         raise TimingWindowError(f"{field_name} must be a supported BattlePhaseKind.") from exc
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise TimingWindowError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise TimingWindowError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(TimingWindowError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

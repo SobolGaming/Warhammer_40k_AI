@@ -3,6 +3,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import cast
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     TARGET_KEYWORD_MATCH_MODE_PARAMETER,
     AbilityDescriptor,
@@ -677,13 +678,7 @@ def _validate_ability_kind(kind: object) -> AbilityKind:
     return kind
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

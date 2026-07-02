@@ -10,6 +10,7 @@ from warhammer40k_core.core.dice import (
     RerollPermission,
 )
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AbilityKind,
@@ -1461,10 +1462,4 @@ def _canonical_keyword(value: str) -> str:
     return value.strip().replace("_", " ").replace("-", " ").upper()
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

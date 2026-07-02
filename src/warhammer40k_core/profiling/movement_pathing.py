@@ -23,6 +23,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.core.unit import Unit, UnitMember
 from warhammer40k_core.core.unit_group import UnitGroup
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.geometry.base import BaseShape, CircularBase, RectangularBase
 from warhammer40k_core.geometry.collision import CollisionSet
@@ -987,7 +988,7 @@ def _path_query_for_group(
         unit_group=UnitGroup.single(_unit(f"{model_prefix}-unit", *model_ids)),
         spatial_index=SpatialIndex(models=models),
         witness=witness,
-        movement_envelope=MovementEnvelope(
+        movement_envelope=_movement_envelope(
             max_distance_inches=10.0,
             sample_interval_inches=scenario.sample_interval_inches,
         ),
@@ -1028,7 +1029,7 @@ def _reserve_like_path_query(scenario: PerformanceScenario) -> PathQuery:
         unit_group=UnitGroup.single(_unit("reserve-like-unit", mover.model_id)),
         spatial_index=SpatialIndex(models=(mover,)),
         witness=witness,
-        movement_envelope=MovementEnvelope(
+        movement_envelope=_movement_envelope(
             max_distance_inches=8.0,
             sample_interval_inches=scenario.sample_interval_inches,
         ),
@@ -1073,6 +1074,30 @@ def _ruins_terrain_contexts(
             terrain_features=_ruins_features(scenario.terrain_feature_count),
             sample_interval_inches=scenario.sample_interval_inches,
         ),
+    )
+
+
+def _movement_envelope(
+    *,
+    max_distance_inches: float,
+    sample_interval_inches: float,
+) -> MovementEnvelope:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    coherency_policy = descriptor.coherency_policy
+    if (
+        coherency_policy.max_horizontal_inches is None
+        or coherency_policy.max_vertical_inches is None
+        or coherency_policy.required_neighbors_small_unit is None
+    ):
+        raise ProfilingError("Profiling movement envelope requires neighbor-count coherency.")
+    return MovementEnvelope(
+        max_distance_inches=max_distance_inches,
+        coherency_horizontal_inches=coherency_policy.max_horizontal_inches,
+        coherency_vertical_inches=coherency_policy.max_vertical_inches,
+        engagement_horizontal_inches=descriptor.engagement_policy.horizontal_inches,
+        engagement_vertical_inches=descriptor.engagement_policy.vertical_inches,
+        sample_interval_inches=sample_interval_inches,
+        required_coherency_neighbors=coherency_policy.required_neighbors_small_unit,
     )
 
 
@@ -1273,15 +1298,7 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
     )
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise ProfilingError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise ProfilingError(f"{field_name} must not be empty.")
-    if "<" in stripped or "object at 0x" in stripped:
-        raise ProfilingError(f"{field_name} must be JSON-safe and not an object repr.")
-    return stripped
+_validate_identifier = IdentifierValidator(ProfilingError, reject_object_repr=True)
 
 
 def _validate_int(field_name: str, value: object) -> int:

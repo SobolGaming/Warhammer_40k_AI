@@ -15,6 +15,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     fight_phase_step_kind_from_token,
     fight_type_kind_from_token,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequencePayload
 from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -1934,13 +1935,7 @@ def _validate_unique_interrupt_source_effect_ids(source_effect_ids: tuple[str, .
         raise GameLifecycleError("FightOrderState interrupt source effect IDs must be unique.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

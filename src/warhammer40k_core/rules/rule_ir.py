@@ -7,6 +7,7 @@ from enum import StrEnum
 from math import isfinite
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.parsed_tokens import TextSpan, TextSpanPayload
 
 
@@ -666,13 +667,7 @@ def _span_from_payload(payload: TextSpanPayload) -> TextSpan:
     return TextSpan(text=payload["text"], start=payload["start"], end=payload["end"])
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise RuleIRError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise RuleIRError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(RuleIRError)
 
 
 def _validate_parameter_value(field_name: str, value: object) -> RuleParameterValue:

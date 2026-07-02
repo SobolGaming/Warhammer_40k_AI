@@ -12,6 +12,7 @@ from warhammer40k_core.core.attributes import (
     CharacteristicValuePayload,
 )
 from warhammer40k_core.core.dice import DiceExpression, DiceExpressionPayload, DiceRollSpecError
+from warhammer40k_core.core.validation import IdentifierValidator
 
 
 class WeaponProfileError(ValueError):
@@ -822,13 +823,7 @@ def range_profile_kind_from_token(token: object) -> RangeProfileKind:
         raise WeaponProfileError(f"Unsupported range profile kind token: {token}.") from exc
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise WeaponProfileError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise WeaponProfileError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(WeaponProfileError)
 
 
 def _validate_identifier_tuple(
