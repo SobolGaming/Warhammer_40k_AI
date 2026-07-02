@@ -1611,15 +1611,9 @@ class GameLifecycle:
                 return shooting_status
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _MOVEMENT_DECISION_TYPES:
-            movement_status = self._movement_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-                reaction_queue=self.reaction_queue,
-            )
-            if movement_status is not None:
-                return movement_status
-            return self.advance_until_decision_or_terminal()
+            return self._decision_dispatch_registry.handler_for(
+                record.request.decision_type
+            ).applier(record, result)
         if record.request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE:
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
             healing_effect = healing_effect_from_request(request=record.request)
@@ -1904,14 +1898,9 @@ class GameLifecycle:
                 return advanced_status
             return self.advance_until_decision_or_terminal()
         if record.request.decision_type in _TRIGGERED_MOVEMENT_DECISION_TYPES:
-            triggered_status = self._triggered_movement_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if triggered_status is not None:
-                return triggered_status
-            return self.advance_until_decision_or_terminal()
+            return self._decision_dispatch_registry.handler_for(
+                record.request.decision_type
+            ).applier(record, result)
         if record.request.decision_type == REACTION_DECISION_TYPE:
             self.reaction_queue.resolve_reaction(
                 result=result,
@@ -2155,6 +2144,22 @@ class GameLifecycle:
                     )
                     for decision_type in _BATTLE_ROUND_DECISION_TYPES
                 ),
+                *(
+                    DecisionDispatchHandler(
+                        decision_type=decision_type,
+                        pre_validator=self._pre_validate_movement_phase_decision,
+                        applier=self._apply_movement_phase_decision,
+                    )
+                    for decision_type in _MOVEMENT_DECISION_TYPES
+                ),
+                *(
+                    DecisionDispatchHandler(
+                        decision_type=decision_type,
+                        pre_validator=self._pre_validate_triggered_movement_decision,
+                        applier=self._apply_triggered_movement_decision,
+                    )
+                    for decision_type in _TRIGGERED_MOVEMENT_DECISION_TYPES
+                ),
             )
         )
 
@@ -2197,6 +2202,51 @@ class GameLifecycle:
             result=result,
             decisions=self.decision_controller,
         )
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_movement_phase_decision(
+        self,
+        _request: DecisionRequest,
+        _result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        return None
+
+    def _apply_movement_phase_decision(
+        self,
+        _record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        movement_status = self._movement_phase_handler.apply_decision(
+            state=state,
+            result=result,
+            decisions=self.decision_controller,
+            reaction_queue=self.reaction_queue,
+        )
+        if movement_status is not None:
+            return movement_status
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_triggered_movement_decision(
+        self,
+        _request: DecisionRequest,
+        _result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        return None
+
+    def _apply_triggered_movement_decision(
+        self,
+        _record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        triggered_status = self._triggered_movement_handler.apply_decision(
+            state=state,
+            result=result,
+            decisions=self.decision_controller,
+        )
+        if triggered_status is not None:
+            return triggered_status
         return self.advance_until_decision_or_terminal()
 
     def pending_decision_request(self) -> DecisionRequest | None:
