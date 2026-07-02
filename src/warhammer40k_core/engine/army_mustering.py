@@ -18,6 +18,7 @@ from warhammer40k_core.core.detachment import EnhancementDefinition, Enhancement
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.core.ruleset import RulesetError, RulesetId, RulesetIdPayload
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     AttachmentDeclarationPayload,
@@ -3639,13 +3640,7 @@ def _validate_optional_identifier(field_name: str, value: object | None) -> str 
     return _validate_identifier(field_name, value)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise ArmyMusteringError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise ArmyMusteringError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(ArmyMusteringError)
 
 
 def _validate_bool(field_name: str, value: object) -> bool:

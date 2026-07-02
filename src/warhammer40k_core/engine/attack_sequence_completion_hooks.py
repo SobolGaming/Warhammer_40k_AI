@@ -4,6 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, cast
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequenceStep
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -203,13 +204,7 @@ def _validate_hook_bindings(
     return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Attack sequence completion hook {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Attack sequence completion hook {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_optional_identifier_tuple(

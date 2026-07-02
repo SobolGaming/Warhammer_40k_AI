@@ -10,6 +10,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     battle_phase_kind_from_token,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -476,13 +477,7 @@ def _validate_optional_phase(field_name: str, value: object) -> BattlePhaseKind 
     raise GameLifecycleError(f"{field_name} must be a BattlePhaseKind or None.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_non_empty_text(field_name: str, value: object) -> str:

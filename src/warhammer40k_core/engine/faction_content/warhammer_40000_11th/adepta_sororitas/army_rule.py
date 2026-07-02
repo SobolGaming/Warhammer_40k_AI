@@ -9,6 +9,7 @@ from warhammer40k_core.core.dice import (
     DiceRollState,
     DiceRollStatePayload,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_round_hooks import (
     BattleRoundStartHookBinding,
@@ -514,13 +515,7 @@ def _validate_state(state: object) -> GameState:
     return state
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Acts of Faith {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Acts of Faith {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_gain_trigger(value: object) -> str:

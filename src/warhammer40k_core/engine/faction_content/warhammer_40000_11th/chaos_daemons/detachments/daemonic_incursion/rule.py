@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
@@ -287,10 +288,4 @@ def _canonical_keyword(value: str) -> str:
     return value.strip().replace("_", " ").replace("-", " ").upper()
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Warp Rifts {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Warp Rifts {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

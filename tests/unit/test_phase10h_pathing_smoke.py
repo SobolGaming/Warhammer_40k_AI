@@ -495,7 +495,9 @@ def _legality_context(
         keywords=keywords,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         movement_mode=movement_mode,
-        movement_phase_action=movement_phase_action,
+        movement_phase_action=None
+        if movement_phase_action is None
+        else movement_phase_action.value,
         displacement_kind=displacement_kind,
     )
 

@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Self, cast
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -290,13 +291,7 @@ def _request_allows_non_active_actor(request: DecisionRequest) -> bool:
     return payload.get("actor_may_be_non_active") is True
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Command-phase start hook {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Command-phase start hook {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_ability_index_mapping(

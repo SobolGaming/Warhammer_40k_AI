@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.data_package import (
     CatalogVersion,
     CatalogVersionPayload,
@@ -1083,13 +1084,7 @@ def _reason_from_schema_error_message(message: str) -> SourceRowDiagnosticReason
     return SourceRowDiagnosticReason.MALFORMED_CSV_ROW
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise WahapediaSchemaError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise WahapediaSchemaError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(WahapediaSchemaError)
 
 
 def _validate_identifier_tuple(

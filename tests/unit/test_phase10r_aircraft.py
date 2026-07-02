@@ -472,6 +472,8 @@ def test_other_models_can_transit_aircraft_but_not_end_on_them() -> None:
         witness=transit_witness,
         battlefield_width_inches=10.0,
         battlefield_depth_inches=10.0,
+        enemy_engagement_horizontal_inches=_engagement_horizontal_inches(),
+        enemy_engagement_vertical_inches=_engagement_vertical_inches(),
         enemy_models=(enemy_aircraft,),
     ).validate()
     allowed = PathValidationContext(
@@ -479,6 +481,8 @@ def test_other_models_can_transit_aircraft_but_not_end_on_them() -> None:
         witness=transit_witness,
         battlefield_width_inches=10.0,
         battlefield_depth_inches=10.0,
+        enemy_engagement_horizontal_inches=_engagement_horizontal_inches(),
+        enemy_engagement_vertical_inches=_engagement_vertical_inches(),
         enemy_models=(enemy_aircraft,),
         aircraft_model_ids=(enemy_aircraft.model_id,),
     ).validate()
@@ -487,6 +491,8 @@ def test_other_models_can_transit_aircraft_but_not_end_on_them() -> None:
         witness=PathWitness.for_paths(((mover.model_id, (mover.pose, Pose.at(3.0, 1.0))),)),
         battlefield_width_inches=10.0,
         battlefield_depth_inches=10.0,
+        enemy_engagement_horizontal_inches=_engagement_horizontal_inches(),
+        enemy_engagement_vertical_inches=_engagement_vertical_inches(),
         enemy_models=(enemy_aircraft,),
         aircraft_model_ids=(enemy_aircraft.model_id,),
     ).validate()
@@ -1783,3 +1789,11 @@ def _model_path_witness(model: Model, end_pose: Pose) -> PathWitness:
 
 def _ruleset() -> RulesetDescriptor:
     return RulesetDescriptor.warhammer_40000_eleventh(descriptor_version="core-v2-phase10r-test")
+
+
+def _engagement_horizontal_inches() -> float:
+    return _ruleset().engagement_policy.horizontal_inches
+
+
+def _engagement_vertical_inches() -> float:
+    return _ruleset().engagement_policy.vertical_inches

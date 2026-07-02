@@ -13,6 +13,7 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_formation_hooks import (
     SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
@@ -1507,13 +1508,7 @@ def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
     return value
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Code Chivalric {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Code Chivalric {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _canonical_keyword(value: str) -> str:

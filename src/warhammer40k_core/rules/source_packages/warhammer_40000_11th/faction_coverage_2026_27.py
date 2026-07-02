@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27,
     faction_subrules_2026_27,
@@ -1187,13 +1188,7 @@ def _runtime_support_status_from_token(
         ) from exc
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise Phase17EFactionCoverageError(f"Phase17E {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise Phase17EFactionCoverageError(f"Phase17E {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(Phase17EFactionCoverageError)
 
 
 def _validate_non_empty_text(field_name: str, value: object) -> str:

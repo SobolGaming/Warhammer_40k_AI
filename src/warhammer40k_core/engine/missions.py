@@ -11,6 +11,7 @@ from warhammer40k_core.core.missions import (
     SecondaryMissionAvailability,
 )
 from warhammer40k_core.core.ruleset_descriptor import reserve_destruction_timing_kind_from_token
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveDestructionTimingPolicy
@@ -310,13 +311,7 @@ def _stable_draw_key(
     return hashlib.sha256(encoded).hexdigest()
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:

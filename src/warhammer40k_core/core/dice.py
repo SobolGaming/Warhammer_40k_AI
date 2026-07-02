@@ -12,6 +12,7 @@ from warhammer40k_core.core.modifiers import (
     RollModifierPayload,
     apply_roll_modifiers,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 
 
 class DiceError(ValueError):
@@ -1422,13 +1423,7 @@ def _validate_characteristic(characteristic: object) -> Characteristic:
     return characteristic
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise DiceRollSpecError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise DiceRollSpecError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(DiceRollSpecError)
 
 
 def _validate_identifier_tuple(

@@ -7,6 +7,7 @@ from datetime import date
 from enum import StrEnum
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.data_package import (
     CatalogVersion,
     CatalogVersionPayload,
@@ -1120,13 +1121,7 @@ def _validate_sha_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, 
     return tuple(_validate_sha256(f"{field_name} value", value) for value in values)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise SourceOverlayError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise SourceOverlayError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(SourceOverlayError)
 
 
 def _validate_sha256(field_name: str, value: object) -> str:

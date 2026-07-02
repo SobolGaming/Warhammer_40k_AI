@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.data_package import (
     CatalogVersion,
     CatalogVersionPayload,
@@ -365,13 +366,7 @@ class SourceCatalog:
         )
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise SourceCatalogError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise SourceCatalogError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(SourceCatalogError)
 
 
 def _validate_sha256(field_name: str, value: object) -> str:

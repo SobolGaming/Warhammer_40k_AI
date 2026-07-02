@@ -7,6 +7,7 @@ from datetime import date
 from enum import StrEnum
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.data_package import (
     CatalogVersion,
     CatalogVersionPayload,
@@ -1219,13 +1220,7 @@ def _validate_diagnostic_tuple(
     )
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise SourcePatchError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise SourcePatchError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(SourcePatchError)
 
 
 def _validate_identifier_tuple(

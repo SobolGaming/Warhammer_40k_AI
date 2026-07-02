@@ -17,6 +17,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     MovementMode,
     RulesetDescriptor,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
@@ -1858,13 +1859,10 @@ def _payload_string_tuple(payload: dict[str, JsonValue], *, key: str) -> tuple[s
     return tuple(cast(list[str], value))
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Cabal of Sorcerers {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Cabal of Sorcerers {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(
+    GameLifecycleError,
+    message_prefix="Cabal of Sorcerers",
+)
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

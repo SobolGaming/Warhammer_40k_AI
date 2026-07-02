@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import cast
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
@@ -117,10 +118,4 @@ def _weapon_keyword_from_value(field_name: str, value: object) -> WeaponKeyword:
     raise GameLifecycleError(f"{field_name} values must be WeaponKeyword values or strings.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

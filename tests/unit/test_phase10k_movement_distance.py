@@ -5,6 +5,7 @@ from typing import cast
 
 import pytest
 
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.unit import Unit, UnitMember
 from warhammer40k_core.core.unit_group import UnitGroup
 from warhammer40k_core.geometry.base import CircularBase, OvalBase, RectangularBase
@@ -89,7 +90,7 @@ def test_straight_distance_budget_rejects_path_query_when_exceeded() -> None:
         unit_group=UnitGroup.single(_unit("movers", model.model_id)),
         spatial_index=SpatialIndex.empty().with_model(model),
         witness=witness,
-        movement_envelope=MovementEnvelope(max_distance_inches=4.0),
+        movement_envelope=_movement_envelope(max_distance_inches=4.0),
         collision_set=CollisionSet.empty(),
     ).evaluate()
 
@@ -119,6 +120,8 @@ def test_path_validation_context_rejects_straight_distance_budget_exceeded() -> 
         witness=witness,
         battlefield_width_inches=10.0,
         battlefield_depth_inches=10.0,
+        enemy_engagement_horizontal_inches=_engagement_horizontal_inches(),
+        enemy_engagement_vertical_inches=_engagement_vertical_inches(),
         movement_distance_budget_inches=4.0,
     ).validate()
 
@@ -241,6 +244,30 @@ def _unit(unit_id: str, *model_ids: str) -> Unit:
             UnitMember.ready(model_id=model_id, name=model_id.title()) for model_id in model_ids
         ),
     )
+
+
+def _movement_envelope(*, max_distance_inches: float) -> MovementEnvelope:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    coherency_policy = descriptor.coherency_policy
+    assert coherency_policy.max_horizontal_inches is not None
+    assert coherency_policy.max_vertical_inches is not None
+    assert coherency_policy.required_neighbors_small_unit is not None
+    return MovementEnvelope(
+        max_distance_inches=max_distance_inches,
+        coherency_horizontal_inches=coherency_policy.max_horizontal_inches,
+        coherency_vertical_inches=coherency_policy.max_vertical_inches,
+        engagement_horizontal_inches=descriptor.engagement_policy.horizontal_inches,
+        engagement_vertical_inches=descriptor.engagement_policy.vertical_inches,
+        required_coherency_neighbors=coherency_policy.required_neighbors_small_unit,
+    )
+
+
+def _engagement_horizontal_inches() -> float:
+    return RulesetDescriptor.warhammer_40000_eleventh().engagement_policy.horizontal_inches
+
+
+def _engagement_vertical_inches() -> float:
+    return RulesetDescriptor.warhammer_40000_eleventh().engagement_policy.vertical_inches
 
 
 def _oval_rotation_witness_payload() -> MovementDistanceWitnessPayload:

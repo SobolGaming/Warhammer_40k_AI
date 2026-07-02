@@ -13,6 +13,7 @@ from warhammer40k_core.core.terrain_display import (
     TerrainDisplayGeometry,
     TerrainDisplayGeometryPayload,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 
 
 class TerrainLayoutError(ValueError):
@@ -874,13 +875,7 @@ def _validate_unprefixed_identifier(
     return identifier
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise TerrainLayoutError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise TerrainLayoutError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(TerrainLayoutError)
 
 
 def _validate_finite_number(field_name: str, value: object) -> float:

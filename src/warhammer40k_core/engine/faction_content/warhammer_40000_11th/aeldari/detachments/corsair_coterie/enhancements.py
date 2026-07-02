@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import cast
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
 from warhammer40k_core.engine.battle_formation_hooks import (
     SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
@@ -1278,10 +1279,4 @@ def _payload_bool(payload: dict[str, JsonValue], key: str) -> bool:
     return value
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Corsair Coterie {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Corsair Coterie {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

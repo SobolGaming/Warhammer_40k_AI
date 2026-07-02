@@ -700,7 +700,7 @@ def _normal_legality_context(
         keywords=keywords,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         movement_mode=MovementMode.NORMAL,
-        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE.value,
         displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
     )
 

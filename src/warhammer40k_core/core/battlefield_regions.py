@@ -5,6 +5,7 @@ from enum import StrEnum
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.deployment_zones import DeploymentZoneShape, DeploymentZoneShapePayload
+from warhammer40k_core.core.validation import IdentifierValidator
 
 
 class BattlefieldRegionError(ValueError):
@@ -151,10 +152,4 @@ def _validate_unprefixed_identifier(
     return identifier
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise BattlefieldRegionError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise BattlefieldRegionError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(BattlefieldRegionError)

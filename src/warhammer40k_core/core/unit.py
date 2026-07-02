@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
+
 
 class UnitError(ValueError):
     """Raised when unit data violates CORE V2 invariants."""
@@ -188,13 +190,7 @@ def movement_status_from_token(token: object) -> MovementStatus:
         raise UnitError(f"Unsupported movement status token: {token}.") from exc
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise UnitError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise UnitError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(UnitError)
 
 
 def _validate_unit_id(value: object) -> str:

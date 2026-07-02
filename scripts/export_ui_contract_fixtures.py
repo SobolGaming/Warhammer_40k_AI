@@ -591,6 +591,8 @@ def _first_model(state: GameState) -> ModelInstance:
 
 
 def _session_state(session: LocalGameSession) -> GameState:
+    # WS5 fixture-authoring exemption: this script mutates authoritative state only to
+    # synthesize stable UI projection fixtures, never as an adapter runtime path.
     state = session.lifecycle.state
     if state is None:
         raise GameLifecycleError("UI contract fixture session must be started.")

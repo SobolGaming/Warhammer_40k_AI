@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
@@ -452,13 +453,7 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     return _validate_identifier(key, value)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Oath of Moment {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Oath of Moment {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _canonical_keyword(keyword: str) -> str:

@@ -100,8 +100,8 @@ class Model:
     def is_within_engagement_range(
         self,
         other: Model,
-        horizontal_inches: float = 2.0,
-        vertical_inches: float = 5.0,
+        horizontal_inches: float,
+        vertical_inches: float,
     ) -> bool:
         other_model = _validate_model("other", other)
         horizontal_limit = _validate_non_negative_number("horizontal_inches", horizontal_inches)

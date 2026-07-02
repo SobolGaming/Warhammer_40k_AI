@@ -8,6 +8,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptorError,
     movement_mode_from_token,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     UnitPlacement,
@@ -1018,8 +1019,7 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     return value
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    return _validate_non_empty_string(field_name, value)
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_non_empty_string(field_name: str, value: object) -> str:

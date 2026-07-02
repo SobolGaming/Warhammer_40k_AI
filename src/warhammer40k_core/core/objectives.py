@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
+
 
 class ObjectiveError(ValueError):
     """Raised when objective data violates CORE V2 invariants."""
@@ -368,13 +370,7 @@ def validate_objective_anchor(field_name: str, value: object) -> ObjectiveAnchor
     raise ObjectiveError(f"{field_name} must be an ObjectiveAnchor.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise ObjectiveError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise ObjectiveError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(ObjectiveError)
 
 
 def _validate_objective_id(value: object) -> str:

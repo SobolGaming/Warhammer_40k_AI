@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
     DecisionRequest,
@@ -164,10 +165,4 @@ class ParameterizedSubmission:
 type DecisionSubmission = FiniteOptionSubmission | ParameterizedSubmission
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

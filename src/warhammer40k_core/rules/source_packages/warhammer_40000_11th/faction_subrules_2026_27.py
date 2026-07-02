@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.validation import FixedMessageIdentifierValidator
+
 EDITION_ID = "warhammer_40000_11th"
 SOURCE_EDITION = "11th"
 SOURCE_PACKAGE_ID = "gw-11e-phase17e-exact-faction-subrules-2026-27"
@@ -482,13 +484,11 @@ def _validate_unique_exact_rows(exact_ids: tuple[tuple[str, str, str], ...]) -> 
         raise ValueError("Exact faction subrule owner/rule IDs must be unique.")
 
 
-def _validate_identifier(value: object) -> str:
-    if type(value) is not str:
-        raise ValueError("Exact faction subrule identifiers must be strings.")
-    stripped = value.strip()
-    if not stripped:
-        raise ValueError("Exact faction subrule identifiers must not be empty.")
-    return stripped
+_validate_identifier = FixedMessageIdentifierValidator(
+    ValueError,
+    string_message="Exact faction subrule identifiers must be strings.",
+    empty_message="Exact faction subrule identifiers must not be empty.",
+)
 
 
 def _validate_text(value: object) -> str:

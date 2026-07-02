@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from html.parser import HTMLParser
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.text_normalization import normalize_source_characters
 
 
@@ -240,13 +241,7 @@ def _cleanup_sanitized_text(text: str) -> str:
     return cleaned.strip()
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise SourceHtmlSanitizationError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise SourceHtmlSanitizationError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(SourceHtmlSanitizationError)
 
 
 def _validate_string_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:

@@ -22,6 +22,7 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import (
+    DEFAULT_MAX_LIFECYCLE_TRANSITIONS,
     GameConfig,
     GameState,
     GameStatePayload,
@@ -67,6 +68,7 @@ def _config(
     ruleset_descriptor: RulesetDescriptor | None = None,
     army_catalog: ArmyCatalog | None = None,
     army_muster_requests: tuple[ArmyMusterRequest, ...] | None = None,
+    max_lifecycle_transitions: int = DEFAULT_MAX_LIFECYCLE_TRANSITIONS,
 ) -> GameConfig:
     descriptor = ruleset_descriptor
     if descriptor is None:
@@ -89,6 +91,7 @@ def _config(
             "bring_it_down",
             "cleanse",
         ),
+        max_lifecycle_transitions=max_lifecycle_transitions,
         mission_setup=_mission_setup(),
     )
 
@@ -799,6 +802,27 @@ def test_descriptor_hash_is_recorded_in_lifecycle_replay_payloads() -> None:
     assert GameLifecycle.from_payload(payload).to_payload() == lifecycle.to_payload()
 
 
+def test_lifecycle_transition_guard_is_recorded_in_config_provenance() -> None:
+    config = _config(max_lifecycle_transitions=127)
+    lifecycle = _start_lifecycle(config)
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+
+    assert payload["config"] is not None
+    assert payload["config"]["max_lifecycle_transitions"] == 127
+    assert GameConfig.from_payload(payload["config"]).max_lifecycle_transitions == 127
+    assert GameLifecycle.from_payload(payload).config.max_lifecycle_transitions == 127
+
+
+def test_lifecycle_transition_guard_fails_deterministically_when_config_limit_is_too_low() -> None:
+    lifecycle = _start_lifecycle(_config(max_lifecycle_transitions=1))
+
+    with pytest.raises(GameLifecycleError, match="exceeded deterministic transition guard"):
+        lifecycle.advance_until_decision_or_terminal()
+
+
 def test_game_config_rejects_lifecycle_sequence_prerequisite_gaps() -> None:
     missing_secondary = _descriptor_with_sequences(
         setup_steps=(
@@ -919,6 +943,7 @@ def test_no_ui_or_headless_specific_phase_path_exists() -> None:
 
     assert public_methods == {
         "advance_until_decision_or_terminal",
+        "pending_decision_request",
         "start",
         "submit_decision",
         "to_payload",

@@ -11,6 +11,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Self
 
+from warhammer40k_core.core.validation import IdentifierValidator
+
 
 class FactionAliasError(ValueError):
     """Raised when faction alias data violates CORE V2 invariants."""
@@ -110,13 +112,7 @@ def _canonical_reference_token(value: str) -> str:
     return " ".join(_validate_identifier("reference", value).upper().split())
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise FactionAliasError(f"Faction alias {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise FactionAliasError(f"Faction alias {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(FactionAliasError)
 
 
 def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:

@@ -35,6 +35,7 @@ from warhammer40k_core.core.terrain_layouts import (
     TerrainLayoutTemplate,
     TerrainWallTemplate,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
@@ -1178,13 +1179,7 @@ def _validate_terrain_areas_within_battlefield(
             raise MissionSetupError("MissionSetup terrain area is outside the battlefield.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise MissionSetupError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise MissionSetupError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(MissionSetupError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

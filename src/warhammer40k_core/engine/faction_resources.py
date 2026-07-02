@@ -4,6 +4,7 @@ from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 
@@ -536,13 +537,7 @@ def _validate_transactions(
     return tuple(transactions)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

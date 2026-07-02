@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from warhammer40k_core.core.dice import D3RollResult, DiceExpression, DiceRollSpec
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
@@ -637,13 +638,7 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     return _validate_identifier(key, payload[key])
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Reanimation Protocols {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Reanimation Protocols {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _canonical_keyword(keyword: str) -> str:

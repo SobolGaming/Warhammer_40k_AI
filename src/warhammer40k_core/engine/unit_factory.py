@@ -28,6 +28,7 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionEffectKind,
 )
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.list_validation import (
     ListValidationError,
     MusteringOptionSelection,
@@ -1018,13 +1019,7 @@ def _validate_unprefixed_identifier(field_name: str, value: object, prefix: str)
     return identifier
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise UnitFactoryError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise UnitFactoryError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(UnitFactoryError)
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

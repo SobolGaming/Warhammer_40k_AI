@@ -4,6 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.shooting_types import ShootingType, shooting_type_from_token
@@ -319,13 +320,7 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     return value
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Target restriction hook {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Target restriction hook {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_optional_identifier(field_name: str, value: object) -> str | None:

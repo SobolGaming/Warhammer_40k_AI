@@ -5,6 +5,7 @@ from typing import cast
 
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_resources import (
     FactionResourceStatus,
@@ -306,13 +307,7 @@ def _battle_round_for_state(state: object) -> int:
     return state.battle_round
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Power from Pain {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Power from Pain {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_pain_ability_keys(values: tuple[str, ...]) -> tuple[str, ...]:

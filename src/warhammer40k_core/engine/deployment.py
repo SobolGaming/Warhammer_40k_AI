@@ -10,6 +10,7 @@ from warhammer40k_core.core.deployment_zones import (
     DeploymentZonePayload,
 )
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldRuntimeState,
@@ -1716,13 +1717,7 @@ def _validate_optional_identifier(field_name: str, value: object | None) -> str 
     return _validate_identifier(field_name, value)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_non_empty_string(field_name: str, value: object) -> str:

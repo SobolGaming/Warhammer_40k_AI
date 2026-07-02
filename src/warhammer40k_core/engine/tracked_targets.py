@@ -5,6 +5,7 @@ from enum import StrEnum
 from typing import TYPE_CHECKING, TypedDict, cast
 
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -933,13 +934,7 @@ def _validate_supported_roll_types(roll_types: tuple[object, ...]) -> tuple[str,
     )
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Tracked target {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Tracked target {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

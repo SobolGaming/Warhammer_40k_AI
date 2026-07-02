@@ -17,6 +17,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     line_of_sight_policy_from_token,
     terrain_feature_kind_from_token,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.pose import (
     GeometryError,
@@ -1537,13 +1538,7 @@ def _validate_positive_int(field_name: str, value: object) -> int:
     return value
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GeometryError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GeometryError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GeometryError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

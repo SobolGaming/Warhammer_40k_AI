@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.base import (
     BaseShape,
@@ -470,13 +471,7 @@ def millimeters_to_inches(value_mm: object) -> float:
     return millimeters / MILLIMETERS_PER_INCH
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GeometryError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GeometryError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GeometryError)
 
 
 def _validate_optional_base_shape(field_name: str, value: object | None) -> BaseShape | None:

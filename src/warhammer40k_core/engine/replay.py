@@ -7,6 +7,7 @@ from enum import StrEnum
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.rng import RandomSource, RandomSourcePayload
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_record import DecisionRecord, DecisionRecordPayload
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
@@ -1102,13 +1103,7 @@ def _json_payload(payload: object) -> JsonValue:
     return validate_json_value(payload)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise ReplayArtifactError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise ReplayArtifactError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(ReplayArtifactError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

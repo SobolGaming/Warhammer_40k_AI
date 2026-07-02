@@ -32,6 +32,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     TerrainFeatureKind,
     battle_phase_kind_from_token,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AbilityKind,
     DamageProfile,
@@ -5067,11 +5068,14 @@ def _resolve_grouped_damage_from(
                 else allocation_context.attacker_constraint.source_rule_ids
             ),
         )
-        damage_attack_context: AttackResolutionContextPayload = {
-            **attack_context,
-            "allocation": allocation.to_payload(),
-            "save_options": [],
-        }
+        damage_attack_context = cast(
+            AttackResolutionContextPayload,
+            {
+                **attack_context,
+                "allocation": allocation.to_payload(),
+                "save_options": [],
+            },
+        )
         save_options = _save_options_for_allocation(
             state=state,
             ruleset_descriptor=ruleset_descriptor,
@@ -5081,10 +5085,13 @@ def _resolve_grouped_damage_from(
             runtime_modifier_registry=runtime_modifiers,
         )
         if save_options:
-            damage_attack_context = {
-                **damage_attack_context,
-                "save_options": [option.to_payload() for option in save_options],
-            }
+            damage_attack_context = cast(
+                AttackResolutionContextPayload,
+                {
+                    **damage_attack_context,
+                    "save_options": [option.to_payload() for option in save_options],
+                },
+            )
         roll_state = DiceRollState.from_payload(save_die["roll_state"])
         saving_throw = (
             None
@@ -10529,13 +10536,7 @@ def _validate_ordered_identifier_tuple(field_name: str, values: object) -> tuple
     return tuple(identifiers)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_int(field_name: str, value: object) -> int:

@@ -8,6 +8,7 @@ from warhammer40k_core.core.attributes import Characteristic, CharacteristicValu
 from warhammer40k_core.core.datasheet import DatasheetAbilityDescriptor
 from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AbilityKind,
     AttackProfile,
@@ -1280,13 +1281,7 @@ def _validate_identifier_tuple(
     return tuple(validated)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Voice of Command {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Voice of Command {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_non_negative_int(field_name: str, value: object) -> int:

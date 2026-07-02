@@ -12,6 +12,7 @@ from warhammer40k_core.core.dice import (
     DiceRollState,
     DiceRollStatePayload,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import PlacementError
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -3054,13 +3055,7 @@ def _validate_ordered_identifier_tuple(field_name: str, values: object) -> tuple
     return tuple(identifiers)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

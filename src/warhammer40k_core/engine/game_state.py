@@ -13,6 +13,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     battle_phase_kind_from_token,
     setup_step_kind_from_token,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatePayload
 from warhammer40k_core.engine.aircraft import HoverModeState, HoverModeStatePayload
 from warhammer40k_core.engine.army_mustering import (
@@ -226,6 +227,7 @@ class GameConfigPayload(TypedDict):
     turn_order: list[str]
     fixed_secondary_mission_ids: list[str]
     tactical_secondary_draw_count: int
+    max_lifecycle_transitions: int
     mission_setup: MissionSetupPayload | None
     reserve_unit_points: list[ReserveUnitPointValuePayload]
 
@@ -247,6 +249,7 @@ class TacticalSecondaryDrawPayload(TypedDict):
 DEDICATED_TRANSPORT_EMPTY_STARTING_CARGO_CONSEQUENCE = (
     "empty_starting_cargo_destroyed_first_battle_round"
 )
+DEFAULT_MAX_LIFECYCLE_TRANSITIONS = 128
 
 
 class DedicatedTransportSetupConsequencePayload(TypedDict):
@@ -671,6 +674,7 @@ class GameConfig:
     turn_order: tuple[str, ...]
     fixed_secondary_mission_ids: tuple[str, ...]
     tactical_secondary_draw_count: int = 2
+    max_lifecycle_transitions: int = DEFAULT_MAX_LIFECYCLE_TRANSITIONS
     mission_setup: MissionSetup | None = None
     reserve_unit_points: tuple[ReserveUnitPointValue, ...] = ()
     allow_legacy_non_strict_rosters: bool = False
@@ -738,6 +742,14 @@ class GameConfig:
         )
         object.__setattr__(
             self,
+            "max_lifecycle_transitions",
+            _validate_positive_int(
+                "GameConfig max_lifecycle_transitions",
+                self.max_lifecycle_transitions,
+            ),
+        )
+        object.__setattr__(
+            self,
             "mission_setup",
             _validate_optional_mission_setup(
                 self.mission_setup,
@@ -765,6 +777,7 @@ class GameConfig:
             "turn_order": list(self.turn_order),
             "fixed_secondary_mission_ids": list(self.fixed_secondary_mission_ids),
             "tactical_secondary_draw_count": self.tactical_secondary_draw_count,
+            "max_lifecycle_transitions": self.max_lifecycle_transitions,
             "mission_setup": (
                 None if self.mission_setup is None else self.mission_setup.to_payload()
             ),
@@ -786,6 +799,7 @@ class GameConfig:
             turn_order=tuple(payload["turn_order"]),
             fixed_secondary_mission_ids=tuple(payload["fixed_secondary_mission_ids"]),
             tactical_secondary_draw_count=payload["tactical_secondary_draw_count"],
+            max_lifecycle_transitions=payload["max_lifecycle_transitions"],
             mission_setup=(
                 None
                 if payload["mission_setup"] is None
@@ -7420,13 +7434,7 @@ def _validate_identifier_tuple(
     return tuple(validated)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

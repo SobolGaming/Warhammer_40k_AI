@@ -27,6 +27,7 @@ from warhammer40k_core.core.model_geometry_catalog import (
     GeometryReviewStatus,
     GeometrySourceUnits,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AntiKeywordMatchMode,
@@ -48,6 +49,7 @@ from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaCsvTable,
     WahapediaJsonArtifact,
 )
+from warhammer40k_core.rules.weapon_profile_names import WEAPON_PROFILE_SUFFIX_RE
 
 
 class WahapediaBridgeError(ValueError):
@@ -139,7 +141,6 @@ _DAEMONIC_ALLEGIANCE_ADDITIONAL_WARGEAR_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 _LOADOUT_RE = re.compile(r"[^.]+? (?:is|are) equipped with: (?P<items>[^.]+)\.?", re.IGNORECASE)
-_WEAPON_PROFILE_SUFFIX_RE = re.compile(r"^(?P<base>.+?)\s+-\s+(?P<profile>.+)$")
 _DAMAGED_HEADER_RE = re.compile(
     r"^\s*DAMAGED:\s*\d+\s*-\s*\d+\s+WOUNDS\s+REMAINING\s*",
     re.IGNORECASE,
@@ -2294,12 +2295,12 @@ def _weapon_description_item_name_keys(description: str) -> frozenset[str]:
 
 
 def _base_wargear_name(name: str) -> str:
-    match = _WEAPON_PROFILE_SUFFIX_RE.fullmatch(name)
+    match = WEAPON_PROFILE_SUFFIX_RE.fullmatch(name)
     return name if match is None else match.group("base")
 
 
 def _weapon_profile_name(name: str) -> str | None:
-    match = _WEAPON_PROFILE_SUFFIX_RE.fullmatch(name)
+    match = WEAPON_PROFILE_SUFFIX_RE.fullmatch(name)
     return None if match is None else match.group("profile")
 
 
@@ -2358,13 +2359,7 @@ def _positive_int_from_count_text(field_name: str, value: str) -> int:
     return _positive_int_from_text(field_name, value)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise WahapediaBridgeError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise WahapediaBridgeError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(WahapediaBridgeError)
 
 
 def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:

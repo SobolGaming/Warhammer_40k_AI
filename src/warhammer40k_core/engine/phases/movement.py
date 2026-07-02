@@ -29,6 +29,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptorError,
     movement_mode_from_token,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.actions import (
@@ -8441,7 +8442,7 @@ def _resolve_unit_move(
             keywords=effective_movement_keywords,
             ruleset_descriptor=ruleset_descriptor,
             movement_mode=movement_mode,
-            movement_phase_action=movement_phase_action,
+            movement_phase_action=movement_phase_action.value,
             displacement_kind=displacement_kind,
             ability_index=ability_index,
             unit=unit,
@@ -10343,13 +10344,7 @@ def _validate_advance_roll_spec(spec: DiceRollSpec, *, unit_instance_id: str) ->
         raise GameLifecycleError("Advance roll spec actor_id must match unit_instance_id.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

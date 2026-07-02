@@ -8,6 +8,7 @@ from warhammer40k_core.core.datasheet import (
     DamagedEffectKind,
     DamagedWeaponScope,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import AttackProfile, RangeProfileKind, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -282,13 +283,7 @@ def _validate_game_state(value: object) -> None:
         raise GameLifecycleError("DAMAGED effect state must be GameState.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _name_key(value: str) -> str:

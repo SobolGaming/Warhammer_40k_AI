@@ -5,6 +5,7 @@ from itertools import combinations
 from typing import cast
 
 from warhammer40k_core.core.missions import MissionActionDefinition
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.actions import MissionActionState
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -1532,13 +1533,7 @@ def _payload_bool(payload: dict[str, JsonValue], *, key: str) -> bool:
     return value
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_identifier_tuple(

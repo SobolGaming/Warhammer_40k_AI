@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_round_hooks import (
@@ -923,13 +924,7 @@ def _validate_game_state(state: object) -> None:
         raise GameLifecycleError("Black Templars army rule requires GameState.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Black Templars {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Black Templars {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _canonical_keyword(value: str) -> str:

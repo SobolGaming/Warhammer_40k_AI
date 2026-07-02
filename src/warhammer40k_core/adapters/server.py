@@ -22,6 +22,7 @@ from warhammer40k_core.adapters.redaction import (
     redacted_decision_type_for_hidden_viewer,
 )
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import EventLogError, JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameConfigPayload
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
@@ -645,21 +646,15 @@ def _required_string(payload: dict[str, JsonValue], *, key: str) -> str:
     return _validate_identifier(key, payload[key])
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise ServerApiError(
-            status_code=HTTPStatus.BAD_REQUEST,
-            code="malformed_identifier",
-            message=f"{field_name} must be a string.",
-        )
-    stripped = value.strip()
-    if not stripped:
-        raise ServerApiError(
-            status_code=HTTPStatus.BAD_REQUEST,
-            code="malformed_identifier",
-            message=f"{field_name} must not be empty.",
-        )
-    return stripped
+def _malformed_identifier_error(message: str) -> ServerApiError:
+    return ServerApiError(
+        status_code=HTTPStatus.BAD_REQUEST,
+        code="malformed_identifier",
+        message=message,
+    )
+
+
+_validate_identifier = IdentifierValidator(_malformed_identifier_error)
 
 
 def _parse_content_length(value: str) -> int:

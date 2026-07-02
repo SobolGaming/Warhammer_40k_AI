@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 
 
@@ -149,13 +150,7 @@ def _validate_decision_option(option: object) -> DecisionOption:
     return option
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise DecisionError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise DecisionError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(DecisionError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

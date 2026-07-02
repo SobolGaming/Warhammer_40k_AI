@@ -5,6 +5,7 @@ import json
 import pytest
 
 from warhammer40k_core.core.attached_unit import AttachedUnit
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.unit import Unit, UnitMember
 from warhammer40k_core.core.unit_group import UnitGroup
 from warhammer40k_core.geometry.base import CircularBase
@@ -54,9 +55,35 @@ def _query_for_single_model(
         spatial_index=SpatialIndex.empty().with_model(model),
         witness=witness,
         movement_envelope=(
-            MovementEnvelope(max_distance_inches=10.0) if envelope is None else envelope
+            _movement_envelope(max_distance_inches=10.0) if envelope is None else envelope
         ),
         collision_set=CollisionSet.empty() if collision_set is None else collision_set,
+    )
+
+
+def _movement_envelope(
+    *,
+    max_distance_inches: float,
+    sample_interval_inches: float = 1.0,
+    required_coherency_neighbors: int | None = None,
+) -> MovementEnvelope:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    coherency_policy = descriptor.coherency_policy
+    assert coherency_policy.max_horizontal_inches is not None
+    assert coherency_policy.max_vertical_inches is not None
+    assert coherency_policy.required_neighbors_small_unit is not None
+    return MovementEnvelope(
+        max_distance_inches=max_distance_inches,
+        coherency_horizontal_inches=coherency_policy.max_horizontal_inches,
+        coherency_vertical_inches=coherency_policy.max_vertical_inches,
+        engagement_horizontal_inches=descriptor.engagement_policy.horizontal_inches,
+        engagement_vertical_inches=descriptor.engagement_policy.vertical_inches,
+        sample_interval_inches=sample_interval_inches,
+        required_coherency_neighbors=(
+            coherency_policy.required_neighbors_small_unit
+            if required_coherency_neighbors is None
+            else required_coherency_neighbors
+        ),
     )
 
 
@@ -214,7 +241,7 @@ def test_path_query_accepts_stationary_model_in_group_witness() -> None:
         unit_group=unit_group,
         spatial_index=SpatialIndex.empty().with_model(first).with_model(second),
         witness=witness,
-        movement_envelope=MovementEnvelope(max_distance_inches=10.0),
+        movement_envelope=_movement_envelope(max_distance_inches=10.0),
         collision_set=CollisionSet.empty(),
     ).evaluate()
 
@@ -346,7 +373,7 @@ def test_path_query_checks_coherency_after_group_movement() -> None:
         unit_group=unit_group,
         spatial_index=SpatialIndex.empty().with_model(first).with_model(second),
         witness=witness,
-        movement_envelope=MovementEnvelope(max_distance_inches=20.0),
+        movement_envelope=_movement_envelope(max_distance_inches=20.0),
         collision_set=CollisionSet.empty(),
     )
 
@@ -358,7 +385,7 @@ def test_path_query_checks_coherency_after_group_movement() -> None:
 
 
 def test_movement_envelope_can_require_two_coherency_neighbors() -> None:
-    envelope = MovementEnvelope(max_distance_inches=10.0, required_coherency_neighbors=2)
+    envelope = _movement_envelope(max_distance_inches=10.0, required_coherency_neighbors=2)
     coherent = (_model("first", 0.0, 0.0), _model("second", 1.5, 0.0), _model("third", 0.0, 1.5))
     incoherent = (
         _model("first", 0.0, 0.0),
@@ -395,14 +422,14 @@ def test_path_query_validates_attached_unit_group_together() -> None:
         unit_group=group,
         spatial_index=index,
         witness=incomplete,
-        movement_envelope=MovementEnvelope(max_distance_inches=10.0),
+        movement_envelope=_movement_envelope(max_distance_inches=10.0),
         collision_set=CollisionSet.empty(),
     ).evaluate()
     complete_result = PathQuery(
         unit_group=group,
         spatial_index=index,
         witness=complete,
-        movement_envelope=MovementEnvelope(max_distance_inches=10.0),
+        movement_envelope=_movement_envelope(max_distance_inches=10.0),
         collision_set=CollisionSet.empty(),
     ).evaluate()
 
@@ -434,7 +461,7 @@ def test_path_query_accepts_attached_group_when_witness_order_differs_from_unit_
         unit_group=group,
         spatial_index=SpatialIndex.empty().with_model(bodyguard_model).with_model(leader_model),
         witness=witness,
-        movement_envelope=MovementEnvelope(max_distance_inches=10.0),
+        movement_envelope=_movement_envelope(max_distance_inches=10.0),
         collision_set=CollisionSet.empty(),
     ).evaluate()
 
@@ -456,7 +483,7 @@ def test_path_query_rejects_final_overlap_between_moving_models() -> None:
         unit_group=unit_group,
         spatial_index=SpatialIndex.empty().with_model(first).with_model(second),
         witness=witness,
-        movement_envelope=MovementEnvelope(max_distance_inches=10.0),
+        movement_envelope=_movement_envelope(max_distance_inches=10.0),
         collision_set=CollisionSet.empty(),
     ).evaluate()
 
@@ -469,7 +496,7 @@ def test_path_query_rejects_final_overlap_between_moving_models() -> None:
 
 def test_pathing_payloads_round_trip_without_object_reprs() -> None:
     witness = _single_model_witness(Pose.at(0.0, 0.0), Pose.at(1.0, 0.0), Pose.at(2.0, 0.0))
-    envelope = MovementEnvelope(
+    envelope = _movement_envelope(
         max_distance_inches=10.0,
         sample_interval_inches=0.5,
         required_coherency_neighbors=1,

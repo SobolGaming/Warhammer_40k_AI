@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Self, TypedDict, cast
 from warhammer40k_core.core.deployment_zones import DeploymentZone
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldScenario,
@@ -303,10 +304,4 @@ def _validate_positive_number(field_name: str, value: object) -> float:
     return number
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Reserve arrival distance hook {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Reserve arrival distance hook {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

@@ -12,6 +12,7 @@ from warhammer40k_core.core.dice import (
     DiceRollStatePayload,
 )
 from warhammer40k_core.core.ruleset_descriptor import CoverEffect
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.geometry.visibility import BenefitOfCoverResult, BenefitOfCoverResultPayload
@@ -677,13 +678,7 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
     return tuple(sorted(identifiers))
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

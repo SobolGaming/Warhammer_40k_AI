@@ -12,6 +12,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     battle_phase_kind_from_token,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
@@ -526,13 +527,7 @@ def _validate_identifier_tuple(
     return tuple(identifiers)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Runtime event {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Runtime event {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

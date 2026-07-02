@@ -40,7 +40,7 @@ from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.interfaces.cli import (
     CliDecisionPromptPayload,
-    render_decision_request_for_cli,
+    render_pending_decision_for_cli,
     submit_cli_choice,
     submit_cli_payload,
 )
@@ -57,7 +57,7 @@ def test_cli_adapter_renders_finite_options_and_records_normal_decision() -> Non
     status = session.advance_until_decision_or_terminal()
     request = _decision_request(status)
 
-    prompt = render_decision_request_for_cli(request)
+    prompt = render_pending_decision_for_cli(session=session, viewer_player_id="player-a")
     follow_up = submit_cli_choice(
         session=session,
         prompt=prompt,
@@ -90,7 +90,7 @@ def test_invalid_cli_choice_is_rejected_without_queue_or_record_mutation() -> No
     session.start(_config(game_id="phase18a-cli-invalid-game"))
     status = session.advance_until_decision_or_terminal()
     request = _decision_request(status)
-    prompt = render_decision_request_for_cli(request)
+    prompt = render_pending_decision_for_cli(session=session, viewer_player_id="player-a")
 
     with pytest.raises(GameLifecycleError, match="out of range"):
         submit_cli_choice(
@@ -109,7 +109,7 @@ def test_stale_cli_choice_is_rejected_without_queue_or_record_mutation() -> None
     session.start(_config(game_id="phase18a-cli-stale-choice-game"))
     status = session.advance_until_decision_or_terminal()
     request = _decision_request(status)
-    prompt = render_decision_request_for_cli(request)
+    prompt = render_pending_decision_for_cli(session=session, viewer_player_id="player-a")
     stale_prompt = cast(
         CliDecisionPromptPayload,
         {
@@ -128,6 +128,22 @@ def test_stale_cli_choice_is_rejected_without_queue_or_record_mutation() -> None
 
     assert session.lifecycle.decision_controller.queue.pending_requests == (request,)
     assert session.lifecycle.decision_controller.records == ()
+
+
+def test_cli_adapter_renders_hidden_prompt_through_viewer_projection() -> None:
+    session = LocalGameSession()
+    session.start(_config(game_id="phase18a-cli-hidden-game"))
+    status = session.advance_until_decision_or_terminal()
+    request = _decision_request(status)
+    assert request.actor_id == "player-a"
+
+    prompt = render_pending_decision_for_cli(session=session, viewer_player_id="player-b")
+
+    assert prompt["request_id"] == request.request_id
+    assert prompt["decision_type"] == "hidden_decision"
+    assert prompt["actor_id"] == "player-a"
+    assert prompt["is_parameterized"] is False
+    assert prompt["options"] == []
 
 
 def test_stale_cli_payload_is_rejected_when_parameterized_request_is_pending() -> None:

@@ -13,6 +13,7 @@ from warhammer40k_core.core.objectives import (
     TerrainObjectiveAnchor,
 )
 from warhammer40k_core.core.ruleset import RulesetId, RulesetIdPayload
+from warhammer40k_core.core.validation import IdentifierValidator
 
 
 class BattlefieldError(ValueError):
@@ -465,13 +466,7 @@ class Battlefield:
         )
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise BattlefieldError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise BattlefieldError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(BattlefieldError)
 
 
 def _validate_battlefield_id(value: object) -> str:

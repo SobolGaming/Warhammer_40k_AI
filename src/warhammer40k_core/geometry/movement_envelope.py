@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from itertools import pairwise
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.geometry.pose import (
     Facing,
     GeometryError,
@@ -441,12 +442,12 @@ class MovementDistanceWitness:
 @dataclass(frozen=True, slots=True)
 class MovementEnvelope:
     max_distance_inches: float
+    coherency_horizontal_inches: float
+    coherency_vertical_inches: float
+    engagement_horizontal_inches: float
+    engagement_vertical_inches: float
     sample_interval_inches: float = 1.0
-    coherency_horizontal_inches: float = 2.0
-    coherency_vertical_inches: float = 5.0
     required_coherency_neighbors: int = 1
-    engagement_horizontal_inches: float = 2.0
-    engagement_vertical_inches: float = 5.0
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -733,13 +734,7 @@ def _validate_non_negative_int(field_name: str, value: object) -> int:
     return value
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GeometryError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GeometryError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GeometryError)
 
 
 def _validate_segment_measurement_point(value: object) -> str:

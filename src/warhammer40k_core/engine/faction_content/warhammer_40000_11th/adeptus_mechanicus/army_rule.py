@@ -6,6 +6,7 @@ from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     RangeProfileKind,
@@ -1045,13 +1046,7 @@ def _expect_payload_string(
         raise GameLifecycleError(f"Doctrina Imperatives {key} drift.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Doctrina Imperatives {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Doctrina Imperatives {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tuple[str, ...]:

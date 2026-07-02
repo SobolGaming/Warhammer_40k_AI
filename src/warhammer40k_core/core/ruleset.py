@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
+
 
 class RulesetError(ValueError):
     """Raised when ruleset identity data violates CORE V2 invariants."""
@@ -65,10 +67,4 @@ def ruleset_edition_from_token(token: object) -> RulesetEdition:
         raise RulesetError(f"Unsupported RulesetEdition token: {token}.") from exc
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise RulesetError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise RulesetError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(RulesetError)

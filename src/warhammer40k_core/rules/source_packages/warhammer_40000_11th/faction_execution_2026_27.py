@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
 )
@@ -552,13 +553,7 @@ def _block_reason_from_token(token: object) -> Phase17FExecutionBlockReason:
         raise Phase17FFactionExecutionError(f"Unsupported Phase17F block reason: {token}.") from exc
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise Phase17FFactionExecutionError(f"Phase17F {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise Phase17FFactionExecutionError(f"Phase17F {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(Phase17FFactionExecutionError)
 
 
 def _validate_non_empty_text(field_name: str, value: object) -> str:

@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import cast
 
 from warhammer40k_core.core.ruleset_descriptor import battle_phase_kind_from_token
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.stratagems import (
@@ -123,10 +124,4 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
     )
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

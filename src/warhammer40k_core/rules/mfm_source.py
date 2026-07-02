@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from html.parser import HTMLParser
 from typing import Self, TypedDict
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.text_normalization import normalize_source_label
 
 
@@ -1736,13 +1737,11 @@ def _validate_identifier_tuple(field_name: str, values: tuple[str, ...]) -> tupl
     return tuple(validated)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise MfmSourceError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not _IDENTIFIER_RE.fullmatch(stripped):
-        raise MfmSourceError(f"{field_name} must be a slug identifier.")
-    return stripped
+_validate_identifier = IdentifierValidator(
+    MfmSourceError,
+    pattern=_IDENTIFIER_RE,
+    pattern_message="{field_name} must be a slug identifier.",
+)
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:

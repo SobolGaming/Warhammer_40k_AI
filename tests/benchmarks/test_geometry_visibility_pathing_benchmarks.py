@@ -6,6 +6,7 @@ from typing import Protocol, TypeVar
 import pytest
 
 from warhammer40k_core.core.attached_unit import AttachedUnit
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.unit import Unit, UnitMember
 from warhammer40k_core.core.unit_group import UnitGroup
 from warhammer40k_core.geometry import shapely_backend
@@ -280,7 +281,7 @@ def _path_query_for_group(
         unit_group=UnitGroup.single(_unit("movers", *model_ids)),
         spatial_index=index,
         witness=witness,
-        movement_envelope=MovementEnvelope(max_distance_inches=10.0),
+        movement_envelope=_movement_envelope(max_distance_inches=10.0),
         collision_set=CollisionSet.empty() if collision_set is None else collision_set,
     )
 
@@ -312,6 +313,22 @@ def _attached_group_path_query() -> PathQuery:
         unit_group=UnitGroup.attached(attached),
         spatial_index=SpatialIndex(models=models),
         witness=witness,
-        movement_envelope=MovementEnvelope(max_distance_inches=10.0),
+        movement_envelope=_movement_envelope(max_distance_inches=10.0),
         collision_set=CollisionSet.empty(),
+    )
+
+
+def _movement_envelope(*, max_distance_inches: float) -> MovementEnvelope:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    coherency_policy = descriptor.coherency_policy
+    assert coherency_policy.max_horizontal_inches is not None
+    assert coherency_policy.max_vertical_inches is not None
+    assert coherency_policy.required_neighbors_small_unit is not None
+    return MovementEnvelope(
+        max_distance_inches=max_distance_inches,
+        coherency_horizontal_inches=coherency_policy.max_horizontal_inches,
+        coherency_vertical_inches=coherency_policy.max_vertical_inches,
+        engagement_horizontal_inches=descriptor.engagement_policy.horizontal_inches,
+        engagement_vertical_inches=descriptor.engagement_policy.vertical_inches,
+        required_coherency_neighbors=coherency_policy.required_neighbors_small_unit,
     )

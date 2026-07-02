@@ -2,6 +2,7 @@
 # Regenerate with `uv run python tools/generate_faction_content_scaffold.py`.
 from __future__ import annotations
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import validate_json_value
@@ -384,10 +385,4 @@ def _canonical_keyword(value: str) -> str:
     return value.strip().replace("_", " ").replace("-", " ").upper()
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import D3RollResult, DiceExpression, DiceRollSpec
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_round_hooks import (
     SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE,
@@ -1065,13 +1066,7 @@ def _validate_game_state(state: object) -> None:
         raise GameLifecycleError("Harbingers of Dread requires GameState.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Harbingers of Dread {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Harbingers of Dread {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

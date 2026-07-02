@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -18,6 +19,7 @@ def unit_within_enemy_engagement_range(
     if type(state) is not GameState:
         raise GameLifecycleError("Engagement range check requires GameState.")
     owner = _owner_for_unit(tuple(state.army_definitions), unit_instance_id=unit_instance_id)
+    engagement_policy = state.runtime_ruleset_descriptor().engagement_policy
     unit_models = _unit_geometry_models(state=state, unit_instance_id=unit_instance_id)
     for army in state.army_definitions:
         if army.player_id == owner:
@@ -27,7 +29,12 @@ def unit_within_enemy_engagement_range(
                 state=state,
                 unit_instance_id=enemy_unit.unit_instance_id,
             )
-            if _any_models_within_engagement_range(unit_models, enemy_models):
+            if _any_models_within_engagement_range(
+                unit_models,
+                enemy_models,
+                horizontal_inches=engagement_policy.horizontal_inches,
+                vertical_inches=engagement_policy.vertical_inches,
+            ):
                 return True
     return False
 
@@ -59,10 +66,17 @@ def _unit_geometry_models(
 def _any_models_within_engagement_range(
     first_models: tuple[GeometryModel, ...],
     second_models: tuple[GeometryModel, ...],
+    *,
+    horizontal_inches: float,
+    vertical_inches: float,
 ) -> bool:
     for first_model in first_models:
         for second_model in second_models:
-            if first_model.is_within_engagement_range(second_model):
+            if first_model.is_within_engagement_range(
+                second_model,
+                horizontal_inches=horizontal_inches,
+                vertical_inches=vertical_inches,
+            ):
                 return True
     return False
 
@@ -75,10 +89,4 @@ def _owner_for_unit(armies: tuple[ArmyDefinition, ...], *, unit_instance_id: str
     raise GameLifecycleError("Unit owner is unknown.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

@@ -1470,6 +1470,53 @@ def test_phase17d_rule_execution_registry_and_binding_validators_fail_fast() -> 
         )
 
 
+def test_phase17d_rule_execution_registry_order_is_binding_id_deterministic() -> None:
+    effect_clause = _compiled("Add 1 to hit rolls for that unit.").rule_ir.clauses[0]
+    effect = effect_clause.effects[0]
+    target_clause = _compiled("Select one enemy unit.").rule_ir.clauses[0]
+    first_effect = RuleRuntimeBinding(
+        binding_id="phase17d:binding-a",
+        template_id=None,
+        effect_kinds=(RuleEffectKind.MODIFY_DICE_ROLL,),
+        handler=_noop_rule_handler,
+    )
+    second_effect = RuleRuntimeBinding(
+        binding_id="phase17d:binding-b",
+        template_id=None,
+        effect_kinds=(RuleEffectKind.MODIFY_DICE_ROLL,),
+        handler=_noop_rule_handler,
+    )
+    first_target = RuleRuntimeBinding(
+        binding_id="phase17d:target-binding-a",
+        template_id=None,
+        effect_kinds=(),
+        handler=_noop_rule_handler,
+        required_target_bindings=("unit_instance_ids",),
+    )
+    second_target = RuleRuntimeBinding(
+        binding_id="phase17d:target-binding-b",
+        template_id=None,
+        effect_kinds=(),
+        handler=_noop_rule_handler,
+        required_target_bindings=("unit_instance_ids",),
+    )
+
+    forward = RuleExecutionRegistry.from_bindings(
+        (first_effect, second_effect, first_target, second_target)
+    )
+    reverse = RuleExecutionRegistry.from_bindings(
+        (second_target, first_target, second_effect, first_effect)
+    )
+    forward_payload_bytes = json.dumps(forward.to_payload(), separators=(",", ":")).encode("utf-8")
+    reverse_payload_bytes = json.dumps(reverse.to_payload(), separators=(",", ":")).encode("utf-8")
+
+    assert forward.binding_for_effect(clause=effect_clause, effect=effect) == first_effect
+    assert reverse.binding_for_effect(clause=effect_clause, effect=effect) == first_effect
+    assert forward.binding_for_clause(target_clause) == first_target
+    assert reverse.binding_for_clause(target_clause) == first_target
+    assert forward_payload_bytes == reverse_payload_bytes
+
+
 def test_phase17d_rule_execution_result_and_binding_shape_validators_fail_fast() -> None:
     compiled = _compiled("Add 1 to hit rolls for that unit.")
     rule_ir = compiled.rule_ir

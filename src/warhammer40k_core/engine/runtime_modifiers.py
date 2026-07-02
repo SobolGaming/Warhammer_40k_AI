@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Self, cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.modifiers import RollModifier
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.saves import SaveOption
@@ -820,10 +821,4 @@ def _validate_int(field_name: str, value: object) -> int:
     return value
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

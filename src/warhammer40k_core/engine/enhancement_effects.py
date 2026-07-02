@@ -10,6 +10,7 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptorPayload,
 )
 from warhammer40k_core.core.modifiers import ModifierOperation
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     EnhancementAssignment,
@@ -664,13 +665,7 @@ def _validate_effect_bindings(value: object) -> tuple[EnhancementEffectBinding, 
     return tuple(sorted(bindings, key=lambda binding: binding.effect_id))
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Enhancement effect {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Enhancement effect {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 def _canonical_keyword(value: str) -> str:

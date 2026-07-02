@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     RangeProfileKind,
@@ -1084,10 +1085,4 @@ def _validate_game_state(state: object) -> None:
         raise GameLifecycleError("Blessings of Khorne requires GameState.")
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError(f"Blessings of Khorne {field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError(f"Blessings of Khorne {field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(GameLifecycleError)

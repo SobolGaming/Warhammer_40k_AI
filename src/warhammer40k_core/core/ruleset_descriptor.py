@@ -10,6 +10,7 @@ from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.objectives import ObjectiveAnchorKind
 from warhammer40k_core.core.ruleset import RulesetId, RulesetIdPayload
+from warhammer40k_core.core.validation import IdentifierValidator
 
 
 class RulesetDescriptorError(ValueError):
@@ -2809,13 +2810,7 @@ def _validate_source_date(value: object) -> str:
     return _validate_identifier("RulesetDescriptor source_date", value)
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise RulesetDescriptorError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise RulesetDescriptorError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(RulesetDescriptorError)
 
 
 def _validate_bool(field_name: str, value: object) -> None:

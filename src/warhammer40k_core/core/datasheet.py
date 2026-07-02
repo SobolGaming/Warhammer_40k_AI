@@ -17,6 +17,7 @@ from warhammer40k_core.core.content_scope import (
     CatalogContentScopeError,
     catalog_content_scope_from_token,
 )
+from warhammer40k_core.core.validation import IdentifierValidator
 
 
 class DatasheetCatalogError(ValueError):
@@ -1504,13 +1505,7 @@ def _characteristic_value_from_payload(payload: CharacteristicValuePayload) -> C
         raise DatasheetCatalogError("CharacteristicValue payload is invalid.") from exc
 
 
-def _validate_identifier(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise DatasheetCatalogError(f"{field_name} must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise DatasheetCatalogError(f"{field_name} must not be empty.")
-    return stripped
+_validate_identifier = IdentifierValidator(DatasheetCatalogError)
 
 
 def _validate_optional_identifier(field_name: str, value: object) -> str | None:
