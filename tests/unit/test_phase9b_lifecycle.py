@@ -15,7 +15,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     SetupSequenceDescriptor,
     SetupStepKind,
 )
-from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -348,6 +348,39 @@ def _complete_setup_through_gate(*, state: GameState, config: GameConfig) -> Non
         decisions=DecisionController(),
         config=config,
     )
+
+
+def test_game_state_replace_army_definitions_sorts_and_validates() -> None:
+    config = _config()
+    state = GameState.from_config(config)
+    armies = tuple(
+        muster_army(catalog=config.army_catalog, request=request)
+        for request in config.army_muster_requests
+    )
+
+    state.replace_army_definitions([armies[1], armies[0]])
+
+    assert [army.player_id for army in state.army_definitions] == ["player-a", "player-b"]
+    with pytest.raises(GameLifecycleError, match="ArmyDefinition values"):
+        state.replace_army_definitions(cast(list[ArmyDefinition], [object()]))
+
+
+def test_game_state_phase_state_mutators_clear_validated_state_fields() -> None:
+    state = GameState.from_config(_config())
+
+    state.replace_command_step_state(None)
+    state.replace_movement_phase_state(None)
+    state.replace_shooting_phase_state(None)
+    state.replace_out_of_phase_shooting_state(None)
+    state.replace_charge_phase_state(None)
+    state.replace_fight_phase_state(None)
+
+    assert state.command_step_state is None
+    assert state.movement_phase_state is None
+    assert state.shooting_phase_state is None
+    assert state.out_of_phase_shooting_state is None
+    assert state.charge_phase_state is None
+    assert state.fight_phase_state is None
 
 
 def test_new_game_starts_at_muster_armies_and_records_descriptor_hash() -> None:

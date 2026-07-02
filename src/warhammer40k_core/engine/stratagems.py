@@ -5274,8 +5274,8 @@ def _apply_rapid_ingress_placement(
         movement_state = state.movement_phase_state
         if movement_state is None:
             raise GameLifecycleError("Ingress arrival requires movement phase state.")
-        state.movement_phase_state = movement_state.with_end_movement_ingress_arrival(
-            arrived_state.unit_instance_id
+        state.replace_movement_phase_state(
+            movement_state.with_end_movement_ingress_arrival(arrived_state.unit_instance_id)
         )
     stratagem_use = _stratagem_use_from_proposal_context(proposal_request)
     event_payload = {
@@ -6529,8 +6529,8 @@ def _apply_counteroffensive_handler(
         },
     )
     state.record_persisting_effect(effect)
-    state.fight_phase_state = fight_state.with_activation(selection).with_active_activation(
-        selection
+    state.replace_fight_phase_state(
+        fight_state.with_activation(selection).with_active_activation(selection)
     )
     decisions.event_log.append(
         "counteroffensive_activation_selected",

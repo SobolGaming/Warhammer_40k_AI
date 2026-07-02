@@ -741,25 +741,31 @@ def _restore_returned_target(
         )
         if wounds_remaining is None:
             raise GameLifecycleError("Return-on-death fixed wounds are missing.")
-        state.army_definitions = list(
-            _army_definitions_with_model_wounds(
-                armies=tuple(state.army_definitions),
-                model_instance_id=model_id,
-                wounds_remaining=wounds_remaining,
+        state.replace_army_definitions(
+            list(
+                _army_definitions_with_model_wounds(
+                    armies=tuple(state.army_definitions),
+                    model_instance_id=model_id,
+                    wounds_remaining=wounds_remaining,
+                )
             )
         )
     else:
-        state.army_definitions = list(
-            _army_definitions_with_unit_full_health(
-                armies=tuple(state.army_definitions),
-                unit_instance_id=pending.destroyed_unit_instance_id,
+        state.replace_army_definitions(
+            list(
+                _army_definitions_with_unit_full_health(
+                    armies=tuple(state.army_definitions),
+                    unit_instance_id=pending.destroyed_unit_instance_id,
+                )
             )
         )
     if state.battlefield_state is None:
         raise GameLifecycleError("Return-on-death restore requires battlefield_state.")
-    state.battlefield_state = _battlefield_with_returned_placement(
-        battlefield=state.battlefield_state,
-        placement=placement,
+    state.replace_battlefield_state(
+        _battlefield_with_returned_placement(
+            battlefield=state.battlefield_state,
+            placement=placement,
+        )
     )
 
 

@@ -2634,7 +2634,7 @@ def _replace_model_wounds(
         updated_armies.append(replace(army, units=tuple(updated_units)))
     if not did_update:
         raise GameLifecycleError("Cannot update wounds for unknown model.")
-    state.army_definitions = updated_armies
+    state.replace_army_definitions(updated_armies)
 
 
 def _remove_destroyed_model(*, state: GameState, model_instance_id: str) -> None:
@@ -2642,7 +2642,7 @@ def _remove_destroyed_model(*, state: GameState, model_instance_id: str) -> None
     if battlefield is None:
         raise GameLifecycleError("Destroyed model removal requires battlefield_state.")
     try:
-        state.battlefield_state = battlefield.with_removed_models((model_instance_id,))
+        state.replace_battlefield_state(battlefield.with_removed_models((model_instance_id,)))
     except PlacementError as exc:
         raise GameLifecycleError("Destroyed model removal failed.") from exc
 

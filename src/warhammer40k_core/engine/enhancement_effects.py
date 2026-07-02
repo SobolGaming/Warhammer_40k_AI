@@ -441,7 +441,7 @@ def apply_enhancement_effects(
 
     if not event_payloads:
         return
-    state.army_definitions = sorted(updated_armies, key=lambda stored: stored.player_id)
+    state.replace_army_definitions(updated_armies)
     decisions.event_log.append(
         "enhancement_effects_applied",
         {

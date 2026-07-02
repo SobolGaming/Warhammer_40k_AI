@@ -2790,7 +2790,7 @@ class MovementPhaseHandler:
             request_id=result.request_id,
             result_id=result.result_id,
         )
-        state.movement_phase_state = movement_state.with_unit_selection(selection)
+        state.replace_movement_phase_state(movement_state.with_unit_selection(selection))
         decisions.event_log.append(
             "movement_unit_selected",
             {
@@ -2897,7 +2897,7 @@ def _complete_reinforcements_step(
     if end_movement_reaction_status is not None:
         return end_movement_reaction_status
     if not movement_state.reinforcements_completed:
-        state.movement_phase_state = movement_state.with_reinforcements_completed()
+        state.replace_movement_phase_state(movement_state.with_reinforcements_completed())
     decisions.event_log.append(
         "move_units_reserve_arrivals_completed",
         {
@@ -3866,7 +3866,7 @@ def _apply_reinforcement_unit_selection_decision(
     if reinforcement_decision == COMPLETE_REINFORCEMENTS_OPTION_ID:
         if _required_reinforcement_reserve_states(state=state):
             raise GameLifecycleError("Required reserve arrival cannot be skipped.")
-        state.movement_phase_state = movement_state.with_reinforcements_completed()
+        state.replace_movement_phase_state(movement_state.with_reinforcements_completed())
         decisions.event_log.append(
             "reserve_arrival_completion_selected",
             {
@@ -4242,8 +4242,8 @@ def _apply_valid_reinforcement_placement(
     movement_state = state.movement_phase_state
     if movement_state is None:
         raise GameLifecycleError("Reinforcement placement requires movement phase state.")
-    state.movement_phase_state = movement_state.with_reinforcement_arrival(
-        arrived_state.unit_instance_id
+    state.replace_movement_phase_state(
+        movement_state.with_reinforcement_arrival(arrived_state.unit_instance_id)
     )
     decisions.event_log.append(
         "reinforcement_unit_arrived",
@@ -4522,10 +4522,12 @@ def _apply_disembark_unit_selection_decision(
             raise GameLifecycleError("Disembark decline payload drift.")
         phase_body_status = "disembark_choices_declined"
         if transport_movement_status is TransportMovementStatus.NOT_MOVED:
-            state.movement_phase_state = movement_state.with_disembark_declined(declined_unit_ids)
+            state.replace_movement_phase_state(
+                movement_state.with_disembark_declined(declined_unit_ids)
+            )
         else:
-            state.movement_phase_state = movement_state.with_post_normal_move_disembark_declined(
-                declined_unit_ids
+            state.replace_movement_phase_state(
+                movement_state.with_post_normal_move_disembark_declined(declined_unit_ids)
             )
             phase_body_status = "post_normal_move_disembark_choices_declined"
         decisions.event_log.append(
@@ -5096,7 +5098,7 @@ def _apply_valid_disembark(
         movement_state = state.movement_phase_state
         if movement_state is None:
             raise GameLifecycleError("Post-move Disembark requires movement_phase_state.")
-        state.movement_phase_state = (
+        state.replace_movement_phase_state(
             movement_state.with_post_normal_move_disembark_counted_as_moved(
                 disembark.selection.unit_instance_id
             )
@@ -5151,8 +5153,10 @@ def _apply_valid_combat_disembark(
     movement_state = state.movement_phase_state
     if movement_state is None:
         raise GameLifecycleError("Combat Disembark requires movement_phase_state.")
-    state.movement_phase_state = movement_state.with_post_normal_move_disembark_counted_as_moved(
-        disembark.selection.unit_instance_id
+    state.replace_movement_phase_state(
+        movement_state.with_post_normal_move_disembark_counted_as_moved(
+            disembark.selection.unit_instance_id
+        )
     )
     decisions.event_log.append(
         "unit_disembarked",
@@ -5345,7 +5349,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             registry=advance_move_hooks,
         )
         if movement_grant_status is not None:
-            state.movement_phase_state = movement_state.with_pending_action(pending_action)
+            state.replace_movement_phase_state(movement_state.with_pending_action(pending_action))
             return movement_grant_status
         return _request_movement_proposal(
             state=state,
@@ -5376,7 +5380,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             registry=advance_move_hooks,
         )
         if advance_grant_status is not None:
-            state.movement_phase_state = movement_state.with_pending_action(pending_action)
+            state.replace_movement_phase_state(movement_state.with_pending_action(pending_action))
             return advance_grant_status
         return _resolve_pending_advance_action(
             state=state,
@@ -5410,7 +5414,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             stratagem_index=stratagem_index,
         )
         if fall_back_stratagem_status is not None:
-            state.movement_phase_state = movement_state.with_pending_action(pending_action)
+            state.replace_movement_phase_state(movement_state.with_pending_action(pending_action))
             return fall_back_stratagem_status
         movement_grant_status = _request_advance_move_grant_decision_if_available(
             state=state,
@@ -5420,7 +5424,7 @@ def _apply_movement_action_decision(  # noqa: RET503
             registry=advance_move_hooks,
         )
         if movement_grant_status is not None:
-            state.movement_phase_state = movement_state.with_pending_action(pending_action)
+            state.replace_movement_phase_state(movement_state.with_pending_action(pending_action))
             return movement_grant_status
         return _request_movement_proposal(
             state=state,
@@ -5626,7 +5630,7 @@ def _apply_advance_move_grant_decision(
             grant=grant,
         )
     )
-    state.movement_phase_state = movement_state.without_pending_action()
+    state.replace_movement_phase_state(movement_state.without_pending_action())
     decisions.event_log.append(
         "movement_action_grant_decision_resolved",
         {
@@ -7585,9 +7589,11 @@ def _complete_movement_activation_with_record_ids(
         result_id=result_id,
         displacement_kind=displacement_kind,
     )
-    state.movement_phase_state = movement_state.with_activation_complete(
-        active_selection.unit_instance_id,
-        maximum_model_distance_inches=_maximum_model_distance_inches_from_witness(witness),
+    state.replace_movement_phase_state(
+        movement_state.with_activation_complete(
+            active_selection.unit_instance_id,
+            maximum_model_distance_inches=_maximum_model_distance_inches_from_witness(witness),
+        )
     )
     event_payload: dict[str, JsonValue] = {
         "game_id": state.game_id,
@@ -9395,10 +9401,11 @@ def _ensure_movement_phase_state(
     ):
         return current
 
-    state.movement_phase_state = MovementPhaseState(
+    movement_state = MovementPhaseState(
         battle_round=state.battle_round,
         active_player_id=active_player_id,
     )
+    state.replace_movement_phase_state(movement_state)
     decisions.event_log.append(
         "movement_phase_entered",
         {
@@ -9408,7 +9415,7 @@ def _ensure_movement_phase_state(
             "phase": BattlePhase.MOVEMENT.value,
         },
     )
-    return state.movement_phase_state
+    return movement_state
 
 
 def _validate_movement_phase_state(state: GameState) -> None:

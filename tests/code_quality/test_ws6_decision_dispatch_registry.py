@@ -23,8 +23,9 @@ ADAPTER_CONTRACT = ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
 
 _NESTED_DECISION_TYPE_ALLOWLIST = {
     WEAPON_ABILITY_SELECTION_DECISION_TYPE: (
-        "Nested under shooting declaration required_weapon_ability_selections; keep the token for "
-        "future Necrons Tesseract Vault DAMAGED profile support."
+        "Nested allowlist entry for duplicate weapon-ability descriptor disambiguation in "
+        "shooting declarations. Tesseract Vault C'tan Power weapon selection is a separate "
+        "top-level decision family using DamagedEffectKind.SHOOTING_WEAPON_SELECTION_LIMIT."
     ),
 }
 
@@ -47,7 +48,7 @@ def test_nested_weapon_ability_allowlist_is_documented_in_adapter_contract() -> 
 
     assert WEAPON_ABILITY_SELECTION_DECISION_TYPE in contract
     assert "nested-decision allowlist" in contract
-    assert "Tesseract Vault" in contract
+    assert "DamagedEffectKind.SHOOTING_WEAPON_SELECTION_LIMIT" in contract
 
 
 def test_decision_type_constant_scan_includes_annotated_assignments() -> None:

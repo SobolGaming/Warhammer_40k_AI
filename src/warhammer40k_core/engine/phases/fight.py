@@ -347,7 +347,7 @@ class FightPhaseHandler:
             decisions=decisions,
             policy=policy,
         )
-        state.fight_phase_state = fight_state
+        state.replace_fight_phase_state(fight_state)
         for _iteration in range(64):
             current = _require_fight_state(state)
             if current.phase_complete:
@@ -513,20 +513,21 @@ def _advance_fight_phase_body(
             policy=policy,
         )
         if selected_context.fight_state.phase_complete:
-            state.fight_phase_state = selected_context.fight_state.with_current_step(
+            updated_fight_state = selected_context.fight_state.with_current_step(
                 current_step=FightPhaseStepKind.CONSOLIDATE,
                 policy=policy,
             )
+            state.replace_fight_phase_state(updated_fight_state)
             decisions.event_log.append(
                 "fight_step_completed",
                 _fight_phase_status_payload(
                     state=state,
-                    fight_state=state.fight_phase_state,
+                    fight_state=updated_fight_state,
                     phase_body_status="fight_step_completed",
                 ),
             )
             return None
-        state.fight_phase_state = selected_context.fight_state
+        state.replace_fight_phase_state(selected_context.fight_state)
         stratagem_status = _request_active_fight_phase_stratagem_if_available(
             handler=handler,
             state=state,
@@ -552,7 +553,7 @@ def _advance_fight_phase_body(
             step=FightPhaseStepKind.CONSOLIDATE,
         )
     if fight_state.current_step is FightPhaseStepKind.END:
-        state.fight_phase_state = fight_state.with_phase_complete()
+        state.replace_fight_phase_state(fight_state.with_phase_complete())
         return None
     raise GameLifecycleError("Fight phase body has unsupported current_step.")
 
@@ -581,7 +582,7 @@ def _advance_fight_attack_sequence(
         attack_sequence=attack_sequence,
         allocated_model_ids_this_phase=allocated_model_ids,
     )
-    state.fight_phase_state = updated_state
+    state.replace_fight_phase_state(updated_state)
     if status is not None:
         return status
     activation = updated_state.active_activation
@@ -755,7 +756,7 @@ def _complete_active_fight_activation(
     activation: FightActivationSelection,
 ) -> LifecycleStatus | None:
     fight_state = _require_fight_state(state)
-    state.fight_phase_state = fight_state.with_active_activation(None)
+    state.replace_fight_phase_state(fight_state.with_active_activation(None))
     event = decisions.event_log.append(
         "unit_has_fought",
         validate_json_value(
@@ -914,35 +915,39 @@ def _advance_fight_movement_step(
             current_player_id=movement_state.next_player_id,
         )
         updated_movement_state = movement_state.with_completed_player(next_player_id=next_player_id)
-        state.fight_phase_state = _with_movement_step_state(
-            fight_state=fight_state,
-            movement_state=updated_movement_state,
+        state.replace_fight_phase_state(
+            _with_movement_step_state(
+                fight_state=fight_state,
+                movement_state=updated_movement_state,
+            )
         )
         return None
     if step is FightPhaseStepKind.PILE_IN:
-        state.fight_phase_state = fight_state.with_current_step(
+        updated_fight_state = fight_state.with_current_step(
             current_step=FightPhaseStepKind.FIGHT,
             policy=policy,
         )
+        state.replace_fight_phase_state(updated_fight_state)
         decisions.event_log.append(
             "pile_in_step_completed",
             _fight_phase_status_payload(
                 state=state,
-                fight_state=state.fight_phase_state,
+                fight_state=updated_fight_state,
                 phase_body_status="pile_in_step_completed",
             ),
         )
         return None
     if step is FightPhaseStepKind.CONSOLIDATE:
-        state.fight_phase_state = fight_state.with_current_step(
+        updated_fight_state = fight_state.with_current_step(
             current_step=FightPhaseStepKind.END,
             policy=policy,
         )
+        state.replace_fight_phase_state(updated_fight_state)
         decisions.event_log.append(
             "consolidate_step_completed",
             _fight_phase_status_payload(
                 state=state,
-                fight_state=state.fight_phase_state,
+                fight_state=updated_fight_state,
                 phase_body_status="consolidate_step_completed",
             ),
         )
@@ -1384,17 +1389,21 @@ def _apply_fight_movement_proposal(
         activation = fight_state.active_activation
         if activation is None:
             raise GameLifecycleError("Overrun pile-in application requires active activation.")
-        state.fight_phase_state = fight_state.with_overrun_pile_in_completed(
-            activation_result_id=activation.result_id,
+        state.replace_fight_phase_state(
+            fight_state.with_overrun_pile_in_completed(
+                activation_result_id=activation.result_id,
+            )
         )
     else:
         movement_state = _movement_step_state(
             fight_state=fight_state,
             step=_fight_step_for_proposal_kind(proposal.proposal_kind),
         ).with_completed_unit(unit_instance_id=proposal.unit_instance_id)
-        state.fight_phase_state = _with_movement_step_state(
-            fight_state=fight_state,
-            movement_state=movement_state,
+        state.replace_fight_phase_state(
+            _with_movement_step_state(
+                fight_state=fight_state,
+                movement_state=movement_state,
+            )
         )
     decisions.event_log.append(
         "fight_movement_completed",
@@ -1449,9 +1458,11 @@ def _apply_melee_declaration_decision(
         result_id=result.result_id,
     )
     fight_state = _require_fight_state(state)
-    state.fight_phase_state = fight_state.with_attack_sequence_update(
-        attack_sequence=attack_sequence,
-        allocated_model_ids_this_phase=fight_state.allocated_model_ids_this_phase,
+    state.replace_fight_phase_state(
+        fight_state.with_attack_sequence_update(
+            attack_sequence=attack_sequence,
+            allocated_model_ids_this_phase=fight_state.allocated_model_ids_this_phase,
+        )
     )
     decisions.event_log.append(
         "melee_declaration_accepted",
@@ -1496,9 +1507,11 @@ def _apply_fight_attack_sequence_selection_decision(
         )
     else:
         raise GameLifecycleError("Unsupported fight attack sequence selection decision type.")
-    state.fight_phase_state = fight_state.with_attack_sequence_update(
-        attack_sequence=attack_sequence,
-        allocated_model_ids_this_phase=fight_state.allocated_model_ids_this_phase,
+    state.replace_fight_phase_state(
+        fight_state.with_attack_sequence_update(
+            attack_sequence=attack_sequence,
+            allocated_model_ids_this_phase=fight_state.allocated_model_ids_this_phase,
+        )
     )
 
 
@@ -1590,9 +1603,11 @@ def _apply_fight_attack_sequence_decision(
         )
     else:
         raise GameLifecycleError("Unsupported fight attack sequence decision type.")
-    state.fight_phase_state = fight_state.with_attack_sequence_update(
-        attack_sequence=updated_sequence,
-        allocated_model_ids_this_phase=allocated_model_ids,
+    state.replace_fight_phase_state(
+        fight_state.with_attack_sequence_update(
+            attack_sequence=updated_sequence,
+            allocated_model_ids_this_phase=allocated_model_ids,
+        )
     )
     return status
 
@@ -2459,7 +2474,7 @@ def _ensure_fight_phase_state(
         ),
         fights_first_registry=registry,
     )
-    state.fight_phase_state = started
+    state.replace_fight_phase_state(started)
     decisions.event_log.append(
         "fight_phase_started",
         _fight_phase_status_payload(
@@ -2837,8 +2852,13 @@ def _apply_fight_activation_decision(
             request_id=result.request_id,
             result_id=result.result_id,
         )
-        state.fight_phase_state = fight_state.with_eligible_pass(eligible_pass).with_next_player(
-            _next_player_id(player_ids=state.player_ids, current_player_id=eligible_pass.player_id)
+        state.replace_fight_phase_state(
+            fight_state.with_eligible_pass(eligible_pass).with_next_player(
+                _next_player_id(
+                    player_ids=state.player_ids,
+                    current_player_id=eligible_pass.player_id,
+                )
+            )
         )
         decisions.event_log.append(
             "eligible_to_fight_pass_recorded",
@@ -2866,7 +2886,7 @@ def _apply_fight_activation_decision(
         )
         .with_active_activation(selection)
     )
-    state.fight_phase_state = activated_state
+    state.replace_fight_phase_state(activated_state)
     decisions.event_log.append(
         "fight_activation_selected",
         validate_json_value(
@@ -3389,9 +3409,11 @@ def _apply_fight_interrupt_decision(
     fight_state = _require_fight_state(state)
     interrupt = fight_interrupt_request_from_payload(result.payload)
     if result.selected_option_id == DECLINE_FIGHT_INTERRUPT_OPTION_ID:
-        state.fight_phase_state = fight_state.with_resolved_interrupt(
-            interrupt_id=interrupt.interrupt_id,
-            source_effect_id=interrupt.source_effect_id,
+        state.replace_fight_phase_state(
+            fight_state.with_resolved_interrupt(
+                interrupt_id=interrupt.interrupt_id,
+                source_effect_id=interrupt.source_effect_id,
+            )
         )
         decisions.event_log.append(
             "fight_interrupt_declined",
@@ -3413,7 +3435,7 @@ def _apply_fight_interrupt_decision(
         result_id=result.result_id,
         interrupt_id=interrupt.interrupt_id,
     )
-    state.fight_phase_state = (
+    state.replace_fight_phase_state(
         fight_state.with_activation(selection)
         .with_resolved_interrupt(
             interrupt_id=interrupt.interrupt_id,
