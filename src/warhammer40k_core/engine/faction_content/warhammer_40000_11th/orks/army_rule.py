@@ -516,10 +516,7 @@ def _unit_has_waaagh(unit: UnitInstance) -> bool:
         raise GameLifecycleError("Waaagh! requires a UnitInstance.")
     if _unit_has_keyword_token(unit.faction_keywords, ORKS_FACTION_KEYWORD):
         return True
-    return any(
-        _normalise_rule_token(ability.name) == _normalise_rule_token("Waaagh!")
-        for ability in unit.datasheet_abilities
-    )
+    return any(ability.source_id == SOURCE_RULE_ID for ability in unit.datasheet_abilities)
 
 
 def _orks_armies(state: GameState) -> tuple[ArmyDefinition, ...]:
@@ -588,12 +585,9 @@ def _source_ids_with_waaagh(source_ids: tuple[str, ...]) -> tuple[str, ...]:
 
 
 def _unit_has_keyword_token(values: tuple[str, ...], expected: str) -> bool:
-    normalised_expected = _normalise_rule_token(expected)
-    return any(_normalise_rule_token(value) == normalised_expected for value in values)
-
-
-def _normalise_rule_token(value: str) -> str:
-    return "".join(character for character in value.upper() if character.isalnum())
+    if type(values) is not tuple:
+        raise GameLifecycleError("Waaagh! keyword values must be a tuple.")
+    return _validate_identifier("keyword", expected) in values
 
 
 def _next_own_turn_battle_round(state: GameState) -> int:

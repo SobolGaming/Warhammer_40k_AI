@@ -45,7 +45,6 @@ WEAPON_PROFILE_MODIFIER_ID = f"{HOOK_ID}:weapon-profile"
 SOURCE_RULE_ID = "phase17f:phase17e:tau-empire:army-rule"
 TAU_EMPIRE_FACTION_ID = "tau-empire"
 TAU_EMPIRE_FACTION_KEYWORD = "T'AU EMPIRE"
-FOR_THE_GREATER_GOOD_ABILITY_NAME = "For the Greater Good"
 MARKERLIGHT_KEYWORD = "MARKERLIGHT"
 FORTIFICATION_KEYWORD = "FORTIFICATION"
 FOR_THE_GREATER_GOOD_EFFECT_KIND = "tau_empire_for_the_greater_good_spotted"
@@ -739,17 +738,18 @@ def _rules_unit_has_for_the_greater_good(rules_unit: RulesUnitView) -> bool:
 def _unit_has_for_the_greater_good(unit: UnitInstance) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("For the Greater Good ability check requires UnitInstance.")
-    return _unit_has_named_ability(unit, FOR_THE_GREATER_GOOD_ABILITY_NAME) or _unit_has_keyword(
+    return _unit_has_rule_source(unit, SOURCE_RULE_ID) or _unit_has_keyword(
         unit.faction_keywords,
         TAU_EMPIRE_FACTION_KEYWORD,
     )
 
 
-def _unit_has_named_ability(unit: UnitInstance, ability_name: str) -> bool:
-    requested_name = _normalise_rule_token(_validate_identifier("ability_name", ability_name))
+def _unit_has_rule_source(unit: UnitInstance, source_rule_id: str) -> bool:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("For the Greater Good ability check requires UnitInstance.")
+    requested_source_rule_id = _validate_identifier("source_rule_id", source_rule_id)
     return any(
-        _normalise_rule_token(ability.name) == requested_name
-        for ability in unit.datasheet_abilities
+        ability.source_id == requested_source_rule_id for ability in unit.datasheet_abilities
     )
 
 
@@ -762,8 +762,7 @@ def _rules_unit_has_keyword(rules_unit: RulesUnitView, keyword: str) -> bool:
 def _unit_has_keyword(keywords: tuple[str, ...], keyword: str) -> bool:
     if type(keywords) is not tuple:
         raise GameLifecycleError("For the Greater Good keyword list must be a tuple.")
-    requested = _normalise_rule_token(_validate_identifier("keyword", keyword))
-    return any(_normalise_rule_token(stored) == requested for stored in keywords)
+    return _validate_identifier("keyword", keyword) in keywords
 
 
 def _tau_empire_army_for_player(
@@ -862,9 +861,3 @@ def _validate_non_negative_int(field_name: str, value: object) -> int:
     if type(value) is not int or value < 0:
         raise GameLifecycleError(f"For the Greater Good {field_name} must be non-negative int.")
     return value
-
-
-def _normalise_rule_token(value: str) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError("For the Greater Good token must be a string.")
-    return "".join(character for character in value.upper() if character.isalnum())

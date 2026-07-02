@@ -148,7 +148,7 @@
       "wounds_remaining": 2
     },
     "projection_schema": "game-view-v3-phase18a",
-    "projection_state_hash": "7d14e58dcace7d0ed788ad823ca46e058a44e396ca24ae404a6ddef1f62cff00",
+    "projection_state_hash": "00577acd3a55b977701fd30e69524cfb676293310ed7cccd0d94faacd82ff384",
     "rules_catalog": {
       "catalog_id": "phase9a-canonical",
       "projection_schema": "rules-catalog-view-v2",
@@ -157,17 +157,17 @@
         "game": "warhammer_40000",
         "version": "core-v2-phase9a"
       },
-      "source_hash": "283f63d96d2cbd59d076be5ef0928196a7dbbe2517aa3fca04c71deeb8e657ca",
+      "source_hash": "ac418e15c6ffd7cc300656d6c4a26a1fe83b97a216fd3df4fb56aae2a313751f",
       "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
     },
     "unit_display": {
       "datasheet_id": "core-intercessor-like-infantry",
       "faction_keywords": [
-        "CORE Marines"
+        "CORE MARINES"
       ],
       "keywords": [
-        "Battleline",
-        "Infantry"
+        "BATTLELINE",
+        "INFANTRY"
       ],
       "model_instance_ids": [
         "army-alpha:intercessor-unit-1:core-intercessor-like:001",
@@ -198,11 +198,11 @@
       "datasheet_id": "core-intercessor-like-infantry",
       "display_name": "CORE Intercessor-like Infantry",
       "faction_keywords": [
-        "CORE Marines"
+        "CORE MARINES"
       ],
       "keywords": [
-        "Battleline",
-        "Infantry"
+        "BATTLELINE",
+        "INFANTRY"
       ],
       "model_profile_ids": [
         "core-intercessor-like"
@@ -324,7 +324,7 @@
       ]
     },
     "projection_schema": "rules-catalog-view-v2",
-    "source_hash": "283f63d96d2cbd59d076be5ef0928196a7dbbe2517aa3fca04c71deeb8e657ca",
+    "source_hash": "ac418e15c6ffd7cc300656d6c4a26a1fe83b97a216fd3df4fb56aae2a313751f",
     "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
   }
 }

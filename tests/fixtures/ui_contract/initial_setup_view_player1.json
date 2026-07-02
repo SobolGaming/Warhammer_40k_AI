@@ -1486,7 +1486,7 @@
     "player-b"
   ],
   "projection_schema": "game-view-v3-phase18a",
-  "projection_state_hash": "0d2dcee5dd2022266568829b5f6a4651ebf897a2343e890a5c2bad883c92b3f7",
+  "projection_state_hash": "1ef0c9977ab12fe89a9309a4b6f920282915e8d6f72e5e8f51e5f3205e170a0b",
   "public_command_point_ledgers": [
     {
       "command_points": 0,
@@ -1522,7 +1522,7 @@
       "game": "warhammer_40000",
       "version": "core-v2-phase9a"
     },
-    "source_hash": "283f63d96d2cbd59d076be5ef0928196a7dbbe2517aa3fca04c71deeb8e657ca",
+    "source_hash": "ac418e15c6ffd7cc300656d6c4a26a1fe83b97a216fd3df4fb56aae2a313751f",
     "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
   },
   "stage": "setup",
@@ -1530,11 +1530,11 @@
     "army-alpha:intercessor-unit-1": {
       "datasheet_id": "core-intercessor-like-infantry",
       "faction_keywords": [
-        "CORE Marines"
+        "CORE MARINES"
       ],
       "keywords": [
-        "Battleline",
-        "Infantry"
+        "BATTLELINE",
+        "INFANTRY"
       ],
       "model_instance_ids": [
         "army-alpha:intercessor-unit-1:core-intercessor-like:001",

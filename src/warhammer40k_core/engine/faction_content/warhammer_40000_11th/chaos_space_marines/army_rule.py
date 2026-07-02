@@ -75,7 +75,6 @@ CONTRIBUTION_ID = "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts
 SOURCE_RULE_ID = "phase17f:phase17e:chaos-space-marines:army-rule"
 HOOK_ID = "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts"
 DARK_PACT_EFFECT_KIND = "chaos_space_marines_dark_pact"
-DARK_PACTS_ABILITY_NAME = "Dark Pacts"
 DARK_PACT_LEADERSHIP_ROLL_TYPE = "chaos_space_marines.dark_pact_leadership_test"
 DARK_PACT_MORTAL_WOUNDS_ROLL_TYPE = "chaos_space_marines.dark_pact_mortal_wounds"
 DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND = "chaos_space_marines_dark_pacts"
@@ -671,8 +670,7 @@ def _unit_has_dark_pacts(unit: UnitInstance) -> bool:
     ):
         return True
     return any(
-        _canonical_rule_token(ability.name) == _canonical_rule_token(DARK_PACTS_ABILITY_NAME)
-        for ability in unit.datasheet_abilities
+        ability.source_id in DARK_PACT_SOURCE_RULE_IDS for ability in unit.datasheet_abilities
     )
 
 
@@ -884,10 +882,6 @@ def _battle_phase_from_token(token: object) -> BattlePhase:
         return BattlePhase(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported Dark Pacts phase: {token}.") from exc
-
-
-def _canonical_rule_token(value: str) -> str:
-    return " ".join(_validate_identifier("rule token", value).upper().split())
 
 
 def _json_object(field_name: str, value: JsonValue) -> dict[str, object]:

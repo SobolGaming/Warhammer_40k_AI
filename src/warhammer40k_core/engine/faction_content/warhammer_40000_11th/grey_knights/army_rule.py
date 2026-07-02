@@ -323,8 +323,6 @@ def _unit_has_gate_of_infinity(unit: UnitInstance) -> bool:
     for ability in unit.datasheet_abilities:
         if ability.ability_id == GATE_OF_INFINITY_ABILITY_ID:
             return True
-        if ability.name in {GATE_OF_INFINITY_ABILITY_NAME, TELEPORT_ASSAULT_ABILITY_NAME}:
-            return True
     return False
 
 

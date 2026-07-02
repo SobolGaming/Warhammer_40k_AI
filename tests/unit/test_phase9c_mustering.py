@@ -1596,7 +1596,7 @@ def test_rules_unit_view_resolves_physical_and_mustered_attached_units() -> None
         support.own_models[0].model_instance_id,
     )
     assert "ATTACHED_UNIT" in attached_view.keywords
-    assert "CORE Marines" in attached_view.faction_keywords
+    assert "CORE MARINES" in attached_view.faction_keywords
     assert physical_view.unit_instance_id == loose_unit.unit_instance_id
     assert physical_view.attached_unit is None
     assert physical_view.bodyguard_model_ids(physical_view.alive_models()) == ()
@@ -2802,10 +2802,10 @@ def test_phase17g_cult_of_dark_gods_allows_cult_units_and_replaces_faction_keywo
     }
 
     assert army.roster_legality_report.is_legal
-    assert faction_keywords_by_datasheet["phase17g-khorne-berzerkers"] == ("Heretic Astartes",)
-    assert faction_keywords_by_datasheet["phase17g-rubric-marines"] == ("Heretic Astartes",)
-    assert faction_keywords_by_datasheet["phase17g-plague-marines"] == ("Heretic Astartes",)
-    assert faction_keywords_by_datasheet["phase17g-noise-marines"] == ("Heretic Astartes",)
+    assert faction_keywords_by_datasheet["phase17g-khorne-berzerkers"] == ("HERETIC ASTARTES",)
+    assert faction_keywords_by_datasheet["phase17g-rubric-marines"] == ("HERETIC ASTARTES",)
+    assert faction_keywords_by_datasheet["phase17g-plague-marines"] == ("HERETIC ASTARTES",)
+    assert faction_keywords_by_datasheet["phase17g-noise-marines"] == ("HERETIC ASTARTES",)
 
 
 @pytest.mark.parametrize(

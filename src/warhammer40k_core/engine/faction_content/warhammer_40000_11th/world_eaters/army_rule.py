@@ -799,10 +799,7 @@ def _unit_has_blessings_of_khorne(unit: UnitInstance) -> bool:
         raise GameLifecycleError("Blessings of Khorne requires a UnitInstance.")
     if _unit_has_keyword_token(unit.faction_keywords, WORLD_EATERS_FACTION_KEYWORD):
         return True
-    return any(
-        _normalise_rule_token(ability.name) == _normalise_rule_token("Blessings of Khorne")
-        for ability in unit.datasheet_abilities
-    )
+    return any(ability.source_id == SOURCE_RULE_ID for ability in unit.datasheet_abilities)
 
 
 def _target_unit_has_keyword(state: GameState, *, unit_instance_id: str, keyword: str) -> bool:
@@ -811,8 +808,9 @@ def _target_unit_has_keyword(state: GameState, *, unit_instance_id: str, keyword
 
 
 def _unit_has_keyword_token(values: tuple[str, ...], expected: str) -> bool:
-    normalised_expected = _normalise_rule_token(expected)
-    return any(_normalise_rule_token(value) == normalised_expected for value in values)
+    if type(values) is not tuple:
+        raise GameLifecycleError("Blessings of Khorne keyword values must be a tuple.")
+    return _validate_identifier("keyword", expected) in values
 
 
 def _world_eaters_armies(state: GameState) -> tuple[ArmyDefinition, ...]:
@@ -977,12 +975,7 @@ def _model_was_live_at_event(
 
 
 def _is_icon_of_khorne_wargear_id(wargear_id: str) -> bool:
-    token = _normalise_rule_token(wargear_id)
-    return "ICON" in token and "KHORNE" in token
-
-
-def _normalise_rule_token(value: str) -> str:
-    return "".join(character for character in value.upper() if character.isalnum())
+    return _validate_identifier("wargear_id", wargear_id).endswith("icon-of-khorne")
 
 
 def _validate_dice_values(values: tuple[int, ...]) -> tuple[int, ...]:

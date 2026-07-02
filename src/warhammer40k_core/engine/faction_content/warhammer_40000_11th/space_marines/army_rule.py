@@ -408,10 +408,8 @@ def _unit_owner_and_instance_by_id(
 def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Oath of Moment keyword lookup requires UnitInstance.")
-    requested_keyword = _canonical_keyword(keyword)
-    return requested_keyword in {
-        _canonical_keyword(stored_keyword) for stored_keyword in unit.faction_keywords
-    }
+    requested_keyword = _validate_identifier("keyword", keyword)
+    return requested_keyword in unit.faction_keywords
 
 
 def _army_has_any_faction_keyword(
@@ -421,13 +419,8 @@ def _army_has_any_faction_keyword(
 ) -> bool:
     if type(army) is not ArmyDefinition:
         raise GameLifecycleError("Oath of Moment army keyword lookup requires ArmyDefinition.")
-    requested_keywords = {_canonical_keyword(keyword) for keyword in keywords}
-    return any(
-        requested_keywords.intersection(
-            {_canonical_keyword(stored_keyword) for stored_keyword in unit.faction_keywords}
-        )
-        for unit in army.units
-    )
+    requested_keywords = {_validate_identifier("keyword", keyword) for keyword in keywords}
+    return any(requested_keywords.intersection(unit.faction_keywords) for unit in army.units)
 
 
 def _next_own_turn_battle_round(state: object) -> int:
@@ -454,7 +447,3 @@ def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _canonical_keyword(keyword: str) -> str:
-    return _validate_identifier("keyword", keyword).upper().replace("_", " ")

@@ -78,9 +78,6 @@ from .bondsman import (
     ARMIGER_KEYWORD as ARMIGER_KEYWORD,
 )
 from .bondsman import (
-    BONDSMAN_ABILITY_NAME as BONDSMAN_ABILITY_NAME,
-)
-from .bondsman import (
     BONDSMAN_APPLIED_EVENT as BONDSMAN_APPLIED_EVENT,
 )
 from .bondsman import (
@@ -141,7 +138,6 @@ RULE_UPDATE_SOURCE = (
 IMPERIAL_KNIGHTS_FACTION_ID = "imperial-knights"
 IMPERIAL_KNIGHTS_FACTION_KEYWORD = "IMPERIAL KNIGHTS"
 CHARACTER_KEYWORD = "CHARACTER"
-CODE_CHIVALRIC_ABILITY_NAME = "Code Chivalric"
 CODE_CHIVALRIC_STATE_KIND = "imperial_knights_code_chivalric_oath"
 CODE_CHIVALRIC_FULFILLED_STATE_KIND = "imperial_knights_code_chivalric_fulfilled"
 CODE_CHIVALRIC_SELECTION_KIND = "imperial_knights_code_chivalric_oath"
@@ -1386,17 +1382,15 @@ def _unit_has_code_chivalric(unit: UnitInstance) -> bool:
         raise GameLifecycleError("Code Chivalric unit check requires UnitInstance.")
     if _unit_has_faction_keyword(unit, IMPERIAL_KNIGHTS_FACTION_KEYWORD):
         return True
-    return any(ability.name == CODE_CHIVALRIC_ABILITY_NAME for ability in unit.datasheet_abilities)
+    return any(ability.source_id == SOURCE_RULE_ID for ability in unit.datasheet_abilities)
 
 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
-    requested_keyword = _canonical_keyword(keyword)
-    return requested_keyword in {_canonical_keyword(item) for item in unit.keywords}
+    return _validate_identifier("keyword", keyword) in unit.keywords
 
 
 def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
-    requested_keyword = _canonical_keyword(keyword)
-    return requested_keyword in {_canonical_keyword(item) for item in unit.faction_keywords}
+    return _validate_identifier("keyword", keyword) in unit.faction_keywords
 
 
 def _deed_from_d6(value: int) -> CodeChivalricDeed:
@@ -1509,7 +1503,3 @@ def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _canonical_keyword(value: str) -> str:
-    return _validate_identifier("keyword", value).upper().replace("_", " ")

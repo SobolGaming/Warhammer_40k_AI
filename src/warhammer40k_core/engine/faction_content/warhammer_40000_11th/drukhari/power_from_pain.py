@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import re
 from typing import cast
 
+from warhammer40k_core.core.datasheet import DatasheetAbilityDescriptor
 from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -26,9 +26,9 @@ POWER_FROM_PAIN_EMPOWERED_EFFECT_KIND = "drukhari_power_from_pain_empowered"
 POWER_FROM_PAIN_SPEND_REASON = "drukhari_power_from_pain_empowerment"
 LITHE_AGILITY_ABILITY_KEY = "lithe_agility"
 HATRED_ETERNAL_ABILITY_KEY = "hatred_eternal"
-_PAIN_ABILITY_NAME_TO_KEY = {
-    "lithe agility": LITHE_AGILITY_ABILITY_KEY,
-    "hatred eternal": HATRED_ETERNAL_ABILITY_KEY,
+_PAIN_ABILITY_TOKEN_TO_KEY = {
+    LITHE_AGILITY_ABILITY_KEY: LITHE_AGILITY_ABILITY_KEY,
+    HATRED_ETERNAL_ABILITY_KEY: HATRED_ETERNAL_ABILITY_KEY,
 }
 
 
@@ -213,7 +213,7 @@ def drukhari_rules_unit_can_empower_for_ability(
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=requested_unit_id)
     if rules_unit.owner_player_id != requested_player_id:
         raise GameLifecycleError("Power from Pain unit is not owned by the acting player.")
-    if "DRUKHARI" not in {_canonical_keyword(keyword) for keyword in rules_unit.faction_keywords}:
+    if "DRUKHARI" not in rules_unit.faction_keywords:
         return False
     if requested_ability not in pain_ability_keys_for_rules_unit(
         state,
@@ -245,7 +245,7 @@ def pain_ability_keys_for_rules_unit(
     seen: set[str] = set()
     for component in rules_unit.components:
         for ability in component.unit.datasheet_abilities:
-            key = _pain_ability_key_for_name(ability.name)
+            key = _pain_ability_key_for_descriptor(ability)
             if key is None or key in seen:
                 continue
             seen.add(key)
@@ -349,20 +349,14 @@ def _validate_pain_ability_key(value: object) -> str:
     return key
 
 
-def _pain_ability_key_for_name(name: str) -> str | None:
-    normalized = _normalize_pain_ability_name(name)
-    if not normalized:
-        return None
-    return _PAIN_ABILITY_NAME_TO_KEY.get(normalized)
-
-
-def _normalize_pain_ability_name(name: object) -> str:
-    if type(name) is not str:
-        raise GameLifecycleError("Power from Pain ability name must be a string.")
-    normalized = re.sub(r"\(pain\)", "", name.strip().lower())
-    normalized = re.sub(r"[^a-z0-9]+", " ", normalized)
-    return re.sub(r"\s+", " ", normalized).strip()
-
-
-def _canonical_keyword(keyword: str) -> str:
-    return _validate_identifier("keyword", keyword).upper().replace(" ", "_")
+def _pain_ability_key_for_descriptor(ability: DatasheetAbilityDescriptor) -> str | None:
+    if type(ability) is not DatasheetAbilityDescriptor:
+        raise GameLifecycleError("Power from Pain ability lookup requires a descriptor.")
+    keys = tuple(
+        _PAIN_ABILITY_TOKEN_TO_KEY[token]
+        for token in ability.parameter_tokens
+        if token in _PAIN_ABILITY_TOKEN_TO_KEY
+    )
+    if len(keys) > 1:
+        raise GameLifecycleError("Power from Pain ability descriptor has multiple ability keys.")
+    return None if not keys else keys[0]
