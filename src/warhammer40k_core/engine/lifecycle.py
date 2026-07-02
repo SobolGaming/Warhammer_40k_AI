@@ -334,13 +334,31 @@ _SHOOTING_DECISION_TYPES = frozenset(
         DICE_REROLL_DECISION_TYPE,
     )
 )
-_SHOOTING_DISPATCH_DECISION_TYPES = _SHOOTING_DECISION_TYPES - frozenset(
-    (DICE_REROLL_DECISION_TYPE,)
+_ATTACK_SEQUENCE_DECISION_TYPES = frozenset(
+    (
+        SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+        SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+        SELECT_PSYCHIC_ATTACK_MODIFIER_IGNORES_DECISION_TYPE,
+        SELECT_ALLOCATION_ORDER_DECISION_TYPE,
+        SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
+        SELECT_PRECISION_ALLOCATION_DECISION_TYPE,
+        SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+    )
+)
+_SHOOTING_PHASE_DISPATCH_DECISION_TYPES = _SHOOTING_DECISION_TYPES - (
+    _ATTACK_SEQUENCE_DECISION_TYPES | frozenset((DICE_REROLL_DECISION_TYPE,))
 )
 _CHARGE_DECISION_TYPES = frozenset(
     (
         SELECT_CHARGING_UNIT_DECISION_TYPE,
         SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
+        SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
+        DICE_REROLL_DECISION_TYPE,
+    )
+)
+_CHARGE_PHASE_DISPATCH_DECISION_TYPES = _CHARGE_DECISION_TYPES - frozenset(
+    (
         SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
     )
@@ -369,6 +387,15 @@ _FIGHT_DECISION_TYPES = frozenset(
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
+    )
+)
+_FIGHT_PHASE_DISPATCH_DECISION_TYPES = _FIGHT_DECISION_TYPES - (
+    _ATTACK_SEQUENCE_DECISION_TYPES
+    | frozenset(
+        (
+            MOVEMENT_PROPOSAL_DECISION_TYPE,
+            DICE_REROLL_DECISION_TYPE,
+        )
     )
 )
 _REACTION_FRAME_DECISION_TYPES = frozenset(
@@ -1538,15 +1565,9 @@ class GameLifecycle:
             record.request.decision_type
             == SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE
         ):
-            target_status = apply_catalog_unit_move_completed_mortal_wounds_target_result(
-                state=state,
-                decisions=self.decision_controller,
-                result=result,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-            )
-            if target_status is not None:
-                return target_status
-            return self.advance_until_decision_or_terminal()
+            return self._decision_dispatch_registry.handler_for(
+                record.request.decision_type
+            ).applier(record, result)
         if (
             record.request.decision_type == DICE_REROLL_DECISION_TYPE
             and state.current_battle_phase is BattlePhase.SHOOTING
@@ -1660,233 +1681,37 @@ class GameLifecycle:
                     )
             return advanced_status
         if record.request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
-            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-            fight_status = self._fight_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-                reaction_queue=self.reaction_queue,
-            )
-            if resolves_reaction_frame and fight_status is not None:
-                self._continue_or_resolve_fight_reaction(
-                    result=result,
-                    status=fight_status,
-                )
-            if fight_status is not None:
-                return fight_status
-            advanced_status = self.advance_until_decision_or_terminal()
-            if resolves_reaction_frame:
-                self._continue_or_resolve_fight_reaction(
-                    result=result,
-                    status=advanced_status,
-                )
-            return advanced_status
+            return self._decision_dispatch_registry.handler_for(
+                record.request.decision_type
+            ).applier(record, result)
         if (
             record.request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
             and is_mortal_wound_feel_no_pain_request(record.request)
         ):
-            if is_unit_move_completed_mortal_wound_feel_no_pain_request(record.request):
-                move_completed_status = (
-                    apply_unit_move_completed_mortal_wound_feel_no_pain_decision(
-                        state=state,
-                        result=result,
-                        decisions=self.decision_controller,
-                    )
-                )
-                if move_completed_status is not None:
-                    return move_completed_status
-                return self.advance_until_decision_or_terminal()
-            source_context = mortal_wound_feel_no_pain_source_context(record.request)
-            if (
-                isinstance(source_context, dict)
-                and source_context.get("source_kind") == "explosives"
-            ):
-                explosives_status = apply_explosives_mortal_wound_feel_no_pain_decision(
-                    state=state,
-                    result=result,
-                    decisions=self.decision_controller,
-                )
-                if explosives_status is not None:
-                    return explosives_status
-                return self.advance_until_decision_or_terminal()
-            if (
-                isinstance(source_context, dict)
-                and source_context.get("source_kind") == TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND
-            ):
-                resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-                transport_hazard_status = apply_transport_hazard_mortal_wound_feel_no_pain_decision(
-                    state=state,
-                    result=result,
-                    decisions=self.decision_controller,
-                )
-                if transport_hazard_status is not None:
-                    if resolves_reaction_frame:
-                        if _fight_decision_owns_request(state=state, request=record.request):
-                            self._continue_or_resolve_fight_reaction(
-                                result=result,
-                                status=transport_hazard_status,
-                            )
-                        else:
-                            handled_status = self._continue_or_resolve_out_of_phase_reaction(
-                                result=result,
-                                status=transport_hazard_status,
-                            )
-                            if handled_status is not None:
-                                return handled_status
-                    return transport_hazard_status
-                advanced_status = self.advance_until_decision_or_terminal()
-                if resolves_reaction_frame:
-                    if _fight_decision_owns_request(state=state, request=record.request):
-                        self._continue_or_resolve_fight_reaction(
-                            result=result,
-                            status=advanced_status,
-                        )
-                    else:
-                        handled_status = self._continue_or_resolve_out_of_phase_reaction(
-                            result=result,
-                            status=advanced_status,
-                        )
-                        if handled_status is not None:
-                            return handled_status
-                return advanced_status
-            runtime_mortal_wound_registry = (
-                self._require_runtime_content_bundle().mortal_wound_feel_no_pain_hook_registry
-            )
-            if runtime_mortal_wound_registry.handles_source_context(source_context):
-                resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-                runtime_status = runtime_mortal_wound_registry.apply_decision(
-                    MortalWoundFeelNoPainContinuationContext(
-                        state=state,
-                        decisions=self.decision_controller,
-                        request=record.request,
-                        result=result,
-                        source_context=source_context,
-                        dice_manager=DiceRollManager(
-                            state.game_id,
-                            event_log=self.decision_controller.event_log,
-                        ),
-                        runtime_modifier_registry=(
-                            self._require_runtime_content_bundle().runtime_modifier_registry
-                        ),
-                    )
-                )
-                if runtime_status is not None:
-                    if resolves_reaction_frame:
-                        if _runtime_mortal_wound_source_context_phase(source_context) is (
-                            BattlePhase.FIGHT
-                        ):
-                            self._continue_or_resolve_fight_reaction(
-                                result=result,
-                                status=runtime_status,
-                            )
-                        else:
-                            handled_status = self._continue_or_resolve_out_of_phase_reaction(
-                                result=result,
-                                status=runtime_status,
-                            )
-                            if handled_status is not None:
-                                return handled_status
-                    return runtime_status
-                advanced_status = self.advance_until_decision_or_terminal()
-                if resolves_reaction_frame:
-                    if _runtime_mortal_wound_source_context_phase(source_context) is (
-                        BattlePhase.FIGHT
-                    ):
-                        self._continue_or_resolve_fight_reaction(
-                            result=result,
-                            status=advanced_status,
-                        )
-                    else:
-                        handled_status = self._continue_or_resolve_out_of_phase_reaction(
-                            result=result,
-                            status=advanced_status,
-                        )
-                        if handled_status is not None:
-                            return handled_status
-                return advanced_status
+            return self._apply_mortal_wound_feel_no_pain_decision(record=record, result=result)
         if record.request.decision_type in _FIGHT_DECISION_TYPES and _fight_decision_owns_request(
             state=state,
             request=record.request,
         ):
-            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-            fight_status = self._fight_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-                reaction_queue=self.reaction_queue,
-            )
-            if fight_status is not None:
-                if resolves_reaction_frame:
-                    self._continue_or_resolve_fight_reaction(
-                        result=result,
-                        status=fight_status,
-                    )
-                return fight_status
-            advanced_status = self.advance_until_decision_or_terminal()
-            if resolves_reaction_frame:
-                self._continue_or_resolve_fight_reaction(
-                    result=result,
-                    status=advanced_status,
-                )
-            return advanced_status
+            return self._decision_dispatch_registry.handler_for(
+                record.request.decision_type
+            ).applier(record, result)
         if record.request.decision_type in _SHOOTING_DECISION_TYPES:
             return self._decision_dispatch_registry.handler_for(
                 record.request.decision_type
             ).applier(record, result)
         if record.request.decision_type in _CHARGE_DECISION_TYPES:
-            charge_status = self._charge_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if charge_status is not None:
-                return charge_status
-            return self.advance_until_decision_or_terminal()
+            return self._decision_dispatch_registry.handler_for(
+                record.request.decision_type
+            ).applier(record, result)
         if record.request.decision_type in _FIGHT_DECISION_TYPES:
-            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-            fight_status = self._fight_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-                reaction_queue=self.reaction_queue,
-            )
-            if fight_status is not None:
-                if resolves_reaction_frame:
-                    self._continue_or_resolve_fight_reaction(
-                        result=result,
-                        status=fight_status,
-                    )
-                return fight_status
-            advanced_status = self.advance_until_decision_or_terminal()
-            if resolves_reaction_frame:
-                self._continue_or_resolve_fight_reaction(
-                    result=result,
-                    status=advanced_status,
-                )
-            return advanced_status
+            return self._decision_dispatch_registry.handler_for(
+                record.request.decision_type
+            ).applier(record, result)
         if record.request.decision_type == FIGHT_INTERRUPT_DECISION_TYPE:
-            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-            fight_status = self._fight_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-                reaction_queue=self.reaction_queue,
-            )
-            if fight_status is not None:
-                if resolves_reaction_frame:
-                    self._continue_or_resolve_fight_reaction(
-                        result=result,
-                        status=fight_status,
-                    )
-                return fight_status
-            if resolves_reaction_frame:
-                advanced_status = self.advance_until_decision_or_terminal()
-                self._continue_or_resolve_fight_reaction(
-                    result=result,
-                    status=advanced_status,
-                )
-                return advanced_status
-            return self.advance_until_decision_or_terminal()
+            return self._decision_dispatch_registry.handler_for(
+                record.request.decision_type
+            ).applier(record, result)
         if record.request.decision_type in _TRIGGERED_MOVEMENT_DECISION_TYPES:
             return self._decision_dispatch_registry.handler_for(
                 record.request.decision_type
@@ -2156,7 +1981,41 @@ class GameLifecycle:
                         pre_validator=self._pre_validate_shooting_phase_decision,
                         applier=self._apply_shooting_phase_decision,
                     )
-                    for decision_type in _SHOOTING_DISPATCH_DECISION_TYPES
+                    for decision_type in _SHOOTING_PHASE_DISPATCH_DECISION_TYPES
+                ),
+                *(
+                    DecisionDispatchHandler(
+                        decision_type=decision_type,
+                        pre_validator=self._pre_validate_attack_sequence_decision,
+                        applier=self._apply_attack_sequence_decision,
+                    )
+                    for decision_type in _ATTACK_SEQUENCE_DECISION_TYPES
+                ),
+                *(
+                    DecisionDispatchHandler(
+                        decision_type=decision_type,
+                        pre_validator=self._pre_validate_charge_phase_decision,
+                        applier=self._apply_charge_phase_decision,
+                    )
+                    for decision_type in _CHARGE_PHASE_DISPATCH_DECISION_TYPES
+                ),
+                DecisionDispatchHandler(
+                    decision_type=SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
+                    pre_validator=self._pre_validate_catalog_move_completed_mortal_wounds_decision,
+                    applier=self._apply_catalog_move_completed_mortal_wounds_decision,
+                ),
+                *(
+                    DecisionDispatchHandler(
+                        decision_type=decision_type,
+                        pre_validator=self._pre_validate_fight_phase_decision,
+                        applier=self._apply_fight_phase_decision,
+                    )
+                    for decision_type in _FIGHT_PHASE_DISPATCH_DECISION_TYPES
+                ),
+                DecisionDispatchHandler(
+                    decision_type=FIGHT_INTERRUPT_DECISION_TYPE,
+                    pre_validator=self._pre_validate_fight_interrupt_decision,
+                    applier=self._apply_fight_phase_decision,
                 ),
             )
         )
@@ -2276,6 +2135,310 @@ class GameLifecycle:
         if shooting_status is not None:
             return shooting_status
         return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_attack_sequence_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        state = self._require_state()
+        if request.decision_type in (
+            SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
+            SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+        ):
+            if _fight_attack_sequence_is_active_for_request(
+                state=state,
+                request=request,
+            ):
+                invalid_status = invalid_fight_attack_sequence_selection_status(
+                    state=state,
+                    request=request,
+                    result=result,
+                )
+            else:
+                invalid_status = (
+                    self._shooting_phase_handler.invalid_attack_sequence_selection_status(
+                        state=state,
+                        request=request,
+                        result=result,
+                    )
+                )
+            if invalid_status is not None:
+                return invalid_status
+        if request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE:
+            invalid_status = _invalid_damage_allocation_model_status(
+                state=state,
+                request=request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if (
+            request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+            and is_mortal_wound_feel_no_pain_request(request)
+        ):
+            invalid_status = _invalid_finite_decision_status(
+                state=state,
+                request=request,
+                result=result,
+                invalid_reason="invalid_mortal_wound_feel_no_pain_result",
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE:
+            invalid_status = _invalid_destruction_reaction_status(
+                state=state,
+                request=request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        return None
+
+    def _apply_attack_sequence_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        if (
+            record.request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+            and is_mortal_wound_feel_no_pain_request(record.request)
+        ):
+            return self._apply_mortal_wound_feel_no_pain_decision(record=record, result=result)
+        if record.request.decision_type in _FIGHT_DECISION_TYPES and _fight_decision_owns_request(
+            state=state,
+            request=record.request,
+        ):
+            return self._apply_fight_phase_decision(record, result)
+        if record.request.decision_type in _SHOOTING_DECISION_TYPES:
+            return self._apply_shooting_phase_decision(record, result)
+        if record.request.decision_type in _FIGHT_DECISION_TYPES:
+            return self._apply_fight_phase_decision(record, result)
+        raise GameLifecycleError("GameLifecycle received an unsupported decision_type.")
+
+    def _apply_mortal_wound_feel_no_pain_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        if is_unit_move_completed_mortal_wound_feel_no_pain_request(record.request):
+            move_completed_status = apply_unit_move_completed_mortal_wound_feel_no_pain_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if move_completed_status is not None:
+                return move_completed_status
+            return self.advance_until_decision_or_terminal()
+        source_context = mortal_wound_feel_no_pain_source_context(record.request)
+        if isinstance(source_context, dict) and source_context.get("source_kind") == "explosives":
+            explosives_status = apply_explosives_mortal_wound_feel_no_pain_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if explosives_status is not None:
+                return explosives_status
+            return self.advance_until_decision_or_terminal()
+        if (
+            isinstance(source_context, dict)
+            and source_context.get("source_kind") == TRANSPORT_HAZARD_MORTAL_WOUNDS_SOURCE_KIND
+        ):
+            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+            transport_hazard_status = apply_transport_hazard_mortal_wound_feel_no_pain_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if transport_hazard_status is not None:
+                if resolves_reaction_frame:
+                    if _fight_decision_owns_request(state=state, request=record.request):
+                        self._continue_or_resolve_fight_reaction(
+                            result=result,
+                            status=transport_hazard_status,
+                        )
+                    else:
+                        handled_status = self._continue_or_resolve_out_of_phase_reaction(
+                            result=result,
+                            status=transport_hazard_status,
+                        )
+                        if handled_status is not None:
+                            return handled_status
+                return transport_hazard_status
+            advanced_status = self.advance_until_decision_or_terminal()
+            if resolves_reaction_frame:
+                if _fight_decision_owns_request(state=state, request=record.request):
+                    self._continue_or_resolve_fight_reaction(
+                        result=result,
+                        status=advanced_status,
+                    )
+                else:
+                    handled_status = self._continue_or_resolve_out_of_phase_reaction(
+                        result=result,
+                        status=advanced_status,
+                    )
+                    if handled_status is not None:
+                        return handled_status
+            return advanced_status
+        runtime_mortal_wound_registry = (
+            self._require_runtime_content_bundle().mortal_wound_feel_no_pain_hook_registry
+        )
+        if runtime_mortal_wound_registry.handles_source_context(source_context):
+            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+            runtime_status = runtime_mortal_wound_registry.apply_decision(
+                MortalWoundFeelNoPainContinuationContext(
+                    state=state,
+                    decisions=self.decision_controller,
+                    request=record.request,
+                    result=result,
+                    source_context=source_context,
+                    dice_manager=DiceRollManager(
+                        state.game_id,
+                        event_log=self.decision_controller.event_log,
+                    ),
+                    runtime_modifier_registry=(
+                        self._require_runtime_content_bundle().runtime_modifier_registry
+                    ),
+                )
+            )
+            if runtime_status is not None:
+                if resolves_reaction_frame:
+                    if _runtime_mortal_wound_source_context_phase(source_context) is (
+                        BattlePhase.FIGHT
+                    ):
+                        self._continue_or_resolve_fight_reaction(
+                            result=result,
+                            status=runtime_status,
+                        )
+                    else:
+                        handled_status = self._continue_or_resolve_out_of_phase_reaction(
+                            result=result,
+                            status=runtime_status,
+                        )
+                        if handled_status is not None:
+                            return handled_status
+                return runtime_status
+            advanced_status = self.advance_until_decision_or_terminal()
+            if resolves_reaction_frame:
+                if _runtime_mortal_wound_source_context_phase(source_context) is BattlePhase.FIGHT:
+                    self._continue_or_resolve_fight_reaction(
+                        result=result,
+                        status=advanced_status,
+                    )
+                else:
+                    handled_status = self._continue_or_resolve_out_of_phase_reaction(
+                        result=result,
+                        status=advanced_status,
+                    )
+                    if handled_status is not None:
+                        return handled_status
+            return advanced_status
+        if _fight_decision_owns_request(state=state, request=record.request):
+            return self._apply_fight_phase_decision(record, result)
+        return self._apply_shooting_phase_decision(record, result)
+
+    def _pre_validate_charge_phase_decision(
+        self,
+        _request: DecisionRequest,
+        _result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        return None
+
+    def _apply_charge_phase_decision(
+        self,
+        _record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        charge_status = self._charge_phase_handler.apply_decision(
+            state=state,
+            result=result,
+            decisions=self.decision_controller,
+        )
+        if charge_status is not None:
+            return charge_status
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_catalog_move_completed_mortal_wounds_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        return invalid_catalog_unit_move_completed_mortal_wounds_target_status(
+            state=self._require_state(),
+            request=request,
+            result=result,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+        )
+
+    def _apply_catalog_move_completed_mortal_wounds_decision(
+        self,
+        _record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        target_status = apply_catalog_unit_move_completed_mortal_wounds_target_result(
+            state=state,
+            decisions=self.decision_controller,
+            result=result,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+        )
+        if target_status is not None:
+            return target_status
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_fight_phase_decision(
+        self,
+        _request: DecisionRequest,
+        _result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        return None
+
+    def _pre_validate_fight_interrupt_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        state = self._require_state()
+        result.validate_for_request(request)
+        if self._result_resolves_active_reaction_frame(result):
+            self.reaction_queue.validate_result(result)
+        return invalid_fight_interrupt_status(
+            state=state,
+            request=request,
+            result=result,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+        )
+
+    def _apply_fight_phase_decision(
+        self,
+        _record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+        fight_status = self._fight_phase_handler.apply_decision(
+            state=state,
+            result=result,
+            decisions=self.decision_controller,
+            reaction_queue=self.reaction_queue,
+        )
+        if fight_status is not None:
+            if resolves_reaction_frame:
+                self._continue_or_resolve_fight_reaction(
+                    result=result,
+                    status=fight_status,
+                )
+            return fight_status
+        advanced_status = self.advance_until_decision_or_terminal()
+        if resolves_reaction_frame:
+            self._continue_or_resolve_fight_reaction(
+                result=result,
+                status=advanced_status,
+            )
+        return advanced_status
 
     def pending_decision_request(self) -> DecisionRequest | None:
         return self._pending_decision_request()
