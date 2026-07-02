@@ -1381,12 +1381,9 @@ class GameLifecycle:
                 result=result,
             )
         if record.request.decision_type in _COMMAND_DECISION_TYPES:
-            self._command_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            return self.advance_until_decision_or_terminal()
+            return self._decision_dispatch_registry.handler_for(
+                record.request.decision_type
+            ).applier(record, result)
         if record.request.decision_type in MISSION_DECISION_TYPES:
             apply_mission_decision(
                 state=state,
@@ -2017,14 +2014,29 @@ class GameLifecycle:
                     pre_validator=self._pre_validate_fight_interrupt_decision,
                     applier=self._apply_fight_phase_decision,
                 ),
+                *(
+                    DecisionDispatchHandler(
+                        decision_type=decision_type,
+                        pre_validator=self._pre_validate_command_phase_decision,
+                        applier=self._apply_command_phase_decision,
+                    )
+                    for decision_type in _COMMAND_DECISION_TYPES
+                ),
             )
         )
 
     def _pre_validate_setup_decision(
         self,
-        _request: DecisionRequest,
-        _result: DecisionResult,
+        request: DecisionRequest,
+        result: DecisionResult,
     ) -> LifecycleStatus | None:
+        if request.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE:
+            return _invalid_finite_decision_status(
+                state=self._require_state(),
+                request=request,
+                result=result,
+                invalid_reason="invalid_faction_rule_setup_option_result",
+            )
         return None
 
     def _apply_setup_decision(
@@ -2043,9 +2055,16 @@ class GameLifecycle:
 
     def _pre_validate_battle_round_decision(
         self,
-        _request: DecisionRequest,
-        _result: DecisionResult,
+        request: DecisionRequest,
+        result: DecisionResult,
     ) -> LifecycleStatus | None:
+        if request.decision_type == SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE:
+            return _invalid_finite_decision_status(
+                state=self._require_state(),
+                request=request,
+                result=result,
+                invalid_reason="invalid_faction_rule_battle_round_option_result",
+            )
         return None
 
     def _apply_battle_round_decision(
@@ -2108,9 +2127,57 @@ class GameLifecycle:
 
     def _pre_validate_shooting_phase_decision(
         self,
-        _request: DecisionRequest,
-        _result: DecisionResult,
+        request: DecisionRequest,
+        result: DecisionResult,
     ) -> LifecycleStatus | None:
+        state = self._require_state()
+        if request.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE:
+            result.validate_for_request(request)
+            invalid_status = self._shooting_phase_handler.invalid_shooting_type_selection_status(
+                state=state,
+                request=request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if request.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE:
+            invalid_status = (
+                self._shooting_phase_handler.invalid_shooting_unit_selected_grant_status(
+                    state=state,
+                    request=request,
+                    result=result,
+                )
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE:
+            result.validate_for_request(request)
+            if self._result_resolves_active_reaction_frame(result):
+                self.reaction_queue.validate_result(result)
+            invalid_status = self._shooting_phase_handler.invalid_declaration_submission_status(
+                state=state,
+                request=request,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if request.decision_type == SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE:
+            invalid_status = invalid_shooting_phase_start_faction_rule_status(
+                state=state,
+                request=request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if request.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE:
+            invalid_status = invalid_catalog_post_shoot_hit_target_status_status(
+                state=state,
+                request=request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
         return None
 
     def _apply_shooting_phase_decision(
@@ -2341,9 +2408,31 @@ class GameLifecycle:
 
     def _pre_validate_charge_phase_decision(
         self,
-        _request: DecisionRequest,
-        _result: DecisionResult,
+        request: DecisionRequest,
+        result: DecisionResult,
     ) -> LifecycleStatus | None:
+        state = self._require_state()
+        if request.decision_type == SELECT_CHARGING_UNIT_DECISION_TYPE:
+            invalid_status = invalid_charging_unit_selection_status(
+                state=state,
+                request=request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+                charge_target_restriction_hooks=(
+                    self._require_runtime_content_bundle().charge_target_restriction_hook_registry
+                ),
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if request.decision_type == SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE:
+            invalid_status = invalid_charge_declaration_grant_status(
+                state=state,
+                request=request,
+                result=result,
+                charge_declaration_hooks=self._charge_phase_handler.charge_declaration_hooks,
+            )
+            if invalid_status is not None:
+                return invalid_status
         return None
 
     def _apply_charge_phase_decision(
@@ -2391,9 +2480,57 @@ class GameLifecycle:
 
     def _pre_validate_fight_phase_decision(
         self,
-        _request: DecisionRequest,
-        _result: DecisionResult,
+        request: DecisionRequest,
+        result: DecisionResult,
     ) -> LifecycleStatus | None:
+        state = self._require_state()
+        if request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
+            result.validate_for_request(request)
+            if self._result_resolves_active_reaction_frame(result):
+                self.reaction_queue.validate_result(result)
+            invalid_status = invalid_melee_declaration_status(
+                state=state,
+                request=request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+                army_catalog=self._require_config().army_catalog,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if request.decision_type == SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE:
+            invalid_status = self._fight_phase_handler.invalid_fight_unit_selected_grant_status(
+                state=state,
+                request=request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if request.decision_type == SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE:
+            invalid_status = invalid_fight_phase_start_faction_rule_status(
+                state=state,
+                request=request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE:
+            invalid_status = invalid_fight_activation_status(
+                state=state,
+                request=request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE:
+            invalid_status = invalid_fight_activation_ability_status(
+                state=state,
+                request=request,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if invalid_status is not None:
+                return invalid_status
         return None
 
     def _pre_validate_fight_interrupt_decision(
@@ -2439,6 +2576,39 @@ class GameLifecycle:
                 status=advanced_status,
             )
         return advanced_status
+
+    def _pre_validate_command_phase_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        state = self._require_state()
+        invalid_status = _invalid_finite_decision_status(
+            state=state,
+            request=request,
+            result=result,
+            invalid_reason="invalid_command_phase_decision_result",
+        )
+        if invalid_status is not None:
+            return invalid_status
+        return invalid_command_phase_decision_status(
+            state=state,
+            request=request,
+            result=result,
+        )
+
+    def _apply_command_phase_decision(
+        self,
+        _record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        self._command_phase_handler.apply_decision(
+            state=state,
+            result=result,
+            decisions=self.decision_controller,
+        )
+        return self.advance_until_decision_or_terminal()
 
     def pending_decision_request(self) -> DecisionRequest | None:
         return self._pending_decision_request()
