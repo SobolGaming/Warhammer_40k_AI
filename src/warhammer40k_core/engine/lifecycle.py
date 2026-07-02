@@ -334,6 +334,9 @@ _SHOOTING_DECISION_TYPES = frozenset(
         DICE_REROLL_DECISION_TYPE,
     )
 )
+_SHOOTING_DISPATCH_DECISION_TYPES = _SHOOTING_DECISION_TYPES - frozenset(
+    (DICE_REROLL_DECISION_TYPE,)
+)
 _CHARGE_DECISION_TYPES = frozenset(
     (
         SELECT_CHARGING_UNIT_DECISION_TYPE,
@@ -1827,22 +1830,9 @@ class GameLifecycle:
                 )
             return advanced_status
         if record.request.decision_type in _SHOOTING_DECISION_TYPES:
-            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-            shooting_status = self._shooting_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if resolves_reaction_frame:
-                handled_status = self._continue_or_resolve_out_of_phase_reaction(
-                    result=result,
-                    status=shooting_status,
-                )
-                if handled_status is not None:
-                    return handled_status
-            if shooting_status is not None:
-                return shooting_status
-            return self.advance_until_decision_or_terminal()
+            return self._decision_dispatch_registry.handler_for(
+                record.request.decision_type
+            ).applier(record, result)
         if record.request.decision_type in _CHARGE_DECISION_TYPES:
             charge_status = self._charge_phase_handler.apply_decision(
                 state=state,
@@ -2160,6 +2150,14 @@ class GameLifecycle:
                     )
                     for decision_type in _TRIGGERED_MOVEMENT_DECISION_TYPES
                 ),
+                *(
+                    DecisionDispatchHandler(
+                        decision_type=decision_type,
+                        pre_validator=self._pre_validate_shooting_phase_decision,
+                        applier=self._apply_shooting_phase_decision,
+                    )
+                    for decision_type in _SHOOTING_DISPATCH_DECISION_TYPES
+                ),
             )
         )
 
@@ -2247,6 +2245,36 @@ class GameLifecycle:
         )
         if triggered_status is not None:
             return triggered_status
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_shooting_phase_decision(
+        self,
+        _request: DecisionRequest,
+        _result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        return None
+
+    def _apply_shooting_phase_decision(
+        self,
+        _record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+        shooting_status = self._shooting_phase_handler.apply_decision(
+            state=state,
+            result=result,
+            decisions=self.decision_controller,
+        )
+        if resolves_reaction_frame:
+            handled_status = self._continue_or_resolve_out_of_phase_reaction(
+                result=result,
+                status=shooting_status,
+            )
+            if handled_status is not None:
+                return handled_status
+        if shooting_status is not None:
+            return shooting_status
         return self.advance_until_decision_or_terminal()
 
     def pending_decision_request(self) -> DecisionRequest | None:
