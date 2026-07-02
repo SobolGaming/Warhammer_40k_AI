@@ -7,6 +7,9 @@ using the fixed option ID `submit_parameterized_payload`.
 
 The catalog lists concrete `decision_type` tokens and concrete proposal kinds so UI,
 headless, network, replay, and test adapters can bind to the same lifecycle path.
+`hidden_decision` is an adapter redaction placeholder for secret pending
+decisions visible to non-actor viewers; adapters must not submit it as an
+engine decision type.
 
 ## Finite
 

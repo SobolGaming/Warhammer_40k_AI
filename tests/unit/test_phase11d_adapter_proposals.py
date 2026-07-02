@@ -1253,7 +1253,7 @@ def test_projection_redacts_secret_pending_decisions_for_non_actor_viewers() -> 
     assert request.actor_id == "player-a"
     assert redacted_pending == {
         "request_id": request.request_id,
-        "decision_type": SECONDARY_MISSION_DECISION_TYPE,
+        "decision_type": "hidden_decision",
         "actor_id": "player-a",
         "payload": {
             "secret": True,

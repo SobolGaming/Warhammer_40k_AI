@@ -1941,6 +1941,16 @@ scoring audit entries from these fields. Future hidden mission rules must mark
 their data hidden explicitly and define their own reveal timing in the same
 contract update that introduces them.
 
+Hidden pending-decision redaction is centralized in `adapters.redaction` and
+applies consistently to projections, event deltas, and HTTP status or mutation
+responses. A hidden pending request exposed to a non-actor viewer uses
+`decision_type: "hidden_decision"` and omits legal options and proposal details.
+Transport status summaries also redact hidden `pending_request_id` and
+`actor_id`; if a status request has no viewer identity, secret pending metadata
+is treated as hidden. Actor-scoped status responses keep the real request ID,
+decision type, and actor ID so the owning client can submit through the normal
+`DecisionRequest -> DecisionResult` path.
+
 Phase 11E scoring amounts and supported timing gates are source-backed. Primary
 mission scoring must honor the selected mission's source scoring-rule condition,
 and secondary scoring must use the selected card's Fixed or Tactical scoring

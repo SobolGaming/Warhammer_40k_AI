@@ -1427,7 +1427,7 @@
   },
   "pending_decision": {
     "actor_id": "player-a",
-    "decision_type": "select_secondary_missions",
+    "decision_type": "hidden_decision",
     "is_parameterized": false,
     "options": [],
     "payload": {

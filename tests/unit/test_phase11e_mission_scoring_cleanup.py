@@ -1506,7 +1506,7 @@ def test_secondary_reveal_event_emits_after_both_choices_without_pre_reveal_leak
     )
     assert cast(dict[str, JsonValue], second_request_event["payload"]) == {
         "request_id": "decision-request-000002",
-        "decision_type": "select_secondary_missions",
+        "decision_type": "hidden_decision",
         "actor_id": "player-b",
         "secret": True,
         "hidden": True,
