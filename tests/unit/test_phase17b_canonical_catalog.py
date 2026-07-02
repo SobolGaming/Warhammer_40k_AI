@@ -6,7 +6,7 @@ import math
 from dataclasses import replace
 from datetime import date
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import pytest
 
@@ -45,6 +45,14 @@ from warhammer40k_core.rules.catalog_package import (
     CanonicalCatalogPackagePayload,
 )
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
+from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
+    RuleIR,
+    RuleParameter,
+    RuleTargetKind,
+    RuleTargetSpec,
+)
 from warhammer40k_core.rules.wahapedia_schema import WahapediaCsvTable, WahapediaJsonArtifact
 
 _DEATH_GUARD_PDF = (
@@ -486,6 +494,32 @@ def test_phase17b_generation_rejects_invalid_source_fields(
         _catalog_package_from_text_overrides(kwargs)
 
 
+def test_phase17b_generic_rule_ir_payloads_are_validated_at_source_package_load() -> None:
+    invalid_payload = _stale_required_keyword_sequence_payload()
+    encoded_payload = _csv_field(json.dumps(invalid_payload, sort_keys=True, separators=(",", ":")))
+
+    with pytest.raises(CatalogGenerationError, match="rule_ir_payload is invalid"):
+        build_canonical_catalog_package(
+            package_id=_catalog_package_id(),
+            catalog_version=_catalog_version(),
+            source_artifacts=(
+                *_source_artifacts(),
+                _artifact(
+                    table_name="Datasheets_abilities",
+                    csv_text=(
+                        "datasheet_id,line,type,ability_id,name,description,support,source_kind,"
+                        "effect_description,source_wargear_id,rule_ir_payload,"
+                        "rule_ir_diagnostics,timing_tags,parameter_tokens\n"
+                        "dg-plague-marines,1,datasheet,dg-keyword-aura,Keyword Aura,"
+                        '"Requires keywords.",generic_rule_ir,datasheet,'
+                        '"Requires keywords.",,'
+                        f'"{encoded_payload}",,,\n'
+                    ),
+                ),
+            ),
+        )
+
+
 def test_phase17b_catalog_package_tuple_validation_is_strict() -> None:
     package = _catalog_package()
 
@@ -826,6 +860,42 @@ def _artifact(*, table_name: str, csv_text: str) -> WahapediaJsonArtifact:
 
 def _csv_field(value: str) -> str:
     return value.replace('"', '""')
+
+
+def _stale_required_keyword_sequence_payload() -> dict[str, Any]:
+    text = "Requires keywords."
+    span = TextSpan(text=text, start=0, end=len(text))
+    payload = cast(
+        dict[str, Any],
+        RuleIR(
+            rule_id="phase17b:rule:keyword-aura",
+            source_id="source:phase17b:keyword-aura",
+            normalized_text=text,
+            parser_version="phase17b-test-parser",
+            clauses=(
+                RuleClause(
+                    clause_id="phase17b:rule:keyword-aura:001",
+                    source_span=span,
+                    target=RuleTargetSpec(
+                        kind=RuleTargetKind.FRIENDLY_UNIT,
+                        source_span=span,
+                        parameters=(
+                            RuleParameter(
+                                key="required_keyword_sequence",
+                                value=("KHORNE", "LEGIONES_DAEMONICA"),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ).to_payload(),
+    )
+    clauses = cast(list[dict[str, Any]], payload["clauses"])
+    target = cast(dict[str, Any], clauses[0]["target"])
+    target["parameters"] = [
+        {"key": "required_keyword_sequence", "value": "KHORNE|LEGIONES_DAEMONICA"}
+    ]
+    return payload
 
 
 def _flying_hull_override() -> ModelGeometryCatalogRecord:

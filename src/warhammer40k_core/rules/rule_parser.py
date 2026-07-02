@@ -2730,7 +2730,7 @@ def _keyword_sequence_parameter_pairs(
     tokens = _keyword_sequence_tokens(value, parser_context=parser_context)
     if len(tokens) == 1:
         return (("required_keyword", tokens[0]),)
-    return (("required_keyword_sequence", "|".join(tokens)),)
+    return (("required_keyword_sequence", tokens),)
 
 
 def _split_source_keyword_sequence(

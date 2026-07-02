@@ -738,6 +738,7 @@ def _validate_typed_parameter_shape(parameter: RuleParameter) -> None:
         "model_keyword_any",
         "movement_modes",
         "required_keyword_any",
+        "required_keyword_sequence",
         "roll_types",
         "weapon_names",
     }

@@ -2329,7 +2329,7 @@ def test_phase17c_aura_target_faction_keyword_sequence_compiles_to_keyword_gates
     assert parameter_payload(target.parameters) == {
         "allegiance": "friendly",
         "eligible_target": "aura_units",
-        "required_keyword_sequence": "KHORNE|LEGIONES_DAEMONICA",
+        "required_keyword_sequence": ("KHORNE", "LEGIONES_DAEMONICA"),
     }
     assert tuple(
         parameter_payload(condition.parameters)["required_keyword"] for condition in keyword_gates
@@ -2370,7 +2370,7 @@ def test_phase17c_shadow_of_chaos_aura_compiles_to_contextual_status(
     assert parameter_payload(target.parameters) == {
         "allegiance": "friendly",
         "eligible_target": "aura_units",
-        "required_keyword_sequence": f"{allegiance.upper()}|LEGIONES_DAEMONICA",
+        "required_keyword_sequence": (allegiance.upper(), "LEGIONES_DAEMONICA"),
     }
     assert {
         parameter_payload(condition.parameters)["required_keyword"] for condition in keyword_gates
@@ -2569,6 +2569,19 @@ def test_phase17c_rule_ir_structural_validators_are_fail_fast() -> None:
     raw_weapon_scope_payload["clauses"][0]["effects"][0]["parameters"] = [
         {"key": "weapon_scope", "value": "all weapons"}
     ]
+    raw_keyword_sequence_payload = cast(
+        Any,
+        _compiled(
+            "Daemon Lord of Khorne (Aura): While a friendly Khorne Legiones Daemonica "
+            'unit is within 6" of this model, each time a model in that unit makes a '
+            "melee attack, add 1 to the Hit roll."
+        ).rule_ir.to_payload(),
+    )
+    raw_keyword_sequence_payload["clauses"][0]["target"]["parameters"] = [
+        {"key": "allegiance", "value": "friendly"},
+        {"key": "eligible_target", "value": "aura_units"},
+        {"key": "required_keyword_sequence", "value": "KHORNE|LEGIONES_DAEMONICA"},
+    ]
 
     assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
     with pytest.raises(RuleIRError, match="blocking must be a boolean"):
@@ -2619,6 +2632,8 @@ def test_phase17c_rule_ir_structural_validators_are_fail_fast() -> None:
         RuleIR.from_payload(stale_payload)
     with pytest.raises(RuleIRError, match="roll_types must be a string tuple"):
         RuleIR.from_payload(cast(RuleIRPayload, raw_roll_types_payload))
+    with pytest.raises(RuleIRError, match="required_keyword_sequence must be a string tuple"):
+        RuleIR.from_payload(cast(RuleIRPayload, raw_keyword_sequence_payload))
     with pytest.raises(RuleIRError, match="weapon_scope must be all, melee, or ranged"):
         RuleIR.from_payload(cast(RuleIRPayload, raw_weapon_scope_payload))
     with pytest.raises(RuleIRError, match="RuleParameter key must be a string"):
