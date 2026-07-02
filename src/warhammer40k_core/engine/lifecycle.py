@@ -216,7 +216,6 @@ from warhammer40k_core.engine.return_on_death import (
 )
 from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
-    SequencingDecision,
     apply_sequencing_decision_from_request,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE, SetupFlow
@@ -689,1151 +688,34 @@ class GameLifecycle:
     def submit_decision(self, result: DecisionResult) -> LifecycleStatus:
         state = self._require_state()
         pending_request = self._pending_decision_request()
-        sequencing_decision: SequencingDecision | None = None
-        stratagem_placement_request: DecisionRequest | None = None
-        cult_ambush_placement_request: DecisionRequest | None = None
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and _is_opportunity_window_request(pending_request)
-        ):
-            opportunity_invalid_reason = opportunity_submission_invalid_reason(
-                request=pending_request,
-                result=result,
-                current_state_hash=self._opportunity_boundary_state_hash(
-                    state=state,
-                    request=pending_request,
-                ),
-                current_sequence_number=self._opportunity_boundary_sequence_number(
-                    request=pending_request,
-                ),
-            )
-            if opportunity_invalid_reason is not None:
-                return LifecycleStatus.invalid(
-                    stage=state.stage,
-                    message="Opportunity-window submission is no longer valid.",
-                    payload={"invalid_reason": opportunity_invalid_reason},
-                )
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and is_stratagem_placement_proposal_request(pending_request)
-        ):
-            stratagem_placement_request = pending_request
-        if stratagem_placement_request is not None:
-            result.validate_for_request(stratagem_placement_request)
-            if self._result_resolves_active_reaction_frame(result):
-                self.reaction_queue.validate_result(result)
-            invalid_status = invalid_stratagem_placement_proposal_status(
-                state=state,
-                request=stratagem_placement_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and is_cult_ambush_placement_request(pending_request)
-        ):
-            cult_ambush_placement_request = pending_request
-        if cult_ambush_placement_request is not None:
-            invalid_status = invalid_cult_ambush_placement_status(
-                state=state,
-                request=cult_ambush_placement_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_TRACKED_TARGET_DECISION_TYPE
-        ):
-            invalid_status = invalid_select_tracked_target_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE
-        ):
-            invalid_status = invalid_return_on_death_placement_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        destroyed_transport_placement_request = (
-            pending_request
-            if (
-                type(result) is DecisionResult
-                and pending_request is not None
-                and is_destroyed_transport_disembark_proposal_request(pending_request)
-            )
-            else None
-        )
-        if destroyed_transport_placement_request is not None:
-            result.validate_for_request(destroyed_transport_placement_request)
-            if self._result_resolves_active_reaction_frame(result):
-                self.reaction_queue.validate_result(result)
-            attack_sequence = _destroyed_transport_attack_sequence_for_request(
-                state=state,
-                request=destroyed_transport_placement_request,
-            )
-            invalid_status = invalid_destroyed_transport_disembark_proposal_status(
-                state=state,
-                request=destroyed_transport_placement_request,
-                result=result,
-                decisions=self.decision_controller,
-                attack_sequence=attack_sequence,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and is_deployment_placement_request(pending_request)
-        ):
-            result.validate_for_request(pending_request)
-            invalid_status = invalid_deployment_placement_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and is_prebattle_proposal_request(pending_request)
-        ):
-            result.validate_for_request(pending_request)
-            invalid_status = invalid_prebattle_proposal_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-                army_catalog=self._require_config().army_catalog,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type in _MOVEMENT_PROPOSAL_DECISION_TYPES
-            and stratagem_placement_request is None
-            and destroyed_transport_placement_request is None
-            and cult_ambush_placement_request is None
-        ):
-            result.validate_for_request(pending_request)
-            if is_heroic_intervention_charge_move_request(pending_request):
-                malformed_status = invalid_heroic_intervention_charge_move_status(
-                    state=state,
+        if type(result) is DecisionResult and pending_request is not None:
+            if _is_opportunity_window_request(pending_request):
+                opportunity_invalid_reason = opportunity_submission_invalid_reason(
                     request=pending_request,
                     result=result,
-                )
-            elif is_triggered_movement_proposal_request(pending_request):
-                malformed_status = invalid_triggered_movement_proposal_status(
-                    state=state,
-                    request=pending_request,
-                    result=result,
-                    decisions=self.decision_controller,
-                )
-            elif _is_fight_movement_proposal_request(pending_request):
-                malformed_status = invalid_fight_movement_proposal_status(
-                    state=state,
-                    request=pending_request,
-                    result=result,
-                    decisions=self.decision_controller,
-                    ruleset_descriptor=self._require_config().ruleset_descriptor,
-                )
-            elif _is_charge_move_proposal_request(pending_request):
-                malformed_status = invalid_charge_move_proposal_status(
-                    state=state,
-                    request=pending_request,
-                    result=result,
-                    decisions=self.decision_controller,
-                    ruleset_descriptor=self._require_config().ruleset_descriptor,
-                    charge_target_restriction_hooks=(
-                        self._require_runtime_content_bundle().charge_target_restriction_hook_registry
-                    ),
-                )
-            else:
-                malformed_status = self._movement_phase_handler.invalid_proposal_submission_status(
-                    state=state,
-                    request=pending_request,
-                    result=result,
-                    decisions=self.decision_controller,
-                )
-            if malformed_status is not None:
-                return malformed_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE
-        ):
-            result.validate_for_request(pending_request)
-            invalid_status = self._shooting_phase_handler.invalid_shooting_type_selection_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE
-        ):
-            invalid_status = (
-                self._shooting_phase_handler.invalid_shooting_unit_selected_grant_status(
-                    state=state,
-                    request=pending_request,
-                    result=result,
-                )
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE
-        ):
-            invalid_status = self._fight_phase_handler.invalid_fight_unit_selected_grant_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
-        ):
-            result.validate_for_request(pending_request)
-            if self._result_resolves_active_reaction_frame(result):
-                self.reaction_queue.validate_result(result)
-            invalid_status = self._shooting_phase_handler.invalid_declaration_submission_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
-        ):
-            result.validate_for_request(pending_request)
-            if self._result_resolves_active_reaction_frame(result):
-                self.reaction_queue.validate_result(result)
-            invalid_status = invalid_melee_declaration_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-                army_catalog=self._require_config().army_catalog,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type
-            in (
-                SELECT_RESOLVE_TARGET_UNIT_DECISION_TYPE,
-                SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
-            )
-        ):
-            if _fight_attack_sequence_is_active_for_request(
-                state=state,
-                request=pending_request,
-            ):
-                invalid_status = invalid_fight_attack_sequence_selection_status(
-                    state=state,
-                    request=pending_request,
-                    result=result,
-                )
-            else:
-                invalid_status = (
-                    self._shooting_phase_handler.invalid_attack_sequence_selection_status(
+                    current_state_hash=self._opportunity_boundary_state_hash(
                         state=state,
                         request=pending_request,
-                        result=result,
+                    ),
+                    current_sequence_number=self._opportunity_boundary_sequence_number(
+                        request=pending_request,
+                    ),
+                )
+                if opportunity_invalid_reason is not None:
+                    return LifecycleStatus.invalid(
+                        stage=state.stage,
+                        message="Opportunity-window submission is no longer valid.",
+                        payload={"invalid_reason": opportunity_invalid_reason},
                     )
-                )
+            handler = self._decision_dispatch_registry.handler_for(pending_request.decision_type)
+            invalid_status = handler.pre_validator(pending_request, result)
             if invalid_status is not None:
                 return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
-        ):
-            invalid_status = _invalid_damage_allocation_model_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_CHARGING_UNIT_DECISION_TYPE
-        ):
-            invalid_status = invalid_charging_unit_selection_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-                charge_target_restriction_hooks=(
-                    self._require_runtime_content_bundle().charge_target_restriction_hook_registry
-                ),
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE
-        ):
-            invalid_status = invalid_charge_declaration_grant_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                charge_declaration_hooks=(self._charge_phase_handler.charge_declaration_hooks),
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type
-            == SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE
-        ):
-            invalid_status = invalid_catalog_unit_move_completed_mortal_wounds_target_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type
-            == SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE
-        ):
-            invalid_status = invalid_shooting_phase_start_faction_rule_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type
-            == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_STATUS_DECISION_TYPE
-        ):
-            invalid_status = invalid_catalog_post_shoot_hit_target_status_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type
-            == SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE
-        ):
-            invalid_status = invalid_fight_phase_start_faction_rule_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
-        ):
-            invalid_status = invalid_fight_activation_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE
-        ):
-            invalid_status = invalid_fight_activation_ability_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == FIGHT_INTERRUPT_DECISION_TYPE
-        ):
-            result.validate_for_request(pending_request)
-            if self._result_resolves_active_reaction_frame(result):
-                self.reaction_queue.validate_result(result)
-            invalid_status = invalid_fight_interrupt_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
-            and is_mortal_wound_feel_no_pain_request(pending_request)
-        ):
-            invalid_status = _invalid_finite_decision_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                invalid_reason="invalid_mortal_wound_feel_no_pain_result",
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE
-        ):
-            if self._result_resolves_active_reaction_frame(result):
-                self.reaction_queue.validate_result(result)
-            invalid_status = invalid_healing_model_decision_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and is_command_reroll_decision_request(pending_request)
-        ):
-            invalid_status = invalid_command_reroll_decision_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
-        ):
-            invalid_status = _invalid_destruction_reaction_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE
-        ):
-            invalid_status = invalid_reserve_declaration_status(
-                state=state,
-                config=self._require_config(),
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_CULT_AMBUSH_RESURGENCE_DECISION_TYPE
-        ):
-            invalid_status = invalid_cult_ambush_resurgence_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SUBMIT_CULT_AMBUSH_MARKER_PLACEMENT_DECISION_TYPE
-        ):
-            invalid_status = invalid_cult_ambush_marker_placement_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE
-        ):
-            invalid_status = _invalid_finite_decision_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                invalid_reason="invalid_faction_rule_setup_option_result",
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type
-            == SELECT_FACTION_RULE_BATTLE_ROUND_OPTION_DECISION_TYPE
-        ):
-            invalid_status = _invalid_finite_decision_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                invalid_reason="invalid_faction_rule_battle_round_option_result",
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE
-        ):
-            invalid_status = _invalid_finite_decision_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                invalid_reason="invalid_stratagem_cost_modifier_option_result",
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type in _COMMAND_DECISION_TYPES
-        ):
-            invalid_status = _invalid_finite_decision_status(
-                state=state,
-                request=pending_request,
-                result=result,
-                invalid_reason="invalid_command_phase_decision_result",
-            )
-            if invalid_status is not None:
-                return invalid_status
-            invalid_status = invalid_command_phase_decision_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type in MISSION_DECISION_TYPES
-        ):
-            result.validate_for_request(pending_request)
-            invalid_status = invalid_mission_decision_status(
-                state=state,
-                request=pending_request,
-                result=result,
-            )
-            if invalid_status is not None:
-                return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == REACTION_DECISION_TYPE
-        ):
-            result.validate_for_request(pending_request)
-            self.reaction_queue.validate_result(result)
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == STRATAGEM_DECISION_TYPE
-        ):
-            result.validate_for_request(pending_request)
-            if self._result_resolves_active_reaction_frame(result):
-                self.reaction_queue.validate_result(result)
-            if is_stratagem_window_decline_result(result) and not stratagem_window_decline_allowed(
-                request=pending_request,
-                result=result,
-            ):
-                return LifecycleStatus.invalid(
-                    stage=state.stage,
-                    message="Stratagem window decline is not allowed for this request.",
-                    payload={"invalid_reason": "decline_not_allowed"},
-                )
-            if not is_stratagem_window_decline_result(result):
-                invalid_status = invalid_stratagem_use_status(
-                    state=state,
-                    request=pending_request,
-                    result=result,
-                    stratagem_cost_modifier_registry=(
-                        self._require_runtime_content_bundle().stratagem_cost_modifier_registry
-                    ),
-                )
-                if invalid_status is not None:
-                    return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
-        ):
-            result.validate_for_request(pending_request)
-            if self._result_resolves_active_reaction_frame(result):
-                self.reaction_queue.validate_result(result)
-            if is_stratagem_window_decline_result(result) and not stratagem_window_decline_allowed(
-                request=pending_request,
-                result=result,
-            ):
-                return LifecycleStatus.invalid(
-                    stage=state.stage,
-                    message="Stratagem window decline is not allowed for this request.",
-                    payload={"invalid_reason": "decline_not_allowed"},
-                )
-            if not is_stratagem_window_decline_result(result):
-                invalid_status = invalid_stratagem_target_proposal_status(
-                    state=state,
-                    request=pending_request,
-                    result=result,
-                    ruleset_descriptor=self._require_config().ruleset_descriptor,
-                    army_catalog=self._require_config().army_catalog,
-                    decisions=self.decision_controller,
-                    stratagem_cost_modifier_registry=(
-                        self._require_runtime_content_bundle().stratagem_cost_modifier_registry
-                    ),
-                )
-                if invalid_status is not None:
-                    return invalid_status
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == SEQUENCING_DECISION_TYPE
-        ):
-            result.validate_for_request(pending_request)
-            sequencing_decision = apply_sequencing_decision_from_request(
-                request=pending_request,
-                result=result,
-            )
         record = self.decision_controller.submit_result(result)
-        if record.request.decision_type == SELECT_TRACKED_TARGET_DECISION_TYPE:
-            apply_select_tracked_target_decision(
-                state=state,
-                request=record.request,
-                result=result,
-                decisions_event_log=self.decision_controller.event_log,
-            )
-            return self.advance_until_decision_or_terminal()
-        if record.request.decision_type == SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE:
-            apply_return_on_death_placement_decision(
-                state=state,
-                decisions=self.decision_controller,
-                request=record.request,
-                result=result,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-            )
-            return self.advance_until_decision_or_terminal()
-        if record.request.decision_type in _SETUP_DECISION_TYPES:
-            return self._decision_dispatch_registry.handler_for(
-                record.request.decision_type
-            ).applier(record, result)
-        if record.request.decision_type in _BATTLE_ROUND_DECISION_TYPES:
-            return self._decision_dispatch_registry.handler_for(
-                record.request.decision_type
-            ).applier(record, result)
-        if record.request.decision_type == SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE:
-            return self._apply_stratagem_cost_choice_and_resume(
-                request=record.request,
-                result=result,
-            )
-        if record.request.decision_type in _COMMAND_DECISION_TYPES:
-            return self._decision_dispatch_registry.handler_for(
-                record.request.decision_type
-            ).applier(record, result)
-        if record.request.decision_type in MISSION_DECISION_TYPES:
-            apply_mission_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if record.request.decision_type == START_MISSION_ACTION_DECISION_TYPE:
-                return LifecycleStatus.advanced(
-                    stage=state.stage,
-                    payload={
-                        "decision_type": START_MISSION_ACTION_DECISION_TYPE,
-                        "result_id": result.result_id,
-                    },
-                )
-            return self.advance_until_decision_or_terminal()
-        if record.request.decision_type == SELECT_CULT_AMBUSH_RESURGENCE_DECISION_TYPE:
-            apply_cult_ambush_resurgence_decision(
-                state=state,
-                decisions=self.decision_controller,
-                request=record.request,
-                result=result,
-            )
-            return self.advance_until_decision_or_terminal()
-        if record.request.decision_type == SUBMIT_CULT_AMBUSH_MARKER_PLACEMENT_DECISION_TYPE:
-            apply_cult_ambush_marker_placement_decision(
-                state=state,
-                decisions=self.decision_controller,
-                request=record.request,
-                result=result,
-            )
-            return self.advance_until_decision_or_terminal()
-        if is_cult_ambush_placement_request(record.request):
-            placement_status = apply_cult_ambush_placement(
-                state=state,
-                decisions=self.decision_controller,
-                request=record.request,
-                result=result,
-            )
-            if placement_status is not None:
-                return placement_status
-            return self.advance_until_decision_or_terminal()
-        if is_stratagem_placement_proposal_request(record.request):
-            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-            placement_status = apply_stratagem_placement_proposal(
-                state=state,
-                request=record.request,
-                result=result,
-                decisions=self.decision_controller,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-            )
-            if placement_status is not None:
-                if resolves_reaction_frame:
-                    retry_request = self._pending_decision_request()
-                    if retry_request is not None and is_stratagem_placement_proposal_request(
-                        retry_request
-                    ):
-                        self.reaction_queue.continue_reaction(
-                            result=result,
-                            next_request_id=retry_request.request_id,
-                            decisions=self.decision_controller,
-                        )
-                return placement_status
-            if resolves_reaction_frame:
-                self.reaction_queue.resolve_reaction(
-                    result=result,
-                    decisions=self.decision_controller,
-                )
-            return self.advance_until_decision_or_terminal()
-        if is_command_reroll_decision_request(record.request):
-            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-            apply_command_reroll_decision(
-                state=state,
-                request=record.request,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if resolves_reaction_frame:
-                self.reaction_queue.resolve_reaction(
-                    result=result,
-                    decisions=self.decision_controller,
-                )
-            return self.advance_until_decision_or_terminal()
-        if (
-            record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
-            and is_heroic_intervention_charge_move_request(record.request)
-        ):
-            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-            heroic_status = apply_heroic_intervention_charge_move(
-                state=state,
-                request=record.request,
-                result=result,
-                decisions=self.decision_controller,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-            )
-            if heroic_status is not None:
-                if resolves_reaction_frame:
-                    retry_request = self._pending_decision_request()
-                    if retry_request is not None and is_heroic_intervention_charge_move_request(
-                        retry_request
-                    ):
-                        self.reaction_queue.continue_reaction(
-                            result=result,
-                            next_request_id=retry_request.request_id,
-                            decisions=self.decision_controller,
-                        )
-                return heroic_status
-            if resolves_reaction_frame:
-                self.reaction_queue.resolve_reaction(
-                    result=result,
-                    decisions=self.decision_controller,
-                )
-            return self.advance_until_decision_or_terminal()
-        if (
-            record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
-            and is_triggered_movement_proposal_request(record.request)
-        ):
-            triggered_status = self._triggered_movement_handler.apply_proposal_decision(
-                state=state,
-                request=record.request,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if triggered_status is not None:
-                return triggered_status
-            return self.advance_until_decision_or_terminal()
-        if (
-            record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
-            and _is_fight_movement_proposal_request(record.request)
-        ):
-            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-            fight_status = self._fight_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-                reaction_queue=self.reaction_queue,
-            )
-            if fight_status is not None:
-                if resolves_reaction_frame:
-                    self._continue_or_resolve_fight_reaction(
-                        result=result,
-                        status=fight_status,
-                    )
-                return fight_status
-            advanced_status = self.advance_until_decision_or_terminal()
-            if resolves_reaction_frame:
-                self._continue_or_resolve_fight_reaction(
-                    result=result,
-                    status=advanced_status,
-                )
-            return advanced_status
-        if (
-            record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
-            and _is_charge_move_proposal_request(record.request)
-        ):
-            charge_status = self._charge_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if charge_status is not None:
-                return charge_status
-            return self.advance_until_decision_or_terminal()
-        if (
-            record.request.decision_type == DICE_REROLL_DECISION_TYPE
-            and state.current_battle_phase is BattlePhase.CHARGE
-        ):
-            charge_status = self._charge_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if charge_status is not None:
-                return charge_status
-            return self.advance_until_decision_or_terminal()
-        if (
-            record.request.decision_type
-            == SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE
-        ):
-            return self._decision_dispatch_registry.handler_for(
-                record.request.decision_type
-            ).applier(record, result)
-        if (
-            record.request.decision_type == DICE_REROLL_DECISION_TYPE
-            and state.current_battle_phase is BattlePhase.SHOOTING
-        ):
-            shooting_status = self._shooting_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if shooting_status is not None:
-                return shooting_status
-            return self.advance_until_decision_or_terminal()
-        if (
-            record.request.decision_type == DICE_REROLL_DECISION_TYPE
-            and state.current_battle_phase is BattlePhase.FIGHT
-        ):
-            fight_status = self._fight_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-                reaction_queue=self.reaction_queue,
-            )
-            if fight_status is not None:
-                return fight_status
-            return self.advance_until_decision_or_terminal()
-        if is_destroyed_transport_disembark_proposal_request(record.request):
-            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-            if _destroyed_transport_request_is_fight_owned(
-                state=state,
-                request=record.request,
-            ):
-                fight_status = self._fight_phase_handler.apply_decision(
-                    state=state,
-                    result=result,
-                    decisions=self.decision_controller,
-                    reaction_queue=self.reaction_queue,
-                )
-                if fight_status is not None:
-                    if resolves_reaction_frame:
-                        self._continue_or_resolve_fight_reaction(
-                            result=result,
-                            status=fight_status,
-                        )
-                    return fight_status
-                advanced_status = self.advance_until_decision_or_terminal()
-                if resolves_reaction_frame:
-                    self._continue_or_resolve_fight_reaction(
-                        result=result,
-                        status=advanced_status,
-                    )
-                return advanced_status
-            shooting_status = self._shooting_phase_handler.apply_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-            )
-            if resolves_reaction_frame:
-                handled_status = self._continue_or_resolve_out_of_phase_reaction(
-                    result=result,
-                    status=shooting_status,
-                )
-                if handled_status is not None:
-                    return handled_status
-            if shooting_status is not None:
-                return shooting_status
-            return self.advance_until_decision_or_terminal()
-        if record.request.decision_type in _MOVEMENT_DECISION_TYPES:
-            return self._decision_dispatch_registry.handler_for(
-                record.request.decision_type
-            ).applier(record, result)
-        if record.request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE:
-            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-            healing_effect = healing_effect_from_request(request=record.request)
-            _updated_effect, follow_up_request = apply_recorded_healing_model_decision(
-                state=state,
-                decisions=self.decision_controller,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-                request=record.request,
-                result=result,
-                effect=healing_effect,
-            )
-            if follow_up_request is not None:
-                healing_status = LifecycleStatus.waiting_for_decision(
-                    stage=state.stage,
-                    decision_request=follow_up_request,
-                    payload={
-                        "decision_type": SELECT_HEALING_MODEL_DECISION_TYPE,
-                        "effect_id": healing_effect.effect_id,
-                        "target_unit_instance_id": healing_effect.target_unit_instance_id,
-                    },
-                )
-                if resolves_reaction_frame:
-                    self.reaction_queue.continue_reaction(
-                        result=result,
-                        next_request_id=follow_up_request.request_id,
-                        decisions=self.decision_controller,
-                    )
-                return healing_status
-            advanced_status = self.advance_until_decision_or_terminal()
-            if resolves_reaction_frame:
-                if advanced_status.decision_request is not None:
-                    self.reaction_queue.continue_reaction(
-                        result=result,
-                        next_request_id=advanced_status.decision_request.request_id,
-                        decisions=self.decision_controller,
-                    )
-                else:
-                    self.reaction_queue.resolve_reaction(
-                        result=result,
-                        decisions=self.decision_controller,
-                    )
-            return advanced_status
-        if record.request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
-            return self._decision_dispatch_registry.handler_for(
-                record.request.decision_type
-            ).applier(record, result)
-        if (
-            record.request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
-            and is_mortal_wound_feel_no_pain_request(record.request)
-        ):
-            return self._apply_mortal_wound_feel_no_pain_decision(record=record, result=result)
-        if record.request.decision_type in _FIGHT_DECISION_TYPES and _fight_decision_owns_request(
-            state=state,
-            request=record.request,
-        ):
-            return self._decision_dispatch_registry.handler_for(
-                record.request.decision_type
-            ).applier(record, result)
-        if record.request.decision_type in _SHOOTING_DECISION_TYPES:
-            return self._decision_dispatch_registry.handler_for(
-                record.request.decision_type
-            ).applier(record, result)
-        if record.request.decision_type in _CHARGE_DECISION_TYPES:
-            return self._decision_dispatch_registry.handler_for(
-                record.request.decision_type
-            ).applier(record, result)
-        if record.request.decision_type in _FIGHT_DECISION_TYPES:
-            return self._decision_dispatch_registry.handler_for(
-                record.request.decision_type
-            ).applier(record, result)
-        if record.request.decision_type == FIGHT_INTERRUPT_DECISION_TYPE:
-            return self._decision_dispatch_registry.handler_for(
-                record.request.decision_type
-            ).applier(record, result)
-        if record.request.decision_type in _TRIGGERED_MOVEMENT_DECISION_TYPES:
-            return self._decision_dispatch_registry.handler_for(
-                record.request.decision_type
-            ).applier(record, result)
-        if record.request.decision_type == REACTION_DECISION_TYPE:
-            self.reaction_queue.resolve_reaction(
-                result=result,
-                decisions=self.decision_controller,
-            )
-            return self.advance_until_decision_or_terminal()
-        if record.request.decision_type == STRATAGEM_DECISION_TYPE:
-            if is_stratagem_window_decline_result(result):
-                self._record_stratagem_window_declined(result)
-                if self._result_resolves_active_reaction_frame(result):
-                    self.reaction_queue.resolve_reaction(
-                        result=result,
-                        decisions=self.decision_controller,
-                    )
-                return self.advance_until_decision_or_terminal()
-            cost_choice_status = self._request_stratagem_cost_choice_if_available(
-                source_request=record.request,
-                source_result=result,
-                selection=stratagem_selection_from_decision_result(result),
-            )
-            if cost_choice_status is not None:
-                return cost_choice_status
-            apply_stratagem_decision(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-                army_catalog=self._require_config().army_catalog,
-                stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
-                stratagem_cost_modifier_registry=(
-                    self._require_runtime_content_bundle().stratagem_cost_modifier_registry
-                ),
-                shooting_unit_selected_grant_hooks=(
-                    self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
-                ),
-            )
-            if self._result_resolves_active_reaction_frame(result):
-                follow_up_request = self._pending_decision_request()
-                if follow_up_request is not None and is_command_reroll_decision_request(
-                    follow_up_request
-                ):
-                    self.reaction_queue.continue_reaction(
-                        result=result,
-                        next_request_id=follow_up_request.request_id,
-                        decisions=self.decision_controller,
-                    )
-                else:
-                    self.reaction_queue.resolve_reaction(
-                        result=result,
-                        decisions=self.decision_controller,
-                    )
-            return self.advance_until_decision_or_terminal()
-        if record.request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
-            resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
-            if is_stratagem_window_decline_result(result):
-                self._record_stratagem_window_declined(result)
-                if resolves_reaction_frame:
-                    if self._fight_interrupt_activation_is_active():
-                        advanced_status = self.advance_until_decision_or_terminal()
-                        self._continue_or_resolve_fight_reaction(
-                            result=result,
-                            status=advanced_status,
-                        )
-                        return advanced_status
-                    self.reaction_queue.resolve_reaction(
-                        result=result,
-                        decisions=self.decision_controller,
-                    )
-                return self.advance_until_decision_or_terminal()
-            cost_choice_status = self._request_stratagem_cost_choice_if_available(
-                source_request=record.request,
-                source_result=result,
-                selection=stratagem_selection_from_target_proposal_result(result),
-            )
-            if cost_choice_status is not None:
-                return cost_choice_status
-            apply_stratagem_target_proposal(
-                state=state,
-                result=result,
-                decisions=self.decision_controller,
-                ruleset_descriptor=self._require_config().ruleset_descriptor,
-                army_catalog=self._require_config().army_catalog,
-                stratagem_handler_registry=self._require_runtime_content_bundle().stratagem_handler_registry,
-                stratagem_cost_modifier_registry=(
-                    self._require_runtime_content_bundle().stratagem_cost_modifier_registry
-                ),
-                shooting_unit_selected_grant_hooks=(
-                    self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
-                ),
-            )
-            advanced_status = self.advance_until_decision_or_terminal()
-            if resolves_reaction_frame:
-                if self._fight_interrupt_activation_is_active():
-                    self._continue_or_resolve_fight_reaction(
-                        result=result,
-                        status=advanced_status,
-                    )
-                elif advanced_status.decision_request is not None:
-                    self.reaction_queue.continue_reaction(
-                        result=result,
-                        next_request_id=advanced_status.decision_request.request_id,
-                        decisions=self.decision_controller,
-                    )
-                else:
-                    self.reaction_queue.resolve_reaction(
-                        result=result,
-                        decisions=self.decision_controller,
-                    )
-            return advanced_status
-        if record.request.decision_type == SEQUENCING_DECISION_TYPE:
-            if sequencing_decision is None:
-                sequencing_decision = apply_sequencing_decision_from_request(
-                    request=record.request,
-                    result=result,
-                )
-            self.decision_controller.event_log.append(
-                "sequencing_order_resolved",
-                sequencing_decision.to_payload(),
-            )
-            return self.advance_until_decision_or_terminal()
-        raise GameLifecycleError("GameLifecycle received an unsupported decision_type.")
+        return self._decision_dispatch_registry.handler_for(record.request.decision_type).applier(
+            record,
+            result,
+        )
 
     def to_payload(self) -> GameLifecyclePayload:
         state = self._require_state()
@@ -2022,6 +904,64 @@ class GameLifecycle:
                     )
                     for decision_type in _COMMAND_DECISION_TYPES
                 ),
+                *(
+                    DecisionDispatchHandler(
+                        decision_type=decision_type,
+                        pre_validator=self._pre_validate_mission_decision,
+                        applier=self._apply_mission_decision,
+                    )
+                    for decision_type in MISSION_DECISION_TYPES
+                ),
+                DecisionDispatchHandler(
+                    decision_type=SELECT_TRACKED_TARGET_DECISION_TYPE,
+                    pre_validator=self._pre_validate_tracked_target_decision,
+                    applier=self._apply_tracked_target_decision,
+                ),
+                DecisionDispatchHandler(
+                    decision_type=SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+                    pre_validator=self._pre_validate_return_on_death_placement_decision,
+                    applier=self._apply_return_on_death_placement_decision,
+                ),
+                DecisionDispatchHandler(
+                    decision_type=SELECT_CULT_AMBUSH_RESURGENCE_DECISION_TYPE,
+                    pre_validator=self._pre_validate_cult_ambush_resurgence_decision,
+                    applier=self._apply_cult_ambush_resurgence_decision,
+                ),
+                DecisionDispatchHandler(
+                    decision_type=SUBMIT_CULT_AMBUSH_MARKER_PLACEMENT_DECISION_TYPE,
+                    pre_validator=self._pre_validate_cult_ambush_marker_placement_decision,
+                    applier=self._apply_cult_ambush_marker_placement_decision,
+                ),
+                DecisionDispatchHandler(
+                    decision_type=SELECT_HEALING_MODEL_DECISION_TYPE,
+                    pre_validator=self._pre_validate_healing_model_decision,
+                    applier=self._apply_healing_model_decision,
+                ),
+                DecisionDispatchHandler(
+                    decision_type=SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
+                    pre_validator=self._pre_validate_stratagem_cost_choice_decision,
+                    applier=self._apply_stratagem_cost_choice_decision,
+                ),
+                DecisionDispatchHandler(
+                    decision_type=REACTION_DECISION_TYPE,
+                    pre_validator=self._pre_validate_reaction_decision,
+                    applier=self._apply_reaction_decision,
+                ),
+                DecisionDispatchHandler(
+                    decision_type=STRATAGEM_DECISION_TYPE,
+                    pre_validator=self._pre_validate_stratagem_decision,
+                    applier=self._apply_stratagem_decision,
+                ),
+                DecisionDispatchHandler(
+                    decision_type=STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+                    pre_validator=self._pre_validate_stratagem_target_proposal_decision,
+                    applier=self._apply_stratagem_target_proposal_decision,
+                ),
+                DecisionDispatchHandler(
+                    decision_type=SEQUENCING_DECISION_TYPE,
+                    pre_validator=self._pre_validate_sequencing_decision,
+                    applier=self._apply_sequencing_decision,
+                ),
             )
         )
 
@@ -2030,9 +970,40 @@ class GameLifecycle:
         request: DecisionRequest,
         result: DecisionResult,
     ) -> LifecycleStatus | None:
+        state = self._require_state()
+        if is_deployment_placement_request(request):
+            result.validate_for_request(request)
+            invalid_status = invalid_deployment_placement_status(
+                state=state,
+                request=request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if is_prebattle_proposal_request(request):
+            result.validate_for_request(request)
+            invalid_status = invalid_prebattle_proposal_status(
+                state=state,
+                request=request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+                army_catalog=self._require_config().army_catalog,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        if request.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE:
+            invalid_status = invalid_reserve_declaration_status(
+                state=state,
+                config=self._require_config(),
+                request=request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
         if request.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE:
             return _invalid_finite_decision_status(
-                state=self._require_state(),
+                state=state,
                 request=request,
                 result=result,
                 invalid_reason="invalid_faction_rule_setup_option_result",
@@ -2082,17 +1053,167 @@ class GameLifecycle:
 
     def _pre_validate_movement_phase_decision(
         self,
-        _request: DecisionRequest,
-        _result: DecisionResult,
+        request: DecisionRequest,
+        result: DecisionResult,
     ) -> LifecycleStatus | None:
+        state = self._require_state()
+        if is_stratagem_placement_proposal_request(request):
+            result.validate_for_request(request)
+            if self._result_resolves_active_reaction_frame(result):
+                self.reaction_queue.validate_result(result)
+            invalid_status = invalid_stratagem_placement_proposal_status(
+                state=state,
+                request=request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        elif is_cult_ambush_placement_request(request):
+            invalid_status = invalid_cult_ambush_placement_status(
+                state=state,
+                request=request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        elif is_destroyed_transport_disembark_proposal_request(request):
+            result.validate_for_request(request)
+            if self._result_resolves_active_reaction_frame(result):
+                self.reaction_queue.validate_result(result)
+            attack_sequence = _destroyed_transport_attack_sequence_for_request(
+                state=state,
+                request=request,
+            )
+            invalid_status = invalid_destroyed_transport_disembark_proposal_status(
+                state=state,
+                request=request,
+                result=result,
+                decisions=self.decision_controller,
+                attack_sequence=attack_sequence,
+            )
+            if invalid_status is not None:
+                return invalid_status
+        elif request.decision_type in _MOVEMENT_PROPOSAL_DECISION_TYPES:
+            result.validate_for_request(request)
+            if is_heroic_intervention_charge_move_request(request):
+                malformed_status = invalid_heroic_intervention_charge_move_status(
+                    state=state,
+                    request=request,
+                    result=result,
+                )
+            elif is_triggered_movement_proposal_request(request):
+                malformed_status = invalid_triggered_movement_proposal_status(
+                    state=state,
+                    request=request,
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+            elif _is_fight_movement_proposal_request(request):
+                malformed_status = invalid_fight_movement_proposal_status(
+                    state=state,
+                    request=request,
+                    result=result,
+                    decisions=self.decision_controller,
+                    ruleset_descriptor=self._require_config().ruleset_descriptor,
+                )
+            elif _is_charge_move_proposal_request(request):
+                malformed_status = invalid_charge_move_proposal_status(
+                    state=state,
+                    request=request,
+                    result=result,
+                    decisions=self.decision_controller,
+                    ruleset_descriptor=self._require_config().ruleset_descriptor,
+                    charge_target_restriction_hooks=(
+                        self._require_runtime_content_bundle().charge_target_restriction_hook_registry
+                    ),
+                )
+            else:
+                malformed_status = self._movement_phase_handler.invalid_proposal_submission_status(
+                    state=state,
+                    request=request,
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+            if malformed_status is not None:
+                return malformed_status
+        if is_command_reroll_decision_request(request):
+            invalid_status = invalid_command_reroll_decision_status(
+                state=state,
+                request=request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
         return None
 
     def _apply_movement_phase_decision(
         self,
-        _record: DecisionRecord,
+        record: DecisionRecord,
         result: DecisionResult,
     ) -> LifecycleStatus:
         state = self._require_state()
+        if is_cult_ambush_placement_request(record.request):
+            placement_status = apply_cult_ambush_placement(
+                state=state,
+                decisions=self.decision_controller,
+                request=record.request,
+                result=result,
+            )
+            if placement_status is not None:
+                return placement_status
+            return self.advance_until_decision_or_terminal()
+        if is_stratagem_placement_proposal_request(record.request):
+            return self._apply_stratagem_placement_decision(record=record, result=result)
+        if is_command_reroll_decision_request(record.request):
+            return self._apply_command_reroll_decision(record=record, result=result)
+        if (
+            record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+            and is_heroic_intervention_charge_move_request(record.request)
+        ):
+            return self._apply_heroic_intervention_charge_move_decision(
+                record=record,
+                result=result,
+            )
+        if (
+            record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+            and is_triggered_movement_proposal_request(record.request)
+        ):
+            triggered_status = self._triggered_movement_handler.apply_proposal_decision(
+                state=state,
+                request=record.request,
+                result=result,
+                decisions=self.decision_controller,
+            )
+            if triggered_status is not None:
+                return triggered_status
+            return self.advance_until_decision_or_terminal()
+        if (
+            record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+            and _is_fight_movement_proposal_request(record.request)
+        ):
+            return self._apply_fight_phase_decision(record, result)
+        if (
+            record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+            and _is_charge_move_proposal_request(record.request)
+        ):
+            return self._apply_charge_phase_decision(record, result)
+        if (
+            record.request.decision_type == DICE_REROLL_DECISION_TYPE
+            and state.current_battle_phase is BattlePhase.CHARGE
+        ):
+            return self._apply_charge_phase_decision(record, result)
+        if (
+            record.request.decision_type == DICE_REROLL_DECISION_TYPE
+            and state.current_battle_phase is BattlePhase.SHOOTING
+        ):
+            return self._apply_shooting_phase_decision(record, result)
+        if (
+            record.request.decision_type == DICE_REROLL_DECISION_TYPE
+            and state.current_battle_phase is BattlePhase.FIGHT
+        ):
+            return self._apply_fight_phase_decision(record, result)
+        if is_destroyed_transport_disembark_proposal_request(record.request):
+            return self._apply_destroyed_transport_disembark_decision(record=record, result=result)
         movement_status = self._movement_phase_handler.apply_decision(
             state=state,
             result=result,
@@ -2101,6 +1222,139 @@ class GameLifecycle:
         )
         if movement_status is not None:
             return movement_status
+        return self.advance_until_decision_or_terminal()
+
+    def _apply_stratagem_placement_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+        placement_status = apply_stratagem_placement_proposal(
+            state=state,
+            request=record.request,
+            result=result,
+            decisions=self.decision_controller,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+        )
+        if placement_status is not None:
+            if resolves_reaction_frame:
+                retry_request = self._pending_decision_request()
+                if retry_request is not None and is_stratagem_placement_proposal_request(
+                    retry_request
+                ):
+                    self.reaction_queue.continue_reaction(
+                        result=result,
+                        next_request_id=retry_request.request_id,
+                        decisions=self.decision_controller,
+                    )
+            return placement_status
+        if resolves_reaction_frame:
+            self.reaction_queue.resolve_reaction(
+                result=result,
+                decisions=self.decision_controller,
+            )
+        return self.advance_until_decision_or_terminal()
+
+    def _apply_command_reroll_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+        apply_command_reroll_decision(
+            state=state,
+            request=record.request,
+            result=result,
+            decisions=self.decision_controller,
+        )
+        if resolves_reaction_frame:
+            self.reaction_queue.resolve_reaction(
+                result=result,
+                decisions=self.decision_controller,
+            )
+        return self.advance_until_decision_or_terminal()
+
+    def _apply_heroic_intervention_charge_move_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+        heroic_status = apply_heroic_intervention_charge_move(
+            state=state,
+            request=record.request,
+            result=result,
+            decisions=self.decision_controller,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+        )
+        if heroic_status is not None:
+            if resolves_reaction_frame:
+                retry_request = self._pending_decision_request()
+                if retry_request is not None and is_heroic_intervention_charge_move_request(
+                    retry_request
+                ):
+                    self.reaction_queue.continue_reaction(
+                        result=result,
+                        next_request_id=retry_request.request_id,
+                        decisions=self.decision_controller,
+                    )
+            return heroic_status
+        if resolves_reaction_frame:
+            self.reaction_queue.resolve_reaction(
+                result=result,
+                decisions=self.decision_controller,
+            )
+        return self.advance_until_decision_or_terminal()
+
+    def _apply_destroyed_transport_disembark_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+        if _destroyed_transport_request_is_fight_owned(
+            state=state,
+            request=record.request,
+        ):
+            fight_status = self._fight_phase_handler.apply_decision(
+                state=state,
+                result=result,
+                decisions=self.decision_controller,
+                reaction_queue=self.reaction_queue,
+            )
+            if fight_status is not None:
+                if resolves_reaction_frame:
+                    self._continue_or_resolve_fight_reaction(
+                        result=result,
+                        status=fight_status,
+                    )
+                return fight_status
+            advanced_status = self.advance_until_decision_or_terminal()
+            if resolves_reaction_frame:
+                self._continue_or_resolve_fight_reaction(
+                    result=result,
+                    status=advanced_status,
+                )
+            return advanced_status
+        shooting_status = self._shooting_phase_handler.apply_decision(
+            state=state,
+            result=result,
+            decisions=self.decision_controller,
+        )
+        if resolves_reaction_frame:
+            handled_status = self._continue_or_resolve_out_of_phase_reaction(
+                result=result,
+                status=shooting_status,
+            )
+            if handled_status is not None:
+                return handled_status
+        if shooting_status is not None:
+            return shooting_status
         return self.advance_until_decision_or_terminal()
 
     def _pre_validate_triggered_movement_decision(
@@ -2607,6 +1861,451 @@ class GameLifecycle:
             state=state,
             result=result,
             decisions=self.decision_controller,
+        )
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_mission_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        result.validate_for_request(request)
+        return invalid_mission_decision_status(
+            state=self._require_state(),
+            request=request,
+            result=result,
+        )
+
+    def _apply_mission_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        apply_mission_decision(
+            state=state,
+            result=result,
+            decisions=self.decision_controller,
+        )
+        if record.request.decision_type == START_MISSION_ACTION_DECISION_TYPE:
+            return LifecycleStatus.advanced(
+                stage=state.stage,
+                payload={
+                    "decision_type": START_MISSION_ACTION_DECISION_TYPE,
+                    "result_id": result.result_id,
+                },
+            )
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_tracked_target_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        return invalid_select_tracked_target_status(
+            state=self._require_state(),
+            request=request,
+            result=result,
+        )
+
+    def _apply_tracked_target_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        apply_select_tracked_target_decision(
+            state=self._require_state(),
+            request=record.request,
+            result=result,
+            decisions_event_log=self.decision_controller.event_log,
+        )
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_return_on_death_placement_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        return invalid_return_on_death_placement_status(
+            state=self._require_state(),
+            request=request,
+            result=result,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+        )
+
+    def _apply_return_on_death_placement_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        apply_return_on_death_placement_decision(
+            state=self._require_state(),
+            decisions=self.decision_controller,
+            request=record.request,
+            result=result,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+        )
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_cult_ambush_resurgence_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        return invalid_cult_ambush_resurgence_status(
+            state=self._require_state(),
+            request=request,
+            result=result,
+        )
+
+    def _apply_cult_ambush_resurgence_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        apply_cult_ambush_resurgence_decision(
+            state=self._require_state(),
+            decisions=self.decision_controller,
+            request=record.request,
+            result=result,
+        )
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_cult_ambush_marker_placement_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        return invalid_cult_ambush_marker_placement_status(
+            state=self._require_state(),
+            request=request,
+            result=result,
+        )
+
+    def _apply_cult_ambush_marker_placement_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        apply_cult_ambush_marker_placement_decision(
+            state=self._require_state(),
+            decisions=self.decision_controller,
+            request=record.request,
+            result=result,
+        )
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_healing_model_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        if self._result_resolves_active_reaction_frame(result):
+            self.reaction_queue.validate_result(result)
+        return invalid_healing_model_decision_status(
+            state=self._require_state(),
+            request=request,
+            result=result,
+        )
+
+    def _apply_healing_model_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+        healing_effect = healing_effect_from_request(request=record.request)
+        _updated_effect, follow_up_request = apply_recorded_healing_model_decision(
+            state=state,
+            decisions=self.decision_controller,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+            request=record.request,
+            result=result,
+            effect=healing_effect,
+        )
+        if follow_up_request is not None:
+            healing_status = LifecycleStatus.waiting_for_decision(
+                stage=state.stage,
+                decision_request=follow_up_request,
+                payload={
+                    "decision_type": SELECT_HEALING_MODEL_DECISION_TYPE,
+                    "effect_id": healing_effect.effect_id,
+                    "target_unit_instance_id": healing_effect.target_unit_instance_id,
+                },
+            )
+            if resolves_reaction_frame:
+                self.reaction_queue.continue_reaction(
+                    result=result,
+                    next_request_id=follow_up_request.request_id,
+                    decisions=self.decision_controller,
+                )
+            return healing_status
+        advanced_status = self.advance_until_decision_or_terminal()
+        if resolves_reaction_frame:
+            if advanced_status.decision_request is not None:
+                self.reaction_queue.continue_reaction(
+                    result=result,
+                    next_request_id=advanced_status.decision_request.request_id,
+                    decisions=self.decision_controller,
+                )
+            else:
+                self.reaction_queue.resolve_reaction(
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+        return advanced_status
+
+    def _pre_validate_stratagem_cost_choice_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        return _invalid_finite_decision_status(
+            state=self._require_state(),
+            request=request,
+            result=result,
+            invalid_reason="invalid_stratagem_cost_modifier_option_result",
+        )
+
+    def _apply_stratagem_cost_choice_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        return self._apply_stratagem_cost_choice_and_resume(
+            request=record.request,
+            result=result,
+        )
+
+    def _pre_validate_reaction_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        result.validate_for_request(request)
+        self.reaction_queue.validate_result(result)
+        return None
+
+    def _apply_reaction_decision(
+        self,
+        _record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        self.reaction_queue.resolve_reaction(
+            result=result,
+            decisions=self.decision_controller,
+        )
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_stratagem_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        state = self._require_state()
+        result.validate_for_request(request)
+        if self._result_resolves_active_reaction_frame(result):
+            self.reaction_queue.validate_result(result)
+        if is_stratagem_window_decline_result(result) and not stratagem_window_decline_allowed(
+            request=request,
+            result=result,
+        ):
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Stratagem window decline is not allowed for this request.",
+                payload={"invalid_reason": "decline_not_allowed"},
+            )
+        if not is_stratagem_window_decline_result(result):
+            invalid_status = invalid_stratagem_use_status(
+                state=state,
+                request=request,
+                result=result,
+                stratagem_cost_modifier_registry=(
+                    self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+                ),
+            )
+            if invalid_status is not None:
+                return invalid_status
+        return None
+
+    def _apply_stratagem_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        if is_stratagem_window_decline_result(result):
+            self._record_stratagem_window_declined(result)
+            if self._result_resolves_active_reaction_frame(result):
+                self.reaction_queue.resolve_reaction(
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+            return self.advance_until_decision_or_terminal()
+        cost_choice_status = self._request_stratagem_cost_choice_if_available(
+            source_request=record.request,
+            source_result=result,
+            selection=stratagem_selection_from_decision_result(result),
+        )
+        if cost_choice_status is not None:
+            return cost_choice_status
+        apply_stratagem_decision(
+            state=state,
+            result=result,
+            decisions=self.decision_controller,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+            army_catalog=self._require_config().army_catalog,
+            stratagem_handler_registry=(
+                self._require_runtime_content_bundle().stratagem_handler_registry
+            ),
+            stratagem_cost_modifier_registry=(
+                self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+            ),
+            shooting_unit_selected_grant_hooks=(
+                self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
+            ),
+        )
+        if self._result_resolves_active_reaction_frame(result):
+            follow_up_request = self._pending_decision_request()
+            if follow_up_request is not None and is_command_reroll_decision_request(
+                follow_up_request
+            ):
+                self.reaction_queue.continue_reaction(
+                    result=result,
+                    next_request_id=follow_up_request.request_id,
+                    decisions=self.decision_controller,
+                )
+            else:
+                self.reaction_queue.resolve_reaction(
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+        return self.advance_until_decision_or_terminal()
+
+    def _pre_validate_stratagem_target_proposal_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        state = self._require_state()
+        result.validate_for_request(request)
+        if self._result_resolves_active_reaction_frame(result):
+            self.reaction_queue.validate_result(result)
+        if is_stratagem_window_decline_result(result) and not stratagem_window_decline_allowed(
+            request=request,
+            result=result,
+        ):
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message="Stratagem window decline is not allowed for this request.",
+                payload={"invalid_reason": "decline_not_allowed"},
+            )
+        if not is_stratagem_window_decline_result(result):
+            invalid_status = invalid_stratagem_target_proposal_status(
+                state=state,
+                request=request,
+                result=result,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+                army_catalog=self._require_config().army_catalog,
+                decisions=self.decision_controller,
+                stratagem_cost_modifier_registry=(
+                    self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+                ),
+            )
+            if invalid_status is not None:
+                return invalid_status
+        return None
+
+    def _apply_stratagem_target_proposal_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
+        if is_stratagem_window_decline_result(result):
+            self._record_stratagem_window_declined(result)
+            if resolves_reaction_frame:
+                if self._fight_interrupt_activation_is_active():
+                    advanced_status = self.advance_until_decision_or_terminal()
+                    self._continue_or_resolve_fight_reaction(
+                        result=result,
+                        status=advanced_status,
+                    )
+                    return advanced_status
+                self.reaction_queue.resolve_reaction(
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+            return self.advance_until_decision_or_terminal()
+        cost_choice_status = self._request_stratagem_cost_choice_if_available(
+            source_request=record.request,
+            source_result=result,
+            selection=stratagem_selection_from_target_proposal_result(result),
+        )
+        if cost_choice_status is not None:
+            return cost_choice_status
+        apply_stratagem_target_proposal(
+            state=state,
+            result=result,
+            decisions=self.decision_controller,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+            army_catalog=self._require_config().army_catalog,
+            stratagem_handler_registry=(
+                self._require_runtime_content_bundle().stratagem_handler_registry
+            ),
+            stratagem_cost_modifier_registry=(
+                self._require_runtime_content_bundle().stratagem_cost_modifier_registry
+            ),
+            shooting_unit_selected_grant_hooks=(
+                self._require_runtime_content_bundle().shooting_unit_selected_grant_hook_registry
+            ),
+        )
+        advanced_status = self.advance_until_decision_or_terminal()
+        if resolves_reaction_frame:
+            if self._fight_interrupt_activation_is_active():
+                self._continue_or_resolve_fight_reaction(
+                    result=result,
+                    status=advanced_status,
+                )
+            elif advanced_status.decision_request is not None:
+                self.reaction_queue.continue_reaction(
+                    result=result,
+                    next_request_id=advanced_status.decision_request.request_id,
+                    decisions=self.decision_controller,
+                )
+            else:
+                self.reaction_queue.resolve_reaction(
+                    result=result,
+                    decisions=self.decision_controller,
+                )
+        return advanced_status
+
+    def _pre_validate_sequencing_decision(
+        self,
+        request: DecisionRequest,
+        result: DecisionResult,
+    ) -> LifecycleStatus | None:
+        result.validate_for_request(request)
+        apply_sequencing_decision_from_request(
+            request=request,
+            result=result,
+        )
+        return None
+
+    def _apply_sequencing_decision(
+        self,
+        record: DecisionRecord,
+        result: DecisionResult,
+    ) -> LifecycleStatus:
+        sequencing_decision = apply_sequencing_decision_from_request(
+            request=record.request,
+            result=result,
+        )
+        self.decision_controller.event_log.append(
+            "sequencing_order_resolved",
+            sequencing_decision.to_payload(),
         )
         return self.advance_until_decision_or_terminal()
 
