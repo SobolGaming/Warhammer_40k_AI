@@ -114,6 +114,8 @@ UI, network, headless, AI, and replay may choose decisions differently, but they
 
 Replay and determinism are core features. Same code, seed, config, and inputs must produce the same logical result. It is acceptable for CORE V2 to differ from the legacy repo.
 
+Every `*_DECISION_TYPE` constant defined in `engine/` must be registered in the engine decision dispatch registry or appear in the documented nested-decision allowlist in `docs/ADAPTER_DECISION_CONTRACT.md`. Orphan decision types fail the quality gate. New decision types register their validator and applier in the same PR that defines the constant.
+
 ## Adapter decision contract policy
 
 All new player-facing choices must use the Phase 11D adapter decision contract in `docs/ADAPTER_DECISION_CONTRACT.md`.
