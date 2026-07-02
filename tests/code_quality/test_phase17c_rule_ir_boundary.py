@@ -80,13 +80,30 @@ def test_phase17c_rule_language_tooling_has_no_llm_or_network_imports() -> None:
     )
 
 
-def test_phase17c_rule_parser_keyword_sequence_lexicon_is_source_generated() -> None:
+def test_phase17c_rule_parser_keyword_sequence_lexicon_is_injected() -> None:
     path = RULE_TOOLING / "rule_parser.py"
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     hardcoded_keyword_literals: list[str] = []
-    source_lexicon_assignment_found = False
+    source_package_imports: list[str] = []
+    parse_rule_ir_requires_keyword_lexicon = False
 
     for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name.startswith("warhammer40k_core.rules.source_packages"):
+                    source_package_imports.append(
+                        f"{path.relative_to(ROOT).as_posix()}:{node.lineno}:import {alias.name}"
+                    )
+            continue
+        if (
+            isinstance(node, ast.ImportFrom)
+            and node.module is not None
+            and node.module.startswith("warhammer40k_core.rules.source_packages")
+        ):
+            source_package_imports.append(
+                f"{path.relative_to(ROOT).as_posix()}:{node.lineno}:from {node.module}"
+            )
+            continue
         if isinstance(node, ast.Constant) and node.value in {
             "KHORNE",
             "LEGIONES DAEMONICA",
@@ -95,24 +112,20 @@ def test_phase17c_rule_parser_keyword_sequence_lexicon_is_source_generated() -> 
             hardcoded_keyword_literals.append(f"{path.relative_to(ROOT).as_posix()}:{node.lineno}")
             continue
 
-        if not isinstance(node, ast.Assign):
+        if not isinstance(node, ast.FunctionDef) or node.name != "parse_rule_ir":
             continue
-        if not any(
-            isinstance(target, ast.Name) and target.id == "_SOURCE_KEYWORD_SEQUENCE_PARTS"
-            for target in node.targets
-        ):
-            continue
-        source_lexicon_assignment_found = (
-            isinstance(node.value, ast.Call)
-            and isinstance(node.value.func, ast.Attribute)
-            and node.value.func.attr == "canonical_datasheet_keyword_sequence_parts"
-            and isinstance(node.value.func.value, ast.Name)
-            and node.value.func.value.id == "datasheet_keyword_lexicon_2026_06_14"
+        parse_rule_ir_requires_keyword_lexicon = any(
+            argument.arg == "source_keyword_sequence_parts" for argument in node.args.kwonlyargs
         )
 
-    assert source_lexicon_assignment_found
+    assert parse_rule_ir_requires_keyword_lexicon
+    assert not source_package_imports, (
+        "Generic rule parser must receive source keyword lexicons from edition-aware "
+        "compile/build entrypoints instead of importing source packages:\n"
+        + "\n".join(source_package_imports)
+    )
     assert not hardcoded_keyword_literals, (
-        "Parser keyword sequences must come from the generated source-package lexicon:\n"
+        "Parser keyword sequences must come from injected generated source-package lexicons:\n"
         + "\n".join(hardcoded_keyword_literals)
     )
 

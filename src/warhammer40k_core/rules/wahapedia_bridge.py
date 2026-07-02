@@ -38,6 +38,9 @@ from warhammer40k_core.rules.data_package import DataPackageId
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_2026_06 as event_companion_source,
 )
 from warhammer40k_core.rules.wahapedia_schema import (
@@ -49,6 +52,11 @@ from warhammer40k_core.rules.wahapedia_schema import (
 
 class WahapediaBridgeError(ValueError):
     """Raised when Wahapedia rows cannot be bridged into canonical source rows."""
+
+
+_SOURCE_KEYWORD_SEQUENCE_PARTS = (
+    datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -824,7 +832,10 @@ def _bridge_abilities(
                     separators=(",", ":"),
                 )
             else:
-                compiled = compile_rule_source_text(source_text)
+                compiled = compile_rule_source_text(
+                    source_text,
+                    source_keyword_sequence_parts=_SOURCE_KEYWORD_SEQUENCE_PARTS,
+                )
                 rule_ir_diagnostics = json.dumps(
                     _rule_ir_diagnostics(compiled.rule_ir),
                     sort_keys=True,

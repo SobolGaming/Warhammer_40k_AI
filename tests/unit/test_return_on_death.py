@@ -61,12 +61,18 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
+)
 
 FIRST_DEATH_RETURN_TEXT = (
     "The first time this model is destroyed, at the end of the phase, roll one D6: on "
     "a 2+, set this model back up on the battlefield as close as possible to where it "
     "was destroyed and not within Engagement Range of one or more enemy units, with "
     "3 wounds remaining."
+)
+SOURCE_KEYWORD_SEQUENCE_PARTS = (
+    datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
 )
 
 
@@ -1093,7 +1099,10 @@ def _return_on_death_record() -> AbilityCatalogRecord:
         source_id="rule:first-death-return",
         raw_text=FIRST_DEATH_RETURN_TEXT,
     )
-    rule_ir = compile_rule_source_text(source).rule_ir
+    rule_ir = compile_rule_source_text(
+        source,
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    ).rule_ir
     return AbilityCatalogRecord(
         record_id="record:first-death-return",
         definition=AbilityDefinition(

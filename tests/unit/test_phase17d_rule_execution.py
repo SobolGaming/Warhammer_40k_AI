@@ -94,6 +94,13 @@ from warhammer40k_core.rules.rule_ir import (
     parameter_payload,
 )
 from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
+)
+
+SOURCE_KEYWORD_SEQUENCE_PARTS = (
+    datasheet_keyword_lexicon_source.canonical_datasheet_keyword_sequence_parts()
+)
 
 
 def test_phase17d_generic_modifier_rule_executes_as_source_linked_effect() -> None:
@@ -1806,7 +1813,8 @@ def test_phase17d_ability_bridge_passes_state_for_leading_model_condition() -> N
 
 def _compiled(raw_text: str) -> CompiledRuleSource:
     return compile_rule_source_text(
-        RuleSourceText.from_raw(source_id=f"phase17d:{raw_text.lower()}", raw_text=raw_text)
+        RuleSourceText.from_raw(source_id=f"phase17d:{raw_text.lower()}", raw_text=raw_text),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
     )
 
 
@@ -1851,7 +1859,8 @@ def _champion_slayer_rule_ir() -> RuleIR:
                 "unit, you can re-roll the Wound roll. Each time this model destroys an enemy "
                 "Character or Monster unit, this model regains up to D6 lost wounds."
             ),
-        )
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
     ).rule_ir
 
 
@@ -1914,7 +1923,8 @@ def _generic_catalog_descriptor(
         RuleSourceText.from_raw(
             source_id=f"phase17d:test:generic-catalog:{source_suffix}",
             raw_text=raw_text,
-        )
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
     ).rule_ir
     resolved_ability_id = ability_id or f"generic-catalog-{source_suffix}"
     return DatasheetAbilityDescriptor(

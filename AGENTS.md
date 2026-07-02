@@ -147,6 +147,9 @@ Dependency direction:
 - `rules` may import `core` and descriptors, not adapters
 - `engine` may import `core`, `geometry`, and `rules`
 - `adapters` may import `engine`; engine must not import adapters
+- `profiling` and `interfaces` may import `engine`; no package under `src/warhammer40k_core` may import `profiling` or `interfaces`
+- `rules` must not import `engine` or `adapters`
+- every package under `src/warhammer40k_core` must be covered by an import-linter contract; adding a package without a contract fails the quality gate
 
 Enforce this with import-linter and code-quality tests.
 

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import ast
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src" / "warhammer40k_core"
+PYPROJECT = ROOT / "pyproject.toml"
 
 
 def _imports(path: Path) -> list[str]:
@@ -53,3 +55,29 @@ def test_core_does_not_import_engine_or_adapters() -> None:
                 violations.append(f"{path.relative_to(ROOT)} imports {module}")
 
     assert not violations, "Core import boundary violations:\n" + "\n".join(violations)
+
+
+def test_top_level_packages_are_covered_by_import_linter_contracts() -> None:
+    top_level_packages = {
+        path.name for path in SRC.iterdir() if path.is_dir() and path.name != "__pycache__"
+    }
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    contracts = pyproject["tool"]["importlinter"]["contracts"]
+    covered_packages: set[str] = set()
+
+    for contract in contracts:
+        for field_name in ("source_modules", "forbidden_modules"):
+            for module_name in contract.get(field_name, ()):
+                package_name = _top_level_package_name(module_name)
+                if package_name is not None:
+                    covered_packages.add(package_name)
+
+    missing = sorted(top_level_packages - covered_packages)
+    assert not missing, "Top-level packages lack import-linter coverage:\n" + "\n".join(missing)
+
+
+def _top_level_package_name(module_name: str) -> str | None:
+    prefix = "warhammer40k_core."
+    if not module_name.startswith(prefix):
+        return None
+    return module_name[len(prefix) :].split(".", 1)[0]
