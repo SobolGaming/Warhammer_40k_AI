@@ -11,6 +11,7 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR
 from warhammer40k_core.rules.rule_templates import (
+    GRANT_ABILITY_TEMPLATE_ID,
     KEYWORD_GATE_TEMPLATE_ID,
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
 )
@@ -44,10 +45,23 @@ _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         "enhancement:space-marines:ceramite-sentinels:000010759004",
     }
 )
-_SUPPORTED_TEMPLATE_IDS = frozenset(
+_SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        "enhancement:genestealer-cults:outlander-claw:000009079002",
+        "enhancement:orks:more-dakka:000009991005",
+        "enhancement:tyranids:warrior-bioform-onslaught:000009737005",
+    }
+)
+_SUPPORTED_CONDITIONAL_WEAPON_ABILITY_TEMPLATE_IDS = frozenset(
     {
         KEYWORD_GATE_TEMPLATE_ID,
         WEAPON_ABILITY_GRANT_TEMPLATE_ID,
+    }
+)
+_SUPPORTED_GRANT_ABILITY_TEMPLATE_IDS = frozenset(
+    {
+        GRANT_ABILITY_TEMPLATE_ID,
+        KEYWORD_GATE_TEMPLATE_ID,
     }
 )
 
@@ -61,13 +75,10 @@ def generic_supported_enhancement_rule_ir(
 ) -> RuleIR | None:
     if type(source_row) is not faction_subrules_2026_27.SourceEnhancementRow:
         raise Phase17FGenericIrSupportError("Generic enhancement support requires source row.")
-    if (
-        source_row.source_row_id
-        not in _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
-    ):
+    if source_row.source_row_id not in _supported_enhancement_source_row_ids():
         return None
     rule_ir = _compile_enhancement_rule_ir(source_row)
-    _validate_conditional_weapon_ability_enhancement_ir(
+    _validate_supported_enhancement_ir(
         rule_ir=rule_ir,
         source_row=source_row,
     )
@@ -102,6 +113,14 @@ def supported_conditional_weapon_ability_enhancement_source_row_ids() -> tuple[s
     return tuple(sorted(_SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS))
 
 
+def supported_grant_ability_enhancement_source_row_ids() -> tuple[str, ...]:
+    return tuple(sorted(_SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS))
+
+
+def supported_generic_enhancement_source_row_ids() -> tuple[str, ...]:
+    return tuple(sorted(_supported_enhancement_source_row_ids()))
+
+
 def _compile_enhancement_rule_ir(
     source_row: faction_subrules_2026_27.SourceEnhancementRow,
 ) -> RuleIR:
@@ -123,10 +142,38 @@ def _compile_enhancement_rule_ir(
     ).rule_ir
 
 
-def _validate_conditional_weapon_ability_enhancement_ir(
+def _validate_supported_enhancement_ir(
     *,
     rule_ir: RuleIR,
     source_row: faction_subrules_2026_27.SourceEnhancementRow,
+) -> None:
+    if source_row.source_row_id in _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS:
+        _validate_supported_effect_family_ir(
+            rule_ir=rule_ir,
+            source_row=source_row,
+            expected_template_ids=_SUPPORTED_CONDITIONAL_WEAPON_ABILITY_TEMPLATE_IDS,
+            effect_kind=RuleEffectKind.GRANT_WEAPON_ABILITY,
+            effect_family_name="weapon ability",
+        )
+    elif source_row.source_row_id in _SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS:
+        _validate_supported_effect_family_ir(
+            rule_ir=rule_ir,
+            source_row=source_row,
+            expected_template_ids=_SUPPORTED_GRANT_ABILITY_TEMPLATE_IDS,
+            effect_kind=RuleEffectKind.GRANT_ABILITY,
+            effect_family_name="ability",
+        )
+    else:
+        raise Phase17FGenericIrSupportError("Generic enhancement support row is not registered.")
+
+
+def _validate_supported_effect_family_ir(
+    *,
+    rule_ir: RuleIR,
+    source_row: faction_subrules_2026_27.SourceEnhancementRow,
+    expected_template_ids: frozenset[str],
+    effect_kind: RuleEffectKind,
+    effect_family_name: str,
 ) -> None:
     if not rule_ir.is_supported:
         raise Phase17FGenericIrSupportError(
@@ -135,22 +182,22 @@ def _validate_conditional_weapon_ability_enhancement_ir(
     template_ids = frozenset(
         clause.template_id for clause in rule_ir.clauses if clause.template_id is not None
     )
-    if template_ids != _SUPPORTED_TEMPLATE_IDS:
+    if template_ids != expected_template_ids:
         raise Phase17FGenericIrSupportError(
-            "Generic enhancement support row must use only the stage-1 template family."
+            "Generic enhancement support row must use only its registered template family."
         )
-    weapon_ability_effect_count = 0
+    effect_count = 0
     for clause in rule_ir.clauses:
         if clause.unsupported_reason is not None or clause.diagnostics:
             raise Phase17FGenericIrSupportError(
                 "Generic enhancement support row includes unsupported clause diagnostics."
             )
         for effect in clause.effects:
-            if effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY:
-                weapon_ability_effect_count += 1
-    if weapon_ability_effect_count != 1:
+            if effect.kind is effect_kind:
+                effect_count += 1
+    if effect_count != 1:
         raise Phase17FGenericIrSupportError(
-            "Generic enhancement support row must grant one weapon ability."
+            f"Generic enhancement support row must grant one {effect_family_name}."
         )
     expected_source_id = f"{SOURCE_PACKAGE_ID}:phase17e:{source_row.source_row_id}:source-text"
     if rule_ir.source_id != expected_source_id:
@@ -180,10 +227,7 @@ def _enhancement_source_row_by_coverage_descriptor_id() -> Mapping[
 ]:
     rows: dict[str, faction_subrules_2026_27.SourceEnhancementRow] = {}
     for source_row in faction_subrules_2026_27.enhancement_rows():
-        if (
-            source_row.source_row_id
-            not in _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
-        ):
+        if source_row.source_row_id not in _supported_enhancement_source_row_ids():
             continue
         descriptor_id = f"phase17e:{source_row.source_row_id}"
         if descriptor_id in rows:
@@ -207,6 +251,15 @@ def _enhancement_raw_description_by_bridge_id() -> Mapping[str, str]:
             table=_ENHANCEMENTS_TABLE,
         )
     return descriptions
+
+
+def _supported_enhancement_source_row_ids() -> frozenset[str]:
+    return frozenset(
+        {
+            *_SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
+            *_SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
+        }
+    )
 
 
 def _load_source_json_artifact(table: str) -> Mapping[str, object]:

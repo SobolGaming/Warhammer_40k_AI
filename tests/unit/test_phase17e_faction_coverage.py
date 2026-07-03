@@ -91,6 +91,19 @@ GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         "enhancement:space-marines:ceramite-sentinels:000010759004",
     }
 )
+GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        "enhancement:genestealer-cults:outlander-claw:000009079002",
+        "enhancement:orks:more-dakka:000009991005",
+        "enhancement:tyranids:warrior-bioform-onslaught:000009737005",
+    }
+)
+GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        *GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
+        *GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
+    }
+)
 BLOOD_LEGION_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall",
     "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted",
@@ -975,7 +988,7 @@ def test_phase17e_coverage_report_groups_supported_and_approved_unsupported_rows
     implemented_army_rule_count = len(FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID)
     implemented_detachment_rule_count = len(CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY)
     source_only_exact_count = len(enhancement_rows) + len(stratagem_rows) - implemented_exact_count
-    generic_supported_count = len(GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS)
+    generic_supported_count = len(GENERIC_ENHANCEMENT_SOURCE_ROW_IDS)
     status_counts = package.status_counts()
 
     assert status_counts[Phase17ECoverageStatus.IMPLEMENTED.value] == (
@@ -997,7 +1010,7 @@ def test_phase17e_coverage_report_groups_supported_and_approved_unsupported_rows
     assert all(row.is_approved_unsupported for row in package.unsupported_rows())
 
 
-def test_phase17e_conditional_weapon_ability_enhancements_are_generic_supported() -> None:
+def test_phase17e_generic_enhancements_are_template_family_bounded() -> None:
     package = faction_coverage_source.phase17e_coverage_package()
     generic_rows = tuple(
         row
@@ -1015,8 +1028,14 @@ def test_phase17e_conditional_weapon_ability_enhancements_are_generic_supported(
         == GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
     )
     assert (
-        set(rows_by_source_row_id) == GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
+        set(generic_ir_support_source.supported_grant_ability_enhancement_source_row_ids())
+        == GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
     )
+    assert (
+        set(generic_ir_support_source.supported_generic_enhancement_source_row_ids())
+        == GENERIC_ENHANCEMENT_SOURCE_ROW_IDS
+    )
+    assert set(rows_by_source_row_id) == GENERIC_ENHANCEMENT_SOURCE_ROW_IDS
     for source_row_id, row in rows_by_source_row_id.items():
         assert row.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
         assert row.handler_id is None
