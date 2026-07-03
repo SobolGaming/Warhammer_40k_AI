@@ -115,7 +115,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `830bbc8590540ea7d2d60944eac0b0d0a3302205f14490adc4f9e40b400d0829`
+  `a076f2bc3fe41749fb41c864a13af3802741b4875edeaa849ca42ce3af956bb9`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -125,10 +125,11 @@ implemented. Datasheet intake is fail-closed as an approved unsupported
 diagnostic. Exact Enhancement and Stratagem rows are generated from the exact
 subrule source package and include stable rule IDs, owner faction/detachment IDs,
 timing/category metadata, source IDs, and support status. Source-only exact rows
-outside generic IR are named-handler-required; nine exact Enhancement rows in
-the conditional weapon-ability grant and grant-ability template families are
-generic-supported with checksum-covered RuleIR hashes; exact rows with existing
-runtime consumers are marked implemented. No aggregate faction-pack Enhancement
+outside generic IR are named-handler-required; ten exact Enhancement rows in
+the conditional weapon-ability grant, grant-ability, and
+characteristic-modification template families are generic-supported with
+checksum-covered RuleIR hashes; exact rows with existing runtime consumers are
+marked implemented. No aggregate faction-pack Enhancement
 or Stratagem row is used to hide missing detail, and no unapproved unsupported
 descriptor remains for Phase 17E matched-play coverage.
 The exact subrule source package also exposes checksum-covered
@@ -156,17 +157,17 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `d1aa5489d61c71ff613de24b947da2d737610191a0547ab93b61d9c0f06ae130`
+  `87ff93d34cdf8c6504e81bd2db9abb2275a631a12987caeb968cc1c14ce57863`
 - upstream Phase 17E checksum:
-  `830bbc8590540ea7d2d60944eac0b0d0a3302205f14490adc4f9e40b400d0829`
+  `a076f2bc3fe41749fb41c864a13af3802741b4875edeaa849ca42ce3af956bb9`
 
 The package emits 2140 execution records, one for every Phase 17E coverage row:
-2052 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, 9 rows are executable generic IR
-rows in the conditional weapon-ability grant and grant-ability template
-families, and 51 rows are executable named-handler rows because they already
-have runtime consumers: 23 faction army rules plus 28 exact detachment,
-Enhancement, and Stratagem rows.
+2051 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, 10 rows are executable generic IR
+rows in the conditional weapon-ability grant, grant-ability, and
+characteristic-modification template families, and 51 rows are executable
+named-handler rows because they already have runtime consumers: 23 faction army
+rules plus 28 exact detachment, Enhancement, and Stratagem rows.
 The engine dispatcher can route every record and returns typed `unsupported`
 diagnostics unless a matching executor is registered. No Phase 17E row remains a
 missing handler, runtime no-op, raw-PDF parse, or silent fallback. Future
@@ -422,15 +423,15 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `0b288e20327bb7012ecd2f0020f052c0e7901dbd987dda5dd0b3ca4036543715`
+  `bc2d53bc1edb482f0ebb501f76bed1391adcecd0e8a6f0e7edd6ac62364a3ffc`
 - upstream Phase 17F checksum:
-  `d1aa5489d61c71ff613de24b947da2d737610191a0547ab93b61d9c0f06ae130`
+  `87ff93d34cdf8c6504e81bd2db9abb2275a631a12987caeb968cc1c14ce57863`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
 
-The report emits 2052 classification rows, one for every Phase 17F row blocked
-as `blocked_structured_semantics_required`. It compiles 1960 rows from Wahapedia
+The report emits 2051 classification rows, one for every Phase 17F row blocked
+as `blocked_structured_semantics_required`. It compiles 1959 rows from Wahapedia
 bridge descriptions through Phase 17C and marks 92 rows as
 `source_text_not_available` metadata-only rows. Each row records the existing
 Phase 17C template IDs and template families that can already express clauses,
@@ -533,8 +534,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 12 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 35 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 1 | `executable_generic_ir` | `applied` | `none` |
+| Enhancements | 34 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 2 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 54 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 

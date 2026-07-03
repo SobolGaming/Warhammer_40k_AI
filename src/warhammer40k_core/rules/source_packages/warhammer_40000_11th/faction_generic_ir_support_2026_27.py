@@ -11,6 +11,7 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR
 from warhammer40k_core.rules.rule_templates import (
+    CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
     GRANT_ABILITY_TEMPLATE_ID,
     KEYWORD_GATE_TEMPLATE_ID,
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
@@ -52,6 +53,11 @@ _SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         "enhancement:tyranids:warrior-bioform-onslaught:000009737005",
     }
 )
+_SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        "enhancement:necrons:cryptek-conclave:000010664004",
+    }
+)
 _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_TEMPLATE_IDS = frozenset(
     {
         KEYWORD_GATE_TEMPLATE_ID,
@@ -61,6 +67,12 @@ _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_TEMPLATE_IDS = frozenset(
 _SUPPORTED_GRANT_ABILITY_TEMPLATE_IDS = frozenset(
     {
         GRANT_ABILITY_TEMPLATE_ID,
+        KEYWORD_GATE_TEMPLATE_ID,
+    }
+)
+_SUPPORTED_CHARACTERISTIC_MODIFICATION_TEMPLATE_IDS = frozenset(
+    {
+        CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
         KEYWORD_GATE_TEMPLATE_ID,
     }
 )
@@ -117,6 +129,10 @@ def supported_grant_ability_enhancement_source_row_ids() -> tuple[str, ...]:
     return tuple(sorted(_SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS))
 
 
+def supported_characteristic_modification_enhancement_source_row_ids() -> tuple[str, ...]:
+    return tuple(sorted(_SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS))
+
+
 def supported_generic_enhancement_source_row_ids() -> tuple[str, ...]:
     return tuple(sorted(_supported_enhancement_source_row_ids()))
 
@@ -163,6 +179,17 @@ def _validate_supported_enhancement_ir(
             effect_kind=RuleEffectKind.GRANT_ABILITY,
             effect_family_name="ability",
         )
+    elif (
+        source_row.source_row_id
+        in _SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
+    ):
+        _validate_supported_effect_family_ir(
+            rule_ir=rule_ir,
+            source_row=source_row,
+            expected_template_ids=_SUPPORTED_CHARACTERISTIC_MODIFICATION_TEMPLATE_IDS,
+            effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
+            effect_family_name="characteristic modifier",
+        )
     else:
         raise Phase17FGenericIrSupportError("Generic enhancement support row is not registered.")
 
@@ -197,7 +224,7 @@ def _validate_supported_effect_family_ir(
                 effect_count += 1
     if effect_count != 1:
         raise Phase17FGenericIrSupportError(
-            f"Generic enhancement support row must grant one {effect_family_name}."
+            f"Generic enhancement support row must include one {effect_family_name} effect."
         )
     expected_source_id = f"{SOURCE_PACKAGE_ID}:phase17e:{source_row.source_row_id}:source-text"
     if rule_ir.source_id != expected_source_id:
@@ -258,6 +285,7 @@ def _supported_enhancement_source_row_ids() -> frozenset[str]:
         {
             *_SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
             *_SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
+            *_SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
         }
     )
 

@@ -98,10 +98,16 @@ GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         "enhancement:tyranids:warrior-bioform-onslaught:000009737005",
     }
 )
+GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        "enhancement:necrons:cryptek-conclave:000010664004",
+    }
+)
 GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         *GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
+        *GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
     }
 )
 BLOOD_LEGION_RUNTIME_CONSUMERS = (
@@ -1030,6 +1036,12 @@ def test_phase17e_generic_enhancements_are_template_family_bounded() -> None:
     assert (
         set(generic_ir_support_source.supported_grant_ability_enhancement_source_row_ids())
         == GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
+    )
+    assert (
+        set(
+            generic_ir_support_source.supported_characteristic_modification_enhancement_source_row_ids()
+        )
+        == GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
     )
     assert (
         set(generic_ir_support_source.supported_generic_enhancement_source_row_ids())
