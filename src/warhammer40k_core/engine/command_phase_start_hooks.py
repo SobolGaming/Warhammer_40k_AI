@@ -11,6 +11,7 @@ from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
@@ -245,20 +246,15 @@ class CommandPhaseStartHookRegistry:
 
 
 def _validate_bindings(value: object) -> tuple[CommandPhaseStartHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("CommandPhaseStartHookRegistry bindings must be a tuple.")
-    bindings: list[CommandPhaseStartHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not CommandPhaseStartHookBinding:
-            raise GameLifecycleError(
-                "CommandPhaseStartHookRegistry bindings must contain hook bindings."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("CommandPhaseStartHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda item: item.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.COMMAND_PHASE_START,
+        binding_type=CommandPhaseStartHookBinding,
+        registry_name="CommandPhaseStartHookRegistry",
+        invalid_binding_message=(
+            "CommandPhaseStartHookRegistry bindings must contain hook bindings."
+        ),
+    )
 
 
 def _sequenced_command_phase_start_request(

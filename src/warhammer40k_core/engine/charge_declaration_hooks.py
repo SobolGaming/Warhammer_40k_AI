@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 if TYPE_CHECKING:
@@ -183,21 +184,16 @@ class ChargeDeclarationHookRegistry:
 
 
 def _validate_hook_bindings(value: object) -> tuple[ChargeDeclarationHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("ChargeDeclarationHookRegistry bindings must be a tuple.")
-    bindings: list[ChargeDeclarationHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not ChargeDeclarationHookBinding:
-            raise GameLifecycleError(
-                "ChargeDeclarationHookRegistry bindings must contain "
-                "ChargeDeclarationHookBinding values."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("ChargeDeclarationHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.CHARGE_DECLARATION,
+        binding_type=ChargeDeclarationHookBinding,
+        registry_name="ChargeDeclarationHookRegistry",
+        invalid_binding_message=(
+            "ChargeDeclarationHookRegistry bindings must contain "
+            "ChargeDeclarationHookBinding values."
+        ),
+    )
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

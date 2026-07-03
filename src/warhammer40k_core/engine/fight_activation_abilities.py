@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 if TYPE_CHECKING:
@@ -563,21 +564,16 @@ def _decline_payload(
 
 
 def _validate_hook_bindings(value: object) -> tuple[FightActivationAbilityHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("FightActivationAbilityHookRegistry bindings must be a tuple.")
-    bindings: list[FightActivationAbilityHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not FightActivationAbilityHookBinding:
-            raise GameLifecycleError(
-                "FightActivationAbilityHookRegistry bindings must contain "
-                "FightActivationAbilityHookBinding values."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("FightActivationAbilityHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.FIGHT_ACTIVATION_ABILITY,
+        binding_type=FightActivationAbilityHookBinding,
+        registry_name="FightActivationAbilityHookRegistry",
+        invalid_binding_message=(
+            "FightActivationAbilityHookRegistry bindings must contain "
+            "FightActivationAbilityHookBinding values."
+        ),
+    )
 
 
 def _validate_unique_option_ids(options: tuple[FightActivationAbilityOption, ...]) -> None:

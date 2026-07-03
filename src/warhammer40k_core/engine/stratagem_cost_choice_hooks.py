@@ -9,6 +9,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
@@ -218,18 +219,14 @@ def source_result_payload_for_cost_choice(source_result: DecisionResult) -> Json
 def _validate_hook_bindings(
     value: object,
 ) -> tuple[StratagemCostChoiceHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("StratagemCostChoiceHookRegistry bindings must be a tuple.")
-    bindings: list[StratagemCostChoiceHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not StratagemCostChoiceHookBinding:
-            raise GameLifecycleError("StratagemCostChoiceHookRegistry requires hook bindings.")
-        if binding.hook_id in seen:
-            raise GameLifecycleError("Stratagem cost choice hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.STRATAGEM_COST_CHOICE,
+        binding_type=StratagemCostChoiceHookBinding,
+        registry_name="StratagemCostChoiceHookRegistry",
+        invalid_binding_message="StratagemCostChoiceHookRegistry requires hook bindings.",
+        duplicate_hook_id_message="Stratagem cost choice hook IDs must be unique.",
+    )
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

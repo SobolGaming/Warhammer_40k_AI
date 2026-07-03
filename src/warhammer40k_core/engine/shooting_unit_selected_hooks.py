@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.effects import PersistingEffect, PersistingEffectPayload
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 if TYPE_CHECKING:
@@ -327,41 +328,31 @@ class ShootingUnitSelectedGrantRegistry:
 def _validate_hook_bindings(
     value: object,
 ) -> tuple[ShootingUnitSelectedHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("ShootingUnitSelectedHookRegistry bindings must be a tuple.")
-    bindings: list[ShootingUnitSelectedHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not ShootingUnitSelectedHookBinding:
-            raise GameLifecycleError(
-                "ShootingUnitSelectedHookRegistry bindings must contain "
-                "ShootingUnitSelectedHookBinding values."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("ShootingUnitSelectedHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.SHOOTING_UNIT_SELECTED,
+        binding_type=ShootingUnitSelectedHookBinding,
+        registry_name="ShootingUnitSelectedHookRegistry",
+        invalid_binding_message=(
+            "ShootingUnitSelectedHookRegistry bindings must contain "
+            "ShootingUnitSelectedHookBinding values."
+        ),
+    )
 
 
 def _validate_grant_bindings(
     value: object,
 ) -> tuple[ShootingUnitSelectedGrantBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("ShootingUnitSelectedGrantRegistry bindings must be a tuple.")
-    bindings: list[ShootingUnitSelectedGrantBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not ShootingUnitSelectedGrantBinding:
-            raise GameLifecycleError(
-                "ShootingUnitSelectedGrantRegistry bindings must contain "
-                "ShootingUnitSelectedGrantBinding values."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("ShootingUnitSelectedGrantRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.SHOOTING_UNIT_SELECTED_GRANT,
+        binding_type=ShootingUnitSelectedGrantBinding,
+        registry_name="ShootingUnitSelectedGrantRegistry",
+        invalid_binding_message=(
+            "ShootingUnitSelectedGrantRegistry bindings must contain "
+            "ShootingUnitSelectedGrantBinding values."
+        ),
+    )
 
 
 def _validate_optional_expiration(field_name: str, value: object) -> str | None:

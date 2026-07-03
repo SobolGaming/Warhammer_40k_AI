@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 if TYPE_CHECKING:
@@ -185,21 +186,15 @@ class MovementEndSurgeHookRegistry:
 
 
 def _validate_hook_bindings(value: object) -> tuple[MovementEndSurgeHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("MovementEndSurgeHookRegistry bindings must be a tuple.")
-    bindings: list[MovementEndSurgeHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not MovementEndSurgeHookBinding:
-            raise GameLifecycleError(
-                "MovementEndSurgeHookRegistry bindings must contain "
-                "MovementEndSurgeHookBinding values."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("MovementEndSurgeHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.MOVEMENT_END_SURGE,
+        binding_type=MovementEndSurgeHookBinding,
+        registry_name="MovementEndSurgeHookRegistry",
+        invalid_binding_message=(
+            "MovementEndSurgeHookRegistry bindings must contain MovementEndSurgeHookBinding values."
+        ),
+    )
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

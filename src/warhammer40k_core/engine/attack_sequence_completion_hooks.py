@@ -9,6 +9,7 @@ from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSeque
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
@@ -187,21 +188,16 @@ def successful_hit_target_unit_ids_for_sequence(
 def _validate_hook_bindings(
     value: object,
 ) -> tuple[AttackSequenceCompletedHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("AttackSequenceCompletedHookRegistry bindings must be a tuple.")
-    bindings: list[AttackSequenceCompletedHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not AttackSequenceCompletedHookBinding:
-            raise GameLifecycleError(
-                "AttackSequenceCompletedHookRegistry bindings must contain "
-                "AttackSequenceCompletedHookBinding values."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("AttackSequenceCompletedHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.ATTACK_SEQUENCE_COMPLETED,
+        binding_type=AttackSequenceCompletedHookBinding,
+        registry_name="AttackSequenceCompletedHookRegistry",
+        invalid_binding_message=(
+            "AttackSequenceCompletedHookRegistry bindings must contain "
+            "AttackSequenceCompletedHookBinding values."
+        ),
+    )
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

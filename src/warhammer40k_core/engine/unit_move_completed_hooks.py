@@ -21,6 +21,7 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -624,18 +625,14 @@ def _source_context_event_payload(source_context: dict[str, JsonValue]) -> dict[
 def _validate_hook_bindings(
     value: object,
 ) -> tuple[UnitMoveCompletedMortalWoundHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("Unit move completed hook bindings must be a tuple.")
-    bindings: list[UnitMoveCompletedMortalWoundHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not UnitMoveCompletedMortalWoundHookBinding:
-            raise GameLifecycleError("Unit move completed hook registry requires hook bindings.")
-        if binding.hook_id in seen:
-            raise GameLifecycleError("Unit move completed hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.UNIT_MOVE_COMPLETED_MORTAL_WOUND,
+        binding_type=UnitMoveCompletedMortalWoundHookBinding,
+        registry_name="Unit move completed hook",
+        invalid_binding_message="Unit move completed hook registry requires hook bindings.",
+        duplicate_hook_id_message="Unit move completed hook IDs must be unique.",
+    )
 
 
 def _battle_phase_from_token(token: object) -> BattlePhase:

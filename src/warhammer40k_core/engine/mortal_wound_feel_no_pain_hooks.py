@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, cast
+from typing import TYPE_CHECKING, Self
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -10,6 +10,7 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
@@ -123,31 +124,24 @@ class MortalWoundFeelNoPainContinuationHookRegistry:
 def _validate_hook_bindings(
     value: object,
 ) -> tuple[MortalWoundFeelNoPainContinuationHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError(
-            "MortalWoundFeelNoPainContinuationHookRegistry bindings must be a tuple."
-        )
-    bindings: list[MortalWoundFeelNoPainContinuationHookBinding] = []
-    seen_hook_ids: set[str] = set()
+    bindings = validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.MORTAL_WOUND_FEEL_NO_PAIN_CONTINUATION,
+        binding_type=MortalWoundFeelNoPainContinuationHookBinding,
+        registry_name="MortalWoundFeelNoPainContinuationHookRegistry",
+        invalid_binding_message=(
+            "MortalWoundFeelNoPainContinuationHookRegistry bindings must contain "
+            "MortalWoundFeelNoPainContinuationHookBinding values."
+        ),
+    )
     seen_source_kinds: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not MortalWoundFeelNoPainContinuationHookBinding:
-            raise GameLifecycleError(
-                "MortalWoundFeelNoPainContinuationHookRegistry bindings must contain "
-                "MortalWoundFeelNoPainContinuationHookBinding values."
-            )
-        if binding.hook_id in seen_hook_ids:
-            raise GameLifecycleError(
-                "MortalWoundFeelNoPainContinuationHookRegistry hook IDs must be unique."
-            )
+    for binding in bindings:
         if binding.source_kind in seen_source_kinds:
             raise GameLifecycleError(
                 "MortalWoundFeelNoPainContinuationHookRegistry source kinds must be unique."
             )
-        seen_hook_ids.add(binding.hook_id)
         seen_source_kinds.add(binding.source_kind)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return bindings
 
 
 def _validate_source_context(value: JsonValue) -> JsonValue:

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 if TYPE_CHECKING:
@@ -171,21 +172,15 @@ class ShootingEndSurgeHookRegistry:
 
 
 def _validate_hook_bindings(value: object) -> tuple[ShootingEndSurgeHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("ShootingEndSurgeHookRegistry bindings must be a tuple.")
-    bindings: list[ShootingEndSurgeHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not ShootingEndSurgeHookBinding:
-            raise GameLifecycleError(
-                "ShootingEndSurgeHookRegistry bindings must contain "
-                "ShootingEndSurgeHookBinding values."
-            )
-        if binding.hook_id in seen:
-            raise GameLifecycleError("ShootingEndSurgeHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.SHOOTING_END_SURGE,
+        binding_type=ShootingEndSurgeHookBinding,
+        registry_name="ShootingEndSurgeHookRegistry",
+        invalid_binding_message=(
+            "ShootingEndSurgeHookRegistry bindings must contain ShootingEndSurgeHookBinding values."
+        ),
+    )
 
 
 def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:

@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, cast
+from typing import TYPE_CHECKING, Self
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 if TYPE_CHECKING:
@@ -102,18 +103,13 @@ class UnitDestroyedHookRegistry:
 
 
 def _validate_bindings(value: object) -> tuple[UnitDestroyedHookBinding, ...]:
-    if type(value) is not tuple:
-        raise GameLifecycleError("UnitDestroyedHookRegistry bindings must be a tuple.")
-    bindings: list[UnitDestroyedHookBinding] = []
-    seen: set[str] = set()
-    for binding in cast(tuple[object, ...], value):
-        if type(binding) is not UnitDestroyedHookBinding:
-            raise GameLifecycleError("UnitDestroyedHookRegistry requires hook bindings.")
-        if binding.hook_id in seen:
-            raise GameLifecycleError("UnitDestroyedHookRegistry hook IDs must be unique.")
-        seen.add(binding.hook_id)
-        bindings.append(binding)
-    return tuple(sorted(bindings, key=lambda item: item.hook_id))
+    return validate_hook_bindings(
+        value,
+        lifecycle_event=LifecycleHookEvent.UNIT_DESTROYED,
+        binding_type=UnitDestroyedHookBinding,
+        registry_name="UnitDestroyedHookRegistry",
+        invalid_binding_message="UnitDestroyedHookRegistry requires hook bindings.",
+    )
 
 
 def _battle_phase_from_token(token: object) -> BattlePhase:
