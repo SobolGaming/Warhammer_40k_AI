@@ -41,14 +41,23 @@ from warhammer40k_core.core.terrain_layouts import (
     TerrainLayoutTemplatePayload,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.geometry.polygons import (
+    GEOMETRY_EPSILON as _GEOMETRY_EPSILON,
+)
+from warhammer40k_core.geometry.polygons import (
+    Point2D,
+)
+from warhammer40k_core.geometry.polygons import (
+    polygon_overlap_area as geometry_polygon_overlap_area,
+)
+from warhammer40k_core.geometry.polygons import (
+    signed_polygon_area as geometry_signed_polygon_area,
+)
+from warhammer40k_core.geometry.pose import GeometryError
 
 
 class MissionPackError(ValueError):
     """Raised when mission pack data violates CORE V2 invariants."""
-
-
-_GEOMETRY_EPSILON = 1e-6
-type _Point2D = tuple[float, float]
 
 
 class SecondaryMissionAvailability(StrEnum):
@@ -3314,7 +3323,7 @@ def _deployment_zone_shape_covers_shape(
 
 def _deployment_zone_shape_polygon_points(
     shape: DeploymentZoneShape,
-) -> tuple[tuple[_Point2D, ...], ...]:
+) -> tuple[tuple[Point2D, ...], ...]:
     if shape.cutouts:
         raise MissionPackError(
             "Battlefield layout region invariant validation does not support cutout shapes."
@@ -3324,7 +3333,7 @@ def _deployment_zone_shape_polygon_points(
     )
 
 
-def _validate_shape_polygons_do_not_overlap(polygons: tuple[tuple[_Point2D, ...], ...]) -> None:
+def _validate_shape_polygons_do_not_overlap(polygons: tuple[tuple[Point2D, ...], ...]) -> None:
     for first_index, first_polygon in enumerate(polygons):
         for second_polygon in polygons[first_index + 1 :]:
             if _polygon_overlap_area(first_polygon, second_polygon) > _GEOMETRY_EPSILON:
@@ -3333,147 +3342,18 @@ def _validate_shape_polygons_do_not_overlap(polygons: tuple[tuple[_Point2D, ...]
                 )
 
 
-def _polygon_overlap_area(first: tuple[_Point2D, ...], second: tuple[_Point2D, ...]) -> float:
-    total_area = 0.0
-    for first_triangle in _triangulate_polygon(first):
-        for second_triangle in _triangulate_polygon(second):
-            total_area += _convex_polygon_intersection_area(first_triangle, second_triangle)
-    return total_area
+def _polygon_overlap_area(first: tuple[Point2D, ...], second: tuple[Point2D, ...]) -> float:
+    try:
+        return geometry_polygon_overlap_area(first, second)
+    except GeometryError as exc:
+        raise MissionPackError("Battlefield layout region polygon geometry is invalid.") from exc
 
 
-def _triangulate_polygon(vertices: tuple[_Point2D, ...]) -> tuple[tuple[_Point2D, ...], ...]:
-    if len(vertices) < 3:
-        raise MissionPackError("Battlefield layout region polygon must have at least 3 vertices.")
-    remaining = list(vertices)
-    if _signed_polygon_area(tuple(remaining)) < 0.0:
-        remaining.reverse()
-
-    triangles: list[tuple[_Point2D, ...]] = []
-    guard = len(remaining) * len(remaining)
-    while len(remaining) > 3:
-        ear_index = _find_ear_index(tuple(remaining))
-        if ear_index is None:
-            raise MissionPackError("Battlefield layout region polygon must be simple.")
-        previous_point = remaining[ear_index - 1]
-        current_point = remaining[ear_index]
-        next_point = remaining[(ear_index + 1) % len(remaining)]
-        triangles.append((previous_point, current_point, next_point))
-        del remaining[ear_index]
-        guard -= 1
-        if guard <= 0:
-            raise MissionPackError("Battlefield layout region polygon triangulation failed.")
-    triangles.append((remaining[0], remaining[1], remaining[2]))
-    return tuple(triangles)
-
-
-def _find_ear_index(vertices: tuple[_Point2D, ...]) -> int | None:
-    for index, current_point in enumerate(vertices):
-        previous_index = (index - 1) % len(vertices)
-        next_index = (index + 1) % len(vertices)
-        previous_point = vertices[previous_index]
-        next_point = vertices[next_index]
-        if _cross(previous_point, current_point, next_point) <= _GEOMETRY_EPSILON:
-            continue
-        triangle = (previous_point, current_point, next_point)
-        if any(
-            _point_in_triangle(point, triangle)
-            for point_index, point in enumerate(vertices)
-            if point_index not in {previous_index, index, next_index}
-        ):
-            continue
-        return index
-    return None
-
-
-def _convex_polygon_intersection_area(
-    first: tuple[_Point2D, ...],
-    second: tuple[_Point2D, ...],
-) -> float:
-    clipped = list(_ensure_counter_clockwise(first))
-    clip_polygon = _ensure_counter_clockwise(second)
-    clip_edges = zip(clip_polygon, (*clip_polygon[1:], clip_polygon[0]), strict=True)
-    for clip_start, clip_end in clip_edges:
-        clipped = _clip_convex_polygon(clipped, clip_start, clip_end)
-        if len(clipped) < 3:
-            return 0.0
-    return abs(_signed_polygon_area(tuple(clipped)))
-
-
-def _clip_convex_polygon(
-    subject: list[_Point2D],
-    clip_start: _Point2D,
-    clip_end: _Point2D,
-) -> list[_Point2D]:
-    if not subject:
-        return []
-    output: list[_Point2D] = []
-    previous = subject[-1]
-    previous_inside = _left_of_or_on_edge(previous, clip_start, clip_end)
-    for current in subject:
-        current_inside = _left_of_or_on_edge(current, clip_start, clip_end)
-        if current_inside:
-            if not previous_inside:
-                output.append(_line_intersection(previous, current, clip_start, clip_end))
-            output.append(current)
-        elif previous_inside:
-            output.append(_line_intersection(previous, current, clip_start, clip_end))
-        previous = current
-        previous_inside = current_inside
-    return output
-
-
-def _line_intersection(
-    first_start: _Point2D,
-    first_end: _Point2D,
-    second_start: _Point2D,
-    second_end: _Point2D,
-) -> _Point2D:
-    first_dx = first_end[0] - first_start[0]
-    first_dy = first_end[1] - first_start[1]
-    second_dx = second_end[0] - second_start[0]
-    second_dy = second_end[1] - second_start[1]
-    denominator = (first_dx * second_dy) - (first_dy * second_dx)
-    if abs(denominator) <= _GEOMETRY_EPSILON:
-        return first_end
-    numerator = ((second_start[0] - first_start[0]) * second_dy) - (
-        (second_start[1] - first_start[1]) * second_dx
-    )
-    ratio = numerator / denominator
-    return (first_start[0] + (ratio * first_dx), first_start[1] + (ratio * first_dy))
-
-
-def _ensure_counter_clockwise(vertices: tuple[_Point2D, ...]) -> tuple[_Point2D, ...]:
-    if _signed_polygon_area(vertices) < 0.0:
-        return tuple(reversed(vertices))
-    return vertices
-
-
-def _point_in_triangle(point: _Point2D, triangle: tuple[_Point2D, ...]) -> bool:
-    first, second, third = triangle
-    return (
-        _cross(first, second, point) >= -_GEOMETRY_EPSILON
-        and _cross(second, third, point) >= -_GEOMETRY_EPSILON
-        and _cross(third, first, point) >= -_GEOMETRY_EPSILON
-    )
-
-
-def _left_of_or_on_edge(point: _Point2D, edge_start: _Point2D, edge_end: _Point2D) -> bool:
-    return _cross(edge_start, edge_end, point) >= -_GEOMETRY_EPSILON
-
-
-def _cross(first: _Point2D, second: _Point2D, third: _Point2D) -> float:
-    return ((second[0] - first[0]) * (third[1] - first[1])) - (
-        (second[1] - first[1]) * (third[0] - first[0])
-    )
-
-
-def _signed_polygon_area(vertices: tuple[_Point2D, ...]) -> float:
-    area = 0.0
-    previous = vertices[-1]
-    for current in vertices:
-        area += (previous[0] * current[1]) - (current[0] * previous[1])
-        previous = current
-    return area / 2.0
+def _signed_polygon_area(vertices: tuple[Point2D, ...]) -> float:
+    try:
+        return geometry_signed_polygon_area(vertices)
+    except GeometryError as exc:
+        raise MissionPackError("Battlefield layout region polygon geometry is invalid.") from exc
 
 
 def _terrain_area_polygons_close(

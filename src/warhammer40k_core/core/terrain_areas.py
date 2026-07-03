@@ -10,6 +10,14 @@ from warhammer40k_core.core.terrain_display import (
     TerrainDisplayPointPayload,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.geometry.polygons import (
+    Point2D,
+    polygon_self_intersects,
+    signed_polygon_area,
+)
+from warhammer40k_core.geometry.polygons import (
+    polygon_bounds as geometry_polygon_bounds,
+)
 
 _AREA_EPSILON = 1e-9
 _GEOMETRY_EPSILON = 1e-6
@@ -498,9 +506,7 @@ def mirror_placed_terrain_area(
 
 def polygon_bounds(points: tuple[TerrainDisplayPoint, ...]) -> tuple[float, float, float, float]:
     polygon = _validate_polygon("polygon_bounds points", points)
-    x_values = tuple(point.x_inches for point in polygon)
-    y_values = tuple(point.y_inches for point in polygon)
-    return (min(x_values), min(y_values), max(x_values), max(y_values))
+    return geometry_polygon_bounds(_terrain_points_to_polygon_points(polygon))
 
 
 def _mirrored_center_and_rotation(
@@ -634,85 +640,17 @@ def _validate_polygon_matches_centered_bounds(
 
 
 def _polygon_area(points: tuple[TerrainDisplayPoint, ...]) -> float:
-    total = 0.0
-    for index, point in enumerate(points):
-        next_point = points[(index + 1) % len(points)]
-        total += (point.x_inches * next_point.y_inches) - (next_point.x_inches * point.y_inches)
-    return total / 2.0
+    return signed_polygon_area(_terrain_points_to_polygon_points(points))
 
 
 def _polygon_self_intersects(points: tuple[TerrainDisplayPoint, ...]) -> bool:
-    segment_count = len(points)
-    for first_index in range(segment_count):
-        first_start = points[first_index]
-        first_end = points[(first_index + 1) % segment_count]
-        for second_index in range(first_index + 1, segment_count):
-            if _segments_are_adjacent(first_index, second_index, segment_count):
-                continue
-            second_start = points[second_index]
-            second_end = points[(second_index + 1) % segment_count]
-            if _segments_intersect(first_start, first_end, second_start, second_end):
-                return True
-    return False
+    return polygon_self_intersects(_terrain_points_to_polygon_points(points))
 
 
-def _segments_are_adjacent(first_index: int, second_index: int, segment_count: int) -> bool:
-    return (
-        first_index == second_index
-        or (first_index + 1) % segment_count == second_index
-        or (second_index + 1) % segment_count == first_index
-    )
-
-
-def _segments_intersect(
-    first_start: TerrainDisplayPoint,
-    first_end: TerrainDisplayPoint,
-    second_start: TerrainDisplayPoint,
-    second_end: TerrainDisplayPoint,
-) -> bool:
-    first_orientation = _orientation(first_start, first_end, second_start)
-    second_orientation = _orientation(first_start, first_end, second_end)
-    third_orientation = _orientation(second_start, second_end, first_start)
-    fourth_orientation = _orientation(second_start, second_end, first_end)
-    if (
-        first_orientation * second_orientation < -_GEOMETRY_EPSILON
-        and third_orientation * fourth_orientation < -_GEOMETRY_EPSILON
-    ):
-        return True
-    return (
-        _point_on_segment(second_start, first_start, first_end)
-        or _point_on_segment(second_end, first_start, first_end)
-        or _point_on_segment(first_start, second_start, second_end)
-        or _point_on_segment(first_end, second_start, second_end)
-    )
-
-
-def _orientation(
-    first: TerrainDisplayPoint,
-    second: TerrainDisplayPoint,
-    third: TerrainDisplayPoint,
-) -> float:
-    return (second.x_inches - first.x_inches) * (third.y_inches - first.y_inches) - (
-        second.y_inches - first.y_inches
-    ) * (third.x_inches - first.x_inches)
-
-
-def _point_on_segment(
-    point: TerrainDisplayPoint,
-    start: TerrainDisplayPoint,
-    end: TerrainDisplayPoint,
-) -> bool:
-    orientation = _orientation(start, end, point)
-    if not math.isclose(orientation, 0.0, rel_tol=0.0, abs_tol=_GEOMETRY_EPSILON):
-        return False
-    return (
-        min(start.x_inches, end.x_inches) - _GEOMETRY_EPSILON
-        <= point.x_inches
-        <= max(start.x_inches, end.x_inches) + _GEOMETRY_EPSILON
-        and min(start.y_inches, end.y_inches) - _GEOMETRY_EPSILON
-        <= point.y_inches
-        <= max(start.y_inches, end.y_inches) + _GEOMETRY_EPSILON
-    )
+def _terrain_points_to_polygon_points(
+    points: tuple[TerrainDisplayPoint, ...],
+) -> tuple[Point2D, ...]:
+    return tuple((point.x_inches, point.y_inches) for point in points)
 
 
 def _validate_unprefixed_identifier(

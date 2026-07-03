@@ -145,8 +145,10 @@ Tests for new decision work must cover valid submission, stale/drift/malformed i
 
 Dependency direction:
 
-- `core` imports no project-layer modules
-- `geometry` may import `core`, not `engine` or `adapters`
+- `core` may import pure `geometry` primitives/helpers; it must not import
+  `rules`, `engine`, or `adapters`
+- `geometry` must not import `rules`, `engine`, `adapters`, or `interfaces`;
+  pure computational geometry modules must not import `core`
 - `rules` may import `core` and descriptors, not adapters
 - `engine` may import `core`, `geometry`, and `rules`
 - `adapters` may import `engine`; engine must not import adapters
@@ -155,6 +157,14 @@ Dependency direction:
 - every package under `src/warhammer40k_core` must be covered by an import-linter contract; adding a package without a contract fails the quality gate
 
 Enforce this with import-linter and code-quality tests.
+
+### Module size policy
+
+New modules must stay under 1,500 lines (generated faction-content modules
+keep their existing 2,000-line cap). Files above the budget are frozen to
+their current responsibilities: extract before extending. The budget is
+enforced by a code-quality test with a legacy allowlist that may only shrink;
+adding a file to the allowlist is forbidden.
 
 ## Legacy migration rule
 

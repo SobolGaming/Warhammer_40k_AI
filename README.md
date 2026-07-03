@@ -130,8 +130,8 @@ warhammer40k_core/
 Dependency direction:
 
 ```text
-core     -> no project-layer imports
-geometry -> may import core, not engine/adapters
+core     -> may import pure geometry helpers; not rules/engine/adapters
+geometry -> no rules/engine/adapters/interfaces; pure helpers do not import core
 rules    -> may import core and descriptors, not adapters
 engine   -> may import core, geometry, rules
 adapters -> may import engine, never the reverse
