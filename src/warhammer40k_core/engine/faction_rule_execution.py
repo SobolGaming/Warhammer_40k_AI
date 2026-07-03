@@ -209,6 +209,7 @@ class FactionRuleExecutionResult:
         record: Phase17FExecutionRecord,
         reason: str,
         context: FactionRuleExecutionContext,
+        replay_payload: JsonValue = None,
     ) -> Self:
         return cls(
             execution_id=record.execution_id,
@@ -222,7 +223,11 @@ class FactionRuleExecutionResult:
             source_ids=record.source_ids,
             status=FactionRuleExecutionStatus.UNSUPPORTED,
             reason=reason,
-            replay_payload=_replay_payload(record=record, context=context),
+            replay_payload=(
+                _replay_payload(record=record, context=context)
+                if replay_payload is None
+                else replay_payload
+            ),
         )
 
     @classmethod
@@ -420,8 +425,15 @@ class FactionRuleExecutionRegistry:
 def default_faction_rule_execution_registry() -> FactionRuleExecutionRegistry:
     return FactionRuleExecutionRegistry.from_records(
         faction_execution_2026_27.execution_records(),
-        generic_ir_executor=_generic_rule_ir_executor,
+        generic_ir_executor=default_faction_rule_generic_ir_executor,
     )
+
+
+def default_faction_rule_generic_ir_executor(
+    record: Phase17FExecutionRecord,
+    context: FactionRuleExecutionContext,
+) -> FactionRuleExecutionResult:
+    return _generic_rule_ir_executor(record, context)
 
 
 def _generic_rule_ir_executor(
@@ -446,14 +458,14 @@ def _generic_rule_ir_executor(
             trigger_payload=context.trigger_payload,
         ),
     )
-    return _faction_result_from_rule_execution_result(
+    return faction_result_from_rule_execution_result(
         record=record,
         context=context,
         rule_result=rule_result,
     )
 
 
-def _faction_result_from_rule_execution_result(
+def faction_result_from_rule_execution_result(
     *,
     record: Phase17FExecutionRecord,
     context: FactionRuleExecutionContext,
@@ -486,6 +498,7 @@ def _faction_result_from_rule_execution_result(
             record=record,
             reason=rule_result.reason,
             context=context,
+            replay_payload=replay_payload,
         )
     raise GameLifecycleError("Unsupported generic rule execution result status.")
 

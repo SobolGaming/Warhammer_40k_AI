@@ -73,6 +73,7 @@ from warhammer40k_core.engine.faction_content.manifest import (
     RuntimeContentManifest,
     RuntimeContentManifestRow,
     RuntimeContentModuleFamily,
+    RuntimeContentSemanticStatus,
     RuntimeContentSupportStatus,
 )
 from warhammer40k_core.engine.faction_content.runtime import (
@@ -322,6 +323,7 @@ def test_runtime_manifest_generation_merges_catalog_rows_and_generated_support()
         "execution:weapon",
     )
     assert summary_row["support_status"] == RuntimeContentSupportStatus.SUPPORTED.value
+    assert summary_row["semantic_status"] == RuntimeContentSemanticStatus.PLACEHOLDER.value
 
     with pytest.raises(GameLifecycleError, match="requires ArmyCatalog"):
         RuntimeContentManifest.from_catalog(
@@ -403,6 +405,34 @@ def test_runtime_manifest_validation_is_fail_fast() -> None:
             execution_record_ids=(),
             module_path=None,
             support_status=cast(RuntimeContentSupportStatus, "bad-status"),
+        )
+    with pytest.raises(GameLifecycleError, match="RuntimeContentSemanticStatus token"):
+        RuntimeContentManifestRow(
+            content_id="bad-semantic-status-type",
+            family=RuntimeContentModuleFamily.FACTION,
+            source_ids=("source:bad-semantic-status-type",),
+            owner_faction_id=None,
+            owner_detachment_id=None,
+            source_package_id="source-package-id:test",
+            source_package_hash="source-package-hash:test",
+            execution_record_ids=(),
+            module_path=None,
+            support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
+            semantic_status=cast(RuntimeContentSemanticStatus, 17),
+        )
+    with pytest.raises(GameLifecycleError, match="Unsupported RuntimeContentSemanticStatus"):
+        RuntimeContentManifestRow(
+            content_id="bad-semantic-status-token",
+            family=RuntimeContentModuleFamily.FACTION,
+            source_ids=("source:bad-semantic-status-token",),
+            owner_faction_id=None,
+            owner_detachment_id=None,
+            source_package_id="source-package-id:test",
+            source_package_hash="source-package-hash:test",
+            execution_record_ids=(),
+            module_path=None,
+            support_status=RuntimeContentSupportStatus.SOURCE_ONLY,
+            semantic_status=cast(RuntimeContentSemanticStatus, "bad-semantic-status"),
         )
     with pytest.raises(GameLifecycleError, match="dependency_ids must not contain duplicates"):
         _manifest_row(
@@ -1806,6 +1836,7 @@ def _manifest_row(
     support_status: RuntimeContentSupportStatus = RuntimeContentSupportStatus.SUPPORTED,
     dependency_ids: tuple[str, ...] = (),
     execution_record_ids: tuple[str, ...] = (),
+    semantic_status: RuntimeContentSemanticStatus = RuntimeContentSemanticStatus.PLACEHOLDER,
     support_reason: str | None = None,
     unsupported_reason: str | None = None,
     required_for_matched_play: bool = True,
@@ -1822,6 +1853,7 @@ def _manifest_row(
         module_path=module_path,
         support_status=support_status,
         dependency_ids=dependency_ids,
+        semantic_status=semantic_status,
         support_reason=support_reason,
         unsupported_reason=unsupported_reason,
         required_for_matched_play=required_for_matched_play,

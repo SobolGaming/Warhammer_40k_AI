@@ -16,6 +16,7 @@ instructions, and then compiled into 11th Edition catalog records.
 - [Phase 17H Datasheet, Wargear, and Weapon Execution Gate](#phase-17h-datasheet-wargear-and-weapon-execution-gate)
 - [Phase 17I Coverage and Unsupported Audit Gate](#phase-17i-coverage-and-unsupported-audit-gate)
 - [Phase 17I Blocked Row Classification Report](#phase-17i-blocked-row-classification-report)
+- [Phase 17I Named Handler Budget](#phase-17i-named-handler-budget)
 - [WS14 IR-First Content-Drop Runbook](#ws14-ir-first-content-drop-runbook)
 - [Faction Execution Status Matrix](#faction-execution-status-matrix)
   - [Death Guard Execution Status](#death-guard-execution-status)
@@ -178,6 +179,9 @@ Phase 17F is an execution dispatch gate, not semantic execution. It proves that
 every Phase 17E coverage row has a deterministic fail-closed engine route. It
 does not implement the game effects of army rules, detachment rules,
 enhancements, or Stratagems.
+Generic IR execution loads checksum-covered static RuleIR payloads from the
+source package and verifies the Phase 17F `rule_ir_hash`; runtime dispatch does
+not compile raw source prose or read raw source snapshot JSON.
 
 ## Phase 17G Runtime Scaffold Gate
 
@@ -449,6 +453,32 @@ The payload does not emit raw rule text. It emits source IDs, template IDs,
 template family tokens, diagnostic reason tokens, and capability family tokens
 only, so runtime engine code remains forbidden from consuming source text or
 re-parsing rule prose.
+
+## Phase 17I Named Handler Budget
+
+WS14 step 3 is enforced as a deterministic Phase 17I source package artifact:
+
+- package ID: `gw-11e-phase17i-named-handler-budget-2026-27`
+- path:
+  `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_named_handler_budget_2026_27.py`
+- source title:
+  `Warhammer 40,000 11th Edition Phase 17I Named Handler Budget`
+- source version: `2026-27`
+- source date: `2026-07-03`
+- upstream identity: `gw-11e-phase17f-faction-execution-2026-27`
+- source edition: `11th`
+- schema version: `core-v2-phase17i-named-handler-budget-v1`
+- source-payload SHA-256 checksum:
+  `f894648324bcd41c0f0745d0bf58e2ef420eb78702c8877bd4fb82ffaf3c70d2`
+- upstream Phase 17F checksum:
+  `87ff93d34cdf8c6504e81bd2db9abb2275a631a12987caeb968cc1c14ce57863`
+
+The budget report tracks 51 executable named-handler Phase 17F rows and 51
+approved entries. The current approved reason is
+`pre_ws14_existing_runtime_consumer`, which is a fixed baseline for handlers
+that existed before the WS14 IR-first pivot. The code-quality audit fails if a
+new named handler appears without an approved entry, or if a row migrates away
+from named-handler execution and leaves a stale approval behind.
 
 ## WS14 IR-First Content-Drop Runbook
 

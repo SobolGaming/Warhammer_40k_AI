@@ -6,12 +6,15 @@ from typing import Literal, TypedDict, cast
 from warhammer40k_core.core.datasheet import CatalogAbilitySupport
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, muster_army
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.faction_content.manifest import RuntimeContentSupportStatus
+from warhammer40k_core.engine.faction_content.manifest import (
+    RuntimeContentSemanticStatus,
+    RuntimeContentSupportStatus,
+)
 from warhammer40k_core.engine.faction_content.runtime import runtime_content_manifest_for_ruleset
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.phase import GameLifecycleError
 
-SUPPORT_PROFILE_SCHEMA_VERSION = "support-profile-v1-phase18e"
+SUPPORT_PROFILE_SCHEMA_VERSION = "support-profile-v2-ws14"
 
 type AdapterSupportStatus = Literal["unsupported", "playable", "full"]
 
@@ -54,6 +57,7 @@ class RuntimeSupportRowPayload(TypedDict):
     owner_faction_id: str | None
     owner_detachment_id: str | None
     runtime_support: str
+    semantic_status: str
     status: AdapterSupportStatus
     support_reason: str | None
     unsupported_reason: str | None
@@ -214,7 +218,8 @@ def _legality_status(*, army: ArmyDefinition) -> str:
 
 def _runtime_support_row(row: dict[str, JsonValue]) -> RuntimeSupportRowPayload:
     runtime_support = _required_string(row, key="support_status")
-    status = _runtime_support_status(runtime_support)
+    semantic_status = _required_string(row, key="semantic_status")
+    status = _runtime_support_status(runtime_support, semantic_status)
     family = _required_string(row, key="family")
     content_id = _required_string(row, key="content_id")
     return {
@@ -225,6 +230,7 @@ def _runtime_support_row(row: dict[str, JsonValue]) -> RuntimeSupportRowPayload:
         "owner_faction_id": _optional_string(row, key="owner_faction_id"),
         "owner_detachment_id": _optional_string(row, key="owner_detachment_id"),
         "runtime_support": runtime_support,
+        "semantic_status": semantic_status,
         "status": status,
         "support_reason": _optional_string(row, key="support_reason"),
         "unsupported_reason": _optional_string(row, key="unsupported_reason"),
@@ -243,16 +249,29 @@ def _catalog_ability_status(support: CatalogAbilitySupport) -> AdapterSupportSta
     raise GameLifecycleError("Unknown CatalogAbilitySupport status.")
 
 
-def _runtime_support_status(status: str) -> AdapterSupportStatus:
+def _runtime_support_status(
+    runtime_support: str,
+    semantic_status: str,
+) -> AdapterSupportStatus:
     try:
-        runtime_status = RuntimeContentSupportStatus(status)
+        runtime_status = RuntimeContentSupportStatus(runtime_support)
     except ValueError as exc:
         raise GameLifecycleError("Unknown RuntimeContentSupportStatus.") from exc
+    try:
+        semantic_runtime_status = RuntimeContentSemanticStatus(semantic_status)
+    except ValueError as exc:
+        raise GameLifecycleError("Unknown RuntimeContentSemanticStatus.") from exc
     if runtime_status is RuntimeContentSupportStatus.UNSUPPORTED:
         return "unsupported"
-    if runtime_status is RuntimeContentSupportStatus.SUPPORTED:
+    if (
+        runtime_status is RuntimeContentSupportStatus.SUPPORTED
+        and semantic_runtime_status is RuntimeContentSemanticStatus.IMPLEMENTED
+    ):
         return "full"
-    if runtime_status is RuntimeContentSupportStatus.SOURCE_ONLY:
+    if runtime_status in {
+        RuntimeContentSupportStatus.SUPPORTED,
+        RuntimeContentSupportStatus.SOURCE_ONLY,
+    }:
         return "playable"
     raise GameLifecycleError("Unknown RuntimeContentSupportStatus.")
 

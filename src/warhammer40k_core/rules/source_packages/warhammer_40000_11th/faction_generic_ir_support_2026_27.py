@@ -1,41 +1,31 @@
 from __future__ import annotations
 
-import json
-import re
 from collections.abc import Mapping
-from functools import cache
-from pathlib import Path
+from types import MappingProxyType
 from typing import cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
-from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR
+from warhammer40k_core.rules.rule_ir import (
+    RuleClausePayload,
+    RuleConditionPayload,
+    RuleEffectKind,
+    RuleEffectSpecPayload,
+    RuleIR,
+    RuleIRPayload,
+    RuleParameterPayload,
+    RuleTargetSpecPayload,
+)
 from warhammer40k_core.rules.rule_templates import (
     CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
     GRANT_ABILITY_TEMPLATE_ID,
     KEYWORD_GATE_TEMPLATE_ID,
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
 )
-from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    datasheet_keyword_lexicon_2026_06_14,
     faction_subrules_2026_27,
 )
 
 SOURCE_PACKAGE_ID = "gw-11e-phase17e-faction-coverage-2026-27"
-WAHAPEDIA_SOURCE_VERSION = "1" + "0" + "th-edition-2026-06-14"
-_SOURCE_JSON_DIR = (
-    Path(__file__).resolve().parents[5]
-    / "data"
-    / "source_snapshots"
-    / "wahapedia"
-    / ("1" + "0" + "th-edition")
-    / "2026-06-14"
-    / "json"
-)
-_BRIDGE_SOURCE_ROW_RE = re.compile(r"bridge-source-row:Enhancements:(?P<id>[^:]+)$")
-_SOURCE_DESCRIPTION_COLUMN = "description"
-_ENHANCEMENTS_TABLE = "Enhancements"
 _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         "enhancement:chaos-space-marines:renegade-warband:000010694003",
@@ -89,7 +79,7 @@ def generic_supported_enhancement_rule_ir(
         raise Phase17FGenericIrSupportError("Generic enhancement support requires source row.")
     if source_row.source_row_id not in _supported_enhancement_source_row_ids():
         return None
-    rule_ir = _compile_enhancement_rule_ir(source_row)
+    rule_ir = generic_rule_ir_by_coverage_descriptor_id(f"phase17e:{source_row.source_row_id}")
     _validate_supported_enhancement_ir(
         rule_ir=rule_ir,
         source_row=source_row,
@@ -108,13 +98,10 @@ def generic_supported_enhancement_rule_ir_hash(
 
 def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> RuleIR:
     descriptor_id = _validate_identifier("coverage_descriptor_id", coverage_descriptor_id)
-    source_row = _enhancement_source_row_by_coverage_descriptor_id().get(descriptor_id)
-    if source_row is None:
+    payload = _STATIC_GENERIC_RULE_IR_PAYLOADS_BY_COVERAGE_DESCRIPTOR_ID.get(descriptor_id)
+    if payload is None:
         raise Phase17FGenericIrSupportError("Generic IR coverage descriptor is not registered.")
-    rule_ir = generic_supported_enhancement_rule_ir(source_row)
-    if rule_ir is None:
-        raise Phase17FGenericIrSupportError("Generic IR coverage descriptor is not supported.")
-    return rule_ir
+    return RuleIR.from_payload(payload)
 
 
 def generic_rule_ir_hash_by_coverage_descriptor_id(coverage_descriptor_id: str) -> str:
@@ -135,27 +122,6 @@ def supported_characteristic_modification_enhancement_source_row_ids() -> tuple[
 
 def supported_generic_enhancement_source_row_ids() -> tuple[str, ...]:
     return tuple(sorted(_supported_enhancement_source_row_ids()))
-
-
-def _compile_enhancement_rule_ir(
-    source_row: faction_subrules_2026_27.SourceEnhancementRow,
-) -> RuleIR:
-    bridge_source_row_id = _bridge_source_row_id(source_row)
-    raw_text = _enhancement_raw_description_by_bridge_id().get(bridge_source_row_id)
-    if raw_text is None:
-        raise Phase17FGenericIrSupportError(
-            "Generic enhancement support row lacks Wahapedia bridge text."
-        )
-    source = RuleSourceText.from_raw(
-        source_id=f"{SOURCE_PACKAGE_ID}:phase17e:{source_row.source_row_id}:source-text",
-        raw_text=raw_text,
-    )
-    return compile_rule_source_text(
-        source,
-        source_keyword_sequence_parts=(
-            datasheet_keyword_lexicon_2026_06_14.canonical_datasheet_keyword_sequence_parts()
-        ),
-    ).rule_ir
 
 
 def _validate_supported_enhancement_ir(
@@ -204,7 +170,7 @@ def _validate_supported_effect_family_ir(
 ) -> None:
     if not rule_ir.is_supported:
         raise Phase17FGenericIrSupportError(
-            "Generic enhancement support row must compile to supported RuleIR."
+            "Generic enhancement support row must deserialize to supported RuleIR."
         )
     template_ids = frozenset(
         clause.template_id for clause in rule_ir.clauses if clause.template_id is not None
@@ -233,53 +199,6 @@ def _validate_supported_effect_family_ir(
         )
 
 
-def _bridge_source_row_id(source_row: faction_subrules_2026_27.SourceEnhancementRow) -> str:
-    matches = tuple(
-        match.group("id")
-        for source_id in source_row.all_source_ids
-        for match in (_BRIDGE_SOURCE_ROW_RE.search(source_id),)
-        if match is not None
-    )
-    if len(matches) != 1:
-        raise Phase17FGenericIrSupportError(
-            "Generic enhancement support row requires one Enhancements bridge source row."
-        )
-    return _validate_identifier("bridge_source_row_id", matches[0])
-
-
-@cache
-def _enhancement_source_row_by_coverage_descriptor_id() -> Mapping[
-    str,
-    faction_subrules_2026_27.SourceEnhancementRow,
-]:
-    rows: dict[str, faction_subrules_2026_27.SourceEnhancementRow] = {}
-    for source_row in faction_subrules_2026_27.enhancement_rows():
-        if source_row.source_row_id not in _supported_enhancement_source_row_ids():
-            continue
-        descriptor_id = f"phase17e:{source_row.source_row_id}"
-        if descriptor_id in rows:
-            raise Phase17FGenericIrSupportError(
-                "Generic enhancement coverage descriptor IDs must be unique."
-            )
-        rows[descriptor_id] = source_row
-    return rows
-
-
-@cache
-def _enhancement_raw_description_by_bridge_id() -> Mapping[str, str]:
-    artifact = _load_source_json_artifact(_ENHANCEMENTS_TABLE)
-    descriptions: dict[str, str] = {}
-    for row in _artifact_rows(artifact, table=_ENHANCEMENTS_TABLE):
-        row_id = _source_row_id(row, table=_ENHANCEMENTS_TABLE)
-        fields = _row_fields(row, table=_ENHANCEMENTS_TABLE)
-        descriptions[row_id] = _required_field_text(
-            fields,
-            field_name=_SOURCE_DESCRIPTION_COLUMN,
-            table=_ENHANCEMENTS_TABLE,
-        )
-    return descriptions
-
-
 def _supported_enhancement_source_row_ids() -> frozenset[str]:
     return frozenset(
         {
@@ -290,75 +209,735 @@ def _supported_enhancement_source_row_ids() -> frozenset[str]:
     )
 
 
-def _load_source_json_artifact(table: str) -> Mapping[str, object]:
-    path = _SOURCE_JSON_DIR / f"{table}.json"
-    if not path.is_file():
-        raise Phase17FGenericIrSupportError(f"Generic IR source artifact is missing: {path}.")
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, dict):
-        raise Phase17FGenericIrSupportError(
-            f"Generic IR source artifact {table} must be a JSON object."
-        )
-    return cast(Mapping[str, object], payload)
+def _coverage_descriptor_id(source_row_id: str) -> str:
+    return f"phase17e:{source_row_id}"
 
 
-def _artifact_rows(
-    artifact: Mapping[str, object], *, table: str
-) -> tuple[Mapping[str, object], ...]:
-    rows = artifact.get("rows")
-    if not isinstance(rows, list):
-        raise Phase17FGenericIrSupportError(
-            f"Generic IR source artifact {table} rows must be a list."
-        )
-    validated: list[Mapping[str, object]] = []
-    row_values = cast(list[object], rows)
-    for row in row_values:
-        if not isinstance(row, dict):
+def _source_text_id(source_row_id: str) -> str:
+    return f"{SOURCE_PACKAGE_ID}:phase17e:{source_row_id}:source-text"
+
+
+def _rule_ir_payload(
+    *,
+    source_row_id: str,
+    normalized_text: str,
+    clauses: tuple[RuleClausePayload, ...],
+    ir_hash: str,
+) -> RuleIRPayload:
+    source_id = _source_text_id(source_row_id)
+    return cast(
+        RuleIRPayload,
+        {
+            "rule_id": source_id,
+            "source_id": source_id,
+            "normalized_text": normalized_text,
+            "parser_version": "phase17c-rule-parser-v1",
+            "schema_version": "phase17c-rule-ir-v1",
+            "clauses": list(clauses),
+            "diagnostics": [],
+            "ir_hash": ir_hash,
+        },
+    )
+
+
+def _keyword_gate_clause(
+    *,
+    source_row_id: str,
+    clause_number: int,
+    source_text: str,
+    source_start: int,
+    source_end: int,
+    keyword_text: str,
+    keyword_start: int,
+    keyword_end: int,
+    required_keywords: tuple[str, ...],
+) -> RuleClausePayload:
+    return cast(
+        RuleClausePayload,
+        {
+            "clause_id": _clause_id(source_row_id, clause_number),
+            "template_id": KEYWORD_GATE_TEMPLATE_ID,
+            "source_span": _span(source_text, source_start, source_end),
+            "trigger": None,
+            "conditions": [
+                _keyword_gate_condition(
+                    source_text=keyword_text,
+                    source_start=keyword_start,
+                    source_end=keyword_end,
+                    required_keyword=required_keyword,
+                )
+                for required_keyword in required_keywords
+            ],
+            "target": None,
+            "effects": [],
+            "duration": None,
+            "unsupported_reason": None,
+            "diagnostics": [],
+        },
+    )
+
+
+def _weapon_ability_grant_clause(
+    *,
+    source_row_id: str,
+    clause_number: int,
+    source_text: str,
+    source_start: int,
+    source_end: int,
+    target_kind: str,
+    target_text: str,
+    target_start: int,
+    target_end: int,
+    effect_text: str,
+    effect_start: int,
+    effect_end: int,
+    weapon_ability: str,
+    weapon_ability_value: int | None = None,
+) -> RuleClausePayload:
+    parameters = [_parameter("weapon_ability", weapon_ability)]
+    if weapon_ability_value is not None:
+        parameters.append(_parameter("weapon_ability_value", weapon_ability_value))
+    parameters.append(_parameter("weapon_scope", "ranged"))
+    return _effect_clause(
+        source_row_id=source_row_id,
+        clause_number=clause_number,
+        template_id=WEAPON_ABILITY_GRANT_TEMPLATE_ID,
+        source_text=source_text,
+        source_start=source_start,
+        source_end=source_end,
+        target=_target(target_kind, target_text, target_start, target_end),
+        effect=_effect("grant_weapon_ability", effect_text, effect_start, effect_end, parameters),
+    )
+
+
+def _grant_ability_clause(
+    *,
+    source_row_id: str,
+    clause_number: int,
+    source_text: str,
+    source_start: int,
+    source_end: int,
+    target_text: str,
+    target_start: int,
+    target_end: int,
+    effect_text: str,
+    effect_start: int,
+    effect_end: int,
+    ability: str,
+) -> RuleClausePayload:
+    return _effect_clause(
+        source_row_id=source_row_id,
+        clause_number=clause_number,
+        template_id=GRANT_ABILITY_TEMPLATE_ID,
+        source_text=source_text,
+        source_start=source_start,
+        source_end=source_end,
+        target=_target("this_unit", target_text, target_start, target_end),
+        effect=_effect(
+            "grant_ability",
+            effect_text,
+            effect_start,
+            effect_end,
+            [_parameter("ability", ability)],
+        ),
+    )
+
+
+def _characteristic_modifier_clause(
+    *,
+    source_row_id: str,
+    clause_number: int,
+    source_text: str,
+    source_start: int,
+    source_end: int,
+    target_text: str,
+    target_start: int,
+    target_end: int,
+    effect_text: str,
+    effect_start: int,
+    effect_end: int,
+    characteristic: str,
+    delta: int,
+) -> RuleClausePayload:
+    return _effect_clause(
+        source_row_id=source_row_id,
+        clause_number=clause_number,
+        template_id=CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
+        source_text=source_text,
+        source_start=source_start,
+        source_end=source_end,
+        target=_target("this_unit", target_text, target_start, target_end),
+        effect=_effect(
+            "modify_characteristic",
+            effect_text,
+            effect_start,
+            effect_end,
+            [
+                _parameter("characteristic", characteristic),
+                _parameter("delta", delta),
+            ],
+        ),
+    )
+
+
+def _effect_clause(
+    *,
+    source_row_id: str,
+    clause_number: int,
+    template_id: str,
+    source_text: str,
+    source_start: int,
+    source_end: int,
+    target: RuleTargetSpecPayload,
+    effect: RuleEffectSpecPayload,
+) -> RuleClausePayload:
+    return cast(
+        RuleClausePayload,
+        {
+            "clause_id": _clause_id(source_row_id, clause_number),
+            "template_id": template_id,
+            "source_span": _span(source_text, source_start, source_end),
+            "trigger": None,
+            "conditions": [],
+            "target": target,
+            "effects": [effect],
+            "duration": None,
+            "unsupported_reason": None,
+            "diagnostics": [],
+        },
+    )
+
+
+def _keyword_gate_condition(
+    *,
+    source_text: str,
+    source_start: int,
+    source_end: int,
+    required_keyword: str,
+) -> RuleConditionPayload:
+    return cast(
+        RuleConditionPayload,
+        {
+            "kind": "keyword_gate",
+            "source_span": _span(source_text, source_start, source_end),
+            "parameters": [_parameter("required_keyword", required_keyword)],
+        },
+    )
+
+
+def _target(
+    kind: str, source_text: str, source_start: int, source_end: int
+) -> RuleTargetSpecPayload:
+    return cast(
+        RuleTargetSpecPayload,
+        {
+            "kind": kind,
+            "source_span": _span(source_text, source_start, source_end),
+            "parameters": [],
+        },
+    )
+
+
+def _effect(
+    kind: str,
+    source_text: str,
+    source_start: int,
+    source_end: int,
+    parameters: list[RuleParameterPayload],
+) -> RuleEffectSpecPayload:
+    return cast(
+        RuleEffectSpecPayload,
+        {
+            "kind": kind,
+            "source_span": _span(source_text, source_start, source_end),
+            "parameters": parameters,
+        },
+    )
+
+
+def _parameter(key: str, value: str | int) -> RuleParameterPayload:
+    return cast(RuleParameterPayload, {"key": key, "value": value})
+
+
+def _span(text: str, start: int, end: int) -> dict[str, str | int]:
+    return {"text": text, "start": start, "end": end}
+
+
+def _clause_id(source_row_id: str, clause_number: int) -> str:
+    return f"{_source_text_id(source_row_id)}:clause:{clause_number:03d}"
+
+
+def _static_generic_rule_ir_payloads() -> Mapping[str, RuleIRPayload]:
+    payloads: dict[str, RuleIRPayload] = {}
+    for source_row_id, payload in _STATIC_GENERIC_RULE_IR_PAYLOAD_ROWS:
+        descriptor_id = _coverage_descriptor_id(source_row_id)
+        if descriptor_id in payloads:
             raise Phase17FGenericIrSupportError(
-                f"Generic IR source artifact {table} rows must contain objects."
+                "Static generic IR coverage descriptor IDs must be unique."
             )
-        validated.append(cast(Mapping[str, object], row))
-    return tuple(validated)
+        payloads[descriptor_id] = payload
+    return MappingProxyType(payloads)
 
 
-def _source_row_id(row: Mapping[str, object], *, table: str) -> str:
-    value = row.get("source_row_id")
-    if type(value) is not str:
-        raise Phase17FGenericIrSupportError(
-            f"Generic IR source row in {table} lacks source_row_id."
-        )
-    return _validate_identifier("source_row_id", value)
+_CHAOS_SPACE_MARINES_RENEGADE_WARBAND_EYES_OF_THE_HUNTER = (
+    "enhancement:chaos-space-marines:renegade-warband:000010694003"
+)
+_GENESTEALER_CULTS_OUTLANDER_CLAW_SERPENTINE_TACTICS = (
+    "enhancement:genestealer-cults:outlander-claw:000009079002"
+)
+_IMPERIAL_KNIGHTS_FREEBLADE_COMPANY_MYSTERIOUS_GUARDIAN = (
+    "enhancement:imperial-knights:freeblade-company:000010755003"
+)
+_NECRONS_CRYPTEK_CONCLAVE_GAUNTLET_OF_COMPRESSION = (
+    "enhancement:necrons:cryptek-conclave:000010664004"
+)
+_NECRONS_STARSHATTER_ARSENAL_MINIATURISED_NEBULOSCOPE = (
+    "enhancement:necrons:starshatter-arsenal:000009749003"
+)
+_ORKS_FREEBOOTER_KREW_SNEAKY_SNEAKIN = "enhancement:orks:freebooter-krew:000010712003"
+_ORKS_MORE_DAKKA_KUNNIN_BUT_BRUTAL = "enhancement:orks:more-dakka:000009991003"
+_ORKS_MORE_DAKKA_SUPA_CYBORK_BODY = "enhancement:orks:more-dakka:000009991005"
+_SPACE_MARINES_CERAMITE_SENTINELS_AUSPEX_INTERFACE = (
+    "enhancement:space-marines:ceramite-sentinels:000010759004"
+)
+_TYRANIDS_WARRIOR_BIOFORM_ONSLAUGHT_ELEVATED_MIGHT = (
+    "enhancement:tyranids:warrior-bioform-onslaught:000009737005"
+)
 
-
-def _row_fields(row: Mapping[str, object], *, table: str) -> Mapping[str, str]:
-    fields = row.get("fields")
-    if not isinstance(fields, dict):
-        raise Phase17FGenericIrSupportError(f"Generic IR source row in {table} lacks fields.")
-    validated: dict[str, str] = {}
-    field_values = cast(dict[object, object], fields)
-    for key, value in field_values.items():
-        if type(key) is not str or type(value) is not str:
-            raise Phase17FGenericIrSupportError(
-                f"Generic IR source row in {table} fields must be strings."
-            )
-        validated[key] = value
-    return validated
-
-
-def _required_field_text(fields: Mapping[str, str], *, field_name: str, table: str) -> str:
-    value = fields.get(field_name)
-    if value is None:
-        raise Phase17FGenericIrSupportError(f"Generic IR source row in {table} lacks {field_name}.")
-    return _validate_text(field_name, value)
-
-
-def _validate_text(field_name: str, value: object) -> str:
-    if type(value) is not str:
-        raise Phase17FGenericIrSupportError(f"{field_name} must be text.")
-    stripped = value.strip()
-    if not stripped:
-        raise Phase17FGenericIrSupportError(f"{field_name} must not be empty.")
-    return stripped
-
+_STATIC_GENERIC_RULE_IR_PAYLOAD_ROWS: tuple[tuple[str, RuleIRPayload], ...] = (
+    (
+        _CHAOS_SPACE_MARINES_RENEGADE_WARBAND_EYES_OF_THE_HUNTER,
+        _rule_ir_payload(
+            source_row_id=_CHAOS_SPACE_MARINES_RENEGADE_WARBAND_EYES_OF_THE_HUNTER,
+            normalized_text=(
+                "HERETIC ASTARTES model only. Ranged weapons equipped by models in "
+                "the bearer's unit have the [Ignores Cover] ability."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_CHAOS_SPACE_MARINES_RENEGADE_WARBAND_EYES_OF_THE_HUNTER,
+                    clause_number=1,
+                    source_text="HERETIC ASTARTES model only.",
+                    source_start=0,
+                    source_end=28,
+                    keyword_text="HERETIC ASTARTES model",
+                    keyword_start=0,
+                    keyword_end=22,
+                    required_keywords=("HERETIC_ASTARTES",),
+                ),
+                _weapon_ability_grant_clause(
+                    source_row_id=_CHAOS_SPACE_MARINES_RENEGADE_WARBAND_EYES_OF_THE_HUNTER,
+                    clause_number=2,
+                    source_text=(
+                        "Ranged weapons equipped by models in the bearer's unit have "
+                        "the [Ignores Cover] ability."
+                    ),
+                    source_start=29,
+                    source_end=117,
+                    target_kind="this_unit",
+                    target_text="models in the bearer's unit",
+                    target_start=56,
+                    target_end=83,
+                    effect_text=(
+                        "Ranged weapons equipped by models in the bearer's unit have "
+                        "the [Ignores Cover] ability"
+                    ),
+                    effect_start=29,
+                    effect_end=116,
+                    weapon_ability="Ignores Cover",
+                ),
+            ),
+            ir_hash="7b3d97a7f6cc445febfdbc52faad53cf9d3bcf937dc647c26a1a0d6a9366816d",
+        ),
+    ),
+    (
+        _GENESTEALER_CULTS_OUTLANDER_CLAW_SERPENTINE_TACTICS,
+        _rule_ir_payload(
+            source_row_id=_GENESTEALER_CULTS_OUTLANDER_CLAW_SERPENTINE_TACTICS,
+            normalized_text=(
+                "GENESTEALER CULTS MOUNTED model only. The bearer's unit is eligible "
+                "to shoot in a turn in which it Fell Back."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_GENESTEALER_CULTS_OUTLANDER_CLAW_SERPENTINE_TACTICS,
+                    clause_number=1,
+                    source_text="GENESTEALER CULTS MOUNTED model only.",
+                    source_start=0,
+                    source_end=37,
+                    keyword_text="GENESTEALER CULTS MOUNTED model",
+                    keyword_start=0,
+                    keyword_end=31,
+                    required_keywords=("GENESTEALER_CULTS", "MOUNTED"),
+                ),
+                _grant_ability_clause(
+                    source_row_id=_GENESTEALER_CULTS_OUTLANDER_CLAW_SERPENTINE_TACTICS,
+                    clause_number=2,
+                    source_text=(
+                        "The bearer's unit is eligible to shoot in a turn in which it Fell Back."
+                    ),
+                    source_start=38,
+                    source_end=109,
+                    target_text="The bearer's unit",
+                    target_start=38,
+                    target_end=55,
+                    effect_text="is eligible to shoot in a turn in which it Fell Back",
+                    effect_start=56,
+                    effect_end=108,
+                    ability="can_fall_back_and_shoot",
+                ),
+            ),
+            ir_hash="e3aa34cc33411062d9313d9487a83729ee278b1a8f5a003652c79e84909f92fe",
+        ),
+    ),
+    (
+        _IMPERIAL_KNIGHTS_FREEBLADE_COMPANY_MYSTERIOUS_GUARDIAN,
+        _rule_ir_payload(
+            source_row_id=_IMPERIAL_KNIGHTS_FREEBLADE_COMPANY_MYSTERIOUS_GUARDIAN,
+            normalized_text=(
+                "IMPERIAL KNIGHTS model only. Ranged weapons equipped by the bearer "
+                "have the [Ignores Cover] ability."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_IMPERIAL_KNIGHTS_FREEBLADE_COMPANY_MYSTERIOUS_GUARDIAN,
+                    clause_number=1,
+                    source_text="IMPERIAL KNIGHTS model only.",
+                    source_start=0,
+                    source_end=28,
+                    keyword_text="IMPERIAL KNIGHTS model",
+                    keyword_start=0,
+                    keyword_end=22,
+                    required_keywords=("IMPERIAL_KNIGHTS",),
+                ),
+                _weapon_ability_grant_clause(
+                    source_row_id=_IMPERIAL_KNIGHTS_FREEBLADE_COMPANY_MYSTERIOUS_GUARDIAN,
+                    clause_number=2,
+                    source_text=(
+                        "Ranged weapons equipped by the bearer have the [Ignores Cover] ability."
+                    ),
+                    source_start=29,
+                    source_end=100,
+                    target_kind="this_model",
+                    target_text="the bearer",
+                    target_start=56,
+                    target_end=66,
+                    effect_text=(
+                        "Ranged weapons equipped by the bearer have the [Ignores Cover] ability"
+                    ),
+                    effect_start=29,
+                    effect_end=99,
+                    weapon_ability="Ignores Cover",
+                ),
+            ),
+            ir_hash="8d7b0854604a383c163656331f296a1acf9494242635a3b6b686c9f0d89fca55",
+        ),
+    ),
+    (
+        _NECRONS_CRYPTEK_CONCLAVE_GAUNTLET_OF_COMPRESSION,
+        _rule_ir_payload(
+            source_row_id=_NECRONS_CRYPTEK_CONCLAVE_GAUNTLET_OF_COMPRESSION,
+            normalized_text=(
+                'NECRONS model only. Add 6" to the Range characteristic of ranged '
+                "weapons equipped by models in the bearer's unit."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_NECRONS_CRYPTEK_CONCLAVE_GAUNTLET_OF_COMPRESSION,
+                    clause_number=1,
+                    source_text="NECRONS model only.",
+                    source_start=0,
+                    source_end=19,
+                    keyword_text="NECRONS model",
+                    keyword_start=0,
+                    keyword_end=13,
+                    required_keywords=("NECRONS",),
+                ),
+                _characteristic_modifier_clause(
+                    source_row_id=_NECRONS_CRYPTEK_CONCLAVE_GAUNTLET_OF_COMPRESSION,
+                    clause_number=2,
+                    source_text=(
+                        'Add 6" to the Range characteristic of ranged weapons equipped '
+                        "by models in the bearer's unit."
+                    ),
+                    source_start=20,
+                    source_end=113,
+                    target_text="models in the bearer's unit",
+                    target_start=85,
+                    target_end=112,
+                    effect_text='Add 6" to the Range characteristic',
+                    effect_start=20,
+                    effect_end=54,
+                    characteristic="range",
+                    delta=6,
+                ),
+            ),
+            ir_hash="45a4770c02967f327f0ff1954cc7e4738a3e6482dba09d353737d74fd71973a3",
+        ),
+    ),
+    (
+        _NECRONS_STARSHATTER_ARSENAL_MINIATURISED_NEBULOSCOPE,
+        _rule_ir_payload(
+            source_row_id=_NECRONS_STARSHATTER_ARSENAL_MINIATURISED_NEBULOSCOPE,
+            normalized_text=(
+                "NECRONS model only. Ranged weapons equipped by models in the bearer's "
+                "unit have the [Ignores Cover] ability."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_NECRONS_STARSHATTER_ARSENAL_MINIATURISED_NEBULOSCOPE,
+                    clause_number=1,
+                    source_text="NECRONS model only.",
+                    source_start=0,
+                    source_end=19,
+                    keyword_text="NECRONS model",
+                    keyword_start=0,
+                    keyword_end=13,
+                    required_keywords=("NECRONS",),
+                ),
+                _weapon_ability_grant_clause(
+                    source_row_id=_NECRONS_STARSHATTER_ARSENAL_MINIATURISED_NEBULOSCOPE,
+                    clause_number=2,
+                    source_text=(
+                        "Ranged weapons equipped by models in the bearer's unit have "
+                        "the [Ignores Cover] ability."
+                    ),
+                    source_start=20,
+                    source_end=108,
+                    target_kind="this_unit",
+                    target_text="models in the bearer's unit",
+                    target_start=47,
+                    target_end=74,
+                    effect_text=(
+                        "Ranged weapons equipped by models in the bearer's unit have "
+                        "the [Ignores Cover] ability"
+                    ),
+                    effect_start=20,
+                    effect_end=107,
+                    weapon_ability="Ignores Cover",
+                ),
+            ),
+            ir_hash="e12690d6c901063a18892031a500d686d19442251e3fd784d3e8ba79444a7d9a",
+        ),
+    ),
+    (
+        _ORKS_FREEBOOTER_KREW_SNEAKY_SNEAKIN,
+        _rule_ir_payload(
+            source_row_id=_ORKS_FREEBOOTER_KREW_SNEAKY_SNEAKIN,
+            normalized_text=(
+                "ORKS model only. Ranged weapons equipped by models in the bearer's "
+                "unit have the [Ignores Cover] ability."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_ORKS_FREEBOOTER_KREW_SNEAKY_SNEAKIN,
+                    clause_number=1,
+                    source_text="ORKS model only.",
+                    source_start=0,
+                    source_end=16,
+                    keyword_text="ORKS model",
+                    keyword_start=0,
+                    keyword_end=10,
+                    required_keywords=("ORKS",),
+                ),
+                _weapon_ability_grant_clause(
+                    source_row_id=_ORKS_FREEBOOTER_KREW_SNEAKY_SNEAKIN,
+                    clause_number=2,
+                    source_text=(
+                        "Ranged weapons equipped by models in the bearer's unit have "
+                        "the [Ignores Cover] ability."
+                    ),
+                    source_start=17,
+                    source_end=105,
+                    target_kind="this_unit",
+                    target_text="models in the bearer's unit",
+                    target_start=44,
+                    target_end=71,
+                    effect_text=(
+                        "Ranged weapons equipped by models in the bearer's unit have "
+                        "the [Ignores Cover] ability"
+                    ),
+                    effect_start=17,
+                    effect_end=104,
+                    weapon_ability="Ignores Cover",
+                ),
+            ),
+            ir_hash="13ee41ef514914bff34822c0d3027e2e2aa90807d3356ea932e165a9b775e05a",
+        ),
+    ),
+    (
+        _ORKS_MORE_DAKKA_KUNNIN_BUT_BRUTAL,
+        _rule_ir_payload(
+            source_row_id=_ORKS_MORE_DAKKA_KUNNIN_BUT_BRUTAL,
+            normalized_text=(
+                "ORKS model only. Ranged weapons equipped by models in the bearer's "
+                "unit have the [Rapid Fire 1] ability."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_ORKS_MORE_DAKKA_KUNNIN_BUT_BRUTAL,
+                    clause_number=1,
+                    source_text="ORKS model only.",
+                    source_start=0,
+                    source_end=16,
+                    keyword_text="ORKS model",
+                    keyword_start=0,
+                    keyword_end=10,
+                    required_keywords=("ORKS",),
+                ),
+                _weapon_ability_grant_clause(
+                    source_row_id=_ORKS_MORE_DAKKA_KUNNIN_BUT_BRUTAL,
+                    clause_number=2,
+                    source_text=(
+                        "Ranged weapons equipped by models in the bearer's unit have "
+                        "the [Rapid Fire 1] ability."
+                    ),
+                    source_start=17,
+                    source_end=104,
+                    target_kind="this_unit",
+                    target_text="models in the bearer's unit",
+                    target_start=44,
+                    target_end=71,
+                    effect_text=(
+                        "Ranged weapons equipped by models in the bearer's unit have "
+                        "the [Rapid Fire 1] ability"
+                    ),
+                    effect_start=17,
+                    effect_end=103,
+                    weapon_ability="Rapid Fire",
+                    weapon_ability_value=1,
+                ),
+            ),
+            ir_hash="d2c25b8f930b1eb6f3fa2374a2df3d6b31c4c65fcde8ef0d31118a8fe682e05a",
+        ),
+    ),
+    (
+        _ORKS_MORE_DAKKA_SUPA_CYBORK_BODY,
+        _rule_ir_payload(
+            source_row_id=_ORKS_MORE_DAKKA_SUPA_CYBORK_BODY,
+            normalized_text=(
+                "ORKS model only. The bearer's unit is eligible to shoot in a turn "
+                "in which it Fell Back."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_ORKS_MORE_DAKKA_SUPA_CYBORK_BODY,
+                    clause_number=1,
+                    source_text="ORKS model only.",
+                    source_start=0,
+                    source_end=16,
+                    keyword_text="ORKS model",
+                    keyword_start=0,
+                    keyword_end=10,
+                    required_keywords=("ORKS",),
+                ),
+                _grant_ability_clause(
+                    source_row_id=_ORKS_MORE_DAKKA_SUPA_CYBORK_BODY,
+                    clause_number=2,
+                    source_text=(
+                        "The bearer's unit is eligible to shoot in a turn in which it Fell Back."
+                    ),
+                    source_start=17,
+                    source_end=88,
+                    target_text="The bearer's unit",
+                    target_start=17,
+                    target_end=34,
+                    effect_text="is eligible to shoot in a turn in which it Fell Back",
+                    effect_start=35,
+                    effect_end=87,
+                    ability="can_fall_back_and_shoot",
+                ),
+            ),
+            ir_hash="e8ab8c02e81a2748968a2cd6b6928c666f3b3259c0774480ee8326593fd11847",
+        ),
+    ),
+    (
+        _SPACE_MARINES_CERAMITE_SENTINELS_AUSPEX_INTERFACE,
+        _rule_ir_payload(
+            source_row_id=_SPACE_MARINES_CERAMITE_SENTINELS_AUSPEX_INTERFACE,
+            normalized_text=(
+                "ADEPTUS ASTARTES model only. Ranged weapons equipped by models in "
+                "the bearer's unit have the [Ignores Cover] ability."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_SPACE_MARINES_CERAMITE_SENTINELS_AUSPEX_INTERFACE,
+                    clause_number=1,
+                    source_text="ADEPTUS ASTARTES model only.",
+                    source_start=0,
+                    source_end=28,
+                    keyword_text="ADEPTUS ASTARTES model",
+                    keyword_start=0,
+                    keyword_end=22,
+                    required_keywords=("ADEPTUS_ASTARTES",),
+                ),
+                _weapon_ability_grant_clause(
+                    source_row_id=_SPACE_MARINES_CERAMITE_SENTINELS_AUSPEX_INTERFACE,
+                    clause_number=2,
+                    source_text=(
+                        "Ranged weapons equipped by models in the bearer's unit have "
+                        "the [Ignores Cover] ability."
+                    ),
+                    source_start=29,
+                    source_end=117,
+                    target_kind="this_unit",
+                    target_text="models in the bearer's unit",
+                    target_start=56,
+                    target_end=83,
+                    effect_text=(
+                        "Ranged weapons equipped by models in the bearer's unit have "
+                        "the [Ignores Cover] ability"
+                    ),
+                    effect_start=29,
+                    effect_end=116,
+                    weapon_ability="Ignores Cover",
+                ),
+            ),
+            ir_hash="1900cf8428b5178aa9722660919e40761c94648073d142d0897133688f384f83",
+        ),
+    ),
+    (
+        _TYRANIDS_WARRIOR_BIOFORM_ONSLAUGHT_ELEVATED_MIGHT,
+        _rule_ir_payload(
+            source_row_id=_TYRANIDS_WARRIOR_BIOFORM_ONSLAUGHT_ELEVATED_MIGHT,
+            normalized_text=(
+                "TYRANIDS model only. The bearer's unit is eligible to declare a "
+                "charge in a turn in which it Advanced."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_TYRANIDS_WARRIOR_BIOFORM_ONSLAUGHT_ELEVATED_MIGHT,
+                    clause_number=1,
+                    source_text="TYRANIDS model only.",
+                    source_start=0,
+                    source_end=20,
+                    keyword_text="TYRANIDS model",
+                    keyword_start=0,
+                    keyword_end=14,
+                    required_keywords=("TYRANIDS",),
+                ),
+                _grant_ability_clause(
+                    source_row_id=_TYRANIDS_WARRIOR_BIOFORM_ONSLAUGHT_ELEVATED_MIGHT,
+                    clause_number=2,
+                    source_text=(
+                        "The bearer's unit is eligible to declare a charge in a turn "
+                        "in which it Advanced."
+                    ),
+                    source_start=21,
+                    source_end=102,
+                    target_text="The bearer's unit",
+                    target_start=21,
+                    target_end=38,
+                    effect_text=("is eligible to declare a charge in a turn in which it Advanced"),
+                    effect_start=39,
+                    effect_end=101,
+                    ability="can_advance_and_charge",
+                ),
+            ),
+            ir_hash="16c3cce7b8d7c7c5a4c74a111bf3cc9ae48668ba83f2fd18da507edec4e2ad30",
+        ),
+    ),
+)
+_STATIC_GENERIC_RULE_IR_PAYLOADS_BY_COVERAGE_DESCRIPTOR_ID = _static_generic_rule_ir_payloads()
 
 _validate_identifier = IdentifierValidator(Phase17FGenericIrSupportError)

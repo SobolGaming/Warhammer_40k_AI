@@ -173,7 +173,15 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
     assert support_profile["overall_status"] == "playable"
     assert support_profile["eligible_for_headless_self_play_smoke"] is True
     assert _field_list(support_profile, "mustering_support_rows")
-    assert _field_list(support_profile, "detachment_faction_support_rows")
+    runtime_rows = [
+        _json_object(row) for row in _field_list(support_profile, "detachment_faction_support_rows")
+    ]
+    assert runtime_rows
+    for row in runtime_rows:
+        semantic_status = _field_string(row, "semantic_status")
+        assert semantic_status in {"placeholder", "partial", "implemented"}
+        if semantic_status != "implemented":
+            assert _field_string(row, "status") != "full"
 
 
 def test_phase18e_mutation_response_does_not_expose_next_opponent_decision() -> None:

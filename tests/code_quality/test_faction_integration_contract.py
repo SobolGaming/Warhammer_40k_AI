@@ -15,6 +15,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27 as faction_execution_source,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_named_handler_budget_2026_27 as named_handler_budget_source,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     Phase17ECoverageKind,
 )
@@ -158,6 +161,9 @@ def test_faction_integration_records_phase17f_execution_gate() -> None:
     assert "unregistered executable statuses return typed `unsupported`" in normalized_document
     assert "cannot emit `applied` by status alone" in normalized_document
     assert "not semantic execution" in normalized_document
+    assert "checksum-covered static RuleIR payloads" in document
+    assert "does not compile raw source prose" in normalized_document
+    assert "read raw source snapshot JSON" in normalized_document
 
 
 def test_faction_integration_records_phase17g_17h_17i_roadmap_split() -> None:
@@ -241,6 +247,36 @@ def test_faction_integration_records_phase17i_blocked_row_classification_report(
     assert "`generic_ir_execution_binding`" in document
     assert "`unrepresented_rule_language`" in document
     assert "The payload does not emit raw rule text" in document
+
+
+def test_faction_integration_records_phase17i_named_handler_budget() -> None:
+    document = FACTION_INTEGRATION_PATH.read_text(encoding="utf-8")
+    normalized_document = " ".join(document.split())
+    identity = named_handler_budget_source.source_package_identity_payload()
+    report = named_handler_budget_source.phase17i_named_handler_budget_report()
+
+    assert "## Phase 17I Named Handler Budget" in document
+    assert "- [Phase 17I Named Handler Budget](#phase-17i-named-handler-budget)" in document
+    assert identity["source_package_id"] in document
+    assert (
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "faction_named_handler_budget_2026_27.py"
+    ) in document
+    assert identity["source_title"] in document
+    assert identity["source_version"] in document
+    assert identity["source_date"] in document
+    assert identity["upstream_identity"] in document
+    assert f"source edition: `{identity['source_edition']}`" in document
+    assert identity["imported_at_schema_version"] in document
+    assert identity["source_payload_checksum_sha256"] in document
+    assert identity["upstream_payload_checksum_sha256"] in document
+    assert f"tracks {len(report.named_handler_records)} executable named-handler" in (
+        normalized_document
+    )
+    assert f"and {len(report.approved_entries)} approved entries" in normalized_document
+    assert "`pre_ws14_existing_runtime_consumer`" in document
+    assert "new named handler appears without an approved entry" in normalized_document
+    assert "leaves a stale approval behind" in normalized_document
 
 
 def test_faction_integration_records_ws14_ir_first_content_drop_runbook() -> None:

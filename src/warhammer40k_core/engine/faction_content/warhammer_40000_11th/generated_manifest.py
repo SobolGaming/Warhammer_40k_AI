@@ -7,8 +7,10 @@ import keyword
 from warhammer40k_core.engine.faction_content.manifest import (
     RuntimeContentManifestRow,
     RuntimeContentModuleFamily,
+    RuntimeContentSemanticStatus,
     RuntimeContentSupportStatus,
 )
+from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27,
     faction_execution_2026_27,
@@ -33,17 +35,19 @@ def _faction_row(
     row: faction_detachments_2026_27.SourceFactionRow,
 ) -> RuntimeContentManifestRow:
     faction_module = _module_name_for_id(row.faction_id)
+    execution_record_ids = _execution_ids_for(
+        faction_id=row.faction_id,
+        detachment_id=None,
+    )
     return _row(
         content_id=row.faction_id,
         family=RuntimeContentModuleFamily.FACTION,
         source_ids=_source_ids_for(faction_id=row.faction_id, detachment_id=None),
         owner_faction_id=row.faction_id,
         owner_detachment_id=None,
-        execution_record_ids=_execution_ids_for(
-            faction_id=row.faction_id,
-            detachment_id=None,
-        ),
+        execution_record_ids=execution_record_ids,
         module_path=f"{_BASE}.{faction_module}.manifest",
+        semantic_status=_semantic_status_for_execution_ids(execution_record_ids),
     )
 
 
@@ -52,6 +56,10 @@ def _detachment_row(
 ) -> RuntimeContentManifestRow:
     faction_module = _module_name_for_id(row.faction_id)
     detachment_module = _module_name_for_id(row.detachment_id)
+    execution_record_ids = _execution_ids_for(
+        faction_id=row.faction_id,
+        detachment_id=row.detachment_id,
+    )
     return _row(
         content_id=row.detachment_id,
         family=RuntimeContentModuleFamily.DETACHMENT,
@@ -61,11 +69,9 @@ def _detachment_row(
         ),
         owner_faction_id=row.faction_id,
         owner_detachment_id=row.detachment_id,
-        execution_record_ids=_execution_ids_for(
-            faction_id=row.faction_id,
-            detachment_id=row.detachment_id,
-        ),
+        execution_record_ids=execution_record_ids,
         module_path=(f"{_BASE}.{faction_module}.detachments.{detachment_module}.manifest"),
+        semantic_status=_semantic_status_for_execution_ids(execution_record_ids),
     )
 
 
@@ -133,6 +139,7 @@ def _row(
     execution_record_ids: tuple[str, ...],
     module_path: str,
     dependency_ids: tuple[str, ...] = (),
+    semantic_status: RuntimeContentSemanticStatus | None = None,
 ) -> RuntimeContentManifestRow:
     return RuntimeContentManifestRow(
         content_id=content_id,
@@ -146,7 +153,39 @@ def _row(
         module_path=module_path,
         support_status=RuntimeContentSupportStatus.SUPPORTED,
         dependency_ids=dependency_ids,
+        semantic_status=(
+            _semantic_status_for_execution_ids(execution_record_ids)
+            if semantic_status is None
+            else semantic_status
+        ),
     )
+
+
+def _semantic_status_for_execution_ids(
+    execution_record_ids: tuple[str, ...],
+) -> RuntimeContentSemanticStatus:
+    if not execution_record_ids:
+        return RuntimeContentSemanticStatus.PLACEHOLDER
+    execution_record_id_set = frozenset(execution_record_ids)
+    records = tuple(
+        record for record in _EXECUTION_RECORDS if record.execution_id in execution_record_id_set
+    )
+    if len(records) != len(execution_record_ids):
+        raise GameLifecycleError(
+            "Generated runtime manifest references unknown Phase 17F execution IDs."
+        )
+    executable_statuses = {
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+    }
+    executable_count = sum(
+        1 for record in records if record.execution_status in executable_statuses
+    )
+    if executable_count == len(records):
+        return RuntimeContentSemanticStatus.IMPLEMENTED
+    if executable_count > 0:
+        return RuntimeContentSemanticStatus.PARTIAL
+    return RuntimeContentSemanticStatus.PLACEHOLDER
 
 
 def _execution_ids_for(

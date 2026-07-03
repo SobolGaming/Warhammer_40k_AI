@@ -17,13 +17,18 @@ from warhammer40k_core.engine.faction_rule_execution import (
     FactionRuleGenericIrExecutor,
     FactionRuleNamedHandler,
     default_faction_rule_execution_registry,
+    faction_result_from_rule_execution_result,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rule_execution import RuleExecutionResult
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27 as faction_coverage_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27 as faction_execution_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_generic_ir_support_2026_27 as generic_ir_support_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     Phase17ECoverageKind,
@@ -644,6 +649,32 @@ def test_phase17f_default_registry_returns_typed_invalid_for_generic_ir_missing_
     generic_payload = replay_payload["generic_rule_execution_result"]
     assert isinstance(generic_payload, dict)
     assert generic_payload["status"] == "invalid"
+
+
+def test_phase17f_generic_ir_unsupported_result_retains_rule_replay_payload() -> None:
+    generic_record = _first_execution_record(Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR)
+    rule_ir = generic_ir_support_source.generic_rule_ir_by_coverage_descriptor_id(
+        generic_record.coverage_descriptor_id
+    )
+    rule_result = RuleExecutionResult.unsupported(
+        rule_ir,
+        reason="missing_target_handler",
+    )
+
+    result = faction_result_from_rule_execution_result(
+        record=generic_record,
+        context=_context(),
+        rule_result=rule_result,
+    )
+
+    assert result.status is FactionRuleExecutionStatus.UNSUPPORTED
+    assert result.reason == "missing_target_handler"
+    replay_payload = result.to_payload()["replay_payload"]
+    assert isinstance(replay_payload, dict)
+    generic_payload = replay_payload["generic_rule_execution_result"]
+    assert isinstance(generic_payload, dict)
+    assert generic_payload["status"] == "unsupported"
+    assert generic_payload["reason"] == "missing_target_handler"
 
 
 def test_phase17f_registry_rejects_unknown_execution_id() -> None:
