@@ -14,9 +14,11 @@ from warhammer40k_core.rules.rule_ir import (
     RuleIRPayload,
     RuleParameterPayload,
     RuleTargetSpecPayload,
+    RuleTriggerPayload,
 )
 from warhammer40k_core.rules.rule_templates import (
     CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
+    DICE_ROLL_MODIFIER_TEMPLATE_ID,
     GRANT_ABILITY_TEMPLATE_ID,
     KEYWORD_GATE_TEMPLATE_ID,
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
@@ -48,6 +50,17 @@ _SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         "enhancement:necrons:cryptek-conclave:000010664004",
     }
 )
+_SUPPORTED_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        "enhancement:adeptus-custodes:talons-of-the-emperor:000008921004",
+        "enhancement:adeptus-custodes:talons-of-the-emperor:000008921005",
+        "enhancement:chaos-space-marines:fellhammer-siege-host:000008976004",
+        "enhancement:genestealer-cults:host-of-ascension:000009067005",
+        "enhancement:leagues-of-votann:persecution-prospect:000010439002",
+        "enhancement:necrons:obeisance-phalanx:000008550004",
+        "enhancement:orks:more-dakka:000009991004",
+    }
+)
 _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_TEMPLATE_IDS = frozenset(
     {
         KEYWORD_GATE_TEMPLATE_ID,
@@ -63,6 +76,12 @@ _SUPPORTED_GRANT_ABILITY_TEMPLATE_IDS = frozenset(
 _SUPPORTED_CHARACTERISTIC_MODIFICATION_TEMPLATE_IDS = frozenset(
     {
         CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
+        KEYWORD_GATE_TEMPLATE_ID,
+    }
+)
+_SUPPORTED_DICE_ROLL_MODIFICATION_TEMPLATE_IDS = frozenset(
+    {
+        DICE_ROLL_MODIFIER_TEMPLATE_ID,
         KEYWORD_GATE_TEMPLATE_ID,
     }
 )
@@ -120,6 +139,10 @@ def supported_characteristic_modification_enhancement_source_row_ids() -> tuple[
     return tuple(sorted(_SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS))
 
 
+def supported_dice_roll_modification_enhancement_source_row_ids() -> tuple[str, ...]:
+    return tuple(sorted(_SUPPORTED_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS))
+
+
 def supported_generic_enhancement_source_row_ids() -> tuple[str, ...]:
     return tuple(sorted(_supported_enhancement_source_row_ids()))
 
@@ -155,6 +178,14 @@ def _validate_supported_enhancement_ir(
             expected_template_ids=_SUPPORTED_CHARACTERISTIC_MODIFICATION_TEMPLATE_IDS,
             effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
             effect_family_name="characteristic modifier",
+        )
+    elif source_row.source_row_id in _SUPPORTED_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS:
+        _validate_supported_effect_family_ir(
+            rule_ir=rule_ir,
+            source_row=source_row,
+            expected_template_ids=_SUPPORTED_DICE_ROLL_MODIFICATION_TEMPLATE_IDS,
+            effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
+            effect_family_name="dice roll modifier",
         )
     else:
         raise Phase17FGenericIrSupportError("Generic enhancement support row is not registered.")
@@ -205,6 +236,7 @@ def _supported_enhancement_source_row_ids() -> frozenset[str]:
             *_SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
             *_SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
             *_SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
+            *_SUPPORTED_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
         }
     )
 
@@ -380,6 +412,55 @@ def _characteristic_modifier_clause(
     )
 
 
+def _dice_roll_modifier_clause(
+    *,
+    source_row_id: str,
+    clause_number: int,
+    source_text: str,
+    source_start: int,
+    source_end: int,
+    trigger_text: str,
+    trigger_start: int,
+    trigger_end: int,
+    target_kind: str,
+    target_text: str,
+    target_start: int,
+    target_end: int,
+    effect_text: str,
+    effect_start: int,
+    effect_end: int,
+    roll_type: str,
+    delta: int,
+    conditions: tuple[RuleConditionPayload, ...] = (),
+) -> RuleClausePayload:
+    return _effect_clause(
+        source_row_id=source_row_id,
+        clause_number=clause_number,
+        template_id=DICE_ROLL_MODIFIER_TEMPLATE_ID,
+        source_text=source_text,
+        source_start=source_start,
+        source_end=source_end,
+        trigger=_dice_roll_trigger(
+            source_text=trigger_text,
+            source_start=trigger_start,
+            source_end=trigger_end,
+            roll_type=roll_type,
+        ),
+        conditions=conditions,
+        target=_target(target_kind, target_text, target_start, target_end),
+        effect=_effect(
+            "modify_dice_roll",
+            effect_text,
+            effect_start,
+            effect_end,
+            [
+                _parameter("delta", delta),
+                _parameter("roll_type", roll_type),
+            ],
+        ),
+    )
+
+
 def _effect_clause(
     *,
     source_row_id: str,
@@ -390,6 +471,8 @@ def _effect_clause(
     source_end: int,
     target: RuleTargetSpecPayload,
     effect: RuleEffectSpecPayload,
+    trigger: RuleTriggerPayload | None = None,
+    conditions: tuple[RuleConditionPayload, ...] = (),
 ) -> RuleClausePayload:
     return cast(
         RuleClausePayload,
@@ -397,13 +480,30 @@ def _effect_clause(
             "clause_id": _clause_id(source_row_id, clause_number),
             "template_id": template_id,
             "source_span": _span(source_text, source_start, source_end),
-            "trigger": None,
-            "conditions": [],
+            "trigger": trigger,
+            "conditions": list(conditions),
             "target": target,
             "effects": [effect],
             "duration": None,
             "unsupported_reason": None,
             "diagnostics": [],
+        },
+    )
+
+
+def _dice_roll_trigger(
+    *,
+    source_text: str,
+    source_start: int,
+    source_end: int,
+    roll_type: str,
+) -> RuleTriggerPayload:
+    return cast(
+        RuleTriggerPayload,
+        {
+            "kind": "dice_roll",
+            "source_span": _span(source_text, source_start, source_end),
+            "parameters": [_parameter("roll_type", roll_type)],
         },
     )
 
@@ -421,6 +521,29 @@ def _keyword_gate_condition(
             "kind": "keyword_gate",
             "source_span": _span(source_text, source_start, source_end),
             "parameters": [_parameter("required_keyword", required_keyword)],
+        },
+    )
+
+
+def _distance_predicate_condition(
+    *,
+    source_text: str,
+    source_start: int,
+    source_end: int,
+    distance_inches: float,
+    predicate: str,
+    qualifier: str | None = None,
+) -> RuleConditionPayload:
+    return cast(
+        RuleConditionPayload,
+        {
+            "kind": "distance_predicate",
+            "source_span": _span(source_text, source_start, source_end),
+            "parameters": [
+                _parameter("distance_inches", distance_inches),
+                _parameter("predicate", predicate),
+                _parameter("qualifier", qualifier),
+            ],
         },
     )
 
@@ -455,7 +578,7 @@ def _effect(
     )
 
 
-def _parameter(key: str, value: str | int) -> RuleParameterPayload:
+def _parameter(key: str, value: str | int | float | None) -> RuleParameterPayload:
     return cast(RuleParameterPayload, {"key": key, "value": value})
 
 
@@ -479,24 +602,41 @@ def _static_generic_rule_ir_payloads() -> Mapping[str, RuleIRPayload]:
     return MappingProxyType(payloads)
 
 
+_ADEPTUS_CUSTODES_TALONS_GIFT_OF_TERRAN_ARTIFICE = (
+    "enhancement:adeptus-custodes:talons-of-the-emperor:000008921004"
+)
+_ADEPTUS_CUSTODES_TALONS_RADIANT_MANTLE = (
+    "enhancement:adeptus-custodes:talons-of-the-emperor:000008921005"
+)
 _CHAOS_SPACE_MARINES_RENEGADE_WARBAND_EYES_OF_THE_HUNTER = (
     "enhancement:chaos-space-marines:renegade-warband:000010694003"
+)
+_CHAOS_SPACE_MARINES_FELLHAMMER_IRONBOUND_ENMITY = (
+    "enhancement:chaos-space-marines:fellhammer-siege-host:000008976004"
 )
 _GENESTEALER_CULTS_OUTLANDER_CLAW_SERPENTINE_TACTICS = (
     "enhancement:genestealer-cults:outlander-claw:000009079002"
 )
+_GENESTEALER_CULTS_HOST_ASSASSINATION_EDICT = (
+    "enhancement:genestealer-cults:host-of-ascension:000009067005"
+)
 _IMPERIAL_KNIGHTS_FREEBLADE_COMPANY_MYSTERIOUS_GUARDIAN = (
     "enhancement:imperial-knights:freeblade-company:000010755003"
+)
+_LEAGUES_OF_VOTANN_PERSECUTION_EYE_FOR_WEAKNESS = (
+    "enhancement:leagues-of-votann:persecution-prospect:000010439002"
 )
 _NECRONS_CRYPTEK_CONCLAVE_GAUNTLET_OF_COMPRESSION = (
     "enhancement:necrons:cryptek-conclave:000010664004"
 )
+_NECRONS_OBEISANCE_PHALANX_WARRIOR_NOBLE = "enhancement:necrons:obeisance-phalanx:000008550004"
 _NECRONS_STARSHATTER_ARSENAL_MINIATURISED_NEBULOSCOPE = (
     "enhancement:necrons:starshatter-arsenal:000009749003"
 )
 _ORKS_FREEBOOTER_KREW_SNEAKY_SNEAKIN = "enhancement:orks:freebooter-krew:000010712003"
 _ORKS_MORE_DAKKA_KUNNIN_BUT_BRUTAL = "enhancement:orks:more-dakka:000009991003"
 _ORKS_MORE_DAKKA_SUPA_CYBORK_BODY = "enhancement:orks:more-dakka:000009991005"
+_ORKS_MORE_DAKKA_TARGETIN_SQUIGS = "enhancement:orks:more-dakka:000009991004"
 _SPACE_MARINES_CERAMITE_SENTINELS_AUSPEX_INTERFACE = (
     "enhancement:space-marines:ceramite-sentinels:000010759004"
 )
@@ -505,6 +645,364 @@ _TYRANIDS_WARRIOR_BIOFORM_ONSLAUGHT_ELEVATED_MIGHT = (
 )
 
 _STATIC_GENERIC_RULE_IR_PAYLOAD_ROWS: tuple[tuple[str, RuleIRPayload], ...] = (
+    (
+        _ADEPTUS_CUSTODES_TALONS_GIFT_OF_TERRAN_ARTIFICE,
+        _rule_ir_payload(
+            source_row_id=_ADEPTUS_CUSTODES_TALONS_GIFT_OF_TERRAN_ARTIFICE,
+            normalized_text=(
+                "ADEPTUS CUSTODES model only. Each time the bearer makes a melee "
+                "attack, add 1 to the Wound roll."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_ADEPTUS_CUSTODES_TALONS_GIFT_OF_TERRAN_ARTIFICE,
+                    clause_number=1,
+                    source_text="ADEPTUS CUSTODES model only.",
+                    source_start=0,
+                    source_end=28,
+                    keyword_text="ADEPTUS CUSTODES model",
+                    keyword_start=0,
+                    keyword_end=22,
+                    required_keywords=("ADEPTUS_CUSTODES",),
+                ),
+                _dice_roll_modifier_clause(
+                    source_row_id=_ADEPTUS_CUSTODES_TALONS_GIFT_OF_TERRAN_ARTIFICE,
+                    clause_number=2,
+                    source_text=(
+                        "Each time the bearer makes a melee attack, add 1 to the Wound roll."
+                    ),
+                    source_start=29,
+                    source_end=96,
+                    trigger_text=(
+                        "Each time the bearer makes a melee attack, add 1 to the Wound roll"
+                    ),
+                    trigger_start=29,
+                    trigger_end=95,
+                    target_kind="this_model",
+                    target_text="the bearer",
+                    target_start=39,
+                    target_end=49,
+                    effect_text="add 1 to the Wound roll",
+                    effect_start=72,
+                    effect_end=95,
+                    roll_type="wound",
+                    delta=1,
+                ),
+            ),
+            ir_hash="a5403b9ea1f2b173a9966d5ae275398259e813d3e400a34118d16c0184bbf056",
+        ),
+    ),
+    (
+        _ADEPTUS_CUSTODES_TALONS_RADIANT_MANTLE,
+        _rule_ir_payload(
+            source_row_id=_ADEPTUS_CUSTODES_TALONS_RADIANT_MANTLE,
+            normalized_text=(
+                "ADEPTUS CUSTODES model only. Each time an attack targets the bearer's "
+                'unit, if the attacking model is within 12", subtract 1 from the Hit roll.'
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_ADEPTUS_CUSTODES_TALONS_RADIANT_MANTLE,
+                    clause_number=1,
+                    source_text="ADEPTUS CUSTODES model only.",
+                    source_start=0,
+                    source_end=28,
+                    keyword_text="ADEPTUS CUSTODES model",
+                    keyword_start=0,
+                    keyword_end=22,
+                    required_keywords=("ADEPTUS_CUSTODES",),
+                ),
+                _dice_roll_modifier_clause(
+                    source_row_id=_ADEPTUS_CUSTODES_TALONS_RADIANT_MANTLE,
+                    clause_number=2,
+                    source_text=(
+                        "Each time an attack targets the bearer's unit, if the attacking "
+                        'model is within 12", subtract 1 from the Hit roll.'
+                    ),
+                    source_start=29,
+                    source_end=143,
+                    trigger_text=(
+                        "Each time an attack targets the bearer's unit, if the attacking "
+                        'model is within 12", subtract 1 from the Hit roll'
+                    ),
+                    trigger_start=29,
+                    trigger_end=142,
+                    conditions=(
+                        _distance_predicate_condition(
+                            source_text='within 12"',
+                            source_start=102,
+                            source_end=112,
+                            distance_inches=12.0,
+                            predicate="within",
+                        ),
+                    ),
+                    target_kind="this_unit",
+                    target_text="the bearer's unit",
+                    target_start=57,
+                    target_end=74,
+                    effect_text="subtract 1 from the Hit roll",
+                    effect_start=114,
+                    effect_end=142,
+                    roll_type="hit",
+                    delta=-1,
+                ),
+            ),
+            ir_hash="9167ed849955784ae4fae5c660bda08e471e286c22f0aaff9c447d0d6dd27de4",
+        ),
+    ),
+    (
+        _CHAOS_SPACE_MARINES_FELLHAMMER_IRONBOUND_ENMITY,
+        _rule_ir_payload(
+            source_row_id=_CHAOS_SPACE_MARINES_FELLHAMMER_IRONBOUND_ENMITY,
+            normalized_text=(
+                "HERETIC ASTARTES model only. Each time the bearer makes an attack "
+                "while within range of an objective marker, add 1 to the Wound roll."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_CHAOS_SPACE_MARINES_FELLHAMMER_IRONBOUND_ENMITY,
+                    clause_number=1,
+                    source_text="HERETIC ASTARTES model only.",
+                    source_start=0,
+                    source_end=28,
+                    keyword_text="HERETIC ASTARTES model",
+                    keyword_start=0,
+                    keyword_end=22,
+                    required_keywords=("HERETIC_ASTARTES",),
+                ),
+                _dice_roll_modifier_clause(
+                    source_row_id=_CHAOS_SPACE_MARINES_FELLHAMMER_IRONBOUND_ENMITY,
+                    clause_number=2,
+                    source_text=(
+                        "Each time the bearer makes an attack while within range of an "
+                        "objective marker, add 1 to the Wound roll."
+                    ),
+                    source_start=29,
+                    source_end=133,
+                    trigger_text=(
+                        "Each time the bearer makes an attack while within range of an "
+                        "objective marker, add 1 to the Wound roll"
+                    ),
+                    trigger_start=29,
+                    trigger_end=132,
+                    target_kind="this_model",
+                    target_text="the bearer",
+                    target_start=39,
+                    target_end=49,
+                    effect_text="add 1 to the Wound roll",
+                    effect_start=109,
+                    effect_end=132,
+                    roll_type="wound",
+                    delta=1,
+                ),
+            ),
+            ir_hash="f0480d2475911787aa79e6acae84f9c6f2c5d87e4ab0eb3e56cbbf6e202dc25a",
+        ),
+    ),
+    (
+        _GENESTEALER_CULTS_HOST_ASSASSINATION_EDICT,
+        _rule_ir_payload(
+            source_row_id=_GENESTEALER_CULTS_HOST_ASSASSINATION_EDICT,
+            normalized_text=(
+                "GENESTEALER CULTS model only. Each time a model in the bearer's unit "
+                "makes an attack that targets a CHARACTER unit, add 1 to the Hit roll"
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_GENESTEALER_CULTS_HOST_ASSASSINATION_EDICT,
+                    clause_number=1,
+                    source_text="GENESTEALER CULTS model only.",
+                    source_start=0,
+                    source_end=29,
+                    keyword_text="GENESTEALER CULTS model",
+                    keyword_start=0,
+                    keyword_end=23,
+                    required_keywords=("GENESTEALER_CULTS",),
+                ),
+                _dice_roll_modifier_clause(
+                    source_row_id=_GENESTEALER_CULTS_HOST_ASSASSINATION_EDICT,
+                    clause_number=2,
+                    source_text=(
+                        "Each time a model in the bearer's unit makes an attack that "
+                        "targets a CHARACTER unit, add 1 to the Hit roll"
+                    ),
+                    source_start=30,
+                    source_end=137,
+                    trigger_text=(
+                        "Each time a model in the bearer's unit makes an attack that "
+                        "targets a CHARACTER unit, add 1 to the Hit roll"
+                    ),
+                    trigger_start=30,
+                    trigger_end=137,
+                    conditions=(
+                        _keyword_gate_condition(
+                            source_text="CHARACTER unit",
+                            source_start=100,
+                            source_end=114,
+                            required_keyword="CHARACTER",
+                        ),
+                    ),
+                    target_kind="this_unit",
+                    target_text="the bearer's unit",
+                    target_start=51,
+                    target_end=68,
+                    effect_text="add 1 to the Hit roll",
+                    effect_start=116,
+                    effect_end=137,
+                    roll_type="hit",
+                    delta=1,
+                ),
+            ),
+            ir_hash="ace002fc22bfb8831b1c63df2e9b476cc4003b891b9a265a3515375cb53e05a4",
+        ),
+    ),
+    (
+        _LEAGUES_OF_VOTANN_PERSECUTION_EYE_FOR_WEAKNESS,
+        _rule_ir_payload(
+            source_row_id=_LEAGUES_OF_VOTANN_PERSECUTION_EYE_FOR_WEAKNESS,
+            normalized_text=(
+                "LEAGUES OF VOTANN model only. Each time a model in the bearer's unit "
+                "makes an attack that targets an assailed unit, add 1 to the Wound roll."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_LEAGUES_OF_VOTANN_PERSECUTION_EYE_FOR_WEAKNESS,
+                    clause_number=1,
+                    source_text="LEAGUES OF VOTANN model only.",
+                    source_start=0,
+                    source_end=29,
+                    keyword_text="LEAGUES OF VOTANN model",
+                    keyword_start=0,
+                    keyword_end=23,
+                    required_keywords=("LEAGUES_OF_VOTANN",),
+                ),
+                _dice_roll_modifier_clause(
+                    source_row_id=_LEAGUES_OF_VOTANN_PERSECUTION_EYE_FOR_WEAKNESS,
+                    clause_number=2,
+                    source_text=(
+                        "Each time a model in the bearer's unit makes an attack that "
+                        "targets an assailed unit, add 1 to the Wound roll."
+                    ),
+                    source_start=30,
+                    source_end=140,
+                    trigger_text=(
+                        "Each time a model in the bearer's unit makes an attack that "
+                        "targets an assailed unit, add 1 to the Wound roll"
+                    ),
+                    trigger_start=30,
+                    trigger_end=139,
+                    target_kind="this_unit",
+                    target_text="the bearer's unit",
+                    target_start=51,
+                    target_end=68,
+                    effect_text="add 1 to the Wound roll",
+                    effect_start=116,
+                    effect_end=139,
+                    roll_type="wound",
+                    delta=1,
+                ),
+            ),
+            ir_hash="182990bed7c68859a63fb558e49103465869d0455a1b172516ee046b55ae230b",
+        ),
+    ),
+    (
+        _NECRONS_OBEISANCE_PHALANX_WARRIOR_NOBLE,
+        _rule_ir_payload(
+            source_row_id=_NECRONS_OBEISANCE_PHALANX_WARRIOR_NOBLE,
+            normalized_text=(
+                "OVERLORD model only. Each time a melee attack targets the bearer's "
+                "unit, subtract 1 from the Hit roll."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_NECRONS_OBEISANCE_PHALANX_WARRIOR_NOBLE,
+                    clause_number=1,
+                    source_text="OVERLORD model only.",
+                    source_start=0,
+                    source_end=20,
+                    keyword_text="OVERLORD model",
+                    keyword_start=0,
+                    keyword_end=14,
+                    required_keywords=("OVERLORD",),
+                ),
+                _dice_roll_modifier_clause(
+                    source_row_id=_NECRONS_OBEISANCE_PHALANX_WARRIOR_NOBLE,
+                    clause_number=2,
+                    source_text=(
+                        "Each time a melee attack targets the bearer's unit, subtract "
+                        "1 from the Hit roll."
+                    ),
+                    source_start=21,
+                    source_end=102,
+                    trigger_text=(
+                        "Each time a melee attack targets the bearer's unit, subtract "
+                        "1 from the Hit roll"
+                    ),
+                    trigger_start=21,
+                    trigger_end=101,
+                    target_kind="this_unit",
+                    target_text="the bearer's unit",
+                    target_start=54,
+                    target_end=71,
+                    effect_text="subtract 1 from the Hit roll",
+                    effect_start=73,
+                    effect_end=101,
+                    roll_type="hit",
+                    delta=-1,
+                ),
+            ),
+            ir_hash="c866e3a4228f6034e1795c3c04d6f70b78e30539c78b8fd1cdc78fc7ff687f78",
+        ),
+    ),
+    (
+        _ORKS_MORE_DAKKA_TARGETIN_SQUIGS,
+        _rule_ir_payload(
+            source_row_id=_ORKS_MORE_DAKKA_TARGETIN_SQUIGS,
+            normalized_text=(
+                "ORKS model only. Each time a model in the bearer's unit makes a "
+                "ranged attack, add 1 to the Hit roll."
+            ),
+            clauses=(
+                _keyword_gate_clause(
+                    source_row_id=_ORKS_MORE_DAKKA_TARGETIN_SQUIGS,
+                    clause_number=1,
+                    source_text="ORKS model only.",
+                    source_start=0,
+                    source_end=16,
+                    keyword_text="ORKS model",
+                    keyword_start=0,
+                    keyword_end=10,
+                    required_keywords=("ORKS",),
+                ),
+                _dice_roll_modifier_clause(
+                    source_row_id=_ORKS_MORE_DAKKA_TARGETIN_SQUIGS,
+                    clause_number=2,
+                    source_text=(
+                        "Each time a model in the bearer's unit makes a ranged attack, "
+                        "add 1 to the Hit roll."
+                    ),
+                    source_start=17,
+                    source_end=101,
+                    trigger_text=(
+                        "Each time a model in the bearer's unit makes a ranged attack, "
+                        "add 1 to the Hit roll"
+                    ),
+                    trigger_start=17,
+                    trigger_end=100,
+                    target_kind="this_unit",
+                    target_text="the bearer's unit",
+                    target_start=38,
+                    target_end=55,
+                    effect_text="add 1 to the Hit roll",
+                    effect_start=79,
+                    effect_end=100,
+                    roll_type="hit",
+                    delta=1,
+                ),
+            ),
+            ir_hash="b2c2dcc5317f6bb19fcde9e7d13cd35dbd4abe738e5c9826d4443822f7ff415f",
+        ),
+    ),
     (
         _CHAOS_SPACE_MARINES_RENEGADE_WARBAND_EYES_OF_THE_HUNTER,
         _rule_ir_payload(

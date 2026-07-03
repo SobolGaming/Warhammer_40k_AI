@@ -49,6 +49,9 @@ FADE_TO_DARKNESS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
     "enhancement:fade_to_darkness:unit-destroyed",
 )
+GENERIC_SOURCE_UNIT_CONTEXT_EXECUTION_ID = (
+    "phase17f:phase17e:enhancement:orks:more-dakka:000009991003"
+)
 LEAPING_SHADOWS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
     "enhancement:leaping_shadows:scouts_9",
@@ -628,7 +631,7 @@ def test_phase17f_registry_dispatches_every_record_without_missing_handlers() ->
 
 def test_phase17f_default_registry_returns_typed_invalid_for_generic_ir_missing_context() -> None:
     registry = default_faction_rule_execution_registry()
-    generic_record = _first_execution_record(Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR)
+    generic_record = _execution_record_by_id(GENERIC_SOURCE_UNIT_CONTEXT_EXECUTION_ID)
     context = FactionRuleExecutionContext(
         game_id="game-phase17f",
         player_id="player-a",
@@ -965,6 +968,13 @@ def _first_execution_record(status: Phase17FExecutionStatus) -> Phase17FExecutio
         if record.execution_status is status:
             return record
     raise AssertionError(f"Missing Phase17F execution status: {status.value}.")
+
+
+def _execution_record_by_id(execution_id: str) -> Phase17FExecutionRecord:
+    for record in faction_execution_source.phase17f_execution_package().execution_records:
+        if record.execution_id == execution_id:
+            return record
+    raise AssertionError(f"Missing Phase17F execution record: {execution_id}.")
 
 
 def _require_handler_id(record: Phase17FExecutionRecord) -> str:

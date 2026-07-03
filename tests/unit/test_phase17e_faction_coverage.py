@@ -103,11 +103,23 @@ GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         "enhancement:necrons:cryptek-conclave:000010664004",
     }
 )
+GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        "enhancement:adeptus-custodes:talons-of-the-emperor:000008921004",
+        "enhancement:adeptus-custodes:talons-of-the-emperor:000008921005",
+        "enhancement:chaos-space-marines:fellhammer-siege-host:000008976004",
+        "enhancement:genestealer-cults:host-of-ascension:000009067005",
+        "enhancement:leagues-of-votann:persecution-prospect:000010439002",
+        "enhancement:necrons:obeisance-phalanx:000008550004",
+        "enhancement:orks:more-dakka:000009991004",
+    }
+)
 GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         *GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
+        *GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
     }
 )
 BLOOD_LEGION_RUNTIME_CONSUMERS = (
@@ -1042,6 +1054,10 @@ def test_phase17e_generic_enhancements_are_template_family_bounded() -> None:
             generic_ir_support_source.supported_characteristic_modification_enhancement_source_row_ids()
         )
         == GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
+    )
+    assert (
+        set(generic_ir_support_source.supported_dice_roll_modification_enhancement_source_row_ids())
+        == GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
     )
     assert (
         set(generic_ir_support_source.supported_generic_enhancement_source_row_ids())

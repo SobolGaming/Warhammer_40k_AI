@@ -38,6 +38,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
 
 _MORE_DAKKA_GENERIC_EXECUTION_IDS = (
     "phase17f:phase17e:enhancement:orks:more-dakka:000009991003",
+    "phase17f:phase17e:enhancement:orks:more-dakka:000009991004",
     "phase17f:phase17e:enhancement:orks:more-dakka:000009991005",
 )
 
@@ -75,6 +76,7 @@ def test_ws14_more_dakka_generic_ir_rows_execute_from_lifecycle_runtime_bundle()
     )
 
     assert tuple(result.status for result in results) == (
+        FactionRuleExecutionStatus.APPLIED,
         FactionRuleExecutionStatus.APPLIED,
         FactionRuleExecutionStatus.APPLIED,
     )
@@ -246,7 +248,7 @@ def _more_dakka_muster_request(
         detachment_selection=DetachmentSelection(
             faction_id="orks",
             detachment_ids=("more-dakka",),
-            enhancement_ids=("000009991003", "000009991005"),
+            enhancement_ids=("000009991003", "000009991004", "000009991005"),
         ),
         unit_selections=(
             UnitMusterSelection(
