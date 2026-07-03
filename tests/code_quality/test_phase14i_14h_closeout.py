@@ -25,6 +25,7 @@ DATASHEET_PATH = ROOT / "src" / "warhammer40k_core" / "core" / "datasheet.py"
 LIST_VALIDATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "list_validation.py"
 ARMY_MUSTERING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "army_mustering.py"
 STRATAGEMS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems.py"
+STRATAGEMS_SPLIT_PATHS = tuple(sorted(STRATAGEMS_PATH.parent.glob("stratagems*.py")))
 SHOOTING_PHASE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "shooting.py"
 SHOOTING_PHASE_SPLIT_PATHS = tuple(sorted(SHOOTING_PHASE_PATH.parent.glob("shooting*.py")))
 ADAPTER_CONTRACT_PATH = ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
@@ -44,6 +45,10 @@ def _function_source_from_paths(paths: tuple[Path, ...], function_name: str) -> 
 
 def _attack_sequence_source() -> str:
     return "\n".join(path.read_text(encoding="utf-8") for path in ATTACK_SEQUENCE_SPLIT_PATHS)
+
+
+def _stratagems_source() -> str:
+    return "\n".join(path.read_text(encoding="utf-8") for path in STRATAGEMS_SPLIT_PATHS)
 
 
 def test_phase14i_core_stratagem_source_cutover_is_complete() -> None:
@@ -106,7 +111,7 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     datasheet_source = DATASHEET_PATH.read_text(encoding="utf-8")
     list_validation_source = LIST_VALIDATION_PATH.read_text(encoding="utf-8")
     army_mustering_source = ARMY_MUSTERING_PATH.read_text(encoding="utf-8")
-    stratagems_source = STRATAGEMS_PATH.read_text(encoding="utf-8")
+    stratagems_source = _stratagems_source()
 
     assert "def resolve_combat_disembark(" in transport_source
     assert "Combat Disembark requires resolve_combat_disembark." in transport_source

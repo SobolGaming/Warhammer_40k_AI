@@ -13,6 +13,7 @@ CHARGE_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "charg
 FIGHT_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "fight.py"
 FIGHT_RESOLUTION = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_resolution.py"
 STRATAGEMS = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems.py"
+STRATAGEM_FILES = (STRATAGEMS, *sorted(STRATAGEMS.parent.glob("stratagems_*.py")))
 TRIGGERED_MOVEMENT = ROOT / "src" / "warhammer40k_core" / "engine" / "triggered_movement.py"
 
 LIVE_MOVEMENT_CALLS = (
@@ -111,6 +112,8 @@ def _parsed_sources(path: Path) -> tuple[tuple[Path, ast.AST], ...]:
 def _source_paths(path: Path) -> tuple[Path, ...]:
     if path == MOVEMENT_PHASE:
         return MOVEMENT_PHASE_FILES
+    if path == STRATAGEMS:
+        return STRATAGEM_FILES
     return (path,)
 
 
