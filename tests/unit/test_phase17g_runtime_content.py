@@ -25,6 +25,7 @@ from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.abilities import (
+    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogRecord,
     AbilityDefinition,
     AbilityExecutionContext,
@@ -34,6 +35,9 @@ from warhammer40k_core.engine.abilities import (
     AbilityTimingDescriptor,
 )
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.catalog_rule_consumption import (
+    CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.enhancement_effects import (
@@ -131,6 +135,20 @@ from warhammer40k_core.engine.stratagems import (
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
+    RuleCondition,
+    RuleConditionKind,
+    RuleEffectKind,
+    RuleEffectSpec,
+    RuleIR,
+    RuleTargetKind,
+    RuleTargetSpec,
+    RuleTrigger,
+    RuleTriggerKind,
+    parameters_from_pairs,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
 )
@@ -722,6 +740,55 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
         binding.binding
         for binding in bundle.hook_bindings_for_event(LifecycleHookEvent.FALL_BACK_ELIGIBILITY)
     ) == (fall_back_binding,)
+
+
+def test_runtime_content_bundle_event_keyed_hooks_match_legacy_registries() -> None:
+    catalog = _catalog_with_runtime_detachment_selection(
+        ArmyCatalog.phase9a_canonical_content_pack()
+    )
+    army = muster_army(catalog=catalog, request=_muster_request(catalog))
+    activation = RuntimeContentActivation.from_armies(armies=(army,), catalog=catalog)
+
+    def fall_back_handler(
+        _context: FallBackEligibilityContext,
+    ) -> FallBackEligibilityGrant | None:
+        return None
+
+    fall_back_binding = FallBackEligibilityHookBinding(
+        hook_id="runtime:fall-back-parity-hook",
+        source_id="runtime:fall-back-parity-source",
+        handler=fall_back_handler,
+    )
+    contribution = RuntimeContentContribution(
+        ability_records=(_tracked_target_ability_record(),),
+        fall_back_hook_bindings=(fall_back_binding,),
+    )
+
+    bundle = RuntimeContentBundle.from_contributions(
+        activation=activation,
+        armies=(army,),
+        catalog=catalog,
+        contributions=(contribution,),
+    )
+    battle_round_start_registry_ids = {
+        binding.hook_id for binding in bundle.battle_round_start_hook_registry.all_bindings()
+    }
+    battle_round_start_event_ids = {
+        binding.hook_id
+        for binding in bundle.hook_bindings_for_event(LifecycleHookEvent.BATTLE_ROUND_START)
+    }
+    fall_back_registry_ids = {
+        binding.hook_id for binding in bundle.fall_back_hook_registry.all_bindings()
+    }
+    fall_back_event_ids = {
+        binding.hook_id
+        for binding in bundle.hook_bindings_for_event(LifecycleHookEvent.FALL_BACK_ELIGIBILITY)
+    }
+
+    assert battle_round_start_registry_ids == {CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID}
+    assert battle_round_start_event_ids == battle_round_start_registry_ids
+    assert fall_back_registry_ids == {"runtime:fall-back-parity-hook"}
+    assert fall_back_event_ids == fall_back_registry_ids
 
 
 def test_runtime_content_contribution_stores_hooks_in_canonical_tuple() -> None:
@@ -1808,6 +1875,120 @@ def _ability_record(
         ),
         source_kind=source_kind,
         faction_id=faction_id,
+    )
+
+
+def _tracked_target_ability_record() -> AbilityCatalogRecord:
+    rule_ir = _tracked_target_rule_ir()
+    return AbilityCatalogRecord(
+        record_id="record:runtime-tracked-target",
+        definition=AbilityDefinition(
+            ability_id="runtime-tracked-target",
+            name="Runtime Tracked Target",
+            source_id="source:runtime-tracked-target",
+            when_descriptor="test battle-round start timing",
+            effect_descriptor="test tracked target",
+            restrictions_descriptor="test restrictions",
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.START_BATTLE_ROUND),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=cast(JsonValue, {"rule_ir": rule_ir.to_payload()}),
+        ),
+        source_kind=AbilitySourceKind.FACTION,
+        faction_id="core-marine-force",
+    )
+
+
+def _tracked_target_rule_ir() -> RuleIR:
+    span = TextSpan(text="runtime tracked target", start=0, end=22)
+    return RuleIR(
+        rule_id="runtime-tracked-target-rule",
+        source_id="runtime-tracked-target-source",
+        normalized_text=span.text,
+        parser_version="runtime-content-test",
+        clauses=(
+            RuleClause(
+                clause_id="runtime-tracked-target-reroll",
+                source_span=span,
+                trigger=RuleTrigger(
+                    kind=RuleTriggerKind.DICE_ROLL,
+                    source_span=span,
+                    parameters=parameters_from_pairs(
+                        (
+                            ("actor", "model_in_this_models_unit"),
+                            ("attack_kind", "ranged"),
+                            ("roll_type", "hit"),
+                            ("target_reference", "tracked_target"),
+                            ("tracked_target_owner", "this_unit"),
+                            ("tracked_target_role", "prey"),
+                        )
+                    ),
+                ),
+                conditions=(
+                    RuleCondition(
+                        kind=RuleConditionKind.TARGET_CONSTRAINT,
+                        source_span=span,
+                        parameters=parameters_from_pairs(
+                            (
+                                ("actor", "model_in_this_models_unit"),
+                                ("attack_kind", "ranged"),
+                                ("gate_subject", "attack_target"),
+                                ("relationship", "attack_targets_tracked_target"),
+                                ("target_reference", "tracked_target"),
+                                ("tracked_target_owner", "this_unit"),
+                                ("tracked_target_role", "prey"),
+                            )
+                        ),
+                    ),
+                ),
+                effects=(
+                    RuleEffectSpec(
+                        kind=RuleEffectKind.REROLL_PERMISSION,
+                        source_span=span,
+                        parameters=parameters_from_pairs(
+                            (
+                                ("roll_type", "hit"),
+                                ("target_reference", "tracked_target"),
+                                ("tracked_target_owner", "this_unit"),
+                                ("tracked_target_role", "prey"),
+                            )
+                        ),
+                    ),
+                ),
+            ),
+            RuleClause(
+                clause_id="runtime-tracked-target-selection",
+                source_span=span,
+                trigger=RuleTrigger(
+                    kind=RuleTriggerKind.TIMING_WINDOW,
+                    source_span=span,
+                    parameters=parameters_from_pairs(
+                        (
+                            ("edge", "start"),
+                            ("phase", "battle_round"),
+                            ("timing_window", "battle_round_start"),
+                        )
+                    ),
+                ),
+                target=RuleTargetSpec(kind=RuleTargetKind.ENEMY_UNIT, source_span=span),
+                effects=(
+                    RuleEffectSpec(
+                        kind=RuleEffectKind.SELECT_TRACKED_TARGET,
+                        source_span=span,
+                        parameters=parameters_from_pairs(
+                            (
+                                ("replacement", False),
+                                ("selection_kind", "select_one"),
+                                ("target_allegiance", "enemy"),
+                                ("target_lifecycle", "until_destroyed"),
+                                ("target_scope", "enemy_unit"),
+                                ("tracked_target_owner", "this_unit"),
+                                ("tracked_target_role", "prey"),
+                            )
+                        ),
+                    ),
+                ),
+            ),
+        ),
     )
 
 

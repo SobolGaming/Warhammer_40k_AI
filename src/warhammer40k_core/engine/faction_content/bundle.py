@@ -76,10 +76,10 @@ from warhammer40k_core.engine.faction_content.hooks import (
     RuntimeHookBindings,
     RuntimeHookBindingsByEvent,
     combine_any_hook_bindings,
+    hook_bindings_by_event_from_registry_owner,
     hook_bindings_by_event_from_sources,
     hook_bindings_for_event,
     validate_any_hook_bindings,
-    validate_hook_bindings_by_event,
 )
 from warhammer40k_core.engine.faction_content.stratagem_handlers import (
     StratagemHandlerBinding,
@@ -1199,7 +1199,10 @@ class RuntimeContentBundle:
         object.__setattr__(
             self,
             "hook_bindings_by_event",
-            validate_hook_bindings_by_event(self.hook_bindings_by_event),
+            hook_bindings_by_event_from_registry_owner(
+                owner=self,
+                extra_bindings_by_event=self.hook_bindings_by_event,
+            ),
         )
 
     def hook_bindings_for_event(self, lifecycle_event: LifecycleHookEvent) -> RuntimeHookBindings:

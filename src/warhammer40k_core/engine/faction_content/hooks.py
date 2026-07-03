@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, fields, is_dataclass
 from types import MappingProxyType
-from typing import cast
+from typing import Protocol, cast, runtime_checkable
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.advance_eligibility_hooks import AdvanceEligibilityHookBinding
@@ -93,6 +93,12 @@ type AnyHookBindingInput = RuntimeHookBinding | HookBindingShape
 type RuntimeHookBindings = tuple[AnyHookBinding, ...]
 type RuntimeHookBindingsByEvent = Mapping[LifecycleHookEvent, RuntimeHookBindings]
 EMPTY_HOOK_BINDINGS_BY_EVENT: RuntimeHookBindingsByEvent = MappingProxyType({})
+
+
+@runtime_checkable
+class RuntimeHookRegistryShape(Protocol):
+    def all_bindings(self) -> tuple[HookBindingShape, ...]: ...
+
 
 _HOOK_EVENT_BY_BINDING_TYPE: Mapping[type[object], LifecycleHookEvent] = MappingProxyType(
     {
@@ -236,6 +242,34 @@ def hook_bindings_by_event_from_sources(
     return hook_bindings_by_event_from_bindings(combined)
 
 
+def hook_bindings_by_event_from_registry_owner(
+    *,
+    owner: object,
+    extra_bindings_by_event: object,
+) -> RuntimeHookBindingsByEvent:
+    registry_bindings = _hook_bindings_from_registry_owner(owner)
+    registry_bindings_by_key = {
+        (binding.lifecycle_event, binding.hook_id): binding for binding in registry_bindings
+    }
+    extra_bindings: list[RuntimeHookBinding] = []
+    for bindings in validate_hook_bindings_by_event(extra_bindings_by_event).values():
+        for binding in bindings:
+            key = (binding.lifecycle_event, binding.hook_id)
+            registry_binding = registry_bindings_by_key.get(key)
+            if type(binding.binding) is HookBinding:
+                extra_bindings.append(binding)
+            elif registry_binding is None:
+                raise GameLifecycleError(
+                    "RuntimeContentBundle hook_bindings_by_event contains typed binding "
+                    "missing from hook registries."
+                )
+            elif binding != registry_binding:
+                raise GameLifecycleError(
+                    "RuntimeContentBundle hook_bindings_by_event does not match hook registry."
+                )
+    return hook_bindings_by_event_from_bindings((*registry_bindings, *extra_bindings))
+
+
 def combine_any_hook_bindings(
     bindings: tuple[AnyHookBinding, ...],
 ) -> tuple[AnyHookBinding, ...]:
@@ -289,6 +323,22 @@ def validate_hook_bindings_by_event(
 
 def _hook_binding_sort_key(binding: AnyHookBinding) -> tuple[str, str]:
     return (binding.lifecycle_event.value, binding.hook_id)
+
+
+def _hook_bindings_from_registry_owner(owner: object) -> tuple[RuntimeHookBinding, ...]:
+    if not is_dataclass(owner) or isinstance(owner, type):
+        raise GameLifecycleError("RuntimeContentBundle hook registry owner must be a dataclass.")
+    bindings: list[RuntimeHookBinding] = []
+    for field in fields(owner):
+        if not field.name.endswith("_hook_registry"):
+            continue
+        registry = getattr(owner, field.name)
+        if not isinstance(registry, RuntimeHookRegistryShape):
+            raise GameLifecycleError(
+                "RuntimeContentBundle hook registry fields must expose all_bindings."
+            )
+        bindings.extend(runtime_hook_binding_for(binding) for binding in registry.all_bindings())
+    return tuple(bindings)
 
 
 def _combine_unique_hook_bindings(
