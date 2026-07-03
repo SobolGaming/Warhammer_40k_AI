@@ -18,6 +18,7 @@ SRC_ROOT = ROOT / "src" / "warhammer40k_core"
 ATTACK_SEQUENCE_PATH = SRC_ROOT / "engine" / "attack_sequence.py"
 DAMAGE_ALLOCATION_PATH = SRC_ROOT / "engine" / "damage_allocation.py"
 SHOOTING_PHASE_PATH = SRC_ROOT / "engine" / "phases" / "shooting.py"
+SHOOTING_PHASE_SPLIT_PATHS = tuple(sorted(SHOOTING_PHASE_PATH.parent.glob("shooting*.py")))
 LIFECYCLE_PATH = SRC_ROOT / "engine" / "lifecycle.py"
 RESERVES_PATH = SRC_ROOT / "engine" / "reserves.py"
 CORE_STRATAGEMS_PATH = (
@@ -70,7 +71,7 @@ def test_phase14k_damage_allocation_model_choice_is_runtime_and_contract_registe
     missing: list[str] = []
 
     for path, token in runtime_expectations:
-        if token not in path.read_text(encoding="utf-8"):
+        if token not in _source_for_path(path):
             missing.append(f"{path.relative_to(ROOT).as_posix()}: missing {token!r}")
 
     contract_text = ADAPTER_CONTRACT_PATH.read_text(encoding="utf-8")
@@ -215,3 +216,11 @@ def test_phase14k_docs_mark_phase_complete() -> None:
 
 def _runtime_python_files() -> tuple[Path, ...]:
     return tuple(sorted(SRC_ROOT.rglob("*.py"), key=lambda path: path.as_posix()))
+
+
+def _source_for_path(path: Path) -> str:
+    if path == SHOOTING_PHASE_PATH:
+        return "\n".join(
+            split_path.read_text(encoding="utf-8") for split_path in SHOOTING_PHASE_SPLIT_PATHS
+        )
+    return path.read_text(encoding="utf-8")

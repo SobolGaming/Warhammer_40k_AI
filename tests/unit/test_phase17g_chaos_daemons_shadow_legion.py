@@ -99,8 +99,8 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseHandler,
     ShootingPhaseState,
     ShootingUnitSelection,
-    _apply_shooting_unit_selected_grant_decision,  # pyright: ignore[reportPrivateUsage]
-    _request_shooting_unit_selected_grant_decision_if_available,  # pyright: ignore[reportPrivateUsage]
+    _apply_shooting_unit_selected_grant_decision,
+    _request_shooting_unit_selected_grant_decision_if_available,
     request_out_of_phase_shooting_declaration,
 )
 from warhammer40k_core.engine.prebattle import scout_ability_instances_for_rules_unit

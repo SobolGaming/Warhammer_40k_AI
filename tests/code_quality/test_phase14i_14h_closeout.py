@@ -26,16 +26,19 @@ LIST_VALIDATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "list_val
 ARMY_MUSTERING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "army_mustering.py"
 STRATAGEMS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems.py"
 SHOOTING_PHASE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "shooting.py"
+SHOOTING_PHASE_SPLIT_PATHS = tuple(sorted(SHOOTING_PHASE_PATH.parent.glob("shooting*.py")))
 ADAPTER_CONTRACT_PATH = ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
 
 
-def _module_function_source(module_source: str, function_name: str) -> str:
-    module = ast.parse(module_source)
-    for node in module.body:
-        if isinstance(node, ast.FunctionDef) and node.name == function_name:
-            source = ast.get_source_segment(module_source, node)
-            assert source is not None
-            return source
+def _function_source_from_paths(paths: tuple[Path, ...], function_name: str) -> str:
+    for path in paths:
+        module_source = path.read_text(encoding="utf-8")
+        module = ast.parse(module_source)
+        for node in module.body:
+            if isinstance(node, ast.FunctionDef) and node.name == function_name:
+                source = ast.get_source_segment(module_source, node)
+                assert source is not None
+                return source
     raise AssertionError(f"Function {function_name} not found.")
 
 
@@ -149,18 +152,23 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
 
 
 def test_phase14h_shooting_selector_and_range_helpers_are_rules_unit_aware() -> None:
-    shooting_source = SHOOTING_PHASE_PATH.read_text(encoding="utf-8")
-    active_selector_source = _module_function_source(
-        shooting_source,
+    active_selector_source = _function_source_from_paths(
+        SHOOTING_PHASE_SPLIT_PATHS,
         "_active_player_placed_unit_ids",
     )
-    legal_selector_source = _module_function_source(shooting_source, "_legal_shooting_unit_ids")
-    options_source = _module_function_source(shooting_source, "_shooting_unit_options")
-    available_weapons_source = _module_function_source(
-        shooting_source,
+    legal_selector_source = _function_source_from_paths(
+        SHOOTING_PHASE_SPLIT_PATHS, "_legal_shooting_unit_ids"
+    )
+    options_source = _function_source_from_paths(
+        SHOOTING_PHASE_SPLIT_PATHS, "_shooting_unit_options"
+    )
+    available_weapons_source = _function_source_from_paths(
+        SHOOTING_PHASE_SPLIT_PATHS,
         "_available_weapons_for_rules_unit",
     )
-    range_source = _module_function_source(shooting_source, "_unit_target_within_max_range")
+    range_source = _function_source_from_paths(
+        SHOOTING_PHASE_SPLIT_PATHS, "_unit_target_within_max_range"
+    )
 
     assert "rules_unit_id_for_unit_id" in active_selector_source
     assert "unit_ids.append(placement.unit_instance_id)" not in active_selector_source

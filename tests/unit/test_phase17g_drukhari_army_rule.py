@@ -145,8 +145,8 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseHandler,
     ShootingPhaseState,
     ShootingUnitSelection,
-    _record_shooting_unit_selected_grant_effects,  # pyright: ignore[reportPrivateUsage]
-    _request_shooting_unit_selected_grant_decision_if_available,  # pyright: ignore[reportPrivateUsage]
+    _record_shooting_unit_selected_grant_effects,
+    _request_shooting_unit_selected_grant_decision_if_available,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
