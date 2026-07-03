@@ -423,7 +423,7 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `bc2d53bc1edb482f0ebb501f76bed1391adcecd0e8a6f0e7edd6ac62364a3ffc`
+  `6976574fa4e9cc5af12c30046e73460f118ae3520360b4f31238bb0001f4c554`
 - upstream Phase 17F checksum:
   `87ff93d34cdf8c6504e81bd2db9abb2275a631a12987caeb968cc1c14ce57863`
 - bridge source version: `10th-edition-2026-06-14`
@@ -440,6 +440,10 @@ frequency. The current missing-capability summary starts with
 `generic_ir_execution_binding`, `unrepresented_rule_language`,
 `stratagem_activation_and_targeting`, `stratagem_effect_execution`, and
 `enhancement_assignment_effect`.
+Stratagem-cost aura rows remain blocked under
+`stratagem_cost_modifier_runtime`; they must not be promoted as generic Aura
+rows until RuleIR and the runtime content bundle can express the CP-cost
+modifier effect.
 
 The payload does not emit raw rule text. It emits source IDs, template IDs,
 template family tokens, diagnostic reason tokens, and capability family tokens

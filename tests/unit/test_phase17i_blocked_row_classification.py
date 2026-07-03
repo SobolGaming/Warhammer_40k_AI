@@ -104,6 +104,11 @@ def test_phase17i_missing_capability_report_groups_rows_by_family() -> None:
     assert summary_by_family["enhancement_assignment_effect"].coverage_kind_counts == {
         "detachment_enhancement": 707
     }
+    assert summary_by_family["stratagem_cost_modifier_runtime"].row_count == 7
+    assert summary_by_family["stratagem_cost_modifier_runtime"].coverage_kind_counts == {
+        "detachment_enhancement": 6,
+        "detachment_rule": 1,
+    }
     assert summary_by_family["detachment_rule_state"].coverage_kind_counts == {
         "detachment_rule": 262
     }
@@ -134,6 +139,24 @@ def test_phase17i_existing_template_report_uses_phase17c_template_families() -> 
             rule_template_by_id(template_id).family.value
             for template_id in row.existing_template_ids
         }
+
+
+def test_phase17i_stratagem_cost_aura_remains_blocked_for_cost_modifier_runtime() -> None:
+    report = classification_source.phase17i_blocked_row_classification_report()
+    row = next(
+        row
+        for row in report.classification_rows
+        if row.execution_id
+        == "phase17f:phase17e:enhancement:space-marines:vanguard-spearhead:000008490005"
+    )
+
+    assert row.existing_template_families == ("aura", "keyword_gate")
+    assert set(row.missing_capability_families) == {
+        classification_source.Phase17IMissingCapabilityFamily.ENHANCEMENT_ASSIGNMENT_EFFECT,
+        classification_source.Phase17IMissingCapabilityFamily.FACTION_RESOURCE_LEDGER,
+        classification_source.Phase17IMissingCapabilityFamily.GENERIC_IR_EXECUTION_BINDING,
+        classification_source.Phase17IMissingCapabilityFamily.STRATAGEM_COST_MODIFIER_RUNTIME,
+    }
 
 
 def test_phase17i_payload_is_deterministic_json_safe_and_round_trips() -> None:
