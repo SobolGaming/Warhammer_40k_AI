@@ -146,6 +146,41 @@ def _target_binding_error(
         required_faction_keywords=target_spec.required_faction_keywords,
     ):
         return "unit_missing_required_faction_keyword"
+    if _target_unit_has_excluded_keywords(
+        state=state,
+        target_binding=target_binding,
+        excluded_keywords=target_spec.excluded_keywords,
+    ):
+        return "unit_has_excluded_keyword"
+    if _target_unit_has_excluded_faction_keywords(
+        state=state,
+        target_binding=target_binding,
+        excluded_faction_keywords=target_spec.excluded_faction_keywords,
+    ):
+        return "unit_has_excluded_faction_keyword"
+    if target_spec.target_policy_id == ENEMY_UNIT_TARGET_POLICY_ID:
+        if target_owner == player_id:
+            return "target_not_enemy"
+        return None
+    if target_spec.target_policy_id == SELECTED_TARGET_UNIT_TARGET_POLICY_ID:
+        if context is None:
+            return None
+        return _selected_target_context_error(
+            context=context,
+            target_binding=target_binding,
+        )
+    if target_spec.target_policy_id == NOT_SELECTED_TO_SHOOT_TARGET_POLICY_ID:
+        return _not_selected_to_shoot_target_error(
+            state=state,
+            context=context,
+            target_binding=target_binding,
+        )
+    if target_spec.target_policy_id == NOT_SELECTED_TO_FIGHT_TARGET_POLICY_ID:
+        return _not_selected_to_fight_target_error(
+            state=state,
+            context=context,
+            target_binding=target_binding,
+        )
     if target_spec.target_policy_id == INSANE_BRAVERY_TARGET_POLICY_ID:
         if _require_target_unit_id(target_binding) not in _battle_shock_test_unit_ids(
             state=state,
@@ -430,6 +465,40 @@ def _target_unit_satisfies_required_faction_keywords(
     return required.issubset(stored)
 
 
+def _target_unit_has_excluded_keywords(
+    *,
+    state: GameState,
+    target_binding: StratagemTargetBinding,
+    excluded_keywords: tuple[str, ...],
+) -> bool:
+    excluded = {_canonical_keyword(keyword) for keyword in excluded_keywords}
+    if not excluded:
+        return False
+    target_unit_id = _require_target_unit_id(target_binding)
+    unit = _unit_by_id_or_none(state=state, unit_instance_id=target_unit_id)
+    if unit is None:
+        raise GameLifecycleError("Stratagem target unit is unknown.")
+    stored = {_canonical_keyword(keyword) for keyword in unit.keywords}
+    return bool(excluded & stored)
+
+
+def _target_unit_has_excluded_faction_keywords(
+    *,
+    state: GameState,
+    target_binding: StratagemTargetBinding,
+    excluded_faction_keywords: tuple[str, ...],
+) -> bool:
+    excluded = {_canonical_keyword(keyword) for keyword in excluded_faction_keywords}
+    if not excluded:
+        return False
+    target_unit_id = _require_target_unit_id(target_binding)
+    unit = _unit_by_id_or_none(state=state, unit_instance_id=target_unit_id)
+    if unit is None:
+        raise GameLifecycleError("Stratagem target unit is unknown.")
+    stored = {_canonical_keyword(keyword) for keyword in unit.faction_keywords}
+    return bool(excluded & stored)
+
+
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Stratagem keyword lookup requires a UnitInstance.")
@@ -647,6 +716,44 @@ def _selected_target_unit_ids_or_none(
         seen.add(unit_id)
         unit_ids.append(unit_id)
     return tuple(sorted(unit_ids))
+
+
+def _not_selected_to_shoot_target_error(
+    *,
+    state: GameState,
+    context: StratagemEligibilityContext | None,
+    target_binding: StratagemTargetBinding,
+) -> str | None:
+    if context is not None and context.phase is not BattlePhase.SHOOTING:
+        return "not_selected_to_shoot_requires_shooting_phase"
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None:
+        return "missing_shooting_phase_state"
+    target_unit_id = _require_target_unit_id(target_binding)
+    if target_unit_id in shooting_state.selected_unit_ids:
+        return "unit_already_selected_to_shoot"
+    if target_unit_id in shooting_state.shot_unit_ids:
+        return "unit_already_shot"
+    if target_unit_id in shooting_state.skipped_unit_ids:
+        return "unit_already_skipped_shooting"
+    return None
+
+
+def _not_selected_to_fight_target_error(
+    *,
+    state: GameState,
+    context: StratagemEligibilityContext | None,
+    target_binding: StratagemTargetBinding,
+) -> str | None:
+    if context is not None and context.phase is not BattlePhase.FIGHT:
+        return "not_selected_to_fight_requires_fight_phase"
+    fight_state = state.fight_phase_state
+    if fight_state is None:
+        return "missing_fight_phase_state"
+    target_unit_id = _require_target_unit_id(target_binding)
+    if target_unit_id in fight_state.fight_order_state.selected_to_fight_unit_ids:
+        return "unit_already_selected_to_fight"
+    return None
 
 
 def _selected_to_move_target_context_error(

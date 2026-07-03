@@ -85,6 +85,9 @@ from warhammer40k_core.engine.faction_content.stratagem_handlers import (
     StratagemHandlerBinding,
     StratagemHandlerRegistry,
 )
+from warhammer40k_core.engine.faction_content.stratagem_record_merge import (
+    merge_stratagem_records_with_contribution_overrides,
+)
 from warhammer40k_core.engine.faction_rule_execution import (
     FactionRuleExecutionRegistry,
     FactionRuleNamedHandler,
@@ -1244,14 +1247,13 @@ class RuntimeContentBundle:
             ),
             AbilityCatalogRecord,
         )
-        stratagem_records = _merge_records(
-            "stratagem_records",
+        contribution_stratagem_records = _contribution_values(
+            validated_contributions,
+            lambda contribution: contribution.stratagem_records,
+        )
+        stratagem_records = merge_stratagem_records_with_contribution_overrides(
             base_stratagem_records,
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.stratagem_records,
-            ),
-            StratagemCatalogRecord,
+            contribution_stratagem_records,
         )
         ability_registry = _merged_ability_registry(
             base_ability_handler_registry,
