@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.stratagems_imports import *
+from warhammer40k_core.engine.selected_target_context import SELECTED_TARGET_UNIT_CONTEXT_KEY
 
 # fmt: off
 if TYPE_CHECKING:
@@ -176,7 +177,6 @@ EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY = "character_model_instance_id"
 HEROIC_INTERVENTION_MODE_CONTEXT_KEY = "mode"
 HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND = "leap_to_defend"
 HEROIC_INTERVENTION_MODE_INTO_THE_FRAY = "into_the_fray"
-SELECTED_TARGET_UNIT_CONTEXT_KEY = "selected_target_unit_instance_ids"
 SELECTED_TO_MOVE_UNIT_CONTEXT_KEY = "selected_to_move_unit_instance_id"
 JUST_FELL_BACK_UNIT_CONTEXT_KEY = "fell_back_unit_instance_id"
 JUST_SHOT_UNIT_CONTEXT_KEY = "shot_unit_instance_id"

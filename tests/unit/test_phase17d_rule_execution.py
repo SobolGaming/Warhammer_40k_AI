@@ -79,6 +79,7 @@ from warhammer40k_core.engine.rule_execution import (
     scoped_rule_ir_from_execution_payload,
 )
 from warhammer40k_core.engine.scoring import initial_victory_point_ledgers
+from warhammer40k_core.engine.selected_target_context import SELECTED_TARGET_UNIT_CONTEXT_KEY
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.pose import Pose
@@ -1059,6 +1060,121 @@ def test_phase17d_generic_stratagem_target_binding_executes() -> None:
         },
     )
     assert result.event_records[0].event_type == "rule_execution_target_bound"
+
+
+def test_phase17d_selected_target_binding_uses_trigger_payload_when_unbound() -> None:
+    compiled = _compiled("One friendly unit that was selected as the target.")
+    first_target_id = "army-alpha:intercessor-unit-1"
+    second_target_id = "army-alpha:intercessor-unit-2"
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            trigger_payload={
+                SELECTED_TARGET_UNIT_CONTEXT_KEY: [second_target_id, first_target_id],
+            },
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert result.target_bindings == (
+        {
+            "rule_id": compiled.rule_ir.rule_id,
+            "source_id": compiled.rule_ir.source_id,
+            "clause_id": compiled.rule_ir.clauses[0].clause_id,
+            "target_kind": "selected_target",
+            "target_unit_instance_ids": [first_target_id, second_target_id],
+            "target_player_id": None,
+        },
+    )
+
+
+def test_phase17d_selected_target_binding_enforces_target_keywords_with_state() -> None:
+    state = _battle_state_with_scenario()
+    infantry = _compiled("One friendly INFANTRY unit that was selected as the target.")
+    vehicle = _compiled("One friendly VEHICLE unit that was selected as the target.")
+    target_unit_id = "army-alpha:intercessor-unit-1"
+
+    applied = execute_rule_ir(
+        rule_ir=infantry.rule_ir,
+        context=_execution_context(
+            state=state,
+            trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [target_unit_id]},
+        ),
+        registry=default_rule_execution_registry(),
+    )
+    missing_state = execute_rule_ir(
+        rule_ir=infantry.rule_ir,
+        context=_execution_context(
+            trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [target_unit_id]},
+        ),
+        registry=default_rule_execution_registry(),
+    )
+    keyword_mismatch = execute_rule_ir(
+        rule_ir=vehicle.rule_ir,
+        context=_execution_context(
+            state=state,
+            trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [target_unit_id]},
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert applied.status is RuleExecutionStatus.APPLIED
+    assert applied.target_bindings[0]["target_unit_instance_ids"] == [target_unit_id]
+    assert missing_state.status is RuleExecutionStatus.INVALID
+    assert missing_state.reason == "missing_input:game_state"
+    assert keyword_mismatch.status is RuleExecutionStatus.INVALID
+    assert keyword_mismatch.reason == "unit_missing_required_keyword"
+
+
+def test_phase17d_selected_target_effect_uses_trigger_payload_binding() -> None:
+    state = _battle_state_with_scenario()
+    compiled = _compiled(
+        "One friendly unit that was selected as the target gains Stealth until the end "
+        "of the phase."
+    )
+    target_unit_id = "army-alpha:intercessor-unit-1"
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=state,
+            trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [target_unit_id]},
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert result.effect_payloads[0]["target_unit_instance_ids"] == [target_unit_id]
+    assert state.persisting_effects_for_unit(target_unit_id) == result.created_persisting_effects
+
+
+def test_phase17d_selected_target_binding_requires_matching_context() -> None:
+    compiled = _compiled("One friendly unit that was selected as the target.")
+    selected_target_id = "army-alpha:intercessor-unit-1"
+    other_target_id = "army-alpha:intercessor-unit-2"
+
+    missing_context = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(),
+        registry=default_rule_execution_registry(),
+    )
+    mismatched_target = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            target_unit_instance_ids=(other_target_id,),
+            trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [selected_target_id]},
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert missing_context.status is RuleExecutionStatus.INVALID
+    assert missing_context.reason == "missing_selected_target_context"
+    assert mismatched_target.status is RuleExecutionStatus.INVALID
+    assert mismatched_target.reason == "unit_not_selected_as_target"
+    assert missing_context.target_bindings == ()
+    assert mismatched_target.target_bindings == ()
 
 
 def test_phase17d_preflight_rejects_missing_target_binding() -> None:
