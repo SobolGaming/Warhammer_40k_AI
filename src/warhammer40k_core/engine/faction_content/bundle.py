@@ -70,11 +70,16 @@ from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventSubscription,
 )
 from warhammer40k_core.engine.faction_content.hooks import (
-    HOOK_BINDING_COMBINE_NAME_BY_EVENT,
+    EMPTY_HOOK_BINDINGS_BY_EVENT,
     AnyHookBinding,
+    AnyHookBindingInput,
+    RuntimeHookBindings,
+    RuntimeHookBindingsByEvent,
+    combine_any_hook_bindings,
+    hook_bindings_by_event_from_sources,
     hook_bindings_for_event,
-    lifecycle_event_for_hook_binding,
     validate_any_hook_bindings,
+    validate_hook_bindings_by_event,
 )
 from warhammer40k_core.engine.faction_content.stratagem_handlers import (
     StratagemHandlerBinding,
@@ -182,24 +187,13 @@ _BundleSummaryPayload = _bundle_payloads.RuntimeContentBundleSummaryPayload
 _Phase17FExecutionRecord = faction_execution_2026_27.Phase17FExecutionRecord
 _summary_hash = _bundle_validation.summary_hash
 _combine_unique_values = _bundle_validation.combine_unique_values
+_validate_contribution_tuple = _bundle_validation.validate_contribution_tuple
 _validate_identifier = _bundle_validation.validate_identifier
 _validate_identifier_tuple = _bundle_validation.validate_identifier_tuple
 _validate_index_mapping = _bundle_validation.validate_index_mapping
 _validate_tuple = _bundle_validation.validate_tuple
 _merge_records = _bundle_validation.merge_records
 _contribution_values = _bundle_validation.contribution_values
-
-
-def _validate_contribution_tuple[ValueT](
-    field_name: str,
-    value: object,
-    expected_type: type[ValueT],
-) -> tuple[ValueT, ...]:
-    return _validate_tuple(
-        f"RuntimeContentContribution {field_name}",
-        value,
-        expected_type,
-    )
 
 
 @dataclass(frozen=True, slots=True, init=False)
@@ -236,7 +230,7 @@ class RuntimeContentContribution:
         rule_runtime_bindings: tuple[RuleRuntimeBinding, ...] = (),
         event_subscriptions: tuple[RuntimeContentEventSubscription, ...] = (),
         event_handler_bindings: tuple[RuntimeContentEventHandlerBinding, ...] = (),
-        hook_bindings: tuple[AnyHookBinding, ...] = (),
+        hook_bindings: tuple[AnyHookBindingInput, ...] = (),
         battle_formation_hook_bindings: tuple[BattleFormationHookBinding, ...] = (),
         battle_round_start_hook_bindings: tuple[BattleRoundStartHookBinding, ...] = (),
         turn_end_hook_bindings: tuple[TurnEndHookBinding, ...] = (),
@@ -365,144 +359,141 @@ class RuntimeContentContribution:
             ),
         )
         validated_hook_bindings = validate_any_hook_bindings(hook_bindings)
-        legacy_hook_bindings = cast(
-            tuple[AnyHookBinding, ...],
-            (
-                *_validate_contribution_tuple(
-                    "battle_formation_hook_bindings",
-                    battle_formation_hook_bindings,
-                    BattleFormationHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "battle_round_start_hook_bindings",
-                    battle_round_start_hook_bindings,
-                    BattleRoundStartHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "turn_end_hook_bindings",
-                    turn_end_hook_bindings,
-                    TurnEndHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "command_phase_start_hook_bindings",
-                    command_phase_start_hook_bindings,
-                    CommandPhaseStartHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "fight_phase_start_hook_bindings",
-                    fight_phase_start_hook_bindings,
-                    FightPhaseStartHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "shooting_phase_start_hook_bindings",
-                    shooting_phase_start_hook_bindings,
-                    ShootingPhaseStartHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "unit_destroyed_hook_bindings",
-                    unit_destroyed_hook_bindings,
-                    UnitDestroyedHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "battle_shock_hook_bindings",
-                    battle_shock_hook_bindings,
-                    BattleShockHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "advance_eligibility_hook_bindings",
-                    advance_eligibility_hook_bindings,
-                    AdvanceEligibilityHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "advance_move_hook_bindings",
-                    advance_move_hook_bindings,
-                    AdvanceMoveHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "fall_back_hook_bindings",
-                    fall_back_hook_bindings,
-                    FallBackEligibilityHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "movement_end_surge_hook_bindings",
-                    movement_end_surge_hook_bindings,
-                    MovementEndSurgeHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "reserve_arrival_distance_hook_bindings",
-                    reserve_arrival_distance_hook_bindings,
-                    ReserveArrivalDistanceHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "unit_move_completed_mortal_wound_hook_bindings",
-                    unit_move_completed_mortal_wound_hook_bindings,
-                    UnitMoveCompletedMortalWoundHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "mortal_wound_feel_no_pain_hook_bindings",
-                    mortal_wound_feel_no_pain_hook_bindings,
-                    MortalWoundFeelNoPainContinuationHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "charge_declaration_hook_bindings",
-                    charge_declaration_hook_bindings,
-                    ChargeDeclarationHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "shooting_target_restriction_hook_bindings",
-                    shooting_target_restriction_hook_bindings,
-                    ShootingTargetRestrictionHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "charge_target_restriction_hook_bindings",
-                    charge_target_restriction_hook_bindings,
-                    ChargeTargetRestrictionHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "shooting_unit_selected_hook_bindings",
-                    shooting_unit_selected_hook_bindings,
-                    ShootingUnitSelectedHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "shooting_unit_selected_grant_hook_bindings",
-                    shooting_unit_selected_grant_hook_bindings,
-                    ShootingUnitSelectedGrantBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "attack_sequence_completed_hook_bindings",
-                    attack_sequence_completed_hook_bindings,
-                    AttackSequenceCompletedHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "shooting_end_surge_hook_bindings",
-                    shooting_end_surge_hook_bindings,
-                    ShootingEndSurgeHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "fight_activation_ability_hook_bindings",
-                    fight_activation_ability_hook_bindings,
-                    FightActivationAbilityHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "fight_unit_selected_hook_bindings",
-                    fight_unit_selected_hook_bindings,
-                    FightUnitSelectedHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "fight_unit_selected_grant_hook_bindings",
-                    fight_unit_selected_grant_hook_bindings,
-                    FightUnitSelectedGrantBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "phase_end_objective_control_hook_bindings",
-                    phase_end_objective_control_hook_bindings,
-                    PhaseEndObjectiveControlHookBinding,
-                ),
-                *_validate_contribution_tuple(
-                    "stratagem_cost_choice_hook_bindings",
-                    stratagem_cost_choice_hook_bindings,
-                    StratagemCostChoiceHookBinding,
-                ),
+        legacy_hook_bindings: tuple[AnyHookBindingInput, ...] = (
+            *_validate_contribution_tuple(
+                "battle_formation_hook_bindings",
+                battle_formation_hook_bindings,
+                BattleFormationHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "battle_round_start_hook_bindings",
+                battle_round_start_hook_bindings,
+                BattleRoundStartHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "turn_end_hook_bindings",
+                turn_end_hook_bindings,
+                TurnEndHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "command_phase_start_hook_bindings",
+                command_phase_start_hook_bindings,
+                CommandPhaseStartHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "fight_phase_start_hook_bindings",
+                fight_phase_start_hook_bindings,
+                FightPhaseStartHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "shooting_phase_start_hook_bindings",
+                shooting_phase_start_hook_bindings,
+                ShootingPhaseStartHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "unit_destroyed_hook_bindings",
+                unit_destroyed_hook_bindings,
+                UnitDestroyedHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "battle_shock_hook_bindings",
+                battle_shock_hook_bindings,
+                BattleShockHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "advance_eligibility_hook_bindings",
+                advance_eligibility_hook_bindings,
+                AdvanceEligibilityHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "advance_move_hook_bindings",
+                advance_move_hook_bindings,
+                AdvanceMoveHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "fall_back_hook_bindings",
+                fall_back_hook_bindings,
+                FallBackEligibilityHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "movement_end_surge_hook_bindings",
+                movement_end_surge_hook_bindings,
+                MovementEndSurgeHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "reserve_arrival_distance_hook_bindings",
+                reserve_arrival_distance_hook_bindings,
+                ReserveArrivalDistanceHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "unit_move_completed_mortal_wound_hook_bindings",
+                unit_move_completed_mortal_wound_hook_bindings,
+                UnitMoveCompletedMortalWoundHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "mortal_wound_feel_no_pain_hook_bindings",
+                mortal_wound_feel_no_pain_hook_bindings,
+                MortalWoundFeelNoPainContinuationHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "charge_declaration_hook_bindings",
+                charge_declaration_hook_bindings,
+                ChargeDeclarationHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "shooting_target_restriction_hook_bindings",
+                shooting_target_restriction_hook_bindings,
+                ShootingTargetRestrictionHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "charge_target_restriction_hook_bindings",
+                charge_target_restriction_hook_bindings,
+                ChargeTargetRestrictionHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "shooting_unit_selected_hook_bindings",
+                shooting_unit_selected_hook_bindings,
+                ShootingUnitSelectedHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "shooting_unit_selected_grant_hook_bindings",
+                shooting_unit_selected_grant_hook_bindings,
+                ShootingUnitSelectedGrantBinding,
+            ),
+            *_validate_contribution_tuple(
+                "attack_sequence_completed_hook_bindings",
+                attack_sequence_completed_hook_bindings,
+                AttackSequenceCompletedHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "shooting_end_surge_hook_bindings",
+                shooting_end_surge_hook_bindings,
+                ShootingEndSurgeHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "fight_activation_ability_hook_bindings",
+                fight_activation_ability_hook_bindings,
+                FightActivationAbilityHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "fight_unit_selected_hook_bindings",
+                fight_unit_selected_hook_bindings,
+                FightUnitSelectedHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "fight_unit_selected_grant_hook_bindings",
+                fight_unit_selected_grant_hook_bindings,
+                FightUnitSelectedGrantBinding,
+            ),
+            *_validate_contribution_tuple(
+                "phase_end_objective_control_hook_bindings",
+                phase_end_objective_control_hook_bindings,
+                PhaseEndObjectiveControlHookBinding,
+            ),
+            *_validate_contribution_tuple(
+                "stratagem_cost_choice_hook_bindings",
+                stratagem_cost_choice_hook_bindings,
+                StratagemCostChoiceHookBinding,
             ),
         )
         object.__setattr__(
@@ -859,27 +850,6 @@ def _combine_contribution_values[T](
     )
 
 
-def _combine_hook_bindings(
-    contributions: tuple[RuntimeContentContribution, ...],
-) -> tuple[AnyHookBinding, ...]:
-    combined: list[AnyHookBinding] = []
-    for event, field_name in HOOK_BINDING_COMBINE_NAME_BY_EVENT.items():
-        event_bindings = tuple(
-            binding
-            for contribution in contributions
-            for binding in contribution.hook_bindings
-            if lifecycle_event_for_hook_binding(binding) == event
-        )
-        combined.extend(
-            _combine_unique_values(
-                field_name,
-                event_bindings,
-                lambda binding: binding.hook_id,
-            )
-        )
-    return validate_any_hook_bindings(tuple(combined))
-
-
 def combine_runtime_content_contributions(
     *,
     contribution_id: str,
@@ -930,7 +900,12 @@ def combine_runtime_content_contributions(
             lambda contribution: contribution.event_handler_bindings,
             lambda binding: binding.handler_id,
         ),
-        hook_bindings=_combine_hook_bindings(validated_contributions),
+        hook_bindings=combine_any_hook_bindings(
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.hook_bindings,
+            )
+        ),
         enhancement_effect_bindings=_combine_unique_values(
             "enhancement effect binding",
             tuple(
@@ -1066,6 +1041,7 @@ class RuntimeContentBundle:
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry
     runtime_modifier_registry: RuntimeModifierRegistry
     contribution_ids: tuple[str, ...] = ()
+    hook_bindings_by_event: RuntimeHookBindingsByEvent = EMPTY_HOOK_BINDINGS_BY_EVENT
 
     def __post_init__(self) -> None:
         if type(self.activation) is not RuntimeContentActivation:
@@ -1220,6 +1196,16 @@ class RuntimeContentBundle:
             "contribution_ids",
             _validate_identifier_tuple("contribution_ids", self.contribution_ids),
         )
+        object.__setattr__(
+            self,
+            "hook_bindings_by_event",
+            validate_hook_bindings_by_event(self.hook_bindings_by_event),
+        )
+
+    def hook_bindings_for_event(self, lifecycle_event: LifecycleHookEvent) -> RuntimeHookBindings:
+        if type(lifecycle_event) is not LifecycleHookEvent:
+            raise GameLifecycleError("RuntimeContentBundle lifecycle event is invalid.")
+        return self.hook_bindings_by_event.get(lifecycle_event, ())
 
     @classmethod
     def from_contributions(
@@ -1663,6 +1649,13 @@ class RuntimeContentBundle:
             stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
             runtime_modifier_registry=runtime_modifier_registry,
             contribution_ids=contribution_ids,
+            hook_bindings_by_event=hook_bindings_by_event_from_sources(
+                emitted_bindings=(),
+                contribution_bindings=_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.hook_bindings,
+                ),
+            ),
         )
 
     def to_summary_payload(self) -> _BundleSummaryPayload:

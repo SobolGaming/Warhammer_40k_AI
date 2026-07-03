@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from dataclasses import dataclass
 from types import MappingProxyType
 from typing import cast
 
@@ -24,7 +25,11 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrantBinding,
     FightUnitSelectedHookBinding,
 )
-from warhammer40k_core.engine.lifecycle_hooks import HookBindingShape, LifecycleHookEvent
+from warhammer40k_core.engine.lifecycle_hooks import (
+    HookBinding,
+    HookBindingShape,
+    LifecycleHookEvent,
+)
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHookBinding,
 )
@@ -51,7 +56,43 @@ from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedMortalWoundHookBinding,
 )
 
-type AnyHookBinding = HookBindingShape
+
+@dataclass(frozen=True, slots=True)
+class RuntimeHookBinding:
+    lifecycle_event: LifecycleHookEvent
+    binding: HookBindingShape
+
+    def __post_init__(self) -> None:
+        if type(self.lifecycle_event) is not LifecycleHookEvent:
+            raise GameLifecycleError("RuntimeHookBinding lifecycle_event is invalid.")
+        binding_type = type(self.binding)
+        if binding_type is HookBinding:
+            binding_event = None
+        else:
+            binding_event = _HOOK_EVENT_BY_BINDING_TYPE.get(binding_type)
+        if binding_type is not HookBinding and binding_event is None:
+            raise GameLifecycleError("RuntimeHookBinding binding is invalid.")
+        if binding_event is not None and binding_event != self.lifecycle_event:
+            raise GameLifecycleError(
+                "RuntimeHookBinding lifecycle_event does not match binding type."
+            )
+        _validate_identifier("hook_id", self.binding.hook_id)
+        _validate_identifier("source_id", self.binding.source_id)
+
+    @property
+    def hook_id(self) -> str:
+        return self.binding.hook_id
+
+    @property
+    def source_id(self) -> str:
+        return self.binding.source_id
+
+
+type AnyHookBinding = RuntimeHookBinding
+type AnyHookBindingInput = RuntimeHookBinding | HookBindingShape
+type RuntimeHookBindings = tuple[AnyHookBinding, ...]
+type RuntimeHookBindingsByEvent = Mapping[LifecycleHookEvent, RuntimeHookBindings]
+EMPTY_HOOK_BINDINGS_BY_EVENT: RuntimeHookBindingsByEvent = MappingProxyType({})
 
 _HOOK_EVENT_BY_BINDING_TYPE: Mapping[type[object], LifecycleHookEvent] = MappingProxyType(
     {
@@ -131,6 +172,8 @@ HOOK_BINDING_COMBINE_NAME_BY_EVENT: Mapping[LifecycleHookEvent, str] = MappingPr
 
 
 def lifecycle_event_for_hook_binding(value: object) -> LifecycleHookEvent:
+    if type(value) is RuntimeHookBinding:
+        return value.lifecycle_event
     event = _HOOK_EVENT_BY_BINDING_TYPE.get(type(value))
     if event is None:
         raise GameLifecycleError(
@@ -145,8 +188,8 @@ def validate_any_hook_bindings(value: object) -> tuple[AnyHookBinding, ...]:
     bindings: list[AnyHookBinding] = []
     seen: set[tuple[LifecycleHookEvent, str]] = set()
     for raw_binding in cast(tuple[object, ...], value):
-        event = lifecycle_event_for_hook_binding(raw_binding)
-        binding = cast(AnyHookBinding, raw_binding)
+        binding = runtime_hook_binding_for(raw_binding)
+        event = binding.lifecycle_event
         hook_id = _validate_identifier("hook binding id", binding.hook_id)
         key = (event, hook_id)
         if key in seen:
@@ -164,14 +207,103 @@ def hook_bindings_for_event[BindingT: HookBindingShape](
     binding_type: type[BindingT],
 ) -> tuple[BindingT, ...]:
     return tuple(
-        binding
+        binding.binding
         for binding in bindings
-        if lifecycle_event_for_hook_binding(binding) == event and type(binding) is binding_type
+        if binding.lifecycle_event == event and type(binding.binding) is binding_type
     )
 
 
+def runtime_hook_binding_for(value: object) -> RuntimeHookBinding:
+    if type(value) is RuntimeHookBinding:
+        return value
+    event = _HOOK_EVENT_BY_BINDING_TYPE.get(type(value))
+    if event is None:
+        raise GameLifecycleError(
+            "RuntimeContentContribution hook_bindings contains invalid values."
+        )
+    return RuntimeHookBinding(lifecycle_event=event, binding=cast(HookBindingShape, value))
+
+
+def hook_bindings_by_event_from_sources(
+    *,
+    emitted_bindings: tuple[HookBindingShape, ...],
+    contribution_bindings: tuple[AnyHookBinding, ...],
+) -> Mapping[LifecycleHookEvent, tuple[AnyHookBinding, ...]]:
+    combined = (
+        *(runtime_hook_binding_for(binding) for binding in emitted_bindings),
+        *contribution_bindings,
+    )
+    return hook_bindings_by_event_from_bindings(combined)
+
+
+def combine_any_hook_bindings(
+    bindings: tuple[AnyHookBinding, ...],
+) -> tuple[AnyHookBinding, ...]:
+    combined: list[AnyHookBinding] = []
+    for event in LifecycleHookEvent:
+        field_name = HOOK_BINDING_COMBINE_NAME_BY_EVENT.get(
+            event,
+            f"{event.value} hook binding",
+        )
+        combined.extend(
+            _combine_unique_hook_bindings(
+                field_name,
+                tuple(binding for binding in bindings if binding.lifecycle_event == event),
+            )
+        )
+    return validate_any_hook_bindings(tuple(combined))
+
+
+def hook_bindings_by_event_from_bindings(
+    bindings: tuple[AnyHookBindingInput, ...],
+) -> Mapping[LifecycleHookEvent, tuple[AnyHookBinding, ...]]:
+    grouped: dict[LifecycleHookEvent, list[AnyHookBinding]] = {}
+    for binding in validate_any_hook_bindings(bindings):
+        grouped.setdefault(binding.lifecycle_event, []).append(binding)
+    return validate_hook_bindings_by_event(
+        {event: tuple(event_bindings) for event, event_bindings in grouped.items()}
+    )
+
+
+def validate_hook_bindings_by_event(
+    value: object,
+) -> Mapping[LifecycleHookEvent, tuple[AnyHookBinding, ...]]:
+    if not isinstance(value, Mapping):
+        raise GameLifecycleError("RuntimeContentBundle hook_bindings_by_event must be a mapping.")
+    validated: dict[LifecycleHookEvent, tuple[AnyHookBinding, ...]] = {}
+    for raw_event, raw_bindings in cast(Mapping[object, object], value).items():
+        if type(raw_event) is not LifecycleHookEvent:
+            raise GameLifecycleError(
+                "RuntimeContentBundle hook_bindings_by_event contains invalid events."
+            )
+        event = raw_event
+        bindings = validate_any_hook_bindings(raw_bindings)
+        for binding in bindings:
+            if binding.lifecycle_event != event:
+                raise GameLifecycleError(
+                    "RuntimeContentBundle hook_bindings_by_event contains mismatched events."
+                )
+        validated[event] = bindings
+    return MappingProxyType(dict(sorted(validated.items(), key=lambda item: item[0].value)))
+
+
 def _hook_binding_sort_key(binding: AnyHookBinding) -> tuple[str, str]:
-    return (lifecycle_event_for_hook_binding(binding).value, binding.hook_id)
+    return (binding.lifecycle_event.value, binding.hook_id)
+
+
+def _combine_unique_hook_bindings(
+    field_name: str,
+    bindings: tuple[AnyHookBinding, ...],
+) -> tuple[AnyHookBinding, ...]:
+    seen: set[str] = set()
+    combined: list[AnyHookBinding] = []
+    for binding in bindings:
+        hook_id = _validate_identifier(f"{field_name} id", binding.hook_id)
+        if hook_id in seen:
+            raise GameLifecycleError(f"Runtime content {field_name} IDs must be unique.")
+        seen.add(hook_id)
+        combined.append(binding)
+    return tuple(combined)
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

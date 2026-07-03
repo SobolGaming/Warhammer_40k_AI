@@ -47,6 +47,18 @@ def validate_tuple[T](
     return tuple(validated)
 
 
+def validate_contribution_tuple[T](
+    field_name: str,
+    value: object,
+    expected_type: type[T],
+) -> tuple[T, ...]:
+    return validate_tuple(
+        f"RuntimeContentContribution {field_name}",
+        value,
+        expected_type,
+    )
+
+
 def validate_index_mapping[T](
     field_name: str,
     value: object,

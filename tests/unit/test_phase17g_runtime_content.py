@@ -59,6 +59,7 @@ from warhammer40k_core.engine.faction_content.events import (
     RuntimeEventHandler,
     RuntimeEventStatus,
 )
+from warhammer40k_core.engine.faction_content.hooks import RuntimeHookBinding
 from warhammer40k_core.engine.faction_content.loader import (
     RuntimeContentModuleIndex,
     RuntimeContentModuleRef,
@@ -102,6 +103,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.lifecycle_hooks import HookBinding, LifecycleHookEvent
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ModelProfileSelection,
@@ -658,6 +660,18 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
     )
     army = muster_army(catalog=catalog, request=_muster_request(catalog))
     activation = RuntimeContentActivation.from_armies(armies=(army,), catalog=catalog)
+
+    def fall_back_handler(
+        _context: FallBackEligibilityContext,
+    ) -> FallBackEligibilityGrant | None:
+        return None
+
+    fall_back_binding = FallBackEligibilityHookBinding(
+        hook_id="runtime:fall-back-hook",
+        source_id="runtime:fall-back-source",
+        handler=fall_back_handler,
+    )
+
     contribution = RuntimeContentContribution(
         ability_records=(
             _ability_record(
@@ -672,6 +686,7 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
                 detachment_id="core-combined-arms",
             ),
         ),
+        fall_back_hook_bindings=(fall_back_binding,),
     )
 
     bundle = RuntimeContentBundle.from_contributions(
@@ -690,7 +705,7 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
         "record:runtime-ambush"
     ]
     assert "core:hazardous" in summary["ability_handler_ids"]
-    assert summary["fall_back_hook_ids"] == []
+    assert summary["fall_back_hook_ids"] == ["runtime:fall-back-hook"]
     assert summary["enhancement_effect_binding_ids"] == []
     assert summary["fight_activation_ability_hook_ids"] == []
     assert summary["unit_characteristic_modifier_ids"] == []
@@ -703,6 +718,10 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
     assert len(summary["bundle_summary_hash"]) == 64
     assert "object at 0x" not in encoded
     assert "<" not in encoded
+    assert tuple(
+        binding.binding
+        for binding in bundle.hook_bindings_for_event(LifecycleHookEvent.FALL_BACK_ELIGIBILITY)
+    ) == (fall_back_binding,)
 
 
 def test_runtime_content_contribution_stores_hooks_in_canonical_tuple() -> None:
@@ -728,16 +747,37 @@ def test_runtime_content_contribution_stores_hooks_in_canonical_tuple() -> None:
         handler=fight_unit_selected_handler,
     )
 
+    def generic_handler() -> None:
+        return None
+
+    generic_binding: HookBinding[LifecycleHookEvent, Callable[[], None]] = HookBinding(
+        hook_id="combined:generic-hook",
+        source_id="combined:generic-source",
+        handler=generic_handler,
+    )
+    generic_hook_binding = RuntimeHookBinding(
+        lifecycle_event=LifecycleHookEvent.STRATAGEM_COST_CHOICE,
+        binding=generic_binding,
+    )
+
     legacy_contribution = RuntimeContentContribution(fall_back_hook_bindings=(fall_back_binding,))
     canonical_contribution = RuntimeContentContribution(
         hook_bindings=(fight_unit_selected_binding, fall_back_binding)
     )
+    generic_contribution = RuntimeContentContribution(hook_bindings=(generic_hook_binding,))
 
-    assert legacy_contribution.hook_bindings == (fall_back_binding,)
-    assert canonical_contribution.hook_bindings == (
+    assert tuple(binding.binding for binding in legacy_contribution.hook_bindings) == (
+        fall_back_binding,
+    )
+    assert tuple(binding.lifecycle_event for binding in canonical_contribution.hook_bindings) == (
+        LifecycleHookEvent.FALL_BACK_ELIGIBILITY,
+        LifecycleHookEvent.FIGHT_UNIT_SELECTED,
+    )
+    assert tuple(binding.binding for binding in canonical_contribution.hook_bindings) == (
         fall_back_binding,
         fight_unit_selected_binding,
     )
+    assert generic_contribution.hook_bindings == (generic_hook_binding,)
     assert canonical_contribution.fall_back_hook_bindings == (fall_back_binding,)
     assert canonical_contribution.fight_unit_selected_hook_bindings == (
         fight_unit_selected_binding,
