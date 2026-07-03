@@ -48,6 +48,7 @@ __all__ = (
     "DECLINE_STRATAGEM_WINDOW_PAYLOAD_KIND",
     "DESTROYED_ENEMY_UNIT_CONTEXT_KEY",
     "DESTROYED_TARGET_UNIT_CONTEXT_KEY",
+    "ENEMY_UNIT_TARGET_POLICY_ID",
     "ENGAGED_ENEMY_UNIT_CONTEXT_KEY",
     "ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND",
     "ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY",
@@ -81,9 +82,12 @@ __all__ = (
     "JUST_SHOT_UNIT_CONTEXT_KEY",
     "JUST_SHOT_UNIT_TARGET_POLICY_ID",
     "NEW_ORDERS_TARGET_POLICY_ID",
+    "NOT_SELECTED_TO_FIGHT_TARGET_POLICY_ID",
+    "NOT_SELECTED_TO_SHOOT_TARGET_POLICY_ID",
     "RAPID_INGRESS_TARGET_POLICY_ID",
     "SELECTED_TARGET_CONTROLLED_OBJECTIVE_INFANTRY_TARGET_POLICY_ID",
     "SELECTED_TARGET_UNIT_CONTEXT_KEY",
+    "SELECTED_TARGET_UNIT_TARGET_POLICY_ID",
     "SELECTED_TO_MOVE_TARGET_POLICY_ID",
     "SELECTED_TO_MOVE_UNIT_CONTEXT_KEY",
     "SMOKESCREEN_TARGET_POLICY_ID",
@@ -161,6 +165,10 @@ SELECTED_TO_MOVE_TARGET_POLICY_ID = "selected_to_move_unit"
 JUST_FELL_BACK_UNIT_TARGET_POLICY_ID = "just_fell_back_unit"
 JUST_SHOT_UNIT_TARGET_POLICY_ID = "just_shot_unit"
 ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID = "engaged_with_fall_back_unit"
+ENEMY_UNIT_TARGET_POLICY_ID = "enemy_unit"
+SELECTED_TARGET_UNIT_TARGET_POLICY_ID = "selected_target_unit"
+NOT_SELECTED_TO_SHOOT_TARGET_POLICY_ID = "not_selected_to_shoot_unit"
+NOT_SELECTED_TO_FIGHT_TARGET_POLICY_ID = "not_selected_to_fight_unit"
 EXPLOSIVES_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
 CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY = "enemy_target_unit_instance_id"
 CRUSHING_IMPACT_MODEL_CONTEXT_KEY = "model_instance_id"
@@ -255,6 +263,8 @@ class StratagemTargetSpecPayload(TypedDict):
     required_keywords: list[str]
     required_keywords_any: list[str]
     required_faction_keywords: list[str]
+    excluded_keywords: NotRequired[list[str]]
+    excluded_faction_keywords: NotRequired[list[str]]
 
 
 class StratagemDefinitionPayload(TypedDict):
@@ -449,6 +459,8 @@ class StratagemTargetSpec:
     required_keywords: tuple[str, ...] = ()
     required_keywords_any: tuple[str, ...] = ()
     required_faction_keywords: tuple[str, ...] = ()
+    excluded_keywords: tuple[str, ...] = ()
+    excluded_faction_keywords: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -493,10 +505,30 @@ class StratagemTargetSpec:
                 self.required_keywords_any,
             ),
         )
+        object.__setattr__(
+            self,
+            "excluded_keywords",
+            _validate_identifier_tuple(
+                "StratagemTargetSpec excluded_keywords",
+                self.excluded_keywords,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "excluded_faction_keywords",
+            _validate_identifier_tuple(
+                "StratagemTargetSpec excluded_faction_keywords",
+                self.excluded_faction_keywords,
+            ),
+        )
         if self.target_kind is StratagemTargetKind.NONE and not self.enumerable:
             raise GameLifecycleError("Targetless StratagemTargetSpec must be enumerable.")
         if self.target_kind is StratagemTargetKind.NONE and (
-            self.required_keywords or self.required_keywords_any or self.required_faction_keywords
+            self.required_keywords
+            or self.required_keywords_any
+            or self.required_faction_keywords
+            or self.excluded_keywords
+            or self.excluded_faction_keywords
         ):
             raise GameLifecycleError("Targetless StratagemTargetSpec cannot require keywords.")
 
@@ -512,6 +544,8 @@ class StratagemTargetSpec:
             "required_keywords": list(self.required_keywords),
             "required_keywords_any": list(self.required_keywords_any),
             "required_faction_keywords": list(self.required_faction_keywords),
+            "excluded_keywords": list(self.excluded_keywords),
+            "excluded_faction_keywords": list(self.excluded_faction_keywords),
         }
 
     @classmethod
@@ -523,6 +557,8 @@ class StratagemTargetSpec:
             required_keywords=tuple(payload["required_keywords"]),
             required_keywords_any=tuple(payload["required_keywords_any"]),
             required_faction_keywords=tuple(payload["required_faction_keywords"]),
+            excluded_keywords=tuple(payload.get("excluded_keywords", ())),
+            excluded_faction_keywords=tuple(payload.get("excluded_faction_keywords", ())),
         )
 
 

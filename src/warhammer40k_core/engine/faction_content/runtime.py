@@ -11,6 +11,9 @@ from warhammer40k_core.engine.faction_content.loader import (
     load_runtime_content_contributions,
 )
 from warhammer40k_core.engine.faction_content.manifest import RuntimeContentManifest
+from warhammer40k_core.engine.faction_content.stratagem_activation import (
+    source_backed_detachment_stratagem_activation_records,
+)
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.phase import GameLifecycleError
 
@@ -49,6 +52,7 @@ def build_runtime_content_bundle_for_armies(
         catalog=config.army_catalog,
         contributions=contributions,
         base_ability_records=catalog_ability_records_from_catalog(config.army_catalog),
+        base_stratagem_records=source_backed_detachment_stratagem_activation_records(),
     )
 
 

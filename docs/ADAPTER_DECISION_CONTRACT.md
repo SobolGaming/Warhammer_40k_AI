@@ -425,8 +425,22 @@ The finite decision type is `use_stratagem`. A pending request exposes one optio
 `StratagemTargetSpec` payloads expose both all-of and any-of keyword gates.
 `required_keywords` lists keywords that must all be present on the bound target.
 `required_keywords_any` lists keywords where at least one must be present; an
-empty list means no any-of gate. Adapters may display these gates, but must not
-use them to invent targets or override engine-emitted option enumeration.
+empty list means no any-of gate. `excluded_keywords` and
+`excluded_faction_keywords` list target keywords that make a unit ineligible.
+Adapters may display these gates, but must not use them to invent targets or
+override engine-emitted option enumeration.
+
+WS14 source-backed faction detachment Stratagem activation records reuse this
+same finite `use_stratagem` surface. The generated runtime records carry
+structured timing, CP cost, target policy, target keyword gates, and a
+checksum-covered `generic:rule-ir` effect payload produced at the source/data
+boundary. Runtime and adapters must not read raw source JSON, compile rule
+prose, or parse display text to decide whether a Stratagem is legal. Generic
+target policies include `friendly_unit`, `enemy_unit`, `selected_target_unit`,
+`not_selected_to_shoot_unit`, and `not_selected_to_fight_unit`; the engine
+filters owner, selected-target trigger context, selected-to-shoot/fight phase
+state, and excluded keywords before emitting options or accepting parameterized
+target bindings.
 
 Phase 17G adds Movement selected-to-move Stratagem windows to the same finite
 `use_stratagem` contract. After `select_movement_unit` records a unit selection

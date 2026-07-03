@@ -433,7 +433,7 @@ def test_pirates_due_lifecycle_accepts_fight_wound_reroll_and_resumes_attack() -
             "corsairs": Pose.at(94.0, 95.0),
             "enemy": Pose.at(95.0, 95.0),
         },
-        game_id="phase17g-corsair-pirates-due-wound-reroll-0",
+        game_id="phase17g-corsair-pirates-due-wound-reroll-1",
         datasheet_id="core-character-leader",
         model_profile_id="core-character-leader",
         model_count=1,
