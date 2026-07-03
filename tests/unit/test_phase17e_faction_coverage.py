@@ -18,6 +18,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27 as faction_detachment_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_generic_ir_support_2026_27 as generic_ir_support_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_subrules_2026_27 as faction_subrule_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
@@ -77,6 +80,35 @@ MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:malice_made_manifest",
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
     "enhancement:malice_made_manifest:mortal-wound-fnp",
+)
+GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        "enhancement:chaos-space-marines:renegade-warband:000010694003",
+        "enhancement:imperial-knights:freeblade-company:000010755003",
+        "enhancement:necrons:starshatter-arsenal:000009749003",
+        "enhancement:orks:freebooter-krew:000010712003",
+        "enhancement:orks:more-dakka:000009991003",
+        "enhancement:space-marines:ceramite-sentinels:000010759004",
+    }
+)
+GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        "enhancement:genestealer-cults:outlander-claw:000009079002",
+        "enhancement:orks:more-dakka:000009991005",
+        "enhancement:tyranids:warrior-bioform-onslaught:000009737005",
+    }
+)
+GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        "enhancement:necrons:cryptek-conclave:000010664004",
+    }
+)
+GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        *GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
+        *GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
+        *GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
+    }
 )
 BLOOD_LEGION_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall",
@@ -962,22 +994,71 @@ def test_phase17e_coverage_report_groups_supported_and_approved_unsupported_rows
     implemented_army_rule_count = len(FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID)
     implemented_detachment_rule_count = len(CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY)
     source_only_exact_count = len(enhancement_rows) + len(stratagem_rows) - implemented_exact_count
+    generic_supported_count = len(GENERIC_ENHANCEMENT_SOURCE_ROW_IDS)
     status_counts = package.status_counts()
 
     assert status_counts[Phase17ECoverageStatus.IMPLEMENTED.value] == (
         implemented_army_rule_count + implemented_exact_count + implemented_detachment_rule_count
     )
-    assert status_counts[Phase17ECoverageStatus.GENERIC_SUPPORTED.value] == 0
+    assert status_counts[Phase17ECoverageStatus.GENERIC_SUPPORTED.value] == (
+        generic_supported_count
+    )
     assert status_counts[Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED.value] == (
         (faction_count - implemented_army_rule_count)
         + (detachment_count - implemented_detachment_rule_count)
         + source_only_exact_count
+        - generic_supported_count
     )
     assert status_counts[Phase17ECoverageStatus.UNSUPPORTED.value] == faction_count
     unsupported_count = status_counts[Phase17ECoverageStatus.UNSUPPORTED.value]
     assert len(package.unsupported_rows()) == unsupported_count
     assert package.unapproved_unsupported_rows() == ()
     assert all(row.is_approved_unsupported for row in package.unsupported_rows())
+
+
+def test_phase17e_generic_enhancements_are_template_family_bounded() -> None:
+    package = faction_coverage_source.phase17e_coverage_package()
+    generic_rows = tuple(
+        row
+        for row in package.coverage_rows
+        if row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+    )
+    rows_by_source_row_id = {
+        row.descriptor_id.removeprefix("phase17e:"): row for row in generic_rows
+    }
+
+    assert (
+        set(
+            generic_ir_support_source.supported_conditional_weapon_ability_enhancement_source_row_ids()
+        )
+        == GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
+    )
+    assert (
+        set(generic_ir_support_source.supported_grant_ability_enhancement_source_row_ids())
+        == GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
+    )
+    assert (
+        set(
+            generic_ir_support_source.supported_characteristic_modification_enhancement_source_row_ids()
+        )
+        == GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
+    )
+    assert (
+        set(generic_ir_support_source.supported_generic_enhancement_source_row_ids())
+        == GENERIC_ENHANCEMENT_SOURCE_ROW_IDS
+    )
+    assert set(rows_by_source_row_id) == GENERIC_ENHANCEMENT_SOURCE_ROW_IDS
+    for source_row_id, row in rows_by_source_row_id.items():
+        assert row.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
+        assert row.handler_id is None
+        assert row.runtime_support_status is not None
+        assert row.runtime_support_status.value == "source_only"
+        assert row.runtime_consumer_ids == ()
+        assert row.rule_ir_hash == (
+            generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+                f"phase17e:{source_row_id}"
+            )
+        )
 
 
 def test_phase17e_coverage_rows_reject_unapproved_or_incomplete_status_shapes() -> None:
@@ -1214,5 +1295,8 @@ def _assert_exact_subrule_coverage_matches_source(
     if runtime_consumer_ids:
         assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
         assert coverage_row.handler_id == runtime_consumer_ids[0]
+    elif coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED:
+        assert coverage_row.handler_id is None
+        assert coverage_row.rule_ir_hash is not None
     else:
         assert coverage_row.status is Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED

@@ -88,6 +88,7 @@ from warhammer40k_core.engine.faction_content.stratagem_handlers import (
 from warhammer40k_core.engine.faction_rule_execution import (
     FactionRuleExecutionRegistry,
     FactionRuleNamedHandler,
+    default_faction_rule_generic_ir_executor,
 )
 from warhammer40k_core.engine.fall_back_hooks import (
     FallBackEligibilityHookBinding,
@@ -1290,6 +1291,7 @@ class RuntimeContentBundle:
         faction_registry = FactionRuleExecutionRegistry.from_records(
             records,
             named_handlers=named_handlers,
+            generic_ir_executor=default_faction_rule_generic_ir_executor,
         )
         contribution_ids = _validate_identifier_tuple(
             "contribution_ids",

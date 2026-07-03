@@ -36,6 +36,14 @@ class RuntimeContentSupportStatus(StrEnum):
     UNSUPPORTED = "unsupported"
 
 
+class RuntimeContentSemanticStatus(StrEnum):
+    """Manifest semantic execution coverage for source-backed runtime content."""
+
+    PLACEHOLDER = "placeholder"
+    PARTIAL = "partial"
+    IMPLEMENTED = "implemented"
+
+
 @dataclass(frozen=True, slots=True)
 class RuntimeContentManifestRow:
     content_id: str
@@ -49,6 +57,7 @@ class RuntimeContentManifestRow:
     module_path: str | None
     support_status: RuntimeContentSupportStatus
     dependency_ids: tuple[str, ...] = ()
+    semantic_status: RuntimeContentSemanticStatus = RuntimeContentSemanticStatus.PLACEHOLDER
     support_reason: str | None = None
     unsupported_reason: str | None = None
     required_for_matched_play: bool = True
@@ -100,6 +109,11 @@ class RuntimeContentManifestRow:
             self,
             "dependency_ids",
             _validate_identifier_tuple("dependency_ids", self.dependency_ids),
+        )
+        object.__setattr__(
+            self,
+            "semantic_status",
+            _semantic_status_from_token(self.semantic_status),
         )
         object.__setattr__(
             self,
@@ -156,6 +170,7 @@ class RuntimeContentManifestRow:
                     "module_path": self.module_path,
                     "support_status": self.support_status.value,
                     "dependency_ids": list(self.dependency_ids),
+                    "semantic_status": self.semantic_status.value,
                     "support_reason": self.support_reason,
                     "unsupported_reason": self.unsupported_reason,
                     "required_for_matched_play": self.required_for_matched_play,
@@ -459,6 +474,7 @@ def _merge_generated_row(
         module_path=generated_row.module_path,
         support_status=generated_row.support_status,
         dependency_ids=tuple(sorted({*catalog_row.dependency_ids, *generated_row.dependency_ids})),
+        semantic_status=generated_row.semantic_status,
         support_reason=generated_row.support_reason,
         unsupported_reason=generated_row.unsupported_reason,
         required_for_matched_play=generated_row.required_for_matched_play,
@@ -519,6 +535,19 @@ def _support_status_from_token(token: object) -> RuntimeContentSupportStatus:
     except ValueError as exc:
         raise GameLifecycleError(
             f"Unsupported RuntimeContentSupportStatus token: {token}."
+        ) from exc
+
+
+def _semantic_status_from_token(token: object) -> RuntimeContentSemanticStatus:
+    if type(token) is RuntimeContentSemanticStatus:
+        return token
+    if type(token) is not str:
+        raise GameLifecycleError("RuntimeContentSemanticStatus token must be a string.")
+    try:
+        return RuntimeContentSemanticStatus(token)
+    except ValueError as exc:
+        raise GameLifecycleError(
+            f"Unsupported RuntimeContentSemanticStatus token: {token}."
         ) from exc
 
 

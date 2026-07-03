@@ -17,13 +17,18 @@ from warhammer40k_core.engine.faction_rule_execution import (
     FactionRuleGenericIrExecutor,
     FactionRuleNamedHandler,
     default_faction_rule_execution_registry,
+    faction_result_from_rule_execution_result,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rule_execution import RuleExecutionResult
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27 as faction_coverage_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27 as faction_execution_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_generic_ir_support_2026_27 as generic_ir_support_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     Phase17ECoverageKind,
@@ -562,7 +567,10 @@ def test_phase17f_execution_statuses_are_explicit_for_all_phase17e_rows() -> Non
     coverage_status_counts = coverage_package.status_counts()
     execution_status_counts = execution_package.status_counts()
 
-    assert execution_status_counts[Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR.value] == 0
+    assert (
+        execution_status_counts[Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR.value]
+        == coverage_status_counts[Phase17ECoverageStatus.GENERIC_SUPPORTED.value]
+    )
     assert (
         execution_status_counts[Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER.value]
         == coverage_status_counts[Phase17ECoverageStatus.IMPLEMENTED.value]
@@ -579,6 +587,7 @@ def test_phase17f_execution_statuses_are_explicit_for_all_phase17e_rows() -> Non
     )
     assert len(execution_package.blocked_records()) == (
         len(execution_package.execution_records)
+        - execution_status_counts[Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR.value]
         - execution_status_counts[Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER.value]
     )
     assert execution_package.unapproved_blocked_records() == ()
@@ -591,20 +600,81 @@ def test_phase17f_registry_dispatches_every_record_without_missing_handlers() ->
 
     for record in registry.all_records():
         result = registry.execute(execution_id=record.execution_id, context=context)
-        assert result.status is FactionRuleExecutionStatus.UNSUPPORTED
         assert result.source_ids == record.source_ids
         assert result.coverage_descriptor_id == record.coverage_descriptor_id
         if record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER:
+            assert result.status is FactionRuleExecutionStatus.UNSUPPORTED
             assert result.reason == "named_handler_not_registered"
+        elif record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR:
+            assert result.status is FactionRuleExecutionStatus.APPLIED
+            assert result.reason is None
+            replay_payload = result.to_payload()["replay_payload"]
+            assert isinstance(replay_payload, dict)
+            generic_payload = replay_payload["generic_rule_execution_result"]
+            assert isinstance(generic_payload, dict)
+            assert generic_payload["status"] == "applied"
         elif (
             record.execution_status is Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
         ):
+            assert result.status is FactionRuleExecutionStatus.UNSUPPORTED
             assert result.reason == "structured_rule_semantics_required"
         else:
+            assert result.status is FactionRuleExecutionStatus.UNSUPPORTED
             assert result.reason == (
                 f"approved_phase17e_source_gap:{record.phase17e_unsupported_reason}"
             )
         assert FactionRuleExecutionResult.from_payload(result.to_payload()) == result
+
+
+def test_phase17f_default_registry_returns_typed_invalid_for_generic_ir_missing_context() -> None:
+    registry = default_faction_rule_execution_registry()
+    generic_record = _first_execution_record(Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR)
+    context = FactionRuleExecutionContext(
+        game_id="game-phase17f",
+        player_id="player-a",
+        battle_round=1,
+        phase=BattlePhaseKind.COMMAND,
+        active_player_id="player-a",
+        source_unit_instance_id=None,
+        target_unit_instance_ids=(),
+        trigger_payload={"event": "phase17f-generic-missing-source-unit"},
+    )
+
+    result = registry.execute(execution_id=generic_record.execution_id, context=context)
+
+    assert result.status is FactionRuleExecutionStatus.INVALID
+    assert result.reason == "missing_input:source_unit_instance_id"
+    replay_payload = result.to_payload()["replay_payload"]
+    assert isinstance(replay_payload, dict)
+    generic_payload = replay_payload["generic_rule_execution_result"]
+    assert isinstance(generic_payload, dict)
+    assert generic_payload["status"] == "invalid"
+
+
+def test_phase17f_generic_ir_unsupported_result_retains_rule_replay_payload() -> None:
+    generic_record = _first_execution_record(Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR)
+    rule_ir = generic_ir_support_source.generic_rule_ir_by_coverage_descriptor_id(
+        generic_record.coverage_descriptor_id
+    )
+    rule_result = RuleExecutionResult.unsupported(
+        rule_ir,
+        reason="missing_target_handler",
+    )
+
+    result = faction_result_from_rule_execution_result(
+        record=generic_record,
+        context=_context(),
+        rule_result=rule_result,
+    )
+
+    assert result.status is FactionRuleExecutionStatus.UNSUPPORTED
+    assert result.reason == "missing_target_handler"
+    replay_payload = result.to_payload()["replay_payload"]
+    assert isinstance(replay_payload, dict)
+    generic_payload = replay_payload["generic_rule_execution_result"]
+    assert isinstance(generic_payload, dict)
+    assert generic_payload["status"] == "unsupported"
+    assert generic_payload["reason"] == "missing_target_handler"
 
 
 def test_phase17f_registry_rejects_unknown_execution_id() -> None:

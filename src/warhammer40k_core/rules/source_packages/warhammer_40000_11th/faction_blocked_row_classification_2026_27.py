@@ -87,6 +87,7 @@ class Phase17IMissingCapabilityFamily(StrEnum):
     PLAYER_CHOICE_SELECTION = "player_choice_selection"
     SOURCE_TEXT_NOT_AVAILABLE = "source_text_not_available"
     STRATAGEM_ACTIVATION_AND_TARGETING = "stratagem_activation_and_targeting"
+    STRATAGEM_COST_MODIFIER_RUNTIME = "stratagem_cost_modifier_runtime"
     STRATAGEM_EFFECT_EXECUTION = "stratagem_effect_execution"
     TRANSPORT_RUNTIME = "transport_runtime"
     UNREPRESENTED_RULE_LANGUAGE = "unrepresented_rule_language"
@@ -791,6 +792,9 @@ def _missing_capabilities_for_record(
             "command point",
             "command points",
             " cp",
+            "1cp",
+            "2cp",
+            "3cp",
             "miracle dice",
             "pain token",
             "cabal point",
@@ -800,6 +804,15 @@ def _missing_capabilities_for_record(
         ),
     ):
         families.add(Phase17IMissingCapabilityFamily.FACTION_RESOURCE_LEDGER)
+    if (
+        "stratagem" in text
+        and "cost" in text
+        and _contains_any(
+            text,
+            ("command point", "command points", " cp", "1cp", "2cp", "3cp"),
+        )
+    ):
+        families.add(Phase17IMissingCapabilityFamily.STRATAGEM_COST_MODIFIER_RUNTIME)
     if _contains_any(text, ("when mustering", "army roster", "when you select", "must include")):
         families.add(Phase17IMissingCapabilityFamily.MUSTERING_CONSTRAINT)
     if _contains_any(text, ("until the end", "until your next", "until the start", "once per")):

@@ -15,12 +15,14 @@ from warhammer40k_core.engine.abilities import (
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.faction_content.manifest import (
     RuntimeContentModuleFamily,
+    RuntimeContentSemanticStatus,
     RuntimeContentSupportStatus,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th import generated_manifest
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27,
+    faction_execution_2026_27,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -314,6 +316,7 @@ def test_generated_manifest_module_paths_match_scaffold_files() -> None:
         row = rows_by_content_id[faction_row.faction_id]
         assert row.family is RuntimeContentModuleFamily.FACTION
         assert row.support_status is RuntimeContentSupportStatus.SUPPORTED
+        assert row.semantic_status is _expected_semantic_status(row.execution_record_ids)
         assert row.module_path == expected_module_path
         assert row.source_ids
         assert row.execution_record_ids
@@ -332,11 +335,26 @@ def test_generated_manifest_module_paths_match_scaffold_files() -> None:
         row = rows_by_content_id[detachment_row.detachment_id]
         assert row.family is RuntimeContentModuleFamily.DETACHMENT
         assert row.support_status is RuntimeContentSupportStatus.SUPPORTED
+        assert row.semantic_status is _expected_semantic_status(row.execution_record_ids)
         assert row.module_path == expected_module_path
         assert row.owner_faction_id == detachment_row.faction_id
         assert row.owner_detachment_id == detachment_row.detachment_id
         assert row.source_ids
         assert row.execution_record_ids
+
+
+def test_generated_manifest_semantic_status_is_source_backed() -> None:
+    status_counts = {
+        RuntimeContentSemanticStatus.PLACEHOLDER: 0,
+        RuntimeContentSemanticStatus.PARTIAL: 0,
+        RuntimeContentSemanticStatus.IMPLEMENTED: 0,
+    }
+    for row in generated_manifest.generated_runtime_content_rows():
+        assert row.semantic_status is _expected_semantic_status(row.execution_record_ids)
+        status_counts[row.semantic_status] += 1
+
+    assert status_counts[RuntimeContentSemanticStatus.PARTIAL] > 0
+    assert status_counts[RuntimeContentSemanticStatus.IMPLEMENTED] > 0
 
 
 def _sentinel_detachment_ability_record() -> AbilityCatalogRecord:
@@ -354,3 +372,26 @@ def _sentinel_detachment_ability_record() -> AbilityCatalogRecord:
         source_kind=AbilitySourceKind.DETACHMENT,
         detachment_id="war-horde",
     )
+
+
+def _expected_semantic_status(
+    execution_record_ids: tuple[str, ...],
+) -> RuntimeContentSemanticStatus:
+    if not execution_record_ids:
+        return RuntimeContentSemanticStatus.PLACEHOLDER
+    records_by_id = {
+        record.execution_id: record for record in faction_execution_2026_27.execution_records()
+    }
+    records = tuple(records_by_id[execution_id] for execution_id in execution_record_ids)
+    executable_statuses = {
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+    }
+    executable_count = sum(
+        1 for record in records if record.execution_status in executable_statuses
+    )
+    if executable_count == len(records):
+        return RuntimeContentSemanticStatus.IMPLEMENTED
+    if executable_count > 0:
+        return RuntimeContentSemanticStatus.PARTIAL
+    return RuntimeContentSemanticStatus.PLACEHOLDER

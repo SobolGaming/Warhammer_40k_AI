@@ -27,7 +27,7 @@ def test_phase17i_classification_covers_every_phase17f_structured_blocked_row() 
     )
     rows_by_execution_id = {row.execution_id: row for row in report.classification_rows}
 
-    assert report.structured_blocked_count == 2061
+    assert report.structured_blocked_count == 2051
     assert set(rows_by_execution_id) == {
         record.execution_id for record in structured_blocked_records
     }
@@ -60,7 +60,7 @@ def test_phase17i_source_text_boundaries_are_explicit() -> None:
         is classification_source.Phase17IClassificationSourceKind.PHASE17F_METADATA_ONLY
     )
 
-    assert report.source_text_matched_count == 1969
+    assert report.source_text_matched_count == 1959
     assert report.source_text_missing_count == 92
     assert len(source_text_rows) == report.source_text_matched_count
     assert len(metadata_only_rows) == report.source_text_missing_count
@@ -87,9 +87,9 @@ def test_phase17i_missing_capability_report_groups_rows_by_family() -> None:
         summary.family: summary for summary in report.missing_capability_summaries()
     }
 
-    assert summary_by_family["generic_ir_execution_binding"].row_count == 2061
+    assert summary_by_family["generic_ir_execution_binding"].row_count == 2051
     assert summary_by_family["generic_ir_execution_binding"].coverage_kind_counts == {
-        "detachment_enhancement": 717,
+        "detachment_enhancement": 707,
         "detachment_rule": 262,
         "detachment_stratagem": 1077,
         "faction_army_rule": 5,
@@ -102,7 +102,12 @@ def test_phase17i_missing_capability_report_groups_rows_by_family() -> None:
         "detachment_stratagem": 1077
     }
     assert summary_by_family["enhancement_assignment_effect"].coverage_kind_counts == {
-        "detachment_enhancement": 717
+        "detachment_enhancement": 707
+    }
+    assert summary_by_family["stratagem_cost_modifier_runtime"].row_count == 7
+    assert summary_by_family["stratagem_cost_modifier_runtime"].coverage_kind_counts == {
+        "detachment_enhancement": 6,
+        "detachment_rule": 1,
     }
     assert summary_by_family["detachment_rule_state"].coverage_kind_counts == {
         "detachment_rule": 262
@@ -123,14 +128,35 @@ def test_phase17i_existing_template_report_uses_phase17c_template_families() -> 
 
     assert set(template_summary_by_family) <= phase17c_family_values
     assert template_summary_by_family["selected_target_constraint"].row_count == 1233
-    assert template_summary_by_family["keyword_gate"].row_count == 852
+    assert template_summary_by_family["keyword_gate"].row_count == 842
     assert template_summary_by_family["dice_roll_modification"].row_count == 191
+    assert template_summary_by_family["conditional_weapon_ability_grant"].row_count == 164
+    assert template_summary_by_family["characteristic_modification"].row_count == 108
+    assert template_summary_by_family["grant_ability"].row_count == 92
     for row in report.classification_rows:
         assert set(row.existing_template_families) <= phase17c_family_values
         assert set(row.existing_template_families) == {
             rule_template_by_id(template_id).family.value
             for template_id in row.existing_template_ids
         }
+
+
+def test_phase17i_stratagem_cost_aura_remains_blocked_for_cost_modifier_runtime() -> None:
+    report = classification_source.phase17i_blocked_row_classification_report()
+    row = next(
+        row
+        for row in report.classification_rows
+        if row.execution_id
+        == "phase17f:phase17e:enhancement:space-marines:vanguard-spearhead:000008490005"
+    )
+
+    assert row.existing_template_families == ("aura", "keyword_gate")
+    assert set(row.missing_capability_families) == {
+        classification_source.Phase17IMissingCapabilityFamily.ENHANCEMENT_ASSIGNMENT_EFFECT,
+        classification_source.Phase17IMissingCapabilityFamily.FACTION_RESOURCE_LEDGER,
+        classification_source.Phase17IMissingCapabilityFamily.GENERIC_IR_EXECUTION_BINDING,
+        classification_source.Phase17IMissingCapabilityFamily.STRATAGEM_COST_MODIFIER_RUNTIME,
+    }
 
 
 def test_phase17i_payload_is_deterministic_json_safe_and_round_trips() -> None:

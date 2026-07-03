@@ -13,8 +13,15 @@ from warhammer40k_core.core.ruleset_descriptor import (
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rule_execution import (
+    RuleExecutionContext,
+    RuleExecutionResult,
+    RuleExecutionStatus,
+    execute_rule_ir,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
+    faction_generic_ir_support_2026_27,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
     Phase17FExecutionRecord,
@@ -202,6 +209,7 @@ class FactionRuleExecutionResult:
         record: Phase17FExecutionRecord,
         reason: str,
         context: FactionRuleExecutionContext,
+        replay_payload: JsonValue = None,
     ) -> Self:
         return cls(
             execution_id=record.execution_id,
@@ -215,7 +223,11 @@ class FactionRuleExecutionResult:
             source_ids=record.source_ids,
             status=FactionRuleExecutionStatus.UNSUPPORTED,
             reason=reason,
-            replay_payload=_replay_payload(record=record, context=context),
+            replay_payload=(
+                _replay_payload(record=record, context=context)
+                if replay_payload is None
+                else replay_payload
+            ),
         )
 
     @classmethod
@@ -224,6 +236,7 @@ class FactionRuleExecutionResult:
         *,
         record: Phase17FExecutionRecord,
         context: FactionRuleExecutionContext,
+        replay_payload: JsonValue = None,
     ) -> Self:
         return cls(
             execution_id=record.execution_id,
@@ -236,7 +249,39 @@ class FactionRuleExecutionResult:
             handler_id=record.handler_id,
             source_ids=record.source_ids,
             status=FactionRuleExecutionStatus.APPLIED,
-            replay_payload=_replay_payload(record=record, context=context),
+            replay_payload=(
+                _replay_payload(record=record, context=context)
+                if replay_payload is None
+                else replay_payload
+            ),
+        )
+
+    @classmethod
+    def invalid(
+        cls,
+        *,
+        record: Phase17FExecutionRecord,
+        reason: str,
+        context: FactionRuleExecutionContext,
+        replay_payload: JsonValue = None,
+    ) -> Self:
+        return cls(
+            execution_id=record.execution_id,
+            coverage_descriptor_id=record.coverage_descriptor_id,
+            coverage_kind=record.coverage_kind.value,
+            faction_id=record.faction_id,
+            faction_name=record.faction_name,
+            detachment_id=record.detachment_id,
+            detachment_name=record.detachment_name,
+            handler_id=record.handler_id,
+            source_ids=record.source_ids,
+            status=FactionRuleExecutionStatus.INVALID,
+            reason=reason,
+            replay_payload=(
+                _replay_payload(record=record, context=context)
+                if replay_payload is None
+                else replay_payload
+            ),
         )
 
     def to_payload(self) -> FactionRuleExecutionResultPayload:
@@ -378,7 +423,84 @@ class FactionRuleExecutionRegistry:
 
 
 def default_faction_rule_execution_registry() -> FactionRuleExecutionRegistry:
-    return FactionRuleExecutionRegistry.from_records(faction_execution_2026_27.execution_records())
+    return FactionRuleExecutionRegistry.from_records(
+        faction_execution_2026_27.execution_records(),
+        generic_ir_executor=default_faction_rule_generic_ir_executor,
+    )
+
+
+def default_faction_rule_generic_ir_executor(
+    record: Phase17FExecutionRecord,
+    context: FactionRuleExecutionContext,
+) -> FactionRuleExecutionResult:
+    return _generic_rule_ir_executor(record, context)
+
+
+def _generic_rule_ir_executor(
+    record: Phase17FExecutionRecord,
+    context: FactionRuleExecutionContext,
+) -> FactionRuleExecutionResult:
+    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+        record.coverage_descriptor_id
+    )
+    if record.rule_ir_hash != rule_ir.ir_hash():
+        raise GameLifecycleError("Generic faction-rule execution record has stale rule_ir_hash.")
+    rule_result = execute_rule_ir(
+        rule_ir=rule_ir,
+        context=RuleExecutionContext(
+            game_id=context.game_id,
+            player_id=context.player_id,
+            battle_round=context.battle_round,
+            phase=context.phase,
+            active_player_id=context.active_player_id,
+            source_unit_instance_id=context.source_unit_instance_id,
+            target_unit_instance_ids=context.target_unit_instance_ids,
+            trigger_payload=context.trigger_payload,
+        ),
+    )
+    return faction_result_from_rule_execution_result(
+        record=record,
+        context=context,
+        rule_result=rule_result,
+    )
+
+
+def faction_result_from_rule_execution_result(
+    *,
+    record: Phase17FExecutionRecord,
+    context: FactionRuleExecutionContext,
+    rule_result: RuleExecutionResult,
+) -> FactionRuleExecutionResult:
+    replay_payload = _replay_payload_with_rule_execution_result(
+        record=record,
+        context=context,
+        rule_result=rule_result,
+    )
+    if rule_result.status is RuleExecutionStatus.APPLIED:
+        return FactionRuleExecutionResult.applied(
+            record=record,
+            context=context,
+            replay_payload=replay_payload,
+        )
+    if rule_result.status is RuleExecutionStatus.INVALID:
+        if rule_result.reason is None:
+            raise GameLifecycleError("Invalid generic rule execution lacks reason.")
+        return FactionRuleExecutionResult.invalid(
+            record=record,
+            reason=rule_result.reason,
+            context=context,
+            replay_payload=replay_payload,
+        )
+    if rule_result.status is RuleExecutionStatus.UNSUPPORTED:
+        if rule_result.reason is None:
+            raise GameLifecycleError("Unsupported generic rule execution lacks reason.")
+        return FactionRuleExecutionResult.unsupported(
+            record=record,
+            reason=rule_result.reason,
+            context=context,
+            replay_payload=replay_payload,
+        )
+    raise GameLifecycleError("Unsupported generic rule execution result status.")
 
 
 def _replay_payload(
@@ -391,6 +513,23 @@ def _replay_payload(
             "phase": "17F",
             "execution_record": record.to_payload(),
             "context": context.to_payload(),
+        }
+    )
+
+
+def _replay_payload_with_rule_execution_result(
+    *,
+    record: Phase17FExecutionRecord,
+    context: FactionRuleExecutionContext,
+    rule_result: RuleExecutionResult,
+) -> JsonValue:
+    payload = _replay_payload(record=record, context=context)
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Faction-rule replay payload must be a JSON object.")
+    return validate_json_value(
+        {
+            **payload,
+            "generic_rule_execution_result": rule_result.to_payload(),
         }
     )
 
