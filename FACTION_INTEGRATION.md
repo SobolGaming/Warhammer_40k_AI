@@ -116,7 +116,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `a076f2bc3fe41749fb41c864a13af3802741b4875edeaa849ca42ce3af956bb9`
+  `30693085b9f17d44734248da01638f8a54087653c002f7db72332e71a1432df0`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -126,9 +126,9 @@ implemented. Datasheet intake is fail-closed as an approved unsupported
 diagnostic. Exact Enhancement and Stratagem rows are generated from the exact
 subrule source package and include stable rule IDs, owner faction/detachment IDs,
 timing/category metadata, source IDs, and support status. Source-only exact rows
-outside generic IR are named-handler-required; ten exact Enhancement rows in
-the conditional weapon-ability grant, grant-ability, and
-characteristic-modification template families are generic-supported with
+outside generic IR are named-handler-required; 17 exact Enhancement rows in
+the conditional weapon-ability grant, grant-ability, characteristic-modification,
+and dice-roll modification template families are generic-supported with
 checksum-covered RuleIR hashes; exact rows with existing runtime consumers are
 marked implemented. No aggregate faction-pack Enhancement
 or Stratagem row is used to hide missing detail, and no unapproved unsupported
@@ -158,15 +158,16 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `87ff93d34cdf8c6504e81bd2db9abb2275a631a12987caeb968cc1c14ce57863`
+  `91adefeda53d7ac6a16285012b4ee1c51546d63378ad2eca2d83df23ff74eaa8`
 - upstream Phase 17E checksum:
-  `a076f2bc3fe41749fb41c864a13af3802741b4875edeaa849ca42ce3af956bb9`
+  `30693085b9f17d44734248da01638f8a54087653c002f7db72332e71a1432df0`
 
 The package emits 2140 execution records, one for every Phase 17E coverage row:
-2051 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, 10 rows are executable generic IR
-rows in the conditional weapon-ability grant, grant-ability, and
-characteristic-modification template families, and 51 rows are executable
+2044 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, 17 rows are executable generic IR
+rows in the conditional weapon-ability grant, grant-ability,
+characteristic-modification, and dice-roll modification template families, and
+51 rows are executable
 named-handler rows because they already have runtime consumers: 23 faction army
 rules plus 28 exact detachment, Enhancement, and Stratagem rows.
 The engine dispatcher can route every record and returns typed `unsupported`
@@ -427,15 +428,15 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `6976574fa4e9cc5af12c30046e73460f118ae3520360b4f31238bb0001f4c554`
+  `0673ac43d058bc37bfc048f86435b840d8be423a329c987d309882d4baf15c83`
 - upstream Phase 17F checksum:
-  `87ff93d34cdf8c6504e81bd2db9abb2275a631a12987caeb968cc1c14ce57863`
+  `91adefeda53d7ac6a16285012b4ee1c51546d63378ad2eca2d83df23ff74eaa8`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
 
-The report emits 2051 classification rows, one for every Phase 17F row blocked
-as `blocked_structured_semantics_required`. It compiles 1959 rows from Wahapedia
+The report emits 2044 classification rows, one for every Phase 17F row blocked
+as `blocked_structured_semantics_required`. It compiles 1952 rows from Wahapedia
 bridge descriptions through Phase 17C and marks 92 rows as
 `source_text_not_available` metadata-only rows. Each row records the existing
 Phase 17C template IDs and template families that can already express clauses,
@@ -469,9 +470,9 @@ WS14 step 3 is enforced as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-named-handler-budget-v1`
 - source-payload SHA-256 checksum:
-  `f894648324bcd41c0f0745d0bf58e2ef420eb78702c8877bd4fb82ffaf3c70d2`
+  `3f62f7fb2d9f993307d0c9b8b0ca5695ce41da30fea3d79b9e1ad443d25e28fb`
 - upstream Phase 17F checksum:
-  `87ff93d34cdf8c6504e81bd2db9abb2275a631a12987caeb968cc1c14ce57863`
+  `91adefeda53d7ac6a16285012b4ee1c51546d63378ad2eca2d83df23ff74eaa8`
 
 The budget report tracks 51 executable named-handler Phase 17F rows and 51
 approved entries. The current approved reason is
@@ -513,8 +514,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 12 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 41 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 3 | `executable_generic_ir` | `applied` | `none` |
+| Enhancements | 40 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 4 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 66 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
@@ -557,8 +558,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 19 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 1 | `executable_generic_ir` | `applied` | `none` |
+| Enhancements | 18 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 2 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 30 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
@@ -568,8 +569,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 12 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 34 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 2 | `executable_generic_ir` | `applied` | `none` |
+| Enhancements | 33 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 3 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 54 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
@@ -579,7 +580,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 28 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 27 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 1 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 42 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
@@ -660,8 +662,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 17 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 59 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 1 | `executable_generic_ir` | `applied` | `none` |
+| Enhancements | 58 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 2 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 90 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
@@ -783,7 +785,8 @@ model-scoped persisting effect until the start of that player's next turn.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 22 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 2 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
