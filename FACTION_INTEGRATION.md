@@ -16,6 +16,7 @@ instructions, and then compiled into 11th Edition catalog records.
 - [Phase 17H Datasheet, Wargear, and Weapon Execution Gate](#phase-17h-datasheet-wargear-and-weapon-execution-gate)
 - [Phase 17I Coverage and Unsupported Audit Gate](#phase-17i-coverage-and-unsupported-audit-gate)
 - [Phase 17I Blocked Row Classification Report](#phase-17i-blocked-row-classification-report)
+- [WS14 IR-First Content-Drop Runbook](#ws14-ir-first-content-drop-runbook)
 - [Faction Execution Status Matrix](#faction-execution-status-matrix)
   - [Death Guard Execution Status](#death-guard-execution-status)
   - [Orks Execution Status](#orks-execution-status)
@@ -114,7 +115,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `d3b0a4b9e73bf2c2464be63484563d8a18e3463553da65b6d57d9d6030dd384b`
+  `d3aea7989e2f2d2793b83abf764ee87de76c946510a3bdeba9afeb55a3d77a4a`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -124,7 +125,9 @@ implemented. Datasheet intake is fail-closed as an approved unsupported
 diagnostic. Exact Enhancement and Stratagem rows are generated from the exact
 subrule source package and include stable rule IDs, owner faction/detachment IDs,
 timing/category metadata, source IDs, and support status. Source-only exact rows
-are named-handler-required; exact rows with existing runtime consumers are
+outside generic IR are named-handler-required; six exact Enhancement rows in the
+conditional weapon-ability grant template family are generic-supported with
+checksum-covered RuleIR hashes; exact rows with existing runtime consumers are
 marked implemented. No aggregate faction-pack Enhancement or Stratagem row is
 used to hide missing detail, and no unapproved unsupported descriptor remains for
 Phase 17E matched-play coverage.
@@ -153,21 +156,22 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `760fc82b5a159390b942b348f2d77a618162710b2955fff4e5315cc7329b28e1`
+  `6d0b5415a325ab8d05bd2460168238192715c4635ab4a06454f8db73c9ef3c33`
 - upstream Phase 17E checksum:
-  `d3b0a4b9e73bf2c2464be63484563d8a18e3463553da65b6d57d9d6030dd384b`
+  `d3aea7989e2f2d2793b83abf764ee87de76c946510a3bdeba9afeb55a3d77a4a`
 
 The package emits 2140 execution records, one for every Phase 17E coverage row:
-2061 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, and 51 rows are executable
-named-handler rows because they already have runtime consumers: 23 faction army
-rules plus 28 exact detachment, Enhancement, and Stratagem rows. The engine
-dispatcher can route every record and returns typed
-`unsupported` diagnostics unless a matching executor is registered. No Phase 17E
-row remains a missing handler, runtime no-op, raw-PDF parse, or silent fallback.
-Future executable rows require a registered generic IR executor or named
-handler; unregistered executable statuses return typed `unsupported` diagnostics
-and cannot emit `applied` by status alone.
+2055 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, 6 rows are executable generic IR
+rows in the conditional weapon-ability grant template family, and 51 rows are
+executable named-handler rows because they already have runtime consumers: 23
+faction army rules plus 28 exact detachment, Enhancement, and Stratagem rows.
+The engine dispatcher can route every record and returns typed `unsupported`
+diagnostics unless a matching executor is registered. No Phase 17E row remains a
+missing handler, runtime no-op, raw-PDF parse, or silent fallback. Future
+executable rows require a registered generic IR executor or named handler;
+unregistered executable statuses return typed `unsupported` diagnostics and
+cannot emit `applied` by status alone.
 Phase 17F is an execution dispatch gate, not semantic execution. It proves that
 every Phase 17E coverage row has a deterministic fail-closed engine route. It
 does not implement the game effects of army rules, detachment rules,
@@ -417,15 +421,15 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `1d65364988b7c9d09f8d78ca42659de55e98b6b75c6655a901c6359b93730a31`
+  `2870cd095b2eeb8f144abf320bfa18a06201ca1a95306fb638ae63d8e5b3796e`
 - upstream Phase 17F checksum:
-  `760fc82b5a159390b942b348f2d77a618162710b2955fff4e5315cc7329b28e1`
+  `6d0b5415a325ab8d05bd2460168238192715c4635ab4a06454f8db73c9ef3c33`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
 
-The report emits 2061 classification rows, one for every Phase 17F row blocked
-as `blocked_structured_semantics_required`. It compiles 1969 rows from Wahapedia
+The report emits 2055 classification rows, one for every Phase 17F row blocked
+as `blocked_structured_semantics_required`. It compiles 1963 rows from Wahapedia
 bridge descriptions through Phase 17C and marks 92 rows as
 `source_text_not_available` metadata-only rows. Each row records the existing
 Phase 17C template IDs and template families that can already express clauses,
@@ -439,6 +443,25 @@ The payload does not emit raw rule text. It emits source IDs, template IDs,
 template family tokens, diagnostic reason tokens, and capability family tokens
 only, so runtime engine code remains forbidden from consuming source text or
 re-parsing rule prose.
+
+## WS14 IR-First Content-Drop Runbook
+
+Steady-state content drops follow the IR-first loop:
+
+1. Ingest the new official PDF, dataslate, MFM, FAQ, or codex source package.
+2. Apply source-linked patch operations and regenerate the normalized package.
+3. Recompile RuleIR at the source boundary and refresh Phase 17E coverage.
+4. Diff the Phase 17F execution report and Phase 17I classification report.
+5. Flip rows to generic IR only when the compiled template family has a
+   registered `RuleExecutionRegistry` executor and focused runtime tests.
+6. Implement only the flagged residue: approved named handlers, approved source
+   gaps, or new Phase 17C template families.
+7. Run the WS15 policy-evaluation gate against the new catalog hashes before
+   promotion.
+
+The success target is that a typical monthly dataslate requires zero new Python,
+and a typical codex requires only a small approved named-handler residue after
+IR recompilation.
 
 ## Faction Execution Status Matrix
 
@@ -454,7 +477,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 12 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 44 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 42 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 2 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 66 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
@@ -506,7 +530,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 12 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 35 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 1 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 54 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
@@ -536,7 +561,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 22 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 80 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 79 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 1 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 119 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
@@ -596,7 +622,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 17 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 60 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 59 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 1 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 90 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
@@ -699,7 +726,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 23 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 1 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 

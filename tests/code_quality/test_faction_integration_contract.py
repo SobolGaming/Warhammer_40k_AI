@@ -243,6 +243,24 @@ def test_faction_integration_records_phase17i_blocked_row_classification_report(
     assert "The payload does not emit raw rule text" in document
 
 
+def test_faction_integration_records_ws14_ir_first_content_drop_runbook() -> None:
+    document = FACTION_INTEGRATION_PATH.read_text(encoding="utf-8")
+    normalized_document = " ".join(document.split())
+
+    assert "## WS14 IR-First Content-Drop Runbook" in document
+    assert "- [WS14 IR-First Content-Drop Runbook](#ws14-ir-first-content-drop-runbook)" in document
+    assert "Ingest the new official PDF, dataslate, MFM, FAQ, or codex source package" in document
+    assert "Apply source-linked patch operations" in document
+    assert "Recompile RuleIR at the source boundary" in document
+    assert "Diff the Phase 17F execution report and Phase 17I classification report" in document
+    assert "registered `RuleExecutionRegistry` executor" in document
+    assert "approved named handlers, approved source gaps, or new Phase 17C template families" in (
+        normalized_document
+    )
+    assert "Run the WS15 policy-evaluation gate" in document
+    assert "typical monthly dataslate requires zero new Python" in document
+
+
 def test_faction_integration_table_of_contents_links_every_execution_section() -> None:
     document = FACTION_INTEGRATION_PATH.read_text(encoding="utf-8")
 

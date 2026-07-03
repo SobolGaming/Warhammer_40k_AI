@@ -11,6 +11,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27,
     faction_subrules_2026_27,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_generic_ir_support_2026_27 as generic_ir_support,
+)
 
 EDITION_ID = "warhammer_40000_11th"
 SOURCE_EDITION = "11th"
@@ -43,23 +46,13 @@ class Phase17ECoverageStatus(StrEnum):
     UNSUPPORTED = "unsupported"
 
 
+# fmt: off
 class Phase17EUnsupportedReason(StrEnum):
-    DATASHEET_INTAKE_REQUIRES_GENERATED_SOURCE_ROWS = (
-        "datasheet_intake_requires_generated_source_rows"
-    )
+    DATASHEET_INTAKE_REQUIRES_GENERATED_SOURCE_ROWS = "datasheet_intake_requires_generated_source_rows"  # noqa: E501
 
-
-APPROVED_UNSUPPORTED_REASONS = frozenset(
-    {
-        Phase17EUnsupportedReason.DATASHEET_INTAKE_REQUIRES_GENERATED_SOURCE_ROWS,
-    }
-)
-_EXACT_SUBRULE_COVERAGE_KINDS = frozenset(
-    {
-        Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
-        Phase17ECoverageKind.DETACHMENT_STRATAGEM,
-    }
-)
+APPROVED_UNSUPPORTED_REASONS = frozenset({Phase17EUnsupportedReason.DATASHEET_INTAKE_REQUIRES_GENERATED_SOURCE_ROWS})  # noqa: E501
+_EXACT_SUBRULE_COVERAGE_KINDS = frozenset({Phase17ECoverageKind.DETACHMENT_ENHANCEMENT, Phase17ECoverageKind.DETACHMENT_STRATAGEM})  # noqa: E501
+# fmt: on
 DAEMONIC_INCURSION_WARP_RIFTS_RUNTIME_CONSUMER_ID = (
     "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts"
 )
@@ -971,10 +964,20 @@ def _enhancement_row(
     detachment_row: faction_detachments_2026_27.SourceDetachmentRow,
     pdf_record: Phase17EFactionPdfRecord,
 ) -> Phase17ECoverageRow:
+    rule_ir_hash = generic_ir_support.generic_supported_enhancement_rule_ir_hash(source_row)
+    status = _exact_subrule_coverage_status(source_row.runtime_consumer_ids)
+    handler_id: str | None = _exact_subrule_handler_id(
+        default_handler_id=f"phase17e:{source_row.faction_id}:{source_row.detachment_id}:"
+        f"enhancement:{source_row.enhancement_id}",
+        runtime_consumer_ids=source_row.runtime_consumer_ids,
+    )
+    if rule_ir_hash is not None:
+        status = Phase17ECoverageStatus.GENERIC_SUPPORTED
+        handler_id = None
     return Phase17ECoverageRow(
         descriptor_id=f"phase17e:{source_row.source_row_id}",
         coverage_kind=Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
-        status=_exact_subrule_coverage_status(source_row.runtime_consumer_ids),
+        status=status,
         faction_id=source_row.faction_id,
         faction_name=source_row.faction_name,
         source_ids=(*source_row.all_source_ids, detachment_row.source_id, pdf_record.source_id),
@@ -990,14 +993,8 @@ def _enhancement_row(
         rule_category=source_row.category,
         runtime_support_status=source_row.runtime_support_status,
         runtime_consumer_ids=source_row.runtime_consumer_ids,
-        handler_id=_exact_subrule_handler_id(
-            default_handler_id=(
-                "phase17e:"
-                f"{source_row.faction_id}:{source_row.detachment_id}:"
-                f"enhancement:{source_row.enhancement_id}"
-            ),
-            runtime_consumer_ids=source_row.runtime_consumer_ids,
-        ),
+        handler_id=handler_id,
+        rule_ir_hash=rule_ir_hash,
     )
 
 
