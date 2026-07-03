@@ -268,9 +268,9 @@ from warhammer40k_core.engine.phases.charge import (
     _charge_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
 )
 from warhammer40k_core.engine.phases.movement import (
-    _ability_index_for_player,  # pyright: ignore[reportPrivateUsage]
-    _advance_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
-    _validate_ability_index_mapping,  # pyright: ignore[reportPrivateUsage]
+    _ability_index_for_player,
+    _advance_reroll_permission_for_unit,
+    _validate_ability_index_mapping,
 )
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseHandler, ShootingPhaseState
 from warhammer40k_core.engine.runtime_modifiers import (

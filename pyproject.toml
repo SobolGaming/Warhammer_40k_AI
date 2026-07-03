@@ -94,23 +94,36 @@ fail_under = 85
 root_package = "warhammer40k_core"
 
 [[tool.importlinter.contracts]]
-name = "Core must not import geometry, rules, engine, or adapters"
+name = "Core must not import rules, engine, or adapters"
 type = "forbidden"
 source_modules = ["warhammer40k_core.core"]
 forbidden_modules = [
-  "warhammer40k_core.geometry",
   "warhammer40k_core.rules",
   "warhammer40k_core.engine",
   "warhammer40k_core.adapters",
 ]
 
 [[tool.importlinter.contracts]]
-name = "Geometry must not import phases or adapters"
+name = "Geometry must not import rules, engine, adapters, or interfaces"
 type = "forbidden"
 source_modules = ["warhammer40k_core.geometry"]
 forbidden_modules = [
-  "warhammer40k_core.engine.phases",
+  "warhammer40k_core.rules",
+  "warhammer40k_core.engine",
   "warhammer40k_core.adapters",
+  "warhammer40k_core.interfaces",
+]
+
+[[tool.importlinter.contracts]]
+name = "Polygon geometry must not import domain or runtime packages"
+type = "forbidden"
+source_modules = ["warhammer40k_core.geometry.polygons"]
+forbidden_modules = [
+  "warhammer40k_core.core",
+  "warhammer40k_core.rules",
+  "warhammer40k_core.engine",
+  "warhammer40k_core.adapters",
+  "warhammer40k_core.interfaces",
 ]
 
 [[tool.importlinter.contracts]]

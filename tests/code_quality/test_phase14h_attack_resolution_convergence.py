@@ -6,11 +6,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 SRC_ROOT = ROOT / "src" / "warhammer40k_core"
 ATTACK_SEQUENCE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "attack_sequence.py"
+ATTACK_SEQUENCE_SPLIT_PATHS = tuple(sorted(ATTACK_SEQUENCE_PATH.parent.glob("attack_sequence*.py")))
+
+
+def _attack_sequence_module_sources() -> tuple[str, ...]:
+    return tuple(path.read_text(encoding="utf-8") for path in ATTACK_SEQUENCE_SPLIT_PATHS)
 
 
 def test_phase14h_single_save_resolution_entry_point() -> None:
-    tree = ast.parse(ATTACK_SEQUENCE_PATH.read_text(encoding="utf-8"))
-    function_names = {node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)}
+    trees = tuple(ast.parse(source) for source in _attack_sequence_module_sources())
+    function_names = {
+        node.name for tree in trees for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+    }
 
     retired_symbols = {
         "_resolve_save_and_damage",
@@ -23,16 +30,17 @@ def test_phase14h_single_save_resolution_entry_point() -> None:
     assert "_resolve_grouped_damage_from" in function_names
 
     saving_throw_callers: list[str] = []
-    for node in ast.walk(tree):
-        if not isinstance(node, ast.FunctionDef):
-            continue
-        if any(
-            isinstance(child, ast.Call)
-            and isinstance(child.func, ast.Name)
-            and child.func.id == "resolve_saving_throw"
-            for child in ast.walk(node)
-        ):
-            saving_throw_callers.append(node.name)
+    for tree in trees:
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.FunctionDef):
+                continue
+            if any(
+                isinstance(child, ast.Call)
+                and isinstance(child.func, ast.Name)
+                and child.func.id == "resolve_saving_throw"
+                for child in ast.walk(node)
+            ):
+                saving_throw_callers.append(node.name)
 
     assert saving_throw_callers == ["_resolve_grouped_damage_from"]
 

@@ -76,8 +76,8 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
     MovementPhaseHandler,
     MovementPhaseState,
-    _model_base_movement_inches,  # pyright: ignore[reportPrivateUsage]
-    _model_movement_budget_inches,  # pyright: ignore[reportPrivateUsage]
+    _model_base_movement_inches,
+    _model_movement_budget_inches,
     resolve_advance_move,
     resolve_normal_move,
 )

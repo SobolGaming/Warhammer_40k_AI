@@ -47,8 +47,8 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
     AttackSequenceStep,
-    _request_source_backed_hit_reroll_if_available,  # pyright: ignore[reportPrivateUsage]
-    _source_backed_reroll_already_answered,  # pyright: ignore[reportPrivateUsage]
+    _request_source_backed_hit_reroll_if_available,
+    _source_backed_reroll_already_answered,
     attack_sequence_hit_roll_spec,
     attack_sequence_wound_roll_spec,
 )
@@ -135,8 +135,8 @@ from warhammer40k_core.engine.phases.charge import (
 )
 from warhammer40k_core.engine.phases.command import CommandPhaseHandler
 from warhammer40k_core.engine.phases.movement import (
-    _advance_reroll_permission_for_unit,  # pyright: ignore[reportPrivateUsage]
-    _record_movement_action_grant_effects,  # pyright: ignore[reportPrivateUsage]
+    _advance_reroll_permission_for_unit,
+    _record_movement_action_grant_effects,
 )
 from warhammer40k_core.engine.phases.shooting import (
     SELECT_SHOOTING_TYPE_DECISION_TYPE,
@@ -145,8 +145,8 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseHandler,
     ShootingPhaseState,
     ShootingUnitSelection,
-    _record_shooting_unit_selected_grant_effects,  # pyright: ignore[reportPrivateUsage]
-    _request_shooting_unit_selected_grant_decision_if_available,  # pyright: ignore[reportPrivateUsage]
+    _record_shooting_unit_selected_grant_effects,
+    _request_shooting_unit_selected_grant_decision_if_available,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
@@ -3429,7 +3429,13 @@ def test_generic_phase_modules_do_not_import_drukhari_faction_code() -> None:
         "src/warhammer40k_core/engine/phases/movement.py",
         "src/warhammer40k_core/engine/phases/charge.py",
     ):
-        source = (root / relative_path).read_text(encoding="utf-8")
+        path = root / relative_path
+        source_paths = (
+            (path, *sorted(path.parent.glob("movement_*.py")))
+            if path.name == "movement.py"
+            else (path,)
+        )
+        source = "\n".join(source_path.read_text(encoding="utf-8") for source_path in source_paths)
         assert "drukhari_power_from_pain" not in source
         assert "warhammer_40000_11th.drukhari" not in source
 

@@ -59,6 +59,22 @@ def test_terrain_area_template_rejects_invalid_polygons() -> None:
             source_id="test-source",
         )
 
+    with pytest.raises(TerrainAreaError, match="self-intersect"):
+        TerrainAreaFootprintTemplate(
+            footprint_template_id="bad-self-intersection",
+            name="Bad Self Intersection",
+            bounding_width_inches=4.0,
+            bounding_depth_inches=2.0,
+            polygon_vertices_inches=(
+                TerrainDisplayPoint(-2.0, -1.0),
+                TerrainDisplayPoint(2.0, 1.0),
+                TerrainDisplayPoint(-2.0, 1.0),
+                TerrainDisplayPoint(2.0, -1.0),
+                TerrainDisplayPoint(2.0, 0.0),
+            ),
+            source_id="test-source",
+        )
+
 
 def test_transform_polygon_rotates_and_translates_deterministically() -> None:
     transformed = transform_polygon(

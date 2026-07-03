@@ -15,6 +15,7 @@ ARCHITECTURE_PATH = ROOT / "ARCHITECTURE_V2.md"
 README_PATH = ROOT / "README.md"
 TRANSPORTS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "transports.py"
 ATTACK_SEQUENCE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "attack_sequence.py"
+ATTACK_SEQUENCE_SPLIT_PATHS = tuple(sorted(ATTACK_SEQUENCE_PATH.parent.glob("attack_sequence*.py")))
 DAMAGE_ALLOCATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "damage_allocation.py"
 HAZARD_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "hazard.py"
 GAME_STATE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py"
@@ -24,18 +25,30 @@ DATASHEET_PATH = ROOT / "src" / "warhammer40k_core" / "core" / "datasheet.py"
 LIST_VALIDATION_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "list_validation.py"
 ARMY_MUSTERING_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "army_mustering.py"
 STRATAGEMS_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems.py"
+STRATAGEMS_SPLIT_PATHS = tuple(sorted(STRATAGEMS_PATH.parent.glob("stratagems*.py")))
 SHOOTING_PHASE_PATH = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "shooting.py"
+SHOOTING_PHASE_SPLIT_PATHS = tuple(sorted(SHOOTING_PHASE_PATH.parent.glob("shooting*.py")))
 ADAPTER_CONTRACT_PATH = ROOT / "docs" / "ADAPTER_DECISION_CONTRACT.md"
 
 
-def _module_function_source(module_source: str, function_name: str) -> str:
-    module = ast.parse(module_source)
-    for node in module.body:
-        if isinstance(node, ast.FunctionDef) and node.name == function_name:
-            source = ast.get_source_segment(module_source, node)
-            assert source is not None
-            return source
+def _function_source_from_paths(paths: tuple[Path, ...], function_name: str) -> str:
+    for path in paths:
+        module_source = path.read_text(encoding="utf-8")
+        module = ast.parse(module_source)
+        for node in module.body:
+            if isinstance(node, ast.FunctionDef) and node.name == function_name:
+                source = ast.get_source_segment(module_source, node)
+                assert source is not None
+                return source
     raise AssertionError(f"Function {function_name} not found.")
+
+
+def _attack_sequence_source() -> str:
+    return "\n".join(path.read_text(encoding="utf-8") for path in ATTACK_SEQUENCE_SPLIT_PATHS)
+
+
+def _stratagems_source() -> str:
+    return "\n".join(path.read_text(encoding="utf-8") for path in STRATAGEMS_SPLIT_PATHS)
 
 
 def test_phase14i_core_stratagem_source_cutover_is_complete() -> None:
@@ -89,7 +102,7 @@ def test_phase14i_docs_mark_complete_without_overclaiming_ability_runtime() -> N
 
 def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit() -> None:
     transport_source = TRANSPORTS_PATH.read_text(encoding="utf-8")
-    attack_sequence_source = ATTACK_SEQUENCE_PATH.read_text(encoding="utf-8")
+    attack_sequence_source = _attack_sequence_source()
     damage_allocation_source = DAMAGE_ALLOCATION_PATH.read_text(encoding="utf-8")
     hazard_source = HAZARD_PATH.read_text(encoding="utf-8")
     game_state_source = GAME_STATE_PATH.read_text(encoding="utf-8")
@@ -98,7 +111,7 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
     datasheet_source = DATASHEET_PATH.read_text(encoding="utf-8")
     list_validation_source = LIST_VALIDATION_PATH.read_text(encoding="utf-8")
     army_mustering_source = ARMY_MUSTERING_PATH.read_text(encoding="utf-8")
-    stratagems_source = STRATAGEMS_PATH.read_text(encoding="utf-8")
+    stratagems_source = _stratagems_source()
 
     assert "def resolve_combat_disembark(" in transport_source
     assert "Combat Disembark requires resolve_combat_disembark." in transport_source
@@ -144,18 +157,23 @@ def test_phase14h_transport_blocker_and_attached_toughness_cutover_are_explicit(
 
 
 def test_phase14h_shooting_selector_and_range_helpers_are_rules_unit_aware() -> None:
-    shooting_source = SHOOTING_PHASE_PATH.read_text(encoding="utf-8")
-    active_selector_source = _module_function_source(
-        shooting_source,
+    active_selector_source = _function_source_from_paths(
+        SHOOTING_PHASE_SPLIT_PATHS,
         "_active_player_placed_unit_ids",
     )
-    legal_selector_source = _module_function_source(shooting_source, "_legal_shooting_unit_ids")
-    options_source = _module_function_source(shooting_source, "_shooting_unit_options")
-    available_weapons_source = _module_function_source(
-        shooting_source,
+    legal_selector_source = _function_source_from_paths(
+        SHOOTING_PHASE_SPLIT_PATHS, "_legal_shooting_unit_ids"
+    )
+    options_source = _function_source_from_paths(
+        SHOOTING_PHASE_SPLIT_PATHS, "_shooting_unit_options"
+    )
+    available_weapons_source = _function_source_from_paths(
+        SHOOTING_PHASE_SPLIT_PATHS,
         "_available_weapons_for_rules_unit",
     )
-    range_source = _module_function_source(shooting_source, "_unit_target_within_max_range")
+    range_source = _function_source_from_paths(
+        SHOOTING_PHASE_SPLIT_PATHS, "_unit_target_within_max_range"
+    )
 
     assert "rules_unit_id_for_unit_id" in active_selector_source
     assert "unit_ids.append(placement.unit_instance_id)" not in active_selector_source

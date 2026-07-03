@@ -2,20 +2,19 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import Self, cast
 
-from warhammer40k_core.core.army_catalog import ArmyCatalog, ArmyCatalogPayload
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     RulesetDescriptor,
-    RulesetDescriptorPayload,
     SetupStepKind,
     battle_phase_kind_from_token,
     setup_step_kind_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatePayload
-from warhammer40k_core.engine.aircraft import HoverModeState, HoverModeStatePayload
+from warhammer40k_core.engine.actions import MissionActionState
+from warhammer40k_core.engine.aircraft import HoverModeState
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyDefinitionPayload,
@@ -26,7 +25,6 @@ from warhammer40k_core.engine.army_mustering import (
 )
 from warhammer40k_core.engine.battle_shock import (
     BattleShockedUnitState,
-    BattleShockedUnitStatePayload,
     BattleShockResult,
 )
 from warhammer40k_core.engine.battlefield_state import (
@@ -44,28 +42,22 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.command_points import (
     CommandPointGainResult,
     CommandPointLedger,
-    CommandPointLedgerPayload,
     CommandPointRefundResult,
     CommandPointSourceKind,
     CommandPointSpendResult,
     CommandStepState,
-    CommandStepStatePayload,
     initial_command_point_ledgers,
 )
 from warhammer40k_core.engine.cult_ambush import (
     CultAmbushMarker,
-    CultAmbushMarkerPayload,
 )
 from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionSource,
-    DestructionReactionSourcePayload,
     FeelNoPainSource,
-    FeelNoPainSourcePayload,
 )
 from warhammer40k_core.engine.effects import (
     EffectExpirationBoundary,
     PersistingEffect,
-    PersistingEffectPayload,
 )
 from warhammer40k_core.engine.endpoint_placement import (
     objective_marker_endpoint_placement_violation,
@@ -73,16 +65,38 @@ from warhammer40k_core.engine.endpoint_placement import (
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_resources import (
     FactionResourceLedger,
-    FactionResourceLedgerPayload,
     FactionResourceResult,
     initial_faction_resource_ledgers,
 )
 from warhammer40k_core.engine.faction_rule_states import (
     FactionRuleState,
-    FactionRuleStatePayload,
 )
-from warhammer40k_core.engine.fight_order import FightPhaseState, FightPhaseStatePayload
-from warhammer40k_core.engine.mission_setup import MissionSetup, MissionSetupPayload
+from warhammer40k_core.engine.fight_order import FightPhaseState
+from warhammer40k_core.engine.game_state_payloads import (
+    DedicatedTransportSetupConsequencePayload as DedicatedTransportSetupConsequencePayload,
+)
+from warhammer40k_core.engine.game_state_payloads import (
+    GameConfigPayload as GameConfigPayload,
+)
+from warhammer40k_core.engine.game_state_payloads import (
+    GameStatePayload as GameStatePayload,
+)
+from warhammer40k_core.engine.game_state_payloads import (
+    OneShotWeaponUseRecordPayload as OneShotWeaponUseRecordPayload,
+)
+from warhammer40k_core.engine.game_state_payloads import (
+    RangedAttackHistoryRecordPayload as RangedAttackHistoryRecordPayload,
+)
+from warhammer40k_core.engine.game_state_payloads import (
+    SecondaryMissionChoicePayload as SecondaryMissionChoicePayload,
+)
+from warhammer40k_core.engine.game_state_payloads import (
+    StartingAttachedUnitRecordPayload as StartingAttachedUnitRecordPayload,
+)
+from warhammer40k_core.engine.game_state_payloads import (
+    TacticalSecondaryDrawPayload as TacticalSecondaryDrawPayload,
+)
+from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.missions import (
     deterministic_tactical_secondary_draw,
     mission_scoring_policy_from_setup,
@@ -91,7 +105,6 @@ from warhammer40k_core.engine.missions import (
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlRecord,
-    ObjectiveControlRecordPayload,
     ObjectiveControlTiming,
     resolve_objective_control,
 )
@@ -104,35 +117,26 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.charge import (
     ChargePhaseState,
-    ChargePhaseStatePayload,
 )
 from warhammer40k_core.engine.phases.movement import (
     AdvancedUnitState,
-    AdvancedUnitStatePayload,
     FellBackUnitState,
-    FellBackUnitStatePayload,
     MovementPhaseState,
-    MovementPhaseStatePayload,
 )
 from warhammer40k_core.engine.phases.shooting import (
     OutOfPhaseShootingState,
-    OutOfPhaseShootingStatePayload,
     ShootingPhaseState,
-    ShootingPhaseStatePayload,
 )
 from warhammer40k_core.engine.prebattle_records import (
     PreBattleActionRecord,
-    PreBattleActionRecordPayload,
 )
 from warhammer40k_core.engine.reserves import (
     ReserveDestructionTimingPolicy,
     ReserveKind,
     ReserveOrigin,
     ReserveState,
-    ReserveStatePayload,
     ReserveStatus,
     ReserveUnitPointValue,
-    ReserveUnitPointValuePayload,
     StrategicReserveDeclaration,
     apply_reserve_destruction_to_battlefield,
     reserve_origin_from_token,
@@ -140,36 +144,25 @@ from warhammer40k_core.engine.reserves import (
 )
 from warhammer40k_core.engine.return_on_death import (
     PendingReturnOnDeath,
-    PendingReturnOnDeathPayload,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
     FinalScoringResult,
     PrimaryObjectiveTurnStartState,
-    PrimaryObjectiveTurnStartStatePayload,
     PrimaryTerrainTrapState,
-    PrimaryTerrainTrapStatePayload,
     PrimaryUnitDestructionState,
-    PrimaryUnitDestructionStatePayload,
     ScoringWindowKind,
     ScoringWindowState,
-    ScoringWindowStatePayload,
     SecondaryDestroyedModelState,
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
-    SecondaryMissionCardStatePayload,
     SecondaryMissionCardStatus,
     SecondaryObjectiveCleanseState,
-    SecondaryObjectiveCleanseStatePayload,
     SecondaryTerrainPlunderState,
-    SecondaryTerrainPlunderStatePayload,
     SecondaryUnitDestructionState,
-    SecondaryUnitDestructionStatePayload,
     TacticalSecondaryAchievementContext,
-    TacticalSecondaryAchievementContextPayload,
     VictoryPointAward,
     VictoryPointLedger,
-    VictoryPointLedgerPayload,
     VictoryPointSourceKind,
     VictoryPointTransaction,
     initial_victory_point_ledgers,
@@ -177,34 +170,28 @@ from warhammer40k_core.engine.scoring import (
 )
 from warhammer40k_core.engine.sticky_objective_control import (
     StickyObjectiveControlState,
-    StickyObjectiveControlStatePayload,
     apply_sticky_objective_control,
     sticky_objective_control_state_is_expired,
 )
-from warhammer40k_core.engine.stratagems import StratagemUseRecord, StratagemUseRecordPayload
+from warhammer40k_core.engine.stratagems import StratagemUseRecord
 from warhammer40k_core.engine.tracked_targets import (
     TrackedTargetOwnerScope,
     TrackedTargetRecord,
-    TrackedTargetRecordPayload,
     TrackedTargetRole,
 )
 from warhammer40k_core.engine.transports import (
     DisembarkedUnitState,
-    DisembarkedUnitStatePayload,
     TransportCapacityProfile,
     TransportCargoState,
-    TransportCargoStatePayload,
 )
-from warhammer40k_core.engine.triggered_movement import SurgeMoveState, SurgeMoveStatePayload
+from warhammer40k_core.engine.triggered_movement import SurgeMoveState
 from warhammer40k_core.engine.turn_cleanup import (
     EndTurnCleanupState,
-    EndTurnCleanupStatePayload,
     resolve_end_turn_cleanup,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import (
     StartingStrengthRecord,
-    StartingStrengthRecordPayload,
 )
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -217,146 +204,10 @@ class SecondaryMissionMode(StrEnum):
     TACTICAL = "tactical"
 
 
-class GameConfigPayload(TypedDict):
-    game_id: str
-    ruleset_descriptor: RulesetDescriptorPayload
-    army_catalog: ArmyCatalogPayload
-    army_muster_requests: list[ArmyMusterRequestPayload]
-    allow_legacy_non_strict_rosters: bool
-    player_ids: list[str]
-    turn_order: list[str]
-    fixed_secondary_mission_ids: list[str]
-    tactical_secondary_draw_count: int
-    max_lifecycle_transitions: int
-    mission_setup: MissionSetupPayload | None
-    reserve_unit_points: list[ReserveUnitPointValuePayload]
-
-
-class SecondaryMissionChoicePayload(TypedDict):
-    player_id: str
-    mode: str
-    fixed_mission_ids: list[str]
-
-
-class TacticalSecondaryDrawPayload(TypedDict):
-    player_id: str
-    battle_round: int
-    request_id: str
-    result_id: str
-    draw_count: int
-
-
 DEDICATED_TRANSPORT_EMPTY_STARTING_CARGO_CONSEQUENCE = (
     "empty_starting_cargo_destroyed_first_battle_round"
 )
 DEFAULT_MAX_LIFECYCLE_TRANSITIONS = 128
-
-
-class DedicatedTransportSetupConsequencePayload(TypedDict):
-    player_id: str
-    transport_unit_instance_id: str
-    consequence_kind: str
-    destroyed_battle_round: int
-    source_id: str
-
-
-class OneShotWeaponUseRecordPayload(TypedDict):
-    model_instance_id: str
-    wargear_id: str
-    weapon_profile_id: str
-    battle_round: int
-    source_phase: str
-    selection_id: str
-
-
-class RangedAttackHistoryRecordPayload(TypedDict):
-    player_id: str
-    unit_instance_id: str
-    battle_round: int
-    active_player_id: str
-    phase: str
-    request_id: str
-    result_id: str
-
-
-class GameStatePayload(TypedDict):
-    game_id: str
-    ruleset_descriptor_hash: str
-    stage: str
-    setup_sequence: list[str]
-    battle_phase_sequence: list[str]
-    setup_step_index: int | None
-    battle_phase_index: int | None
-    battle_round: int
-    active_player_id: str | None
-    player_ids: list[str]
-    turn_order: list[str]
-    decision_request_count: int
-    tactical_secondary_draw_count: int
-    command_step_state: CommandStepStatePayload | None
-    command_point_ledgers: list[CommandPointLedgerPayload]
-    victory_point_ledgers: list[VictoryPointLedgerPayload]
-    faction_resource_ledgers: list[FactionResourceLedgerPayload]
-    stratagem_use_records: list[StratagemUseRecordPayload]
-    faction_rule_states: list[FactionRuleStatePayload]
-    army_definitions: list[ArmyDefinitionPayload]
-    starting_strength_records: list[StartingStrengthRecordPayload]
-    starting_attached_unit_records: list[StartingAttachedUnitRecordPayload]
-    battlefield_state: BattlefieldRuntimeStatePayload | None
-    mission_setup: MissionSetupPayload | None
-    movement_phase_state: MovementPhaseStatePayload | None
-    charge_phase_state: ChargePhaseStatePayload | None
-    fight_phase_state: FightPhaseStatePayload | None
-    shooting_phase_state: ShootingPhaseStatePayload | None
-    out_of_phase_shooting_state: OutOfPhaseShootingStatePayload | None
-    feel_no_pain_sources_by_model_id: dict[str, list[FeelNoPainSourcePayload]]
-    feel_no_pain_decline_allowed_model_ids: list[str]
-    destruction_reaction_sources_by_model_id: dict[str, list[DestructionReactionSourcePayload]]
-    one_shot_weapon_use_records: list[OneShotWeaponUseRecordPayload]
-    ranged_attack_history_records: list[RangedAttackHistoryRecordPayload]
-    reserve_states: list[ReserveStatePayload]
-    cult_ambush_markers: list[CultAmbushMarkerPayload]
-    hover_mode_states: list[HoverModeStatePayload]
-    transport_cargo_states: list[TransportCargoStatePayload]
-    dedicated_transport_setup_consequences: list[DedicatedTransportSetupConsequencePayload]
-    disembarked_unit_states: list[DisembarkedUnitStatePayload]
-    advanced_unit_states: list[AdvancedUnitStatePayload]
-    fell_back_unit_states: list[FellBackUnitStatePayload]
-    surge_move_states: list[SurgeMoveStatePayload]
-    battle_shocked_unit_ids: list[str]
-    battle_shocked_unit_states: list[BattleShockedUnitStatePayload]
-    objective_control_records: list[ObjectiveControlRecordPayload]
-    sticky_objective_control_states: list[StickyObjectiveControlStatePayload]
-    primary_objective_turn_start_states: list[PrimaryObjectiveTurnStartStatePayload]
-    primary_terrain_trap_states: list[PrimaryTerrainTrapStatePayload]
-    primary_unit_destruction_states: list[PrimaryUnitDestructionStatePayload]
-    secondary_unit_destruction_states: list[SecondaryUnitDestructionStatePayload]
-    secondary_objective_cleanse_states: list[SecondaryObjectiveCleanseStatePayload]
-    secondary_terrain_plunder_states: list[SecondaryTerrainPlunderStatePayload]
-    mission_action_states: list[MissionActionStatePayload]
-    end_turn_cleanup_states: list[EndTurnCleanupStatePayload]
-    scoring_window_states: list[ScoringWindowStatePayload]
-    persisting_effects: list[PersistingEffectPayload]
-    tracked_target_records: list[TrackedTargetRecordPayload]
-    pending_return_on_death: list[PendingReturnOnDeathPayload]
-    return_on_death_consumed_keys: list[str]
-    secondary_mission_choices: list[SecondaryMissionChoicePayload]
-    tactical_secondary_draws: list[TacticalSecondaryDrawPayload]
-    prebattle_action_records: list[PreBattleActionRecordPayload]
-    secondary_mission_card_states: list[SecondaryMissionCardStatePayload]
-    tactical_secondary_achievement_contexts: list[TacticalSecondaryAchievementContextPayload]
-    tactical_secondary_discard_cp_reward_window_ids: list[str]
-    tactical_secondary_replacement_player_ids: list[str]
-
-
-class StartingAttachedUnitRecordPayload(TypedDict):
-    player_id: str
-    attached_unit_instance_id: str
-    bodyguard_unit_instance_id: str
-    leader_unit_instance_ids: list[str]
-    support_unit_instance_ids: list[str]
-    component_unit_instance_ids: list[str]
-    source_id: str
 
 
 @dataclass(frozen=True, slots=True)
