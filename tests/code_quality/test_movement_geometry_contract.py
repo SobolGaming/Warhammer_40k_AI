@@ -5,6 +5,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 MOVEMENT_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement.py"
+MOVEMENT_PHASE_FILES = (
+    MOVEMENT_PHASE,
+    *sorted(MOVEMENT_PHASE.parent.glob("movement_*.py")),
+)
 CHARGE_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "charge.py"
 FIGHT_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "fight.py"
 FIGHT_RESOLUTION = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_resolution.py"
@@ -38,10 +42,10 @@ RESOLVER_GEOMETRY_READS = (
 def test_live_movement_callers_do_not_pass_copied_battlefield_geometry() -> None:
     violations: list[str] = []
     for path, function_name, call_name in LIVE_MOVEMENT_CALLS:
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        if _module_imports_name(tree, "live_battlefield_geometry_for_state"):
-            violations.append(f"{path.relative_to(ROOT)} imports live geometry helper")
-        function = _function_by_name(tree, function_name)
+        for source_path, tree in _parsed_sources(path):
+            if _module_imports_name(tree, "live_battlefield_geometry_for_state"):
+                violations.append(f"{source_path.relative_to(ROOT)} imports live geometry helper")
+        source_path, function = _function_by_name(path, function_name)
         for node in ast.walk(function):
             if not isinstance(node, ast.Call):
                 continue
@@ -54,7 +58,7 @@ def test_live_movement_callers_do_not_pass_copied_battlefield_geometry() -> None
             }
             if copied_keywords:
                 violations.append(
-                    f"{path.relative_to(ROOT)}:{node.lineno} {call_name} passes "
+                    f"{source_path.relative_to(ROOT)}:{node.lineno} {call_name} passes "
                     + ", ".join(sorted(copied_keywords))
                 )
 
@@ -68,8 +72,7 @@ def test_live_movement_callers_do_not_pass_copied_battlefield_geometry() -> None
 def test_movement_resolvers_read_manifested_battlefield_geometry() -> None:
     violations: list[str] = []
     for path, function_name in RESOLVER_GEOMETRY_READS:
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        function = _function_by_name(tree, function_name)
+        source_path, function = _function_by_name(path, function_name)
         source = ast.unparse(function)
         missing: list[str] = []
         if "scenario.battlefield_state.battlefield_width_inches" not in source:
@@ -80,7 +83,7 @@ def test_movement_resolvers_read_manifested_battlefield_geometry() -> None:
             missing.append("terrain_features")
         if missing:
             violations.append(
-                f"{path.relative_to(ROOT)}:{function.lineno} {function_name} missing "
+                f"{source_path.relative_to(ROOT)}:{function.lineno} {function_name} missing "
                 + ", ".join(missing)
             )
 
@@ -90,11 +93,25 @@ def test_movement_resolvers_read_manifested_battlefield_geometry() -> None:
     )
 
 
-def _function_by_name(tree: ast.AST, name: str) -> ast.FunctionDef:
-    for node in ast.walk(tree):
-        if isinstance(node, ast.FunctionDef) and node.name == name:
-            return node
+def _function_by_name(path: Path, name: str) -> tuple[Path, ast.FunctionDef]:
+    for source_path, tree in _parsed_sources(path):
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef) and node.name == name:
+                return source_path, node
     raise AssertionError(f"Missing function: {name}")
+
+
+def _parsed_sources(path: Path) -> tuple[tuple[Path, ast.AST], ...]:
+    return tuple(
+        (source_path, ast.parse(source_path.read_text(encoding="utf-8"), filename=str(source_path)))
+        for source_path in _source_paths(path)
+    )
+
+
+def _source_paths(path: Path) -> tuple[Path, ...]:
+    if path == MOVEMENT_PHASE:
+        return MOVEMENT_PHASE_FILES
+    return (path,)
 
 
 def _module_imports_name(tree: ast.AST, imported_name: str) -> bool:

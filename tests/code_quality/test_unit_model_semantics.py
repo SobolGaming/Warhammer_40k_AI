@@ -7,6 +7,10 @@ ROOT = Path(__file__).resolve().parents[2]
 CORE = ROOT / "src" / "warhammer40k_core" / "core"
 MOVEMENT_LEGALITY = ROOT / "src" / "warhammer40k_core" / "engine" / "movement_legality.py"
 MOVEMENT_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "movement.py"
+MOVEMENT_PHASE_FILES = (
+    MOVEMENT_PHASE,
+    *sorted(MOVEMENT_PHASE.parent.glob("movement_*.py")),
+)
 PATHING = ROOT / "src" / "warhammer40k_core" / "geometry" / "pathing.py"
 UNIT_MODULES = (
     CORE / "unit.py",
@@ -102,7 +106,7 @@ def test_movement_legality_gates_friendly_vehicle_monster_blockers_by_mover() ->
 
 
 def test_movement_phase_has_no_public_reinforcements_step_tokens() -> None:
-    source = MOVEMENT_PHASE.read_text(encoding="utf-8")
+    source = "\n".join(path.read_text(encoding="utf-8") for path in MOVEMENT_PHASE_FILES)
     forbidden_tokens = (
         "reinforcements_step_completed",
         "reinforcements_waiting_for_arrival_choice",
