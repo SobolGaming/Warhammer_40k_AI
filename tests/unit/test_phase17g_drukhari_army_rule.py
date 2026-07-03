@@ -47,8 +47,8 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
     AttackSequenceStep,
-    _request_source_backed_hit_reroll_if_available,  # pyright: ignore[reportPrivateUsage]
-    _source_backed_reroll_already_answered,  # pyright: ignore[reportPrivateUsage]
+    _request_source_backed_hit_reroll_if_available,
+    _source_backed_reroll_already_answered,
     attack_sequence_hit_roll_spec,
     attack_sequence_wound_roll_spec,
 )

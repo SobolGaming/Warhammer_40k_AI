@@ -29,7 +29,7 @@ from warhammer40k_core.engine.army_mustering import (
 from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
     AttackSequenceStep,
-    _target_unit_toughness,  # pyright: ignore[reportPrivateUsage]
+    _target_unit_toughness,
     attack_sequence_hit_roll_spec,
     attack_sequence_wound_roll_spec,
     resolve_attack_sequence_until_blocked,
