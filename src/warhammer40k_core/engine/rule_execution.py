@@ -37,6 +37,13 @@ from warhammer40k_core.engine.event_log import (
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rule_target_resolution import (
+    clause_requires_unit_target,
+    effect_clause_target_unavailable_reason,
+    target_binding_clause_unavailable_reason,
+    target_unit_instance_ids_for_clause,
+    unit_has_required_keywords,
+)
 from warhammer40k_core.engine.scoring import (
     VictoryPointAward,
     VictoryPointSourceKind,
@@ -68,29 +75,6 @@ STATE_INPUT_BATTLEFIELD_STATE = "battlefield_state"
 STATE_INPUT_SOURCE_UNIT = "source_unit"
 STATE_INPUT_EVENT_LOG = "event_log"
 TARGET_BINDING_UNIT_IDS = "target_unit_instance_ids"
-UNIT_EFFECT_TARGET_KINDS = (
-    RuleTargetKind.ENEMY_UNIT,
-    RuleTargetKind.FRIENDLY_UNIT,
-    RuleTargetKind.SELECTED_TARGET,
-    RuleTargetKind.SELECTED_UNIT,
-    RuleTargetKind.THIS_UNIT,
-)
-TARGET_SCOPED_EFFECT_KINDS = (
-    RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS,
-    RuleEffectKind.GRANT_ABILITY,
-    RuleEffectKind.GRANT_WEAPON_ABILITY,
-    RuleEffectKind.INFLICT_MORTAL_WOUNDS,
-    RuleEffectKind.MODIFY_CHARACTERISTIC,
-    RuleEffectKind.MODIFY_DICE_ROLL,
-    RuleEffectKind.MODIFY_MOVE_DISTANCE,
-    RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION,
-    RuleEffectKind.PLACEMENT_PERMISSION,
-    RuleEffectKind.PLACEMENT_RESTRICTION,
-    RuleEffectKind.REROLL_PERMISSION,
-    RuleEffectKind.RESTORE_LOST_WOUNDS,
-    RuleEffectKind.SET_CONTEXTUAL_STATUS,
-    RuleEffectKind.SET_CHARACTERISTIC,
-)
 AURA_ALLEGIANCE_ANY = "any"
 AURA_ALLEGIANCE_ENEMY = "enemy"
 AURA_ALLEGIANCE_FRIENDLY = "friendly"
@@ -736,7 +720,11 @@ def _preflight_rule_ir(
             binding = registry.binding_for_clause(clause)
             if binding is None:
                 return RuleExecutionResult.unsupported(rule_ir, reason="missing_aura_handler")
-            unavailable = _binding_unavailable_reason(binding=binding, context=context)
+            unavailable = _binding_unavailable_reason(
+                binding=binding,
+                clause=clause,
+                context=context,
+            )
             if unavailable is not None:
                 return RuleExecutionResult.invalid(rule_ir, reason=unavailable)
             unavailable = _clause_semantic_unavailable_reason(
@@ -756,7 +744,11 @@ def _preflight_rule_ir(
                         rule_ir,
                         reason=f"missing_effect_handler:{effect.kind.value}",
                     )
-                unavailable = _binding_unavailable_reason(binding=binding, context=context)
+                unavailable = _binding_unavailable_reason(
+                    binding=binding,
+                    clause=clause,
+                    context=context,
+                )
                 if unavailable is not None:
                     return RuleExecutionResult.invalid(rule_ir, reason=unavailable)
             unavailable = _clause_semantic_unavailable_reason(
@@ -772,7 +764,14 @@ def _preflight_rule_ir(
             binding = registry.binding_for_clause(clause)
             if binding is None:
                 return RuleExecutionResult.unsupported(rule_ir, reason="missing_target_handler")
-            unavailable = _binding_unavailable_reason(binding=binding, context=context)
+            unavailable = _binding_unavailable_reason(
+                binding=binding,
+                clause=clause,
+                context=context,
+            )
+            if unavailable is not None:
+                return RuleExecutionResult.invalid(rule_ir, reason=unavailable)
+            unavailable = target_binding_clause_unavailable_reason(clause=clause, context=context)
             if unavailable is not None:
                 return RuleExecutionResult.invalid(rule_ir, reason=unavailable)
     return None
@@ -967,12 +966,17 @@ def _target_binding_handler(
     if effect is not None:
         raise GameLifecycleError("Target binding handler does not accept an effect.")
     target_kind = "unbound" if clause.target is None else clause.target.kind.value
+    target_unit_instance_ids = target_unit_instance_ids_for_clause(
+        clause=clause,
+        context=context,
+        target_unit_instance_ids=None,
+    )
     payload: dict[str, JsonValue] = {
         "rule_id": rule_ir.rule_id,
         "source_id": rule_ir.source_id,
         "clause_id": clause.clause_id,
         "target_kind": target_kind,
-        "target_unit_instance_ids": list(context.target_unit_instance_ids),
+        "target_unit_instance_ids": list(target_unit_instance_ids),
         "target_player_id": context.target_player_id,
     }
     event = _emit_event(
@@ -1041,7 +1045,7 @@ def _effect_payload(
     context: RuleExecutionContext,
     target_unit_instance_ids: tuple[str, ...] | None = None,
 ) -> dict[str, JsonValue]:
-    target_ids = _target_unit_instance_ids_for_clause(
+    target_ids = target_unit_instance_ids_for_clause(
         clause=clause,
         context=context,
         target_unit_instance_ids=target_unit_instance_ids,
@@ -1070,7 +1074,7 @@ def _persisting_effect_or_none(
     effect_payload: dict[str, JsonValue],
     context: RuleExecutionContext,
 ) -> PersistingEffect | None:
-    target_unit_instance_ids = _target_unit_instance_ids_for_clause(
+    target_unit_instance_ids = target_unit_instance_ids_for_clause(
         clause=clause,
         context=context,
         target_unit_instance_ids=None,
@@ -1164,7 +1168,7 @@ def _aura_affected_unit_ids(
             ):
                 continue
             unit = scenario.unit_instance_for_placement(unit_placement)
-            if required_keywords and not _unit_has_required_keywords(
+            if required_keywords and not unit_has_required_keywords(
                 unit_keywords=unit.keywords,
                 faction_keywords=unit.faction_keywords,
                 required_keywords=required_keywords,
@@ -1244,22 +1248,6 @@ def _required_keywords(conditions: tuple[RuleCondition, ...]) -> tuple[str, ...]
     return tuple(sorted(keywords))
 
 
-def _unit_has_required_keywords(
-    *,
-    unit_keywords: tuple[str, ...],
-    faction_keywords: tuple[str, ...],
-    required_keywords: tuple[str, ...],
-) -> bool:
-    unit_keyword_set = {
-        _canonical_keyword(keyword) for keyword in (*unit_keywords, *faction_keywords)
-    }
-    return {_canonical_keyword(keyword) for keyword in required_keywords}.issubset(unit_keyword_set)
-
-
-def _canonical_keyword(keyword: str) -> str:
-    return keyword.strip().upper().replace("_", " ").replace("-", " ")
-
-
 def _status_token(status: str) -> str:
     return status.strip().lower().replace(" ", "_").replace("-", "_")
 
@@ -1274,7 +1262,7 @@ def _clause_semantic_unavailable_reason(
     condition_reason = _condition_unavailable_reason(clause=clause, context=context)
     if condition_reason is not None:
         return condition_reason
-    target_reason = _effect_clause_target_unavailable_reason(clause=clause, context=context)
+    target_reason = effect_clause_target_unavailable_reason(clause=clause, context=context)
     if target_reason is not None:
         return target_reason
     duration_reason = _duration_unavailable_reason(clause=clause, context=context)
@@ -1418,49 +1406,6 @@ def _this_model_constraint_unavailable_reason(context: RuleExecutionContext) -> 
     return None
 
 
-def _effect_clause_target_unavailable_reason(
-    *,
-    clause: RuleClause,
-    context: RuleExecutionContext,
-) -> str | None:
-    if not _clause_requires_unit_target(clause):
-        return None
-    if _target_unit_instance_ids_for_clause(
-        clause=clause,
-        context=context,
-        target_unit_instance_ids=None,
-    ):
-        return None
-    if clause.target is not None and clause.target.kind is RuleTargetKind.THIS_UNIT:
-        return "missing_input:source_unit_instance_id"
-    return "missing_target:unit_instance_ids"
-
-
-def _clause_requires_unit_target(clause: RuleClause) -> bool:
-    return (
-        clause.target is not None
-        and clause.target.kind in UNIT_EFFECT_TARGET_KINDS
-        and any(effect.kind in TARGET_SCOPED_EFFECT_KINDS for effect in clause.effects)
-    )
-
-
-def _target_unit_instance_ids_for_clause(
-    *,
-    clause: RuleClause,
-    context: RuleExecutionContext,
-    target_unit_instance_ids: tuple[str, ...] | None,
-) -> tuple[str, ...]:
-    if clause.target is not None and clause.target.kind is RuleTargetKind.THIS_UNIT:
-        if context.source_unit_instance_id is None:
-            return ()
-        return (context.source_unit_instance_id,)
-    if target_unit_instance_ids is not None:
-        return target_unit_instance_ids
-    if context.target_unit_instance_ids:
-        return context.target_unit_instance_ids
-    return ()
-
-
 def _duration_unavailable_reason(
     *,
     clause: RuleClause,
@@ -1470,7 +1415,7 @@ def _duration_unavailable_reason(
         return None
     if (
         clause.duration.kind is not RuleDurationKind.IMMEDIATE
-        and _clause_requires_unit_target(clause)
+        and clause_requires_unit_target(clause)
         and context.state is None
     ):
         return "missing_input:game_state"
@@ -1543,6 +1488,7 @@ def _command_point_unavailable_reason(
 def _binding_unavailable_reason(
     *,
     binding: RuleRuntimeBinding,
+    clause: RuleClause,
     context: RuleExecutionContext,
 ) -> str | None:
     for state_input in binding.required_state_inputs:
@@ -1557,8 +1503,11 @@ def _binding_unavailable_reason(
         if state_input == STATE_INPUT_EVENT_LOG and context.event_log is None:
             return "missing_input:event_log"
     for target_binding in binding.required_target_bindings:
-        if target_binding == TARGET_BINDING_UNIT_IDS and not context.target_unit_instance_ids:
-            return "missing_target:unit_instance_ids"
+        if target_binding != TARGET_BINDING_UNIT_IDS or context.target_unit_instance_ids:
+            continue
+        if clause.target is not None and clause.target.kind is RuleTargetKind.SELECTED_TARGET:
+            continue
+        return "missing_target:unit_instance_ids"
     return None
 
 

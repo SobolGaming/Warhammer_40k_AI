@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.selected_target_context import selected_target_unit_ids_or_none
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -699,23 +700,7 @@ def _selected_target_context_error(
 def _selected_target_unit_ids_or_none(
     context: StratagemEligibilityContext,
 ) -> tuple[str, ...] | None:
-    trigger_payload = context.trigger_payload
-    if not isinstance(trigger_payload, dict):
-        return None
-    raw_unit_ids = trigger_payload.get(SELECTED_TARGET_UNIT_CONTEXT_KEY)
-    if not isinstance(raw_unit_ids, list):
-        return None
-    unit_ids: list[str] = []
-    seen: set[str] = set()
-    for raw_unit_id in raw_unit_ids:
-        if type(raw_unit_id) is not str:
-            return None
-        unit_id = _validate_identifier("Selected target unit id", raw_unit_id)
-        if unit_id in seen:
-            return None
-        seen.add(unit_id)
-        unit_ids.append(unit_id)
-    return tuple(sorted(unit_ids))
+    return selected_target_unit_ids_or_none(context.trigger_payload)
 
 
 def _not_selected_to_shoot_target_error(

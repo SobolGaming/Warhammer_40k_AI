@@ -10,7 +10,14 @@ from warhammer40k_core.engine.faction_content.stratagem_activation import (
 from warhammer40k_core.engine.faction_content.stratagem_record_merge import (
     merge_stratagem_records_with_contribution_overrides,
 )
-from warhammer40k_core.engine.rule_execution import GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
+from warhammer40k_core.engine.rule_execution import (
+    GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
+    RuleExecutionContext,
+    RuleExecutionStatus,
+    default_rule_execution_registry,
+    execute_rule_ir,
+)
+from warhammer40k_core.engine.selected_target_context import SELECTED_TARGET_UNIT_CONTEXT_KEY
 from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -71,6 +78,33 @@ def test_ws14_source_backed_stratagem_activation_records_are_runtime_loadable() 
         rule_ir_payload = payload["rule_ir"]
         assert isinstance(rule_ir_payload, dict)
         RuleIR.from_payload(cast(RuleIRPayload, rule_ir_payload))
+
+
+def test_ws14_selected_target_activation_rule_ir_executes_from_structured_context() -> None:
+    profile = next(
+        profile
+        for profile in faction_stratagem_activation_2026_27.stratagem_activation_profiles()
+        if profile.target_policy_id == "selected_target_unit"
+    )
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, profile.rule_ir_payload()))
+    target_unit_id = "army-alpha:selected-target-unit"
+
+    result = execute_rule_ir(
+        rule_ir=rule_ir,
+        context=RuleExecutionContext(
+            game_id="ws14-selected-target-activation",
+            player_id="player-a",
+            battle_round=1,
+            phase=None,
+            active_player_id="player-b",
+            trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [target_unit_id]},
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert result.target_bindings[0]["target_kind"] == "selected_target"
+    assert result.target_bindings[0]["target_unit_instance_ids"] == [target_unit_id]
 
 
 def test_ws14_source_backed_stratagem_activation_does_not_shadow_named_records() -> None:

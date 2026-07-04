@@ -1551,6 +1551,16 @@ def test_phase17c_death_guard_cloud_of_flies_fixture_text_keeps_residual_explici
             RuleEffectKind.GRANT_ABILITY,
         ),
         (
+            (
+                "One friendly INFANTRY unit that was selected as the target gains Stealth "
+                "until the end of the phase."
+            ),
+            None,
+            RuleConditionKind.KEYWORD_GATE,
+            RuleTargetKind.SELECTED_TARGET,
+            RuleEffectKind.GRANT_ABILITY,
+        ),
+        (
             "This unit is eligible to declare a charge in a turn in  which it Advanced.",
             None,
             None,
@@ -1609,6 +1619,23 @@ def test_phase17c_initial_language_families_compile_to_typed_components(
         assert expected_target in targets
     if expected_effect is not None:
         assert expected_effect in effects
+
+
+def test_phase17c_selected_target_source_text_preserves_structured_target_context() -> None:
+    compiled = _compiled(
+        "One ADEPTUS CUSTODES CHARACTER unit from your army that was selected as the "
+        "target of one or more attacks gains Stealth until the end of the phase."
+    )
+    clause = compiled.rule_ir.clauses[0]
+
+    assert compiled.rule_ir.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.SELECTED_TARGET
+    assert parameter_payload(clause.target.parameters) == {
+        "allegiance": "friendly",
+        "required_keyword_sequence": ("ADEPTUS_CUSTODES", "CHARACTER"),
+        "source_context": "selected_target",
+    }
 
 
 def test_phase17c_equivalent_roll_modifier_forms_compile_to_same_semantics() -> None:

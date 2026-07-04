@@ -127,8 +127,8 @@ def test_phase17i_existing_template_report_uses_phase17c_template_families() -> 
     phase17c_family_values = {family.value for family in RuleTemplateFamily}
 
     assert set(template_summary_by_family) <= phase17c_family_values
-    assert template_summary_by_family["selected_target_constraint"].row_count == 1233
-    assert template_summary_by_family["keyword_gate"].row_count == 835
+    assert template_summary_by_family["selected_target_constraint"].row_count == 1234
+    assert template_summary_by_family["keyword_gate"].row_count == 769
     assert template_summary_by_family["dice_roll_modification"].row_count == 184
     assert template_summary_by_family["conditional_weapon_ability_grant"].row_count == 164
     assert template_summary_by_family["characteristic_modification"].row_count == 108

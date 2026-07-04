@@ -47,6 +47,10 @@ from warhammer40k_core.rules.rule_templates import (
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
     rule_template_by_id,
 )
+from warhammer40k_core.rules.selected_target_parser import (
+    is_structural_target_keyword,
+    selected_target_spec_from_text,
+)
 
 RULE_PARSER_VERSION = "phase17c-rule-parser-v1"
 
@@ -1260,7 +1264,7 @@ def _parse_keyword_conditions(
         if _match_inside_ranges(match, target_match_ranges):
             continue
         keyword_text = match.group("keyword")
-        if keyword_text is None or _target_keyword_text_is_structural_relation(keyword_text):
+        if keyword_text is None or is_structural_target_keyword(keyword_text):
             continue
         target_match_ranges.append((match.start(), match.end()))
         conditions.extend(
@@ -1300,16 +1304,6 @@ def _keyword_gate_conditions_from_match(
             match.group("keyword"),
             parser_context=parser_context,
         )
-    )
-
-
-def _target_keyword_text_is_structural_relation(value: str) -> bool:
-    token = " ".join(value.lower().split())
-    return (
-        " within " in f" {token} "
-        or " engagement range" in token
-        or " objective marker range" in token
-        or " hit by " in f" {token} "
     )
 
 
@@ -1423,6 +1417,13 @@ def _parse_target(
             kind=RuleTargetKind.THIS_MODEL if target == "this_model" else RuleTargetKind.THIS_UNIT,
             source_span=_span_from_match(clause_text, return_on_death_match),
         )
+    selected_target_spec = selected_target_spec_from_text(
+        text=clause_text.text,
+        source_start=clause_text.start,
+        source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
+    )
+    if selected_target_spec is not None:
+        return selected_target_spec
     tracked_selection_match = _TRACKED_TARGET_SELECTION_RE.search(clause_text.text)
     if tracked_selection_match is not None:
         allegiance = _lower_group(tracked_selection_match, "allegiance")
@@ -1442,9 +1443,7 @@ def _parse_target(
         )
         pairs: list[tuple[str, RuleParameterValue]] = [("allegiance", allegiance)]
         keyword_text = match.group("keyword")
-        if keyword_text is not None and not _target_keyword_text_is_structural_relation(
-            keyword_text
-        ):
+        if keyword_text is not None and not is_structural_target_keyword(keyword_text):
             pairs.extend(
                 _keyword_sequence_parameter_pairs(
                     keyword_text,
