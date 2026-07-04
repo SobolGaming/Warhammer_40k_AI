@@ -89,6 +89,9 @@ def source_backed_reroll_permission_context_for_unit(
     target_unit_instance_id: str | None = None,
 ) -> SourceBackedRerollPermissionContext | None:
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.generic_rule_attack_hooks import (
+        generic_rule_reroll_permission_context_for_unit,
+    )
     from warhammer40k_core.engine.tracked_targets import (
         tracked_target_reroll_permission_context_for_unit,
     )
@@ -134,6 +137,21 @@ def source_backed_reroll_permission_context_for_unit(
         ):
             continue
         permissions.append(permission_context)
+    generic_context = generic_rule_reroll_permission_context_for_unit(
+        state=state,
+        player_id=requested_player_id,
+        unit_instance_id=requested_unit_id,
+        roll_type=requested_roll_type,
+        timing_window=requested_timing_window,
+        target_unit_instance_id=requested_target_unit_id,
+    )
+    if generic_context is not None:
+        permissions.append(
+            SourceBackedRerollPermissionContext(
+                permission=generic_context.permission,
+                source_payload=generic_context.source_payload,
+            )
+        )
     tracked_context = tracked_target_reroll_permission_context_for_unit(
         state=state,
         player_id=requested_player_id,

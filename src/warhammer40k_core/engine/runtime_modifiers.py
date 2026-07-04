@@ -21,6 +21,7 @@ type UnitCharacteristicModifierHandler = Callable[
 ]
 type HitRollModifierHandler = Callable[["HitRollModifierContext"], int]
 type WoundRollModifierHandler = Callable[["WoundRollModifierContext"], int]
+type DamageRollModifierHandler = Callable[["DamageRollModifierContext"], int]
 type SaveOptionModifierHandler = Callable[
     ["SaveOptionModifierContext"],
     tuple[SaveOption, ...],
@@ -151,10 +152,60 @@ class WoundRollModifierContext:
 
 
 @dataclass(frozen=True, slots=True)
+class DamageRollModifierContext:
+    state: GameState
+    source_phase: BattlePhase
+    attacking_unit_instance_id: str
+    attacker_model_instance_id: str
+    target_unit_instance_id: str
+    weapon_profile: WeaponProfile
+    current_value: int
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(self.state) is not GameState:
+            raise GameLifecycleError("Damage roll modifier state must be GameState.")
+        object.__setattr__(self, "source_phase", _battle_phase_from_token(self.source_phase))
+        object.__setattr__(
+            self,
+            "attacking_unit_instance_id",
+            _validate_identifier(
+                "attacking_unit_instance_id",
+                self.attacking_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "attacker_model_instance_id",
+            _validate_identifier(
+                "attacker_model_instance_id",
+                self.attacker_model_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_instance_id",
+            _validate_identifier("target_unit_instance_id", self.target_unit_instance_id),
+        )
+        if type(self.weapon_profile) is not WeaponProfile:
+            raise GameLifecycleError("Damage roll modifier profile must be WeaponProfile.")
+        object.__setattr__(
+            self,
+            "current_value",
+            _validate_positive_int("current_value", self.current_value),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class SaveOptionModifierContext:
     state: GameState
     target_unit_instance_id: str
     save_options: tuple[SaveOption, ...]
+    source_phase: BattlePhase | None = None
+    attacking_unit_instance_id: str | None = None
+    attacker_model_instance_id: str | None = None
+    weapon_profile: WeaponProfile | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -171,6 +222,29 @@ class SaveOptionModifierContext:
             "save_options",
             _validate_save_option_tuple("save_options", self.save_options),
         )
+        object.__setattr__(
+            self,
+            "source_phase",
+            None if self.source_phase is None else _battle_phase_from_token(self.source_phase),
+        )
+        object.__setattr__(
+            self,
+            "attacking_unit_instance_id",
+            _validate_optional_identifier(
+                "attacking_unit_instance_id",
+                self.attacking_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "attacker_model_instance_id",
+            _validate_optional_identifier(
+                "attacker_model_instance_id",
+                self.attacker_model_instance_id,
+            ),
+        )
+        if self.weapon_profile is not None and type(self.weapon_profile) is not WeaponProfile:
+            raise GameLifecycleError("Save option modifier profile must be WeaponProfile.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -358,6 +432,21 @@ class WoundRollModifierBinding:
 
 
 @dataclass(frozen=True, slots=True)
+class DamageRollModifierBinding:
+    modifier_id: str
+    source_id: str
+    handler: DamageRollModifierHandler
+
+    def __post_init__(self) -> None:
+        _validate_modifier_binding(
+            field_prefix="Damage roll modifier",
+            modifier_id=self.modifier_id,
+            source_id=self.source_id,
+            handler=self.handler,
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class SaveOptionModifierBinding:
     modifier_id: str
     source_id: str
@@ -437,6 +526,7 @@ class RuntimeModifierRegistry:
     unit_characteristic_modifier_bindings: tuple[UnitCharacteristicModifierBinding, ...] = ()
     hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = ()
     wound_roll_modifier_bindings: tuple[WoundRollModifierBinding, ...] = ()
+    damage_roll_modifier_bindings: tuple[DamageRollModifierBinding, ...] = ()
     save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = ()
     movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = ()
     objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = ()
@@ -469,6 +559,15 @@ class RuntimeModifierRegistry:
                 "RuntimeModifierRegistry wound_roll_modifier_bindings",
                 self.wound_roll_modifier_bindings,
                 WoundRollModifierBinding,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "damage_roll_modifier_bindings",
+            _validate_bindings(
+                "RuntimeModifierRegistry damage_roll_modifier_bindings",
+                self.damage_roll_modifier_bindings,
+                DamageRollModifierBinding,
             ),
         )
         object.__setattr__(
@@ -531,6 +630,7 @@ class RuntimeModifierRegistry:
         ] = (),
         hit_roll_modifier_bindings: tuple[HitRollModifierBinding, ...] = (),
         wound_roll_modifier_bindings: tuple[WoundRollModifierBinding, ...] = (),
+        damage_roll_modifier_bindings: tuple[DamageRollModifierBinding, ...] = (),
         save_option_modifier_bindings: tuple[SaveOptionModifierBinding, ...] = (),
         movement_budget_modifier_bindings: tuple[MovementBudgetModifierBinding, ...] = (),
         objective_control_modifier_bindings: tuple[ObjectiveControlModifierBinding, ...] = (),
@@ -541,6 +641,7 @@ class RuntimeModifierRegistry:
             unit_characteristic_modifier_bindings=unit_characteristic_modifier_bindings,
             hit_roll_modifier_bindings=hit_roll_modifier_bindings,
             wound_roll_modifier_bindings=wound_roll_modifier_bindings,
+            damage_roll_modifier_bindings=damage_roll_modifier_bindings,
             save_option_modifier_bindings=save_option_modifier_bindings,
             movement_budget_modifier_bindings=movement_budget_modifier_bindings,
             objective_control_modifier_bindings=objective_control_modifier_bindings,
@@ -556,6 +657,9 @@ class RuntimeModifierRegistry:
 
     def all_wound_roll_bindings(self) -> tuple[WoundRollModifierBinding, ...]:
         return self.wound_roll_modifier_bindings
+
+    def all_damage_roll_bindings(self) -> tuple[DamageRollModifierBinding, ...]:
+        return self.damage_roll_modifier_bindings
 
     def all_save_option_bindings(self) -> tuple[SaveOptionModifierBinding, ...]:
         return self.save_option_modifier_bindings
@@ -586,23 +690,49 @@ class RuntimeModifierRegistry:
     def hit_roll_modifier(self, context: HitRollModifierContext) -> int:
         if type(context) is not HitRollModifierContext:
             raise GameLifecycleError("Hit roll modifiers require a context.")
+        from warhammer40k_core.engine.generic_rule_attack_hooks import (
+            generic_rule_hit_roll_modifier,
+        )
+
         total = 0
         for binding in self.hit_roll_modifier_bindings:
             total += _validate_int(
                 f"{binding.modifier_id} returned modifier",
                 binding.handler(context),
             )
+        total += generic_rule_hit_roll_modifier(context)
         return total
 
     def wound_roll_modifier(self, context: WoundRollModifierContext) -> int:
         if type(context) is not WoundRollModifierContext:
             raise GameLifecycleError("Wound roll modifiers require a context.")
+        from warhammer40k_core.engine.generic_rule_attack_hooks import (
+            generic_rule_wound_roll_modifier,
+        )
+
         total = 0
         for binding in self.wound_roll_modifier_bindings:
             total += _validate_int(
                 f"{binding.modifier_id} returned modifier",
                 binding.handler(context),
             )
+        total += generic_rule_wound_roll_modifier(context)
+        return total
+
+    def damage_roll_modifier(self, context: DamageRollModifierContext) -> int:
+        if type(context) is not DamageRollModifierContext:
+            raise GameLifecycleError("Damage roll modifiers require a context.")
+        from warhammer40k_core.engine.generic_rule_attack_hooks import (
+            generic_rule_damage_roll_modifier,
+        )
+
+        total = 0
+        for binding in self.damage_roll_modifier_bindings:
+            total += _validate_int(
+                f"{binding.modifier_id} returned modifier",
+                binding.handler(context),
+            )
+        total += generic_rule_damage_roll_modifier(context)
         return total
 
     def modified_save_options(
@@ -611,13 +741,17 @@ class RuntimeModifierRegistry:
     ) -> tuple[SaveOption, ...]:
         if type(context) is not SaveOptionModifierContext:
             raise GameLifecycleError("Save option modifiers require a context.")
+        from warhammer40k_core.engine.generic_rule_attack_hooks import (
+            generic_rule_modified_save_options,
+        )
+
         current = context.save_options
         for binding in self.save_option_modifier_bindings:
             current = _validate_save_option_tuple(
                 f"{binding.modifier_id} returned save_options",
                 binding.handler(replace(context, save_options=current)),
             )
-        return current
+        return generic_rule_modified_save_options(replace(context, save_options=current))
 
     def modified_movement_inches(self, context: MovementBudgetModifierContext) -> float:
         if type(context) is not MovementBudgetModifierContext:
@@ -661,13 +795,17 @@ class RuntimeModifierRegistry:
     ) -> WeaponProfile:
         if type(context) is not WeaponProfileModifierContext:
             raise GameLifecycleError("Weapon profile modifiers require a context.")
+        from warhammer40k_core.engine.generic_rule_attack_hooks import (
+            generic_rule_modified_weapon_profile,
+        )
+
         current = context.weapon_profile
         for binding in self.weapon_profile_modifier_bindings:
             current = _validate_weapon_profile(
                 f"{binding.modifier_id} returned weapon profile",
                 binding.handler(replace(context, weapon_profile=current)),
             )
-        return current
+        return generic_rule_modified_weapon_profile(replace(context, weapon_profile=current))
 
 
 def _validate_bindings[T](
@@ -686,6 +824,7 @@ def _validate_bindings[T](
             UnitCharacteristicModifierBinding
             | HitRollModifierBinding
             | WoundRollModifierBinding
+            | DamageRollModifierBinding
             | SaveOptionModifierBinding
             | MovementBudgetModifierBinding
             | ObjectiveControlModifierBinding
@@ -706,6 +845,7 @@ def _modifier_id_for_binding(binding: object) -> str:
         HitRollModifierBinding,
         WoundRollModifierBinding,
         SaveOptionModifierBinding,
+        DamageRollModifierBinding,
         MovementBudgetModifierBinding,
         ObjectiveControlModifierBinding,
         ChargeRollModifierBinding,
@@ -715,6 +855,7 @@ def _modifier_id_for_binding(binding: object) -> str:
             UnitCharacteristicModifierBinding
             | HitRollModifierBinding
             | WoundRollModifierBinding
+            | DamageRollModifierBinding
             | SaveOptionModifierBinding
             | MovementBudgetModifierBinding
             | ObjectiveControlModifierBinding
@@ -822,3 +963,9 @@ def _validate_int(field_name: str, value: object) -> int:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
+
+
+def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(field_name, value)

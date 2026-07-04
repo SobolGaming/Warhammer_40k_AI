@@ -1,0 +1,769 @@
+from __future__ import annotations
+
+from collections.abc import Callable
+from dataclasses import dataclass, replace
+from typing import Literal, cast
+
+from warhammer40k_core.core.attributes import (
+    Characteristic,
+    CharacteristicValue,
+    characteristic_from_token,
+)
+from warhammer40k_core.core.dice import RerollComponentSelectionPolicy, RerollPermission
+from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.core.weapon_profiles import (
+    AbilityDescriptor,
+    AttackProfile,
+    DamageProfile,
+    RangeProfileKind,
+    WeaponKeyword,
+    WeaponProfile,
+    WeaponProfileError,
+    weapon_keyword_from_token,
+)
+from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, PersistingEffect
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.runtime_modifiers import (
+    DamageRollModifierContext,
+    HitRollModifierContext,
+    SaveOptionModifierContext,
+    WeaponProfileModifierContext,
+    WoundRollModifierContext,
+)
+from warhammer40k_core.engine.saves import SaveOption
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
+
+type AttackRole = Literal["attacker", "target"]
+
+_ATTACKER_TARGET_KINDS = frozenset(
+    {
+        RuleTargetKind.FRIENDLY_UNIT,
+        RuleTargetKind.SELECTED_UNIT,
+        RuleTargetKind.THIS_MODEL,
+        RuleTargetKind.THIS_UNIT,
+        RuleTargetKind.WEAPON,
+    }
+)
+_TARGET_TARGET_KINDS = frozenset({RuleTargetKind.ENEMY_UNIT, RuleTargetKind.SELECTED_TARGET})
+_LEGACY_SELF_TARGET_KINDS = frozenset(
+    {
+        RuleTargetKind.FRIENDLY_UNIT,
+        RuleTargetKind.SELECTED_UNIT,
+        RuleTargetKind.THIS_MODEL,
+        RuleTargetKind.THIS_UNIT,
+    }
+)
+
+
+@dataclass(frozen=True, slots=True)
+class GenericRuleRerollPermissionContext:
+    permission: RerollPermission
+    source_payload: dict[str, JsonValue]
+
+    def __post_init__(self) -> None:
+        if type(self.permission) is not RerollPermission:
+            raise GameLifecycleError("Generic RuleIR reroll context requires permission.")
+        source_payload = validate_json_value(self.source_payload)
+        if not isinstance(source_payload, dict):
+            raise GameLifecycleError("Generic RuleIR reroll source payload must be an object.")
+        object.__setattr__(self, "source_payload", source_payload)
+
+
+@dataclass(frozen=True, slots=True)
+class _GenericAttackEffect:
+    persisting_effect: PersistingEffect
+    role: AttackRole
+    source_id: str
+    rule_id: str
+    rule_ir_hash: str
+    clause_id: str
+    target_kind: RuleTargetKind | None
+    effect_kind: RuleEffectKind
+    parameters: dict[str, JsonValue]
+
+
+def generic_rule_hit_roll_modifier(context: HitRollModifierContext) -> int:
+    if type(context) is not HitRollModifierContext:
+        raise GameLifecycleError("Generic hit roll hooks require HitRollModifierContext.")
+    return _dice_roll_modifier_for_attack(
+        state=context.state,
+        attacking_unit_instance_id=context.attacking_unit_instance_id,
+        target_unit_instance_id=context.target_unit_instance_id,
+        expected_roll_type="hit",
+        legacy_attacker_role_allowed=lambda effect: (
+            _required_int_parameter(
+                effect.parameters,
+                key="delta",
+            )
+            >= 0
+        ),
+        legacy_target_role_allowed=lambda effect: (
+            _required_int_parameter(
+                effect.parameters,
+                key="delta",
+            )
+            <= 0
+        ),
+    )
+
+
+def generic_rule_wound_roll_modifier(context: WoundRollModifierContext) -> int:
+    if type(context) is not WoundRollModifierContext:
+        raise GameLifecycleError("Generic wound roll hooks require WoundRollModifierContext.")
+    return _dice_roll_modifier_for_attack(
+        state=context.state,
+        attacking_unit_instance_id=context.attacking_unit_instance_id,
+        target_unit_instance_id=context.target_unit_instance_id,
+        expected_roll_type="wound",
+        legacy_attacker_role_allowed=lambda effect: (
+            _required_int_parameter(
+                effect.parameters,
+                key="delta",
+            )
+            >= 0
+        ),
+        legacy_target_role_allowed=lambda effect: (
+            _required_int_parameter(
+                effect.parameters,
+                key="delta",
+            )
+            <= 0
+        ),
+    )
+
+
+def generic_rule_damage_roll_modifier(context: DamageRollModifierContext) -> int:
+    if type(context) is not DamageRollModifierContext:
+        raise GameLifecycleError("Generic damage roll hooks require DamageRollModifierContext.")
+    return _dice_roll_modifier_for_attack(
+        state=context.state,
+        attacking_unit_instance_id=context.attacking_unit_instance_id,
+        target_unit_instance_id=context.target_unit_instance_id,
+        expected_roll_type="damage",
+        legacy_attacker_role_allowed=lambda effect: (
+            _required_int_parameter(
+                effect.parameters,
+                key="delta",
+            )
+            >= 0
+        ),
+        legacy_target_role_allowed=lambda effect: (
+            _required_int_parameter(
+                effect.parameters,
+                key="delta",
+            )
+            <= 0
+        ),
+    )
+
+
+def generic_rule_modified_save_options(
+    context: SaveOptionModifierContext,
+) -> tuple[SaveOption, ...]:
+    if type(context) is not SaveOptionModifierContext:
+        raise GameLifecycleError("Generic save hooks require SaveOptionModifierContext.")
+    if (
+        context.attacking_unit_instance_id is None
+        or context.attacker_model_instance_id is None
+        or context.weapon_profile is None
+        or context.source_phase is None
+    ):
+        return context.save_options
+    current = context.save_options
+    for effect in _matching_generic_attack_effects(
+        state=context.state,
+        attacking_unit_instance_id=context.attacking_unit_instance_id,
+        target_unit_instance_id=context.target_unit_instance_id,
+        effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
+        legacy_attacker_role_allowed=lambda candidate: (
+            _required_int_parameter(
+                candidate.parameters,
+                key="delta",
+            )
+            <= 0
+        ),
+        legacy_target_role_allowed=lambda candidate: (
+            _required_int_parameter(
+                candidate.parameters,
+                key="delta",
+            )
+            >= 0
+        ),
+    ):
+        if not _roll_type_matches(effect.parameters, expected="save"):
+            continue
+        delta = _required_int_parameter(effect.parameters, key="delta")
+        source_id = _modifier_source_id(effect)
+        current = tuple(
+            _save_option_with_roll_modifier(option, delta, source_id) for option in current
+        )
+    return current
+
+
+def generic_rule_modified_weapon_profile(context: WeaponProfileModifierContext) -> WeaponProfile:
+    if type(context) is not WeaponProfileModifierContext:
+        raise GameLifecycleError("Generic weapon hooks require WeaponProfileModifierContext.")
+    profile = context.weapon_profile
+    for effect in _matching_generic_attack_effects(
+        state=context.state,
+        attacking_unit_instance_id=context.attacking_unit_instance_id,
+        target_unit_instance_id=context.target_unit_instance_id,
+        effect_kind=RuleEffectKind.GRANT_WEAPON_ABILITY,
+        legacy_attacker_role_allowed=lambda _candidate: True,
+        legacy_target_role_allowed=lambda _candidate: False,
+    ):
+        if not _weapon_scope_matches_profile(effect.parameters, profile):
+            continue
+        profile = _profile_with_weapon_ability_grant(profile=profile, effect=effect)
+    for effect in _matching_generic_attack_effects(
+        state=context.state,
+        attacking_unit_instance_id=context.attacking_unit_instance_id,
+        target_unit_instance_id=context.target_unit_instance_id,
+        effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
+        legacy_attacker_role_allowed=lambda _candidate: True,
+        legacy_target_role_allowed=lambda _candidate: False,
+    ):
+        profile = _profile_with_characteristic_modifier(profile=profile, effect=effect)
+    return profile
+
+
+def generic_rule_reroll_permission_context_for_unit(
+    *,
+    state: object,
+    player_id: str,
+    unit_instance_id: str,
+    roll_type: str,
+    timing_window: str,
+    target_unit_instance_id: str | None,
+) -> GenericRuleRerollPermissionContext | None:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Generic RuleIR reroll lookup requires GameState.")
+    requested_player_id = _validate_identifier("player_id", player_id)
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    requested_roll_type = _validate_identifier("roll_type", roll_type)
+    requested_timing_window = _validate_identifier("timing_window", timing_window)
+    requested_target_id = (
+        None
+        if target_unit_instance_id is None
+        else _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    )
+    candidates: list[GenericRuleRerollPermissionContext] = []
+    target_ids = (requested_target_id,) if requested_target_id is not None else ()
+    for effect in _matching_generic_attack_effects(
+        state=state,
+        attacking_unit_instance_id=requested_unit_id,
+        target_unit_instance_id=requested_target_id,
+        effect_kind=RuleEffectKind.REROLL_PERMISSION,
+        legacy_attacker_role_allowed=lambda _candidate: True,
+        legacy_target_role_allowed=lambda _candidate: False,
+        target_unit_lookup_ids=target_ids,
+    ):
+        if effect.persisting_effect.owner_player_id != requested_player_id:
+            continue
+        if not _roll_type_matches(effect.parameters, expected=requested_roll_type):
+            continue
+        expected_window = _timing_window_for_roll_type(effect.parameters, requested_roll_type)
+        if expected_window != requested_timing_window:
+            continue
+        permission = RerollPermission(
+            source_id=_modifier_source_id(effect),
+            timing_window=requested_timing_window,
+            owning_player_id=requested_player_id,
+            eligible_roll_type=requested_roll_type,
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        )
+        candidates.append(
+            GenericRuleRerollPermissionContext(
+                permission=permission,
+                source_payload=_generic_source_payload(effect, requested_target_id),
+            )
+        )
+    if len(candidates) > 1:
+        raise GameLifecycleError("Multiple generic RuleIR reroll permissions are available.")
+    return candidates[0] if candidates else None
+
+
+def _dice_roll_modifier_for_attack(
+    *,
+    state: object,
+    attacking_unit_instance_id: str,
+    target_unit_instance_id: str,
+    expected_roll_type: str,
+    legacy_attacker_role_allowed: Callable[[_GenericAttackEffect], bool],
+    legacy_target_role_allowed: Callable[[_GenericAttackEffect], bool],
+) -> int:
+    total = 0
+    for effect in _matching_generic_attack_effects(
+        state=state,
+        attacking_unit_instance_id=attacking_unit_instance_id,
+        target_unit_instance_id=target_unit_instance_id,
+        effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
+        legacy_attacker_role_allowed=legacy_attacker_role_allowed,
+        legacy_target_role_allowed=legacy_target_role_allowed,
+    ):
+        if not _roll_type_matches(effect.parameters, expected=expected_roll_type):
+            continue
+        total += _required_int_parameter(effect.parameters, key="delta")
+    return total
+
+
+def _matching_generic_attack_effects(
+    *,
+    state: object,
+    attacking_unit_instance_id: str,
+    target_unit_instance_id: str | None,
+    effect_kind: RuleEffectKind,
+    legacy_attacker_role_allowed: Callable[[_GenericAttackEffect], bool],
+    legacy_target_role_allowed: Callable[[_GenericAttackEffect], bool],
+    target_unit_lookup_ids: tuple[str | None, ...] | None = None,
+) -> tuple[_GenericAttackEffect, ...]:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Generic RuleIR attack hooks require GameState.")
+    attacker_id = _validate_identifier("attacking_unit_instance_id", attacking_unit_instance_id)
+    target_id = (
+        None
+        if target_unit_instance_id is None
+        else _validate_identifier("target_unit_instance_id", target_unit_instance_id)
+    )
+    target_lookup_ids = (target_id,) if target_unit_lookup_ids is None else target_unit_lookup_ids
+    role_unit_ids: tuple[tuple[AttackRole, str], ...] = (("attacker", attacker_id),)
+    for raw_target_id in target_lookup_ids:
+        if raw_target_id is None:
+            continue
+        role_unit_ids = (
+            *role_unit_ids,
+            ("target", _validate_identifier("target_unit_instance_id", raw_target_id)),
+        )
+    matches: list[_GenericAttackEffect] = []
+    seen: set[tuple[str, AttackRole]] = set()
+    for role, unit_id in role_unit_ids:
+        for persisting_effect in state.persisting_effects_for_unit(unit_id):
+            generic_effect = _generic_attack_effect_or_none(
+                persisting_effect=persisting_effect,
+                role=role,
+                expected_effect_kind=effect_kind,
+            )
+            if generic_effect is None:
+                continue
+            if not _generic_effect_role_applies(
+                effect=generic_effect,
+                role=role,
+                attacking_unit_instance_id=attacker_id,
+                target_unit_instance_id=target_id,
+                legacy_attacker_role_allowed=legacy_attacker_role_allowed,
+                legacy_target_role_allowed=legacy_target_role_allowed,
+            ):
+                continue
+            key = (generic_effect.persisting_effect.effect_id, role)
+            if key in seen:
+                continue
+            seen.add(key)
+            matches.append(generic_effect)
+    return tuple(sorted(matches, key=lambda effect: _modifier_source_id(effect)))
+
+
+def _generic_attack_effect_or_none(
+    *,
+    persisting_effect: PersistingEffect,
+    role: AttackRole,
+    expected_effect_kind: RuleEffectKind,
+) -> _GenericAttackEffect | None:
+    payload = persisting_effect.effect_payload
+    if not isinstance(payload, dict):
+        return None
+    if payload.get("effect_kind") != GENERIC_RULE_EFFECT_KIND:
+        return None
+    effect_payload = payload.get("effect")
+    if not isinstance(effect_payload, dict):
+        raise GameLifecycleError("Generic RuleIR effect payload must include effect object.")
+    effect_kind = _effect_kind_from_payload(effect_payload)
+    if effect_kind is not expected_effect_kind:
+        return None
+    return _GenericAttackEffect(
+        persisting_effect=persisting_effect,
+        role=role,
+        source_id=_required_identifier_payload(payload, "source_id"),
+        rule_id=_required_identifier_payload(payload, "rule_id"),
+        rule_ir_hash=_required_identifier_payload(payload, "rule_ir_hash"),
+        clause_id=_required_identifier_payload(payload, "clause_id"),
+        target_kind=_target_kind_from_payload(payload),
+        effect_kind=effect_kind,
+        parameters=_parameters_from_effect_payload(effect_payload),
+    )
+
+
+def _generic_effect_role_applies(
+    *,
+    effect: _GenericAttackEffect,
+    role: AttackRole,
+    attacking_unit_instance_id: str,
+    target_unit_instance_id: str | None,
+    legacy_attacker_role_allowed: Callable[[_GenericAttackEffect], bool],
+    legacy_target_role_allowed: Callable[[_GenericAttackEffect], bool],
+) -> bool:
+    requested_role = _attack_role_parameter(effect.parameters)
+    target_ids = set(effect.persisting_effect.target_unit_instance_ids)
+    if requested_role is not None:
+        if requested_role != role:
+            return False
+        if role == "attacker":
+            return attacking_unit_instance_id in target_ids
+        if target_unit_instance_id is None:
+            return False
+        return target_unit_instance_id in target_ids
+    target_kind = effect.target_kind
+    if role == "attacker":
+        return (
+            attacking_unit_instance_id in target_ids
+            and (target_kind is None or target_kind in _ATTACKER_TARGET_KINDS)
+            and legacy_attacker_role_allowed(effect)
+        )
+    if target_unit_instance_id is None or target_unit_instance_id not in target_ids:
+        return False
+    if target_kind in _TARGET_TARGET_KINDS:
+        return True
+    if target_kind is None or target_kind in _LEGACY_SELF_TARGET_KINDS:
+        return legacy_target_role_allowed(effect)
+    return False
+
+
+def _roll_type_matches(parameters: dict[str, JsonValue], *, expected: str) -> bool:
+    roll_type = _required_string_parameter(parameters, key="roll_type")
+    requested = _roll_type_suffix(expected)
+    return _roll_type_suffix(roll_type) == requested
+
+
+def _roll_type_suffix(roll_type: str) -> str:
+    token = _validate_identifier("roll_type", roll_type)
+    return token.rsplit(".", maxsplit=1)[-1]
+
+
+def _timing_window_for_roll_type(
+    parameters: dict[str, JsonValue],
+    requested_roll_type: str,
+) -> str:
+    timing_window = parameters.get("timing_window")
+    if timing_window is not None:
+        if type(timing_window) is not str:
+            raise GameLifecycleError("Generic RuleIR timing_window must be a string.")
+        return _validate_identifier("timing_window", timing_window)
+    roll_suffix = _roll_type_suffix(_required_string_parameter(parameters, key="roll_type"))
+    requested_suffix = _roll_type_suffix(requested_roll_type)
+    if roll_suffix != requested_suffix:
+        raise GameLifecycleError("Generic RuleIR reroll roll_type drift.")
+    return requested_roll_type
+
+
+def _save_option_with_roll_modifier(
+    option: SaveOption,
+    delta: int,
+    source_id: str,
+) -> SaveOption:
+    if type(option) is not SaveOption:
+        raise GameLifecycleError("Generic save modifier requires SaveOption.")
+    modified_target = max(2, option.target_number - delta)
+    modified_characteristic_target = max(2, option.characteristic_target_number - delta)
+    source_ids = option.source_rule_ids
+    if source_id not in source_ids:
+        source_ids = tuple(sorted((*source_ids, source_id)))
+    return replace(
+        option,
+        target_number=modified_target,
+        characteristic_target_number=modified_characteristic_target,
+        source_rule_ids=source_ids,
+    )
+
+
+def _profile_with_weapon_ability_grant(
+    *,
+    profile: WeaponProfile,
+    effect: _GenericAttackEffect,
+) -> WeaponProfile:
+    if type(profile) is not WeaponProfile:
+        raise GameLifecycleError("Generic weapon ability grant requires WeaponProfile.")
+    keyword = _weapon_keyword_parameter(effect.parameters)
+    ability = _weapon_ability_descriptor(effect.parameters, keyword=keyword)
+    keywords = profile.keywords
+    if keyword not in keywords:
+        keywords = tuple(sorted((*keywords, keyword), key=lambda value: value.value))
+    abilities = profile.abilities
+    if ability is not None and all(
+        existing.ability_id != ability.ability_id for existing in abilities
+    ):
+        abilities = tuple(sorted((*abilities, ability), key=lambda value: value.ability_id))
+    source_ids = _source_ids_with(profile.source_ids, _modifier_source_id(effect))
+    if (
+        keywords == profile.keywords
+        and abilities == profile.abilities
+        and source_ids == profile.source_ids
+    ):
+        return profile
+    return replace(profile, keywords=keywords, abilities=abilities, source_ids=source_ids)
+
+
+def _profile_with_characteristic_modifier(
+    *,
+    profile: WeaponProfile,
+    effect: _GenericAttackEffect,
+) -> WeaponProfile:
+    characteristic = _characteristic_parameter(effect.parameters)
+    delta = _required_int_parameter(effect.parameters, key="delta")
+    source_ids = _source_ids_with(profile.source_ids, _modifier_source_id(effect))
+    if characteristic is Characteristic.STRENGTH:
+        return replace(
+            profile,
+            strength=_modified_characteristic_value(profile.strength, delta),
+            source_ids=source_ids,
+        )
+    if characteristic is Characteristic.ARMOR_PENETRATION:
+        return replace(
+            profile,
+            armor_penetration=_modified_characteristic_value(profile.armor_penetration, delta),
+            source_ids=source_ids,
+        )
+    if characteristic in {Characteristic.BALLISTIC_SKILL, Characteristic.WEAPON_SKILL}:
+        if profile.skill.characteristic is not characteristic:
+            return replace(profile, source_ids=source_ids)
+        return replace(
+            profile,
+            skill=_modified_characteristic_value(profile.skill, delta),
+            source_ids=source_ids,
+        )
+    if characteristic is Characteristic.ATTACKS:
+        return replace(
+            profile,
+            attack_profile=_modified_attack_profile(profile.attack_profile, delta),
+            source_ids=source_ids,
+        )
+    if characteristic is Characteristic.DAMAGE:
+        return replace(
+            profile,
+            damage_profile=_modified_damage_profile(profile.damage_profile, delta),
+            source_ids=source_ids,
+        )
+    return profile
+
+
+def _modified_characteristic_value(value: CharacteristicValue, delta: int) -> CharacteristicValue:
+    if type(value) is not CharacteristicValue:
+        raise GameLifecycleError("Generic characteristic modifier requires value.")
+    if not value.is_numeric:
+        raise GameLifecycleError("Generic characteristic modifier cannot modify dash values.")
+    return CharacteristicValue.from_raw(value.characteristic, value.final + delta)
+
+
+def _modified_attack_profile(profile: AttackProfile, delta: int) -> AttackProfile:
+    if type(profile) is not AttackProfile:
+        raise GameLifecycleError("Generic Attacks modifier requires AttackProfile.")
+    if profile.fixed_attacks is not None:
+        return AttackProfile.fixed(max(1, profile.fixed_attacks + delta))
+    if profile.dice_expression is None:
+        raise GameLifecycleError("AttackProfile requires fixed attacks or dice expression.")
+    return AttackProfile.dice(
+        replace(profile.dice_expression, modifier=profile.dice_expression.modifier + delta)
+    )
+
+
+def _modified_damage_profile(profile: DamageProfile, delta: int) -> DamageProfile:
+    if type(profile) is not DamageProfile:
+        raise GameLifecycleError("Generic Damage modifier requires DamageProfile.")
+    if profile.fixed_damage is not None:
+        return DamageProfile.fixed(max(1, profile.fixed_damage + delta))
+    if profile.dice_expression is None:
+        raise GameLifecycleError("DamageProfile requires fixed damage or dice expression.")
+    return DamageProfile.dice(
+        replace(profile.dice_expression, modifier=profile.dice_expression.modifier + delta)
+    )
+
+
+def _weapon_scope_matches_profile(
+    parameters: dict[str, JsonValue],
+    profile: WeaponProfile,
+) -> bool:
+    if type(profile) is not WeaponProfile:
+        raise GameLifecycleError("Generic weapon scope requires WeaponProfile.")
+    scope = parameters.get("weapon_scope")
+    if scope is None:
+        return True
+    if type(scope) is not str:
+        raise GameLifecycleError("Generic weapon_scope must be a string.")
+    if scope == "all":
+        return True
+    if scope == "melee":
+        return profile.range_profile.kind is RangeProfileKind.MELEE
+    if scope == "ranged":
+        return profile.range_profile.kind is RangeProfileKind.DISTANCE
+    raise GameLifecycleError("Unsupported generic weapon_scope.")
+
+
+def _weapon_keyword_parameter(parameters: dict[str, JsonValue]) -> WeaponKeyword:
+    value = _required_string_parameter(parameters, key="weapon_ability")
+    try:
+        return weapon_keyword_from_token(value)
+    except WeaponProfileError as exc:
+        raise GameLifecycleError("Generic weapon ability grant has unsupported keyword.") from exc
+
+
+def _weapon_ability_descriptor(
+    parameters: dict[str, JsonValue],
+    *,
+    keyword: WeaponKeyword,
+) -> AbilityDescriptor | None:
+    if keyword is WeaponKeyword.LETHAL_HITS:
+        return AbilityDescriptor.lethal_hits()
+    if keyword is WeaponKeyword.DEVASTATING_WOUNDS:
+        return AbilityDescriptor.devastating_wounds()
+    if keyword is WeaponKeyword.HEAVY:
+        return AbilityDescriptor.heavy()
+    if keyword is WeaponKeyword.SUSTAINED_HITS:
+        return AbilityDescriptor.sustained_hits(_required_weapon_ability_value(parameters))
+    if keyword is WeaponKeyword.RAPID_FIRE:
+        return AbilityDescriptor.rapid_fire(_required_positive_int_parameter(parameters))
+    if keyword is WeaponKeyword.MELTA:
+        return AbilityDescriptor.melta(_required_positive_int_parameter(parameters))
+    if keyword is WeaponKeyword.CLEAVE:
+        return AbilityDescriptor.cleave(_required_positive_int_parameter(parameters))
+    if keyword is WeaponKeyword.HUNTER:
+        raise GameLifecycleError("Generic weapon ability grant cannot infer Hunter targets.")
+    return None
+
+
+def _characteristic_parameter(parameters: dict[str, JsonValue]) -> Characteristic:
+    value = _required_string_parameter(parameters, key="characteristic")
+    try:
+        return characteristic_from_token(value)
+    except ValueError as exc:
+        raise GameLifecycleError("Generic characteristic modifier is unsupported.") from exc
+
+
+def _effect_kind_from_payload(effect_payload: dict[str, JsonValue]) -> RuleEffectKind:
+    value = effect_payload.get("kind")
+    if type(value) is not str:
+        raise GameLifecycleError("Generic RuleIR effect kind must be a string.")
+    try:
+        return RuleEffectKind(value)
+    except ValueError as exc:
+        raise GameLifecycleError("Generic RuleIR effect kind is unsupported.") from exc
+
+
+def _target_kind_from_payload(payload: dict[str, JsonValue]) -> RuleTargetKind | None:
+    target_payload = payload.get("target")
+    if target_payload is None:
+        return None
+    if not isinstance(target_payload, dict):
+        raise GameLifecycleError("Generic RuleIR target payload must be an object.")
+    value = target_payload.get("kind")
+    if type(value) is not str:
+        raise GameLifecycleError("Generic RuleIR target kind must be a string.")
+    try:
+        return RuleTargetKind(value)
+    except ValueError as exc:
+        raise GameLifecycleError("Generic RuleIR target kind is unsupported.") from exc
+
+
+def _parameters_from_effect_payload(effect_payload: dict[str, JsonValue]) -> dict[str, JsonValue]:
+    raw_parameters = effect_payload.get("parameters")
+    if not isinstance(raw_parameters, list):
+        raise GameLifecycleError("Generic RuleIR effect parameters must be a list.")
+    parameters: dict[str, JsonValue] = {}
+    for raw_parameter in raw_parameters:
+        if not isinstance(raw_parameter, dict):
+            raise GameLifecycleError("Generic RuleIR parameter must be an object.")
+        key = raw_parameter.get("key")
+        if type(key) is not str:
+            raise GameLifecycleError("Generic RuleIR parameter key must be a string.")
+        parameter_key = _validate_identifier("parameter key", key)
+        if parameter_key in parameters:
+            raise GameLifecycleError("Generic RuleIR parameters must not duplicate keys.")
+        if "value" not in raw_parameter:
+            raise GameLifecycleError("Generic RuleIR parameter requires value.")
+        parameters[parameter_key] = validate_json_value(raw_parameter["value"])
+    return parameters
+
+
+def _attack_role_parameter(parameters: dict[str, JsonValue]) -> AttackRole | None:
+    value = parameters.get("attack_role")
+    if value is None:
+        return None
+    if value not in {"attacker", "target"}:
+        raise GameLifecycleError("Generic RuleIR attack_role must be attacker or target.")
+    return cast(AttackRole, value)
+
+
+def _required_string_parameter(parameters: dict[str, JsonValue], *, key: str) -> str:
+    value = parameters.get(key)
+    if type(value) is not str or not value.strip():
+        raise GameLifecycleError(f"Generic RuleIR parameter {key} must be a string.")
+    return value
+
+
+def _required_int_parameter(parameters: dict[str, JsonValue], *, key: str) -> int:
+    value = parameters.get(key)
+    if type(value) is not int:
+        raise GameLifecycleError(f"Generic RuleIR parameter {key} must be an int.")
+    return value
+
+
+def _required_weapon_ability_value(parameters: dict[str, JsonValue]) -> int | str:
+    value = parameters.get("weapon_ability_value")
+    if type(value) in {int, str}:
+        if type(value) is int and value < 1:
+            raise GameLifecycleError("Generic weapon_ability_value must be positive.")
+        if type(value) is str and not value.strip():
+            raise GameLifecycleError("Generic weapon_ability_value must not be empty.")
+        return cast(int | str, value)
+    raise GameLifecycleError("Generic weapon_ability_value is required.")
+
+
+def _required_positive_int_parameter(parameters: dict[str, JsonValue]) -> int:
+    value = parameters.get("weapon_ability_value")
+    if type(value) is not int or value < 1:
+        raise GameLifecycleError("Generic weapon_ability_value must be a positive int.")
+    return value
+
+
+def _required_identifier_payload(payload: dict[str, JsonValue], key: str) -> str:
+    value = payload.get(key)
+    if type(value) is not str:
+        raise GameLifecycleError(f"Generic RuleIR payload {key} must be a string.")
+    return _validate_identifier(key, value)
+
+
+def _modifier_source_id(effect: _GenericAttackEffect) -> str:
+    return _validate_identifier(
+        "generic modifier source_id",
+        f"{effect.source_id}:{effect.clause_id}:{effect.effect_kind.value}",
+    )
+
+
+def _source_ids_with(source_ids: tuple[str, ...], source_id: str) -> tuple[str, ...]:
+    if source_id in source_ids:
+        return source_ids
+    return tuple(sorted((*source_ids, source_id)))
+
+
+def _generic_source_payload(
+    effect: _GenericAttackEffect,
+    target_unit_instance_id: str | None,
+) -> dict[str, JsonValue]:
+    payload: dict[str, JsonValue] = {
+        "effect_kind": GENERIC_RULE_EFFECT_KIND,
+        "rule_id": effect.rule_id,
+        "source_id": effect.source_id,
+        "rule_ir_hash": effect.rule_ir_hash,
+        "clause_id": effect.clause_id,
+        "effect_id": effect.persisting_effect.effect_id,
+        "target_role": effect.role,
+        "target_kind": None if effect.target_kind is None else effect.target_kind.value,
+    }
+    if target_unit_instance_id is not None:
+        payload["target_unit_instance_id"] = target_unit_instance_id
+    return payload
+
+
+_validate_identifier = IdentifierValidator(GameLifecycleError)

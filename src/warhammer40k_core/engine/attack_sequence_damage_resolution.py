@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.attack_sequence_damage_helpers import (
+    no_save_damage_order_roll_spec as _no_save_damage_order_roll_spec,
+)
 from warhammer40k_core.engine.attack_sequence_imports import *
 
 # fmt: off
@@ -58,20 +61,6 @@ __all__ = (
     "_save_options_for_allocation",
     "_unit_has_model_within_deadly_demise_range",
 )
-
-
-def _no_save_damage_order_roll_spec(
-    *,
-    player_id: str,
-    allocated_model_id: str,
-    attack_context_id: str,
-) -> DiceRollSpec:
-    return DiceRollSpec(
-        expression=DiceExpression(quantity=1, sides=6),
-        reason=f"No-save damage order die for {allocated_model_id} from {attack_context_id}",
-        roll_type="attack_sequence.allocation_order.no_save",
-        actor_id=player_id,
-    )
 
 
 def _save_options_for_allocation(
@@ -130,7 +119,11 @@ def _save_options_for_allocation(
     save_options = runtime_modifiers.modified_save_options(
         SaveOptionModifierContext(
             state=state,
+            source_phase=attack_sequence.source_phase,
+            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            attacker_model_instance_id=pool.attacker_model_instance_id,
             target_unit_instance_id=pool.target_unit_instance_id,
+            weapon_profile=pool.weapon_profile,
             save_options=save_options_for_model(
                 model=model_by_id(state=state, model_instance_id=allocated_model_id),
                 armor_penetration=pool.weapon_profile.armor_penetration.final,
