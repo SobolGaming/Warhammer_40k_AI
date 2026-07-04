@@ -44,6 +44,11 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_2026_06 as event_companion_source,
 )
+from warhammer40k_core.rules.wahapedia_bridge_rows import (
+    BridgeSourceArtifact,
+    bridge_rows_by_table,
+    resolve_bridge_ability_source_row,
+)
 from warhammer40k_core.rules.wahapedia_schema import (
     NormalizedSourceRow,
     WahapediaCsvTable,
@@ -204,7 +209,7 @@ _DAEMONIC_ALLEGIANCE_KEYWORDS = ("KHORNE", "TZEENTCH", "NURGLE", "SLAANESH")
 
 def build_wahapedia_canonical_bridge_artifacts(
     *,
-    source_artifacts: tuple[WahapediaJsonArtifact, ...],
+    source_artifacts: tuple[BridgeSourceArtifact, ...],
     bridge_package_id: DataPackageId,
     datasheet_ids: tuple[str, ...],
     pdf_corrections: tuple[PdfDatasheetCorrection, ...] | None = None,
@@ -219,7 +224,7 @@ def build_wahapedia_canonical_bridge_artifacts(
     selected_datasheet_ids = _validate_identifier_tuple("datasheet_ids", datasheet_ids)
     if not selected_datasheet_ids:
         raise WahapediaBridgeError("datasheet_ids must not be empty.")
-    rows_by_table = _rows_by_table(source_artifacts)
+    rows_by_table = bridge_rows_by_table(source_artifacts, error_type=WahapediaBridgeError)
     selected_pdf_corrections = (
         DEFAULT_PDF_CORRECTIONS if pdf_corrections is None else pdf_corrections
     )
@@ -669,20 +674,11 @@ def _faction_ability_row(*, context: _BridgeContext, datasheet_id: str) -> Norma
 def _ability_source_row(
     *, context: _BridgeContext, ability_row: NormalizedSourceRow
 ) -> NormalizedSourceRow:
-    ability_id = _required_field(ability_row, "ability_id")
-    candidate_rows = tuple(
-        row
-        for row in context.rows_by_table.get("Abilities", ())
-        if _required_field(row, "id") == ability_id
+    return resolve_bridge_ability_source_row(
+        rows_by_table=context.rows_by_table,
+        ability_row=ability_row,
+        error_type=WahapediaBridgeError,
     )
-    if not candidate_rows:
-        raise WahapediaBridgeError("Datasheet ability link references a missing ability row.")
-    if len(candidate_rows) == 1:
-        return candidate_rows[0]
-    for row in candidate_rows:
-        if not _required_field(row, "faction_id"):
-            return row
-    raise WahapediaBridgeError("Datasheet ability link is ambiguous.")
 
 
 def _bridge_unit_composition(
@@ -1465,20 +1461,6 @@ def _raise_for_unparsed_damaged_text(
     stripped = _DAMAGED_IGNORABLE_REMAINDER_RE.sub("", remainder)
     if stripped:
         raise WahapediaBridgeError("DAMAGED section contains unsupported effect text.")
-
-
-def _rows_by_table(
-    source_artifacts: tuple[WahapediaJsonArtifact, ...],
-) -> dict[str, tuple[NormalizedSourceRow, ...]]:
-    rows_by_table: dict[str, tuple[NormalizedSourceRow, ...]] = {}
-    for artifact in source_artifacts:
-        if type(artifact) is not WahapediaJsonArtifact:
-            raise WahapediaBridgeError(
-                "source_artifacts must contain WahapediaJsonArtifact values."
-            )
-        existing = rows_by_table.get(artifact.source_table, ())
-        rows_by_table[artifact.source_table] = (*existing, *artifact.rows)
-    return rows_by_table
 
 
 def _empty_bridge_rows() -> dict[str, list[dict[str, str]]]:
