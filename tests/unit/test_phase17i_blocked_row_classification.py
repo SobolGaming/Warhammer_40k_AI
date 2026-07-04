@@ -94,7 +94,7 @@ def test_phase17i_missing_capability_report_groups_rows_by_family() -> None:
         "detachment_stratagem": 1077,
         "faction_army_rule": 5,
     }
-    assert summary_by_family["unrepresented_rule_language"].row_count == 1920
+    assert summary_by_family["unrepresented_rule_language"].row_count == 1919
     assert summary_by_family["stratagem_activation_and_targeting"].coverage_kind_counts == {
         "detachment_stratagem": 1077
     }

@@ -24,7 +24,6 @@ from warhammer40k_core.engine.command_points import (
 )
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
-    EffectExpiration,
     PersistingEffect,
     generic_rule_persisting_effect,
 )
@@ -37,8 +36,11 @@ from warhammer40k_core.engine.event_log import (
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rule_duration_execution import (
+    expiration_for_duration,
+    rule_duration_unavailable_reason,
+)
 from warhammer40k_core.engine.rule_target_resolution import (
-    clause_requires_unit_target,
     effect_clause_target_unavailable_reason,
     target_binding_clause_unavailable_reason,
     target_unit_instance_ids_for_clause,
@@ -54,8 +56,6 @@ from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleCondition,
     RuleConditionKind,
-    RuleDuration,
-    RuleDurationKind,
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
@@ -1081,7 +1081,7 @@ def _persisting_effect_or_none(
     )
     if context.state is None or not target_unit_instance_ids or clause.duration is None:
         return None
-    expiration = _expiration_for_duration(duration=clause.duration, context=context)
+    expiration = expiration_for_duration(duration=clause.duration, context=context)
     if expiration is None:
         return None
     effect = generic_rule_persisting_effect(
@@ -1096,41 +1096,6 @@ def _persisting_effect_or_none(
     )
     context.state.record_persisting_effect(effect)
     return effect
-
-
-def _expiration_for_duration(
-    *,
-    duration: RuleDuration,
-    context: RuleExecutionContext,
-) -> EffectExpiration | None:
-    if duration.kind is RuleDurationKind.IMMEDIATE:
-        return None
-    if duration.kind is RuleDurationKind.PERMANENT:
-        return EffectExpiration.end_of_battle()
-    parameters = parameter_payload(duration.parameters)
-    endpoint = parameters.get("endpoint")
-    if duration.kind is RuleDurationKind.UNTIL_TIMING_ENDPOINT:
-        if endpoint == "phase":
-            if context.phase is None:
-                raise GameLifecycleError("Phase duration requires execution phase.")
-            return EffectExpiration.end_phase(
-                battle_round=context.battle_round,
-                phase=context.phase,
-                player_id=context.player_id,
-            )
-        if endpoint == "turn":
-            return EffectExpiration.end_turn(
-                battle_round=context.battle_round,
-                player_id=context.player_id,
-            )
-        if endpoint == "battle round":
-            return EffectExpiration.end_battle_round(battle_round=context.battle_round)
-        if endpoint == "battle":
-            return EffectExpiration.end_of_battle()
-        raise GameLifecycleError("Unsupported rule duration endpoint.")
-    if duration.kind is RuleDurationKind.WHILE_CONDITION_TRUE:
-        return None
-    raise GameLifecycleError("Unsupported rule duration kind.")
 
 
 def _aura_affected_unit_ids(
@@ -1265,7 +1230,7 @@ def _clause_semantic_unavailable_reason(
     target_reason = effect_clause_target_unavailable_reason(clause=clause, context=context)
     if target_reason is not None:
         return target_reason
-    duration_reason = _duration_unavailable_reason(clause=clause, context=context)
+    duration_reason = rule_duration_unavailable_reason(clause=clause, context=context)
     if duration_reason is not None:
         return duration_reason
     for effect in clause.effects:
@@ -1403,27 +1368,6 @@ def _this_model_constraint_unavailable_reason(context: RuleExecutionContext) -> 
         model_unit_id = state.unit_instance_id_for_model(source_model_id)
         if source_unit_id is not None and model_unit_id != source_unit_id:
             return "source_model_unit_mismatch"
-    return None
-
-
-def _duration_unavailable_reason(
-    *,
-    clause: RuleClause,
-    context: RuleExecutionContext,
-) -> str | None:
-    if clause.duration is None:
-        return None
-    if (
-        clause.duration.kind is not RuleDurationKind.IMMEDIATE
-        and clause_requires_unit_target(clause)
-        and context.state is None
-    ):
-        return "missing_input:game_state"
-    if clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT:
-        return None
-    parameters = parameter_payload(clause.duration.parameters)
-    if parameters.get("endpoint") == "phase" and context.phase is None:
-        return "missing_phase"
     return None
 
 

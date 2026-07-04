@@ -963,6 +963,94 @@ def test_phase17d_duration_endpoint_variants_record_persisting_effects(
     )
 
 
+def test_phase17d_current_phase_duration_expires_on_active_player_boundary() -> None:
+    state = _battle_state_with_scenario()
+    state.active_player_id = "player-b"
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    compiled = _compiled("That unit gains Stealth until the end of the phase.")
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=state,
+            target_unit_instance_ids=(target_unit_id,),
+            phase=BattlePhaseKind.SHOOTING,
+            active_player_id="player-b",
+        ),
+        registry=default_rule_execution_registry(),
+    )
+    expiration = result.created_persisting_effects[0].expiration
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert expiration.expiration_kind.value == "end_phase"
+    assert expiration.player_id == "player-b"
+    assert expiration.phase is BattlePhaseKind.SHOOTING
+
+
+@pytest.mark.parametrize(
+    ("raw_text", "phase", "active_player_id", "expected_expiration"),
+    [
+        (
+            "That unit has the Stealth ability until your next Command phase.",
+            BattlePhaseKind.SHOOTING,
+            "player-a",
+            {
+                "expiration_kind": "start_phase",
+                "battle_round": 2,
+                "phase": "command",
+                "player_id": "player-a",
+            },
+        ),
+        (
+            "That unit has the Stealth ability until the end of your next turn.",
+            BattlePhaseKind.SHOOTING,
+            "player-a",
+            {
+                "expiration_kind": "end_turn",
+                "battle_round": 2,
+                "phase": None,
+                "player_id": "player-a",
+            },
+        ),
+        (
+            "That unit has the Stealth ability until the start of opponent's next turn.",
+            BattlePhaseKind.SHOOTING,
+            "player-a",
+            {
+                "expiration_kind": "start_turn",
+                "battle_round": 1,
+                "phase": None,
+                "player_id": "player-b",
+            },
+        ),
+    ],
+)
+def test_phase17d_relative_duration_endpoints_record_lifecycle_expiration(
+    raw_text: str,
+    phase: BattlePhaseKind,
+    active_player_id: str,
+    expected_expiration: dict[str, object],
+) -> None:
+    state = _battle_state_with_scenario()
+    state.active_player_id = active_player_id
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    compiled = _compiled(raw_text)
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=state,
+            target_unit_instance_ids=(target_unit_id,),
+            phase=phase,
+            active_player_id=active_player_id,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert result.created_persisting_effects[0].expiration.to_payload() == expected_expiration
+
+
 def test_phase17d_phase_duration_requires_phase_before_mutation() -> None:
     state = _battle_state_with_scenario()
     event_log = EventLog()
@@ -2209,13 +2297,14 @@ def _execution_context(
     target_unit_instance_ids: tuple[str, ...] = (),
     trigger_payload: JsonValue = None,
     phase: BattlePhaseKind | None = BattlePhaseKind.COMMAND,
+    active_player_id: str | None = "player-a",
 ) -> RuleExecutionContext:
     return RuleExecutionContext(
         game_id="phase17d-game",
         player_id="player-a",
         battle_round=1,
         phase=phase,
-        active_player_id="player-a",
+        active_player_id=active_player_id,
         timing_window_id="phase17d:test-window",
         source_unit_instance_id=source_unit_instance_id,
         source_model_instance_id=source_model_instance_id,

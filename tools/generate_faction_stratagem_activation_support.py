@@ -5,8 +5,13 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
+from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
+from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14,
     faction_subrules_2026_27,
 )
 
@@ -37,7 +42,7 @@ SOURCE_VERSION = "2026-27"
 SOURCE_DATE = "2026-06-21"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-phase17s-stratagem-activation-v1"
 RULE_IR_NORMALIZED_TEXT = "stratagem_activation_target_binding"
-RULE_IR_PARSER_VERSION = "phase17s-stratagem-activation-template-v1"
+RULE_IR_PARSER_VERSION = "phase17s-stratagem-activation-template-v2"
 RULE_IR_SCHEMA_VERSION = "phase17c-rule-ir-v1"
 RULE_IR_TEMPLATE_ID = "phase17s:stratagem-activation-target-binding"
 
@@ -97,6 +102,7 @@ class ActivationProfile:
     excluded_keywords: tuple[str, ...]
     excluded_faction_keywords: tuple[str, ...]
     rule_ir_hash: str
+    compiled_rule_ir_payload: RuleIRPayload | None
 
     def constructor_line(self) -> str:
         values = (
@@ -178,11 +184,20 @@ def _activation_profile(
         target_kind=target_kind,
         target_policy_id=target_policy_id,
     )
-    rule_ir_hash = _rule_ir_hash(
+    compiled_rule_ir_payload = _compiled_stratagem_rule_ir_payload_or_none(
         profile_id=profile_id,
         source_id=source_row.source_id,
         rule_target_kind=rule_target_kind,
+        effect_descriptor=sections["effect"],
     )
+    if compiled_rule_ir_payload is None:
+        rule_ir_hash = _rule_ir_hash(
+            profile_id=profile_id,
+            source_id=source_row.source_id,
+            rule_target_kind=rule_target_kind,
+        )
+    else:
+        rule_ir_hash = str(compiled_rule_ir_payload["ir_hash"])
     return ActivationProfile(
         profile_id=profile_id,
         source_row_id=source_row.source_row_id,
@@ -207,6 +222,7 @@ def _activation_profile(
         excluded_keywords=_excluded_keywords(target_descriptor),
         excluded_faction_keywords=(),
         rule_ir_hash=rule_ir_hash,
+        compiled_rule_ir_payload=compiled_rule_ir_payload,
     )
 
 
@@ -388,6 +404,147 @@ def _rule_ir_hash(*, profile_id: str, source_id: str, rule_target_kind: str) -> 
     return _sha256_payload(payload)
 
 
+def _compiled_stratagem_rule_ir_payload_or_none(
+    *,
+    profile_id: str,
+    source_id: str,
+    rule_target_kind: str,
+    effect_descriptor: str,
+) -> RuleIRPayload | None:
+    compiled = compile_rule_source_text(
+        RuleSourceText.from_raw(source_id=source_id, raw_text=effect_descriptor),
+        source_keyword_sequence_parts=(
+            datasheet_keyword_lexicon_2026_06_14.canonical_datasheet_keyword_sequence_parts()
+        ),
+    ).rule_ir
+    if not compiled.is_supported or not any(clause.effects for clause in compiled.clauses):
+        return None
+    effect_payload = compiled.to_payload()
+    activation_text = RULE_IR_NORMALIZED_TEXT
+    effect_text = str(effect_payload["normalized_text"])
+    normalized_text = f"{activation_text}\n{effect_text}"
+    activation_span = {
+        "text": activation_text,
+        "start": 0,
+        "end": len(activation_text),
+    }
+    effect_offset = len(activation_text) + 1
+    clauses: list[dict[str, object]] = [
+        _target_binding_clause_payload(
+            profile_id=profile_id,
+            rule_target_kind=rule_target_kind,
+            span=activation_span,
+        )
+    ]
+    for index, clause in enumerate(effect_payload["clauses"], start=1):
+        clauses.append(
+            _shift_clause_payload(
+                clause=clause,
+                offset=effect_offset,
+                clause_id=f"{profile_id}:effect:{index:03d}",
+            )
+        )
+    payload = {
+        "rule_id": profile_id,
+        "source_id": source_id,
+        "normalized_text": normalized_text,
+        "parser_version": RULE_IR_PARSER_VERSION,
+        "schema_version": RULE_IR_SCHEMA_VERSION,
+        "clauses": clauses,
+        "diagnostics": [],
+        "ir_hash": "",
+    }
+    payload["ir_hash"] = _sha256_payload(payload)
+    return RuleIR.from_payload(cast(RuleIRPayload, payload)).to_payload()
+
+
+def _target_binding_clause_payload(
+    *,
+    profile_id: str,
+    rule_target_kind: str,
+    span: dict[str, object],
+) -> dict[str, object]:
+    return {
+        "clause_id": f"{profile_id}:target-binding",
+        "template_id": RULE_IR_TEMPLATE_ID,
+        "source_span": span,
+        "trigger": None,
+        "conditions": [],
+        "target": {
+            "kind": rule_target_kind,
+            "source_span": span,
+            "parameters": [],
+        },
+        "effects": [],
+        "duration": None,
+        "unsupported_reason": None,
+        "diagnostics": [],
+    }
+
+
+def _shift_clause_payload(
+    *,
+    clause: object,
+    offset: int,
+    clause_id: str,
+) -> dict[str, object]:
+    if not isinstance(clause, dict):
+        raise TypeError("Compiled RuleIR clause payload must be an object.")
+    shifted = dict(clause)
+    shifted["clause_id"] = clause_id
+    shifted["source_span"] = _shift_span_payload(shifted["source_span"], offset=offset)
+    trigger = shifted["trigger"]
+    if trigger is not None:
+        shifted["trigger"] = _shift_component_payload(trigger, offset=offset)
+    shifted["conditions"] = [
+        _shift_component_payload(condition, offset=offset)
+        for condition in _object_list(shifted["conditions"], "conditions")
+    ]
+    target = shifted["target"]
+    if target is not None:
+        shifted["target"] = _shift_component_payload(target, offset=offset)
+    shifted["effects"] = [
+        _shift_component_payload(effect, offset=offset)
+        for effect in _object_list(shifted["effects"], "effects")
+    ]
+    duration = shifted["duration"]
+    if duration is not None:
+        shifted["duration"] = _shift_component_payload(duration, offset=offset)
+    shifted["diagnostics"] = [
+        _shift_component_payload(diagnostic, offset=offset)
+        for diagnostic in _object_list(shifted["diagnostics"], "diagnostics")
+    ]
+    return shifted
+
+
+def _shift_component_payload(component: object, *, offset: int) -> dict[str, object]:
+    if not isinstance(component, dict):
+        raise TypeError("Compiled RuleIR component payload must be an object.")
+    shifted = dict(component)
+    shifted["source_span"] = _shift_span_payload(shifted["source_span"], offset=offset)
+    return shifted
+
+
+def _shift_span_payload(span: object, *, offset: int) -> dict[str, object]:
+    if not isinstance(span, dict):
+        raise TypeError("Compiled RuleIR span payload must be an object.")
+    start = span["start"]
+    end = span["end"]
+    if type(start) is not int or type(end) is not int:
+        raise TypeError("Compiled RuleIR span boundaries must be integers.")
+    return {
+        "text": span["text"],
+        "start": start + offset,
+        "end": end + offset,
+    }
+
+
+def _object_list(value: object, field_name: str) -> list[object]:
+    if not isinstance(value, list):
+        raise TypeError(f"Compiled RuleIR {field_name} must be a list.")
+    return value
+
+
 def _rule_ir_payload(
     *,
     profile_id: str,
@@ -407,22 +564,11 @@ def _rule_ir_payload(
         "parser_version": RULE_IR_PARSER_VERSION,
         "schema_version": RULE_IR_SCHEMA_VERSION,
         "clauses": [
-            {
-                "clause_id": f"{profile_id}:target-binding",
-                "template_id": RULE_IR_TEMPLATE_ID,
-                "source_span": span,
-                "trigger": None,
-                "conditions": [],
-                "target": {
-                    "kind": rule_target_kind,
-                    "source_span": span,
-                    "parameters": [],
-                },
-                "effects": [],
-                "duration": None,
-                "unsupported_reason": None,
-                "diagnostics": [],
-            }
+            _target_binding_clause_payload(
+                profile_id=profile_id,
+                rule_target_kind=rule_target_kind,
+                span=span,
+            )
         ],
         "diagnostics": [],
         "ir_hash": rule_ir_hash,
@@ -441,6 +587,11 @@ def _validate_profile_coverage(profiles: tuple[ActivationProfile, ...]) -> None:
 
 def _module_text(profiles: tuple[ActivationProfile, ...]) -> str:
     profile_lines = "\n".join(profile.constructor_line() for profile in profiles)
+    static_payload_lines = "\n".join(
+        (f"    {_py_value(profile.profile_id)}: {_py_value(profile.compiled_rule_ir_payload)},")
+        for profile in profiles
+        if profile.compiled_rule_ir_payload is not None
+    )
     return "\n".join(
         (
             "# Generated by tools/generate_faction_stratagem_activation_support.py.",
@@ -454,6 +605,7 @@ def _module_text(profiles: tuple[ActivationProfile, ...]) -> str:
             "",
             "import hashlib",
             "import json",
+            "from copy import deepcopy",
             "from dataclasses import dataclass",
             "",
             f'SOURCE_PACKAGE_ID = "{SOURCE_PACKAGE_ID}"',
@@ -494,6 +646,9 @@ def _module_text(profiles: tuple[ActivationProfile, ...]) -> str:
             '    rule_ir_hash: str = ""',
             "",
             "    def rule_ir_payload(self) -> dict[str, object]:",
+            "        static_payload = _STATIC_RULE_IR_PAYLOADS_BY_PROFILE_ID.get(self.profile_id)",
+            "        if static_payload is not None:",
+            "            return deepcopy(static_payload)",
             "        return _rule_ir_payload(",
             "            profile_id=self.profile_id,",
             "            source_id=self.source_id,",
@@ -611,6 +766,11 @@ def _module_text(profiles: tuple[ActivationProfile, ...]) -> str:
             "    return hashlib.sha256(canonical).hexdigest()",
             "",
             "",
+            "_STATIC_RULE_IR_PAYLOADS_BY_PROFILE_ID: dict[str, dict[str, object]] = {",
+            static_payload_lines,
+            "}",
+            "",
+            "",
             "def _validate_profiles(",
             "    profiles: tuple[SourceStratagemActivationProfile, ...]",
             ") -> tuple[SourceStratagemActivationProfile, ...]:",
@@ -629,6 +789,14 @@ def _module_text(profiles: tuple[ActivationProfile, ...]) -> str:
                 '            raise ValueError("Stratagem activation profile phases must not '
                 'be empty.")'
             ),
+            "        static_payload = _STATIC_RULE_IR_PAYLOADS_BY_PROFILE_ID.get(",
+            "            profile.profile_id",
+            "        )",
+            "        if static_payload is not None:",
+            "            hash_payload = dict(static_payload)",
+            '            hash_payload["ir_hash"] = ""',
+            "            if _sha256_payload(hash_payload) != profile.rule_ir_hash:",
+            '                raise ValueError("Stratagem activation static RuleIR hash drift.")',
             "    return profiles",
             "",
             "",
@@ -647,12 +815,26 @@ def _sha256_payload(payload: object) -> str:
 
 
 def _py_value(value: object) -> str:
+    if value is None:
+        return "None"
+    if type(value) is bool:
+        return "True" if value else "False"
     if type(value) is tuple:
         if not value:
             return "()"
         return f"({', '.join(_py_value(item) for item in value)},)"
+    if type(value) is list:
+        return f"[{', '.join(_py_value(item) for item in value)}]"
+    if type(value) is dict:
+        return (
+            "{"
+            + ", ".join(f"{_py_value(key)}: {_py_value(item)}" for key, item in value.items())
+            + "}"
+        )
     if type(value) is int:
         return str(value)
+    if type(value) is float:
+        return repr(value)
     if type(value) is str:
         return ascii(value)
     raise ValueError(f"Unsupported constructor value type: {type(value).__name__}.")

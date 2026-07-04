@@ -2115,6 +2115,52 @@ def test_phase17c_post_shoot_hit_target_cover_denial_compiles_to_semantic_ir() -
     )
 
 
+@pytest.mark.parametrize(
+    ("raw_text", "expected_parameters"),
+    [
+        (
+            "That unit gains Stealth until your next Command phase.",
+            {
+                "boundary": "start",
+                "endpoint": "phase",
+                "owner": "self",
+                "phase": "command",
+                "relative": "next",
+            },
+        ),
+        (
+            "That unit gains Stealth until the end of your next turn.",
+            {
+                "boundary": "end",
+                "endpoint": "turn",
+                "owner": "self",
+                "relative": "next",
+            },
+        ),
+        (
+            "That unit gains Stealth until the start of opponent's next turn.",
+            {
+                "boundary": "start",
+                "endpoint": "turn",
+                "owner": "opponent",
+                "relative": "next",
+            },
+        ),
+    ],
+)
+def test_phase17c_relative_duration_endpoints_compile_to_structured_parameters(
+    raw_text: str,
+    expected_parameters: dict[str, object],
+) -> None:
+    rule_ir = _compiled(raw_text).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert clause.duration is not None
+    assert clause.duration.kind is RuleDurationKind.UNTIL_TIMING_ENDPOINT
+    assert parameter_payload(clause.duration.parameters) == expected_parameters
+
+
 def test_phase17c_contextual_status_denial_is_not_cover_specific() -> None:
     rule_ir = _compiled(
         "In your Shooting phase, after this model has shot, select one enemy unit hit by "
