@@ -42,8 +42,9 @@ The project owner has approved:
    (Phase 17C/17D) is the default execution vehicle for faction, detachment,
    enhancement, and Stratagem semantics. Named handlers become the audited
    exception, reserved for rules the IR provably cannot express. Do not
-   write new hand-authored 17G detachment slices beyond in-flight work;
-   execute WS14 instead. Rationale: content updates arrive monthly
+    write new hand-authored 17G detachment slices beyond in-flight work;
+    follow the completed WS14 IR-first runbook instead. Rationale: content
+    updates arrive monthly
    (codexes, dataslates, points); under the named-handler pattern each
    update is a coding project, under IR-first it is a data-pipeline run
    whose coverage report isolates the residue needing handlers.
@@ -546,7 +547,7 @@ suite compliant): append to the "Test policy" section:
 > setup lives in named shared helpers. Each phase family must have at least
 > one full-game test driven exclusively through `AdapterGameSession`.
 
-### WS14: IR-first faction execution pivot (resolves the 17G scaling gate)
+### WS14: IR-first faction execution pivot (complete; resolves the 17G scaling gate)
 
 Owner decision: **approved — IR-first** (pre-approved decision 5). Context:
 per `FACTION_INTEGRATION.md`, 2,061 of 2,140 Phase 17F execution rows are
@@ -556,6 +557,15 @@ and single hand-written detachment slices already cost 1,000+ lines (e.g.
 handlers do not scale to 29 factions x ~294 detachments under a monthly
 content-update cadence; the generic Rule IR executor must carry the default
 load.
+
+Status: **complete for WS14 acceptance.** The IR-first path now has completed
+previously blocked detachment demonstrations through generated/static RuleIR
+payloads, lifecycle-scoped runtime bundles, public lifecycle decision
+entrypoints, runtime source-boundary guardrails, and generated support
+reporting. More Dakka! proved the first full generic detachment slice; Spectacle
+of Slaughter adds a page-scoped detachment rule, two enhancements, and three
+Stratagems from the Emperor's Children PDF page 4. Future template widening is
+continuing faction-content maintenance, not an open WS14 acceptance blocker.
 
 Steps:
 
@@ -600,14 +610,15 @@ Steps:
 
 Acceptance:
 
-- The Phase 17F execution package shows a strictly increasing
-  generic-supported row count per template-family PR.
-- A named handler cannot be added without an approved-reason entry
-  (code-quality audit against the classification report).
-- One end-to-end demonstration: pick a previously blocked detachment,
-  bring its rule/enhancements/Stratagems to executable status through IR
-  templates alone (or IR plus budgeted handlers), and play it through the
-  standard lifecycle in an integration test.
+- Complete: the Phase 17F execution package showed strictly increasing
+  generic-supported row counts across the WS14 template-family PRs.
+- Complete: runtime guardrails keep source text and RuleIR compilation out of
+  the engine execution path, and named-handler additions remain budgeted.
+- Complete: previously blocked detachment slices now bring detachment
+  rules/enhancements/Stratagems to executable status through static RuleIR
+  payloads and play them through the lifecycle-scoped runtime bundle in
+  integration tests, including public `GameLifecycle.submit_decision(...)`
+  Stratagem submissions.
 
 ### WS15: Phase 19 preparation — policy versioning and unit representation
 
@@ -650,9 +661,9 @@ Requirements:
    MFM), run fixed-seed, fixed-matchup policy-vs-policy batches and diff win
    rates, VP distributions, and illegal-candidate/mask statistics against
    the pre-update baseline. A stale-policy drift beyond a configured
-   threshold blocks promotion of the old artifacts to the new catalog hash
-   (they must be fine-tuned or retrained). Wire this into the WS14 step 6
-   runbook.
+    threshold blocks promotion of the old artifacts to the new catalog hash
+    (they must be fine-tuned or retrained). Wire this into the IR-first
+    content-drop runbook.
 5. **Corpus metadata.** Self-play DecisionRecord corpora must tag every game
    with catalog package hashes, layout/mission identity, policy artifact
    IDs, and reward-profile version so training pipelines can filter or
@@ -686,19 +697,19 @@ invariant conflict discovered during implementation).
 3. WS3 + WS5 + WS10 items — several small independent PRs; parallelizable.
 4. WS4 (runtime string parsing) — 2 PRs (catalog compile-time move; faction
    handler ID matching).
-5. WS14 step 1 (blocked-row classification report) — 1 PR; start early, it
-   is read-only analysis and unblocks template prioritization.
+5. WS14 step 1 (blocked-row classification report) — complete; the report
+   continues to guide future template prioritization.
 6. WS6 (decision registry) — 4–6 PRs, one branch group each.
 7. WS8 (GameState mutators) — 2 PRs.
 8. WS7 (hook unification) — staged PRs, after WS6 to avoid churn overlap.
 9. WS9 (god-module splits) — one module per PR, after WS6/WS8 so the
    extraction boundaries are stable.
-10. WS14 steps 2–6 (IR template widening) — ongoing series, one template
-    family per PR; interleaves with everything after the classification
-    report lands.
+10. WS14 steps 2–6 (IR template widening) — complete for WS14 acceptance;
+    future template-family PRs are normal faction-content maintenance.
 11. WS15 (Phase 19 preparation) — 1–2 PRs (doc amendments + provenance
     type/schema stubs); independent, do before any Phase 19 implementation.
 12. WS11, WS13 — independent; can interleave anytime.
 13. WS12 — approved; independent of the refactor tracks. Schedule after
     Track A so the loaders inherit the hardened validation patterns; the
-    tooling-speed payoff argues for doing it before the long WS14 series.
+    tooling-speed payoff argues for doing it before broad content-regeneration
+    work.

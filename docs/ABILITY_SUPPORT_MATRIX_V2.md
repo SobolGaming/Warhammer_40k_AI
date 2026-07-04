@@ -141,7 +141,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 
 | Faction | Detachments | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows | File |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| Orks | 12 | 0 | 44 | 66 | 1 | [orks](factions/orks.md) |
+| Orks | 12 | 1 | 44 | 66 | 1 | [orks](factions/orks.md) |
 | Aeldari | 15 | 2 | 51 | 75 | 16 | [aeldari](factions/aeldari.md) |
 | Drukhari | 9 | 0 | 24 | 36 | 1 | [drukhari](factions/drukhari.md) |
 | Tyranids | 10 | 0 | 32 | 48 | 1 | [tyranids](factions/tyranids.md) |
@@ -158,7 +158,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Grey Knights | 9 | 0 | 24 | 36 | 1 | [grey-knights](factions/grey-knights.md) |
 | Chaos Space Marines | 17 | 0 | 60 | 90 | 1 | [chaos-space-marines](factions/chaos-space-marines.md) |
 | World Eaters | 8 | 0 | 24 | 36 | 1 | [world-eaters](factions/world-eaters.md) |
-| Emperor's Children | 10 | 0 | 28 | 42 | 1 | [emperors-children](factions/emperors-children.md) |
+| Emperor's Children | 10 | 1 | 30 | 45 | 1 | [emperors-children](factions/emperors-children.md) |
 | Death Guard | 9 | 0 | 28 | 42 | 1 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 26 | 36 | 1 | [chaos-knights](factions/chaos-knights.md) |
@@ -286,7 +286,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
 | `generic:force-desperate-escape` | Inescapable Manifestations |
 | `generic:ingress-move` | From Beyond the Veil |
-| `generic:rule-ir` | CALL DAT DAKKA?<br>GET STUCK IN, LADZ!<br>HUGE SHOW-OFFS<br>LONG, UNCONTROLLED BURSTS<br>ORKS IS STILL ORKS<br>SPESHUL SHELLS |
+| `generic:rule-ir` | CALL DAT DAKKA?<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>LONG, UNCONTROLLED BURSTS<br>ORKS IS STILL ORKS<br>SINGLE-MINDED STRIKE<br>SPESHUL SHELLS |
 | `phase17g:aeldari:corsair-coterie:stratagems:cloak-and-shadow:target-restriction` | Cloak and Shadow |
 | `phase17g:aeldari:corsair-coterie:stratagems:outcast-ambush:weapon-profile` | Outcast Ambush |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
@@ -398,6 +398,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction` | Thrill Seekers |
+| `warhammer_40000_11th:emperors_children:spectacle_of_slaughter:beguiling_grotesquerie:snap_target_restriction` | Snap Target Restriction |
 | `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush` | Cult Ambush |
 | `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:initial_resurgence` | Cult Ambush |
 | `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:marker_ingress` | Cult Ambush |

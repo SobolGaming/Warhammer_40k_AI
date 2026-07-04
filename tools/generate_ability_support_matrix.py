@@ -557,6 +557,43 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
             "mortal-wound Feel No Pain continuation."
         ),
     ),
+    (
+        "emperors-children",
+        "spectacle-of-slaughter",
+    ): SupportSectionRow(
+        subject="Spectacle of Slaughter",
+        engine=(
+            "Static RuleIR runtime bundle for the detachment rule, two enhancement "
+            "bindings, and three Stratagem records"
+        ),
+        documentation="Source rows, generated matrix, and WS14 remediation status",
+        tests="Lifecycle bundle, enhancement hook, Stratagem lifecycle, and runtime boundary tests",
+        overall="Full",
+        notes=(
+            "Covers Entitled to Victory Fights First grants, Beguiling Grotesquerie "
+            "Snap Shooting target restriction, Eager Patrons Move modifier, Honour Is "
+            "for Fools Precision, Single-minded Strike charge transit permission, and "
+            "Intoxicated by Triumph triggered movement."
+        ),
+    ),
+    (
+        "orks",
+        "more-dakka",
+    ): SupportSectionRow(
+        subject="More Dakka!",
+        engine=(
+            "Static RuleIR runtime bundle for the detachment rule, four enhancement "
+            "bindings, and six Stratagem records"
+        ),
+        documentation="Source rows, generated matrix, and WS14 runbook",
+        tests="Lifecycle bundle, enhancement hook, Stratagem lifecycle, and runtime boundary tests",
+        overall="Full",
+        notes=(
+            "Generic RuleIR rows execute from structured payloads through the "
+            "lifecycle-scoped runtime bundle, including Call Dat Dakka through the "
+            "public lifecycle decision entrypoint."
+        ),
+    ),
 }
 
 _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {

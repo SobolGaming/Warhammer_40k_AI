@@ -52,6 +52,9 @@ BLOOD_LEGION_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.b
 CAVALCADE_OF_CHAOS_RULE_MODULE_PATH = (
     f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.cavalcade_of_chaos.rule"
 )
+SPECTACLE_OF_SLAUGHTER_MODULE_PATH = (
+    f"{BASE_IMPORT_PATH}.emperors_children.detachments.spectacle_of_slaughter"
+)
 IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
     CHAOS_SPACE_MARINES_ARMY_RULE_MODULE_PATH: (
         "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts"
@@ -112,6 +115,20 @@ IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
     ),
     CAVALCADE_OF_CHAOS_RULE_MODULE_PATH: (
         "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:rule"
+    ),
+    f"{SPECTACLE_OF_SLAUGHTER_MODULE_PATH}.manifest": (
+        "warhammer_40000_11th:emperors_children:detachment:spectacle_of_slaughter:manifest:rule_ir"
+    ),
+    f"{SPECTACLE_OF_SLAUGHTER_MODULE_PATH}.rule": (
+        "warhammer_40000_11th:emperors_children:detachment:spectacle_of_slaughter:rule:generic_ir"
+    ),
+    f"{SPECTACLE_OF_SLAUGHTER_MODULE_PATH}.enhancements": (
+        "warhammer_40000_11th:emperors_children:detachment:"
+        "spectacle_of_slaughter:enhancements:rule_ir"
+    ),
+    f"{SPECTACLE_OF_SLAUGHTER_MODULE_PATH}.stratagems": (
+        "warhammer_40000_11th:emperors_children:detachment:"
+        "spectacle_of_slaughter:stratagems:rule_ir"
     ),
 }
 
@@ -407,8 +424,8 @@ def _faction_manifest_content(*, faction_module: str) -> str:
 
 
 def _detachment_manifest_content(*, faction_module: str, detachment_module: str) -> str:
-    contribution_id = (
-        f"warhammer_40000_11th:{faction_module}:detachment:{detachment_module}:manifest:scaffold"
+    contribution_id = contribution_id_for_module_path(
+        f"{BASE_IMPORT_PATH}.{faction_module}.detachments.{detachment_module}.manifest"
     )
     return (
         f"{_generated_header()}\n"

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battle_formation_hooks import (
@@ -11,10 +12,15 @@ from warhammer40k_core.engine.battle_formation_hooks import (
 )
 from warhammer40k_core.engine.effects import (
     EffectExpiration,
+    PersistingEffect,
     generic_rule_persisting_effect,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
+from warhammer40k_core.engine.fight_order import FIGHTS_FIRST_EFFECT_KIND
+from warhammer40k_core.engine.generic_rule_effect_payloads import (
+    generic_rule_effect_payload_grants_ability,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
@@ -27,16 +33,23 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
     faction_execution_2026_27,
     faction_generic_ir_support_2026_27,
-    faction_more_dakka_ir_support_2026_27,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_more_dakka_ir_support_2026_27 as more_dakka_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_spectacle_of_slaughter_ir_support_2026_27 as spectacle_ir,
 )
 
 _Phase17FExecutionRecord = faction_execution_2026_27.Phase17FExecutionRecord
 
 MORE_DAKKA_DETACHMENT_ID = "more-dakka"
 MORE_DAKKA_FACTION_KEYWORD = "ORKS"
-MORE_DAKKA_DETACHMENT_RULE_DESCRIPTOR_ID = (
-    faction_more_dakka_ir_support_2026_27.MORE_DAKKA_DETACHMENT_RULE_DESCRIPTOR_ID
+MORE_DAKKA_DETACHMENT_RULE_DESCRIPTOR_ID = more_dakka_ir.MORE_DAKKA_DETACHMENT_RULE_DESCRIPTOR_ID
+SPECTACLE_OF_SLAUGHTER_DETACHMENT_RULE_DESCRIPTOR_ID = (
+    spectacle_ir.SPECTACLE_OF_SLAUGHTER_DETACHMENT_RULE_DESCRIPTOR_ID
 )
+SPECTACLE_OF_SLAUGHTER_UNIT_KEYWORD = spectacle_ir.FLAWLESS_BLADES_KEYWORD
 
 
 @dataclass(frozen=True, slots=True)
@@ -175,7 +188,7 @@ def _apply_generic_detachment_rule_effects(
                 player_id=army.player_id,
                 clause_id=clause_id,
             )
-            effect = generic_rule_persisting_effect(
+            effect = _persisting_effect_for_detachment_payload(
                 effect_id=effect_id,
                 source_rule_id=binding_source.rule_ir.source_id,
                 owner_player_id=army.player_id,
@@ -203,6 +216,45 @@ def _apply_generic_detachment_rule_effects(
                 "persisting_effects": applied_payloads,
             },
         )
+
+
+def _persisting_effect_for_detachment_payload(
+    *,
+    effect_id: str,
+    source_rule_id: str,
+    owner_player_id: str,
+    target_unit_instance_ids: tuple[str, ...],
+    started_battle_round: int,
+    expiration: EffectExpiration,
+    effect_payload: JsonValue,
+    started_phase: BattlePhaseKind | None = None,
+) -> PersistingEffect:
+    payload = validate_json_value(effect_payload)
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Generic detachment effect payload must be an object.")
+    if generic_rule_effect_payload_grants_ability(payload, ability=FIGHTS_FIRST_EFFECT_KIND):
+        return PersistingEffect(
+            effect_id=effect_id,
+            source_rule_id=source_rule_id,
+            owner_player_id=owner_player_id,
+            target_unit_instance_ids=target_unit_instance_ids,
+            started_battle_round=started_battle_round,
+            started_phase=started_phase,
+            expiration=expiration,
+            effect_payload=validate_json_value(
+                {**payload, "effect_kind": FIGHTS_FIRST_EFFECT_KIND}
+            ),
+        )
+    return generic_rule_persisting_effect(
+        effect_id=effect_id,
+        source_rule_id=source_rule_id,
+        owner_player_id=owner_player_id,
+        target_unit_instance_ids=target_unit_instance_ids,
+        started_battle_round=started_battle_round,
+        started_phase=started_phase,
+        expiration=expiration,
+        effect_payload=payload,
+    )
 
 
 def _record_is_generic_detachment_rule(record: _Phase17FExecutionRecord) -> bool:
@@ -233,12 +285,27 @@ def _target_unit_ids_for_record(
     record: _Phase17FExecutionRecord,
     army: ArmyDefinition,
 ) -> tuple[str, ...]:
-    if record.coverage_descriptor_id != MORE_DAKKA_DETACHMENT_RULE_DESCRIPTOR_ID:
-        raise GameLifecycleError("Generic detachment record is not supported by runtime.")
-    target_ids = tuple(
-        unit.unit_instance_id for unit in army.units if _unit_is_more_dakka_detachment_target(unit)
-    )
-    return tuple(sorted(target_ids))
+    if record.coverage_descriptor_id == MORE_DAKKA_DETACHMENT_RULE_DESCRIPTOR_ID:
+        target_ids = tuple(
+            unit.unit_instance_id
+            for unit in army.units
+            if _unit_is_more_dakka_detachment_target(unit)
+        )
+        return tuple(sorted(target_ids))
+    if record.coverage_descriptor_id == SPECTACLE_OF_SLAUGHTER_DETACHMENT_RULE_DESCRIPTOR_ID:
+        target_ids = tuple(
+            unit.unit_instance_id
+            for unit in army.units
+            if _unit_is_spectacle_of_slaughter_detachment_target(unit)
+        )
+        return tuple(sorted(target_ids))
+    raise GameLifecycleError("Generic detachment record is not supported by runtime.")
+
+
+def _unit_is_spectacle_of_slaughter_detachment_target(unit: UnitInstance) -> bool:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Generic detachment target requires UnitInstance.")
+    return SPECTACLE_OF_SLAUGHTER_UNIT_KEYWORD in (*unit.keywords, *unit.faction_keywords)
 
 
 def _unit_is_more_dakka_detachment_target(unit: UnitInstance) -> bool:

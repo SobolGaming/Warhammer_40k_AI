@@ -8,7 +8,7 @@ Source PDF: [eng_09-06_warhammer40000_faction_pack_orks-agh9kwrtno-0xarrl5fjj.pd
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 12 | 0 | 44 | 66 | 1 |
+| 12 | 1 | 44 | 66 | 1 |
 
 ## Detachment Rule Support
 
@@ -23,7 +23,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Freebooter Krew | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Green Tide | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Kult of Speed | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
-| More Dakka! | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
+| More Dakka! | `Full` | Static RuleIR runtime bundle for the detachment rule, four enhancement bindings, and six Stratagem records | Lifecycle bundle, enhancement hook, Stratagem lifecycle, and runtime boundary tests | Generic RuleIR rows execute from structured payloads through the lifecycle-scoped runtime bundle, including Call Dat Dakka through the public lifecycle decision entrypoint. |
 | Rollin' Deff | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Speedwaaagh! | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |
 | Taktikal Brigade | `None` | Generated scaffold only | Source-row/catalog coverage | No semantic detachment-rule hook is implemented. |

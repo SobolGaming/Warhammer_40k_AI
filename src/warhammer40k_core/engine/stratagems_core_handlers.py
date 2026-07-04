@@ -407,6 +407,14 @@ def _apply_generic_rule_ir_stratagem_handler(
             army_catalog=army_catalog,
             shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
         )
+    if _rule_execution_result_grants_triggered_normal_move(result.effect_payloads):
+        _request_generic_triggered_normal_move(
+            state=state,
+            decisions=decisions,
+            context=context,
+            definition=definition,
+            use_record=use_record,
+        )
 
 
 def _single_target_unit_id_or_none(use_record: StratagemUseRecord) -> str | None:
@@ -448,8 +456,29 @@ def _generic_stratagem_rule_trigger_payload(
 def _rule_execution_result_grants_out_of_phase_shoot(
     effect_payloads: tuple[dict[str, JsonValue], ...],
 ) -> bool:
+    return _rule_execution_result_grants_ability(
+        effect_payloads=effect_payloads,
+        ability="out_of_phase_shoot",
+    )
+
+
+def _rule_execution_result_grants_triggered_normal_move(
+    effect_payloads: tuple[dict[str, JsonValue], ...],
+) -> bool:
+    return _rule_execution_result_grants_ability(
+        effect_payloads=effect_payloads,
+        ability="triggered_normal_move",
+    )
+
+
+def _rule_execution_result_grants_ability(
+    *,
+    effect_payloads: tuple[dict[str, JsonValue], ...],
+    ability: str,
+) -> bool:
     if type(effect_payloads) is not tuple:
         raise GameLifecycleError("Generic Stratagem effect payloads must be a tuple.")
+    requested_ability = _validate_identifier("generic Stratagem ability", ability)
     granted = False
     for effect_payload in effect_payloads:
         effect = effect_payload.get("effect")
@@ -463,7 +492,7 @@ def _rule_execution_result_grants_out_of_phase_shoot(
         for parameter in parameters:
             if not isinstance(parameter, dict):
                 raise GameLifecycleError("Generic Stratagem effect parameter must be an object.")
-            if parameter.get("key") == "ability" and parameter.get("value") == "out_of_phase_shoot":
+            if parameter.get("key") == "ability" and parameter.get("value") == requested_ability:
                 granted = True
     return granted
 
@@ -519,6 +548,81 @@ def _request_generic_out_of_phase_shooting(
             "stratagem_use": use_record.to_payload(),
             "shooting_unit_instance_id": shooting_unit_id,
             "target_unit_instance_id": enemy_unit_id,
+        },
+    )
+
+
+def _request_generic_triggered_normal_move(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    definition: StratagemDefinition,
+    use_record: StratagemUseRecord,
+) -> None:
+    from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
+    from warhammer40k_core.engine.triggered_movement import (
+        TriggeredMovementDescriptor,
+        TriggeredMovementEligibleUnit,
+        TriggeredMovementKind,
+        triggered_movement_unit_selection_request,
+    )
+
+    moving_unit_id = _single_target_unit_id_or_none(use_record)
+    if moving_unit_id is None:
+        raise GameLifecycleError("Generic triggered movement requires one target unit.")
+    d3_result = DiceRollManager(state.game_id, event_log=decisions.event_log).roll_d3(
+        reason=f"{definition.stratagem_id} triggered normal move for {moving_unit_id}",
+        roll_type="generic_rule_ir_triggered_normal_move_d3",
+        actor_id=use_record.player_id,
+    )
+    descriptor = TriggeredMovementDescriptor(
+        movement_kind=TriggeredMovementKind.TRIGGERED,
+        source_rule_id=definition.source_id,
+        trigger_timing=ReactionWindow(
+            phase=context.phase,
+            window_kind=ReactionWindowKind.RULE_TRIGGER,
+            source_step="generic_rule_ir_triggered_normal_move",
+            source_event_id=use_record.use_id,
+        ),
+        max_distance_inches=float(d3_result.value + 3),
+        movement_mode=MovementMode.NORMAL,
+        allow_battle_shocked=False,
+        allow_within_engagement_range=False,
+        one_per_phase=False,
+        optional=True,
+    )
+    request = triggered_movement_unit_selection_request(
+        state=state,
+        player_id=use_record.player_id,
+        descriptor=descriptor,
+        eligible_units=(
+            TriggeredMovementEligibleUnit(
+                unit_instance_id=moving_unit_id,
+                hook_id=definition.handler_id,
+                source_id=definition.source_id,
+                replay_payload={
+                    "effect_kind": "generic_rule_ir_triggered_normal_move",
+                    "stratagem_use_id": use_record.use_id,
+                    "distance_roll": validate_json_value(d3_result.to_payload()),
+                },
+                decision_effect_payload=None,
+            ),
+        ),
+    )
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "generic_stratagem_triggered_normal_move_requested",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": use_record.battle_round,
+            "phase": use_record.phase.value,
+            "stratagem_use": use_record.to_payload(),
+            "unit_instance_id": moving_unit_id,
+            "max_distance_inches": d3_result.value + 3,
+            "d3_result": validate_json_value(d3_result.to_payload()),
+            "request_id": request.request_id,
         },
     )
 
@@ -898,6 +1002,7 @@ def _apply_force_desperate_escape_handler(
             "required_fall_back_mode": "desperate_escape",
         },
     )
+
     state.record_persisting_effect(effect)
     decisions.event_log.append(
         "forced_fall_back_desperate_escape_registered",
@@ -913,3 +1018,6 @@ def _apply_force_desperate_escape_handler(
             "persisting_effect": effect.to_payload(),
         },
     )
+
+
+_validate_identifier = IdentifierValidator(GameLifecycleError)

@@ -45,8 +45,8 @@ def test_ws14_stratagem_activation_profiles_cover_source_only_detachment_rows() 
     )
     profiles = faction_stratagem_activation_2026_27.stratagem_activation_profiles()
 
-    assert len(source_only_rows) == 1077
-    assert len(profiles) == 1077
+    assert len(source_only_rows) == 1080
+    assert len(profiles) == 1080
     assert {profile.source_row_id for profile in profiles} == {
         row.source_row_id for row in source_only_rows
     }
@@ -80,8 +80,8 @@ def test_ws14_generated_stratagem_rule_ir_freezes_supported_effect_durations() -
         )
     ]
 
-    assert len(effect_profiles) == 164
-    assert len(duration_profiles) == 162
+    assert len(effect_profiles) == 167
+    assert len(duration_profiles) == 164
 
     payload = effect_profiles[0].rule_ir_payload()
     payload["rule_id"] = "tampered"
@@ -97,7 +97,7 @@ def test_ws14_source_backed_stratagem_activation_records_are_runtime_loadable() 
         faction_stratagem_activation_2026_27.SOURCE_PACKAGE_ID
     )
     assert len(records) == sum(len(profile.phase_tokens) for profile in profiles)
-    assert len(records) == 1261
+    assert len(records) == 1264
     assert StratagemCatalogIndex.from_records(records).all_records() == tuple(
         sorted(records, key=lambda record: record.record_id)
     )

@@ -985,7 +985,10 @@ def _engaged_with_fall_back_unit_target_context_error(
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding,
 ) -> str | None:
-    if context.trigger_kind is not TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK:
+    if context.trigger_kind not in {
+        TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+        TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+    }:
         return "fall_back_engagement_requires_fall_back_selection_trigger"
     if context.phase is not BattlePhase.MOVEMENT:
         return "fall_back_engagement_requires_movement_phase"
@@ -1026,6 +1029,15 @@ def _engaged_fall_back_target_unit_ids(
     fall_back_unit_id = _fall_back_unit_id_or_none(context)
     if fall_back_unit_id is None:
         return ()
+    snapshotted_unit_ids = _snapshotted_engaged_fall_back_target_unit_ids(
+        state=state,
+        player_id=player_id,
+        context=context,
+    )
+    if snapshotted_unit_ids:
+        return snapshotted_unit_ids
+    if context.trigger_kind is TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE:
+        return ()
     return tuple(
         sorted(
             unit.unit_instance_id
@@ -1037,6 +1049,31 @@ def _engaged_fall_back_target_unit_ids(
                 first_unit_instance_id=unit.unit_instance_id,
                 second_unit_instance_id=fall_back_unit_id,
             )
+        )
+    )
+
+
+def _snapshotted_engaged_fall_back_target_unit_ids(
+    *,
+    state: GameState,
+    player_id: str,
+    context: StratagemEligibilityContext,
+) -> tuple[str, ...]:
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        return ()
+    unit_ids = _identifier_list_from_trigger_payload(
+        trigger_payload=trigger_payload,
+        key=ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY,
+        field_name="Engaged Fall Back target unit id",
+    )
+    if not unit_ids:
+        return ()
+    return tuple(
+        sorted(
+            unit_id
+            for unit_id in unit_ids
+            if _unit_owner(state=state, unit_instance_id=unit_id) == player_id
         )
     )
 
