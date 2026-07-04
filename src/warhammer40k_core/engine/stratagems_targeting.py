@@ -39,6 +39,7 @@ __all__ = (
     "_command_reroll_permission",
     "_command_reroll_roll_class",
     "_command_reroll_state",
+    "_destroyed_target_by_just_shot_unit_target_context_error",
     "_effect_selection_required_target_keywords",
     "_engaged_enemy_unit_id_or_none",
     "_engaged_enemy_unit_ids_or_empty",
@@ -318,6 +319,13 @@ def _target_binding_error(
         if context is None:
             return None
         return _just_shot_target_context_error(
+            context=context,
+            target_binding=target_binding,
+        )
+    if target_spec.target_policy_id == DESTROYED_TARGET_BY_JUST_SHOT_UNIT_TARGET_POLICY_ID:
+        if context is None:
+            return None
+        return _destroyed_target_by_just_shot_unit_target_context_error(
             context=context,
             target_binding=target_binding,
         )
@@ -826,6 +834,30 @@ def _just_shot_unit_id_or_none(context: StratagemEligibilityContext) -> str | No
     if type(raw_unit_id) is not str:
         return None
     return _validate_identifier("Just-shot unit id", raw_unit_id)
+
+
+def _destroyed_target_by_just_shot_unit_target_context_error(
+    *,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+) -> str | None:
+    if context.trigger_kind not in {
+        TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+        TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_SHOT,
+    }:
+        return "destroyed_target_requires_unit_has_shot_trigger"
+    if context.phase is not BattlePhase.SHOOTING:
+        return "destroyed_target_requires_shooting_phase"
+    if _just_shot_unit_id_or_none(context) is None:
+        return "missing_just_shot_unit_context"
+    destroyed_target_unit_ids = destroyed_target_unit_ids_from_context(context)
+    if not destroyed_target_unit_ids:
+        return "missing_destroyed_target_context"
+    if target_binding is None:
+        return None
+    if _require_target_unit_id(target_binding) not in destroyed_target_unit_ids:
+        return "unit_not_destroyed_target_of_just_shot_unit"
+    return None
 
 
 def _hit_target_unit_ids_or_empty(context: StratagemEligibilityContext) -> tuple[str, ...]:

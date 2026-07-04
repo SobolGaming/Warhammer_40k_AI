@@ -286,6 +286,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
 | `generic:force-desperate-escape` | Inescapable Manifestations |
 | `generic:ingress-move` | From Beyond the Veil |
+| `generic:rule-ir` | CALL DAT DAKKA?<br>GET STUCK IN, LADZ!<br>HUGE SHOW-OFFS<br>LONG, UNCONTROLLED BURSTS<br>ORKS IS STILL ORKS<br>SPESHUL SHELLS |
 | `phase17g:aeldari:corsair-coterie:stratagems:cloak-and-shadow:target-restriction` | Cloak and Shadow |
 | `phase17g:aeldari:corsair-coterie:stratagems:outcast-ambush:weapon-profile` | Outcast Ambush |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |

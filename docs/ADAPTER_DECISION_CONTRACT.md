@@ -437,10 +437,11 @@ checksum-covered `generic:rule-ir` effect payload produced at the source/data
 boundary. Runtime and adapters must not read raw source JSON, compile rule
 prose, or parse display text to decide whether a Stratagem is legal. Generic
 target policies include `friendly_unit`, `enemy_unit`, `selected_target_unit`,
-`not_selected_to_shoot_unit`, and `not_selected_to_fight_unit`; the engine
-filters owner, selected-target trigger context, selected-to-shoot/fight phase
-state, and excluded keywords before emitting options or accepting parameterized
-target bindings.
+`not_selected_to_shoot_unit`, `not_selected_to_fight_unit`, and
+`destroyed_target_by_just_shot_unit`; the engine filters owner,
+selected-target trigger context, selected-to-shoot/fight phase state,
+post-resolution destroyed-target trigger context, and excluded keywords before
+emitting options or accepting parameterized target bindings.
 
 Phase 17G adds Movement selected-to-move Stratagem windows to the same finite
 `use_stratagem` contract. After `select_movement_unit` records a unit selection
@@ -467,8 +468,11 @@ the Shooting engine may emit an optional active-player request with trigger kind
 destroyed by the attacks; `destroyed_enemy_unit_instance_ids` is the narrower
 all-models-destroyed unit set used by effects such as Corsair Coterie Into the
 Breach. Path of the Outcast and Corsair Coterie Stratagem options use the
-just-shot unit as the target binding. Stratagems whose effect chooses an enemy
-hit by those attacks carry `effect_selection` with
+just-shot unit as the target binding. More Dakka options that react to an enemy
+unit's completed shooting use `destroyed_target_by_just_shot_unit` and bind one
+friendly unit from `destroyed_target_unit_instance_ids` while retaining the
+just-shot enemy in `shot_unit_instance_id` for effect dispatch. Stratagems whose
+effect chooses an enemy hit by those attacks carry `effect_selection` with
 `effect_selection_kind: "hit_enemy_unit"` and
 `hit_enemy_unit_instance_id`; adapters must submit one emitted option and must
 not invent or substitute hit targets. Accepted handlers may record Battle-shock

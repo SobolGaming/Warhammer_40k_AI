@@ -24,6 +24,8 @@ from warhammer40k_core.rules.rule_templates import (
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_detachments_2026_27,
+    faction_more_dakka_ir_support_2026_27,
     faction_subrules_2026_27,
 )
 
@@ -34,6 +36,7 @@ _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         "enhancement:imperial-knights:freeblade-company:000010755003",
         "enhancement:necrons:starshatter-arsenal:000009749003",
         "enhancement:orks:freebooter-krew:000010712003",
+        "enhancement:orks:more-dakka:000009991002",
         "enhancement:orks:more-dakka:000009991003",
         "enhancement:space-marines:ceramite-sentinels:000010759004",
     }
@@ -115,9 +118,34 @@ def generic_supported_enhancement_rule_ir_hash(
     return rule_ir.ir_hash()
 
 
+def generic_supported_detachment_rule_ir_hash(
+    detachment_row: faction_detachments_2026_27.SourceDetachmentRow,
+) -> str | None:
+    if type(detachment_row) is not faction_detachments_2026_27.SourceDetachmentRow:
+        raise Phase17FGenericIrSupportError("Generic detachment support requires source row.")
+    descriptor_id = f"phase17e:{detachment_row.faction_id}:{detachment_row.detachment_id}:rule"
+    return faction_more_dakka_ir_support_2026_27.coverage_rule_ir_hash_by_descriptor_id(
+        descriptor_id
+    )
+
+
+def generic_supported_stratagem_rule_ir_hash(
+    source_row: faction_subrules_2026_27.SourceStratagemRow,
+) -> str | None:
+    if type(source_row) is not faction_subrules_2026_27.SourceStratagemRow:
+        raise Phase17FGenericIrSupportError("Generic Stratagem support requires source row.")
+    return faction_more_dakka_ir_support_2026_27.coverage_rule_ir_hash_by_descriptor_id(
+        f"phase17e:{source_row.source_row_id}"
+    )
+
+
 def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> RuleIR:
     descriptor_id = _validate_identifier("coverage_descriptor_id", coverage_descriptor_id)
     payload = _STATIC_GENERIC_RULE_IR_PAYLOADS_BY_COVERAGE_DESCRIPTOR_ID.get(descriptor_id)
+    if payload is None:
+        payload = faction_more_dakka_ir_support_2026_27.coverage_rule_ir_payload_by_descriptor_id(
+            descriptor_id
+        )
     if payload is None:
         raise Phase17FGenericIrSupportError("Generic IR coverage descriptor is not registered.")
     return RuleIR.from_payload(payload)
@@ -159,6 +187,9 @@ def _validate_supported_enhancement_ir(
             expected_template_ids=_SUPPORTED_CONDITIONAL_WEAPON_ABILITY_TEMPLATE_IDS,
             effect_kind=RuleEffectKind.GRANT_WEAPON_ABILITY,
             effect_family_name="weapon ability",
+            expected_effect_count=(
+                2 if source_row.source_row_id == "enhancement:orks:more-dakka:000009991002" else 1
+            ),
         )
     elif source_row.source_row_id in _SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS:
         _validate_supported_effect_family_ir(
@@ -167,6 +198,7 @@ def _validate_supported_enhancement_ir(
             expected_template_ids=_SUPPORTED_GRANT_ABILITY_TEMPLATE_IDS,
             effect_kind=RuleEffectKind.GRANT_ABILITY,
             effect_family_name="ability",
+            expected_effect_count=1,
         )
     elif (
         source_row.source_row_id
@@ -178,6 +210,7 @@ def _validate_supported_enhancement_ir(
             expected_template_ids=_SUPPORTED_CHARACTERISTIC_MODIFICATION_TEMPLATE_IDS,
             effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
             effect_family_name="characteristic modifier",
+            expected_effect_count=1,
         )
     elif source_row.source_row_id in _SUPPORTED_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS:
         _validate_supported_effect_family_ir(
@@ -186,6 +219,7 @@ def _validate_supported_enhancement_ir(
             expected_template_ids=_SUPPORTED_DICE_ROLL_MODIFICATION_TEMPLATE_IDS,
             effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
             effect_family_name="dice roll modifier",
+            expected_effect_count=1,
         )
     else:
         raise Phase17FGenericIrSupportError("Generic enhancement support row is not registered.")
@@ -198,6 +232,7 @@ def _validate_supported_effect_family_ir(
     expected_template_ids: frozenset[str],
     effect_kind: RuleEffectKind,
     effect_family_name: str,
+    expected_effect_count: int,
 ) -> None:
     if not rule_ir.is_supported:
         raise Phase17FGenericIrSupportError(
@@ -219,9 +254,9 @@ def _validate_supported_effect_family_ir(
         for effect in clause.effects:
             if effect.kind is effect_kind:
                 effect_count += 1
-    if effect_count != 1:
+    if effect_count != expected_effect_count:
         raise Phase17FGenericIrSupportError(
-            f"Generic enhancement support row must include one {effect_family_name} effect."
+            f"Generic enhancement support row has an unexpected {effect_family_name} effect count."
         )
     expected_source_id = f"{SOURCE_PACKAGE_ID}:phase17e:{source_row.source_row_id}:source-text"
     if rule_ir.source_id != expected_source_id:

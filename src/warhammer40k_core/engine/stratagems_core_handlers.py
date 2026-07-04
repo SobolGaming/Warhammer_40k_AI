@@ -249,6 +249,9 @@ def _apply_supported_stratagem_handler(
             target_binding=target_binding,
             definition=definition,
             use_record=use_record,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
         )
         return
     raise GameLifecycleError("Stratagem handler is not supported.")
@@ -356,6 +359,9 @@ def _apply_generic_rule_ir_stratagem_handler(
     target_binding: StratagemTargetBinding,
     definition: StratagemDefinition,
     use_record: StratagemUseRecord,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
+    shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None,
 ) -> None:
     from warhammer40k_core.engine.rule_execution import (
         RuleExecutionContext,
@@ -374,13 +380,14 @@ def _apply_generic_rule_ir_stratagem_handler(
             phase=context.phase,
             active_player_id=context.active_player_id,
             timing_window_id=context.timing_window_id,
+            source_unit_instance_id=_single_target_unit_id_or_none(use_record),
             target_unit_instance_ids=use_record.targeted_unit_instance_ids,
             target_player_id=target_binding.target_player_id,
-            trigger_payload={
-                "stratagem_id": definition.stratagem_id,
-                "stratagem_use_id": use_record.use_id,
-                "effect_selection": use_record.effect_selection,
-            },
+            trigger_payload=_generic_stratagem_rule_trigger_payload(
+                context=context,
+                definition=definition,
+                use_record=use_record,
+            ),
             state=state,
             event_log=decisions.event_log,
         ),
@@ -389,6 +396,131 @@ def _apply_generic_rule_ir_stratagem_handler(
         if result.reason is None:
             raise GameLifecycleError("Generic Stratagem rule execution failed without reason.")
         raise GameLifecycleError(f"Generic Stratagem rule execution failed: {result.reason}.")
+    if _rule_execution_result_grants_out_of_phase_shoot(result.effect_payloads):
+        _request_generic_out_of_phase_shooting(
+            state=state,
+            decisions=decisions,
+            context=context,
+            definition=definition,
+            use_record=use_record,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
+        )
+
+
+def _single_target_unit_id_or_none(use_record: StratagemUseRecord) -> str | None:
+    if type(use_record) is not StratagemUseRecord:
+        raise GameLifecycleError("Generic Stratagem source binding requires use record.")
+    if len(use_record.targeted_unit_instance_ids) == 1:
+        return use_record.targeted_unit_instance_ids[0]
+    return None
+
+
+def _generic_stratagem_rule_trigger_payload(
+    *,
+    context: StratagemEligibilityContext,
+    definition: StratagemDefinition,
+    use_record: StratagemUseRecord,
+) -> JsonValue:
+    if type(context) is not StratagemEligibilityContext:
+        raise GameLifecycleError("Generic Stratagem trigger payload requires context.")
+    if type(definition) is not StratagemDefinition:
+        raise GameLifecycleError("Generic Stratagem trigger payload requires definition.")
+    if type(use_record) is not StratagemUseRecord:
+        raise GameLifecycleError("Generic Stratagem trigger payload requires use record.")
+    payload: dict[str, JsonValue] = {}
+    if isinstance(context.trigger_payload, dict):
+        payload.update(context.trigger_payload)
+    elif context.trigger_payload is not None:
+        payload["source_trigger_payload"] = context.trigger_payload
+    payload.update(
+        {
+            "stratagem_id": definition.stratagem_id,
+            "stratagem_use_id": use_record.use_id,
+            "effect_selection": use_record.effect_selection,
+            "stratagem_context": validate_json_value(context.to_payload()),
+        }
+    )
+    return validate_json_value(payload)
+
+
+def _rule_execution_result_grants_out_of_phase_shoot(
+    effect_payloads: tuple[dict[str, JsonValue], ...],
+) -> bool:
+    if type(effect_payloads) is not tuple:
+        raise GameLifecycleError("Generic Stratagem effect payloads must be a tuple.")
+    granted = False
+    for effect_payload in effect_payloads:
+        effect = effect_payload.get("effect")
+        if not isinstance(effect, dict):
+            raise GameLifecycleError("Generic Stratagem effect payload requires effect object.")
+        if effect.get("kind") != "grant_ability":
+            continue
+        parameters = effect.get("parameters")
+        if not isinstance(parameters, list):
+            raise GameLifecycleError("Generic Stratagem effect parameters must be a list.")
+        for parameter in parameters:
+            if not isinstance(parameter, dict):
+                raise GameLifecycleError("Generic Stratagem effect parameter must be an object.")
+            if parameter.get("key") == "ability" and parameter.get("value") == "out_of_phase_shoot":
+                granted = True
+    return granted
+
+
+def _request_generic_out_of_phase_shooting(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    definition: StratagemDefinition,
+    use_record: StratagemUseRecord,
+    ruleset_descriptor: RulesetDescriptor,
+    army_catalog: ArmyCatalog,
+    shooting_unit_selected_grant_hooks: ShootingUnitSelectedGrantRegistry | None,
+) -> None:
+    shooting_unit_id = _single_target_unit_id_or_none(use_record)
+    if shooting_unit_id is None:
+        raise GameLifecycleError("Generic out-of-phase shooting requires one target unit.")
+    enemy_unit_id = _just_shot_unit_id_or_none(context)
+    if enemy_unit_id is None:
+        raise GameLifecycleError("Generic out-of-phase shooting requires just-shot unit context.")
+    request_out_of_phase_shooting_declaration(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+        player_id=use_record.player_id,
+        unit_instance_id=shooting_unit_id,
+        parent_phase=context.phase,
+        source_rule_id=definition.source_id,
+        source_decision_request_id=use_record.request_id,
+        source_decision_result_id=use_record.result_id,
+        source_context=validate_json_value(
+            {
+                "source_kind": "generic_rule_ir_stratagem",
+                "stratagem_use": use_record.to_payload(),
+                "stratagem_context": context.to_payload(),
+                "trigger_kind": context.trigger_kind.value,
+                "trigger_payload": context.trigger_payload,
+                "target_unit_ids": [enemy_unit_id],
+            }
+        ),
+        target_unit_ids=(enemy_unit_id,),
+        shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
+    )
+    decisions.event_log.append(
+        "generic_stratagem_out_of_phase_shooting_requested",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": use_record.battle_round,
+            "phase": use_record.phase.value,
+            "stratagem_use": use_record.to_payload(),
+            "shooting_unit_instance_id": shooting_unit_id,
+            "target_unit_instance_id": enemy_unit_id,
+        },
+    )
 
 
 def _apply_command_reroll_handler(

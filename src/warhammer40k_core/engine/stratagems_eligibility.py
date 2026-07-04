@@ -500,6 +500,44 @@ def _enumerated_target_bindings(
             is None
             else ()
         )
+    if target_spec.target_policy_id == DESTROYED_TARGET_BY_JUST_SHOT_UNIT_TARGET_POLICY_ID:
+        if context is None or _just_shot_unit_id_or_none(context) is None:
+            return ()
+        destroyed_bindings: list[StratagemTargetBinding] = []
+        for target_unit_id in destroyed_target_unit_ids_from_context(context):
+            target_owner = _unit_owner(state=state, unit_instance_id=target_unit_id)
+            if target_owner is None:
+                continue
+            binding = StratagemTargetBinding(
+                target_kind=target_spec.target_kind,
+                target_player_id=target_owner,
+                target_unit_instance_id=target_unit_id,
+            )
+            if (
+                _target_binding_error(
+                    state=state,
+                    player_id=player_id,
+                    target_spec=target_spec,
+                    policy=definition.restriction_policy,
+                    target_binding=binding,
+                    context=context,
+                    ruleset_descriptor=None,
+                    army_catalog=None,
+                )
+                is None
+            ):
+                destroyed_bindings.append(binding)
+        return tuple(
+            sorted(
+                destroyed_bindings,
+                key=lambda binding: (
+                    "" if binding.target_player_id is None else binding.target_player_id,
+                    ""
+                    if binding.target_unit_instance_id is None
+                    else binding.target_unit_instance_id,
+                ),
+            )
+        )
     if target_spec.target_policy_id == JUST_FELL_BACK_UNIT_TARGET_POLICY_ID:
         if context is None:
             return ()

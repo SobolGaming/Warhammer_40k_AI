@@ -87,6 +87,7 @@ GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         "enhancement:imperial-knights:freeblade-company:000010755003",
         "enhancement:necrons:starshatter-arsenal:000009749003",
         "enhancement:orks:freebooter-krew:000010712003",
+        "enhancement:orks:more-dakka:000009991002",
         "enhancement:orks:more-dakka:000009991003",
         "enhancement:space-marines:ceramite-sentinels:000010759004",
     }
@@ -120,6 +121,17 @@ GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         *GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
+    }
+)
+GENERIC_DETACHMENT_RULE_KEYS = frozenset({("orks", "more-dakka")})
+GENERIC_STRATAGEM_SOURCE_ROW_IDS = frozenset(
+    {
+        "stratagem:orks:more-dakka:000009992002",
+        "stratagem:orks:more-dakka:000009992003",
+        "stratagem:orks:more-dakka:000009992004",
+        "stratagem:orks:more-dakka:000009992005",
+        "stratagem:orks:more-dakka:000009992006",
+        "stratagem:orks:more-dakka:000009992007",
     }
 )
 BLOOD_LEGION_RUNTIME_CONSUMERS = (
@@ -576,6 +588,16 @@ def test_phase17e_loads_every_seeded_faction_and_detachment() -> None:
             assert coverage_row.runtime_support_status.value == "engine_consumed"
             assert coverage_row.runtime_consumer_ids == tuple(sorted(detachment_runtime_consumers))
             assert coverage_row.handler_id == detachment_runtime_consumers[0]
+        elif key in GENERIC_DETACHMENT_RULE_KEYS:
+            assert coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+            assert coverage_row.runtime_support_status is None
+            assert coverage_row.runtime_consumer_ids == ()
+            assert coverage_row.handler_id is None
+            assert coverage_row.rule_ir_hash == (
+                generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+                    coverage_row.descriptor_id
+                )
+            )
         else:
             assert coverage_row.status is Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED
             assert coverage_row.runtime_support_status is None
@@ -1006,7 +1028,11 @@ def test_phase17e_coverage_report_groups_supported_and_approved_unsupported_rows
     implemented_army_rule_count = len(FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID)
     implemented_detachment_rule_count = len(CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY)
     source_only_exact_count = len(enhancement_rows) + len(stratagem_rows) - implemented_exact_count
-    generic_supported_count = len(GENERIC_ENHANCEMENT_SOURCE_ROW_IDS)
+    generic_supported_count = (
+        len(GENERIC_ENHANCEMENT_SOURCE_ROW_IDS)
+        + len(GENERIC_DETACHMENT_RULE_KEYS)
+        + len(GENERIC_STRATAGEM_SOURCE_ROW_IDS)
+    )
     status_counts = package.status_counts()
 
     assert status_counts[Phase17ECoverageStatus.IMPLEMENTED.value] == (
@@ -1034,6 +1060,7 @@ def test_phase17e_generic_enhancements_are_template_family_bounded() -> None:
         row
         for row in package.coverage_rows
         if row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+        and row.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
     )
     rows_by_source_row_id = {
         row.descriptor_id.removeprefix("phase17e:"): row for row in generic_rows

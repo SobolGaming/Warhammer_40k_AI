@@ -679,13 +679,17 @@ class RuntimeModifierRegistry:
     def modified_unit_characteristic(self, context: UnitCharacteristicModifierContext) -> int:
         if type(context) is not UnitCharacteristicModifierContext:
             raise GameLifecycleError("Unit characteristic modifiers require a context.")
+        from warhammer40k_core.engine.generic_rule_attack_hooks import (
+            generic_rule_modified_unit_characteristic,
+        )
+
         current = context.current_value
         for binding in self.unit_characteristic_modifier_bindings:
             current = _validate_non_negative_int(
                 f"{binding.modifier_id} returned value",
                 binding.handler(replace(context, current_value=current)),
             )
-        return current
+        return generic_rule_modified_unit_characteristic(replace(context, current_value=current))
 
     def hit_roll_modifier(self, context: HitRollModifierContext) -> int:
         if type(context) is not HitRollModifierContext:
@@ -756,24 +760,36 @@ class RuntimeModifierRegistry:
     def modified_movement_inches(self, context: MovementBudgetModifierContext) -> float:
         if type(context) is not MovementBudgetModifierContext:
             raise GameLifecycleError("Movement budget modifiers require a context.")
+        from warhammer40k_core.engine.generic_rule_attack_hooks import (
+            generic_rule_modified_movement_inches,
+        )
+
         current = context.current_movement_inches
         for binding in self.movement_budget_modifier_bindings:
             current = _validate_non_negative_float(
                 f"{binding.modifier_id} returned movement",
                 binding.handler(replace(context, current_movement_inches=current)),
             )
-        return current
+        return generic_rule_modified_movement_inches(
+            replace(context, current_movement_inches=current)
+        )
 
     def modified_objective_control(self, context: ObjectiveControlModifierContext) -> int:
         if type(context) is not ObjectiveControlModifierContext:
             raise GameLifecycleError("Objective Control modifiers require a context.")
+        from warhammer40k_core.engine.generic_rule_attack_hooks import (
+            generic_rule_modified_objective_control,
+        )
+
         current = context.current_objective_control
         for binding in self.objective_control_modifier_bindings:
             current = _validate_non_negative_int(
                 f"{binding.modifier_id} returned Objective Control",
                 binding.handler(replace(context, current_objective_control=current)),
             )
-        return current
+        return generic_rule_modified_objective_control(
+            replace(context, current_objective_control=current)
+        )
 
     def charge_roll_modifiers(
         self,
