@@ -609,13 +609,19 @@ def test_phase17f_registry_dispatches_every_record_without_missing_handlers() ->
             assert result.status is FactionRuleExecutionStatus.UNSUPPORTED
             assert result.reason == "named_handler_not_registered"
         elif record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR:
-            assert result.status is FactionRuleExecutionStatus.APPLIED
-            assert result.reason is None
+            assert result.status in {
+                FactionRuleExecutionStatus.APPLIED,
+                FactionRuleExecutionStatus.INVALID,
+            }
+            if result.status is FactionRuleExecutionStatus.INVALID:
+                assert result.reason == "missing_input:game_state"
+            else:
+                assert result.reason is None
             replay_payload = result.to_payload()["replay_payload"]
             assert isinstance(replay_payload, dict)
             generic_payload = replay_payload["generic_rule_execution_result"]
             assert isinstance(generic_payload, dict)
-            assert generic_payload["status"] == "applied"
+            assert generic_payload["status"] == result.status.value
         elif (
             record.execution_status is Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
         ):

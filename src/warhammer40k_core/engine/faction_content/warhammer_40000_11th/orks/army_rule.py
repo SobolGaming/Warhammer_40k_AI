@@ -21,7 +21,11 @@ from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartResultContext,
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
-from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.effects import (
+    GENERIC_RULE_EFFECT_KIND,
+    EffectExpiration,
+    PersistingEffect,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
@@ -245,7 +249,10 @@ def waaagh_is_active_for_unit(state: GameState, *, unit_instance_id: str) -> boo
     unit, army = _unit_and_army_by_id(state, unit_instance_id=unit_instance_id)
     if not _unit_has_waaagh(unit):
         return False
-    return bool(_active_waaagh_effects_for_player(state, player_id=army.player_id))
+    return bool(
+        _active_waaagh_effects_for_player(state, player_id=army.player_id)
+        or _active_generic_waaagh_effects_for_unit(state, unit_instance_id=unit_instance_id)
+    )
 
 
 def waaagh_advance_eligibility(
@@ -475,6 +482,47 @@ def _active_waaagh_effects_for_player(
     if len(matching) > 1:
         raise GameLifecycleError("Waaagh! lookup found multiple active effects.")
     return tuple(matching)
+
+
+def _active_generic_waaagh_effects_for_unit(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+) -> tuple[PersistingEffect, ...]:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    matching: list[PersistingEffect] = []
+    for effect in state.persisting_effects_for_unit(requested_unit_id):
+        payload = _payload_object(effect.effect_payload)
+        if payload.get("effect_kind") != GENERIC_RULE_EFFECT_KIND:
+            continue
+        effect_payload = payload.get("effect")
+        if not isinstance(effect_payload, dict):
+            raise GameLifecycleError("Generic Waaagh! payload must include effect object.")
+        if effect_payload.get("kind") != "set_contextual_status":
+            continue
+        if _generic_status_parameter(effect_payload) == WAAAGH_EFFECT_KIND:
+            matching.append(effect)
+    return tuple(sorted(matching, key=lambda stored: stored.effect_id))
+
+
+def _generic_status_parameter(effect_payload: dict[str, JsonValue]) -> str | None:
+    raw_parameters = effect_payload.get("parameters")
+    if not isinstance(raw_parameters, list):
+        raise GameLifecycleError("Generic Waaagh! effect parameters must be a list.")
+    status: str | None = None
+    for raw_parameter in raw_parameters:
+        if not isinstance(raw_parameter, dict):
+            raise GameLifecycleError("Generic Waaagh! parameter must be an object.")
+        key = raw_parameter.get("key")
+        if key != "status":
+            continue
+        if status is not None:
+            raise GameLifecycleError("Generic Waaagh! status parameter is duplicated.")
+        value = raw_parameter.get("value")
+        if type(value) is not str:
+            raise GameLifecycleError("Generic Waaagh! status parameter must be a string.")
+        status = value
+    return status
 
 
 def _waaagh_declined_this_command_phase(state: GameState, *, player_id: str) -> bool:

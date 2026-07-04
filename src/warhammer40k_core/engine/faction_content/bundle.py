@@ -6,7 +6,7 @@ from types import MappingProxyType
 from typing import cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.engine import catalog_turn_end_reserves
+from warhammer40k_core.engine import catalog_turn_end_reserves, generic_detachment_rule_effects
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityCatalogRecord,
@@ -1319,9 +1319,9 @@ class RuntimeContentBundle:
             handler_registry=event_handler_registry,
         )
         battle_formation_hook_registry = BattleFormationHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.battle_formation_hook_bindings,
+            generic_detachment_rule_effects.battle_formation_hook_bindings(activation, records)
+            + _contribution_values(
+                validated_contributions, lambda c: c.battle_formation_hook_bindings
             )
         )
         battle_round_start_hook_registry = BattleRoundStartHookRegistry.from_bindings(

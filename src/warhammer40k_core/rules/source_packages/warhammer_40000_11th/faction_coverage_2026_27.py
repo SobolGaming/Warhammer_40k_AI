@@ -441,11 +441,7 @@ class Phase17ECoverageRow:
             "descriptor_id",
             _validate_identifier("descriptor_id", self.descriptor_id),
         )
-        object.__setattr__(
-            self,
-            "coverage_kind",
-            _coverage_kind_from_token(self.coverage_kind),
-        )
+        object.__setattr__(self, "coverage_kind", _coverage_kind_from_token(self.coverage_kind))
         status = _coverage_status_from_token(self.status)
         object.__setattr__(self, "status", status)
         object.__setattr__(self, "faction_id", _validate_identifier("faction_id", self.faction_id))
@@ -522,10 +518,11 @@ class Phase17ECoverageRow:
             )
         if self.rule_ir_hash is not None:
             object.__setattr__(
-                self,
-                "rule_ir_hash",
-                _validate_sha256("rule_ir_hash", self.rule_ir_hash),
+                self, "rule_ir_hash", _validate_sha256("rule_ir_hash", self.rule_ir_hash)
             )
+            status = Phase17ECoverageStatus.GENERIC_SUPPORTED
+            object.__setattr__(self, "status", status)
+            object.__setattr__(self, "handler_id", None)
         unsupported_reason = self.unsupported_reason
         if unsupported_reason is not None:
             unsupported_reason = _unsupported_reason_from_token(unsupported_reason)
@@ -911,6 +908,7 @@ def _detachment_rows(
     pdf_record: Phase17EFactionPdfRecord,
 ) -> tuple[Phase17ECoverageRow, ...]:
     runtime_consumer_ids = _detachment_rule_runtime_consumer_ids(detachment_row)
+    rule_ir_hash = generic_ir_support.generic_supported_detachment_rule_ir_hash(detachment_row)
     return (
         Phase17ECoverageRow(
             descriptor_id=(
@@ -943,6 +941,7 @@ def _detachment_rows(
                 if runtime_consumer_ids
                 else f"phase17e:detachment:{detachment_row.detachment_id}:rule"
             ),
+            rule_ir_hash=rule_ir_hash,
         ),
     )
 
@@ -1004,6 +1003,7 @@ def _stratagem_row(
     detachment_row: faction_detachments_2026_27.SourceDetachmentRow,
     pdf_record: Phase17EFactionPdfRecord,
 ) -> Phase17ECoverageRow:
+    rule_ir_hash = generic_ir_support.generic_supported_stratagem_rule_ir_hash(source_row)
     return Phase17ECoverageRow(
         descriptor_id=f"phase17e:{source_row.source_row_id}",
         coverage_kind=Phase17ECoverageKind.DETACHMENT_STRATAGEM,
@@ -1031,6 +1031,7 @@ def _stratagem_row(
             ),
             runtime_consumer_ids=source_row.runtime_consumer_ids,
         ),
+        rule_ir_hash=rule_ir_hash,
     )
 
 
