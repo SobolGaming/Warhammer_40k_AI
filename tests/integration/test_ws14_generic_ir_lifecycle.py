@@ -51,6 +51,7 @@ from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
     GameLifecycleStage,
+    LifecycleStatus,
     LifecycleStatusKind,
     SetupStep,
 )
@@ -448,7 +449,7 @@ def test_ws14_more_dakka_call_dat_dakka_binds_destroyed_target_and_requests_shoo
     state = _state(lifecycle)
     _place_units_for_more_dakka_shooting(state)
 
-    use_record = _use_more_dakka_stratagem(
+    use_record, submit_status = _use_more_dakka_stratagem_through_lifecycle(
         lifecycle,
         stratagem_id="000009992007",
         target_unit_id="army-alpha:boyz-1",
@@ -472,8 +473,12 @@ def test_ws14_more_dakka_call_dat_dakka_binds_destroyed_target_and_requests_shoo
         ]
         == "army-beta:boyz-2"
     )
+    assert submit_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert submit_status.decision_request is not None
+    assert submit_status.decision_request.decision_type == "submit_shooting_declaration"
     request = lifecycle.pending_decision_request()
     assert request is not None
+    assert request == submit_status.decision_request
     assert request.decision_type == "submit_shooting_declaration"
     assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
 
@@ -802,6 +807,79 @@ def _use_more_dakka_stratagem(
     trigger_payload: JsonValue = None,
 ) -> StratagemUseRecord:
     state = _state(lifecycle)
+    result = _more_dakka_stratagem_decision_result(
+        lifecycle,
+        stratagem_id=stratagem_id,
+        target_unit_id=target_unit_id,
+        phase=phase,
+        command_points=command_points,
+        active_player_id=active_player_id,
+        trigger_kind=trigger_kind,
+        trigger_payload=trigger_payload,
+    )
+    lifecycle.decision_controller.submit_result(result)
+    config = object.__getattribute__(lifecycle, "_config")
+    if type(config) is not GameConfig:
+        raise AssertionError("Lifecycle config was not loaded.")
+    use_record = apply_stratagem_decision(
+        state=state,
+        result=result,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=config.ruleset_descriptor,
+        army_catalog=config.army_catalog,
+        stratagem_handler_registry=(_runtime_content_bundle(lifecycle).stratagem_handler_registry),
+        stratagem_cost_modifier_registry=(
+            _runtime_content_bundle(lifecycle).stratagem_cost_modifier_registry
+        ),
+        shooting_unit_selected_grant_hooks=(
+            _runtime_content_bundle(lifecycle).shooting_unit_selected_grant_hook_registry
+        ),
+    )
+    assert state.stratagem_use_records[-1] == use_record
+    return use_record
+
+
+def _use_more_dakka_stratagem_through_lifecycle(
+    lifecycle: GameLifecycle,
+    *,
+    stratagem_id: str,
+    target_unit_id: str,
+    phase: BattlePhase,
+    command_points: int = 1,
+    active_player_id: str = "player-a",
+    trigger_kind: TimingTriggerKind = TimingTriggerKind.START_PHASE,
+    trigger_payload: JsonValue = None,
+) -> tuple[StratagemUseRecord, LifecycleStatus]:
+    state = _state(lifecycle)
+    result = _more_dakka_stratagem_decision_result(
+        lifecycle,
+        stratagem_id=stratagem_id,
+        target_unit_id=target_unit_id,
+        phase=phase,
+        command_points=command_points,
+        active_player_id=active_player_id,
+        trigger_kind=trigger_kind,
+        trigger_payload=trigger_payload,
+    )
+    status = lifecycle.submit_decision(result)
+    use_record = state.stratagem_use_records[-1]
+    assert use_record.stratagem_id == stratagem_id
+    assert use_record.targeted_unit_instance_ids == (target_unit_id,)
+    return use_record, status
+
+
+def _more_dakka_stratagem_decision_result(
+    lifecycle: GameLifecycle,
+    *,
+    stratagem_id: str,
+    target_unit_id: str,
+    phase: BattlePhase,
+    command_points: int,
+    active_player_id: str,
+    trigger_kind: TimingTriggerKind,
+    trigger_payload: JsonValue,
+) -> DecisionResult:
+    state = _state(lifecycle)
     _prepare_battle_phase(state, phase=phase, active_player_id=active_player_id)
     _grant_cp(state, player_id="player-a", amount=command_points)
     context = StratagemEligibilityContext.from_state(
@@ -825,31 +903,11 @@ def _use_more_dakka_stratagem(
         if _option_stratagem_id(option.payload) == stratagem_id
         and _option_target_unit_id(option.payload) == target_unit_id
     )
-    result = DecisionResult.for_request(
+    return DecisionResult.for_request(
         result_id=f"ws14-more-dakka-{stratagem_id}-result",
         request=request,
         selected_option_id=selected_option.option_id,
     )
-    lifecycle.decision_controller.submit_result(result)
-    config = object.__getattribute__(lifecycle, "_config")
-    if type(config) is not GameConfig:
-        raise AssertionError("Lifecycle config was not loaded.")
-    use_record = apply_stratagem_decision(
-        state=state,
-        result=result,
-        decisions=lifecycle.decision_controller,
-        ruleset_descriptor=config.ruleset_descriptor,
-        army_catalog=config.army_catalog,
-        stratagem_handler_registry=(_runtime_content_bundle(lifecycle).stratagem_handler_registry),
-        stratagem_cost_modifier_registry=(
-            _runtime_content_bundle(lifecycle).stratagem_cost_modifier_registry
-        ),
-        shooting_unit_selected_grant_hooks=(
-            _runtime_content_bundle(lifecycle).shooting_unit_selected_grant_hook_registry
-        ),
-    )
-    assert state.stratagem_use_records[-1] == use_record
-    return use_record
 
 
 def _grant_cp(state: GameState, *, player_id: str, amount: int) -> None:
