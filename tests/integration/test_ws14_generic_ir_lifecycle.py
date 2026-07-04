@@ -65,11 +65,14 @@ from warhammer40k_core.engine.runtime_modifiers import (
     UnitCharacteristicModifierContext,
     WeaponProfileModifierContext,
 )
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_context_for_unit,
 )
 from warhammer40k_core.engine.stratagems import (
     DESTROYED_TARGET_UNIT_CONTEXT_KEY,
+    ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY,
+    FALL_BACK_UNIT_CONTEXT_KEY,
     JUST_SHOT_UNIT_CONTEXT_KEY,
     STRATAGEM_DECISION_TYPE,
     StratagemEligibilityContext,
@@ -77,7 +80,12 @@ from warhammer40k_core.engine.stratagems import (
     apply_stratagem_decision,
     request_stratagem_use_from_index,
 )
+from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionContext
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.triggered_movement import SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE
+from warhammer40k_core.engine.unit_rule_effects import (
+    charge_transit_through_non_vehicle_monster_models_allowed,
+)
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
@@ -102,6 +110,18 @@ _MORE_DAKKA_ENHANCEMENT_EXECUTION_IDS = (
     "phase17f:phase17e:enhancement:orks:more-dakka:000009991003",
     "phase17f:phase17e:enhancement:orks:more-dakka:000009991004",
     "phase17f:phase17e:enhancement:orks:more-dakka:000009991005",
+)
+_SPECTACLE_GENERIC_EXECUTION_IDS = (
+    "phase17f:phase17e:emperors-children:spectacle-of-slaughter:rule",
+    ("phase17f:phase17e:enhancement:emperors-children:spectacle-of-slaughter:000010900002"),
+    ("phase17f:phase17e:enhancement:emperors-children:spectacle-of-slaughter:000010900003"),
+    ("phase17f:phase17e:stratagem:emperors-children:spectacle-of-slaughter:000010901002"),
+    ("phase17f:phase17e:stratagem:emperors-children:spectacle-of-slaughter:000010901003"),
+    ("phase17f:phase17e:stratagem:emperors-children:spectacle-of-slaughter:000010901004"),
+)
+_SPECTACLE_ENHANCEMENT_EXECUTION_IDS = (
+    ("phase17f:phase17e:enhancement:emperors-children:spectacle-of-slaughter:000010900002"),
+    ("phase17f:phase17e:enhancement:emperors-children:spectacle-of-slaughter:000010900003"),
 )
 
 
@@ -483,6 +503,248 @@ def test_ws14_more_dakka_call_dat_dakka_binds_destroyed_target_and_requests_shoo
     assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
 
 
+@pytest.mark.integration
+def test_ws14_spectacle_of_slaughter_page_four_rows_execute_from_lifecycle_bundle() -> None:
+    config = _spectacle_lifecycle_config()
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.advance_until_decision_or_terminal()
+
+    bundle = _runtime_content_bundle(lifecycle)
+
+    assert "emperors-children" in bundle.activation.selected_faction_ids
+    assert "spectacle-of-slaughter" in bundle.activation.selected_detachment_ids
+    assert set(_SPECTACLE_GENERIC_EXECUTION_IDS).issubset(
+        bundle.activation.selected_execution_record_ids
+    )
+
+    context = FactionRuleExecutionContext(
+        game_id=config.game_id,
+        player_id="player-a",
+        battle_round=1,
+        phase=BattlePhaseKind.FIGHT,
+        active_player_id="player-a",
+        source_unit_instance_id="army-alpha:blades-1",
+        target_unit_instance_ids=("army-alpha:blades-1",),
+        trigger_payload={"event": "ws14-spectacle-generic-ir-demo"},
+    )
+    results = tuple(
+        bundle.faction_rule_execution_registry.execute(
+            execution_id=execution_id,
+            context=context,
+        )
+        for execution_id in _SPECTACLE_ENHANCEMENT_EXECUTION_IDS
+    )
+
+    assert tuple(result.status for result in results) == (
+        FactionRuleExecutionStatus.APPLIED,
+        FactionRuleExecutionStatus.APPLIED,
+    )
+    for result in results:
+        record = bundle.faction_rule_execution_registry.record_by_execution_id(result.execution_id)
+        assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+        assert record.rule_ir_hash is not None
+        assert FactionRuleExecutionResult.from_payload(result.to_payload()) == result
+
+    assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
+    assert "object at 0x" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
+
+
+@pytest.mark.integration
+def test_ws14_spectacle_of_slaughter_rule_and_enhancements_bind_to_runtime_hooks() -> None:
+    lifecycle = _spectacle_battle_lifecycle()
+    state = _state(lifecycle)
+    bundle = _runtime_content_bundle(lifecycle)
+
+    assignment_payloads = sorted(
+        (
+            assignment.to_payload()
+            for assignment in bundle.activation.selected_enhancement_assignments
+            if assignment.player_id == "player-a"
+        ),
+        key=lambda payload: str(payload["assignment_id"]),
+    )
+    assert assignment_payloads == [
+        {
+            "assignment_id": "army-alpha:000010900002:blades-1",
+            "player_id": "player-a",
+            "army_id": "army-alpha",
+            "enhancement_id": "000010900002",
+            "target_unit_selection_id": "blades-1",
+            "bearer_unit_instance_id": "army-alpha:blades-1",
+            "source_id": "ws14-spectacle:assignment:blades-1:000010900002",
+        },
+        {
+            "assignment_id": "army-alpha:000010900003:blades-2",
+            "player_id": "player-a",
+            "army_id": "army-alpha",
+            "enhancement_id": "000010900003",
+            "target_unit_selection_id": "blades-2",
+            "bearer_unit_instance_id": "army-alpha:blades-2",
+            "source_id": "ws14-spectacle:assignment:blades-2:000010900003",
+        },
+    ]
+
+    fights_first = FightsFirstRegistry.from_state(state)
+    assert fights_first.has_unit("army-alpha:blades-1")
+    assert fights_first.has_unit("army-alpha:blades-2")
+
+    eager_model_id = _first_model_id(state, unit_instance_id="army-alpha:blades-2")
+    assert (
+        bundle.runtime_modifier_registry.modified_movement_inches(
+            MovementBudgetModifierContext(
+                state=state,
+                unit_instance_id="army-alpha:blades-2",
+                model_instance_id=eager_model_id,
+                base_movement_inches=6.0,
+                current_movement_inches=6.0,
+            )
+        )
+        == 8.0
+    )
+
+    snap_restrictions = bundle.shooting_target_restriction_hook_registry.restrictions_for(
+        ShootingTargetRestrictionContext(
+            state=state,
+            player_id="player-b",
+            battle_round=state.battle_round,
+            attacking_unit_instance_id="army-beta:blades-3",
+            target_unit_instance_id="army-alpha:blades-1",
+            attacker_model_instance_id=_first_model_id(
+                state, unit_instance_id="army-beta:blades-3"
+            ),
+            shooting_type=ShootingType.SNAP,
+        )
+    )
+    assert len(snap_restrictions) == 1
+    assert snap_restrictions[0].violation_code == (
+        "spectacle_of_slaughter_beguiling_grotesquerie_snap_target_forbidden"
+    )
+    normal_restrictions = bundle.shooting_target_restriction_hook_registry.restrictions_for(
+        ShootingTargetRestrictionContext(
+            state=state,
+            player_id="player-b",
+            battle_round=state.battle_round,
+            attacking_unit_instance_id="army-beta:blades-3",
+            target_unit_instance_id="army-alpha:blades-1",
+            attacker_model_instance_id=_first_model_id(
+                state, unit_instance_id="army-beta:blades-3"
+            ),
+            shooting_type=ShootingType.NORMAL,
+        )
+    )
+    assert normal_restrictions == ()
+    assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
+
+
+@pytest.mark.integration
+def test_ws14_spectacle_of_slaughter_stratagems_execute_through_lifecycle() -> None:
+    honour_lifecycle = _spectacle_battle_lifecycle()
+    use_record, submit_status = _use_spectacle_stratagem_through_lifecycle(
+        honour_lifecycle,
+        stratagem_id="000010901002",
+        target_unit_id="army-alpha:blades-1",
+        phase=BattlePhase.FIGHT,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+    )
+    assert use_record.targeted_unit_instance_ids == ("army-alpha:blades-1",)
+    assert submit_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    honour_effect_payload = _last_event_payload(honour_lifecycle, "rule_execution_effect_applied")
+    honour_effect = _json_object(honour_effect_payload["effect"])
+    assert honour_effect["kind"] == "grant_weapon_ability"
+    assert honour_effect_payload["target_unit_instance_ids"] == ["army-alpha:blades-1"]
+
+    honour_hook_lifecycle = _spectacle_battle_lifecycle()
+    honour_hook_state = _state(honour_hook_lifecycle)
+    honour_hook_bundle = _runtime_content_bundle(honour_hook_lifecycle)
+    _use_spectacle_stratagem(
+        honour_hook_lifecycle,
+        stratagem_id="000010901002",
+        target_unit_id="army-alpha:blades-1",
+        phase=BattlePhase.FIGHT,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+    )
+    precision_profile = honour_hook_bundle.runtime_modifier_registry.modified_weapon_profile(
+        _spectacle_weapon_profile_context(
+            state=honour_hook_state,
+            weapon_profile=_leader_blade_profile(),
+            attacker_model_id=_first_model_id(
+                honour_hook_state,
+                unit_instance_id="army-alpha:blades-1",
+            ),
+            source_phase=BattlePhase.FIGHT,
+        )
+    )
+    assert WeaponKeyword.PRECISION in precision_profile.keywords
+
+    single_lifecycle = _spectacle_battle_lifecycle()
+    _use_record, submit_status = _use_spectacle_stratagem_through_lifecycle(
+        single_lifecycle,
+        stratagem_id="000010901003",
+        target_unit_id="army-alpha:blades-1",
+        phase=BattlePhase.CHARGE,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+    )
+    assert submit_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    single_effect_payload = _last_event_payload(single_lifecycle, "rule_execution_effect_applied")
+    single_effect = _json_object(single_effect_payload["effect"])
+    assert single_effect["kind"] == "movement_transit_permission"
+    assert single_effect_payload["target_unit_instance_ids"] == ["army-alpha:blades-1"]
+
+    single_hook_lifecycle = _spectacle_battle_lifecycle()
+    single_hook_state = _state(single_hook_lifecycle)
+    _use_spectacle_stratagem(
+        single_hook_lifecycle,
+        stratagem_id="000010901003",
+        target_unit_id="army-alpha:blades-1",
+        phase=BattlePhase.CHARGE,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+    )
+    assert charge_transit_through_non_vehicle_monster_models_allowed(
+        tuple(single_hook_state.persisting_effects_for_unit("army-alpha:blades-1")),
+        owner_player_id="player-a",
+    )
+
+    intoxicated_lifecycle = _spectacle_battle_lifecycle()
+    use_record, submit_status = _use_spectacle_stratagem_through_lifecycle(
+        intoxicated_lifecycle,
+        stratagem_id="000010901004",
+        target_unit_id="army-alpha:blades-1",
+        phase=BattlePhase.MOVEMENT,
+        active_player_id="player-b",
+        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+        trigger_payload={
+            FALL_BACK_UNIT_CONTEXT_KEY: "army-beta:blades-3",
+            ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY: ["army-alpha:blades-1"],
+        },
+    )
+    assert use_record.targeted_unit_instance_ids == ("army-alpha:blades-1",)
+    assert submit_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = intoxicated_lifecycle.pending_decision_request()
+    assert request is not None
+    assert request.decision_type == SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE
+    request_payload = _json_object(request.payload)
+    eligible_units = request_payload["eligible_units"]
+    assert isinstance(eligible_units, list)
+    assert len(eligible_units) == 1
+    eligible_unit = _json_object(eligible_units[0])
+    assert eligible_unit["unit_instance_id"] == "army-alpha:blades-1"
+    descriptor = _json_object(request_payload["descriptor"])
+    max_distance = descriptor["max_distance_inches"]
+    assert isinstance(max_distance, int | float)
+    assert 4 <= max_distance <= 6
+    event_payload = _last_event_payload(
+        intoxicated_lifecycle,
+        "generic_stratagem_triggered_normal_move_requested",
+    )
+    assert event_payload["unit_instance_id"] == "army-alpha:blades-1"
+    assert "object at 0x" not in json.dumps(intoxicated_lifecycle.to_payload(), sort_keys=True)
+    assert (
+        GameLifecycle.from_payload(intoxicated_lifecycle.to_payload()).to_payload()
+        == intoxicated_lifecycle.to_payload()
+    )
+
+
 def _more_dakka_lifecycle_config() -> GameConfig:
     catalog = _more_dakka_catalog()
     return GameConfig(
@@ -656,6 +918,197 @@ def _more_dakka_stratagem(
         source_id=f"phase17e:stratagem:orks:more-dakka:{stratagem_id}",
         command_point_cost=command_point_cost,
         timing_tags=("shooting",),
+    )
+
+
+def _spectacle_lifecycle_config() -> GameConfig:
+    catalog = _spectacle_catalog()
+    return GameConfig(
+        game_id="ws14-spectacle-of-slaughter-generic-ir-game",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            _spectacle_muster_request(
+                catalog=catalog,
+                army_id="army-alpha",
+                player_id="player-a",
+                unit_selection_ids=("blades-1", "blades-2"),
+                enhancement_assignments=(
+                    ("000010900002", "blades-1"),
+                    ("000010900003", "blades-2"),
+                ),
+            ),
+            _spectacle_muster_request(
+                catalog=catalog,
+                army_id="army-beta",
+                player_id="player-b",
+                unit_selection_ids=("blades-3",),
+                enhancement_assignments=(),
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring-it-down"),
+        mission_setup=_mission_setup(),
+    )
+
+
+def _spectacle_battle_lifecycle() -> GameLifecycle:
+    config = _spectacle_lifecycle_config()
+    armies = tuple(
+        muster_army(catalog=config.army_catalog, request=request)
+        for request in config.army_muster_requests
+    )
+    state = GameState.from_config(config)
+    for army in armies:
+        state.record_army_definition(army)
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="ws14-spectacle-battlefield",
+        armies=armies,
+    )
+    state.record_battlefield_state(scenario.battlefield_state)
+    _record_fixed_secondary_choices_for_fixture(state, config=config)
+    enter_battle_for_fixture(state)
+    lifecycle = GameLifecycle.from_payload(
+        {
+            "config": config.to_payload(),
+            "parameterized_movement_proposals": True,
+            "state": state.to_payload(),
+            "decisions": DecisionController().to_payload(),
+            "reaction_queue": ReactionQueue().to_payload(),
+        }
+    )
+    _apply_battle_formation_hooks_from_bundle(lifecycle)
+    return lifecycle
+
+
+def _spectacle_catalog() -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_datasheet = base_catalog.datasheet_by_id("core-boyz-like-infantry")
+    flawless_blades_datasheet = replace(
+        base_datasheet,
+        datasheet_id="ws14-emperors-children-flawless-blades",
+        name="WS14 Emperor's Children Flawless Blades",
+        keywords=DatasheetKeywordSet(
+            keywords=("Character", "Infantry"),
+            faction_keywords=("Emperor's Children", "Flawless Blades"),
+        ),
+        source_ids=("datasheet:ws14-emperors-children-flawless-blades",),
+    )
+    core_weapons = tuple(
+        wargear
+        for wargear in base_catalog.wargear
+        if wargear.wargear_id in {"core-leader-blade", "core-mob-shoota"}
+    )
+    return ArmyCatalog(
+        catalog_id="ws14-spectacle-of-slaughter-demo",
+        ruleset_id=base_catalog.ruleset_id,
+        source_package_id="data-package:core-v2:ws14-spectacle-of-slaughter-demo:0.1.0",
+        datasheets=(flawless_blades_datasheet,),
+        wargear=core_weapons,
+        factions=(
+            FactionDefinition(
+                faction_id="emperors-children",
+                name="Emperor's Children",
+                faction_keywords=("Emperor's Children",),
+                source_ids=("faction:emperors-children",),
+            ),
+        ),
+        detachments=(
+            DetachmentDefinition(
+                detachment_id="spectacle-of-slaughter",
+                name="Spectacle of Slaughter",
+                faction_id="emperors-children",
+                detachment_point_cost=1,
+                unit_datasheet_ids=("ws14-emperors-children-flawless-blades",),
+                force_disposition_ids=("purge-the-foe",),
+                rule_source_ids=("phase17e:emperors-children:spectacle-of-slaughter:rule",),
+                enhancement_ids=("000010900002", "000010900003"),
+                stratagem_ids=("000010901002", "000010901003", "000010901004"),
+                source_ids=("detachment:spectacle-of-slaughter",),
+            ),
+        ),
+        enhancements=(
+            EnhancementDefinition(
+                enhancement_id="000010900002",
+                name="Beguiling Grotesquerie Upgrade",
+                source_id=(
+                    "phase17e:enhancement:emperors-children:spectacle-of-slaughter:000010900002"
+                ),
+                points=15,
+            ),
+            EnhancementDefinition(
+                enhancement_id="000010900003",
+                name="Eager Patrons Upgrade",
+                source_id=(
+                    "phase17e:enhancement:emperors-children:spectacle-of-slaughter:000010900003"
+                ),
+                points=20,
+            ),
+        ),
+        stratagems=(
+            _spectacle_stratagem("000010901002", "Honour Is For Fools"),
+            _spectacle_stratagem("000010901003", "Single-Minded Strike"),
+            _spectacle_stratagem("000010901004", "Intoxicated By Triumph"),
+        ),
+        source_ids=("catalog:ws14-spectacle-of-slaughter-demo",),
+    )
+
+
+def _spectacle_stratagem(stratagem_id: str, name: str) -> StratagemDefinition:
+    return StratagemDefinition(
+        stratagem_id=stratagem_id,
+        name=name,
+        source_id=f"phase17e:stratagem:emperors-children:spectacle-of-slaughter:{stratagem_id}",
+        command_point_cost=1,
+        timing_tags=("fight", "charge", "movement"),
+    )
+
+
+def _spectacle_muster_request(
+    *,
+    catalog: ArmyCatalog,
+    army_id: str,
+    player_id: str,
+    unit_selection_ids: tuple[str, ...],
+    enhancement_assignments: tuple[tuple[str, str], ...],
+) -> ArmyMusterRequest:
+    return ArmyMusterRequest(
+        army_id=army_id,
+        player_id=player_id,
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="emperors-children",
+            detachment_ids=("spectacle-of-slaughter",),
+            enhancement_ids=("000010900002", "000010900003"),
+        ),
+        unit_selections=tuple(
+            UnitMusterSelection(
+                unit_selection_id=unit_selection_id,
+                datasheet_id="ws14-emperors-children-flawless-blades",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-boyz-like",
+                        model_count=10,
+                    ),
+                ),
+            )
+            for unit_selection_id in unit_selection_ids
+        ),
+        enhancement_assignments=tuple(
+            EnhancementAssignment(
+                enhancement_id=enhancement_id,
+                target_unit_selection_id=target_unit_selection_id,
+                source_id=(
+                    f"ws14-spectacle:assignment:{target_unit_selection_id}:{enhancement_id}"
+                ),
+            )
+            for enhancement_id, target_unit_selection_id in enhancement_assignments
+        ),
+        roster_legality_required=False,
     )
 
 
@@ -868,6 +1321,79 @@ def _use_more_dakka_stratagem_through_lifecycle(
     return use_record, status
 
 
+def _use_spectacle_stratagem(
+    lifecycle: GameLifecycle,
+    *,
+    stratagem_id: str,
+    target_unit_id: str,
+    phase: BattlePhase,
+    command_points: int = 1,
+    active_player_id: str = "player-a",
+    trigger_kind: TimingTriggerKind = TimingTriggerKind.START_PHASE,
+    trigger_payload: JsonValue = None,
+) -> StratagemUseRecord:
+    state = _state(lifecycle)
+    result = _spectacle_stratagem_decision_result(
+        lifecycle,
+        stratagem_id=stratagem_id,
+        target_unit_id=target_unit_id,
+        phase=phase,
+        command_points=command_points,
+        active_player_id=active_player_id,
+        trigger_kind=trigger_kind,
+        trigger_payload=trigger_payload,
+    )
+    lifecycle.decision_controller.submit_result(result)
+    config = object.__getattribute__(lifecycle, "_config")
+    if type(config) is not GameConfig:
+        raise AssertionError("Lifecycle config was not loaded.")
+    use_record = apply_stratagem_decision(
+        state=state,
+        result=result,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=config.ruleset_descriptor,
+        army_catalog=config.army_catalog,
+        stratagem_handler_registry=(_runtime_content_bundle(lifecycle).stratagem_handler_registry),
+        stratagem_cost_modifier_registry=(
+            _runtime_content_bundle(lifecycle).stratagem_cost_modifier_registry
+        ),
+        shooting_unit_selected_grant_hooks=(
+            _runtime_content_bundle(lifecycle).shooting_unit_selected_grant_hook_registry
+        ),
+    )
+    assert state.stratagem_use_records[-1] == use_record
+    return use_record
+
+
+def _use_spectacle_stratagem_through_lifecycle(
+    lifecycle: GameLifecycle,
+    *,
+    stratagem_id: str,
+    target_unit_id: str,
+    phase: BattlePhase,
+    command_points: int = 1,
+    active_player_id: str = "player-a",
+    trigger_kind: TimingTriggerKind = TimingTriggerKind.START_PHASE,
+    trigger_payload: JsonValue = None,
+) -> tuple[StratagemUseRecord, LifecycleStatus]:
+    state = _state(lifecycle)
+    result = _spectacle_stratagem_decision_result(
+        lifecycle,
+        stratagem_id=stratagem_id,
+        target_unit_id=target_unit_id,
+        phase=phase,
+        command_points=command_points,
+        active_player_id=active_player_id,
+        trigger_kind=trigger_kind,
+        trigger_payload=trigger_payload,
+    )
+    status = lifecycle.submit_decision(result)
+    use_record = state.stratagem_use_records[-1]
+    assert use_record.stratagem_id == stratagem_id
+    assert use_record.targeted_unit_instance_ids == (target_unit_id,)
+    return use_record, status
+
+
 def _more_dakka_stratagem_decision_result(
     lifecycle: GameLifecycle,
     *,
@@ -905,6 +1431,48 @@ def _more_dakka_stratagem_decision_result(
     )
     return DecisionResult.for_request(
         result_id=f"ws14-more-dakka-{stratagem_id}-result",
+        request=request,
+        selected_option_id=selected_option.option_id,
+    )
+
+
+def _spectacle_stratagem_decision_result(
+    lifecycle: GameLifecycle,
+    *,
+    stratagem_id: str,
+    target_unit_id: str,
+    phase: BattlePhase,
+    command_points: int,
+    active_player_id: str,
+    trigger_kind: TimingTriggerKind,
+    trigger_payload: JsonValue,
+) -> DecisionResult:
+    state = _state(lifecycle)
+    _prepare_battle_phase(state, phase=phase, active_player_id=active_player_id)
+    _grant_cp(state, player_id="player-a", amount=command_points)
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id="player-a",
+        trigger_kind=trigger_kind,
+        trigger_payload=trigger_payload,
+    )
+    status = request_stratagem_use_from_index(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        index=_runtime_content_bundle(lifecycle).stratagem_indexes_by_player_id["player-a"],
+        context=context,
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = lifecycle.pending_decision_request()
+    assert request is not None
+    selected_option = next(
+        option
+        for option in request.options
+        if _option_stratagem_id(option.payload) == stratagem_id
+        and _option_target_unit_id(option.payload) == target_unit_id
+    )
+    return DecisionResult.for_request(
+        result_id=f"ws14-spectacle-{stratagem_id}-result",
         request=request,
         selected_option_id=selected_option.option_id,
     )
@@ -985,6 +1553,33 @@ def _mob_shoota_profile() -> WeaponProfile:
         for wargear in _more_dakka_catalog().wargear
         if wargear.wargear_id == "core-mob-shoota"
     ).weapon_profiles[0]
+
+
+def _leader_blade_profile() -> WeaponProfile:
+    return next(
+        wargear
+        for wargear in _spectacle_catalog().wargear
+        if wargear.wargear_id == "core-leader-blade"
+    ).weapon_profiles[0]
+
+
+def _spectacle_weapon_profile_context(
+    *,
+    state: GameState,
+    weapon_profile: WeaponProfile,
+    attacker_model_id: str,
+    source_phase: BattlePhase,
+    attacking_unit_id: str = "army-alpha:blades-1",
+    target_unit_id: str = "army-beta:blades-3",
+) -> WeaponProfileModifierContext:
+    return WeaponProfileModifierContext(
+        state=state,
+        source_phase=source_phase,
+        attacking_unit_instance_id=attacking_unit_id,
+        attacker_model_instance_id=attacker_model_id,
+        target_unit_instance_id=target_unit_id,
+        weapon_profile=weapon_profile,
+    )
 
 
 def _weapon_profile_context(

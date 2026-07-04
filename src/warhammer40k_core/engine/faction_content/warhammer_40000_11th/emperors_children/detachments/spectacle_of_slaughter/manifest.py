@@ -18,7 +18,7 @@ CONTRIBUTION_ID = ":".join(
         "detachment",
         "spectacle_of_slaughter",
         "manifest",
-        "scaffold",
+        "rule_ir",
     )
 )
 

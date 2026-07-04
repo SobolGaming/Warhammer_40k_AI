@@ -12,6 +12,20 @@ RUNTIME_GENERIC_IR_BOUNDARY_FILES = (
     / "source_packages"
     / "warhammer_40000_11th"
     / "faction_generic_ir_support_2026_27.py",
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "rules"
+    / "source_packages"
+    / "warhammer_40000_11th"
+    / "faction_generic_ir_static_payloads_2026_27.py",
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "rules"
+    / "source_packages"
+    / "warhammer_40000_11th"
+    / "faction_spectacle_of_slaughter_ir_support_2026_27.py",
     ROOT / "src" / "warhammer40k_core" / "engine" / "faction_content" / "stratagem_activation.py",
     ROOT
     / "src"

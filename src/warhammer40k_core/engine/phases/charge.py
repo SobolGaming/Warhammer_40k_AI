@@ -53,6 +53,11 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
     ChargeDeclarationGrantPayload,
     ChargeDeclarationHookRegistry,
 )
+from warhammer40k_core.engine.charge_rule_effects import (
+    charge_path_context_with_rule_effect_permissions,
+    enemy_vehicle_monster_model_ids_for_player,
+    unit_has_vehicle_or_monster_keyword,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     DecisionError,
@@ -2185,6 +2190,7 @@ def _apply_charge_move_proposal_decision(
         maximum_distance_inches=pending_distance.roll_result.value,
         path_witness=proposal.witness,
         hover_mode_states=tuple(state.hover_mode_states),
+        unit_persisting_effects=tuple(state.persisting_effects_for_unit(proposal.unit_instance_id)),
     )
     violation_code = _charge_move_violation_code(
         resolution=resolution,
@@ -2245,6 +2251,7 @@ def resolve_charge_move(
     path_witness: PathWitness,
     hover_mode_states: tuple[HoverModeState, ...] = (),
     terrain: tuple[TerrainVolume, ...] = (),
+    unit_persisting_effects: tuple[PersistingEffect, ...] = (),
 ) -> ChargeMoveResolution:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Charge Move requires a BattlefieldScenario.")
@@ -2286,6 +2293,10 @@ def resolve_charge_move(
     path_validation_results: list[PathValidationResult] = []
     terrain_path_legality_results: list[TerrainPathLegalityResult] = []
     model_movements: list[JsonValue] = []
+    enemy_vehicle_monster_model_ids = enemy_vehicle_monster_model_ids_for_player(
+        scenario=scenario,
+        player_id=unit_placement.player_id,
+    )
     for placement in unit_placement.model_placements:
         model = scenario.model_instance_for_placement(placement)
         moving_model = geometry_model_for_placement(model=model, placement=placement)
@@ -2304,7 +2315,7 @@ def resolve_charge_move(
             movement_phase_action=None,
             displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
         )
-        path_result = legality_context.to_path_validation_context(
+        path_context = legality_context.to_path_validation_context(
             moving_model=moving_model,
             witness=model_witness,
             battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
@@ -2325,11 +2336,14 @@ def resolve_charge_move(
                 player_id=unit_placement.player_id,
                 moving_model_instance_id=placement.model_instance_id,
             ),
-            enemy_vehicle_monster_model_ids=_enemy_vehicle_monster_model_ids_for_player(
-                scenario=scenario,
-                player_id=unit_placement.player_id,
-            ),
+            enemy_vehicle_monster_model_ids=enemy_vehicle_monster_model_ids,
             movement_distance_budget_inches=float(maximum_distance_inches),
+        )
+        path_result = charge_path_context_with_rule_effect_permissions(
+            path_context,
+            unit_persisting_effects=unit_persisting_effects,
+            owner_player_id=unit_placement.player_id,
+            enemy_vehicle_monster_model_ids=enemy_vehicle_monster_model_ids,
         ).validate()
         terrain_result = legality_context.to_terrain_path_legality_context(
             moving_model=moving_model,
@@ -2862,7 +2876,7 @@ def _friendly_vehicle_monster_model_ids(
             continue
         for unit_placement in placed_army.unit_placements:
             unit = scenario.unit_instance_for_placement(unit_placement)
-            if not _unit_has_vehicle_or_monster_keyword(unit.keywords):
+            if not unit_has_vehicle_or_monster_keyword(unit.keywords):
                 continue
             model_ids.extend(
                 placement.model_instance_id
@@ -2870,31 +2884,6 @@ def _friendly_vehicle_monster_model_ids(
                 if placement.model_instance_id != moving_model_id
             )
     return tuple(sorted(model_ids))
-
-
-def _enemy_vehicle_monster_model_ids_for_player(
-    *,
-    scenario: BattlefieldScenario,
-    player_id: str,
-) -> tuple[str, ...]:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    model_ids: list[str] = []
-    for placed_army in scenario.battlefield_state.placed_armies:
-        if placed_army.player_id == requested_player_id:
-            continue
-        for unit_placement in placed_army.unit_placements:
-            unit = scenario.unit_instance_for_placement(unit_placement)
-            if not _unit_has_vehicle_or_monster_keyword(unit.keywords):
-                continue
-            model_ids.extend(
-                placement.model_instance_id for placement in unit_placement.model_placements
-            )
-    return tuple(sorted(model_ids))
-
-
-def _unit_has_vehicle_or_monster_keyword(keywords: tuple[str, ...]) -> bool:
-    keyword_set = {_canonical_keyword(keyword) for keyword in keywords}
-    return "VEHICLE" in keyword_set or "MONSTER" in keyword_set
 
 
 def _charge_endpoint_witness(
@@ -3709,10 +3698,6 @@ def _validate_json_object(field_name: str, value: object) -> dict[str, JsonValue
     if not isinstance(json_value, dict):
         raise GameLifecycleError(f"{field_name} must be a JSON object.")
     return json_value
-
-
-def _canonical_keyword(value: str) -> str:
-    return _validate_identifier("keyword", value).upper().replace(" ", "_").replace("-", "_")
 
 
 def _key_error_field(error: KeyError) -> str:

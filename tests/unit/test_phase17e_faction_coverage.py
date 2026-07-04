@@ -94,9 +94,15 @@ GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        "enhancement:emperors-children:spectacle-of-slaughter:000010900002",
         "enhancement:genestealer-cults:outlander-claw:000009079002",
         "enhancement:orks:more-dakka:000009991005",
         "enhancement:tyranids:warrior-bioform-onslaught:000009737005",
+    }
+)
+GENERIC_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        "enhancement:emperors-children:spectacle-of-slaughter:000010900003",
     }
 )
 GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
@@ -119,13 +125,22 @@ GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         *GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
+        *GENERIC_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
     }
 )
-GENERIC_DETACHMENT_RULE_KEYS = frozenset({("orks", "more-dakka")})
+GENERIC_DETACHMENT_RULE_KEYS = frozenset(
+    {
+        ("emperors-children", "spectacle-of-slaughter"),
+        ("orks", "more-dakka"),
+    }
+)
 GENERIC_STRATAGEM_SOURCE_ROW_IDS = frozenset(
     {
+        "stratagem:emperors-children:spectacle-of-slaughter:000010901002",
+        "stratagem:emperors-children:spectacle-of-slaughter:000010901003",
+        "stratagem:emperors-children:spectacle-of-slaughter:000010901004",
         "stratagem:orks:more-dakka:000009992002",
         "stratagem:orks:more-dakka:000009992003",
         "stratagem:orks:more-dakka:000009992004",
@@ -1075,6 +1090,10 @@ def test_phase17e_generic_enhancements_are_template_family_bounded() -> None:
     assert (
         set(generic_ir_support_source.supported_grant_ability_enhancement_source_row_ids())
         == GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
+    )
+    assert (
+        set(generic_ir_support_source.supported_movement_distance_enhancement_source_row_ids())
+        == GENERIC_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS
     )
     assert (
         set(

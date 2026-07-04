@@ -909,17 +909,21 @@ def _detachment_rows(
 ) -> tuple[Phase17ECoverageRow, ...]:
     runtime_consumer_ids = _detachment_rule_runtime_consumer_ids(detachment_row)
     rule_ir_hash = generic_ir_support.generic_supported_detachment_rule_ir_hash(detachment_row)
+    status = Phase17ECoverageStatus.GENERIC_SUPPORTED
+    handler_id: str | None = None
+    if rule_ir_hash is None and runtime_consumer_ids:
+        status = Phase17ECoverageStatus.IMPLEMENTED
+        handler_id = runtime_consumer_ids[0]
+    elif rule_ir_hash is None:
+        status = Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED
+        handler_id = f"phase17e:detachment:{detachment_row.detachment_id}:rule"
     return (
         Phase17ECoverageRow(
             descriptor_id=(
                 f"phase17e:{detachment_row.faction_id}:{detachment_row.detachment_id}:rule"
             ),
             coverage_kind=Phase17ECoverageKind.DETACHMENT_RULE,
-            status=(
-                Phase17ECoverageStatus.IMPLEMENTED
-                if runtime_consumer_ids
-                else Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED
-            ),
+            status=status,
             faction_id=detachment_row.faction_id,
             faction_name=pdf_record.faction_name,
             source_ids=(detachment_row.source_id, pdf_record.source_id),
@@ -936,11 +940,7 @@ def _detachment_rows(
                 else None
             ),
             runtime_consumer_ids=runtime_consumer_ids,
-            handler_id=(
-                runtime_consumer_ids[0]
-                if runtime_consumer_ids
-                else f"phase17e:detachment:{detachment_row.detachment_id}:rule"
-            ),
+            handler_id=handler_id,
             rule_ir_hash=rule_ir_hash,
         ),
     )
@@ -1004,10 +1004,19 @@ def _stratagem_row(
     pdf_record: Phase17EFactionPdfRecord,
 ) -> Phase17ECoverageRow:
     rule_ir_hash = generic_ir_support.generic_supported_stratagem_rule_ir_hash(source_row)
+    status = Phase17ECoverageStatus.GENERIC_SUPPORTED
+    handler_id: str | None = None
+    if rule_ir_hash is None:
+        status = _exact_subrule_coverage_status(source_row.runtime_consumer_ids)
+        handler_id = _exact_subrule_handler_id(
+            default_handler_id=f"phase17e:{source_row.faction_id}:{source_row.detachment_id}:"
+            f"stratagem:{source_row.stratagem_id}",
+            runtime_consumer_ids=source_row.runtime_consumer_ids,
+        )
     return Phase17ECoverageRow(
         descriptor_id=f"phase17e:{source_row.source_row_id}",
         coverage_kind=Phase17ECoverageKind.DETACHMENT_STRATAGEM,
-        status=_exact_subrule_coverage_status(source_row.runtime_consumer_ids),
+        status=status,
         faction_id=source_row.faction_id,
         faction_name=source_row.faction_name,
         source_ids=(*source_row.all_source_ids, detachment_row.source_id, pdf_record.source_id),
@@ -1023,14 +1032,7 @@ def _stratagem_row(
         rule_category=source_row.category,
         runtime_support_status=source_row.runtime_support_status,
         runtime_consumer_ids=source_row.runtime_consumer_ids,
-        handler_id=_exact_subrule_handler_id(
-            default_handler_id=(
-                "phase17e:"
-                f"{source_row.faction_id}:{source_row.detachment_id}:"
-                f"stratagem:{source_row.stratagem_id}"
-            ),
-            runtime_consumer_ids=source_row.runtime_consumer_ids,
-        ),
+        handler_id=handler_id,
         rule_ir_hash=rule_ir_hash,
     )
 
