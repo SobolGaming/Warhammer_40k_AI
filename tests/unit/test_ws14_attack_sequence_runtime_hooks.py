@@ -1,0 +1,450 @@
+from __future__ import annotations
+
+from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword, WeaponProfile
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.effects import (
+    GENERIC_RULE_EFFECT_KIND,
+    EffectExpiration,
+    EffectExpirationBoundary,
+    PersistingEffect,
+)
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.list_validation import (
+    DetachmentSelection,
+    ModelProfileSelection,
+    UnitMusterSelection,
+    WargearSelection,
+)
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage
+from warhammer40k_core.engine.runtime_modifiers import (
+    DamageRollModifierContext,
+    HitRollModifierContext,
+    RuntimeModifierRegistry,
+    SaveOptionModifierContext,
+    WeaponProfileModifierContext,
+    WoundRollModifierContext,
+)
+from warhammer40k_core.engine.saves import SaveKind, SaveOption
+from warhammer40k_core.engine.source_backed_rerolls import (
+    source_backed_reroll_permission_context_for_unit,
+)
+from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+
+
+def test_ws14_generic_attack_roll_hooks_bind_attacker_and_target_roles() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender-unit")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    profile = _weapon_profile(catalog, attacker.own_models[0].wargear_ids[0])
+    registry = RuntimeModifierRegistry.empty()
+
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:attacker-hit-bonus",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(attacker.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="modify_dice_roll",
+            parameters={"roll_type": "hit", "delta": 1},
+        )
+    )
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:defender-hit-penalty",
+            owner_player_id="player-b",
+            target_unit_instance_ids=(defender.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="modify_dice_roll",
+            parameters={"roll_type": "hit", "delta": -1},
+        )
+    )
+
+    assert (
+        registry.hit_roll_modifier(
+            HitRollModifierContext(
+                state=state,
+                attacking_unit_instance_id=attacker.unit_instance_id,
+                attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                target_unit_instance_id=defender.unit_instance_id,
+                weapon_profile=profile,
+                source_phase=BattlePhase.SHOOTING,
+            )
+        )
+        == 0
+    )
+    assert (
+        registry.hit_roll_modifier(
+            HitRollModifierContext(
+                state=state,
+                attacking_unit_instance_id=defender.unit_instance_id,
+                attacker_model_instance_id=defender.own_models[0].model_instance_id,
+                target_unit_instance_id=attacker.unit_instance_id,
+                weapon_profile=profile,
+                source_phase=BattlePhase.SHOOTING,
+            )
+        )
+        == 0
+    )
+
+
+def test_ws14_generic_selected_target_wound_and_damage_hooks_use_explicit_attack_role() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender-unit")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    profile = _weapon_profile(catalog, attacker.own_models[0].wargear_ids[0])
+    registry = RuntimeModifierRegistry.empty()
+
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:selected-target-wound",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(defender.unit_instance_id,),
+            target_kind="selected_target",
+            effect_kind="modify_dice_roll",
+            parameters={"roll_type": "wound", "delta": 1, "attack_role": "target"},
+        )
+    )
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:selected-target-damage",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(defender.unit_instance_id,),
+            target_kind="selected_target",
+            effect_kind="modify_dice_roll",
+            parameters={"roll_type": "damage", "delta": 2, "attack_role": "target"},
+        )
+    )
+
+    assert (
+        registry.wound_roll_modifier(
+            WoundRollModifierContext(
+                state=state,
+                source_phase=BattlePhase.SHOOTING,
+                attacking_unit_instance_id=attacker.unit_instance_id,
+                attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                target_unit_instance_id=defender.unit_instance_id,
+                weapon_profile=profile,
+                strength=4,
+                toughness=4,
+            )
+        )
+        == 1
+    )
+    assert (
+        registry.damage_roll_modifier(
+            DamageRollModifierContext(
+                state=state,
+                source_phase=BattlePhase.SHOOTING,
+                attacking_unit_instance_id=attacker.unit_instance_id,
+                attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                target_unit_instance_id=defender.unit_instance_id,
+                weapon_profile=profile,
+                current_value=3,
+            )
+        )
+        == 2
+    )
+
+
+def test_ws14_generic_save_and_weapon_profile_hooks_execute_from_persisted_payloads() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender-unit")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    model = attacker.own_models[0]
+    profile = _weapon_profile(catalog, model.wargear_ids[0])
+    registry = RuntimeModifierRegistry.empty()
+
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:attacker-lethal-hits",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(attacker.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="grant_weapon_ability",
+            parameters={
+                "weapon_ability": WeaponKeyword.LETHAL_HITS.value,
+                "weapon_scope": "all",
+            },
+        )
+    )
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:attacker-strength",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(attacker.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="modify_characteristic",
+            parameters={"characteristic": "strength", "delta": 1},
+        )
+    )
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:target-save-bonus",
+            owner_player_id="player-b",
+            target_unit_instance_ids=(defender.unit_instance_id,),
+            target_kind="selected_target",
+            effect_kind="modify_dice_roll",
+            parameters={"roll_type": "save", "delta": 1, "attack_role": "target"},
+        )
+    )
+
+    modified_profile = registry.modified_weapon_profile(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.SHOOTING,
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attacker_model_instance_id=model.model_instance_id,
+            target_unit_instance_id=defender.unit_instance_id,
+            weapon_profile=profile,
+        )
+    )
+    modified_saves = registry.modified_save_options(
+        SaveOptionModifierContext(
+            state=state,
+            source_phase=BattlePhase.SHOOTING,
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attacker_model_instance_id=model.model_instance_id,
+            target_unit_instance_id=defender.unit_instance_id,
+            weapon_profile=profile,
+            save_options=(
+                SaveOption(
+                    save_kind=SaveKind.ARMOUR,
+                    target_number=4,
+                    characteristic_target_number=4,
+                    armor_penetration=0,
+                ),
+            ),
+        )
+    )
+
+    assert WeaponKeyword.LETHAL_HITS in modified_profile.keywords
+    assert any(
+        ability.ability_kind is AbilityKind.LETHAL_HITS for ability in modified_profile.abilities
+    )
+    assert modified_profile.strength.final == profile.strength.final + 1
+    assert modified_saves[0].target_number == 3
+    assert modified_saves[0].characteristic_target_number == 3
+
+
+def test_ws14_generic_reroll_permission_uses_source_backed_attack_path() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender-unit")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:attacker-hit-reroll",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(attacker.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="reroll_permission",
+            parameters={"roll_type": "hit", "attack_role": "attacker"},
+        )
+    )
+
+    context = source_backed_reroll_permission_context_for_unit(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=attacker.unit_instance_id,
+        model_instance_id=attacker.own_models[0].model_instance_id,
+        roll_type="attack_sequence.hit",
+        timing_window="attack_sequence.hit",
+        attack_kind="ranged",
+        target_unit_instance_id=defender.unit_instance_id,
+    )
+
+    assert context is not None
+    assert context.permission.eligible_roll_type == "attack_sequence.hit"
+    assert context.permission.timing_window == "attack_sequence.hit"
+    assert context.source_payload["effect_kind"] == GENERIC_RULE_EFFECT_KIND
+
+
+def test_ws14_generic_attack_hooks_observe_persisting_effect_expiry() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender-unit")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    profile = _weapon_profile(catalog, attacker.own_models[0].wargear_ids[0])
+    registry = RuntimeModifierRegistry.empty()
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:expiring-hit-bonus",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(attacker.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="modify_dice_roll",
+            parameters={"roll_type": "hit", "delta": 1, "attack_role": "attacker"},
+        )
+    )
+    context = HitRollModifierContext(
+        state=state,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        target_unit_instance_id=defender.unit_instance_id,
+        weapon_profile=profile,
+        source_phase=BattlePhase.SHOOTING,
+    )
+
+    assert registry.hit_roll_modifier(context) == 1
+
+    state.expire_persisting_effects_at_boundary(
+        EffectExpirationBoundary.phase_end(
+            battle_round=1,
+            phase=BattlePhase.SHOOTING,
+            player_id="player-a",
+        )
+    )
+
+    assert registry.hit_roll_modifier(context) == 0
+
+
+def _unit(*, catalog: ArmyCatalog, army_id: str, unit_selection_id: str) -> UnitInstance:
+    datasheet = catalog.datasheet_by_id("core-character-leader")
+    profile = datasheet.model_profiles[0]
+    option = datasheet.wargear_options[0]
+    return UnitFactory(catalog=catalog).instantiate_unit(
+        army_id=army_id,
+        selection=UnitMusterSelection(
+            unit_selection_id=unit_selection_id,
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id=profile.model_profile_id,
+                    model_count=1,
+                ),
+            ),
+            wargear_selections=(
+                WargearSelection(
+                    option_id=option.option_id,
+                    model_profile_id=profile.model_profile_id,
+                    wargear_ids=option.default_wargear_ids,
+                ),
+            ),
+        ),
+        datasheet=datasheet,
+    )
+
+
+def _army(
+    *,
+    catalog: ArmyCatalog,
+    player_id: str,
+    army_id: str,
+    unit: UnitInstance,
+) -> ArmyDefinition:
+    detachment = catalog.detachments[0]
+    return ArmyDefinition(
+        army_id=army_id,
+        player_id=player_id,
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id=detachment.faction_id,
+            detachment_ids=(detachment.detachment_id,),
+        ),
+        units=(unit,),
+    )
+
+
+def _state(*armies: ArmyDefinition) -> GameState:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    state = GameState(
+        game_id="ws14-attack-hooks-game",
+        ruleset_descriptor_hash=descriptor.descriptor_hash,
+        stage=GameLifecycleStage.BATTLE,
+        setup_sequence=tuple(descriptor.setup_sequence.steps),
+        battle_phase_sequence=tuple(descriptor.battle_phase_sequence.phases),
+        setup_step_index=None,
+        battle_phase_index=0,
+        battle_round=1,
+        active_player_id="player-a",
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        tactical_secondary_draw_count=2,
+    )
+    for army in armies:
+        state.record_army_definition(army)
+    return state
+
+
+def _weapon_profile(catalog: ArmyCatalog, wargear_id: str) -> WeaponProfile:
+    for wargear in catalog.wargear:
+        if wargear.wargear_id == wargear_id:
+            return wargear.weapon_profiles[0]
+    raise AssertionError(f"Unknown wargear id: {wargear_id}")
+
+
+def _generic_effect(
+    *,
+    effect_id: str,
+    owner_player_id: str,
+    target_unit_instance_ids: tuple[str, ...],
+    target_kind: str,
+    effect_kind: str,
+    parameters: dict[str, JsonValue],
+) -> PersistingEffect:
+    parameter_payloads: list[dict[str, JsonValue]] = [
+        {"key": key, "value": value} for key, value in sorted(parameters.items())
+    ]
+    return PersistingEffect(
+        effect_id=effect_id,
+        source_rule_id=f"source:{effect_id}",
+        owner_player_id=owner_player_id,
+        target_unit_instance_ids=target_unit_instance_ids,
+        started_battle_round=1,
+        started_phase=BattlePhase.SHOOTING,
+        expiration=EffectExpiration.end_phase(
+            battle_round=1,
+            phase=BattlePhase.SHOOTING,
+            player_id="player-a",
+        ),
+        effect_payload=validate_json_value(
+            {
+                "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                "rule_id": f"rule:{effect_id}",
+                "source_id": f"source:{effect_id}",
+                "rule_ir_hash": "0" * 64,
+                "clause_id": f"clause:{effect_id}",
+                "source_span": {"start": 0, "end": 1, "text": "x"},
+                "target": {
+                    "kind": target_kind,
+                    "source_span": {"start": 0, "end": 1, "text": "x"},
+                    "parameters": [],
+                },
+                "target_unit_instance_ids": list(target_unit_instance_ids),
+                "duration": None,
+                "effect": {
+                    "kind": effect_kind,
+                    "source_span": {"start": 0, "end": 1, "text": "x"},
+                    "parameters": parameter_payloads,
+                },
+                "context": {
+                    "state": None,
+                    "player_id": owner_player_id,
+                    "phase": BattlePhase.SHOOTING.value,
+                },
+            }
+        ),
+    )

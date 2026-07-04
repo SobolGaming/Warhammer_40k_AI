@@ -172,8 +172,13 @@ def _damage_value(
     attack_context_id: str,
     attacker_player_id: str,
     affected_unit_instance_id: str,
+    attacking_unit_instance_id: str,
+    attacker_model_instance_id: str,
+    target_unit_instance_id: str,
+    weapon_profile: WeaponProfile,
     source_phase: BattlePhase,
     stratagem_index: StratagemCatalogIndex | None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> tuple[int | None, LifecycleStatus | None]:
     if type(profile) is not DamageProfile:
         raise GameLifecycleError("Damage resolution requires a DamageProfile.")
@@ -205,12 +210,24 @@ def _damage_value(
     )
     if status is not None:
         return None, status
+    runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
+    damage_modifier = runtime_modifiers.damage_roll_modifier(
+        DamageRollModifierContext(
+            state=state,
+            source_phase=source_phase,
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            attacker_model_instance_id=attacker_model_instance_id,
+            target_unit_instance_id=target_unit_instance_id,
+            weapon_profile=weapon_profile,
+            current_value=roll_state.current_total,
+        )
+    )
     random_roll = RandomCharacteristicRoll(
         characteristic=Characteristic.DAMAGE,
         timing=timing,
         scope_id=scope_id,
         roll_state=roll_state,
-        value=roll_state.current_total,
+        value=max(1, roll_state.current_total + damage_modifier),
     )
     _append_replay_resume_unique_event_once(
         decisions=decisions,

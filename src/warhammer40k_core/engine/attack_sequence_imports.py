@@ -151,6 +151,7 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
+    DamageRollModifierContext,
     HitRollModifierContext,
     RuntimeModifierRegistry,
     SaveOptionModifierContext,
@@ -263,6 +264,7 @@ __all__ = (
     "DamageApplication",
     "DamageApplicationPayload",
     "DamageKind",
+    "DamageRollModifierContext",
     "DamageProfile",
     "DamageProfilePayload",
     "DecisionController",

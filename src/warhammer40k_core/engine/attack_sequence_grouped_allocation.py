@@ -438,8 +438,13 @@ def _resolve_grouped_damage_from(
             attack_context_id=damage_attack_context["attack_context_id"],
             attacker_player_id=attack_sequence.attacker_player_id,
             affected_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            attacker_model_instance_id=pool.attacker_model_instance_id,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            weapon_profile=pool.weapon_profile,
             source_phase=attack_sequence.source_phase,
             stratagem_index=stratagem_index,
+            runtime_modifier_registry=runtime_modifiers,
         )
         if status is not None:
             return (
