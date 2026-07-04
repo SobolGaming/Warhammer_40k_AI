@@ -34,6 +34,9 @@ from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_stratagem_activation_2026_27,
     faction_subrules_2026_27,
 )
@@ -80,8 +83,8 @@ def test_ws14_generated_stratagem_rule_ir_freezes_supported_effect_durations() -
         )
     ]
 
-    assert len(effect_profiles) == 167
-    assert len(duration_profiles) == 164
+    assert len(effect_profiles) == 171
+    assert len(duration_profiles) == 167
 
     payload = effect_profiles[0].rule_ir_payload()
     payload["rule_id"] = "tampered"
@@ -123,6 +126,35 @@ def test_ws14_source_backed_stratagem_activation_records_are_runtime_loadable() 
         rule_ir_payload = payload["rule_ir"]
         assert isinstance(rule_ir_payload, dict)
         RuleIR.from_payload(cast(RuleIRPayload, rule_ir_payload))
+
+
+def test_ws14_court_of_the_phoenician_stratagem_profiles_use_court_rule_ir() -> None:
+    profiles = {
+        profile.stratagem_id: profile
+        for profile in faction_stratagem_activation_2026_27.stratagem_activation_profiles()
+        if profile.detachment_id == "court-of-the-phoenician"
+    }
+
+    assert set(profiles) == {
+        "000010655002",
+        "000010655003",
+        "000010655004",
+        "000010655005",
+        "000010655006",
+        "000010655007",
+    }
+    assert profiles["000010655004"].required_keywords == ("DAEMON",)
+    assert profiles["000010655006"].required_keywords == ("DAEMON",)
+    for profile in profiles.values():
+        expected_payload = court_ir.stratagem_activation_rule_ir_payload_by_profile_id(
+            profile.profile_id
+        )
+        assert expected_payload is not None
+        rule_ir = RuleIR.from_payload(cast(RuleIRPayload, profile.rule_ir_payload()))
+        expected_rule_ir = RuleIR.from_payload(expected_payload)
+        assert rule_ir == expected_rule_ir
+        assert rule_ir.is_supported
+        assert any(clause.effects for clause in rule_ir.clauses)
 
 
 def test_ws14_selected_target_activation_rule_ir_executes_from_structured_context() -> None:

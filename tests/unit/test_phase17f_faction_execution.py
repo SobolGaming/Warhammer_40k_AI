@@ -177,6 +177,21 @@ SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "tyranids": "Shadow in the Warp / Synapse",
     "world-eaters": "Blessings of Khorne",
 }
+COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS = frozenset(
+    {
+        "phase17e:emperors-children:court-of-the-phoenician:rule",
+        "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654002",
+        "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003",
+        "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654004",
+        "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654005",
+        "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655002",
+        "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655003",
+        "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655004",
+        "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655005",
+        "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655006",
+        "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655007",
+    }
+)
 
 
 def test_phase17f_execution_package_covers_every_phase17e_coverage_row() -> None:
@@ -595,6 +610,23 @@ def test_phase17f_execution_statuses_are_explicit_for_all_phase17e_rows() -> Non
     )
     assert execution_package.unapproved_blocked_records() == ()
     assert all(record.is_approved_blocked for record in execution_package.blocked_records())
+
+
+def test_phase17f_court_of_the_phoenician_rows_are_executable_generic_ir() -> None:
+    records_by_descriptor_id = {
+        record.coverage_descriptor_id: record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+    }
+
+    assert set(records_by_descriptor_id) >= COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS
+    for descriptor_id in COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS:
+        record = records_by_descriptor_id[descriptor_id]
+        assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+        assert record.block_reason is None
+        assert record.handler_id is None
+        assert record.rule_ir_hash == (
+            generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(descriptor_id)
+        )
 
 
 def test_phase17f_registry_dispatches_every_record_without_missing_handlers() -> None:

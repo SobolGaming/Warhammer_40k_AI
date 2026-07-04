@@ -116,7 +116,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `fb58c11e12dfd3379a9cb12a69db9f3169fd5c9e26917f224d58f8123ae15f55`
+  `eeb2eac27e52199592acf1541e705370f8f9cdd97d2179cd5b65660f1d356551`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -126,15 +126,18 @@ implemented. Datasheet intake is fail-closed as an approved unsupported
 diagnostic. Exact Enhancement and Stratagem rows are generated from the exact
 subrule source package and include stable rule IDs, owner faction/detachment IDs,
 timing/category metadata, source IDs, and support status. Source-only exact rows
-outside generic IR are named-handler-required; 19 exact Enhancement rows in
+outside generic IR are named-handler-required; 24 exact Enhancement rows in
 the conditional weapon-ability grant, grant-ability, characteristic-modification,
-movement-distance, and dice-roll modification template families are generic-supported with
-checksum-covered RuleIR hashes. The More Dakka detachment rule and six More
-Dakka Stratagem rows are also generic-supported through source-boundary static
-RuleIR payloads. The Spectacle of Slaughter detachment rule, two Enhancements,
-and three Stratagem rows are generic-supported the same way, for a total of 31
-generic-supported rows; exact rows with existing runtime consumers are marked
-implemented. No aggregate faction-pack Enhancement or Stratagem row is used to
+movement-distance, dice-roll modification, and Court of the Phoenician mixed-family
+template groups are generic-supported with checksum-covered RuleIR hashes. The
+More Dakka detachment rule and six More Dakka Stratagem rows are also
+generic-supported through source-boundary static RuleIR payloads. The Spectacle
+of Slaughter detachment rule, two Enhancements, and three Stratagem rows are
+generic-supported the same way. The Court of the Phoenician detachment rule,
+four Enhancements, and six Stratagem rows are generic-supported from the same
+RuleIR path, for a total of 42 generic-supported rows; exact rows with existing
+runtime consumers are marked implemented. No aggregate faction-pack Enhancement
+or Stratagem row is used to
 hide missing detail, and no unapproved unsupported descriptor remains for Phase
 17E matched-play coverage.
 The exact subrule source package also exposes checksum-covered
@@ -162,13 +165,13 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `6b1154d6e9db45f493e7737189f83b5793c782b241e3762edba9af86437e27f4`
+  `6436daeb8be3ab2270530fca85e67555df3d06b14ab45a8e96fe5491d77e0fd7`
 - upstream Phase 17E checksum:
-  `fb58c11e12dfd3379a9cb12a69db9f3169fd5c9e26917f224d58f8123ae15f55`
+  `eeb2eac27e52199592acf1541e705370f8f9cdd97d2179cd5b65660f1d356551`
 
 The package emits 2145 execution records, one for every Phase 17E coverage row:
-2035 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, 31 rows are executable generic IR
+2024 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, 42 rows are executable generic IR
 rows, and 51 rows are executable
 named-handler rows because they already have runtime consumers: 23 faction army
 rules plus 28 exact detachment, Enhancement, and Stratagem rows.
@@ -430,15 +433,15 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `251ed10bddd77ece10c100f5a02d419455b3ec485f2beba5d8f08d2eb4085e2f`
+  `f970b792fd8f8b3cbec3529b514e6a35c4f4ee920315b9a95922d44e7dab8bb2`
 - upstream Phase 17F checksum:
-  `6b1154d6e9db45f493e7737189f83b5793c782b241e3762edba9af86437e27f4`
+  `6436daeb8be3ab2270530fca85e67555df3d06b14ab45a8e96fe5491d77e0fd7`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
 
-The report emits 2035 classification rows, one for every Phase 17F row blocked
-as `blocked_structured_semantics_required`. It compiles 1944 rows from Wahapedia
+The report emits 2024 classification rows, one for every Phase 17F row blocked
+as `blocked_structured_semantics_required`. It compiles 1933 rows from Wahapedia
 bridge descriptions through Phase 17C and marks 91 rows as
 `source_text_not_available` metadata-only rows. Each row records the existing
 Phase 17C template IDs and template families that can already express clauses,
@@ -472,9 +475,9 @@ WS14 step 3 is enforced as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-named-handler-budget-v1`
 - source-payload SHA-256 checksum:
-  `81ed702fc2b7a7e71df7457a088506ffd1db994e69c20cc9c087a5a1ef7b4167`
+  `fe067922eb3953d152ca7500cdc2351039db02c0b720d3db1e1d5792a1b4c7ee`
 - upstream Phase 17F checksum:
-  `6b1154d6e9db45f493e7737189f83b5793c782b241e3762edba9af86437e27f4`
+  `6436daeb8be3ab2270530fca85e67555df3d06b14ab45a8e96fe5491d77e0fd7`
 
 The budget report tracks 51 executable named-handler Phase 17F rows and 51
 approved entries. The current approved reason is
@@ -686,12 +689,12 @@ already engine-consumed named handlers.
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
-| Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Detachment rules | 1 | `executable_generic_ir` | `applied` | `none` |
-| Enhancements | 28 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 2 | `executable_generic_ir` | `applied` | `none` |
-| Stratagems | 42 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 3 | `executable_generic_ir` | `applied` | `none` |
+| Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 2 | `executable_generic_ir` | `applied` | `none` |
+| Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 6 | `executable_generic_ir` | `applied` | `none` |
+| Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 9 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Death Guard Execution Status
