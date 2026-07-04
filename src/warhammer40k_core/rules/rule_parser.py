@@ -7,12 +7,12 @@ from typing import cast
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_tokens
 from warhammer40k_core.rules.parsed_tokens import DistancePredicateToken, ParsedRuleText, TextSpan
+from warhammer40k_core.rules.rule_duration_parser import parse_rule_duration
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleCondition,
     RuleConditionKind,
     RuleDuration,
-    RuleDurationKind,
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
@@ -259,11 +259,6 @@ _CP_RE = re.compile(
 )
 _VP_RE = re.compile(
     r"\b(?P<verb>score|gain|add)\s+(?P<value>\d+)\s*(?:VP|Victory Points?)\b",
-    re.IGNORECASE,
-)
-_UNTIL_RE = re.compile(
-    r"\buntil\s+(?:the\s+)?end\s+of\s+(?:the\s+|this\s+|that\s+|your\s+|opponent's\s+)?"
-    r"(?P<endpoint>phase|turn|battle round|battle)\b",
     re.IGNORECASE,
 )
 _GRANT_ABILITY_RE = re.compile(
@@ -1525,20 +1520,7 @@ def _aura_target_parameter_pairs(
 
 
 def _parse_duration(clause_text: _ClauseText) -> RuleDuration | None:
-    match = _UNTIL_RE.search(clause_text.text)
-    if match is not None:
-        return RuleDuration(
-            kind=RuleDurationKind.UNTIL_TIMING_ENDPOINT,
-            source_span=_span_from_match(clause_text, match),
-            parameters=parameters_from_pairs((("endpoint", _lower_group(match, "endpoint")),)),
-        )
-    if _AURA_RE.search(clause_text.text) is not None and "while" in clause_text.text.lower():
-        return RuleDuration(
-            kind=RuleDurationKind.WHILE_CONDITION_TRUE,
-            source_span=clause_text.span,
-            parameters=parameters_from_pairs((("condition", "aura"),)),
-        )
-    return None
+    return parse_rule_duration(text=clause_text.text, span=clause_text.span)
 
 
 def _parse_dice_roll_modifier_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
