@@ -34,7 +34,11 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
     AbilityTimingDescriptor,
 )
-from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.army_mustering import (
+    ArmyMusterRequest,
+    EnhancementAssignment,
+    muster_army,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_TRACKED_TARGET_SELECTION_CONSUMER_ID,
 )
@@ -173,6 +177,19 @@ def test_runtime_content_activation_derives_selected_sources_from_real_armies() 
     assert activation.selected_weapon_profile_ids == ("core-bolt-rifle:standard",)
     assert activation.selected_weapon_keywords == ("HAZARDOUS", "RAPID_FIRE")
     assert activation.loaded_unit_instance_ids == ("army-alpha:intercessor-unit-1",)
+    assert [
+        assignment.to_payload() for assignment in activation.selected_enhancement_assignments
+    ] == [
+        {
+            "assignment_id": "army-alpha:runtime-enhancement:intercessor-unit-1",
+            "player_id": "player-a",
+            "army_id": "army-alpha",
+            "enhancement_id": "runtime-enhancement",
+            "target_unit_selection_id": "intercessor-unit-1",
+            "bearer_unit_instance_id": "army-alpha:intercessor-unit-1",
+            "source_id": "source:runtime-enhancement-assignment",
+        }
+    ]
     assert RuntimeContentActivation.from_payload(payload) == activation
     assert "object at 0x" not in json.dumps(payload, sort_keys=True)
 
@@ -1883,6 +1900,13 @@ def _muster_request(catalog: ArmyCatalog) -> ArmyMusterRequest:
                         model_count=5,
                     ),
                 ),
+            ),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="runtime-enhancement",
+                target_unit_selection_id="intercessor-unit-1",
+                source_id="source:runtime-enhancement-assignment",
             ),
         ),
     )

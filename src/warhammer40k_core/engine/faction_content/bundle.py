@@ -111,6 +111,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedHookBinding,
     FightUnitSelectedHookRegistry,
 )
+from warhammer40k_core.engine.generic_enhancement_effects import generic_enhancement_effect_bindings
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHookBinding,
@@ -1512,11 +1513,11 @@ class RuntimeContentBundle:
             )
         )
         enhancement_effect_registry = EnhancementEffectRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.enhancement_effect_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.enhancement_effect_bindings,
             )
+            + generic_enhancement_effect_bindings(activation=activation, execution_records=records)
         )
         fight_activation_ability_hook_registry = FightActivationAbilityHookRegistry.from_bindings(
             tuple(
