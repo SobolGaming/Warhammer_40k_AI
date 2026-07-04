@@ -15,7 +15,11 @@ from warhammer40k_core.core.detachment import (
 )
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
-from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.army_mustering import (
+    ArmyMusterRequest,
+    EnhancementAssignment,
+    muster_army,
+)
 from warhammer40k_core.engine.command_points import CommandPointGainStatus, CommandPointSourceKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -42,6 +46,7 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.runtime_modifiers import HitRollModifierContext
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
     StratagemEligibilityContext,
@@ -172,6 +177,68 @@ def test_ws14_more_dakka_stratagem_activation_binds_target_through_lifecycle_bun
     assert "object at 0x" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
 
 
+@pytest.mark.integration
+def test_ws14_more_dakka_generic_enhancement_ir_binds_to_assigned_bearer() -> None:
+    lifecycle = _more_dakka_battle_lifecycle()
+    state = _state(lifecycle)
+    bundle = _runtime_content_bundle(lifecycle)
+
+    assignment_payloads = [
+        assignment.to_payload()
+        for assignment in bundle.activation.selected_enhancement_assignments
+        if assignment.player_id == "player-a"
+    ]
+    assert assignment_payloads == [
+        {
+            "assignment_id": "army-alpha:000009991004:boyz-1",
+            "player_id": "player-a",
+            "army_id": "army-alpha",
+            "enhancement_id": "000009991004",
+            "target_unit_selection_id": "boyz-1",
+            "bearer_unit_instance_id": "army-alpha:boyz-1",
+            "source_id": "ws14-more-dakka:assignment:boyz-1:000009991004",
+        }
+    ]
+
+    bearer_effects = tuple(state.persisting_effects_for_unit("army-alpha:boyz-1"))
+    generic_hit_effects = tuple(
+        effect
+        for effect in bearer_effects
+        if _json_object(effect.effect_payload)["execution_id"]
+        == "phase17f:phase17e:enhancement:orks:more-dakka:000009991004"
+    )
+    assert len(generic_hit_effects) == 1
+    effect_payload = _json_object(generic_hit_effects[0].effect_payload)
+    assert effect_payload["effect_kind"] == "generic_rule_execution"
+    assert effect_payload["target_unit_instance_ids"] == ["army-alpha:boyz-1"]
+    effect = _json_object(effect_payload["effect"])
+    assert effect["kind"] == "modify_dice_roll"
+    assignment = _json_object(effect_payload["enhancement_assignment"])
+    assert assignment["bearer_unit_instance_id"] == "army-alpha:boyz-1"
+
+    weapon_profile = next(
+        wargear
+        for wargear in _more_dakka_catalog().wargear
+        if wargear.wargear_id == "core-mob-shoota"
+    ).weapon_profiles[0]
+    model_instance_id = state.army_definitions[0].units[0].own_models[0].model_instance_id
+    assert (
+        bundle.runtime_modifier_registry.hit_roll_modifier(
+            HitRollModifierContext(
+                state=state,
+                attacking_unit_instance_id="army-alpha:boyz-1",
+                attacker_model_instance_id=model_instance_id,
+                target_unit_instance_id="army-beta:boyz-2",
+                weapon_profile=weapon_profile,
+                source_phase=BattlePhase.SHOOTING,
+            )
+        )
+        == 1
+    )
+    assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
+    assert "object at 0x" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
+
+
 def _more_dakka_lifecycle_config() -> GameConfig:
     catalog = _more_dakka_catalog()
     return GameConfig(
@@ -235,7 +302,7 @@ def _more_dakka_catalog() -> ArmyCatalog:
         datasheet_id="ws14-orks-boyz",
         name="WS14 Orks Boyz",
         keywords=DatasheetKeywordSet(
-            keywords=("Infantry",),
+            keywords=("Character", "Infantry"),
             faction_keywords=("Orks",),
         ),
         source_ids=("datasheet:ws14-orks-boyz",),
@@ -363,6 +430,13 @@ def _more_dakka_muster_request(
                         model_count=10,
                     ),
                 ),
+            ),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id="000009991004",
+                target_unit_selection_id=unit_selection_id,
+                source_id=(f"ws14-more-dakka:assignment:{unit_selection_id}:000009991004"),
             ),
         ),
         roster_legality_required=False,

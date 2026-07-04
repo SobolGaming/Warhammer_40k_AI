@@ -9,15 +9,31 @@ from typing import Self, TypedDict, cast
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear
-from warhammer40k_core.engine.army_mustering import ArmyDefinition, muster_army
+from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
+    EnhancementAssignment,
+    muster_army,
+)
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.unit_factory import UnitInstance
+
+
+class RuntimeEnhancementAssignmentPayload(TypedDict):
+    assignment_id: str
+    player_id: str
+    army_id: str
+    enhancement_id: str
+    target_unit_selection_id: str
+    bearer_unit_instance_id: str
+    source_id: str
 
 
 class RuntimeContentActivationPayload(TypedDict):
     selected_faction_ids: list[str]
     selected_detachment_ids: list[str]
     selected_enhancement_ids: list[str]
+    selected_enhancement_assignments: list[RuntimeEnhancementAssignmentPayload]
     selected_stratagem_ids: list[str]
     selected_datasheet_ids: list[str]
     selected_wargear_ids: list[str]
@@ -35,6 +51,65 @@ class RuntimeContentActivationPayload(TypedDict):
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeEnhancementAssignment:
+    assignment_id: str
+    player_id: str
+    army_id: str
+    enhancement_id: str
+    target_unit_selection_id: str
+    bearer_unit_instance_id: str
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "assignment_id",
+            _validate_identifier("assignment_id", self.assignment_id),
+        )
+        object.__setattr__(self, "player_id", _validate_identifier("player_id", self.player_id))
+        object.__setattr__(self, "army_id", _validate_identifier("army_id", self.army_id))
+        object.__setattr__(
+            self,
+            "enhancement_id",
+            _validate_identifier("enhancement_id", self.enhancement_id),
+        )
+        object.__setattr__(
+            self,
+            "target_unit_selection_id",
+            _validate_identifier("target_unit_selection_id", self.target_unit_selection_id),
+        )
+        object.__setattr__(
+            self,
+            "bearer_unit_instance_id",
+            _validate_identifier("bearer_unit_instance_id", self.bearer_unit_instance_id),
+        )
+        object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
+
+    def to_payload(self) -> RuntimeEnhancementAssignmentPayload:
+        return {
+            "assignment_id": self.assignment_id,
+            "player_id": self.player_id,
+            "army_id": self.army_id,
+            "enhancement_id": self.enhancement_id,
+            "target_unit_selection_id": self.target_unit_selection_id,
+            "bearer_unit_instance_id": self.bearer_unit_instance_id,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: RuntimeEnhancementAssignmentPayload) -> Self:
+        return cls(
+            assignment_id=payload["assignment_id"],
+            player_id=payload["player_id"],
+            army_id=payload["army_id"],
+            enhancement_id=payload["enhancement_id"],
+            target_unit_selection_id=payload["target_unit_selection_id"],
+            bearer_unit_instance_id=payload["bearer_unit_instance_id"],
+            source_id=payload["source_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeContentActivation:
     selected_faction_ids: tuple[str, ...]
     selected_detachment_ids: tuple[str, ...]
@@ -45,6 +120,7 @@ class RuntimeContentActivation:
     selected_weapon_profile_ids: tuple[str, ...]
     selected_weapon_keywords: tuple[str, ...]
     loaded_unit_instance_ids: tuple[str, ...]
+    selected_enhancement_assignments: tuple[RuntimeEnhancementAssignment, ...] = ()
     reachable_content_ids: tuple[str, ...] = ()
     selected_module_paths: tuple[str, ...] = ()
     source_package_ids: tuple[str, ...] = ()
@@ -69,6 +145,11 @@ class RuntimeContentActivation:
             self,
             "selected_enhancement_ids",
             _validate_identifier_tuple("selected_enhancement_ids", self.selected_enhancement_ids),
+        )
+        object.__setattr__(
+            self,
+            "selected_enhancement_assignments",
+            _validate_runtime_enhancement_assignment_tuple(self.selected_enhancement_assignments),
         )
         object.__setattr__(
             self,
@@ -168,6 +249,7 @@ class RuntimeContentActivation:
         datasheet_ids: set[str] = set()
         wargear_ids: set[str] = set()
         unit_ids: set[str] = set()
+        enhancement_assignments: list[RuntimeEnhancementAssignment] = []
         for army in validated_armies:
             faction_ids.add(army.detachment_selection.faction_id)
             detachment_ids.update(army.detachment_selection.detachment_ids)
@@ -181,6 +263,10 @@ class RuntimeContentActivation:
             )
             enhancement_ids.update(
                 assignment.enhancement_id for assignment in army.enhancement_assignments
+            )
+            enhancement_assignments.extend(
+                _runtime_enhancement_assignment_from_army(army=army, assignment=assignment)
+                for assignment in army.enhancement_assignments
             )
             unit_ids.update(unit.unit_instance_id for unit in army.units)
             unit_ids.update(attached.attached_unit_instance_id for attached in army.attached_units)
@@ -210,6 +296,7 @@ class RuntimeContentActivation:
             selected_weapon_profile_ids=tuple(weapon_profile_ids),
             selected_weapon_keywords=tuple(weapon_keywords),
             loaded_unit_instance_ids=tuple(loaded_ids),
+            selected_enhancement_assignments=tuple(enhancement_assignments),
         )
 
     @classmethod
@@ -229,6 +316,9 @@ class RuntimeContentActivation:
             "selected_faction_ids": list(self.selected_faction_ids),
             "selected_detachment_ids": list(self.selected_detachment_ids),
             "selected_enhancement_ids": list(self.selected_enhancement_ids),
+            "selected_enhancement_assignments": [
+                assignment.to_payload() for assignment in self.selected_enhancement_assignments
+            ],
             "selected_stratagem_ids": list(self.selected_stratagem_ids),
             "selected_datasheet_ids": list(self.selected_datasheet_ids),
             "selected_wargear_ids": list(self.selected_wargear_ids),
@@ -251,6 +341,10 @@ class RuntimeContentActivation:
             selected_faction_ids=tuple(payload["selected_faction_ids"]),
             selected_detachment_ids=tuple(payload["selected_detachment_ids"]),
             selected_enhancement_ids=tuple(payload["selected_enhancement_ids"]),
+            selected_enhancement_assignments=tuple(
+                RuntimeEnhancementAssignment.from_payload(assignment)
+                for assignment in payload["selected_enhancement_assignments"]
+            ),
             selected_stratagem_ids=tuple(payload["selected_stratagem_ids"]),
             selected_datasheet_ids=tuple(payload["selected_datasheet_ids"]),
             selected_wargear_ids=tuple(payload["selected_wargear_ids"]),
@@ -296,6 +390,7 @@ class RuntimeContentActivation:
             selected_faction_ids=self.selected_faction_ids,
             selected_detachment_ids=self.selected_detachment_ids,
             selected_enhancement_ids=self.selected_enhancement_ids,
+            selected_enhancement_assignments=self.selected_enhancement_assignments,
             selected_stratagem_ids=self.selected_stratagem_ids,
             selected_datasheet_ids=self.selected_datasheet_ids,
             selected_wargear_ids=self.selected_wargear_ids,
@@ -315,6 +410,7 @@ class RuntimeContentActivation:
             selected_faction_ids=resolved.selected_faction_ids,
             selected_detachment_ids=resolved.selected_detachment_ids,
             selected_enhancement_ids=resolved.selected_enhancement_ids,
+            selected_enhancement_assignments=resolved.selected_enhancement_assignments,
             selected_stratagem_ids=resolved.selected_stratagem_ids,
             selected_datasheet_ids=resolved.selected_datasheet_ids,
             selected_wargear_ids=resolved.selected_wargear_ids,
@@ -347,6 +443,56 @@ def _validate_armies(armies: object) -> tuple[ArmyDefinition, ...]:
         seen.add(army.army_id)
         validated.append(army)
     return tuple(sorted(validated, key=lambda army: army.army_id))
+
+
+def _runtime_enhancement_assignment_from_army(
+    *,
+    army: ArmyDefinition,
+    assignment: EnhancementAssignment,
+) -> RuntimeEnhancementAssignment:
+    bearer_unit = _bearer_unit_for_assignment(army=army, assignment=assignment)
+    return RuntimeEnhancementAssignment(
+        assignment_id=(
+            f"{army.army_id}:{assignment.enhancement_id}:{assignment.target_unit_selection_id}"
+        ),
+        player_id=army.player_id,
+        army_id=army.army_id,
+        enhancement_id=assignment.enhancement_id,
+        target_unit_selection_id=assignment.target_unit_selection_id,
+        bearer_unit_instance_id=bearer_unit.unit_instance_id,
+        source_id=assignment.source_id,
+    )
+
+
+def _bearer_unit_for_assignment(
+    *,
+    army: ArmyDefinition,
+    assignment: EnhancementAssignment,
+) -> UnitInstance:
+    expected_unit_instance_id = f"{army.army_id}:{assignment.target_unit_selection_id}"
+    for unit in army.units:
+        if unit.unit_instance_id == expected_unit_instance_id:
+            return unit
+    raise GameLifecycleError("Runtime enhancement assignment references unknown bearer unit.")
+
+
+def _validate_runtime_enhancement_assignment_tuple(
+    values: object,
+) -> tuple[RuntimeEnhancementAssignment, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Runtime enhancement assignments must be a tuple.")
+    assignments: list[RuntimeEnhancementAssignment] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not RuntimeEnhancementAssignment:
+            raise GameLifecycleError(
+                "Runtime enhancement assignments must contain assignment values."
+            )
+        if value.assignment_id in seen:
+            raise GameLifecycleError("Runtime enhancement assignment IDs must be unique.")
+        seen.add(value.assignment_id)
+        assignments.append(value)
+    return tuple(sorted(assignments, key=lambda assignment: assignment.assignment_id))
 
 
 def _selected_weapon_profile_ids(

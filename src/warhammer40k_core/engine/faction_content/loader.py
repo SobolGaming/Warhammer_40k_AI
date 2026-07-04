@@ -201,6 +201,7 @@ def _validate_resolved_activation_matches_manifest(
             selected_faction_ids=activation.selected_faction_ids,
             selected_detachment_ids=activation.selected_detachment_ids,
             selected_enhancement_ids=activation.selected_enhancement_ids,
+            selected_enhancement_assignments=activation.selected_enhancement_assignments,
             selected_stratagem_ids=activation.selected_stratagem_ids,
             selected_datasheet_ids=activation.selected_datasheet_ids,
             selected_wargear_ids=activation.selected_wargear_ids,
