@@ -32,6 +32,22 @@ from warhammer40k_core.engine.enhancement_effects import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    army_for_player as _shared_army_for_player,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    canonical_keyword as _canonical_keyword,
+)
+from warhammer40k_core.engine.faction_content.common import payload_bool as _payload_bool
+from warhammer40k_core.engine.faction_content.common import (
+    payload_identifier as _payload_string,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_identifier_tuple as _payload_string_tuple,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_object as _payload_object,
+)
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
     FightPhaseStartHookBinding,
@@ -1255,16 +1271,17 @@ def _fade_to_darkness_event_payload(
 
 
 def _army_for_player(armies: tuple[ArmyDefinition, ...], *, player_id: str) -> ArmyDefinition:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    for army in armies:
-        if army.player_id == requested_player_id:
-            if not (
-                army.detachment_selection.faction_id == CHAOS_DAEMONS_FACTION_ID
-                and DETACHMENT_ID in army.detachment_selection.detachment_ids
-            ):
-                raise GameLifecycleError("Fade to Darkness requires Shadow Legion.")
-            return army
-    raise GameLifecycleError("Fade to Darkness player army is unknown.")
+    army = _shared_army_for_player(
+        armies,
+        player_id=player_id,
+        context="Fade to Darkness",
+    )
+    if not (
+        army.detachment_selection.faction_id == CHAOS_DAEMONS_FACTION_ID
+        and DETACHMENT_ID in army.detachment_selection.detachment_ids
+    ):
+        raise GameLifecycleError("Fade to Darkness requires Shadow Legion.")
+    return army
 
 
 def _active_player_id(state: object) -> str:
@@ -1277,38 +1294,4 @@ def _active_player_id(state: object) -> str:
     return state.active_player_id
 
 
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Fade to Darkness payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], key: str) -> str:
-    value = payload.get(key)
-    if type(value) is not str:
-        raise GameLifecycleError(f"Fade to Darkness payload missing string {key}.")
-    return _validate_identifier(key, value)
-
-
-def _payload_bool(payload: dict[str, JsonValue], key: str) -> bool:
-    value = payload.get(key)
-    if type(value) is not bool:
-        raise GameLifecycleError(f"Fade to Darkness payload missing bool {key}.")
-    return value
-
-
-def _payload_string_tuple(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
-    value = payload.get(key)
-    if not isinstance(value, list):
-        raise GameLifecycleError(f"Shadow Legion enhancement payload missing list {key}.")
-    parsed: list[str] = []
-    for item in value:
-        parsed.append(_validate_identifier(key, item))
-    return tuple(parsed)
-
-
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _canonical_keyword(value: str) -> str:
-    return _validate_identifier("keyword", value).upper().replace("_", " ").replace("-", " ")

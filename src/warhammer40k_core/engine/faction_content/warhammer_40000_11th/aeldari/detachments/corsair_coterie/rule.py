@@ -6,6 +6,9 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.event_log import canonical_json
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    canonical_keyword as _canonical_keyword,
+)
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlRecord,
@@ -271,7 +274,3 @@ def _active_player_id(context: PhaseEndObjectiveControlContext) -> str:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _canonical_keyword(keyword: str) -> str:
-    return _validate_identifier("keyword", keyword).upper().replace("_", " ")

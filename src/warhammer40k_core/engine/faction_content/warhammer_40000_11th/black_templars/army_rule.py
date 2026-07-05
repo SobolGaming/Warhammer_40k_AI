@@ -29,6 +29,13 @@ from warhammer40k_core.engine.decision_request import DecisionError, DecisionOpt
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    canonical_keyword as _canonical_keyword,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_identifier as _payload_string,
+)
+from warhammer40k_core.engine.faction_content.common import payload_object as _payload_object
 from warhammer40k_core.engine.fall_back_hooks import (
     FallBackEligibilityContext,
     FallBackEligibilityGrant,
@@ -906,17 +913,6 @@ def _templar_vow_from_token(token: object) -> TemplarVow:
         raise GameLifecycleError(f"Unsupported Templar Vow: {token}.") from exc
 
 
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Templar Vows payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    value = payload.get(key)
-    return _validate_identifier(key, value)
-
-
 def _validate_game_state(state: object) -> None:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -925,7 +921,3 @@ def _validate_game_state(state: object) -> None:
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _canonical_keyword(value: str) -> str:
-    return _validate_identifier("keyword", value).upper().replace("_", " ")

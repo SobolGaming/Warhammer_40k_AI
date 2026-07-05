@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import importlib
 from pathlib import Path
 
@@ -208,6 +209,26 @@ def test_all_generated_detachments_have_required_files() -> None:
     assert missing == []
 
 
+def test_generated_manifest_module_paths_resolve_without_importing_runtime_tree() -> None:
+    invalid_rows: list[str] = []
+    for row in generated_manifest.generated_runtime_content_rows():
+        if row.support_status is not RuntimeContentSupportStatus.SUPPORTED:
+            continue
+        if row.module_path is None:
+            invalid_rows.append(f"{row.content_id}: missing module_path")
+            continue
+        module_file = _module_path_to_file(row.module_path)
+        if not module_file.exists():
+            invalid_rows.append(f"{row.content_id}: missing {module_file.relative_to(ROOT)}")
+            continue
+        export_error = _runtime_module_export_error(module_file)
+        if export_error is not None:
+            invalid_rows.append(f"{row.content_id}: {export_error}")
+
+    assert invalid_rows == []
+
+
+@pytest.mark.slow
 def test_all_scaffold_modules_export_runtime_contribution() -> None:
     invalid_modules: list[str] = []
     for module_path in generate_faction_content_scaffold.scaffold_runtime_module_paths():
@@ -223,6 +244,7 @@ def test_all_scaffold_modules_export_runtime_contribution() -> None:
     assert invalid_modules == []
 
 
+@pytest.mark.slow
 def test_scaffold_contributions_have_stable_ids_and_placeholders_are_empty() -> None:
     invalid_modules: list[str] = []
     for module_path in generate_faction_content_scaffold.scaffold_runtime_module_paths():
@@ -395,3 +417,20 @@ def _expected_semantic_status(
     if executable_count > 0:
         return RuntimeContentSemanticStatus.PARTIAL
     return RuntimeContentSemanticStatus.PLACEHOLDER
+
+
+def _module_path_to_file(module_path: str) -> Path:
+    prefix = "warhammer40k_core."
+    if not module_path.startswith(prefix):
+        raise AssertionError(f"Runtime module path is outside package: {module_path}")
+    return ROOT / "src" / Path(*module_path.split(".")).with_suffix(".py")
+
+
+def _runtime_module_export_error(path: Path) -> str | None:
+    module_ast = ast.parse(path.read_text(encoding="utf-8"))
+    if not any(
+        isinstance(node, ast.FunctionDef) and node.name == "runtime_contribution"
+        for node in module_ast.body
+    ):
+        return "missing runtime_contribution() export"
+    return None

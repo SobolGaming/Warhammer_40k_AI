@@ -12,6 +12,7 @@ from warhammer40k_core.engine.command_phase_start_hooks import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import canonical_keyword as _canonical_keyword
 from warhammer40k_core.engine.faction_resources import FactionResourceStatus
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
@@ -550,7 +551,3 @@ def _validate_non_negative_int(field_name: str, value: object) -> int:
     if value < 0:
         raise GameLifecycleError(f"Prioritised Efficiency {field_name} must be non-negative.")
     return value
-
-
-def _canonical_keyword(keyword: str) -> str:
-    return _validate_identifier("keyword", keyword).upper().replace("_", " ")

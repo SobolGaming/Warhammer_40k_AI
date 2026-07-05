@@ -11,6 +11,7 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import canonical_keyword as _canonical_keyword
 from warhammer40k_core.engine.fall_back_hooks import (
     FallBackEligibilityContext,
     FallBackEligibilityGrant,
@@ -358,10 +359,6 @@ def _target_restriction_payload(
             "rules_update_source": THRILL_SEEKERS_RULE_UPDATE_SOURCE,
         }
     )
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().replace("\u2019", "").replace("'", "").upper()
 
 
 def _validate_game_state(state: GameState) -> None:

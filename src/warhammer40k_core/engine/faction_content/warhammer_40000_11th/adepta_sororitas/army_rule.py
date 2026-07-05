@@ -20,6 +20,18 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    canonical_keyword as _canonical_keyword,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_int as _payload_int,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_object as _payload_object,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_string as _payload_string,
+)
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.unit_destroyed_hooks import (
@@ -480,27 +492,6 @@ def _next_miracle_die_spend_index(state: GameState, *, player_id: str) -> int:
     return len(_miracle_die_spend_states(state, player_id=player_id)) + 1
 
 
-def _payload_object(value: object, *, field_name: str) -> dict[str, JsonValue]:
-    payload = validate_json_value(value)
-    if not isinstance(payload, dict):
-        raise GameLifecycleError(f"{field_name} must be a JSON object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    value = payload.get(key)
-    if type(value) is not str or not value.strip():
-        raise GameLifecycleError(f"{key} must be a non-empty string.")
-    return value
-
-
-def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
-    value = payload.get(key)
-    if type(value) is not int:
-        raise GameLifecycleError(f"{key} must be an integer.")
-    return value
-
-
 def _active_player_id(state: GameState) -> str:
     if state.active_player_id is None:
         raise GameLifecycleError("Acts of Faith battle-round start requires active player.")
@@ -542,7 +533,3 @@ def _battle_phase_from_token(token: object) -> BattlePhase:
         return BattlePhase(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported Acts of Faith phase: {token}.") from exc
-
-
-def _canonical_keyword(keyword: str) -> str:
-    return " ".join(keyword.replace("_", " ").upper().split())

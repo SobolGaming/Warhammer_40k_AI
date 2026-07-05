@@ -38,6 +38,12 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    payload_object as _payload_object,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_string as _payload_string,
+)
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.rules_units import (
@@ -1204,19 +1210,6 @@ def _catalog_payload_object(payload: object) -> dict[str, JsonValue]:
     if not isinstance(payload, dict):
         raise GameLifecycleError("Voice of Command Orders profile payload must be an object.")
     return cast(dict[str, JsonValue], payload)
-
-
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Voice of Command payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    value = payload.get(key)
-    if type(value) is not str or not value.strip():
-        raise GameLifecycleError(f"Voice of Command payload {key} must be a string.")
-    return value
 
 
 def _payload_string_tuple(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:

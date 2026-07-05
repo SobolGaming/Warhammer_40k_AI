@@ -8,6 +8,9 @@ from warhammer40k_core.engine.enhancement_effects import (
     EnhancementPersistingEffectGrant,
 )
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    canonical_keyword as _canonical_keyword,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.ranged_rule_effects import (
     character_target_ap_bonus_payload,
@@ -162,7 +165,3 @@ def _validate_path_of_the_outcast_army(army: ArmyDefinition, *, label: str) -> N
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     canonical = _canonical_keyword(keyword)
     return any(_canonical_keyword(stored) == canonical for stored in unit.keywords)
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().replace("_", " ").replace("-", " ").upper()

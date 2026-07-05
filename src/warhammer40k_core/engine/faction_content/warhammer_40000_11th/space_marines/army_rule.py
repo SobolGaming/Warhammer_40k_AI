@@ -14,6 +14,10 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    payload_identifier,
+    payload_object,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.runtime_modifiers import (
     WoundRollModifierBinding,
@@ -36,6 +40,16 @@ OATH_WOUND_MODIFIER_ID = f"{HOOK_ID}:wound-roll"
 OATH_WOUND_BONUS_EXCLUDED_CHAPTER_KEYWORDS = frozenset(
     {"BLOOD ANGELS", "DARK ANGELS", "DEATHWATCH", "SPACE WOLVES"}
 )
+
+
+def _payload_object(value: object) -> dict[str, JsonValue]:
+    return payload_object(value)
+
+
+def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
+    if key not in payload:
+        raise GameLifecycleError(f"Oath of Moment payload missing required key {key}.")
+    return payload_identifier(payload, key)
 
 
 def runtime_contribution() -> RuntimeContentContribution:
@@ -431,19 +445,6 @@ def _next_own_turn_battle_round(state: object) -> int:
     if state.battle_round < 1:
         raise GameLifecycleError("Oath of Moment requires an active battle round.")
     return state.battle_round + 1
-
-
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Oath of Moment payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    if key not in payload:
-        raise GameLifecycleError(f"Oath of Moment payload missing required key: {key}.")
-    value = payload[key]
-    return _validate_identifier(key, value)
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

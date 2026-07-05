@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    canonical_keyword as _canonical_keyword,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.ranged_rule_effects import detection_range_bonus_payload
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
@@ -116,12 +119,3 @@ def _enemy_placed_unit_ids(*, context: ShootingUnitSelectedContext) -> tuple[str
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     canonical = _canonical_keyword(keyword)
     return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
-
-
-def _canonical_keyword(keyword: str) -> str:
-    if type(keyword) is not str:
-        raise GameLifecycleError("Path of the Outcast keyword must be a string.")
-    stripped = keyword.strip()
-    if not stripped:
-        raise GameLifecycleError("Path of the Outcast keyword must not be empty.")
-    return stripped.replace("_", " ").replace("-", " ").upper()

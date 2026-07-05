@@ -26,6 +26,7 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import canonical_keyword as _canonical_keyword
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
 from warhammer40k_core.engine.objective_control import (
@@ -945,10 +946,6 @@ def _chaos_daemons_armies(state: GameState) -> tuple[ArmyDefinition, ...]:
         for army in state.army_definitions
         if army.detachment_selection.faction_id == CHAOS_DAEMONS_FACTION_ID
     )
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().replace("_", " ").replace("-", " ").upper()
 
 
 def _validate_identifier_tuple(field_name: str, value: object) -> tuple[str, ...]:

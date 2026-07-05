@@ -28,6 +28,15 @@ from warhammer40k_core.engine.decision_request import DecisionError, DecisionOpt
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    payload_identifier as _payload_string,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_identifier_tuple as _payload_string_list,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_object as _payload_object,
+)
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -1023,29 +1032,6 @@ def _dread_from_token(token: object) -> DreadAbility:
         return DreadAbility(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported Dread ability: {token}.") from exc
-
-
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Harbingers of Dread payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    value = payload.get(key)
-    return _validate_identifier(key, value)
-
-
-def _payload_string_list(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
-    value = payload.get(key)
-    if not isinstance(value, list):
-        raise GameLifecycleError(f"Harbingers of Dread payload {key} must be a list.")
-    strings: list[str] = []
-    for item in value:
-        if type(item) is not str or not item.strip():
-            raise GameLifecycleError(f"Harbingers of Dread payload {key} must contain strings.")
-        strings.append(item)
-    return tuple(strings)
 
 
 def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:

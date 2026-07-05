@@ -38,6 +38,21 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    payload_bool as _payload_bool,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_int as _payload_int,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_object as _payload_object,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_string as _payload_string,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_string_tuple as _payload_string_tuple,
+)
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
@@ -1822,40 +1837,6 @@ def _active_player_id(state: GameState) -> str:
     if state.active_player_id is None:
         raise GameLifecycleError("Cabal of Sorcerers requires active_player_id.")
     return state.active_player_id
-
-
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Cabal of Sorcerers payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    value = payload.get(key)
-    if type(value) is not str:
-        raise GameLifecycleError(f"Cabal of Sorcerers payload field {key} must be a string.")
-    return value
-
-
-def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
-    value = payload.get(key)
-    if type(value) is not int:
-        raise GameLifecycleError(f"Cabal of Sorcerers payload field {key} must be an int.")
-    return value
-
-
-def _payload_bool(payload: dict[str, JsonValue], *, key: str) -> bool:
-    value = payload.get(key)
-    if type(value) is not bool:
-        raise GameLifecycleError(f"Cabal of Sorcerers payload field {key} must be a bool.")
-    return value
-
-
-def _payload_string_tuple(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
-    value = payload.get(key)
-    if not isinstance(value, list) or not all(type(item) is str for item in value):
-        raise GameLifecycleError(f"Cabal of Sorcerers payload field {key} must be a string list.")
-    return tuple(cast(list[str], value))
 
 
 _validate_identifier = IdentifierValidator(

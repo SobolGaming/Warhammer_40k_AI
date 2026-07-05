@@ -8,6 +8,8 @@ The raw per-ability rows remain available in
 `data/generated/ability_coverage/ability_coverage_rows.json`.
 Pregame mustering and list-construction rows are generated separately in
 `data/generated/ability_coverage/mustering_support_rows.json`.
+Runtime faction-content semantic status is generated separately in
+`data/generated/ability_coverage/runtime_content_semantic_coverage.json`.
 
 Support stages:
 
@@ -15,6 +17,46 @@ Support stages:
 - `ir_compiled_unsupported`: rule text compiled to IR with preserved diagnostics, but the IR is not supported.
 - `generic_ir_executable`: rule text compiled to supported generic IR and can execute through the generic IR handler, but is not necessarily consumed by a phase/query host.
 - `engine_consumed`: a structured descriptor, supported generic IR, or implementation-backed runtime content is consumed by a phase/query host through a named runtime consumer.
+
+## Runtime Content Semantic Coverage
+
+Load support and semantic execution support are distinct. A row with `support_status: supported` has an importable runtime module; its `semantic_status` records whether source-backed gameplay execution is still a placeholder, partially implemented, or implemented.
+
+| Family | Placeholder | Partial | Implemented |
+| --- | ---: | ---: | ---: |
+| Faction | 5 | 23 | 0 |
+| Detachment | 244 | 18 | 4 |
+
+| Faction | Faction semantic status | Placeholder detachments | Partial detachments | Implemented detachments |
+| --- | --- | ---: | ---: | ---: |
+| Orks | `partial` | 10 | 1 | 1 |
+| Aeldari | `partial` | 13 | 2 | 0 |
+| Drukhari | `partial` | 9 | 0 | 0 |
+| Tyranids | `partial` | 9 | 1 | 0 |
+| Genestealer Cults | `partial` | 7 | 2 | 0 |
+| Necrons | `partial` | 9 | 3 | 0 |
+| Leagues of Votann | `partial` | 9 | 1 | 0 |
+| T'au Empire | `partial` | 7 | 0 | 0 |
+| Space Marines | `partial` | 21 | 1 | 0 |
+| Dark Angels | `placeholder` | 8 | 0 | 0 |
+| Blood Angels | `placeholder` | 8 | 0 | 0 |
+| Space Wolves | `placeholder` | 7 | 0 | 0 |
+| Black Templars | `partial` | 6 | 0 | 0 |
+| Deathwatch | `placeholder` | 1 | 0 | 0 |
+| Grey Knights | `partial` | 9 | 0 | 0 |
+| Chaos Space Marines | `partial` | 15 | 2 | 0 |
+| World Eaters | `partial` | 8 | 0 | 0 |
+| Emperor's Children | `partial` | 8 | 0 | 2 |
+| Death Guard | `partial` | 9 | 0 | 0 |
+| Thousand Sons | `partial` | 9 | 0 | 0 |
+| Chaos Knights | `partial` | 8 | 0 | 0 |
+| Chaos Daemons | `partial` | 5 | 3 | 1 |
+| Astra Militarum | `partial` | 11 | 0 | 0 |
+| Adepta Sororitas | `partial` | 8 | 0 | 0 |
+| Adeptus Mechanicus | `partial` | 10 | 0 | 0 |
+| Imperial Knights | `partial` | 7 | 1 | 0 |
+| Adeptus Custodes | `partial` | 8 | 1 | 0 |
+| Imperial Agents | `placeholder` | 5 | 0 | 0 |
 
 ## Structured Support Sections
 

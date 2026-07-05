@@ -13,6 +13,11 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    payload_bool,
+    payload_object,
+    payload_string,
+)
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.phases.shooting import shooting_rules_unit_is_eligible_to_shoot
@@ -34,6 +39,19 @@ from warhammer40k_core.engine.shooting_phase_start_hooks import (
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
+
+
+def _payload_object(value: object) -> dict[str, JsonValue]:
+    return payload_object(value)
+
+
+def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
+    return payload_string(payload, key, field_name="payload field")
+
+
+def _payload_bool(payload: dict[str, JsonValue], *, key: str) -> bool:
+    return payload_bool(payload, key, field_name="payload field")
+
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -832,26 +850,6 @@ def _active_player_id(state: GameState) -> str:
     if state.active_player_id is None:
         raise GameLifecycleError("For the Greater Good requires active_player_id.")
     return state.active_player_id
-
-
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("For the Greater Good payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    value = payload.get(key)
-    if type(value) is not str:
-        raise GameLifecycleError(f"For the Greater Good payload field {key} must be a string.")
-    return value
-
-
-def _payload_bool(payload: dict[str, JsonValue], *, key: str) -> bool:
-    value = payload.get(key)
-    if type(value) is not bool:
-        raise GameLifecycleError(f"For the Greater Good payload field {key} must be a bool.")
-    return value
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

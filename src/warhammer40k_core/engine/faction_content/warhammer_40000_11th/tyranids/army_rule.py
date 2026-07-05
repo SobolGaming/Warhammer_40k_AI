@@ -37,6 +37,11 @@ from warhammer40k_core.engine.decision_request import DecisionError, DecisionOpt
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    payload_identifier,
+    payload_identifier_tuple,
+    payload_object,
+)
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -47,6 +52,19 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.volume import Model as GeometryModel
+
+
+def _payload_object(value: object) -> dict[str, JsonValue]:
+    return payload_object(value)
+
+
+def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
+    return payload_identifier(payload, key)
+
+
+def _payload_string_list(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
+    return payload_identifier_tuple(payload, key, field_name="payload")
+
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -873,27 +891,6 @@ def _shadow_request_prefix(*, battle_round: int, tyranids_player_id: str) -> str
     requested_round = _validate_positive_int("battle_round", battle_round)
     requested_player_id = _validate_identifier("tyranids_player_id", tyranids_player_id)
     return f"{HOOK_ID}:shadow:{requested_player_id}:round-{requested_round:02d}:"
-
-
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Tyranids army rule payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    value = payload.get(key)
-    return _validate_identifier(key, value)
-
-
-def _payload_string_list(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
-    value = payload.get(key)
-    if not isinstance(value, list):
-        raise GameLifecycleError(f"Tyranids army rule payload {key} must be a list.")
-    strings: list[str] = []
-    for item in value:
-        strings.append(_validate_identifier(f"{key} value", item))
-    return tuple(strings)
 
 
 def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:

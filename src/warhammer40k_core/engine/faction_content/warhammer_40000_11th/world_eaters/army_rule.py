@@ -31,6 +31,15 @@ from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    payload_object as _payload_object,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_string as _payload_string,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_string_tuple as _payload_string_list,
+)
 from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
     FightActivationAbilityContext,
@@ -989,31 +998,6 @@ def _validate_dice_values(values: tuple[int, ...]) -> tuple[int, ...]:
             raise GameLifecycleError("Blessings of Khorne dice values must be D6 results.")
         validated.append(value)
     return tuple(validated)
-
-
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Blessings of Khorne payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    value = payload.get(key)
-    if type(value) is not str or not value.strip():
-        raise GameLifecycleError(f"Blessings of Khorne payload {key} must be a string.")
-    return value
-
-
-def _payload_string_list(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:
-    value = payload.get(key)
-    if not isinstance(value, list):
-        raise GameLifecycleError(f"Blessings of Khorne payload {key} must be a list.")
-    strings: list[str] = []
-    for item in value:
-        if type(item) is not str or not item.strip():
-            raise GameLifecycleError(f"Blessings of Khorne payload {key} must contain strings.")
-        strings.append(item)
-    return tuple(strings)
 
 
 def _payload_int_list(payload: dict[str, JsonValue], *, key: str) -> tuple[int, ...]:

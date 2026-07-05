@@ -24,6 +24,14 @@ from warhammer40k_core.engine.enhancement_effects import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    army_for_player as _shared_army_for_player,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_bool,
+    payload_identifier,
+    payload_object,
+)
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.reserves import ReserveOrigin
@@ -1225,11 +1233,11 @@ def _geometry_model_for_model(
 
 
 def _army_for_player(armies: tuple[ArmyDefinition, ...], *, player_id: str) -> ArmyDefinition:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    for army in armies:
-        if army.player_id == requested_player_id:
-            return army
-    raise GameLifecycleError("Corsair Coterie player army is unknown.")
+    return _shared_army_for_player(
+        armies,
+        player_id=player_id,
+        context="Corsair Coterie",
+    )
 
 
 def _unit_in_army_by_id(army: ArmyDefinition, *, unit_instance_id: str) -> UnitInstance:
@@ -1259,24 +1267,20 @@ def _active_player_id(state: object) -> str:
     return active_player_id
 
 
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Corsair Coterie payload must be an object.")
-    return payload
+def _payload_object(value: object) -> dict[str, JsonValue]:
+    return payload_object(value)
 
 
 def _payload_string(payload: dict[str, JsonValue], key: str) -> str:
-    value = payload.get(key)
-    if type(value) is not str:
+    if key not in payload or type(payload[key]) is not str:
         raise GameLifecycleError(f"Corsair Coterie payload missing string {key}.")
-    return _validate_identifier(key, value)
+    return payload_identifier(payload, key)
 
 
 def _payload_bool(payload: dict[str, JsonValue], key: str) -> bool:
-    value = payload.get(key)
-    if type(value) is not bool:
+    if key not in payload or type(payload[key]) is not bool:
         raise GameLifecycleError(f"Corsair Coterie payload missing bool {key}.")
-    return value
+    return payload_bool(payload, key)
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

@@ -26,6 +26,7 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import canonical_keyword as _canonical_keyword
 from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
     FightActivationAbilityContext,
@@ -861,10 +862,6 @@ def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
         )
     canonical = _canonical_keyword(keyword)
     return any(_canonical_keyword(stored) == canonical for stored in unit.faction_keywords)
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().replace("_", " ").replace("-", " ").upper()
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
