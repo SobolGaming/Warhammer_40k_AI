@@ -443,13 +443,19 @@ def _prideful_superiority_payload(*, rule_id: str, source_id: str) -> RuleIRPayl
                     "reroll_permission",
                     normalized_text,
                     "you can re-roll the Hit roll",
-                    (_parameter("roll_type", "hit"),),
+                    (
+                        _parameter("roll_type", "hit"),
+                        _parameter("target_required_keyword", CHARACTER_KEYWORD),
+                    ),
                 ),
                 _effect(
                     "reroll_permission",
                     normalized_text,
                     "you can re-roll the Wound roll",
-                    (_parameter("roll_type", "wound"),),
+                    (
+                        _parameter("roll_type", "wound"),
+                        _parameter("target_required_keyword", CHARACTER_KEYWORD),
+                    ),
                 ),
             ),
             duration=_end_phase_duration(normalized_text),

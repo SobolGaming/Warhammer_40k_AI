@@ -12,6 +12,9 @@ import pytest
 from tools.fetch_official_sources import load_official_source_manifest
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27 as faction_coverage_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -94,6 +97,8 @@ GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        "enhancement:emperors-children:court-of-the-phoenician:000010654002",
+        "enhancement:emperors-children:court-of-the-phoenician:000010654004",
         "enhancement:emperors-children:spectacle-of-slaughter:000010900002",
         "enhancement:genestealer-cults:outlander-claw:000009079002",
         "enhancement:orks:more-dakka:000009991005",
@@ -107,7 +112,13 @@ GENERIC_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        "enhancement:emperors-children:court-of-the-phoenician:000010654005",
         "enhancement:necrons:cryptek-conclave:000010664004",
+    }
+)
+GENERIC_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        "enhancement:emperors-children:court-of-the-phoenician:000010654003",
     }
 )
 GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
@@ -121,14 +132,6 @@ GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         "enhancement:orks:more-dakka:000009991004",
     }
 )
-GENERIC_COURT_OF_THE_PHOENICIAN_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
-    {
-        "enhancement:emperors-children:court-of-the-phoenician:000010654002",
-        "enhancement:emperors-children:court-of-the-phoenician:000010654003",
-        "enhancement:emperors-children:court-of-the-phoenician:000010654004",
-        "enhancement:emperors-children:court-of-the-phoenician:000010654005",
-    }
-)
 GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         *GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
@@ -136,7 +139,7 @@ GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         *GENERIC_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
-        *GENERIC_COURT_OF_THE_PHOENICIAN_ENHANCEMENT_SOURCE_ROW_IDS,
+        *GENERIC_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS,
     }
 )
 GENERIC_DETACHMENT_RULE_KEYS = frozenset(
@@ -1138,9 +1141,9 @@ def test_phase17e_generic_enhancements_are_template_family_bounded() -> None:
     )
     assert (
         set(
-            generic_ir_support_source.supported_court_of_the_phoenician_enhancement_source_row_ids()
+            generic_ir_support_source.supported_court_of_the_phoenician_mixed_enhancement_source_row_ids()
         )
-        == GENERIC_COURT_OF_THE_PHOENICIAN_ENHANCEMENT_SOURCE_ROW_IDS
+        == GENERIC_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS
     )
     assert (
         set(generic_ir_support_source.supported_generic_enhancement_source_row_ids())
@@ -1165,8 +1168,14 @@ def test_phase17e_court_of_the_phoenician_rows_are_generic_rule_ir_supported() -
         row.descriptor_id: row for row in faction_coverage_source.coverage_rows()
     }
 
+    assert set(court_ir.supported_coverage_descriptor_ids()) == (
+        COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS
+    )
     assert set(rows_by_descriptor_id) >= COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS
     for descriptor_id in COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS:
+        assert court_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id) is not None
+        assert court_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id) is not None
+
         row = rows_by_descriptor_id[descriptor_id]
         assert row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
         assert row.faction_id == "emperors-children"

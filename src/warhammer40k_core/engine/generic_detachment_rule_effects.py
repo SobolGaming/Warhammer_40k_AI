@@ -30,6 +30,9 @@ from warhammer40k_core.engine.rule_execution import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
     faction_execution_2026_27,
     faction_generic_ir_support_2026_27,
@@ -50,6 +53,10 @@ SPECTACLE_OF_SLAUGHTER_DETACHMENT_RULE_DESCRIPTOR_ID = (
     spectacle_ir.SPECTACLE_OF_SLAUGHTER_DETACHMENT_RULE_DESCRIPTOR_ID
 )
 SPECTACLE_OF_SLAUGHTER_UNIT_KEYWORD = spectacle_ir.FLAWLESS_BLADES_KEYWORD
+COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID = (
+    court_ir.COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID
+)
+COURT_OF_THE_PHOENICIAN_FACTION_KEYWORD = court_ir.EMPERORS_CHILDREN_KEYWORD
 
 
 @dataclass(frozen=True, slots=True)
@@ -171,7 +178,9 @@ def _apply_generic_detachment_rule_effects(
                     "detachment_id": binding_source.record.detachment_id,
                     "coverage_descriptor_id": binding_source.record.coverage_descriptor_id,
                 },
+                state=context.state,
                 event_log=context.decisions.event_log,
+                record_persisting_effects=False,
             ),
         )
         if result.status is not RuleExecutionStatus.APPLIED:
@@ -299,6 +308,13 @@ def _target_unit_ids_for_record(
             if _unit_is_spectacle_of_slaughter_detachment_target(unit)
         )
         return tuple(sorted(target_ids))
+    if record.coverage_descriptor_id == COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID:
+        target_ids = tuple(
+            unit.unit_instance_id
+            for unit in army.units
+            if _unit_is_court_of_the_phoenician_detachment_target(unit)
+        )
+        return tuple(sorted(target_ids))
     raise GameLifecycleError("Generic detachment record is not supported by runtime.")
 
 
@@ -314,6 +330,15 @@ def _unit_is_more_dakka_detachment_target(unit: UnitInstance) -> bool:
     if MORE_DAKKA_FACTION_KEYWORD not in unit.faction_keywords:
         return False
     return bool({"INFANTRY", "WALKER"}.intersection(unit.keywords))
+
+
+def _unit_is_court_of_the_phoenician_detachment_target(unit: UnitInstance) -> bool:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Generic detachment target requires UnitInstance.")
+    return COURT_OF_THE_PHOENICIAN_FACTION_KEYWORD in (
+        *unit.keywords,
+        *unit.faction_keywords,
+    )
 
 
 def _expected_effect_ids(

@@ -621,6 +621,7 @@ def test_phase17f_court_of_the_phoenician_rows_are_executable_generic_ir() -> No
     assert set(records_by_descriptor_id) >= COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS
     for descriptor_id in COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS:
         record = records_by_descriptor_id[descriptor_id]
+        assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
         assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
         assert record.block_reason is None
         assert record.handler_id is None

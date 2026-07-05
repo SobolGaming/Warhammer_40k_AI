@@ -357,7 +357,11 @@ def _stratagem_use_options_for_records(
         raise GameLifecycleError("Stratagem options require an eligibility context.")
     options: list[DecisionOption] = []
     for record in records:
-        if not _record_is_available_for_context(state=state, record=record, context=context):
+        if not _record_can_enumerate_targets(
+            state=state,
+            record=record,
+            context=context,
+        ):
             continue
         definition = record.definition
         if not definition.target_spec.enumerable:
@@ -407,6 +411,21 @@ def _stratagem_use_options_for_records(
                     )
                 )
     return tuple(sorted(options, key=lambda option: option.option_id))
+
+
+def _record_can_enumerate_targets(
+    *,
+    state: GameState,
+    record: StratagemCatalogRecord,
+    context: StratagemEligibilityContext,
+) -> bool:
+    unavailable = _stratagem_unavailable_reason(
+        state=state,
+        record=record,
+        context=context,
+        target_binding=None,
+    )
+    return unavailable is None or unavailable == "insufficient_command_points"
 
 
 def _effect_selections_for_binding(

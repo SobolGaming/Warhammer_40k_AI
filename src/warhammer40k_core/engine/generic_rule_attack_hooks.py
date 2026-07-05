@@ -48,6 +48,7 @@ type AttackRole = Literal["attacker", "target"]
 _ATTACKER_TARGET_KINDS = frozenset(
     {
         RuleTargetKind.FRIENDLY_UNIT,
+        RuleTargetKind.PLAYER,
         RuleTargetKind.SELECTED_UNIT,
         RuleTargetKind.THIS_MODEL,
         RuleTargetKind.THIS_UNIT,
@@ -126,6 +127,8 @@ def generic_rule_wound_roll_modifier(context: WoundRollModifierContext) -> int:
         attacking_unit_instance_id=context.attacking_unit_instance_id,
         target_unit_instance_id=context.target_unit_instance_id,
         source_phase=context.source_phase,
+        attack_strength=context.strength,
+        target_toughness=context.toughness,
         expected_roll_type="wound",
         legacy_attacker_role_allowed=lambda effect: (
             _required_int_parameter(
@@ -364,6 +367,8 @@ def _dice_roll_modifier_for_attack(
     expected_roll_type: str,
     legacy_attacker_role_allowed: Callable[[_GenericAttackEffect], bool],
     legacy_target_role_allowed: Callable[[_GenericAttackEffect], bool],
+    attack_strength: int | None = None,
+    target_toughness: int | None = None,
 ) -> int:
     total = 0
     for effect in _matching_generic_attack_effects(
@@ -371,6 +376,8 @@ def _dice_roll_modifier_for_attack(
         attacking_unit_instance_id=attacking_unit_instance_id,
         target_unit_instance_id=target_unit_instance_id,
         source_phase=source_phase,
+        attack_strength=attack_strength,
+        target_toughness=target_toughness,
         effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
         legacy_attacker_role_allowed=legacy_attacker_role_allowed,
         legacy_target_role_allowed=legacy_target_role_allowed,
@@ -417,6 +424,8 @@ def _matching_generic_attack_effects(
     legacy_attacker_role_allowed: Callable[[_GenericAttackEffect], bool],
     legacy_target_role_allowed: Callable[[_GenericAttackEffect], bool],
     target_unit_lookup_ids: tuple[str | None, ...] | None = None,
+    attack_strength: int | None = None,
+    target_toughness: int | None = None,
 ) -> tuple[_GenericAttackEffect, ...]:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -463,6 +472,8 @@ def _matching_generic_attack_effects(
                 attacking_unit_instance_id=attacker_id,
                 target_unit_instance_id=target_id,
                 source_phase=source_phase,
+                attack_strength=attack_strength,
+                target_toughness=target_toughness,
             ):
                 continue
             key = (generic_effect.persisting_effect.effect_id, role)
@@ -558,8 +569,28 @@ def _generic_effect_context_applies(
     attacking_unit_instance_id: str,
     target_unit_instance_id: str | None,
     source_phase: object,
+    attack_strength: int | None,
+    target_toughness: int | None,
 ) -> bool:
     if not _generic_effect_source_phase_applies(effect=effect, source_phase=source_phase):
+        return False
+    if not _generic_effect_required_ability_gate_applies(
+        state=state,
+        effect=effect,
+        attacking_unit_instance_id=attacking_unit_instance_id,
+    ):
+        return False
+    if not _generic_effect_charge_move_gate_applies(
+        state=state,
+        effect=effect,
+        attacking_unit_instance_id=attacking_unit_instance_id,
+    ):
+        return False
+    if not _generic_effect_target_keyword_gate_applies(
+        state=state,
+        effect=effect,
+        target_unit_instance_id=target_unit_instance_id,
+    ):
         return False
     if not _generic_effect_waaagh_gate_applies(
         state=state,
@@ -572,6 +603,8 @@ def _generic_effect_context_applies(
         effect=effect,
         attacking_unit_instance_id=attacking_unit_instance_id,
         target_unit_instance_id=target_unit_instance_id,
+        attack_strength=attack_strength,
+        target_toughness=target_toughness,
     )
 
 
@@ -612,12 +645,92 @@ def _generic_effect_waaagh_gate_applies(
     return waaagh_is_active_for_unit(state, unit_instance_id=attacking_unit_instance_id)
 
 
+def _generic_effect_required_ability_gate_applies(
+    *,
+    state: object,
+    effect: _GenericAttackEffect,
+    attacking_unit_instance_id: str,
+) -> bool:
+    required_ability = effect.parameters.get("ability_required")
+    if required_ability is None:
+        return True
+    if type(required_ability) is not str:
+        raise GameLifecycleError("Generic RuleIR ability_required must be a string.")
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Generic RuleIR ability_required gate requires GameState.")
+    for persisting_effect in state.persisting_effects_for_unit(attacking_unit_instance_id):
+        generic_effect = _generic_attack_effect_or_none(
+            persisting_effect=persisting_effect,
+            role="attacker",
+            expected_effect_kind=RuleEffectKind.GRANT_ABILITY,
+        )
+        if generic_effect is None:
+            continue
+        if (
+            attacking_unit_instance_id
+            not in generic_effect.persisting_effect.target_unit_instance_ids
+        ):
+            continue
+        if _required_string_parameter(generic_effect.parameters, key="ability") == required_ability:
+            return True
+    return False
+
+
+def _generic_effect_charge_move_gate_applies(
+    *,
+    state: object,
+    effect: _GenericAttackEffect,
+    attacking_unit_instance_id: str,
+) -> bool:
+    required = effect.parameters.get("requires_charge_move_this_turn")
+    if required is None or required is False:
+        return True
+    if required is not True:
+        raise GameLifecycleError("Generic RuleIR requires_charge_move_this_turn must be boolean.")
+    from warhammer40k_core.engine.fight_order import CHARGE_FIGHTS_FIRST_EFFECT_KIND
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Generic RuleIR charge-move gate requires GameState.")
+    for persisting_effect in state.persisting_effects_for_unit(attacking_unit_instance_id):
+        payload = persisting_effect.effect_payload
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("effect_kind") == CHARGE_FIGHTS_FIRST_EFFECT_KIND:
+            return True
+    return False
+
+
+def _generic_effect_target_keyword_gate_applies(
+    *,
+    state: object,
+    effect: _GenericAttackEffect,
+    target_unit_instance_id: str | None,
+) -> bool:
+    required_keyword = effect.parameters.get("target_required_keyword")
+    if required_keyword is None:
+        return True
+    if type(required_keyword) is not str:
+        raise GameLifecycleError("Generic RuleIR target_required_keyword must be a string.")
+    if target_unit_instance_id is None:
+        return False
+    return _unit_has_keyword(
+        state=state,
+        unit_instance_id=target_unit_instance_id,
+        keyword=required_keyword,
+    )
+
+
 def _generic_effect_target_constraint_applies(
     *,
     state: object,
     effect: _GenericAttackEffect,
     attacking_unit_instance_id: str,
     target_unit_instance_id: str | None,
+    attack_strength: int | None,
+    target_toughness: int | None,
 ) -> bool:
     constraint = effect.parameters.get("target_constraint")
     if constraint is None:
@@ -632,6 +745,19 @@ def _generic_effect_target_constraint_applies(
             attacking_unit_instance_id=attacking_unit_instance_id,
             target_unit_instance_id=target_unit_instance_id,
             distance_inches=18.0,
+        )
+    if constraint == "attack_strength_greater_than_target_toughness":
+        if attack_strength is None or target_toughness is None:
+            return False
+        return attack_strength > target_toughness
+    if constraint == "eligible_unit_within_12":
+        if target_unit_instance_id is None:
+            return False
+        return _target_is_enemy_within_distance(
+            state=state,
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            target_unit_instance_id=target_unit_instance_id,
+            distance_inches=12.0,
         )
     raise GameLifecycleError("Unsupported generic RuleIR target_constraint.")
 
@@ -1050,6 +1176,27 @@ def _target_is_closest_enemy_within_distance(
     return True
 
 
+def _target_is_enemy_within_distance(
+    *,
+    state: object,
+    attacking_unit_instance_id: str,
+    target_unit_instance_id: str,
+    distance_inches: float,
+) -> bool:
+    attacker_owner = _unit_owner(state=state, unit_instance_id=attacking_unit_instance_id)
+    target_owner = _unit_owner(state=state, unit_instance_id=target_unit_instance_id)
+    if attacker_owner == target_owner:
+        return False
+    return (
+        _closest_unit_distance_inches(
+            state=state,
+            first_unit_instance_id=attacking_unit_instance_id,
+            second_unit_instance_id=target_unit_instance_id,
+        )
+        <= distance_inches
+    )
+
+
 def _enemy_unit_ids_for_player(*, state: object, player_id: str) -> tuple[str, ...]:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -1075,6 +1222,21 @@ def _unit_owner(*, state: object, unit_instance_id: str) -> str:
             if unit.unit_instance_id == requested_unit_id:
                 return army.player_id
     raise GameLifecycleError("Generic RuleIR target constraint unit is unknown.")
+
+
+def _unit_has_keyword(*, state: object, unit_instance_id: str, keyword: str) -> bool:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Generic RuleIR keyword gate requires GameState.")
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    requested_keyword = _validate_identifier("keyword", keyword)
+    for army in state.army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id != requested_unit_id:
+                continue
+            return requested_keyword in (*unit.keywords, *unit.faction_keywords)
+    raise GameLifecycleError("Generic RuleIR keyword gate unit is unknown.")
 
 
 def _closest_unit_distance_inches(

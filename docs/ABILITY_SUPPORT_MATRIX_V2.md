@@ -286,7 +286,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
 | `generic:force-desperate-escape` | Inescapable Manifestations |
 | `generic:ingress-move` | From Beyond the Veil |
-| `generic:rule-ir` | CALL DAT DAKKA?<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>LONG, UNCONTROLLED BURSTS<br>ORKS IS STILL ORKS<br>SINGLE-MINDED STRIKE<br>SPESHUL SHELLS |
+| `generic:rule-ir` | CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>EUPHORIC INSPIRATION<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>LONG, UNCONTROLLED BURSTS<br>ORKS IS STILL ORKS<br>PRIDEFUL SUPERIORITY<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS |
 | `phase17g:aeldari:corsair-coterie:stratagems:cloak-and-shadow:target-restriction` | Cloak and Shadow |
 | `phase17g:aeldari:corsair-coterie:stratagems:outcast-ambush:weapon-profile` | Outcast Ambush |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
@@ -398,6 +398,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction` | Thrill Seekers |
+| `warhammer_40000_11th:emperors_children:detachment:court_of_the_phoenician:master_of_the_pageant:cp_cost_reduction` | CP Cost Reduction |
 | `warhammer_40000_11th:emperors_children:spectacle_of_slaughter:beguiling_grotesquerie:snap_target_restriction` | Snap Target Restriction |
 | `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush` | Cult Ambush |
 | `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:initial_resurgence` | Cult Ambush |

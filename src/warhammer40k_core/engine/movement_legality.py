@@ -29,7 +29,11 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CatalogMovementTransitPermission,
     catalog_movement_transit_permissions_for_model,
 )
+from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_rule_effects import (
+    movement_transit_through_terrain_features_allowed,
+)
 from warhammer40k_core.geometry.pathing import (
     PathValidationContext,
     PathWitness,
@@ -205,6 +209,8 @@ class MovementCapabilitySet:
         unit: UnitInstance | None = None,
         model_instance_id: str | None = None,
         current_model_instance_ids: tuple[str, ...] = (),
+        unit_persisting_effects: tuple[PersistingEffect, ...] = (),
+        owner_player_id: str | None = None,
     ) -> Self:
         descriptor = _validate_ruleset_descriptor(ruleset_descriptor)
         normalized_keywords = _validate_keyword_tuple(
@@ -228,6 +234,12 @@ class MovementCapabilitySet:
             current_model_instance_ids=current_model_instance_ids,
             movement_mode=movement_mode,
         )
+        terrain_transit_permission = _unit_effect_terrain_transit_permission(
+            effects=unit_persisting_effects,
+            owner_player_id=owner_player_id,
+            movement_mode=movement_mode,
+            unit_keywords=normalized_keywords,
+        )
         has_fly = "has_fly" in flags
         is_titanic = "is_titanic" in flags
         is_infantry = "is_infantry" in flags
@@ -242,8 +254,10 @@ class MovementCapabilitySet:
             )
         )
         can_move_through_models = has_fly and descriptor.fly_policy.may_move_through_models
-        can_move_through_terrain = can_traverse_ruins_walls or (
-            has_fly and descriptor.fly_policy.may_move_through_terrain
+        can_move_through_terrain = (
+            can_traverse_ruins_walls
+            or (has_fly and descriptor.fly_policy.may_move_through_terrain)
+            or terrain_transit_permission
         )
         ignores_vertical_distance = has_fly and descriptor.fly_policy.ignores_vertical_distance
         return cls(
@@ -521,6 +535,8 @@ class MovementLegalityContext:
         unit: UnitInstance | None = None,
         model_instance_id: str | None = None,
         current_model_instance_ids: tuple[str, ...] = (),
+        unit_persisting_effects: tuple[PersistingEffect, ...] = (),
+        owner_player_id: str | None = None,
     ) -> Self:
         descriptor = _validate_ruleset_descriptor(ruleset_descriptor)
         mode = movement_mode_from_token(movement_mode)
@@ -538,6 +554,8 @@ class MovementLegalityContext:
                 unit=unit,
                 model_instance_id=model_instance_id,
                 current_model_instance_ids=current_model_instance_ids,
+                unit_persisting_effects=unit_persisting_effects,
+                owner_player_id=owner_player_id,
             ),
             engagement_policy=EngagementMovementPolicy.from_ruleset_descriptor(
                 descriptor,
@@ -860,6 +878,26 @@ def _catalog_movement_transit_permissions(
         model_instance_id=model_instance_id,
         current_model_instance_ids=current_model_instance_ids,
         movement_mode=mode.value,
+    )
+
+
+def _unit_effect_terrain_transit_permission(
+    *,
+    effects: tuple[PersistingEffect, ...],
+    owner_player_id: str | None,
+    movement_mode: object | None,
+    unit_keywords: tuple[str, ...],
+) -> bool:
+    if not effects:
+        return False
+    if owner_player_id is None:
+        raise MovementLegalityError("Unit effect terrain transit requires owner_player_id.")
+    mode = movement_mode_from_token(movement_mode)
+    return movement_transit_through_terrain_features_allowed(
+        effects,
+        owner_player_id=owner_player_id,
+        movement_mode=mode.value,
+        unit_keywords=unit_keywords,
     )
 
 

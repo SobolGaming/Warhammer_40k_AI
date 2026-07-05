@@ -15,7 +15,11 @@ from warhammer40k_core.core.detachment import (
     StratagemDefinition,
 )
 from warhammer40k_core.core.faction import FactionDefinition
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    MovementMode,
+    RulesetDescriptor,
+)
 from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
@@ -26,6 +30,7 @@ from warhammer40k_core.engine.battle_formation_hooks import BattleFormationReque
 from warhammer40k_core.engine.command_points import CommandPointGainStatus, CommandPointSourceKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_rule_execution import (
@@ -33,7 +38,11 @@ from warhammer40k_core.engine.faction_rule_execution import (
     FactionRuleExecutionResult,
     FactionRuleExecutionStatus,
 )
-from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
+from warhammer40k_core.engine.fight_order import (
+    CHARGE_FIGHTS_FIRST_EFFECT_KIND,
+    FightPhaseState,
+    FightsFirstRegistry,
+)
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -47,6 +56,7 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_legality import MovementCapabilitySet
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -64,6 +74,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
     UnitCharacteristicModifierContext,
     WeaponProfileModifierContext,
+    WoundRollModifierContext,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.source_backed_rerolls import (
@@ -85,9 +96,13 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.triggered_movement import SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE
 from warhammer40k_core.engine.unit_rule_effects import (
     charge_transit_through_non_vehicle_monster_models_allowed,
+    movement_transit_through_terrain_features_allowed,
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
     Phase17FExecutionStatus,
 )
@@ -122,6 +137,25 @@ _SPECTACLE_GENERIC_EXECUTION_IDS = (
 _SPECTACLE_ENHANCEMENT_EXECUTION_IDS = (
     ("phase17f:phase17e:enhancement:emperors-children:spectacle-of-slaughter:000010900002"),
     ("phase17f:phase17e:enhancement:emperors-children:spectacle-of-slaughter:000010900003"),
+)
+_COURT_GENERIC_EXECUTION_IDS = (
+    "phase17f:phase17e:emperors-children:court-of-the-phoenician:rule",
+    "phase17f:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654002",
+    "phase17f:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003",
+    "phase17f:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654004",
+    "phase17f:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654005",
+    "phase17f:phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655002",
+    "phase17f:phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655003",
+    "phase17f:phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655004",
+    "phase17f:phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655005",
+    "phase17f:phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655006",
+    "phase17f:phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655007",
+)
+_COURT_ENHANCEMENT_EXECUTION_IDS = (
+    "phase17f:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654002",
+    "phase17f:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003",
+    "phase17f:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654004",
+    "phase17f:phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654005",
 )
 
 
@@ -745,6 +779,326 @@ def test_ws14_spectacle_of_slaughter_stratagems_execute_through_lifecycle() -> N
     )
 
 
+@pytest.mark.integration
+def test_ws14_court_of_the_phoenician_rows_execute_from_lifecycle_bundle() -> None:
+    config = _court_lifecycle_config()
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.advance_until_decision_or_terminal()
+
+    bundle = _runtime_content_bundle(lifecycle)
+
+    assert "emperors-children" in bundle.activation.selected_faction_ids
+    assert "court-of-the-phoenician" in bundle.activation.selected_detachment_ids
+    assert set(_COURT_GENERIC_EXECUTION_IDS).issubset(
+        bundle.activation.selected_execution_record_ids
+    )
+
+    context = FactionRuleExecutionContext(
+        game_id=config.game_id,
+        player_id="player-a",
+        battle_round=1,
+        phase=BattlePhaseKind.FIGHT,
+        active_player_id="player-a",
+        source_unit_instance_id="army-alpha:fulgrim-1",
+        target_unit_instance_ids=("army-alpha:fulgrim-1",),
+        trigger_payload={"event": "ws14-court-generic-ir-demo"},
+    )
+    results = tuple(
+        bundle.faction_rule_execution_registry.execute(
+            execution_id=execution_id,
+            context=context,
+        )
+        for execution_id in _COURT_ENHANCEMENT_EXECUTION_IDS
+    )
+
+    assert tuple(result.status for result in results) == (
+        FactionRuleExecutionStatus.APPLIED,
+        FactionRuleExecutionStatus.APPLIED,
+        FactionRuleExecutionStatus.APPLIED,
+        FactionRuleExecutionStatus.APPLIED,
+    )
+    for result in results:
+        record = bundle.faction_rule_execution_registry.record_by_execution_id(result.execution_id)
+        assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+        assert record.rule_ir_hash is not None
+        assert FactionRuleExecutionResult.from_payload(result.to_payload()) == result
+
+    assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
+    assert "object at 0x" not in json.dumps(lifecycle.to_payload(), sort_keys=True)
+
+
+@pytest.mark.integration
+def test_ws14_court_of_the_phoenician_rule_and_enhancements_bind_to_runtime_hooks() -> None:
+    lifecycle = _court_battle_lifecycle()
+    state = _state(lifecycle)
+    bundle = _runtime_content_bundle(lifecycle)
+
+    court_effects = tuple(
+        effect
+        for effect in state.persisting_effects_for_unit("army-alpha:fulgrim-1")
+        if effect.source_rule_id == "gw-11e-phase17e-faction-coverage-2026-27:phase17e:"
+        "emperors-children:court-of-the-phoenician:rule:source-text"
+    )
+    assert len(court_effects) == 4
+    assert any(
+        _effect_parameter(_json_object(_json_object(effect.effect_payload)["effect"]), "ability")
+        == "sensational_performance"
+        for effect in court_effects
+    )
+
+    lord_model_id = _first_model_id(state, unit_instance_id="army-alpha:lord-exultant-1")
+    assert (
+        bundle.runtime_modifier_registry.modified_movement_inches(
+            MovementBudgetModifierContext(
+                state=state,
+                unit_instance_id="army-alpha:lord-exultant-1",
+                model_instance_id=lord_model_id,
+                base_movement_inches=6.0,
+                current_movement_inches=6.0,
+            )
+        )
+        == 7.0
+    )
+
+    daemon_model_id = _first_model_id(state, unit_instance_id="army-alpha:daemon-prince-1")
+    daemon_base = _court_blade_profile()
+    daemon_profile = bundle.runtime_modifier_registry.modified_weapon_profile(
+        _court_weapon_profile_context(
+            state=state,
+            weapon_profile=daemon_base,
+            attacker_model_id=daemon_model_id,
+            attacking_unit_id="army-alpha:daemon-prince-1",
+            target_unit_id="army-beta:enemy-character-1",
+            source_phase=BattlePhase.FIGHT,
+        )
+    )
+    assert daemon_profile.strength.final == daemon_base.strength.final + 1
+    assert daemon_base.attack_profile.fixed_attacks is not None
+    assert daemon_profile.attack_profile.fixed_attacks == (
+        daemon_base.attack_profile.fixed_attacks + 1
+    )
+
+    fulgrim_model_id = _first_model_id(state, unit_instance_id="army-alpha:fulgrim-1")
+    sensational_base = _court_blade_profile()
+    pre_charge_profile = bundle.runtime_modifier_registry.modified_weapon_profile(
+        _court_weapon_profile_context(
+            state=state,
+            weapon_profile=sensational_base,
+            attacker_model_id=fulgrim_model_id,
+            attacking_unit_id="army-alpha:fulgrim-1",
+            target_unit_id="army-beta:enemy-character-1",
+            source_phase=BattlePhase.FIGHT,
+        )
+    )
+    assert pre_charge_profile.strength == sensational_base.strength
+    assert pre_charge_profile.armor_penetration == sensational_base.armor_penetration
+
+    _record_charge_move_effect(state, unit_instance_id="army-alpha:fulgrim-1")
+    post_charge_profile = bundle.runtime_modifier_registry.modified_weapon_profile(
+        _court_weapon_profile_context(
+            state=state,
+            weapon_profile=sensational_base,
+            attacker_model_id=fulgrim_model_id,
+            attacking_unit_id="army-alpha:fulgrim-1",
+            target_unit_id="army-beta:enemy-character-1",
+            source_phase=BattlePhase.FIGHT,
+        )
+    )
+    assert post_charge_profile.strength.final == sensational_base.strength.final + 1
+    assert post_charge_profile.armor_penetration.final == (
+        sensational_base.armor_penetration.final + 1
+    )
+    assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
+
+
+@pytest.mark.integration
+def test_ws14_court_of_the_phoenician_stratagems_execute_through_lifecycle() -> None:
+    prideful_lifecycle = _court_battle_lifecycle()
+    use_record, submit_status = _use_court_stratagem_through_lifecycle(
+        prideful_lifecycle,
+        stratagem_id="000010655003",
+        target_unit_id="army-alpha:fulgrim-1",
+        phase=BattlePhase.FIGHT,
+        command_points=0,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    assert use_record.command_point_cost == 0
+    assert (
+        "warhammer_40000_11th:emperors_children:detachment:"
+        "court_of_the_phoenician:master_of_the_pageant:cp_cost_reduction"
+        in use_record.command_point_modifier_ids
+    )
+    assert submit_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    prideful_effect_lifecycle = _court_battle_lifecycle()
+    _use_court_stratagem(
+        prideful_effect_lifecycle,
+        stratagem_id="000010655003",
+        target_unit_id="army-alpha:fulgrim-1",
+        phase=BattlePhase.FIGHT,
+        command_points=0,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    prideful_state = _state(prideful_effect_lifecycle)
+    reroll_context = source_backed_reroll_permission_context_for_unit(
+        state=prideful_state,
+        player_id="player-a",
+        unit_instance_id="army-alpha:fulgrim-1",
+        model_instance_id=_first_model_id(prideful_state, unit_instance_id="army-alpha:fulgrim-1"),
+        roll_type="attack_sequence.hit",
+        timing_window="attack_sequence.hit",
+        target_unit_instance_id="army-beta:enemy-character-1",
+    )
+    assert reroll_context is not None
+
+    restriction_lifecycle = _court_battle_lifecycle()
+    restriction_state = _state(restriction_lifecycle)
+    _prepare_battle_phase(
+        restriction_state,
+        phase=BattlePhase.CHARGE,
+        active_player_id="player-a",
+    )
+    _grant_cp(restriction_state, player_id="player-a", amount=1)
+    restriction_context = StratagemEligibilityContext.from_state(
+        state=restriction_state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    restriction_status = request_stratagem_use_from_index(
+        state=restriction_state,
+        decisions=restriction_lifecycle.decision_controller,
+        index=_runtime_content_bundle(restriction_lifecycle).stratagem_indexes_by_player_id[
+            "player-a"
+        ],
+        context=restriction_context,
+        stratagem_cost_modifier_registry=(
+            _runtime_content_bundle(restriction_lifecycle).stratagem_cost_modifier_registry
+        ),
+    )
+    assert restriction_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = restriction_lifecycle.pending_decision_request()
+    assert request is not None
+    assert not any(
+        _option_stratagem_id(option.payload) == "000010655004"
+        and _option_target_unit_id(option.payload) == "army-alpha:tears-1"
+        for option in request.options
+    )
+    assert any(
+        _option_stratagem_id(option.payload) == "000010655004"
+        and _option_target_unit_id(option.payload) == "army-alpha:fulgrim-1"
+        for option in request.options
+    )
+
+    sinuous_lifecycle = _court_battle_lifecycle()
+    sinuous_state = _state(sinuous_lifecycle)
+    _use_court_stratagem(
+        sinuous_lifecycle,
+        stratagem_id="000010655004",
+        target_unit_id="army-alpha:fulgrim-1",
+        phase=BattlePhase.CHARGE,
+        command_points=0,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    sinuous_effects = tuple(sinuous_state.persisting_effects_for_unit("army-alpha:fulgrim-1"))
+    assert movement_transit_through_terrain_features_allowed(
+        sinuous_effects,
+        owner_player_id="player-a",
+        movement_mode="charge",
+        unit_keywords=(
+            court_ir.FULGRIM_KEYWORD,
+            court_ir.DAEMON_KEYWORD,
+            court_ir.CHARACTER_KEYWORD,
+        ),
+    )
+    sinuous_capabilities = MovementCapabilitySet.from_keywords(
+        (
+            court_ir.FULGRIM_KEYWORD,
+            court_ir.DAEMON_KEYWORD,
+            court_ir.CHARACTER_KEYWORD,
+        ),
+        ruleset_descriptor=sinuous_lifecycle.config.ruleset_descriptor,
+        movement_mode=MovementMode.CHARGE,
+        unit_persisting_effects=sinuous_effects,
+        owner_player_id="player-a",
+    )
+    assert sinuous_capabilities.can_move_through_terrain
+
+    contempt_lifecycle = _court_battle_lifecycle()
+    contempt_state = _state(contempt_lifecycle)
+    contempt_bundle = _runtime_content_bundle(contempt_lifecycle)
+    _use_court_stratagem(
+        contempt_lifecycle,
+        stratagem_id="000010655002",
+        target_unit_id="army-alpha:fulgrim-1",
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    assert (
+        contempt_bundle.runtime_modifier_registry.wound_roll_modifier(
+            WoundRollModifierContext(
+                state=contempt_state,
+                source_phase=BattlePhase.SHOOTING,
+                attacking_unit_instance_id="army-beta:enemy-character-1",
+                attacker_model_instance_id=_first_model_id(
+                    contempt_state,
+                    unit_instance_id="army-beta:enemy-character-1",
+                ),
+                target_unit_instance_id="army-alpha:fulgrim-1",
+                weapon_profile=_court_shoota_profile(),
+                strength=10,
+                toughness=8,
+            )
+        )
+        == -1
+    )
+    assert (
+        contempt_bundle.runtime_modifier_registry.wound_roll_modifier(
+            WoundRollModifierContext(
+                state=contempt_state,
+                source_phase=BattlePhase.SHOOTING,
+                attacking_unit_instance_id="army-beta:enemy-character-1",
+                attacker_model_instance_id=_first_model_id(
+                    contempt_state,
+                    unit_instance_id="army-beta:enemy-character-1",
+                ),
+                target_unit_instance_id="army-alpha:fulgrim-1",
+                weapon_profile=_court_shoota_profile(),
+                strength=8,
+                toughness=8,
+            )
+        )
+        == 0
+    )
+
+    close_lifecycle = _court_battle_lifecycle()
+    close_state = _state(close_lifecycle)
+    _place_units_for_court_within_12(close_state)
+    close_bundle = _runtime_content_bundle(close_lifecycle)
+    close_base = _court_shoota_profile()
+    _use_court_stratagem(
+        close_lifecycle,
+        stratagem_id="000010655005",
+        target_unit_id="army-alpha:fulgrim-1",
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.START_PHASE,
+    )
+    close_profile = close_bundle.runtime_modifier_registry.modified_weapon_profile(
+        _court_weapon_profile_context(
+            state=close_state,
+            weapon_profile=close_base,
+            attacker_model_id=_first_model_id(close_state, unit_instance_id="army-alpha:fulgrim-1"),
+            attacking_unit_id="army-alpha:fulgrim-1",
+            target_unit_id="army-beta:enemy-character-1",
+            source_phase=BattlePhase.SHOOTING,
+        )
+    )
+    assert close_profile.strength.final == close_base.strength.final + 1
+    assert close_profile.armor_penetration.final == close_base.armor_penetration.final + 1
+    assert GameLifecycle.from_payload(close_lifecycle.to_payload()).to_payload() == (
+        close_lifecycle.to_payload()
+    )
+
+
 def _more_dakka_lifecycle_config() -> GameConfig:
     catalog = _more_dakka_catalog()
     return GameConfig(
@@ -1112,6 +1466,316 @@ def _spectacle_muster_request(
     )
 
 
+def _court_lifecycle_config() -> GameConfig:
+    catalog = _court_catalog()
+    return GameConfig(
+        game_id="ws14-court-of-the-phoenician-generic-ir-game",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            _court_muster_request(
+                catalog=catalog,
+                army_id="army-alpha",
+                player_id="player-a",
+                unit_selection_ids=(
+                    "fulgrim-1",
+                    "daemon-prince-1",
+                    "lord-exultant-1",
+                    "tears-1",
+                    "soulstain-1",
+                ),
+                enhancement_assignments=(
+                    ("000010654002", "tears-1"),
+                    ("000010654003", "lord-exultant-1"),
+                    ("000010654004", "soulstain-1"),
+                    ("000010654005", "daemon-prince-1"),
+                ),
+            ),
+            _court_muster_request(
+                catalog=catalog,
+                army_id="army-beta",
+                player_id="player-b",
+                unit_selection_ids=("enemy-character-1",),
+                enhancement_assignments=(),
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring-it-down"),
+        mission_setup=_mission_setup(),
+    )
+
+
+def _court_battle_lifecycle() -> GameLifecycle:
+    config = _court_lifecycle_config()
+    armies = tuple(
+        muster_army(catalog=config.army_catalog, request=request)
+        for request in config.army_muster_requests
+    )
+    state = GameState.from_config(config)
+    for army in armies:
+        state.record_army_definition(army)
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="ws14-court-battlefield",
+        armies=armies,
+    )
+    state.record_battlefield_state(scenario.battlefield_state)
+    _record_fixed_secondary_choices_for_fixture(state, config=config)
+    enter_battle_for_fixture(state)
+    lifecycle = GameLifecycle.from_payload(
+        {
+            "config": config.to_payload(),
+            "parameterized_movement_proposals": True,
+            "state": state.to_payload(),
+            "decisions": DecisionController().to_payload(),
+            "reaction_queue": ReactionQueue().to_payload(),
+        }
+    )
+    _apply_battle_formation_hooks_from_bundle(lifecycle)
+    return lifecycle
+
+
+def _court_catalog() -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_datasheet = base_catalog.datasheet_by_id("core-boyz-like-infantry")
+    core_weapons = tuple(
+        wargear
+        for wargear in base_catalog.wargear
+        if wargear.wargear_id in {"core-leader-blade", "core-mob-shoota"}
+    )
+    return ArmyCatalog(
+        catalog_id="ws14-court-of-the-phoenician-demo",
+        ruleset_id=base_catalog.ruleset_id,
+        source_package_id="data-package:core-v2:ws14-court-of-the-phoenician-demo:0.1.0",
+        datasheets=(
+            replace(
+                base_datasheet,
+                datasheet_id="ws14-court-fulgrim",
+                name="WS14 Fulgrim",
+                keywords=DatasheetKeywordSet(
+                    keywords=(
+                        court_ir.FULGRIM_KEYWORD,
+                        court_ir.DAEMON_KEYWORD,
+                        court_ir.CHARACTER_KEYWORD,
+                        "MONSTER",
+                    ),
+                    faction_keywords=(court_ir.EMPERORS_CHILDREN_KEYWORD,),
+                ),
+                source_ids=("datasheet:ws14-court-fulgrim",),
+            ),
+            replace(
+                base_datasheet,
+                datasheet_id="ws14-court-daemon-prince",
+                name="WS14 Emperor's Children Daemon Prince",
+                keywords=DatasheetKeywordSet(
+                    keywords=(
+                        court_ir.DAEMON_PRINCE_KEYWORD,
+                        court_ir.DAEMON_KEYWORD,
+                        court_ir.CHARACTER_KEYWORD,
+                        "MONSTER",
+                    ),
+                    faction_keywords=(court_ir.EMPERORS_CHILDREN_KEYWORD,),
+                ),
+                source_ids=("datasheet:ws14-court-daemon-prince",),
+            ),
+            replace(
+                base_datasheet,
+                datasheet_id="ws14-court-lord-exultant",
+                name="WS14 Lord Exultant",
+                keywords=DatasheetKeywordSet(
+                    keywords=(court_ir.LORD_EXULTANT_KEYWORD, court_ir.CHARACTER_KEYWORD),
+                    faction_keywords=(court_ir.EMPERORS_CHILDREN_KEYWORD,),
+                ),
+                source_ids=("datasheet:ws14-court-lord-exultant",),
+            ),
+            replace(
+                base_datasheet,
+                datasheet_id="ws14-court-infantry",
+                name="WS14 Emperor's Children Infantry",
+                keywords=DatasheetKeywordSet(
+                    keywords=("INFANTRY",),
+                    faction_keywords=(court_ir.EMPERORS_CHILDREN_KEYWORD,),
+                ),
+                source_ids=("datasheet:ws14-court-infantry",),
+            ),
+            replace(
+                base_datasheet,
+                datasheet_id="ws14-court-enemy-character",
+                name="WS14 Enemy Character",
+                keywords=DatasheetKeywordSet(
+                    keywords=(court_ir.CHARACTER_KEYWORD, "INFANTRY"),
+                    faction_keywords=("ENEMY", court_ir.EMPERORS_CHILDREN_KEYWORD),
+                ),
+                source_ids=("datasheet:ws14-court-enemy-character",),
+            ),
+        ),
+        wargear=core_weapons,
+        factions=(
+            FactionDefinition(
+                faction_id="emperors-children",
+                name="Emperor's Children",
+                faction_keywords=(court_ir.EMPERORS_CHILDREN_KEYWORD,),
+                source_ids=("faction:emperors-children",),
+            ),
+            FactionDefinition(
+                faction_id="ws14-opponent",
+                name="WS14 Opponent",
+                faction_keywords=("ENEMY",),
+                source_ids=("faction:ws14-opponent",),
+            ),
+        ),
+        detachments=(
+            DetachmentDefinition(
+                detachment_id="court-of-the-phoenician",
+                name="Court of the Phoenician",
+                faction_id="emperors-children",
+                detachment_point_cost=1,
+                unit_datasheet_ids=(
+                    "ws14-court-fulgrim",
+                    "ws14-court-daemon-prince",
+                    "ws14-court-lord-exultant",
+                    "ws14-court-infantry",
+                    "ws14-court-enemy-character",
+                ),
+                force_disposition_ids=("purge-the-foe",),
+                rule_source_ids=("phase17e:emperors-children:court-of-the-phoenician:rule",),
+                enhancement_ids=(
+                    "000010654002",
+                    "000010654003",
+                    "000010654004",
+                    "000010654005",
+                ),
+                stratagem_ids=(
+                    "000010655002",
+                    "000010655003",
+                    "000010655004",
+                    "000010655005",
+                    "000010655006",
+                    "000010655007",
+                ),
+                source_ids=("detachment:court-of-the-phoenician",),
+            ),
+        ),
+        enhancements=(
+            EnhancementDefinition(
+                enhancement_id="000010654002",
+                name="Tears of the Phoenix",
+                source_id=(
+                    "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654002"
+                ),
+                points=15,
+            ),
+            EnhancementDefinition(
+                enhancement_id="000010654003",
+                name="Exalted Patron",
+                source_id=(
+                    "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003"
+                ),
+                points=20,
+            ),
+            EnhancementDefinition(
+                enhancement_id="000010654004",
+                name="Soulstain Made Manifest",
+                source_id=(
+                    "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654004"
+                ),
+                points=20,
+            ),
+            EnhancementDefinition(
+                enhancement_id="000010654005",
+                name="Spiritsliver",
+                source_id=(
+                    "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654005"
+                ),
+                points=25,
+            ),
+        ),
+        stratagems=(
+            _court_stratagem("000010655002", "Contemptuous Disregard"),
+            _court_stratagem("000010655003", "Prideful Superiority"),
+            _court_stratagem("000010655004", "Sinuous Breach"),
+            _court_stratagem("000010655005", "Close-Quarters Excruciation"),
+            _court_stratagem("000010655006", "Euphoric Inspiration"),
+            _court_stratagem("000010655007", "Catalytic Stimulus"),
+        ),
+        source_ids=("catalog:ws14-court-of-the-phoenician-demo",),
+    )
+
+
+def _court_stratagem(stratagem_id: str, name: str) -> StratagemDefinition:
+    return StratagemDefinition(
+        stratagem_id=stratagem_id,
+        name=name,
+        source_id=f"phase17e:stratagem:emperors-children:court-of-the-phoenician:{stratagem_id}",
+        command_point_cost=1,
+        timing_tags=("shooting", "fight", "movement", "charge"),
+    )
+
+
+def _court_muster_request(
+    *,
+    catalog: ArmyCatalog,
+    army_id: str,
+    player_id: str,
+    unit_selection_ids: tuple[str, ...],
+    enhancement_assignments: tuple[tuple[str, str], ...],
+) -> ArmyMusterRequest:
+    return ArmyMusterRequest(
+        army_id=army_id,
+        player_id=player_id,
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="emperors-children",
+            detachment_ids=("court-of-the-phoenician",),
+            enhancement_ids=(
+                "000010654002",
+                "000010654003",
+                "000010654004",
+                "000010654005",
+            ),
+        ),
+        unit_selections=tuple(
+            UnitMusterSelection(
+                unit_selection_id=unit_selection_id,
+                datasheet_id=_court_datasheet_id_for_selection(unit_selection_id),
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-boyz-like",
+                        model_count=10,
+                    ),
+                ),
+            )
+            for unit_selection_id in unit_selection_ids
+        ),
+        enhancement_assignments=tuple(
+            EnhancementAssignment(
+                enhancement_id=enhancement_id,
+                target_unit_selection_id=target_unit_selection_id,
+                source_id=f"ws14-court:assignment:{target_unit_selection_id}:{enhancement_id}",
+            )
+            for enhancement_id, target_unit_selection_id in enhancement_assignments
+        ),
+        roster_legality_required=False,
+    )
+
+
+def _court_datasheet_id_for_selection(unit_selection_id: str) -> str:
+    if unit_selection_id == "fulgrim-1":
+        return "ws14-court-fulgrim"
+    if unit_selection_id == "daemon-prince-1":
+        return "ws14-court-daemon-prince"
+    if unit_selection_id == "lord-exultant-1":
+        return "ws14-court-lord-exultant"
+    if unit_selection_id in {"tears-1", "soulstain-1"}:
+        return "ws14-court-infantry"
+    if unit_selection_id == "enemy-character-1":
+        return "ws14-court-enemy-character"
+    raise AssertionError(f"Missing Court datasheet mapping for {unit_selection_id}.")
+
+
 def _more_dakka_muster_request(
     *,
     catalog: ArmyCatalog,
@@ -1394,6 +2058,79 @@ def _use_spectacle_stratagem_through_lifecycle(
     return use_record, status
 
 
+def _use_court_stratagem(
+    lifecycle: GameLifecycle,
+    *,
+    stratagem_id: str,
+    target_unit_id: str,
+    phase: BattlePhase,
+    command_points: int = 1,
+    active_player_id: str = "player-a",
+    trigger_kind: TimingTriggerKind = TimingTriggerKind.DURING_PHASE,
+    trigger_payload: JsonValue = None,
+) -> StratagemUseRecord:
+    state = _state(lifecycle)
+    result = _court_stratagem_decision_result(
+        lifecycle,
+        stratagem_id=stratagem_id,
+        target_unit_id=target_unit_id,
+        phase=phase,
+        command_points=command_points,
+        active_player_id=active_player_id,
+        trigger_kind=trigger_kind,
+        trigger_payload=trigger_payload,
+    )
+    lifecycle.decision_controller.submit_result(result)
+    config = object.__getattribute__(lifecycle, "_config")
+    if type(config) is not GameConfig:
+        raise AssertionError("Lifecycle config was not loaded.")
+    use_record = apply_stratagem_decision(
+        state=state,
+        result=result,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=config.ruleset_descriptor,
+        army_catalog=config.army_catalog,
+        stratagem_handler_registry=(_runtime_content_bundle(lifecycle).stratagem_handler_registry),
+        stratagem_cost_modifier_registry=(
+            _runtime_content_bundle(lifecycle).stratagem_cost_modifier_registry
+        ),
+        shooting_unit_selected_grant_hooks=(
+            _runtime_content_bundle(lifecycle).shooting_unit_selected_grant_hook_registry
+        ),
+    )
+    assert state.stratagem_use_records[-1] == use_record
+    return use_record
+
+
+def _use_court_stratagem_through_lifecycle(
+    lifecycle: GameLifecycle,
+    *,
+    stratagem_id: str,
+    target_unit_id: str,
+    phase: BattlePhase,
+    command_points: int = 1,
+    active_player_id: str = "player-a",
+    trigger_kind: TimingTriggerKind = TimingTriggerKind.DURING_PHASE,
+    trigger_payload: JsonValue = None,
+) -> tuple[StratagemUseRecord, LifecycleStatus]:
+    state = _state(lifecycle)
+    result = _court_stratagem_decision_result(
+        lifecycle,
+        stratagem_id=stratagem_id,
+        target_unit_id=target_unit_id,
+        phase=phase,
+        command_points=command_points,
+        active_player_id=active_player_id,
+        trigger_kind=trigger_kind,
+        trigger_payload=trigger_payload,
+    )
+    status = lifecycle.submit_decision(result)
+    use_record = state.stratagem_use_records[-1]
+    assert use_record.stratagem_id == stratagem_id
+    assert use_record.targeted_unit_instance_ids == (target_unit_id,)
+    return use_record, status
+
+
 def _more_dakka_stratagem_decision_result(
     lifecycle: GameLifecycle,
     *,
@@ -1473,6 +2210,52 @@ def _spectacle_stratagem_decision_result(
     )
     return DecisionResult.for_request(
         result_id=f"ws14-spectacle-{stratagem_id}-result",
+        request=request,
+        selected_option_id=selected_option.option_id,
+    )
+
+
+def _court_stratagem_decision_result(
+    lifecycle: GameLifecycle,
+    *,
+    stratagem_id: str,
+    target_unit_id: str,
+    phase: BattlePhase,
+    command_points: int,
+    active_player_id: str,
+    trigger_kind: TimingTriggerKind,
+    trigger_payload: JsonValue,
+) -> DecisionResult:
+    state = _state(lifecycle)
+    _prepare_battle_phase(state, phase=phase, active_player_id=active_player_id)
+    if command_points > 0:
+        _grant_cp(state, player_id="player-a", amount=command_points)
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id="player-a",
+        trigger_kind=trigger_kind,
+        trigger_payload=trigger_payload,
+    )
+    status = request_stratagem_use_from_index(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        index=_runtime_content_bundle(lifecycle).stratagem_indexes_by_player_id["player-a"],
+        context=context,
+        stratagem_cost_modifier_registry=(
+            _runtime_content_bundle(lifecycle).stratagem_cost_modifier_registry
+        ),
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = lifecycle.pending_decision_request()
+    assert request is not None
+    selected_option = next(
+        option
+        for option in request.options
+        if _option_stratagem_id(option.payload) == stratagem_id
+        and _option_target_unit_id(option.payload) == target_unit_id
+    )
+    return DecisionResult.for_request(
+        result_id=f"ws14-court-{stratagem_id}-result",
         request=request,
         selected_option_id=selected_option.option_id,
     )
@@ -1563,6 +2346,18 @@ def _leader_blade_profile() -> WeaponProfile:
     ).weapon_profiles[0]
 
 
+def _court_blade_profile() -> WeaponProfile:
+    return next(
+        wargear for wargear in _court_catalog().wargear if wargear.wargear_id == "core-leader-blade"
+    ).weapon_profiles[0]
+
+
+def _court_shoota_profile() -> WeaponProfile:
+    return next(
+        wargear for wargear in _court_catalog().wargear if wargear.wargear_id == "core-mob-shoota"
+    ).weapon_profiles[0]
+
+
 def _spectacle_weapon_profile_context(
     *,
     state: GameState,
@@ -1571,6 +2366,25 @@ def _spectacle_weapon_profile_context(
     source_phase: BattlePhase,
     attacking_unit_id: str = "army-alpha:blades-1",
     target_unit_id: str = "army-beta:blades-3",
+) -> WeaponProfileModifierContext:
+    return WeaponProfileModifierContext(
+        state=state,
+        source_phase=source_phase,
+        attacking_unit_instance_id=attacking_unit_id,
+        attacker_model_instance_id=attacker_model_id,
+        target_unit_instance_id=target_unit_id,
+        weapon_profile=weapon_profile,
+    )
+
+
+def _court_weapon_profile_context(
+    *,
+    state: GameState,
+    weapon_profile: WeaponProfile,
+    attacker_model_id: str,
+    attacking_unit_id: str,
+    target_unit_id: str,
+    source_phase: BattlePhase,
 ) -> WeaponProfileModifierContext:
     return WeaponProfileModifierContext(
         state=state,
@@ -1630,6 +2444,42 @@ def _place_units_for_more_dakka_shooting(state: GameState) -> None:
     _clear_terrain(state)
 
 
+def _place_units_for_court_within_12(state: GameState) -> None:
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-alpha:fulgrim-1",
+        poses=tuple(
+            Pose.at(x=10.0 + (index % 5) * 1.5, y=10.0 + (index // 5) * 1.5) for index in range(10)
+        ),
+    )
+    _replace_unit_poses(
+        state,
+        unit_instance_id="army-beta:enemy-character-1",
+        poses=tuple(
+            Pose.at(x=16.0 + (index % 5) * 1.5, y=10.0 + (index // 5) * 1.5) for index in range(10)
+        ),
+    )
+    _clear_terrain(state)
+
+
+def _record_charge_move_effect(state: GameState, *, unit_instance_id: str) -> None:
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id=f"ws14-court:charge-move:{unit_instance_id}:{state.battle_round}",
+            source_rule_id="core-rules:charge-move",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.CHARGE,
+            expiration=EffectExpiration.end_turn(
+                battle_round=state.battle_round,
+                player_id="player-a",
+            ),
+            effect_payload={"effect_kind": CHARGE_FIGHTS_FIRST_EFFECT_KIND},
+        )
+    )
+
+
 def _replace_unit_poses(
     state: GameState,
     *,
@@ -1656,3 +2506,15 @@ def _clear_terrain(state: GameState) -> None:
     battlefield_state = state.battlefield_state
     assert battlefield_state is not None
     state.battlefield_state = replace(battlefield_state, terrain_features=())
+
+
+def _effect_parameter(effect_payload: dict[str, JsonValue], key: str) -> JsonValue:
+    parameters = effect_payload.get("parameters")
+    if not isinstance(parameters, list):
+        raise GameLifecycleError("Expected RuleIR effect parameters.")
+    for parameter in parameters:
+        if not isinstance(parameter, dict):
+            raise GameLifecycleError("Expected RuleIR effect parameter object.")
+        if parameter.get("key") == key:
+            return parameter.get("value")
+    return None

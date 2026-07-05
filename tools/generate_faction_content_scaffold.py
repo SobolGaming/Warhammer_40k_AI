@@ -55,6 +55,9 @@ CAVALCADE_OF_CHAOS_RULE_MODULE_PATH = (
 SPECTACLE_OF_SLAUGHTER_MODULE_PATH = (
     f"{BASE_IMPORT_PATH}.emperors_children.detachments.spectacle_of_slaughter"
 )
+COURT_OF_THE_PHOENICIAN_MODULE_PATH = (
+    f"{BASE_IMPORT_PATH}.emperors_children.detachments.court_of_the_phoenician"
+)
 IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
     CHAOS_SPACE_MARINES_ARMY_RULE_MODULE_PATH: (
         "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts"
@@ -129,6 +132,20 @@ IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
     f"{SPECTACLE_OF_SLAUGHTER_MODULE_PATH}.stratagems": (
         "warhammer_40000_11th:emperors_children:detachment:"
         "spectacle_of_slaughter:stratagems:rule_ir"
+    ),
+    f"{COURT_OF_THE_PHOENICIAN_MODULE_PATH}.manifest": (
+        "warhammer_40000_11th:emperors_children:detachment:court_of_the_phoenician:manifest:rule_ir"
+    ),
+    f"{COURT_OF_THE_PHOENICIAN_MODULE_PATH}.rule": (
+        "warhammer_40000_11th:emperors_children:detachment:court_of_the_phoenician:rule:rule_ir"
+    ),
+    f"{COURT_OF_THE_PHOENICIAN_MODULE_PATH}.enhancements": (
+        "warhammer_40000_11th:emperors_children:detachment:"
+        "court_of_the_phoenician:enhancements:rule_ir"
+    ),
+    f"{COURT_OF_THE_PHOENICIAN_MODULE_PATH}.stratagems": (
+        "warhammer_40000_11th:emperors_children:detachment:"
+        "court_of_the_phoenician:stratagems:rule_ir"
     ),
 }
 
