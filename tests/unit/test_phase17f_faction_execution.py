@@ -69,9 +69,6 @@ BLOOD_LEGION_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall",
     "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted",
 )
-CAVALCADE_OF_CHAOS_RUNTIME_CONSUMERS = (
-    "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche",
-)
 DAEMONIC_INCURSION_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts",
 )
@@ -190,6 +187,31 @@ COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS = frozenset(
         "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655005",
         "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655006",
         "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655007",
+    }
+)
+CAVALCADE_OF_CHAOS_GENERIC_DESCRIPTOR_IDS = frozenset(
+    {
+        "phase17e:chaos-daemons:cavalcade-of-chaos:rule",
+        (
+            "phase17e:enhancement:chaos-daemons:cavalcade-of-chaos:"
+            "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade"
+        ),
+        (
+            "phase17e:enhancement:chaos-daemons:cavalcade-of-chaos:"
+            "chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade"
+        ),
+        (
+            "phase17e:stratagem:chaos-daemons:cavalcade-of-chaos:"
+            "chaos-daemons:cavalcade-of-chaos:from-beyond-the-veil"
+        ),
+        (
+            "phase17e:stratagem:chaos-daemons:cavalcade-of-chaos:"
+            "chaos-daemons:cavalcade-of-chaos:inescapable-manifestations"
+        ),
+        (
+            "phase17e:stratagem:chaos-daemons:cavalcade-of-chaos:"
+            "chaos-daemons:cavalcade-of-chaos:warp-riders"
+        ),
     }
 )
 
@@ -331,11 +353,6 @@ def test_phase17f_malice_made_manifest_execution_record_is_named_handler() -> No
             "blood-legion",
             "Blood Legion detachment rule",
             BLOOD_LEGION_RUNTIME_CONSUMERS,
-        ),
-        (
-            "cavalcade-of-chaos",
-            "Cavalcade of Chaos detachment rule",
-            CAVALCADE_OF_CHAOS_RUNTIME_CONSUMERS,
         ),
         (
             "daemonic-incursion",
@@ -620,6 +637,24 @@ def test_phase17f_court_of_the_phoenician_rows_are_executable_generic_ir() -> No
 
     assert set(records_by_descriptor_id) >= COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS
     for descriptor_id in COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS:
+        record = records_by_descriptor_id[descriptor_id]
+        assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+        assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+        assert record.block_reason is None
+        assert record.handler_id is None
+        assert record.rule_ir_hash == (
+            generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(descriptor_id)
+        )
+
+
+def test_phase17f_cavalcade_of_chaos_rows_are_executable_generic_ir() -> None:
+    records_by_descriptor_id = {
+        record.coverage_descriptor_id: record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+    }
+
+    assert set(records_by_descriptor_id) >= CAVALCADE_OF_CHAOS_GENERIC_DESCRIPTOR_IDS
+    for descriptor_id in CAVALCADE_OF_CHAOS_GENERIC_DESCRIPTOR_IDS:
         record = records_by_descriptor_id[descriptor_id]
         assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
         assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR

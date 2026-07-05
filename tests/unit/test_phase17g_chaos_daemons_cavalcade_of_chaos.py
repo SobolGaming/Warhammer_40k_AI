@@ -21,7 +21,6 @@ from tests.unit.test_phase10o_fall_back import (
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
     DatasheetKeywordSet,
@@ -147,12 +146,15 @@ from warhammer40k_core.engine.reserves import (
     ReserveStatus,
     ReserveUnitPointValue,
 )
+from warhammer40k_core.engine.runtime_modifiers import MovementBudgetModifierContext
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+    GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     STRATAGEM_DECISION_TYPE,
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    stratagem_decline_payload,
 )
-from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -163,6 +165,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_covera
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
     Phase17FExecutionRecord,
+    Phase17FExecutionStatus,
 )
 
 _CAVALCADE_TEST_DATASHEET_ID = "phase17g-cavalcade-mounted-daemon"
@@ -183,7 +186,7 @@ def test_cavalcade_unholy_avalanche_grants_fall_back_shoot_and_charge_permission
     bundle = _runtime_content_bundle(lifecycle)
     summary = bundle.to_summary_payload()
 
-    assert rule.HOOK_ID in summary["fall_back_hook_ids"]
+    assert rule.FALL_BACK_HOOK_ID in summary["fall_back_hook_ids"]
     assert rule.SOURCE_RULE_ID in summary["selected_execution_record_ids"]
     assert any(
         path.endswith(".chaos_daemons.detachments.cavalcade_of_chaos.manifest")
@@ -242,11 +245,11 @@ def test_cavalcade_unholy_avalanche_grants_fall_back_shoot_and_charge_permission
     grants = cast(list[JsonValue], grant_event["grants"])
     grant = cast(dict[str, JsonValue], grants[0])
     replay_payload = cast(dict[str, JsonValue], grant["replay_payload"])
-    assert grant["hook_id"] == rule.HOOK_ID
-    assert grant["source_id"] == rule.SOURCE_RULE_ID
+    assert grant["hook_id"] == rule.FALL_BACK_HOOK_ID
+    assert grant["source_id"] == rule.RULE_IR_SOURCE_ID
     assert grant["can_shoot"] is True
     assert grant["can_declare_charge"] is True
-    assert replay_payload["effect_kind"] == "unholy_avalanche"
+    assert replay_payload["effect_kind"] == "generic_rule_fall_back_eligibility"
     assert replay_payload["unit_instance_id"] == _CAVALCADE_UNIT_ID
 
     shooting_state = _state_at_phase(state, BattlePhase.SHOOTING)
@@ -280,8 +283,15 @@ def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> Non
     _grant_cp(state, player_id="player-a", amount=1)
     bundle = _runtime_content_bundle(lifecycle)
     summary = bundle.to_summary_payload()
+    contribution = stratagems.runtime_contribution()
+    warp_riders_record = next(
+        record
+        for record in contribution.stratagem_records
+        if record.record_id == stratagems.WARP_RIDERS_RECORD_ID
+    )
 
-    assert stratagems.WARP_RIDERS_HANDLER_ID in summary["stratagem_handler_ids"]
+    assert contribution.stratagem_handler_bindings == ()
+    assert warp_riders_record.definition.handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
     assert stratagems.WARP_RIDERS_SOURCE_RULE_ID in summary["selected_execution_record_ids"]
     assert (
         stratagems.WARP_RIDERS_RECORD_ID
@@ -319,13 +329,17 @@ def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> Non
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
     assert state.command_point_total("player-a") == command_points_before_use - 1
 
-    effect_event = _event_payload(lifecycle, "warp_riders_mobile_granted")
-    persisting_effect = cast(dict[str, JsonValue], effect_event["persisting_effect"])
-    effect_payload = cast(dict[str, JsonValue], persisting_effect["effect_payload"])
-    assert effect_event["player_id"] == "player-a"
-    assert effect_payload["effect_kind"] == "movement_keyword_grant"
-    assert effect_payload["granted_keywords"] == ["MOBILE"]
-    assert persisting_effect["target_unit_instance_ids"] == [_CAVALCADE_UNIT_ID]
+    persisting_effect = _required_generic_rule_effect_for_unit(
+        state,
+        unit_instance_id=_CAVALCADE_UNIT_ID,
+        source_rule_id=stratagems.WARP_RIDERS_RULE_IR_SOURCE_ID,
+    )
+    effect_payload = cast(dict[str, JsonValue], persisting_effect.effect_payload)
+    rule_effect = cast(dict[str, JsonValue], effect_payload["effect"])
+    assert effect_payload["effect_kind"] == "generic_rule_execution"
+    assert rule_effect["kind"] == "grant_ability"
+    assert _rule_effect_parameters(rule_effect)["ability"] == stratagems.MOBILE
+    assert persisting_effect.target_unit_instance_ids == (_CAVALCADE_UNIT_ID,)
 
     move_status = submit_action_and_movement_proposal(
         lifecycle,
@@ -378,7 +392,6 @@ def test_cavalcade_warp_riders_not_registered_without_cavalcade_detachment() -> 
     _grant_cp(_state(lifecycle), player_id="player-a", amount=1)
     summary = _runtime_content_bundle(lifecycle).to_summary_payload()
 
-    assert stratagems.WARP_RIDERS_HANDLER_ID not in summary["stratagem_handler_ids"]
     assert (
         stratagems.WARP_RIDERS_RECORD_ID
         not in summary["stratagem_index_record_ids_by_player_id"]["player-a"]
@@ -464,6 +477,11 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
             selected_option_id=COMPLETE_REINFORCEMENTS_OPTION_ID,
         )
     )
+    movement_status = _decline_stratagem_target_proposal_if_present(
+        lifecycle,
+        movement_status,
+        result_id="phase17g-from-veil-decline-fire-overwatch",
+    )
     stratagem_request = _decision_request(movement_status)
     assert stratagem_request.decision_type == STRATAGEM_DECISION_TYPE
     from_beyond_option = _required_option_id_containing(
@@ -486,7 +504,9 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
     assert proposal_request.proposal_kind is ProposalKind.STRATEGIC_RESERVES
     assert proposal_request.placement_kinds == (BattlefieldPlacementKind.STRATEGIC_RESERVES,)
     assert proposal_request.context is not None
-    assert proposal_request.context["stratagem_handler_id"] == "generic:ingress-move"
+    assert proposal_request.context["stratagem_handler_id"] == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
+    assert "generic_rule_execution_result" in proposal_request.context
+    assert "generic_rule_effect" in proposal_request.context
     assert proposal_request.context["from_start_of_battle"] is True
     assert _state(lifecycle).command_point_total("player-a") == command_points_before_use - 1
 
@@ -512,7 +532,7 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
     resolved_event = _event_payload(lifecycle, "rapid_ingress_resolved")
     stratagem_use = cast(dict[str, JsonValue], resolved_event["stratagem_use"])
     assert stratagem_use["stratagem_id"] == stratagems.FROM_BEYOND_THE_VEIL_STRATAGEM_ID
-    assert stratagem_use["handler_id"] == "generic:ingress-move"
+    assert stratagem_use["handler_id"] == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
 
 
 def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> None:
@@ -568,13 +588,28 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
         FallBackModeKind.ORDERED_RETREAT.value
     )
     assert proposal_request.context["forced_desperate_escape_source_rule_ids"] == [
-        stratagems.INESCAPABLE_MANIFESTATIONS_SOURCE_RULE_ID
+        stratagems.INESCAPABLE_MANIFESTATIONS_RULE_IR_SOURCE_ID
     ]
+    forced_sources = cast(
+        list[dict[str, JsonValue]],
+        proposal_request.context["forced_desperate_escape_sources"],
+    )
+    assert len(forced_sources) == 1
+    assert forced_sources[0]["source_rule_id"] == (
+        stratagems.INESCAPABLE_MANIFESTATIONS_RULE_IR_SOURCE_ID
+    )
+    assert forced_sources[0]["source_stratagem_id"] == (
+        stratagems.INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID
+    )
     assert _state(lifecycle).command_point_total("player-a") == command_points_before_use - 1
 
     effect_event = _event_payload(lifecycle, "forced_fall_back_desperate_escape_registered")
     assert effect_event["fall_back_unit_instance_id"] == _ENEMY_UNIT_ID
     assert effect_event["forcing_unit_instance_id"] == _CAVALCADE_UNIT_ID
+    persisting_effect = cast(dict[str, JsonValue], effect_event["persisting_effect"])
+    effect_payload = cast(dict[str, JsonValue], persisting_effect["effect_payload"])
+    assert "generic_rule_effect" in effect_payload
+    assert "generic_rule_execution_result" in effect_payload
 
     unit_placement = _unit_placement(state, _ENEMY_UNIT_ID)
     movement_payload = MovementProposalPayload(
@@ -630,31 +665,47 @@ def test_cavalcade_apocalyptic_steeds_applies_movement_upgrade_through_lifecycle
     summary = bundle.to_summary_payload()
     army = state.army_definitions[0]
     unit = army.unit_by_id(_CAVALCADE_UNIT_ID)
+    first_model_id = unit.own_models[0].model_instance_id
 
-    assert enhancements.EFFECT_ID in summary["enhancement_effect_binding_ids"]
+    assert (
+        enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID in summary["enhancement_effect_binding_ids"]
+    )
     assert (
         enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID in summary["selected_execution_record_ids"]
     )
-    assert all(
-        enhancements.MODIFIER_ID
-        in _characteristic_for_model(model, Characteristic.MOVEMENT).applied_modifier_ids
-        for model in unit.own_models
+    persisting_effect = _required_generic_rule_effect_for_unit(
+        state,
+        unit_instance_id=_CAVALCADE_UNIT_ID,
+        source_rule_id=enhancements.APOCALYPTIC_STEEDS_RULE_IR_SOURCE_ID,
     )
-    assert {_model_movement_inches(model) for model in unit.own_models} == {7}
+    generic_payload = cast(dict[str, JsonValue], persisting_effect.effect_payload)
+    rule_effect = cast(dict[str, JsonValue], generic_payload["effect"])
+    assert generic_payload["execution_id"] == enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID
+    assert rule_effect["kind"] == "modify_characteristic"
+    assert _rule_effect_parameters(rule_effect) == {"characteristic": "movement", "delta": 1}
+    assert (
+        bundle.runtime_modifier_registry.modified_movement_inches(
+            MovementBudgetModifierContext(
+                state=state,
+                unit_instance_id=_CAVALCADE_UNIT_ID,
+                model_instance_id=first_model_id,
+                base_movement_inches=6.0,
+                current_movement_inches=6.0,
+            )
+        )
+        == 7.0
+    )
 
     effect_event = _event_payload(lifecycle, "enhancement_effects_applied")
     effect_payloads = cast(list[JsonValue], effect_event["effects"])
     effect_payload = cast(dict[str, JsonValue], effect_payloads[0])
     replay_payload = cast(dict[str, JsonValue], effect_payload["replay_payload"])
-    model_payloads = cast(list[JsonValue], effect_payload["model_modifiers"])
-    first_model_payload = cast(dict[str, JsonValue], model_payloads[0])
-    assert effect_payload["effect_id"] == enhancements.EFFECT_ID
-    assert effect_payload["source_id"] == enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID
+    persisting_payload = cast(dict[str, JsonValue], effect_payload["persisting_effect"])
+    assert effect_payload["effect_id"] == enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID
+    assert effect_payload["source_id"] == enhancements.APOCALYPTIC_STEEDS_RULE_IR_SOURCE_ID
     assert effect_payload["enhancement_id"] == enhancements.ENHANCEMENT_ID
-    assert replay_payload["effect_kind"] == "apocalyptic_steeds_upgrade"
-    assert replay_payload["enhancement_source_id"] == enhancements.ENHANCEMENT_SOURCE_ID
-    assert first_model_payload["before_final"] == 6
-    assert first_model_payload["after_final"] == 7
+    assert persisting_payload["source_rule_id"] == enhancements.APOCALYPTIC_STEEDS_RULE_IR_SOURCE_ID
+    assert replay_payload["execution_id"] == enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID
 
     selection_request = _decision_request(movement_status)
     action_status = lifecycle.submit_decision(
@@ -803,7 +854,7 @@ def test_cavalcade_soul_shattering_charge_extends_melee_targeting_through_lifecy
     persisting_effect = cast(dict[str, JsonValue], used_event["persisting_effect"])
     effect_payload = cast(dict[str, JsonValue], persisting_effect["effect_payload"])
     assert ability_use["hook_id"] == enhancements.SOUL_SHATTERING_CHARGE_HOOK_ID
-    assert ability_use["source_id"] == enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID
+    assert ability_use["source_id"] == enhancements.SOUL_SHATTERING_CHARGE_RULE_IR_SOURCE_ID
     assert ability_use["enhancement_id"] == enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID
     assert effect_payload["effect_kind"] == "fight_activation_melee_targeting_distance"
 
@@ -821,7 +872,8 @@ def test_cavalcade_soul_shattering_charge_extends_melee_targeting_through_lifecy
     )
     assert len(extended_pools) == 1
     assert (
-        enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID in extended_pools[0].targeting_rule_ids
+        enhancements.SOUL_SHATTERING_CHARGE_RULE_IR_SOURCE_ID
+        in extended_pools[0].targeting_rule_ids
     )
 
 
@@ -844,10 +896,12 @@ def test_cavalcade_soul_shattering_charge_roster_requires_mounted_target() -> No
 def test_cavalcade_enhancement_effect_uses_phase17f_execution_source_id() -> None:
     record = _cavalcade_enhancement_execution_record(enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID)
     contribution = enhancements.runtime_contribution()
-    binding = contribution.enhancement_effect_bindings[0]
 
     assert record.execution_id == enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID
-    assert binding.source_id == record.execution_id
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.handler_id is None
+    assert record.rule_ir_hash is not None
+    assert contribution.enhancement_effect_bindings == ()
 
 
 def test_cavalcade_soul_shattering_charge_hook_uses_phase17f_execution_source_id() -> None:
@@ -855,30 +909,40 @@ def test_cavalcade_soul_shattering_charge_hook_uses_phase17f_execution_source_id
         enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID
     )
     contribution = enhancements.runtime_contribution()
-    binding = contribution.fight_activation_ability_hook_bindings[0]
 
     assert record.execution_id == enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID
-    assert binding.source_id == record.execution_id
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.handler_id is None
+    assert record.rule_ir_hash is not None
+    assert contribution.fight_activation_ability_hook_bindings == ()
 
 
 def test_cavalcade_warp_riders_uses_phase17f_execution_source_id() -> None:
     record = _cavalcade_stratagem_execution_record(stratagems.WARP_RIDERS_SOURCE_RULE_ID)
     contribution = stratagems.runtime_contribution()
-    binding = contribution.stratagem_handler_bindings[0]
     catalog_record = contribution.stratagem_records[0]
+    effect_payload = cast(dict[str, JsonValue], catalog_record.definition.effect_payload)
+    rule_ir_payload = cast(dict[str, JsonValue], effect_payload["rule_ir"])
 
     assert record.execution_id == stratagems.WARP_RIDERS_SOURCE_RULE_ID
-    assert binding.handler_id == stratagems.WARP_RIDERS_HANDLER_ID
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.handler_id is None
+    assert record.rule_ir_hash is not None
+    assert contribution.stratagem_handler_bindings == ()
+    assert catalog_record.definition.handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
     assert catalog_record.definition.source_id == record.execution_id
+    assert rule_ir_payload["source_id"] == stratagems.WARP_RIDERS_RULE_IR_SOURCE_ID
 
 
 def test_cavalcade_rule_hook_uses_phase17f_execution_source_id() -> None:
     record = _cavalcade_rule_execution_record()
     contribution = rule.runtime_contribution()
-    binding = contribution.fall_back_hook_bindings[0]
 
     assert record.execution_id == rule.SOURCE_RULE_ID
-    assert binding.source_id == record.execution_id
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.handler_id is None
+    assert record.rule_ir_hash is not None
+    assert contribution.fall_back_hook_bindings == ()
 
 
 def test_cavalcade_rule_requires_target_unit_owned_by_selected_player() -> None:
@@ -900,7 +964,7 @@ def test_cavalcade_rule_requires_target_unit_owned_by_selected_player() -> None:
     )
 
     with pytest.raises(GameLifecycleError, match="not in the selected player army"):
-        rule.fall_back_eligibility_grant(context)
+        _runtime_content_bundle(lifecycle).fall_back_hook_registry.grants_for(context)
 
 
 def test_fall_back_hook_registry_rejects_cavalcade_handler_identity_drift() -> None:
@@ -918,7 +982,7 @@ def test_fall_back_hook_registry_rejects_cavalcade_handler_identity_drift() -> N
     ) -> FallBackEligibilityGrant:
         return FallBackEligibilityGrant(
             hook_id="phase17g:wrong-hook",
-            source_id=rule.SOURCE_RULE_ID,
+            source_id=rule.RULE_IR_SOURCE_ID,
             can_shoot=True,
             can_declare_charge=True,
         )
@@ -926,8 +990,8 @@ def test_fall_back_hook_registry_rejects_cavalcade_handler_identity_drift() -> N
     hook_drift_registry = FallBackEligibilityHookRegistry.from_bindings(
         (
             FallBackEligibilityHookBinding(
-                hook_id=rule.HOOK_ID,
-                source_id=rule.SOURCE_RULE_ID,
+                hook_id=rule.FALL_BACK_HOOK_ID,
+                source_id=rule.RULE_IR_SOURCE_ID,
                 handler=hook_id_drift,
             ),
         )
@@ -939,7 +1003,7 @@ def test_fall_back_hook_registry_rejects_cavalcade_handler_identity_drift() -> N
         _context: FallBackEligibilityContext,
     ) -> FallBackEligibilityGrant:
         return FallBackEligibilityGrant(
-            hook_id=rule.HOOK_ID,
+            hook_id=rule.FALL_BACK_HOOK_ID,
             source_id="phase17g:wrong-source",
             can_shoot=True,
             can_declare_charge=True,
@@ -948,8 +1012,8 @@ def test_fall_back_hook_registry_rejects_cavalcade_handler_identity_drift() -> N
     source_drift_registry = FallBackEligibilityHookRegistry.from_bindings(
         (
             FallBackEligibilityHookBinding(
-                hook_id=rule.HOOK_ID,
-                source_id=rule.SOURCE_RULE_ID,
+                hook_id=rule.FALL_BACK_HOOK_ID,
+                source_id=rule.RULE_IR_SOURCE_ID,
                 handler=source_id_drift,
             ),
         )
@@ -988,7 +1052,7 @@ def test_fight_activation_ability_registry_rejects_cavalcade_handler_identity_dr
     ) -> FightActivationAbilityOption:
         return FightActivationAbilityOption(
             hook_id="phase17g:wrong-hook",
-            source_id=enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID,
+            source_id=enhancements.SOUL_SHATTERING_CHARGE_RULE_IR_SOURCE_ID,
             ability_id=enhancements.SOUL_SHATTERING_CHARGE_ABILITY_ID,
             enhancement_id=enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID,
             model_proximity_inches=3.0,
@@ -998,7 +1062,7 @@ def test_fight_activation_ability_registry_rejects_cavalcade_handler_identity_dr
         (
             FightActivationAbilityHookBinding(
                 hook_id=enhancements.SOUL_SHATTERING_CHARGE_HOOK_ID,
-                source_id=enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID,
+                source_id=enhancements.SOUL_SHATTERING_CHARGE_RULE_IR_SOURCE_ID,
                 handler=hook_id_drift,
             ),
         )
@@ -1021,7 +1085,7 @@ def test_fight_activation_ability_registry_rejects_cavalcade_handler_identity_dr
         (
             FightActivationAbilityHookBinding(
                 hook_id=enhancements.SOUL_SHATTERING_CHARGE_HOOK_ID,
-                source_id=enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID,
+                source_id=enhancements.SOUL_SHATTERING_CHARGE_RULE_IR_SOURCE_ID,
                 handler=source_id_drift,
             ),
         )
@@ -1069,21 +1133,6 @@ def _cavalcade_stratagem_execution_record(source_rule_id: str) -> Phase17FExecut
     if len(records) != 1:
         raise AssertionError("expected one Cavalcade of Chaos stratagem execution record")
     return records[0]
-
-
-def _characteristic_for_model(
-    model: ModelInstance,
-    characteristic: Characteristic,
-) -> CharacteristicValue:
-    for value in model.characteristics:
-        if value.characteristic is characteristic:
-            return value
-    raise AssertionError(f"model is missing {characteristic.value}")
-
-
-def _model_movement_inches(model: ModelInstance) -> int:
-    value = _characteristic_for_model(model, Characteristic.MOVEMENT)
-    return value.final
 
 
 def _runtime_content_bundle(lifecycle: GameLifecycle) -> RuntimeContentBundle:
@@ -1303,20 +1352,20 @@ def _cavalcade_catalog(
             EnhancementDefinition(
                 enhancement_id=enhancements.ENHANCEMENT_ID,
                 name="Apocalyptic Steeds Upgrade",
-                source_id=enhancements.ENHANCEMENT_SOURCE_ID,
+                source_id=enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID,
                 subtypes=(EnhancementSubtype.UPGRADE,),
                 points=0,
-                target_required_keywords=(enhancements.MOUNTED,),
-                target_required_faction_keywords=(enhancements.LEGIONES_DAEMONICA,),
+                target_required_keywords=(rule.MOUNTED,),
+                target_required_faction_keywords=(rule.LEGIONES_DAEMONICA,),
             ),
             EnhancementDefinition(
                 enhancement_id=enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID,
                 name="Soul-Shattering Charge Upgrade",
-                source_id=enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_SOURCE_ID,
+                source_id=enhancements.SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID,
                 subtypes=(EnhancementSubtype.UPGRADE,),
                 points=0,
-                target_required_keywords=(enhancements.MOUNTED,),
-                target_required_faction_keywords=(enhancements.LEGIONES_DAEMONICA,),
+                target_required_keywords=(rule.MOUNTED,),
+                target_required_faction_keywords=(rule.LEGIONES_DAEMONICA,),
             ),
         ),
         stratagems=(
@@ -1724,6 +1773,41 @@ def _melee_proposal_payload(
     )
 
 
+def _required_generic_rule_effect_for_unit(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    source_rule_id: str,
+) -> PersistingEffect:
+    matches = tuple(
+        effect
+        for effect in state.persisting_effects_for_unit(unit_instance_id)
+        if effect.source_rule_id == source_rule_id
+        and isinstance(effect.effect_payload, dict)
+        and effect.effect_payload.get("effect_kind") == "generic_rule_execution"
+    )
+    if len(matches) != 1:
+        raise AssertionError(f"expected one generic RuleIR effect for {source_rule_id}")
+    return matches[0]
+
+
+def _rule_effect_parameters(rule_effect: dict[str, JsonValue]) -> dict[str, JsonValue]:
+    raw_parameters = rule_effect.get("parameters")
+    if not isinstance(raw_parameters, list):
+        raise TypeError("generic RuleIR effect must include parameters")
+    parameters: dict[str, JsonValue] = {}
+    for raw_parameter in raw_parameters:
+        if not isinstance(raw_parameter, dict):
+            raise TypeError("generic RuleIR effect parameter must be an object")
+        key = raw_parameter.get("key")
+        if type(key) is not str:
+            raise AssertionError("generic RuleIR effect parameter requires key")
+        if key in parameters:
+            raise AssertionError(f"duplicate generic RuleIR effect parameter: {key}")
+        parameters[key] = raw_parameter.get("value")
+    return parameters
+
+
 def _event_payload(lifecycle: GameLifecycle, event_type: str) -> dict[str, JsonValue]:
     for event in lifecycle.decision_controller.event_log.records:
         if event.event_type == event_type:
@@ -1745,6 +1829,27 @@ def _decline_stratagem_window_if_present(
             result_id=result_id,
             request=request,
             selected_option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+        )
+    )
+
+
+def _decline_stratagem_target_proposal_if_present(
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+    *,
+    result_id: str,
+) -> LifecycleStatus:
+    request = _decision_request(status)
+    if request.decision_type != STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+        return status
+    return lifecycle.submit_decision(
+        DecisionResult(
+            result_id=result_id,
+            request_id=request.request_id,
+            decision_type=request.decision_type,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=stratagem_decline_payload(),
         )
     )
 

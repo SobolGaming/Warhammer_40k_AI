@@ -185,14 +185,17 @@ source-backed faction or detachment Stratagems whose timing is represented by an
 engine timing window. Selected-to-move Stratagems use the finite
 `use_stratagem` decision surface with trigger kind
 `just_after_friendly_unit_selected_to_move`, after Movement unit selection and
-before Movement action selection. End-of-Movement ingress Stratagems may use the
-generic `generic:ingress-move` handler when they target a source-backed friendly
-Strategic Reserves unit and then emit the normal `submit_placement_proposal`
-Strategic Reserves path. Selected-Fall-Back reaction Stratagems may use the
-generic `generic:force-desperate-escape` handler when the opponent selects a
-Fall Back move and a friendly source-backed target unit is engaged with that
-enemy unit; the handler records engine-owned `PersistingEffect` state and the
-Movement engine emits the resulting Fall Back proposal with
+before Movement action selection. Source-backed generic RuleIR Stratagems use
+the approved `generic:rule-ir` handler when their structured effects map to an
+existing engine-owned mutation, such as Strategic Reserves placement
+permission, a temporary movement ability grant, or forced Desperate Escape
+tests. End-of-Movement placement permissions then emit the normal
+`submit_placement_proposal` Strategic Reserves path. Selected-Fall-Back
+reaction Stratagems may use `generic:rule-ir` when the opponent selects a Fall
+Back move and a friendly source-backed target unit is engaged with that enemy
+unit; the handler records engine-owned
+`PersistingEffect` state and the Movement engine emits the resulting Fall Back
+proposal with
 `fall_back_mode: "desperate_escape"`. Detachment Stratagem records must enter
 the player Stratagem index only when the owning detachment is selected and
 materialized by the runtime content bundle. Handlers must validate timing,
@@ -296,10 +299,10 @@ Required:
   and link them to generated Phase 17F execution row IDs.
 - Register faction or detachment Stratagems through source-backed Stratagem
   records and named or approved generic handlers only when an engine timing
-  window exists. End-Movement ingress Stratagems may use
-  `generic:ingress-move`; selected-Fall-Back reaction Stratagems may use
-  `generic:force-desperate-escape`. Prove runtime detachment materialization
-  registers them before `use_stratagem` options are emitted.
+  window exists. Generic RuleIR Stratagems may use `generic:rule-ir` when their
+  structured effect descriptors map to an existing shared engine mutation.
+  Prove runtime detachment materialization registers them before
+  `use_stratagem` options are emitted.
 - Register enhancement effect bindings only for source-backed Enhancement or
   Upgrade effects selected through Phase 16D army-construction records, and link
   them to generated Phase 17F exact Enhancement execution row IDs.

@@ -162,7 +162,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Death Guard | 9 | 0 | 28 | 42 | 1 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 26 | 36 | 1 | [chaos-knights](factions/chaos-knights.md) |
-| Chaos Daemons | 9 | 4 | 28 | 43 | 14 | [chaos-daemons](factions/chaos-daemons.md) |
+| Chaos Daemons | 9 | 4 | 28 | 43 | 8 | [chaos-daemons](factions/chaos-daemons.md) |
 | Astra Militarum | 11 | 0 | 36 | 54 | 1 | [astra-militarum](factions/astra-militarum.md) |
 | Adepta Sororitas | 8 | 0 | 20 | 30 | 1 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 1 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
@@ -284,9 +284,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `core:smokescreen` | Smokescreen |
 | `descriptor:movement:deep-strike-placement` | Deep Strike |
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
-| `generic:force-desperate-escape` | Inescapable Manifestations |
-| `generic:ingress-move` | From Beyond the Veil |
-| `generic:rule-ir` | CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>EUPHORIC INSPIRATION<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>LONG, UNCONTROLLED BURSTS<br>ORKS IS STILL ORKS<br>PRIDEFUL SUPERIORITY<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS |
+| `generic:rule-ir` | CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>EUPHORIC INSPIRATION<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Inescapable Manifestations<br>LONG, UNCONTROLLED BURSTS<br>ORKS IS STILL ORKS<br>PRIDEFUL SUPERIORITY<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>Warp-Riders |
 | `phase17g:aeldari:corsair-coterie:stratagems:cloak-and-shadow:target-restriction` | Cloak and Shadow |
 | `phase17g:aeldari:corsair-coterie:stratagems:outcast-ambush:weapon-profile` | Outcast Ambush |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
@@ -346,10 +344,6 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos` | The Shadow of Chaos |
 | `warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted` | Blood Tainted |
 | `warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall` | Murdercall |
-| `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:apocalyptic_steeds_upgrade` | Apocalyptic Steeds Upgrade |
-| `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:soul_shattering_charge_upgrade` | Soul-Shattering Charge Upgrade |
-| `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche` | Unholy Avalanche |
-| `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:warp_riders` | Warp-Riders |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:fade_to_darkness:turn-end-reserves` | Turn End Reserves |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:fade_to_darkness:unit-destroyed` | Unit Destroyed |
 | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:enhancement:leaping_shadows:scouts_9` | 000009980002 |

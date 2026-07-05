@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR
+
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -201,7 +203,7 @@ def _handler_unavailable_reason(
             effect_selection=effect_selection,
         )
     if definition.handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID:
-        _generic_rule_ir_from_stratagem_payload(definition.effect_payload)
+        _rule_ir_from_stratagem_definition(definition)
         return None
     return None
 
@@ -314,10 +316,7 @@ def _stratagem_affected_unit_ids(
         crushing_target_id = _crushing_impact_enemy_target_id_or_none(effect_selection)
         if crushing_target_id is not None:
             raw_unit_ids.append(crushing_target_id)
-    if (
-        definition.handler_id == GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID
-        and target_binding is not None
-    ):
+    if _definition_forces_fall_back_unit_desperate_escape(definition, target_binding):
         fall_back_unit_id = _fall_back_unit_id_or_none(context)
         if fall_back_unit_id is not None:
             raw_unit_ids.append(fall_back_unit_id)
@@ -363,6 +362,30 @@ def _canonical_stratagem_affected_unit_id(
     if unit is not None and _unit_has_runtime_attached_role(unit):
         raise GameLifecycleError("Runtime attached unit requires attached-unit identity.")
     return requested_unit_id
+
+
+def _definition_forces_fall_back_unit_desperate_escape(
+    definition: StratagemDefinition,
+    target_binding: StratagemTargetBinding | None,
+) -> bool:
+    if target_binding is None:
+        return False
+    if definition.handler_id == GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID:
+        return True
+    if definition.handler_id != GENERIC_RULE_IR_STRATAGEM_HANDLER_ID:
+        return False
+    rule_ir = _rule_ir_from_stratagem_definition(definition)
+    return any(
+        effect.kind is RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+    )
+
+
+def _rule_ir_from_stratagem_definition(definition: StratagemDefinition) -> RuleIR:
+    from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
+
+    return rule_ir_from_execution_payload(definition.effect_payload)
 
 
 def _attached_unit_id_for_component(

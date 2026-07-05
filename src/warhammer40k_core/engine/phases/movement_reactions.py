@@ -103,7 +103,7 @@ def _request_end_movement_active_player_stratagem_if_available(
         state=state,
         index=stratagem_index,
         context=context,
-        handler_id=GENERIC_INGRESS_MOVE_HANDLER_ID,
+        handler_id=GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     )
     if not options:
         return None
@@ -381,7 +381,7 @@ def _request_selected_to_fall_back_stratagem_if_available(
             state=state,
             index=stratagem_index,
             context=context,
-            handler_id=GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+            handler_id=GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
         )
         if not options:
             continue
@@ -389,9 +389,9 @@ def _request_selected_to_fall_back_stratagem_if_available(
             timing_window=TimingWindow(
                 window_id=window_id,
                 descriptor=TimingWindowDescriptor(
-                    descriptor_id="generic-force-desperate-escape-selected-fall-back",
+                    descriptor_id="generic-rule-ir-selected-fall-back",
                     trigger_kind=TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
-                    source_rule_id=GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+                    source_rule_id=GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
                     phase=BattlePhase.MOVEMENT,
                     source_step="selected_fall_back_reactions",
                     metadata={**trigger_payload, "timing_window_id": window_id},

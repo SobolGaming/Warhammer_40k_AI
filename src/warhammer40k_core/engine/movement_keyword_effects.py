@@ -3,12 +3,14 @@ from __future__ import annotations
 from typing import cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.effects import PersistingEffect
+from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.generic_rule_effect_payloads import rule_effect_ability_parameter
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 MOVEMENT_KEYWORD_GRANT_EFFECT_KIND = "movement_keyword_grant"
 MOVEMENT_KEYWORD_GRANT_KEY = "granted_keywords"
+GENERIC_RULE_MOVEMENT_KEYWORD_ABILITIES = frozenset({"MOBILE"})
 
 
 def movement_keyword_grant_payload(
@@ -55,6 +57,9 @@ def movement_keywords_granted_by_effects(
         if not isinstance(payload, dict):
             continue
         if payload.get("effect_kind") != MOVEMENT_KEYWORD_GRANT_EFFECT_KIND:
+            generic_keyword = _generic_rule_movement_keyword_or_none(payload)
+            if generic_keyword is not None:
+                keywords.add(generic_keyword)
             continue
         raw_keywords = payload.get(MOVEMENT_KEYWORD_GRANT_KEY)
         if not isinstance(raw_keywords, list):
@@ -66,6 +71,21 @@ def movement_keywords_granted_by_effects(
             )
         )
     return tuple(sorted(keywords))
+
+
+def _generic_rule_movement_keyword_or_none(payload: dict[str, JsonValue]) -> str | None:
+    if payload.get("effect_kind") != GENERIC_RULE_EFFECT_KIND:
+        return None
+    raw_effect = payload.get("effect")
+    if not isinstance(raw_effect, dict):
+        raise GameLifecycleError("Generic movement keyword effect requires effect object.")
+    ability = rule_effect_ability_parameter(raw_effect)
+    if ability is None:
+        return None
+    keyword = _validate_identifier("generic movement keyword", ability).strip().upper()
+    if keyword not in GENERIC_RULE_MOVEMENT_KEYWORD_ABILITIES:
+        return None
+    return keyword
 
 
 def _validate_keyword_tuple(field_name: str, values: object) -> tuple[str, ...]:
