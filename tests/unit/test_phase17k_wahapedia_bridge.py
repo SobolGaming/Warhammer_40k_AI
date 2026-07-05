@@ -19,6 +19,7 @@ from tools.generate_ability_support_matrix import (
     faction_support_markdown_files,
     mustering_support_rows,
     mustering_support_rows_payload,
+    runtime_content_semantic_coverage_payload,
     support_matrix_markdown,
 )
 
@@ -4564,6 +4565,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     rows = ability_support_matrix_rows()
     support_rows = datasheet_support_rows()
     mustering_rows = mustering_support_rows()
+    runtime_semantic_payload = runtime_content_semantic_coverage_payload()
     snapshot = json.loads(
         (
             Path(__file__).resolve().parents[2]
@@ -4601,6 +4603,15 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
             / "mustering_support_rows.json"
         ).read_text(encoding="utf-8")
     )
+    runtime_semantic_snapshot = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "data"
+            / "generated"
+            / "ability_coverage"
+            / "runtime_content_semantic_coverage.json"
+        ).read_text(encoding="utf-8")
+    )
     markdown_snapshot = (
         Path(__file__).resolve().parents[2] / "docs" / "ABILITY_SUPPORT_MATRIX_V2.md"
     ).read_text(encoding="utf-8")
@@ -4609,7 +4620,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         for path in sorted((Path(__file__).resolve().parents[2] / "docs" / "factions").glob("*.md"))
     }
     generated_markdown = support_matrix_markdown(
-        ability_coverage_category_rows_payload(category_rows)
+        ability_coverage_category_rows_payload(category_rows),
+        runtime_semantic_coverage=runtime_semantic_payload,
     )
     generated_faction_markdown = faction_support_markdown_files(
         datasheet_support_rows=support_rows,
@@ -4644,9 +4656,14 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert ability_coverage_category_rows_payload(category_rows) == category_snapshot
     assert datasheet_support_rows_payload(support_rows) == datasheet_support_snapshot
     assert mustering_support_rows_payload(mustering_rows) == mustering_support_snapshot
+    assert runtime_semantic_payload == runtime_semantic_snapshot
     assert generated_markdown == markdown_snapshot
     assert generated_faction_markdown == faction_markdown_snapshot
     assert "## Factions" in generated_markdown
+    assert "## Runtime Content Semantic Coverage" in generated_markdown
+    assert "`data/generated/ability_coverage/runtime_content_semantic_coverage.json`" in (
+        generated_markdown
+    )
     assert "[aeldari](factions/aeldari.md)" in generated_markdown
     assert "Faction-pack Stratagems" not in generated_markdown
     assert "Faction-pack Enhancements" not in generated_markdown

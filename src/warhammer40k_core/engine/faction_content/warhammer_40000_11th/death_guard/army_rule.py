@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
 from dataclasses import replace
 from enum import StrEnum
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -19,8 +18,17 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    canonical_keyword as _canonical_keyword,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_object as _payload_object,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_string as _payload_string,
+)
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.rules_units import rules_unit_owner_player_id
@@ -605,23 +613,6 @@ def _plague_from_token(token: object) -> NurglesGiftPlague:
         return NurglesGiftPlague(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported Nurgle's Gift plague: {token}.") from exc
-
-
-def _payload_object(payload: JsonValue) -> Mapping[str, JsonValue]:
-    if not isinstance(payload, Mapping):
-        raise GameLifecycleError("Nurgle's Gift payload must be an object.")
-    return cast(Mapping[str, JsonValue], payload)
-
-
-def _payload_string(payload: Mapping[str, JsonValue], *, key: str) -> str:
-    value = payload.get(key)
-    if type(value) is not str:
-        raise GameLifecycleError(f"Nurgle's Gift payload missing string field {key}.")
-    return value
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().replace("_", " ").replace("-", " ").upper()
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

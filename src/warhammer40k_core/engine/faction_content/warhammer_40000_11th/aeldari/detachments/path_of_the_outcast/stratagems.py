@@ -18,6 +18,9 @@ from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    canonical_keyword as _canonical_keyword,
+)
 from warhammer40k_core.engine.faction_content.stratagem_handlers import (
     StratagemHandlerBinding,
     StratagemHandlerContext,
@@ -670,10 +673,6 @@ def _model_leadership(model: ModelInstance) -> int:
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
     canonical = _canonical_keyword(keyword)
     return any(_canonical_keyword(stored) == canonical for stored in unit.keywords)
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().replace("_", " ").replace("-", " ").upper()
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

@@ -31,6 +31,11 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import EventLog, EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    payload_identifier,
+    payload_int,
+    payload_object,
+)
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventContext,
     RuntimeContentEventHandlerBinding,
@@ -119,6 +124,23 @@ from .bondsman import (
 from .bondsman import (
     model_is_affected_by_bondsman as model_is_affected_by_bondsman,
 )
+
+
+def _payload_object(value: object) -> dict[str, JsonValue]:
+    return payload_object(value)
+
+
+def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
+    if key not in payload:
+        raise GameLifecycleError(f"Code Chivalric payload missing {key}.")
+    return payload_identifier(payload, key)
+
+
+def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
+    if key not in payload:
+        raise GameLifecycleError(f"Code Chivalric payload missing {key}.")
+    return payload_int(payload, key)
+
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -1472,18 +1494,6 @@ def _validate_game_state(state: object) -> GameState:
     return state
 
 
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Code Chivalric payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    if key not in payload:
-        raise GameLifecycleError(f"Code Chivalric payload missing {key}.")
-    return _validate_identifier(key, payload[key])
-
-
 def _payload_optional_string(payload: dict[str, JsonValue], *, key: str) -> str | None:
     if key not in payload:
         raise GameLifecycleError(f"Code Chivalric payload missing {key}.")
@@ -1491,15 +1501,6 @@ def _payload_optional_string(payload: dict[str, JsonValue], *, key: str) -> str 
     if value is None:
         return None
     return _validate_identifier(key, value)
-
-
-def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
-    if key not in payload:
-        raise GameLifecycleError(f"Code Chivalric payload missing {key}.")
-    value = payload[key]
-    if type(value) is not int:
-        raise GameLifecycleError(f"Code Chivalric payload {key} must be an int.")
-    return value
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

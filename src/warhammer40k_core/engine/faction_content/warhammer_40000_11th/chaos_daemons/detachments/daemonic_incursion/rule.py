@@ -9,6 +9,9 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    canonical_keyword as _canonical_keyword,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.army_rule import (
     CHAOS_DAEMONS_FACTION_ID as _CHAOS_DAEMONS_FACTION_ID,
 )
@@ -282,10 +285,6 @@ def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
 def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
     canonical = _canonical_keyword(keyword)
     return any(_canonical_keyword(stored) == canonical for stored in unit.faction_keywords)
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().replace("_", " ").replace("-", " ").upper()
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

@@ -8,6 +8,21 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    payload_bool as _payload_bool,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_int as _payload_int,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_object as _payload_object,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_string as _payload_string,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_string_tuple as _payload_string_tuple,
+)
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import BattleSize
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
@@ -643,45 +658,6 @@ def _active_player_id(state: GameState) -> str:
     if state.active_player_id is None:
         raise GameLifecycleError("Grey Knights Gate of Infinity requires active player.")
     return state.active_player_id
-
-
-def _payload_object(value: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(value, dict):
-        raise GameLifecycleError("Grey Knights Gate of Infinity payload must be an object.")
-    return value
-
-
-def _payload_string(payload: dict[str, JsonValue], key: str) -> str:
-    value = payload.get(key)
-    if type(value) is not str:
-        raise GameLifecycleError(f"Grey Knights Gate of Infinity {key} must be a string.")
-    return value
-
-
-def _payload_bool(payload: dict[str, JsonValue], key: str) -> bool:
-    value = payload.get(key)
-    if type(value) is not bool:
-        raise GameLifecycleError(f"Grey Knights Gate of Infinity {key} must be a bool.")
-    return value
-
-
-def _payload_int(payload: dict[str, JsonValue], key: str) -> int:
-    value = payload.get(key)
-    if type(value) is not int:
-        raise GameLifecycleError(f"Grey Knights Gate of Infinity {key} must be an int.")
-    return value
-
-
-def _payload_string_tuple(payload: dict[str, JsonValue], key: str) -> tuple[str, ...]:
-    value = payload.get(key)
-    if not isinstance(value, list):
-        raise GameLifecycleError(f"Grey Knights Gate of Infinity {key} must be a list.")
-    values: list[str] = []
-    for item in value:
-        if type(item) is not str:
-            raise GameLifecycleError(f"Grey Knights Gate of Infinity {key} must contain strings.")
-        values.append(item)
-    return tuple(values)
 
 
 def _validate_string(field_name: str, value: object) -> str:

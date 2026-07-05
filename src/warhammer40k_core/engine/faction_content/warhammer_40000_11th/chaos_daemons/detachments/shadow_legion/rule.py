@@ -13,6 +13,9 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    canonical_keyword as _canonical_keyword,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as dark_pacts,
 )
@@ -499,10 +502,6 @@ def _shadow_legion_replay_payload(battle_round: int) -> JsonValue:
             "battle_round": battle_round,
         }
     )
-
-
-def _canonical_keyword(value: str) -> str:
-    return _validate_identifier("keyword", value).upper().replace("_", " ").replace("-", " ")
 
 
 def _canonical_name(value: str) -> str:

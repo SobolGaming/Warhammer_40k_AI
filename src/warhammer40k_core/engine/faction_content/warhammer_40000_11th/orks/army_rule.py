@@ -28,6 +28,12 @@ from warhammer40k_core.engine.effects import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    payload_object as _payload_object,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_string as _payload_string,
+)
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -641,19 +647,6 @@ def _unit_has_keyword_token(values: tuple[str, ...], expected: str) -> bool:
 def _next_own_turn_battle_round(state: GameState) -> int:
     _validate_game_state(state)
     return state.battle_round + 1
-
-
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Waaagh! payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    value = payload.get(key)
-    if type(value) is not str or not value.strip():
-        raise GameLifecycleError(f"Waaagh! payload {key} must be a string.")
-    return value
 
 
 def _validate_game_state(state: object) -> None:

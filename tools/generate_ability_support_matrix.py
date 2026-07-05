@@ -47,7 +47,11 @@ from warhammer40k_core.engine.faction_content.bundle import (
     DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID,
     RuntimeContentContribution,
 )
-from warhammer40k_core.engine.faction_content.manifest import RuntimeContentSupportStatus
+from warhammer40k_core.engine.faction_content.manifest import (
+    RuntimeContentModuleFamily,
+    RuntimeContentSemanticStatus,
+    RuntimeContentSupportStatus,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas import (
     army_rule as adepta_sororitas_army_rule,
 )
@@ -142,6 +146,7 @@ DEFAULT_OUTPUT_DIR = Path("data") / "generated" / "ability_coverage"
 DEFAULT_DOCS_PATH = Path("docs") / "ABILITY_SUPPORT_MATRIX_V2.md"
 DEFAULT_FACTION_DOCS_DIR = Path("docs") / "factions"
 GENERATED_BY_COMMAND = "uv run python tools/generate_ability_support_matrix.py"
+RUNTIME_CONTENT_SEMANTIC_COVERAGE_SCHEMA_VERSION = "runtime-content-semantic-coverage-v1"
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
 DATASHEET_SUPPORT_FULL = "Full"
 DATASHEET_SUPPORT_PLAYABLE = "Playable"
@@ -272,6 +277,41 @@ class DatasheetGroupReviewRow:
 class RuntimeHookInventoryRow:
     hook_id: str
     ability_or_rule_labels: tuple[str, ...]
+
+
+class RuntimeContentSemanticStatusCountsPayload(TypedDict):
+    placeholder: int
+    partial: int
+    implemented: int
+
+
+class RuntimeContentDetachmentSemanticCoveragePayload(TypedDict):
+    detachment_id: str
+    detachment_name: str
+    semantic_status: str
+    execution_record_count: int
+    source_ids: list[str]
+    module_path: str
+
+
+class RuntimeContentFactionSemanticCoveragePayload(TypedDict):
+    faction_id: str
+    faction_name: str
+    semantic_status: str
+    execution_record_count: int
+    source_ids: list[str]
+    module_path: str
+    detachment_status_counts: RuntimeContentSemanticStatusCountsPayload
+    detachments: list[RuntimeContentDetachmentSemanticCoveragePayload]
+
+
+class RuntimeContentSemanticCoveragePayload(TypedDict):
+    schema_version: str
+    source_package_id: str
+    source_package_hash: str
+    faction_status_counts: RuntimeContentSemanticStatusCountsPayload
+    detachment_status_counts: RuntimeContentSemanticStatusCountsPayload
+    factions: list[RuntimeContentFactionSemanticCoveragePayload]
 
 
 class MusteringSupportRowPayload(TypedDict):
@@ -849,13 +889,21 @@ def main() -> None:
     category_payloads = ability_coverage_category_rows_payload(category_rows)
     datasheet_payloads = datasheet_support_rows_payload(datasheet_rows)
     mustering_payloads = mustering_support_rows_payload(mustering_rows)
+    runtime_semantic_payload = runtime_content_semantic_coverage_payload()
 
     output_dir.mkdir(parents=True, exist_ok=True)
     _write_json(output_dir / "ability_coverage_rows.json", row_payloads)
     _write_json(output_dir / "ability_support_category_rows.json", category_payloads)
     _write_json(output_dir / "datasheet_support_rows.json", datasheet_payloads)
     _write_json(output_dir / "mustering_support_rows.json", mustering_payloads)
-    docs_path.write_text(support_matrix_markdown(category_payloads), encoding="utf-8")
+    _write_json(output_dir / "runtime_content_semantic_coverage.json", runtime_semantic_payload)
+    docs_path.write_text(
+        support_matrix_markdown(
+            category_payloads,
+            runtime_semantic_coverage=runtime_semantic_payload,
+        ),
+        encoding="utf-8",
+    )
     faction_docs_dir.mkdir(parents=True, exist_ok=True)
     for filename, markdown in faction_support_markdown_files(
         datasheet_support_rows=datasheet_rows,
@@ -880,6 +928,82 @@ def datasheet_support_rows(
     package = _ability_support_catalog_package(source_json_dir=source_json_dir)
     ability_rows = _ability_support_matrix_rows_from_package(package)
     return _datasheet_support_rows_from_package(package=package, ability_rows=ability_rows)
+
+
+def runtime_content_semantic_coverage_payload() -> RuntimeContentSemanticCoveragePayload:
+    rows = tuple(generated_runtime_content_rows())
+    faction_rows_by_id = {
+        row.content_id: row
+        for row in rows
+        if row.family is RuntimeContentModuleFamily.FACTION
+        and row.support_status is RuntimeContentSupportStatus.SUPPORTED
+    }
+    detachment_rows_by_id = {
+        row.content_id: row
+        for row in rows
+        if row.family is RuntimeContentModuleFamily.DETACHMENT
+        and row.support_status is RuntimeContentSupportStatus.SUPPORTED
+    }
+    source_package_ids = tuple(sorted({row.source_package_id for row in rows}))
+    source_package_hashes = tuple(
+        sorted({row.source_package_hash for row in rows if row.source_package_hash is not None})
+    )
+    if len(source_package_ids) != 1 or len(source_package_hashes) != 1:
+        raise ValueError("Runtime content semantic coverage requires one source package identity.")
+
+    faction_payloads: list[RuntimeContentFactionSemanticCoveragePayload] = []
+    for faction_row in faction_detachments_2026_27.faction_rows():
+        runtime_faction_row = faction_rows_by_id.get(faction_row.faction_id)
+        if runtime_faction_row is None:
+            raise ValueError("Runtime content semantic coverage is missing a faction manifest row.")
+        detachment_payloads: list[RuntimeContentDetachmentSemanticCoveragePayload] = []
+        runtime_detachment_rows = []
+        for detachment_row in faction_detachments_2026_27.detachment_rows():
+            if detachment_row.faction_id != faction_row.faction_id:
+                continue
+            runtime_detachment_row = detachment_rows_by_id.get(detachment_row.detachment_id)
+            if runtime_detachment_row is None:
+                raise ValueError(
+                    "Runtime content semantic coverage is missing a detachment manifest row."
+                )
+            runtime_detachment_rows.append(runtime_detachment_row)
+            detachment_payloads.append(
+                {
+                    "detachment_id": detachment_row.detachment_id,
+                    "detachment_name": detachment_row.name,
+                    "semantic_status": runtime_detachment_row.semantic_status.value,
+                    "execution_record_count": len(runtime_detachment_row.execution_record_ids),
+                    "source_ids": list(runtime_detachment_row.source_ids),
+                    "module_path": _required_module_path(runtime_detachment_row.module_path),
+                }
+            )
+        faction_payloads.append(
+            {
+                "faction_id": faction_row.faction_id,
+                "faction_name": faction_row.name,
+                "semantic_status": runtime_faction_row.semantic_status.value,
+                "execution_record_count": len(runtime_faction_row.execution_record_ids),
+                "source_ids": list(runtime_faction_row.source_ids),
+                "module_path": _required_module_path(runtime_faction_row.module_path),
+                "detachment_status_counts": _runtime_semantic_status_counts(
+                    tuple(row.semantic_status for row in runtime_detachment_rows)
+                ),
+                "detachments": detachment_payloads,
+            }
+        )
+
+    return {
+        "schema_version": RUNTIME_CONTENT_SEMANTIC_COVERAGE_SCHEMA_VERSION,
+        "source_package_id": source_package_ids[0],
+        "source_package_hash": source_package_hashes[0],
+        "faction_status_counts": _runtime_semantic_status_counts(
+            tuple(row.semantic_status for row in faction_rows_by_id.values())
+        ),
+        "detachment_status_counts": _runtime_semantic_status_counts(
+            tuple(row.semantic_status for row in detachment_rows_by_id.values())
+        ),
+        "factions": faction_payloads,
+    }
 
 
 def datasheet_support_rows_payload(
@@ -1668,6 +1792,26 @@ def _write_json(path: Path, payload: object) -> None:
     path.write_text(json.dumps(payload, sort_keys=True, indent=2) + "\n", encoding="utf-8")
 
 
+def _runtime_semantic_status_counts(
+    statuses: tuple[RuntimeContentSemanticStatus, ...],
+) -> RuntimeContentSemanticStatusCountsPayload:
+    return {
+        "placeholder": sum(
+            1 for status in statuses if status is RuntimeContentSemanticStatus.PLACEHOLDER
+        ),
+        "partial": sum(1 for status in statuses if status is RuntimeContentSemanticStatus.PARTIAL),
+        "implemented": sum(
+            1 for status in statuses if status is RuntimeContentSemanticStatus.IMPLEMENTED
+        ),
+    }
+
+
+def _required_module_path(module_path: str | None) -> str:
+    if module_path is None:
+        raise ValueError("Runtime content semantic coverage row lacks module path.")
+    return module_path
+
+
 def _runtime_faction_army_rule_rows() -> tuple[AbilityCoverageRow, ...]:
     return (
         _implemented_faction_army_rule_row(
@@ -2179,7 +2323,14 @@ def _leagues_of_votann_runtime_consumer_ids() -> tuple[str, ...]:
 
 def support_matrix_markdown(
     category_rows: list[AbilityCoverageCategoryRowPayload],
+    *,
+    runtime_semantic_coverage: RuntimeContentSemanticCoveragePayload | None = None,
 ) -> str:
+    runtime_semantic_payload = (
+        runtime_content_semantic_coverage_payload()
+        if runtime_semantic_coverage is None
+        else runtime_semantic_coverage
+    )
     lines = [
         "# Ability Support Matrix V2",
         "",
@@ -2194,6 +2345,8 @@ def support_matrix_markdown(
         "`data/generated/ability_coverage/ability_coverage_rows.json`.",
         "Pregame mustering and list-construction rows are generated separately in",
         "`data/generated/ability_coverage/mustering_support_rows.json`.",
+        "Runtime faction-content semantic status is generated separately in",
+        "`data/generated/ability_coverage/runtime_content_semantic_coverage.json`.",
         "",
         "Support stages:",
         "",
@@ -2216,6 +2369,7 @@ def support_matrix_markdown(
             "named runtime consumer."
         ),
     ]
+    lines.extend(_runtime_content_semantic_coverage_markdown(runtime_semantic_payload))
     lines.extend(_structured_support_sections_markdown())
     lines.extend(
         (
@@ -2239,6 +2393,69 @@ def support_matrix_markdown(
     lines.extend(_runtime_hook_inventory_markdown(category_rows))
     lines.append("")
     return "\n".join(lines)
+
+
+def _runtime_content_semantic_coverage_markdown(
+    payload: RuntimeContentSemanticCoveragePayload,
+) -> list[str]:
+    faction_counts = payload["faction_status_counts"]
+    detachment_counts = payload["detachment_status_counts"]
+    lines = [
+        "",
+        "## Runtime Content Semantic Coverage",
+        "",
+        (
+            "Load support and semantic execution support are distinct. A row with "
+            "`support_status: supported` has an importable runtime module; its "
+            "`semantic_status` records whether source-backed gameplay execution is still a "
+            "placeholder, partially implemented, or implemented."
+        ),
+        "",
+        ("| Family | Placeholder | Partial | Implemented |"),
+        "| --- | ---: | ---: | ---: |",
+        _runtime_semantic_count_row("Faction", faction_counts),
+        _runtime_semantic_count_row("Detachment", detachment_counts),
+        "",
+        (
+            "| Faction | Faction semantic status | Placeholder detachments | "
+            "Partial detachments | Implemented detachments |"
+        ),
+        "| --- | --- | ---: | ---: | ---: |",
+    ]
+    for row in payload["factions"]:
+        counts = row["detachment_status_counts"]
+        lines.append(
+            "| "
+            + " | ".join(
+                (
+                    _markdown_text(row["faction_name"]),
+                    f"`{_markdown_text(row['semantic_status'])}`",
+                    str(counts["placeholder"]),
+                    str(counts["partial"]),
+                    str(counts["implemented"]),
+                )
+            )
+            + " |"
+        )
+    return lines
+
+
+def _runtime_semantic_count_row(
+    label: str,
+    counts: RuntimeContentSemanticStatusCountsPayload,
+) -> str:
+    return (
+        "| "
+        + " | ".join(
+            (
+                _markdown_text(label),
+                str(counts["placeholder"]),
+                str(counts["partial"]),
+                str(counts["implemented"]),
+            )
+        )
+        + " |"
+    )
 
 
 def faction_support_markdown_files(

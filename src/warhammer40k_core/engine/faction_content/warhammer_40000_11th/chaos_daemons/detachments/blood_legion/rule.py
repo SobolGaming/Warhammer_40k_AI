@@ -9,6 +9,12 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    canonical_keyword as _canonical_keyword,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    payload_string as _payload_string,
+)
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeContext,
     MovementEndSurgeGrant,
@@ -490,17 +496,6 @@ def _active_player_id(context: PhaseEndObjectiveControlContext) -> str:
     if active_player_id is None:
         raise GameLifecycleError("Blood Tainted requires active_player_id.")
     return active_player_id
-
-
-def _payload_string(payload: dict[str, JsonValue], key: str) -> str:
-    value = payload.get(key)
-    if type(value) is not str:
-        raise GameLifecycleError(f"Blood Legion event payload missing string key: {key}.")
-    return value
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().replace("_", " ").replace("-", " ").upper()
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

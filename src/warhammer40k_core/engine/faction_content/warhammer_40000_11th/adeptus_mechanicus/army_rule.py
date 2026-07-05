@@ -33,6 +33,11 @@ from warhammer40k_core.engine.decision_request import (
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    payload_int,
+    payload_object,
+    payload_string,
+)
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.rules_units import (
@@ -47,6 +52,19 @@ from warhammer40k_core.engine.runtime_modifiers import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.volume import Model as GeometryModel
+
+
+def _payload_object(value: object) -> dict[str, JsonValue]:
+    return payload_object(value)
+
+
+def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
+    return payload_string(payload, key, field_name="payload")
+
+
+def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
+    return payload_int(payload, key, field_name="payload")
+
 
 SOURCE_RULE_ID = "phase17f:phase17e:adeptus-mechanicus:army-rule"
 HOOK_ID = "warhammer_40000_11th:adeptus_mechanicus:army_rule:doctrina_imperatives"
@@ -983,30 +1001,10 @@ def _weapon_keyword_from_token(token: object) -> WeaponKeyword:
         raise GameLifecycleError(f"Unsupported Doctrina weapon keyword: {token}.") from exc
 
 
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Doctrina Imperatives payload must be an object.")
-    return payload
-
-
 def _json_object(field_name: str, value: object) -> dict[str, JsonValue]:
     if not isinstance(value, dict):
         raise GameLifecycleError(f"{field_name} must be an object.")
     return cast(dict[str, JsonValue], value)
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    value = payload.get(key)
-    if type(value) is not str or not value.strip():
-        raise GameLifecycleError(f"Doctrina Imperatives payload {key} must be a string.")
-    return value
-
-
-def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
-    value = payload.get(key)
-    if type(value) is not int:
-        raise GameLifecycleError(f"Doctrina Imperatives payload {key} must be an int.")
-    return value
 
 
 def _payload_string_tuple(payload: dict[str, JsonValue], *, key: str) -> tuple[str, ...]:

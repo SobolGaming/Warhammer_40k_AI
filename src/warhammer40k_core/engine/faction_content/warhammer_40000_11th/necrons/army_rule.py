@@ -21,12 +21,30 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.engine.faction_content.common import (
+    canonical_keyword as _canonical_keyword,
+)
+from warhammer40k_core.engine.faction_content.common import (
+    event_payload_object,
+    payload_identifier,
+    payload_object,
+)
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
+
+_event_payload_object = event_payload_object
+_payload_object = payload_object
+
+
+def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
+    if key not in payload:
+        raise GameLifecycleError(f"Reanimation Protocols payload missing required key {key}.")
+    return payload_identifier(payload, key)
+
 
 CONTRIBUTION_ID = "warhammer_40000_11th:necrons:army_rule:reanimation_protocols"
 HOOK_ID = "warhammer_40000_11th:necrons:army_rule:reanimation_protocols"
@@ -614,32 +632,9 @@ def _battlefield_state(state: GameState) -> BattlefieldRuntimeState:
     return battlefield
 
 
-def _event_payload_object(record: EventRecord) -> dict[str, JsonValue]:
-    payload = record.payload
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Reanimation Protocols event payload must be an object.")
-    return payload
-
-
 def _reanimation_option_id(rules_unit_instance_id: str) -> str:
     rules_unit_id = _validate_identifier("rules_unit_instance_id", rules_unit_instance_id)
     return f"necrons:reanimation_protocols:{rules_unit_id}"
 
 
-def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Reanimation Protocols payload must be an object.")
-    return payload
-
-
-def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
-    if key not in payload:
-        raise GameLifecycleError(f"Reanimation Protocols payload missing required key: {key}.")
-    return _validate_identifier(key, payload[key])
-
-
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _canonical_keyword(keyword: str) -> str:
-    return _validate_identifier("keyword", keyword).upper().replace("_", " ")
