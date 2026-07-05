@@ -6,14 +6,14 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.unit.test_phase11c_command_phase import (
-    _complete_setup_through_gate,  # pyright: ignore[reportPrivateUsage]
-    _default_unit_selection,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    complete_setup_through_gate,
+    default_unit_selection,
 )
-from tests.unit.test_phase15d_fight_resolution import (
-    _melee_fixture,  # pyright: ignore[reportPrivateUsage]
-    _melee_proposal,  # pyright: ignore[reportPrivateUsage]
-    _melee_request,  # pyright: ignore[reportPrivateUsage]
+from tests.phase15d_fight_resolution_helpers import (
+    melee_fixture,
+    melee_proposal,
+    melee_request,
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -725,14 +725,14 @@ def test_blessings_weapon_profile_modifier_adds_melee_keywords() -> None:
 
 
 def test_blessings_weapon_profile_modifier_reaches_melee_sequence_consumer() -> None:
-    catalog, ruleset, scenario, attacker, target_a, _target_b = _melee_fixture()
-    request = _melee_request(
+    catalog, ruleset, scenario, attacker, target_a, _target_b = melee_fixture()
+    request = melee_request(
         catalog=catalog,
         ruleset=ruleset,
         scenario=scenario,
         attacker=attacker,
     )
-    proposal = _melee_proposal(
+    proposal = melee_proposal(
         request=request,
         attacker=attacker,
         declarations=(
@@ -1292,7 +1292,7 @@ def _world_eaters_config() -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
-                unit_selections=(_default_unit_selection("enemy-unit"),),
+                unit_selections=(default_unit_selection("enemy-unit"),),
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -1401,7 +1401,7 @@ def _battle_ready_lifecycle() -> GameLifecycle:
     state.record_battlefield_state(scenario.battlefield_state)
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-a"))
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-b"))
-    _complete_setup_through_gate(state=state, config=config)
+    complete_setup_through_gate(state=state, config=config)
     _runtime_content_bundle(lifecycle)
     return lifecycle
 

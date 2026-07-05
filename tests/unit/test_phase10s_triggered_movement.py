@@ -602,7 +602,11 @@ def test_lifecycle_submit_decision_routes_triggered_movement_choice() -> None:
         descriptor=descriptor,
         candidate_witnesses=(_shift_witness(unit_placement, dx=3.0),),
     )
-    lifecycle.decision_controller = DecisionController()
+    lifecycle_payload = lifecycle.to_payload()
+    lifecycle_payload["decisions"] = DecisionController().to_payload()
+    lifecycle = GameLifecycle.from_payload(lifecycle_payload)
+    state = lifecycle.state
+    assert state is not None
     lifecycle.decision_controller.request_decision(request)
 
     status = lifecycle.submit_decision(

@@ -4,8 +4,8 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.unit.test_phase11c_command_phase import (
-    _battle_state,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    battle_state,
 )
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -243,7 +243,7 @@ def test_martial_katah_effect_applies_to_attached_rules_unit_components() -> Non
 
 
 def test_martial_katah_is_not_available_for_non_custodes_armies() -> None:
-    state = _battle_state()
+    state = battle_state()
     unit = _unit_for_player(state, player_id="player-a")
     _set_current_battle_phase(state, BattlePhase.FIGHT)
     registry = FightUnitSelectedGrantRegistry.from_bindings(
@@ -266,7 +266,7 @@ def test_martial_katah_is_not_available_for_non_custodes_armies() -> None:
 
 
 def test_martial_katah_source_id_allows_rule_without_faction_keyword() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_adeptus_custodes(
         state,
         player_id="player-a",
@@ -423,7 +423,7 @@ def test_martial_katah_payload_and_handlers_are_fail_fast() -> None:
 
 
 def _custodes_battle_state() -> GameState:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_adeptus_custodes(state, player_id="player-a")
     return state
 

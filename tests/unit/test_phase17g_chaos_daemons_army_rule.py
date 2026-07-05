@@ -4,15 +4,15 @@ from collections.abc import Callable
 from dataclasses import replace
 from typing import cast
 
-from tests.unit.test_phase11c_command_phase import (
-    _battle_state,  # pyright: ignore[reportPrivateUsage]
-    _battle_state_with_center_objective_positions,  # pyright: ignore[reportPrivateUsage]
-    _center_marker_definition,  # pyright: ignore[reportPrivateUsage]
-    _complete_setup_through_gate,  # pyright: ignore[reportPrivateUsage]
-    _default_unit_selection,  # pyright: ignore[reportPrivateUsage]
-    _remove_first_models,  # pyright: ignore[reportPrivateUsage]
-    _unit_by_id,  # pyright: ignore[reportPrivateUsage]
-    _with_model_offsets,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    battle_state,
+    battle_state_with_center_objective_positions,
+    center_marker_definition,
+    complete_setup_through_gate,
+    default_unit_selection,
+    remove_first_models,
+    unit_by_id,
+    with_model_offsets,
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -88,7 +88,7 @@ SOURCE_KEYWORD_SEQUENCE_PARTS = (
 
 
 def test_shadow_of_chaos_marks_no_mans_land_when_daemons_control_half_objectives() -> None:
-    state = _battle_state_with_center_objective_positions(
+    state = battle_state_with_center_objective_positions(
         player_a_offsets=((0.0, 0.0), (-1.5, -13.5)),
         player_b_offsets=((8.0, 0.0),),
     )
@@ -101,14 +101,14 @@ def test_shadow_of_chaos_marks_no_mans_land_when_daemons_control_half_objectives
 
 
 def test_daemonic_manifestation_modifies_battle_shock_and_heals_one_model() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_chaos_daemons(
         state,
         player_id="player-a",
         remove_battleline=True,
     )
     unit_id = "army-alpha:intercessor-unit-1"
-    _remove_first_models(state, unit_instance_id=unit_id, count=3)
+    remove_first_models(state, unit_instance_id=unit_id, count=3)
     wounded_model_id = _placed_model_ids(state, unit_id)[0]
     _replace_model_wounds(state, model_instance_id=wounded_model_id, wounds_remaining=1)
     _record_battle_shock_auto_pass(state, unit_instance_id=unit_id)
@@ -143,10 +143,10 @@ def test_daemonic_manifestation_modifies_battle_shock_and_heals_one_model() -> N
 
 
 def test_daemonic_manifestation_uses_semantic_shadow_of_chaos_aura() -> None:
-    state = _battle_state(
+    state = battle_state(
         player_a_units=(
-            _default_unit_selection("intercessor-unit-1"),
-            _default_unit_selection("intercessor-unit-2"),
+            default_unit_selection("intercessor-unit-1"),
+            default_unit_selection("intercessor-unit-2"),
         )
     )
     _mark_player_as_chaos_daemons(state, player_id="player-a", remove_battleline=True)
@@ -167,7 +167,7 @@ def test_daemonic_manifestation_uses_semantic_shadow_of_chaos_aura() -> None:
     )
     _place_unit_near_center(state, unit_instance_id=source_unit_id, offset=(16.0, 0.0))
     _place_unit_near_center(state, unit_instance_id=target_unit_id, offset=(18.0, 0.0))
-    _remove_first_models(state, unit_instance_id=target_unit_id, count=3)
+    remove_first_models(state, unit_instance_id=target_unit_id, count=3)
     wounded_model_id = _placed_model_ids(state, target_unit_id)[0]
     _replace_model_wounds(state, model_instance_id=wounded_model_id, wounds_remaining=1)
     _record_battle_shock_auto_pass(state, unit_instance_id=target_unit_id)
@@ -190,7 +190,7 @@ def test_daemonic_manifestation_uses_semantic_shadow_of_chaos_aura() -> None:
 
 
 def test_daemonic_manifestation_caps_non_battleline_healing_before_revival() -> None:
-    state = _battle_state()
+    state = battle_state()
     state.game_id = "phase17g-overheal-seed-1"
     _mark_player_as_chaos_daemons(
         state,
@@ -200,7 +200,7 @@ def test_daemonic_manifestation_caps_non_battleline_healing_before_revival() -> 
     unit_id = "army-alpha:intercessor-unit-1"
     starting_model_ids = _placed_model_ids(state, unit_id)
     destroyed_model_ids = starting_model_ids[:3]
-    _remove_first_models(state, unit_instance_id=unit_id, count=3)
+    remove_first_models(state, unit_instance_id=unit_id, count=3)
     for destroyed_model_id in destroyed_model_ids:
         _replace_model_wounds(
             state,
@@ -260,7 +260,7 @@ def test_lifecycle_loads_chaos_daemons_battle_shock_hook_from_runtime_manifest()
     lifecycle.start(config)
     state = _record_lifecycle_battle_state(lifecycle=lifecycle, config=config)
     unit_id = "army-alpha:manifestation-daemon"
-    _remove_first_models(state, unit_instance_id=unit_id, count=3)
+    remove_first_models(state, unit_instance_id=unit_id, count=3)
     wounded_model_id = _placed_model_ids(state, unit_id)[0]
     _replace_model_wounds(state, model_instance_id=wounded_model_id, wounds_remaining=1)
     _record_battle_shock_auto_pass(state, unit_instance_id=unit_id)
@@ -290,16 +290,16 @@ def test_lifecycle_loads_chaos_daemons_battle_shock_hook_from_runtime_manifest()
 
 
 def test_shadow_of_chaos_uses_phase_start_control_snapshot_for_all_tests() -> None:
-    state = _battle_state(
+    state = battle_state(
         player_a_units=(
-            _default_unit_selection("intercessor-unit-1"),
-            _default_unit_selection("intercessor-unit-2"),
+            default_unit_selection("intercessor-unit-1"),
+            default_unit_selection("intercessor-unit-2"),
         )
     )
     _mark_player_as_chaos_daemons(state, player_id="player-a")
     unit_ids = ("army-alpha:intercessor-unit-1", "army-alpha:intercessor-unit-2")
     for unit_id in unit_ids:
-        _remove_first_models(state, unit_instance_id=unit_id, count=3)
+        remove_first_models(state, unit_instance_id=unit_id, count=3)
         _replace_unit_leadership(state, unit_instance_id=unit_id, leadership=99)
     _place_unit_near_center(state, unit_instance_id=unit_ids[0], offset=(0.0, 0.0))
     _place_unit_near_center(state, unit_instance_id=unit_ids[1], offset=(-1.5, -13.5))
@@ -327,7 +327,7 @@ def test_shadow_of_chaos_uses_phase_start_control_snapshot_for_all_tests() -> No
 
 
 def test_daemonic_terror_modifies_enemy_battle_shock_and_applies_mortal_wounds() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_chaos_daemons(
         state,
         player_id="player-a",
@@ -336,7 +336,7 @@ def test_daemonic_terror_modifies_enemy_battle_shock_and_applies_mortal_wounds()
     state.active_player_id = "player-b"
     state.command_step_state = None
     target_unit_id = "army-beta:intercessor-unit-3"
-    _remove_first_models(state, unit_instance_id=target_unit_id, count=3)
+    remove_first_models(state, unit_instance_id=target_unit_id, count=3)
     _replace_unit_leadership(state, unit_instance_id=target_unit_id, leadership=13)
     _place_units_near_center(
         state,
@@ -344,7 +344,7 @@ def test_daemonic_terror_modifies_enemy_battle_shock_and_applies_mortal_wounds()
         target_unit_id=target_unit_id,
     )
     starting_wounds = sum(
-        model.wounds_remaining for model in _unit_by_id(state, target_unit_id).own_models
+        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
     )
     decisions = DecisionController()
     handler = CommandPhaseHandler(
@@ -368,7 +368,7 @@ def test_daemonic_terror_modifies_enemy_battle_shock_and_applies_mortal_wounds()
     application = cast(dict[str, JsonValue], terror_payload["mortal_wound_application"])
     assert application["mortal_wounds"] in (1, 2, 3)
     final_wounds = sum(
-        model.wounds_remaining for model in _unit_by_id(state, target_unit_id).own_models
+        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
     )
     assert final_wounds < starting_wounds
 
@@ -411,7 +411,7 @@ def _record_lifecycle_battle_state(
     state.record_secondary_mission_choice(
         _fixed_secondary_choice(player_id="player-b"),
     )
-    _complete_setup_through_gate(state=state, config=config)
+    complete_setup_through_gate(state=state, config=config)
     return state
 
 
@@ -719,14 +719,14 @@ def _place_units_near_center(
 ) -> None:
     if state.battlefield_state is None:
         raise AssertionError("test state requires battlefield_state")
-    marker = _center_marker_definition(state)
+    marker = center_marker_definition(state)
     source = state.battlefield_state.unit_placement_by_id(source_unit_id)
     target = state.battlefield_state.unit_placement_by_id(target_unit_id)
     battlefield_state = state.battlefield_state.with_unit_placement(
-        _with_model_offsets(source, marker, offsets=((0.0, 0.0),))
+        with_model_offsets(source, marker, offsets=((0.0, 0.0),))
     )
     battlefield_state = battlefield_state.with_unit_placement(
-        _with_model_offsets(target, marker, offsets=((1.0, 0.0),))
+        with_model_offsets(target, marker, offsets=((1.0, 0.0),))
     )
     state.battlefield_state = battlefield_state
 
@@ -739,10 +739,10 @@ def _place_unit_near_center(
 ) -> None:
     if state.battlefield_state is None:
         raise AssertionError("test state requires battlefield_state")
-    marker = _center_marker_definition(state)
+    marker = center_marker_definition(state)
     unit = state.battlefield_state.unit_placement_by_id(unit_instance_id)
     state.battlefield_state = state.battlefield_state.with_unit_placement(
-        _with_model_offsets(unit, marker, offsets=(offset,))
+        with_model_offsets(unit, marker, offsets=(offset,))
     )
 
 

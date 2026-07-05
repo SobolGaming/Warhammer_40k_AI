@@ -5,9 +5,9 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.unit.test_phase11c_command_phase import (
-    _battle_state,  # pyright: ignore[reportPrivateUsage]
-    _battle_state_with_center_objective_positions,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    battle_state,
+    battle_state_with_center_objective_positions,
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -202,7 +202,7 @@ def test_command_phase_handler_with_bundle_hook_transitions_to_fortify_takeover(
 
 
 def test_non_votann_detachment_with_votann_keyword_unit_does_not_gain_yield_points() -> None:
-    state = _battle_state_with_center_objective_positions(
+    state = battle_state_with_center_objective_positions(
         player_a_offsets=((0.0, 0.0),),
         player_b_offsets=(),
     )
@@ -229,7 +229,7 @@ def test_non_votann_detachment_with_votann_keyword_unit_does_not_gain_yield_poin
 
 
 def test_prioritised_efficiency_mode_requires_votann_detachment_selection() -> None:
-    state = _battle_state_with_center_objective_positions(
+    state = battle_state_with_center_objective_positions(
         player_a_offsets=((0.0, 0.0),),
         player_b_offsets=(),
     )
@@ -376,7 +376,7 @@ def test_yield_points_from_objectives_reject_malformed_counts_and_identifier_set
 
 
 def test_own_deployment_objectives_use_official_layout_home_markers() -> None:
-    state = _battle_state()
+    state = battle_state()
 
     assert army_rule._own_deployment_objective_ids(  # pyright: ignore[reportPrivateUsage]
         state,
@@ -389,7 +389,7 @@ def test_own_deployment_objectives_use_official_layout_home_markers() -> None:
 
 
 def test_own_deployment_objective_lookup_requires_mission_setup_and_zone() -> None:
-    state = _battle_state()
+    state = battle_state()
     state.mission_setup = None
     with pytest.raises(GameLifecycleError, match="requires MissionSetup"):
         army_rule._own_deployment_objective_ids(  # pyright: ignore[reportPrivateUsage]
@@ -397,7 +397,7 @@ def test_own_deployment_objective_lookup_requires_mission_setup_and_zone() -> No
             player_id="player-a",
         )
 
-    state = _battle_state()
+    state = battle_state()
     with pytest.raises(GameLifecycleError, match="requires the player's deployment zone"):
         army_rule._own_deployment_objective_ids(  # pyright: ignore[reportPrivateUsage]
             state,
@@ -539,7 +539,7 @@ def test_fortify_takeover_hit_bonus_and_wound_penalty() -> None:
 
 
 def test_unit_scoped_modifiers_reject_non_owner_and_unknown_units() -> None:
-    state = _battle_state_with_center_objective_positions(
+    state = battle_state_with_center_objective_positions(
         player_a_offsets=((0.0, 0.0),),
         player_b_offsets=((0.0, 0.0),),
     )
@@ -630,7 +630,7 @@ def _votann_center_objective_state(
     player_a_offsets: tuple[tuple[float, float], ...],
     player_b_offsets: tuple[tuple[float, float], ...],
 ) -> GameState:
-    state = _battle_state_with_center_objective_positions(
+    state = battle_state_with_center_objective_positions(
         player_a_offsets=player_a_offsets,
         player_b_offsets=player_b_offsets,
     )

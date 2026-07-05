@@ -9,10 +9,10 @@ from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_movement_proposal,
 )
-from tests.unit.test_phase15c_fight_order import (
-    _advance_to_fight_order_request,  # pyright: ignore[reportPrivateUsage]
-    _fight_lifecycle,  # pyright: ignore[reportPrivateUsage]
-    _submit_minimal_melee_declaration,  # pyright: ignore[reportPrivateUsage]
+from tests.phase15c_fight_order_helpers import (
+    advance_to_fight_order_request,
+    fight_lifecycle,
+    submit_minimal_melee_declaration,
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -426,7 +426,7 @@ def test_pirates_due_records_source_backed_wound_reroll_permission() -> None:
 
 
 def test_pirates_due_lifecycle_accepts_fight_wound_reroll_and_resumes_attack() -> None:
-    lifecycle, units = _fight_lifecycle(
+    lifecycle, units = fight_lifecycle(
         alpha_unit_ids=("corsairs",),
         enemy_unit_ids=("enemy",),
         origins={
@@ -450,7 +450,7 @@ def test_pirates_due_lifecycle_accepts_fight_wound_reroll_and_resumes_attack() -
     _refresh_lifecycle_runtime_content(lifecycle)
     unit = units["corsairs"]
 
-    stratagem_request = _advance_to_fight_order_request(lifecycle)
+    stratagem_request = advance_to_fight_order_request(lifecycle)
     assert stratagem_request.decision_type == STRATAGEM_DECISION_TYPE
     pirates_due_option = _stratagem_option(stratagem_request, stratagems.PIRATES_DUE_STRATAGEM_ID)
     activation_request = _decision_request(
@@ -513,7 +513,7 @@ def test_pirates_due_lifecycle_accepts_fight_wound_reroll_and_resumes_attack() -
     fixed_rolls.roll_fixed(wound_spec, [1])
 
     reroll_request = _decision_request(
-        _submit_minimal_melee_declaration(
+        submit_minimal_melee_declaration(
             lifecycle,
             request=melee_request,
             result_id=declaration_result_id,

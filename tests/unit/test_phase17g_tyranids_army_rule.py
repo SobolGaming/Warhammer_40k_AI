@@ -6,12 +6,12 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.unit.test_phase11c_command_phase import (
-    _battle_shock_request_for_unit,  # pyright: ignore[reportPrivateUsage]
-    _center_marker_definition,  # pyright: ignore[reportPrivateUsage]
-    _remove_first_models,  # pyright: ignore[reportPrivateUsage]
-    _unit_by_id,  # pyright: ignore[reportPrivateUsage]
-    _with_model_offsets,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    battle_shock_request_for_unit,
+    center_marker_definition,
+    remove_first_models,
+    unit_by_id,
+    with_model_offsets,
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -343,7 +343,7 @@ def test_synapse_battle_shock_uses_three_d6_in_command_phase() -> None:
         active_player_id="player-a",
     )
     state = _require_state(lifecycle)
-    _remove_first_models(state, unit_instance_id=TYRANIDS_GAUNTS_UNIT_ID, count=3)
+    remove_first_models(state, unit_instance_id=TYRANIDS_GAUNTS_UNIT_ID, count=3)
     decisions = DecisionController()
     handler = CommandPhaseHandler(
         stratagem_index=StratagemCatalogIndex.from_records(()),
@@ -832,8 +832,8 @@ def test_shadow_and_synapse_handlers_are_fail_fast_on_edge_paths() -> None:
         active_player_id="player-b",
     )
     no_source_state = _require_state(no_sources)
-    _remove_first_models(no_source_state, unit_instance_id=TYRANIDS_WARRIORS_UNIT_ID, count=5)
-    _remove_first_models(no_source_state, unit_instance_id=TYRANIDS_GAUNTS_UNIT_ID, count=5)
+    remove_first_models(no_source_state, unit_instance_id=TYRANIDS_WARRIORS_UNIT_ID, count=5)
+    remove_first_models(no_source_state, unit_instance_id=TYRANIDS_GAUNTS_UNIT_ID, count=5)
     no_source_army = no_source_state.army_definition_for_player("player-a")
     assert no_source_army is not None
     assert not army_rule.tyranids_unit_within_synapse_range(
@@ -872,7 +872,7 @@ def test_shadow_and_synapse_handlers_are_fail_fast_on_edge_paths() -> None:
         active_player_id="player-b",
     )
     no_target_state = _require_state(no_targets)
-    _remove_first_models(no_target_state, unit_instance_id=ENEMY_UNIT_ID, count=5)
+    remove_first_models(no_target_state, unit_instance_id=ENEMY_UNIT_ID, count=5)
     assert (
         army_rule.shadow_in_the_warp_request(
             CommandPhaseStartRequestContext(
@@ -1063,8 +1063,8 @@ def test_tyranids_army_rule_validation_helpers_are_fail_fast() -> None:
         unit_has_shadow_in_the_warp(cast(UnitInstance, object()))
     with pytest.raises(GameLifecycleError, match="Synapse requires a UnitInstance"):
         unit_has_synapse(cast(UnitInstance, object()))
-    assert unit_has_shadow_in_the_warp(_unit_by_id(state, TYRANIDS_GAUNTS_UNIT_ID))
-    assert unit_has_synapse(_unit_by_id(state, TYRANIDS_WARRIORS_UNIT_ID))
+    assert unit_has_shadow_in_the_warp(unit_by_id(state, TYRANIDS_GAUNTS_UNIT_ID))
+    assert unit_has_synapse(unit_by_id(state, TYRANIDS_WARRIORS_UNIT_ID))
     with pytest.raises(GameLifecycleError, match="requires CharacteristicValue"):
         strength_with_plus_one(cast(CharacteristicValue, object()))
     with pytest.raises(GameLifecycleError, match="characteristic drift"):
@@ -1332,26 +1332,26 @@ def _mission_setup() -> MissionSetup:
 def _place_units_near_center(state: GameState) -> None:
     if state.battlefield_state is None:
         raise AssertionError("test state requires battlefield_state")
-    marker = _center_marker_definition(state)
+    marker = center_marker_definition(state)
     warriors = state.battlefield_state.unit_placement_by_id(TYRANIDS_WARRIORS_UNIT_ID)
     gaunts = state.battlefield_state.unit_placement_by_id(TYRANIDS_GAUNTS_UNIT_ID)
     enemy = state.battlefield_state.unit_placement_by_id(ENEMY_UNIT_ID)
     battlefield_state = state.battlefield_state.with_unit_placement(
-        _with_model_offsets(
+        with_model_offsets(
             warriors,
             marker,
             offsets=((0.0, 0.0), (0.4, 0.0), (0.8, 0.0), (1.2, 0.0), (1.6, 0.0)),
         )
     )
     battlefield_state = battlefield_state.with_unit_placement(
-        _with_model_offsets(
+        with_model_offsets(
             gaunts,
             marker,
             offsets=((1.0, 0.6), (1.4, 0.6), (1.8, 0.6), (2.2, 0.6), (2.6, 0.6)),
         )
     )
     battlefield_state = battlefield_state.with_unit_placement(
-        _with_model_offsets(
+        with_model_offsets(
             enemy,
             marker,
             offsets=(
@@ -1387,9 +1387,9 @@ def _battle_shock_dice_context(
 
 def _battle_shock_modifier_context(state: GameState) -> BattleShockModifierContext:
     active_player_id = _active_player_id(state)
-    request = _battle_shock_request_for_unit(
+    request = battle_shock_request_for_unit(
         state,
-        _unit_by_id(state, TYRANIDS_GAUNTS_UNIT_ID),
+        unit_by_id(state, TYRANIDS_GAUNTS_UNIT_ID),
     )
     return BattleShockModifierContext(
         state=state,

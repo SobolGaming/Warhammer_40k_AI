@@ -5,12 +5,12 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.unit.test_phase11c_command_phase import (
-    _battle_state,  # pyright: ignore[reportPrivateUsage]
-    _center_marker_definition,  # pyright: ignore[reportPrivateUsage]
-    _remove_first_models,  # pyright: ignore[reportPrivateUsage]
-    _unit_by_id,  # pyright: ignore[reportPrivateUsage]
-    _with_model_offsets,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    battle_state,
+    center_marker_definition,
+    remove_first_models,
+    unit_by_id,
+    with_model_offsets,
 )
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -69,7 +69,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
 
 
 def test_harbingers_selection_records_persistent_dread_state() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_chaos_knights(state, player_id="player-a")
     decisions = DecisionController()
     registry = _battle_round_start_hooks()
@@ -113,7 +113,7 @@ def test_harbingers_selection_records_persistent_dread_state() -> None:
 
 
 def test_harbingers_roll_selection_records_engine_owned_dice() -> None:
-    state = _battle_state()
+    state = battle_state()
     state.game_id = "phase17g-chaos-knights-roll-selection"
     _mark_player_as_chaos_knights(state, player_id="player-a")
     decisions = DecisionController()
@@ -149,7 +149,7 @@ def test_harbingers_roll_selection_records_engine_owned_dice() -> None:
 
 
 def test_harbingers_rejects_stale_selection_after_active_dread_drift() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_chaos_knights(state, player_id="player-a")
     decisions = DecisionController()
     registry = _battle_round_start_hooks()
@@ -182,7 +182,7 @@ def test_harbingers_rejects_stale_selection_after_active_dread_drift() -> None:
 
 
 def test_harbingers_selection_request_suppresses_unavailable_states() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_chaos_knights(state, player_id="player-a")
     decisions = DecisionController()
     registry = _battle_round_start_hooks()
@@ -204,7 +204,7 @@ def test_harbingers_selection_request_suppresses_unavailable_states() -> None:
         is None
     )
 
-    exhausted_state = _battle_state()
+    exhausted_state = battle_state()
     exhausted_state.battle_round = 5
     _mark_player_as_chaos_knights(exhausted_state, player_id="player-a")
     _record_harbingers_selection(
@@ -220,7 +220,7 @@ def test_harbingers_selection_request_suppresses_unavailable_states() -> None:
         is None
     )
 
-    no_harbingers_units_state = _battle_state()
+    no_harbingers_units_state = battle_state()
     _mark_player_faction_only_as_chaos_knights(
         no_harbingers_units_state,
         player_id="player-a",
@@ -234,7 +234,7 @@ def test_harbingers_selection_request_suppresses_unavailable_states() -> None:
 
 
 def test_harbingers_selection_result_rejects_invalid_contexts_and_payloads() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_chaos_knights(state, player_id="player-a")
     decisions = DecisionController()
     registry = _battle_round_start_hooks()
@@ -518,7 +518,7 @@ def test_harbingers_public_handlers_fail_fast_for_invalid_inputs() -> None:
 
 
 def test_harbingers_rejects_invalid_persisted_dread_states() -> None:
-    deathly_state = _battle_state()
+    deathly_state = battle_state()
     _mark_player_as_chaos_knights(deathly_state, player_id="player-a")
     _record_harbingers_selection(
         deathly_state,
@@ -528,7 +528,7 @@ def test_harbingers_rejects_invalid_persisted_dread_states() -> None:
     with pytest.raises(GameLifecycleError, match="Deathly Terror must not be selected"):
         army_rule.active_dread_abilities_for_player(deathly_state, player_id="player-a")
 
-    duplicate_ability_state = _battle_state()
+    duplicate_ability_state = battle_state()
     _mark_player_as_chaos_knights(duplicate_ability_state, player_id="player-a")
     _record_harbingers_selection(
         duplicate_ability_state,
@@ -548,7 +548,7 @@ def test_harbingers_rejects_invalid_persisted_dread_states() -> None:
             player_id="player-a",
         )
 
-    duplicate_round_state = _battle_state()
+    duplicate_round_state = battle_state()
     _mark_player_as_chaos_knights(duplicate_round_state, player_id="player-a")
     _record_harbingers_selection(
         duplicate_round_state,
@@ -593,7 +593,7 @@ def test_harbingers_rejects_invalid_persisted_dread_states() -> None:
 
 
 def test_dismay_forces_below_starting_enemy_battle_shock_test() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_chaos_knights(state, player_id="player-a")
     _record_harbingers_selection(
         state,
@@ -603,7 +603,7 @@ def test_dismay_forces_below_starting_enemy_battle_shock_test() -> None:
     state.active_player_id = "player-b"
     state.command_step_state = None
     target_unit_id = "army-beta:intercessor-unit-3"
-    _remove_first_models(state, unit_instance_id=target_unit_id, count=1)
+    remove_first_models(state, unit_instance_id=target_unit_id, count=1)
     _place_units_near_center(
         state,
         source_unit_id="army-alpha:intercessor-unit-1",
@@ -625,7 +625,7 @@ def test_dismay_forces_below_starting_enemy_battle_shock_test() -> None:
 
 
 def test_delirium_applies_mortal_wounds_after_failed_battle_shock() -> None:
-    state = _battle_state()
+    state = battle_state()
     state.game_id = "phase17g-chaos-knights-delirium"
     _mark_player_as_chaos_knights(state, player_id="player-a")
     _record_harbingers_selection(
@@ -636,7 +636,7 @@ def test_delirium_applies_mortal_wounds_after_failed_battle_shock() -> None:
     state.active_player_id = "player-b"
     state.command_step_state = None
     target_unit_id = "army-beta:intercessor-unit-3"
-    _remove_first_models(state, unit_instance_id=target_unit_id, count=3)
+    remove_first_models(state, unit_instance_id=target_unit_id, count=3)
     _replace_unit_leadership(state, unit_instance_id=target_unit_id, leadership=13)
     _place_units_near_center(
         state,
@@ -644,7 +644,7 @@ def test_delirium_applies_mortal_wounds_after_failed_battle_shock() -> None:
         target_unit_id=target_unit_id,
     )
     starting_wounds = sum(
-        model.wounds_remaining for model in _unit_by_id(state, target_unit_id).own_models
+        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
     )
     decisions = DecisionController()
     handler = CommandPhaseHandler(
@@ -660,13 +660,13 @@ def test_delirium_applies_mortal_wounds_after_failed_battle_shock() -> None:
     application = cast(dict[str, JsonValue], delirium_payload["mortal_wound_application"])
     assert application["mortal_wounds"] in (1, 2, 3)
     final_wounds = sum(
-        model.wounds_remaining for model in _unit_by_id(state, target_unit_id).own_models
+        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
     )
     assert final_wounds < starting_wounds
 
 
 def test_delirium_reports_unsupported_when_mortal_wound_fnp_requires_choice() -> None:
-    state = _battle_state()
+    state = battle_state()
     state.game_id = "phase17g-chaos-knights-delirium-fnp"
     _mark_player_as_chaos_knights(state, player_id="player-a")
     _record_harbingers_selection(
@@ -677,14 +677,14 @@ def test_delirium_reports_unsupported_when_mortal_wound_fnp_requires_choice() ->
     state.active_player_id = "player-b"
     state.command_step_state = None
     target_unit_id = "army-beta:intercessor-unit-3"
-    _remove_first_models(state, unit_instance_id=target_unit_id, count=3)
+    remove_first_models(state, unit_instance_id=target_unit_id, count=3)
     _replace_unit_leadership(state, unit_instance_id=target_unit_id, leadership=13)
     _place_units_near_center(
         state,
         source_unit_id="army-alpha:intercessor-unit-1",
         target_unit_id=target_unit_id,
     )
-    target_unit = _unit_by_id(state, target_unit_id)
+    target_unit = unit_by_id(state, target_unit_id)
     fnp_model = next(model for model in target_unit.own_models if model.is_alive)
     state.record_model_feel_no_pain_sources(
         model_instance_id=fnp_model.model_instance_id,
@@ -706,13 +706,13 @@ def test_delirium_reports_unsupported_when_mortal_wound_fnp_requires_choice() ->
         unsupported_payload["unsupported_reason"] == "mortal_wound_feel_no_pain_requires_decision"
     )
     final_wounds = sum(
-        model.wounds_remaining for model in _unit_by_id(state, target_unit_id).own_models
+        model.wounds_remaining for model in unit_by_id(state, target_unit_id).own_models
     )
     assert final_wounds == starting_wounds
 
 
 def test_deathly_terror_and_despair_worsen_enemy_leadership_in_aura() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_chaos_knights(state, player_id="player-a")
     _record_harbingers_selection(
         state,
@@ -741,7 +741,7 @@ def test_deathly_terror_and_despair_worsen_enemy_leadership_in_aura() -> None:
 
 
 def test_doom_and_darkness_runtime_modifiers_apply_to_enemy_attacks() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_chaos_knights(state, player_id="player-a")
     _record_harbingers_selection(
         state,
@@ -784,7 +784,7 @@ def test_doom_and_darkness_runtime_modifiers_apply_to_enemy_attacks() -> None:
 
 
 def test_harbingers_modifiers_return_neutral_outside_required_contexts() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_chaos_knights(state, player_id="player-a")
     _record_harbingers_selection(
         state,
@@ -896,7 +896,7 @@ def _harbingers_selection_request_for_test() -> tuple[
     DecisionController,
     DecisionRequest,
 ]:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_chaos_knights(state, player_id="player-a")
     decisions = DecisionController()
     request = _battle_round_start_hooks().next_request_for(
@@ -1001,14 +1001,14 @@ def _place_units_near_center(
 ) -> None:
     if state.battlefield_state is None:
         raise AssertionError("test state requires battlefield_state")
-    marker = _center_marker_definition(state)
+    marker = center_marker_definition(state)
     source = state.battlefield_state.unit_placement_by_id(source_unit_id)
     target = state.battlefield_state.unit_placement_by_id(target_unit_id)
     battlefield_state = state.battlefield_state.with_unit_placement(
-        _with_model_offsets(source, marker, offsets=((0.0, 0.0),))
+        with_model_offsets(source, marker, offsets=((0.0, 0.0),))
     )
     battlefield_state = battlefield_state.with_unit_placement(
-        _with_model_offsets(target, marker, offsets=((1.0, 0.0),))
+        with_model_offsets(target, marker, offsets=((1.0, 0.0),))
     )
     state.battlefield_state = battlefield_state
 
