@@ -37,6 +37,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_generic_ir_support_2026_27,
     faction_stratagem_activation_2026_27,
     faction_subrules_2026_27,
 )
@@ -47,12 +48,16 @@ def test_ws14_stratagem_activation_profiles_cover_source_only_detachment_rows() 
         row for row in faction_subrules_2026_27.stratagem_rows() if not row.runtime_consumer_ids
     )
     profiles = faction_stratagem_activation_2026_27.stratagem_activation_profiles()
+    source_only_row_ids = {row.source_row_id for row in source_only_rows}
+    profile_source_row_ids = {profile.source_row_id for profile in profiles}
+    cavalcade_generic_row_ids = set(
+        faction_generic_ir_support_2026_27.supported_cavalcade_of_chaos_stratagem_source_row_ids()
+    )
 
-    assert len(source_only_rows) == 1080
+    assert len(source_only_rows) == 1083
     assert len(profiles) == 1080
-    assert {profile.source_row_id for profile in profiles} == {
-        row.source_row_id for row in source_only_rows
-    }
+    assert cavalcade_generic_row_ids <= source_only_row_ids
+    assert profile_source_row_ids == source_only_row_ids - cavalcade_generic_row_ids
 
     for profile in profiles:
         rule_ir = RuleIR.from_payload(cast(RuleIRPayload, profile.rule_ir_payload()))

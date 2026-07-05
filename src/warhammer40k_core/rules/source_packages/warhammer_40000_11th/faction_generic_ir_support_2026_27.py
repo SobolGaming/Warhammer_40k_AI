@@ -1,13 +1,21 @@
 from __future__ import annotations
 
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR
+from warhammer40k_core.rules.rule_ir import (
+    RuleDurationKind,
+    RuleEffectKind,
+    RuleEffectSpec,
+    RuleIR,
+    parameter_payload,
+)
 from warhammer40k_core.rules.rule_templates import (
     CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
+    DESPERATE_ESCAPE_TEMPLATE_ID,
     DICE_ROLL_MODIFIER_TEMPLATE_ID,
     GRANT_ABILITY_TEMPLATE_ID,
     KEYWORD_GATE_TEMPLATE_ID,
     MOVEMENT_DISTANCE_TEMPLATE_ID,
+    PLACEMENT_TEMPLATE_ID,
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -28,6 +36,26 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 
 SOURCE_PACKAGE_ID = static_payloads.SOURCE_PACKAGE_ID
+CAVALCADE_OF_CHAOS_DETACHMENT_RULE_DESCRIPTOR_ID = "phase17e:chaos-daemons:cavalcade-of-chaos:rule"
+CAVALCADE_OF_CHAOS_APOCALYPTIC_STEEDS_SOURCE_ROW_ID = (
+    "enhancement:chaos-daemons:cavalcade-of-chaos:"
+    "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade"
+)
+CAVALCADE_OF_CHAOS_SOUL_SHATTERING_CHARGE_SOURCE_ROW_ID = (
+    "enhancement:chaos-daemons:cavalcade-of-chaos:"
+    "chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade"
+)
+CAVALCADE_OF_CHAOS_FROM_BEYOND_THE_VEIL_SOURCE_ROW_ID = (
+    "stratagem:chaos-daemons:cavalcade-of-chaos:"
+    "chaos-daemons:cavalcade-of-chaos:from-beyond-the-veil"
+)
+CAVALCADE_OF_CHAOS_INESCAPABLE_MANIFESTATIONS_SOURCE_ROW_ID = (
+    "stratagem:chaos-daemons:cavalcade-of-chaos:"
+    "chaos-daemons:cavalcade-of-chaos:inescapable-manifestations"
+)
+CAVALCADE_OF_CHAOS_WARP_RIDERS_SOURCE_ROW_ID = (
+    "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:warp-riders"
+)
 _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         "enhancement:chaos-space-marines:renegade-warband:000010694003",
@@ -41,6 +69,7 @@ _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 _SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        CAVALCADE_OF_CHAOS_SOUL_SHATTERING_CHARGE_SOURCE_ROW_ID,
         "enhancement:emperors-children:court-of-the-phoenician:000010654002",
         "enhancement:emperors-children:court-of-the-phoenician:000010654004",
         "enhancement:emperors-children:spectacle-of-slaughter:000010900002",
@@ -56,8 +85,16 @@ _SUPPORTED_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 _SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        CAVALCADE_OF_CHAOS_APOCALYPTIC_STEEDS_SOURCE_ROW_ID,
         "enhancement:emperors-children:court-of-the-phoenician:000010654005",
         "enhancement:necrons:cryptek-conclave:000010664004",
+    }
+)
+_SUPPORTED_CAVALCADE_OF_CHAOS_STRATAGEM_SOURCE_ROW_IDS = frozenset(
+    {
+        CAVALCADE_OF_CHAOS_FROM_BEYOND_THE_VEIL_SOURCE_ROW_ID,
+        CAVALCADE_OF_CHAOS_INESCAPABLE_MANIFESTATIONS_SOURCE_ROW_ID,
+        CAVALCADE_OF_CHAOS_WARP_RIDERS_SOURCE_ROW_ID,
     }
 )
 _SUPPORTED_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
@@ -147,6 +184,10 @@ def generic_supported_detachment_rule_ir_hash(
     if type(detachment_row) is not faction_detachments_2026_27.SourceDetachmentRow:
         raise Phase17FGenericIrSupportError("Generic detachment support requires source row.")
     descriptor_id = f"phase17e:{detachment_row.faction_id}:{detachment_row.detachment_id}:rule"
+    if descriptor_id == CAVALCADE_OF_CHAOS_DETACHMENT_RULE_DESCRIPTOR_ID:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_cavalcade_of_chaos_detachment_rule_ir(rule_ir)
+        return rule_ir.ir_hash()
     rule_ir_hash = more_dakka_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         return rule_ir_hash
@@ -162,6 +203,10 @@ def generic_supported_stratagem_rule_ir_hash(
     if type(source_row) is not faction_subrules_2026_27.SourceStratagemRow:
         raise Phase17FGenericIrSupportError("Generic Stratagem support requires source row.")
     descriptor_id = f"phase17e:{source_row.source_row_id}"
+    if source_row.source_row_id in _SUPPORTED_CAVALCADE_OF_CHAOS_STRATAGEM_SOURCE_ROW_IDS:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_cavalcade_of_chaos_stratagem_rule_ir(rule_ir=rule_ir, source_row=source_row)
+        return rule_ir.ir_hash()
     rule_ir_hash = more_dakka_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         return rule_ir_hash
@@ -211,6 +256,10 @@ def supported_movement_distance_enhancement_source_row_ids() -> tuple[str, ...]:
 
 def supported_court_of_the_phoenician_mixed_enhancement_source_row_ids() -> tuple[str, ...]:
     return tuple(sorted(_SUPPORTED_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS))
+
+
+def supported_cavalcade_of_chaos_stratagem_source_row_ids() -> tuple[str, ...]:
+    return tuple(sorted(_SUPPORTED_CAVALCADE_OF_CHAOS_STRATAGEM_SOURCE_ROW_IDS))
 
 
 def supported_generic_enhancement_source_row_ids() -> tuple[str, ...]:
@@ -377,6 +426,123 @@ def _validate_supported_court_of_the_phoenician_mixed_enhancement_ir(
         raise Phase17FGenericIrSupportError(
             "Court of the Phoenician mixed enhancement has unexpected effect counts."
         )
+
+
+def _validate_cavalcade_of_chaos_detachment_rule_ir(rule_ir: RuleIR) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Cavalcade of Chaos detachment requires RuleIR.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Cavalcade of Chaos detachment RuleIR must deserialize as supported."
+        )
+    expected_source_id = (
+        f"{SOURCE_PACKAGE_ID}:phase17e:chaos-daemons:cavalcade-of-chaos:rule:source-text"
+    )
+    if rule_ir.source_id != expected_source_id:
+        raise Phase17FGenericIrSupportError(
+            "Cavalcade of Chaos detachment RuleIR produced an unexpected source ID."
+        )
+    template_ids = frozenset(
+        clause.template_id for clause in rule_ir.clauses if clause.template_id is not None
+    )
+    if template_ids != frozenset({GRANT_ABILITY_TEMPLATE_ID}):
+        raise Phase17FGenericIrSupportError(
+            "Cavalcade of Chaos detachment RuleIR uses an unregistered template family."
+        )
+    granted_abilities = frozenset(
+        _ability_parameter(effect)
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.GRANT_ABILITY
+    )
+    if granted_abilities != frozenset({"can_fall_back_and_shoot", "can_fall_back_and_charge"}):
+        raise Phase17FGenericIrSupportError(
+            "Cavalcade of Chaos detachment RuleIR has unexpected granted abilities."
+        )
+
+
+def _validate_cavalcade_of_chaos_stratagem_rule_ir(
+    *,
+    rule_ir: RuleIR,
+    source_row: faction_subrules_2026_27.SourceStratagemRow,
+) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Cavalcade Stratagem support requires RuleIR.")
+    if type(source_row) is not faction_subrules_2026_27.SourceStratagemRow:
+        raise Phase17FGenericIrSupportError("Cavalcade Stratagem support requires source row.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Cavalcade Stratagem RuleIR must deserialize as supported."
+        )
+    expected_source_id = f"{SOURCE_PACKAGE_ID}:phase17e:{source_row.source_row_id}:source-text"
+    if rule_ir.source_id != expected_source_id:
+        raise Phase17FGenericIrSupportError(
+            "Cavalcade Stratagem support row produced an unexpected source ID."
+        )
+    if source_row.source_row_id == CAVALCADE_OF_CHAOS_FROM_BEYOND_THE_VEIL_SOURCE_ROW_ID:
+        _validate_single_effect_family(
+            rule_ir=rule_ir,
+            expected_template_id=PLACEMENT_TEMPLATE_ID,
+            expected_effect_kind=RuleEffectKind.PLACEMENT_PERMISSION,
+            row_name="Cavalcade From Beyond the Veil",
+        )
+    elif source_row.source_row_id == CAVALCADE_OF_CHAOS_INESCAPABLE_MANIFESTATIONS_SOURCE_ROW_ID:
+        _validate_single_effect_family(
+            rule_ir=rule_ir,
+            expected_template_id=DESPERATE_ESCAPE_TEMPLATE_ID,
+            expected_effect_kind=RuleEffectKind.FORCE_DESPERATE_ESCAPE_TESTS,
+            row_name="Cavalcade Inescapable Manifestations",
+        )
+    elif source_row.source_row_id == CAVALCADE_OF_CHAOS_WARP_RIDERS_SOURCE_ROW_ID:
+        _validate_single_effect_family(
+            rule_ir=rule_ir,
+            expected_template_id=GRANT_ABILITY_TEMPLATE_ID,
+            expected_effect_kind=RuleEffectKind.GRANT_ABILITY,
+            row_name="Cavalcade Warp-Riders",
+        )
+        clause = rule_ir.clauses[0]
+        if (
+            clause.duration is None
+            or clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT
+        ):
+            raise Phase17FGenericIrSupportError(
+                "Cavalcade Warp-Riders RuleIR must carry a timing endpoint duration."
+            )
+        duration_parameters = parameter_payload(clause.duration.parameters)
+        if duration_parameters.get("endpoint") != "phase":
+            raise Phase17FGenericIrSupportError(
+                "Cavalcade Warp-Riders RuleIR must expire at the end of the phase."
+            )
+    else:
+        raise Phase17FGenericIrSupportError("Cavalcade Stratagem support row is not registered.")
+
+
+def _validate_single_effect_family(
+    *,
+    rule_ir: RuleIR,
+    expected_template_id: str,
+    expected_effect_kind: RuleEffectKind,
+    row_name: str,
+) -> None:
+    if len(rule_ir.clauses) != 1:
+        raise Phase17FGenericIrSupportError(f"{row_name} RuleIR must contain one clause.")
+    clause = rule_ir.clauses[0]
+    if clause.template_id != expected_template_id:
+        raise Phase17FGenericIrSupportError(f"{row_name} RuleIR has an unexpected template.")
+    if clause.unsupported_reason is not None or clause.diagnostics:
+        raise Phase17FGenericIrSupportError(f"{row_name} RuleIR includes diagnostics.")
+    if len(clause.effects) != 1 or clause.effects[0].kind is not expected_effect_kind:
+        raise Phase17FGenericIrSupportError(f"{row_name} RuleIR has an unexpected effect.")
+
+
+def _ability_parameter(effect: RuleEffectSpec) -> str:
+    if type(effect) is not RuleEffectSpec:
+        raise Phase17FGenericIrSupportError("Generic grant ability validation requires effect.")
+    parameters = parameter_payload(effect.parameters)
+    ability = parameters.get("ability")
+    if type(ability) is not str:
+        raise Phase17FGenericIrSupportError("Generic grant ability effect requires ability.")
+    return ability
 
 
 def _supported_enhancement_source_row_ids() -> frozenset[str]:

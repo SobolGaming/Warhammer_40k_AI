@@ -18,6 +18,7 @@ from warhammer40k_core.engine.stratagems_ingress import *
 if TYPE_CHECKING:
     from warhammer40k_core.engine.faction_content.stratagem_handlers import StratagemHandlerRegistry
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.rule_execution import RuleExecutionResult
     from warhammer40k_core.engine.stratagems_model import STRATAGEM_DECISION_TYPE, STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE, STRATAGEM_PROPOSAL_PAYLOAD_KIND, DECLINE_STRATAGEM_WINDOW_OPTION_ID, DECLINE_STRATAGEM_WINDOW_PAYLOAD_KIND, STRATAGEM_WINDOW_DECLINED_EVENT_TYPE, UNSUPPORTED_STRATAGEM_HANDLER_PREFIX, CORE_COMMAND_REROLL_HANDLER_ID, CORE_INSANE_BRAVERY_HANDLER_ID, CORE_RAPID_INGRESS_HANDLER_ID, CORE_NEW_ORDERS_HANDLER_ID, CORE_FIRE_OVERWATCH_HANDLER_ID, CORE_GO_TO_GROUND_HANDLER_ID, CORE_EXPLOSIVES_HANDLER_ID, CORE_SMOKESCREEN_HANDLER_ID, CORE_HEROIC_INTERVENTION_HANDLER_ID, CORE_COUNTEROFFENSIVE_HANDLER_ID, CORE_CRUSHING_IMPACT_HANDLER_ID, CORE_EPIC_CHALLENGE_HANDLER_ID, GENERIC_INGRESS_MOVE_HANDLER_ID, GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID, GENERIC_RULE_IR_STRATAGEM_HANDLER_ID, COMMAND_REROLL_DICE_CONTEXT_KEY, COMMAND_REROLL_AFFECTED_UNIT_CONTEXT_KEY, INSANE_BRAVERY_TARGET_POLICY_ID, RAPID_INGRESS_TARGET_POLICY_ID, STRATEGIC_RESERVES_INGRESS_TARGET_POLICY_ID, NEW_ORDERS_TARGET_POLICY_ID, FIRE_OVERWATCH_TARGET_POLICY_ID, GO_TO_GROUND_TARGET_POLICY_ID, SELECTED_TARGET_CONTROLLED_OBJECTIVE_INFANTRY_TARGET_POLICY_ID, EXPLOSIVES_TARGET_POLICY_ID, SMOKESCREEN_TARGET_POLICY_ID, HEROIC_INTERVENTION_TARGET_POLICY_ID, COUNTEROFFENSIVE_TARGET_POLICY_ID, CRUSHING_IMPACT_TARGET_POLICY_ID, EPIC_CHALLENGE_TARGET_POLICY_ID, SELECTED_TO_MOVE_TARGET_POLICY_ID, JUST_FELL_BACK_UNIT_TARGET_POLICY_ID, JUST_SHOT_UNIT_TARGET_POLICY_ID, ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID, EXPLOSIVES_TARGET_CONTEXT_KEY, CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY, CRUSHING_IMPACT_MODEL_CONTEXT_KEY, EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY, HEROIC_INTERVENTION_MODE_CONTEXT_KEY, HEROIC_INTERVENTION_MODE_LEAP_TO_DEFEND, HEROIC_INTERVENTION_MODE_INTO_THE_FRAY, SELECTED_TARGET_UNIT_CONTEXT_KEY, SELECTED_TO_MOVE_UNIT_CONTEXT_KEY, JUST_FELL_BACK_UNIT_CONTEXT_KEY, JUST_SHOT_UNIT_CONTEXT_KEY, HIT_TARGET_UNIT_CONTEXT_KEY, DESTROYED_TARGET_UNIT_CONTEXT_KEY, DESTROYED_ENEMY_UNIT_CONTEXT_KEY, HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND, HIT_ENEMY_UNIT_CONTEXT_KEY, ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND, ENGAGED_ENEMY_UNIT_CONTEXT_KEY, ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY, FALL_BACK_UNIT_CONTEXT_KEY, FALL_BACK_MODE_CONTEXT_KEY, FORCED_FALL_BACK_DESPERATE_ESCAPE_EFFECT_KIND, FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY, FIRE_OVERWATCH_MAX_RANGE_INCHES, HEROIC_INTERVENTION_TARGET_RANGE_INCHES, HEROIC_INTERVENTION_INTO_THE_FRAY_TARGET_RANGE_INCHES, CRUSHING_IMPACT_MAX_MORTAL_WOUNDS_PER_UNIT, StratagemAvailabilityKind, StratagemCategory, StratagemTargetKind, StratagemUseRecordPayload, StratagemTimingDescriptorPayload, StratagemRestrictionPolicyPayload, StratagemTargetSpecPayload, StratagemDefinitionPayload, StratagemCatalogRecordPayload, StratagemEligibilityContextPayload, StratagemTargetBindingPayload, StratagemTargetProposalPayload, StratagemTimingDescriptor, StratagemRestrictionPolicy, StratagemTargetSpec, StratagemDefinition, StratagemCatalogRecord, StratagemCatalogIndex, StratagemEligibilityContext, StratagemTargetBinding, StratagemTargetProposal, StratagemUseRequest, StratagemUseRecord
     from warhammer40k_core.engine.stratagems_requests import request_stratagem_use, request_stratagem_use_from_index, _request_stratagem_use_with_options, create_stratagem_use_decision_request, stratagem_decline_option, stratagem_decline_payload, is_stratagem_window_decline_result, stratagem_window_decline_allowed, stratagem_window_context_from_request, stratagem_window_decline_event_payload, stratagem_window_declined_for_context, stratagem_use_options, stratagem_use_options_from_index, stratagem_use_options_for_handler_from_index, hit_enemy_unit_effect_selection, engaged_enemy_unit_effect_selection, _stratagem_use_options_for_records, _effect_selections_for_binding, request_stratagem_target_proposal, create_stratagem_target_proposal_decision_request, stratagem_target_proposal_request_payload, stratagem_target_proposal_from_index
     from warhammer40k_core.engine.stratagems_apply import invalid_stratagem_use_status, apply_stratagem_decision, _apply_stratagem_use, invalid_stratagem_target_proposal_status, apply_stratagem_target_proposal, is_stratagem_placement_proposal_request, invalid_stratagem_placement_proposal_status, apply_stratagem_placement_proposal, is_heroic_intervention_charge_move_request, invalid_heroic_intervention_charge_move_status, apply_heroic_intervention_charge_move, _request_heroic_intervention_charge_move_retry
@@ -371,7 +372,7 @@ def _apply_generic_rule_ir_stratagem_handler(
     )
 
     rule_ir = rule_ir_from_execution_payload(definition.effect_payload)
-    result = execute_rule_ir(
+    rule_result = execute_rule_ir(
         rule_ir=rule_ir,
         context=RuleExecutionContext(
             game_id=context.game_id,
@@ -392,11 +393,11 @@ def _apply_generic_rule_ir_stratagem_handler(
             event_log=decisions.event_log,
         ),
     )
-    if result.status is not RuleExecutionStatus.APPLIED:
-        if result.reason is None:
+    if rule_result.status is not RuleExecutionStatus.APPLIED:
+        if rule_result.reason is None:
             raise GameLifecycleError("Generic Stratagem rule execution failed without reason.")
-        raise GameLifecycleError(f"Generic Stratagem rule execution failed: {result.reason}.")
-    if _rule_execution_result_grants_out_of_phase_shoot(result.effect_payloads):
+        raise GameLifecycleError(f"Generic Stratagem rule execution failed: {rule_result.reason}.")
+    if _rule_execution_result_grants_out_of_phase_shoot(rule_result.effect_payloads):
         _request_generic_out_of_phase_shooting(
             state=state,
             decisions=decisions,
@@ -407,13 +408,31 @@ def _apply_generic_rule_ir_stratagem_handler(
             army_catalog=army_catalog,
             shooting_unit_selected_grant_hooks=shooting_unit_selected_grant_hooks,
         )
-    if _rule_execution_result_grants_triggered_normal_move(result.effect_payloads):
+    if _rule_execution_result_grants_triggered_normal_move(rule_result.effect_payloads):
         _request_generic_triggered_normal_move(
             state=state,
             decisions=decisions,
             context=context,
             definition=definition,
             use_record=use_record,
+        )
+    if _rule_execution_result_grants_strategic_reserves_placement(rule_result.effect_payloads):
+        _request_generic_rule_ir_strategic_reserves_placement(
+            state=state,
+            decisions=decisions,
+            context=context,
+            target_binding=target_binding,
+            use_record=use_record,
+            rule_result=rule_result,
+        )
+    if _rule_execution_result_forces_desperate_escape(rule_result.effect_payloads):
+        _record_generic_rule_ir_force_desperate_escape(
+            state=state,
+            decisions=decisions,
+            context=context,
+            target_binding=target_binding,
+            use_record=use_record,
+            rule_result=rule_result,
         )
 
 
@@ -471,6 +490,25 @@ def _rule_execution_result_grants_triggered_normal_move(
     )
 
 
+def _rule_execution_result_grants_strategic_reserves_placement(
+    effect_payloads: tuple[dict[str, JsonValue], ...],
+) -> bool:
+    return any(
+        _rule_effect_payload_kind(effect_payload) == "placement_permission"
+        and _rule_effect_parameter(effect_payload, "placement_kind") == "strategic_reserves"
+        for effect_payload in effect_payloads
+    )
+
+
+def _rule_execution_result_forces_desperate_escape(
+    effect_payloads: tuple[dict[str, JsonValue], ...],
+) -> bool:
+    return any(
+        _rule_effect_payload_kind(effect_payload) == "force_desperate_escape_tests"
+        for effect_payload in effect_payloads
+    )
+
+
 def _rule_execution_result_grants_ability(
     *,
     effect_payloads: tuple[dict[str, JsonValue], ...],
@@ -495,6 +533,193 @@ def _rule_execution_result_grants_ability(
             if parameter.get("key") == "ability" and parameter.get("value") == requested_ability:
                 granted = True
     return granted
+
+
+def _request_generic_rule_ir_strategic_reserves_placement(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+    rule_result: RuleExecutionResult,
+) -> None:
+    reserve_state = _reserve_state_for_target(state=state, target_binding=target_binding)
+    if reserve_state.reserve_kind is not ReserveKind.STRATEGIC_RESERVES:
+        raise GameLifecycleError("Generic RuleIR placement requires a Strategic Reserves target.")
+    effect_payload = _single_rule_effect_payload(
+        rule_result.effect_payloads,
+        effect_kind="placement_permission",
+    )
+    if _rule_effect_parameter(effect_payload, "from_start_of_battle") is not True:
+        raise GameLifecycleError("Generic RuleIR placement must allow start-of-battle use.")
+    if _rule_effect_parameter(effect_payload, "placement_scope") != "strategic_reserves_only":
+        raise GameLifecycleError("Generic RuleIR placement must be Strategic Reserves only.")
+    proposal_request = MovementProposalRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+        actor_id=context.player_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT.value,
+        unit_instance_id=reserve_state.unit_instance_id,
+        proposal_kind=ProposalKind.STRATEGIC_RESERVES,
+        source_decision_request_id=use_record.request_id,
+        source_decision_result_id=use_record.result_id,
+        placement_kinds=(BattlefieldPlacementKind.STRATEGIC_RESERVES,),
+        context=cast(
+            dict[str, JsonValue],
+            validate_json_value(
+                {
+                    "stratagem_handler_id": GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
+                    "stratagem_use": validate_json_value(use_record.to_payload()),
+                    "reserve_state": validate_json_value(reserve_state.to_payload()),
+                    "from_start_of_battle": True,
+                    "mark_movement_phase_reinforcement_arrival": (
+                        context.active_player_id == context.player_id
+                    ),
+                    "placement_scope": "strategic_reserves_only",
+                    "generic_rule_execution_result": validate_json_value(rule_result.to_payload()),
+                    "generic_rule_effect": validate_json_value(effect_payload),
+                }
+            ),
+        ),
+    )
+    request = proposal_request.to_decision_request()
+    decisions.request_decision(request)
+    decisions.event_log.append(
+        "placement_proposal_requested",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "player_id": context.player_id,
+            "phase": BattlePhase.MOVEMENT.value,
+            "unit_instance_id": reserve_state.unit_instance_id,
+            "proposal_kind": ProposalKind.STRATEGIC_RESERVES.value,
+            "placement_kinds": [BattlefieldPlacementKind.STRATEGIC_RESERVES.value],
+            "request_id": request.request_id,
+            "source_decision_request_id": use_record.request_id,
+            "source_decision_result_id": use_record.result_id,
+            "stratagem_use_id": use_record.use_id,
+            "phase_body_status": "generic_rule_ir_placement_proposal_required",
+        },
+    )
+
+
+def _record_generic_rule_ir_force_desperate_escape(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding,
+    use_record: StratagemUseRecord,
+    rule_result: RuleExecutionResult,
+) -> None:
+    target_unit_id = _require_target_unit_id(target_binding)
+    fall_back_unit_id = _fall_back_unit_id_or_none(context)
+    if fall_back_unit_id is None:
+        raise GameLifecycleError("Generic RuleIR force Desperate Escape requires context.")
+    effect_payload = _single_rule_effect_payload(
+        rule_result.effect_payloads,
+        effect_kind="force_desperate_escape_tests",
+    )
+    required_mode = _rule_effect_parameter(effect_payload, "required_fall_back_mode")
+    if required_mode is None:
+        required_mode = "desperate_escape"
+    if required_mode != "desperate_escape":
+        raise GameLifecycleError("Generic RuleIR force Desperate Escape has unsupported mode.")
+    source_rule_id = _rule_effect_source_id(effect_payload)
+    effect = PersistingEffect(
+        effect_id=f"{use_record.use_id}:force-desperate-escape:{fall_back_unit_id}",
+        source_rule_id=source_rule_id,
+        owner_player_id=use_record.player_id,
+        target_unit_instance_ids=(fall_back_unit_id,),
+        started_battle_round=use_record.battle_round,
+        started_phase=BattlePhase.MOVEMENT,
+        expiration=EffectExpiration.end_phase(
+            battle_round=use_record.battle_round,
+            phase=BattlePhase.MOVEMENT,
+            player_id=context.active_player_id or use_record.player_id,
+        ),
+        effect_payload={
+            "effect_kind": FORCED_FALL_BACK_DESPERATE_ESCAPE_EFFECT_KIND,
+            "stratagem_use_id": use_record.use_id,
+            "source_rule_id": source_rule_id,
+            "source_stratagem_id": use_record.stratagem_id,
+            "forcing_unit_instance_id": target_unit_id,
+            "fall_back_unit_instance_id": fall_back_unit_id,
+            "required_fall_back_mode": "desperate_escape",
+            "generic_rule_execution_result": validate_json_value(rule_result.to_payload()),
+            "generic_rule_effect": validate_json_value(effect_payload),
+        },
+    )
+    state.record_persisting_effect(effect)
+    decisions.event_log.append(
+        "forced_fall_back_desperate_escape_registered",
+        {
+            "game_id": state.game_id,
+            "player_id": use_record.player_id,
+            "battle_round": use_record.battle_round,
+            "phase": BattlePhase.MOVEMENT.value,
+            "active_player_id": context.active_player_id,
+            "stratagem_use": use_record.to_payload(),
+            "forcing_unit_instance_id": target_unit_id,
+            "fall_back_unit_instance_id": fall_back_unit_id,
+            "persisting_effect": effect.to_payload(),
+        },
+    )
+
+
+def _single_rule_effect_payload(
+    effect_payloads: tuple[dict[str, JsonValue], ...],
+    *,
+    effect_kind: str,
+) -> dict[str, JsonValue]:
+    matching = tuple(
+        effect_payload
+        for effect_payload in effect_payloads
+        if _rule_effect_payload_kind(effect_payload) == effect_kind
+    )
+    if len(matching) != 1:
+        raise GameLifecycleError("Generic RuleIR Stratagem must produce exactly one effect.")
+    return matching[0]
+
+
+def _rule_effect_payload_kind(effect_payload: dict[str, JsonValue]) -> str | None:
+    effect = effect_payload.get("effect")
+    if not isinstance(effect, dict):
+        raise GameLifecycleError("Generic Stratagem effect payload requires effect object.")
+    value = effect.get("kind")
+    if value is None:
+        return None
+    if type(value) is not str:
+        raise GameLifecycleError("Generic Stratagem effect kind must be a string.")
+    return value
+
+
+def _rule_effect_parameter(effect_payload: dict[str, JsonValue], key: str) -> JsonValue:
+    requested_key = _validate_identifier("generic Stratagem effect parameter", key)
+    effect = effect_payload.get("effect")
+    if not isinstance(effect, dict):
+        raise GameLifecycleError("Generic Stratagem effect payload requires effect object.")
+    parameters = effect.get("parameters")
+    if not isinstance(parameters, list):
+        raise GameLifecycleError("Generic Stratagem effect parameters must be a list.")
+    for parameter in parameters:
+        if not isinstance(parameter, dict):
+            raise GameLifecycleError("Generic Stratagem effect parameter must be an object.")
+        if parameter.get("key") != requested_key:
+            continue
+        return validate_json_value(parameter.get("value"))
+    return None
+
+
+def _rule_effect_source_id(effect_payload: dict[str, JsonValue]) -> str:
+    value = effect_payload.get("source_id")
+    if type(value) is not str:
+        raise GameLifecycleError("Generic Stratagem effect payload requires source_id.")
+    return _validate_identifier("generic Stratagem source_id", value)
 
 
 def _request_generic_out_of_phase_shooting(

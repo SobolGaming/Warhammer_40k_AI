@@ -4654,7 +4654,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         generated_markdown
     )
     assert (
-        "| Chaos Daemons | 9 | 4 | 28 | 43 | 14 | [chaos-daemons](factions/chaos-daemons.md) |"
+        "| Chaos Daemons | 9 | 4 | 28 | 43 | 8 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
     assert (
@@ -5048,7 +5048,9 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| `catalog-ir:can-be-placed-in-reserves` | Hunters from the Warp |"
     ) in generated_markdown
     assert "| `core:command-reroll` | Command Re-roll |" in generated_markdown
-    assert "| `generic:ingress-move` | From Beyond the Veil |" in generated_markdown
+    assert "From Beyond the Veil<br>GET STUCK IN, LADZ!" in generated_markdown
+    assert "Inescapable Manifestations<br>LONG, UNCONTROLLED BURSTS" in generated_markdown
+    assert "SPESHUL SHELLS<br>Warp-Riders |" in generated_markdown
     assert (
         "| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:"
         "relentless_raiders` | Relentless Raiders |"
@@ -5056,11 +5058,11 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert (
         "| `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:"
         "warp_riders` | Warp-Riders |"
-    ) in generated_markdown
+    ) not in generated_markdown
     assert (
         "| `warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:"
         "soul_shattering_charge_upgrade` | Soul-Shattering Charge Upgrade |"
-    ) in generated_markdown
+    ) not in generated_markdown
     assert (
         f"| `{imperial_knights_army_rule.SETUP_HOOK_ID}` | Code Chivalric - Oath Selection |"
     ) in generated_markdown

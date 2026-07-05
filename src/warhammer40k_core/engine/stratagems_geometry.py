@@ -870,4 +870,5 @@ def _proposal_request_is_rapid_ingress(proposal_request: MovementProposalRequest
     return handler in {
         CORE_RAPID_INGRESS_HANDLER_ID,
         GENERIC_INGRESS_MOVE_HANDLER_ID,
+        GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     }

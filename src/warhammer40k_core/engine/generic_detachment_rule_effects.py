@@ -57,6 +57,13 @@ COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID = (
     court_ir.COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID
 )
 COURT_OF_THE_PHOENICIAN_FACTION_KEYWORD = court_ir.EMPERORS_CHILDREN_KEYWORD
+_BATTLE_FORMATION_DETACHMENT_RULE_DESCRIPTOR_IDS = frozenset(
+    {
+        MORE_DAKKA_DETACHMENT_RULE_DESCRIPTOR_ID,
+        SPECTACLE_OF_SLAUGHTER_DETACHMENT_RULE_DESCRIPTOR_ID,
+        COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID,
+    }
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -90,6 +97,8 @@ def generic_detachment_rule_battle_formation_hook_bindings(
         if type(record) is not _Phase17FExecutionRecord:
             raise GameLifecycleError("Generic detachment bindings require execution records.")
         if not _record_is_generic_detachment_rule(record):
+            continue
+        if record.coverage_descriptor_id not in _BATTLE_FORMATION_DETACHMENT_RULE_DESCRIPTOR_IDS:
             continue
         if record.detachment_id not in selected_detachment_ids:
             continue

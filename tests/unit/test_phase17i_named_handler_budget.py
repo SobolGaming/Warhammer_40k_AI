@@ -26,14 +26,14 @@ def test_phase17i_named_handler_budget_covers_current_phase17f_named_handlers() 
     )
 
     assert report.named_handler_records == named_handler_records
-    assert len(report.named_handler_records) == 51
-    assert len(report.approved_entries) == 51
+    assert len(report.named_handler_records) == 45
+    assert len(report.approved_entries) == 45
     assert report.unapproved_named_handler_execution_ids == ()
     assert report.stale_approved_execution_ids == ()
     pre_ws14_reason = (
         budget_source.Phase17INamedHandlerApprovalReason.PRE_WS14_EXISTING_RUNTIME_CONSUMER.value
     )
-    assert report.approval_reason_counts() == {pre_ws14_reason: 51}
+    assert report.approval_reason_counts() == {pre_ws14_reason: 45}
 
 
 def test_phase17i_named_handler_budget_payload_is_deterministic_json_safe() -> None:

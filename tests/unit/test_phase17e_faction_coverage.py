@@ -51,14 +51,9 @@ APPROVED_RUNTIME_ONLY_SOURCE_ROW_IDS = frozenset(
         "enhancement:aeldari:corsair-coterie:infamy",
         "enhancement:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:assassins-eye-upgrade",
         "enhancement:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:camouflaged-snipers-upgrade",
-        "enhancement:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade",
-        "enhancement:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade",
         "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:casting-back-the-veil",
         "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:eldritch-suppression",
         "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:nomads-of-the-hidden-way",
-        "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:from-beyond-the-veil",
-        "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:inescapable-manifestations",
-        "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:warp-riders",
     )
 )
 FADE_TO_DARKNESS_SOURCE_ROW_ID = "enhancement:chaos-daemons:shadow-legion:000009980004"
@@ -97,6 +92,7 @@ GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        "enhancement:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade",
         "enhancement:emperors-children:court-of-the-phoenician:000010654002",
         "enhancement:emperors-children:court-of-the-phoenician:000010654004",
         "enhancement:emperors-children:spectacle-of-slaughter:000010900002",
@@ -112,6 +108,7 @@ GENERIC_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        "enhancement:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade",
         "enhancement:emperors-children:court-of-the-phoenician:000010654005",
         "enhancement:necrons:cryptek-conclave:000010664004",
     }
@@ -144,6 +141,7 @@ GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 GENERIC_DETACHMENT_RULE_KEYS = frozenset(
     {
+        ("chaos-daemons", "cavalcade-of-chaos"),
         ("emperors-children", "court-of-the-phoenician"),
         ("emperors-children", "spectacle-of-slaughter"),
         ("orks", "more-dakka"),
@@ -151,6 +149,9 @@ GENERIC_DETACHMENT_RULE_KEYS = frozenset(
 )
 GENERIC_STRATAGEM_SOURCE_ROW_IDS = frozenset(
     {
+        "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:from-beyond-the-veil",
+        "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:inescapable-manifestations",
+        "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:warp-riders",
         "stratagem:emperors-children:court-of-the-phoenician:000010655002",
         "stratagem:emperors-children:court-of-the-phoenician:000010655003",
         "stratagem:emperors-children:court-of-the-phoenician:000010655004",
@@ -187,9 +188,6 @@ BLOOD_LEGION_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall",
     "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted",
 )
-CAVALCADE_OF_CHAOS_RUNTIME_CONSUMERS = (
-    "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche",
-)
 DAEMONIC_INCURSION_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts",
 )
@@ -217,7 +215,6 @@ SHADOW_LEGION_RUNTIME_CONSUMERS = (
 )
 CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY = {
     ("chaos-daemons", "blood-legion"): BLOOD_LEGION_RUNTIME_CONSUMERS,
-    ("chaos-daemons", "cavalcade-of-chaos"): CAVALCADE_OF_CHAOS_RUNTIME_CONSUMERS,
     ("chaos-daemons", "daemonic-incursion"): DAEMONIC_INCURSION_RUNTIME_CONSUMERS,
     ("chaos-daemons", "shadow-legion"): SHADOW_LEGION_RUNTIME_CONSUMERS,
 }
@@ -839,11 +836,6 @@ def test_phase17e_malice_made_manifest_exact_row_is_engine_consumed() -> None:
             "blood-legion",
             "Blood Legion detachment rule",
             BLOOD_LEGION_RUNTIME_CONSUMERS,
-        ),
-        (
-            "cavalcade-of-chaos",
-            "Cavalcade of Chaos detachment rule",
-            CAVALCADE_OF_CHAOS_RUNTIME_CONSUMERS,
         ),
         (
             "daemonic-incursion",

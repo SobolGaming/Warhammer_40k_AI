@@ -60,9 +60,6 @@ BLOOD_LEGION_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall",
     "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted",
 )
-CAVALCADE_OF_CHAOS_RUNTIME_CONSUMER_IDS = (
-    "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:unholy_avalanche",
-)
 DAEMONIC_INCURSION_RUNTIME_CONSUMER_IDS = (DAEMONIC_INCURSION_WARP_RIFTS_RUNTIME_CONSUMER_ID,)
 SHADOW_LEGION_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
@@ -88,7 +85,6 @@ SHADOW_LEGION_RUNTIME_CONSUMER_IDS = (
 )
 CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMER_IDS_BY_DETACHMENT_ID = {
     "blood-legion": BLOOD_LEGION_RUNTIME_CONSUMER_IDS,
-    "cavalcade-of-chaos": CAVALCADE_OF_CHAOS_RUNTIME_CONSUMER_IDS,
     "daemonic-incursion": DAEMONIC_INCURSION_RUNTIME_CONSUMER_IDS,
     "shadow-legion": SHADOW_LEGION_RUNTIME_CONSUMER_IDS,
 }

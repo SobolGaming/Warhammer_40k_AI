@@ -333,6 +333,14 @@ def generic_rule_modified_movement_inches(
     for effect in _matching_generic_unit_effects(
         state=context.state,
         unit_instance_id=context.unit_instance_id,
+        effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
+    ):
+        if _characteristic_parameter(effect.parameters) is not Characteristic.MOVEMENT:
+            continue
+        current = max(0.0, current + _required_int_parameter(effect.parameters, key="delta"))
+    for effect in _matching_generic_unit_effects(
+        state=context.state,
+        unit_instance_id=context.unit_instance_id,
         effect_kind=RuleEffectKind.MODIFY_MOVE_DISTANCE,
     ):
         current = max(0.0, current + _required_numeric_parameter(effect.parameters, key="delta"))

@@ -6,7 +6,11 @@ from types import MappingProxyType
 from typing import cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.engine import catalog_turn_end_reserves, generic_detachment_rule_effects
+from warhammer40k_core.engine import (
+    catalog_turn_end_reserves,
+    generic_detachment_rule_effects,
+    generic_rule_lifecycle_hooks,
+)
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
     AbilityCatalogRecord,
@@ -913,91 +917,81 @@ def combine_runtime_content_contributions(
         ),
         enhancement_effect_bindings=_combine_unique_values(
             "enhancement effect binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.enhancement_effect_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.enhancement_effect_bindings,
             ),
             lambda binding: binding.effect_id,
         ),
         stratagem_cost_modifier_bindings=_combine_unique_values(
             "Stratagem cost modifier binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.stratagem_cost_modifier_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.stratagem_cost_modifier_bindings,
             ),
             lambda binding: binding.modifier_id,
         ),
         unit_characteristic_modifier_bindings=_combine_unique_values(
             "unit characteristic modifier binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.unit_characteristic_modifier_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.unit_characteristic_modifier_bindings,
             ),
             lambda binding: binding.modifier_id,
         ),
         hit_roll_modifier_bindings=_combine_unique_values(
             "Hit roll modifier binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.hit_roll_modifier_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.hit_roll_modifier_bindings,
             ),
             lambda binding: binding.modifier_id,
         ),
         wound_roll_modifier_bindings=_combine_unique_values(
             "Wound roll modifier binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.wound_roll_modifier_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.wound_roll_modifier_bindings,
             ),
             lambda binding: binding.modifier_id,
         ),
         save_option_modifier_bindings=_combine_unique_values(
             "save option modifier binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.save_option_modifier_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.save_option_modifier_bindings,
             ),
             lambda binding: binding.modifier_id,
         ),
         movement_budget_modifier_bindings=_combine_unique_values(
             "movement budget modifier binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.movement_budget_modifier_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.movement_budget_modifier_bindings,
             ),
             lambda binding: binding.modifier_id,
         ),
         objective_control_modifier_bindings=_combine_unique_values(
             "Objective Control modifier binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.objective_control_modifier_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.objective_control_modifier_bindings,
             ),
             lambda binding: binding.modifier_id,
         ),
         charge_roll_modifier_bindings=_combine_unique_values(
             "charge roll modifier binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.charge_roll_modifier_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.charge_roll_modifier_bindings,
             ),
             lambda binding: binding.modifier_id,
         ),
         weapon_profile_modifier_bindings=_combine_unique_values(
             "weapon profile modifier binding",
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.weapon_profile_modifier_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.weapon_profile_modifier_bindings,
             ),
             lambda binding: binding.modifier_id,
         ),
@@ -1414,6 +1408,10 @@ class RuntimeContentBundle:
                     ability_indexes_by_player_id=ability_indexes_by_player_id,
                     armies=validated_armies,
                 ),
+                *generic_rule_lifecycle_hooks.fall_back_eligibility_hook_bindings(
+                    activation=activation,
+                    execution_records=records,
+                ),
                 *_contribution_values(
                     validated_contributions,
                     lambda contribution: contribution.fall_back_hook_bindings,
@@ -1477,25 +1475,22 @@ class RuntimeContentBundle:
             )
         )
         shooting_end_surge_hook_registry = ShootingEndSurgeHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.shooting_end_surge_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.shooting_end_surge_hook_bindings,
             )
         )
         shooting_unit_selected_hook_registry = ShootingUnitSelectedHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.shooting_unit_selected_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.shooting_unit_selected_hook_bindings,
             )
         )
         shooting_unit_selected_grant_hook_registry = (
             ShootingUnitSelectedGrantRegistry.from_bindings(
-                tuple(
-                    binding
-                    for contribution in validated_contributions
-                    for binding in contribution.shooting_unit_selected_grant_hook_bindings
+                _contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.shooting_unit_selected_grant_hook_bindings,
                 )
             )
         )
@@ -1505,10 +1500,9 @@ class RuntimeContentBundle:
                     ability_indexes_by_player_id=ability_indexes_by_player_id,
                     armies=validated_armies,
                 ),
-                *tuple(
-                    binding
-                    for contribution in validated_contributions
-                    for binding in contribution.attack_sequence_completed_hook_bindings
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.attack_sequence_completed_hook_bindings,
                 ),
             )
         )
@@ -1520,24 +1514,27 @@ class RuntimeContentBundle:
             + generic_enhancement_effect_bindings(activation=activation, execution_records=records)
         )
         fight_activation_ability_hook_registry = FightActivationAbilityHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.fight_activation_ability_hook_bindings
+            (
+                *generic_rule_lifecycle_hooks.fight_activation_ability_hook_bindings(
+                    activation=activation,
+                    execution_records=records,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.fight_activation_ability_hook_bindings,
+                ),
             )
         )
         fight_unit_selected_hook_registry = FightUnitSelectedHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.fight_unit_selected_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.fight_unit_selected_hook_bindings,
             )
         )
         fight_unit_selected_grant_hook_registry = FightUnitSelectedGrantRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.fight_unit_selected_grant_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.fight_unit_selected_grant_hook_bindings,
             )
         )
         phase_end_objective_control_hook_registry = (
@@ -1547,26 +1544,23 @@ class RuntimeContentBundle:
                         ability_indexes_by_player_id=ability_indexes_by_player_id,
                         armies=validated_armies,
                     ),
-                    *tuple(
-                        binding
-                        for contribution in validated_contributions
-                        for binding in contribution.phase_end_objective_control_hook_bindings
+                    *_contribution_values(
+                        validated_contributions,
+                        lambda contribution: contribution.phase_end_objective_control_hook_bindings,
                     ),
                 )
             )
         )
         stratagem_cost_choice_hook_registry = StratagemCostChoiceHookRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.stratagem_cost_choice_hook_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.stratagem_cost_choice_hook_bindings,
             )
         )
         stratagem_cost_modifier_registry = StratagemCostModifierRegistry.from_bindings(
-            tuple(
-                binding
-                for contribution in validated_contributions
-                for binding in contribution.stratagem_cost_modifier_bindings
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.stratagem_cost_modifier_bindings,
             )
         )
         damaged_runtime = CatalogDamagedEffectRuntime(armies=validated_armies)

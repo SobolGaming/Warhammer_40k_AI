@@ -2,22 +2,7 @@
 # Regenerate with `uv run python tools/generate_faction_content_scaffold.py`.
 from __future__ import annotations
 
-from warhammer40k_core.core.attributes import Characteristic
-from warhammer40k_core.core.modifiers import ModifierOperation
-from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.enhancement_effects import (
-    EnhancementCharacteristicModifier,
-    EnhancementEffectBinding,
-    EnhancementEffectContext,
-)
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
-from warhammer40k_core.engine.fight_activation_abilities import (
-    FightActivationAbilityContext,
-    FightActivationAbilityHookBinding,
-    FightActivationAbilityOption,
-)
-from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.unit_factory import UnitInstance
 
 CONTRIBUTION_ID = ":".join(
     (
@@ -29,26 +14,11 @@ CONTRIBUTION_ID = ":".join(
         "scaffold",
     )
 )
-EFFECT_ID = (
-    "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:apocalyptic_steeds_upgrade"
-)
 ENHANCEMENT_ID = "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade"
-ENHANCEMENT_SOURCE_ID = (
-    "gw-11e-faction-detachments-2026-27:enhancement:"
-    "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade"
-)
-SOUL_SHATTERING_CHARGE_HOOK_ID = (
-    "warhammer_40000_11th:chaos_daemons:detachment:cavalcade_of_chaos:"
-    "soul_shattering_charge_upgrade"
-)
 SOUL_SHATTERING_CHARGE_ABILITY_ID = (
     "chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade"
 )
 SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID = SOUL_SHATTERING_CHARGE_ABILITY_ID
-SOUL_SHATTERING_CHARGE_ENHANCEMENT_SOURCE_ID = (
-    "gw-11e-faction-detachments-2026-27:enhancement:"
-    "chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade"
-)
 APOCALYPTIC_STEEDS_SOURCE_RULE_ID = (
     "phase17f:phase17e:enhancement:chaos-daemons:cavalcade-of-chaos:"
     "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade"
@@ -57,175 +27,19 @@ SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID = (
     "phase17f:phase17e:enhancement:chaos-daemons:cavalcade-of-chaos:"
     "chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade"
 )
+APOCALYPTIC_STEEDS_RULE_IR_SOURCE_ID = (
+    "gw-11e-phase17e-faction-coverage-2026-27:"
+    "phase17e:enhancement:chaos-daemons:cavalcade-of-chaos:"
+    "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade:source-text"
+)
+SOUL_SHATTERING_CHARGE_RULE_IR_SOURCE_ID = (
+    "gw-11e-phase17e-faction-coverage-2026-27:"
+    "phase17e:enhancement:chaos-daemons:cavalcade-of-chaos:"
+    "chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade:source-text"
+)
+SOUL_SHATTERING_CHARGE_HOOK_ID = f"{SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID}:fight-activation-ability"
 SOURCE_RULE_ID = APOCALYPTIC_STEEDS_SOURCE_RULE_ID
-MODIFIER_ID = f"{EFFECT_ID}:movement-plus-1"
-CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
-CAVALCADE_DETACHMENT_ID = "cavalcade-of-chaos"
-LEGIONES_DAEMONICA = "LEGIONES DAEMONICA"
-MOUNTED = "MOUNTED"
 
 
 def runtime_contribution() -> RuntimeContentContribution:
-    return RuntimeContentContribution(
-        contribution_id=CONTRIBUTION_ID,
-        enhancement_effect_bindings=(
-            EnhancementEffectBinding(
-                effect_id=EFFECT_ID,
-                source_id=APOCALYPTIC_STEEDS_SOURCE_RULE_ID,
-                enhancement_id=ENHANCEMENT_ID,
-                handler=apocalyptic_steeds_effect,
-            ),
-        ),
-        fight_activation_ability_hook_bindings=(
-            FightActivationAbilityHookBinding(
-                hook_id=SOUL_SHATTERING_CHARGE_HOOK_ID,
-                source_id=SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID,
-                handler=soul_shattering_charge_option,
-            ),
-        ),
-    )
-
-
-def apocalyptic_steeds_effect(
-    context: EnhancementEffectContext,
-) -> tuple[EnhancementCharacteristicModifier, ...]:
-    if type(context) is not EnhancementEffectContext:
-        raise GameLifecycleError("Apocalyptic Steeds requires an EnhancementEffectContext.")
-    if context.assignment.enhancement_id != ENHANCEMENT_ID:
-        return ()
-    if not (
-        context.army.detachment_selection.faction_id == CHAOS_DAEMONS_FACTION_ID
-        and CAVALCADE_DETACHMENT_ID in context.army.detachment_selection.detachment_ids
-    ):
-        raise GameLifecycleError("Apocalyptic Steeds requires Cavalcade of Chaos.")
-    unit = context.target_unit
-    if not _unit_has_faction_keyword(unit, LEGIONES_DAEMONICA):
-        raise GameLifecycleError("Apocalyptic Steeds requires LEGIONES DAEMONICA.")
-    if not _unit_has_keyword(unit, MOUNTED):
-        raise GameLifecycleError("Apocalyptic Steeds requires MOUNTED.")
-    return (
-        EnhancementCharacteristicModifier(
-            effect_id=EFFECT_ID,
-            source_id=APOCALYPTIC_STEEDS_SOURCE_RULE_ID,
-            enhancement_id=ENHANCEMENT_ID,
-            target_unit_instance_id=unit.unit_instance_id,
-            characteristic=Characteristic.MOVEMENT,
-            operation=ModifierOperation.ADD,
-            operand=1,
-            modifier_id=MODIFIER_ID,
-            replay_payload={
-                "effect_kind": "apocalyptic_steeds_upgrade",
-                "enhancement_source_id": ENHANCEMENT_SOURCE_ID,
-                "assignment_source_id": context.assignment.source_id,
-                "target_unit_selection_id": context.assignment.target_unit_selection_id,
-                "target_unit_instance_id": unit.unit_instance_id,
-                "required_faction_keyword": LEGIONES_DAEMONICA,
-                "required_keyword": MOUNTED,
-                "characteristic": Characteristic.MOVEMENT.value,
-                "operation": ModifierOperation.ADD.value,
-                "operand": 1,
-            },
-        ),
-    )
-
-
-def soul_shattering_charge_option(
-    context: FightActivationAbilityContext,
-) -> FightActivationAbilityOption | None:
-    if type(context) is not FightActivationAbilityContext:
-        raise GameLifecycleError("Soul-Shattering Charge requires a fight ability context.")
-    army = _army_for_player(context)
-    if not (
-        army.detachment_selection.faction_id == CHAOS_DAEMONS_FACTION_ID
-        and CAVALCADE_DETACHMENT_ID in army.detachment_selection.detachment_ids
-    ):
-        raise GameLifecycleError("Soul-Shattering Charge requires Cavalcade of Chaos.")
-    unit = _unit_in_army(army=army, unit_instance_id=context.unit_instance_id)
-    if not _unit_has_faction_keyword(unit, LEGIONES_DAEMONICA):
-        raise GameLifecycleError("Soul-Shattering Charge requires LEGIONES DAEMONICA.")
-    if not _unit_has_keyword(unit, MOUNTED):
-        raise GameLifecycleError("Soul-Shattering Charge requires MOUNTED.")
-    if not _unit_has_enhancement(
-        army=army,
-        unit=unit,
-        enhancement_id=SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID,
-    ):
-        return None
-    if not _unit_made_charge_move(context=context):
-        return None
-    if not context.target_unit_instance_ids:
-        return None
-    return FightActivationAbilityOption(
-        hook_id=SOUL_SHATTERING_CHARGE_HOOK_ID,
-        source_id=SOUL_SHATTERING_CHARGE_SOURCE_RULE_ID,
-        ability_id=SOUL_SHATTERING_CHARGE_ABILITY_ID,
-        enhancement_id=SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID,
-        model_proximity_inches=3.0,
-        replay_payload={
-            "effect_kind": "soul_shattering_charge_upgrade",
-            "enhancement_source_id": SOUL_SHATTERING_CHARGE_ENHANCEMENT_SOURCE_ID,
-            "target_unit_instance_id": unit.unit_instance_id,
-            "target_unit_instance_ids": list(context.target_unit_instance_ids),
-            "required_faction_keyword": LEGIONES_DAEMONICA,
-            "required_keyword": MOUNTED,
-            "charge_effect_kind": "charge_grants_fights_first",
-            "model_proximity_inches": 3.0,
-        },
-    )
-
-
-def _army_for_player(context: FightActivationAbilityContext) -> ArmyDefinition:
-    for army in context.state.army_definitions:
-        if army.player_id == context.player_id:
-            return army
-    raise GameLifecycleError("Soul-Shattering Charge player army was not found.")
-
-
-def _unit_in_army(*, army: ArmyDefinition, unit_instance_id: str) -> UnitInstance:
-    requested_unit_id = unit_instance_id.strip()
-    if not requested_unit_id:
-        raise GameLifecycleError("Soul-Shattering Charge unit id must not be empty.")
-    for unit in army.units:
-        if unit.unit_instance_id == requested_unit_id:
-            return unit
-    raise GameLifecycleError("Soul-Shattering Charge unit is not in the selected player army.")
-
-
-def _unit_has_enhancement(
-    *,
-    army: ArmyDefinition,
-    unit: UnitInstance,
-    enhancement_id: str,
-) -> bool:
-    target_selection_id = unit.unit_instance_id.removeprefix(f"{army.army_id}:")
-    return any(
-        assignment.enhancement_id == enhancement_id
-        and assignment.target_unit_selection_id == target_selection_id
-        for assignment in army.enhancement_assignments
-    )
-
-
-def _unit_made_charge_move(*, context: FightActivationAbilityContext) -> bool:
-    for effect in context.state.persisting_effects:
-        if context.unit_instance_id not in effect.target_unit_instance_ids:
-            continue
-        effect_payload = effect.effect_payload
-        if not isinstance(effect_payload, dict):
-            continue
-        if effect_payload.get("effect_kind") == "charge_grants_fights_first":
-            return True
-    return False
-
-
-def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
-    canonical = _canonical_keyword(keyword)
-    return any(_canonical_keyword(stored) == canonical for stored in unit.keywords)
-
-
-def _unit_has_faction_keyword(unit: UnitInstance, keyword: str) -> bool:
-    canonical = _canonical_keyword(keyword)
-    return any(_canonical_keyword(stored) == canonical for stored in unit.faction_keywords)
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().replace("_", " ").replace("-", " ").upper()
+    return RuntimeContentContribution(contribution_id=CONTRIBUTION_ID)

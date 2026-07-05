@@ -6,6 +6,7 @@ from typing import cast
 from warhammer40k_core.rules.rule_ir import (
     RuleClausePayload,
     RuleConditionPayload,
+    RuleDurationPayload,
     RuleEffectSpecPayload,
     RuleIRPayload,
     RuleParameterPayload,
@@ -142,6 +143,10 @@ def _grant_ability_clause(
     effect_start: int,
     effect_end: int,
     ability: str,
+    target_kind: str = "this_unit",
+    target_parameters: tuple[RuleParameterPayload, ...] = (),
+    effect_parameters: tuple[RuleParameterPayload, ...] = (),
+    duration: RuleDurationPayload | None = None,
 ) -> RuleClausePayload:
     return _effect_clause(
         source_row_id=source_row_id,
@@ -150,14 +155,21 @@ def _grant_ability_clause(
         source_text=source_text,
         source_start=source_start,
         source_end=source_end,
-        target=_target("this_unit", target_text, target_start, target_end),
+        target=_target(
+            target_kind,
+            target_text,
+            target_start,
+            target_end,
+            parameters=target_parameters,
+        ),
         effect=_effect(
             "grant_ability",
             effect_text,
             effect_start,
             effect_end,
-            [_parameter("ability", ability)],
+            [_parameter("ability", ability), *effect_parameters],
         ),
+        duration=duration,
     )
 
 
@@ -176,6 +188,7 @@ def _characteristic_modifier_clause(
     effect_end: int,
     characteristic: str,
     delta: int,
+    target_parameters: tuple[RuleParameterPayload, ...] = (),
 ) -> RuleClausePayload:
     return _effect_clause(
         source_row_id=source_row_id,
@@ -184,7 +197,13 @@ def _characteristic_modifier_clause(
         source_text=source_text,
         source_start=source_start,
         source_end=source_end,
-        target=_target("this_unit", target_text, target_start, target_end),
+        target=_target(
+            "this_unit",
+            target_text,
+            target_start,
+            target_end,
+            parameters=target_parameters,
+        ),
         effect=_effect(
             "modify_characteristic",
             effect_text,
@@ -259,6 +278,7 @@ def _effect_clause(
     effect: RuleEffectSpecPayload,
     trigger: RuleTriggerPayload | None = None,
     conditions: tuple[RuleConditionPayload, ...] = (),
+    duration: RuleDurationPayload | None = None,
 ) -> RuleClausePayload:
     return cast(
         RuleClausePayload,
@@ -270,7 +290,7 @@ def _effect_clause(
             "conditions": list(conditions),
             "target": target,
             "effects": [effect],
-            "duration": None,
+            "duration": duration,
             "unsupported_reason": None,
             "diagnostics": [],
         },
@@ -335,14 +355,19 @@ def _distance_predicate_condition(
 
 
 def _target(
-    kind: str, source_text: str, source_start: int, source_end: int
+    kind: str,
+    source_text: str,
+    source_start: int,
+    source_end: int,
+    *,
+    parameters: tuple[RuleParameterPayload, ...] = (),
 ) -> RuleTargetSpecPayload:
     return cast(
         RuleTargetSpecPayload,
         {
             "kind": kind,
             "source_span": _span(source_text, source_start, source_end),
-            "parameters": [],
+            "parameters": list(parameters),
         },
     )
 
@@ -364,8 +389,40 @@ def _effect(
     )
 
 
-def _parameter(key: str, value: str | int | float | None) -> RuleParameterPayload:
-    return cast(RuleParameterPayload, {"key": key, "value": value})
+def _duration(
+    kind: str,
+    source_text: str,
+    source_start: int,
+    source_end: int,
+    parameters: tuple[RuleParameterPayload, ...],
+) -> RuleDurationPayload:
+    return cast(
+        RuleDurationPayload,
+        {
+            "kind": kind,
+            "source_span": _span(source_text, source_start, source_end),
+            "parameters": list(parameters),
+        },
+    )
+
+
+def _parameter(
+    key: str,
+    value: str | int | float | bool | None | tuple[str, ...],
+) -> RuleParameterPayload:
+    payload_value = list(value) if type(value) is tuple else value
+    return cast(RuleParameterPayload, {"key": key, "value": payload_value})
+
+
+static_rule_ir_payload = _rule_ir_payload
+static_keyword_gate_clause = _keyword_gate_clause
+static_grant_ability_clause = _grant_ability_clause
+static_characteristic_modifier_clause = _characteristic_modifier_clause
+static_effect_clause = _effect_clause
+static_target = _target
+static_effect = _effect
+static_duration = _duration
+static_parameter = _parameter
 
 
 def _span(text: str, start: int, end: int) -> dict[str, str | int]:
@@ -377,8 +434,15 @@ def _clause_id(source_row_id: str, clause_number: int) -> str:
 
 
 def static_generic_rule_ir_payloads() -> MappingProxyType[str, RuleIRPayload]:
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        faction_cavalcade_of_chaos_ir_static_payloads_2026_27 as cavalcade_static,
+    )
+
     payloads: dict[str, RuleIRPayload] = {}
-    for source_row_id, payload in _STATIC_GENERIC_RULE_IR_PAYLOAD_ROWS:
+    for source_row_id, payload in (
+        *cavalcade_static.CAVALCADE_GENERIC_RULE_IR_PAYLOAD_ROWS,
+        *_STATIC_GENERIC_RULE_IR_PAYLOAD_ROWS,
+    ):
         descriptor_id = _coverage_descriptor_id(source_row_id)
         if descriptor_id in payloads:
             raise Phase17FGenericIrStaticPayloadError(
