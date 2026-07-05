@@ -11,6 +11,9 @@ from warhammer40k_core.rules.rule_templates import (
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27,
     faction_subrules_2026_27,
 )
@@ -38,6 +41,8 @@ _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 _SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        "enhancement:emperors-children:court-of-the-phoenician:000010654002",
+        "enhancement:emperors-children:court-of-the-phoenician:000010654004",
         "enhancement:emperors-children:spectacle-of-slaughter:000010900002",
         "enhancement:genestealer-cults:outlander-claw:000009079002",
         "enhancement:orks:more-dakka:000009991005",
@@ -51,7 +56,13 @@ _SUPPORTED_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 _SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        "enhancement:emperors-children:court-of-the-phoenician:000010654005",
         "enhancement:necrons:cryptek-conclave:000010664004",
+    }
+)
+_SUPPORTED_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        "enhancement:emperors-children:court-of-the-phoenician:000010654003",
     }
 )
 _SUPPORTED_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
@@ -139,7 +150,10 @@ def generic_supported_detachment_rule_ir_hash(
     rule_ir_hash = more_dakka_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         return rule_ir_hash
-    return spectacle_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    rule_ir_hash = spectacle_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        return rule_ir_hash
+    return court_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
 
 
 def generic_supported_stratagem_rule_ir_hash(
@@ -151,7 +165,10 @@ def generic_supported_stratagem_rule_ir_hash(
     rule_ir_hash = more_dakka_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         return rule_ir_hash
-    return spectacle_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    rule_ir_hash = spectacle_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        return rule_ir_hash
+    return court_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
 
 
 def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> RuleIR:
@@ -161,6 +178,8 @@ def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> Ru
         payload = more_dakka_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         payload = spectacle_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
+    if payload is None:
+        payload = court_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         raise Phase17FGenericIrSupportError("Generic IR coverage descriptor is not registered.")
     return RuleIR.from_payload(payload)
@@ -188,6 +207,10 @@ def supported_dice_roll_modification_enhancement_source_row_ids() -> tuple[str, 
 
 def supported_movement_distance_enhancement_source_row_ids() -> tuple[str, ...]:
     return tuple(sorted(_SUPPORTED_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS))
+
+
+def supported_court_of_the_phoenician_mixed_enhancement_source_row_ids() -> tuple[str, ...]:
+    return tuple(sorted(_SUPPORTED_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS))
 
 
 def supported_generic_enhancement_source_row_ids() -> tuple[str, ...]:
@@ -223,13 +246,19 @@ def _validate_supported_enhancement_ir(
         source_row.source_row_id
         in _SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
     ):
+        expected_effect_count = (
+            2
+            if source_row.source_row_id
+            == "enhancement:emperors-children:court-of-the-phoenician:000010654005"
+            else 1
+        )
         _validate_supported_effect_family_ir(
             rule_ir=rule_ir,
             source_row=source_row,
             expected_template_ids=_SUPPORTED_CHARACTERISTIC_MODIFICATION_TEMPLATE_IDS,
             effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
             effect_family_name="characteristic modifier",
-            expected_effect_count=1,
+            expected_effect_count=expected_effect_count,
         )
     elif source_row.source_row_id in _SUPPORTED_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS:
         _validate_supported_effect_family_ir(
@@ -248,6 +277,14 @@ def _validate_supported_enhancement_ir(
             effect_kind=RuleEffectKind.MODIFY_MOVE_DISTANCE,
             effect_family_name="movement distance modifier",
             expected_effect_count=1,
+        )
+    elif (
+        source_row.source_row_id
+        in _SUPPORTED_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS
+    ):
+        _validate_supported_court_of_the_phoenician_mixed_enhancement_ir(
+            rule_ir=rule_ir,
+            source_row=source_row,
         )
     else:
         raise Phase17FGenericIrSupportError("Generic enhancement support row is not registered.")
@@ -293,6 +330,55 @@ def _validate_supported_effect_family_ir(
         )
 
 
+def _validate_supported_court_of_the_phoenician_mixed_enhancement_ir(
+    *,
+    rule_ir: RuleIR,
+    source_row: faction_subrules_2026_27.SourceEnhancementRow,
+) -> None:
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Court of the Phoenician mixed enhancement RuleIR must deserialize as supported."
+        )
+    expected_source_id = f"{SOURCE_PACKAGE_ID}:phase17e:{source_row.source_row_id}:source-text"
+    if rule_ir.source_id != expected_source_id:
+        raise Phase17FGenericIrSupportError(
+            "Court of the Phoenician mixed enhancement produced an unexpected source ID."
+        )
+    template_ids = frozenset(
+        clause.template_id for clause in rule_ir.clauses if clause.template_id is not None
+    )
+    if template_ids != frozenset(
+        {
+            GRANT_ABILITY_TEMPLATE_ID,
+            KEYWORD_GATE_TEMPLATE_ID,
+            MOVEMENT_DISTANCE_TEMPLATE_ID,
+        }
+    ):
+        raise Phase17FGenericIrSupportError(
+            "Court of the Phoenician mixed enhancement uses an unregistered template family."
+        )
+    expected_effect_counts = {
+        RuleEffectKind.GRANT_ABILITY: 1,
+        RuleEffectKind.MODIFY_MOVE_DISTANCE: 1,
+    }
+    actual_effect_counts = dict.fromkeys(expected_effect_counts, 0)
+    for clause in rule_ir.clauses:
+        if clause.unsupported_reason is not None or clause.diagnostics:
+            raise Phase17FGenericIrSupportError(
+                "Court of the Phoenician mixed enhancement includes unsupported diagnostics."
+            )
+        for effect in clause.effects:
+            if effect.kind not in actual_effect_counts:
+                raise Phase17FGenericIrSupportError(
+                    "Court of the Phoenician mixed enhancement includes an unexpected effect kind."
+                )
+            actual_effect_counts[effect.kind] += 1
+    if actual_effect_counts != expected_effect_counts:
+        raise Phase17FGenericIrSupportError(
+            "Court of the Phoenician mixed enhancement has unexpected effect counts."
+        )
+
+
 def _supported_enhancement_source_row_ids() -> frozenset[str]:
     return (
         _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
@@ -300,6 +386,7 @@ def _supported_enhancement_source_row_ids() -> frozenset[str]:
         | _SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
         | _SUPPORTED_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
         | _SUPPORTED_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS
+        | _SUPPORTED_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS
     )
 
 

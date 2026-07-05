@@ -2314,6 +2314,8 @@ def resolve_charge_move(
             movement_mode=MovementMode.CHARGE,
             movement_phase_action=None,
             displacement_kind=ModelDisplacementKind.CHARGE_MOVE,
+            unit_persisting_effects=unit_persisting_effects,
+            owner_player_id=unit_placement.player_id,
         )
         path_context = legality_context.to_path_validation_context(
             moving_model=moving_model,

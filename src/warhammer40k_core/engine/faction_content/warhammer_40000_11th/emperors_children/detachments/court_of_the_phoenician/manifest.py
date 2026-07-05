@@ -18,7 +18,7 @@ CONTRIBUTION_ID = ":".join(
         "detachment",
         "court_of_the_phoenician",
         "manifest",
-        "scaffold",
+        "rule_ir",
     )
 )
 

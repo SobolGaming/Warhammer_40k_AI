@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
 from enum import StrEnum
@@ -104,6 +106,7 @@ class RuleExecutionContextPayload(TypedDict):
     target_player_id: str | None
     source_keywords: list[str]
     trigger_payload: JsonValue
+    record_persisting_effects: bool
 
 
 class RuleRuntimeBindingPayload(TypedDict):
@@ -148,6 +151,7 @@ class RuleExecutionContext:
     trigger_payload: JsonValue = None
     state: GameState | None = None
     event_log: EventLog | None = None
+    record_persisting_effects: bool = True
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "game_id", _validate_identifier("game_id", self.game_id))
@@ -210,6 +214,8 @@ class RuleExecutionContext:
             raise GameLifecycleError("RuleExecutionContext state must be a GameState.")
         if self.event_log is not None and type(self.event_log) is not EventLog:
             raise GameLifecycleError("RuleExecutionContext event_log must be an EventLog.")
+        if type(self.record_persisting_effects) is not bool:
+            raise GameLifecycleError("RuleExecutionContext record_persisting_effects must be bool.")
 
     def to_payload(self) -> RuleExecutionContextPayload:
         return {
@@ -225,6 +231,7 @@ class RuleExecutionContext:
             "target_player_id": self.target_player_id,
             "source_keywords": list(self.source_keywords),
             "trigger_payload": self.trigger_payload,
+            "record_persisting_effects": self.record_persisting_effects,
         }
 
 
@@ -835,6 +842,7 @@ def _generic_effect_handler(
     created_effect = _persisting_effect_or_none(
         rule_ir=rule_ir,
         clause=clause,
+        effect=resolved_effect,
         effect_payload=effect_payload,
         context=context,
     )
@@ -1071,6 +1079,7 @@ def _persisting_effect_or_none(
     *,
     rule_ir: RuleIR,
     clause: RuleClause,
+    effect: RuleEffectSpec,
     effect_payload: dict[str, JsonValue],
     context: RuleExecutionContext,
 ) -> PersistingEffect | None:
@@ -1079,13 +1088,18 @@ def _persisting_effect_or_none(
         context=context,
         target_unit_instance_ids=None,
     )
-    if context.state is None or not target_unit_instance_ids or clause.duration is None:
+    if (
+        not context.record_persisting_effects
+        or context.state is None
+        or not target_unit_instance_ids
+        or clause.duration is None
+    ):
         return None
     expiration = expiration_for_duration(duration=clause.duration, context=context)
     if expiration is None:
         return None
-    effect = generic_rule_persisting_effect(
-        effect_id=_effect_id(rule_ir=rule_ir, clause=clause),
+    persisting_effect = generic_rule_persisting_effect(
+        effect_id=_effect_id(rule_ir=rule_ir, clause=clause, effect=effect),
         source_rule_id=rule_ir.source_id,
         owner_player_id=context.player_id,
         target_unit_instance_ids=target_unit_instance_ids,
@@ -1094,8 +1108,8 @@ def _persisting_effect_or_none(
         expiration=expiration,
         effect_payload=effect_payload,
     )
-    context.state.record_persisting_effect(effect)
-    return effect
+    context.state.record_persisting_effect(persisting_effect)
+    return persisting_effect
 
 
 def _aura_affected_unit_ids(
@@ -1535,8 +1549,17 @@ def _fallback_event_id(
     return f"rule-event:{rule_ir.ir_hash()[:12]}:{clause_suffix}:{effect_kind}:{suffix}"
 
 
-def _effect_id(*, rule_ir: RuleIR, clause: RuleClause) -> str:
-    return f"rule-effect:{rule_ir.ir_hash()[:16]}:{clause.clause_id.rsplit(':', 1)[-1]}"
+def _effect_id(*, rule_ir: RuleIR, clause: RuleClause, effect: RuleEffectSpec) -> str:
+    canonical = json.dumps(
+        effect.to_payload(),
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
+    effect_suffix = hashlib.sha256(canonical).hexdigest()[:8]
+    return (
+        f"rule-effect:{rule_ir.ir_hash()[:16]}:"
+        f"{clause.clause_id.rsplit(':', 1)[-1]}:{effect_suffix}"
+    )
 
 
 def _diagnostic_payloads(rule_ir: RuleIR) -> list[dict[str, JsonValue]]:

@@ -25,6 +25,13 @@ RUNTIME_GENERIC_IR_BOUNDARY_FILES = (
     / "rules"
     / "source_packages"
     / "warhammer_40000_11th"
+    / "faction_court_of_the_phoenician_ir_support_2026_27.py",
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "rules"
+    / "source_packages"
+    / "warhammer_40000_11th"
     / "faction_spectacle_of_slaughter_ir_support_2026_27.py",
     ROOT / "src" / "warhammer40k_core" / "engine" / "faction_content" / "stratagem_activation.py",
     ROOT

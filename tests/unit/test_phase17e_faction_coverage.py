@@ -12,6 +12,9 @@ import pytest
 from tools.fetch_official_sources import load_official_source_manifest
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27 as faction_coverage_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -94,6 +97,8 @@ GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        "enhancement:emperors-children:court-of-the-phoenician:000010654002",
+        "enhancement:emperors-children:court-of-the-phoenician:000010654004",
         "enhancement:emperors-children:spectacle-of-slaughter:000010900002",
         "enhancement:genestealer-cults:outlander-claw:000009079002",
         "enhancement:orks:more-dakka:000009991005",
@@ -107,7 +112,13 @@ GENERIC_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        "enhancement:emperors-children:court-of-the-phoenician:000010654005",
         "enhancement:necrons:cryptek-conclave:000010664004",
+    }
+)
+GENERIC_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        "enhancement:emperors-children:court-of-the-phoenician:000010654003",
     }
 )
 GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
@@ -128,16 +139,24 @@ GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         *GENERIC_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
+        *GENERIC_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS,
     }
 )
 GENERIC_DETACHMENT_RULE_KEYS = frozenset(
     {
+        ("emperors-children", "court-of-the-phoenician"),
         ("emperors-children", "spectacle-of-slaughter"),
         ("orks", "more-dakka"),
     }
 )
 GENERIC_STRATAGEM_SOURCE_ROW_IDS = frozenset(
     {
+        "stratagem:emperors-children:court-of-the-phoenician:000010655002",
+        "stratagem:emperors-children:court-of-the-phoenician:000010655003",
+        "stratagem:emperors-children:court-of-the-phoenician:000010655004",
+        "stratagem:emperors-children:court-of-the-phoenician:000010655005",
+        "stratagem:emperors-children:court-of-the-phoenician:000010655006",
+        "stratagem:emperors-children:court-of-the-phoenician:000010655007",
         "stratagem:emperors-children:spectacle-of-slaughter:000010901002",
         "stratagem:emperors-children:spectacle-of-slaughter:000010901003",
         "stratagem:emperors-children:spectacle-of-slaughter:000010901004",
@@ -147,6 +166,21 @@ GENERIC_STRATAGEM_SOURCE_ROW_IDS = frozenset(
         "stratagem:orks:more-dakka:000009992005",
         "stratagem:orks:more-dakka:000009992006",
         "stratagem:orks:more-dakka:000009992007",
+    }
+)
+COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS = frozenset(
+    {
+        "phase17e:emperors-children:court-of-the-phoenician:rule",
+        "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654002",
+        "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654003",
+        "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654004",
+        "phase17e:enhancement:emperors-children:court-of-the-phoenician:000010654005",
+        "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655002",
+        "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655003",
+        "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655004",
+        "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655005",
+        "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655006",
+        "phase17e:stratagem:emperors-children:court-of-the-phoenician:000010655007",
     }
 )
 BLOOD_LEGION_RUNTIME_CONSUMERS = (
@@ -1106,6 +1140,12 @@ def test_phase17e_generic_enhancements_are_template_family_bounded() -> None:
         == GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
     )
     assert (
+        set(
+            generic_ir_support_source.supported_court_of_the_phoenician_mixed_enhancement_source_row_ids()
+        )
+        == GENERIC_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS
+    )
+    assert (
         set(generic_ir_support_source.supported_generic_enhancement_source_row_ids())
         == GENERIC_ENHANCEMENT_SOURCE_ROW_IDS
     )
@@ -1120,6 +1160,29 @@ def test_phase17e_generic_enhancements_are_template_family_bounded() -> None:
             generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
                 f"phase17e:{source_row_id}"
             )
+        )
+
+
+def test_phase17e_court_of_the_phoenician_rows_are_generic_rule_ir_supported() -> None:
+    rows_by_descriptor_id = {
+        row.descriptor_id: row for row in faction_coverage_source.coverage_rows()
+    }
+
+    assert set(court_ir.supported_coverage_descriptor_ids()) == (
+        COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS
+    )
+    assert set(rows_by_descriptor_id) >= COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS
+    for descriptor_id in COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS:
+        assert court_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id) is not None
+        assert court_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id) is not None
+
+        row = rows_by_descriptor_id[descriptor_id]
+        assert row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+        assert row.faction_id == "emperors-children"
+        assert row.detachment_id == "court-of-the-phoenician"
+        assert row.handler_id is None
+        assert row.rule_ir_hash == (
+            generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(descriptor_id)
         )
 
 

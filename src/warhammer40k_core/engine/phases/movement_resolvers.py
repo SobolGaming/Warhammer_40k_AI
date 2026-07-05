@@ -295,6 +295,11 @@ def _resolve_unit_move(
         objective_markers,
     )
     unit = scenario.unit_instance_for_placement(unit_placement)
+    unit_persisting_effects = (
+        tuple(state.persisting_effects_for_unit(unit_placement.unit_instance_id))
+        if state is not None
+        else ()
+    )
     hover_mode_state = _hover_mode_state_for_unit(
         hover_mode_states=hover_mode_states,
         unit_instance_id=unit_placement.unit_instance_id,
@@ -399,6 +404,8 @@ def _resolve_unit_move(
                 model_placement.model_instance_id
                 for model_placement in unit_placement.model_placements
             ),
+            unit_persisting_effects=unit_persisting_effects,
+            owner_player_id=unit_placement.player_id,
         )
         path_result = legality_context.to_path_validation_context(
             moving_model=moving_model,
