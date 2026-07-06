@@ -214,6 +214,7 @@ CAVALCADE_OF_CHAOS_GENERIC_DESCRIPTOR_IDS = frozenset(
         ),
     }
 )
+SHADOW_LEGION_GENERIC_DESCRIPTOR_IDS = frozenset({"phase17e:chaos-daemons:shadow-legion:rule"})
 
 
 def test_phase17f_execution_package_covers_every_phase17e_coverage_row() -> None:
@@ -358,11 +359,6 @@ def test_phase17f_malice_made_manifest_execution_record_is_named_handler() -> No
             "daemonic-incursion",
             "Daemonic Incursion detachment rule",
             DAEMONIC_INCURSION_RUNTIME_CONSUMERS,
-        ),
-        (
-            "shadow-legion",
-            "Shadow Legion detachment rule",
-            SHADOW_LEGION_RUNTIME_CONSUMERS,
         ),
     ],
 )
@@ -655,6 +651,24 @@ def test_phase17f_cavalcade_of_chaos_rows_are_executable_generic_ir() -> None:
 
     assert set(records_by_descriptor_id) >= CAVALCADE_OF_CHAOS_GENERIC_DESCRIPTOR_IDS
     for descriptor_id in CAVALCADE_OF_CHAOS_GENERIC_DESCRIPTOR_IDS:
+        record = records_by_descriptor_id[descriptor_id]
+        assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+        assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+        assert record.block_reason is None
+        assert record.handler_id is None
+        assert record.rule_ir_hash == (
+            generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(descriptor_id)
+        )
+
+
+def test_phase17f_shadow_legion_detachment_rule_is_executable_generic_ir() -> None:
+    records_by_descriptor_id = {
+        record.coverage_descriptor_id: record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+    }
+
+    assert set(records_by_descriptor_id) >= SHADOW_LEGION_GENERIC_DESCRIPTOR_IDS
+    for descriptor_id in SHADOW_LEGION_GENERIC_DESCRIPTOR_IDS:
         record = records_by_descriptor_id[descriptor_id]
         assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
         assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR

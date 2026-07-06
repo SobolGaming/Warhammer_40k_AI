@@ -8,7 +8,7 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_daemons-kisvudjypt-uzk9
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 4 | 28 | 43 | 8 |
+| 9 | 4 | 28 | 43 | 7 |
 
 ## Detachment Rule Support
 
@@ -168,7 +168,7 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 | Lords of the Warp | Lords of the Warp detachment rule | `phase17e:chaos-daemons:lords-of-the-warp:rule` | `named_handler_required` | `phase17e:detachment:lords-of-the-warp:rule` | `gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:lords-of-the-warp`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons` |
 | Plague Legion | Plague Legion detachment rule | `phase17e:chaos-daemons:plague-legion:rule` | `named_handler_required` | `phase17e:detachment:plague-legion:rule` | `gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:plague-legion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons` |
 | Scintillating Legion | Scintillating Legion detachment rule | `phase17e:chaos-daemons:scintillating-legion:rule` | `named_handler_required` | `phase17e:detachment:scintillating-legion:rule` | `gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:scintillating-legion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons` |
-| Shadow Legion | Shadow Legion detachment rule | `phase17e:chaos-daemons:shadow-legion:rule` | `implemented` / `engine_consumed` | `warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:murderers-cowl:advance-eligibility` | `gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:shadow-legion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons` |
+| Shadow Legion | Shadow Legion detachment rule | `phase17e:chaos-daemons:shadow-legion:rule` | `generic_supported` |  | `gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:shadow-legion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons` |
 | Warptide | Warptide detachment rule | `phase17e:chaos-daemons:warptide:rule` | `named_handler_required` | `phase17e:detachment:warptide:rule` | `gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:warptide`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons` |
 
 ## Enhancements

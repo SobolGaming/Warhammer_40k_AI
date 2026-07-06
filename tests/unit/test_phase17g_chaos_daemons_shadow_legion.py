@@ -6,6 +6,7 @@ from typing import cast
 import pytest
 from tests.phase11c_command_phase_helpers import (
     battle_state,
+    phase11c_config,
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -20,6 +21,7 @@ from warhammer40k_core.core.faction_aliases import (
 )
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
+    FightEligibilityKind,
     FightOrderingBandKind,
     FightTypeKind,
     RulesetDescriptor,
@@ -45,8 +47,8 @@ from warhammer40k_core.engine.army_mustering import (
 from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
-    AttackSequenceCompletedHookRegistry,
 )
+from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
 from warhammer40k_core.engine.damage_allocation import (
     FeelNoPainSource,
@@ -64,6 +66,8 @@ from warhammer40k_core.engine.enhancement_effects import (
     apply_enhancement_effects,
 )
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
+from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle_for_armies
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.shadow_legion import (  # noqa: E501
     enhancements,
     rule,
@@ -71,14 +75,19 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as dark_pacts,
 )
+from warhammer40k_core.engine.fight_order import FightActivationSelection
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
     FightPhaseStartHookRegistry,
     FightPhaseStartRequestContext,
     FightPhaseStartResultContext,
 )
-from warhammer40k_core.engine.fight_unit_selected_hooks import FightUnitSelectedContext
-from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.fight_unit_selected_hooks import (
+    DECLINE_FIGHT_UNIT_GRANT_OPTION_ID,
+    SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
+    FightUnitSelectedContext,
+)
+from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.list_validation import (
     BattleSize,
     DetachmentSelection,
@@ -89,9 +98,16 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookRegistry,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatusKind,
+    SetupStep,
+)
 from warhammer40k_core.engine.phases.fight import (
     FightPhaseHandler,
+    _request_fight_unit_selected_grant_decision_if_available,  # pyright: ignore[reportPrivateUsage]
     invalid_fight_phase_start_faction_rule_status,
 )
 from warhammer40k_core.engine.phases.shooting import (
@@ -114,8 +130,8 @@ from warhammer40k_core.engine.runtime_modifiers import (
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
+    DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID,
     SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
-    ShootingUnitSelectedGrantRegistry,
 )
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionContext
 from warhammer40k_core.engine.turn_end_hooks import (
@@ -132,6 +148,9 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_shadow_legion_ir_support_2026_27 as shadow_legion_ir,
+)
 
 _DAEMON_DATASHEET_ID = "phase17g-shadow-legion-daemon"
 _BELAKOR_DATASHEET_ID = "phase17g-shadow-legion-belakor"
@@ -140,45 +159,29 @@ _DAMNED_DATASHEET_ID = "phase17g-shadow-legion-damned"
 _DAEMON_PRINCE_DATASHEET_ID = "phase17g-shadow-legion-daemon-prince"
 _EPIC_HERO_DATASHEET_ID = "phase17g-shadow-legion-epic-hero"
 _NOISE_MARINES_DATASHEET_ID = "phase17g-shadow-legion-noise-marines"
+_EXPECTED_SHADOW_LEGION_SHOOTING_DARK_PACT_OPTION_IDS = {
+    "phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:shooting:lethal_hits",
+    ("phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:shooting:sustained_hits_1"),
+}
+_EXPECTED_SHADOW_LEGION_FIGHT_DARK_PACT_OPTION_IDS = {
+    "phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:fight:lethal_hits",
+    ("phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:fight:sustained_hits_1"),
+}
 
 
-def test_shadow_legion_runtime_contribution_registers_engine_hooks() -> None:
+def test_shadow_legion_runtime_contribution_delegates_detachment_rule_to_generic_ir() -> None:
     contribution = rule.runtime_contribution()
-    shooting_grant_hook_ids = {
-        binding.hook_id for binding in contribution.shooting_unit_selected_grant_hook_bindings
-    }
-    fight_grant_hook_ids = {
-        binding.hook_id for binding in contribution.fight_unit_selected_grant_hook_bindings
-    }
 
     assert contribution.contribution_id == rule.CONTRIBUTION_ID
-    assert contribution.advance_eligibility_hook_bindings[0].hook_id == (
-        rule.ADVANCE_ELIGIBILITY_HOOK_ID
-    )
-    assert contribution.shooting_target_restriction_hook_bindings[0].hook_id == (
-        rule.SLAANESH_TARGET_RESTRICTION_HOOK_ID
-    )
-    assert shooting_grant_hook_ids == {
-        rule.SHOOTING_LETHAL_HITS_HOOK_ID,
-        rule.SHOOTING_SUSTAINED_HITS_HOOK_ID,
-    }
-    assert fight_grant_hook_ids == {
-        rule.FIGHT_LETHAL_HITS_HOOK_ID,
-        rule.FIGHT_SUSTAINED_HITS_HOOK_ID,
-    }
-    assert contribution.attack_sequence_completed_hook_bindings[0].hook_id == (
-        rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
-    )
-    assert contribution.mortal_wound_feel_no_pain_hook_bindings[0].source_kind == (
-        dark_pacts.SHADOW_LEGION_DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND
-    )
-    assert contribution.hit_roll_modifier_bindings[0].modifier_id == rule.TZEENTCH_HIT_MODIFIER_ID
-    assert contribution.wound_roll_modifier_bindings[0].modifier_id == (
-        rule.NURGLE_WOUND_MODIFIER_ID
-    )
-    assert contribution.weapon_profile_modifier_bindings[0].modifier_id == (
-        rule.WEAPON_PROFILE_MODIFIER_ID
-    )
+    assert contribution.advance_eligibility_hook_bindings == ()
+    assert contribution.shooting_target_restriction_hook_bindings == ()
+    assert contribution.shooting_unit_selected_grant_hook_bindings == ()
+    assert contribution.fight_unit_selected_grant_hook_bindings == ()
+    assert contribution.attack_sequence_completed_hook_bindings == ()
+    assert contribution.mortal_wound_feel_no_pain_hook_bindings == ()
+    assert contribution.hit_roll_modifier_bindings == ()
+    assert contribution.wound_roll_modifier_bindings == ()
+    assert contribution.weapon_profile_modifier_bindings == ()
 
 
 def test_shadow_legion_enhancement_runtime_contribution_registers_exact_hooks() -> None:
@@ -951,8 +954,9 @@ def test_shadow_legion_roster_reports_thralls_and_forbidden_units() -> None:
 def test_shadow_legion_mark_abilities_apply_through_engine_hook_contexts() -> None:
     khorne_state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Khorne"))
     khorne_unit = _unit_for_player(khorne_state, player_id="player-a")
+    khorne_bundle = _shadow_legion_runtime_bundle(khorne_state)
 
-    advance_grant = rule.murderers_cowl_advance_eligibility(
+    advance_grants = khorne_bundle.advance_eligibility_hook_registry.grants_for(
         AdvanceEligibilityContext(
             state=khorne_state,
             player_id="player-a",
@@ -963,6 +967,7 @@ def test_shadow_legion_mark_abilities_apply_through_engine_hook_contexts() -> No
         )
     )
 
+    advance_grant = _single(advance_grants)
     assert advance_grant is not None
     assert advance_grant.can_shoot
     assert advance_grant.can_declare_charge
@@ -970,8 +975,9 @@ def test_shadow_legion_mark_abilities_apply_through_engine_hook_contexts() -> No
     tzeentch_state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Tzeentch"))
     tzeentch_target = _unit_for_player(tzeentch_state, player_id="player-a")
     enemy = _unit_for_player(tzeentch_state, player_id="player-b")
+    tzeentch_bundle = _shadow_legion_runtime_bundle(tzeentch_state)
     assert (
-        rule.penumbral_puppetry_hit_roll_modifier(
+        tzeentch_bundle.runtime_modifier_registry.hit_roll_modifier(
             HitRollModifierContext(
                 state=tzeentch_state,
                 attacking_unit_instance_id=enemy.unit_instance_id,
@@ -984,7 +990,7 @@ def test_shadow_legion_mark_abilities_apply_through_engine_hook_contexts() -> No
         == -1
     )
     assert (
-        rule.penumbral_puppetry_hit_roll_modifier(
+        tzeentch_bundle.runtime_modifier_registry.hit_roll_modifier(
             HitRollModifierContext(
                 state=tzeentch_state,
                 attacking_unit_instance_id=enemy.unit_instance_id,
@@ -1000,8 +1006,9 @@ def test_shadow_legion_mark_abilities_apply_through_engine_hook_contexts() -> No
     nurgle_state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Nurgle"))
     nurgle_target = _unit_for_player(nurgle_state, player_id="player-a")
     enemy = _unit_for_player(nurgle_state, player_id="player-b")
+    nurgle_bundle = _shadow_legion_runtime_bundle(nurgle_state)
     assert (
-        rule.gloam_rot_wound_roll_modifier(
+        nurgle_bundle.runtime_modifier_registry.wound_roll_modifier(
             WoundRollModifierContext(
                 state=nurgle_state,
                 source_phase=BattlePhase.SHOOTING,
@@ -1016,7 +1023,7 @@ def test_shadow_legion_mark_abilities_apply_through_engine_hook_contexts() -> No
         == -1
     )
     assert (
-        rule.gloam_rot_wound_roll_modifier(
+        nurgle_bundle.runtime_modifier_registry.wound_roll_modifier(
             WoundRollModifierContext(
                 state=nurgle_state,
                 source_phase=BattlePhase.SHOOTING,
@@ -1034,7 +1041,8 @@ def test_shadow_legion_mark_abilities_apply_through_engine_hook_contexts() -> No
     slaanesh_state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Slaanesh"))
     slaanesh_target = _unit_for_player(slaanesh_state, player_id="player-a")
     enemy = _unit_for_player(slaanesh_state, player_id="player-b")
-    snap_restriction = rule.shadows_caress_snap_target_restriction(
+    slaanesh_bundle = _shadow_legion_runtime_bundle(slaanesh_state)
+    snap_restrictions = slaanesh_bundle.shooting_target_restriction_hook_registry.restrictions_for(
         ShootingTargetRestrictionContext(
             state=slaanesh_state,
             player_id="player-b",
@@ -1045,21 +1053,63 @@ def test_shadow_legion_mark_abilities_apply_through_engine_hook_contexts() -> No
             shooting_type=ShootingType.SNAP,
         )
     )
-    normal_restriction = rule.shadows_caress_snap_target_restriction(
-        ShootingTargetRestrictionContext(
-            state=slaanesh_state,
-            player_id="player-b",
-            battle_round=slaanesh_state.battle_round,
-            attacking_unit_instance_id=enemy.unit_instance_id,
-            target_unit_instance_id=slaanesh_target.unit_instance_id,
-            attacker_model_instance_id=enemy.own_models[0].model_instance_id,
-            shooting_type=ShootingType.NORMAL,
+    normal_restrictions = (
+        slaanesh_bundle.shooting_target_restriction_hook_registry.restrictions_for(
+            ShootingTargetRestrictionContext(
+                state=slaanesh_state,
+                player_id="player-b",
+                battle_round=slaanesh_state.battle_round,
+                attacking_unit_instance_id=enemy.unit_instance_id,
+                target_unit_instance_id=slaanesh_target.unit_instance_id,
+                attacker_model_instance_id=enemy.own_models[0].model_instance_id,
+                shooting_type=ShootingType.NORMAL,
+            )
         )
     )
 
-    assert snap_restriction is not None
+    snap_restriction = _single(snap_restrictions)
     assert snap_restriction.violation_code == "shadow_legion_shadows_caress_snap_target_forbidden"
-    assert normal_restriction is None
+    assert normal_restrictions == ()
+
+
+def test_shadow_legion_generic_runtime_bundle_materializes_detachment_hooks() -> None:
+    state = _shadow_legion_state()
+    bundle = _shadow_legion_runtime_bundle(state)
+
+    assert any(
+        "shadow-legion" in binding.hook_id
+        for binding in bundle.battle_formation_hook_registry.all_bindings()
+    )
+    assert any(
+        "shadow-legion" in binding.hook_id
+        for binding in bundle.advance_eligibility_hook_registry.all_bindings()
+    )
+    assert any(
+        "shadow-legion" in binding.hook_id
+        for binding in bundle.shooting_unit_selected_grant_hook_registry.all_bindings()
+    )
+    assert any(
+        "shadow-legion" in binding.hook_id
+        for binding in bundle.fight_unit_selected_grant_hook_registry.all_bindings()
+    )
+    assert any(
+        "shadow-legion" in binding.hook_id
+        for binding in bundle.attack_sequence_completed_hook_registry.all_bindings()
+    )
+    assert any(
+        "shadow-legion" in binding.hook_id
+        for binding in bundle.mortal_wound_feel_no_pain_hook_registry.all_bindings()
+    )
+    assert any(
+        "shadow-legion" in binding.modifier_id
+        for binding in bundle.runtime_modifier_registry.all_weapon_profile_bindings()
+    )
+    assert any(
+        effect.effect_payload.get("coverage_descriptor_id")
+        == shadow_legion_ir.SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
+        for effect in state.persisting_effects
+        if isinstance(effect.effect_payload, dict)
+    )
 
 
 def test_shadow_legion_dark_pacts_grant_and_belakor_auto_pass_completion() -> None:
@@ -1076,10 +1126,8 @@ def test_shadow_legion_dark_pacts_grant_and_belakor_auto_pass_completion() -> No
         active_player_id="player-a",
     ).with_unit_selection(selection)
     decisions = DecisionController()
-    contribution = rule.runtime_contribution()
-    grant_registry = ShootingUnitSelectedGrantRegistry.from_bindings(
-        contribution.shooting_unit_selected_grant_hook_bindings
-    )
+    bundle = _shadow_legion_runtime_bundle(state)
+    grant_registry = bundle.shooting_unit_selected_grant_hook_registry
 
     status = _request_shooting_unit_selected_grant_decision_if_available(
         state=state,
@@ -1088,10 +1136,17 @@ def test_shadow_legion_dark_pacts_grant_and_belakor_auto_pass_completion() -> No
         registry=grant_registry,
     )
     request = _decision_request(None if status is None else status.decision_request)
+
+    assert request.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE
+    assert {option.option_id for option in request.options} == (
+        _EXPECTED_SHADOW_LEGION_SHOOTING_DARK_PACT_OPTION_IDS
+        | {DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID}
+    )
+
     result = DecisionResult.for_request(
         result_id="shadow-legion-belakor-dark-pact-result",
         request=request,
-        selected_option_id=rule.SHOOTING_LETHAL_HITS_HOOK_ID,
+        selected_option_id=_option_id_for_label(request, "Dark Pacts: Lethal Hits"),
     )
     decisions.submit_result(result)
     _apply_shooting_unit_selected_grant_decision(
@@ -1101,7 +1156,7 @@ def test_shadow_legion_dark_pacts_grant_and_belakor_auto_pass_completion() -> No
         registry=grant_registry,
     )
 
-    modified = dark_pacts.dark_pact_weapon_profile_modifier(
+    modified = bundle.runtime_modifier_registry.modified_weapon_profile(
         WeaponProfileModifierContext(
             state=state,
             source_phase=BattlePhase.SHOOTING,
@@ -1138,9 +1193,7 @@ def test_shadow_legion_dark_pacts_grant_and_belakor_auto_pass_completion() -> No
             descriptor_version="phase17g-shadow-legion-belakor"
         ),
         army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
-        attack_sequence_completed_hooks=AttackSequenceCompletedHookRegistry.from_bindings(
-            contribution.attack_sequence_completed_hook_bindings
-        ),
+        attack_sequence_completed_hooks=bundle.attack_sequence_completed_hook_registry,
     ).begin_phase(state=state, decisions=decisions)
 
     assert completion_status.status_kind is LifecycleStatusKind.ADVANCED
@@ -1157,9 +1210,7 @@ def test_shadow_legion_dark_pacts_grant_and_belakor_auto_pass_completion() -> No
             descriptor_version="phase17g-shadow-legion-belakor"
         ),
         army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
-        attack_sequence_completed_hooks=AttackSequenceCompletedHookRegistry.from_bindings(
-            contribution.attack_sequence_completed_hook_bindings
-        ),
+        attack_sequence_completed_hooks=bundle.attack_sequence_completed_hook_registry,
     ).begin_phase(state=state, decisions=decisions)
     assert _event_count(decisions, "chaos_space_marines_dark_pact_resolved") == 1
 
@@ -1233,11 +1284,9 @@ def test_shadow_legion_dark_pacts_failed_leadership_routes_fnp_decision() -> Non
         ),
     )
     starting_wounds = sum(model.wounds_remaining for model in unit.own_models)
-    contribution = rule.runtime_contribution()
+    bundle = _shadow_legion_runtime_bundle(state)
 
-    status = AttackSequenceCompletedHookRegistry.from_bindings(
-        contribution.attack_sequence_completed_hook_bindings
-    ).resolve_completed_sequence(
+    status = bundle.attack_sequence_completed_hook_registry.resolve_completed_sequence(
         AttackSequenceCompletedContext(
             state=state,
             decisions=decisions,
@@ -1276,9 +1325,7 @@ def test_shadow_legion_dark_pacts_failed_leadership_routes_fnp_decision() -> Non
         selected_option_id=source_a.source_id,
     )
     decisions.submit_result(result)
-    continuation_status = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
-        contribution.mortal_wound_feel_no_pain_hook_bindings
-    ).apply_decision(
+    continuation_status = bundle.mortal_wound_feel_no_pain_hook_registry.apply_decision(
         MortalWoundFeelNoPainContinuationContext(
             state=state,
             decisions=decisions,
@@ -1328,9 +1375,8 @@ def test_shadow_legion_out_of_phase_shooting_requests_dark_pacts_grant() -> None
     target = _unit_for_player(state, player_id="player-b")
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
     decisions = DecisionController()
-    grant_registry = ShootingUnitSelectedGrantRegistry.from_bindings(
-        rule.runtime_contribution().shooting_unit_selected_grant_hook_bindings
-    )
+    bundle = _shadow_legion_runtime_bundle(state)
+    grant_registry = bundle.shooting_unit_selected_grant_hook_registry
 
     grant_status = request_out_of_phase_shooting_declaration(
         state=state,
@@ -1357,11 +1403,15 @@ def test_shadow_legion_out_of_phase_shooting_requests_dark_pacts_grant() -> None
     assert request.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE
     assert state.out_of_phase_shooting_state is not None
     assert state.out_of_phase_shooting_state.target_unit_ids == (target.unit_instance_id,)
+    assert {option.option_id for option in request.options} == (
+        _EXPECTED_SHADOW_LEGION_SHOOTING_DARK_PACT_OPTION_IDS
+        | {DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID}
+    )
 
     result = DecisionResult.for_request(
         result_id="shadow-legion-out-of-phase-dark-pact-result",
         request=request,
-        selected_option_id=rule.SHOOTING_LETHAL_HITS_HOOK_ID,
+        selected_option_id=_option_id_for_label(request, "Dark Pacts: Lethal Hits"),
     )
     decisions.submit_result(result)
     declaration_status = ShootingPhaseHandler(
@@ -1396,9 +1446,69 @@ def test_shadow_legion_fight_grants_dark_pacts_for_undivided_units() -> None:
     state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided"))
     unit = _unit_for_player(state, player_id="player-a")
     _set_current_battle_phase(state, BattlePhase.FIGHT)
+    bundle = _shadow_legion_runtime_bundle(state)
 
-    grants = tuple(
-        binding.handler(
+    grants = bundle.fight_unit_selected_grant_hook_registry.grants_for(
+        FightUnitSelectedContext(
+            state=state,
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            fight_type=FightTypeKind.NORMAL.value,
+            ordering_band=FightOrderingBandKind.REMAINING_COMBATS.value,
+            request_id="shadow-legion-fight-request",
+            result_id="shadow-legion-fight-result",
+        )
+    )
+
+    assert {grant.label for grant in grants} == {
+        "Dark Pacts: Lethal Hits",
+        "Dark Pacts: Sustained Hits 1",
+    }
+    assert {grant.hook_id for grant in grants} == _EXPECTED_SHADOW_LEGION_FIGHT_DARK_PACT_OPTION_IDS
+
+    decisions = DecisionController()
+    status = _request_fight_unit_selected_grant_decision_if_available(
+        state=state,
+        decisions=decisions,
+        activation=FightActivationSelection(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+            ordering_band=FightOrderingBandKind.REMAINING_COMBATS,
+            fight_type=FightTypeKind.NORMAL,
+            eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
+            request_id="shadow-legion-fight-request",
+            result_id="shadow-legion-fight-result",
+        ),
+        registry=bundle.fight_unit_selected_grant_hook_registry,
+    )
+    request = _decision_request(None if status is None else status.decision_request)
+
+    assert request.decision_type == SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE
+    assert {option.option_id for option in request.options} == (
+        _EXPECTED_SHADOW_LEGION_FIGHT_DARK_PACT_OPTION_IDS | {DECLINE_FIGHT_UNIT_GRANT_OPTION_ID}
+    )
+
+
+def test_shadow_legion_generic_effect_consumption_excludes_faction_keyword_only_units() -> None:
+    state = _shadow_legion_state(
+        unit_keywords=("Undivided",),
+        faction_keywords=("Shadow Legion", "Legiones Daemonica"),
+    )
+    unit = _unit_for_player(state, player_id="player-a")
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    bundle = _shadow_legion_runtime_bundle(state)
+
+    assert any(
+        unit.unit_instance_id in effect.target_unit_instance_ids
+        and isinstance(effect.effect_payload, dict)
+        and effect.effect_payload.get("coverage_descriptor_id")
+        == shadow_legion_ir.SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
+        for effect in state.persisting_effects
+    )
+    assert (
+        bundle.fight_unit_selected_grant_hook_registry.grants_for(
             FightUnitSelectedContext(
                 state=state,
                 player_id="player-a",
@@ -1406,17 +1516,12 @@ def test_shadow_legion_fight_grants_dark_pacts_for_undivided_units() -> None:
                 unit_instance_id=unit.unit_instance_id,
                 fight_type=FightTypeKind.NORMAL.value,
                 ordering_band=FightOrderingBandKind.REMAINING_COMBATS.value,
-                request_id="shadow-legion-fight-request",
-                result_id="shadow-legion-fight-result",
+                request_id="shadow-legion-faction-keyword-fight-request",
+                result_id="shadow-legion-faction-keyword-fight-result",
             )
         )
-        for binding in rule.runtime_contribution().fight_unit_selected_grant_hook_bindings
+        == ()
     )
-
-    assert {grant.hook_id for grant in grants if grant is not None} == {
-        rule.FIGHT_LETHAL_HITS_HOOK_ID,
-        rule.FIGHT_SUSTAINED_HITS_HOOK_ID,
-    }
 
 
 def test_fade_to_darkness_requires_current_fight_destroyed_enemy_marker() -> None:
@@ -1713,6 +1818,47 @@ def _shadow_legion_state(
         )
     state.army_definitions = updated_armies
     return state
+
+
+def _shadow_legion_runtime_bundle(state: GameState) -> RuntimeContentBundle:
+    config = phase11c_config()
+    bundle = build_runtime_content_bundle_for_armies(
+        config=config,
+        armies=tuple(state.army_definitions),
+    )
+    _apply_runtime_battle_formation_hooks(
+        state=state,
+        bundle=bundle,
+        config=config,
+    )
+    return bundle
+
+
+def _apply_runtime_battle_formation_hooks(
+    *,
+    state: GameState,
+    bundle: RuntimeContentBundle,
+    config: GameConfig,
+) -> None:
+    original_stage = state.stage
+    original_setup_step_index = state.setup_step_index
+    try:
+        state.stage = GameLifecycleStage.SETUP
+        state.setup_step_index = state.setup_sequence.index(SetupStep.DECLARE_BATTLE_FORMATIONS)
+        context = BattleFormationRequestContext(
+            state=state,
+            decisions=DecisionController(),
+            config=config,
+        )
+        for binding in bundle.battle_formation_hook_registry.all_bindings():
+            if binding.request_handler is None:
+                continue
+            request = binding.request_handler(context)
+            if request is not None:
+                raise AssertionError("Shadow Legion generic detachment hook emitted a request.")
+    finally:
+        state.stage = original_stage
+        state.setup_step_index = original_setup_step_index
 
 
 def _core_unit_selection(unit_selection_id: str) -> UnitMusterSelection:
@@ -2261,6 +2407,17 @@ def _decision_request(request: DecisionRequest | None) -> DecisionRequest:
     if request is None:
         raise AssertionError("Expected decision request.")
     return request
+
+
+def _single[T](values: tuple[T, ...]) -> T:
+    if len(values) != 1:
+        raise AssertionError(f"Expected one value, got {len(values)}.")
+    return values[0]
+
+
+def _option_id_for_label(request: DecisionRequest, label: str) -> str:
+    matches = tuple(option.option_id for option in request.options if option.label == label)
+    return _single(matches)
 
 
 def _last_event_payload(
