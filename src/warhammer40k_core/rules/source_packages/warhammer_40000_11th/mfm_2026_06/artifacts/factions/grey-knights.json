@@ -1,0 +1,2018 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "argent-assault",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "psychic-celerity",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Psychic Celerity",
+          "points": 15,
+          "raw_name": "Psychic Celerity",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:argent-assault:enhancement:psychic-celerity"
+        },
+        {
+          "enhancement_id": "vigilance-of-titan",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Vigilance of Titan",
+          "points": 20,
+          "raw_name": "Vigilance of Titan",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:argent-assault:enhancement:vigilance-of-titan"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "ARGENT ASSAULT",
+      "raw_name": "ARGENT ASSAULT",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:argent-assault"
+    },
+    {
+      "detachment_id": "augurium-task-force",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "doomseers-amulet",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Doomseer's Amulet",
+          "points": 25,
+          "raw_name": "Doomseer's Amulet",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:augurium-task-force:enhancement:doomseers-amulet"
+        },
+        {
+          "enhancement_id": "grimoire-of-conjunctions",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Grimoire of Conjunctions",
+          "points": 10,
+          "raw_name": "Grimoire of Conjunctions",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:augurium-task-force:enhancement:grimoire-of-conjunctions"
+        },
+        {
+          "enhancement_id": "one-foot-in-the-future",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "One Foot in the Future",
+          "points": 15,
+          "raw_name": "One Foot in the Future",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:augurium-task-force:enhancement:one-foot-in-the-future"
+        },
+        {
+          "enhancement_id": "shield-of-prophecy",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Shield of Prophecy",
+          "points": 20,
+          "raw_name": "Shield of Prophecy",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:augurium-task-force:enhancement:shield-of-prophecy"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "AUGURIUM TASK FORCE",
+      "raw_name": "AUGURIUM TASK FORCE",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:augurium-task-force"
+    },
+    {
+      "detachment_id": "banishers",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "ephemeral-tome",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Ephemeral Tome",
+          "points": 15,
+          "raw_name": "Ephemeral Tome",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:banishers:enhancement:ephemeral-tome"
+        },
+        {
+          "enhancement_id": "pyresoul",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Pyresoul",
+          "points": 20,
+          "raw_name": "Pyresoul",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:banishers:enhancement:pyresoul"
+        },
+        {
+          "enhancement_id": "sigil-of-the-hunt",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Sigil of the Hunt",
+          "points": 10,
+          "raw_name": "Sigil of the Hunt",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:banishers:enhancement:sigil-of-the-hunt"
+        },
+        {
+          "enhancement_id": "sixty-sixth-seal",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Sixty-sixth Seal",
+          "points": 25,
+          "raw_name": "Sixty-sixth Seal",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:banishers:enhancement:sixty-sixth-seal"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "BANISHERS",
+      "raw_name": "BANISHERS",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:banishers"
+    },
+    {
+      "detachment_id": "brotherhood-strike",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "banishing-wave",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Banishing Wave",
+          "points": 20,
+          "raw_name": "Banishing Wave",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:brotherhood-strike:enhancement:banishing-wave"
+        },
+        {
+          "enhancement_id": "blinding-aura",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Blinding Aura",
+          "points": 10,
+          "raw_name": "Blinding Aura",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:brotherhood-strike:enhancement:blinding-aura"
+        },
+        {
+          "enhancement_id": "purity-of-purpose",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Purity of Purpose",
+          "points": 15,
+          "raw_name": "Purity of Purpose",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:brotherhood-strike:enhancement:purity-of-purpose"
+        },
+        {
+          "enhancement_id": "tome-of-forbidden-ways",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tome of Forbidden Ways",
+          "points": 25,
+          "raw_name": "Tome of Forbidden Ways",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:brotherhood-strike:enhancement:tome-of-forbidden-ways"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "BROTHERHOOD STRIKE",
+      "raw_name": "BROTHERHOOD STRIKE",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:brotherhood-strike"
+    },
+    {
+      "detachment_id": "fires-of-purgation",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "boons-of-deimos",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Boons of Deimos (Upgrade)",
+          "points": 20,
+          "raw_name": "Boons of Deimos (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:fires-of-purgation:enhancement:boons-of-deimos"
+        },
+        {
+          "enhancement_id": "precognicient-volleys",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Precognicient Volleys (Upgrade)",
+          "points": 10,
+          "raw_name": "Precognicient Volleys (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:fires-of-purgation:enhancement:precognicient-volleys"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "FIRES OF PURGATION",
+      "raw_name": "FIRES OF PURGATION",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:fires-of-purgation"
+    },
+    {
+      "detachment_id": "hallowed-conclave",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "eye-of-the-augurium",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eye of the Augurium",
+          "points": 25,
+          "raw_name": "Eye of the Augurium",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:hallowed-conclave:enhancement:eye-of-the-augurium"
+        },
+        {
+          "enhancement_id": "inescapable-judgement",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Inescapable Judgement",
+          "points": 20,
+          "raw_name": "Inescapable Judgement",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:hallowed-conclave:enhancement:inescapable-judgement"
+        },
+        {
+          "enhancement_id": "nemesis-rounds",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Nemesis Rounds",
+          "points": 10,
+          "raw_name": "Nemesis Rounds",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:hallowed-conclave:enhancement:nemesis-rounds"
+        },
+        {
+          "enhancement_id": "sanctic-reaper",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Sanctic Reaper",
+          "points": 15,
+          "raw_name": "Sanctic Reaper",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:hallowed-conclave:enhancement:sanctic-reaper"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "HALLOWED CONCLAVE",
+      "raw_name": "HALLOWED CONCLAVE",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:hallowed-conclave"
+    },
+    {
+      "detachment_id": "immaterial-interdiction",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "astral-overlap",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Astral Overlap (Upgrade)",
+          "points": 10,
+          "raw_name": "Astral Overlap (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:immaterial-interdiction:enhancement:astral-overlap"
+        },
+        {
+          "enhancement_id": "predestined-coordinates",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Predestined Coordinates (Upgrade)",
+          "points": 10,
+          "raw_name": "Predestined Coordinates (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:immaterial-interdiction:enhancement:predestined-coordinates"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "IMMATERIAL INTERDICTION",
+      "raw_name": "IMMATERIAL INTERDICTION",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:immaterial-interdiction"
+    },
+    {
+      "detachment_id": "sanctic-spearhead",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "driven-by-duty",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Driven by Duty",
+          "points": 10,
+          "raw_name": "Driven by Duty",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:sanctic-spearhead:enhancement:driven-by-duty"
+        },
+        {
+          "enhancement_id": "quickening-foci",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Quickening Foci",
+          "points": 15,
+          "raw_name": "Quickening Foci",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:sanctic-spearhead:enhancement:quickening-foci"
+        },
+        {
+          "enhancement_id": "sigil-of-exigence",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Sigil of Exigence",
+          "points": 30,
+          "raw_name": "Sigil of Exigence",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:sanctic-spearhead:enhancement:sigil-of-exigence"
+        },
+        {
+          "enhancement_id": "spiritus-machina",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Spiritus Machina",
+          "points": 25,
+          "raw_name": "Spiritus Machina",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:sanctic-spearhead:enhancement:spiritus-machina"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "SANCTIC SPEARHEAD",
+      "raw_name": "SANCTIC SPEARHEAD",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:sanctic-spearhead"
+    },
+    {
+      "detachment_id": "warpbane-task-force",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "mandulian-reliquary",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mandulian Reliquary",
+          "points": 20,
+          "raw_name": "Mandulian Reliquary",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:warpbane-task-force:enhancement:mandulian-reliquary"
+        },
+        {
+          "enhancement_id": "paragon-of-sanctity",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Paragon of Sanctity",
+          "points": 10,
+          "raw_name": "Paragon of Sanctity",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:warpbane-task-force:enhancement:paragon-of-sanctity"
+        },
+        {
+          "enhancement_id": "phial-of-the-abyss",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Phial of the Abyss",
+          "points": 15,
+          "raw_name": "Phial of the Abyss",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:warpbane-task-force:enhancement:phial-of-the-abyss"
+        },
+        {
+          "enhancement_id": "radiant-champion",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Radiant Champion",
+          "points": 15,
+          "raw_name": "Radiant Champion",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:warpbane-task-force:enhancement:radiant-champion"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "WARPBANE TASK FORCE",
+      "raw_name": "WARPBANE TASK FORCE",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:detachment:warpbane-task-force"
+    }
+  ],
+  "faction_id": "grey-knights",
+  "name": "Grey Knights",
+  "raw_name": "Grey Knights",
+  "source_id": "gw-11e-mfm-2026-06:faction:grey-knights",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brother-captain:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brother-captain:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BROTHERHOOD TERMINATOR SQUAD",
+          "PALADIN SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "brotherhood-terminator-squad",
+          "paladin-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brother-captain:leader"
+      },
+      "name": "BROTHER-CAPTAIN",
+      "raw_name": "BROTHER-CAPTAIN",
+      "record_id": "units-brother-captain",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brother-captain",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "brother-captain",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-champion:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-champion:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PURGATION SQUAD",
+          "STRIKE SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "purgation-squad",
+          "strike-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-champion:leader"
+      },
+      "name": "BROTHERHOOD CHAMPION",
+      "raw_name": "BROTHERHOOD CHAMPION",
+      "record_id": "units-brotherhood-champion",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-champion",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "brotherhood-champion",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-chaplain:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-chaplain:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BROTHERHOOD TERMINATOR SQUAD",
+          "PALADIN SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "brotherhood-terminator-squad",
+          "paladin-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-chaplain:leader"
+      },
+      "name": "BROTHERHOOD CHAPLAIN",
+      "raw_name": "BROTHERHOOD CHAPLAIN",
+      "record_id": "units-brotherhood-chaplain",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-chaplain",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "brotherhood-chaplain",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-techmarine:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-techmarine:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PURGATION SQUAD",
+          "PURIFIER SQUAD",
+          "STRIKE SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "purgation-squad",
+          "purifier-squad",
+          "strike-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-techmarine:leader"
+      },
+      "name": "BROTHERHOOD TECHMARINE",
+      "raw_name": "BROTHERHOOD TECHMARINE",
+      "record_id": "units-brotherhood-techmarine",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-techmarine",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "brotherhood-techmarine",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 3RD UNITS COST",
+          "raw_label": "YOUR 1ST TO 3RD UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-terminator-squad:cost:your-1st-to-3rd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-terminator-squad:cost:your-1st-to-3rd-units-cost:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "8 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 8,
+              "model_id": null,
+              "model_name": null,
+              "points": 300,
+              "raw_label": "8 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-terminator-squad:cost:your-1st-to-3rd-units-cost:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 375,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-terminator-squad:cost:your-1st-to-3rd-units-cost:4"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-terminator-squad:cost:your-1st-to-3rd-units-cost",
+          "unit_number_max": 3,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 4TH + UNIT COSTS",
+          "raw_label": "YOUR 4TH + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-terminator-squad:cost:your-4th-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 185,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-terminator-squad:cost:your-4th-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "8 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 8,
+              "model_id": null,
+              "model_name": null,
+              "points": 310,
+              "raw_label": "8 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-terminator-squad:cost:your-4th-unit-costs:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 385,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-terminator-squad:cost:your-4th-unit-costs:4"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-terminator-squad:cost:your-4th-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 4
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BROTHERHOOD TERMINATOR SQUAD",
+      "raw_name": "BROTHERHOOD TERMINATOR SQUAD",
+      "record_id": "units-brotherhood-terminator-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-terminator-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "brotherhood-terminator-squad",
+      "wargear_costs": [
+        {
+          "name": "Psycannon",
+          "points_per_item": 5,
+          "raw_name": "per Psycannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-brotherhood-terminator-squad:wargear:per-psycannon:1",
+          "wargear_id": "psycannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-castellan-crowe:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-castellan-crowe:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PURIFIER SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "purifier-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-castellan-crowe:leader"
+      },
+      "name": "CASTELLAN CROWE",
+      "raw_name": "CASTELLAN CROWE",
+      "record_id": "units-castellan-crowe",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-castellan-crowe",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "castellan-crowe",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BROTHERHOOD TERMINATOR SQUAD",
+          "PALADIN SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "brotherhood-terminator-squad",
+          "paladin-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master:leader"
+      },
+      "name": "GRAND MASTER",
+      "raw_name": "GRAND MASTER",
+      "record_id": "units-grand-master",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "grand-master",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master-in-nemesis-dreadknight:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master-in-nemesis-dreadknight:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 215,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master-in-nemesis-dreadknight:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master-in-nemesis-dreadknight:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GRAND MASTER IN NEMESIS DREADKNIGHT",
+      "raw_name": "GRAND MASTER IN NEMESIS DREADKNIGHT",
+      "record_id": "units-grand-master-in-nemesis-dreadknight",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master-in-nemesis-dreadknight",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "grand-master-in-nemesis-dreadknight",
+      "wargear_costs": [
+        {
+          "name": "Heavy psycannon",
+          "points_per_item": 15,
+          "raw_name": "per Heavy psycannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master-in-nemesis-dreadknight:wargear:per-heavy-psycannon:2",
+          "wargear_id": "heavy-psycannon"
+        },
+        {
+          "name": "Sublimator",
+          "points_per_item": 15,
+          "raw_name": "per Sublimator",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master-in-nemesis-dreadknight:wargear:per-sublimator:1",
+          "wargear_id": "sublimator"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master-voldus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master-voldus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BROTHERHOOD TERMINATOR SQUAD",
+          "PALADIN SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "brotherhood-terminator-squad",
+          "paladin-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master-voldus:leader"
+      },
+      "name": "GRAND MASTER VOLDUS",
+      "raw_name": "GRAND MASTER VOLDUS",
+      "record_id": "units-grand-master-voldus",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grand-master-voldus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "grand-master-voldus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 805,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grey-knights-thunderhawk-gunship:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grey-knights-thunderhawk-gunship:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 855,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grey-knights-thunderhawk-gunship:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grey-knights-thunderhawk-gunship:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GREY KNIGHTS THUNDERHAWK GUNSHIP",
+      "raw_name": "GREY KNIGHTS THUNDERHAWK GUNSHIP",
+      "record_id": "units-grey-knights-thunderhawk-gunship",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-grey-knights-thunderhawk-gunship",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "grey-knights-thunderhawk-gunship",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-interceptor-squad:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 250,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-interceptor-squad:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-interceptor-squad:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-interceptor-squad:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 260,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-interceptor-squad:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-interceptor-squad:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "INTERCEPTOR SQUAD",
+      "raw_name": "INTERCEPTOR SQUAD",
+      "record_id": "units-interceptor-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-interceptor-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "interceptor-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 240,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LAND RAIDER",
+      "raw_name": "LAND RAIDER",
+      "record_id": "units-land-raider",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "land-raider",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider-crusader:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider-crusader:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 240,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider-crusader:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider-crusader:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LAND RAIDER CRUSADER",
+      "raw_name": "LAND RAIDER CRUSADER",
+      "record_id": "units-land-raider-crusader",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider-crusader",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "land-raider-crusader",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 250,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider-redeemer:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider-redeemer:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 270,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider-redeemer:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider-redeemer:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LAND RAIDER REDEEMER",
+      "raw_name": "LAND RAIDER REDEEMER",
+      "record_id": "units-land-raider-redeemer",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-land-raider-redeemer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "land-raider-redeemer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 195,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-nemesis-dreadknight:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-nemesis-dreadknight:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 210,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-nemesis-dreadknight:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-nemesis-dreadknight:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NEMESIS DREADKNIGHT",
+      "raw_name": "NEMESIS DREADKNIGHT",
+      "record_id": "units-nemesis-dreadknight",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-nemesis-dreadknight",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "nemesis-dreadknight",
+      "wargear_costs": [
+        {
+          "name": "Heavy psycannon",
+          "points_per_item": 15,
+          "raw_name": "per Heavy psycannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-nemesis-dreadknight:wargear:per-heavy-psycannon:1",
+          "wargear_id": "heavy-psycannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-paladin-squad:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 215,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-paladin-squad:cost:your-1st-to-2nd-units-cost:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "8 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 8,
+              "model_id": null,
+              "model_name": null,
+              "points": 360,
+              "raw_label": "8 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-paladin-squad:cost:your-1st-to-2nd-units-cost:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 450,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-paladin-squad:cost:your-1st-to-2nd-units-cost:4"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-paladin-squad:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 185,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-paladin-squad:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 230,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-paladin-squad:cost:your-3rd-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "8 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 8,
+              "model_id": null,
+              "model_name": null,
+              "points": 375,
+              "raw_label": "8 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-paladin-squad:cost:your-3rd-unit-costs:3"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 465,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-paladin-squad:cost:your-3rd-unit-costs:4"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-paladin-squad:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PALADIN SQUAD",
+      "raw_name": "PALADIN SQUAD",
+      "record_id": "units-paladin-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-paladin-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "paladin-squad",
+      "wargear_costs": [
+        {
+          "name": "Psycannon",
+          "points_per_item": 5,
+          "raw_name": "per Psycannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-paladin-squad:wargear:per-psycannon:1",
+          "wargear_id": "psycannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purgation-squad:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purgation-squad:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purgation-squad:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purgation-squad:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 230,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purgation-squad:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purgation-squad:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PURGATION SQUAD",
+      "raw_name": "PURGATION SQUAD",
+      "record_id": "units-purgation-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purgation-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "purgation-squad",
+      "wargear_costs": [
+        {
+          "name": "Psycannon",
+          "points_per_item": 5,
+          "raw_name": "per Psycannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purgation-squad:wargear:per-psycannon:1",
+          "wargear_id": "psycannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purifier-squad:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 260,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purifier-squad:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purifier-squad:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purifier-squad:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 270,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purifier-squad:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purifier-squad:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PURIFIER SQUAD",
+      "raw_name": "PURIFIER SQUAD",
+      "record_id": "units-purifier-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purifier-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "purifier-squad",
+      "wargear_costs": [
+        {
+          "name": "Psycannon",
+          "points_per_item": 5,
+          "raw_name": "per Psycannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-purifier-squad:wargear:per-psycannon:1",
+          "wargear_id": "psycannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-razorback:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-razorback:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RAZORBACK",
+      "raw_name": "RAZORBACK",
+      "record_id": "units-razorback",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-razorback",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "razorback",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-rhino:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-rhino:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RHINO",
+      "raw_name": "RHINO",
+      "record_id": "units-rhino",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-rhino",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "rhino",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormhawk-interceptor:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormhawk-interceptor:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STORMHAWK INTERCEPTOR",
+      "raw_name": "STORMHAWK INTERCEPTOR",
+      "record_id": "units-stormhawk-interceptor",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormhawk-interceptor",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "stormhawk-interceptor",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 280,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormraven-gunship:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormraven-gunship:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 300,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormraven-gunship:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormraven-gunship:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STORMRAVEN GUNSHIP",
+      "raw_name": "STORMRAVEN GUNSHIP",
+      "record_id": "units-stormraven-gunship",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormraven-gunship",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "stormraven-gunship",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormtalon-gunship:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormtalon-gunship:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STORMTALON GUNSHIP",
+      "raw_name": "STORMTALON GUNSHIP",
+      "record_id": "units-stormtalon-gunship",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-stormtalon-gunship",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "stormtalon-gunship",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-strike-squad:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 240,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-strike-squad:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-strike-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STRIKE SQUAD",
+      "raw_name": "STRIKE SQUAD",
+      "record_id": "units-strike-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-strike-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "strike-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-venerable-dreadnought:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-venerable-dreadnought:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-venerable-dreadnought:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-venerable-dreadnought:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VENERABLE DREADNOUGHT",
+      "raw_name": "VENERABLE DREADNOUGHT",
+      "record_id": "units-venerable-dreadnought",
+      "source_id": "gw-11e-mfm-2026-06:faction:grey-knights:unit:units-venerable-dreadnought",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "venerable-dreadnought",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/grey-knights"
+}

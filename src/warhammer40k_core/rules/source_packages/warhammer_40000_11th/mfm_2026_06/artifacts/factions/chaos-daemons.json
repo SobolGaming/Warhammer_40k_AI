@@ -1,0 +1,2759 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "blood-legion",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "brazenmaw",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Brazenmaw",
+          "points": 15,
+          "raw_name": "Brazenmaw",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:blood-legion:enhancement:brazenmaw"
+        },
+        {
+          "enhancement_id": "furys-cage",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Fury's Cage",
+          "points": 20,
+          "raw_name": "Fury's Cage",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:blood-legion:enhancement:furys-cage"
+        },
+        {
+          "enhancement_id": "gateway-unto-damnation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Gateway Unto Damnation",
+          "points": 10,
+          "raw_name": "Gateway Unto Damnation",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:blood-legion:enhancement:gateway-unto-damnation"
+        },
+        {
+          "enhancement_id": "slaughterthirst",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Slaughterthirst",
+          "points": 25,
+          "raw_name": "Slaughterthirst",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:blood-legion:enhancement:slaughterthirst"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "BLOOD LEGION",
+      "raw_name": "BLOOD LEGION",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:blood-legion"
+    },
+    {
+      "detachment_id": "cavalcade-of-chaos",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "apocalyptic-steeds",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Apocalyptic Steeds (Upgrade)",
+          "points": 10,
+          "raw_name": "Apocalyptic Steeds (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:apocalyptic-steeds"
+        },
+        {
+          "enhancement_id": "soul-shattering-charge",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Soul-shattering Charge (Upgrade)",
+          "points": 10,
+          "raw_name": "Soul-shattering Charge (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:soul-shattering-charge"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "CAVALCADE OF CHAOS",
+      "raw_name": "CAVALCADE OF CHAOS",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:cavalcade-of-chaos"
+    },
+    {
+      "detachment_id": "daemonic-incursion",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "argath-the-king-of-blades",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "A'rgath, The King of Blades",
+          "points": 20,
+          "raw_name": "A'rgath, The King of Blades",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:daemonic-incursion:enhancement:argath-the-king-of-blades"
+        },
+        {
+          "enhancement_id": "soulstealer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Soulstealer",
+          "points": 15,
+          "raw_name": "Soulstealer",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:daemonic-incursion:enhancement:soulstealer"
+        },
+        {
+          "enhancement_id": "the-endless-gift",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "The Endless Gift",
+          "points": 30,
+          "raw_name": "The Endless Gift",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:daemonic-incursion:enhancement:the-endless-gift"
+        },
+        {
+          "enhancement_id": "the-everstave",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "The Everstave",
+          "points": 25,
+          "raw_name": "The Everstave",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:daemonic-incursion:enhancement:the-everstave"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "DAEMONIC INCURSION",
+      "raw_name": "DAEMONIC INCURSION",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:daemonic-incursion"
+    },
+    {
+      "detachment_id": "legion-of-excess",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "avatar-of-perfection",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Avatar of Perfection",
+          "points": 15,
+          "raw_name": "Avatar of Perfection",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:legion-of-excess:enhancement:avatar-of-perfection"
+        },
+        {
+          "enhancement_id": "dreaming-crown",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Dreaming Crown",
+          "points": 30,
+          "raw_name": "Dreaming Crown",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:legion-of-excess:enhancement:dreaming-crown"
+        },
+        {
+          "enhancement_id": "false-majesty",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "False Majesty",
+          "points": 30,
+          "raw_name": "False Majesty",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:legion-of-excess:enhancement:false-majesty"
+        },
+        {
+          "enhancement_id": "soul-glutton",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Soul Glutton",
+          "points": 10,
+          "raw_name": "Soul Glutton",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:legion-of-excess:enhancement:soul-glutton"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "LEGION OF EXCESS",
+      "raw_name": "LEGION OF EXCESS",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:legion-of-excess"
+    },
+    {
+      "detachment_id": "lords-of-the-warp",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "swollen-with-power",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Swollen with Power (Upgrade)",
+          "points": 10,
+          "raw_name": "Swollen with Power (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:lords-of-the-warp:enhancement:swollen-with-power"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "LORDS OF THE WARP",
+      "raw_name": "LORDS OF THE WARP",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:lords-of-the-warp"
+    },
+    {
+      "detachment_id": "plague-legion",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "cankerblight",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Cankerblight",
+          "points": 15,
+          "raw_name": "Cankerblight",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:plague-legion:enhancement:cankerblight"
+        },
+        {
+          "enhancement_id": "droning-shroud",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Droning Shroud",
+          "points": 35,
+          "raw_name": "Droning Shroud",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:plague-legion:enhancement:droning-shroud"
+        },
+        {
+          "enhancement_id": "font-of-spores",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Font of Spores",
+          "points": 20,
+          "raw_name": "Font of Spores",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:plague-legion:enhancement:font-of-spores"
+        },
+        {
+          "enhancement_id": "maggot-maws",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Maggot Maws",
+          "points": 15,
+          "raw_name": "Maggot Maws",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:plague-legion:enhancement:maggot-maws"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "PLAGUE LEGION",
+      "raw_name": "PLAGUE LEGION",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:plague-legion"
+    },
+    {
+      "detachment_id": "scintillating-legion",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "improbable-shield",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Improbable Shield",
+          "points": 30,
+          "raw_name": "Improbable Shield",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:scintillating-legion:enhancement:improbable-shield"
+        },
+        {
+          "enhancement_id": "inescapable-eye",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Inescapable Eye",
+          "points": 10,
+          "raw_name": "Inescapable Eye",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:scintillating-legion:enhancement:inescapable-eye"
+        },
+        {
+          "enhancement_id": "infernal-puppeteer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Infernal Puppeteer",
+          "points": 25,
+          "raw_name": "Infernal Puppeteer",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:scintillating-legion:enhancement:infernal-puppeteer"
+        },
+        {
+          "enhancement_id": "neverblade",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Neverblade",
+          "points": 20,
+          "raw_name": "Neverblade",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:scintillating-legion:enhancement:neverblade"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "SCINTILLATING LEGION",
+      "raw_name": "SCINTILLATING LEGION",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:scintillating-legion"
+    },
+    {
+      "detachment_id": "shadow-legion",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "fade-to-darkness",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Fade to Darkness",
+          "points": 30,
+          "raw_name": "Fade to Darkness",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:shadow-legion:enhancement:fade-to-darkness"
+        },
+        {
+          "enhancement_id": "leaping-shadows",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Leaping Shadows",
+          "points": 25,
+          "raw_name": "Leaping Shadows",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:shadow-legion:enhancement:leaping-shadows"
+        },
+        {
+          "enhancement_id": "malice-made-manifest",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Malice Made Manifest",
+          "points": 25,
+          "raw_name": "Malice Made Manifest",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:shadow-legion:enhancement:malice-made-manifest"
+        },
+        {
+          "enhancement_id": "mantle-of-gloom",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mantle of Gloom",
+          "points": 20,
+          "raw_name": "Mantle of Gloom",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:shadow-legion:enhancement:mantle-of-gloom"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "SHADOW LEGION",
+      "raw_name": "SHADOW LEGION",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:shadow-legion"
+    },
+    {
+      "detachment_id": "warptide",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "bane-forged-weapons",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Bane-forged Weapons (Upgrade)",
+          "points": 15,
+          "raw_name": "Bane-forged Weapons (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:warptide:enhancement:bane-forged-weapons"
+        },
+        {
+          "enhancement_id": "soul-hungry-slaughterers",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Soul-hungry Slaughterers (Upgrade)",
+          "points": 10,
+          "raw_name": "Soul-hungry Slaughterers (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:warptide:enhancement:soul-hungry-slaughterers"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "WARPTIDE",
+      "raw_name": "WARPTIDE",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:warptide"
+    }
+  ],
+  "faction_id": "chaos-daemons",
+  "name": "Chaos Daemons",
+  "raw_name": "Chaos Daemons",
+  "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-beasts-of-nurgle:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-beasts-of-nurgle:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-beasts-of-nurgle:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BEASTS OF NURGLE",
+      "raw_name": "BEASTS OF NURGLE",
+      "record_id": "units-beasts-of-nurgle",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-beasts-of-nurgle",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "beasts-of-nurgle",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 390,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-belakor:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-belakor:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BE'LAKOR",
+      "raw_name": "BE'LAKOR",
+      "record_id": "units-belakor",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-belakor",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "belakor",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodcrushers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodcrushers:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodcrushers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodcrushers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodcrushers:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodcrushers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BLOODCRUSHERS",
+      "raw_name": "BLOODCRUSHERS",
+      "record_id": "units-bloodcrushers",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodcrushers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "bloodcrushers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodletters:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodletters:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BLOODLETTERS",
+      "raw_name": "BLOODLETTERS",
+      "record_id": "units-bloodletters",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodletters",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "bloodletters",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 320,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodthirster:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodthirster:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 335,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodthirster:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodthirster:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BLOODTHIRSTER",
+      "raw_name": "BLOODTHIRSTER",
+      "record_id": "units-bloodthirster",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-bloodthirster",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "bloodthirster",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-blue-horrors:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-blue-horrors:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BLUE HORRORS",
+      "raw_name": "BLUE HORRORS",
+      "record_id": "units-blue-horrors",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-blue-horrors",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "blue-horrors",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-burning-chariot:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-burning-chariot:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BURNING CHARIOT",
+      "raw_name": "BURNING CHARIOT",
+      "record_id": "units-burning-chariot",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-burning-chariot",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "burning-chariot",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-changecaster:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-changecaster:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BLUE HORRORS",
+          "PINK HORRORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "blue-horrors",
+          "pink-horrors"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-changecaster:leader"
+      },
+      "name": "CHANGECASTER",
+      "raw_name": "CHANGECASTER",
+      "record_id": "units-changecaster",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-changecaster",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "changecaster",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-contorted-epitome:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-contorted-epitome:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "DAEMONETTES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "daemonettes"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-contorted-epitome:leader"
+      },
+      "name": "CONTORTED EPITOME",
+      "raw_name": "CONTORTED EPITOME",
+      "record_id": "units-contorted-epitome",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-contorted-epitome",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "contorted-epitome",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 165,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-daemon-prince-of-chaos:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-daemon-prince-of-chaos:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAEMON PRINCE OF CHAOS",
+      "raw_name": "DAEMON PRINCE OF CHAOS",
+      "record_id": "units-daemon-prince-of-chaos",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-daemon-prince-of-chaos",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "daemon-prince-of-chaos",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-daemon-prince-of-chaos-with-wings:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-daemon-prince-of-chaos-with-wings:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAEMON PRINCE OF CHAOS WITH WINGS",
+      "raw_name": "DAEMON PRINCE OF CHAOS WITH WINGS",
+      "record_id": "units-daemon-prince-of-chaos-with-wings",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-daemon-prince-of-chaos-with-wings",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "daemon-prince-of-chaos-with-wings",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-daemonettes:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-daemonettes:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAEMONETTES",
+      "raw_name": "DAEMONETTES",
+      "record_id": "units-daemonettes",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-daemonettes",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "daemonettes",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-epidemius:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-epidemius:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PLAGUEBEARERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "plaguebearers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-epidemius:leader"
+      },
+      "name": "EPIDEMIUS",
+      "raw_name": "EPIDEMIUS",
+      "record_id": "units-epidemius",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-epidemius",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "epidemius",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-exalted-flamer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-exalted-flamer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "FLAMERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "flamers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-exalted-flamer:leader"
+      },
+      "name": "EXALTED FLAMER",
+      "raw_name": "EXALTED FLAMER",
+      "record_id": "units-exalted-flamer",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-exalted-flamer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "exalted-flamer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fateskimmer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fateskimmer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "SCREAMERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "screamers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fateskimmer:leader"
+      },
+      "name": "FATESKIMMER",
+      "raw_name": "FATESKIMMER",
+      "record_id": "units-fateskimmer",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fateskimmer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "fateskimmer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-feculent-gnarlmaw:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-feculent-gnarlmaw:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FECULENT GNARLMAW",
+      "raw_name": "FECULENT GNARLMAW",
+      "record_id": "units-feculent-gnarlmaw",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-feculent-gnarlmaw",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "feculent-gnarlmaw",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fiends:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fiends:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fiends:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FIENDS",
+      "raw_name": "FIENDS",
+      "record_id": "units-fiends",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fiends",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "fiends",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-flamers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-flamers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-flamers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FLAMERS",
+      "raw_name": "FLAMERS",
+      "record_id": "units-flamers",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-flamers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "flamers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-flesh-hounds:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-flesh-hounds:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-flesh-hounds:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FLESH HOUNDS",
+      "raw_name": "FLESH HOUNDS",
+      "record_id": "units-flesh-hounds",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-flesh-hounds",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "flesh-hounds",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fluxmaster:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fluxmaster:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BLUE HORRORS",
+          "PINK HORRORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "blue-horrors",
+          "pink-horrors"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fluxmaster:leader"
+      },
+      "name": "FLUXMASTER",
+      "raw_name": "FLUXMASTER",
+      "record_id": "units-fluxmaster",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-fluxmaster",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "fluxmaster",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 265,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-great-unclean-one:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-great-unclean-one:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 280,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-great-unclean-one:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-great-unclean-one:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GREAT UNCLEAN ONE",
+      "raw_name": "GREAT UNCLEAN ONE",
+      "record_id": "units-great-unclean-one",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-great-unclean-one",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "great-unclean-one",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-hellflayers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-hellflayers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-hellflayers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HELLFLAYERS",
+      "raw_name": "HELLFLAYERS",
+      "record_id": "units-hellflayers",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-hellflayers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hellflayers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-horticulous-slimux:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-horticulous-slimux:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BEASTS OF NURGLE"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "beasts-of-nurgle"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-horticulous-slimux:leader"
+      },
+      "name": "HORTICULOUS SLIMUX",
+      "raw_name": "HORTICULOUS SLIMUX",
+      "record_id": "units-horticulous-slimux",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-horticulous-slimux",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "horticulous-slimux",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-infernal-enrapturess:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-infernal-enrapturess:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "DAEMONETTES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "daemonettes"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-infernal-enrapturess:leader"
+      },
+      "name": "INFERNAL ENRAPTURESS",
+      "raw_name": "INFERNAL ENRAPTURESS",
+      "record_id": "units-infernal-enrapturess",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-infernal-enrapturess",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "infernal-enrapturess",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 295,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-kairos-fateweaver:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-kairos-fateweaver:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KAIROS FATEWEAVER",
+      "raw_name": "KAIROS FATEWEAVER",
+      "record_id": "units-kairos-fateweaver",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-kairos-fateweaver",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kairos-fateweaver",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-karanak:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-karanak:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "FLESH HOUNDS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "flesh-hounds"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-karanak:leader"
+      },
+      "name": "KARANAK",
+      "raw_name": "KARANAK",
+      "record_id": "units-karanak",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-karanak",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "karanak",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 255,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-keeper-of-secrets:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-keeper-of-secrets:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 270,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-keeper-of-secrets:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-keeper-of-secrets:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KEEPER OF SECRETS",
+      "raw_name": "KEEPER OF SECRETS",
+      "record_id": "units-keeper-of-secrets",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-keeper-of-secrets",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "keeper-of-secrets",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 300,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-lord-of-change:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-lord-of-change:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 315,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-lord-of-change:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-lord-of-change:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LORD OF CHANGE",
+      "raw_name": "LORD OF CHANGE",
+      "record_id": "units-lord-of-change",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-lord-of-change",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "lord-of-change",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-nurglings:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-nurglings:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-nurglings:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NURGLINGS",
+      "raw_name": "NURGLINGS",
+      "record_id": "units-nurglings",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-nurglings",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "nurglings",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-pink-horrors:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-pink-horrors:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PINK HORRORS",
+      "raw_name": "PINK HORRORS",
+      "record_id": "units-pink-horrors",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-pink-horrors",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "pink-horrors",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-plague-drones:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-plague-drones:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-plague-drones:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PLAGUE DRONES",
+      "raw_name": "PLAGUE DRONES",
+      "record_id": "units-plague-drones",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-plague-drones",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "plague-drones",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-plaguebearers:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-plaguebearers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PLAGUEBEARERS",
+      "raw_name": "PLAGUEBEARERS",
+      "record_id": "units-plaguebearers",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-plaguebearers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "plaguebearers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-poxbringer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-poxbringer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PLAGUEBEARERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "plaguebearers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-poxbringer:leader"
+      },
+      "name": "POXBRINGER",
+      "raw_name": "POXBRINGER",
+      "record_id": "units-poxbringer",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-poxbringer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "poxbringer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-rendmaster-on-blood-throne:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-rendmaster-on-blood-throne:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-rendmaster-on-blood-throne:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-rendmaster-on-blood-throne:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RENDMASTER ON BLOOD THRONE",
+      "raw_name": "RENDMASTER ON BLOOD THRONE",
+      "record_id": "units-rendmaster-on-blood-throne",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-rendmaster-on-blood-throne",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "rendmaster-on-blood-throne",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 280,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-rotigus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-rotigus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ROTIGUS",
+      "raw_name": "ROTIGUS",
+      "record_id": "units-rotigus",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-rotigus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "rotigus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-screamers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-screamers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-screamers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SCREAMERS",
+      "raw_name": "SCREAMERS",
+      "record_id": "units-screamers",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-screamers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "screamers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-seekers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 155,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-seekers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-seekers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SEEKERS",
+      "raw_name": "SEEKERS",
+      "record_id": "units-seekers",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-seekers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "seekers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 340,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-shalaxi-helbane:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-shalaxi-helbane:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SHALAXI HELBANE",
+      "raw_name": "SHALAXI HELBANE",
+      "record_id": "units-shalaxi-helbane",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-shalaxi-helbane",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "shalaxi-helbane",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 315,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skarbrand:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skarbrand:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SKARBRAND",
+      "raw_name": "SKARBRAND",
+      "record_id": "units-skarbrand",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skarbrand",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "skarbrand",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skull-altar:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skull-altar:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SKULL ALTAR",
+      "raw_name": "SKULL ALTAR",
+      "record_id": "units-skull-altar",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skull-altar",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "skull-altar",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skull-cannon:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skull-cannon:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SKULL CANNON",
+      "raw_name": "SKULL CANNON",
+      "record_id": "units-skull-cannon",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skull-cannon",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "skull-cannon",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skullmaster:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skullmaster:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BLOODCRUSHERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "bloodcrushers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skullmaster:leader"
+      },
+      "name": "SKULLMASTER",
+      "raw_name": "SKULLMASTER",
+      "record_id": "units-skullmaster",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skullmaster",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "skullmaster",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skulltaker:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skulltaker:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BLOODLETTERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "bloodletters"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skulltaker:leader"
+      },
+      "name": "SKULLTAKER",
+      "raw_name": "SKULLTAKER",
+      "record_id": "units-skulltaker",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-skulltaker",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "skulltaker",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-sloppity-bilepiper:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-sloppity-bilepiper:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PLAGUEBEARERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "plaguebearers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-sloppity-bilepiper:leader"
+      },
+      "name": "SLOPPITY BILEPIPER",
+      "raw_name": "SLOPPITY BILEPIPER",
+      "record_id": "units-sloppity-bilepiper",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-sloppity-bilepiper",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sloppity-bilepiper",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-soul-grinder:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-soul-grinder:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 195,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-soul-grinder:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-soul-grinder:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SOUL GRINDER",
+      "raw_name": "SOUL GRINDER",
+      "record_id": "units-soul-grinder",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-soul-grinder",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "soul-grinder",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-spoilpox-scrivener:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-spoilpox-scrivener:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PLAGUEBEARERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "plaguebearers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-spoilpox-scrivener:leader"
+      },
+      "name": "SPOILPOX SCRIVENER",
+      "raw_name": "SPOILPOX SCRIVENER",
+      "record_id": "units-spoilpox-scrivener",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-spoilpox-scrivener",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "spoilpox-scrivener",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-syllesske:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-syllesske:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "DAEMONETTES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "daemonettes"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-syllesske:leader"
+      },
+      "name": "SYLL'ESSKE",
+      "raw_name": "SYLL'ESSKE",
+      "record_id": "units-syllesske",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-syllesske",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "syllesske",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-the-blue-scribes:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-the-blue-scribes:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "THE BLUE SCRIBES",
+      "raw_name": "THE BLUE SCRIBES",
+      "record_id": "units-the-blue-scribes",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-the-blue-scribes",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "the-blue-scribes",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-the-changeling:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-the-changeling:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "THE CHANGELING",
+      "raw_name": "THE CHANGELING",
+      "record_id": "units-the-changeling",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-the-changeling",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "the-changeling",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-the-masque-of-slaanesh:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-the-masque-of-slaanesh:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "THE MASQUE OF SLAANESH",
+      "raw_name": "THE MASQUE OF SLAANESH",
+      "record_id": "units-the-masque-of-slaanesh",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-the-masque-of-slaanesh",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "the-masque-of-slaanesh",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-tormentbringer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-tormentbringer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "HELLFLAYERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "hellflayers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-tormentbringer:leader"
+      },
+      "name": "TORMENTBRINGER",
+      "raw_name": "TORMENTBRINGER",
+      "record_id": "units-tormentbringer",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-tormentbringer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tormentbringer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-tranceweaver:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-tranceweaver:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "DAEMONETTES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "daemonettes"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-tranceweaver:leader"
+      },
+      "name": "TRANCEWEAVER",
+      "raw_name": "TRANCEWEAVER",
+      "record_id": "units-tranceweaver",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:unit:units-tranceweaver",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tranceweaver",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/chaos-daemons"
+}

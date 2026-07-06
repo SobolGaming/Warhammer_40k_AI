@@ -1,0 +1,1579 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "dominus-foebreakers",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "archeotech-autoloaders",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Archeotech Autoloaders",
+          "points": 25,
+          "raw_name": "Archeotech Autoloaders",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:dominus-foebreakers:enhancement:archeotech-autoloaders"
+        },
+        {
+          "enhancement_id": "blessed-plate",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Blessed Plate",
+          "points": 30,
+          "raw_name": "Blessed Plate",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:dominus-foebreakers:enhancement:blessed-plate"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "DOMINUS FOEBREAKERS",
+      "raw_name": "DOMINUS FOEBREAKERS",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:dominus-foebreakers"
+    },
+    {
+      "detachment_id": "freeblade-company",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "bringer-of-justice",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Bringer of Justice",
+          "points": 30,
+          "raw_name": "Bringer of Justice",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:freeblade-company:enhancement:bringer-of-justice"
+        },
+        {
+          "enhancement_id": "hunters-eye",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Hunter's Eye",
+          "points": 25,
+          "raw_name": "Hunter's Eye",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:freeblade-company:enhancement:hunters-eye"
+        },
+        {
+          "enhancement_id": "mysterious-guardian",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mysterious Guardian",
+          "points": 35,
+          "raw_name": "Mysterious Guardian",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:freeblade-company:enhancement:mysterious-guardian"
+        },
+        {
+          "enhancement_id": "sanctuary",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Sanctuary",
+          "points": 20,
+          "raw_name": "Sanctuary",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:freeblade-company:enhancement:sanctuary"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "FREEBLADE COMPANY",
+      "raw_name": "FREEBLADE COMPANY",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:freeblade-company"
+    },
+    {
+      "detachment_id": "gate-warden-lance",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "acquisitor-at-arms",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Acquisitor-at-Arms",
+          "points": 15,
+          "raw_name": "Acquisitor-at-Arms",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:gate-warden-lance:enhancement:acquisitor-at-arms"
+        },
+        {
+          "enhancement_id": "augury-halo",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Augury Halo",
+          "points": 20,
+          "raw_name": "Augury Halo",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:gate-warden-lance:enhancement:augury-halo"
+        },
+        {
+          "enhancement_id": "purgations-hand",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Purgation's Hand",
+          "points": 20,
+          "raw_name": "Purgation's Hand",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:gate-warden-lance:enhancement:purgations-hand"
+        },
+        {
+          "enhancement_id": "vengeful-tread",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Vengeful Tread",
+          "points": 15,
+          "raw_name": "Vengeful Tread",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:gate-warden-lance:enhancement:vengeful-tread"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "GATE WARDEN LANCE",
+      "raw_name": "GATE WARDEN LANCE",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:gate-warden-lance"
+    },
+    {
+      "detachment_id": "questor-forgepact",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "knight-of-the-opus-machina-aura",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Knight of the Opus Machina (Aura)",
+          "points": 15,
+          "raw_name": "Knight of the Opus Machina (Aura)",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:questor-forgepact:enhancement:knight-of-the-opus-machina-aura"
+        },
+        {
+          "enhancement_id": "magos-questoris",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Magos Questoris",
+          "points": 20,
+          "raw_name": "Magos Questoris",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:questor-forgepact:enhancement:magos-questoris"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "QUESTOR FORGEPACT",
+      "raw_name": "QUESTOR FORGEPACT",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:questor-forgepact"
+    },
+    {
+      "detachment_id": "questoris-companions",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "crushing-condemnation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Crushing Condemnation",
+          "points": 10,
+          "raw_name": "Crushing Condemnation",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:questoris-companions:enhancement:crushing-condemnation"
+        },
+        {
+          "enhancement_id": "herald-of-triumph",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Herald of Triumph",
+          "points": 15,
+          "raw_name": "Herald of Triumph",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:questoris-companions:enhancement:herald-of-triumph"
+        },
+        {
+          "enhancement_id": "pennant-of-silvered-fury",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Pennant of Silvered Fury",
+          "points": 15,
+          "raw_name": "Pennant of Silvered Fury",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:questoris-companions:enhancement:pennant-of-silvered-fury"
+        },
+        {
+          "enhancement_id": "wyrmslayer-divination",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Wyrmslayer Divination",
+          "points": 10,
+          "raw_name": "Wyrmslayer Divination",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:questoris-companions:enhancement:wyrmslayer-divination"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "QUESTORIS COMPANIONS",
+      "raw_name": "QUESTORIS COMPANIONS",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:questoris-companions"
+    },
+    {
+      "detachment_id": "spearhead-at-arms",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "fables-of-nightmare",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Fables of Nightmare",
+          "points": 10,
+          "raw_name": "Fables of Nightmare",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:spearhead-at-arms:enhancement:fables-of-nightmare"
+        },
+        {
+          "enhancement_id": "martial-tuition",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Martial Tuition",
+          "points": 15,
+          "raw_name": "Martial Tuition",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:spearhead-at-arms:enhancement:martial-tuition"
+        },
+        {
+          "enhancement_id": "mentors-pride",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mentor's Pride",
+          "points": 20,
+          "raw_name": "Mentor's Pride",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:spearhead-at-arms:enhancement:mentors-pride"
+        },
+        {
+          "enhancement_id": "tales-of-heroism",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tales of Heroism",
+          "points": 10,
+          "raw_name": "Tales of Heroism",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:spearhead-at-arms:enhancement:tales-of-heroism"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "SPEARHEAD-AT-ARMS",
+      "raw_name": "SPEARHEAD-AT-ARMS",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:spearhead-at-arms"
+    },
+    {
+      "detachment_id": "throne-bonded-outriders",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "ancestral-overbleed",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Ancestral Overbleed (Upgrade)",
+          "points": 10,
+          "raw_name": "Ancestral Overbleed (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:throne-bonded-outriders:enhancement:ancestral-overbleed"
+        },
+        {
+          "enhancement_id": "gyro-optimised-actuators",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Gyro-optimised Actuators (Upgrade)",
+          "points": 15,
+          "raw_name": "Gyro-optimised Actuators (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:throne-bonded-outriders:enhancement:gyro-optimised-actuators"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "THRONE-BONDED OUTRIDERS",
+      "raw_name": "THRONE-BONDED OUTRIDERS",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:throne-bonded-outriders"
+    },
+    {
+      "detachment_id": "valourstrike-lance",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "bearer-of-the-evanescent-ion",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Bearer of the Evanescent Ion",
+          "points": 15,
+          "raw_name": "Bearer of the Evanescent Ion",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:valourstrike-lance:enhancement:bearer-of-the-evanescent-ion"
+        },
+        {
+          "enhancement_id": "bearer-of-the-iron-chalice",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Bearer of the Iron Chalice",
+          "points": 20,
+          "raw_name": "Bearer of the Iron Chalice",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:valourstrike-lance:enhancement:bearer-of-the-iron-chalice"
+        },
+        {
+          "enhancement_id": "bearer-of-the-judicants-helm",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Bearer of the Judicant's Helm",
+          "points": 25,
+          "raw_name": "Bearer of the Judicant's Helm",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:valourstrike-lance:enhancement:bearer-of-the-judicants-helm"
+        },
+        {
+          "enhancement_id": "bearer-of-the-lancers-sigil",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Bearer of the Lancer's Sigil",
+          "points": 25,
+          "raw_name": "Bearer of the Lancer's Sigil",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:valourstrike-lance:enhancement:bearer-of-the-lancers-sigil"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "VALOURSTRIKE LANCE",
+      "raw_name": "VALOURSTRIKE LANCE",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:detachment:valourstrike-lance"
+    }
+  ],
+  "faction_id": "imperial-knights",
+  "name": "Imperial Knights",
+  "raw_name": "Imperial Knights",
+  "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 785,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-acastus-knight-asterius:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-acastus-knight-asterius:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 860,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-acastus-knight-asterius:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-acastus-knight-asterius:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ACASTUS KNIGHT ASTERIUS",
+      "raw_name": "ACASTUS KNIGHT ASTERIUS",
+      "record_id": "units-acastus-knight-asterius",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-acastus-knight-asterius",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "acastus-knight-asterius",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 725,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-acastus-knight-porphyrion:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-acastus-knight-porphyrion:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 800,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-acastus-knight-porphyrion:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-acastus-knight-porphyrion:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ACASTUS KNIGHT PORPHYRION",
+      "raw_name": "ACASTUS KNIGHT PORPHYRION",
+      "record_id": "units-acastus-knight-porphyrion",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-acastus-knight-porphyrion",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "acastus-knight-porphyrion",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-armiger-helverin:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-armiger-helverin:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ARMIGER HELVERIN",
+      "raw_name": "ARMIGER HELVERIN",
+      "record_id": "units-armiger-helverin",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-armiger-helverin",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "armiger-helverin",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-armiger-moirax:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-armiger-moirax:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ARMIGER MOIRAX",
+      "raw_name": "ARMIGER MOIRAX",
+      "record_id": "units-armiger-moirax",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-armiger-moirax",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "armiger-moirax",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-armiger-warglaive:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-armiger-warglaive:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ARMIGER WARGLAIVE",
+      "raw_name": "ARMIGER WARGLAIVE",
+      "record_id": "units-armiger-warglaive",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-armiger-warglaive",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "armiger-warglaive",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 415,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-canis-rex:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-canis-rex:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CANIS REX",
+      "raw_name": "CANIS REX",
+      "record_id": "units-canis-rex",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-canis-rex",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "canis-rex",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 380,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-acheron:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-acheron:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 395,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-acheron:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-acheron:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CERASTUS KNIGHT ACHERON",
+      "raw_name": "CERASTUS KNIGHT ACHERON",
+      "record_id": "units-cerastus-knight-acheron",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-acheron",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cerastus-knight-acheron",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 405,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-atrapos:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-atrapos:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 425,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-atrapos:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-atrapos:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CERASTUS KNIGHT ATRAPOS",
+      "raw_name": "CERASTUS KNIGHT ATRAPOS",
+      "record_id": "units-cerastus-knight-atrapos",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-atrapos",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cerastus-knight-atrapos",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 380,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-castigator:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-castigator:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 395,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-castigator:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-castigator:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CERASTUS KNIGHT CASTIGATOR",
+      "raw_name": "CERASTUS KNIGHT CASTIGATOR",
+      "record_id": "units-cerastus-knight-castigator",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-castigator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cerastus-knight-castigator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 415,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-lancer:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-lancer:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 435,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-lancer:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-lancer:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CERASTUS KNIGHT LANCER",
+      "raw_name": "CERASTUS KNIGHT LANCER",
+      "record_id": "units-cerastus-knight-lancer",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-cerastus-knight-lancer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cerastus-knight-lancer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 400,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-castellan:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-castellan:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 420,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-castellan:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-castellan:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT CASTELLAN",
+      "raw_name": "KNIGHT CASTELLAN",
+      "record_id": "units-knight-castellan",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-castellan",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "knight-castellan",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 395,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-crusader:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-crusader:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 415,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-crusader:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-crusader:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT CRUSADER",
+      "raw_name": "KNIGHT CRUSADER",
+      "record_id": "units-knight-crusader",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-crusader",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "knight-crusader",
+      "wargear_costs": [
+        {
+          "name": "Rapid-fire battle cannon",
+          "points_per_item": 15,
+          "raw_name": "per Rapid-fire battle cannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-crusader:wargear:per-rapid-fire-battle-cannon:1",
+          "wargear_id": "rapid-fire-battle-cannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 400,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-defender:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-defender:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 420,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-defender:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-defender:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT DEFENDER",
+      "raw_name": "KNIGHT DEFENDER",
+      "record_id": "units-knight-defender",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-defender",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "knight-defender",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 265,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-destrier:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-destrier:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 280,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-destrier:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-destrier:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT DESTRIER",
+      "raw_name": "KNIGHT DESTRIER",
+      "record_id": "units-knight-destrier",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-destrier",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "knight-destrier",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 355,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-errant:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-errant:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 370,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-errant:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-errant:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT ERRANT",
+      "raw_name": "KNIGHT ERRANT",
+      "record_id": "units-knight-errant",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-errant",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "knight-errant",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 355,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-gallant:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-gallant:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 370,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-gallant:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-gallant:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT GALLANT",
+      "raw_name": "KNIGHT GALLANT",
+      "record_id": "units-knight-gallant",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-gallant",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "knight-gallant",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 375,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-paladin:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-paladin:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 390,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-paladin:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-paladin:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT PALADIN",
+      "raw_name": "KNIGHT PALADIN",
+      "record_id": "units-knight-paladin",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-paladin",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "knight-paladin",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 365,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-preceptor:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-preceptor:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 380,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-preceptor:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-preceptor:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT PRECEPTOR",
+      "raw_name": "KNIGHT PRECEPTOR",
+      "record_id": "units-knight-preceptor",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-preceptor",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "knight-preceptor",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 400,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-valiant:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-valiant:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 415,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-valiant:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-valiant:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT VALIANT",
+      "raw_name": "KNIGHT VALIANT",
+      "record_id": "units-knight-valiant",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-valiant",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "knight-valiant",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 375,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-warden:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-warden:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 390,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-warden:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-warden:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KNIGHT WARDEN",
+      "raw_name": "KNIGHT WARDEN",
+      "record_id": "units-knight-warden",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-knight-warden",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "knight-warden",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 385,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-questoris-knight-magaera:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-questoris-knight-magaera:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 400,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-questoris-knight-magaera:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-questoris-knight-magaera:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "QUESTORIS KNIGHT MAGAERA",
+      "raw_name": "QUESTORIS KNIGHT MAGAERA",
+      "record_id": "units-questoris-knight-magaera",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-questoris-knight-magaera",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "questoris-knight-magaera",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 375,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-questoris-knight-styrix:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-questoris-knight-styrix:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 390,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-questoris-knight-styrix:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-questoris-knight-styrix:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "QUESTORIS KNIGHT STYRIX",
+      "raw_name": "QUESTORIS KNIGHT STYRIX",
+      "record_id": "units-questoris-knight-styrix",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-knights:unit:units-questoris-knight-styrix",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "questoris-knight-styrix",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/imperial-knights"
+}

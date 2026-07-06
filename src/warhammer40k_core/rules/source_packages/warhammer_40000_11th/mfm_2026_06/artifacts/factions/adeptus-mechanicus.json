@@ -1,0 +1,2309 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "cohort-acquisitus",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "explorator-dispensation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Explorator Dispensation",
+          "points": 20,
+          "raw_name": "Explorator Dispensation",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:cohort-acquisitus:enhancement:explorator-dispensation"
+        },
+        {
+          "enhancement_id": "stealth-screened-cybercanids",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Stealth-screened Cybercanids (Upgrade)",
+          "points": 15,
+          "raw_name": "Stealth-screened Cybercanids (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:cohort-acquisitus:enhancement:stealth-screened-cybercanids"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "COHORT ACQUISITUS",
+      "raw_name": "COHORT ACQUISITUS",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:cohort-acquisitus"
+    },
+    {
+      "detachment_id": "cohort-cybernetica",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "arch-negator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Arch-negator",
+          "points": 5,
+          "raw_name": "Arch-negator",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:cohort-cybernetica:enhancement:arch-negator"
+        },
+        {
+          "enhancement_id": "emotionless-clarity",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Emotionless Clarity",
+          "points": 10,
+          "raw_name": "Emotionless Clarity",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:cohort-cybernetica:enhancement:emotionless-clarity"
+        },
+        {
+          "enhancement_id": "lord-of-machines",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Lord of Machines",
+          "points": 15,
+          "raw_name": "Lord of Machines",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:cohort-cybernetica:enhancement:lord-of-machines"
+        },
+        {
+          "enhancement_id": "necromechanic",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Necromechanic",
+          "points": 20,
+          "raw_name": "Necromechanic",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:cohort-cybernetica:enhancement:necromechanic"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "COHORT CYBERNETICA",
+      "raw_name": "COHORT CYBERNETICA",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:cohort-cybernetica"
+    },
+    {
+      "detachment_id": "data-psalm-conclave",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "data-blessed-autosermon",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Data-blessed Autosermon",
+          "points": 15,
+          "raw_name": "Data-blessed Autosermon",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:data-psalm-conclave:enhancement:data-blessed-autosermon"
+        },
+        {
+          "enhancement_id": "mantle-of-the-gnosticarch",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mantle of the Gnosticarch",
+          "points": 10,
+          "raw_name": "Mantle of the Gnosticarch",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:data-psalm-conclave:enhancement:mantle-of-the-gnosticarch"
+        },
+        {
+          "enhancement_id": "mechanicus-locum",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mechanicus Locum",
+          "points": 5,
+          "raw_name": "Mechanicus Locum",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:data-psalm-conclave:enhancement:mechanicus-locum"
+        },
+        {
+          "enhancement_id": "temporcopia",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Temporcopia",
+          "points": 20,
+          "raw_name": "Temporcopia",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:data-psalm-conclave:enhancement:temporcopia"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "DATA-PSALM CONCLAVE",
+      "raw_name": "DATA-PSALM CONCLAVE",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:data-psalm-conclave"
+    },
+    {
+      "detachment_id": "eradication-cohort",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "belicosa-class-capacitor-vanes",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Belicosa-class Capacitor Vanes",
+          "points": 25,
+          "raw_name": "Belicosa-class Capacitor Vanes",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:eradication-cohort:enhancement:belicosa-class-capacitor-vanes"
+        },
+        {
+          "enhancement_id": "martial-signatum-amplificator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Martial Signatum Amplificator",
+          "points": 15,
+          "raw_name": "Martial Signatum Amplificator",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:eradication-cohort:enhancement:martial-signatum-amplificator"
+        },
+        {
+          "enhancement_id": "omnicogitator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Omnicogitator",
+          "points": 25,
+          "raw_name": "Omnicogitator",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:eradication-cohort:enhancement:omnicogitator"
+        },
+        {
+          "enhancement_id": "omnissiahs-fury",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Omnissiah's Fury",
+          "points": 10,
+          "raw_name": "Omnissiah's Fury",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:eradication-cohort:enhancement:omnissiahs-fury"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "ERADICATION COHORT",
+      "raw_name": "ERADICATION COHORT",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:eradication-cohort"
+    },
+    {
+      "detachment_id": "explorator-maniple",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "artisan",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Artisan",
+          "points": 10,
+          "raw_name": "Artisan",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:explorator-maniple:enhancement:artisan"
+        },
+        {
+          "enhancement_id": "genetor",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Genetor",
+          "points": 20,
+          "raw_name": "Genetor",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:explorator-maniple:enhancement:genetor"
+        },
+        {
+          "enhancement_id": "logis",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Logis",
+          "points": 15,
+          "raw_name": "Logis",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:explorator-maniple:enhancement:logis"
+        },
+        {
+          "enhancement_id": "magos",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Magos",
+          "points": 10,
+          "raw_name": "Magos",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:explorator-maniple:enhancement:magos"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "EXPLORATOR MANIPLE",
+      "raw_name": "EXPLORATOR MANIPLE",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:explorator-maniple"
+    },
+    {
+      "detachment_id": "haloscreed-battle-clade",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "cognitive-reinforcement",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Cognitive Reinforcement",
+          "points": 30,
+          "raw_name": "Cognitive Reinforcement",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:haloscreed-battle-clade:enhancement:cognitive-reinforcement"
+        },
+        {
+          "enhancement_id": "inloaded-lethality",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Inloaded Lethality",
+          "points": 15,
+          "raw_name": "Inloaded Lethality",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:haloscreed-battle-clade:enhancement:inloaded-lethality"
+        },
+        {
+          "enhancement_id": "sanctified-ordnance",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Sanctified Ordnance",
+          "points": 10,
+          "raw_name": "Sanctified Ordnance",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:haloscreed-battle-clade:enhancement:sanctified-ordnance"
+        },
+        {
+          "enhancement_id": "transoracular-dyad-wafers",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Transoracular Dyad Wafers",
+          "points": 15,
+          "raw_name": "Transoracular Dyad Wafers",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:haloscreed-battle-clade:enhancement:transoracular-dyad-wafers"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "HALOSCREED BATTLE CLADE",
+      "raw_name": "HALOSCREED BATTLE CLADE",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:haloscreed-battle-clade"
+    },
+    {
+      "detachment_id": "lords-of-the-forge",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "tl-4-9",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "TL-4\u00f89",
+          "points": 30,
+          "raw_name": "TL-4\u00f89",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:lords-of-the-forge:enhancement:tl-4-9"
+        },
+        {
+          "enhancement_id": "vinghs-wafers-of-dynamism",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Vingh's Wafers of Dynamism",
+          "points": 25,
+          "raw_name": "Vingh's Wafers of Dynamism",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:lords-of-the-forge:enhancement:vinghs-wafers-of-dynamism"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "LORDS OF THE FORGE",
+      "raw_name": "LORDS OF THE FORGE",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:lords-of-the-forge"
+    },
+    {
+      "detachment_id": "luminen-auto-choir",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "electromiasmic-brazier",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Electromiasmic Brazier",
+          "points": 10,
+          "raw_name": "Electromiasmic Brazier",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:luminen-auto-choir:enhancement:electromiasmic-brazier"
+        },
+        {
+          "enhancement_id": "voltagheist-reliquary",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Voltagheist Reliquary",
+          "points": 15,
+          "raw_name": "Voltagheist Reliquary",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:luminen-auto-choir:enhancement:voltagheist-reliquary"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "LUMINEN AUTO-CHOIR",
+      "raw_name": "LUMINEN AUTO-CHOIR",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:luminen-auto-choir"
+    },
+    {
+      "detachment_id": "rad-zone-corps",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "autoclavic-denunciation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Autoclavic Denunciation",
+          "points": 15,
+          "raw_name": "Autoclavic Denunciation",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:rad-zone-corps:enhancement:autoclavic-denunciation"
+        },
+        {
+          "enhancement_id": "malphonic-susurrus",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Malphonic Susurrus",
+          "points": 20,
+          "raw_name": "Malphonic Susurrus",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:rad-zone-corps:enhancement:malphonic-susurrus"
+        },
+        {
+          "enhancement_id": "peerless-eradicator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Peerless Eradicator",
+          "points": 20,
+          "raw_name": "Peerless Eradicator",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:rad-zone-corps:enhancement:peerless-eradicator"
+        },
+        {
+          "enhancement_id": "radial-suffusion",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Radial Suffusion",
+          "points": 25,
+          "raw_name": "Radial Suffusion",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:rad-zone-corps:enhancement:radial-suffusion"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "RAD-ZONE CORPS",
+      "raw_name": "RAD-ZONE CORPS",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:rad-zone-corps"
+    },
+    {
+      "detachment_id": "skitarii-hunter-cohort",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "battle-sphere-uplink",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Battle-sphere Uplink",
+          "points": 25,
+          "raw_name": "Battle-sphere Uplink",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:skitarii-hunter-cohort:enhancement:battle-sphere-uplink"
+        },
+        {
+          "enhancement_id": "cantic-thrallnet",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Cantic Thrallnet",
+          "points": 25,
+          "raw_name": "Cantic Thrallnet",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:skitarii-hunter-cohort:enhancement:cantic-thrallnet"
+        },
+        {
+          "enhancement_id": "clandestine-infiltrator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Clandestine Infiltrator",
+          "points": 15,
+          "raw_name": "Clandestine Infiltrator",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:skitarii-hunter-cohort:enhancement:clandestine-infiltrator"
+        },
+        {
+          "enhancement_id": "veiled-hunter",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Veiled Hunter",
+          "points": 10,
+          "raw_name": "Veiled Hunter",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:skitarii-hunter-cohort:enhancement:veiled-hunter"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "SKITARII HUNTER COHORT",
+      "raw_name": "SKITARII HUNTER COHORT",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:detachment:skitarii-hunter-cohort"
+    }
+  ],
+  "faction_id": "adeptus-mechanicus",
+  "name": "Adeptus Mechanicus",
+  "raw_name": "Adeptus Mechanicus",
+  "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-archaeopter-fusilave:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-archaeopter-fusilave:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ARCHAEOPTER FUSILAVE",
+      "raw_name": "ARCHAEOPTER FUSILAVE",
+      "record_id": "units-archaeopter-fusilave",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-archaeopter-fusilave",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "archaeopter-fusilave",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 185,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-archaeopter-stratoraptor:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-archaeopter-stratoraptor:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ARCHAEOPTER STRATORAPTOR",
+      "raw_name": "ARCHAEOPTER STRATORAPTOR",
+      "record_id": "units-archaeopter-stratoraptor",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-archaeopter-stratoraptor",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "archaeopter-stratoraptor",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-archaeopter-transvector:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-archaeopter-transvector:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ARCHAEOPTER TRANSVECTOR",
+      "raw_name": "ARCHAEOPTER TRANSVECTOR",
+      "record_id": "units-archaeopter-transvector",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-archaeopter-transvector",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "archaeopter-transvector",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-belisarius-cawl:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-belisarius-cawl:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BELISARIUS CAWL",
+      "raw_name": "BELISARIUS CAWL",
+      "record_id": "units-belisarius-cawl",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-belisarius-cawl",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "belisarius-cawl",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-corpuscarii-electro-priests:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-corpuscarii-electro-priests:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-corpuscarii-electro-priests:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CORPUSCARII ELECTRO-PRIESTS",
+      "raw_name": "CORPUSCARII ELECTRO-PRIESTS",
+      "record_id": "units-corpuscarii-electro-priests",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-corpuscarii-electro-priests",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "corpuscarii-electro-priests",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 25,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-cybernetica-datasmith:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-cybernetica-datasmith:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CYBERNETICA DATASMITH",
+      "raw_name": "CYBERNETICA DATASMITH",
+      "record_id": "units-cybernetica-datasmith",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-cybernetica-datasmith",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cybernetica-datasmith",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-fulgurite-electro-priests:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-fulgurite-electro-priests:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-fulgurite-electro-priests:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FULGURITE ELECTRO-PRIESTS",
+      "raw_name": "FULGURITE ELECTRO-PRIESTS",
+      "record_id": "units-fulgurite-electro-priests",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-fulgurite-electro-priests",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "fulgurite-electro-priests",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-hastarii-exterminators:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-hastarii-exterminators:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-hastarii-exterminators:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-hastarii-exterminators:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HASTARII EXTERMINATORS",
+      "raw_name": "HASTARII EXTERMINATORS",
+      "record_id": "units-hastarii-exterminators",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-hastarii-exterminators",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hastarii-exterminators",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-hastarii-fusiliers:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-hastarii-fusiliers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-hastarii-fusiliers:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-hastarii-fusiliers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HASTARII FUSILIERS",
+      "raw_name": "HASTARII FUSILIERS",
+      "record_id": "units-hastarii-fusiliers",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-hastarii-fusiliers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hastarii-fusiliers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-ironstrider-ballistarii:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-ironstrider-ballistarii:cost:your-1st-to-2nd-units-cost:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 240,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-ironstrider-ballistarii:cost:your-1st-to-2nd-units-cost:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-ironstrider-ballistarii:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-ironstrider-ballistarii:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-ironstrider-ballistarii:cost:your-3rd-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 255,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-ironstrider-ballistarii:cost:your-3rd-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-ironstrider-ballistarii:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "IRONSTRIDER BALLISTARII",
+      "raw_name": "IRONSTRIDER BALLISTARII",
+      "record_id": "units-ironstrider-ballistarii",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-ironstrider-ballistarii",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "ironstrider-ballistarii",
+      "wargear_costs": [
+        {
+          "name": "Twin cognis lascannon",
+          "points_per_item": 10,
+          "raw_name": "per Twin cognis lascannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-ironstrider-ballistarii:wargear:per-twin-cognis-lascannon:1",
+          "wargear_id": "twin-cognis-lascannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kastelan-robots:cost:your-1st-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 320,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kastelan-robots:cost:your-1st-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kastelan-robots:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kastelan-robots:cost:your-2nd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 340,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kastelan-robots:cost:your-2nd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kastelan-robots:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KASTELAN ROBOTS",
+      "raw_name": "KASTELAN ROBOTS",
+      "record_id": "units-kastelan-robots",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kastelan-robots",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kastelan-robots",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kataphron-breachers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 320,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kataphron-breachers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kataphron-breachers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KATAPHRON BREACHERS",
+      "raw_name": "KATAPHRON BREACHERS",
+      "record_id": "units-kataphron-breachers",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kataphron-breachers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kataphron-breachers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kataphron-destroyers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 210,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kataphron-destroyers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kataphron-destroyers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KATAPHRON DESTROYERS",
+      "raw_name": "KATAPHRON DESTROYERS",
+      "record_id": "units-kataphron-destroyers",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-kataphron-destroyers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kataphron-destroyers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 155,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-onager-dunecrawler:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-onager-dunecrawler:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ONAGER DUNECRAWLER",
+      "raw_name": "ONAGER DUNECRAWLER",
+      "record_id": "units-onager-dunecrawler",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-onager-dunecrawler",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "onager-dunecrawler",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-skystalkers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-skystalkers:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-skystalkers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-skystalkers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-skystalkers:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-skystalkers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PTERAXII SKYSTALKERS",
+      "raw_name": "PTERAXII SKYSTALKERS",
+      "record_id": "units-pteraxii-skystalkers",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-skystalkers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "pteraxii-skystalkers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-sterylizors:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-sterylizors:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-sterylizors:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-sterylizors:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-sterylizors:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-sterylizors:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PTERAXII STERYLIZORS",
+      "raw_name": "PTERAXII STERYLIZORS",
+      "record_id": "units-pteraxii-sterylizors",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-pteraxii-sterylizors",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "pteraxii-sterylizors",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-serberys-raiders:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-serberys-raiders:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-serberys-raiders:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SERBERYS RAIDERS",
+      "raw_name": "SERBERYS RAIDERS",
+      "record_id": "units-serberys-raiders",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-serberys-raiders",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "serberys-raiders",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-serberys-sulphurhounds:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-serberys-sulphurhounds:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-serberys-sulphurhounds:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SERBERYS SULPHURHOUNDS",
+      "raw_name": "SERBERYS SULPHURHOUNDS",
+      "record_id": "units-serberys-sulphurhounds",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-serberys-sulphurhounds",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "serberys-sulphurhounds",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "9 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 9,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "9 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-servitor-battleclade:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-servitor-battleclade:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SERVITOR BATTLECLADE",
+      "raw_name": "SERVITOR BATTLECLADE",
+      "record_id": "units-servitor-battleclade",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-servitor-battleclade",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "servitor-battleclade",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-infiltrators:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 155,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-infiltrators:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-infiltrators:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-infiltrators:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 165,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-infiltrators:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-infiltrators:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SICARIAN INFILTRATORS",
+      "raw_name": "SICARIAN INFILTRATORS",
+      "record_id": "units-sicarian-infiltrators",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-infiltrators",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sicarian-infiltrators",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-ruststalkers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-ruststalkers:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-ruststalkers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-ruststalkers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-ruststalkers:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-ruststalkers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SICARIAN RUSTSTALKERS",
+      "raw_name": "SICARIAN RUSTSTALKERS",
+      "record_id": "units-sicarian-ruststalkers",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sicarian-ruststalkers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sicarian-ruststalkers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 35,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skitarii-marshal:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skitarii-marshal:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SKITARII MARSHAL",
+      "raw_name": "SKITARII MARSHAL",
+      "record_id": "units-skitarii-marshal",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skitarii-marshal",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "skitarii-marshal",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skitarii-rangers:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skitarii-rangers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SKITARII RANGERS",
+      "raw_name": "SKITARII RANGERS",
+      "record_id": "units-skitarii-rangers",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skitarii-rangers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "skitarii-rangers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skitarii-vanguard:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skitarii-vanguard:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SKITARII VANGUARD",
+      "raw_name": "SKITARII VANGUARD",
+      "record_id": "units-skitarii-vanguard",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skitarii-vanguard",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "skitarii-vanguard",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skorpius-disintegrator:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skorpius-disintegrator:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SKORPIUS DISINTEGRATOR",
+      "raw_name": "SKORPIUS DISINTEGRATOR",
+      "record_id": "units-skorpius-disintegrator",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skorpius-disintegrator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "skorpius-disintegrator",
+      "wargear_costs": [
+        {
+          "name": "Ferrumite cannon",
+          "points_per_item": 10,
+          "raw_name": "per Ferrumite cannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skorpius-disintegrator:wargear:per-ferrumite-cannon:1",
+          "wargear_id": "ferrumite-cannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skorpius-dunerider:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skorpius-dunerider:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SKORPIUS DUNERIDER",
+      "raw_name": "SKORPIUS DUNERIDER",
+      "record_id": "units-skorpius-dunerider",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-skorpius-dunerider",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "skorpius-dunerider",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-dragoons-with-radium-jezzails:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-dragoons-with-radium-jezzails:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-dragoons-with-radium-jezzails:cost:your-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-dragoons-with-radium-jezzails:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SYDONIAN DRAGOONS WITH RADIUM JEZZAILS",
+      "raw_name": "SYDONIAN DRAGOONS WITH RADIUM JEZZAILS",
+      "record_id": "units-sydonian-dragoons-with-radium-jezzails",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-dragoons-with-radium-jezzails",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sydonian-dragoons-with-radium-jezzails",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-dragoons-with-taser-lances:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-dragoons-with-taser-lances:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-dragoons-with-taser-lances:cost:your-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-dragoons-with-taser-lances:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SYDONIAN DRAGOONS WITH TASER LANCES",
+      "raw_name": "SYDONIAN DRAGOONS WITH TASER LANCES",
+      "record_id": "units-sydonian-dragoons-with-taser-lances",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-dragoons-with-taser-lances",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sydonian-dragoons-with-taser-lances",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-skatros:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-skatros:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SYDONIAN SKATROS",
+      "raw_name": "SYDONIAN SKATROS",
+      "record_id": "units-sydonian-skatros",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-sydonian-skatros",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sydonian-skatros",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-dominus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-dominus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CORPUSCARII ELECTRO-PRIESTS",
+          "FULGURITE ELECTRO-PRIESTS",
+          "HASTARII EXTERMINATORS",
+          "HASTARII FUSILIERS",
+          "KATAPHRON BREACHERS",
+          "KATAPHRON DESTROYERS",
+          "SERVITOR BATTLECLADE",
+          "SKITARII RANGERS",
+          "SKITARII VANGUARD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "corpuscarii-electro-priests",
+          "fulgurite-electro-priests",
+          "hastarii-exterminators",
+          "hastarii-fusiliers",
+          "kataphron-breachers",
+          "kataphron-destroyers",
+          "servitor-battleclade",
+          "skitarii-rangers",
+          "skitarii-vanguard"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-dominus:leader"
+      },
+      "name": "TECH-PRIEST DOMINUS",
+      "raw_name": "TECH-PRIEST DOMINUS",
+      "record_id": "units-tech-priest-dominus",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-dominus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tech-priest-dominus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-enginseer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-enginseer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CORPUSCARII ELECTRO-PRIESTS",
+          "FULGURITE ELECTRO-PRIESTS",
+          "KATAPHRON BREACHERS",
+          "KATAPHRON DESTROYERS",
+          "SKITARII RANGERS",
+          "SKITARII VANGUARD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "corpuscarii-electro-priests",
+          "fulgurite-electro-priests",
+          "kataphron-breachers",
+          "kataphron-destroyers",
+          "skitarii-rangers",
+          "skitarii-vanguard"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-enginseer:leader"
+      },
+      "name": "TECH-PRIEST ENGINSEER",
+      "raw_name": "TECH-PRIEST ENGINSEER",
+      "record_id": "units-tech-priest-enginseer",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-enginseer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tech-priest-enginseer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-manipulus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-manipulus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CORPUSCARII ELECTRO-PRIESTS",
+          "FULGURITE ELECTRO-PRIESTS",
+          "HASTARII EXTERMINATORS",
+          "HASTARII FUSILIERS",
+          "KATAPHRON BREACHERS",
+          "KATAPHRON DESTROYERS",
+          "SERVITOR BATTLECLADE",
+          "SKITARII RANGERS",
+          "SKITARII VANGUARD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "corpuscarii-electro-priests",
+          "fulgurite-electro-priests",
+          "hastarii-exterminators",
+          "hastarii-fusiliers",
+          "kataphron-breachers",
+          "kataphron-destroyers",
+          "servitor-battleclade",
+          "skitarii-rangers",
+          "skitarii-vanguard"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-manipulus:leader"
+      },
+      "name": "TECH-PRIEST MANIPULUS",
+      "raw_name": "TECH-PRIEST MANIPULUS",
+      "record_id": "units-tech-priest-manipulus",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-tech-priest-manipulus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tech-priest-manipulus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-technoarcheologist:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-technoarcheologist:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TECHNOARCHEOLOGIST",
+      "raw_name": "TECHNOARCHEOLOGIST",
+      "record_id": "units-technoarcheologist",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-technoarcheologist",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "technoarcheologist",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-thulia-ghuld:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-thulia-ghuld:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "THULIA GHULD",
+      "raw_name": "THULIA GHULD",
+      "record_id": "units-thulia-ghuld",
+      "source_id": "gw-11e-mfm-2026-06:faction:adeptus-mechanicus:unit:units-thulia-ghuld",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "thulia-ghuld",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/adeptus-mechanicus"
+}

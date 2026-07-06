@@ -1,0 +1,1688 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "covenite-coterie",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "master-artisan",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Master Artisan",
+          "points": 20,
+          "raw_name": "Master Artisan",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:covenite-coterie:enhancement:master-artisan"
+        },
+        {
+          "enhancement_id": "master-nemesine",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Master Nemesine",
+          "points": 5,
+          "raw_name": "Master Nemesine",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:covenite-coterie:enhancement:master-nemesine"
+        },
+        {
+          "enhancement_id": "master-regenesist",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Master Regenesist",
+          "points": 25,
+          "raw_name": "Master Regenesist",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:covenite-coterie:enhancement:master-regenesist"
+        },
+        {
+          "enhancement_id": "master-repugnomancer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Master Repugnomancer",
+          "points": 15,
+          "raw_name": "Master Repugnomancer",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:covenite-coterie:enhancement:master-repugnomancer"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "COVENITE COTERIE",
+      "raw_name": "COVENITE COTERIE",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:covenite-coterie"
+    },
+    {
+      "detachment_id": "exhibition-of-slaughter",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "hyperstimm-trafficker",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Hyperstimm Trafficker",
+          "points": 20,
+          "raw_name": "Hyperstimm Trafficker",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:exhibition-of-slaughter:enhancement:hyperstimm-trafficker"
+        },
+        {
+          "enhancement_id": "periapt-of-torments",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Periapt of Torments",
+          "points": 20,
+          "raw_name": "Periapt of Torments",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:exhibition-of-slaughter:enhancement:periapt-of-torments"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "EXHIBITION OF SLAUGHTER",
+      "raw_name": "EXHIBITION OF SLAUGHTER",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:exhibition-of-slaughter"
+    },
+    {
+      "detachment_id": "kabalite-agonysts",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "contempt-for-rivals",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Contempt for Rivals",
+          "points": 20,
+          "raw_name": "Contempt for Rivals",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:kabalite-agonysts:enhancement:contempt-for-rivals"
+        },
+        {
+          "enhancement_id": "towering-arrogance",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Towering Arrogance",
+          "points": 15,
+          "raw_name": "Towering Arrogance",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:kabalite-agonysts:enhancement:towering-arrogance"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "KABALITE AGONYSTS",
+      "raw_name": "KABALITE AGONYSTS",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:kabalite-agonysts"
+    },
+    {
+      "detachment_id": "kabalite-cartel",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "informant-network",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Informant Network",
+          "points": 30,
+          "raw_name": "Informant Network",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:kabalite-cartel:enhancement:informant-network"
+        },
+        {
+          "enhancement_id": "leechbite-plate",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Leechbite Plate",
+          "points": 5,
+          "raw_name": "Leechbite Plate",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:kabalite-cartel:enhancement:leechbite-plate"
+        },
+        {
+          "enhancement_id": "towering-arrogance",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Towering Arrogance",
+          "points": 20,
+          "raw_name": "Towering Arrogance",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:kabalite-cartel:enhancement:towering-arrogance"
+        },
+        {
+          "enhancement_id": "webway-awl",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Webway Awl",
+          "points": 25,
+          "raw_name": "Webway Awl",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:kabalite-cartel:enhancement:webway-awl"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "KABALITE CARTEL",
+      "raw_name": "KABALITE CARTEL",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:kabalite-cartel"
+    },
+    {
+      "detachment_id": "realspace-raiders",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "crucible-of-malediction",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Crucible of Malediction",
+          "points": 15,
+          "raw_name": "Crucible of Malediction",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:realspace-raiders:enhancement:crucible-of-malediction"
+        },
+        {
+          "enhancement_id": "dark-vitality",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Dark Vitality",
+          "points": 20,
+          "raw_name": "Dark Vitality",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:realspace-raiders:enhancement:dark-vitality"
+        },
+        {
+          "enhancement_id": "eye-of-spite",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eye of Spite",
+          "points": 15,
+          "raw_name": "Eye of Spite",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:realspace-raiders:enhancement:eye-of-spite"
+        },
+        {
+          "enhancement_id": "labyrinthine-cunning",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Labyrinthine Cunning",
+          "points": 25,
+          "raw_name": "Labyrinthine Cunning",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:realspace-raiders:enhancement:labyrinthine-cunning"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "REALSPACE RAIDERS",
+      "raw_name": "REALSPACE RAIDERS",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:realspace-raiders"
+    },
+    {
+      "detachment_id": "reapers-wager",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "archraider",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Archraider",
+          "points": 15,
+          "raw_name": "Archraider",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:reapers-wager:enhancement:archraider"
+        },
+        {
+          "enhancement_id": "conductor-of-torment",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Conductor of Torment",
+          "points": 20,
+          "raw_name": "Conductor of Torment",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:reapers-wager:enhancement:conductor-of-torment"
+        },
+        {
+          "enhancement_id": "reapers-cowl",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Reaper's Cowl",
+          "points": 25,
+          "raw_name": "Reaper's Cowl",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:reapers-wager:enhancement:reapers-cowl"
+        },
+        {
+          "enhancement_id": "webway-walker",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Webway Walker",
+          "points": 15,
+          "raw_name": "Webway Walker",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:reapers-wager:enhancement:webway-walker"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "REAPER'S WAGER",
+      "raw_name": "REAPER'S WAGER",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:reapers-wager"
+    },
+    {
+      "detachment_id": "skysplinter-assault",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "nightmare-shroud",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Nightmare Shroud",
+          "points": 20,
+          "raw_name": "Nightmare Shroud",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:skysplinter-assault:enhancement:nightmare-shroud"
+        },
+        {
+          "enhancement_id": "phantasmal-smoke",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Phantasmal Smoke",
+          "points": 15,
+          "raw_name": "Phantasmal Smoke",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:skysplinter-assault:enhancement:phantasmal-smoke"
+        },
+        {
+          "enhancement_id": "sadistic-fulcrum",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Sadistic Fulcrum",
+          "points": 15,
+          "raw_name": "Sadistic Fulcrum",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:skysplinter-assault:enhancement:sadistic-fulcrum"
+        },
+        {
+          "enhancement_id": "spiteful-raider",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Spiteful Raider",
+          "points": 10,
+          "raw_name": "Spiteful Raider",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:skysplinter-assault:enhancement:spiteful-raider"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "SKYSPLINTER ASSAULT",
+      "raw_name": "SKYSPLINTER ASSAULT",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:skysplinter-assault"
+    },
+    {
+      "detachment_id": "spectacle-of-spite",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "chronoshard",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Chronoshard",
+          "points": 15,
+          "raw_name": "Chronoshard",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:spectacle-of-spite:enhancement:chronoshard"
+        },
+        {
+          "enhancement_id": "morghennas-curse",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "MORGHENNA'S CURSE",
+          "points": 20,
+          "raw_name": "MORGHENNA'S CURSE",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:spectacle-of-spite:enhancement:morghennas-curse"
+        },
+        {
+          "enhancement_id": "periapt-of-torments",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Periapt of Torments",
+          "points": 25,
+          "raw_name": "Periapt of Torments",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:spectacle-of-spite:enhancement:periapt-of-torments"
+        },
+        {
+          "enhancement_id": "pharmacophex",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Pharmacophex",
+          "points": 15,
+          "raw_name": "Pharmacophex",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:spectacle-of-spite:enhancement:pharmacophex"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "SPECTACLE OF SPITE",
+      "raw_name": "SPECTACLE OF SPITE",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:spectacle-of-spite"
+    },
+    {
+      "detachment_id": "tools-of-torment",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "elixir-of-the-corpse-courts",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Elixir of the Corpse Courts (Upgrade)",
+          "points": 15,
+          "raw_name": "Elixir of the Corpse Courts (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:tools-of-torment:enhancement:elixir-of-the-corpse-courts"
+        },
+        {
+          "enhancement_id": "gnarlskin-experimentor",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Gnarlskin Experimentor",
+          "points": 20,
+          "raw_name": "Gnarlskin Experimentor",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:tools-of-torment:enhancement:gnarlskin-experimentor"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "TOOLS OF TORMENT",
+      "raw_name": "TOOLS OF TORMENT",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:detachment:tools-of-torment"
+    }
+  ],
+  "faction_id": "drukhari",
+  "name": "Drukhari",
+  "raw_name": "Drukhari",
+  "source_id": "gw-11e-mfm-2026-06:faction:drukhari",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-archon:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-archon:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "HAND OF THE ARCHON",
+          "INCUBI",
+          "KABALITE WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "hand-of-the-archon",
+          "incubi",
+          "kabalite-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-archon:leader"
+      },
+      "name": "ARCHON",
+      "raw_name": "ARCHON",
+      "record_id": "units-archon",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-archon",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "archon",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-cronos:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-cronos:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-cronos:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CRONOS",
+      "raw_name": "CRONOS",
+      "record_id": "units-cronos",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-cronos",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cronos",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-drazhar:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-drazhar:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "INCUBI"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "incubi"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-drazhar:leader"
+      },
+      "name": "DRAZHAR",
+      "raw_name": "DRAZHAR",
+      "record_id": "units-drazhar",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-drazhar",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "drazhar",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-haemonculus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-haemonculus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HAEMONCULUS",
+      "raw_name": "HAEMONCULUS",
+      "record_id": "units-haemonculus",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-haemonculus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "haemonculus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-hand-of-the-archon:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-hand-of-the-archon:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HAND OF THE ARCHON",
+      "raw_name": "HAND OF THE ARCHON",
+      "record_id": "units-hand-of-the-archon",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-hand-of-the-archon",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hand-of-the-archon",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-hellions:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-hellions:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-hellions:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-hellions:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-hellions:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-hellions:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HELLIONS",
+      "raw_name": "HELLIONS",
+      "record_id": "units-hellions",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-hellions",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hellions",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-incubi:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-incubi:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-incubi:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-incubi:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-incubi:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-incubi:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "INCUBI",
+      "raw_name": "INCUBI",
+      "record_id": "units-incubi",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-incubi",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "incubi",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-kabalite-warriors:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-kabalite-warriors:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KABALITE WARRIORS",
+      "raw_name": "KABALITE WARRIORS",
+      "record_id": "units-kabalite-warriors",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-kabalite-warriors",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kabalite-warriors",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-lady-malys:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-lady-malys:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "HAND OF THE ARCHON",
+          "INCUBI",
+          "KABALITE WARRIORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "hand-of-the-archon",
+          "incubi",
+          "kabalite-warriors"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-lady-malys:leader"
+      },
+      "name": "LADY MALYS",
+      "raw_name": "LADY MALYS",
+      "record_id": "units-lady-malys",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-lady-malys",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "lady-malys",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-lelith-hesperax:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-lelith-hesperax:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "WYCHES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "wyches"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-lelith-hesperax:leader"
+      },
+      "name": "LELITH HESPERAX",
+      "raw_name": "LELITH HESPERAX",
+      "record_id": "units-lelith-hesperax",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-lelith-hesperax",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "lelith-hesperax",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-mandrakes:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-mandrakes:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-mandrakes:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-mandrakes:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-mandrakes:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-mandrakes:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MANDRAKES",
+      "raw_name": "MANDRAKES",
+      "record_id": "units-mandrakes",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-mandrakes",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "mandrakes",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-raider:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-raider:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RAIDER",
+      "raw_name": "RAIDER",
+      "record_id": "units-raider",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-raider",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "raider",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-ravager:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-ravager:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-ravager:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-ravager:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RAVAGER",
+      "raw_name": "RAVAGER",
+      "record_id": "units-ravager",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-ravager",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "ravager",
+      "wargear_costs": [
+        {
+          "name": "Dark lance",
+          "points_per_item": 5,
+          "raw_name": "per Dark lance",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-ravager:wargear:per-dark-lance:1",
+          "wargear_id": "dark-lance"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-razorwing-jetfighter:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-razorwing-jetfighter:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RAZORWING JETFIGHTER",
+      "raw_name": "RAZORWING JETFIGHTER",
+      "record_id": "units-razorwing-jetfighter",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-razorwing-jetfighter",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "razorwing-jetfighter",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-reavers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-reavers:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-reavers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-reavers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-reavers:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-reavers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "REAVERS",
+      "raw_name": "REAVERS",
+      "record_id": "units-reavers",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-reavers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "reavers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-heavy-weapons:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-heavy-weapons:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-heavy-weapons:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-heavy-weapons:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SCOURGES WITH HEAVY WEAPONS",
+      "raw_name": "SCOURGES WITH HEAVY WEAPONS",
+      "record_id": "units-scourges-with-heavy-weapons",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-heavy-weapons",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "scourges-with-heavy-weapons",
+      "wargear_costs": [
+        {
+          "name": "Dark lance",
+          "points_per_item": 5,
+          "raw_name": "per Dark lance",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-heavy-weapons:wargear:per-dark-lance:2",
+          "wargear_id": "dark-lance"
+        },
+        {
+          "name": "Haywire blaster",
+          "points_per_item": 5,
+          "raw_name": "per Haywire blaster",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-heavy-weapons:wargear:per-haywire-blaster:1",
+          "wargear_id": "haywire-blaster"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-shardcarbines:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-shardcarbines:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-shardcarbines:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-shardcarbines:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SCOURGES WITH SHARDCARBINES",
+      "raw_name": "SCOURGES WITH SHARDCARBINES",
+      "record_id": "units-scourges-with-shardcarbines",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-scourges-with-shardcarbines",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "scourges-with-shardcarbines",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-succubus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-succubus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "WYCHES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "wyches"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-succubus:leader"
+      },
+      "name": "SUCCUBUS",
+      "raw_name": "SUCCUBUS",
+      "record_id": "units-succubus",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-succubus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "succubus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-talos:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-talos:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-talos:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-talos:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-talos:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-talos:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TALOS",
+      "raw_name": "TALOS",
+      "record_id": "units-talos",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-talos",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "talos",
+      "wargear_costs": [
+        {
+          "name": "Twin haywire blaster",
+          "points_per_item": 5,
+          "raw_name": "per Twin haywire blaster",
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-talos:wargear:per-twin-haywire-blaster:1",
+          "wargear_id": "twin-haywire-blaster"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-venom:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-venom:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VENOM",
+      "raw_name": "VENOM",
+      "record_id": "units-venom",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-venom",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "venom",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 245,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-voidraven-bomber:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-voidraven-bomber:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VOIDRAVEN BOMBER",
+      "raw_name": "VOIDRAVEN BOMBER",
+      "record_id": "units-voidraven-bomber",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-voidraven-bomber",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "voidraven-bomber",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-wracks:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "8 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 8,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "8 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-wracks:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-wracks:cost:your-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-wracks:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WRACKS",
+      "raw_name": "WRACKS",
+      "record_id": "units-wracks",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-wracks",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "wracks",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-wyches:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-wyches:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WYCHES",
+      "raw_name": "WYCHES",
+      "record_id": "units-wyches",
+      "source_id": "gw-11e-mfm-2026-06:faction:drukhari:unit:units-wyches",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "wyches",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/drukhari"
+}

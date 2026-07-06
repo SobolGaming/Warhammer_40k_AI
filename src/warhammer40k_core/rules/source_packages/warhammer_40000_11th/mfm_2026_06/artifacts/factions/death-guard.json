@@ -1,0 +1,2123 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "champions-of-contagion",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "cornucophagus",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Cornucophagus",
+          "points": 35,
+          "raw_name": "Cornucophagus",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:champions-of-contagion:enhancement:cornucophagus"
+        },
+        {
+          "enhancement_id": "final-ingredient",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Final Ingredient",
+          "points": 20,
+          "raw_name": "Final Ingredient",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:champions-of-contagion:enhancement:final-ingredient"
+        },
+        {
+          "enhancement_id": "needle-of-nurgle",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Needle of Nurgle",
+          "points": 25,
+          "raw_name": "Needle of Nurgle",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:champions-of-contagion:enhancement:needle-of-nurgle"
+        },
+        {
+          "enhancement_id": "visions-of-virulence",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Visions of Virulence",
+          "points": 15,
+          "raw_name": "Visions of Virulence",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:champions-of-contagion:enhancement:visions-of-virulence"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "CHAMPIONS OF CONTAGION",
+      "raw_name": "CHAMPIONS OF CONTAGION",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:champions-of-contagion"
+    },
+    {
+      "detachment_id": "contagion-engines",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "lancet-of-the-worldsore",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Lancet of the Worldsore (Upgrade)",
+          "points": 15,
+          "raw_name": "Lancet of the Worldsore (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:contagion-engines:enhancement:lancet-of-the-worldsore"
+        },
+        {
+          "enhancement_id": "parasitic-woe-reaper",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Parasitic Woe-reaper (Upgrade)",
+          "points": 15,
+          "raw_name": "Parasitic Woe-reaper (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:contagion-engines:enhancement:parasitic-woe-reaper"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "CONTAGION ENGINES",
+      "raw_name": "CONTAGION ENGINES",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:contagion-engines"
+    },
+    {
+      "detachment_id": "death-lords-chosen",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "face-of-death",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Face of Death",
+          "points": 10,
+          "raw_name": "Face of Death",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:death-lords-chosen:enhancement:face-of-death"
+        },
+        {
+          "enhancement_id": "helm-of-the-fly-king",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Helm of The Fly King",
+          "points": 20,
+          "raw_name": "Helm of The Fly King",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:death-lords-chosen:enhancement:helm-of-the-fly-king"
+        },
+        {
+          "enhancement_id": "vile-vigour",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Vile Vigour",
+          "points": 15,
+          "raw_name": "Vile Vigour",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:death-lords-chosen:enhancement:vile-vigour"
+        },
+        {
+          "enhancement_id": "warprot-talisman",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Warprot Talisman",
+          "points": 30,
+          "raw_name": "Warprot Talisman",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:death-lords-chosen:enhancement:warprot-talisman"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "DEATH LORD'S CHOSEN",
+      "raw_name": "DEATH LORD'S CHOSEN",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:death-lords-chosen"
+    },
+    {
+      "detachment_id": "flyblown-host",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "insectile-murmuration",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Insectile Murmuration (Upgrade)",
+          "points": 15,
+          "raw_name": "Insectile Murmuration (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:flyblown-host:enhancement:insectile-murmuration"
+        },
+        {
+          "enhancement_id": "plagueveil",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Plagueveil (Upgrade)",
+          "points": 15,
+          "raw_name": "Plagueveil (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:flyblown-host:enhancement:plagueveil"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "FLYBLOWN HOST",
+      "raw_name": "FLYBLOWN HOST",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:flyblown-host"
+    },
+    {
+      "detachment_id": "mortarions-hammer",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "bilemaw-blight",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Bilemaw Blight",
+          "points": 10,
+          "raw_name": "Bilemaw Blight",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:mortarions-hammer:enhancement:bilemaw-blight"
+        },
+        {
+          "enhancement_id": "eye-of-affliction",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eye of Affliction",
+          "points": 20,
+          "raw_name": "Eye of Affliction",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:mortarions-hammer:enhancement:eye-of-affliction"
+        },
+        {
+          "enhancement_id": "shriekworm-familiar",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Shriekworm Familiar",
+          "points": 15,
+          "raw_name": "Shriekworm Familiar",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:mortarions-hammer:enhancement:shriekworm-familiar"
+        },
+        {
+          "enhancement_id": "tendrilous-emissions",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tendrilous Emissions",
+          "points": 30,
+          "raw_name": "Tendrilous Emissions",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:mortarions-hammer:enhancement:tendrilous-emissions"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "MORTARION'S HAMMER",
+      "raw_name": "MORTARION'S HAMMER",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:mortarions-hammer"
+    },
+    {
+      "detachment_id": "paragons-of-putrescence",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "host-of-the-hybridised-pox",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Host of the Hybridised Pox",
+          "points": 40,
+          "raw_name": "Host of the Hybridised Pox",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:paragons-of-putrescence:enhancement:host-of-the-hybridised-pox"
+        },
+        {
+          "enhancement_id": "rejuvenating-swarm",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Rejuvenating Swarm",
+          "points": 20,
+          "raw_name": "Rejuvenating Swarm",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:paragons-of-putrescence:enhancement:rejuvenating-swarm"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "PARAGONS OF PUTRESCENCE",
+      "raw_name": "PARAGONS OF PUTRESCENCE",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:paragons-of-putrescence"
+    },
+    {
+      "detachment_id": "shamblerot-vectorium",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "lord-of-the-walking-pox",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Lord of the Walking Pox",
+          "points": 15,
+          "raw_name": "Lord of the Walking Pox",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:shamblerot-vectorium:enhancement:lord-of-the-walking-pox"
+        },
+        {
+          "enhancement_id": "sorrowsyphon",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Sorrowsyphon",
+          "points": 10,
+          "raw_name": "Sorrowsyphon",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:shamblerot-vectorium:enhancement:sorrowsyphon"
+        },
+        {
+          "enhancement_id": "talisman-of-burgeoning",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Talisman of Burgeoning",
+          "points": 25,
+          "raw_name": "Talisman of Burgeoning",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:shamblerot-vectorium:enhancement:talisman-of-burgeoning"
+        },
+        {
+          "enhancement_id": "witherbone-pipes",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Witherbone Pipes",
+          "points": 25,
+          "raw_name": "Witherbone Pipes",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:shamblerot-vectorium:enhancement:witherbone-pipes"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "SHAMBLEROT VECTORIUM",
+      "raw_name": "SHAMBLEROT VECTORIUM",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:shamblerot-vectorium"
+    },
+    {
+      "detachment_id": "tallyband-summoners",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "beckoning-blight",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Beckoning Blight",
+          "points": 20,
+          "raw_name": "Beckoning Blight",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:tallyband-summoners:enhancement:beckoning-blight"
+        },
+        {
+          "enhancement_id": "entropic-knell",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Entropic Knell",
+          "points": 15,
+          "raw_name": "Entropic Knell",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:tallyband-summoners:enhancement:entropic-knell"
+        },
+        {
+          "enhancement_id": "fell-harvester",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Fell Harvester",
+          "points": 10,
+          "raw_name": "Fell Harvester",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:tallyband-summoners:enhancement:fell-harvester"
+        },
+        {
+          "enhancement_id": "tome-of-bounteous-blessings",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tome of Bounteous Blessings",
+          "points": 20,
+          "raw_name": "Tome of Bounteous Blessings",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:tallyband-summoners:enhancement:tome-of-bounteous-blessings"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "TALLYBAND SUMMONERS",
+      "raw_name": "TALLYBAND SUMMONERS",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:tallyband-summoners"
+    },
+    {
+      "detachment_id": "virulent-vectorium",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "arch-contaminator",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Arch Contaminator",
+          "points": 25,
+          "raw_name": "Arch Contaminator",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:virulent-vectorium:enhancement:arch-contaminator"
+        },
+        {
+          "enhancement_id": "daemon-weapon-of-nurgle",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Daemon Weapon of Nurgle",
+          "points": 10,
+          "raw_name": "Daemon Weapon of Nurgle",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:virulent-vectorium:enhancement:daemon-weapon-of-nurgle"
+        },
+        {
+          "enhancement_id": "furnace-of-plagues",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Furnace of Plagues",
+          "points": 25,
+          "raw_name": "Furnace of Plagues",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:virulent-vectorium:enhancement:furnace-of-plagues"
+        },
+        {
+          "enhancement_id": "revolting-regeneration",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Revolting Regeneration",
+          "points": 30,
+          "raw_name": "Revolting Regeneration",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:virulent-vectorium:enhancement:revolting-regeneration"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "VIRULENT VECTORIUM",
+      "raw_name": "VIRULENT VECTORIUM",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:detachment:virulent-vectorium"
+    }
+  ],
+  "faction_id": "death-guard",
+  "name": "Death Guard",
+  "raw_name": "Death Guard",
+  "source_id": "gw-11e-mfm-2026-06:faction:death-guard",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-beasts-of-nurgle:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-beasts-of-nurgle:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-beasts-of-nurgle:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BEASTS OF NURGLE",
+      "raw_name": "BEASTS OF NURGLE",
+      "record_id": "plague-legions-beasts-of-nurgle",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-beasts-of-nurgle",
+      "source_section_id": "plague-legions",
+      "source_section_name": "PLAGUE LEGIONS",
+      "unit_id": "beasts-of-nurgle",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 265,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-great-unclean-one:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-great-unclean-one:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 280,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-great-unclean-one:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-great-unclean-one:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GREAT UNCLEAN ONE",
+      "raw_name": "GREAT UNCLEAN ONE",
+      "record_id": "plague-legions-great-unclean-one",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-great-unclean-one",
+      "source_section_id": "plague-legions",
+      "source_section_name": "PLAGUE LEGIONS",
+      "unit_id": "great-unclean-one",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-nurglings:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-nurglings:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-nurglings:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NURGLINGS",
+      "raw_name": "NURGLINGS",
+      "record_id": "plague-legions-nurglings",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-nurglings",
+      "source_section_id": "plague-legions",
+      "source_section_name": "PLAGUE LEGIONS",
+      "unit_id": "nurglings",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-plaguebearers:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-plaguebearers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PLAGUEBEARERS",
+      "raw_name": "PLAGUEBEARERS",
+      "record_id": "plague-legions-plaguebearers",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-plaguebearers",
+      "source_section_id": "plague-legions",
+      "source_section_name": "PLAGUE LEGIONS",
+      "unit_id": "plaguebearers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 280,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-rotigus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-rotigus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ROTIGUS",
+      "raw_name": "ROTIGUS",
+      "record_id": "plague-legions-rotigus",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:plague-legions-rotigus",
+      "source_section_id": "plague-legions",
+      "source_section_name": "PLAGUE LEGIONS",
+      "unit_id": "rotigus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-biologus-putrifier:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-biologus-putrifier:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PLAGUE MARINES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "plague-marines"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-biologus-putrifier:leader"
+      },
+      "name": "BIOLOGUS PUTRIFIER",
+      "raw_name": "BIOLOGUS PUTRIFIER",
+      "record_id": "units-biologus-putrifier",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-biologus-putrifier",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "biologus-putrifier",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-blightlord-terminators:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 185,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-blightlord-terminators:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 370,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-blightlord-terminators:cost:your-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-blightlord-terminators:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BLIGHTLORD TERMINATORS",
+      "raw_name": "BLIGHTLORD TERMINATORS",
+      "record_id": "units-blightlord-terminators",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-blightlord-terminators",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "blightlord-terminators",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-land-raider:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-land-raider:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 240,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-land-raider:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-land-raider:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS LAND RAIDER",
+      "raw_name": "CHAOS LAND RAIDER",
+      "record_id": "units-chaos-land-raider",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-land-raider",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-land-raider",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-predator-annihilator:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-predator-annihilator:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS PREDATOR ANNIHILATOR",
+      "raw_name": "CHAOS PREDATOR ANNIHILATOR",
+      "record_id": "units-chaos-predator-annihilator",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-predator-annihilator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-predator-annihilator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-predator-destructor:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-predator-destructor:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 155,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-predator-destructor:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-predator-destructor:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS PREDATOR DESTRUCTOR",
+      "raw_name": "CHAOS PREDATOR DESTRUCTOR",
+      "record_id": "units-chaos-predator-destructor",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-predator-destructor",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-predator-destructor",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-rhino:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-rhino:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS RHINO",
+      "raw_name": "CHAOS RHINO",
+      "record_id": "units-chaos-rhino",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-rhino",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-rhino",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-spawn:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-spawn:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS SPAWN",
+      "raw_name": "CHAOS SPAWN",
+      "record_id": "units-chaos-spawn",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-chaos-spawn",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-spawn",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 195,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-daemon-prince-of-nurgle:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-daemon-prince-of-nurgle:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAEMON PRINCE OF NURGLE",
+      "raw_name": "DAEMON PRINCE OF NURGLE",
+      "record_id": "units-daemon-prince-of-nurgle",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-daemon-prince-of-nurgle",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "daemon-prince-of-nurgle",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-daemon-prince-of-nurgle-with-wings:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-daemon-prince-of-nurgle-with-wings:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DAEMON PRINCE OF NURGLE WITH WINGS",
+      "raw_name": "DAEMON PRINCE OF NURGLE WITH WINGS",
+      "record_id": "units-daemon-prince-of-nurgle-with-wings",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-daemon-prince-of-nurgle-with-wings",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "daemon-prince-of-nurgle-with-wings",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-deathshroud-terminators:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 320,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-deathshroud-terminators:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-deathshroud-terminators:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-deathshroud-terminators:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 330,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-deathshroud-terminators:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-deathshroud-terminators:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEATHSHROUD TERMINATORS",
+      "raw_name": "DEATHSHROUD TERMINATORS",
+      "record_id": "units-deathshroud-terminators",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-deathshroud-terminators",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "deathshroud-terminators",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 290,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-defiler:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-defiler:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 320,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-defiler:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-defiler:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEFILER",
+      "raw_name": "DEFILER",
+      "record_id": "units-defiler",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-defiler",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "defiler",
+      "wargear_costs": [
+        {
+          "name": "Hades lascannon",
+          "points_per_item": 10,
+          "raw_name": "per Hades lascannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-defiler:wargear:per-hades-lascannon:2",
+          "wargear_id": "hades-lascannon"
+        },
+        {
+          "name": "Heavy reaper autocannon",
+          "points_per_item": 10,
+          "raw_name": "per Heavy reaper autocannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-defiler:wargear:per-heavy-reaper-autocannon:1",
+          "wargear_id": "heavy-reaper-autocannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foetid-bloat-drone:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foetid-bloat-drone:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foetid-bloat-drone:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foetid-bloat-drone:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FOETID BLOAT-DRONE",
+      "raw_name": "FOETID BLOAT-DRONE",
+      "record_id": "units-foetid-bloat-drone",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foetid-bloat-drone",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "foetid-bloat-drone",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foetid-bloat-drone-with-heavy-blight-launcher:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foetid-bloat-drone-with-heavy-blight-launcher:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foetid-bloat-drone-with-heavy-blight-launcher:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foetid-bloat-drone-with-heavy-blight-launcher:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FOETID BLOAT-DRONE WITH HEAVY BLIGHT LAUNCHER",
+      "raw_name": "FOETID BLOAT-DRONE WITH HEAVY BLIGHT LAUNCHER",
+      "record_id": "units-foetid-bloat-drone-with-heavy-blight-launcher",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foetid-bloat-drone-with-heavy-blight-launcher",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "foetid-bloat-drone-with-heavy-blight-launcher",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foul-blightspawn:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foul-blightspawn:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PLAGUE MARINES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "plague-marines"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foul-blightspawn:leader"
+      },
+      "name": "FOUL BLIGHTSPAWN",
+      "raw_name": "FOUL BLIGHTSPAWN",
+      "record_id": "units-foul-blightspawn",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-foul-blightspawn",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "foul-blightspawn",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-helbrute:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-helbrute:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HELBRUTE",
+      "raw_name": "HELBRUTE",
+      "record_id": "units-helbrute",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-helbrute",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "helbrute",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-icon-bearer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-icon-bearer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PLAGUE MARINES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "plague-marines"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-icon-bearer:leader"
+      },
+      "name": "ICON BEARER",
+      "raw_name": "ICON BEARER",
+      "record_id": "units-icon-bearer",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-icon-bearer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "icon-bearer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-contagion:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-contagion:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BLIGHTLORD TERMINATORS",
+          "DEATHSHROUD TERMINATORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "blightlord-terminators",
+          "deathshroud-terminators"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-contagion:leader"
+      },
+      "name": "LORD OF CONTAGION",
+      "raw_name": "LORD OF CONTAGION",
+      "record_id": "units-lord-of-contagion",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-contagion",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "lord-of-contagion",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-poxes:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-poxes:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PLAGUE MARINES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "plague-marines"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-poxes:leader"
+      },
+      "name": "LORD OF POXES",
+      "raw_name": "LORD OF POXES",
+      "record_id": "units-lord-of-poxes",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-poxes",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "lord-of-poxes",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-virulence:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-virulence:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BLIGHTLORD TERMINATORS",
+          "DEATHSHROUD TERMINATORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "blightlord-terminators",
+          "deathshroud-terminators"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-virulence:leader"
+      },
+      "name": "LORD OF VIRULENCE",
+      "raw_name": "LORD OF VIRULENCE",
+      "record_id": "units-lord-of-virulence",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-lord-of-virulence",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "lord-of-virulence",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-malignant-plaguecaster:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-malignant-plaguecaster:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PLAGUE MARINES",
+          "POXWALKERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "plague-marines",
+          "poxwalkers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-malignant-plaguecaster:leader"
+      },
+      "name": "MALIGNANT PLAGUECASTER",
+      "raw_name": "MALIGNANT PLAGUECASTER",
+      "record_id": "units-malignant-plaguecaster",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-malignant-plaguecaster",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "malignant-plaguecaster",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-miasmic-malignifier:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-miasmic-malignifier:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MIASMIC MALIGNIFIER",
+      "raw_name": "MIASMIC MALIGNIFIER",
+      "record_id": "units-miasmic-malignifier",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-miasmic-malignifier",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "miasmic-malignifier",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 400,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-mortarion:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-mortarion:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MORTARION",
+      "raw_name": "MORTARION",
+      "record_id": "units-mortarion",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-mortarion",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "mortarion",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-myphitic-blight-haulers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-myphitic-blight-haulers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-myphitic-blight-haulers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MYPHITIC BLIGHT-HAULERS",
+      "raw_name": "MYPHITIC BLIGHT-HAULERS",
+      "record_id": "units-myphitic-blight-haulers",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-myphitic-blight-haulers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "myphitic-blight-haulers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-noxious-blightbringer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-noxious-blightbringer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PLAGUE MARINES",
+          "POXWALKERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "plague-marines",
+          "poxwalkers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-noxious-blightbringer:leader"
+      },
+      "name": "NOXIOUS BLIGHTBRINGER",
+      "raw_name": "NOXIOUS BLIGHTBRINGER",
+      "record_id": "units-noxious-blightbringer",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-noxious-blightbringer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "noxious-blightbringer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plague-marines:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "7 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 7,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "7 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plague-marines:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plague-marines:cost:your-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plague-marines:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PLAGUE MARINES",
+      "raw_name": "PLAGUE MARINES",
+      "record_id": "units-plague-marines",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plague-marines",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "plague-marines",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plague-surgeon:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plague-surgeon:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PLAGUE MARINES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "plague-marines"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plague-surgeon:leader"
+      },
+      "name": "PLAGUE SURGEON",
+      "raw_name": "PLAGUE SURGEON",
+      "record_id": "units-plague-surgeon",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plague-surgeon",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "plague-surgeon",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 185,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plagueburst-crawler:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plagueburst-crawler:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 210,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plagueburst-crawler:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plagueburst-crawler:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PLAGUEBURST CRAWLER",
+      "raw_name": "PLAGUEBURST CRAWLER",
+      "record_id": "units-plagueburst-crawler",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-plagueburst-crawler",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "plagueburst-crawler",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-poxwalkers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-poxwalkers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-poxwalkers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "POXWALKERS",
+      "raw_name": "POXWALKERS",
+      "record_id": "units-poxwalkers",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-poxwalkers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "poxwalkers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-tallyman:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-tallyman:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PLAGUE MARINES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "plague-marines"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-tallyman:leader"
+      },
+      "name": "TALLYMAN",
+      "raw_name": "TALLYMAN",
+      "record_id": "units-tallyman",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-tallyman",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tallyman",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-typhus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-typhus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BLIGHTLORD TERMINATORS",
+          "DEATHSHROUD TERMINATORS",
+          "POXWALKERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "blightlord-terminators",
+          "deathshroud-terminators",
+          "poxwalkers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-typhus:leader"
+      },
+      "name": "TYPHUS",
+      "raw_name": "TYPHUS",
+      "record_id": "units-typhus",
+      "source_id": "gw-11e-mfm-2026-06:faction:death-guard:unit:units-typhus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "typhus",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/death-guard"
+}

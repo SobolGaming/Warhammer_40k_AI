@@ -43,60 +43,9 @@ LEGACY_OVERSIZED_MODULE_LIMITS = {
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
     "event_companion_2026_06.py": 3621,
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
-    "event_companion_base_size_rows.py": 8674,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
     "faction_coverage_2026_27.py": 1535,
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
     "faction_subrules_2026_27.py": 2957,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "adepta_sororitas.py": 2041,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "adeptus_custodes.py": 2169,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "adeptus_mechanicus.py": 2320,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/aeldari.py": 4050,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "astra_militarum.py": 4278,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "black_templars.py": 5799,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "blood_angels.py": 6532,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "chaos_daemons.py": 2698,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "chaos_space_marines.py": 3630,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "dark_angels.py": 6508,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "death_guard.py": 2086,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "deathwatch.py": 5596,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "drukhari.py": 1671,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "genestealer_cults.py": 1662,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "grey_knights.py": 1987,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "imperial_agents.py": 2728,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "imperial_knights.py": 1590,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "leagues_of_votann.py": 1561,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/necrons.py": 3305,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/orks.py": 3483,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "space_marines.py": 6591,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "space_wolves.py": 6815,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "tau_empire.py": 2598,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "thousand_sons.py": 2075,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "tyranids.py": 3130,
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/mfm_2026_06/"
-    "world_eaters.py": 1934,
     "src/warhammer40k_core/rules/wahapedia_bridge.py": 2425,
 }
 

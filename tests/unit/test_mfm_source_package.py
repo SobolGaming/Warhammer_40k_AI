@@ -1,3 +1,6 @@
+import json
+from importlib.resources import files
+
 import pytest
 
 from warhammer40k_core.rules.mfm_source import (
@@ -20,9 +23,13 @@ from warhammer40k_core.rules.mfm_source import (
     unit_cost_row_label_details,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06 import (
+    SOURCE_PAYLOAD_CHECKSUM_SHA256,
     faction_record,
     source_package,
     supported_faction_ids,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06._artifacts import (
+    mfm_package_artifact_from_json_bytes,
 )
 
 
@@ -50,6 +57,44 @@ def test_mfm_source_package_excludes_unsupported_factions_and_sections() -> None
         for unit in faction.units
         if unit.source_section_id in unsupported_sections
     ]
+
+
+def test_mfm_source_package_loads_versioned_json_artifacts() -> None:
+    package = source_package()
+    package_resources = files(
+        "warhammer40k_core.rules.source_packages.warhammer_40000_11th.mfm_2026_06"
+    )
+    faction_artifacts = tuple(
+        sorted(
+            path.name
+            for path in package_resources.joinpath("artifacts", "factions").iterdir()
+            if path.name.endswith(".json")
+        )
+    )
+
+    assert package_resources.joinpath("artifacts", "package.json").is_file()
+    assert not package_resources.joinpath("space_marines.py").is_file()
+    assert faction_artifacts == tuple(
+        f"{faction_id}.json" for faction_id in supported_faction_ids()
+    )
+    assert package.source_payload_checksum_sha256() == SOURCE_PAYLOAD_CHECKSUM_SHA256
+
+
+def test_mfm_source_package_artifact_manifest_fails_fast_for_schema_drift() -> None:
+    payload: dict[str, object] = {
+        "artifact_schema": "stale-schema",
+        "source_package_id": "gw-11e-mfm-2026-06",
+        "source_title": "Warhammer 40,000: Munitorum Field Manual",
+        "source_version": "v1.0",
+        "source_date": "2026-06-17",
+        "source_url": "https://mfm.warhammer-community.com/en/",
+        "excluded_faction_ids": [],
+        "faction_artifacts": {"orks": "factions/orks.json"},
+        "source_payload_checksum_sha256": "0" * 64,
+    }
+
+    with pytest.raises(MfmSourceError, match="schema"):
+        mfm_package_artifact_from_json_bytes(json.dumps(payload).encode("utf-8"))
 
 
 def test_mfm_source_package_preserves_world_eaters_defiler_special_pricing() -> None:

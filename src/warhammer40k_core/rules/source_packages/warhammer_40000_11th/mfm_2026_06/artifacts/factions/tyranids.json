@@ -1,0 +1,3147 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "ambush-predators",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "cryptophotaic-camouflage",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Cryptophotaic Camouflage (Upgrade)",
+          "points": 15,
+          "raw_name": "Cryptophotaic Camouflage (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:ambush-predators:enhancement:cryptophotaic-camouflage"
+        },
+        {
+          "enhancement_id": "encircling-horrors",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Encircling Horrors (Upgrade)",
+          "points": 20,
+          "raw_name": "Encircling Horrors (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:ambush-predators:enhancement:encircling-horrors"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "AMBUSH PREDATORS",
+      "raw_name": "AMBUSH PREDATORS",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:ambush-predators"
+    },
+    {
+      "detachment_id": "assimilation-swarm",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "biophagic-flow",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Biophagic Flow",
+          "points": 10,
+          "raw_name": "Biophagic Flow",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:assimilation-swarm:enhancement:biophagic-flow"
+        },
+        {
+          "enhancement_id": "instinctive-defence",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Instinctive Defence",
+          "points": 15,
+          "raw_name": "Instinctive Defence",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:assimilation-swarm:enhancement:instinctive-defence"
+        },
+        {
+          "enhancement_id": "parasitic-biomorphology",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Parasitic Biomorphology",
+          "points": 25,
+          "raw_name": "Parasitic Biomorphology",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:assimilation-swarm:enhancement:parasitic-biomorphology"
+        },
+        {
+          "enhancement_id": "regenerating-monstrosity",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Regenerating Monstrosity",
+          "points": 20,
+          "raw_name": "Regenerating Monstrosity",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:assimilation-swarm:enhancement:regenerating-monstrosity"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "ASSIMILATION SWARM",
+      "raw_name": "ASSIMILATION SWARM",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:assimilation-swarm"
+    },
+    {
+      "detachment_id": "crusher-stampede",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "enraged-reserves",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Enraged Reserves",
+          "points": 20,
+          "raw_name": "Enraged Reserves",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:crusher-stampede:enhancement:enraged-reserves"
+        },
+        {
+          "enhancement_id": "monstrous-nemesis",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Monstrous Nemesis",
+          "points": 25,
+          "raw_name": "Monstrous Nemesis",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:crusher-stampede:enhancement:monstrous-nemesis"
+        },
+        {
+          "enhancement_id": "null-nodules",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Null Nodules",
+          "points": 10,
+          "raw_name": "Null Nodules",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:crusher-stampede:enhancement:null-nodules"
+        },
+        {
+          "enhancement_id": "ominous-presence",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Ominous Presence",
+          "points": 15,
+          "raw_name": "Ominous Presence",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:crusher-stampede:enhancement:ominous-presence"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "CRUSHER STAMPEDE",
+      "raw_name": "CRUSHER STAMPEDE",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:crusher-stampede"
+    },
+    {
+      "detachment_id": "invasion-fleet",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "adaptive-biology",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Adaptive Biology",
+          "points": 25,
+          "raw_name": "Adaptive Biology",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:invasion-fleet:enhancement:adaptive-biology"
+        },
+        {
+          "enhancement_id": "alien-cunning",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Alien Cunning",
+          "points": 30,
+          "raw_name": "Alien Cunning",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:invasion-fleet:enhancement:alien-cunning"
+        },
+        {
+          "enhancement_id": "perfectly-adapted",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Perfectly Adapted",
+          "points": 15,
+          "raw_name": "Perfectly Adapted",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:invasion-fleet:enhancement:perfectly-adapted"
+        },
+        {
+          "enhancement_id": "synaptic-linchpin",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Synaptic Linchpin",
+          "points": 20,
+          "raw_name": "Synaptic Linchpin",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:invasion-fleet:enhancement:synaptic-linchpin"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "INVASION FLEET",
+      "raw_name": "INVASION FLEET",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:invasion-fleet"
+    },
+    {
+      "detachment_id": "subterranean-assault",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "synaptic-strategy",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Synaptic Strategy",
+          "points": 15,
+          "raw_name": "Synaptic Strategy",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:subterranean-assault:enhancement:synaptic-strategy"
+        },
+        {
+          "enhancement_id": "tremor-senses",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tremor Senses",
+          "points": 20,
+          "raw_name": "Tremor Senses",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:subterranean-assault:enhancement:tremor-senses"
+        },
+        {
+          "enhancement_id": "trygon-prime",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Trygon Prime",
+          "points": 20,
+          "raw_name": "Trygon Prime",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:subterranean-assault:enhancement:trygon-prime"
+        },
+        {
+          "enhancement_id": "vanguard-intellect",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Vanguard Intellect",
+          "points": 15,
+          "raw_name": "Vanguard Intellect",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:subterranean-assault:enhancement:vanguard-intellect"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "SUBTERRANEAN ASSAULT",
+      "raw_name": "SUBTERRANEAN ASSAULT",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:subterranean-assault"
+    },
+    {
+      "detachment_id": "synaptic-nexus",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "power-of-the-hive-mind",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Power of the Hive Mind",
+          "points": 10,
+          "raw_name": "Power of the Hive Mind",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:synaptic-nexus:enhancement:power-of-the-hive-mind"
+        },
+        {
+          "enhancement_id": "psychostatic-disruption",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Psychostatic Disruption",
+          "points": 30,
+          "raw_name": "Psychostatic Disruption",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:synaptic-nexus:enhancement:psychostatic-disruption"
+        },
+        {
+          "enhancement_id": "synaptic-control",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Synaptic Control",
+          "points": 20,
+          "raw_name": "Synaptic Control",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:synaptic-nexus:enhancement:synaptic-control"
+        },
+        {
+          "enhancement_id": "the-dirgeheart-of-kharis",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "The Dirgeheart of Kharis",
+          "points": 15,
+          "raw_name": "The Dirgeheart of Kharis",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:synaptic-nexus:enhancement:the-dirgeheart-of-kharis"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "SYNAPTIC NEXUS",
+      "raw_name": "SYNAPTIC NEXUS",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:synaptic-nexus"
+    },
+    {
+      "detachment_id": "talons-of-the-norn-queen",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "destabilising-predation",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Destabilising Predation (Upgrade)",
+          "points": 20,
+          "raw_name": "Destabilising Predation (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:talons-of-the-norn-queen:enhancement:destabilising-predation"
+        },
+        {
+          "enhancement_id": "synaptoprescience",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Synaptoprescience (Upgrade)",
+          "points": 25,
+          "raw_name": "Synaptoprescience (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:talons-of-the-norn-queen:enhancement:synaptoprescience"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "TALONS OF THE NORN QUEEN",
+      "raw_name": "TALONS OF THE NORN QUEEN",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:talons-of-the-norn-queen"
+    },
+    {
+      "detachment_id": "unending-swarm",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "adrenalised-onslaught",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Adrenalised Onslaught",
+          "points": 15,
+          "raw_name": "Adrenalised Onslaught",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:unending-swarm:enhancement:adrenalised-onslaught"
+        },
+        {
+          "enhancement_id": "naturalised-camouflage",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Naturalised Camouflage",
+          "points": 30,
+          "raw_name": "Naturalised Camouflage",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:unending-swarm:enhancement:naturalised-camouflage"
+        },
+        {
+          "enhancement_id": "piercing-talons",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Piercing Talons",
+          "points": 25,
+          "raw_name": "Piercing Talons",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:unending-swarm:enhancement:piercing-talons"
+        },
+        {
+          "enhancement_id": "relentless-hunger",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Relentless Hunger",
+          "points": 20,
+          "raw_name": "Relentless Hunger",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:unending-swarm:enhancement:relentless-hunger"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "UNENDING SWARM",
+      "raw_name": "UNENDING SWARM",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:unending-swarm"
+    },
+    {
+      "detachment_id": "vanguard-onslaught",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "chameleonic",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Chameleonic",
+          "points": 15,
+          "raw_name": "Chameleonic",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:vanguard-onslaught:enhancement:chameleonic"
+        },
+        {
+          "enhancement_id": "hunting-grounds",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Hunting Grounds",
+          "points": 20,
+          "raw_name": "Hunting Grounds",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:vanguard-onslaught:enhancement:hunting-grounds"
+        },
+        {
+          "enhancement_id": "neuronode",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Neuronode",
+          "points": 20,
+          "raw_name": "Neuronode",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:vanguard-onslaught:enhancement:neuronode"
+        },
+        {
+          "enhancement_id": "stalker",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Stalker",
+          "points": 10,
+          "raw_name": "Stalker",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:vanguard-onslaught:enhancement:stalker"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "VANGUARD ONSLAUGHT",
+      "raw_name": "VANGUARD ONSLAUGHT",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:vanguard-onslaught"
+    },
+    {
+      "detachment_id": "warrior-bioform-onslaught",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "elevated-might",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Elevated Might",
+          "points": 30,
+          "raw_name": "Elevated Might",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:warrior-bioform-onslaught:enhancement:elevated-might"
+        },
+        {
+          "enhancement_id": "ocular-adaptation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Ocular Adaptation",
+          "points": 20,
+          "raw_name": "Ocular Adaptation",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:warrior-bioform-onslaught:enhancement:ocular-adaptation"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "WARRIOR BIOFORM ONSLAUGHT",
+      "raw_name": "WARRIOR BIOFORM ONSLAUGHT",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:detachment:warrior-bioform-onslaught"
+    }
+  ],
+  "faction_id": "tyranids",
+  "name": "Tyranids",
+  "raw_name": "Tyranids",
+  "source_id": "gw-11e-mfm-2026-06:faction:tyranids",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-barbgaunts:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-barbgaunts:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-barbgaunts:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BARBGAUNTS",
+      "raw_name": "BARBGAUNTS",
+      "record_id": "units-barbgaunts",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-barbgaunts",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "barbgaunts",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-biovores:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-biovores:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-biovores:cost:your-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-biovores:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BIOVORES",
+      "raw_name": "BIOVORES",
+      "record_id": "units-biovores",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-biovores",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "biovores",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-broodlord:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-broodlord:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "GENESTEALERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "genestealers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-broodlord:leader"
+      },
+      "name": "BROODLORD",
+      "raw_name": "BROODLORD",
+      "record_id": "units-broodlord",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-broodlord",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "broodlord",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-carnifexes:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-carnifexes:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-carnifexes:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CARNIFEXES",
+      "raw_name": "CARNIFEXES",
+      "record_id": "units-carnifexes",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-carnifexes",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "carnifexes",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-exocrine:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-exocrine:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-exocrine:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-exocrine:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "EXOCRINE",
+      "raw_name": "EXOCRINE",
+      "record_id": "units-exocrine",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-exocrine",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "exocrine",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-gargoyles:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 155,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-gargoyles:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-gargoyles:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GARGOYLES",
+      "raw_name": "GARGOYLES",
+      "record_id": "units-gargoyles",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-gargoyles",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "gargoyles",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-genestealers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-genestealers:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-genestealers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-genestealers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-genestealers:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-genestealers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GENESTEALERS",
+      "raw_name": "GENESTEALERS",
+      "record_id": "units-genestealers",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-genestealers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "genestealers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 185,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-harpy:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-harpy:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HARPY",
+      "raw_name": "HARPY",
+      "record_id": "units-harpy",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-harpy",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "harpy",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 610,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-harridan:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-harridan:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 660,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-harridan:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-harridan:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HARRIDAN",
+      "raw_name": "HARRIDAN",
+      "record_id": "units-harridan",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-harridan",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "harridan",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-haruspex:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-haruspex:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-haruspex:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-haruspex:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HARUSPEX",
+      "raw_name": "HARUSPEX",
+      "record_id": "units-haruspex",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-haruspex",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "haruspex",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 810,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hierophant:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hierophant:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 910,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hierophant:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hierophant:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HIEROPHANT",
+      "raw_name": "HIEROPHANT",
+      "record_id": "units-hierophant",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hierophant",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hierophant",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-crone:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-crone:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HIVE CRONE",
+      "raw_name": "HIVE CRONE",
+      "record_id": "units-hive-crone",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-crone",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hive-crone",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-guard:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-guard:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-guard:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-guard:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-guard:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-guard:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HIVE GUARD",
+      "raw_name": "HIVE GUARD",
+      "record_id": "units-hive-guard",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-guard",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hive-guard",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 195,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-tyrant:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-tyrant:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "TYRANT GUARD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "tyrant-guard"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-tyrant:leader"
+      },
+      "name": "HIVE TYRANT",
+      "raw_name": "HIVE TYRANT",
+      "record_id": "units-hive-tyrant",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hive-tyrant",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hive-tyrant",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hormagaunts:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hormagaunts:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hormagaunts:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HORMAGAUNTS",
+      "raw_name": "HORMAGAUNTS",
+      "record_id": "units-hormagaunts",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hormagaunts",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hormagaunts",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 165,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hyperadapted-raveners:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hyperadapted-raveners:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hyperadapted-raveners:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hyperadapted-raveners:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "RAVENERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "raveners"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hyperadapted-raveners:leader"
+      },
+      "name": "HYPERADAPTED RAVENERS",
+      "raw_name": "HYPERADAPTED RAVENERS",
+      "record_id": "units-hyperadapted-raveners",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-hyperadapted-raveners",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hyperadapted-raveners",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-lictor:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-lictor:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LICTOR",
+      "raw_name": "LICTOR",
+      "record_id": "units-lictor",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-lictor",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "lictor",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-maleceptor:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-maleceptor:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-maleceptor:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-maleceptor:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MALECEPTOR",
+      "raw_name": "MALECEPTOR",
+      "record_id": "units-maleceptor",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-maleceptor",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "maleceptor",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-mawloc:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-mawloc:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MAWLOC",
+      "raw_name": "MAWLOC",
+      "record_id": "units-mawloc",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-mawloc",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "mawloc",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 30,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-mucolid-spores:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-mucolid-spores:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-mucolid-spores:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MUCOLID SPORES",
+      "raw_name": "MUCOLID SPORES",
+      "record_id": "units-mucolid-spores",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-mucolid-spores",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "mucolid-spores",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "11 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 11,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "11 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurogaunts:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "22 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 22,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "22 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurogaunts:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurogaunts:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NEUROGAUNTS",
+      "raw_name": "NEUROGAUNTS",
+      "record_id": "units-neurogaunts",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurogaunts",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "neurogaunts",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurolictor:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurolictor:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurolictor:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurolictor:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NEUROLICTOR",
+      "raw_name": "NEUROLICTOR",
+      "record_id": "units-neurolictor",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurolictor",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "neurolictor",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurotyrant:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurotyrant:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "NEUROGAUNTS",
+          "TYRANT GUARD",
+          "ZOANTHROPES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "neurogaunts",
+          "tyrant-guard",
+          "zoanthropes"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurotyrant:leader"
+      },
+      "name": "NEUROTYRANT",
+      "raw_name": "NEUROTYRANT",
+      "record_id": "units-neurotyrant",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-neurotyrant",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "neurotyrant",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 250,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-norn-assimilator:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-norn-assimilator:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 270,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-norn-assimilator:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-norn-assimilator:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NORN ASSIMILATOR",
+      "raw_name": "NORN ASSIMILATOR",
+      "record_id": "units-norn-assimilator",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-norn-assimilator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "norn-assimilator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 250,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-norn-emissary:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-norn-emissary:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 270,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-norn-emissary:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-norn-emissary:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NORN EMISSARY",
+      "raw_name": "NORN EMISSARY",
+      "record_id": "units-norn-emissary",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-norn-emissary",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "norn-emissary",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-old-one-eye:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-old-one-eye:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CARNIFEXES"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "carnifexes"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-old-one-eye:leader"
+      },
+      "name": "OLD ONE EYE",
+      "raw_name": "OLD ONE EYE",
+      "record_id": "units-old-one-eye",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-old-one-eye",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "old-one-eye",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-parasite-of-mortrex:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-parasite-of-mortrex:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PARASITE OF MORTREX",
+      "raw_name": "PARASITE OF MORTREX",
+      "record_id": "units-parasite-of-mortrex",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-parasite-of-mortrex",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "parasite-of-mortrex",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-psychophage:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-psychophage:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PSYCHOPHAGE",
+      "raw_name": "PSYCHOPHAGE",
+      "record_id": "units-psychophage",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-psychophage",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "psychophage",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-pyrovores:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-pyrovores:cost:your-1st-to-2nd-units-cost:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-pyrovores:cost:your-1st-to-2nd-units-cost:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-pyrovores:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-pyrovores:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-pyrovores:cost:your-3rd-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-pyrovores:cost:your-3rd-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-pyrovores:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PYROVORES",
+      "raw_name": "PYROVORES",
+      "record_id": "units-pyrovores",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-pyrovores",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "pyrovores",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-raveners:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-raveners:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-raveners:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-raveners:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RAVENERS",
+      "raw_name": "RAVENERS",
+      "record_id": "units-raveners",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-raveners",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "raveners",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 30,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-ripper-swarms:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 40,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-ripper-swarms:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-ripper-swarms:cost:your-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-ripper-swarms:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RIPPER SWARMS",
+      "raw_name": "RIPPER SWARMS",
+      "record_id": "units-ripper-swarms",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-ripper-swarms",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "ripper-swarms",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-screamer-killer:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-screamer-killer:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-screamer-killer:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-screamer-killer:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SCREAMER-KILLER",
+      "raw_name": "SCREAMER-KILLER",
+      "record_id": "units-screamer-killer",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-screamer-killer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "screamer-killer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-spore-mines:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-spore-mines:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-spore-mines:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SPORE MINES",
+      "raw_name": "SPORE MINES",
+      "record_id": "units-spore-mines",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-spore-mines",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "spore-mines",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-sporocyst:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-sporocyst:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SPOROCYST",
+      "raw_name": "SPOROCYST",
+      "record_id": "units-sporocyst",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-sporocyst",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sporocyst",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-termagants:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-termagants:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-termagants:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TERMAGANTS",
+      "raw_name": "TERMAGANTS",
+      "record_id": "units-termagants",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-termagants",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "termagants",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tervigon:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tervigon:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TERVIGON",
+      "raw_name": "TERVIGON",
+      "record_id": "units-tervigon",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tervigon",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tervigon",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-the-red-terror:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-the-red-terror:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "THE RED TERROR",
+      "raw_name": "THE RED TERROR",
+      "record_id": "units-the-red-terror",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-the-red-terror",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "the-red-terror",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 210,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-the-swarmlord:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-the-swarmlord:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "TYRANT GUARD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "tyrant-guard"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-the-swarmlord:leader"
+      },
+      "name": "THE SWARMLORD",
+      "raw_name": "THE SWARMLORD",
+      "record_id": "units-the-swarmlord",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-the-swarmlord",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "the-swarmlord",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-toxicrene:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-toxicrene:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TOXICRENE",
+      "raw_name": "TOXICRENE",
+      "record_id": "units-toxicrene",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-toxicrene",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "toxicrene",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-trygon:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-trygon:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TRYGON",
+      "raw_name": "TRYGON",
+      "record_id": "units-trygon",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-trygon",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "trygon",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-prime-with-lash-whip:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-prime-with-lash-whip:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "HORMAGAUNTS",
+          "TERMAGANTS",
+          "TYRANID WARRIORS WITH MELEE BIO-WEAPONS",
+          "TYRANID WARRIORS WITH RANGED BIO-WEAPONS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "hormagaunts",
+          "termagants",
+          "tyranid-warriors-with-melee-bio-weapons",
+          "tyranid-warriors-with-ranged-bio-weapons"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-prime-with-lash-whip:leader"
+      },
+      "name": "TYRANID PRIME WITH LASH WHIP",
+      "raw_name": "TYRANID PRIME WITH LASH WHIP",
+      "record_id": "units-tyranid-prime-with-lash-whip",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-prime-with-lash-whip",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tyranid-prime-with-lash-whip",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-warriors-with-melee-bio-weapons:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-warriors-with-melee-bio-weapons:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-warriors-with-melee-bio-weapons:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TYRANID WARRIORS WITH MELEE BIO-WEAPONS",
+      "raw_name": "TYRANID WARRIORS WITH MELEE BIO-WEAPONS",
+      "record_id": "units-tyranid-warriors-with-melee-bio-weapons",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-warriors-with-melee-bio-weapons",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tyranid-warriors-with-melee-bio-weapons",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-warriors-with-ranged-bio-weapons:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-warriors-with-ranged-bio-weapons:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-warriors-with-ranged-bio-weapons:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TYRANID WARRIORS WITH RANGED BIO-WEAPONS",
+      "raw_name": "TYRANID WARRIORS WITH RANGED BIO-WEAPONS",
+      "record_id": "units-tyranid-warriors-with-ranged-bio-weapons",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyranid-warriors-with-ranged-bio-weapons",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tyranid-warriors-with-ranged-bio-weapons",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrannocyte:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrannocyte:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TYRANNOCYTE",
+      "raw_name": "TYRANNOCYTE",
+      "record_id": "units-tyrannocyte",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrannocyte",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tyrannocyte",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrannofex:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrannofex:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrannofex:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrannofex:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TYRANNOFEX",
+      "raw_name": "TYRANNOFEX",
+      "record_id": "units-tyrannofex",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrannofex",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tyrannofex",
+      "wargear_costs": [
+        {
+          "name": "Acid spray",
+          "points_per_item": 10,
+          "raw_name": "per Acid spray",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrannofex:wargear:per-acid-spray:1",
+          "wargear_id": "acid-spray"
+        },
+        {
+          "name": "Rupture cannon",
+          "points_per_item": 20,
+          "raw_name": "per Rupture cannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrannofex:wargear:per-rupture-cannon:2",
+          "wargear_id": "rupture-cannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrant-guard:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrant-guard:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrant-guard:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TYRANT GUARD",
+      "raw_name": "TYRANT GUARD",
+      "record_id": "units-tyrant-guard",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-tyrant-guard",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tyrant-guard",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-venomthropes:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-venomthropes:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-venomthropes:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VENOMTHROPES",
+      "raw_name": "VENOMTHROPES",
+      "record_id": "units-venomthropes",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-venomthropes",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "venomthropes",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-von-ryans-leapers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-von-ryans-leapers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-von-ryans-leapers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VON RYAN'S LEAPERS",
+      "raw_name": "VON RYAN'S LEAPERS",
+      "record_id": "units-von-ryans-leapers",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-von-ryans-leapers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "von-ryans-leapers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 185,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-winged-hive-tyrant:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-winged-hive-tyrant:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WINGED HIVE TYRANT",
+      "raw_name": "WINGED HIVE TYRANT",
+      "record_id": "units-winged-hive-tyrant",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-winged-hive-tyrant",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "winged-hive-tyrant",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-winged-tyranid-prime:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-winged-tyranid-prime:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "GARGOYLES",
+          "TYRANID WARRIORS WITH MELEE BIO-WEAPONS",
+          "TYRANID WARRIORS WITH RANGED BIO-WEAPONS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "gargoyles",
+          "tyranid-warriors-with-melee-bio-weapons",
+          "tyranid-warriors-with-ranged-bio-weapons"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-winged-tyranid-prime:leader"
+      },
+      "name": "WINGED TYRANID PRIME",
+      "raw_name": "WINGED TYRANID PRIME",
+      "record_id": "units-winged-tyranid-prime",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-winged-tyranid-prime",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "winged-tyranid-prime",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-zoanthropes:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-zoanthropes:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-zoanthropes:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ZOANTHROPES",
+      "raw_name": "ZOANTHROPES",
+      "record_id": "units-zoanthropes",
+      "source_id": "gw-11e-mfm-2026-06:faction:tyranids:unit:units-zoanthropes",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "zoanthropes",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/tyranids"
+}

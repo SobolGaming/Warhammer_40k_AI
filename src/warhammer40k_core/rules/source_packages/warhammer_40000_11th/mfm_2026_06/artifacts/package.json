@@ -1,0 +1,43 @@
+{
+  "artifact_schema": "core-v2-mfm-source-package-v1",
+  "excluded_faction_ids": [
+    "chaos-titan-legions",
+    "titan-legions"
+  ],
+  "faction_artifacts": {
+    "adepta-sororitas": "factions/adepta-sororitas.json",
+    "adeptus-custodes": "factions/adeptus-custodes.json",
+    "adeptus-mechanicus": "factions/adeptus-mechanicus.json",
+    "aeldari": "factions/aeldari.json",
+    "astra-militarum": "factions/astra-militarum.json",
+    "black-templars": "factions/black-templars.json",
+    "blood-angels": "factions/blood-angels.json",
+    "chaos-daemons": "factions/chaos-daemons.json",
+    "chaos-knights": "factions/chaos-knights.json",
+    "chaos-space-marines": "factions/chaos-space-marines.json",
+    "dark-angels": "factions/dark-angels.json",
+    "death-guard": "factions/death-guard.json",
+    "deathwatch": "factions/deathwatch.json",
+    "drukhari": "factions/drukhari.json",
+    "emperors-children": "factions/emperors-children.json",
+    "genestealer-cults": "factions/genestealer-cults.json",
+    "grey-knights": "factions/grey-knights.json",
+    "imperial-agents": "factions/imperial-agents.json",
+    "imperial-knights": "factions/imperial-knights.json",
+    "leagues-of-votann": "factions/leagues-of-votann.json",
+    "necrons": "factions/necrons.json",
+    "orks": "factions/orks.json",
+    "space-marines": "factions/space-marines.json",
+    "space-wolves": "factions/space-wolves.json",
+    "tau-empire": "factions/tau-empire.json",
+    "thousand-sons": "factions/thousand-sons.json",
+    "tyranids": "factions/tyranids.json",
+    "world-eaters": "factions/world-eaters.json"
+  },
+  "source_date": "2026-06-17",
+  "source_package_id": "gw-11e-mfm-2026-06",
+  "source_payload_checksum_sha256": "1e668fd51b4766516068b7ea9ea0fa79bc98680aa4e38f649caa17fa7400f2af",
+  "source_title": "Warhammer 40,000: Munitorum Field Manual",
+  "source_url": "https://mfm.warhammer-community.com/en/",
+  "source_version": "v1.0"
+}
