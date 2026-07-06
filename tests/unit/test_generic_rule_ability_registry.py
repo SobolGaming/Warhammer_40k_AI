@@ -4,19 +4,39 @@ from dataclasses import replace
 
 import pytest
 
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.datasheet import BaseSizeDefinition
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.effects import (
+    EffectExpiration,
+    PersistingEffect,
+    generic_rule_persisting_effect,
+)
+from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as dark_pacts,
 )
+from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleAbilityHookFamily,
     GenericRuleAbilityRegistry,
     GenericRuleAbilitySource,
+    generic_rule_ability_effects_for_unit,
     rule_ir_grants_any_ability,
 )
 from warhammer40k_core.engine.generic_rule_ability_registry_defaults import (
     DEFAULT_GENERIC_RULE_ABILITY_REGISTRY,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.list_validation import DetachmentSelection
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.unit_state import StartingStrengthRecord
+from warhammer40k_core.geometry.model_geometry import ModelGeometry
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
 )
@@ -27,6 +47,10 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_shadow_legion_ir_support_2026_27 as shadow_legion_ir,
 )
+
+_RANGERS_UNIT_ID = "army-a:rangers"
+_SHROUD_RUNNERS_UNIT_ID = "army-a:shroud-runners"
+_ENEMY_UNIT_ID = "army-b:target"
 
 
 def test_default_generic_rule_ability_registry_maps_shadow_legion_grants() -> None:
@@ -252,6 +276,82 @@ def test_rule_ir_grants_any_ability_uses_grant_ability_parameters() -> None:
     assert not rule_ir_grants_any_ability(source.rule_ir, abilities=("missing_ability",))
 
 
+def test_generic_rule_ability_effects_for_unit_enforces_required_keyword_any() -> None:
+    state = _keyword_any_state()
+    source = _aeldari_path_of_the_outcast_source(
+        path_outcast_ir.ASSASSINS_EYE_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    required_keywords = (path_outcast_ir.RANGERS_KEYWORD, path_outcast_ir.SHROUD_RUNNERS_KEYWORD)
+    ranger_effect = _grant_ability_effect(
+        source=source,
+        effect_id="generic-keyword-any:rangers",
+        target_unit_instance_id=_RANGERS_UNIT_ID,
+        ability=path_outcast_ir.ASSASSINS_EYE_CHARACTER_AP_BONUS_ABILITY,
+        required_keyword_any=required_keywords,
+    )
+    shroud_runner_effect = _grant_ability_effect(
+        source=source,
+        effect_id="generic-keyword-any:shroud-runners",
+        target_unit_instance_id=_SHROUD_RUNNERS_UNIT_ID,
+        ability=path_outcast_ir.ASSASSINS_EYE_CHARACTER_AP_BONUS_ABILITY,
+        required_keyword_any=required_keywords,
+    )
+    enemy_effect = _grant_ability_effect(
+        source=source,
+        effect_id="generic-keyword-any:enemy",
+        target_unit_instance_id=_ENEMY_UNIT_ID,
+        ability=path_outcast_ir.ASSASSINS_EYE_CHARACTER_AP_BONUS_ABILITY,
+        required_keyword_any=required_keywords,
+    )
+    for effect in (ranger_effect, shroud_runner_effect, enemy_effect):
+        state.record_persisting_effect(effect)
+
+    assert generic_rule_ability_effects_for_unit(
+        state=state,
+        source=source,
+        unit_instance_id=_RANGERS_UNIT_ID,
+        ability=path_outcast_ir.ASSASSINS_EYE_CHARACTER_AP_BONUS_ABILITY,
+    ) == (ranger_effect,)
+    assert generic_rule_ability_effects_for_unit(
+        state=state,
+        source=source,
+        unit_instance_id=_SHROUD_RUNNERS_UNIT_ID,
+        ability=path_outcast_ir.ASSASSINS_EYE_CHARACTER_AP_BONUS_ABILITY,
+    ) == (shroud_runner_effect,)
+    assert (
+        generic_rule_ability_effects_for_unit(
+            state=state,
+            source=source,
+            unit_instance_id=_ENEMY_UNIT_ID,
+            ability=path_outcast_ir.ASSASSINS_EYE_CHARACTER_AP_BONUS_ABILITY,
+        )
+        == ()
+    )
+
+
+def test_generic_rule_ability_effects_for_unit_rejects_empty_required_keyword_any() -> None:
+    state = _keyword_any_state()
+    source = _aeldari_path_of_the_outcast_source(
+        path_outcast_ir.ASSASSINS_EYE_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    effect = _grant_ability_effect(
+        source=source,
+        effect_id="generic-keyword-any:empty",
+        target_unit_instance_id=_RANGERS_UNIT_ID,
+        ability=path_outcast_ir.ASSASSINS_EYE_CHARACTER_AP_BONUS_ABILITY,
+        required_keyword_any=(),
+    )
+    state.record_persisting_effect(effect)
+
+    with pytest.raises(GameLifecycleError, match="required_keyword_any must not be empty"):
+        generic_rule_ability_effects_for_unit(
+            state=state,
+            source=source,
+            unit_instance_id=_RANGERS_UNIT_ID,
+            ability=path_outcast_ir.ASSASSINS_EYE_CHARACTER_AP_BONUS_ABILITY,
+        )
+
+
 def _shadow_legion_source() -> GenericRuleAbilitySource:
     record = next(
         record
@@ -288,3 +388,202 @@ def _shadow_legion_enhancement_source(coverage_descriptor_id: str) -> GenericRul
         record.coverage_descriptor_id
     )
     return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
+
+
+def _aeldari_path_of_the_outcast_source(coverage_descriptor_id: str) -> GenericRuleAbilitySource:
+    record = next(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.coverage_descriptor_id == coverage_descriptor_id
+    )
+    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+        record.coverage_descriptor_id
+    )
+    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
+
+
+def _keyword_any_state() -> GameState:
+    ruleset = RulesetDescriptor.warhammer_40000_eleventh()
+    rangers = _unit(
+        unit_instance_id=_RANGERS_UNIT_ID,
+        datasheet_id="aeldari-rangers",
+        name="Rangers",
+        keywords=(path_outcast_ir.RANGERS_KEYWORD, "INFANTRY"),
+        faction_keywords=("AELDARI",),
+    )
+    shroud_runners = _unit(
+        unit_instance_id=_SHROUD_RUNNERS_UNIT_ID,
+        datasheet_id="aeldari-shroud-runners",
+        name="Shroud Runners",
+        keywords=(path_outcast_ir.SHROUD_RUNNERS_KEYWORD, "MOUNTED"),
+        faction_keywords=("AELDARI",),
+    )
+    enemy = _unit(
+        unit_instance_id=_ENEMY_UNIT_ID,
+        datasheet_id="opfor-target",
+        name="Target",
+        keywords=("INFANTRY",),
+        faction_keywords=("OPFOR",),
+    )
+    friendly_army = _army(
+        army_id="army-a",
+        player_id="player-a",
+        ruleset=ruleset,
+        faction_id="aeldari",
+        detachment_id="path-of-the-outcast",
+        units=(rangers, shroud_runners),
+    )
+    enemy_army = _army(
+        army_id="army-b",
+        player_id="player-b",
+        ruleset=ruleset,
+        faction_id="opfor",
+        detachment_id="target-practice",
+        units=(enemy,),
+    )
+    battle_phases = tuple(ruleset.battle_phase_sequence.phases)
+    return GameState(
+        game_id="generic-rule-ability-keyword-any",
+        ruleset_descriptor_hash=ruleset.descriptor_hash,
+        stage=GameLifecycleStage.BATTLE,
+        setup_sequence=tuple(ruleset.setup_sequence.steps),
+        battle_phase_sequence=battle_phases,
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        tactical_secondary_draw_count=2,
+        setup_step_index=None,
+        battle_phase_index=battle_phases.index(BattlePhase.SHOOTING),
+        battle_round=1,
+        active_player_id="player-a",
+        army_definitions=[friendly_army, enemy_army],
+        starting_strength_records=[
+            StartingStrengthRecord.from_unit(player_id="player-a", unit=rangers),
+            StartingStrengthRecord.from_unit(player_id="player-a", unit=shroud_runners),
+            StartingStrengthRecord.from_unit(player_id="player-b", unit=enemy),
+        ],
+    )
+
+
+def _army(
+    *,
+    army_id: str,
+    player_id: str,
+    ruleset: RulesetDescriptor,
+    faction_id: str,
+    detachment_id: str,
+    units: tuple[UnitInstance, ...],
+) -> ArmyDefinition:
+    return ArmyDefinition(
+        army_id=army_id,
+        player_id=player_id,
+        catalog_id="generic-rule-ability-test-catalog",
+        source_package_id=path_outcast_ir.SOURCE_PACKAGE_ID,
+        ruleset_id=ruleset.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id=faction_id,
+            detachment_ids=(detachment_id,),
+        ),
+        units=units,
+    )
+
+
+def _unit(
+    *,
+    unit_instance_id: str,
+    datasheet_id: str,
+    name: str,
+    keywords: tuple[str, ...],
+    faction_keywords: tuple[str, ...],
+) -> UnitInstance:
+    model = _model(
+        model_instance_id=f"{unit_instance_id}:model-001",
+        datasheet_id=datasheet_id,
+        model_profile_id=f"{datasheet_id}-profile",
+        name=f"{name} model",
+        keywords=keywords,
+    )
+    return UnitInstance(
+        unit_instance_id=unit_instance_id,
+        datasheet_id=datasheet_id,
+        name=name,
+        keywords=keywords,
+        faction_keywords=faction_keywords,
+        datasheet_abilities=(),
+        datasheet_source_ids=(f"source:{datasheet_id}",),
+        own_models=(model,),
+        wargear_selections=(),
+    )
+
+
+def _model(
+    *,
+    model_instance_id: str,
+    datasheet_id: str,
+    model_profile_id: str,
+    name: str,
+    keywords: tuple[str, ...],
+) -> ModelInstance:
+    base_size = BaseSizeDefinition.circular(32.0)
+    return ModelInstance(
+        model_instance_id=model_instance_id,
+        datasheet_id=datasheet_id,
+        model_profile_id=model_profile_id,
+        name=name,
+        characteristics=(
+            CharacteristicValue.from_raw(Characteristic.WOUNDS, 1),
+            CharacteristicValue.from_raw(Characteristic.LEADERSHIP, 7),
+        ),
+        base_size=base_size,
+        geometry=ModelGeometry.from_base_size(
+            base_size,
+            keywords=keywords,
+            geometry_source_id=model_profile_id,
+        ),
+        starting_wounds=1,
+        wounds_remaining=1,
+        wargear_ids=(),
+        source_ids=(f"source:{model_profile_id}",),
+    )
+
+
+def _grant_ability_effect(
+    *,
+    source: GenericRuleAbilitySource,
+    effect_id: str,
+    target_unit_instance_id: str,
+    ability: str,
+    required_keyword_any: tuple[str, ...],
+) -> PersistingEffect:
+    return generic_rule_persisting_effect(
+        effect_id=effect_id,
+        source_rule_id=source.rule_ir.source_id,
+        owner_player_id=_owner_player_id_for_unit_id(target_unit_instance_id),
+        target_unit_instance_ids=(target_unit_instance_id,),
+        started_battle_round=1,
+        started_phase=BattlePhase.SHOOTING,
+        expiration=EffectExpiration.end_of_battle(),
+        effect_payload=validate_json_value(
+            {
+                "effect_kind": "generic_rule_execution",
+                "coverage_descriptor_id": source.record.coverage_descriptor_id,
+                "execution_id": source.record.execution_id,
+                "target_unit_instance_ids": [target_unit_instance_id],
+                "target": {"kind": RuleTargetKind.THIS_UNIT.value},
+                "effect": {
+                    "kind": RuleEffectKind.GRANT_ABILITY.value,
+                    "parameters": [
+                        {"key": "ability", "value": ability},
+                        {"key": "required_keyword_any", "value": list(required_keyword_any)},
+                    ],
+                },
+            }
+        ),
+    )
+
+
+def _owner_player_id_for_unit_id(unit_instance_id: str) -> str:
+    if unit_instance_id.startswith("army-a:"):
+        return "player-a"
+    if unit_instance_id.startswith("army-b:"):
+        return "player-b"
+    raise AssertionError(f"Unknown test unit ID: {unit_instance_id}")
