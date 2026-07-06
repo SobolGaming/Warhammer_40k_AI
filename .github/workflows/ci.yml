@@ -81,8 +81,8 @@ jobs:
       - name: Sync dependencies
         run: uv sync --all-groups
 
-      - name: Run fast tests
-        run: uv run pytest tests/ -m "not slow and not integration"
+      - name: Run coverage tests
+        run: uv run pytest tests/
 
   integration-smoke:
     name: integration-smoke
