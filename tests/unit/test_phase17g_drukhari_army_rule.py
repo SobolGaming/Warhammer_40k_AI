@@ -6,19 +6,19 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from tests.unit.test_phase11c_command_phase import (
-    _battle_state,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    battle_state,
 )
-from tests.unit.test_phase13b_shooting_declarations import (
-    _catalog_with_replaced_bolt_profiles,  # pyright: ignore[reportPrivateUsage]
-    _proposal_from_request,  # pyright: ignore[reportPrivateUsage]
-    _shooting_lifecycle,  # pyright: ignore[reportPrivateUsage]
-    _weapon_profile_by_wargear,  # pyright: ignore[reportPrivateUsage]
+from tests.phase13b_shooting_declaration_helpers import (
+    catalog_with_replaced_bolt_profiles,
+    proposal_from_request,
+    shooting_lifecycle,
+    weapon_profile_by_wargear,
 )
-from tests.unit.test_phase15c_fight_order import (
-    _advance_to_fight_order_request,  # pyright: ignore[reportPrivateUsage]
-    _fight_lifecycle,  # pyright: ignore[reportPrivateUsage]
-    _submit_minimal_melee_declaration,  # pyright: ignore[reportPrivateUsage]
+from tests.phase15c_fight_order_helpers import (
+    advance_to_fight_order_request,
+    fight_lifecycle,
+    submit_minimal_melee_declaration,
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -177,7 +177,7 @@ from warhammer40k_core.geometry.pose import Pose
 
 
 def test_power_from_pain_command_start_gains_pain_token() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_drukhari(state, player_id="player-a")
     decisions = DecisionController()
     handler = CommandPhaseHandler(
@@ -197,7 +197,7 @@ def test_power_from_pain_command_start_gains_pain_token() -> None:
 
 
 def test_power_from_pain_failed_enemy_battle_shock_gains_pain_token() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_drukhari(state, player_id="player-a")
     target_unit = _unit_for_player(state, player_id="player-b")
     decisions = DecisionController()
@@ -253,7 +253,7 @@ def test_power_from_pain_failed_enemy_battle_shock_gains_pain_token() -> None:
 
 
 def test_power_from_pain_enemy_unit_destroyed_gains_one_pain_token() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_drukhari(state, player_id="player-a")
     target_unit = _unit_for_player(state, player_id="player-b")
     decisions = DecisionController()
@@ -290,7 +290,7 @@ def test_power_from_pain_enemy_unit_destroyed_gains_one_pain_token() -> None:
 
 
 def test_pain_token_ledger_payload_round_trips_after_spend() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_drukhari(state, player_id="player-a")
     state.gain_faction_resource(
         player_id="player-a",
@@ -312,7 +312,7 @@ def test_pain_token_ledger_payload_round_trips_after_spend() -> None:
 
 
 def test_lithe_agility_advance_grant_spends_pain_token_and_empowers_unit() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
     _mark_player_as_drukhari(
         state,
@@ -366,7 +366,7 @@ def test_lithe_agility_advance_grant_spends_pain_token_and_empowers_unit() -> No
 
 
 def test_lithe_agility_charge_grant_spends_pain_token_and_unlocks_charge_reroll() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.CHARGE)
     _mark_player_as_drukhari(
         state,
@@ -427,7 +427,7 @@ def test_lithe_agility_charge_grant_spends_pain_token_and_unlocks_charge_reroll(
 
 
 def test_hatred_eternal_selected_to_shoot_requests_player_facing_grant() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     _mark_player_as_drukhari(
         state,
@@ -472,7 +472,7 @@ def test_hatred_eternal_selected_to_shoot_requests_player_facing_grant() -> None
 
 
 def test_empty_selected_to_shoot_grant_registry_does_not_request_decision() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     unit = _unit_for_player(state, player_id="player-a")
     decisions = DecisionController()
@@ -496,7 +496,7 @@ def test_empty_selected_to_shoot_grant_registry_does_not_request_decision() -> N
 
 
 def test_selected_to_shoot_grant_registry_validates_handler_contract() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     unit = _unit_for_player(state, player_id="player-a")
     context = ShootingUnitSelectedContext(
@@ -619,7 +619,7 @@ def test_selected_to_shoot_grant_registry_validates_handler_contract() -> None:
 
 
 def test_selected_to_fight_grant_registry_validates_handler_contract() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.FIGHT)
     unit = _unit_for_player(state, player_id="player-a")
     context = FightUnitSelectedContext(
@@ -644,7 +644,7 @@ def test_selected_to_fight_grant_registry_validates_handler_contract() -> None:
             request_id="drukhari-test:fight-registry-request",
             result_id="drukhari-test:fight-registry-result",
         )
-    shooting_state = _battle_state()
+    shooting_state = battle_state()
     _set_current_battle_phase(shooting_state, BattlePhase.SHOOTING)
     with pytest.raises(GameLifecycleError, match="requires the Fight phase"):
         FightUnitSelectedContext(
@@ -796,7 +796,7 @@ def test_selected_to_fight_grant_registry_validates_handler_contract() -> None:
 
 
 def test_hatred_eternal_grant_spends_pain_token_and_unlocks_hit_reroll() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     _mark_player_as_drukhari(
         state,
@@ -875,7 +875,7 @@ def test_hatred_eternal_grant_spends_pain_token_and_unlocks_hit_reroll() -> None
 
 
 def test_hatred_eternal_grant_prevalidation_rejects_payload_drift() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     _mark_player_as_drukhari(
         state,
@@ -948,7 +948,7 @@ def test_hatred_eternal_grant_prevalidation_rejects_payload_drift() -> None:
 
 
 def test_hatred_eternal_grant_prevalidation_rejects_context_and_shape_drift() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     _mark_player_as_drukhari(
         state,
@@ -1075,7 +1075,7 @@ def test_hatred_eternal_grant_prevalidation_rejects_context_and_shape_drift() ->
 
 
 def test_hatred_eternal_grant_decline_spends_no_pain_token() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     _mark_player_as_drukhari(
         state,
@@ -1141,7 +1141,7 @@ def test_hatred_eternal_grant_decline_spends_no_pain_token() -> None:
 
 
 def test_hatred_eternal_decline_rejects_selected_grant_payload() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     _mark_player_as_drukhari(
         state,
@@ -1212,7 +1212,7 @@ def test_hatred_eternal_decline_rejects_selected_grant_payload() -> None:
 
 
 def test_selected_to_shoot_grant_effect_recording_validates_unit_effect_payload() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     unit = _unit_for_player(state, player_id="player-a")
     target_unit = _unit_for_player(state, player_id="player-b")
@@ -1335,7 +1335,7 @@ def test_selected_to_shoot_grant_effect_recording_validates_unit_effect_payload(
 
 
 def test_hatred_eternal_hit_reroll_uses_attack_sequence_dice_reroll_request() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     _mark_player_as_drukhari(
         state,
@@ -1432,7 +1432,7 @@ def test_hatred_eternal_hit_reroll_uses_attack_sequence_dice_reroll_request() ->
 
 
 def test_hatred_eternal_accepted_hit_reroll_resumes_attack_sequence_with_rerolled_hit() -> None:
-    base_profile = _weapon_profile_by_wargear(
+    base_profile = weapon_profile_by_wargear(
         wargear_id="core-bolt-rifle",
         weapon_profile_id="core-bolt-rifle:standard",
     )
@@ -1446,10 +1446,10 @@ def test_hatred_eternal_accepted_hit_reroll_resumes_attack_sequence_with_rerolle
         keywords=(),
         abilities=(),
     )
-    lifecycle, units = _shooting_lifecycle(
+    lifecycle, units = shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         game_id="drukhari-test-hatred-eternal-consumer",
-        catalog=_catalog_with_replaced_bolt_profiles((hatred_profile,)),
+        catalog=catalog_with_replaced_bolt_profiles((hatred_profile,)),
     )
     state = _lifecycle_state(lifecycle)
     _mark_player_as_drukhari(
@@ -1503,7 +1503,7 @@ def test_hatred_eternal_accepted_hit_reroll_resumes_attack_sequence_with_rerolle
         )
     )
     assert declaration_request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
-    proposal = _proposal_from_request(
+    proposal = proposal_from_request(
         request=declaration_request,
         target_unit_id=target_unit.unit_instance_id,
         weapon_profile_id=hatred_profile.profile_id,
@@ -1580,12 +1580,12 @@ def test_hatred_eternal_accepted_hit_reroll_resumes_attack_sequence_with_rerolle
 
 
 def test_shooting_dice_reroll_branch_accepts_source_backed_wound_payload() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     attacker = _unit_for_player(state, player_id="player-a")
     defender = _unit_for_player(state, player_id="player-b")
     wargear_id = attacker.wargear_selections[0].wargear_ids[0]
-    weapon_profile = _weapon_profile_by_wargear(
+    weapon_profile = weapon_profile_by_wargear(
         wargear_id=wargear_id,
         weapon_profile_id=None,
     )
@@ -1702,12 +1702,12 @@ def test_shooting_dice_reroll_branch_accepts_source_backed_wound_payload() -> No
 
 
 def test_source_backed_attack_reroll_revalidates_current_source_context() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     attacker = _unit_for_player(state, player_id="player-a")
     defender = _unit_for_player(state, player_id="player-b")
     wargear_id = attacker.wargear_selections[0].wargear_ids[0]
-    weapon_profile = _weapon_profile_by_wargear(
+    weapon_profile = weapon_profile_by_wargear(
         wargear_id=wargear_id,
         weapon_profile_id=None,
     )
@@ -1810,7 +1810,7 @@ def test_source_backed_attack_reroll_revalidates_current_source_context() -> Non
 
 
 def test_hatred_eternal_selected_to_fight_grant_spends_pain_token_and_unlocks_hit_reroll() -> None:
-    lifecycle, units = _fight_lifecycle(
+    lifecycle, units = fight_lifecycle(
         alpha_unit_ids=("attacker",),
         enemy_unit_ids=("enemy",),
         origins={
@@ -1837,7 +1837,7 @@ def test_hatred_eternal_selected_to_fight_grant_spends_pain_token_and_unlocks_hi
     )
     _refresh_lifecycle_runtime_content(lifecycle)
 
-    activation_request = _advance_to_fight_order_request(lifecycle)
+    activation_request = advance_to_fight_order_request(lifecycle)
     grant_request = _decision_request_from_status(
         lifecycle.submit_decision(
             DecisionResult.for_request(
@@ -1892,7 +1892,7 @@ def test_hatred_eternal_selected_to_fight_grant_spends_pain_token_and_unlocks_hi
 
 
 def test_hatred_eternal_accepted_fight_hit_reroll_resumes_attack_sequence() -> None:
-    lifecycle, units = _fight_lifecycle(
+    lifecycle, units = fight_lifecycle(
         alpha_unit_ids=("attacker",),
         enemy_unit_ids=("enemy",),
         origins={
@@ -1919,7 +1919,7 @@ def test_hatred_eternal_accepted_fight_hit_reroll_resumes_attack_sequence() -> N
     )
     _refresh_lifecycle_runtime_content(lifecycle)
 
-    activation_request = _advance_to_fight_order_request(lifecycle)
+    activation_request = advance_to_fight_order_request(lifecycle)
     grant_request = _decision_request_from_status(
         lifecycle.submit_decision(
             DecisionResult.for_request(
@@ -1971,7 +1971,7 @@ def test_hatred_eternal_accepted_fight_hit_reroll_resumes_attack_sequence() -> N
     )
 
     reroll_request = _decision_request_from_status(
-        _submit_minimal_melee_declaration(
+        submit_minimal_melee_declaration(
             lifecycle,
             request=melee_request,
             result_id=declaration_result_id,
@@ -2016,7 +2016,7 @@ def test_hatred_eternal_accepted_fight_hit_reroll_resumes_attack_sequence() -> N
 
 
 def test_hatred_eternal_hit_reroll_request_ignores_ineligible_contexts() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     unit = _unit_for_player(state, player_id="player-a")
     decisions = DecisionController()
@@ -2172,7 +2172,7 @@ def test_source_backed_hit_reroll_replay_guard_is_fail_fast_for_malformed_payloa
 
 
 def test_drukhari_advance_roll_permission_requires_lithe_agility_empowerment() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_drukhari(
         state,
         player_id="player-a",
@@ -2246,7 +2246,7 @@ def test_drukhari_advance_roll_permission_requires_lithe_agility_empowerment() -
 
 
 def test_lithe_agility_advance_grant_requires_drukhari_rules_unit() -> None:
-    state = _battle_state()
+    state = battle_state()
     _set_current_battle_phase(state, BattlePhase.MOVEMENT)
     _mark_player_as_drukhari(
         state,
@@ -2322,7 +2322,7 @@ def test_faction_resource_ledger_validates_transactions_and_effect_payloads() ->
         is FactionResourceStatus.APPLIED
     )
 
-    state = _battle_state()
+    state = battle_state()
     state.gain_faction_resource(
         player_id="player-a",
         resource_kind=PAIN_TOKEN_RESOURCE_KIND,
@@ -2532,13 +2532,13 @@ def test_faction_resource_ledger_validates_transactions_and_effect_payloads() ->
             effect_payload=spend_effect,
         ),
         lambda: apply_faction_resource_spend_effect(
-            state=_battle_state(),
+            state=battle_state(),
             player_id="player-a",
             source_id="drukhari-test:no-token",
             effect_payload=spend_effect,
         ),
         lambda: apply_faction_resource_spend_effect(
-            state=_battle_state(),
+            state=battle_state(),
             player_id="player-a",
             source_id="drukhari-test:bad-amount",
             effect_payload={
@@ -2559,7 +2559,7 @@ def test_faction_resource_ledger_validates_transactions_and_effect_payloads() ->
 
 
 def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registries() -> None:
-    state = _battle_state()
+    state = battle_state()
     decisions = DecisionController()
     command_calls: list[str] = []
     command_context = CommandPhaseStartContext(
@@ -2759,7 +2759,7 @@ def test_generic_command_and_unit_destroyed_hooks_validate_contexts_and_registri
 
 
 def test_source_backed_reroll_payloads_and_lookup_are_fail_fast() -> None:
-    state = _battle_state()
+    state = battle_state()
     unit = _unit_for_player(state, player_id="player-a")
     permission = lithe_agility_advance_reroll_permission(
         state=state,
@@ -2894,7 +2894,7 @@ def test_source_backed_reroll_payloads_and_lookup_are_fail_fast() -> None:
         with pytest.raises(GameLifecycleError):
             invalid_case()
 
-    malformed_permission_state = _battle_state()
+    malformed_permission_state = battle_state()
     malformed_permission_unit = _unit_for_player(malformed_permission_state, player_id="player-a")
     malformed_permission_state.record_persisting_effect(
         _persisting_effect(
@@ -2916,7 +2916,7 @@ def test_source_backed_reroll_payloads_and_lookup_are_fail_fast() -> None:
             timing_window="after_advance_roll",
         )
 
-    owner_drift_state = _battle_state()
+    owner_drift_state = battle_state()
     owner_drift_unit = _unit_for_player(owner_drift_state, player_id="player-a")
     owner_drift_permission = RerollPermission(
         source_id="drukhari-test:owner-drift-permission",
@@ -2946,7 +2946,7 @@ def test_source_backed_reroll_payloads_and_lookup_are_fail_fast() -> None:
             timing_window="after_advance_roll",
         )
 
-    duplicate_state = _battle_state()
+    duplicate_state = battle_state()
     duplicate_unit = _unit_for_player(duplicate_state, player_id="player-a")
     duplicate_payload = source_backed_reroll_permission_effect_payload(
         target_unit_instance_ids=(duplicate_unit.unit_instance_id,),
@@ -2984,7 +2984,7 @@ def test_source_backed_reroll_payloads_and_lookup_are_fail_fast() -> None:
 
 
 def test_power_from_pain_helpers_validate_eligibility_and_payloads() -> None:
-    state = _battle_state()
+    state = battle_state()
     unit = _unit_for_player(state, player_id="player-a")
 
     wrong_state_cases: tuple[Callable[[], object], ...] = (
@@ -3089,7 +3089,7 @@ def test_power_from_pain_helpers_validate_eligibility_and_payloads() -> None:
         pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
     )
 
-    malformed_state = _battle_state()
+    malformed_state = battle_state()
     malformed_unit = _unit_for_player(malformed_state, player_id="player-a")
     malformed_state.record_persisting_effect(
         _persisting_effect(
@@ -3107,7 +3107,7 @@ def test_power_from_pain_helpers_validate_eligibility_and_payloads() -> None:
             pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
         )
 
-    malformed_keys_state = _battle_state()
+    malformed_keys_state = battle_state()
     malformed_keys_unit = _unit_for_player(malformed_keys_state, player_id="player-a")
     malformed_keys_state.record_persisting_effect(
         _persisting_effect(
@@ -3128,7 +3128,7 @@ def test_power_from_pain_helpers_validate_eligibility_and_payloads() -> None:
             pain_ability_key=LITHE_AGILITY_ABILITY_KEY,
         )
 
-    non_power_state = _battle_state()
+    non_power_state = battle_state()
     non_power_unit = _unit_for_player(non_power_state, player_id="player-a")
     non_power_state.record_persisting_effect(
         _persisting_effect(
@@ -3217,7 +3217,7 @@ def test_power_from_pain_helpers_validate_eligibility_and_payloads() -> None:
 
 
 def test_power_from_pain_runtime_hooks_validate_skips_and_duplicate_events() -> None:
-    state = _battle_state()
+    state = battle_state()
     decisions = DecisionController()
     unit = _unit_for_player(state, player_id="player-a")
     target_unit = _unit_for_player(state, player_id="player-b")
@@ -3263,7 +3263,7 @@ def test_power_from_pain_runtime_hooks_validate_skips_and_duplicate_events() -> 
         is None
     )
 
-    no_token_state = _battle_state()
+    no_token_state = battle_state()
     _set_current_battle_phase(no_token_state, BattlePhase.CHARGE)
     _mark_player_as_drukhari(
         no_token_state,
@@ -3285,7 +3285,7 @@ def test_power_from_pain_runtime_hooks_validate_skips_and_duplicate_events() -> 
         is None
     )
 
-    non_drukhari_command_state = _battle_state()
+    non_drukhari_command_state = battle_state()
     non_drukhari_decisions = DecisionController()
     army_rule.resolve_command_phase_start(
         CommandPhaseStartContext(
@@ -3363,7 +3363,7 @@ def test_power_from_pain_runtime_hooks_validate_skips_and_duplicate_events() -> 
     )
     assert pain_tokens_available(state, player_id="player-a") == 2
 
-    non_drukhari_destroyed_state = _battle_state()
+    non_drukhari_destroyed_state = battle_state()
     non_drukhari_destroyed_decisions = DecisionController()
     non_drukhari_target = _unit_for_player(non_drukhari_destroyed_state, player_id="player-b")
     non_drukhari_event = non_drukhari_destroyed_decisions.event_log.append(
@@ -3392,7 +3392,7 @@ def test_power_from_pain_runtime_hooks_validate_skips_and_duplicate_events() -> 
     )
     assert pain_tokens_available(non_drukhari_destroyed_state, player_id="player-a") == 0
 
-    destroyed_state = _battle_state()
+    destroyed_state = battle_state()
     _mark_player_as_drukhari(destroyed_state, player_id="player-a")
     destroyed_decisions = DecisionController()
     destroyed_target = _unit_for_player(destroyed_state, player_id="player-b")

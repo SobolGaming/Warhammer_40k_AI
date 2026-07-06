@@ -4,8 +4,8 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.unit.test_phase11c_command_phase import (
-    _battle_state,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    battle_state,
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -946,7 +946,7 @@ def test_dark_pacts_completion_hook_runs_once_through_shooting_phase_handler() -
 
 
 def _csm_battle_state() -> GameState:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_chaos_space_marines(state, player_id="player-a")
     return state
 

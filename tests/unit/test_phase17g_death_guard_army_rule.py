@@ -6,11 +6,11 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.unit.test_phase11c_command_phase import (
-    _battle_state_with_center_objective_positions,  # pyright: ignore[reportPrivateUsage]
-    _default_unit_selection,  # pyright: ignore[reportPrivateUsage]
-    _remove_first_models,  # pyright: ignore[reportPrivateUsage]
-    _unit_by_id,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    battle_state_with_center_objective_positions,
+    default_unit_selection,
+    remove_first_models,
+    unit_by_id,
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -306,7 +306,7 @@ def test_battle_formation_hook_registry_enforces_single_request_and_handler() ->
 
 def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() -> None:
     state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SKULLSQUIRM_BLIGHT)
-    unit = _unit_by_id(state, DEATH_GUARD_UNIT_ID)
+    unit = unit_by_id(state, DEATH_GUARD_UNIT_ID)
     model_id = unit.own_models[0].model_instance_id
     save_option = SaveOption(
         save_kind=SaveKind.ARMOUR,
@@ -570,7 +570,7 @@ def test_runtime_modifier_registry_applies_generic_surfaces_deterministically() 
 
 def test_runtime_modifier_registry_rejects_duplicate_ids_and_bad_handler_results() -> None:
     state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SKULLSQUIRM_BLIGHT)
-    unit = _unit_by_id(state, DEATH_GUARD_UNIT_ID)
+    unit = unit_by_id(state, DEATH_GUARD_UNIT_ID)
     model_id = unit.own_models[0].model_instance_id
 
     valid_binding = HitRollModifierBinding(
@@ -605,7 +605,7 @@ def test_runtime_modifier_registry_rejects_duplicate_ids_and_bad_handler_results
 
 def test_runtime_modifier_registry_rejects_invalid_context_and_binding_shapes() -> None:
     state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SKULLSQUIRM_BLIGHT)
-    unit = _unit_by_id(state, DEATH_GUARD_UNIT_ID)
+    unit = unit_by_id(state, DEATH_GUARD_UNIT_ID)
     model_id = unit.own_models[0].model_instance_id
     invalid_state = cast(GameState, object())
     registry = RuntimeModifierRegistry.empty()
@@ -936,7 +936,7 @@ def test_nurgles_gift_requires_live_placed_death_guard_model_in_contagion_range(
         target_unit_instance_id=ENEMY_UNIT_ID,
     ) == ("player-a",)
 
-    _remove_first_models(state, unit_instance_id=DEATH_GUARD_UNIT_ID, count=1)
+    remove_first_models(state, unit_instance_id=DEATH_GUARD_UNIT_ID, count=1)
 
     assert (
         army_rule.afflicting_death_guard_player_ids(
@@ -970,7 +970,7 @@ def test_nurgles_gift_afflicted_units_have_minus_one_toughness() -> None:
 
 def test_skullsquirm_blight_only_modifies_afflicted_melee_hit_rolls() -> None:
     state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SKULLSQUIRM_BLIGHT)
-    enemy_model_id = _unit_by_id(state, ENEMY_UNIT_ID).own_models[0].model_instance_id
+    enemy_model_id = unit_by_id(state, ENEMY_UNIT_ID).own_models[0].model_instance_id
 
     assert (
         army_rule.nurgles_gift_hit_roll_modifier(
@@ -992,7 +992,7 @@ def test_skullsquirm_blight_only_modifies_afflicted_melee_hit_rolls() -> None:
 
 def test_rattlejoint_ague_worsens_afflicted_armour_save_option() -> None:
     state = _death_guard_battle_state(army_rule.NurglesGiftPlague.RATTLEJOINT_AGUE)
-    enemy_model = _unit_by_id(state, ENEMY_UNIT_ID).own_models[0]
+    enemy_model = unit_by_id(state, ENEMY_UNIT_ID).own_models[0]
     base_options = save_options_for_model(model=enemy_model, armor_penetration=0)
 
     modified = army_rule.nurgles_gift_modified_save_options(
@@ -1067,8 +1067,8 @@ def test_scabrous_soulrot_objective_control_consumer_uses_reduced_oc() -> None:
 
 def test_skullsquirm_blight_attack_sequence_consumes_melee_hit_modifier_only() -> None:
     state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SKULLSQUIRM_BLIGHT)
-    attacker = _unit_by_id(state, ENEMY_UNIT_ID)
-    defender = _unit_by_id(state, DEATH_GUARD_UNIT_ID)
+    attacker = unit_by_id(state, ENEMY_UNIT_ID)
+    defender = unit_by_id(state, DEATH_GUARD_UNIT_ID)
 
     melee_hit = _single_attack_hit_payload(
         state=state,
@@ -1099,8 +1099,8 @@ def test_skullsquirm_blight_attack_sequence_consumes_melee_hit_modifier_only() -
 
 def test_rattlejoint_ague_attack_sequence_worsens_armour_save_option() -> None:
     state = _death_guard_battle_state(army_rule.NurglesGiftPlague.RATTLEJOINT_AGUE)
-    attacker = _unit_by_id(state, DEATH_GUARD_UNIT_ID)
-    defender = _unit_by_id(state, ENEMY_UNIT_ID)
+    attacker = unit_by_id(state, DEATH_GUARD_UNIT_ID)
+    defender = unit_by_id(state, ENEMY_UNIT_ID)
     defender_model = defender.own_models[2]
     assert state.battlefield_state is not None
     state.battlefield_state = state.battlefield_state.with_removed_models(
@@ -1133,7 +1133,7 @@ def test_rattlejoint_ague_attack_sequence_worsens_armour_save_option() -> None:
 
 def test_scabrous_soulrot_worsens_afflicted_move_leadership_and_oc() -> None:
     state = _death_guard_battle_state(army_rule.NurglesGiftPlague.SCABROUS_SOULROT)
-    enemy_unit = _unit_by_id(state, ENEMY_UNIT_ID)
+    enemy_unit = unit_by_id(state, ENEMY_UNIT_ID)
     enemy_model = enemy_unit.own_models[0]
 
     assert (
@@ -1161,7 +1161,7 @@ def test_scabrous_soulrot_worsens_afflicted_move_leadership_and_oc() -> None:
         == 1
     )
 
-    _remove_first_models(state, unit_instance_id=ENEMY_UNIT_ID, count=3)
+    remove_first_models(state, unit_instance_id=ENEMY_UNIT_ID, count=3)
     assert state.battlefield_state is not None
     enemy_army = state.army_definition_for_player("player-b")
     assert enemy_army is not None
@@ -1442,7 +1442,7 @@ def defender_player_id(unit: UnitInstance) -> str:
 
 
 def _death_guard_battle_state(plague: army_rule.NurglesGiftPlague) -> GameState:
-    state = _battle_state_with_center_objective_positions(
+    state = battle_state_with_center_objective_positions(
         player_a_offsets=((0.0, 0.0),),
         player_b_offsets=((2.0, -3.0), (2.0, -1.5), (2.0, 0.0), (2.0, 1.5), (2.0, 3.0)),
     )
@@ -1593,7 +1593,7 @@ def _death_guard_config() -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
-                unit_selections=(_default_unit_selection("enemy-unit"),),
+                unit_selections=(default_unit_selection("enemy-unit"),),
             ),
         ),
         player_ids=("player-a", "player-b"),

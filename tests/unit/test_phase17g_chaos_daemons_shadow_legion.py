@@ -4,8 +4,8 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.unit.test_phase11c_command_phase import (
-    _battle_state,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    battle_state,
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -1681,7 +1681,7 @@ def _shadow_legion_state(
     faction_keywords: tuple[str, ...] = ("Legiones Daemonica",),
     player_a_unit_selection_ids: tuple[str, ...] = ("intercessor-unit-1",),
 ) -> GameState:
-    state = _battle_state(
+    state = battle_state(
         player_a_units=tuple(
             _core_unit_selection(unit_selection_id)
             for unit_selection_id in player_a_unit_selection_ids

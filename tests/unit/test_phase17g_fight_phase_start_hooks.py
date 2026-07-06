@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import cast
 
 import pytest
-from tests.unit.test_phase11c_command_phase import (
-    _battle_state,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    battle_state,
 )
 
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -378,7 +378,7 @@ def test_fight_phase_start_hook_and_bundle_validation_guards() -> None:
 
 
 def _fight_phase_state() -> tuple[GameState, DecisionController]:
-    state = _battle_state()
+    state = battle_state()
     state.stage = GameLifecycleStage.BATTLE
     _set_current_battle_phase(state, BattlePhase.FIGHT)
     return state, DecisionController()

@@ -6,8 +6,8 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.unit.test_phase11c_command_phase import (
-    _battle_state,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    battle_state,
 )
 
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -27,7 +27,7 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 
 
 def test_battle_round_start_gains_miracle_die_once_for_adepta_army() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_adepta_sororitas(state, player_id="player-a")
     decisions = DecisionController()
     registry = BattleRoundStartHookRegistry.from_bindings(
@@ -63,7 +63,7 @@ def test_battle_round_start_gains_miracle_die_once_for_adepta_army() -> None:
 
 
 def test_battle_round_start_ignores_non_adepta_armies() -> None:
-    state = _battle_state()
+    state = battle_state()
     decisions = DecisionController()
     registry = BattleRoundStartHookRegistry.from_bindings(
         army_rule.runtime_contribution().battle_round_start_hook_bindings
@@ -79,7 +79,7 @@ def test_battle_round_start_ignores_non_adepta_armies() -> None:
 
 
 def test_destroyed_adepta_sororitas_unit_gains_miracle_die_for_owner() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_adepta_sororitas(state, player_id="player-b")
     target_unit = _unit_for_player(state, player_id="player-b")
     decisions = DecisionController()
@@ -118,7 +118,7 @@ def test_destroyed_adepta_sororitas_unit_gains_miracle_die_for_owner() -> None:
 
 
 def test_destroyed_non_adepta_unit_in_adepta_army_does_not_gain_miracle_die() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_adepta_sororitas(
         state,
         player_id="player-b",
@@ -151,7 +151,7 @@ def test_destroyed_non_adepta_unit_in_adepta_army_does_not_gain_miracle_die() ->
 
 
 def test_miracle_die_pool_spend_and_game_state_payload_round_trip() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_adepta_sororitas(state, player_id="player-a")
     decisions = DecisionController()
     die = army_rule.gain_miracle_die(
@@ -213,7 +213,7 @@ def test_acts_of_faith_runtime_contribution_exposes_hooks() -> None:
 
 
 def test_acts_of_faith_handlers_fail_fast_on_malformed_inputs() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_adepta_sororitas(state, player_id="player-a")
     decisions = DecisionController()
 

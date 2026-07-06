@@ -528,10 +528,9 @@ def test_setup_declarations_keep_reserve_and_embarked_units_off_battlefield() ->
 
     state.complete_current_setup_step()
     deployment_status = flow.advance(state=state, decisions=decisions, config=config)
-    lifecycle = GameLifecycle()
+    lifecycle = GameLifecycle(decision_controller=decisions)
     lifecycle.start(config)
     lifecycle.state = state
-    lifecycle.decision_controller = decisions
     submit_all_deployments_if_pending(
         lifecycle,
         deployment_status,

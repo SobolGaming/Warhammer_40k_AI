@@ -8,15 +8,15 @@ from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_action_and_movement_proposal,
 )
-from tests.unit.test_phase10o_fall_back import (
-    _advance_to_movement_unit_selection,  # pyright: ignore[reportPrivateUsage]
-    _decision_request,  # pyright: ignore[reportPrivateUsage]
-    _state,  # pyright: ignore[reportPrivateUsage]
+from tests.phase10o_fall_back_helpers import (
+    advance_to_movement_unit_selection,
+    decision_request,
+    fall_back_state,
 )
-from tests.unit.test_phase11c_command_phase import (
-    _center_marker_definition,  # pyright: ignore[reportPrivateUsage]
-    _complete_setup_through_gate,  # pyright: ignore[reportPrivateUsage]
-    _with_model_offsets,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    center_marker_definition,
+    complete_setup_through_gate,
+    with_model_offsets,
 )
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
@@ -123,14 +123,14 @@ def test_murdercall_triggers_after_enemy_move_and_resolves_surge_proposal() -> N
         game_id="phase17g-murdercall-game",
         turn_order=("player-b", "player-a"),
     )
-    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
-    state = _state(lifecycle)
+    lifecycle, movement_status = advance_to_movement_unit_selection(config)
+    state = fall_back_state(lifecycle)
     _place_murdercall_units(state)
     summary = _runtime_content_bundle(lifecycle).to_summary_payload()
 
     assert rule.MURDERCALL_HOOK_ID in summary["movement_end_surge_hook_ids"]
 
-    selection_request = _decision_request(movement_status)
+    selection_request = decision_request(movement_status)
     action_status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase17g-murdercall-select-enemy",
@@ -138,7 +138,7 @@ def test_murdercall_triggers_after_enemy_move_and_resolves_surge_proposal() -> N
             selected_option_id=_ENEMY_UNIT_ID,
         )
     )
-    action_request = _decision_request(action_status)
+    action_request = decision_request(action_status)
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
 
     surge_status = submit_action_and_movement_proposal(
@@ -156,7 +156,7 @@ def test_murdercall_triggers_after_enemy_move_and_resolves_surge_proposal() -> N
             dx=4.0,
         ),
     )
-    surge_request = _decision_request(surge_status)
+    surge_request = decision_request(surge_status)
     assert surge_request.decision_type == SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE
     assert surge_request.actor_id == "player-a"
     surge_option_id = f"surge:{_BLOOD_UNIT_ID}"
@@ -169,7 +169,7 @@ def test_murdercall_triggers_after_enemy_move_and_resolves_surge_proposal() -> N
             selected_option_id=surge_option_id,
         )
     )
-    proposal_request = _decision_request(proposal_status)
+    proposal_request = decision_request(proposal_status)
     proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
     assert proposal_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
     assert proposal.proposal_kind is ProposalKind.SURGE_MOVE
@@ -527,7 +527,7 @@ def _battle_ready_state(
     state.record_battlefield_state(scenario.battlefield_state)
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-a"))
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-b"))
-    _complete_setup_through_gate(state=state, config=config)
+    complete_setup_through_gate(state=state, config=config)
     return state
 
 
@@ -570,18 +570,18 @@ def _place_murdercall_units(state: GameState) -> None:
 def _place_blood_tainted_units_on_center_objective(state: GameState) -> None:
     if state.battlefield_state is None:
         raise AssertionError("test state requires battlefield_state")
-    marker = _center_marker_definition(state)
+    marker = center_marker_definition(state)
     blood = state.battlefield_state.unit_placement_by_id(_BLOOD_UNIT_ID)
     enemy = state.battlefield_state.unit_placement_by_id(_ENEMY_UNIT_ID)
     battlefield_state = state.battlefield_state.with_unit_placement(
-        _with_model_offsets(
+        with_model_offsets(
             blood,
             marker,
             offsets=((0.0, 0.0), (1.5, 0.0), (0.0, 1.5), (1.5, 1.5), (-1.5, 0.0)),
         )
     )
     battlefield_state = battlefield_state.with_unit_placement(
-        _with_model_offsets(
+        with_model_offsets(
             enemy,
             marker,
             offsets=((2.5, 0.0), (2.5, 1.5), (2.5, -1.5), (4.0, 0.0), (4.0, 1.5)),

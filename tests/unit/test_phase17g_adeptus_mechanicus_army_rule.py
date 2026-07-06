@@ -7,12 +7,12 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.unit.test_phase11c_command_phase import (
-    _battle_state,
-    _center_marker_definition,
-    _default_unit_selection,
-    _unit_by_id,
-    _with_model_offsets,
+from tests.phase11c_command_phase_helpers import (
+    battle_state,
+    center_marker_definition,
+    default_unit_selection,
+    unit_by_id,
+    with_model_offsets,
 )
 
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -214,10 +214,10 @@ def test_conqueror_imperative_grants_assault_ws_and_battleline_ap() -> None:
 
 
 def test_doctrina_battleline_aura_supports_nearby_admech_battleline() -> None:
-    state = _battle_state(
+    state = battle_state(
         player_a_units=(
-            _default_unit_selection("intercessor-unit-1"),
-            _default_unit_selection("intercessor-unit-2"),
+            default_unit_selection("intercessor-unit-1"),
+            default_unit_selection("intercessor-unit-2"),
         )
     )
     supported_id = "army-alpha:intercessor-unit-1"
@@ -237,7 +237,7 @@ def test_doctrina_battleline_aura_supports_nearby_admech_battleline() -> None:
             battleline_id: ((4.0, 0.0), (4.2, 0.0), (4.4, 0.0), (4.6, 0.0), (4.8, 0.0)),
         },
     )
-    supported = _unit_by_id(state, supported_id)
+    supported = unit_by_id(state, supported_id)
     enemy = _unit_for_player(state, player_id="player-b")
     _select_doctrina(state, selected_option_id=army_rule.DoctrinaImperative.CONQUEROR.value)
 
@@ -444,7 +444,7 @@ def test_doctrina_selection_rejects_stale_payloads_and_invalid_contexts() -> Non
 
 def test_doctrina_skips_armies_without_eligible_doctrina_units() -> None:
     decisions = DecisionController()
-    non_admech_state = _battle_state()
+    non_admech_state = battle_state()
     no_ability_state = _admech_battle_state()
     _remove_doctrina_abilities(no_ability_state, player_id="player-a")
     unit_without_ability = _unit_for_player(no_ability_state, player_id="player-a")
@@ -760,7 +760,7 @@ def test_doctrina_source_coverage_and_execution_records_are_engine_consumed() ->
 
 
 def _admech_battle_state(*, battleline: bool = True) -> GameState:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_admech(state, player_id="player-a", battleline=battleline)
     return state
 
@@ -969,12 +969,12 @@ def _place_units_near_center(
 ) -> None:
     if state.battlefield_state is None:
         raise AssertionError("Expected battlefield state.")
-    marker = _center_marker_definition(state)
+    marker = center_marker_definition(state)
     battlefield_state = state.battlefield_state
     for unit_instance_id, offsets in placements.items():
         current = battlefield_state.unit_placement_by_id(unit_instance_id)
         battlefield_state = battlefield_state.with_unit_placement(
-            _with_model_offsets(current, marker, offsets=offsets)
+            with_model_offsets(current, marker, offsets=offsets)
         )
     state.battlefield_state = battlefield_state
 

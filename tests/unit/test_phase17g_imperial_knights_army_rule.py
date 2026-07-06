@@ -6,13 +6,13 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.unit.test_phase11c_command_phase import (
-    _battle_state,  # pyright: ignore[reportPrivateUsage]
-    _battle_state_with_center_objective_positions,  # pyright: ignore[reportPrivateUsage]
-    _config,  # pyright: ignore[reportPrivateUsage]
-    _default_unit_selection,  # pyright: ignore[reportPrivateUsage]
-    _setup_state_at_declare_battle_formations,  # pyright: ignore[reportPrivateUsage]
-    _unit_by_id,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    battle_state,
+    battle_state_with_center_objective_positions,
+    default_unit_selection,
+    phase11c_config,
+    setup_state_at_declare_battle_formations,
+    unit_by_id,
 )
 
 from warhammer40k_core.core.attributes import Characteristic
@@ -84,8 +84,8 @@ ENEMY_UNIT_ID = "army-beta:intercessor-unit-3"
 
 
 def test_code_chivalric_setup_selection_records_replay_safe_oath() -> None:
-    config = _config()
-    state = _setup_state_at_declare_battle_formations(config)
+    config = phase11c_config()
+    state = setup_state_at_declare_battle_formations(config)
     _mark_player_as_imperial_knights(state, player_id="player-a")
     _mark_enemy_unit_as_character(state, player_id="player-b")
     decisions = DecisionController()
@@ -138,8 +138,8 @@ def test_code_chivalric_setup_selection_records_replay_safe_oath() -> None:
 
 
 def test_code_chivalric_random_oath_rolls_engine_dice_and_rewards_three_cp() -> None:
-    config = _config()
-    state = _setup_state_at_declare_battle_formations(config)
+    config = phase11c_config()
+    state = setup_state_at_declare_battle_formations(config)
     _mark_player_as_imperial_knights(state, player_id="player-a")
     _mark_enemy_unit_as_character(state, player_id="player-b")
     decisions = DecisionController()
@@ -393,11 +393,11 @@ def test_bondsman_rejects_drifted_selection_before_mutation() -> None:
 
 
 def test_code_chivalric_lay_low_honours_army_from_destroyed_character_model() -> None:
-    config = _config()
-    state = _battle_state()
+    config = phase11c_config()
+    state = battle_state()
     _mark_player_as_imperial_knights(state, player_id="player-a")
     _mark_enemy_unit_as_character(state, player_id="player-b")
-    enemy = _unit_by_id(state, ENEMY_UNIT_ID)
+    enemy = unit_by_id(state, ENEMY_UNIT_ID)
     target_model_id = enemy.own_models[0].model_instance_id
     _record_oath(
         state,
@@ -450,8 +450,8 @@ def test_code_chivalric_lay_low_honours_army_from_destroyed_character_model() ->
 
 
 def test_code_chivalric_reclaim_honours_army_at_opponent_turn_end() -> None:
-    config = _config()
-    state = _battle_state_with_center_objective_positions(
+    config = phase11c_config()
+    state = battle_state_with_center_objective_positions(
         player_a_offsets=((2.0, 0.0), (-2.0, 0.0)),
         player_b_offsets=((10.0, 10.0),),
     )
@@ -462,7 +462,7 @@ def test_code_chivalric_reclaim_honours_army_at_opponent_turn_end() -> None:
         quality=army_rule.CodeChivalricQuality.LEGACY_UNSULLIED,
     )
     assert state.battlefield_state is not None
-    enemy_model_ids = _unit_by_id(state, ENEMY_UNIT_ID).own_model_ids()
+    enemy_model_ids = unit_by_id(state, ENEMY_UNIT_ID).own_model_ids()
     state.replace_battlefield_state(state.battlefield_state.with_removed_models(enemy_model_ids))
     _set_current_phase(state, BattlePhase.FIGHT, active_player_id="player-b")
 
@@ -492,8 +492,8 @@ def test_code_chivalric_reclaim_honours_army_at_opponent_turn_end() -> None:
 
 
 def test_code_chivalric_tally_uses_updated_threshold_and_returned_destroyed_units() -> None:
-    config = _config()
-    state = _battle_state()
+    config = phase11c_config()
+    state = battle_state()
     _mark_player_as_imperial_knights(state, player_id="player-a")
     _record_oath(
         state,
@@ -555,8 +555,8 @@ def test_code_chivalric_tally_uses_updated_threshold_and_returned_destroyed_unit
 
 
 def test_code_chivalric_tally_counts_current_phase_unit_completion_evidence() -> None:
-    config = _config()
-    state = _battle_state()
+    config = phase11c_config()
+    state = battle_state()
     _mark_player_as_imperial_knights(state, player_id="player-a")
     _record_oath(
         state,
@@ -570,7 +570,7 @@ def test_code_chivalric_tally_counts_current_phase_unit_completion_evidence() ->
         decisions=decisions,
         model_destroyed_event_id_suffix="recorded-hook-destruction",
     )
-    enemy = _unit_by_id(state, ENEMY_UNIT_ID)
+    enemy = unit_by_id(state, ENEMY_UNIT_ID)
     model_id = enemy.own_models[0].model_instance_id
     decisions.event_log.append(
         "model_destroyed",
@@ -608,7 +608,7 @@ def test_code_chivalric_tally_counts_current_phase_unit_completion_evidence() ->
 
 
 def test_code_chivalric_eager_and_legacy_quality_modifiers() -> None:
-    eager_state = _battle_state()
+    eager_state = battle_state()
     _mark_player_as_imperial_knights(eager_state, player_id="player-a")
     _record_oath(
         eager_state,
@@ -620,7 +620,7 @@ def test_code_chivalric_eager_and_legacy_quality_modifiers() -> None:
         MovementBudgetModifierContext(
             state=eager_state,
             unit_instance_id=IMPERIAL_KNIGHTS_UNIT_ID,
-            model_instance_id=_unit_by_id(eager_state, IMPERIAL_KNIGHTS_UNIT_ID)
+            model_instance_id=unit_by_id(eager_state, IMPERIAL_KNIGHTS_UNIT_ID)
             .own_models[0]
             .model_instance_id,
             base_movement_inches=10.0,
@@ -639,14 +639,14 @@ def test_code_chivalric_eager_and_legacy_quality_modifiers() -> None:
     assert len(charge_modifiers) == 1
     assert charge_modifiers[0].operand == 1
 
-    legacy_state = _battle_state()
+    legacy_state = battle_state()
     _mark_player_as_imperial_knights(legacy_state, player_id="player-a")
     _record_oath(
         legacy_state,
         deed=army_rule.CodeChivalricDeed.RECLAIM_THE_REALM,
         quality=army_rule.CodeChivalricQuality.LEGACY_UNSULLIED,
     )
-    legacy_unit = _unit_by_id(legacy_state, IMPERIAL_KNIGHTS_UNIT_ID)
+    legacy_unit = unit_by_id(legacy_state, IMPERIAL_KNIGHTS_UNIT_ID)
     legacy_model_id = legacy_unit.own_models[0].model_instance_id
 
     objective_control = army_rule.code_chivalric_legacy_objective_control_modifier(
@@ -673,20 +673,20 @@ def test_code_chivalric_eager_and_legacy_quality_modifiers() -> None:
 
 
 def test_code_chivalric_modifiers_noop_without_matching_quality_or_characteristic() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_imperial_knights(state, player_id="player-a")
     _record_oath(
         state,
         deed=army_rule.CodeChivalricDeed.RECLAIM_THE_REALM,
         quality=army_rule.CodeChivalricQuality.MARTIAL_VALOUR,
     )
-    model_id = _unit_by_id(state, IMPERIAL_KNIGHTS_UNIT_ID).own_models[0].model_instance_id
+    model_id = unit_by_id(state, IMPERIAL_KNIGHTS_UNIT_ID).own_models[0].model_instance_id
 
-    assert army_rule.selected_deed_for_player(_battle_state(), player_id="player-a") is None
-    assert army_rule.selected_quality_for_player(_battle_state(), player_id="player-a") is None
+    assert army_rule.selected_deed_for_player(battle_state(), player_id="player-a") is None
+    assert army_rule.selected_quality_for_player(battle_state(), player_id="player-a") is None
     assert (
         army_rule.unit_has_code_chivalric_quality(
-            _battle_state(),
+            battle_state(),
             unit_instance_id=IMPERIAL_KNIGHTS_UNIT_ID,
             quality=army_rule.CodeChivalricQuality.MARTIAL_VALOUR,
         )
@@ -738,7 +738,7 @@ def test_code_chivalric_modifiers_noop_without_matching_quality_or_characteristi
         )
         == 7
     )
-    non_martial_state = _battle_state()
+    non_martial_state = battle_state()
     _mark_player_as_imperial_knights(non_martial_state, player_id="player-a")
     _record_oath(
         non_martial_state,
@@ -778,7 +778,7 @@ def test_code_chivalric_modifiers_noop_without_matching_quality_or_characteristi
 
 
 def test_code_chivalric_martial_valour_grants_hit_and_wound_rerolls() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_imperial_knights(state, player_id="player-a")
     _record_oath(
         state,
@@ -824,7 +824,7 @@ def test_code_chivalric_martial_valour_grants_hit_and_wound_rerolls() -> None:
 
 
 def test_code_chivalric_martial_valour_fight_grants_hit_and_wound_rerolls() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_imperial_knights(state, player_id="player-a")
     _record_oath(
         state,
@@ -872,7 +872,7 @@ def test_code_chivalric_martial_valour_fight_grants_hit_and_wound_rerolls() -> N
 
 
 def test_code_chivalric_fight_effect_registry_is_fail_fast() -> None:
-    state = _battle_state()
+    state = battle_state()
     _mark_player_as_imperial_knights(state, player_id="player-a")
     _record_oath(
         state,
@@ -999,7 +999,7 @@ def test_code_chivalric_fight_effect_registry_is_fail_fast() -> None:
 
 
 def test_code_chivalric_unit_destroyed_hook_ignores_non_knights_and_duplicates() -> None:
-    state = _battle_state()
+    state = battle_state()
     decisions = DecisionController()
     _set_current_phase(state, BattlePhase.FIGHT, active_player_id="player-b")
     _record_enemy_unit_destroyed(
@@ -1038,9 +1038,9 @@ def test_code_chivalric_unit_destroyed_hook_ignores_non_knights_and_duplicates()
 
 
 def test_code_chivalric_runtime_timing_reports_ignored_no_oath_and_already_honoured() -> None:
-    config = _config()
+    config = phase11c_config()
     decisions = DecisionController()
-    ignored_state = _battle_state()
+    ignored_state = battle_state()
     _mark_player_as_imperial_knights(ignored_state, player_id="player-a")
     ignored = army_rule.resolve_code_chivalric_end_turn(
         _runtime_event_context(
@@ -1056,7 +1056,7 @@ def test_code_chivalric_runtime_timing_reports_ignored_no_oath_and_already_honou
     ignored_payload = cast(dict[str, JsonValue], ignored.replay_payload)
     assert ignored_payload["resolution"] == "ignored_non_imperial_knights_player"
 
-    no_oath_state = _battle_state()
+    no_oath_state = battle_state()
     _mark_player_as_imperial_knights(no_oath_state, player_id="player-a")
     no_oath = army_rule.resolve_code_chivalric_end_turn(
         _runtime_event_context(
@@ -1071,7 +1071,7 @@ def test_code_chivalric_runtime_timing_reports_ignored_no_oath_and_already_honou
     no_oath_payload = cast(dict[str, JsonValue], no_oath.replay_payload)
     assert no_oath_payload["resolution"] == "no_selected_oath"
 
-    honoured_state = _battle_state()
+    honoured_state = battle_state()
     _mark_player_as_imperial_knights(honoured_state, player_id="player-a")
     _record_oath(
         honoured_state,
@@ -1094,8 +1094,8 @@ def test_code_chivalric_runtime_timing_reports_ignored_no_oath_and_already_honou
 
 
 def test_code_chivalric_invalid_payloads_fail_fast_before_mutation() -> None:
-    config = _config()
-    state = _setup_state_at_declare_battle_formations(config)
+    config = phase11c_config()
+    state = setup_state_at_declare_battle_formations(config)
     _mark_player_as_imperial_knights(state, player_id="player-a")
     _mark_enemy_unit_as_character(state, player_id="player-b")
     decisions = DecisionController()
@@ -1134,8 +1134,8 @@ def test_code_chivalric_invalid_payloads_fail_fast_before_mutation() -> None:
 
 
 def test_code_chivalric_setup_result_rejects_wrong_contexts_before_mutation() -> None:
-    config = _config()
-    state = _setup_state_at_declare_battle_formations(config)
+    config = phase11c_config()
+    state = setup_state_at_declare_battle_formations(config)
     _mark_player_as_imperial_knights(state, player_id="player-a")
     _mark_enemy_unit_as_character(state, player_id="player-b")
     decisions = DecisionController()
@@ -1251,11 +1251,11 @@ def test_code_chivalric_setup_result_rejects_wrong_contexts_before_mutation() ->
 
 
 def test_code_chivalric_unfinished_deeds_report_without_mutation() -> None:
-    config = _config()
-    lay_low_state = _battle_state()
+    config = phase11c_config()
+    lay_low_state = battle_state()
     _mark_player_as_imperial_knights(lay_low_state, player_id="player-a")
     _mark_enemy_unit_as_character(lay_low_state, player_id="player-b")
-    target_model_id = _unit_by_id(lay_low_state, ENEMY_UNIT_ID).own_models[0].model_instance_id
+    target_model_id = unit_by_id(lay_low_state, ENEMY_UNIT_ID).own_models[0].model_instance_id
     _record_oath(
         lay_low_state,
         deed=army_rule.CodeChivalricDeed.LAY_LOW_THE_TYRANT,
@@ -1277,7 +1277,7 @@ def test_code_chivalric_unfinished_deeds_report_without_mutation() -> None:
     lay_low_payload = cast(dict[str, JsonValue], lay_low_result.replay_payload)
     assert lay_low_payload["resolution"] == "deed_not_completed"
 
-    reclaim_state = _battle_state()
+    reclaim_state = battle_state()
     _mark_player_as_imperial_knights(reclaim_state, player_id="player-a")
     _record_oath(
         reclaim_state,
@@ -1298,7 +1298,7 @@ def test_code_chivalric_unfinished_deeds_report_without_mutation() -> None:
     reclaim_payload = cast(dict[str, JsonValue], reclaim_result.replay_payload)
     assert reclaim_payload["resolution"] == "deed_not_completed"
 
-    tally_state = _battle_state()
+    tally_state = battle_state()
     _mark_player_as_imperial_knights(tally_state, player_id="player-a")
     _record_oath(
         tally_state,
@@ -1452,7 +1452,7 @@ def test_code_chivalric_token_and_payload_validators_are_fail_fast() -> None:
     assert event_with_source_id_exists(decisions.event_log, source_id="source:matched") is True
     assert event_with_source_id_exists(decisions.event_log, source_id="source:missing") is False
 
-    inactive_state = _battle_state()
+    inactive_state = battle_state()
     inactive_state.active_player_id = None
     with pytest.raises(GameLifecycleError, match="active player"):
         active_player_id(inactive_state)
@@ -1623,10 +1623,10 @@ def _bondsman_battle_state(
     target_is_armiger: bool = True,
     target_x: float = 16.0,
 ) -> GameState:
-    state = _battle_state(
+    state = battle_state(
         player_a_units=(
-            _default_unit_selection("intercessor-unit-1"),
-            _default_unit_selection("intercessor-unit-2"),
+            default_unit_selection("intercessor-unit-1"),
+            default_unit_selection("intercessor-unit-2"),
         ),
     )
     _mark_player_as_imperial_knights(state, player_id="player-a")
@@ -1811,7 +1811,7 @@ def _record_enemy_unit_destroyed(
     decisions: DecisionController,
     model_destroyed_event_id_suffix: str,
 ) -> EventRecord:
-    enemy = _unit_by_id(state, ENEMY_UNIT_ID)
+    enemy = unit_by_id(state, ENEMY_UNIT_ID)
     model = enemy.own_models[0]
     destroyed_event = decisions.event_log.append(
         "model_destroyed",

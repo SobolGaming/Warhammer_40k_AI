@@ -10,13 +10,13 @@ from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_action_and_movement_proposal,
 )
-from tests.unit.test_phase10o_fall_back import (
-    _advance_to_movement_unit_selection,  # pyright: ignore[reportPrivateUsage]
-    _decision_request,  # pyright: ignore[reportPrivateUsage]
-    _fall_back_forward_pose,  # pyright: ignore[reportPrivateUsage]
-    _fall_back_witness,  # pyright: ignore[reportPrivateUsage]
-    _move_first_enemy_model_into_side_engagement,  # pyright: ignore[reportPrivateUsage]
-    _state,  # pyright: ignore[reportPrivateUsage]
+from tests.phase10o_fall_back_helpers import (
+    advance_to_movement_unit_selection,
+    decision_request,
+    fall_back_forward_pose,
+    fall_back_state,
+    fall_back_witness,
+    move_first_enemy_model_into_side_engagement,
 )
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
@@ -180,9 +180,9 @@ _ORDERED_FALL_BACK_OPTION_ID = (
 
 def test_cavalcade_unholy_avalanche_grants_fall_back_shoot_and_charge_permissions() -> None:
     config = _cavalcade_config()
-    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
-    _move_first_enemy_model_into_side_engagement(lifecycle)
-    state = _state(lifecycle)
+    lifecycle, movement_status = advance_to_movement_unit_selection(config)
+    move_first_enemy_model_into_side_engagement(lifecycle)
+    state = fall_back_state(lifecycle)
     bundle = _runtime_content_bundle(lifecycle)
     summary = bundle.to_summary_payload()
 
@@ -193,7 +193,7 @@ def test_cavalcade_unholy_avalanche_grants_fall_back_shoot_and_charge_permission
         for path in summary["selected_module_paths"]
     )
 
-    selection_request = _decision_request(movement_status)
+    selection_request = decision_request(movement_status)
     action_status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase17g-cavalcade-select-mounted",
@@ -206,7 +206,7 @@ def test_cavalcade_unholy_avalanche_grants_fall_back_shoot_and_charge_permission
         action_status,
         result_id="phase17g-cavalcade-decline-warp-riders",
     )
-    action_request = _decision_request(action_status)
+    action_request = decision_request(action_status)
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
     assert _ORDERED_FALL_BACK_OPTION_ID in {option.option_id for option in action_request.options}
     if state.battlefield_state is None:
@@ -223,9 +223,9 @@ def test_cavalcade_unholy_avalanche_grants_fall_back_shoot_and_charge_permission
         movement_phase_action=MovementPhaseActionKind.FALL_BACK,
         movement_mode=MovementMode.FALL_BACK,
         fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
-        witness=_fall_back_witness(
+        witness=fall_back_witness(
             unit_placement,
-            first_model_end_pose=_fall_back_forward_pose(unit_placement),
+            first_model_end_pose=fall_back_forward_pose(unit_placement),
         ),
     )
 
@@ -257,7 +257,7 @@ def test_cavalcade_unholy_avalanche_grants_fall_back_shoot_and_charge_permission
         ruleset_descriptor=config.ruleset_descriptor,
         army_catalog=config.army_catalog,
     ).begin_phase(state=shooting_state, decisions=DecisionController())
-    shooting_request = _decision_request(shooting_status)
+    shooting_request = decision_request(shooting_status)
     assert shooting_request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE
     assert {option.option_id for option in shooting_request.options} >= {
         _CAVALCADE_UNIT_ID,
@@ -268,7 +268,7 @@ def test_cavalcade_unholy_avalanche_grants_fall_back_shoot_and_charge_permission
     charge_status = ChargePhaseHandler(
         ruleset_descriptor=config.ruleset_descriptor,
     ).begin_phase(state=charge_state, decisions=DecisionController())
-    charge_request = _decision_request(charge_status)
+    charge_request = decision_request(charge_status)
     assert charge_request.decision_type == SELECT_CHARGING_UNIT_DECISION_TYPE
     assert {option.option_id for option in charge_request.options} >= {
         _CAVALCADE_UNIT_ID,
@@ -278,8 +278,8 @@ def test_cavalcade_unholy_avalanche_grants_fall_back_shoot_and_charge_permission
 
 def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> None:
     config = _cavalcade_config()
-    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
-    state = _state(lifecycle)
+    lifecycle, movement_status = advance_to_movement_unit_selection(config)
+    state = fall_back_state(lifecycle)
     _grant_cp(state, player_id="player-a", amount=1)
     bundle = _runtime_content_bundle(lifecycle)
     summary = bundle.to_summary_payload()
@@ -302,7 +302,7 @@ def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> Non
         not in summary["stratagem_index_record_ids_by_player_id"]["player-b"]
     )
 
-    selection_request = _decision_request(movement_status)
+    selection_request = decision_request(movement_status)
     stratagem_status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase17g-warp-riders-select-mounted",
@@ -310,7 +310,7 @@ def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> Non
             selected_option_id=_CAVALCADE_UNIT_ID,
         )
     )
-    stratagem_request = _decision_request(stratagem_status)
+    stratagem_request = decision_request(stratagem_status)
     assert stratagem_request.decision_type == STRATAGEM_DECISION_TYPE
     warp_option = _required_option_id_containing(
         stratagem_request,
@@ -325,7 +325,7 @@ def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> Non
             selected_option_id=warp_option,
         )
     )
-    action_request = _decision_request(action_status)
+    action_request = decision_request(action_status)
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
     assert state.command_point_total("player-a") == command_points_before_use - 1
 
@@ -370,10 +370,10 @@ def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> Non
 
 def test_cavalcade_warp_riders_not_offered_for_non_mounted_selected_unit() -> None:
     config = _cavalcade_config(friendly_keywords=("Khorne",))
-    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
-    _grant_cp(_state(lifecycle), player_id="player-a", amount=1)
+    lifecycle, movement_status = advance_to_movement_unit_selection(config)
+    _grant_cp(fall_back_state(lifecycle), player_id="player-a", amount=1)
 
-    selection_request = _decision_request(movement_status)
+    selection_request = decision_request(movement_status)
     action_status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase17g-warp-riders-select-not-mounted",
@@ -381,15 +381,15 @@ def test_cavalcade_warp_riders_not_offered_for_non_mounted_selected_unit() -> No
             selected_option_id=_CAVALCADE_UNIT_ID,
         )
     )
-    action_request = _decision_request(action_status)
+    action_request = decision_request(action_status)
 
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
 
 
 def test_cavalcade_warp_riders_not_registered_without_cavalcade_detachment() -> None:
     config = _non_cavalcade_daemon_config()
-    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
-    _grant_cp(_state(lifecycle), player_id="player-a", amount=1)
+    lifecycle, movement_status = advance_to_movement_unit_selection(config)
+    _grant_cp(fall_back_state(lifecycle), player_id="player-a", amount=1)
     summary = _runtime_content_bundle(lifecycle).to_summary_payload()
 
     assert (
@@ -405,7 +405,7 @@ def test_cavalcade_warp_riders_not_registered_without_cavalcade_detachment() -> 
         not in summary["stratagem_index_record_ids_by_player_id"]["player-a"]
     )
 
-    selection_request = _decision_request(movement_status)
+    selection_request = decision_request(movement_status)
     action_status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase17g-warp-riders-select-non-cavalcade",
@@ -413,7 +413,7 @@ def test_cavalcade_warp_riders_not_registered_without_cavalcade_detachment() -> 
             selected_option_id=_CAVALCADE_UNIT_ID,
         )
     )
-    action_request = _decision_request(action_status)
+    action_request = decision_request(action_status)
 
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
 
@@ -421,7 +421,7 @@ def test_cavalcade_warp_riders_not_registered_without_cavalcade_detachment() -> 
 def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_one() -> None:
     config = _cavalcade_config(include_reserve_unit=True)
     lifecycle, movement_status = _advance_to_movement_unit_selection_with_reserve(config)
-    state = _state(lifecycle)
+    state = fall_back_state(lifecycle)
     reserve_state = state.reserve_state_for_unit(_CAVALCADE_RESERVE_UNIT_ID)
     assert reserve_state is not None
     assert reserve_state.status is ReserveStatus.IN_RESERVES
@@ -439,7 +439,7 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
         not in summary["stratagem_index_record_ids_by_player_id"]["player-b"]
     )
 
-    selection_request = _decision_request(movement_status)
+    selection_request = decision_request(movement_status)
     action_status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase17g-from-veil-select-board-unit",
@@ -452,7 +452,7 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
         action_status,
         result_id="phase17g-from-veil-decline-warp-riders",
     )
-    action_request = _decision_request(action_status)
+    action_request = decision_request(action_status)
     movement_status = submit_action_and_movement_proposal(
         lifecycle,
         request=action_request,
@@ -468,7 +468,7 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
             dx=1.0,
         ),
     )
-    reinforcement_request = _decision_request(movement_status)
+    reinforcement_request = decision_request(movement_status)
     assert reinforcement_request.decision_type == SELECT_REINFORCEMENT_UNIT_DECISION_TYPE
     movement_status = lifecycle.submit_decision(
         DecisionResult.for_request(
@@ -482,7 +482,7 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
         movement_status,
         result_id="phase17g-from-veil-decline-fire-overwatch",
     )
-    stratagem_request = _decision_request(movement_status)
+    stratagem_request = decision_request(movement_status)
     assert stratagem_request.decision_type == STRATAGEM_DECISION_TYPE
     from_beyond_option = _required_option_id_containing(
         stratagem_request,
@@ -496,7 +496,7 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
             selected_option_id=from_beyond_option,
         )
     )
-    placement_request = _decision_request(placement_status)
+    placement_request = decision_request(placement_status)
     proposal_request = MovementProposalRequest.from_decision_request_payload(
         placement_request.payload
     )
@@ -508,7 +508,9 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
     assert "generic_rule_execution_result" in proposal_request.context
     assert "generic_rule_effect" in proposal_request.context
     assert proposal_request.context["from_start_of_battle"] is True
-    assert _state(lifecycle).command_point_total("player-a") == command_points_before_use - 1
+    assert (
+        fall_back_state(lifecycle).command_point_total("player-a") == command_points_before_use - 1
+    )
 
     final_status = _submit_placement_proposal(
         lifecycle,
@@ -523,10 +525,12 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
     )
 
     assert final_status.status_kind is not LifecycleStatusKind.INVALID
-    arrived_state = _state(lifecycle).reserve_state_for_unit(reserve_state.unit_instance_id)
+    arrived_state = fall_back_state(lifecycle).reserve_state_for_unit(
+        reserve_state.unit_instance_id
+    )
     assert arrived_state is not None
     assert arrived_state.status is ReserveStatus.ARRIVED
-    movement_phase_state = _state(lifecycle).movement_phase_state
+    movement_phase_state = fall_back_state(lifecycle).movement_phase_state
     assert movement_phase_state is not None
     assert reserve_state.unit_instance_id in movement_phase_state.moved_unit_ids
     resolved_event = _event_payload(lifecycle, "rapid_ingress_resolved")
@@ -537,13 +541,13 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
 
 def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> None:
     config = _cavalcade_config(turn_order=("player-b", "player-a"))
-    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
-    state = _state(lifecycle)
-    _move_first_enemy_model_into_side_engagement(lifecycle)
+    lifecycle, movement_status = advance_to_movement_unit_selection(config)
+    state = fall_back_state(lifecycle)
+    move_first_enemy_model_into_side_engagement(lifecycle)
     _grant_cp(state, player_id="player-a", amount=1)
     command_points_before_use = state.command_point_total("player-a")
 
-    selection_request = _decision_request(movement_status)
+    selection_request = decision_request(movement_status)
     action_status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase17g-inescapable-select-enemy",
@@ -551,7 +555,7 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
             selected_option_id=_ENEMY_UNIT_ID,
         )
     )
-    action_request = _decision_request(action_status)
+    action_request = decision_request(action_status)
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
     assert _ORDERED_FALL_BACK_OPTION_ID in {option.option_id for option in action_request.options}
 
@@ -562,7 +566,7 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
             selected_option_id=_ORDERED_FALL_BACK_OPTION_ID,
         )
     )
-    stratagem_request = _decision_request(stratagem_status)
+    stratagem_request = decision_request(stratagem_status)
     assert stratagem_request.decision_type == STRATAGEM_DECISION_TYPE
     inescapable_option = _required_option_id_containing(
         stratagem_request,
@@ -576,7 +580,7 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
             selected_option_id=inescapable_option,
         )
     )
-    proposal_decision_request = _decision_request(proposal_status)
+    proposal_decision_request = decision_request(proposal_status)
     proposal_request = MovementProposalRequest.from_decision_request_payload(
         proposal_decision_request.payload
     )
@@ -601,7 +605,9 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
     assert forced_sources[0]["source_stratagem_id"] == (
         stratagems.INESCAPABLE_MANIFESTATIONS_STRATAGEM_ID
     )
-    assert _state(lifecycle).command_point_total("player-a") == command_points_before_use - 1
+    assert (
+        fall_back_state(lifecycle).command_point_total("player-a") == command_points_before_use - 1
+    )
 
     effect_event = _event_payload(lifecycle, "forced_fall_back_desperate_escape_registered")
     assert effect_event["fall_back_unit_instance_id"] == _ENEMY_UNIT_ID
@@ -619,9 +625,9 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
         movement_phase_action=MovementPhaseActionKind.FALL_BACK.value,
         movement_mode=MovementMode.FALL_BACK.value,
         fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE.value,
-        witness=_fall_back_witness(
+        witness=fall_back_witness(
             unit_placement,
-            first_model_end_pose=_fall_back_forward_pose(unit_placement),
+            first_model_end_pose=fall_back_forward_pose(unit_placement),
         ),
     )
     final_status = lifecycle.submit_decision(
@@ -640,7 +646,7 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
         LifecycleStatusKind.WAITING_FOR_DECISION,
     }
     if final_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION:
-        assert _decision_request(final_status).decision_type == (
+        assert decision_request(final_status).decision_type == (
             SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
         )
     roll_events = [
@@ -659,8 +665,8 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
 
 def test_cavalcade_apocalyptic_steeds_applies_movement_upgrade_through_lifecycle() -> None:
     config = _cavalcade_config(apocalyptic_steeds=True)
-    lifecycle, movement_status = _advance_to_movement_unit_selection(config)
-    state = _state(lifecycle)
+    lifecycle, movement_status = advance_to_movement_unit_selection(config)
+    state = fall_back_state(lifecycle)
     bundle = _runtime_content_bundle(lifecycle)
     summary = bundle.to_summary_payload()
     army = state.army_definitions[0]
@@ -707,7 +713,7 @@ def test_cavalcade_apocalyptic_steeds_applies_movement_upgrade_through_lifecycle
     assert persisting_payload["source_rule_id"] == enhancements.APOCALYPTIC_STEEDS_RULE_IR_SOURCE_ID
     assert replay_payload["execution_id"] == enhancements.APOCALYPTIC_STEEDS_SOURCE_RULE_ID
 
-    selection_request = _decision_request(movement_status)
+    selection_request = decision_request(movement_status)
     action_status = lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id="phase17g-cavalcade-select-apocalyptic-steeds",
@@ -720,7 +726,7 @@ def test_cavalcade_apocalyptic_steeds_applies_movement_upgrade_through_lifecycle
         action_status,
         result_id="phase17g-cavalcade-apocalyptic-decline-warp-riders",
     )
-    action_request = _decision_request(action_status)
+    action_request = decision_request(action_status)
     assert action_request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE
     move_status = submit_action_and_movement_proposal(
         lifecycle,
@@ -762,8 +768,8 @@ def test_cavalcade_apocalyptic_steeds_roster_requires_mounted_target() -> None:
 
 def test_cavalcade_soul_shattering_charge_extends_melee_targeting_through_lifecycle() -> None:
     config = _cavalcade_config(soul_shattering_charge=True)
-    lifecycle, _movement_status = _advance_to_movement_unit_selection(config)
-    state = _state(lifecycle)
+    lifecycle, _movement_status = advance_to_movement_unit_selection(config)
+    state = fall_back_state(lifecycle)
     army = state.army_definition_for_player("player-a")
     if army is None:
         raise AssertionError("test state requires player-a army")
@@ -775,7 +781,7 @@ def test_cavalcade_soul_shattering_charge_extends_melee_targeting_through_lifecy
     _record_charge_move_for_unit(state, unit_instance_id=_CAVALCADE_UNIT_ID)
     _advance_lifecycle_state_to_phase(lifecycle, BattlePhase.FIGHT)
     lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
-    state = _state(lifecycle)
+    state = fall_back_state(lifecycle)
     bundle = _runtime_content_bundle(lifecycle)
     summary = bundle.to_summary_payload()
 
@@ -787,7 +793,7 @@ def test_cavalcade_soul_shattering_charge_extends_melee_targeting_through_lifecy
         in summary["selected_execution_record_ids"]
     )
 
-    activation_request = _decision_request(
+    activation_request = decision_request(
         _drain_fight_movement_requests(
             lifecycle,
             lifecycle.advance_until_decision_or_terminal(),
@@ -804,7 +810,7 @@ def test_cavalcade_soul_shattering_charge_extends_melee_targeting_through_lifecy
             ),
         )
     )
-    ability_request = _decision_request(ability_status)
+    ability_request = decision_request(ability_status)
     assert ability_request.decision_type == FIGHT_ACTIVATION_ABILITY_DECISION_TYPE
     ability_option_id = f"use:{enhancements.SOUL_SHATTERING_CHARGE_ABILITY_ID}"
     assert ability_option_id in {option.option_id for option in ability_request.options}
@@ -816,7 +822,7 @@ def test_cavalcade_soul_shattering_charge_extends_melee_targeting_through_lifecy
             selected_option_id=ability_option_id,
         )
     )
-    melee_request = _decision_request(melee_status)
+    melee_request = decision_request(melee_status)
     assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
     proposal_request = MeleeDeclarationProposalRequest.from_decision_request(melee_request)
     engaged_weapon = _required_melee_weapon_for_model(
@@ -946,14 +952,14 @@ def test_cavalcade_rule_hook_uses_phase17f_execution_source_id() -> None:
 
 
 def test_cavalcade_rule_requires_target_unit_owned_by_selected_player() -> None:
-    lifecycle, _movement_status = _advance_to_movement_unit_selection(
+    lifecycle, _movement_status = advance_to_movement_unit_selection(
         _cavalcade_config(
             enemy_faction_id=rule.CHAOS_DAEMONS_FACTION_ID,
             enemy_detachment_id=rule.CAVALCADE_DETACHMENT_ID,
             enemy_datasheet_id=_CAVALCADE_TEST_DATASHEET_ID,
         )
     )
-    state = _state(lifecycle)
+    state = fall_back_state(lifecycle)
     context = FallBackEligibilityContext(
         state=state,
         player_id="player-a",
@@ -1169,7 +1175,7 @@ def _advance_to_movement_unit_selection_with_reserve(
         status.decision_request is not None
         and status.decision_request.decision_type == SECONDARY_MISSION_DECISION_TYPE
     ):
-        request = _decision_request(status)
+        request = decision_request(status)
         status = lifecycle.submit_decision(
             DecisionResult.for_request(
                 result_id=f"phase17g-reserve-secondary-{secondary_index:06d}",
@@ -1183,7 +1189,7 @@ def _advance_to_movement_unit_selection_with_reserve(
         status.decision_request is not None
         and status.decision_request.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE
     ):
-        request = _decision_request(status)
+        request = decision_request(status)
         declare_option_id = f"declare_strategic_reserves:{_CAVALCADE_RESERVE_UNIT_ID}"
         option_ids = {option.option_id for option in request.options}
         selected_option_id = (
@@ -1204,7 +1210,7 @@ def _advance_to_movement_unit_selection_with_reserve(
         status,
         result_id_prefix="phase17g-reserve-deploy",
     )
-    assert _decision_request(movement_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert decision_request(movement_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     return lifecycle, movement_status
 
 
@@ -1546,7 +1552,7 @@ def _selected_cavalcade_enhancement_ids(
 
 
 def _advance_lifecycle_state_to_phase(lifecycle: GameLifecycle, phase: BattlePhase) -> None:
-    state = _state(lifecycle)
+    state = fall_back_state(lifecycle)
     while state.current_battle_phase is not phase:
         if state.current_battle_phase is None:
             raise AssertionError("battle state ended before expected phase")
@@ -1821,7 +1827,7 @@ def _decline_stratagem_window_if_present(
     *,
     result_id: str,
 ) -> LifecycleStatus:
-    request = _decision_request(status)
+    request = decision_request(status)
     if request.decision_type != STRATAGEM_DECISION_TYPE:
         return status
     return lifecycle.submit_decision(
@@ -1839,7 +1845,7 @@ def _decline_stratagem_target_proposal_if_present(
     *,
     result_id: str,
 ) -> LifecycleStatus:
-    request = _decision_request(status)
+    request = decision_request(status)
     if request.decision_type != STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
         return status
     return lifecycle.submit_decision(

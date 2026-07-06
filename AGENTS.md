@@ -81,6 +81,8 @@ Stubs are allowed only for pure functions and must be marked `stubbed`.
 
 Engine behavior tests must use real domain objects or canonical fixtures. This includes movement, shooting, charge, fight, deployment, transports, attached units, damage allocation, replay, decision dispatch, UI routing, and network serialization.
 
+Tests must not replace `lifecycle.decision_controller` directly. Tests must not import from other `test_*.py` modules; shared setup used across test modules lives in named shared helpers. Each major phase family must have facade-driven coverage through `AdapterGameSession` / `LocalGameSession` submissions and viewer-scoped projections or event deltas.
+
 Every bug fix must:
 
 1. name the violated invariant;

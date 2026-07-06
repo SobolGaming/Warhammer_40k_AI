@@ -10,11 +10,11 @@ from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_movement_proposal,
 )
-from tests.unit.test_phase11c_command_phase import (
-    _battle_state,  # pyright: ignore[reportPrivateUsage]
-    _battle_state_with_center_objective_positions,  # pyright: ignore[reportPrivateUsage]
-    _default_unit_selection,  # pyright: ignore[reportPrivateUsage]
-    _unit_by_id,  # pyright: ignore[reportPrivateUsage]
+from tests.phase11c_command_phase_helpers import (
+    battle_state,
+    battle_state_with_center_objective_positions,
+    default_unit_selection,
+    unit_by_id,
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -258,7 +258,9 @@ def test_thrill_seekers_shooting_restriction_is_consumed_by_declaration_path() -
         )
     )
     state.advance_to_next_battle_phase()
-    lifecycle.decision_controller = DecisionController()
+    lifecycle_payload = lifecycle.to_payload()
+    lifecycle_payload["decisions"] = DecisionController().to_payload()
+    lifecycle = GameLifecycle.from_payload(lifecycle_payload)
 
     shooting_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
     assert shooting_request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE
@@ -372,7 +374,7 @@ def test_thrill_seekers_grants_shoot_and_charge_after_advance_and_fall_back() ->
 
 
 def test_thrill_seekers_does_not_apply_to_non_emperors_children_army() -> None:
-    state = _battle_state()
+    state = battle_state()
 
     grant = army_rule.thrill_seekers_advance_eligibility(
         AdvanceEligibilityContext(
@@ -418,13 +420,13 @@ def test_thrill_seekers_blocks_target_engaged_with_unit_at_turn_start() -> None:
 
 def test_thrill_seekers_blocks_target_attacked_by_another_unit_this_phase() -> None:
     state = _emperors_children_battle_state()
-    acting_attacker = _unit_by_id(state, EMPERORS_CHILDREN_UNIT_ID)
+    acting_attacker = unit_by_id(state, EMPERORS_CHILDREN_UNIT_ID)
     other_attacker = _copy_unit_for_test(
         acting_attacker,
         unit_instance_id="army-alpha:noise-marine-unit-2",
     )
     _append_unit_to_player_army(state, player_id="player-a", unit=other_attacker)
-    defender = _unit_by_id(state, ENEMY_UNIT_ID)
+    defender = unit_by_id(state, ENEMY_UNIT_ID)
     state.record_advanced_unit_state(
         _advanced_unit_state(state=state, unit_instance_id=EMPERORS_CHILDREN_UNIT_ID)
     )
@@ -457,8 +459,8 @@ def test_thrill_seekers_blocks_target_attacked_by_another_unit_this_phase() -> N
 
 def test_thrill_seekers_allows_target_already_attacked_by_same_unit_this_phase() -> None:
     state = _emperors_children_battle_state()
-    attacker = _unit_by_id(state, EMPERORS_CHILDREN_UNIT_ID)
-    defender = _unit_by_id(state, ENEMY_UNIT_ID)
+    attacker = unit_by_id(state, EMPERORS_CHILDREN_UNIT_ID)
+    defender = unit_by_id(state, ENEMY_UNIT_ID)
     state.record_advanced_unit_state(
         _advanced_unit_state(state=state, unit_instance_id=EMPERORS_CHILDREN_UNIT_ID)
     )
@@ -1049,7 +1051,7 @@ def _emperors_children_battle_state(
     player_a_offsets: tuple[tuple[float, float], ...] = ((0.0, 0.0),),
     player_b_offsets: tuple[tuple[float, float], ...] = ((6.0, 0.0),),
 ) -> GameState:
-    state = _battle_state_with_center_objective_positions(
+    state = battle_state_with_center_objective_positions(
         player_a_offsets=player_a_offsets,
         player_b_offsets=player_b_offsets,
     )
@@ -1208,7 +1210,7 @@ def _emperors_children_config(
                     detachment_ids=("core-combined-arms",),
                 ),
                 unit_selections=tuple(
-                    _default_unit_selection(unit_id) for unit_id in enemy_unit_ids
+                    default_unit_selection(unit_id) for unit_id in enemy_unit_ids
                 ),
             ),
         ),

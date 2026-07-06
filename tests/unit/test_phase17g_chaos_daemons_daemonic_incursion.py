@@ -3,16 +3,16 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import cast
 
-from tests.unit.test_phase10p_reserves import (
-    _base_radius_inches,  # pyright: ignore[reportPrivateUsage]
-    _battle_state_with_reserve,  # pyright: ignore[reportPrivateUsage]
-    _decision_request,  # pyright: ignore[reportPrivateUsage]
-    _last_event_payload,  # pyright: ignore[reportPrivateUsage]
-    _single_model_reserve_placement,  # pyright: ignore[reportPrivateUsage]
-    _south_edge_touching_pose,  # pyright: ignore[reportPrivateUsage]
-    _submit_handler_decision,  # pyright: ignore[reportPrivateUsage]
-    _submit_reserve_placement_payload,  # pyright: ignore[reportPrivateUsage]
-    _with_model_pose,  # pyright: ignore[reportPrivateUsage]
+from tests.phase10p_reserves_helpers import (
+    base_radius_inches,
+    battle_state_with_reserve,
+    decision_request,
+    last_event_payload,
+    single_model_reserve_placement,
+    south_edge_touching_pose,
+    submit_handler_decision,
+    submit_reserve_placement_payload,
+    with_model_pose,
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -104,7 +104,7 @@ def test_warp_rifts_shadow_allows_deep_strike_more_than_six_from_enemy() -> None
     arrived_state = state.reserve_state_for_unit(reserve_state.unit_instance_id)
     assert arrived_state is not None
     assert arrived_state.status is ReserveStatus.ARRIVED
-    arrival_event = _last_event_payload(status.decisions, "reinforcement_unit_arrived")
+    arrival_event = last_event_payload(status.decisions, "reinforcement_unit_arrived")
     assert arrival_event["placement_kind"] == BattlefieldPlacementKind.DEEP_STRIKE.value
 
 
@@ -167,7 +167,7 @@ def test_warp_rifts_does_not_reduce_strategic_reserves_enemy_distance() -> None:
     state, reserve_state, reserve_unit = _daemonic_incursion_reserve_state(
         reserve_kind=ReserveKind.STRATEGIC_RESERVES
     )
-    target_pose = _south_edge_touching_pose(base_diameter_mm=_RESERVE_BASE_DIAMETER_MM, x=16.0)
+    target_pose = south_edge_touching_pose(base_diameter_mm=_RESERVE_BASE_DIAMETER_MM, x=16.0)
     _place_enemy_at_base_distance(state=state, target_pose=target_pose, distance_inches=7.0)
 
     status = _submit_reserve_arrival(
@@ -196,7 +196,7 @@ def _daemonic_incursion_reserve_state(
     anchor_god_keyword: str = "Khorne",
     reserve_kind: ReserveKind = ReserveKind.DEEP_STRIKE,
 ) -> tuple[GameState, ReserveState, UnitInstance]:
-    state, _scenario, reserve_state, _reserve_unit = _battle_state_with_reserve(
+    state, _scenario, reserve_state, _reserve_unit = battle_state_with_reserve(
         reserve_base_diameter_mm=_RESERVE_BASE_DIAMETER_MM
     )
     state.army_definitions = list(
@@ -250,8 +250,8 @@ def _submit_reserve_arrival(
     )
     decisions = DecisionController()
     selection_status = handler.begin_phase(state=state, decisions=decisions)
-    selection_request = _decision_request(selection_status)
-    placement_status = _submit_handler_decision(
+    selection_request = decision_request(selection_status)
+    placement_status = submit_handler_decision(
         handler=handler,
         state=state,
         decisions=decisions,
@@ -259,15 +259,15 @@ def _submit_reserve_arrival(
         option_id=reserve_state.unit_instance_id,
         result_id=f"{result_id}:select",
     )
-    placement_request = _decision_request(placement_status)
-    result_status = _submit_reserve_placement_payload(
+    placement_request = decision_request(placement_status)
+    result_status = submit_reserve_placement_payload(
         handler=handler,
         state=state,
         decisions=decisions,
         request=placement_request,
         reserve_unit=reserve_unit,
         placement_kind=placement_kind,
-        attempted_placement=_single_model_reserve_placement(
+        attempted_placement=single_model_reserve_placement(
             reserve_unit=reserve_unit,
             pose=target_pose,
         ),
@@ -377,7 +377,7 @@ def _place_enemy_at_base_distance(
         for unit in army.units
     )
     enemy_model_id = enemy_unit.own_models[0].model_instance_id
-    radius = _base_radius_inches(_RESERVE_BASE_DIAMETER_MM)
+    radius = base_radius_inches(_RESERVE_BASE_DIAMETER_MM)
     _place_model(
         state=state,
         model_instance_id=enemy_model_id,
@@ -398,7 +398,7 @@ def _place_anchor_at_base_distance(
 ) -> None:
     anchor_unit = _unit_by_id(state, _ANCHOR_UNIT_ID)
     anchor_model_id = anchor_unit.own_models[0].model_instance_id
-    radius = _base_radius_inches(_RESERVE_BASE_DIAMETER_MM)
+    radius = base_radius_inches(_RESERVE_BASE_DIAMETER_MM)
     _place_model(
         state=state,
         model_instance_id=anchor_model_id,
@@ -423,7 +423,7 @@ def _place_model(
         armies=tuple(state.army_definitions),
         battlefield_state=state.battlefield_state,
     )
-    updated_scenario = _with_model_pose(
+    updated_scenario = with_model_pose(
         scenario,
         model_instance_id=model_instance_id,
         pose=pose,
