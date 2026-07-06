@@ -43,20 +43,30 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.generic_rule_ability_registry import (
-    DEFAULT_GENERIC_RULE_ABILITY_REGISTRY,
     GenericRuleAbilitySource,
     GenericRuleAdvanceEligibilityAbility,
     GenericRuleFightUnitSelectedGrantAbility,
+    GenericRuleMovementEndSurgeAbility,
+    GenericRulePhaseEndObjectiveControlAbility,
     GenericRuleShootingTargetRestrictionAbility,
     GenericRuleShootingUnitSelectedGrantAbility,
     generic_rule_ability_effects_for_unit,
     rule_ir_grants_any_ability,
+)
+from warhammer40k_core.engine.generic_rule_ability_registry_defaults import (
+    DEFAULT_GENERIC_RULE_ABILITY_REGISTRY,
 )
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_payload_grants_ability,
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHookBinding,
+)
+from warhammer40k_core.engine.movement_end_surge_hooks import (
+    MovementEndSurgeContext,
+    MovementEndSurgeGrant,
+    MovementEndSurgeHandler,
+    MovementEndSurgeHookBinding,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_execution import (
@@ -70,6 +80,12 @@ from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedGrant,
     ShootingUnitSelectedGrantBinding,
     ShootingUnitSelectedGrantHandler,
+)
+from warhammer40k_core.engine.sticky_objective_control import (
+    PhaseEndObjectiveControlContext,
+    PhaseEndObjectiveControlHandler,
+    PhaseEndObjectiveControlHookBinding,
+    StickyObjectiveControlState,
 )
 from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
@@ -303,6 +319,55 @@ def fight_unit_selected_grant_hook_bindings(
     return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
 
 
+def movement_end_surge_hook_bindings(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+) -> tuple[MovementEndSurgeHookBinding, ...]:
+    bindings: list[MovementEndSurgeHookBinding] = []
+    for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.movement_end_surge_abilities:
+        for source in _generic_rule_ability_sources(
+            activation=activation,
+            execution_records=execution_records,
+            coverage_descriptor_id=descriptor.coverage_descriptor_id,
+            ability_ids=descriptor.ability_ids(),
+        ):
+            bindings.append(
+                MovementEndSurgeHookBinding(
+                    hook_id=descriptor.hook_id(source),
+                    source_id=descriptor.source_rule_id,
+                    handler=_movement_end_surge_handler_for_descriptor(source, descriptor),
+                )
+            )
+    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+
+
+def phase_end_objective_control_hook_bindings(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+) -> tuple[PhaseEndObjectiveControlHookBinding, ...]:
+    bindings: list[PhaseEndObjectiveControlHookBinding] = []
+    for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.phase_end_objective_control_abilities:
+        for source in _generic_rule_ability_sources(
+            activation=activation,
+            execution_records=execution_records,
+            coverage_descriptor_id=descriptor.coverage_descriptor_id,
+            ability_ids=descriptor.ability_ids(),
+        ):
+            bindings.append(
+                PhaseEndObjectiveControlHookBinding(
+                    hook_id=descriptor.hook_id(source),
+                    source_id=descriptor.source_rule_id,
+                    handler=_phase_end_objective_control_handler_for_descriptor(
+                        source,
+                        descriptor,
+                    ),
+                )
+            )
+    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+
+
 def attack_sequence_completed_hook_bindings(
     *,
     activation: RuntimeContentActivation,
@@ -466,6 +531,46 @@ def _fight_unit_selected_grant_handler_for_descriptor(
         if not descriptor.context_predicate(context, source, matching_effects):
             return None
         return descriptor.grant_builder(context, source, matching_effects)
+
+    return handler
+
+
+def _movement_end_surge_handler_for_descriptor(
+    source: GenericRuleAbilitySource,
+    descriptor: GenericRuleMovementEndSurgeAbility,
+) -> MovementEndSurgeHandler:
+    def handler(context: MovementEndSurgeContext) -> tuple[MovementEndSurgeGrant, ...]:
+        if type(context) is not MovementEndSurgeContext:
+            raise GameLifecycleError("Generic RuleIR movement-end surge ability requires context.")
+        if not descriptor.context_predicate(context, source):
+            return ()
+        grants = descriptor.grant_builder(context, source)
+        if type(grants) is not tuple:
+            raise GameLifecycleError("Generic RuleIR movement-end surge grants must be a tuple.")
+        return grants
+
+    return handler
+
+
+def _phase_end_objective_control_handler_for_descriptor(
+    source: GenericRuleAbilitySource,
+    descriptor: GenericRulePhaseEndObjectiveControlAbility,
+) -> PhaseEndObjectiveControlHandler:
+    def handler(
+        context: PhaseEndObjectiveControlContext,
+    ) -> tuple[StickyObjectiveControlState, ...]:
+        if type(context) is not PhaseEndObjectiveControlContext:
+            raise GameLifecycleError(
+                "Generic RuleIR phase-end objective-control ability requires context."
+            )
+        if not descriptor.context_predicate(context, source):
+            return ()
+        states = descriptor.state_builder(context, source)
+        if type(states) is not tuple:
+            raise GameLifecycleError(
+                "Generic RuleIR phase-end objective-control states must be a tuple."
+            )
+        return states
 
     return handler
 

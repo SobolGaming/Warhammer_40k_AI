@@ -8,13 +8,18 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_m
     army_rule as dark_pacts,
 )
 from warhammer40k_core.engine.generic_rule_ability_registry import (
-    DEFAULT_GENERIC_RULE_ABILITY_REGISTRY,
     GenericRuleAbilityHookFamily,
     GenericRuleAbilityRegistry,
     GenericRuleAbilitySource,
     rule_ir_grants_any_ability,
 )
+from warhammer40k_core.engine.generic_rule_ability_registry_defaults import (
+    DEFAULT_GENERIC_RULE_ABILITY_REGISTRY,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
     faction_generic_ir_support_2026_27,
@@ -93,6 +98,29 @@ def test_default_generic_rule_ability_registry_maps_shadow_legion_grants() -> No
     )
 
 
+def test_default_generic_rule_ability_registry_maps_blood_legion_grants() -> None:
+    source = _blood_legion_source()
+    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
+
+    surge = registry.movement_end_surge_abilities[0]
+    assert surge.hook_family is GenericRuleAbilityHookFamily.MOVEMENT_END_SURGE
+    assert surge.ability_ids() == (blood_legion_ir.MURDERCALL_SURGE_ABILITY,)
+    assert (
+        surge.coverage_descriptor_id == blood_legion_ir.BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
+    )
+    assert surge.source_rule_id == blood_legion_ir.BLOOD_LEGION_SOURCE_RULE_ID
+    assert surge.hook_id(source) == blood_legion_ir.MURDERCALL_HOOK_ID
+
+    sticky = registry.phase_end_objective_control_abilities[0]
+    assert sticky.hook_family is GenericRuleAbilityHookFamily.PHASE_END_OBJECTIVE_CONTROL
+    assert sticky.ability_ids() == (blood_legion_ir.BLOOD_TAINTED_STICKY_OBJECTIVE_ABILITY,)
+    assert (
+        sticky.coverage_descriptor_id == blood_legion_ir.BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
+    )
+    assert sticky.source_rule_id == blood_legion_ir.BLOOD_LEGION_SOURCE_RULE_ID
+    assert sticky.hook_id(source) == blood_legion_ir.BLOOD_TAINTED_HOOK_ID
+
+
 def test_generic_rule_ability_registry_rejects_duplicate_descriptors() -> None:
     descriptor = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.advance_eligibility_abilities[0]
 
@@ -124,6 +152,19 @@ def _shadow_legion_source() -> GenericRuleAbilitySource:
         for record in faction_execution_2026_27.execution_records()
         if record.coverage_descriptor_id
         == shadow_legion_ir.SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
+    )
+    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+        record.coverage_descriptor_id
+    )
+    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
+
+
+def _blood_legion_source() -> GenericRuleAbilitySource:
+    record = next(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.coverage_descriptor_id
+        == blood_legion_ir.BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
     )
     rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
         record.coverage_descriptor_id

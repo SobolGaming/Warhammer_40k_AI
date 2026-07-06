@@ -19,6 +19,9 @@ from warhammer40k_core.rules.rule_templates import (
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -202,6 +205,11 @@ def generic_supported_detachment_rule_ir_hash(
         rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
         _validate_shadow_legion_detachment_rule_ir(rule_ir)
         return rule_ir_hash
+    rule_ir_hash = blood_legion_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_blood_legion_detachment_rule_ir(rule_ir)
+        return rule_ir_hash
     return court_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
 
 
@@ -233,6 +241,8 @@ def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> Ru
         payload = spectacle_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         payload = shadow_legion_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
+    if payload is None:
+        payload = blood_legion_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         payload = court_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
@@ -519,6 +529,57 @@ def _validate_shadow_legion_detachment_rule_ir(rule_ir: RuleIR) -> None:
         raise Phase17FGenericIrSupportError(
             "Shadow Legion detachment RuleIR has unexpected dice modifier roll types."
         )
+
+
+def _validate_blood_legion_detachment_rule_ir(rule_ir: RuleIR) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Blood Legion detachment requires RuleIR.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Blood Legion detachment RuleIR must deserialize as supported."
+        )
+    expected_source_id = f"{SOURCE_PACKAGE_ID}:phase17e:chaos-daemons:blood-legion:rule:source-text"
+    if rule_ir.source_id != expected_source_id:
+        raise Phase17FGenericIrSupportError(
+            "Blood Legion detachment RuleIR produced an unexpected source ID."
+        )
+    template_ids = frozenset(
+        clause.template_id for clause in rule_ir.clauses if clause.template_id is not None
+    )
+    if template_ids != frozenset({GRANT_ABILITY_TEMPLATE_ID}):
+        raise Phase17FGenericIrSupportError(
+            "Blood Legion detachment RuleIR uses an unregistered template family."
+        )
+    granted_abilities = frozenset(
+        _ability_parameter(effect)
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.GRANT_ABILITY
+    )
+    if granted_abilities != frozenset(
+        {
+            blood_legion_ir.MURDERCALL_SURGE_ABILITY,
+            blood_legion_ir.BLOOD_TAINTED_STICKY_OBJECTIVE_ABILITY,
+        }
+    ):
+        raise Phase17FGenericIrSupportError(
+            "Blood Legion detachment RuleIR has unexpected granted abilities."
+        )
+    for clause in rule_ir.clauses:
+        for effect in clause.effects:
+            if effect.kind is not RuleEffectKind.GRANT_ABILITY:
+                continue
+            parameters = parameter_payload(effect.parameters)
+            if parameters.get("required_faction_keyword_sequence") != (
+                blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,
+            ):
+                raise Phase17FGenericIrSupportError(
+                    "Blood Legion detachment RuleIR has unexpected faction keyword gate."
+                )
+            if parameters.get("required_keyword_sequence") != (blood_legion_ir.KHORNE_KEYWORD,):
+                raise Phase17FGenericIrSupportError(
+                    "Blood Legion detachment RuleIR has unexpected keyword gate."
+                )
 
 
 def _validate_cavalcade_of_chaos_stratagem_rule_ir(

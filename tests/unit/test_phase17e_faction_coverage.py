@@ -141,6 +141,7 @@ GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 GENERIC_DETACHMENT_RULE_KEYS = frozenset(
     {
+        ("chaos-daemons", "blood-legion"),
         ("chaos-daemons", "shadow-legion"),
         ("chaos-daemons", "cavalcade-of-chaos"),
         ("emperors-children", "court-of-the-phoenician"),
@@ -215,8 +216,10 @@ SHADOW_LEGION_RUNTIME_CONSUMERS = (
     "disciples-of-belakor:weapon-profile",
 )
 CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY = {
-    ("chaos-daemons", "blood-legion"): BLOOD_LEGION_RUNTIME_CONSUMERS,
     ("chaos-daemons", "daemonic-incursion"): DAEMONIC_INCURSION_RUNTIME_CONSUMERS,
+}
+GENERIC_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY = {
+    ("chaos-daemons", "blood-legion"): BLOOD_LEGION_RUNTIME_CONSUMERS,
 }
 AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:aeldari:army_rule:fade_back",
@@ -635,9 +638,17 @@ def test_phase17e_loads_every_seeded_faction_and_detachment() -> None:
             assert coverage_row.runtime_consumer_ids == tuple(sorted(detachment_runtime_consumers))
             assert coverage_row.handler_id == detachment_runtime_consumers[0]
         elif key in GENERIC_DETACHMENT_RULE_KEYS:
+            generic_runtime_consumers = GENERIC_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY.get(
+                key,
+                (),
+            )
             assert coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
-            assert coverage_row.runtime_support_status is None
-            assert coverage_row.runtime_consumer_ids == ()
+            if generic_runtime_consumers:
+                assert coverage_row.runtime_support_status is not None
+                assert coverage_row.runtime_support_status.value == "engine_consumed"
+            else:
+                assert coverage_row.runtime_support_status is None
+            assert coverage_row.runtime_consumer_ids == tuple(sorted(generic_runtime_consumers))
             assert coverage_row.handler_id is None
             assert coverage_row.rule_ir_hash == (
                 generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
@@ -833,11 +844,6 @@ def test_phase17e_malice_made_manifest_exact_row_is_engine_consumed() -> None:
     ("detachment_id", "rule_name", "runtime_consumers"),
     [
         (
-            "blood-legion",
-            "Blood Legion detachment rule",
-            BLOOD_LEGION_RUNTIME_CONSUMERS,
-        ),
-        (
             "daemonic-incursion",
             "Daemonic Incursion detachment rule",
             DAEMONIC_INCURSION_RUNTIME_CONSUMERS,
@@ -865,19 +871,34 @@ def test_phase17e_chaos_daemons_detachment_rule_is_engine_consumed(
     assert coverage_row.handler_id == runtime_consumers[0]
 
 
-def test_phase17e_shadow_legion_detachment_rule_is_generic_rule_ir_supported() -> None:
+@pytest.mark.parametrize(
+    ("detachment_id", "rule_name", "runtime_consumers"),
+    [
+        ("blood-legion", "Blood Legion detachment rule", BLOOD_LEGION_RUNTIME_CONSUMERS),
+        ("shadow-legion", "Shadow Legion detachment rule", ()),
+    ],
+)
+def test_phase17e_chaos_daemons_detachment_rule_is_generic_rule_ir_supported(
+    detachment_id: str,
+    rule_name: str,
+    runtime_consumers: tuple[str, ...],
+) -> None:
     coverage_row = next(
         row
         for row in faction_coverage_source.coverage_rows()
         if row.coverage_kind is Phase17ECoverageKind.DETACHMENT_RULE
         and row.faction_id == "chaos-daemons"
-        and row.detachment_id == "shadow-legion"
+        and row.detachment_id == detachment_id
     )
 
-    assert coverage_row.rule_name == "Shadow Legion detachment rule"
+    assert coverage_row.rule_name == rule_name
     assert coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
-    assert coverage_row.runtime_support_status is None
-    assert coverage_row.runtime_consumer_ids == ()
+    if runtime_consumers:
+        assert coverage_row.runtime_support_status is not None
+        assert coverage_row.runtime_support_status.value == "engine_consumed"
+    else:
+        assert coverage_row.runtime_support_status is None
+    assert coverage_row.runtime_consumer_ids == tuple(sorted(runtime_consumers))
     assert coverage_row.handler_id is None
     assert coverage_row.rule_ir_hash == (
         generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(

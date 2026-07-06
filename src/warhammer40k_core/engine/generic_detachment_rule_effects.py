@@ -30,6 +30,9 @@ from warhammer40k_core.engine.rule_execution import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -64,12 +67,18 @@ SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID = (
     shadow_legion_ir.SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
 )
 SHADOW_LEGION_KEYWORD = shadow_legion_ir.SHADOW_LEGION_KEYWORD
+BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID = (
+    blood_legion_ir.BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
+)
+BLOOD_LEGION_FACTION_KEYWORD = blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD
+BLOOD_LEGION_KEYWORD = blood_legion_ir.KHORNE_KEYWORD
 _BATTLE_FORMATION_DETACHMENT_RULE_DESCRIPTOR_IDS = frozenset(
     {
         MORE_DAKKA_DETACHMENT_RULE_DESCRIPTOR_ID,
         SPECTACLE_OF_SLAUGHTER_DETACHMENT_RULE_DESCRIPTOR_ID,
         COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID,
         SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID,
+        BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID,
     }
 )
 
@@ -341,6 +350,13 @@ def _target_unit_ids_for_record(
             if _unit_is_shadow_legion_detachment_target(unit)
         )
         return tuple(sorted(target_ids))
+    if record.coverage_descriptor_id == BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID:
+        target_ids = tuple(
+            unit.unit_instance_id
+            for unit in army.units
+            if _unit_is_blood_legion_detachment_target(unit)
+        )
+        return tuple(sorted(target_ids))
     raise GameLifecycleError("Generic detachment record is not supported by runtime.")
 
 
@@ -373,6 +389,17 @@ def _unit_is_shadow_legion_detachment_target(unit: UnitInstance) -> bool:
     return _canonical_keyword(SHADOW_LEGION_KEYWORD) in {
         _canonical_keyword(keyword) for keyword in (*unit.keywords, *unit.faction_keywords)
     }
+
+
+def _unit_is_blood_legion_detachment_target(unit: UnitInstance) -> bool:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Generic detachment target requires UnitInstance.")
+    faction_keywords = {_canonical_keyword(keyword) for keyword in unit.faction_keywords}
+    keywords = {_canonical_keyword(keyword) for keyword in unit.keywords}
+    return (
+        _canonical_keyword(BLOOD_LEGION_FACTION_KEYWORD) in faction_keywords
+        and _canonical_keyword(BLOOD_LEGION_KEYWORD) in keywords
+    )
 
 
 def _expected_effect_ids(

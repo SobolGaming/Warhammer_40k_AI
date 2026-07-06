@@ -26,6 +26,7 @@ from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -66,6 +67,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
     PlaceholderPhaseHandler,
+    SetupStep,
 )
 from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
@@ -291,13 +293,21 @@ def test_blood_tainted_credits_only_unit_destruction_completion_attacker() -> No
 
 def test_blood_legion_rule_hooks_use_phase17f_execution_source_id() -> None:
     record = _blood_legion_rule_execution_record()
-    contribution = rule.runtime_contribution()
+    bundle = build_runtime_content_bundle(_blood_legion_config(game_id="phase17g-blood-source-id"))
+    surge_binding = next(
+        binding
+        for binding in bundle.movement_end_surge_hook_registry.all_bindings()
+        if binding.hook_id == rule.MURDERCALL_HOOK_ID
+    )
+    sticky_binding = next(
+        binding
+        for binding in bundle.phase_end_objective_control_hook_registry.all_bindings()
+        if binding.hook_id == rule.BLOOD_TAINTED_HOOK_ID
+    )
 
     assert record.execution_id == rule.SOURCE_RULE_ID
-    assert contribution.movement_end_surge_hook_bindings[0].source_id == record.execution_id
-    assert (
-        contribution.phase_end_objective_control_hook_bindings[0].source_id == record.execution_id
-    )
+    assert surge_binding.source_id == record.execution_id
+    assert sticky_binding.source_id == record.execution_id
 
 
 def _blood_legion_rule_execution_record() -> Phase17FExecutionRecord:
@@ -527,6 +537,17 @@ def _battle_ready_state(
     state.record_battlefield_state(scenario.battlefield_state)
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-a"))
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-b"))
+    while state.current_setup_step is not SetupStep.DECLARE_BATTLE_FORMATIONS:
+        state.complete_current_setup_step()
+    request = _runtime_content_bundle(lifecycle).battle_formation_hook_registry.next_request_for(
+        BattleFormationRequestContext(
+            state=state,
+            decisions=DecisionController(),
+            config=config,
+        )
+    )
+    if request is not None:
+        raise AssertionError("Blood Legion test fixture should not require battle formation input")
     complete_setup_through_gate(state=state, config=config)
     return state
 
