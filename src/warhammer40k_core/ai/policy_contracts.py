@@ -279,7 +279,7 @@ class PolicyProvenance:
             reward_profile_version=reward_profile_version,
             engine_version=engine_version,
         )
-        mismatch_fields = self._mismatch_fields(actual)
+        mismatch_fields = self.mismatch_fields_against(actual)
         if mismatch_fields and not allow_cross_version:
             raise PolicyProvenanceError(
                 "Policy provenance does not match the requested game config: "
@@ -293,7 +293,11 @@ class PolicyProvenance:
             actual=actual,
         )
 
-    def _mismatch_fields(self, actual: PolicyProvenance) -> tuple[str, ...]:
+    def mismatch_fields_against(self, actual: PolicyProvenance) -> tuple[str, ...]:
+        if type(actual) is not PolicyProvenance:
+            raise PolicyProvenanceError(
+                "PolicyProvenance mismatch comparison requires PolicyProvenance."
+            )
         mismatches: list[str] = []
         if self.catalog_packages != actual.catalog_packages:
             mismatches.append("catalog_packages")
@@ -349,6 +353,19 @@ class PolicyCompatibilityRecord:
         if self.policy_artifact_id != self.actual.artifact_id:
             raise PolicyProvenanceError(
                 "PolicyCompatibilityRecord policy_artifact_id must match actual."
+            )
+        expected_mismatches = _validate_identifier_tuple(
+            "PolicyCompatibilityRecord expected mismatch_fields",
+            self.expected.mismatch_fields_against(self.actual),
+            allow_empty=True,
+        )
+        if self.mismatch_fields != expected_mismatches:
+            raise PolicyProvenanceError(
+                "PolicyCompatibilityRecord mismatch_fields must match expected/actual provenance."
+            )
+        if self.mismatch_fields and not self.allow_cross_version:
+            raise PolicyProvenanceError(
+                "PolicyCompatibilityRecord provenance mismatch requires cross-version override."
             )
 
     def to_payload(self) -> PolicyCompatibilityRecordPayload:

@@ -4,6 +4,7 @@ import pytest
 
 from warhammer40k_core.ai.policy_contracts import (
     PolicyArtifactKind,
+    PolicyCompatibilityRecord,
     PolicyProvenance,
     PolicyProvenanceError,
     TrainingFeature,
@@ -77,6 +78,54 @@ def test_policy_provenance_override_records_cross_version_mismatch() -> None:
     assert record.has_mismatch
     assert set(record.mismatch_fields) == {"ruleset_id", "ruleset_descriptor_hash"}
     assert record.to_payload()["allow_cross_version"] is True
+
+
+def test_policy_compatibility_record_rejects_false_negative_mismatch_fields() -> None:
+    expected = PolicyProvenance.from_game_config(
+        artifact_id="phase19-evaluator",
+        artifact_kind=PolicyArtifactKind.EVALUATION_FUNCTION,
+        game_config=_game_config(descriptor_version="phase19-policy-old-ruleset"),
+        reward_profile_version="phase19e-reward-v1",
+    )
+    actual = PolicyProvenance.from_game_config(
+        artifact_id=expected.artifact_id,
+        artifact_kind=expected.artifact_kind,
+        game_config=_game_config(descriptor_version="phase19-policy-new-ruleset"),
+        reward_profile_version="phase19e-reward-v1",
+    )
+
+    with pytest.raises(PolicyProvenanceError, match="mismatch_fields must match"):
+        PolicyCompatibilityRecord(
+            policy_artifact_id=expected.artifact_id,
+            allow_cross_version=True,
+            mismatch_fields=(),
+            expected=expected,
+            actual=actual,
+        )
+
+
+def test_policy_compatibility_record_rejects_mismatch_without_override() -> None:
+    expected = PolicyProvenance.from_game_config(
+        artifact_id="phase19-evaluator",
+        artifact_kind=PolicyArtifactKind.EVALUATION_FUNCTION,
+        game_config=_game_config(descriptor_version="phase19-policy-old-ruleset"),
+        reward_profile_version="phase19e-reward-v1",
+    )
+    actual = PolicyProvenance.from_game_config(
+        artifact_id=expected.artifact_id,
+        artifact_kind=expected.artifact_kind,
+        game_config=_game_config(descriptor_version="phase19-policy-new-ruleset"),
+        reward_profile_version="phase19e-reward-v1",
+    )
+
+    with pytest.raises(PolicyProvenanceError, match="requires cross-version override"):
+        PolicyCompatibilityRecord(
+            policy_artifact_id=expected.artifact_id,
+            allow_cross_version=False,
+            mismatch_fields=("ruleset_id", "ruleset_descriptor_hash"),
+            expected=expected,
+            actual=actual,
+        )
 
 
 def test_training_row_schema_allows_characteristics_not_identity_features() -> None:
