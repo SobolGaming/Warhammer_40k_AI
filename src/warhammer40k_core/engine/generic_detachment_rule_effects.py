@@ -41,6 +41,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_more_dakka_ir_support_2026_27 as more_dakka_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_shadow_legion_ir_support_2026_27 as shadow_legion_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_spectacle_of_slaughter_ir_support_2026_27 as spectacle_ir,
 )
 
@@ -57,11 +60,16 @@ COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID = (
     court_ir.COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID
 )
 COURT_OF_THE_PHOENICIAN_FACTION_KEYWORD = court_ir.EMPERORS_CHILDREN_KEYWORD
+SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID = (
+    shadow_legion_ir.SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
+)
+SHADOW_LEGION_KEYWORD = shadow_legion_ir.SHADOW_LEGION_KEYWORD
 _BATTLE_FORMATION_DETACHMENT_RULE_DESCRIPTOR_IDS = frozenset(
     {
         MORE_DAKKA_DETACHMENT_RULE_DESCRIPTOR_ID,
         SPECTACLE_OF_SLAUGHTER_DETACHMENT_RULE_DESCRIPTOR_ID,
         COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID,
+        SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID,
     }
 )
 
@@ -217,6 +225,8 @@ def _apply_generic_detachment_rule_effects(
                 effect_payload=validate_json_value(
                     {
                         **effect_payload,
+                        "coverage_descriptor_id": binding_source.record.coverage_descriptor_id,
+                        "execution_id": binding_source.record.execution_id,
                         "detachment_id": binding_source.record.detachment_id,
                         "generic_detachment_effect_id": effect_id,
                     }
@@ -324,6 +334,13 @@ def _target_unit_ids_for_record(
             if _unit_is_court_of_the_phoenician_detachment_target(unit)
         )
         return tuple(sorted(target_ids))
+    if record.coverage_descriptor_id == SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID:
+        target_ids = tuple(
+            unit.unit_instance_id
+            for unit in army.units
+            if _unit_is_shadow_legion_detachment_target(unit)
+        )
+        return tuple(sorted(target_ids))
     raise GameLifecycleError("Generic detachment record is not supported by runtime.")
 
 
@@ -348,6 +365,14 @@ def _unit_is_court_of_the_phoenician_detachment_target(unit: UnitInstance) -> bo
         *unit.keywords,
         *unit.faction_keywords,
     )
+
+
+def _unit_is_shadow_legion_detachment_target(unit: UnitInstance) -> bool:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Generic detachment target requires UnitInstance.")
+    return _canonical_keyword(SHADOW_LEGION_KEYWORD) in {
+        _canonical_keyword(keyword) for keyword in (*unit.keywords, *unit.faction_keywords)
+    }
 
 
 def _expected_effect_ids(
@@ -391,6 +416,10 @@ def _payload_string(payload: dict[str, JsonValue], key: str) -> str:
     if type(value) is not str:
         raise GameLifecycleError(f"Generic detachment effect payload requires {key}.")
     return _validate_identifier(key, value)
+
+
+def _canonical_keyword(value: str) -> str:
+    return value.strip().upper().replace("_", " ").replace("-", " ")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

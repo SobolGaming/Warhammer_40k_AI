@@ -32,6 +32,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_more_dakka_ir_support_2026_27 as more_dakka_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_shadow_legion_ir_support_2026_27 as shadow_legion_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_spectacle_of_slaughter_ir_support_2026_27 as spectacle_ir,
 )
 
@@ -194,6 +197,11 @@ def generic_supported_detachment_rule_ir_hash(
     rule_ir_hash = spectacle_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         return rule_ir_hash
+    rule_ir_hash = shadow_legion_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_shadow_legion_detachment_rule_ir(rule_ir)
+        return rule_ir_hash
     return court_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
 
 
@@ -223,6 +231,8 @@ def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> Ru
         payload = more_dakka_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         payload = spectacle_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
+    if payload is None:
+        payload = shadow_legion_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         payload = court_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
@@ -458,6 +468,56 @@ def _validate_cavalcade_of_chaos_detachment_rule_ir(rule_ir: RuleIR) -> None:
     if granted_abilities != frozenset({"can_fall_back_and_shoot", "can_fall_back_and_charge"}):
         raise Phase17FGenericIrSupportError(
             "Cavalcade of Chaos detachment RuleIR has unexpected granted abilities."
+        )
+
+
+def _validate_shadow_legion_detachment_rule_ir(rule_ir: RuleIR) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Shadow Legion detachment requires RuleIR.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Shadow Legion detachment RuleIR must deserialize as supported."
+        )
+    expected_source_id = (
+        f"{SOURCE_PACKAGE_ID}:phase17e:chaos-daemons:shadow-legion:rule:source-text"
+    )
+    if rule_ir.source_id != expected_source_id:
+        raise Phase17FGenericIrSupportError(
+            "Shadow Legion detachment RuleIR produced an unexpected source ID."
+        )
+    template_ids = frozenset(
+        clause.template_id for clause in rule_ir.clauses if clause.template_id is not None
+    )
+    if template_ids != frozenset({DICE_ROLL_MODIFIER_TEMPLATE_ID, GRANT_ABILITY_TEMPLATE_ID}):
+        raise Phase17FGenericIrSupportError(
+            "Shadow Legion detachment RuleIR uses an unregistered template family."
+        )
+    granted_abilities = frozenset(
+        _ability_parameter(effect)
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.GRANT_ABILITY
+    )
+    if granted_abilities != frozenset(
+        {
+            shadow_legion_ir.CAN_ADVANCE_AND_SHOOT_AND_CHARGE_ABILITY,
+            shadow_legion_ir.SNAP_SHOOTING_TARGET_FORBIDDEN_ABILITY,
+            shadow_legion_ir.SHADOW_LEGION_DARK_PACT_LETHAL_HITS_CHOICE_ABILITY,
+            shadow_legion_ir.SHADOW_LEGION_DARK_PACT_SUSTAINED_HITS_1_CHOICE_ABILITY,
+        }
+    ):
+        raise Phase17FGenericIrSupportError(
+            "Shadow Legion detachment RuleIR has unexpected granted abilities."
+        )
+    modifier_roll_types = frozenset(
+        parameter_payload(effect.parameters).get("roll_type")
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL
+    )
+    if modifier_roll_types != frozenset({"hit", "wound"}):
+        raise Phase17FGenericIrSupportError(
+            "Shadow Legion detachment RuleIR has unexpected dice modifier roll types."
         )
 
 

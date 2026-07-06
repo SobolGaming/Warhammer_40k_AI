@@ -6,10 +6,6 @@ from warhammer40k_core.core.weapon_profiles import RangeProfileKind
 from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityContext,
     AdvanceEligibilityGrant,
-    AdvanceEligibilityHookBinding,
-)
-from warhammer40k_core.engine.attack_sequence_completion_hooks import (
-    AttackSequenceCompletedHookBinding,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
@@ -22,29 +18,20 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_m
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
-    FightUnitSelectedGrantBinding,
-)
-from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
-    MortalWoundFeelNoPainContinuationHookBinding,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
-    HitRollModifierBinding,
     HitRollModifierContext,
-    WeaponProfileModifierBinding,
-    WoundRollModifierBinding,
     WoundRollModifierContext,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedContext,
     ShootingUnitSelectedGrant,
-    ShootingUnitSelectedGrantBinding,
 )
 from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
-    ShootingTargetRestrictionHookBinding,
     TargetRestriction,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -75,83 +62,7 @@ WEAPON_PROFILE_MODIFIER_ID = f"{HOOK_ID}:disciples-of-belakor:weapon-profile"
 
 
 def runtime_contribution() -> RuntimeContentContribution:
-    return RuntimeContentContribution(
-        contribution_id=CONTRIBUTION_ID,
-        advance_eligibility_hook_bindings=(
-            AdvanceEligibilityHookBinding(
-                hook_id=ADVANCE_ELIGIBILITY_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=murderers_cowl_advance_eligibility,
-            ),
-        ),
-        shooting_target_restriction_hook_bindings=(
-            ShootingTargetRestrictionHookBinding(
-                hook_id=SLAANESH_TARGET_RESTRICTION_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=shadows_caress_snap_target_restriction,
-            ),
-        ),
-        shooting_unit_selected_grant_hook_bindings=(
-            ShootingUnitSelectedGrantBinding(
-                hook_id=SHOOTING_LETHAL_HITS_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=shooting_lethal_hits_dark_pact_grant,
-            ),
-            ShootingUnitSelectedGrantBinding(
-                hook_id=SHOOTING_SUSTAINED_HITS_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=shooting_sustained_hits_dark_pact_grant,
-            ),
-        ),
-        fight_unit_selected_grant_hook_bindings=(
-            FightUnitSelectedGrantBinding(
-                hook_id=FIGHT_LETHAL_HITS_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=fight_lethal_hits_dark_pact_grant,
-            ),
-            FightUnitSelectedGrantBinding(
-                hook_id=FIGHT_SUSTAINED_HITS_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=fight_sustained_hits_dark_pact_grant,
-            ),
-        ),
-        attack_sequence_completed_hook_bindings=(
-            AttackSequenceCompletedHookBinding(
-                hook_id=ATTACK_SEQUENCE_COMPLETED_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=dark_pacts.resolve_dark_pact_attack_sequence_completion,
-            ),
-        ),
-        mortal_wound_feel_no_pain_hook_bindings=(
-            MortalWoundFeelNoPainContinuationHookBinding(
-                hook_id=MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                source_kind=dark_pacts.SHADOW_LEGION_DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND,
-                handler=dark_pacts.apply_dark_pact_mortal_wound_feel_no_pain_decision,
-            ),
-        ),
-        hit_roll_modifier_bindings=(
-            HitRollModifierBinding(
-                modifier_id=TZEENTCH_HIT_MODIFIER_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=penumbral_puppetry_hit_roll_modifier,
-            ),
-        ),
-        wound_roll_modifier_bindings=(
-            WoundRollModifierBinding(
-                modifier_id=NURGLE_WOUND_MODIFIER_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=gloam_rot_wound_roll_modifier,
-            ),
-        ),
-        weapon_profile_modifier_bindings=(
-            WeaponProfileModifierBinding(
-                modifier_id=WEAPON_PROFILE_MODIFIER_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=dark_pacts.dark_pact_weapon_profile_modifier,
-            ),
-        ),
-    )
+    return RuntimeContentContribution(contribution_id=CONTRIBUTION_ID)
 
 
 def murderers_cowl_advance_eligibility(

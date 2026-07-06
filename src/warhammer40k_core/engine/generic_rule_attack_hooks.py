@@ -101,6 +101,7 @@ def generic_rule_hit_roll_modifier(context: HitRollModifierContext) -> int:
         attacking_unit_instance_id=context.attacking_unit_instance_id,
         target_unit_instance_id=context.target_unit_instance_id,
         source_phase=context.source_phase,
+        weapon_profile=context.weapon_profile,
         expected_roll_type="hit",
         legacy_attacker_role_allowed=lambda effect: (
             _required_int_parameter(
@@ -127,6 +128,7 @@ def generic_rule_wound_roll_modifier(context: WoundRollModifierContext) -> int:
         attacking_unit_instance_id=context.attacking_unit_instance_id,
         target_unit_instance_id=context.target_unit_instance_id,
         source_phase=context.source_phase,
+        weapon_profile=context.weapon_profile,
         attack_strength=context.strength,
         target_toughness=context.toughness,
         expected_roll_type="wound",
@@ -155,6 +157,7 @@ def generic_rule_damage_roll_modifier(context: DamageRollModifierContext) -> int
         attacking_unit_instance_id=context.attacking_unit_instance_id,
         target_unit_instance_id=context.target_unit_instance_id,
         source_phase=context.source_phase,
+        weapon_profile=context.weapon_profile,
         expected_roll_type="damage",
         legacy_attacker_role_allowed=lambda effect: (
             _required_int_parameter(
@@ -191,6 +194,7 @@ def generic_rule_modified_save_options(
         attacking_unit_instance_id=context.attacking_unit_instance_id,
         target_unit_instance_id=context.target_unit_instance_id,
         source_phase=context.source_phase,
+        weapon_profile=context.weapon_profile,
         effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
         legacy_attacker_role_allowed=lambda candidate: (
             _required_int_parameter(
@@ -226,6 +230,7 @@ def generic_rule_modified_weapon_profile(context: WeaponProfileModifierContext) 
         attacking_unit_instance_id=context.attacking_unit_instance_id,
         target_unit_instance_id=context.target_unit_instance_id,
         source_phase=context.source_phase,
+        weapon_profile=profile,
         effect_kind=RuleEffectKind.GRANT_WEAPON_ABILITY,
         legacy_attacker_role_allowed=lambda _candidate: True,
         legacy_target_role_allowed=lambda _candidate: False,
@@ -238,6 +243,7 @@ def generic_rule_modified_weapon_profile(context: WeaponProfileModifierContext) 
         attacking_unit_instance_id=context.attacking_unit_instance_id,
         target_unit_instance_id=context.target_unit_instance_id,
         source_phase=context.source_phase,
+        weapon_profile=profile,
         effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
         legacy_attacker_role_allowed=lambda _candidate: True,
         legacy_target_role_allowed=lambda _candidate: False,
@@ -375,6 +381,7 @@ def _dice_roll_modifier_for_attack(
     expected_roll_type: str,
     legacy_attacker_role_allowed: Callable[[_GenericAttackEffect], bool],
     legacy_target_role_allowed: Callable[[_GenericAttackEffect], bool],
+    weapon_profile: WeaponProfile | None = None,
     attack_strength: int | None = None,
     target_toughness: int | None = None,
 ) -> int:
@@ -389,6 +396,7 @@ def _dice_roll_modifier_for_attack(
         effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
         legacy_attacker_role_allowed=legacy_attacker_role_allowed,
         legacy_target_role_allowed=legacy_target_role_allowed,
+        weapon_profile=weapon_profile,
     ):
         if not _roll_type_matches(effect.parameters, expected=expected_roll_type):
             continue
@@ -432,6 +440,7 @@ def _matching_generic_attack_effects(
     legacy_attacker_role_allowed: Callable[[_GenericAttackEffect], bool],
     legacy_target_role_allowed: Callable[[_GenericAttackEffect], bool],
     target_unit_lookup_ids: tuple[str | None, ...] | None = None,
+    weapon_profile: WeaponProfile | None = None,
     attack_strength: int | None = None,
     target_toughness: int | None = None,
 ) -> tuple[_GenericAttackEffect, ...]:
@@ -480,6 +489,7 @@ def _matching_generic_attack_effects(
                 attacking_unit_instance_id=attacker_id,
                 target_unit_instance_id=target_id,
                 source_phase=source_phase,
+                weapon_profile=weapon_profile,
                 attack_strength=attack_strength,
                 target_toughness=target_toughness,
             ):
@@ -577,6 +587,7 @@ def _generic_effect_context_applies(
     attacking_unit_instance_id: str,
     target_unit_instance_id: str | None,
     source_phase: object,
+    weapon_profile: WeaponProfile | None,
     attack_strength: int | None,
     target_toughness: int | None,
 ) -> bool:
@@ -599,6 +610,15 @@ def _generic_effect_context_applies(
         effect=effect,
         target_unit_instance_id=target_unit_instance_id,
     ):
+        return False
+    if not _generic_effect_required_keyword_sequence_applies(
+        state=state,
+        effect=effect,
+        attacking_unit_instance_id=attacking_unit_instance_id,
+        target_unit_instance_id=target_unit_instance_id,
+    ):
+        return False
+    if not _generic_effect_weapon_scope_applies(effect=effect, weapon_profile=weapon_profile):
         return False
     if not _generic_effect_waaagh_gate_applies(
         state=state,
@@ -729,6 +749,47 @@ def _generic_effect_target_keyword_gate_applies(
         unit_instance_id=target_unit_instance_id,
         keyword=required_keyword,
     )
+
+
+def _generic_effect_required_keyword_sequence_applies(
+    *,
+    state: object,
+    effect: _GenericAttackEffect,
+    attacking_unit_instance_id: str,
+    target_unit_instance_id: str | None,
+) -> bool:
+    required_keywords = _keyword_sequence_parameter(
+        effect.parameters.get("required_keyword_sequence")
+    )
+    required_keyword = effect.parameters.get("required_keyword")
+    if required_keyword is not None:
+        if type(required_keyword) is not str:
+            raise GameLifecycleError("Generic RuleIR required_keyword must be a string.")
+        required_keywords = (*required_keywords, required_keyword)
+    if not required_keywords:
+        return True
+    if effect.role == "attacker":
+        unit_id = attacking_unit_instance_id
+    else:
+        if target_unit_instance_id is None:
+            return False
+        unit_id = target_unit_instance_id
+    return all(
+        _unit_has_keyword(state=state, unit_instance_id=unit_id, keyword=keyword)
+        for keyword in required_keywords
+    )
+
+
+def _generic_effect_weapon_scope_applies(
+    *,
+    effect: _GenericAttackEffect,
+    weapon_profile: WeaponProfile | None,
+) -> bool:
+    if "weapon_scope" not in effect.parameters:
+        return True
+    if weapon_profile is None:
+        return False
+    return _weapon_scope_matches_profile(effect.parameters, weapon_profile)
 
 
 def _generic_effect_target_constraint_applies(
@@ -1238,13 +1299,36 @@ def _unit_has_keyword(*, state: object, unit_instance_id: str, keyword: str) -> 
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR keyword gate requires GameState.")
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    requested_keyword = _validate_identifier("keyword", keyword)
+    requested_keyword = _canonical_keyword(_validate_identifier("keyword", keyword))
     for army in state.army_definitions:
         for unit in army.units:
             if unit.unit_instance_id != requested_unit_id:
                 continue
-            return requested_keyword in (*unit.keywords, *unit.faction_keywords)
+            return requested_keyword in {
+                _canonical_keyword(stored) for stored in (*unit.keywords, *unit.faction_keywords)
+            }
     raise GameLifecycleError("Generic RuleIR keyword gate unit is unknown.")
+
+
+def _keyword_sequence_parameter(value: object) -> tuple[str, ...]:
+    if value is None:
+        return ()
+    if not isinstance(value, list):
+        raise GameLifecycleError("Generic RuleIR required_keyword_sequence must be a list.")
+    keywords: list[str] = []
+    for item in cast(list[object], value):
+        if type(item) is not str:
+            raise GameLifecycleError(
+                "Generic RuleIR required_keyword_sequence must contain strings."
+            )
+        keywords.append(_validate_identifier("required_keyword_sequence", item))
+    if not keywords:
+        raise GameLifecycleError("Generic RuleIR required_keyword_sequence must not be empty.")
+    return tuple(keywords)
+
+
+def _canonical_keyword(value: str) -> str:
+    return value.strip().upper().replace("_", " ").replace("-", " ")
 
 
 def _closest_unit_distance_inches(

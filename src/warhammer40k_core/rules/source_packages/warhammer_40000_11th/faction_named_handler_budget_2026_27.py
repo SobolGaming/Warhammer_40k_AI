@@ -32,7 +32,6 @@ _APPROVED_PRE_WS14_NAMED_HANDLER_EXECUTION_IDS = (
     "phase17f:phase17e:chaos-daemons:army-rule",
     "phase17f:phase17e:chaos-daemons:blood-legion:rule",
     "phase17f:phase17e:chaos-daemons:daemonic-incursion:rule",
-    "phase17f:phase17e:chaos-daemons:shadow-legion:rule",
     "phase17f:phase17e:chaos-knights:army-rule",
     "phase17f:phase17e:chaos-space-marines:army-rule",
     "phase17f:phase17e:death-guard:army-rule",
