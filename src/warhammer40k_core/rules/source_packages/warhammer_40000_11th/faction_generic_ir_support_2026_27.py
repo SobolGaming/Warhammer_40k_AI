@@ -81,6 +81,10 @@ _SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         "enhancement:emperors-children:spectacle-of-slaughter:000010900002",
         "enhancement:genestealer-cults:outlander-claw:000009079002",
         "enhancement:orks:more-dakka:000009991005",
+        shadow_legion_ir.FADE_TO_DARKNESS_SOURCE_ROW_ID,
+        shadow_legion_ir.LEAPING_SHADOWS_SOURCE_ROW_ID,
+        shadow_legion_ir.MALICE_MADE_MANIFEST_SOURCE_ROW_ID,
+        shadow_legion_ir.MANTLE_OF_GLOOM_SOURCE_ROW_ID,
         "enhancement:tyranids:warrior-bioform-onslaught:000009737005",
     }
 )

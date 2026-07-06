@@ -28,7 +28,7 @@ from warhammer40k_core.engine.rule_execution import (
     execute_rule_ir,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
-from warhammer40k_core.rules.rule_ir import RuleIR
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, parameter_payload
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
     faction_execution_2026_27,
@@ -85,6 +85,8 @@ def generic_enhancement_effect_bindings(
         )
         if rule_ir.ir_hash() != record.rule_ir_hash:
             raise GameLifecycleError("Generic enhancement execution record has stale rule_ir_hash.")
+        if _rule_ir_has_specialized_runtime_hook_family(rule_ir):
+            continue
         _validate_enhancement_rule_ir(rule_ir)
         source = _GenericEnhancementBindingSource(
             record=record,
@@ -211,6 +213,22 @@ def _validate_enhancement_rule_ir(rule_ir: RuleIR) -> None:
             raise GameLifecycleError(
                 "Generic enhancement assignment owns effect duration semantics."
             )
+
+
+def _rule_ir_has_specialized_runtime_hook_family(rule_ir: RuleIR) -> bool:
+    if type(rule_ir) is not RuleIR:
+        raise GameLifecycleError("Generic enhancement hook-family lookup requires RuleIR.")
+    for clause in rule_ir.clauses:
+        for effect in clause.effects:
+            if effect.kind is not RuleEffectKind.GRANT_ABILITY:
+                continue
+            hook_family = parameter_payload(effect.parameters).get("hook_family")
+            if hook_family is None:
+                continue
+            if type(hook_family) is not str:
+                raise GameLifecycleError("Generic enhancement hook_family must be a string.")
+            return True
+    return False
 
 
 def _selected_assignment_for_context(

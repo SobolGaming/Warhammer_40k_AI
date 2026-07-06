@@ -61,10 +61,7 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
-from warhammer40k_core.engine.enhancement_effects import (
-    EnhancementEffectRegistry,
-    apply_enhancement_effects,
-)
+from warhammer40k_core.engine.enhancement_effects import apply_enhancement_effects
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle_for_armies
@@ -184,7 +181,7 @@ def test_shadow_legion_runtime_contribution_delegates_detachment_rule_to_generic
     assert contribution.weapon_profile_modifier_bindings == ()
 
 
-def test_shadow_legion_enhancement_runtime_contribution_registers_exact_hooks() -> None:
+def test_shadow_legion_enhancement_runtime_contribution_delegates_to_generic_ir() -> None:
     contribution = enhancements.runtime_contribution()
 
     assert contribution.contribution_id == enhancements.CONTRIBUTION_ID
@@ -194,38 +191,68 @@ def test_shadow_legion_enhancement_runtime_contribution_registers_exact_hooks() 
     )
     assert "fade_to_darkness" not in contribution.contribution_id
     assert not contribution.contribution_id.endswith(":scaffold")
-    assert contribution.enhancement_effect_bindings[0].effect_id == (
-        enhancements.LEAPING_SHADOWS_EFFECT_ID
+    assert contribution.enhancement_effect_bindings == ()
+    assert contribution.objective_control_modifier_bindings == ()
+    assert contribution.unit_destroyed_hook_bindings == ()
+    assert contribution.turn_end_hook_bindings == ()
+    assert contribution.fight_phase_start_hook_bindings == ()
+    assert contribution.mortal_wound_feel_no_pain_hook_bindings == ()
+
+
+def test_shadow_legion_generic_runtime_bundle_materializes_enhancement_hooks() -> None:
+    leaping_state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    leaping_unit = _unit_for_player(leaping_state, player_id="player-a")
+    _assign_leaping_shadows(leaping_state, unit=leaping_unit)
+    leaping_bundle = _shadow_legion_runtime_bundle(leaping_state)
+
+    assert any(
+        binding.effect_id == enhancements.LEAPING_SHADOWS_EFFECT_ID
+        and binding.source_id == enhancements.LEAPING_SHADOWS_SOURCE_RULE_ID
+        and binding.enhancement_id == enhancements.LEAPING_SHADOWS_ENHANCEMENT_ID
+        for binding in leaping_bundle.enhancement_effect_registry.all_bindings()
     )
-    assert contribution.enhancement_effect_bindings[0].source_id == (
-        enhancements.LEAPING_SHADOWS_SOURCE_RULE_ID
+
+    mantle_state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    mantle_unit = _unit_for_player(mantle_state, player_id="player-a")
+    _assign_mantle_of_gloom(mantle_state, unit=mantle_unit)
+    mantle_bundle = _shadow_legion_runtime_bundle(mantle_state)
+
+    assert any(
+        binding.modifier_id == enhancements.MANTLE_OF_GLOOM_OBJECTIVE_CONTROL_MODIFIER_ID
+        and binding.source_id == enhancements.MANTLE_OF_GLOOM_SOURCE_RULE_ID
+        for binding in mantle_bundle.runtime_modifier_registry.all_objective_control_bindings()
     )
-    assert contribution.enhancement_effect_bindings[0].enhancement_id == (
-        enhancements.LEAPING_SHADOWS_ENHANCEMENT_ID
+
+    fade_state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    fade_unit = _unit_for_player(fade_state, player_id="player-a")
+    _assign_fade_to_darkness(fade_state, unit=fade_unit)
+    fade_bundle = _shadow_legion_runtime_bundle(fade_state)
+
+    assert any(
+        binding.hook_id == enhancements.UNIT_DESTROYED_HOOK_ID
+        and binding.source_id == enhancements.SOURCE_RULE_ID
+        for binding in fade_bundle.unit_destroyed_hook_registry.all_bindings()
     )
-    assert contribution.objective_control_modifier_bindings[0].modifier_id == (
-        enhancements.MANTLE_OF_GLOOM_OBJECTIVE_CONTROL_MODIFIER_ID
+    assert any(
+        binding.hook_id == enhancements.TURN_END_HOOK_ID
+        and binding.source_id == enhancements.SOURCE_RULE_ID
+        for binding in fade_bundle.turn_end_hook_registry.all_bindings()
     )
-    assert contribution.objective_control_modifier_bindings[0].source_id == (
-        enhancements.MANTLE_OF_GLOOM_SOURCE_RULE_ID
+
+    malice_state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided", "Character"))
+    malice_unit = _unit_for_player(malice_state, player_id="player-a")
+    _assign_malice_made_manifest(malice_state, unit=malice_unit)
+    malice_bundle = _shadow_legion_runtime_bundle(malice_state)
+
+    assert any(
+        binding.hook_id == enhancements.MALICE_MADE_MANIFEST_HOOK_ID
+        and binding.source_id == enhancements.MALICE_MADE_MANIFEST_SOURCE_RULE_ID
+        for binding in malice_bundle.fight_phase_start_hook_registry.all_bindings()
     )
-    assert contribution.unit_destroyed_hook_bindings[0].hook_id == (
-        enhancements.UNIT_DESTROYED_HOOK_ID
-    )
-    assert contribution.unit_destroyed_hook_bindings[0].source_id == enhancements.SOURCE_RULE_ID
-    assert contribution.turn_end_hook_bindings[0].hook_id == enhancements.TURN_END_HOOK_ID
-    assert contribution.turn_end_hook_bindings[0].source_id == enhancements.SOURCE_RULE_ID
-    assert contribution.fight_phase_start_hook_bindings[0].hook_id == (
-        enhancements.MALICE_MADE_MANIFEST_HOOK_ID
-    )
-    assert contribution.fight_phase_start_hook_bindings[0].source_id == (
-        enhancements.MALICE_MADE_MANIFEST_SOURCE_RULE_ID
-    )
-    assert contribution.mortal_wound_feel_no_pain_hook_bindings[0].hook_id == (
-        enhancements.MALICE_MADE_MANIFEST_MORTAL_WOUND_FNP_HOOK_ID
-    )
-    assert contribution.mortal_wound_feel_no_pain_hook_bindings[0].source_kind == (
-        enhancements.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_SOURCE_KIND
+    assert any(
+        binding.hook_id == enhancements.MALICE_MADE_MANIFEST_MORTAL_WOUND_FNP_HOOK_ID
+        and binding.source_kind == enhancements.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_SOURCE_KIND
+        for binding in malice_bundle.mortal_wound_feel_no_pain_hook_registry.all_bindings()
     )
 
 
@@ -242,16 +269,12 @@ def test_leaping_shadows_grants_scouts_nine_to_bearers_attached_rules_unit() -> 
 
     apply_enhancement_effects(
         state=state,
-        registry=EnhancementEffectRegistry.from_bindings(
-            enhancements.runtime_contribution().enhancement_effect_bindings
-        ),
+        registry=_shadow_legion_runtime_bundle(state).enhancement_effect_registry,
         decisions=decisions,
     )
     apply_enhancement_effects(
         state=state,
-        registry=EnhancementEffectRegistry.from_bindings(
-            enhancements.runtime_contribution().enhancement_effect_bindings
-        ),
+        registry=_shadow_legion_runtime_bundle(state).enhancement_effect_registry,
         decisions=decisions,
     )
 
@@ -316,11 +339,7 @@ def test_mantle_of_gloom_reduces_enemy_oc_in_engagement_with_bearers_attached_un
         unit_instance_id=target.unit_instance_id,
         poses=_unit_line_poses(x=12.0, y=20.0),
     )
-    registry = RuntimeModifierRegistry.from_bindings(
-        objective_control_modifier_bindings=(
-            enhancements.runtime_contribution().objective_control_modifier_bindings
-        )
-    )
+    registry = _shadow_legion_runtime_bundle(state).runtime_modifier_registry
 
     assert (
         enhancements.mantle_of_gloom_modified_objective_control(
@@ -567,7 +586,7 @@ def test_malice_made_manifest_routes_mortal_wound_feel_no_pain_choice() -> None:
     )
     decisions.submit_result(fnp_result)
     continuation_status = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
-        enhancements.runtime_contribution().mortal_wound_feel_no_pain_hook_bindings
+        _shadow_legion_runtime_bundle(state).mortal_wound_feel_no_pain_hook_registry.all_bindings()
     ).apply_decision(
         MortalWoundFeelNoPainContinuationContext(
             state=state,
@@ -619,7 +638,7 @@ def test_malice_made_manifest_fight_handler_requests_and_resolves_start_choice()
     decisions = DecisionController()
     handler = FightPhaseHandler(
         fight_phase_start_hooks=FightPhaseStartHookRegistry.from_bindings(
-            enhancements.runtime_contribution().fight_phase_start_hook_bindings
+            _shadow_legion_runtime_bundle(state).fight_phase_start_hook_registry.all_bindings()
         ),
     )
 

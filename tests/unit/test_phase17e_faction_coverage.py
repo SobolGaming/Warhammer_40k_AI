@@ -92,6 +92,10 @@ GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        FADE_TO_DARKNESS_SOURCE_ROW_ID,
+        LEAPING_SHADOWS_SOURCE_ROW_ID,
+        MALICE_MADE_MANIFEST_SOURCE_ROW_ID,
+        MANTLE_OF_GLOOM_SOURCE_ROW_ID,
         "enhancement:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade",
         "enhancement:emperors-children:court-of-the-phoenician:000010654002",
         "enhancement:emperors-children:court-of-the-phoenician:000010654004",
@@ -139,6 +143,12 @@ GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         *GENERIC_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS,
     }
 )
+GENERIC_ENGINE_CONSUMED_ENHANCEMENT_RUNTIME_CONSUMERS_BY_SOURCE_ROW_ID = {
+    FADE_TO_DARKNESS_SOURCE_ROW_ID: FADE_TO_DARKNESS_RUNTIME_CONSUMERS,
+    LEAPING_SHADOWS_SOURCE_ROW_ID: LEAPING_SHADOWS_RUNTIME_CONSUMERS,
+    MALICE_MADE_MANIFEST_SOURCE_ROW_ID: MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS,
+    MANTLE_OF_GLOOM_SOURCE_ROW_ID: MANTLE_OF_GLOOM_RUNTIME_CONSUMERS,
+}
 GENERIC_DETACHMENT_RULE_KEYS = frozenset(
     {
         ("chaos-daemons", "blood-legion"),
@@ -740,7 +750,7 @@ def test_phase17e_exact_enhancement_and_stratagem_rows_cover_source_catalog() ->
         )
 
 
-def test_phase17e_fade_to_darkness_exact_row_is_engine_consumed() -> None:
+def test_phase17e_fade_to_darkness_exact_row_is_generic_rule_ir_supported() -> None:
     source_row = next(
         row
         for row in faction_subrule_source.enhancement_rows()
@@ -758,14 +768,19 @@ def test_phase17e_fade_to_darkness_exact_row_is_engine_consumed() -> None:
     assert source_row.name == "Fade to Darkness"
     assert source_row.runtime_support_status.value == "engine_consumed"
     assert source_row.runtime_consumer_ids == FADE_TO_DARKNESS_RUNTIME_CONSUMERS
-    assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+    assert coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
     assert coverage_row.runtime_support_status is not None
     assert coverage_row.runtime_support_status.value == "engine_consumed"
     assert coverage_row.runtime_consumer_ids == FADE_TO_DARKNESS_RUNTIME_CONSUMERS
-    assert coverage_row.handler_id == FADE_TO_DARKNESS_RUNTIME_CONSUMERS[0]
+    assert coverage_row.handler_id is None
+    assert coverage_row.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+            coverage_row.descriptor_id
+        )
+    )
 
 
-def test_phase17e_leaping_shadows_exact_row_is_engine_consumed() -> None:
+def test_phase17e_leaping_shadows_exact_row_is_generic_rule_ir_supported() -> None:
     source_row = next(
         row
         for row in faction_subrule_source.enhancement_rows()
@@ -783,14 +798,19 @@ def test_phase17e_leaping_shadows_exact_row_is_engine_consumed() -> None:
     assert source_row.name == "Leaping Shadows"
     assert source_row.runtime_support_status.value == "engine_consumed"
     assert source_row.runtime_consumer_ids == LEAPING_SHADOWS_RUNTIME_CONSUMERS
-    assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+    assert coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
     assert coverage_row.runtime_support_status is not None
     assert coverage_row.runtime_support_status.value == "engine_consumed"
     assert coverage_row.runtime_consumer_ids == LEAPING_SHADOWS_RUNTIME_CONSUMERS
-    assert coverage_row.handler_id == LEAPING_SHADOWS_RUNTIME_CONSUMERS[0]
+    assert coverage_row.handler_id is None
+    assert coverage_row.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+            coverage_row.descriptor_id
+        )
+    )
 
 
-def test_phase17e_mantle_of_gloom_exact_row_is_engine_consumed() -> None:
+def test_phase17e_mantle_of_gloom_exact_row_is_generic_rule_ir_supported() -> None:
     source_row = next(
         row
         for row in faction_subrule_source.enhancement_rows()
@@ -808,14 +828,19 @@ def test_phase17e_mantle_of_gloom_exact_row_is_engine_consumed() -> None:
     assert source_row.name == "Mantle of Gloom (Aura)"
     assert source_row.runtime_support_status.value == "engine_consumed"
     assert source_row.runtime_consumer_ids == MANTLE_OF_GLOOM_RUNTIME_CONSUMERS
-    assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+    assert coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
     assert coverage_row.runtime_support_status is not None
     assert coverage_row.runtime_support_status.value == "engine_consumed"
     assert coverage_row.runtime_consumer_ids == MANTLE_OF_GLOOM_RUNTIME_CONSUMERS
-    assert coverage_row.handler_id == MANTLE_OF_GLOOM_RUNTIME_CONSUMERS[0]
+    assert coverage_row.handler_id is None
+    assert coverage_row.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+            coverage_row.descriptor_id
+        )
+    )
 
 
-def test_phase17e_malice_made_manifest_exact_row_is_engine_consumed() -> None:
+def test_phase17e_malice_made_manifest_exact_row_is_generic_rule_ir_supported() -> None:
     source_row = next(
         row
         for row in faction_subrule_source.enhancement_rows()
@@ -833,11 +858,16 @@ def test_phase17e_malice_made_manifest_exact_row_is_engine_consumed() -> None:
     assert source_row.name == "Malice Made Manifest"
     assert source_row.runtime_support_status.value == "engine_consumed"
     assert source_row.runtime_consumer_ids == MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS
-    assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+    assert coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
     assert coverage_row.runtime_support_status is not None
     assert coverage_row.runtime_support_status.value == "engine_consumed"
     assert coverage_row.runtime_consumer_ids == MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS
-    assert coverage_row.handler_id == MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS[0]
+    assert coverage_row.handler_id is None
+    assert coverage_row.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+            coverage_row.descriptor_id
+        )
+    )
 
 
 @pytest.mark.parametrize(
@@ -1100,8 +1130,14 @@ def test_phase17e_coverage_report_groups_supported_and_approved_unsupported_rows
     detachment_count = len(faction_detachment_source.detachment_rows())
     enhancement_rows = faction_subrule_source.enhancement_rows()
     stratagem_rows = faction_subrule_source.stratagem_rows()
-    implemented_exact_count = sum(1 for row in enhancement_rows if row.runtime_consumer_ids) + sum(
-        1 for row in stratagem_rows if row.runtime_consumer_ids
+    implemented_exact_count = sum(
+        1
+        for row in enhancement_rows
+        if row.runtime_consumer_ids and row.source_row_id not in GENERIC_ENHANCEMENT_SOURCE_ROW_IDS
+    ) + sum(
+        1
+        for row in stratagem_rows
+        if row.runtime_consumer_ids and row.source_row_id not in GENERIC_STRATAGEM_SOURCE_ROW_IDS
     )
     implemented_army_rule_count = len(FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID)
     implemented_detachment_rule_count = len(CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY)
@@ -1183,8 +1219,19 @@ def test_phase17e_generic_enhancements_are_template_family_bounded() -> None:
         assert row.coverage_kind is Phase17ECoverageKind.DETACHMENT_ENHANCEMENT
         assert row.handler_id is None
         assert row.runtime_support_status is not None
-        assert row.runtime_support_status.value == "source_only"
-        assert row.runtime_consumer_ids == ()
+        if source_row_id in GENERIC_ENGINE_CONSUMED_ENHANCEMENT_RUNTIME_CONSUMERS_BY_SOURCE_ROW_ID:
+            assert row.runtime_support_status.value == "engine_consumed"
+            assert (
+                row.runtime_consumer_ids
+                == (
+                    GENERIC_ENGINE_CONSUMED_ENHANCEMENT_RUNTIME_CONSUMERS_BY_SOURCE_ROW_ID[
+                        source_row_id
+                    ]
+                )
+            )
+        else:
+            assert row.runtime_support_status.value == "source_only"
+            assert row.runtime_consumer_ids == ()
         assert row.rule_ir_hash == (
             generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
                 f"phase17e:{source_row_id}"
@@ -1446,11 +1493,11 @@ def _assert_exact_subrule_coverage_matches_source(
     assert all(source_id in coverage_row.source_ids for source_id in source_ids)
     assert detachment_source_id in coverage_row.source_ids
     assert pdf_source_id in coverage_row.source_ids
-    if runtime_consumer_ids:
-        assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
-        assert coverage_row.handler_id == runtime_consumer_ids[0]
-    elif coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED:
+    if coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED:
         assert coverage_row.handler_id is None
         assert coverage_row.rule_ir_hash is not None
+    elif runtime_consumer_ids:
+        assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+        assert coverage_row.handler_id == runtime_consumer_ids[0]
     else:
         assert coverage_row.status is Phase17ECoverageStatus.NAMED_HANDLER_REQUIRED

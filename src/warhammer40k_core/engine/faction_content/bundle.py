@@ -1335,6 +1335,10 @@ class RuntimeContentBundle:
                     ability_indexes_by_player_id=ability_indexes_by_player_id,
                     armies=validated_armies,
                 ),
+                *generic_rule_lifecycle_hooks.turn_end_hook_bindings(
+                    activation=activation,
+                    execution_records=records,
+                ),
                 *_contribution_values(
                     validated_contributions,
                     lambda contribution: contribution.turn_end_hook_bindings,
@@ -1348,9 +1352,15 @@ class RuntimeContentBundle:
             )
         )
         fight_phase_start_hook_registry = FightPhaseStartHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.fight_phase_start_hook_bindings,
+            (
+                *generic_rule_lifecycle_hooks.fight_phase_start_hook_bindings(
+                    activation=activation,
+                    execution_records=records,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.fight_phase_start_hook_bindings,
+                ),
             )
         )
         shooting_phase_start_hook_registry = ShootingPhaseStartHookRegistry.from_bindings(
@@ -1370,6 +1380,10 @@ class RuntimeContentBundle:
                 *catalog_runtime_hooks.unit_destroyed_hook_bindings(
                     ability_indexes_by_player_id=ability_indexes_by_player_id,
                     armies=validated_armies,
+                ),
+                *generic_rule_lifecycle_hooks.unit_destroyed_hook_bindings(
+                    activation=activation,
+                    execution_records=records,
                 ),
                 *_contribution_values(
                     validated_contributions,
@@ -1540,11 +1554,20 @@ class RuntimeContentBundle:
             )
         )
         enhancement_effect_registry = EnhancementEffectRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.enhancement_effect_bindings,
+            (
+                *generic_rule_lifecycle_hooks.enhancement_effect_bindings(
+                    activation=activation,
+                    execution_records=records,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.enhancement_effect_bindings,
+                ),
+                *generic_enhancement_effect_bindings(
+                    activation=activation,
+                    execution_records=records,
+                ),
             )
-            + generic_enhancement_effect_bindings(activation=activation, execution_records=records)
         )
         fight_activation_ability_hook_registry = FightActivationAbilityHookRegistry.from_bindings(
             (
@@ -1629,11 +1652,17 @@ class RuntimeContentBundle:
                 validated_contributions,
                 lambda contribution: contribution.movement_budget_modifier_bindings,
             ),
-            objective_control_modifier_bindings=_contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.objective_control_modifier_bindings,
-            )
-            + damaged_runtime.objective_control_bindings(),
+            objective_control_modifier_bindings=(
+                generic_rule_lifecycle_hooks.objective_control_modifier_bindings(
+                    activation=activation,
+                    execution_records=records,
+                )
+                + _contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.objective_control_modifier_bindings,
+                )
+                + damaged_runtime.objective_control_bindings()
+            ),
             charge_roll_modifier_bindings=_contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.charge_roll_modifier_bindings,

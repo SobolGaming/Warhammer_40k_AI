@@ -276,7 +276,7 @@ def test_phase17f_exact_enhancement_and_stratagem_execution_records_are_one_to_o
     assert all(record.rule_category is not None for record in exact_records)
 
 
-def test_phase17f_fade_to_darkness_execution_record_is_named_handler() -> None:
+def test_phase17f_fade_to_darkness_execution_record_is_generic_rule_ir() -> None:
     record = next(
         record
         for record in faction_execution_source.phase17f_execution_package().execution_records
@@ -287,14 +287,20 @@ def test_phase17f_fade_to_darkness_execution_record_is_named_handler() -> None:
     )
 
     assert record.rule_name == "Fade to Darkness"
+    assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
     assert record.runtime_support_status == "engine_consumed"
     assert record.runtime_consumer_ids == FADE_TO_DARKNESS_RUNTIME_CONSUMERS
-    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
-    assert record.handler_id == FADE_TO_DARKNESS_RUNTIME_CONSUMERS[0]
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.handler_id is None
+    assert record.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+            record.coverage_descriptor_id
+        )
+    )
     assert record.block_reason is None
 
 
-def test_phase17f_leaping_shadows_execution_record_is_named_handler() -> None:
+def test_phase17f_leaping_shadows_execution_record_is_generic_rule_ir() -> None:
     record = next(
         record
         for record in faction_execution_source.phase17f_execution_package().execution_records
@@ -305,14 +311,20 @@ def test_phase17f_leaping_shadows_execution_record_is_named_handler() -> None:
     )
 
     assert record.rule_name == "Leaping Shadows"
+    assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
     assert record.runtime_support_status == "engine_consumed"
     assert record.runtime_consumer_ids == LEAPING_SHADOWS_RUNTIME_CONSUMERS
-    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
-    assert record.handler_id == LEAPING_SHADOWS_RUNTIME_CONSUMERS[0]
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.handler_id is None
+    assert record.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+            record.coverage_descriptor_id
+        )
+    )
     assert record.block_reason is None
 
 
-def test_phase17f_mantle_of_gloom_execution_record_is_named_handler() -> None:
+def test_phase17f_mantle_of_gloom_execution_record_is_generic_rule_ir() -> None:
     record = next(
         record
         for record in faction_execution_source.phase17f_execution_package().execution_records
@@ -323,14 +335,20 @@ def test_phase17f_mantle_of_gloom_execution_record_is_named_handler() -> None:
     )
 
     assert record.rule_name == "Mantle of Gloom (Aura)"
+    assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
     assert record.runtime_support_status == "engine_consumed"
     assert record.runtime_consumer_ids == MANTLE_OF_GLOOM_RUNTIME_CONSUMERS
-    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
-    assert record.handler_id == MANTLE_OF_GLOOM_RUNTIME_CONSUMERS[0]
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.handler_id is None
+    assert record.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+            record.coverage_descriptor_id
+        )
+    )
     assert record.block_reason is None
 
 
-def test_phase17f_malice_made_manifest_execution_record_is_named_handler() -> None:
+def test_phase17f_malice_made_manifest_execution_record_is_generic_rule_ir() -> None:
     record = next(
         record
         for record in faction_execution_source.phase17f_execution_package().execution_records
@@ -341,10 +359,16 @@ def test_phase17f_malice_made_manifest_execution_record_is_named_handler() -> No
     )
 
     assert record.rule_name == "Malice Made Manifest"
+    assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
     assert record.runtime_support_status == "engine_consumed"
     assert record.runtime_consumer_ids == MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS
-    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
-    assert record.handler_id == MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS[0]
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.handler_id is None
+    assert record.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+            record.coverage_descriptor_id
+        )
+    )
     assert record.block_reason is None
 
 
