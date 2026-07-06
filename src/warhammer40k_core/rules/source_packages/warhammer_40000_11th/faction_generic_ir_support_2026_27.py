@@ -19,6 +19,9 @@ from warhammer40k_core.rules.rule_templates import (
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -76,6 +79,8 @@ _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 _SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         CAVALCADE_OF_CHAOS_SOUL_SHATTERING_CHARGE_SOURCE_ROW_ID,
+        path_outcast_ir.ASSASSINS_EYE_SOURCE_ROW_ID,
+        path_outcast_ir.CAMOUFLAGED_SNIPERS_SOURCE_ROW_ID,
         "enhancement:emperors-children:court-of-the-phoenician:000010654002",
         "enhancement:emperors-children:court-of-the-phoenician:000010654004",
         "enhancement:emperors-children:spectacle-of-slaughter:000010900002",
@@ -249,6 +254,8 @@ def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> Ru
         payload = blood_legion_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         payload = court_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
+    if payload is None:
+        payload = path_outcast_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         raise Phase17FGenericIrSupportError("Generic IR coverage descriptor is not registered.")
     return RuleIR.from_payload(payload)

@@ -12,6 +12,9 @@ import pytest
 from tools.fetch_official_sources import load_official_source_manifest
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -56,6 +59,12 @@ APPROVED_RUNTIME_ONLY_SOURCE_ROW_IDS = frozenset(
         "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:nomads-of-the-hidden-way",
     )
 )
+ASSASSINS_EYE_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:assassins_eye_upgrade",
+)
+CAMOUFLAGED_SNIPERS_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:camouflaged_snipers_upgrade",
+)
 FADE_TO_DARKNESS_SOURCE_ROW_ID = "enhancement:chaos-daemons:shadow-legion:000009980004"
 FADE_TO_DARKNESS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
@@ -92,6 +101,8 @@ GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        path_outcast_ir.ASSASSINS_EYE_SOURCE_ROW_ID,
+        path_outcast_ir.CAMOUFLAGED_SNIPERS_SOURCE_ROW_ID,
         FADE_TO_DARKNESS_SOURCE_ROW_ID,
         LEAPING_SHADOWS_SOURCE_ROW_ID,
         MALICE_MADE_MANIFEST_SOURCE_ROW_ID,
@@ -144,6 +155,8 @@ GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     }
 )
 GENERIC_ENGINE_CONSUMED_ENHANCEMENT_RUNTIME_CONSUMERS_BY_SOURCE_ROW_ID = {
+    path_outcast_ir.ASSASSINS_EYE_SOURCE_ROW_ID: ASSASSINS_EYE_RUNTIME_CONSUMERS,
+    path_outcast_ir.CAMOUFLAGED_SNIPERS_SOURCE_ROW_ID: CAMOUFLAGED_SNIPERS_RUNTIME_CONSUMERS,
     FADE_TO_DARKNESS_SOURCE_ROW_ID: FADE_TO_DARKNESS_RUNTIME_CONSUMERS,
     LEAPING_SHADOWS_SOURCE_ROW_ID: LEAPING_SHADOWS_RUNTIME_CONSUMERS,
     MALICE_MADE_MANIFEST_SOURCE_ROW_ID: MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS,

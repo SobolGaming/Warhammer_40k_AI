@@ -40,8 +40,6 @@ _APPROVED_PRE_WS14_NAMED_HANDLER_EXECUTION_IDS = (
     "phase17f:phase17e:enhancement:aeldari:corsair-coterie:infamy",
     "phase17f:phase17e:enhancement:aeldari:corsair-coterie:voidstone",
     "phase17f:phase17e:enhancement:aeldari:corsair-coterie:webway-pathstone",
-    "phase17f:phase17e:enhancement:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:assassins-eye-upgrade",
-    "phase17f:phase17e:enhancement:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:camouflaged-snipers-upgrade",
     "phase17f:phase17e:genestealer-cults:army-rule",
     "phase17f:phase17e:grey-knights:army-rule",
     "phase17f:phase17e:imperial-knights:army-rule",

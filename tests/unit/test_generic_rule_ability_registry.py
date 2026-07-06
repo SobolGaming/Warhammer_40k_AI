@@ -127,7 +127,11 @@ def test_default_generic_rule_ability_registry_maps_shadow_legion_enhancement_gr
     leaping_source = _shadow_legion_enhancement_source(
         shadow_legion_ir.LEAPING_SHADOWS_ENHANCEMENT_DESCRIPTOR_ID
     )
-    leaping = registry.enhancement_effect_abilities[0]
+    leaping = next(
+        ability
+        for ability in registry.enhancement_effect_abilities
+        if ability.ability_ids() == (shadow_legion_ir.LEAPING_SHADOWS_SCOUTS_ABILITY,)
+    )
     assert leaping.hook_family is GenericRuleAbilityHookFamily.ENHANCEMENT_EFFECT
     assert leaping.ability_ids() == (shadow_legion_ir.LEAPING_SHADOWS_SCOUTS_ABILITY,)
     assert (
