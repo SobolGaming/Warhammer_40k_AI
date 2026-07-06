@@ -8,7 +8,7 @@ Source PDF: [eng_10-06_warhammer40000_faction_pack_chaos_daemons-kisvudjypt-uzk9
 
 | Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 4 | 28 | 43 | 7 |
+| 9 | 4 | 28 | 43 | 6 |
 
 ## Detachment Rule Support
 
@@ -161,7 +161,7 @@ These rows expose the underlying Phase17E source coverage and handler IDs. Use t
 
 | Detachment | Rule | Coverage row | Support status | Handler / block | Source IDs |
 | --- | --- | --- | --- | --- | --- |
-| Blood Legion | Blood Legion detachment rule | `phase17e:chaos-daemons:blood-legion:rule` | `implemented` / `engine_consumed` | `warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall` | `gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:blood-legion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons` |
+| Blood Legion | Blood Legion detachment rule | `phase17e:chaos-daemons:blood-legion:rule` | `generic_supported` / `engine_consumed` |  | `gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:blood-legion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons` |
 | Cavalcade of Chaos | Cavalcade of Chaos detachment rule | `phase17e:chaos-daemons:cavalcade-of-chaos:rule` | `generic_supported` |  | `gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:cavalcade-of-chaos`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons` |
 | Daemonic Incursion | Daemonic Incursion detachment rule | `phase17e:chaos-daemons:daemonic-incursion:rule` | `implemented` / `engine_consumed` | `warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts` | `gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:daemonic-incursion`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons` |
 | Legion of Excess | Legion of Excess detachment rule | `phase17e:chaos-daemons:legion-of-excess:rule` | `named_handler_required` | `phase17e:detachment:legion-of-excess:rule` | `gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:legion-of-excess`, `gw-11e-phase17e-faction-coverage-2026-27:source-pdf:chaos-daemons` |

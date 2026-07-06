@@ -1422,9 +1422,15 @@ class RuntimeContentBundle:
             )
         )
         movement_end_surge_hook_registry = MovementEndSurgeHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.movement_end_surge_hook_bindings,
+            (
+                *generic_rule_lifecycle_hooks.movement_end_surge_hook_bindings(
+                    activation=activation,
+                    execution_records=records,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.movement_end_surge_hook_bindings,
+                ),
             )
         )
         reserve_arrival_distance_hook_registry = ReserveArrivalDistanceHookRegistry.from_bindings(
@@ -1576,6 +1582,10 @@ class RuntimeContentBundle:
                     *catalog_runtime_hooks.phase_end_objective_control_hook_bindings(
                         ability_indexes_by_player_id=ability_indexes_by_player_id,
                         armies=validated_armies,
+                    ),
+                    *generic_rule_lifecycle_hooks.phase_end_objective_control_hook_bindings(
+                        activation=activation,
+                        execution_records=records,
                     ),
                     *_contribution_values(
                         validated_contributions,
