@@ -1,9 +1,13 @@
 # CORE V2 Remediation Plan (2026-07 design review)
 
-This plan remediates the findings of the July 2026 design review. Execute
-workstreams in order unless stated otherwise. Each workstream is intended to be
-one or a few small PRs. Read `AGENTS.md`, `README.md`, `pyproject.toml`, and the
-tests relevant to each workstream before coding.
+**Status: archived — complete.** Archived on 2026-07-06 after WS1-WS15 landed on
+`main`, with WS15 closing in PR #277. This document is retained as the historical
+implementation record for the July 2026 design-review remediation; it is no
+longer an active execution plan.
+
+This archived plan records the findings of the July 2026 design review and the
+workstreams used to remediate them. The original execution guidance is preserved
+below for auditability.
 
 ## Ground rules for the implementing agent
 
@@ -72,6 +76,14 @@ The project owner has approved:
 
 All decision gates from the original plan are now resolved; nothing at the
 bottom of this document requires further owner input.
+
+## Archive closeout
+
+- WS1-WS15 are complete and merged to `main`.
+- The final workstream, WS15, merged on 2026-07-06 in PR #277.
+- Follow-up work for Phase 19 or routine faction-content maintenance should be
+  tracked in new planning documents or issues instead of appending to this
+  archived plan.
 
 ---
 
@@ -682,15 +694,18 @@ Deliverables:
 
 ---
 
-## Decision gates
+## Archived decision gates
 
-All gates are resolved; see pre-approved decisions 5–10. There is nothing
-in this plan that requires stopping to ask the project owner, except the
+All gates were resolved before archive; see pre-approved decisions 5–10. There
+is nothing in this archived plan that requires stopping to ask the project owner,
+except the
 standing AGENTS.md stop-and-ask triggers for situations this plan does not
 already cover (e.g. a refactor that would change replay output, or a new
 invariant conflict discovered during implementation).
 
-## Suggested PR sequence
+## Completed PR sequence
+
+The original sequence is retained as the historical completion map.
 
 1. WS1 (redaction/server) — 1–2 PRs.
 2. WS2 (PlacementError class) — 1–2 PRs.
@@ -706,10 +721,7 @@ invariant conflict discovered during implementation).
    extraction boundaries are stable.
 10. WS14 steps 2–6 (IR template widening) — complete for WS14 acceptance;
     future template-family PRs are normal faction-content maintenance.
-11. WS15 (Phase 19 preparation) — 1–2 PRs (doc amendments + provenance
-    type/schema stubs); independent, do before any Phase 19 implementation.
-12. WS11, WS13 — independent; can interleave anytime.
-13. WS12 — approved; independent of the refactor tracks. Schedule after
-    Track A so the loaders inherit the hardened validation patterns; the
-    tooling-speed payoff argues for doing it before broad content-regeneration
-    work.
+11. WS15 (Phase 19 preparation) — completed before Phase 19 implementation.
+12. WS11, WS13 — completed as independent tracks.
+13. WS12 — completed after the correctness tracks so the loaders inherited the
+    hardened validation patterns.
