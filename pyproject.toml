@@ -181,6 +181,29 @@ source_modules = [
 forbidden_modules = ["warhammer40k_core.profiling"]
 
 [[tool.importlinter.contracts]]
+name = "Runtime packages must not import AI"
+type = "forbidden"
+source_modules = [
+  "warhammer40k_core.core",
+  "warhammer40k_core.geometry",
+  "warhammer40k_core.rules",
+  "warhammer40k_core.engine",
+  "warhammer40k_core.adapters",
+  "warhammer40k_core.profiling",
+  "warhammer40k_core.interfaces",
+]
+forbidden_modules = ["warhammer40k_core.ai"]
+
+[[tool.importlinter.contracts]]
+name = "AI must not import profiling or interfaces"
+type = "forbidden"
+source_modules = ["warhammer40k_core.ai"]
+forbidden_modules = [
+  "warhammer40k_core.profiling",
+  "warhammer40k_core.interfaces",
+]
+
+[[tool.importlinter.contracts]]
 name = "No runtime package imports interfaces"
 type = "forbidden"
 source_modules = [
