@@ -3,7 +3,6 @@ from __future__ import annotations
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.enhancement_effects import (
-    EnhancementEffectBinding,
     EnhancementEffectContext,
     EnhancementPersistingEffectGrant,
 )
@@ -28,11 +27,14 @@ from .rule import (
 CONTRIBUTION_ID = (
     "warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:enhancements:scaffold"
 )
-SOURCE_RULE_ID = "phase17f:phase17e:aeldari:path-of-the-outcast:enhancements"
 CAMOUFLAGED_SNIPERS_EFFECT_ID = (
     "warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:camouflaged_snipers_upgrade"
 )
 CAMOUFLAGED_SNIPERS_ENHANCEMENT_ID = "aeldari:path-of-the-outcast:camouflaged-snipers-upgrade"
+CAMOUFLAGED_SNIPERS_SOURCE_RULE_ID = (
+    "phase17f:phase17e:enhancement:aeldari:path-of-the-outcast:"
+    "aeldari:path-of-the-outcast:camouflaged-snipers-upgrade"
+)
 CAMOUFLAGED_SNIPERS_SOURCE_ID = (
     "gw-11e-faction-detachments-2026-27:enhancement:"
     "aeldari:path-of-the-outcast:camouflaged-snipers-upgrade"
@@ -41,6 +43,10 @@ ASSASSINS_EYE_EFFECT_ID = (
     "warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:assassins_eye_upgrade"
 )
 ASSASSINS_EYE_ENHANCEMENT_ID = "aeldari:path-of-the-outcast:assassins-eye-upgrade"
+ASSASSINS_EYE_SOURCE_RULE_ID = (
+    "phase17f:phase17e:enhancement:aeldari:path-of-the-outcast:"
+    "aeldari:path-of-the-outcast:assassins-eye-upgrade"
+)
 ASSASSINS_EYE_SOURCE_ID = (
     "gw-11e-faction-detachments-2026-27:enhancement:"
     "aeldari:path-of-the-outcast:assassins-eye-upgrade"
@@ -48,23 +54,7 @@ ASSASSINS_EYE_SOURCE_ID = (
 
 
 def runtime_contribution() -> RuntimeContentContribution:
-    return RuntimeContentContribution(
-        contribution_id=CONTRIBUTION_ID,
-        enhancement_effect_bindings=(
-            EnhancementEffectBinding(
-                effect_id=CAMOUFLAGED_SNIPERS_EFFECT_ID,
-                source_id=SOURCE_RULE_ID,
-                enhancement_id=CAMOUFLAGED_SNIPERS_ENHANCEMENT_ID,
-                handler=camouflaged_snipers_effect,
-            ),
-            EnhancementEffectBinding(
-                effect_id=ASSASSINS_EYE_EFFECT_ID,
-                source_id=SOURCE_RULE_ID,
-                enhancement_id=ASSASSINS_EYE_ENHANCEMENT_ID,
-                handler=assassins_eye_effect,
-            ),
-        ),
-    )
+    return RuntimeContentContribution(contribution_id=CONTRIBUTION_ID)
 
 
 def camouflaged_snipers_effect(
@@ -80,7 +70,7 @@ def camouflaged_snipers_effect(
         raise GameLifecycleError("Camouflaged Snipers requires a RANGERS unit.")
     effect = PersistingEffect(
         effect_id=f"{CAMOUFLAGED_SNIPERS_EFFECT_ID}:{unit.unit_instance_id}",
-        source_rule_id=SOURCE_RULE_ID,
+        source_rule_id=CAMOUFLAGED_SNIPERS_SOURCE_RULE_ID,
         owner_player_id=context.army.player_id,
         target_unit_instance_ids=(unit.unit_instance_id,),
         started_battle_round=context.state.battle_round,
@@ -94,7 +84,7 @@ def camouflaged_snipers_effect(
     return (
         EnhancementPersistingEffectGrant(
             effect_id=CAMOUFLAGED_SNIPERS_EFFECT_ID,
-            source_id=SOURCE_RULE_ID,
+            source_id=CAMOUFLAGED_SNIPERS_SOURCE_RULE_ID,
             enhancement_id=CAMOUFLAGED_SNIPERS_ENHANCEMENT_ID,
             target_unit_instance_id=unit.unit_instance_id,
             persisting_effect=effect,
@@ -121,7 +111,7 @@ def assassins_eye_effect(
         raise GameLifecycleError("Assassins' Eye requires RANGERS or SHROUD RUNNERS.")
     effect = PersistingEffect(
         effect_id=f"{ASSASSINS_EYE_EFFECT_ID}:{unit.unit_instance_id}",
-        source_rule_id=SOURCE_RULE_ID,
+        source_rule_id=ASSASSINS_EYE_SOURCE_RULE_ID,
         owner_player_id=context.army.player_id,
         target_unit_instance_ids=(unit.unit_instance_id,),
         started_battle_round=context.state.battle_round,
@@ -136,7 +126,7 @@ def assassins_eye_effect(
     return (
         EnhancementPersistingEffectGrant(
             effect_id=ASSASSINS_EYE_EFFECT_ID,
-            source_id=SOURCE_RULE_ID,
+            source_id=ASSASSINS_EYE_SOURCE_RULE_ID,
             enhancement_id=ASSASSINS_EYE_ENHANCEMENT_ID,
             target_unit_instance_id=unit.unit_instance_id,
             persisting_effect=effect,

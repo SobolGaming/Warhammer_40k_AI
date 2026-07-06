@@ -63,6 +63,9 @@ from warhammer40k_core.engine.generic_rule_ability_registry import (
     generic_rule_shooting_target_restriction_target_unit_id,
     generic_rule_shooting_unit_selected_unit_id,
 )
+from warhammer40k_core.engine.generic_rule_ability_registry_aeldari_defaults import (
+    aeldari_path_of_the_outcast_enhancement_effect_abilities,
+)
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
 )
@@ -1385,6 +1388,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
         ),
     ),
     enhancement_effect_abilities=(
+        *aeldari_path_of_the_outcast_enhancement_effect_abilities(),
         GenericRuleEnhancementEffectAbility(
             ability_id=shadow_legion_ir.LEAPING_SHADOWS_SCOUTS_ABILITY,
             coverage_descriptor_id=shadow_legion_ir.LEAPING_SHADOWS_ENHANCEMENT_DESCRIPTOR_ID,

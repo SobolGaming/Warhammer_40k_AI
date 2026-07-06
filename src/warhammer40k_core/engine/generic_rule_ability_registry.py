@@ -1210,14 +1210,19 @@ def _required_keywords_apply(
         singular_key="required_faction_keyword",
         sequence_key="required_faction_keyword_sequence",
     )
-    if not required_keywords and not required_faction_keywords:
+    required_keyword_any = _required_keyword_any_values(parameters=parameters)
+    if not required_keywords and not required_faction_keywords and required_keyword_any is None:
         return True
-    return all(
-        _rules_unit_has_keyword(rules_unit, keyword) for keyword in required_keywords
-    ) and all(
+    if not all(_rules_unit_has_keyword(rules_unit, keyword) for keyword in required_keywords):
+        return False
+    if not all(
         _rules_unit_has_faction_keyword(rules_unit, keyword)
         for keyword in required_faction_keywords
-    )
+    ):
+        return False
+    if required_keyword_any is not None:
+        return any(_rules_unit_has_keyword(rules_unit, keyword) for keyword in required_keyword_any)
+    return True
 
 
 def _required_keyword_values(
@@ -1242,6 +1247,22 @@ def _required_keyword_values(
                     f"Generic RuleIR ability {sequence_key} must contain strings."
                 )
             required_keywords.append(item)
+    return tuple(required_keywords)
+
+
+def _required_keyword_any_values(*, parameters: Mapping[str, JsonValue]) -> tuple[str, ...] | None:
+    required_keyword_any = parameters.get("required_keyword_any")
+    if required_keyword_any is None:
+        return None
+    if not isinstance(required_keyword_any, list):
+        raise GameLifecycleError("Generic RuleIR ability required_keyword_any must be a list.")
+    if not required_keyword_any:
+        raise GameLifecycleError("Generic RuleIR ability required_keyword_any must not be empty.")
+    required_keywords: list[str] = []
+    for item in required_keyword_any:
+        if type(item) is not str:
+            raise GameLifecycleError("Generic RuleIR ability required_keyword_any item is invalid.")
+        required_keywords.append(item)
     return tuple(required_keywords)
 
 

@@ -184,7 +184,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Faction | Detachments | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows | File |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | Orks | 12 | 1 | 44 | 66 | 1 | [orks](factions/orks.md) |
-| Aeldari | 15 | 2 | 51 | 75 | 16 | [aeldari](factions/aeldari.md) |
+| Aeldari | 15 | 2 | 51 | 75 | 14 | [aeldari](factions/aeldari.md) |
 | Drukhari | 9 | 0 | 24 | 36 | 1 | [drukhari](factions/drukhari.md) |
 | Tyranids | 10 | 0 | 32 | 48 | 1 | [tyranids](factions/tyranids.md) |
 | Genestealer Cults | 9 | 0 | 20 | 30 | 1 | [genestealer-cults](factions/genestealer-cults.md) |
@@ -363,8 +363,6 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone` | Webway Pathstone |
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone:deep_strike` | Webway Pathstone |
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone:turn_end_reserves` | Webway Pathstone |
-| `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:assassins_eye_upgrade` | Assassins' Eye |
-| `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:camouflaged_snipers_upgrade` | Camouflaged Snipers |
 | `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:casting_back_the_veil` | Casting Back the Veil |
 | `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:eldritch_suppression` | Eldritch Suppression |
 | `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:nomads_of_the_hidden_way` | Nomads of the Hidden Way |

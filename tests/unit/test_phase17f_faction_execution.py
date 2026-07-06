@@ -22,6 +22,9 @@ from warhammer40k_core.engine.faction_rule_execution import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_execution import RuleExecutionResult
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27 as faction_coverage_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -48,6 +51,12 @@ FADE_TO_DARKNESS_RUNTIME_CONSUMERS = (
     "enhancement:fade_to_darkness:turn-end-reserves",
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
     "enhancement:fade_to_darkness:unit-destroyed",
+)
+ASSASSINS_EYE_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:assassins_eye_upgrade",
+)
+CAMOUFLAGED_SNIPERS_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:camouflaged_snipers_upgrade",
 )
 GENERIC_SOURCE_UNIT_CONTEXT_EXECUTION_ID = (
     "phase17f:phase17e:enhancement:orks:more-dakka:000009991003"
@@ -362,6 +371,50 @@ def test_phase17f_malice_made_manifest_execution_record_is_generic_rule_ir() -> 
     assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
     assert record.runtime_support_status == "engine_consumed"
     assert record.runtime_consumer_ids == MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.handler_id is None
+    assert record.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+            record.coverage_descriptor_id
+        )
+    )
+    assert record.block_reason is None
+
+
+@pytest.mark.parametrize(
+    ("source_row_id", "rule_id", "rule_name", "runtime_consumers"),
+    [
+        (
+            path_outcast_ir.ASSASSINS_EYE_SOURCE_ROW_ID,
+            path_outcast_ir.ASSASSINS_EYE_ENHANCEMENT_ID,
+            "Assassins Eye Upgrade",
+            ASSASSINS_EYE_RUNTIME_CONSUMERS,
+        ),
+        (
+            path_outcast_ir.CAMOUFLAGED_SNIPERS_SOURCE_ROW_ID,
+            path_outcast_ir.CAMOUFLAGED_SNIPERS_ENHANCEMENT_ID,
+            "Camouflaged Snipers Upgrade",
+            CAMOUFLAGED_SNIPERS_RUNTIME_CONSUMERS,
+        ),
+    ],
+)
+def test_phase17f_aeldari_path_of_the_outcast_upgrade_records_are_generic_rule_ir(
+    source_row_id: str,
+    rule_id: str,
+    rule_name: str,
+    runtime_consumers: tuple[str, ...],
+) -> None:
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_descriptor_id == f"phase17e:{source_row_id}"
+    )
+
+    assert record.rule_name == rule_name
+    assert record.rule_id == rule_id
+    assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+    assert record.runtime_support_status == "engine_consumed"
+    assert record.runtime_consumer_ids == runtime_consumers
     assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
     assert record.handler_id is None
     assert record.rule_ir_hash == (

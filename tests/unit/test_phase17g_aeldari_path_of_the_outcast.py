@@ -36,6 +36,11 @@ from warhammer40k_core.engine.enhancement_effects import (
     EnhancementPersistingEffectGrant,
     apply_enhancement_effects,
 )
+from warhammer40k_core.engine.faction_content.activation import (
+    RuntimeContentActivation,
+    RuntimeEnhancementAssignment,
+)
+from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.stratagem_handlers import (
     StratagemHandlerContext,
     StratagemHandlerExecutionStatus,
@@ -110,12 +115,48 @@ def test_path_of_the_outcast_runtime_contribution_registers_content() -> None:
         stratagems.CASTING_BACK_THE_VEIL_HANDLER_ID,
         stratagems.NOMADS_OF_THE_HIDDEN_WAY_HANDLER_ID,
     }
-    assert {binding.enhancement_id for binding in contribution.enhancement_effect_bindings} == {
-        enhancements.CAMOUFLAGED_SNIPERS_ENHANCEMENT_ID,
-        enhancements.ASSASSINS_EYE_ENHANCEMENT_ID,
-    }
+    assert contribution.enhancement_effect_bindings == ()
     assert {binding.hook_id for binding in contribution.shooting_unit_selected_hook_bindings} == {
         rule.FAR_REACHING_DOOM_HOOK_ID,
+    }
+
+
+def test_path_of_the_outcast_generic_runtime_bundle_materializes_upgrade_hooks() -> None:
+    state, _army, _rangers, _shroud_runners, _enemy = _path_state(
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id=enhancements.CAMOUFLAGED_SNIPERS_ENHANCEMENT_ID,
+                target_unit_selection_id="rangers",
+                source_id="assignment:camouflaged-snipers",
+            ),
+            EnhancementAssignment(
+                enhancement_id=enhancements.ASSASSINS_EYE_ENHANCEMENT_ID,
+                target_unit_selection_id="shroud-runners",
+                source_id="assignment:assassins-eye",
+            ),
+        )
+    )
+    bindings = _path_runtime_bundle(state).enhancement_effect_registry.all_bindings()
+
+    assert {
+        (binding.effect_id, binding.source_id, binding.enhancement_id)
+        for binding in bindings
+        if binding.enhancement_id
+        in {
+            enhancements.CAMOUFLAGED_SNIPERS_ENHANCEMENT_ID,
+            enhancements.ASSASSINS_EYE_ENHANCEMENT_ID,
+        }
+    } == {
+        (
+            enhancements.CAMOUFLAGED_SNIPERS_EFFECT_ID,
+            enhancements.CAMOUFLAGED_SNIPERS_SOURCE_RULE_ID,
+            enhancements.CAMOUFLAGED_SNIPERS_ENHANCEMENT_ID,
+        ),
+        (
+            enhancements.ASSASSINS_EYE_EFFECT_ID,
+            enhancements.ASSASSINS_EYE_SOURCE_RULE_ID,
+            enhancements.ASSASSINS_EYE_ENHANCEMENT_ID,
+        ),
     }
 
 
@@ -378,7 +419,7 @@ def test_character_target_ap_bonus_only_modifies_character_targets() -> None:
     profile = _test_weapon_profile(ap=0)
     effect = PersistingEffect(
         effect_id="assassins-eye:unit-a",
-        source_rule_id=enhancements.SOURCE_RULE_ID,
+        source_rule_id=enhancements.ASSASSINS_EYE_SOURCE_RULE_ID,
         owner_player_id="player-a",
         target_unit_instance_ids=("unit-a",),
         started_battle_round=1,
@@ -404,7 +445,7 @@ def test_character_target_ap_bonus_only_modifies_character_targets() -> None:
     )
 
     assert modified.armor_penetration.final == -1
-    assert enhancements.SOURCE_RULE_ID in modified.source_ids
+    assert enhancements.ASSASSINS_EYE_SOURCE_RULE_ID in modified.source_ids
     assert unmodified == profile
 
 
@@ -739,9 +780,7 @@ def test_apply_enhancement_effects_records_persisting_grant_once() -> None:
     state, _army, _rangers, _shroud_runners, _enemy = _path_state(
         enhancement_assignments=(assignment,)
     )
-    registry = EnhancementEffectRegistry.from_bindings(
-        manifest.runtime_contribution().enhancement_effect_bindings
-    )
+    registry = _path_runtime_bundle(state).enhancement_effect_registry
     decisions = DecisionController()
 
     apply_enhancement_effects(state=state, registry=registry, decisions=decisions)
@@ -1269,6 +1308,63 @@ def _path_state(
         ),
     )
     return state, army, rangers, shroud_runners, enemy
+
+
+def _path_runtime_bundle(state: GameState) -> RuntimeContentBundle:
+    armies = tuple(state.army_definitions)
+    return RuntimeContentBundle.from_contributions(
+        activation=_path_runtime_activation(armies),
+        armies=armies,
+        catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+        contributions=(manifest.runtime_contribution(),),
+    )
+
+
+def _path_runtime_activation(armies: tuple[ArmyDefinition, ...]) -> RuntimeContentActivation:
+    army = next(army for army in armies if army.player_id == "player-a")
+    return RuntimeContentActivation(
+        selected_faction_ids=("aeldari", "opfor"),
+        selected_detachment_ids=("path-of-the-outcast", "target-practice"),
+        selected_enhancement_ids=tuple(
+            sorted(assignment.enhancement_id for assignment in army.enhancement_assignments)
+        ),
+        selected_stratagem_ids=(),
+        selected_datasheet_ids=tuple(
+            sorted(unit.datasheet_id for active_army in armies for unit in active_army.units)
+        ),
+        selected_wargear_ids=(),
+        selected_weapon_profile_ids=(),
+        selected_weapon_keywords=(),
+        loaded_unit_instance_ids=tuple(
+            sorted(unit.unit_instance_id for active_army in armies for unit in active_army.units)
+        ),
+        selected_enhancement_assignments=tuple(
+            _runtime_assignment(army=army, assignment=assignment)
+            for assignment in army.enhancement_assignments
+        ),
+        selected_execution_record_ids=(
+            enhancements.ASSASSINS_EYE_SOURCE_RULE_ID,
+            enhancements.CAMOUFLAGED_SNIPERS_SOURCE_RULE_ID,
+        ),
+    )
+
+
+def _runtime_assignment(
+    *,
+    army: ArmyDefinition,
+    assignment: EnhancementAssignment,
+) -> RuntimeEnhancementAssignment:
+    return RuntimeEnhancementAssignment(
+        assignment_id=(
+            f"{army.army_id}:{assignment.enhancement_id}:{assignment.target_unit_selection_id}"
+        ),
+        player_id=army.player_id,
+        army_id=army.army_id,
+        enhancement_id=assignment.enhancement_id,
+        target_unit_selection_id=assignment.target_unit_selection_id,
+        bearer_unit_instance_id=f"{army.army_id}:{assignment.target_unit_selection_id}",
+        source_id=assignment.source_id,
+    )
 
 
 def _army(
