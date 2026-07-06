@@ -49,10 +49,11 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_2026_06 as event_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    event_companion_layouts_2026_06 as event_layouts,
+    event_companion_base_size_rows,
+    event_companion_patches,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    event_companion_patches,
+    event_companion_layouts_2026_06 as event_layouts,
 )
 
 
@@ -1984,6 +1985,15 @@ def test_phase17j_base_size_source_rows_fail_closed_for_noncanonical_shapes() ->
     rows = event_source.base_size_source_rows()
     rows_by_kind = {row.base_source_kind: row for row in rows}
 
+    assert len(event_companion_base_size_rows.BASE_SIZE_SOURCE_ROWS) == len(rows)
+    assert event_companion_base_size_rows.BASE_SIZE_SOURCE_ROWS[0] == (
+        "page-55-adepta-sororitas-aestred-thurga-and-agathae-dolan-aestred-thurga",
+        55,
+        "Adepta Sororitas",
+        None,
+        "Aestred Thurga and Agathae Dolan: Aestred Thurga",
+        "32mm",
+    )
     assert len(rows) == 1083
     assert {row.source_page for row in rows} == set(range(55, 94))
     assert len({row.record_id for row in rows}) == len(rows)

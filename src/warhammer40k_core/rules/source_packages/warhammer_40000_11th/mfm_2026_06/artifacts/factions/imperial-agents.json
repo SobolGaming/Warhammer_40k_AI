@@ -1,0 +1,2765 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "imperialis-fleet",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "clandestine-operation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Clandestine Operation",
+          "points": 15,
+          "raw_name": "Clandestine Operation",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:imperialis-fleet:enhancement:clandestine-operation"
+        },
+        {
+          "enhancement_id": "combat-landers",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Combat Landers",
+          "points": 10,
+          "raw_name": "Combat Landers",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:imperialis-fleet:enhancement:combat-landers"
+        },
+        {
+          "enhancement_id": "digital-weapons",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Digital Weapons",
+          "points": 10,
+          "raw_name": "Digital Weapons",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:imperialis-fleet:enhancement:digital-weapons"
+        },
+        {
+          "enhancement_id": "fleetmaster",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Fleetmaster",
+          "points": 20,
+          "raw_name": "Fleetmaster",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:imperialis-fleet:enhancement:fleetmaster"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "IMPERIALIS FLEET",
+      "raw_name": "IMPERIALIS FLEET",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:imperialis-fleet"
+    },
+    {
+      "detachment_id": "ordo-hereticus-purgation-force",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "ignis-judicium",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Ignis Judicium",
+          "points": 10,
+          "raw_name": "Ignis Judicium",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-hereticus-purgation-force:enhancement:ignis-judicium"
+        },
+        {
+          "enhancement_id": "liber-heresius",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Liber Heresius",
+          "points": 10,
+          "raw_name": "Liber Heresius",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-hereticus-purgation-force:enhancement:liber-heresius"
+        },
+        {
+          "enhancement_id": "no-escape",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "No Escape",
+          "points": 25,
+          "raw_name": "No Escape",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-hereticus-purgation-force:enhancement:no-escape"
+        },
+        {
+          "enhancement_id": "witch-hunter",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Witch Hunter",
+          "points": 15,
+          "raw_name": "Witch Hunter",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-hereticus-purgation-force:enhancement:witch-hunter"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "ORDO HERETICUS, PURGATION FORCE",
+      "raw_name": "ORDO HERETICUS, PURGATION FORCE",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-hereticus-purgation-force"
+    },
+    {
+      "detachment_id": "ordo-malleus-daemon-hunters",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "daemon-slayer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Daemon Slayer",
+          "points": 10,
+          "raw_name": "Daemon Slayer",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-malleus-daemon-hunters:enhancement:daemon-slayer"
+        },
+        {
+          "enhancement_id": "formidable-resolve",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Formidable Resolve",
+          "points": 5,
+          "raw_name": "Formidable Resolve",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-malleus-daemon-hunters:enhancement:formidable-resolve"
+        },
+        {
+          "enhancement_id": "gift-of-the-prescient",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Gift of the Prescient",
+          "points": 20,
+          "raw_name": "Gift of the Prescient",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-malleus-daemon-hunters:enhancement:gift-of-the-prescient"
+        },
+        {
+          "enhancement_id": "grimoire-of-true-names",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Grimoire of True Names",
+          "points": 10,
+          "raw_name": "Grimoire of True Names",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-malleus-daemon-hunters:enhancement:grimoire-of-true-names"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "ORDO MALLEUS, DAEMON HUNTERS",
+      "raw_name": "ORDO MALLEUS, DAEMON HUNTERS",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-malleus-daemon-hunters"
+    },
+    {
+      "detachment_id": "ordo-xenos-alien-hunters",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "amulet-of-auto-chastisement",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Amulet of Auto-chastisement",
+          "points": 25,
+          "raw_name": "Amulet of Auto-chastisement",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-xenos-alien-hunters:enhancement:amulet-of-auto-chastisement"
+        },
+        {
+          "enhancement_id": "beacon-angelis",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Beacon Angelis",
+          "points": 30,
+          "raw_name": "Beacon Angelis",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-xenos-alien-hunters:enhancement:beacon-angelis"
+        },
+        {
+          "enhancement_id": "blackweave-shroud",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Blackweave Shroud",
+          "points": 15,
+          "raw_name": "Blackweave Shroud",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-xenos-alien-hunters:enhancement:blackweave-shroud"
+        },
+        {
+          "enhancement_id": "universal-anathema",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Universal Anathema",
+          "points": 10,
+          "raw_name": "Universal Anathema",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-xenos-alien-hunters:enhancement:universal-anathema"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "ORDO XENOS, ALIEN HUNTERS",
+      "raw_name": "ORDO XENOS, ALIEN HUNTERS",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:ordo-xenos-alien-hunters"
+    },
+    {
+      "detachment_id": "veiled-blade-elimination-force",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "decoy-targets",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Decoy Targets",
+          "points": 40,
+          "raw_name": "Decoy Targets",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:veiled-blade-elimination-force:enhancement:decoy-targets"
+        },
+        {
+          "enhancement_id": "esoteric-explosives",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Esoteric Explosives",
+          "points": 40,
+          "raw_name": "Esoteric Explosives",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:veiled-blade-elimination-force:enhancement:esoteric-explosives"
+        },
+        {
+          "enhancement_id": "introneural-biotech",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Introneural Biotech",
+          "points": 35,
+          "raw_name": "Introneural Biotech",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:veiled-blade-elimination-force:enhancement:introneural-biotech"
+        },
+        {
+          "enhancement_id": "micromelta-rounds",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Micromelta Rounds",
+          "points": 45,
+          "raw_name": "Micromelta Rounds",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:veiled-blade-elimination-force:enhancement:micromelta-rounds"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "VEILED BLADE ELIMINATION FORCE",
+      "raw_name": "VEILED BLADE ELIMINATION FORCE",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:detachment:veiled-blade-elimination-force"
+    }
+  ],
+  "faction_id": "imperial-agents",
+  "name": "Imperial Agents",
+  "raw_name": "Imperial Agents",
+  "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-aquila-kill-team:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-aquila-kill-team:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-aquila-kill-team:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "AQUILA KILL TEAM",
+      "raw_name": "AQUILA KILL TEAM",
+      "record_id": "every-model-has-the-imperium-keyword-aquila-kill-team",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-aquila-kill-team",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "aquila-kill-team",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-callidus-assassin:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-callidus-assassin:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CALLIDUS ASSASSIN",
+      "raw_name": "CALLIDUS ASSASSIN",
+      "record_id": "every-model-has-the-imperium-keyword-callidus-assassin",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-callidus-assassin",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "callidus-assassin",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-corvus-blackstar:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-corvus-blackstar:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CORVUS BLACKSTAR",
+      "raw_name": "CORVUS BLACKSTAR",
+      "record_id": "every-model-has-the-imperium-keyword-corvus-blackstar",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-corvus-blackstar",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "corvus-blackstar",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-culexus-assassin:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-culexus-assassin:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CULEXUS ASSASSIN",
+      "raw_name": "CULEXUS ASSASSIN",
+      "record_id": "every-model-has-the-imperium-keyword-culexus-assassin",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-culexus-assassin",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "culexus-assassin",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-deathwatch-kill-team:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-deathwatch-kill-team:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-deathwatch-kill-team:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEATHWATCH KILL TEAM",
+      "raw_name": "DEATHWATCH KILL TEAM",
+      "record_id": "every-model-has-the-imperium-keyword-deathwatch-kill-team",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-deathwatch-kill-team",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "deathwatch-kill-team",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-eversor-assassin:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-eversor-assassin:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "EVERSOR ASSASSIN",
+      "raw_name": "EVERSOR ASSASSIN",
+      "record_id": "every-model-has-the-imperium-keyword-eversor-assassin",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-eversor-assassin",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "eversor-assassin",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "11 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 11,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "11 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-exaction-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-exaction-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "EXACTION SQUAD",
+      "raw_name": "EXACTION SQUAD",
+      "record_id": "every-model-has-the-imperium-keyword-exaction-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-exaction-squad",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "exaction-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 210,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-grey-knights-terminator-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-grey-knights-terminator-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GREY KNIGHTS TERMINATOR SQUAD",
+      "raw_name": "GREY KNIGHTS TERMINATOR SQUAD",
+      "record_id": "every-model-has-the-imperium-keyword-grey-knights-terminator-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-grey-knights-terminator-squad",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "grey-knights-terminator-squad",
+      "wargear_costs": [
+        {
+          "name": "Psycannon",
+          "points_per_item": 5,
+          "raw_name": "per Psycannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-grey-knights-terminator-squad:wargear:per-psycannon:1",
+          "wargear_id": "psycannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-imperial-navy-breachers:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-imperial-navy-breachers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "IMPERIAL NAVY BREACHERS",
+      "raw_name": "IMPERIAL NAVY BREACHERS",
+      "record_id": "every-model-has-the-imperium-keyword-imperial-navy-breachers",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-imperial-navy-breachers",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "imperial-navy-breachers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-imperial-rhino:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-imperial-rhino:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "IMPERIAL RHINO",
+      "raw_name": "IMPERIAL RHINO",
+      "record_id": "every-model-has-the-imperium-keyword-imperial-rhino",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-imperial-rhino",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "imperial-rhino",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "AQUILA KILL TEAM",
+          "BATTLELINE IMPERIUM INFANTRY",
+          "EXACTION SQUAD",
+          "GREY KNIGHTS TERMINATOR SQUAD",
+          "IMPERIAL NAVY BREACHERS",
+          "INQUISITORIAL AGENTS",
+          "SANCTIFIERS",
+          "SISTERS OF BATTLE SQUAD",
+          "SUBDUCTOR SQUAD",
+          "VIGILANT SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "aquila-kill-team",
+          "battleline-imperium-infantry",
+          "exaction-squad",
+          "grey-knights-terminator-squad",
+          "imperial-navy-breachers",
+          "inquisitorial-agents",
+          "sanctifiers",
+          "sisters-of-battle-squad",
+          "subductor-squad",
+          "vigilant-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor:leader"
+      },
+      "name": "INQUISITOR",
+      "raw_name": "INQUISITOR",
+      "record_id": "every-model-has-the-imperium-keyword-inquisitor",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "inquisitor",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-coteaz:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-coteaz:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BATTLELINE IMPERIUM INFANTRY",
+          "EXACTION SQUAD",
+          "GREY KNIGHTS TERMINATOR SQUAD",
+          "IMPERIAL NAVY BREACHERS",
+          "INQUISITORIAL AGENTS",
+          "SUBDUCTOR SQUAD",
+          "VIGILANT SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "battleline-imperium-infantry",
+          "exaction-squad",
+          "grey-knights-terminator-squad",
+          "imperial-navy-breachers",
+          "inquisitorial-agents",
+          "subductor-squad",
+          "vigilant-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-coteaz:leader"
+      },
+      "name": "INQUISITOR COTEAZ",
+      "raw_name": "INQUISITOR COTEAZ",
+      "record_id": "every-model-has-the-imperium-keyword-inquisitor-coteaz",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-coteaz",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "inquisitor-coteaz",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-draxus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-draxus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "AQUILA KILL TEAM",
+          "BATTLELINE IMPERIUM INFANTRY",
+          "EXACTION SQUAD",
+          "IMPERIAL NAVY BREACHERS",
+          "INQUISITORIAL AGENTS",
+          "SUBDUCTOR SQUAD",
+          "VIGILANT SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "aquila-kill-team",
+          "battleline-imperium-infantry",
+          "exaction-squad",
+          "imperial-navy-breachers",
+          "inquisitorial-agents",
+          "subductor-squad",
+          "vigilant-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-draxus:leader"
+      },
+      "name": "INQUISITOR DRAXUS",
+      "raw_name": "INQUISITOR DRAXUS",
+      "record_id": "every-model-has-the-imperium-keyword-inquisitor-draxus",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-draxus",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "inquisitor-draxus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-greyfax:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-greyfax:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BATTLELINE IMPERIUM INFANTRY",
+          "EXACTION SQUAD",
+          "IMPERIAL NAVY BREACHERS",
+          "INQUISITORIAL AGENTS",
+          "SANCTIFIERS",
+          "SISTERS OF BATTLE SQUAD",
+          "SUBDUCTOR SQUAD",
+          "VIGILANT SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "battleline-imperium-infantry",
+          "exaction-squad",
+          "imperial-navy-breachers",
+          "inquisitorial-agents",
+          "sanctifiers",
+          "sisters-of-battle-squad",
+          "subductor-squad",
+          "vigilant-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-greyfax:leader"
+      },
+      "name": "INQUISITOR GREYFAX",
+      "raw_name": "INQUISITOR GREYFAX",
+      "record_id": "every-model-has-the-imperium-keyword-inquisitor-greyfax",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-greyfax",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "inquisitor-greyfax",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-kroyle:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-kroyle:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "INQUISITOR KROYLE",
+      "raw_name": "INQUISITOR KROYLE",
+      "record_id": "every-model-has-the-imperium-keyword-inquisitor-kroyle",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitor-kroyle",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "inquisitor-kroyle",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitorial-agents:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "12 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 12,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "12 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitorial-agents:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitorial-agents:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "INQUISITORIAL AGENTS",
+      "raw_name": "INQUISITORIAL AGENTS",
+      "record_id": "every-model-has-the-imperium-keyword-inquisitorial-agents",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitorial-agents",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "inquisitorial-agents",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitorial-chimera:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitorial-chimera:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "INQUISITORIAL CHIMERA",
+      "raw_name": "INQUISITORIAL CHIMERA",
+      "record_id": "every-model-has-the-imperium-keyword-inquisitorial-chimera",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-inquisitorial-chimera",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "inquisitorial-chimera",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 40,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-ministorum-priest:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-ministorum-priest:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MINISTORUM PRIEST",
+      "raw_name": "MINISTORUM PRIEST",
+      "record_id": "every-model-has-the-imperium-keyword-ministorum-priest",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-ministorum-priest",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "ministorum-priest",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-navigator:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-navigator:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "IMPERIAL NAVY BREACHERS",
+          "VOIDSMEN-AT-ARMS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "imperial-navy-breachers",
+          "voidsmen-at-arms"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-navigator:leader"
+      },
+      "name": "NAVIGATOR",
+      "raw_name": "NAVIGATOR",
+      "record_id": "every-model-has-the-imperium-keyword-navigator",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-navigator",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "navigator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-rogue-trader-entourage:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-rogue-trader-entourage:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "IMPERIAL NAVY BREACHERS",
+          "VOIDSMEN-AT-ARMS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "imperial-navy-breachers",
+          "voidsmen-at-arms"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-rogue-trader-entourage:leader"
+      },
+      "name": "ROGUE TRADER ENTOURAGE",
+      "raw_name": "ROGUE TRADER ENTOURAGE",
+      "record_id": "every-model-has-the-imperium-keyword-rogue-trader-entourage",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-rogue-trader-entourage",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "rogue-trader-entourage",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "9 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 9,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "9 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-sanctifiers:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-sanctifiers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SANCTIFIERS",
+      "raw_name": "SANCTIFIERS",
+      "record_id": "every-model-has-the-imperium-keyword-sanctifiers",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-sanctifiers",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "sanctifiers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-sisters-of-battle-immolator:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-sisters-of-battle-immolator:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SISTERS OF BATTLE IMMOLATOR",
+      "raw_name": "SISTERS OF BATTLE IMMOLATOR",
+      "record_id": "every-model-has-the-imperium-keyword-sisters-of-battle-immolator",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-sisters-of-battle-immolator",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "sisters-of-battle-immolator",
+      "wargear_costs": [
+        {
+          "name": "Twin multi-melta",
+          "points_per_item": 15,
+          "raw_name": "per Twin multi-melta",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-sisters-of-battle-immolator:wargear:per-twin-multi-melta:1",
+          "wargear_id": "twin-multi-melta"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-sisters-of-battle-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-sisters-of-battle-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SISTERS OF BATTLE SQUAD",
+      "raw_name": "SISTERS OF BATTLE SQUAD",
+      "record_id": "every-model-has-the-imperium-keyword-sisters-of-battle-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-sisters-of-battle-squad",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "sisters-of-battle-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "11 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 11,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "11 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-subductor-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-subductor-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SUBDUCTOR SQUAD",
+      "raw_name": "SUBDUCTOR SQUAD",
+      "record_id": "every-model-has-the-imperium-keyword-subductor-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-subductor-squad",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "subductor-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "11 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 11,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "11 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-vigilant-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-vigilant-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VIGILANT SQUAD",
+      "raw_name": "VIGILANT SQUAD",
+      "record_id": "every-model-has-the-imperium-keyword-vigilant-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-vigilant-squad",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "vigilant-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-vindicare-assassin:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-vindicare-assassin:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VINDICARE ASSASSIN",
+      "raw_name": "VINDICARE ASSASSIN",
+      "record_id": "every-model-has-the-imperium-keyword-vindicare-assassin",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-vindicare-assassin",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "vindicare-assassin",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-voidsmen-at-arms:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-voidsmen-at-arms:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VOIDSMEN-AT-ARMS",
+      "raw_name": "VOIDSMEN-AT-ARMS",
+      "record_id": "every-model-has-the-imperium-keyword-voidsmen-at-arms",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-voidsmen-at-arms",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "voidsmen-at-arms",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-watch-captain-artemis:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-watch-captain-artemis:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "AQUILA KILL TEAM",
+          "DEATHWATCH KILL TEAM"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "aquila-kill-team",
+          "deathwatch-kill-team"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-watch-captain-artemis:leader"
+      },
+      "name": "WATCH CAPTAIN ARTEMIS",
+      "raw_name": "WATCH CAPTAIN ARTEMIS",
+      "record_id": "every-model-has-the-imperium-keyword-watch-captain-artemis",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-watch-captain-artemis",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "watch-captain-artemis",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-watch-master:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-watch-master:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "AQUILA KILL TEAM",
+          "DEATHWATCH KILL TEAM"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "aquila-kill-team",
+          "deathwatch-kill-team"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-watch-master:leader"
+      },
+      "name": "WATCH MASTER",
+      "raw_name": "WATCH MASTER",
+      "record_id": "every-model-has-the-imperium-keyword-watch-master",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:every-model-has-the-imperium-keyword-watch-master",
+      "source_section_id": "every-model-has-the-imperium-keyword",
+      "source_section_name": "EVERY MODEL HAS THE IMPERIUM KEYWORD",
+      "unit_id": "watch-master",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-aquila-kill-team:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-aquila-kill-team:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-aquila-kill-team:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "AQUILA KILL TEAM",
+      "raw_name": "AQUILA KILL TEAM",
+      "record_id": "units-aquila-kill-team",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-aquila-kill-team",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "aquila-kill-team",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-callidus-assassin:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-callidus-assassin:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CALLIDUS ASSASSIN",
+      "raw_name": "CALLIDUS ASSASSIN",
+      "record_id": "units-callidus-assassin",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-callidus-assassin",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "callidus-assassin",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-corvus-blackstar:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-corvus-blackstar:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CORVUS BLACKSTAR",
+      "raw_name": "CORVUS BLACKSTAR",
+      "record_id": "units-corvus-blackstar",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-corvus-blackstar",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "corvus-blackstar",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-culexus-assassin:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-culexus-assassin:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CULEXUS ASSASSIN",
+      "raw_name": "CULEXUS ASSASSIN",
+      "record_id": "units-culexus-assassin",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-culexus-assassin",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "culexus-assassin",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-deathwatch-kill-team:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-deathwatch-kill-team:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-deathwatch-kill-team:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEATHWATCH KILL TEAM",
+      "raw_name": "DEATHWATCH KILL TEAM",
+      "record_id": "units-deathwatch-kill-team",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-deathwatch-kill-team",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "deathwatch-kill-team",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-eversor-assassin:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-eversor-assassin:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "EVERSOR ASSASSIN",
+      "raw_name": "EVERSOR ASSASSIN",
+      "record_id": "units-eversor-assassin",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-eversor-assassin",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "eversor-assassin",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "11 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 11,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "11 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-exaction-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-exaction-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "EXACTION SQUAD",
+      "raw_name": "EXACTION SQUAD",
+      "record_id": "units-exaction-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-exaction-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "exaction-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-grey-knights-terminator-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-grey-knights-terminator-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GREY KNIGHTS TERMINATOR SQUAD",
+      "raw_name": "GREY KNIGHTS TERMINATOR SQUAD",
+      "record_id": "units-grey-knights-terminator-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-grey-knights-terminator-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "grey-knights-terminator-squad",
+      "wargear_costs": [
+        {
+          "name": "Psycannon",
+          "points_per_item": 5,
+          "raw_name": "per Psycannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-grey-knights-terminator-squad:wargear:per-psycannon:1",
+          "wargear_id": "psycannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-imperial-navy-breachers:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-imperial-navy-breachers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "IMPERIAL NAVY BREACHERS",
+      "raw_name": "IMPERIAL NAVY BREACHERS",
+      "record_id": "units-imperial-navy-breachers",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-imperial-navy-breachers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "imperial-navy-breachers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-imperial-rhino:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-imperial-rhino:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "IMPERIAL RHINO",
+      "raw_name": "IMPERIAL RHINO",
+      "record_id": "units-imperial-rhino",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-imperial-rhino",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "imperial-rhino",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "AQUILA KILL TEAM",
+          "BATTLELINE IMPERIUM INFANTRY",
+          "EXACTION SQUAD",
+          "GREY KNIGHTS TERMINATOR SQUAD",
+          "IMPERIAL NAVY BREACHERS",
+          "INQUISITORIAL AGENTS",
+          "SANCTIFIERS",
+          "SISTERS OF BATTLE SQUAD",
+          "SUBDUCTOR SQUAD",
+          "VIGILANT SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "aquila-kill-team",
+          "battleline-imperium-infantry",
+          "exaction-squad",
+          "grey-knights-terminator-squad",
+          "imperial-navy-breachers",
+          "inquisitorial-agents",
+          "sanctifiers",
+          "sisters-of-battle-squad",
+          "subductor-squad",
+          "vigilant-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor:leader"
+      },
+      "name": "INQUISITOR",
+      "raw_name": "INQUISITOR",
+      "record_id": "units-inquisitor",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "inquisitor",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-coteaz:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-coteaz:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BATTLELINE IMPERIUM INFANTRY",
+          "EXACTION SQUAD",
+          "GREY KNIGHTS TERMINATOR SQUAD",
+          "IMPERIAL NAVY BREACHERS",
+          "INQUISITORIAL AGENTS",
+          "SUBDUCTOR SQUAD",
+          "VIGILANT SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "battleline-imperium-infantry",
+          "exaction-squad",
+          "grey-knights-terminator-squad",
+          "imperial-navy-breachers",
+          "inquisitorial-agents",
+          "subductor-squad",
+          "vigilant-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-coteaz:leader"
+      },
+      "name": "INQUISITOR COTEAZ",
+      "raw_name": "INQUISITOR COTEAZ",
+      "record_id": "units-inquisitor-coteaz",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-coteaz",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "inquisitor-coteaz",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-draxus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-draxus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "AQUILA KILL TEAM",
+          "BATTLELINE IMPERIUM INFANTRY",
+          "EXACTION SQUAD",
+          "IMPERIAL NAVY BREACHERS",
+          "INQUISITORIAL AGENTS",
+          "SUBDUCTOR SQUAD",
+          "VIGILANT SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "aquila-kill-team",
+          "battleline-imperium-infantry",
+          "exaction-squad",
+          "imperial-navy-breachers",
+          "inquisitorial-agents",
+          "subductor-squad",
+          "vigilant-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-draxus:leader"
+      },
+      "name": "INQUISITOR DRAXUS",
+      "raw_name": "INQUISITOR DRAXUS",
+      "record_id": "units-inquisitor-draxus",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-draxus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "inquisitor-draxus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-greyfax:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-greyfax:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BATTLELINE IMPERIUM INFANTRY",
+          "EXACTION SQUAD",
+          "IMPERIAL NAVY BREACHERS",
+          "INQUISITORIAL AGENTS",
+          "SANCTIFIERS",
+          "SISTERS OF BATTLE SQUAD",
+          "SUBDUCTOR SQUAD",
+          "VIGILANT SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "battleline-imperium-infantry",
+          "exaction-squad",
+          "imperial-navy-breachers",
+          "inquisitorial-agents",
+          "sanctifiers",
+          "sisters-of-battle-squad",
+          "subductor-squad",
+          "vigilant-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-greyfax:leader"
+      },
+      "name": "INQUISITOR GREYFAX",
+      "raw_name": "INQUISITOR GREYFAX",
+      "record_id": "units-inquisitor-greyfax",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-greyfax",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "inquisitor-greyfax",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-kroyle:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-kroyle:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "INQUISITOR KROYLE",
+      "raw_name": "INQUISITOR KROYLE",
+      "record_id": "units-inquisitor-kroyle",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitor-kroyle",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "inquisitor-kroyle",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitorial-agents:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "12 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 12,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "12 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitorial-agents:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitorial-agents:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "INQUISITORIAL AGENTS",
+      "raw_name": "INQUISITORIAL AGENTS",
+      "record_id": "units-inquisitorial-agents",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitorial-agents",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "inquisitorial-agents",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitorial-chimera:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitorial-chimera:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "INQUISITORIAL CHIMERA",
+      "raw_name": "INQUISITORIAL CHIMERA",
+      "record_id": "units-inquisitorial-chimera",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-inquisitorial-chimera",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "inquisitorial-chimera",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 40,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-ministorum-priest:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-ministorum-priest:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MINISTORUM PRIEST",
+      "raw_name": "MINISTORUM PRIEST",
+      "record_id": "units-ministorum-priest",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-ministorum-priest",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "ministorum-priest",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-navigator:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-navigator:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "IMPERIAL NAVY BREACHERS",
+          "VOIDSMEN-AT-ARMS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "imperial-navy-breachers",
+          "voidsmen-at-arms"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-navigator:leader"
+      },
+      "name": "NAVIGATOR",
+      "raw_name": "NAVIGATOR",
+      "record_id": "units-navigator",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-navigator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "navigator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-rogue-trader-entourage:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-rogue-trader-entourage:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "IMPERIAL NAVY BREACHERS",
+          "VOIDSMEN-AT-ARMS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "imperial-navy-breachers",
+          "voidsmen-at-arms"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-rogue-trader-entourage:leader"
+      },
+      "name": "ROGUE TRADER ENTOURAGE",
+      "raw_name": "ROGUE TRADER ENTOURAGE",
+      "record_id": "units-rogue-trader-entourage",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-rogue-trader-entourage",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "rogue-trader-entourage",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "9 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 9,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "9 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-sanctifiers:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-sanctifiers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SANCTIFIERS",
+      "raw_name": "SANCTIFIERS",
+      "record_id": "units-sanctifiers",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-sanctifiers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sanctifiers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-sisters-of-battle-immolator:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-sisters-of-battle-immolator:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SISTERS OF BATTLE IMMOLATOR",
+      "raw_name": "SISTERS OF BATTLE IMMOLATOR",
+      "record_id": "units-sisters-of-battle-immolator",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-sisters-of-battle-immolator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sisters-of-battle-immolator",
+      "wargear_costs": [
+        {
+          "name": "Twin multi-melta",
+          "points_per_item": 15,
+          "raw_name": "per Twin multi-melta",
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-sisters-of-battle-immolator:wargear:per-twin-multi-melta:1",
+          "wargear_id": "twin-multi-melta"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-sisters-of-battle-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-sisters-of-battle-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SISTERS OF BATTLE SQUAD",
+      "raw_name": "SISTERS OF BATTLE SQUAD",
+      "record_id": "units-sisters-of-battle-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-sisters-of-battle-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sisters-of-battle-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "11 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 11,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "11 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-subductor-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-subductor-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SUBDUCTOR SQUAD",
+      "raw_name": "SUBDUCTOR SQUAD",
+      "record_id": "units-subductor-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-subductor-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "subductor-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "11 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 11,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "11 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-vigilant-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-vigilant-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VIGILANT SQUAD",
+      "raw_name": "VIGILANT SQUAD",
+      "record_id": "units-vigilant-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-vigilant-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "vigilant-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-vindicare-assassin:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-vindicare-assassin:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VINDICARE ASSASSIN",
+      "raw_name": "VINDICARE ASSASSIN",
+      "record_id": "units-vindicare-assassin",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-vindicare-assassin",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "vindicare-assassin",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-voidsmen-at-arms:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-voidsmen-at-arms:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VOIDSMEN-AT-ARMS",
+      "raw_name": "VOIDSMEN-AT-ARMS",
+      "record_id": "units-voidsmen-at-arms",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-voidsmen-at-arms",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "voidsmen-at-arms",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-watch-captain-artemis:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-watch-captain-artemis:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "AQUILA KILL TEAM",
+          "DEATHWATCH KILL TEAM"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "aquila-kill-team",
+          "deathwatch-kill-team"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-watch-captain-artemis:leader"
+      },
+      "name": "WATCH CAPTAIN ARTEMIS",
+      "raw_name": "WATCH CAPTAIN ARTEMIS",
+      "record_id": "units-watch-captain-artemis",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-watch-captain-artemis",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "watch-captain-artemis",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-watch-master:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-watch-master:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "AQUILA KILL TEAM",
+          "DEATHWATCH KILL TEAM"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "aquila-kill-team",
+          "deathwatch-kill-team"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-watch-master:leader"
+      },
+      "name": "WATCH MASTER",
+      "raw_name": "WATCH MASTER",
+      "record_id": "units-watch-master",
+      "source_id": "gw-11e-mfm-2026-06:faction:imperial-agents:unit:units-watch-master",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "watch-master",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/imperial-agents"
+}

@@ -1,0 +1,4313 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "abhuman-auxiliaries",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "exemplar-of-duty",
+          "is_upgrade": true,
+          "leader_allowance": {
+            "allowed_bodyguard_names": [
+              "OGRYN SQUAD",
+              "BULLGRYN SQUAD"
+            ],
+            "allowed_bodyguard_unit_ids": [
+              "ogryn-squad",
+              "bullgryn-squad"
+            ],
+            "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:abhuman-auxiliaries:enhancement:exemplar-of-duty:leader"
+          },
+          "name": "Exemplar of Duty (Upgrade)",
+          "points": 10,
+          "raw_name": "Exemplar of Duty (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:abhuman-auxiliaries:enhancement:exemplar-of-duty"
+        },
+        {
+          "enhancement_id": "sharp-eyes",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Sharp Eyes (Upgrade)",
+          "points": 10,
+          "raw_name": "Sharp Eyes (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:abhuman-auxiliaries:enhancement:sharp-eyes"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "ABHUMAN AUXILIARIES",
+      "raw_name": "ABHUMAN AUXILIARIES",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:abhuman-auxiliaries"
+    },
+    {
+      "detachment_id": "armoured-infantry",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "exemplary-officer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Exemplary Officer",
+          "points": 20,
+          "raw_name": "Exemplary Officer",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:armoured-infantry:enhancement:exemplary-officer"
+        },
+        {
+          "enhancement_id": "grand-strategist",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Grand Strategist",
+          "points": 25,
+          "raw_name": "Grand Strategist",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:armoured-infantry:enhancement:grand-strategist"
+        },
+        {
+          "enhancement_id": "master-manoeuvrist",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Master Manoeuvrist",
+          "points": 15,
+          "raw_name": "Master Manoeuvrist",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:armoured-infantry:enhancement:master-manoeuvrist"
+        },
+        {
+          "enhancement_id": "omnissian-unguents",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Omnissian Unguents",
+          "points": 35,
+          "raw_name": "Omnissian Unguents",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:armoured-infantry:enhancement:omnissian-unguents"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "ARMOURED INFANTRY",
+      "raw_name": "ARMOURED INFANTRY",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:armoured-infantry"
+    },
+    {
+      "detachment_id": "bridgehead-strike",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "bombast-class-vox-array",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Bombast-class Vox-array",
+          "points": 15,
+          "raw_name": "Bombast-class Vox-array",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:bridgehead-strike:enhancement:bombast-class-vox-array"
+        },
+        {
+          "enhancement_id": "priority-drop-beacon",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Priority Drop Beacon",
+          "points": 25,
+          "raw_name": "Priority Drop Beacon",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:bridgehead-strike:enhancement:priority-drop-beacon"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "BRIDGEHEAD STRIKE",
+      "raw_name": "BRIDGEHEAD STRIKE",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:bridgehead-strike"
+    },
+    {
+      "detachment_id": "combined-arms",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "death-mask-of-ollanius",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Death Mask of Ollanius",
+          "points": 10,
+          "raw_name": "Death Mask of Ollanius",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:combined-arms:enhancement:death-mask-of-ollanius"
+        },
+        {
+          "enhancement_id": "drill-commander",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Drill Commander",
+          "points": 20,
+          "raw_name": "Drill Commander",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:combined-arms:enhancement:drill-commander"
+        },
+        {
+          "enhancement_id": "grand-strategist",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Grand Strategist",
+          "points": 15,
+          "raw_name": "Grand Strategist",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:combined-arms:enhancement:grand-strategist"
+        },
+        {
+          "enhancement_id": "reactive-command",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Reactive Command",
+          "points": 15,
+          "raw_name": "Reactive Command",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:combined-arms:enhancement:reactive-command"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "COMBINED ARMS",
+      "raw_name": "COMBINED ARMS",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:combined-arms"
+    },
+    {
+      "detachment_id": "designation-force",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "long-range-scout",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Long-range Scout (Upgrade)",
+          "points": 10,
+          "raw_name": "Long-range Scout (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:designation-force:enhancement:long-range-scout"
+        },
+        {
+          "enhancement_id": "recon-star",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Recon Star (Upgrade)",
+          "points": 10,
+          "raw_name": "Recon Star (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:designation-force:enhancement:recon-star"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "DESIGNATION FORCE",
+      "raw_name": "DESIGNATION FORCE",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:designation-force"
+    },
+    {
+      "detachment_id": "grizzled-company",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "abhuman-detail",
+          "is_upgrade": false,
+          "leader_allowance": {
+            "allowed_bodyguard_names": [
+              "OGRYN SQUAD",
+              "BULLGRYN SQUAD"
+            ],
+            "allowed_bodyguard_unit_ids": [
+              "ogryn-squad",
+              "bullgryn-squad"
+            ],
+            "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:grizzled-company:enhancement:abhuman-detail:leader"
+          },
+          "name": "Abhuman Detail",
+          "points": 20,
+          "raw_name": "Abhuman Detail",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:grizzled-company:enhancement:abhuman-detail"
+        },
+        {
+          "enhancement_id": "aquilan-eye",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Aquilan Eye",
+          "points": 20,
+          "raw_name": "Aquilan Eye",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:grizzled-company:enhancement:aquilan-eye"
+        },
+        {
+          "enhancement_id": "laud-hailer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Laud Hailer",
+          "points": 10,
+          "raw_name": "Laud Hailer",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:grizzled-company:enhancement:laud-hailer"
+        },
+        {
+          "enhancement_id": "spec-ops-veteran",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Spec Ops Veteran",
+          "points": 15,
+          "raw_name": "Spec Ops Veteran",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:grizzled-company:enhancement:spec-ops-veteran"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "GRIZZLED COMPANY",
+      "raw_name": "GRIZZLED COMPANY",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:grizzled-company"
+    },
+    {
+      "detachment_id": "hammer-of-the-emperor",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "calm-under-fire",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Calm Under Fire",
+          "points": 15,
+          "raw_name": "Calm Under Fire",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:hammer-of-the-emperor:enhancement:calm-under-fire"
+        },
+        {
+          "enhancement_id": "indomitable-steed",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Indomitable Steed",
+          "points": 15,
+          "raw_name": "Indomitable Steed",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:hammer-of-the-emperor:enhancement:indomitable-steed"
+        },
+        {
+          "enhancement_id": "regimental-banner",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Regimental Banner",
+          "points": 20,
+          "raw_name": "Regimental Banner",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:hammer-of-the-emperor:enhancement:regimental-banner"
+        },
+        {
+          "enhancement_id": "veteran-crew",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Veteran Crew",
+          "points": 20,
+          "raw_name": "Veteran Crew",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:hammer-of-the-emperor:enhancement:veteran-crew"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "HAMMER OF THE EMPEROR",
+      "raw_name": "HAMMER OF THE EMPEROR",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:hammer-of-the-emperor"
+    },
+    {
+      "detachment_id": "mechanised-assault",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "bold-leadership",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Bold Leadership",
+          "points": 25,
+          "raw_name": "Bold Leadership",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:mechanised-assault:enhancement:bold-leadership"
+        },
+        {
+          "enhancement_id": "sacred-unguents",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Sacred Unguents",
+          "points": 10,
+          "raw_name": "Sacred Unguents",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:mechanised-assault:enhancement:sacred-unguents"
+        },
+        {
+          "enhancement_id": "smoke-grenades",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Smoke Grenades",
+          "points": 10,
+          "raw_name": "Smoke Grenades",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:mechanised-assault:enhancement:smoke-grenades"
+        },
+        {
+          "enhancement_id": "vanguard-honours",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Vanguard Honours",
+          "points": 15,
+          "raw_name": "Vanguard Honours",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:mechanised-assault:enhancement:vanguard-honours"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "MECHANISED ASSAULT",
+      "raw_name": "MECHANISED ASSAULT",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:mechanised-assault"
+    },
+    {
+      "detachment_id": "recon-element",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "guerrilla-honours",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Guerrilla Honours",
+          "points": 25,
+          "raw_name": "Guerrilla Honours",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:recon-element:enhancement:guerrilla-honours"
+        },
+        {
+          "enhancement_id": "scare-gas-grenades",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Scare Gas Grenades",
+          "points": 5,
+          "raw_name": "Scare Gas Grenades",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:recon-element:enhancement:scare-gas-grenades"
+        },
+        {
+          "enhancement_id": "survival-gear",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Survival Gear",
+          "points": 5,
+          "raw_name": "Survival Gear",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:recon-element:enhancement:survival-gear"
+        },
+        {
+          "enhancement_id": "tripwires",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tripwires",
+          "points": 20,
+          "raw_name": "Tripwires",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:recon-element:enhancement:tripwires"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "RECON ELEMENT",
+      "raw_name": "RECON ELEMENT",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:recon-element"
+    },
+    {
+      "detachment_id": "siege-regiment",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "eager-advance",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eager Advance",
+          "points": 20,
+          "raw_name": "Eager Advance",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:siege-regiment:enhancement:eager-advance"
+        },
+        {
+          "enhancement_id": "flash-grenades",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Flash Grenades",
+          "points": 20,
+          "raw_name": "Flash Grenades",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:siege-regiment:enhancement:flash-grenades"
+        },
+        {
+          "enhancement_id": "legacy-sidearm",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Legacy Sidearm",
+          "points": 10,
+          "raw_name": "Legacy Sidearm",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:siege-regiment:enhancement:legacy-sidearm"
+        },
+        {
+          "enhancement_id": "stalwarts-honours",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Stalwart's Honours",
+          "points": 15,
+          "raw_name": "Stalwart's Honours",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:siege-regiment:enhancement:stalwarts-honours"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "SIEGE REGIMENT",
+      "raw_name": "SIEGE REGIMENT",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:siege-regiment"
+    },
+    {
+      "detachment_id": "steel-hammer",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "assault-hatches",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Assault Hatches",
+          "points": 25,
+          "raw_name": "Assault Hatches",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:steel-hammer:enhancement:assault-hatches"
+        },
+        {
+          "enhancement_id": "battalion-commander",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Battalion Commander",
+          "points": 30,
+          "raw_name": "Battalion Commander",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:steel-hammer:enhancement:battalion-commander"
+        },
+        {
+          "enhancement_id": "engine-speaker",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Engine Speaker",
+          "points": 15,
+          "raw_name": "Engine Speaker",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:steel-hammer:enhancement:engine-speaker"
+        },
+        {
+          "enhancement_id": "titan-killer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Titan Killer",
+          "points": 20,
+          "raw_name": "Titan Killer",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:steel-hammer:enhancement:titan-killer"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "STEEL HAMMER",
+      "raw_name": "STEEL HAMMER",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:detachment:steel-hammer"
+    }
+  ],
+  "faction_id": "astra-militarum",
+  "name": "Astra Militarum",
+  "raw_name": "Astra Militarum",
+  "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-aegis-defence-line:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-aegis-defence-line:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "AEGIS DEFENCE LINE",
+      "raw_name": "AEGIS DEFENCE LINE",
+      "record_id": "units-aegis-defence-line",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-aegis-defence-line",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "aegis-defence-line",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-armoured-sentinels:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-armoured-sentinels:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-armoured-sentinels:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ARMOURED SENTINELS",
+      "raw_name": "ARMOURED SENTINELS",
+      "record_id": "units-armoured-sentinels",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-armoured-sentinels",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "armoured-sentinels",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-artillery-team:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-artillery-team:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ARTILLERY TEAM",
+      "raw_name": "ARTILLERY TEAM",
+      "record_id": "units-artillery-team",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-artillery-team",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "artillery-team",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-attilan-rough-riders:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-attilan-rough-riders:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-attilan-rough-riders:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-attilan-rough-riders:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-attilan-rough-riders:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-attilan-rough-riders:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ATTILAN ROUGH RIDERS",
+      "raw_name": "ATTILAN ROUGH RIDERS",
+      "record_id": "units-attilan-rough-riders",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-attilan-rough-riders",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "attilan-rough-riders",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 450,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-baneblade:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-baneblade:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 470,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-baneblade:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-baneblade:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BANEBLADE",
+      "raw_name": "BANEBLADE",
+      "record_id": "units-baneblade",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-baneblade",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "baneblade",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 420,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-banehammer:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-banehammer:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 440,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-banehammer:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-banehammer:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BANEHAMMER",
+      "raw_name": "BANEHAMMER",
+      "record_id": "units-banehammer",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-banehammer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "banehammer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 450,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-banesword:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-banesword:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 470,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-banesword:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-banesword:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BANESWORD",
+      "raw_name": "BANESWORD",
+      "record_id": "units-banesword",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-banesword",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "banesword",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-basilisk:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-basilisk:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-basilisk:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-basilisk:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BASILISK",
+      "raw_name": "BASILISK",
+      "record_id": "units-basilisk",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-basilisk",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "basilisk",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-bullgryn-squad:cost:your-1st-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-bullgryn-squad:cost:your-1st-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-bullgryn-squad:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-bullgryn-squad:cost:your-2nd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 215,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-bullgryn-squad:cost:your-2nd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-bullgryn-squad:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BULLGRYN SQUAD",
+      "raw_name": "BULLGRYN SQUAD",
+      "record_id": "units-bullgryn-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-bullgryn-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "bullgryn-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-castellan:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-castellan:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CADIAN SHOCK TROOPS",
+          "KASRKIN"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "cadian-shock-troops",
+          "kasrkin"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-castellan:leader"
+      },
+      "name": "CADIAN CASTELLAN",
+      "raw_name": "CADIAN CASTELLAN",
+      "record_id": "units-cadian-castellan",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-castellan",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cadian-castellan",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-command-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-command-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CADIAN SHOCK TROOPS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "cadian-shock-troops"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-command-squad:leader"
+      },
+      "name": "CADIAN COMMAND SQUAD",
+      "raw_name": "CADIAN COMMAND SQUAD",
+      "record_id": "units-cadian-command-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-command-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cadian-command-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-heavy-weapons-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-heavy-weapons-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CADIAN HEAVY WEAPONS SQUAD",
+      "raw_name": "CADIAN HEAVY WEAPONS SQUAD",
+      "record_id": "units-cadian-heavy-weapons-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-heavy-weapons-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cadian-heavy-weapons-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-recon-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-recon-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CADIAN RECON SQUAD",
+      "raw_name": "CADIAN RECON SQUAD",
+      "record_id": "units-cadian-recon-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-recon-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cadian-recon-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-shock-troops:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-shock-troops:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-shock-troops:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CADIAN SHOCK TROOPS",
+      "raw_name": "CADIAN SHOCK TROOPS",
+      "record_id": "units-cadian-shock-troops",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cadian-shock-troops",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cadian-shock-troops",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-command-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-command-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CATACHAN JUNGLE FIGHTERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "catachan-jungle-fighters"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-command-squad:leader"
+      },
+      "name": "CATACHAN COMMAND SQUAD",
+      "raw_name": "CATACHAN COMMAND SQUAD",
+      "record_id": "units-catachan-command-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-command-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "catachan-command-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-heavy-weapons-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-heavy-weapons-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CATACHAN HEAVY WEAPONS SQUAD",
+      "raw_name": "CATACHAN HEAVY WEAPONS SQUAD",
+      "record_id": "units-catachan-heavy-weapons-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-heavy-weapons-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "catachan-heavy-weapons-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-jungle-fighters:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-jungle-fighters:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-jungle-fighters:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CATACHAN JUNGLE FIGHTERS",
+      "raw_name": "CATACHAN JUNGLE FIGHTERS",
+      "record_id": "units-catachan-jungle-fighters",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-catachan-jungle-fighters",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "catachan-jungle-fighters",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-centaur-rsv:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-centaur-rsv:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CENTAUR RSV",
+      "raw_name": "CENTAUR RSV",
+      "record_id": "units-centaur-rsv",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-centaur-rsv",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "centaur-rsv",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-chimera:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-chimera:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHIMERA",
+      "raw_name": "CHIMERA",
+      "record_id": "units-chimera",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-chimera",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chimera",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 30,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CADIAN SHOCK TROOPS",
+          "CATACHAN JUNGLE FIGHTERS",
+          "DEATH KORPS OF KRIEG",
+          "KASRKIN",
+          "KRIEG COMBAT ENGINEERS",
+          "TEMPESTUS SCIONS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "cadian-shock-troops",
+          "catachan-jungle-fighters",
+          "death-korps-of-krieg",
+          "kasrkin",
+          "krieg-combat-engineers",
+          "tempestus-scions"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar:leader"
+      },
+      "name": "COMMISSAR",
+      "raw_name": "COMMISSAR",
+      "record_id": "units-commissar",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "commissar",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-graves:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-graves:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "COMMISSAR GRAVES",
+      "raw_name": "COMMISSAR GRAVES",
+      "record_id": "units-commissar-graves",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-graves",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "commissar-graves",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-graves-on-foot:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-graves-on-foot:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CADIAN SHOCK TROOPS",
+          "CATACHAN JUNGLE FIGHTERS",
+          "DEATH KORPS OF KRIEG",
+          "KASRKIN",
+          "KRIEG COMBAT ENGINEERS",
+          "TEMPESTUS SCIONS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "cadian-shock-troops",
+          "catachan-jungle-fighters",
+          "death-korps-of-krieg",
+          "kasrkin",
+          "krieg-combat-engineers",
+          "tempestus-scions"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-graves-on-foot:leader"
+      },
+      "name": "COMMISSAR GRAVES ON FOOT",
+      "raw_name": "COMMISSAR GRAVES ON FOOT",
+      "record_id": "units-commissar-graves-on-foot",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-graves-on-foot",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "commissar-graves-on-foot",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-yarrick:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-yarrick:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CADIAN SHOCK TROOPS",
+          "CATACHAN JUNGLE FIGHTERS",
+          "DEATH KORPS OF KRIEG",
+          "KASRKIN",
+          "KRIEG COMBAT ENGINEERS",
+          "TEMPESTUS SCIONS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "cadian-shock-troops",
+          "catachan-jungle-fighters",
+          "death-korps-of-krieg",
+          "kasrkin",
+          "krieg-combat-engineers",
+          "tempestus-scions"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-yarrick:leader"
+      },
+      "name": "COMMISSAR YARRICK",
+      "raw_name": "COMMISSAR YARRICK",
+      "record_id": "units-commissar-yarrick",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-commissar-yarrick",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "commissar-yarrick",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 40,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cyclops-demolition-vehicle:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cyclops-demolition-vehicle:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cyclops-demolition-vehicle:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cyclops-demolition-vehicle:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CYCLOPS DEMOLITION VEHICLE",
+      "raw_name": "CYCLOPS DEMOLITION VEHICLE",
+      "record_id": "units-cyclops-demolition-vehicle",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-cyclops-demolition-vehicle",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cyclops-demolition-vehicle",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-death-korps-of-krieg:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-death-korps-of-krieg:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-death-korps-of-krieg:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEATH KORPS OF KRIEG",
+      "raw_name": "DEATH KORPS OF KRIEG",
+      "record_id": "units-death-korps-of-krieg",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-death-korps-of-krieg",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "death-korps-of-krieg",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-death-riders:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-death-riders:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-death-riders:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEATH RIDERS",
+      "raw_name": "DEATH RIDERS",
+      "record_id": "units-death-riders",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-death-riders",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "death-riders",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-deathstrike:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-deathstrike:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-deathstrike:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-deathstrike:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEATHSTRIKE",
+      "raw_name": "DEATHSTRIKE",
+      "record_id": "units-deathstrike",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-deathstrike",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "deathstrike",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 415,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-doomhammer:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-doomhammer:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 435,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-doomhammer:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-doomhammer:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DOOMHAMMER",
+      "raw_name": "DOOMHAMMER",
+      "record_id": "units-doomhammer",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-doomhammer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "doomhammer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-field-ordnance-battery:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-field-ordnance-battery:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FIELD ORDNANCE BATTERY",
+      "raw_name": "FIELD ORDNANCE BATTERY",
+      "record_id": "units-field-ordnance-battery",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-field-ordnance-battery",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "field-ordnance-battery",
+      "wargear_costs": [
+        {
+          "name": "Bombast field gun",
+          "points_per_item": 10,
+          "raw_name": "per Bombast field gun",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-field-ordnance-battery:wargear:per-bombast-field-gun:1",
+          "wargear_id": "bombast-field-gun"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-gaunts-ghosts:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-gaunts-ghosts:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GAUNT'S GHOSTS",
+      "raw_name": "GAUNT'S GHOSTS",
+      "record_id": "units-gaunts-ghosts",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-gaunts-ghosts",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "gaunts-ghosts",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 420,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hellhammer:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hellhammer:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 440,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hellhammer:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hellhammer:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HELLHAMMER",
+      "raw_name": "HELLHAMMER",
+      "record_id": "units-hellhammer",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hellhammer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hellhammer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hellhound:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hellhound:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hellhound:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hellhound:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HELLHOUND",
+      "raw_name": "HELLHOUND",
+      "record_id": "units-hellhound",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hellhound",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hellhound",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hippogriff-afv:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hippogriff-afv:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hippogriff-afv:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HIPPOGRIFF AFV",
+      "raw_name": "HIPPOGRIFF AFV",
+      "record_id": "units-hippogriff-afv",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hippogriff-afv",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hippogriff-afv",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hydra:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hydra:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HYDRA",
+      "raw_name": "HYDRA",
+      "record_id": "units-hydra",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-hydra",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hydra",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-kasrkin:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-kasrkin:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-kasrkin:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-kasrkin:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KASRKIN",
+      "raw_name": "KASRKIN",
+      "record_id": "units-kasrkin",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-kasrkin",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kasrkin",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-combat-engineers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-combat-engineers:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-combat-engineers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-combat-engineers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 105,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-combat-engineers:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-combat-engineers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KRIEG COMBAT ENGINEERS",
+      "raw_name": "KRIEG COMBAT ENGINEERS",
+      "record_id": "units-krieg-combat-engineers",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-combat-engineers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "krieg-combat-engineers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-command-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-command-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "DEATH KORPS OF KRIEG",
+          "KRIEG COMBAT ENGINEERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "death-korps-of-krieg",
+          "krieg-combat-engineers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-command-squad:leader"
+      },
+      "name": "KRIEG COMMAND SQUAD",
+      "raw_name": "KRIEG COMMAND SQUAD",
+      "record_id": "units-krieg-command-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-command-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "krieg-command-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "4 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 4,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "4 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-heavy-weapons-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-heavy-weapons-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KRIEG HEAVY WEAPONS SQUAD",
+      "raw_name": "KRIEG HEAVY WEAPONS SQUAD",
+      "record_id": "units-krieg-heavy-weapons-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-heavy-weapons-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "krieg-heavy-weapons-squad",
+      "wargear_costs": [
+        {
+          "name": "Krieg heavy flamer",
+          "points_per_item": 5,
+          "raw_name": "per Krieg heavy flamer",
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-krieg-heavy-weapons-squad:wargear:per-krieg-heavy-flamer:1",
+          "wargear_id": "krieg-heavy-flamer"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 185,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-battle-tank:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-battle-tank:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 195,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-battle-tank:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-battle-tank:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LEMAN RUSS BATTLE TANK",
+      "raw_name": "LEMAN RUSS BATTLE TANK",
+      "record_id": "units-leman-russ-battle-tank",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-battle-tank",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "leman-russ-battle-tank",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 235,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-commander:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-commander:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 250,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-commander:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-commander:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LEMAN RUSS COMMANDER",
+      "raw_name": "LEMAN RUSS COMMANDER",
+      "record_id": "units-leman-russ-commander",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-commander",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "leman-russ-commander",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-demolisher:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-demolisher:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 200,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-demolisher:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-demolisher:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LEMAN RUSS DEMOLISHER",
+      "raw_name": "LEMAN RUSS DEMOLISHER",
+      "record_id": "units-leman-russ-demolisher",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-demolisher",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "leman-russ-demolisher",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-eradicator:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-eradicator:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-eradicator:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-eradicator:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LEMAN RUSS ERADICATOR",
+      "raw_name": "LEMAN RUSS ERADICATOR",
+      "record_id": "units-leman-russ-eradicator",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-eradicator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "leman-russ-eradicator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-executioner:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-executioner:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-executioner:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-executioner:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LEMAN RUSS EXECUTIONER",
+      "raw_name": "LEMAN RUSS EXECUTIONER",
+      "record_id": "units-leman-russ-executioner",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-executioner",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "leman-russ-executioner",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-exterminator:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-exterminator:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-exterminator:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-exterminator:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LEMAN RUSS EXTERMINATOR",
+      "raw_name": "LEMAN RUSS EXTERMINATOR",
+      "record_id": "units-leman-russ-exterminator",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-exterminator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "leman-russ-exterminator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-punisher:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-punisher:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-punisher:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-punisher:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LEMAN RUSS PUNISHER",
+      "raw_name": "LEMAN RUSS PUNISHER",
+      "record_id": "units-leman-russ-punisher",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-punisher",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "leman-russ-punisher",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-vanquisher:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-vanquisher:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-vanquisher:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-vanquisher:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LEMAN RUSS VANQUISHER",
+      "raw_name": "LEMAN RUSS VANQUISHER",
+      "record_id": "units-leman-russ-vanquisher",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-leman-russ-vanquisher",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "leman-russ-vanquisher",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-lord-marshal-dreir:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-lord-marshal-dreir:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "DEATH RIDERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "death-riders"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-lord-marshal-dreir:leader"
+      },
+      "name": "LORD MARSHAL DREIR",
+      "raw_name": "LORD MARSHAL DREIR",
+      "record_id": "units-lord-marshal-dreir",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-lord-marshal-dreir",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "lord-marshal-dreir",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-lord-solar-leontus:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-lord-solar-leontus:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "ATTILAN ROUGH RIDERS",
+          "CADIAN SHOCK TROOPS",
+          "CATACHAN JUNGLE FIGHTERS",
+          "DEATH KORPS OF KRIEG",
+          "DEATH RIDERS",
+          "KASRKIN",
+          "KRIEG COMBAT ENGINEERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "attilan-rough-riders",
+          "cadian-shock-troops",
+          "catachan-jungle-fighters",
+          "death-korps-of-krieg",
+          "death-riders",
+          "kasrkin",
+          "krieg-combat-engineers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-lord-solar-leontus:leader"
+      },
+      "name": "LORD SOLAR LEONTUS",
+      "raw_name": "LORD SOLAR LEONTUS",
+      "record_id": "units-lord-solar-leontus",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-lord-solar-leontus",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "lord-solar-leontus",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-manticore:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-manticore:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-manticore:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-manticore:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MANTICORE",
+      "raw_name": "MANTICORE",
+      "record_id": "units-manticore",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-manticore",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "manticore",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-militarum-tempestus-command-squad:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-militarum-tempestus-command-squad:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-militarum-tempestus-command-squad:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-militarum-tempestus-command-squad:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "TEMPESTUS SCIONS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "tempestus-scions"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-militarum-tempestus-command-squad:leader"
+      },
+      "name": "MILITARUM TEMPESTUS COMMAND SQUAD",
+      "raw_name": "MILITARUM TEMPESTUS COMMAND SQUAD",
+      "record_id": "units-militarum-tempestus-command-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-militarum-tempestus-command-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "militarum-tempestus-command-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 35,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ministorum-priest:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ministorum-priest:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CADIAN SHOCK TROOPS",
+          "CATACHAN JUNGLE FIGHTERS",
+          "DEATH KORPS OF KRIEG",
+          "KASRKIN",
+          "KRIEG COMBAT ENGINEERS",
+          "TEMPESTUS SCIONS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "cadian-shock-troops",
+          "catachan-jungle-fighters",
+          "death-korps-of-krieg",
+          "kasrkin",
+          "krieg-combat-engineers",
+          "tempestus-scions"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ministorum-priest:leader"
+      },
+      "name": "MINISTORUM PRIEST",
+      "raw_name": "MINISTORUM PRIEST",
+      "record_id": "units-ministorum-priest",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ministorum-priest",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "ministorum-priest",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-nork-deddog:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-nork-deddog:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NORK DEDDOG",
+      "raw_name": "NORK DEDDOG",
+      "record_id": "units-nork-deddog",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-nork-deddog",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "nork-deddog",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 40,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ogryn-bodyguard:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ogryn-bodyguard:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "OGRYN BODYGUARD",
+      "raw_name": "OGRYN BODYGUARD",
+      "record_id": "units-ogryn-bodyguard",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ogryn-bodyguard",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "ogryn-bodyguard",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ogryn-squad:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ogryn-squad:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ogryn-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "OGRYN SQUAD",
+      "raw_name": "OGRYN SQUAD",
+      "record_id": "units-ogryn-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ogryn-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "ogryn-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-primaris-psyker:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-primaris-psyker:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CADIAN SHOCK TROOPS",
+          "CATACHAN JUNGLE FIGHTERS",
+          "DEATH KORPS OF KRIEG",
+          "KASRKIN",
+          "KRIEG COMBAT ENGINEERS",
+          "TEMPESTUS SCIONS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "cadian-shock-troops",
+          "catachan-jungle-fighters",
+          "death-korps-of-krieg",
+          "kasrkin",
+          "krieg-combat-engineers",
+          "tempestus-scions"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-primaris-psyker:leader"
+      },
+      "name": "PRIMARIS PSYKER",
+      "raw_name": "PRIMARIS PSYKER",
+      "record_id": "units-primaris-psyker",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-primaris-psyker",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "primaris-psyker",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ratlings:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ratlings:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ratlings:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RATLINGS",
+      "raw_name": "RATLINGS",
+      "record_id": "units-ratlings",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ratlings",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "ratlings",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 260,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-rogal-dorn-battle-tank:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-rogal-dorn-battle-tank:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 275,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-rogal-dorn-battle-tank:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-rogal-dorn-battle-tank:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ROGAL DORN BATTLE TANK",
+      "raw_name": "ROGAL DORN BATTLE TANK",
+      "record_id": "units-rogal-dorn-battle-tank",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-rogal-dorn-battle-tank",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "rogal-dorn-battle-tank",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 290,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-rogal-dorn-commander:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-rogal-dorn-commander:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 305,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-rogal-dorn-commander:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-rogal-dorn-commander:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ROGAL DORN COMMANDER",
+      "raw_name": "ROGAL DORN COMMANDER",
+      "record_id": "units-rogal-dorn-commander",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-rogal-dorn-commander",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "rogal-dorn-commander",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-scout-sentinels:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-scout-sentinels:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-scout-sentinels:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SCOUT SENTINELS",
+      "raw_name": "SCOUT SENTINELS",
+      "record_id": "units-scout-sentinels",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-scout-sentinels",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "scout-sentinels",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 410,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-shadowsword:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-shadowsword:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 430,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-shadowsword:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-shadowsword:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SHADOWSWORD",
+      "raw_name": "SHADOWSWORD",
+      "record_id": "units-shadowsword",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-shadowsword",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "shadowsword",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-sly-marbo:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-sly-marbo:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SLY MARBO",
+      "raw_name": "SLY MARBO",
+      "record_id": "units-sly-marbo",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-sly-marbo",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sly-marbo",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 430,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-stormlord:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-stormlord:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 450,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-stormlord:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-stormlord:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STORMLORD",
+      "raw_name": "STORMLORD",
+      "record_id": "units-stormlord",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-stormlord",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "stormlord",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 465,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-stormsword:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-stormsword:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 485,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-stormsword:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-stormsword:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STORMSWORD",
+      "raw_name": "STORMSWORD",
+      "record_id": "units-stormsword",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-stormsword",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "stormsword",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-taurox:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-taurox:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TAUROX",
+      "raw_name": "TAUROX",
+      "record_id": "units-taurox",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-taurox",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "taurox",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-taurox-prime:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-taurox-prime:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TAUROX PRIME",
+      "raw_name": "TAUROX PRIME",
+      "record_id": "units-taurox-prime",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-taurox-prime",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "taurox-prime",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tech-priest-enginseer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tech-priest-enginseer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CADIAN SHOCK TROOPS",
+          "CATACHAN JUNGLE FIGHTERS",
+          "DEATH KORPS OF KRIEG",
+          "KASRKIN",
+          "KRIEG COMBAT ENGINEERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "cadian-shock-troops",
+          "catachan-jungle-fighters",
+          "death-korps-of-krieg",
+          "kasrkin",
+          "krieg-combat-engineers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tech-priest-enginseer:leader"
+      },
+      "name": "TECH-PRIEST ENGINSEER",
+      "raw_name": "TECH-PRIEST ENGINSEER",
+      "record_id": "units-tech-priest-enginseer",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tech-priest-enginseer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tech-priest-enginseer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tempestus-aquilons:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tempestus-aquilons:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TEMPESTUS AQUILONS",
+      "raw_name": "TEMPESTUS AQUILONS",
+      "record_id": "units-tempestus-aquilons",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tempestus-aquilons",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tempestus-aquilons",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tempestus-scions:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 155,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tempestus-scions:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tempestus-scions:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tempestus-scions:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 165,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tempestus-scions:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tempestus-scions:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TEMPESTUS SCIONS",
+      "raw_name": "TEMPESTUS SCIONS",
+      "record_id": "units-tempestus-scions",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-tempestus-scions",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tempestus-scions",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ursula-creed:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ursula-creed:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CADIAN SHOCK TROOPS",
+          "KASRKIN"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "cadian-shock-troops",
+          "kasrkin"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ursula-creed:leader"
+      },
+      "name": "URSULA CREED",
+      "raw_name": "URSULA CREED",
+      "record_id": "units-ursula-creed",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-ursula-creed",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "ursula-creed",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-valkyrie:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-valkyrie:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-valkyrie:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-valkyrie:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VALKYRIE",
+      "raw_name": "VALKYRIE",
+      "record_id": "units-valkyrie",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-valkyrie",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "valkyrie",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-wyvern:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-wyvern:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-wyvern:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-wyvern:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WYVERN",
+      "raw_name": "WYVERN",
+      "record_id": "units-wyvern",
+      "source_id": "gw-11e-mfm-2026-06:faction:astra-militarum:unit:units-wyvern",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "wyvern",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/astra-militarum"
+}

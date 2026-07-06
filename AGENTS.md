@@ -49,6 +49,9 @@ Do not add AI/ranker/training logic before the deterministic rules core, decisio
 - Movement/charge/pile-in/consolidate/disembark/reserves/reactive movement require `PathWitness` or typed invalid result.
 - Endpoint-only movement validation is invalid except for explicit teleport/set-up placement.
 - Raw rule text is normalized once at the data boundary.
+- Generated content is committed as versioned data artifacts (JSON) plus
+  typed fail-fast loaders, not as Python modules. Generators emit data;
+  loaders validate eagerly and preserve package hashes and provenance.
 - Runtime engine code consumes structured descriptors, not ad hoc string parsing.
 - Runtime code must not gate behavior on rule or ability display names, normalized rule-text tokens, or locally re-normalized keyword strings. Behavior gates use stable source rule IDs, descriptor IDs, or canonical keyword tokens carried by the catalog.
 - Load-support status and semantic-execution status are distinct recorded fields for all runtime content. No manifest, coverage report, or documentation may present a placeholder or load-only module as implemented gameplay support.

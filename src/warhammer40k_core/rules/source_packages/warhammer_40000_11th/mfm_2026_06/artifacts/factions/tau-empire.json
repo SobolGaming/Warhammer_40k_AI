@@ -1,0 +1,2621 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "advanced-acquisition-cadre",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "negation-emitters",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Negation Emitters (Upgrade)",
+          "points": 15,
+          "raw_name": "Negation Emitters (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:advanced-acquisition-cadre:enhancement:negation-emitters"
+        },
+        {
+          "enhancement_id": "unmasking-suite",
+          "is_upgrade": true,
+          "leader_allowance": null,
+          "name": "Unmasking Suite (Upgrade)",
+          "points": 15,
+          "raw_name": "Unmasking Suite (Upgrade)",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:advanced-acquisition-cadre:enhancement:unmasking-suite"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "ADVANCED ACQUISITION CADRE",
+      "raw_name": "ADVANCED ACQUISITION CADRE",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:advanced-acquisition-cadre"
+    },
+    {
+      "detachment_id": "auxiliary-cadre",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "admired-leader",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Admired Leader",
+          "points": 20,
+          "raw_name": "Admired Leader",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:auxiliary-cadre:enhancement:admired-leader"
+        },
+        {
+          "enhancement_id": "student-of-kauyon",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Student of Kauyon",
+          "points": 20,
+          "raw_name": "Student of Kauyon",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:auxiliary-cadre:enhancement:student-of-kauyon"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "AUXILIARY CADRE",
+      "raw_name": "AUXILIARY CADRE",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:auxiliary-cadre"
+    },
+    {
+      "detachment_id": "experimental-prototype-cadre",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "plasma-accelerator-rifle",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Plasma Accelerator Rifle",
+          "points": 20,
+          "raw_name": "Plasma Accelerator Rifle",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:experimental-prototype-cadre:enhancement:plasma-accelerator-rifle"
+        },
+        {
+          "enhancement_id": "supernova-launcher",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Supernova Launcher",
+          "points": 15,
+          "raw_name": "Supernova Launcher",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:experimental-prototype-cadre:enhancement:supernova-launcher"
+        },
+        {
+          "enhancement_id": "thermoneutronic-projector",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Thermoneutronic Projector",
+          "points": 15,
+          "raw_name": "Thermoneutronic Projector",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:experimental-prototype-cadre:enhancement:thermoneutronic-projector"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "EXPERIMENTAL PROTOTYPE CADRE",
+      "raw_name": "EXPERIMENTAL PROTOTYPE CADRE",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:experimental-prototype-cadre"
+    },
+    {
+      "detachment_id": "kauyon",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "exemplar-of-the-kauyon",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Exemplar of the Kauyon",
+          "points": 20,
+          "raw_name": "Exemplar of the Kauyon",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:kauyon:enhancement:exemplar-of-the-kauyon"
+        },
+        {
+          "enhancement_id": "precision-of-the-patient-hunter",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Precision of the Patient Hunter",
+          "points": 15,
+          "raw_name": "Precision of the Patient Hunter",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:kauyon:enhancement:precision-of-the-patient-hunter"
+        },
+        {
+          "enhancement_id": "solid-image-projection-unit",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Solid-image Projection Unit",
+          "points": 20,
+          "raw_name": "Solid-image Projection Unit",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:kauyon:enhancement:solid-image-projection-unit"
+        },
+        {
+          "enhancement_id": "through-unity-devastation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Through Unity, Devastation",
+          "points": 30,
+          "raw_name": "Through Unity, Devastation",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:kauyon:enhancement:through-unity-devastation"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "KAUYON",
+      "raw_name": "KAUYON",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:kauyon"
+    },
+    {
+      "detachment_id": "kroot-hunting-pack",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "borthrod-gland",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Borthrod Gland",
+          "points": 15,
+          "raw_name": "Borthrod Gland",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:kroot-hunting-pack:enhancement:borthrod-gland"
+        },
+        {
+          "enhancement_id": "kroothawk-flock",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Kroothawk Flock",
+          "points": 10,
+          "raw_name": "Kroothawk Flock",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:kroot-hunting-pack:enhancement:kroothawk-flock"
+        },
+        {
+          "enhancement_id": "nomadic-hunter",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Nomadic Hunter",
+          "points": 20,
+          "raw_name": "Nomadic Hunter",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:kroot-hunting-pack:enhancement:nomadic-hunter"
+        },
+        {
+          "enhancement_id": "root-carved-weapons",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Root-carved Weapons",
+          "points": 10,
+          "raw_name": "Root-carved Weapons",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:kroot-hunting-pack:enhancement:root-carved-weapons"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "KROOT HUNTING PACK",
+      "raw_name": "KROOT HUNTING PACK",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:kroot-hunting-pack"
+    },
+    {
+      "detachment_id": "montka",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "coordinated-exploitation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Coordinated Exploitation",
+          "points": 30,
+          "raw_name": "Coordinated Exploitation",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:montka:enhancement:coordinated-exploitation"
+        },
+        {
+          "enhancement_id": "exemplar-of-the-montka",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Exemplar of the Mont'ka",
+          "points": 10,
+          "raw_name": "Exemplar of the Mont'ka",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:montka:enhancement:exemplar-of-the-montka"
+        },
+        {
+          "enhancement_id": "strategic-conqueror",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Strategic Conqueror",
+          "points": 15,
+          "raw_name": "Strategic Conqueror",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:montka:enhancement:strategic-conqueror"
+        },
+        {
+          "enhancement_id": "strike-swiftly",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Strike Swiftly",
+          "points": 35,
+          "raw_name": "Strike Swiftly",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:montka:enhancement:strike-swiftly"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "MONT'KA",
+      "raw_name": "MONT'KA",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:montka"
+    },
+    {
+      "detachment_id": "retaliation-cadre",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "internal-grenade-racks",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Internal Grenade Racks",
+          "points": 20,
+          "raw_name": "Internal Grenade Racks",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:retaliation-cadre:enhancement:internal-grenade-racks"
+        },
+        {
+          "enhancement_id": "prototype-weapon-system",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Prototype Weapon System",
+          "points": 15,
+          "raw_name": "Prototype Weapon System",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:retaliation-cadre:enhancement:prototype-weapon-system"
+        },
+        {
+          "enhancement_id": "puretide-engram-neurochip",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Puretide Engram Neurochip",
+          "points": 15,
+          "raw_name": "Puretide Engram Neurochip",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:retaliation-cadre:enhancement:puretide-engram-neurochip"
+        },
+        {
+          "enhancement_id": "starflare-ignition-system",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Starflare Ignition System",
+          "points": 20,
+          "raw_name": "Starflare Ignition System",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:retaliation-cadre:enhancement:starflare-ignition-system"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "RETALIATION CADRE",
+      "raw_name": "RETALIATION CADRE",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:detachment:retaliation-cadre"
+    }
+  ],
+  "faction_id": "tau-empire",
+  "name": "T'au Empire",
+  "raw_name": "T'au Empire",
+  "source_id": "gw-11e-mfm-2026-06:faction:tau-empire",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 315,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ax-1-0-tiger-shark:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ax-1-0-tiger-shark:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 375,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ax-1-0-tiger-shark:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ax-1-0-tiger-shark:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "AX-1-0 TIGER SHARK",
+      "raw_name": "AX-1-0 TIGER SHARK",
+      "record_id": "units-ax-1-0-tiger-shark",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ax-1-0-tiger-shark",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "ax-1-0-tiger-shark",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-breacher-team:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-breacher-team:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BREACHER TEAM",
+      "raw_name": "BREACHER TEAM",
+      "record_id": "units-breacher-team",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-breacher-team",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "breacher-team",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-broadside-battlesuits:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-broadside-battlesuits:cost:your-1st-to-2nd-units-cost:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 240,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-broadside-battlesuits:cost:your-1st-to-2nd-units-cost:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-broadside-battlesuits:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-broadside-battlesuits:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-broadside-battlesuits:cost:your-3rd-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 260,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-broadside-battlesuits:cost:your-3rd-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-broadside-battlesuits:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "BROADSIDE BATTLESUITS",
+      "raw_name": "BROADSIDE BATTLESUITS",
+      "record_id": "units-broadside-battlesuits",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-broadside-battlesuits",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "broadside-battlesuits",
+      "wargear_costs": [
+        {
+          "name": "High-yield missile pods",
+          "points_per_item": 5,
+          "raw_name": "per High-yield missile pods",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-broadside-battlesuits:wargear:per-high-yield-missile-pods:1",
+          "wargear_id": "high-yield-missile-pods"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-cadre-fireblade:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-cadre-fireblade:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BREACHER TEAM",
+          "STRIKE TEAM"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "breacher-team",
+          "strike-team"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-cadre-fireblade:leader"
+      },
+      "name": "CADRE FIREBLADE",
+      "raw_name": "CADRE FIREBLADE",
+      "record_id": "units-cadre-fireblade",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-cadre-fireblade",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cadre-fireblade",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-farsight:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-farsight:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CRISIS FIREKNIFE BATTLESUITS",
+          "CRISIS STARSCYTHE BATTLESUITS",
+          "CRISIS SUNFORGE BATTLESUITS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "crisis-fireknife-battlesuits",
+          "crisis-starscythe-battlesuits",
+          "crisis-sunforge-battlesuits"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-farsight:leader"
+      },
+      "name": "COMMANDER FARSIGHT",
+      "raw_name": "COMMANDER FARSIGHT",
+      "record_id": "units-commander-farsight",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-farsight",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "commander-farsight",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-in-coldstar-battlesuit:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-in-coldstar-battlesuit:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CRISIS FIREKNIFE BATTLESUITS",
+          "CRISIS STARSCYTHE BATTLESUITS",
+          "CRISIS SUNFORGE BATTLESUITS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "crisis-fireknife-battlesuits",
+          "crisis-starscythe-battlesuits",
+          "crisis-sunforge-battlesuits"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-in-coldstar-battlesuit:leader"
+      },
+      "name": "COMMANDER IN COLDSTAR BATTLESUIT",
+      "raw_name": "COMMANDER IN COLDSTAR BATTLESUIT",
+      "record_id": "units-commander-in-coldstar-battlesuit",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-in-coldstar-battlesuit",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "commander-in-coldstar-battlesuit",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-in-enforcer-battlesuit:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-in-enforcer-battlesuit:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CRISIS FIREKNIFE BATTLESUITS",
+          "CRISIS STARSCYTHE BATTLESUITS",
+          "CRISIS SUNFORGE BATTLESUITS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "crisis-fireknife-battlesuits",
+          "crisis-starscythe-battlesuits",
+          "crisis-sunforge-battlesuits"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-in-enforcer-battlesuit:leader"
+      },
+      "name": "COMMANDER IN ENFORCER BATTLESUIT",
+      "raw_name": "COMMANDER IN ENFORCER BATTLESUIT",
+      "record_id": "units-commander-in-enforcer-battlesuit",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-in-enforcer-battlesuit",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "commander-in-enforcer-battlesuit",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-shadowsun:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-shadowsun:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "COMMANDER SHADOWSUN",
+      "raw_name": "COMMANDER SHADOWSUN",
+      "record_id": "units-commander-shadowsun",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-commander-shadowsun",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "commander-shadowsun",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-fireknife-battlesuits:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-fireknife-battlesuits:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-fireknife-battlesuits:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-fireknife-battlesuits:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CRISIS FIREKNIFE BATTLESUITS",
+      "raw_name": "CRISIS FIREKNIFE BATTLESUITS",
+      "record_id": "units-crisis-fireknife-battlesuits",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-fireknife-battlesuits",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "crisis-fireknife-battlesuits",
+      "wargear_costs": [
+        {
+          "name": "Missile pod",
+          "points_per_item": 5,
+          "raw_name": "per Missile pod",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-fireknife-battlesuits:wargear:per-missile-pod:1",
+          "wargear_id": "missile-pod"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-starscythe-battlesuits:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-starscythe-battlesuits:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-starscythe-battlesuits:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-starscythe-battlesuits:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CRISIS STARSCYTHE BATTLESUITS",
+      "raw_name": "CRISIS STARSCYTHE BATTLESUITS",
+      "record_id": "units-crisis-starscythe-battlesuits",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-starscythe-battlesuits",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "crisis-starscythe-battlesuits",
+      "wargear_costs": [
+        {
+          "name": "T'au flamer",
+          "points_per_item": 5,
+          "raw_name": "per T'au flamer",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-starscythe-battlesuits:wargear:per-tau-flamer:1",
+          "wargear_id": "tau-flamer"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-sunforge-battlesuits:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-sunforge-battlesuits:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-sunforge-battlesuits:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-sunforge-battlesuits:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CRISIS SUNFORGE BATTLESUITS",
+      "raw_name": "CRISIS SUNFORGE BATTLESUITS",
+      "record_id": "units-crisis-sunforge-battlesuits",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-crisis-sunforge-battlesuits",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "crisis-sunforge-battlesuits",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-darkstrider:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-darkstrider:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "PATHFINDER TEAM"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "pathfinder-team"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-darkstrider:leader"
+      },
+      "name": "DARKSTRIDER",
+      "raw_name": "DARKSTRIDER",
+      "record_id": "units-darkstrider",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-darkstrider",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "darkstrider",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-devilfish:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-devilfish:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEVILFISH",
+      "raw_name": "DEVILFISH",
+      "record_id": "units-devilfish",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-devilfish",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "devilfish",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ethereal:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ethereal:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "BREACHER TEAM",
+          "STRIKE TEAM"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "breacher-team",
+          "strike-team"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ethereal:leader"
+      },
+      "name": "ETHEREAL",
+      "raw_name": "ETHEREAL",
+      "record_id": "units-ethereal",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ethereal",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "ethereal",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 55,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-firesight-team:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-firesight-team:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FIRESIGHT TEAM",
+      "raw_name": "FIRESIGHT TEAM",
+      "record_id": "units-firesight-team",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-firesight-team",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "firesight-team",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ghostkeel-battlesuit:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ghostkeel-battlesuit:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ghostkeel-battlesuit:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ghostkeel-battlesuit:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "GHOSTKEEL BATTLESUIT",
+      "raw_name": "GHOSTKEEL BATTLESUIT",
+      "record_id": "units-ghostkeel-battlesuit",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ghostkeel-battlesuit",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "ghostkeel-battlesuit",
+      "wargear_costs": [
+        {
+          "name": "Cyclic Ion Raker",
+          "points_per_item": 10,
+          "raw_name": "per Cyclic Ion Raker",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-ghostkeel-battlesuit:wargear:per-cyclic-ion-raker:1",
+          "wargear_id": "cyclic-ion-raker"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-hammerhead-gunship:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-hammerhead-gunship:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-hammerhead-gunship:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-hammerhead-gunship:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HAMMERHEAD GUNSHIP",
+      "raw_name": "HAMMERHEAD GUNSHIP",
+      "record_id": "units-hammerhead-gunship",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-hammerhead-gunship",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "hammerhead-gunship",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-carnivores:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-carnivores:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-carnivores:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KROOT CARNIVORES",
+      "raw_name": "KROOT CARNIVORES",
+      "record_id": "units-kroot-carnivores",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-carnivores",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kroot-carnivores",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "12 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 12,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "12 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-farstalkers:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-farstalkers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "12 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 12,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "12 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-farstalkers:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-farstalkers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KROOT FARSTALKERS",
+      "raw_name": "KROOT FARSTALKERS",
+      "record_id": "units-kroot-farstalkers",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-farstalkers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kroot-farstalkers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-flesh-shaper:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-flesh-shaper:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "KROOT CARNIVORES",
+          "KROOT FARSTALKERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "kroot-carnivores",
+          "kroot-farstalkers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-flesh-shaper:leader"
+      },
+      "name": "KROOT FLESH SHAPER",
+      "raw_name": "KROOT FLESH SHAPER",
+      "record_id": "units-kroot-flesh-shaper",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-flesh-shaper",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kroot-flesh-shaper",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-hounds:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-hounds:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-hounds:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KROOT HOUNDS",
+      "raw_name": "KROOT HOUNDS",
+      "record_id": "units-kroot-hounds",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-hounds",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kroot-hounds",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-lone-spear:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-lone-spear:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KROOT LONE-SPEAR",
+      "raw_name": "KROOT LONE-SPEAR",
+      "record_id": "units-kroot-lone-spear",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-lone-spear",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kroot-lone-spear",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-trail-shaper:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-trail-shaper:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "KROOT CARNIVORES",
+          "KROOT FARSTALKERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "kroot-carnivores",
+          "kroot-farstalkers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-trail-shaper:leader"
+      },
+      "name": "KROOT TRAIL SHAPER",
+      "raw_name": "KROOT TRAIL SHAPER",
+      "record_id": "units-kroot-trail-shaper",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-trail-shaper",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kroot-trail-shaper",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-war-shaper:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-war-shaper:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "KROOT CARNIVORES",
+          "KROOT FARSTALKERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "kroot-carnivores",
+          "kroot-farstalkers"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-war-shaper:leader"
+      },
+      "name": "KROOT WAR SHAPER",
+      "raw_name": "KROOT WAR SHAPER",
+      "record_id": "units-kroot-war-shaper",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-kroot-war-shaper",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kroot-war-shaper",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-rampagers:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-rampagers:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-rampagers:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 95,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-rampagers:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-rampagers:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-rampagers:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KROOTOX RAMPAGERS",
+      "raw_name": "KROOTOX RAMPAGERS",
+      "record_id": "units-krootox-rampagers",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-rampagers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "krootox-rampagers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-riders:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-riders:cost:your-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-riders:cost:your-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-riders:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KROOTOX RIDERS",
+      "raw_name": "KROOTOX RIDERS",
+      "record_id": "units-krootox-riders",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-krootox-riders",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "krootox-riders",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 2100,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-manta:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-manta:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MANTA",
+      "raw_name": "MANTA",
+      "record_id": "units-manta",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-manta",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "manta",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-pathfinder-team:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-pathfinder-team:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PATHFINDER TEAM",
+      "raw_name": "PATHFINDER TEAM",
+      "record_id": "units-pathfinder-team",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-pathfinder-team",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "pathfinder-team",
+      "wargear_costs": [
+        {
+          "name": "Ion rifle",
+          "points_per_item": 5,
+          "raw_name": "per Ion rifle",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-pathfinder-team:wargear:per-ion-rifle:1",
+          "wargear_id": "ion-rifle"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-piranhas:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-piranhas:cost:your-1st-to-2nd-units-cost:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 165,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-piranhas:cost:your-1st-to-2nd-units-cost:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-piranhas:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-piranhas:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-piranhas:cost:your-3rd-unit-costs:2"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-piranhas:cost:your-3rd-unit-costs:3"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-piranhas:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "PIRANHAS",
+      "raw_name": "PIRANHAS",
+      "record_id": "units-piranhas",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-piranhas",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "piranhas",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-razorshark-strike-fighter:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-razorshark-strike-fighter:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RAZORSHARK STRIKE FIGHTER",
+      "raw_name": "RAZORSHARK STRIKE FIGHTER",
+      "record_id": "units-razorshark-strike-fighter",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-razorshark-strike-fighter",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "razorshark-strike-fighter",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-riptide-battlesuit:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-riptide-battlesuit:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 210,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-riptide-battlesuit:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-riptide-battlesuit:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RIPTIDE BATTLESUIT",
+      "raw_name": "RIPTIDE BATTLESUIT",
+      "record_id": "units-riptide-battlesuit",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-riptide-battlesuit",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "riptide-battlesuit",
+      "wargear_costs": [
+        {
+          "name": "Ion accelerator",
+          "points_per_item": 20,
+          "raw_name": "per Ion accelerator",
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-riptide-battlesuit:wargear:per-ion-accelerator:1",
+          "wargear_id": "ion-accelerator"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-sky-ray-gunship:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-sky-ray-gunship:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SKY RAY GUNSHIP",
+      "raw_name": "SKY RAY GUNSHIP",
+      "record_id": "units-sky-ray-gunship",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-sky-ray-gunship",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sky-ray-gunship",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-stealth-battlesuits:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-stealth-battlesuits:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-stealth-battlesuits:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-stealth-battlesuits:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STEALTH BATTLESUITS",
+      "raw_name": "STEALTH BATTLESUITS",
+      "record_id": "units-stealth-battlesuits",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-stealth-battlesuits",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "stealth-battlesuits",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 360,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-stormsurge:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-stormsurge:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 385,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-stormsurge:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-stormsurge:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STORMSURGE",
+      "raw_name": "STORMSURGE",
+      "record_id": "units-stormsurge",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-stormsurge",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "stormsurge",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-strike-team:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-strike-team:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "STRIKE TEAM",
+      "raw_name": "STRIKE TEAM",
+      "record_id": "units-strike-team",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-strike-team",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "strike-team",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-sun-shark-bomber:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-sun-shark-bomber:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "SUN SHARK BOMBER",
+      "raw_name": "SUN SHARK BOMBER",
+      "record_id": "units-sun-shark-bomber",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-sun-shark-bomber",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sun-shark-bomber",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 790,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-taunar-supremacy-armour:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-taunar-supremacy-armour:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 890,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-taunar-supremacy-armour:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-taunar-supremacy-armour:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TA'UNAR SUPREMACY ARMOUR",
+      "raw_name": "TA'UNAR SUPREMACY ARMOUR",
+      "record_id": "units-taunar-supremacy-armour",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-taunar-supremacy-armour",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "taunar-supremacy-armour",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 205,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-the-twin-lance:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-the-twin-lance:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "THE TWIN LANCE",
+      "raw_name": "THE TWIN LANCE",
+      "record_id": "units-the-twin-lance",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-the-twin-lance",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "the-twin-lance",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tidewall-droneport:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tidewall-droneport:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TIDEWALL DRONEPORT",
+      "raw_name": "TIDEWALL DRONEPORT",
+      "record_id": "units-tidewall-droneport",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tidewall-droneport",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tidewall-droneport",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tidewall-gunrig:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tidewall-gunrig:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TIDEWALL GUNRIG",
+      "raw_name": "TIDEWALL GUNRIG",
+      "record_id": "units-tidewall-gunrig",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tidewall-gunrig",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tidewall-gunrig",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tidewall-shieldline:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": 1,
+              "additional_model_id": "tidewall-defence-platform",
+              "additional_model_name": "Tidewall Defence Platform",
+              "label": "+ 1 Tidewall Defence Platform",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": null,
+              "model_id": null,
+              "model_name": null,
+              "points": 20,
+              "raw_label": "+ 1 Tidewall Defence Platform",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tidewall-shieldline:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tidewall-shieldline:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TIDEWALL SHIELDLINE",
+      "raw_name": "TIDEWALL SHIELDLINE",
+      "record_id": "units-tidewall-shieldline",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tidewall-shieldline",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tidewall-shieldline",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 325,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tiger-shark:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tiger-shark:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 375,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tiger-shark:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tiger-shark:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TIGER SHARK",
+      "raw_name": "TIGER SHARK",
+      "record_id": "units-tiger-shark",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-tiger-shark",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "tiger-shark",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-vespid-stingwings:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 115,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-vespid-stingwings:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-vespid-stingwings:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VESPID STINGWINGS",
+      "raw_name": "VESPID STINGWINGS",
+      "record_id": "units-vespid-stingwings",
+      "source_id": "gw-11e-mfm-2026-06:faction:tau-empire:unit:units-vespid-stingwings",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "vespid-stingwings",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/tau-empire"
+}

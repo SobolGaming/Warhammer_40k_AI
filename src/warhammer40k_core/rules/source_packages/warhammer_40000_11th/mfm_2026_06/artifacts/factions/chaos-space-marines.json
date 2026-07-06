@@ -1,0 +1,3669 @@
+{
+  "detachments": [
+    {
+      "detachment_id": "cabal-of-chaos",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "conduit-of-chaos",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Conduit of Chaos",
+          "points": 20,
+          "raw_name": "Conduit of Chaos",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:cabal-of-chaos:enhancement:conduit-of-chaos"
+        },
+        {
+          "enhancement_id": "touched-by-the-warp",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Touched by the Warp",
+          "points": 10,
+          "raw_name": "Touched by the Warp",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:cabal-of-chaos:enhancement:touched-by-the-warp"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "CABAL OF CHAOS",
+      "raw_name": "CABAL OF CHAOS",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:cabal-of-chaos"
+    },
+    {
+      "detachment_id": "chaos-cult",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "amulet-of-tainted-vigour",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Amulet of Tainted Vigour",
+          "points": 20,
+          "raw_name": "Amulet of Tainted Vigour",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:chaos-cult:enhancement:amulet-of-tainted-vigour"
+        },
+        {
+          "enhancement_id": "cultists-brand",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Cultist's Brand",
+          "points": 30,
+          "raw_name": "Cultist's Brand",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:chaos-cult:enhancement:cultists-brand"
+        },
+        {
+          "enhancement_id": "incendiary-goad",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Incendiary Goad",
+          "points": 25,
+          "raw_name": "Incendiary Goad",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:chaos-cult:enhancement:incendiary-goad"
+        },
+        {
+          "enhancement_id": "warped-foresight",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Warped Foresight",
+          "points": 10,
+          "raw_name": "Warped Foresight",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:chaos-cult:enhancement:warped-foresight"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "CHAOS CULT",
+      "raw_name": "CHAOS CULT",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:chaos-cult"
+    },
+    {
+      "detachment_id": "creations-of-bile",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "helm-of-all-seeing",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Helm of All-Seeing",
+          "points": 25,
+          "raw_name": "Helm of All-Seeing",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:creations-of-bile:enhancement:helm-of-all-seeing"
+        },
+        {
+          "enhancement_id": "living-carapace",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Living Carapace",
+          "points": 15,
+          "raw_name": "Living Carapace",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:creations-of-bile:enhancement:living-carapace"
+        },
+        {
+          "enhancement_id": "prime-test-subject",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Prime Test Subject",
+          "points": 35,
+          "raw_name": "Prime Test Subject",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:creations-of-bile:enhancement:prime-test-subject"
+        },
+        {
+          "enhancement_id": "surgical-precision",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Surgical Precision",
+          "points": 10,
+          "raw_name": "Surgical Precision",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:creations-of-bile:enhancement:surgical-precision"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "CREATIONS OF BILE",
+      "raw_name": "CREATIONS OF BILE",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:creations-of-bile"
+    },
+    {
+      "detachment_id": "cult-of-the-arkifane",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "crown-of-worms",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Crown of Worms",
+          "points": 15,
+          "raw_name": "Crown of Worms",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:cult-of-the-arkifane:enhancement:crown-of-worms"
+        },
+        {
+          "enhancement_id": "cybinfernal-font",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Cybinfernal Font",
+          "points": 20,
+          "raw_name": "Cybinfernal Font",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:cult-of-the-arkifane:enhancement:cybinfernal-font"
+        },
+        {
+          "enhancement_id": "mark-of-the-soul-forges",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mark of the Soul Forges",
+          "points": 20,
+          "raw_name": "Mark of the Soul Forges",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:cult-of-the-arkifane:enhancement:mark-of-the-soul-forges"
+        },
+        {
+          "enhancement_id": "wyredjinn",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Wyredjinn",
+          "points": 25,
+          "raw_name": "Wyredjinn",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:cult-of-the-arkifane:enhancement:wyredjinn"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "CULT OF THE ARKIFANE",
+      "raw_name": "CULT OF THE ARKIFANE",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:cult-of-the-arkifane"
+    },
+    {
+      "detachment_id": "deceptors",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "cursed-fang",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Cursed Fang",
+          "points": 10,
+          "raw_name": "Cursed Fang",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:deceptors:enhancement:cursed-fang"
+        },
+        {
+          "enhancement_id": "falsehood",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Falsehood",
+          "points": 10,
+          "raw_name": "Falsehood",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:deceptors:enhancement:falsehood"
+        },
+        {
+          "enhancement_id": "shroud-of-obfuscation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Shroud of Obfuscation",
+          "points": 15,
+          "raw_name": "Shroud of Obfuscation",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:deceptors:enhancement:shroud-of-obfuscation"
+        },
+        {
+          "enhancement_id": "soul-link",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Soul Link",
+          "points": 5,
+          "raw_name": "Soul Link",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:deceptors:enhancement:soul-link"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "DECEPTORS",
+      "raw_name": "DECEPTORS",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:deceptors"
+    },
+    {
+      "detachment_id": "devotees-of-destruction",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "eye-of-oblivion",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eye of Oblivion",
+          "points": 20,
+          "raw_name": "Eye of Oblivion",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:devotees-of-destruction:enhancement:eye-of-oblivion"
+        },
+        {
+          "enhancement_id": "pact-of-destruction",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Pact of Destruction",
+          "points": 15,
+          "raw_name": "Pact of Destruction",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:devotees-of-destruction:enhancement:pact-of-destruction"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "DEVOTEES OF DESTRUCTION",
+      "raw_name": "DEVOTEES OF DESTRUCTION",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:devotees-of-destruction"
+    },
+    {
+      "detachment_id": "dread-talons",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "eater-of-dread",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eater of Dread",
+          "points": 15,
+          "raw_name": "Eater of Dread",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:dread-talons:enhancement:eater-of-dread"
+        },
+        {
+          "enhancement_id": "nights-shroud",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Night's Shroud",
+          "points": 10,
+          "raw_name": "Night's Shroud",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:dread-talons:enhancement:nights-shroud"
+        },
+        {
+          "enhancement_id": "warp-fuelled-thrusters",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Warp-Fuelled Thrusters",
+          "points": 20,
+          "raw_name": "Warp-Fuelled Thrusters",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:dread-talons:enhancement:warp-fuelled-thrusters"
+        },
+        {
+          "enhancement_id": "willbreaker",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Willbreaker",
+          "points": 10,
+          "raw_name": "Willbreaker",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:dread-talons:enhancement:willbreaker"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "DREAD TALONS",
+      "raw_name": "DREAD TALONS",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:dread-talons"
+    },
+    {
+      "detachment_id": "fellhammer-siege-host",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "bastion-plate",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Bastion Plate",
+          "points": 10,
+          "raw_name": "Bastion Plate",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:fellhammer-siege-host:enhancement:bastion-plate"
+        },
+        {
+          "enhancement_id": "iron-artifice",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Iron Artifice",
+          "points": 10,
+          "raw_name": "Iron Artifice",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:fellhammer-siege-host:enhancement:iron-artifice"
+        },
+        {
+          "enhancement_id": "ironbound-enmity",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Ironbound Enmity",
+          "points": 15,
+          "raw_name": "Ironbound Enmity",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:fellhammer-siege-host:enhancement:ironbound-enmity"
+        },
+        {
+          "enhancement_id": "warp-tracer",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Warp Tracer",
+          "points": 20,
+          "raw_name": "Warp Tracer",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:fellhammer-siege-host:enhancement:warp-tracer"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "FELLHAMMER SIEGE-HOST",
+      "raw_name": "FELLHAMMER SIEGE-HOST",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:fellhammer-siege-host"
+    },
+    {
+      "detachment_id": "hurons-marauders",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "dread-reputation",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Dread Reputation",
+          "points": 25,
+          "raw_name": "Dread Reputation",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:hurons-marauders:enhancement:dread-reputation"
+        },
+        {
+          "enhancement_id": "eager-for-bloodshed",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eager for Bloodshed",
+          "points": 30,
+          "raw_name": "Eager for Bloodshed",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:hurons-marauders:enhancement:eager-for-bloodshed"
+        },
+        {
+          "enhancement_id": "raid-leader",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Raid Leader",
+          "points": 20,
+          "raw_name": "Raid Leader",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:hurons-marauders:enhancement:raid-leader"
+        },
+        {
+          "enhancement_id": "voice-of-the-tyrant",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Voice of the Tyrant",
+          "points": 25,
+          "raw_name": "Voice of the Tyrant",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:hurons-marauders:enhancement:voice-of-the-tyrant"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "HURON'S MARAUDERS",
+      "raw_name": "HURON'S MARAUDERS",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:hurons-marauders"
+    },
+    {
+      "detachment_id": "murdertalon-raiders",
+      "detachment_point_cost": 1,
+      "enhancements": [
+        {
+          "enhancement_id": "pact-of-cursed-pinions",
+          "is_upgrade": false,
+          "leader_allowance": {
+            "allowed_bodyguard_names": [
+              "WARP TALONS"
+            ],
+            "allowed_bodyguard_unit_ids": [
+              "warp-talons"
+            ],
+            "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:murdertalon-raiders:enhancement:pact-of-cursed-pinions:leader"
+          },
+          "name": "Pact of Cursed Pinions",
+          "points": 20,
+          "raw_name": "Pact of Cursed Pinions",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:murdertalon-raiders:enhancement:pact-of-cursed-pinions"
+        },
+        {
+          "enhancement_id": "shadowcowl-talisman",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Shadowcowl Talisman",
+          "points": 20,
+          "raw_name": "Shadowcowl Talisman",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:murdertalon-raiders:enhancement:shadowcowl-talisman"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "MURDERTALON RAIDERS",
+      "raw_name": "MURDERTALON RAIDERS",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:murdertalon-raiders"
+    },
+    {
+      "detachment_id": "nightmare-hunt",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "greyveil-hex",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Greyveil Hex",
+          "points": 25,
+          "raw_name": "Greyveil Hex",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:nightmare-hunt:enhancement:greyveil-hex"
+        },
+        {
+          "enhancement_id": "sorrowscent-vulture",
+          "is_upgrade": false,
+          "leader_allowance": {
+            "allowed_bodyguard_names": [
+              "WARP TALONS"
+            ],
+            "allowed_bodyguard_unit_ids": [
+              "warp-talons"
+            ],
+            "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:nightmare-hunt:enhancement:sorrowscent-vulture:leader"
+          },
+          "name": "Sorrowscent Vulture",
+          "points": 35,
+          "raw_name": "Sorrowscent Vulture",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:nightmare-hunt:enhancement:sorrowscent-vulture"
+        },
+        {
+          "enhancement_id": "terrorglut-parasite",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Terrorglut Parasite",
+          "points": 20,
+          "raw_name": "Terrorglut Parasite",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:nightmare-hunt:enhancement:terrorglut-parasite"
+        },
+        {
+          "enhancement_id": "warp-fuelled-thrusters",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Warp-Fuelled Thrusters",
+          "points": 20,
+          "raw_name": "Warp-Fuelled Thrusters",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:nightmare-hunt:enhancement:warp-fuelled-thrusters"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "NIGHTMARE HUNT",
+      "raw_name": "NIGHTMARE HUNT",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:nightmare-hunt"
+    },
+    {
+      "detachment_id": "pactbound-zealots",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "eye-of-tzeentch",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eye of Tzeentch",
+          "points": 15,
+          "raw_name": "Eye of Tzeentch",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:pactbound-zealots:enhancement:eye-of-tzeentch"
+        },
+        {
+          "enhancement_id": "intoxicating-elixir",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Intoxicating Elixir",
+          "points": 15,
+          "raw_name": "Intoxicating Elixir",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:pactbound-zealots:enhancement:intoxicating-elixir"
+        },
+        {
+          "enhancement_id": "orbs-of-unlife",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Orbs of Unlife",
+          "points": 15,
+          "raw_name": "Orbs of Unlife",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:pactbound-zealots:enhancement:orbs-of-unlife"
+        },
+        {
+          "enhancement_id": "talisman-of-burning-blood",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Talisman of Burning Blood",
+          "points": 15,
+          "raw_name": "Talisman of Burning Blood",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:pactbound-zealots:enhancement:talisman-of-burning-blood"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "PACTBOUND ZEALOTS",
+      "raw_name": "PACTBOUND ZEALOTS",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:pactbound-zealots"
+    },
+    {
+      "detachment_id": "renegade-raiders",
+      "detachment_point_cost": 3,
+      "enhancements": [
+        {
+          "enhancement_id": "despots-claim",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Despot's Claim",
+          "points": 15,
+          "raw_name": "Despot's Claim",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:renegade-raiders:enhancement:despots-claim"
+        },
+        {
+          "enhancement_id": "dread-reaver",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Dread Reaver",
+          "points": 15,
+          "raw_name": "Dread Reaver",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:renegade-raiders:enhancement:dread-reaver"
+        },
+        {
+          "enhancement_id": "mark-of-the-hound",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mark of the Hound",
+          "points": 25,
+          "raw_name": "Mark of the Hound",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:renegade-raiders:enhancement:mark-of-the-hound"
+        },
+        {
+          "enhancement_id": "tyrants-lash",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tyrant's Lash",
+          "points": 20,
+          "raw_name": "Tyrant's Lash",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:renegade-raiders:enhancement:tyrants-lash"
+        }
+      ],
+      "force_disposition_id": "reconnaissance",
+      "name": "RENEGADE RAIDERS",
+      "raw_name": "RENEGADE RAIDERS",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:renegade-raiders"
+    },
+    {
+      "detachment_id": "renegade-warband",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "empyric-symbiote",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Empyric Symbiote",
+          "points": 15,
+          "raw_name": "Empyric Symbiote",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:renegade-warband:enhancement:empyric-symbiote"
+        },
+        {
+          "enhancement_id": "eyes-of-the-hunter",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eyes of the Hunter",
+          "points": 15,
+          "raw_name": "Eyes of the Hunter",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:renegade-warband:enhancement:eyes-of-the-hunter"
+        },
+        {
+          "enhancement_id": "fratricidal-trophies",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Fratricidal Trophies",
+          "points": 5,
+          "raw_name": "Fratricidal Trophies",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:renegade-warband:enhancement:fratricidal-trophies"
+        },
+        {
+          "enhancement_id": "weaponised-hatred",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Weaponised Hatred",
+          "points": 35,
+          "raw_name": "Weaponised Hatred",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:renegade-warband:enhancement:weaponised-hatred"
+        }
+      ],
+      "force_disposition_id": "priority-assets",
+      "name": "RENEGADE WARBAND",
+      "raw_name": "RENEGADE WARBAND",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:renegade-warband"
+    },
+    {
+      "detachment_id": "soulforged-warpack",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "forges-blessing",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Forge's Blessing",
+          "points": 20,
+          "raw_name": "Forge's Blessing",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:soulforged-warpack:enhancement:forges-blessing"
+        },
+        {
+          "enhancement_id": "invigorated-mechatendrils",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Invigorated Mechatendrils",
+          "points": 15,
+          "raw_name": "Invigorated Mechatendrils",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:soulforged-warpack:enhancement:invigorated-mechatendrils"
+        },
+        {
+          "enhancement_id": "soul-harvester",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Soul Harvester",
+          "points": 15,
+          "raw_name": "Soul Harvester",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:soulforged-warpack:enhancement:soul-harvester"
+        },
+        {
+          "enhancement_id": "tempting-addendum",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tempting Addendum",
+          "points": 25,
+          "raw_name": "Tempting Addendum",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:soulforged-warpack:enhancement:tempting-addendum"
+        }
+      ],
+      "force_disposition_id": "purge-the-foe",
+      "name": "SOULFORGED WARPACK",
+      "raw_name": "SOULFORGED WARPACK",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:soulforged-warpack"
+    },
+    {
+      "detachment_id": "veterans-of-the-long-war",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "eager-for-vengeance",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eager for Vengeance",
+          "points": 20,
+          "raw_name": "Eager for Vengeance",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:veterans-of-the-long-war:enhancement:eager-for-vengeance"
+        },
+        {
+          "enhancement_id": "eye-of-abaddon",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eye of Abaddon",
+          "points": 15,
+          "raw_name": "Eye of Abaddon",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:veterans-of-the-long-war:enhancement:eye-of-abaddon"
+        },
+        {
+          "enhancement_id": "mark-of-legend",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Mark of Legend",
+          "points": 10,
+          "raw_name": "Mark of Legend",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:veterans-of-the-long-war:enhancement:mark-of-legend"
+        },
+        {
+          "enhancement_id": "warmasters-gift",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Warmaster's Gift",
+          "points": 15,
+          "raw_name": "Warmaster's Gift",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:veterans-of-the-long-war:enhancement:warmasters-gift"
+        }
+      ],
+      "force_disposition_id": "take-and-hold",
+      "name": "VETERANS OF THE LONG WAR",
+      "raw_name": "VETERANS OF THE LONG WAR",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:veterans-of-the-long-war"
+    },
+    {
+      "detachment_id": "warpstrike-champions",
+      "detachment_point_cost": 2,
+      "enhancements": [
+        {
+          "enhancement_id": "akshurs-binding-runes",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Akshur's Binding Runes",
+          "points": 20,
+          "raw_name": "Akshur's Binding Runes",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:warpstrike-champions:enhancement:akshurs-binding-runes"
+        },
+        {
+          "enhancement_id": "eye-of-the-warp",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Eye of the Warp",
+          "points": 15,
+          "raw_name": "Eye of the Warp",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:warpstrike-champions:enhancement:eye-of-the-warp"
+        },
+        {
+          "enhancement_id": "infernal-fulgurite",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Infernal Fulgurite",
+          "points": 20,
+          "raw_name": "Infernal Fulgurite",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:warpstrike-champions:enhancement:infernal-fulgurite"
+        },
+        {
+          "enhancement_id": "tzagulla",
+          "is_upgrade": false,
+          "leader_allowance": null,
+          "name": "Tzagulla",
+          "points": 25,
+          "raw_name": "Tzagulla",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:warpstrike-champions:enhancement:tzagulla"
+        }
+      ],
+      "force_disposition_id": "disruption",
+      "name": "WARPSTRIKE CHAMPIONS",
+      "raw_name": "WARPSTRIKE CHAMPIONS",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:detachment:warpstrike-champions"
+    }
+  ],
+  "faction_id": "chaos-space-marines",
+  "name": "Chaos Space Marines",
+  "raw_name": "Chaos Space Marines",
+  "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines",
+  "units": [
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 285,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-abaddon-the-despoiler:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-abaddon-the-despoiler:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CHAOS TERMINATOR SQUAD",
+          "CHOSEN"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "chaos-terminator-squad",
+          "chosen"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-abaddon-the-despoiler:leader"
+      },
+      "name": "ABADDON THE DESPOILER",
+      "raw_name": "ABADDON THE DESPOILER",
+      "record_id": "units-abaddon-the-despoiler",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-abaddon-the-despoiler",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "abaddon-the-despoiler",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "8 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 8,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "8 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-accursed-cultists:cost:your-1st-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "16 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 16,
+              "model_id": null,
+              "model_name": null,
+              "points": 195,
+              "raw_label": "16 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-accursed-cultists:cost:your-1st-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-accursed-cultists:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "8 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 8,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "8 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-accursed-cultists:cost:your-2nd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "16 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 16,
+              "model_id": null,
+              "model_name": null,
+              "points": 215,
+              "raw_label": "16 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-accursed-cultists:cost:your-2nd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-accursed-cultists:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "ACCURSED CULTISTS",
+      "raw_name": "ACCURSED CULTISTS",
+      "record_id": "units-accursed-cultists",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-accursed-cultists",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "accursed-cultists",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-bikers:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "6 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 6,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "6 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-bikers:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-bikers:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS BIKERS",
+      "raw_name": "CHAOS BIKERS",
+      "record_id": "units-chaos-bikers",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-bikers",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-bikers",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-land-raider:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-land-raider:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS LAND RAIDER",
+      "raw_name": "CHAOS LAND RAIDER",
+      "record_id": "units-chaos-land-raider",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-land-raider",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-land-raider",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-lord:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-lord:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CHOSEN",
+          "LEGIONARIES",
+          "NEMESIS CLAW",
+          "RED CORSAIRS RAIDERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "chosen",
+          "legionaries",
+          "nemesis-claw",
+          "red-corsairs-raiders"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-lord:leader"
+      },
+      "name": "CHAOS LORD",
+      "raw_name": "CHAOS LORD",
+      "record_id": "units-chaos-lord",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-lord",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-lord",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 85,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-lord-in-terminator-armour:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-lord-in-terminator-armour:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CHAOS TERMINATOR SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "chaos-terminator-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-lord-in-terminator-armour:leader"
+      },
+      "name": "CHAOS LORD IN TERMINATOR ARMOUR",
+      "raw_name": "CHAOS LORD IN TERMINATOR ARMOUR",
+      "record_id": "units-chaos-lord-in-terminator-armour",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-lord-in-terminator-armour",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-lord-in-terminator-armour",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-lord-with-jump-pack:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-lord-with-jump-pack:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "RAPTORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "raptors"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-lord-with-jump-pack:leader"
+      },
+      "name": "CHAOS LORD WITH JUMP PACK",
+      "raw_name": "CHAOS LORD WITH JUMP PACK",
+      "record_id": "units-chaos-lord-with-jump-pack",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-lord-with-jump-pack",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-lord-with-jump-pack",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-predator-annihilator:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-predator-annihilator:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 145,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-predator-annihilator:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-predator-annihilator:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS PREDATOR ANNIHILATOR",
+      "raw_name": "CHAOS PREDATOR ANNIHILATOR",
+      "record_id": "units-chaos-predator-annihilator",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-predator-annihilator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-predator-annihilator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 140,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-predator-destructor:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-predator-destructor:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 150,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-predator-destructor:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-predator-destructor:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS PREDATOR DESTRUCTOR",
+      "raw_name": "CHAOS PREDATOR DESTRUCTOR",
+      "record_id": "units-chaos-predator-destructor",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-predator-destructor",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-predator-destructor",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 75,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-rhino:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-rhino:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS RHINO",
+      "raw_name": "CHAOS RHINO",
+      "record_id": "units-chaos-rhino",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-rhino",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-rhino",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-spawn:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-spawn:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS SPAWN",
+      "raw_name": "CHAOS SPAWN",
+      "record_id": "units-chaos-spawn",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-spawn",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-spawn",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-terminator-squad:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 360,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-terminator-squad:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-terminator-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS TERMINATOR SQUAD",
+      "raw_name": "CHAOS TERMINATOR SQUAD",
+      "record_id": "units-chaos-terminator-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-terminator-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-terminator-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 185,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-vindicator:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-vindicator:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 195,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-vindicator:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-vindicator:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHAOS VINDICATOR",
+      "raw_name": "CHAOS VINDICATOR",
+      "record_id": "units-chaos-vindicator",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chaos-vindicator",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chaos-vindicator",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chosen:cost:your-1st-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 250,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chosen:cost:your-1st-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chosen:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chosen:cost:your-2nd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 260,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chosen:cost:your-2nd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chosen:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CHOSEN",
+      "raw_name": "CHOSEN",
+      "record_id": "units-chosen",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-chosen",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "chosen",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 45,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-cultist-firebrand:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-cultist-firebrand:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-cultist-firebrand:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-cultist-firebrand:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "ACCURSED CULTISTS",
+          "CULTIST MOB"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "accursed-cultists",
+          "cultist-mob"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-cultist-firebrand:leader"
+      },
+      "name": "CULTIST FIREBRAND",
+      "raw_name": "CULTIST FIREBRAND",
+      "record_id": "units-cultist-firebrand",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-cultist-firebrand",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cultist-firebrand",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 50,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-cultist-mob:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "20 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 20,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "20 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-cultist-mob:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-cultist-mob:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CULTIST MOB",
+      "raw_name": "CULTIST MOB",
+      "record_id": "units-cultist-mob",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-cultist-mob",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cultist-mob",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-cypher:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-cypher:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "CYPHER",
+      "raw_name": "CYPHER",
+      "record_id": "units-cypher",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-cypher",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "cypher",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 65,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-dark-apostle:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-dark-apostle:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "ACCURSED CULTISTS",
+          "CHOSEN",
+          "CULTIST MOB",
+          "LEGIONARIES",
+          "NEMESIS CLAW",
+          "RED CORSAIRS RAIDERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "accursed-cultists",
+          "chosen",
+          "cultist-mob",
+          "legionaries",
+          "nemesis-claw",
+          "red-corsairs-raiders"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-dark-apostle:leader"
+      },
+      "name": "DARK APOSTLE",
+      "raw_name": "DARK APOSTLE",
+      "record_id": "units-dark-apostle",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-dark-apostle",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "dark-apostle",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-dark-commune:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-dark-commune:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-dark-commune:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-dark-commune:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "ACCURSED CULTISTS",
+          "CULTIST MOB"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "accursed-cultists",
+          "cultist-mob"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-dark-commune:leader"
+      },
+      "name": "DARK COMMUNE",
+      "raw_name": "DARK COMMUNE",
+      "record_id": "units-dark-commune",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-dark-commune",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "dark-commune",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 300,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-defiler:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-defiler:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 330,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-defiler:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-defiler:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "DEFILER",
+      "raw_name": "DEFILER",
+      "record_id": "units-defiler",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-defiler",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "defiler",
+      "wargear_costs": [
+        {
+          "name": "Hades lascannon",
+          "points_per_item": 10,
+          "raw_name": "per Hades lascannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-defiler:wargear:per-hades-lascannon:2",
+          "wargear_id": "hades-lascannon"
+        },
+        {
+          "name": "Heavy reaper autocannon",
+          "points_per_item": 10,
+          "raw_name": "per Heavy reaper autocannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-defiler:wargear:per-heavy-reaper-autocannon:1",
+          "wargear_id": "heavy-reaper-autocannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 100,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-fabius-bile:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-fabius-bile:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "ACCURSED CULTISTS",
+          "CHOSEN",
+          "CULTIST MOB",
+          "LEGIONARIES",
+          "RED CORSAIRS RAIDERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "accursed-cultists",
+          "chosen",
+          "cultist-mob",
+          "legionaries",
+          "red-corsairs-raiders"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-fabius-bile:leader"
+      },
+      "name": "FABIUS BILE",
+      "raw_name": "FABIUS BILE",
+      "record_id": "units-fabius-bile",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-fabius-bile",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "fabius-bile",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-fellgor-beastmen:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-fellgor-beastmen:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FELLGOR BEASTMEN",
+      "raw_name": "FELLGOR BEASTMEN",
+      "record_id": "units-fellgor-beastmen",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-fellgor-beastmen",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "fellgor-beastmen",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-forgefiend:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-forgefiend:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-forgefiend:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-forgefiend:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "FORGEFIEND",
+      "raw_name": "FORGEFIEND",
+      "record_id": "units-forgefiend",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-forgefiend",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "forgefiend",
+      "wargear_costs": [
+        {
+          "name": "Ectoplasma cannon",
+          "points_per_item": 5,
+          "raw_name": "per Ectoplasma cannon",
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-forgefiend:wargear:per-ectoplasma-cannon:1",
+          "wargear_id": "ectoplasma-cannon"
+        }
+      ]
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-haarken-worldclaimer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-haarken-worldclaimer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "RAPTORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "raptors"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-haarken-worldclaimer:leader"
+      },
+      "name": "HAARKEN WORLDCLAIMER",
+      "raw_name": "HAARKEN WORLDCLAIMER",
+      "record_id": "units-haarken-worldclaimer",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-haarken-worldclaimer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "haarken-worldclaimer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-havocs:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-havocs:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-havocs:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-havocs:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HAVOCS",
+      "raw_name": "HAVOCS",
+      "record_id": "units-havocs",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-havocs",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "havocs",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-helbrute:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-helbrute:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HELBRUTE",
+      "raw_name": "HELBRUTE",
+      "record_id": "units-helbrute",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-helbrute",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "helbrute",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 175,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-heldrake:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-heldrake:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HELDRAKE",
+      "raw_name": "HELDRAKE",
+      "record_id": "units-heldrake",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-heldrake",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "heldrake",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 165,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-heretic-astartes-daemon-prince:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-heretic-astartes-daemon-prince:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HERETIC ASTARTES DAEMON PRINCE",
+      "raw_name": "HERETIC ASTARTES DAEMON PRINCE",
+      "record_id": "units-heretic-astartes-daemon-prince",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-heretic-astartes-daemon-prince",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "heretic-astartes-daemon-prince",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-heretic-astartes-daemon-prince-with-wings:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-heretic-astartes-daemon-prince-with-wings:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "HERETIC ASTARTES DAEMON PRINCE WITH WINGS",
+      "raw_name": "HERETIC ASTARTES DAEMON PRINCE WITH WINGS",
+      "record_id": "units-heretic-astartes-daemon-prince-with-wings",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-heretic-astartes-daemon-prince-with-wings",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "heretic-astartes-daemon-prince-with-wings",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-huron-blackheart:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-huron-blackheart:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CHAOS TERMINATOR SQUAD",
+          "CHOSEN",
+          "LEGIONARIES",
+          "MASTERS OF THE MAELSTROM",
+          "RED CORSAIRS RAIDERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "chaos-terminator-squad",
+          "chosen",
+          "legionaries",
+          "masters-of-the-maelstrom",
+          "red-corsairs-raiders"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-huron-blackheart:leader"
+      },
+      "name": "HURON BLACKHEART",
+      "raw_name": "HURON BLACKHEART",
+      "record_id": "units-huron-blackheart",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-huron-blackheart",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "huron-blackheart",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST UNIT COSTS",
+          "raw_label": "YOUR 1ST UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 450,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-khorne-lord-of-skulls:cost:your-1st-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-khorne-lord-of-skulls:cost:your-1st-unit-costs",
+          "unit_number_max": 1,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 2ND + UNIT COSTS",
+          "raw_label": "YOUR 2ND + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 475,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-khorne-lord-of-skulls:cost:your-2nd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-khorne-lord-of-skulls:cost:your-2nd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 2
+        }
+      ],
+      "leader_allowance": null,
+      "name": "KHORNE LORD OF SKULLS",
+      "raw_name": "KHORNE LORD OF SKULLS",
+      "record_id": "units-khorne-lord-of-skulls",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-khorne-lord-of-skulls",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "khorne-lord-of-skulls",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-kravek-morne:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-kravek-morne:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CHAOS TERMINATOR SQUAD",
+          "MUTILATORS",
+          "OBLITERATORS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "chaos-terminator-squad",
+          "mutilators",
+          "obliterators"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-kravek-morne:leader"
+      },
+      "name": "KRAVEK MORNE",
+      "raw_name": "KRAVEK MORNE",
+      "record_id": "units-kravek-morne",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-kravek-morne",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "kravek-morne",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 90,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-legionaries:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-legionaries:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-legionaries:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LEGIONARIES",
+      "raw_name": "LEGIONARIES",
+      "record_id": "units-legionaries",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-legionaries",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "legionaries",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-lord-discordant-on-helstalker:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-lord-discordant-on-helstalker:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "LORD DISCORDANT ON HELSTALKER",
+      "raw_name": "LORD DISCORDANT ON HELSTALKER",
+      "record_id": "units-lord-discordant-on-helstalker",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-lord-discordant-on-helstalker",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "lord-discordant-on-helstalker",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-master-of-executions:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-master-of-executions:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MASTER OF EXECUTIONS",
+      "raw_name": "MASTER OF EXECUTIONS",
+      "record_id": "units-master-of-executions",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-master-of-executions",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "master-of-executions",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-master-of-possession:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-master-of-possession:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CHOSEN",
+          "LEGIONARIES",
+          "NEMESIS CLAW",
+          "POSSESSED",
+          "RED CORSAIRS RAIDERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "chosen",
+          "legionaries",
+          "nemesis-claw",
+          "possessed",
+          "red-corsairs-raiders"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-master-of-possession:leader"
+      },
+      "name": "MASTER OF POSSESSION",
+      "raw_name": "MASTER OF POSSESSION",
+      "record_id": "units-master-of-possession",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-master-of-possession",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "master-of-possession",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-masters-of-the-maelstrom:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-masters-of-the-maelstrom:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MASTERS OF THE MAELSTROM",
+      "raw_name": "MASTERS OF THE MAELSTROM",
+      "record_id": "units-masters-of-the-maelstrom",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-masters-of-the-maelstrom",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "masters-of-the-maelstrom",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-maulerfiend:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-maulerfiend:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MAULERFIEND",
+      "raw_name": "MAULERFIEND",
+      "record_id": "units-maulerfiend",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-maulerfiend",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "maulerfiend",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 180,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-mutilators:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-mutilators:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "3 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 3,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "3 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-mutilators:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-mutilators:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "MUTILATORS",
+      "raw_name": "MUTILATORS",
+      "record_id": "units-mutilators",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-mutilators",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "mutilators",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-nemesis-claw:cost:your-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 190,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-nemesis-claw:cost:your-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-nemesis-claw:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NEMESIS CLAW",
+      "raw_name": "NEMESIS CLAW",
+      "record_id": "units-nemesis-claw",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-nemesis-claw",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "nemesis-claw",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-noctilith-crown:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-noctilith-crown:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "NOCTILITH CROWN",
+      "raw_name": "NOCTILITH CROWN",
+      "record_id": "units-noctilith-crown",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-noctilith-crown",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "noctilith-crown",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 160,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-obliterators:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-obliterators:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 170,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-obliterators:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-obliterators:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "OBLITERATORS",
+      "raw_name": "OBLITERATORS",
+      "record_id": "units-obliterators",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-obliterators",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "obliterators",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-possessed:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 250,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-possessed:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-possessed:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 130,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-possessed:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 260,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-possessed:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-possessed:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "POSSESSED",
+      "raw_name": "POSSESSED",
+      "record_id": "units-possessed",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-possessed",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "possessed",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-raptors:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 210,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-raptors:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-raptors:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-raptors:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-raptors:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-raptors:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RAPTORS",
+      "raw_name": "RAPTORS",
+      "record_id": "units-raptors",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-raptors",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "raptors",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-red-corsairs-raiders:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 210,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-red-corsairs-raiders:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-red-corsairs-raiders:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-red-corsairs-raiders:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 220,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-red-corsairs-raiders:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-red-corsairs-raiders:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "RED CORSAIRS RAIDERS",
+      "raw_name": "RED CORSAIRS RAIDERS",
+      "record_id": "units-red-corsairs-raiders",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-red-corsairs-raiders",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "red-corsairs-raiders",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-red-corsairs-reave-captain:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-red-corsairs-reave-captain:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CHOSEN",
+          "LEGIONARIES",
+          "NEMESIS CLAW",
+          "RED CORSAIRS RAIDERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "chosen",
+          "legionaries",
+          "nemesis-claw",
+          "red-corsairs-raiders"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-red-corsairs-reave-captain:leader"
+      },
+      "name": "RED CORSAIRS REAVE-CAPTAIN",
+      "raw_name": "RED CORSAIRS REAVE-CAPTAIN",
+      "record_id": "units-red-corsairs-reave-captain",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-red-corsairs-reave-captain",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "red-corsairs-reave-captain",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-sorcerer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-sorcerer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CHOSEN",
+          "LEGIONARIES",
+          "NEMESIS CLAW",
+          "RED CORSAIRS RAIDERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "chosen",
+          "legionaries",
+          "nemesis-claw",
+          "red-corsairs-raiders"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-sorcerer:leader"
+      },
+      "name": "SORCERER",
+      "raw_name": "SORCERER",
+      "record_id": "units-sorcerer",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-sorcerer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sorcerer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 80,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-sorcerer-in-terminator-armour:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-sorcerer-in-terminator-armour:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CHAOS TERMINATOR SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "chaos-terminator-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-sorcerer-in-terminator-armour:leader"
+      },
+      "name": "SORCERER IN TERMINATOR ARMOUR",
+      "raw_name": "SORCERER IN TERMINATOR ARMOUR",
+      "record_id": "units-sorcerer-in-terminator-armour",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-sorcerer-in-terminator-armour",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "sorcerer-in-terminator-armour",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "2 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 2,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "2 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-traitor-enforcer:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-traitor-enforcer:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "TRAITOR GUARDSMEN SQUAD"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "traitor-guardsmen-squad"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-traitor-enforcer:leader"
+      },
+      "name": "TRAITOR ENFORCER",
+      "raw_name": "TRAITOR ENFORCER",
+      "record_id": "units-traitor-enforcer",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-traitor-enforcer",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "traitor-enforcer",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 70,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-traitor-guardsmen-squad:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-traitor-guardsmen-squad:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "TRAITOR GUARDSMEN SQUAD",
+      "raw_name": "TRAITOR GUARDSMEN SQUAD",
+      "record_id": "units-traitor-guardsmen-squad",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-traitor-guardsmen-squad",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "traitor-guardsmen-squad",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 205,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-vashtorr-the-arkifane:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-vashtorr-the-arkifane:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VASHTORR THE ARKIFANE",
+      "raw_name": "VASHTORR THE ARKIFANE",
+      "record_id": "units-vashtorr-the-arkifane",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-vashtorr-the-arkifane",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "vashtorr-the-arkifane",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 110,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-venomcrawler:cost:your-1st-to-2nd-units-cost:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-venomcrawler:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 120,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-venomcrawler:cost:your-3rd-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-venomcrawler:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "VENOMCRAWLER",
+      "raw_name": "VENOMCRAWLER",
+      "record_id": "units-venomcrawler",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-venomcrawler",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "venomcrawler",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR 1ST TO 2ND UNITS COST",
+          "raw_label": "YOUR 1ST TO 2ND UNITS COST",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 125,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-warp-talons:cost:your-1st-to-2nd-units-cost:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 280,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-warp-talons:cost:your-1st-to-2nd-units-cost:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-warp-talons:cost:your-1st-to-2nd-units-cost",
+          "unit_number_max": 2,
+          "unit_number_min": 1
+        },
+        {
+          "label": "YOUR 3RD + UNIT COSTS",
+          "raw_label": "YOUR 3RD + UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "5 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 5,
+              "model_id": null,
+              "model_name": null,
+              "points": 135,
+              "raw_label": "5 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-warp-talons:cost:your-3rd-unit-costs:1"
+            },
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "10 models",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 10,
+              "model_id": null,
+              "model_name": null,
+              "points": 290,
+              "raw_label": "10 models",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-warp-talons:cost:your-3rd-unit-costs:2"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-warp-talons:cost:your-3rd-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 3
+        }
+      ],
+      "leader_allowance": null,
+      "name": "WARP TALONS",
+      "raw_name": "WARP TALONS",
+      "record_id": "units-warp-talons",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-warp-talons",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "warp-talons",
+      "wargear_costs": []
+    },
+    {
+      "cost_brackets": [
+        {
+          "label": "YOUR UNIT COSTS",
+          "raw_label": "YOUR UNIT COSTS",
+          "rows": [
+            {
+              "additional_model_count": null,
+              "additional_model_id": null,
+              "additional_model_name": null,
+              "label": "1 model",
+              "model_component_counts": [],
+              "model_component_ids": [],
+              "model_component_names": [],
+              "model_count": 1,
+              "model_id": null,
+              "model_name": null,
+              "points": 60,
+              "raw_label": "1 model",
+              "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-warpsmith:cost:your-unit-costs:1"
+            }
+          ],
+          "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-warpsmith:cost:your-unit-costs",
+          "unit_number_max": null,
+          "unit_number_min": 1
+        }
+      ],
+      "leader_allowance": {
+        "allowed_bodyguard_names": [
+          "CHOSEN",
+          "HAVOCS",
+          "LEGIONARIES",
+          "NEMESIS CLAW",
+          "RED CORSAIRS RAIDERS"
+        ],
+        "allowed_bodyguard_unit_ids": [
+          "chosen",
+          "havocs",
+          "legionaries",
+          "nemesis-claw",
+          "red-corsairs-raiders"
+        ],
+        "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-warpsmith:leader"
+      },
+      "name": "WARPSMITH",
+      "raw_name": "WARPSMITH",
+      "record_id": "units-warpsmith",
+      "source_id": "gw-11e-mfm-2026-06:faction:chaos-space-marines:unit:units-warpsmith",
+      "source_section_id": "units",
+      "source_section_name": "UNITS",
+      "unit_id": "warpsmith",
+      "wargear_costs": []
+    }
+  ],
+  "url_path": "/en/chaos-space-marines"
+}
