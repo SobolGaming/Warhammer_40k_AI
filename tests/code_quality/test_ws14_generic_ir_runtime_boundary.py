@@ -4,6 +4,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 RUNTIME_GENERIC_IR_BOUNDARY_FILES = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "generic_rule_lifecycle_hooks.py",
+    ROOT / "src" / "warhammer40k_core" / "engine" / "generic_rule_ability_registry.py",
     ROOT / "src" / "warhammer40k_core" / "engine" / "faction_rule_execution.py",
     ROOT
     / "src"
@@ -49,6 +51,9 @@ RUNTIME_GENERIC_IR_BOUNDARY_FILES = (
     / "warhammer_40000_11th"
     / "faction_stratagem_activation_2026_27.py",
 )
+GENERIC_RULE_LIFECYCLE_HOOKS = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "generic_rule_lifecycle_hooks.py"
+)
 FORBIDDEN_RUNTIME_GENERIC_IR_TOKENS = (
     "compile_rule_source_text",
     "RuleSourceText",
@@ -56,6 +61,13 @@ FORBIDDEN_RUNTIME_GENERIC_IR_TOKENS = (
     "source_snapshots",
     "wahapedia",
     "json.loads",
+)
+FORBIDDEN_GENERIC_RULE_LIFECYCLE_DETACHMENT_TOKENS = (
+    "shadow_legion",
+    "Shadow Legion",
+    "SHADOW_LEGION",
+    "shadow-legion",
+    "chaos-daemons",
 )
 
 
@@ -66,5 +78,14 @@ def test_ws14_generic_ir_runtime_path_does_not_compile_or_read_raw_source_text()
         for token in FORBIDDEN_RUNTIME_GENERIC_IR_TOKENS:
             if token in text:
                 offenders.append((path.relative_to(ROOT).as_posix(), token))
+
+    assert offenders == []
+
+
+def test_ws14_generic_rule_lifecycle_hooks_use_ability_registry_for_detachment_grants() -> None:
+    text = GENERIC_RULE_LIFECYCLE_HOOKS.read_text(encoding="utf-8")
+    offenders = [
+        token for token in FORBIDDEN_GENERIC_RULE_LIFECYCLE_DETACHMENT_TOKENS if token in text
+    ]
 
     assert offenders == []
