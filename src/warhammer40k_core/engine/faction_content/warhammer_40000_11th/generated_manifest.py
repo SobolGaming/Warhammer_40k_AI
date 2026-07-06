@@ -14,6 +14,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27,
     faction_execution_2026_27,
+    faction_subrules_2026_27,
 )
 
 _BASE = "warhammer40k_core.engine.faction_content.warhammer_40000_11th"
@@ -27,6 +28,16 @@ def generated_runtime_content_rows() -> tuple[RuntimeContentManifestRow, ...]:
     return (
         *tuple(_faction_row(row) for row in faction_detachments_2026_27.faction_rows()),
         *tuple(_detachment_row(row) for row in faction_detachments_2026_27.detachment_rows()),
+        *tuple(
+            _enhancement_row(row)
+            for row in faction_subrules_2026_27.enhancement_rows()
+            if _executable_execution_ids_for_rule(
+                faction_id=row.faction_id,
+                detachment_id=row.detachment_id,
+                rule_id=row.enhancement_id,
+                coverage_kind="detachment_enhancement",
+            )
+        ),
         *_pilot_runtime_content_rows(),
     )
 
@@ -66,6 +77,34 @@ def _detachment_row(
         source_ids=_source_ids_for(
             faction_id=row.faction_id,
             detachment_id=row.detachment_id,
+        ),
+        owner_faction_id=row.faction_id,
+        owner_detachment_id=row.detachment_id,
+        execution_record_ids=execution_record_ids,
+        module_path=(f"{_BASE}.{faction_module}.detachments.{detachment_module}.manifest"),
+        semantic_status=_semantic_status_for_execution_ids(execution_record_ids),
+    )
+
+
+def _enhancement_row(
+    row: faction_subrules_2026_27.SourceEnhancementRow,
+) -> RuntimeContentManifestRow:
+    faction_module = _module_name_for_id(row.faction_id)
+    detachment_module = _module_name_for_id(row.detachment_id)
+    execution_record_ids = _executable_execution_ids_for_rule(
+        faction_id=row.faction_id,
+        detachment_id=row.detachment_id,
+        rule_id=row.enhancement_id,
+        coverage_kind="detachment_enhancement",
+    )
+    return _row(
+        content_id=row.enhancement_id,
+        family=RuntimeContentModuleFamily.ENHANCEMENT,
+        source_ids=_source_ids_for_rule(
+            faction_id=row.faction_id,
+            detachment_id=row.detachment_id,
+            rule_id=row.enhancement_id,
+            coverage_kind="detachment_enhancement",
         ),
         owner_faction_id=row.faction_id,
         owner_detachment_id=row.detachment_id,
@@ -208,6 +247,30 @@ def _execution_ids_matching(token: str) -> tuple[str, ...]:
     )
 
 
+def _executable_execution_ids_for_rule(
+    *,
+    faction_id: str,
+    detachment_id: str | None,
+    rule_id: str,
+    coverage_kind: str,
+) -> tuple[str, ...]:
+    executable_statuses = {
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+    }
+    return tuple(
+        sorted(
+            record.execution_id
+            for record in _EXECUTION_RECORDS
+            if record.faction_id == faction_id
+            and record.detachment_id == detachment_id
+            and record.rule_id == rule_id
+            and record.coverage_kind.value == coverage_kind
+            and record.execution_status in executable_statuses
+        )
+    )
+
+
 def _source_ids_for(
     *,
     faction_id: str,
@@ -217,6 +280,25 @@ def _source_ids_for(
         source_id
         for record in _EXECUTION_RECORDS
         if record.faction_id == faction_id and record.detachment_id == detachment_id
+        for source_id in record.source_ids
+    }
+    return tuple(sorted(source_ids))
+
+
+def _source_ids_for_rule(
+    *,
+    faction_id: str,
+    detachment_id: str | None,
+    rule_id: str,
+    coverage_kind: str,
+) -> tuple[str, ...]:
+    source_ids = {
+        source_id
+        for record in _EXECUTION_RECORDS
+        if record.faction_id == faction_id
+        and record.detachment_id == detachment_id
+        and record.rule_id == rule_id
+        and record.coverage_kind.value == coverage_kind
         for source_id in record.source_ids
     }
     return tuple(sorted(source_ids))

@@ -121,6 +121,108 @@ def test_default_generic_rule_ability_registry_maps_blood_legion_grants() -> Non
     assert sticky.hook_id(source) == blood_legion_ir.BLOOD_TAINTED_HOOK_ID
 
 
+def test_default_generic_rule_ability_registry_maps_shadow_legion_enhancement_grants() -> None:
+    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
+
+    leaping_source = _shadow_legion_enhancement_source(
+        shadow_legion_ir.LEAPING_SHADOWS_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    leaping = registry.enhancement_effect_abilities[0]
+    assert leaping.hook_family is GenericRuleAbilityHookFamily.ENHANCEMENT_EFFECT
+    assert leaping.ability_ids() == (shadow_legion_ir.LEAPING_SHADOWS_SCOUTS_ABILITY,)
+    assert (
+        leaping.coverage_descriptor_id == shadow_legion_ir.LEAPING_SHADOWS_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    assert leaping.source_rule_id == shadow_legion_ir.LEAPING_SHADOWS_SOURCE_RULE_ID
+    assert leaping.enhancement_id == shadow_legion_ir.LEAPING_SHADOWS_ENHANCEMENT_ID
+    assert leaping.effect_id(leaping_source) == (
+        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+        "enhancement:leaping_shadows:scouts_9"
+    )
+
+    mantle_source = _shadow_legion_enhancement_source(
+        shadow_legion_ir.MANTLE_OF_GLOOM_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    mantle = registry.objective_control_modifier_abilities[0]
+    assert mantle.hook_family is GenericRuleAbilityHookFamily.OBJECTIVE_CONTROL_MODIFIER
+    assert mantle.ability_ids() == (shadow_legion_ir.MANTLE_OF_GLOOM_OBJECTIVE_CONTROL_ABILITY,)
+    assert (
+        mantle.coverage_descriptor_id == shadow_legion_ir.MANTLE_OF_GLOOM_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    assert mantle.source_rule_id == shadow_legion_ir.MANTLE_OF_GLOOM_SOURCE_RULE_ID
+    assert mantle.modifier_id(mantle_source) == (
+        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+        "enhancement:mantle_of_gloom:objective-control"
+    )
+
+    fade_source = _shadow_legion_enhancement_source(
+        shadow_legion_ir.FADE_TO_DARKNESS_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    unit_destroyed = registry.unit_destroyed_abilities[0]
+    assert unit_destroyed.hook_family is GenericRuleAbilityHookFamily.UNIT_DESTROYED
+    assert unit_destroyed.ability_ids() == (shadow_legion_ir.FADE_TO_DARKNESS_RESERVES_ABILITY,)
+    assert (
+        unit_destroyed.coverage_descriptor_id
+        == shadow_legion_ir.FADE_TO_DARKNESS_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    assert unit_destroyed.source_rule_id == shadow_legion_ir.FADE_TO_DARKNESS_SOURCE_RULE_ID
+    assert unit_destroyed.hook_id(fade_source) == (
+        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+        "enhancement:fade_to_darkness:unit-destroyed"
+    )
+
+    turn_end = registry.turn_end_abilities[0]
+    assert turn_end.hook_family is GenericRuleAbilityHookFamily.TURN_END
+    assert turn_end.ability_ids() == (shadow_legion_ir.FADE_TO_DARKNESS_RESERVES_ABILITY,)
+    assert (
+        turn_end.coverage_descriptor_id
+        == shadow_legion_ir.FADE_TO_DARKNESS_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    assert turn_end.source_rule_id == shadow_legion_ir.FADE_TO_DARKNESS_SOURCE_RULE_ID
+    assert turn_end.hook_id(fade_source) == (
+        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+        "enhancement:fade_to_darkness:turn-end-reserves"
+    )
+
+    malice_source = _shadow_legion_enhancement_source(
+        shadow_legion_ir.MALICE_MADE_MANIFEST_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    fight_start = registry.fight_phase_start_abilities[0]
+    assert fight_start.hook_family is GenericRuleAbilityHookFamily.FIGHT_PHASE_START
+    assert fight_start.ability_ids() == (
+        shadow_legion_ir.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_ABILITY,
+    )
+    assert (
+        fight_start.coverage_descriptor_id
+        == shadow_legion_ir.MALICE_MADE_MANIFEST_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    assert fight_start.source_rule_id == shadow_legion_ir.MALICE_MADE_MANIFEST_SOURCE_RULE_ID
+    assert fight_start.hook_id(malice_source) == (
+        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+        "enhancement:malice_made_manifest"
+    )
+
+    malice_fnp = next(
+        descriptor
+        for descriptor in registry.mortal_wound_feel_no_pain_abilities
+        if descriptor.coverage_descriptor_id
+        == shadow_legion_ir.MALICE_MADE_MANIFEST_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    assert (
+        malice_fnp.hook_family
+        is GenericRuleAbilityHookFamily.MORTAL_WOUND_FEEL_NO_PAIN_CONTINUATION
+    )
+    assert malice_fnp.ability_ids() == (
+        shadow_legion_ir.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_ABILITY,
+    )
+    assert malice_fnp.source_rule_id == shadow_legion_ir.MALICE_MADE_MANIFEST_SOURCE_RULE_ID
+    assert malice_fnp.source_kind == shadow_legion_ir.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_SOURCE_KIND
+    assert malice_fnp.hook_id(malice_source) == (
+        "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
+        "enhancement:malice_made_manifest:mortal-wound-fnp"
+    )
+
+
 def test_generic_rule_ability_registry_rejects_duplicate_descriptors() -> None:
     descriptor = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.advance_eligibility_abilities[0]
 
@@ -165,6 +267,18 @@ def _blood_legion_source() -> GenericRuleAbilitySource:
         for record in faction_execution_2026_27.execution_records()
         if record.coverage_descriptor_id
         == blood_legion_ir.BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
+    )
+    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+        record.coverage_descriptor_id
+    )
+    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
+
+
+def _shadow_legion_enhancement_source(coverage_descriptor_id: str) -> GenericRuleAbilitySource:
+    record = next(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.coverage_descriptor_id == coverage_descriptor_id
     )
     rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
         record.coverage_descriptor_id

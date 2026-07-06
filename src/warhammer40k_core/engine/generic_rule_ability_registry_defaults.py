@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from types import MappingProxyType
+from typing import Protocol, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
@@ -18,8 +19,14 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.effects import PersistingEffect
+from warhammer40k_core.engine.enhancement_effects import EnhancementEffectContext
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_phase_start_hooks import (
+    FightPhaseStartRequestContext,
+    FightPhaseStartResultContext,
+)
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
@@ -31,13 +38,18 @@ from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleAbilitySource,
     GenericRuleAdvanceEligibilityAbility,
     GenericRuleAttackSequenceCompletedAbility,
+    GenericRuleEnhancementEffectAbility,
+    GenericRuleFightPhaseStartAbility,
     GenericRuleFightUnitSelectedGrantAbility,
     GenericRuleHookIdBuilder,
     GenericRuleMortalWoundFeelNoPainAbility,
     GenericRuleMovementEndSurgeAbility,
+    GenericRuleObjectiveControlModifierAbility,
     GenericRulePhaseEndObjectiveControlAbility,
     GenericRuleShootingTargetRestrictionAbility,
     GenericRuleShootingUnitSelectedGrantAbility,
+    GenericRuleTurnEndAbility,
+    GenericRuleUnitDestroyedAbility,
     GenericRuleWeaponProfileModifierAbility,
     ShootingUnitSelectedGrantBuilder,
     generic_rule_ability_effects_for_unit,
@@ -66,7 +78,10 @@ from warhammer40k_core.engine.objective_control import (
     resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
-from warhammer40k_core.engine.runtime_modifiers import WeaponProfileModifierContext
+from warhammer40k_core.engine.runtime_modifiers import (
+    ObjectiveControlModifierContext,
+    WeaponProfileModifierContext,
+)
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedContext,
@@ -80,6 +95,8 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
     TargetRestriction,
 )
+from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext, TurnEndResultContext
+from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
@@ -93,6 +110,55 @@ _DARK_PACT_SUSTAINED_HITS_1 = "sustained_hits_1"
 _DARK_PACT_EFFECT_KIND = "chaos_space_marines_dark_pact"
 _SHADOW_LEGION_SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:shadow-legion:rule"
 _SHADOW_LEGION_DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND = "chaos_daemons_shadow_legion_dark_pacts"
+
+
+class _ShadowLegionEnhancementsModule(Protocol):
+    LEAPING_SHADOWS_EFFECT_ID: str
+    MANTLE_OF_GLOOM_OBJECTIVE_CONTROL_MODIFIER_ID: str
+    UNIT_DESTROYED_HOOK_ID: str
+    TURN_END_HOOK_ID: str
+    MALICE_MADE_MANIFEST_HOOK_ID: str
+    MALICE_MADE_MANIFEST_MORTAL_WOUND_FNP_HOOK_ID: str
+
+    def leaping_shadows_effect(
+        self,
+        context: EnhancementEffectContext,
+    ) -> tuple[object, ...]: ...
+
+    def mantle_of_gloom_objective_control_modifier(
+        self,
+        context: ObjectiveControlModifierContext,
+    ) -> int: ...
+
+    def record_fade_to_darkness_destroyed_enemy_unit(
+        self,
+        context: UnitDestroyedContext,
+    ) -> None: ...
+
+    def fade_to_darkness_turn_end_request(
+        self,
+        context: TurnEndRequestContext,
+    ) -> DecisionRequest | None: ...
+
+    def apply_fade_to_darkness_turn_end_result(
+        self,
+        context: TurnEndResultContext,
+    ) -> bool: ...
+
+    def malice_made_manifest_fight_phase_start_request(
+        self,
+        context: FightPhaseStartRequestContext,
+    ) -> DecisionRequest | None: ...
+
+    def apply_malice_made_manifest_fight_phase_start_result(
+        self,
+        context: FightPhaseStartResultContext,
+    ) -> bool | LifecycleStatus: ...
+
+    def apply_malice_made_manifest_mortal_wound_feel_no_pain_decision(
+        self,
+        context: MortalWoundFeelNoPainContinuationContext,
+    ) -> LifecycleStatus | None: ...
 
 
 def _shadow_legion_advance_context_predicate(
@@ -574,6 +640,153 @@ def _shadow_legion_dark_pact_weapon_profile_modifier(
     )
 
     return dark_pacts.dark_pact_weapon_profile_modifier(context)
+
+
+def _shadow_legion_enhancements() -> _ShadowLegionEnhancementsModule:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.shadow_legion import (  # noqa: E501
+        enhancements,
+    )
+
+    return cast(_ShadowLegionEnhancementsModule, enhancements)
+
+
+def _shadow_legion_enhancement_context_predicate(
+    context: EnhancementEffectContext,
+    source: GenericRuleAbilitySource,
+) -> bool:
+    if type(context) is not EnhancementEffectContext:
+        raise GameLifecycleError("Shadow Legion enhancement effect requires context.")
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Shadow Legion enhancement effect requires source.")
+    return True
+
+
+def _shadow_legion_objective_control_context_predicate(
+    context: ObjectiveControlModifierContext,
+    source: GenericRuleAbilitySource,
+) -> bool:
+    if type(context) is not ObjectiveControlModifierContext:
+        raise GameLifecycleError("Shadow Legion objective-control modifier requires context.")
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Shadow Legion objective-control modifier requires source.")
+    return True
+
+
+def _shadow_legion_leaping_shadows_effect_id(source: GenericRuleAbilitySource) -> str:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Leaping Shadows effect ID requires source.")
+    return _shadow_legion_enhancements().LEAPING_SHADOWS_EFFECT_ID
+
+
+def _shadow_legion_leaping_shadows_effect(
+    context: EnhancementEffectContext,
+    source: GenericRuleAbilitySource,
+) -> tuple[object, ...]:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Leaping Shadows effect requires source.")
+    return _shadow_legion_enhancements().leaping_shadows_effect(context)
+
+
+def _shadow_legion_mantle_of_gloom_modifier_id(source: GenericRuleAbilitySource) -> str:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Mantle of Gloom modifier ID requires source.")
+    return _shadow_legion_enhancements().MANTLE_OF_GLOOM_OBJECTIVE_CONTROL_MODIFIER_ID
+
+
+def _shadow_legion_mantle_of_gloom_modifier(
+    context: ObjectiveControlModifierContext,
+    source: GenericRuleAbilitySource,
+) -> int:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Mantle of Gloom modifier requires source.")
+    return _shadow_legion_enhancements().mantle_of_gloom_objective_control_modifier(context)
+
+
+def _shadow_legion_fade_to_darkness_unit_destroyed_hook_id(
+    source: GenericRuleAbilitySource,
+) -> str:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Fade to Darkness unit-destroyed hook ID requires source.")
+    return _shadow_legion_enhancements().UNIT_DESTROYED_HOOK_ID
+
+
+def _shadow_legion_fade_to_darkness_unit_destroyed(
+    context: UnitDestroyedContext,
+    source: GenericRuleAbilitySource,
+) -> None:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Fade to Darkness unit-destroyed hook requires source.")
+    _shadow_legion_enhancements().record_fade_to_darkness_destroyed_enemy_unit(context)
+
+
+def _shadow_legion_fade_to_darkness_turn_end_hook_id(
+    source: GenericRuleAbilitySource,
+) -> str:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Fade to Darkness turn-end hook ID requires source.")
+    return _shadow_legion_enhancements().TURN_END_HOOK_ID
+
+
+def _shadow_legion_fade_to_darkness_turn_end_request(
+    context: TurnEndRequestContext,
+    source: GenericRuleAbilitySource,
+) -> DecisionRequest | None:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Fade to Darkness turn-end request requires source.")
+    return _shadow_legion_enhancements().fade_to_darkness_turn_end_request(context)
+
+
+def _shadow_legion_fade_to_darkness_turn_end_result(
+    context: TurnEndResultContext,
+    source: GenericRuleAbilitySource,
+) -> bool:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Fade to Darkness turn-end result requires source.")
+    return _shadow_legion_enhancements().apply_fade_to_darkness_turn_end_result(context)
+
+
+def _shadow_legion_malice_made_manifest_hook_id(source: GenericRuleAbilitySource) -> str:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Malice Made Manifest hook ID requires source.")
+    return _shadow_legion_enhancements().MALICE_MADE_MANIFEST_HOOK_ID
+
+
+def _shadow_legion_malice_made_manifest_request(
+    context: FightPhaseStartRequestContext,
+    source: GenericRuleAbilitySource,
+) -> DecisionRequest | None:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Malice Made Manifest request requires source.")
+    return _shadow_legion_enhancements().malice_made_manifest_fight_phase_start_request(context)
+
+
+def _shadow_legion_malice_made_manifest_result(
+    context: FightPhaseStartResultContext,
+    source: GenericRuleAbilitySource,
+) -> bool | LifecycleStatus:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Malice Made Manifest result requires source.")
+    return _shadow_legion_enhancements().apply_malice_made_manifest_fight_phase_start_result(
+        context
+    )
+
+
+def _shadow_legion_malice_made_manifest_fnp_hook_id(
+    source: GenericRuleAbilitySource,
+) -> str:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Malice Made Manifest FNP hook ID requires source.")
+    return _shadow_legion_enhancements().MALICE_MADE_MANIFEST_MORTAL_WOUND_FNP_HOOK_ID
+
+
+def _shadow_legion_malice_made_manifest_fnp(
+    context: MortalWoundFeelNoPainContinuationContext,
+) -> LifecycleStatus | None:
+    return (
+        _shadow_legion_enhancements().apply_malice_made_manifest_mortal_wound_feel_no_pain_decision(
+            context
+        )
+    )
 
 
 def _blood_legion_movement_end_surge_context_predicate(
@@ -1131,6 +1344,16 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             hook_id_builder=_shadow_legion_dark_pact_mortal_wound_fnp_hook_id,
             handler=_apply_shadow_legion_dark_pact_mortal_wound_feel_no_pain_decision,
         ),
+        GenericRuleMortalWoundFeelNoPainAbility(
+            ability_ids_value=(shadow_legion_ir.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_ABILITY,),
+            coverage_descriptor_id=(
+                shadow_legion_ir.MALICE_MADE_MANIFEST_ENHANCEMENT_DESCRIPTOR_ID
+            ),
+            source_rule_id=shadow_legion_ir.MALICE_MADE_MANIFEST_SOURCE_RULE_ID,
+            source_kind=shadow_legion_ir.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_SOURCE_KIND,
+            hook_id_builder=_shadow_legion_malice_made_manifest_fnp_hook_id,
+            handler=_shadow_legion_malice_made_manifest_fnp,
+        ),
     ),
     weapon_profile_modifier_abilities=(
         GenericRuleWeaponProfileModifierAbility(
@@ -1159,6 +1382,58 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             hook_id_builder=_blood_legion_blood_tainted_hook_id,
             context_predicate=_blood_legion_phase_end_objective_context_predicate,
             state_builder=_blood_legion_blood_tainted_sticky_states,
+        ),
+    ),
+    enhancement_effect_abilities=(
+        GenericRuleEnhancementEffectAbility(
+            ability_id=shadow_legion_ir.LEAPING_SHADOWS_SCOUTS_ABILITY,
+            coverage_descriptor_id=shadow_legion_ir.LEAPING_SHADOWS_ENHANCEMENT_DESCRIPTOR_ID,
+            source_rule_id=shadow_legion_ir.LEAPING_SHADOWS_SOURCE_RULE_ID,
+            enhancement_id=shadow_legion_ir.LEAPING_SHADOWS_ENHANCEMENT_ID,
+            effect_id_builder=_shadow_legion_leaping_shadows_effect_id,
+            context_predicate=_shadow_legion_enhancement_context_predicate,
+            effect_builder=_shadow_legion_leaping_shadows_effect,
+        ),
+    ),
+    objective_control_modifier_abilities=(
+        GenericRuleObjectiveControlModifierAbility(
+            ability_id=shadow_legion_ir.MANTLE_OF_GLOOM_OBJECTIVE_CONTROL_ABILITY,
+            coverage_descriptor_id=shadow_legion_ir.MANTLE_OF_GLOOM_ENHANCEMENT_DESCRIPTOR_ID,
+            source_rule_id=shadow_legion_ir.MANTLE_OF_GLOOM_SOURCE_RULE_ID,
+            modifier_id_builder=_shadow_legion_mantle_of_gloom_modifier_id,
+            context_predicate=_shadow_legion_objective_control_context_predicate,
+            modifier_builder=_shadow_legion_mantle_of_gloom_modifier,
+        ),
+    ),
+    unit_destroyed_abilities=(
+        GenericRuleUnitDestroyedAbility(
+            ability_id=shadow_legion_ir.FADE_TO_DARKNESS_RESERVES_ABILITY,
+            coverage_descriptor_id=shadow_legion_ir.FADE_TO_DARKNESS_ENHANCEMENT_DESCRIPTOR_ID,
+            source_rule_id=shadow_legion_ir.FADE_TO_DARKNESS_SOURCE_RULE_ID,
+            hook_id_builder=_shadow_legion_fade_to_darkness_unit_destroyed_hook_id,
+            effect_builder=_shadow_legion_fade_to_darkness_unit_destroyed,
+        ),
+    ),
+    turn_end_abilities=(
+        GenericRuleTurnEndAbility(
+            ability_id=shadow_legion_ir.FADE_TO_DARKNESS_RESERVES_ABILITY,
+            coverage_descriptor_id=shadow_legion_ir.FADE_TO_DARKNESS_ENHANCEMENT_DESCRIPTOR_ID,
+            source_rule_id=shadow_legion_ir.FADE_TO_DARKNESS_SOURCE_RULE_ID,
+            hook_id_builder=_shadow_legion_fade_to_darkness_turn_end_hook_id,
+            request_builder=_shadow_legion_fade_to_darkness_turn_end_request,
+            result_builder=_shadow_legion_fade_to_darkness_turn_end_result,
+        ),
+    ),
+    fight_phase_start_abilities=(
+        GenericRuleFightPhaseStartAbility(
+            ability_id=shadow_legion_ir.MALICE_MADE_MANIFEST_MORTAL_WOUNDS_ABILITY,
+            coverage_descriptor_id=(
+                shadow_legion_ir.MALICE_MADE_MANIFEST_ENHANCEMENT_DESCRIPTOR_ID
+            ),
+            source_rule_id=shadow_legion_ir.MALICE_MADE_MANIFEST_SOURCE_RULE_ID,
+            hook_id_builder=_shadow_legion_malice_made_manifest_hook_id,
+            request_builder=_shadow_legion_malice_made_manifest_request,
+            result_builder=_shadow_legion_malice_made_manifest_result,
         ),
     ),
 )

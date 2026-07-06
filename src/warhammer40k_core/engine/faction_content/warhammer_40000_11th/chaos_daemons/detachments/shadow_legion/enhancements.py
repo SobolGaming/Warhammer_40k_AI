@@ -27,7 +27,6 @@ from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRe
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementDatasheetAbilityGrant,
-    EnhancementEffectBinding,
     EnhancementEffectContext,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -50,13 +49,11 @@ from warhammer40k_core.engine.faction_content.common import (
 )
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
-    FightPhaseStartHookBinding,
     FightPhaseStartRequestContext,
     FightPhaseStartResultContext,
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
-    MortalWoundFeelNoPainContinuationHookBinding,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -67,19 +64,14 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.reserves import ReserveOrigin
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
-    ObjectiveControlModifierBinding,
     ObjectiveControlModifierContext,
 )
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
-    TurnEndHookBinding,
     TurnEndRequestContext,
     TurnEndResultContext,
 )
-from warhammer40k_core.engine.unit_destroyed_hooks import (
-    UnitDestroyedContext,
-    UnitDestroyedHookBinding,
-)
+from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_proximity import unit_within_enemy_engagement_range
 from warhammer40k_core.geometry.volume import Model as GeometryModel
@@ -154,55 +146,7 @@ DECLINED_EVENT = "chaos_daemons_shadow_legion_fade_to_darkness_declined"
 
 
 def runtime_contribution() -> RuntimeContentContribution:
-    return RuntimeContentContribution(
-        contribution_id=CONTRIBUTION_ID,
-        enhancement_effect_bindings=(
-            EnhancementEffectBinding(
-                effect_id=LEAPING_SHADOWS_EFFECT_ID,
-                source_id=LEAPING_SHADOWS_SOURCE_RULE_ID,
-                enhancement_id=LEAPING_SHADOWS_ENHANCEMENT_ID,
-                handler=leaping_shadows_effect,
-            ),
-        ),
-        objective_control_modifier_bindings=(
-            ObjectiveControlModifierBinding(
-                modifier_id=MANTLE_OF_GLOOM_OBJECTIVE_CONTROL_MODIFIER_ID,
-                source_id=MANTLE_OF_GLOOM_SOURCE_RULE_ID,
-                handler=mantle_of_gloom_objective_control_modifier,
-            ),
-        ),
-        unit_destroyed_hook_bindings=(
-            UnitDestroyedHookBinding(
-                hook_id=UNIT_DESTROYED_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=record_fade_to_darkness_destroyed_enemy_unit,
-            ),
-        ),
-        turn_end_hook_bindings=(
-            TurnEndHookBinding(
-                hook_id=TURN_END_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                request_handler=fade_to_darkness_turn_end_request,
-                result_handler=apply_fade_to_darkness_turn_end_result,
-            ),
-        ),
-        fight_phase_start_hook_bindings=(
-            FightPhaseStartHookBinding(
-                hook_id=MALICE_MADE_MANIFEST_HOOK_ID,
-                source_id=MALICE_MADE_MANIFEST_SOURCE_RULE_ID,
-                request_handler=malice_made_manifest_fight_phase_start_request,
-                result_handler=apply_malice_made_manifest_fight_phase_start_result,
-            ),
-        ),
-        mortal_wound_feel_no_pain_hook_bindings=(
-            MortalWoundFeelNoPainContinuationHookBinding(
-                hook_id=MALICE_MADE_MANIFEST_MORTAL_WOUND_FNP_HOOK_ID,
-                source_id=MALICE_MADE_MANIFEST_SOURCE_RULE_ID,
-                source_kind=MALICE_MADE_MANIFEST_MORTAL_WOUNDS_SOURCE_KIND,
-                handler=apply_malice_made_manifest_mortal_wound_feel_no_pain_decision,
-            ),
-        ),
-    )
+    return RuntimeContentContribution(contribution_id=CONTRIBUTION_ID)
 
 
 def leaping_shadows_effect(

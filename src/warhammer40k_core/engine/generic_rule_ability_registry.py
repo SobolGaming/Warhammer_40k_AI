@@ -14,8 +14,14 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedHandler,
 )
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, PersistingEffect
+from warhammer40k_core.engine.enhancement_effects import EnhancementEffectContext
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.fight_phase_start_hooks import (
+    FightPhaseStartRequestContext,
+    FightPhaseStartResultContext,
+)
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
@@ -28,9 +34,12 @@ from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeContext,
     MovementEndSurgeGrant,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
-from warhammer40k_core.engine.runtime_modifiers import WeaponProfileModifierHandler
+from warhammer40k_core.engine.runtime_modifiers import (
+    ObjectiveControlModifierContext,
+    WeaponProfileModifierHandler,
+)
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedContext,
     ShootingUnitSelectedGrant,
@@ -43,6 +52,8 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
     TargetRestriction,
 )
+from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext, TurnEndResultContext
+from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.rules.rule_ir import (
     RuleEffectKind,
     RuleIR,
@@ -66,6 +77,11 @@ class GenericRuleAbilityHookFamily(StrEnum):
     WEAPON_PROFILE_MODIFIER = "weapon_profile_modifier"
     MOVEMENT_END_SURGE = "movement_end_surge"
     PHASE_END_OBJECTIVE_CONTROL = "phase_end_objective_control"
+    ENHANCEMENT_EFFECT = "enhancement_effect"
+    OBJECTIVE_CONTROL_MODIFIER = "objective_control_modifier"
+    UNIT_DESTROYED = "unit_destroyed"
+    TURN_END = "turn_end"
+    FIGHT_PHASE_START = "fight_phase_start"
 
 
 @dataclass(frozen=True, slots=True)
@@ -136,6 +152,38 @@ type PhaseEndObjectiveControlContextPredicate = Callable[
 type PhaseEndObjectiveControlStateBuilder = Callable[
     [PhaseEndObjectiveControlContext, GenericRuleAbilitySource],
     tuple[StickyObjectiveControlState, ...],
+]
+type EnhancementEffectContextPredicate = Callable[
+    [EnhancementEffectContext, GenericRuleAbilitySource],
+    bool,
+]
+type EnhancementEffectBuilder = Callable[
+    [EnhancementEffectContext, GenericRuleAbilitySource],
+    tuple[object, ...],
+]
+type ObjectiveControlModifierContextPredicate = Callable[
+    [ObjectiveControlModifierContext, GenericRuleAbilitySource],
+    bool,
+]
+type ObjectiveControlModifierBuilder = Callable[
+    [ObjectiveControlModifierContext, GenericRuleAbilitySource],
+    int,
+]
+type UnitDestroyedBuilder = Callable[
+    [UnitDestroyedContext, GenericRuleAbilitySource], object | None
+]
+type TurnEndRequestBuilder = Callable[
+    [TurnEndRequestContext, GenericRuleAbilitySource],
+    DecisionRequest | None,
+]
+type TurnEndResultBuilder = Callable[[TurnEndResultContext, GenericRuleAbilitySource], bool]
+type FightPhaseStartRequestBuilder = Callable[
+    [FightPhaseStartRequestContext, GenericRuleAbilitySource],
+    DecisionRequest | None,
+]
+type FightPhaseStartResultBuilder = Callable[
+    [FightPhaseStartResultContext, GenericRuleAbilitySource],
+    bool | LifecycleStatus,
 ]
 
 
@@ -613,6 +661,242 @@ class GenericRulePhaseEndObjectiveControlAbility:
 
 
 @dataclass(frozen=True, slots=True)
+class GenericRuleEnhancementEffectAbility:
+    ability_id: str
+    coverage_descriptor_id: str
+    source_rule_id: str
+    enhancement_id: str
+    effect_id_builder: GenericRuleHookIdBuilder
+    context_predicate: EnhancementEffectContextPredicate
+    effect_builder: EnhancementEffectBuilder
+
+    @property
+    def hook_family(self) -> GenericRuleAbilityHookFamily:
+        return GenericRuleAbilityHookFamily.ENHANCEMENT_EFFECT
+
+    def __post_init__(self) -> None:
+        _validate_single_descriptor_fields(
+            self.ability_id,
+            coverage_descriptor_id=self.coverage_descriptor_id,
+            source_rule_id=self.source_rule_id,
+            set_validated_values=self._set_validated_identity,
+        )
+        object.__setattr__(
+            self,
+            "enhancement_id",
+            _validate_identifier("enhancement_id", self.enhancement_id),
+        )
+        _validate_callable(
+            "Generic enhancement effect ability effect_id_builder", self.effect_id_builder
+        )
+        _validate_callable(
+            "Generic enhancement effect ability context_predicate", self.context_predicate
+        )
+        _validate_callable("Generic enhancement effect ability effect_builder", self.effect_builder)
+
+    def _set_validated_identity(
+        self,
+        *,
+        ability_id: str,
+        coverage_descriptor_id: str,
+        source_rule_id: str,
+    ) -> None:
+        object.__setattr__(self, "ability_id", ability_id)
+        object.__setattr__(self, "coverage_descriptor_id", coverage_descriptor_id)
+        object.__setattr__(self, "source_rule_id", source_rule_id)
+
+    def ability_ids(self) -> tuple[str, ...]:
+        return (self.ability_id,)
+
+    def effect_id(self, source: GenericRuleAbilitySource) -> str:
+        return _validate_identifier("effect_id", self.effect_id_builder(source))
+
+
+@dataclass(frozen=True, slots=True)
+class GenericRuleObjectiveControlModifierAbility:
+    ability_id: str
+    coverage_descriptor_id: str
+    source_rule_id: str
+    modifier_id_builder: GenericRuleModifierIdBuilder
+    context_predicate: ObjectiveControlModifierContextPredicate
+    modifier_builder: ObjectiveControlModifierBuilder
+
+    @property
+    def hook_family(self) -> GenericRuleAbilityHookFamily:
+        return GenericRuleAbilityHookFamily.OBJECTIVE_CONTROL_MODIFIER
+
+    def __post_init__(self) -> None:
+        _validate_single_descriptor_fields(
+            self.ability_id,
+            coverage_descriptor_id=self.coverage_descriptor_id,
+            source_rule_id=self.source_rule_id,
+            set_validated_values=self._set_validated_identity,
+        )
+        _validate_callable(
+            "Generic objective-control modifier ability modifier_id_builder",
+            self.modifier_id_builder,
+        )
+        _validate_callable(
+            "Generic objective-control modifier ability context_predicate",
+            self.context_predicate,
+        )
+        _validate_callable(
+            "Generic objective-control modifier ability modifier_builder",
+            self.modifier_builder,
+        )
+
+    def _set_validated_identity(
+        self,
+        *,
+        ability_id: str,
+        coverage_descriptor_id: str,
+        source_rule_id: str,
+    ) -> None:
+        object.__setattr__(self, "ability_id", ability_id)
+        object.__setattr__(self, "coverage_descriptor_id", coverage_descriptor_id)
+        object.__setattr__(self, "source_rule_id", source_rule_id)
+
+    def ability_ids(self) -> tuple[str, ...]:
+        return (self.ability_id,)
+
+    def modifier_id(self, source: GenericRuleAbilitySource) -> str:
+        return _validate_identifier("modifier_id", self.modifier_id_builder(source))
+
+
+@dataclass(frozen=True, slots=True)
+class GenericRuleUnitDestroyedAbility:
+    ability_id: str
+    coverage_descriptor_id: str
+    source_rule_id: str
+    hook_id_builder: GenericRuleHookIdBuilder
+    effect_builder: UnitDestroyedBuilder
+
+    @property
+    def hook_family(self) -> GenericRuleAbilityHookFamily:
+        return GenericRuleAbilityHookFamily.UNIT_DESTROYED
+
+    def __post_init__(self) -> None:
+        _validate_single_descriptor_fields(
+            self.ability_id,
+            coverage_descriptor_id=self.coverage_descriptor_id,
+            source_rule_id=self.source_rule_id,
+            set_validated_values=self._set_validated_identity,
+        )
+        _validate_callable("Generic unit-destroyed ability hook_id_builder", self.hook_id_builder)
+        _validate_callable("Generic unit-destroyed ability effect_builder", self.effect_builder)
+
+    def _set_validated_identity(
+        self,
+        *,
+        ability_id: str,
+        coverage_descriptor_id: str,
+        source_rule_id: str,
+    ) -> None:
+        object.__setattr__(self, "ability_id", ability_id)
+        object.__setattr__(self, "coverage_descriptor_id", coverage_descriptor_id)
+        object.__setattr__(self, "source_rule_id", source_rule_id)
+
+    def ability_ids(self) -> tuple[str, ...]:
+        return (self.ability_id,)
+
+    def hook_id(self, source: GenericRuleAbilitySource) -> str:
+        return _validate_identifier("hook_id", self.hook_id_builder(source))
+
+
+@dataclass(frozen=True, slots=True)
+class GenericRuleTurnEndAbility:
+    ability_id: str
+    coverage_descriptor_id: str
+    source_rule_id: str
+    hook_id_builder: GenericRuleHookIdBuilder
+    request_builder: TurnEndRequestBuilder
+    result_builder: TurnEndResultBuilder
+
+    @property
+    def hook_family(self) -> GenericRuleAbilityHookFamily:
+        return GenericRuleAbilityHookFamily.TURN_END
+
+    def __post_init__(self) -> None:
+        _validate_single_descriptor_fields(
+            self.ability_id,
+            coverage_descriptor_id=self.coverage_descriptor_id,
+            source_rule_id=self.source_rule_id,
+            set_validated_values=self._set_validated_identity,
+        )
+        _validate_callable("Generic turn-end ability hook_id_builder", self.hook_id_builder)
+        _validate_callable("Generic turn-end ability request_builder", self.request_builder)
+        _validate_callable("Generic turn-end ability result_builder", self.result_builder)
+
+    def _set_validated_identity(
+        self,
+        *,
+        ability_id: str,
+        coverage_descriptor_id: str,
+        source_rule_id: str,
+    ) -> None:
+        object.__setattr__(self, "ability_id", ability_id)
+        object.__setattr__(self, "coverage_descriptor_id", coverage_descriptor_id)
+        object.__setattr__(self, "source_rule_id", source_rule_id)
+
+    def ability_ids(self) -> tuple[str, ...]:
+        return (self.ability_id,)
+
+    def hook_id(self, source: GenericRuleAbilitySource) -> str:
+        return _validate_identifier("hook_id", self.hook_id_builder(source))
+
+
+@dataclass(frozen=True, slots=True)
+class GenericRuleFightPhaseStartAbility:
+    ability_id: str
+    coverage_descriptor_id: str
+    source_rule_id: str
+    hook_id_builder: GenericRuleHookIdBuilder
+    request_builder: FightPhaseStartRequestBuilder
+    result_builder: FightPhaseStartResultBuilder
+
+    @property
+    def hook_family(self) -> GenericRuleAbilityHookFamily:
+        return GenericRuleAbilityHookFamily.FIGHT_PHASE_START
+
+    def __post_init__(self) -> None:
+        _validate_single_descriptor_fields(
+            self.ability_id,
+            coverage_descriptor_id=self.coverage_descriptor_id,
+            source_rule_id=self.source_rule_id,
+            set_validated_values=self._set_validated_identity,
+        )
+        _validate_callable(
+            "Generic fight-phase-start ability hook_id_builder",
+            self.hook_id_builder,
+        )
+        _validate_callable(
+            "Generic fight-phase-start ability request_builder",
+            self.request_builder,
+        )
+        _validate_callable(
+            "Generic fight-phase-start ability result_builder",
+            self.result_builder,
+        )
+
+    def _set_validated_identity(
+        self,
+        *,
+        ability_id: str,
+        coverage_descriptor_id: str,
+        source_rule_id: str,
+    ) -> None:
+        object.__setattr__(self, "ability_id", ability_id)
+        object.__setattr__(self, "coverage_descriptor_id", coverage_descriptor_id)
+        object.__setattr__(self, "source_rule_id", source_rule_id)
+
+    def ability_ids(self) -> tuple[str, ...]:
+        return (self.ability_id,)
+
+    def hook_id(self, source: GenericRuleAbilitySource) -> str:
+        return _validate_identifier("hook_id", self.hook_id_builder(source))
+
+
+@dataclass(frozen=True, slots=True)
 class GenericRuleAbilityRegistry:
     advance_eligibility_abilities: tuple[GenericRuleAdvanceEligibilityAbility, ...] = ()
     shooting_target_restriction_abilities: tuple[
@@ -645,6 +929,26 @@ class GenericRuleAbilityRegistry:
     ] = ()
     phase_end_objective_control_abilities: tuple[
         GenericRulePhaseEndObjectiveControlAbility,
+        ...,
+    ] = ()
+    enhancement_effect_abilities: tuple[
+        GenericRuleEnhancementEffectAbility,
+        ...,
+    ] = ()
+    objective_control_modifier_abilities: tuple[
+        GenericRuleObjectiveControlModifierAbility,
+        ...,
+    ] = ()
+    unit_destroyed_abilities: tuple[
+        GenericRuleUnitDestroyedAbility,
+        ...,
+    ] = ()
+    turn_end_abilities: tuple[
+        GenericRuleTurnEndAbility,
+        ...,
+    ] = ()
+    fight_phase_start_abilities: tuple[
+        GenericRuleFightPhaseStartAbility,
         ...,
     ] = ()
 
@@ -719,6 +1023,46 @@ class GenericRuleAbilityRegistry:
             _validate_descriptor_tuple(
                 self.phase_end_objective_control_abilities,
                 descriptor_type=GenericRulePhaseEndObjectiveControlAbility,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "enhancement_effect_abilities",
+            _validate_descriptor_tuple(
+                self.enhancement_effect_abilities,
+                descriptor_type=GenericRuleEnhancementEffectAbility,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "objective_control_modifier_abilities",
+            _validate_descriptor_tuple(
+                self.objective_control_modifier_abilities,
+                descriptor_type=GenericRuleObjectiveControlModifierAbility,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "unit_destroyed_abilities",
+            _validate_descriptor_tuple(
+                self.unit_destroyed_abilities,
+                descriptor_type=GenericRuleUnitDestroyedAbility,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "turn_end_abilities",
+            _validate_descriptor_tuple(
+                self.turn_end_abilities,
+                descriptor_type=GenericRuleTurnEndAbility,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "fight_phase_start_abilities",
+            _validate_descriptor_tuple(
+                self.fight_phase_start_abilities,
+                descriptor_type=GenericRuleFightPhaseStartAbility,
             ),
         )
 
@@ -1021,6 +1365,11 @@ type _AnyGenericRuleAbilityDescriptor = (
     | GenericRuleWeaponProfileModifierAbility
     | GenericRuleMovementEndSurgeAbility
     | GenericRulePhaseEndObjectiveControlAbility
+    | GenericRuleEnhancementEffectAbility
+    | GenericRuleObjectiveControlModifierAbility
+    | GenericRuleUnitDestroyedAbility
+    | GenericRuleTurnEndAbility
+    | GenericRuleFightPhaseStartAbility
 )
 
 

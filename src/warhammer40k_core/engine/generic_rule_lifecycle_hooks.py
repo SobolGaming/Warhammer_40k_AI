@@ -16,6 +16,12 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedHookBinding,
 )
+from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.enhancement_effects import (
+    EnhancementEffectBinding,
+    EnhancementEffectContext,
+    EnhancementEffectHandler,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import (
     RuntimeContentActivation,
@@ -35,6 +41,13 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FightActivationAbilityOption,
 )
 from warhammer40k_core.engine.fight_order import CHARGE_FIGHTS_FIRST_EFFECT_KIND
+from warhammer40k_core.engine.fight_phase_start_hooks import (
+    FightPhaseStartHookBinding,
+    FightPhaseStartRequestContext,
+    FightPhaseStartRequestHandler,
+    FightPhaseStartResultContext,
+    FightPhaseStartResultHandler,
+)
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
@@ -45,11 +58,16 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleAbilitySource,
     GenericRuleAdvanceEligibilityAbility,
+    GenericRuleEnhancementEffectAbility,
+    GenericRuleFightPhaseStartAbility,
     GenericRuleFightUnitSelectedGrantAbility,
     GenericRuleMovementEndSurgeAbility,
+    GenericRuleObjectiveControlModifierAbility,
     GenericRulePhaseEndObjectiveControlAbility,
     GenericRuleShootingTargetRestrictionAbility,
     GenericRuleShootingUnitSelectedGrantAbility,
+    GenericRuleTurnEndAbility,
+    GenericRuleUnitDestroyedAbility,
     generic_rule_ability_effects_for_unit,
     rule_ir_grants_any_ability,
 )
@@ -68,13 +86,18 @@ from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeHandler,
     MovementEndSurgeHookBinding,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     RuleExecutionStatus,
     execute_rule_ir,
 )
-from warhammer40k_core.engine.runtime_modifiers import WeaponProfileModifierBinding
+from warhammer40k_core.engine.runtime_modifiers import (
+    ObjectiveControlModifierBinding,
+    ObjectiveControlModifierContext,
+    ObjectiveControlModifierHandler,
+    WeaponProfileModifierBinding,
+)
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedContext,
     ShootingUnitSelectedGrant,
@@ -92,6 +115,18 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionHandler,
     ShootingTargetRestrictionHookBinding,
     TargetRestriction,
+)
+from warhammer40k_core.engine.turn_end_hooks import (
+    TurnEndHookBinding,
+    TurnEndRequestContext,
+    TurnEndRequestHandler,
+    TurnEndResultContext,
+    TurnEndResultHandler,
+)
+from warhammer40k_core.engine.unit_destroyed_hooks import (
+    UnitDestroyedContext,
+    UnitDestroyedHandler,
+    UnitDestroyedHookBinding,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import RuleIR
@@ -368,6 +403,140 @@ def phase_end_objective_control_hook_bindings(
     return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
 
 
+def enhancement_effect_bindings(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+) -> tuple[EnhancementEffectBinding, ...]:
+    bindings: list[EnhancementEffectBinding] = []
+    for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.enhancement_effect_abilities:
+        for source in _generic_rule_enhancement_ability_sources(
+            activation=activation,
+            execution_records=execution_records,
+            coverage_descriptor_id=descriptor.coverage_descriptor_id,
+            ability_ids=descriptor.ability_ids(),
+            enhancement_id=descriptor.enhancement_id,
+        ):
+            bindings.append(
+                EnhancementEffectBinding(
+                    effect_id=descriptor.effect_id(source),
+                    source_id=descriptor.source_rule_id,
+                    enhancement_id=descriptor.enhancement_id,
+                    handler=_enhancement_effect_handler_for_descriptor(source, descriptor),
+                )
+            )
+    return tuple(sorted(bindings, key=lambda binding: binding.effect_id))
+
+
+def objective_control_modifier_bindings(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+) -> tuple[ObjectiveControlModifierBinding, ...]:
+    bindings: list[ObjectiveControlModifierBinding] = []
+    for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.objective_control_modifier_abilities:
+        for source in _generic_rule_enhancement_ability_sources(
+            activation=activation,
+            execution_records=execution_records,
+            coverage_descriptor_id=descriptor.coverage_descriptor_id,
+            ability_ids=descriptor.ability_ids(),
+        ):
+            bindings.append(
+                ObjectiveControlModifierBinding(
+                    modifier_id=descriptor.modifier_id(source),
+                    source_id=descriptor.source_rule_id,
+                    handler=_objective_control_modifier_handler_for_descriptor(
+                        source,
+                        descriptor,
+                    ),
+                )
+            )
+    return tuple(sorted(bindings, key=lambda binding: binding.modifier_id))
+
+
+def unit_destroyed_hook_bindings(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+) -> tuple[UnitDestroyedHookBinding, ...]:
+    bindings: list[UnitDestroyedHookBinding] = []
+    for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.unit_destroyed_abilities:
+        for source in _generic_rule_enhancement_ability_sources(
+            activation=activation,
+            execution_records=execution_records,
+            coverage_descriptor_id=descriptor.coverage_descriptor_id,
+            ability_ids=descriptor.ability_ids(),
+        ):
+            bindings.append(
+                UnitDestroyedHookBinding(
+                    hook_id=descriptor.hook_id(source),
+                    source_id=descriptor.source_rule_id,
+                    handler=_unit_destroyed_handler_for_descriptor(source, descriptor),
+                )
+            )
+    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+
+
+def turn_end_hook_bindings(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+) -> tuple[TurnEndHookBinding, ...]:
+    bindings: list[TurnEndHookBinding] = []
+    for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.turn_end_abilities:
+        for source in _generic_rule_enhancement_ability_sources(
+            activation=activation,
+            execution_records=execution_records,
+            coverage_descriptor_id=descriptor.coverage_descriptor_id,
+            ability_ids=descriptor.ability_ids(),
+        ):
+            bindings.append(
+                TurnEndHookBinding(
+                    hook_id=descriptor.hook_id(source),
+                    source_id=descriptor.source_rule_id,
+                    request_handler=_turn_end_request_handler_for_descriptor(
+                        source,
+                        descriptor,
+                    ),
+                    result_handler=_turn_end_result_handler_for_descriptor(
+                        source,
+                        descriptor,
+                    ),
+                )
+            )
+    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+
+
+def fight_phase_start_hook_bindings(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+) -> tuple[FightPhaseStartHookBinding, ...]:
+    bindings: list[FightPhaseStartHookBinding] = []
+    for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.fight_phase_start_abilities:
+        for source in _generic_rule_enhancement_ability_sources(
+            activation=activation,
+            execution_records=execution_records,
+            coverage_descriptor_id=descriptor.coverage_descriptor_id,
+            ability_ids=descriptor.ability_ids(),
+        ):
+            bindings.append(
+                FightPhaseStartHookBinding(
+                    hook_id=descriptor.hook_id(source),
+                    source_id=descriptor.source_rule_id,
+                    request_handler=_fight_phase_start_request_handler_for_descriptor(
+                        source,
+                        descriptor,
+                    ),
+                    result_handler=_fight_phase_start_result_handler_for_descriptor(
+                        source,
+                        descriptor,
+                    ),
+                )
+            )
+    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+
+
 def attack_sequence_completed_hook_bindings(
     *,
     activation: RuntimeContentActivation,
@@ -398,12 +567,21 @@ def mortal_wound_feel_no_pain_hook_bindings(
 ) -> tuple[MortalWoundFeelNoPainContinuationHookBinding, ...]:
     bindings: list[MortalWoundFeelNoPainContinuationHookBinding] = []
     for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.mortal_wound_feel_no_pain_abilities:
-        for source in _generic_rule_ability_sources(
-            activation=activation,
-            execution_records=execution_records,
-            coverage_descriptor_id=descriptor.coverage_descriptor_id,
-            ability_ids=descriptor.ability_ids(),
-        ):
+        sources = (
+            *_generic_rule_ability_sources(
+                activation=activation,
+                execution_records=execution_records,
+                coverage_descriptor_id=descriptor.coverage_descriptor_id,
+                ability_ids=descriptor.ability_ids(),
+            ),
+            *_generic_rule_enhancement_ability_sources(
+                activation=activation,
+                execution_records=execution_records,
+                coverage_descriptor_id=descriptor.coverage_descriptor_id,
+                ability_ids=descriptor.ability_ids(),
+            ),
+        )
+        for source in sources:
             bindings.append(
                 MortalWoundFeelNoPainContinuationHookBinding(
                     hook_id=descriptor.hook_id(source),
@@ -571,6 +749,122 @@ def _phase_end_objective_control_handler_for_descriptor(
                 "Generic RuleIR phase-end objective-control states must be a tuple."
             )
         return states
+
+    return handler
+
+
+def _enhancement_effect_handler_for_descriptor(
+    source: GenericRuleAbilitySource,
+    descriptor: GenericRuleEnhancementEffectAbility,
+) -> EnhancementEffectHandler:
+    def handler(context: EnhancementEffectContext) -> tuple[object, ...]:
+        if type(context) is not EnhancementEffectContext:
+            raise GameLifecycleError("Generic RuleIR enhancement effect requires context.")
+        if not descriptor.context_predicate(context, source):
+            return ()
+        effects = descriptor.effect_builder(context, source)
+        if type(effects) is not tuple:
+            raise GameLifecycleError("Generic RuleIR enhancement effects must be a tuple.")
+        return effects
+
+    return handler
+
+
+def _objective_control_modifier_handler_for_descriptor(
+    source: GenericRuleAbilitySource,
+    descriptor: GenericRuleObjectiveControlModifierAbility,
+) -> ObjectiveControlModifierHandler:
+    def handler(context: ObjectiveControlModifierContext) -> int:
+        if type(context) is not ObjectiveControlModifierContext:
+            raise GameLifecycleError("Generic RuleIR objective-control modifier requires context.")
+        if not descriptor.context_predicate(context, source):
+            return context.current_objective_control
+        modified = descriptor.modifier_builder(context, source)
+        if type(modified) is not int:
+            raise GameLifecycleError(
+                "Generic RuleIR objective-control modifier must return an int."
+            )
+        return modified
+
+    return handler
+
+
+def _unit_destroyed_handler_for_descriptor(
+    source: GenericRuleAbilitySource,
+    descriptor: GenericRuleUnitDestroyedAbility,
+) -> UnitDestroyedHandler:
+    def handler(context: UnitDestroyedContext) -> None:
+        if type(context) is not UnitDestroyedContext:
+            raise GameLifecycleError("Generic RuleIR unit-destroyed ability requires context.")
+        result = descriptor.effect_builder(context, source)
+        if result is not None:
+            raise GameLifecycleError("Generic RuleIR unit-destroyed builder must return None.")
+
+    return handler
+
+
+def _turn_end_request_handler_for_descriptor(
+    source: GenericRuleAbilitySource,
+    descriptor: GenericRuleTurnEndAbility,
+) -> TurnEndRequestHandler:
+    def handler(context: TurnEndRequestContext) -> DecisionRequest | None:
+        if type(context) is not TurnEndRequestContext:
+            raise GameLifecycleError("Generic RuleIR turn-end request requires context.")
+        request = descriptor.request_builder(context, source)
+        if request is not None and type(request) is not DecisionRequest:
+            raise GameLifecycleError(
+                "Generic RuleIR turn-end request builder must return DecisionRequest or None."
+            )
+        return request
+
+    return handler
+
+
+def _turn_end_result_handler_for_descriptor(
+    source: GenericRuleAbilitySource,
+    descriptor: GenericRuleTurnEndAbility,
+) -> TurnEndResultHandler:
+    def handler(context: TurnEndResultContext) -> bool:
+        if type(context) is not TurnEndResultContext:
+            raise GameLifecycleError("Generic RuleIR turn-end result requires context.")
+        handled = descriptor.result_builder(context, source)
+        if type(handled) is not bool:
+            raise GameLifecycleError("Generic RuleIR turn-end result builder must return bool.")
+        return handled
+
+    return handler
+
+
+def _fight_phase_start_request_handler_for_descriptor(
+    source: GenericRuleAbilitySource,
+    descriptor: GenericRuleFightPhaseStartAbility,
+) -> FightPhaseStartRequestHandler:
+    def handler(context: FightPhaseStartRequestContext) -> DecisionRequest | None:
+        if type(context) is not FightPhaseStartRequestContext:
+            raise GameLifecycleError("Generic RuleIR fight-start request requires context.")
+        request = descriptor.request_builder(context, source)
+        if request is not None and type(request) is not DecisionRequest:
+            raise GameLifecycleError(
+                "Generic RuleIR fight-start request builder must return DecisionRequest or None."
+            )
+        return request
+
+    return handler
+
+
+def _fight_phase_start_result_handler_for_descriptor(
+    source: GenericRuleAbilitySource,
+    descriptor: GenericRuleFightPhaseStartAbility,
+) -> FightPhaseStartResultHandler:
+    def handler(context: FightPhaseStartResultContext) -> bool | LifecycleStatus:
+        if type(context) is not FightPhaseStartResultContext:
+            raise GameLifecycleError("Generic RuleIR fight-start result requires context.")
+        handled = descriptor.result_builder(context, source)
+        if type(handled) is not bool and type(handled) is not LifecycleStatus:
+            raise GameLifecycleError(
+                "Generic RuleIR fight-start result builder must return bool or status."
+            )
+        return handled
 
     return handler
 
@@ -753,6 +1047,49 @@ def _generic_rule_ability_sources(
         if record.coverage_descriptor_id != requested_descriptor_id:
             continue
         if record.detachment_id not in selected_detachment_ids:
+            continue
+        rule_ir = _rule_ir_for_record(record)
+        if not rule_ir_grants_any_ability(rule_ir, abilities=ability_ids):
+            continue
+        sources.append(GenericRuleAbilitySource(record=record, rule_ir=rule_ir))
+    return tuple(sorted(sources, key=lambda source: source.record.execution_id))
+
+
+def _generic_rule_enhancement_ability_sources(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+    coverage_descriptor_id: str,
+    ability_ids: tuple[str, ...],
+    enhancement_id: str | None = None,
+) -> tuple[GenericRuleAbilitySource, ...]:
+    if type(activation) is not RuntimeContentActivation:
+        raise GameLifecycleError("Generic RuleIR enhancement bindings require activation.")
+    if type(execution_records) is not tuple:
+        raise GameLifecycleError("Generic RuleIR enhancement bindings require records.")
+    requested_descriptor_id = _validate_identifier(
+        "coverage_descriptor_id",
+        coverage_descriptor_id,
+    )
+    requested_enhancement_id = (
+        None if enhancement_id is None else _validate_identifier("enhancement_id", enhancement_id)
+    )
+    assignments_by_enhancement_id = _assignments_by_enhancement_id(activation)
+    sources: list[GenericRuleAbilitySource] = []
+    for record in execution_records:
+        if type(record) is not _Phase17FExecutionRecord:
+            raise GameLifecycleError("Generic RuleIR enhancement bindings require records.")
+        if not _record_is_generic_enhancement(record):
+            continue
+        if record.coverage_descriptor_id != requested_descriptor_id:
+            continue
+        record_enhancement_id = _record_rule_id(record)
+        if (
+            requested_enhancement_id is not None
+            and record_enhancement_id != requested_enhancement_id
+        ):
+            continue
+        if record_enhancement_id not in assignments_by_enhancement_id:
             continue
         rule_ir = _rule_ir_for_record(record)
         if not rule_ir_grants_any_ability(rule_ir, abilities=ability_ids):
