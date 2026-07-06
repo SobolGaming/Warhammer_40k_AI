@@ -403,7 +403,6 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction` | Thrill Seekers |
-| `warhammer_40000_11th:emperors_children:detachment:court_of_the_phoenician:master_of_the_pageant:cp_cost_reduction` | CP Cost Reduction |
 | `warhammer_40000_11th:emperors_children:spectacle_of_slaughter:beguiling_grotesquerie:snap_target_restriction` | Snap Target Restriction |
 | `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush` | Cult Ambush |
 | `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:initial_resurgence` | Cult Ambush |

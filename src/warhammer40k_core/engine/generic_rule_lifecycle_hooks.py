@@ -541,12 +541,21 @@ def stratagem_cost_modifier_bindings(
 ) -> tuple[StratagemCostModifierBinding, ...]:
     bindings: list[StratagemCostModifierBinding] = []
     for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.stratagem_cost_modifier_abilities:
-        for source in _generic_rule_enhancement_ability_sources(
-            activation=activation,
-            execution_records=execution_records,
-            coverage_descriptor_id=descriptor.coverage_descriptor_id,
-            ability_ids=descriptor.ability_ids(),
-        ):
+        descriptor_sources = (
+            *_generic_rule_ability_sources(
+                activation=activation,
+                execution_records=execution_records,
+                coverage_descriptor_id=descriptor.coverage_descriptor_id,
+                ability_ids=descriptor.ability_ids(),
+            ),
+            *_generic_rule_enhancement_ability_sources(
+                activation=activation,
+                execution_records=execution_records,
+                coverage_descriptor_id=descriptor.coverage_descriptor_id,
+                ability_ids=descriptor.ability_ids(),
+            ),
+        )
+        for source in descriptor_sources:
             bindings.append(
                 StratagemCostModifierBinding(
                     modifier_id=descriptor.modifier_id(source),

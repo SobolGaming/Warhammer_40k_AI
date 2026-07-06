@@ -75,6 +75,9 @@ from warhammer40k_core.engine.generic_rule_ability_registry_aeldari_defaults imp
     aeldari_corsair_coterie_turn_end_abilities,
     aeldari_path_of_the_outcast_enhancement_effect_abilities,
 )
+from warhammer40k_core.engine.generic_rule_ability_registry_emperors_children_defaults import (
+    emperors_children_court_of_the_phoenician_stratagem_cost_modifier_abilities,
+)
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
 )
@@ -1424,6 +1427,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
     stratagem_cost_choice_abilities=(*aeldari_corsair_coterie_stratagem_cost_choice_abilities(),),
     stratagem_cost_modifier_abilities=(
         *aeldari_corsair_coterie_stratagem_cost_modifier_abilities(),
+        *emperors_children_court_of_the_phoenician_stratagem_cost_modifier_abilities(),
     ),
     save_option_modifier_abilities=(*aeldari_corsair_coterie_save_option_modifier_abilities(),),
     unit_destroyed_abilities=(

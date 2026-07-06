@@ -20,6 +20,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari.detac
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as dark_pacts,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children.detachments.court_of_the_phoenician import (  # noqa: E501
+    rule as court_rule,
+)
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.generic_rule_ability_effects import (
     generic_rule_ability_effects_for_unit,
@@ -47,6 +50,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
@@ -395,6 +401,35 @@ def test_default_generic_rule_ability_registry_maps_corsair_coterie_enhancement_
     )
 
 
+def test_default_generic_rule_ability_registry_maps_court_detachment_cost_grant() -> None:
+    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
+    source = _court_of_the_phoenician_source()
+
+    master_of_the_pageant = next(
+        descriptor
+        for descriptor in registry.stratagem_cost_modifier_abilities
+        if descriptor.ability_ids()
+        == (court_ir.MASTER_OF_THE_PAGEANT_STRATAGEM_COST_REDUCTION_ABILITY,)
+    )
+
+    assert master_of_the_pageant.hook_family is GenericRuleAbilityHookFamily.STRATAGEM_COST_MODIFIER
+    assert master_of_the_pageant.coverage_descriptor_id == (
+        court_ir.COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID
+    )
+    assert master_of_the_pageant.source_rule_id == court_rule.COURT_OF_THE_PHOENICIAN_RULE_SOURCE_ID
+    assert (
+        master_of_the_pageant.modifier_id(source)
+        == court_rule.MASTER_OF_THE_PAGEANT_COST_MODIFIER_ID
+    )
+
+
+def test_court_runtime_contribution_delegates_cost_modifier_to_generic_ir() -> None:
+    contribution = court_rule.runtime_contribution()
+
+    assert contribution.contribution_id == court_rule.CONTRIBUTION_ID
+    assert contribution.stratagem_cost_modifier_bindings == ()
+
+
 def test_generic_rule_ability_registry_rejects_duplicate_descriptors() -> None:
     descriptor = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.advance_eligibility_abilities[0]
 
@@ -515,6 +550,19 @@ def _blood_legion_source() -> GenericRuleAbilitySource:
         for record in faction_execution_2026_27.execution_records()
         if record.coverage_descriptor_id
         == blood_legion_ir.BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
+    )
+    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+        record.coverage_descriptor_id
+    )
+    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
+
+
+def _court_of_the_phoenician_source() -> GenericRuleAbilitySource:
+    record = next(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.coverage_descriptor_id
+        == court_ir.COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID
     )
     rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
         record.coverage_descriptor_id
