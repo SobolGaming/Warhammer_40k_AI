@@ -53,6 +53,11 @@ Do not add AI/ranker/training logic before the deterministic rules core, decisio
   typed fail-fast loaders, not as Python modules. Generators emit data;
   loaders validate eagerly and preserve package hashes and provenance.
 - Runtime engine code consumes structured descriptors, not ad hoc string parsing.
+- Reusable rule semantics use source-backed RuleIR, generic semantic handlers,
+  or approved runtime hooks before named handlers.
+- Named runtime handlers are deliberate exceptions for bespoke resources, state
+  machines, setup/mission integration, or phase orchestration that cannot be
+  expressed through existing generic surfaces without polluting them.
 - Runtime code must not gate behavior on rule or ability display names, normalized rule-text tokens, or locally re-normalized keyword strings. Behavior gates use stable source rule IDs, descriptor IDs, or canonical keyword tokens carried by the catalog.
 - Load-support status and semantic-execution status are distinct recorded fields for all runtime content. No manifest, coverage report, or documentation may present a placeholder or load-only module as implemented gameplay support.
 - Physical battlefield operations use explicit model-group APIs.
@@ -147,6 +152,70 @@ Hidden-information redaction logic must live in exactly one shared adapters modu
 
 Tests for new decision work must cover valid submission, stale/drift/malformed invalid submission, replay/payload round-trip, deterministic JSON-safe records, and viewer-scoped projection/event redaction when visibility can differ by viewer.
 
+## RuleIR, runtime hook, and named-handler policy
+
+Named handlers are acceptable only when they represent genuinely bespoke game
+subsystems. They are not acceptable when they are content-specific wiring for
+reusable semantics.
+
+Use source-backed RuleIR, generic semantic handlers, or approved runtime hooks
+when a rule can be expressed as:
+
+- source ownership, phase/window, target, or keyword checks;
+- finite decision options or parameterized proposals;
+- ability grants, persisting effects, rerolls, modifiers, target restrictions,
+  or Objective Control adjustments;
+- movement, placement, reserve, reactive-movement, or phase-boundary hooks;
+- deterministic event, replay, audit, and source-context payloads.
+
+Keep or add a named handler only when the rule owns at least one of these:
+
+- bespoke army-level resource accounting;
+- a multi-step faction state machine or unique cross-phase memory model;
+- special setup, mission, army-construction, or non-local orchestration;
+- engine-level state that does not fit an existing generic runtime surface;
+- semantics that would require faction-specific escape hatches inside generic
+  lifecycle modules.
+
+Faction army rules may remain named orchestrators when they own unique faction
+concepts, but reusable sub-effects must route through existing generic IR,
+runtime modifier, Stratagem, decision, movement, objective-control, or ability
+services. Do not duplicate local mutation for a sub-effect already supported by
+an engine-owned generic service.
+
+Detachment rules, Enhancements, Upgrades, and Stratagems are generic-first.
+Implement them through RuleIR, ability records, Stratagem records, runtime
+modifier bindings, and approved hook bindings unless the PR documents the
+bespoke subsystem that requires a named handler. Group these migrations by
+semantic hook family, not by display name alone.
+
+New generic hook families are allowed only when a real source-backed rule in the
+same PR needs them. They must be typed, source-ID-linked, lifecycle/bundle
+loaded, consumed by the engine owner of the mutation, and covered by at least
+one real consumer-path regression. Do not prebuild speculative generic
+registries.
+
+Generic lifecycle modules and runtime hook dispatch must stay content-neutral.
+Do not branch on faction, detachment, Enhancement, Stratagem, rule display name,
+or source-text tokens in generic lifecycle code. Content-specific builders must
+sit behind source-linked provider or registry entries.
+
+Every new named handler must include:
+
+1. a documented justification using the bespoke-subsystem rubric above;
+2. generated source/execution IDs and deterministic handler IDs;
+3. lifecycle-loading coverage without manual handler injection;
+4. replay/audit payload coverage for state-changing behavior;
+5. unsupported/invalid diagnostic coverage where semantics are partial;
+6. handler identity drift coverage;
+7. named-handler budget/classification updates, or proof the current approved
+   budget already covers the handler.
+
+If a generic registry defaults module starts accumulating source-specific
+builders, split those builders into source/provider modules and compose them
+into the default registry. Do not let a defaults module become a new
+named-handler sink.
+
 ## Architecture boundaries
 
 Dependency direction:
@@ -213,6 +282,15 @@ Stop before coding if the change would:
 - copy legacy code wholesale;
 - make UI/headless/network paths diverge;
 - use endpoint-only movement validation;
+- add a named handler for reusable semantics that fit RuleIR, a generic
+  semantic handler, or an approved runtime hook;
+- add a named handler without documented bespoke-subsystem justification and
+  named-handler budget/classification treatment;
+- add faction-, detachment-, Enhancement-, Stratagem-, display-name-, or
+  source-text-token branching to generic lifecycle modules or runtime hook
+  dispatch;
+- add speculative generic hook families not required by real source-backed
+  rules in the same PR;
 - add or change a player-facing decision, finite option family, proposal kind, or adapter-visible payload without updating or confirming `docs/ADAPTER_DECISION_CONTRACT.md`;
 - weaken a CORE V2 invariant.
 
