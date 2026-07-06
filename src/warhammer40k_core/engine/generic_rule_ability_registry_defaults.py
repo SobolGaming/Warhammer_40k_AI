@@ -32,6 +32,18 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrant,
 )
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.generic_rule_ability_effects import (
+    generic_rule_ability_effects_for_unit,
+    generic_rule_ability_source_context_payload,
+    generic_rule_ability_unit_for_player_context,
+    generic_rule_advance_context_unit_id,
+    generic_rule_army_for_player,
+    generic_rule_army_uses_record,
+    generic_rule_fight_unit_selected_unit_id,
+    generic_rule_persisting_effect_ids,
+    generic_rule_shooting_target_restriction_target_unit_id,
+    generic_rule_shooting_unit_selected_unit_id,
+)
 from warhammer40k_core.engine.generic_rule_ability_registry import (
     FightUnitSelectedGrantBuilder,
     GenericRuleAbilityRegistry,
@@ -52,19 +64,19 @@ from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleUnitDestroyedAbility,
     GenericRuleWeaponProfileModifierAbility,
     ShootingUnitSelectedGrantBuilder,
-    generic_rule_ability_effects_for_unit,
-    generic_rule_ability_source_context_payload,
-    generic_rule_ability_unit_for_player_context,
-    generic_rule_advance_context_unit_id,
-    generic_rule_army_for_player,
-    generic_rule_army_uses_record,
-    generic_rule_fight_unit_selected_unit_id,
-    generic_rule_persisting_effect_ids,
-    generic_rule_shooting_target_restriction_target_unit_id,
-    generic_rule_shooting_unit_selected_unit_id,
 )
 from warhammer40k_core.engine.generic_rule_ability_registry_aeldari_defaults import (
+    aeldari_corsair_coterie_battle_formation_abilities,
+    aeldari_corsair_coterie_enhancement_effect_abilities,
+    aeldari_corsair_coterie_objective_control_modifier_abilities,
+    aeldari_corsair_coterie_save_option_modifier_abilities,
+    aeldari_corsair_coterie_stratagem_cost_choice_abilities,
+    aeldari_corsair_coterie_stratagem_cost_modifier_abilities,
+    aeldari_corsair_coterie_turn_end_abilities,
     aeldari_path_of_the_outcast_enhancement_effect_abilities,
+)
+from warhammer40k_core.engine.generic_rule_ability_registry_emperors_children_defaults import (
+    emperors_children_court_of_the_phoenician_stratagem_cost_modifier_abilities,
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
@@ -1387,8 +1399,10 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             state_builder=_blood_legion_blood_tainted_sticky_states,
         ),
     ),
+    battle_formation_abilities=(*aeldari_corsair_coterie_battle_formation_abilities(),),
     enhancement_effect_abilities=(
         *aeldari_path_of_the_outcast_enhancement_effect_abilities(),
+        *aeldari_corsair_coterie_enhancement_effect_abilities(),
         GenericRuleEnhancementEffectAbility(
             ability_id=shadow_legion_ir.LEAPING_SHADOWS_SCOUTS_ABILITY,
             coverage_descriptor_id=shadow_legion_ir.LEAPING_SHADOWS_ENHANCEMENT_DESCRIPTOR_ID,
@@ -1408,7 +1422,14 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             context_predicate=_shadow_legion_objective_control_context_predicate,
             modifier_builder=_shadow_legion_mantle_of_gloom_modifier,
         ),
+        *aeldari_corsair_coterie_objective_control_modifier_abilities(),
     ),
+    stratagem_cost_choice_abilities=(*aeldari_corsair_coterie_stratagem_cost_choice_abilities(),),
+    stratagem_cost_modifier_abilities=(
+        *aeldari_corsair_coterie_stratagem_cost_modifier_abilities(),
+        *emperors_children_court_of_the_phoenician_stratagem_cost_modifier_abilities(),
+    ),
+    save_option_modifier_abilities=(*aeldari_corsair_coterie_save_option_modifier_abilities(),),
     unit_destroyed_abilities=(
         GenericRuleUnitDestroyedAbility(
             ability_id=shadow_legion_ir.FADE_TO_DARKNESS_RESERVES_ABILITY,
@@ -1427,6 +1448,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             request_builder=_shadow_legion_fade_to_darkness_turn_end_request,
             result_builder=_shadow_legion_fade_to_darkness_turn_end_result,
         ),
+        *aeldari_corsair_coterie_turn_end_abilities(),
     ),
     fight_phase_start_abilities=(
         GenericRuleFightPhaseStartAbility(

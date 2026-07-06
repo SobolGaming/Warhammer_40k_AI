@@ -116,7 +116,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `4da53811e3ac7d812d3cdc8bb551ec8d766eda006c29670fae6d9051dcddf94b`
+  `89b75ad329f492e831cf9f2964da96cb11fcf9f73d72fad40dbbe76370557b3e`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -126,7 +126,7 @@ implemented. Datasheet intake is fail-closed as an approved unsupported
 diagnostic. Exact Enhancement and Stratagem rows are generated from the exact
 subrule source package and include stable rule IDs, owner faction/detachment IDs,
 timing/category metadata, source IDs, and support status. Source-only exact rows
-outside generic IR are named-handler-required; 30 exact Enhancement rows in
+outside generic IR are named-handler-required; 36 exact Enhancement rows in
 the conditional weapon-ability grant, grant-ability, characteristic-modification,
 movement-distance, dice-roll modification, and Court of the Phoenician mixed-family
 template groups are generic-supported with checksum-covered RuleIR hashes. The
@@ -138,7 +138,7 @@ four Enhancements, and six Stratagem rows are generic-supported from the same
 RuleIR path. The Cavalcade of Chaos detachment rule, two Enhancements, and
 three Stratagem rows are also generic-supported through semantic RuleIR.
 The Chaos Daemons Shadow Legion and Blood Legion detachment rules are
-generic-supported through semantic RuleIR, for a total of 56 generic-supported
+generic-supported through semantic RuleIR, for a total of 60 generic-supported
 rows; exact rows outside generic IR with existing runtime consumers are marked
 implemented. No
 aggregate faction-pack Enhancement or Stratagem row is used to
@@ -169,16 +169,16 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `22c1402e0cde3b3173c9029173fa9b89fc7d121d5acea3c54f4fd97ead103cc6`
+  `0bd337c46f826054b0c0363bb285958b3a2ceab526ebc12a439d8a86f4234255`
 - upstream Phase 17E checksum:
-  `4da53811e3ac7d812d3cdc8bb551ec8d766eda006c29670fae6d9051dcddf94b`
+  `89b75ad329f492e831cf9f2964da96cb11fcf9f73d72fad40dbbe76370557b3e`
 
 The package emits 2145 execution records, one for every Phase 17E coverage row:
 2024 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, 56 rows are executable generic IR
-rows, and 37 rows are executable
+blocked as `approved_phase17e_source_gap`, 60 rows are executable generic IR
+rows, and 33 rows are executable
 named-handler rows because they already have runtime consumers: 23 faction army
-rules plus 14 exact detachment, Enhancement, and Stratagem rows.
+rules plus 10 exact detachment and Stratagem rows.
 The engine dispatcher can route every record and returns typed `unsupported`
 diagnostics unless a matching executor is registered. No Phase 17E row remains a
 missing handler, runtime no-op, raw-PDF parse, or silent fallback. Future
@@ -437,9 +437,9 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `81f7bb5e78b07cc2a23bc64bdf42bef9f166743d1637aab1f8c514ab91479766`
+  `6c6ce54490dc77733122f5f5379d8641012c7b58559de64a800ffb3ff006fb5e`
 - upstream Phase 17F checksum:
-  `22c1402e0cde3b3173c9029173fa9b89fc7d121d5acea3c54f4fd97ead103cc6`
+  `0bd337c46f826054b0c0363bb285958b3a2ceab526ebc12a439d8a86f4234255`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
@@ -479,11 +479,11 @@ WS14 step 3 is enforced as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-named-handler-budget-v1`
 - source-payload SHA-256 checksum:
-  `df0eec482a397db6b0671bc51f42178c3d7c06d2703a02e5b7a18a7b48adf759`
+  `e59f2a7f9a75c16d34813e56e73561024aef658600ba714e26a6aba31895b64e`
 - upstream Phase 17F checksum:
-  `22c1402e0cde3b3173c9029173fa9b89fc7d121d5acea3c54f4fd97ead103cc6`
+  `0bd337c46f826054b0c0363bb285958b3a2ceab526ebc12a439d8a86f4234255`
 
-The budget report tracks 37 executable named-handler Phase 17F rows and 37
+The budget report tracks 33 executable named-handler Phase 17F rows and 33
 approved entries. The current approved reason is
 `pre_ws14_existing_runtime_consumer`, which is a fixed baseline for handlers
 that existed before the WS14 IR-first pivot. The code-quality audit fails if a
@@ -542,8 +542,7 @@ already engine-consumed named handlers.
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 15 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 45 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 2 | `executable_generic_ir` | `applied` | `none` |
-| Enhancements | 4 | `executable_named_handler` | `applied` | `none` |
+| Enhancements | 6 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 66 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 9 | `executable_named_handler` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |

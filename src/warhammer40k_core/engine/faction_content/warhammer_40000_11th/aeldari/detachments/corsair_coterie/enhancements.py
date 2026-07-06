@@ -6,7 +6,6 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
 from warhammer40k_core.engine.battle_formation_hooks import (
     SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
-    BattleFormationHookBinding,
     BattleFormationRequestContext,
     BattleFormationResultContext,
 )
@@ -17,7 +16,6 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.enhancement_effects import (
-    EnhancementEffectBinding,
     EnhancementEffectContext,
     EnhancementPersistingEffectGrant,
     EnhancementUnitKeywordGrant,
@@ -36,26 +34,19 @@ from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.reserves import ReserveOrigin
 from warhammer40k_core.engine.runtime_modifiers import (
-    ObjectiveControlModifierBinding,
     ObjectiveControlModifierContext,
-    SaveOptionModifierBinding,
     SaveOptionModifierContext,
 )
 from warhammer40k_core.engine.saves import SaveKind, SaveOption
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
-    StratagemCostChoiceHookBinding,
     StratagemCostChoiceRequestContext,
     StratagemCostChoiceResultContext,
     source_result_payload_for_cost_choice,
 )
-from warhammer40k_core.engine.stratagem_cost_modifiers import (
-    StratagemCostModifierBinding,
-    StratagemCostModifierContext,
-)
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierContext
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
-    TurnEndHookBinding,
     TurnEndRequestContext,
     TurnEndResultContext,
 )
@@ -63,9 +54,15 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_proximity import unit_within_enemy_engagement_range
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.volume import Model as GeometryModel
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_aeldari_corsair_coterie_ir_support_2026_27 as corsair_ir,
+)
 
 CONTRIBUTION_ID = "warhammer_40000_11th:aeldari:detachment:corsair_coterie:enhancements:scaffold"
-SOURCE_RULE_ID = "phase17g:aeldari:corsair-coterie:enhancements"
+ARCHRAIDER_SOURCE_RULE_ID = corsair_ir.ARCHRAIDER_SOURCE_RULE_ID
+INFAMY_SOURCE_RULE_ID = corsair_ir.INFAMY_SOURCE_RULE_ID
+VOIDSTONE_SOURCE_RULE_ID = corsair_ir.VOIDSTONE_SOURCE_RULE_ID
+WEBWAY_PATHSTONE_SOURCE_RULE_ID = corsair_ir.WEBWAY_PATHSTONE_SOURCE_RULE_ID
 CORSAIR_COTERIE_DETACHMENT_ID = "corsair-coterie"
 AELDARI_FACTION_ID = "aeldari"
 ANHRATHE = "ANHRATHE"
@@ -107,86 +104,7 @@ ARCHRAIDER_COST_MODIFIER_DECLINED_EVENT = "aeldari_corsair_coterie_lord_of_decei
 
 
 def runtime_contribution() -> RuntimeContentContribution:
-    return RuntimeContentContribution(
-        contribution_id=CONTRIBUTION_ID,
-        enhancement_effect_bindings=(
-            EnhancementEffectBinding(
-                effect_id=ARCHRAIDER_EFFECT_ID,
-                source_id=SOURCE_RULE_ID,
-                enhancement_id=ARCHRAIDER_ENHANCEMENT_ID,
-                handler=archraider_effect,
-            ),
-            EnhancementEffectBinding(
-                effect_id=INFAMY_EFFECT_ID,
-                source_id=SOURCE_RULE_ID,
-                enhancement_id=INFAMY_ENHANCEMENT_ID,
-                handler=infamy_effect,
-            ),
-            EnhancementEffectBinding(
-                effect_id=VOIDSTONE_EFFECT_ID,
-                source_id=SOURCE_RULE_ID,
-                enhancement_id=VOIDSTONE_ENHANCEMENT_ID,
-                handler=voidstone_effect,
-            ),
-            EnhancementEffectBinding(
-                effect_id=WEBWAY_PATHSTONE_EFFECT_ID,
-                source_id=SOURCE_RULE_ID,
-                enhancement_id=WEBWAY_PATHSTONE_ENHANCEMENT_ID,
-                handler=webway_pathstone_effect,
-            ),
-            EnhancementEffectBinding(
-                effect_id=WEBWAY_PATHSTONE_DEEP_STRIKE_EFFECT_ID,
-                source_id=SOURCE_RULE_ID,
-                enhancement_id=WEBWAY_PATHSTONE_ENHANCEMENT_ID,
-                handler=webway_pathstone_deep_strike_effect,
-            ),
-        ),
-        battle_formation_hook_bindings=(
-            BattleFormationHookBinding(
-                hook_id=ARCHRAIDER_SETUP_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                request_handler=archraider_model_selection_request,
-                result_handler=apply_archraider_model_selection_result,
-            ),
-        ),
-        turn_end_hook_bindings=(
-            TurnEndHookBinding(
-                hook_id=WEBWAY_PATHSTONE_TURN_END_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                request_handler=webway_pathstone_turn_end_request,
-                result_handler=apply_webway_pathstone_turn_end_result,
-            ),
-        ),
-        stratagem_cost_choice_hook_bindings=(
-            StratagemCostChoiceHookBinding(
-                hook_id=ARCHRAIDER_COST_CHOICE_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                request_handler=archraider_command_point_cost_choice_request,
-                result_handler=apply_archraider_command_point_cost_choice_result,
-            ),
-        ),
-        stratagem_cost_modifier_bindings=(
-            StratagemCostModifierBinding(
-                modifier_id=ARCHRAIDER_COST_MODIFIER_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=archraider_command_point_cost_modifier,
-            ),
-        ),
-        objective_control_modifier_bindings=(
-            ObjectiveControlModifierBinding(
-                modifier_id=INFAMY_OBJECTIVE_CONTROL_MODIFIER_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=infamy_objective_control_modifier,
-            ),
-        ),
-        save_option_modifier_bindings=(
-            SaveOptionModifierBinding(
-                modifier_id=VOIDSTONE_SAVE_MODIFIER_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=voidstone_save_option_modifier,
-            ),
-        ),
-    )
+    return RuntimeContentContribution(contribution_id=CONTRIBUTION_ID)
 
 
 def archraider_effect(
@@ -197,6 +115,7 @@ def archraider_effect(
         enhancement_id=ARCHRAIDER_ENHANCEMENT_ID,
         effect_id=ARCHRAIDER_EFFECT_ID,
         effect_kind=ARCHRAIDER_EFFECT_KIND,
+        source_rule_id=ARCHRAIDER_SOURCE_RULE_ID,
     )
 
 
@@ -208,6 +127,7 @@ def infamy_effect(
         enhancement_id=INFAMY_ENHANCEMENT_ID,
         effect_id=INFAMY_EFFECT_ID,
         effect_kind=INFAMY_EFFECT_KIND,
+        source_rule_id=INFAMY_SOURCE_RULE_ID,
     )
 
 
@@ -219,6 +139,7 @@ def voidstone_effect(
         enhancement_id=VOIDSTONE_ENHANCEMENT_ID,
         effect_id=VOIDSTONE_EFFECT_ID,
         effect_kind=VOIDSTONE_EFFECT_KIND,
+        source_rule_id=VOIDSTONE_SOURCE_RULE_ID,
     )
 
 
@@ -230,6 +151,7 @@ def webway_pathstone_effect(
         enhancement_id=WEBWAY_PATHSTONE_ENHANCEMENT_ID,
         effect_id=WEBWAY_PATHSTONE_EFFECT_ID,
         effect_kind=WEBWAY_PATHSTONE_EFFECT_KIND,
+        source_rule_id=WEBWAY_PATHSTONE_SOURCE_RULE_ID,
     )
 
 
@@ -244,7 +166,7 @@ def webway_pathstone_deep_strike_effect(
     return (
         EnhancementUnitKeywordGrant(
             effect_id=WEBWAY_PATHSTONE_DEEP_STRIKE_EFFECT_ID,
-            source_id=SOURCE_RULE_ID,
+            source_id=WEBWAY_PATHSTONE_SOURCE_RULE_ID,
             enhancement_id=WEBWAY_PATHSTONE_ENHANCEMENT_ID,
             target_unit_instance_id=context.target_unit.unit_instance_id,
             keyword=DEEP_STRIKE,
@@ -263,6 +185,7 @@ def _persisting_enhancement_effect(
     enhancement_id: str,
     effect_id: str,
     effect_kind: str,
+    source_rule_id: str,
 ) -> tuple[EnhancementPersistingEffectGrant, ...]:
     if type(context) is not EnhancementEffectContext:
         raise GameLifecycleError("Corsair Coterie requires EnhancementEffectContext.")
@@ -271,7 +194,7 @@ def _persisting_enhancement_effect(
     _validate_corsair_coterie_army(context.army, label=enhancement_id)
     effect = PersistingEffect(
         effect_id=f"{effect_id}:{context.target_unit.unit_instance_id}",
-        source_rule_id=SOURCE_RULE_ID,
+        source_rule_id=source_rule_id,
         owner_player_id=context.army.player_id,
         target_unit_instance_ids=(context.target_unit.unit_instance_id,),
         started_battle_round=context.state.battle_round,
@@ -287,7 +210,7 @@ def _persisting_enhancement_effect(
     return (
         EnhancementPersistingEffectGrant(
             effect_id=effect_id,
-            source_id=SOURCE_RULE_ID,
+            source_id=source_rule_id,
             enhancement_id=enhancement_id,
             target_unit_instance_id=context.target_unit.unit_instance_id,
             persisting_effect=effect,
@@ -330,7 +253,7 @@ def archraider_model_selection_request(
                     "setup_step": SetupStep.DECLARE_BATTLE_FORMATIONS.value,
                     "faction_id": AELDARI_FACTION_ID,
                     "detachment_id": CORSAIR_COTERIE_DETACHMENT_ID,
-                    "source_rule_id": SOURCE_RULE_ID,
+                    "source_rule_id": ARCHRAIDER_SOURCE_RULE_ID,
                     "hook_id": ARCHRAIDER_SETUP_HOOK_ID,
                     "state_kind": ARCHRAIDER_STATE_KIND,
                     "target_unit_instance_id": unit.unit_instance_id,
@@ -370,7 +293,7 @@ def apply_archraider_model_selection_result(context: BattleFormationResultContex
         state_id=f"{ARCHRAIDER_SETUP_HOOK_ID}:{unit_instance_id}:selected-model",
         player_id=player_id,
         faction_id=AELDARI_FACTION_ID,
-        source_rule_id=SOURCE_RULE_ID,
+        source_rule_id=ARCHRAIDER_SOURCE_RULE_ID,
         state_kind=ARCHRAIDER_STATE_KIND,
         setup_step=SetupStep.DECLARE_BATTLE_FORMATIONS,
         request_id=context.request.request_id,
@@ -393,7 +316,7 @@ def apply_archraider_model_selection_result(context: BattleFormationResultContex
         {
             "game_id": context.state.game_id,
             "player_id": player_id,
-            "source_rule_id": SOURCE_RULE_ID,
+            "source_rule_id": ARCHRAIDER_SOURCE_RULE_ID,
             "hook_id": ARCHRAIDER_SETUP_HOOK_ID,
             "target_unit_instance_id": unit_instance_id,
             "selected_model_instance_id": selected_model_id,
@@ -478,7 +401,7 @@ def archraider_command_point_cost_choice_request(
                 "battle_round": context.state.battle_round,
                 "active_player_id": context.eligibility_context.active_player_id,
                 "phase": context.eligibility_context.phase.value,
-                "source_rule_id": SOURCE_RULE_ID,
+                "source_rule_id": ARCHRAIDER_SOURCE_RULE_ID,
                 "hook_id": ARCHRAIDER_COST_CHOICE_HOOK_ID,
                 "modifier_id": ARCHRAIDER_COST_MODIFIER_ID,
                 "enhancement_id": ARCHRAIDER_ENHANCEMENT_ID,
@@ -595,7 +518,7 @@ def voidstone_save_option_modifier(context: SaveOptionModifierContext) -> tuple[
                     target_number=5,
                     characteristic_target_number=5,
                     armor_penetration=armor_penetration,
-                    source_rule_ids=(SOURCE_RULE_ID,),
+                    source_rule_ids=(VOIDSTONE_SOURCE_RULE_ID,),
                 ),
             ),
             key=lambda option: (option.save_kind.value, option.target_number),
@@ -640,7 +563,7 @@ def webway_pathstone_turn_end_request(context: TurnEndRequestContext) -> Decisio
                     "battle_round": context.state.battle_round,
                     "active_player_id": active_player_id,
                     "phase": context.completed_phase.value,
-                    "source_rule_id": SOURCE_RULE_ID,
+                    "source_rule_id": WEBWAY_PATHSTONE_SOURCE_RULE_ID,
                     "hook_id": WEBWAY_PATHSTONE_TURN_END_HOOK_ID,
                     "enhancement_id": WEBWAY_PATHSTONE_ENHANCEMENT_ID,
                     "target_unit_instance_id": unit.unit_instance_id,
@@ -691,7 +614,7 @@ def apply_webway_pathstone_turn_end_result(context: TurnEndResultContext) -> boo
         player_id=player_id,
         unit_instance_id=unit_instance_id,
         reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
-        source_rule_ids=(SOURCE_RULE_ID,),
+        source_rule_ids=(WEBWAY_PATHSTONE_SOURCE_RULE_ID,),
     )
     context.decisions.event_log.append(
         WEBWAY_PATHSTONE_USED_EVENT,
@@ -760,7 +683,7 @@ def _archraider_model_options(
             payload={
                 "submission_kind": "aeldari_corsair_coterie_archraider_model_selection",
                 "player_id": player_id,
-                "source_rule_id": SOURCE_RULE_ID,
+                "source_rule_id": ARCHRAIDER_SOURCE_RULE_ID,
                 "hook_id": ARCHRAIDER_SETUP_HOOK_ID,
                 "enhancement_id": ARCHRAIDER_ENHANCEMENT_ID,
                 "assignment_source_id": assignment.source_id,
@@ -785,7 +708,7 @@ def _webway_pathstone_option(
         payload={
             "submission_kind": "aeldari_corsair_coterie_webway_pathstone_turn_end",
             "player_id": player_id,
-            "source_rule_id": SOURCE_RULE_ID,
+            "source_rule_id": WEBWAY_PATHSTONE_SOURCE_RULE_ID,
             "hook_id": WEBWAY_PATHSTONE_TURN_END_HOOK_ID,
             "enhancement_id": WEBWAY_PATHSTONE_ENHANCEMENT_ID,
             "target_unit_instance_id": unit_instance_id,
@@ -812,7 +735,7 @@ def _archraider_cost_choice_option(
         payload={
             "submission_kind": "aeldari_corsair_coterie_lord_of_deceit_cost_choice",
             "player_id": player_id,
-            "source_rule_id": SOURCE_RULE_ID,
+            "source_rule_id": ARCHRAIDER_SOURCE_RULE_ID,
             "hook_id": ARCHRAIDER_COST_CHOICE_HOOK_ID,
             "modifier_id": ARCHRAIDER_COST_MODIFIER_ID,
             "enhancement_id": ARCHRAIDER_ENHANCEMENT_ID,
@@ -1084,7 +1007,7 @@ def _webway_pathstone_event_payload(
         if context.state.current_battle_phase is not None
         else None,
         "player_id": player_id,
-        "source_rule_id": SOURCE_RULE_ID,
+        "source_rule_id": WEBWAY_PATHSTONE_SOURCE_RULE_ID,
         "hook_id": WEBWAY_PATHSTONE_TURN_END_HOOK_ID,
         "enhancement_id": WEBWAY_PATHSTONE_ENHANCEMENT_ID,
         "target_unit_instance_id": unit_instance_id,
@@ -1108,7 +1031,7 @@ def _archraider_cost_choice_event_payload(
         "active_player_id": context.eligibility_context.active_player_id,
         "phase": context.eligibility_context.phase.value,
         "player_id": player_id,
-        "source_rule_id": SOURCE_RULE_ID,
+        "source_rule_id": ARCHRAIDER_SOURCE_RULE_ID,
         "hook_id": ARCHRAIDER_COST_CHOICE_HOOK_ID,
         "modifier_id": ARCHRAIDER_COST_MODIFIER_ID,
         "enhancement_id": ARCHRAIDER_ENHANCEMENT_ID,

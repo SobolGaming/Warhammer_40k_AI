@@ -78,12 +78,12 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectContext,
-    EnhancementEffectRegistry,
     apply_enhancement_effects,
 )
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
+from warhammer40k_core.engine.faction_content.runtime import runtime_content_activation_for_armies
 from warhammer40k_core.engine.faction_content.stratagem_handlers import (
     StratagemHandlerContext,
     StratagemHandlerRegistry,
@@ -208,6 +208,9 @@ from warhammer40k_core.engine.unit_state import starting_strength_records_for_un
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_execution_2026_27,
+)
 
 _CORSAIR_UNIT_ID = "army-a:corsairs"
 _ARCHRAIDER_UNIT_ID = "army-a:archraider"
@@ -265,33 +268,13 @@ def test_corsair_coterie_runtime_contribution_registers_rule_and_enhancement_hoo
     assert rule.VOID_THIEVES_HOOK_ID in {
         binding.hook_id for binding in contribution.phase_end_objective_control_hook_bindings
     }
-    assert {binding.enhancement_id for binding in contribution.enhancement_effect_bindings} == {
-        enhancements.ARCHRAIDER_ENHANCEMENT_ID,
-        enhancements.INFAMY_ENHANCEMENT_ID,
-        enhancements.VOIDSTONE_ENHANCEMENT_ID,
-        enhancements.WEBWAY_PATHSTONE_ENHANCEMENT_ID,
-    }
-    assert {binding.hook_id for binding in contribution.battle_formation_hook_bindings} == {
-        enhancements.ARCHRAIDER_SETUP_HOOK_ID,
-    }
-    assert {binding.hook_id for binding in contribution.stratagem_cost_choice_hook_bindings} == {
-        enhancements.ARCHRAIDER_COST_CHOICE_HOOK_ID,
-    }
-    assert {binding.modifier_id for binding in contribution.stratagem_cost_modifier_bindings} == {
-        enhancements.ARCHRAIDER_COST_MODIFIER_ID,
-    }
-    objective_control_modifier_ids = {
-        binding.modifier_id for binding in contribution.objective_control_modifier_bindings
-    }
-    assert objective_control_modifier_ids == {
-        enhancements.INFAMY_OBJECTIVE_CONTROL_MODIFIER_ID,
-    }
-    assert {binding.modifier_id for binding in contribution.save_option_modifier_bindings} == {
-        enhancements.VOIDSTONE_SAVE_MODIFIER_ID,
-    }
-    assert {binding.hook_id for binding in contribution.turn_end_hook_bindings} == {
-        enhancements.WEBWAY_PATHSTONE_TURN_END_HOOK_ID,
-    }
+    assert contribution.enhancement_effect_bindings == ()
+    assert contribution.battle_formation_hook_bindings == ()
+    assert contribution.stratagem_cost_choice_hook_bindings == ()
+    assert contribution.stratagem_cost_modifier_bindings == ()
+    assert contribution.objective_control_modifier_bindings == ()
+    assert contribution.save_option_modifier_bindings == ()
+    assert contribution.turn_end_hook_bindings == ()
     assert {record.definition.stratagem_id for record in contribution.stratagem_records} == {
         stratagems.PIRATES_DUE_STRATAGEM_ID,
         stratagems.LETHAL_RUSE_STRATAGEM_ID,
@@ -330,42 +313,29 @@ def test_corsair_coterie_runtime_bundle_exposes_new_hook_registries_and_summary(
         muster_army(catalog=config.army_catalog, request=request)
         for request in config.army_muster_requests
     )
-    activation = RuntimeContentActivation(
-        selected_faction_ids=("aeldari",),
-        selected_detachment_ids=("corsair-coterie",),
-        selected_enhancement_ids=(
-            enhancements.ARCHRAIDER_ENHANCEMENT_ID,
-            enhancements.INFAMY_ENHANCEMENT_ID,
-            enhancements.VOIDSTONE_ENHANCEMENT_ID,
-            enhancements.WEBWAY_PATHSTONE_ENHANCEMENT_ID,
-        ),
-        selected_stratagem_ids=(),
-        selected_datasheet_ids=(
-            "phase17g-corsair-archraider",
-            "phase17g-corsairs",
-            "phase17g-voidstone-bearers",
-            "phase17g-webway-bearers",
-        ),
-        selected_wargear_ids=(),
-        selected_weapon_profile_ids=(),
-        selected_weapon_keywords=(),
-        loaded_unit_instance_ids=(
-            "army-a:archraider",
-            "army-a:corsairs",
-            "army-a:voidstone-bearers",
-            "army-a:webway-bearers",
-        ),
-    )
+    activation = runtime_content_activation_for_armies(config=config, armies=armies)
 
     bundle = RuntimeContentBundle.from_contributions(
         activation=activation,
         armies=armies,
         catalog=config.army_catalog,
         contributions=(manifest.runtime_contribution(),),
-        faction_execution_records=(),
+        faction_execution_records=faction_execution_2026_27.execution_records(),
     )
     summary = bundle.to_summary_payload()
 
+    assert {binding.effect_id for binding in bundle.enhancement_effect_registry.all_bindings()} == {
+        enhancements.ARCHRAIDER_EFFECT_ID,
+        enhancements.INFAMY_EFFECT_ID,
+        enhancements.VOIDSTONE_EFFECT_ID,
+        enhancements.WEBWAY_PATHSTONE_EFFECT_ID,
+        enhancements.WEBWAY_PATHSTONE_DEEP_STRIKE_EFFECT_ID,
+    }
+    assert {
+        binding.hook_id for binding in bundle.battle_formation_hook_registry.all_bindings()
+    } == {
+        enhancements.ARCHRAIDER_SETUP_HOOK_ID,
+    }
     assert {binding.hook_id for binding in bundle.turn_end_hook_registry.all_bindings()} == {
         enhancements.WEBWAY_PATHSTONE_TURN_END_HOOK_ID
     }
@@ -379,12 +349,32 @@ def test_corsair_coterie_runtime_bundle_exposes_new_hook_registries_and_summary(
     assert {
         binding.modifier_id for binding in bundle.stratagem_cost_modifier_registry.all_bindings()
     } == {enhancements.ARCHRAIDER_COST_MODIFIER_ID}
+    assert {
+        binding.modifier_id
+        for binding in bundle.runtime_modifier_registry.all_objective_control_bindings()
+    } == {enhancements.INFAMY_OBJECTIVE_CONTROL_MODIFIER_ID}
+    assert {
+        binding.modifier_id
+        for binding in bundle.runtime_modifier_registry.all_save_option_bindings()
+    } == {enhancements.VOIDSTONE_SAVE_MODIFIER_ID}
+    assert summary["enhancement_effect_binding_ids"] == [
+        enhancements.ARCHRAIDER_EFFECT_ID,
+        enhancements.INFAMY_EFFECT_ID,
+        enhancements.VOIDSTONE_EFFECT_ID,
+        enhancements.WEBWAY_PATHSTONE_EFFECT_ID,
+        enhancements.WEBWAY_PATHSTONE_DEEP_STRIKE_EFFECT_ID,
+    ]
+    assert summary["battle_formation_hook_ids"] == [enhancements.ARCHRAIDER_SETUP_HOOK_ID]
     assert summary["turn_end_hook_ids"] == [enhancements.WEBWAY_PATHSTONE_TURN_END_HOOK_ID]
     assert summary["unit_move_completed_mortal_wound_hook_ids"] == [rule.RELENTLESS_RAIDERS_HOOK_ID]
     assert summary["stratagem_cost_choice_hook_ids"] == [
         enhancements.ARCHRAIDER_COST_CHOICE_HOOK_ID
     ]
     assert summary["stratagem_cost_modifier_ids"] == [enhancements.ARCHRAIDER_COST_MODIFIER_ID]
+    assert summary["objective_control_modifier_ids"] == [
+        enhancements.INFAMY_OBJECTIVE_CONTROL_MODIFIER_ID
+    ]
+    assert summary["save_option_modifier_ids"] == [enhancements.VOIDSTONE_SAVE_MODIFIER_ID]
     assert summary["bundle_summary_hash"]
 
 
@@ -1908,9 +1898,7 @@ def test_corsair_enhancements_apply_infamy_voidstone_and_webway_pathstone_effect
 
     apply_enhancement_effects(
         state=state,
-        registry=EnhancementEffectRegistry.from_bindings(
-            manifest.runtime_contribution().enhancement_effect_bindings
-        ),
+        registry=_corsair_runtime_bundle_for_state(state).enhancement_effect_registry,
         decisions=decisions,
     )
 
@@ -2027,9 +2015,7 @@ def test_corsair_enhancement_effects_and_modifiers_ignore_non_matching_sources()
 
     apply_enhancement_effects(
         state=state,
-        registry=EnhancementEffectRegistry.from_bindings(
-            manifest.runtime_contribution().enhancement_effect_bindings
-        ),
+        registry=_corsair_runtime_bundle_for_state(state).enhancement_effect_registry,
         decisions=DecisionController(),
     )
     existing_invulnerable_options = (
@@ -2163,7 +2149,7 @@ def test_webway_pathstone_turn_end_choice_moves_unit_to_strategic_reserves_once(
     assert handled is True
     reserve_state = state.reserve_state_for_unit(_WEBWAY_UNIT_ID)
     assert reserve_state is not None
-    assert reserve_state.source_rule_ids == (enhancements.SOURCE_RULE_ID,)
+    assert reserve_state.source_rule_ids == (enhancements.WEBWAY_PATHSTONE_SOURCE_RULE_ID,)
     assert state.battlefield_state is not None
     assert all(
         unit_placement.unit_instance_id != _WEBWAY_UNIT_ID
@@ -2604,7 +2590,7 @@ def test_webway_pathstone_lifecycle_records_void_thieves_before_turn_end_reserve
 
     reserve_state = state.reserve_state_for_unit(_WEBWAY_UNIT_ID)
     assert reserve_state is not None
-    assert reserve_state.source_rule_ids == (enhancements.SOURCE_RULE_ID,)
+    assert reserve_state.source_rule_ids == (enhancements.WEBWAY_PATHSTONE_SOURCE_RULE_ID,)
     assert state.battlefield_state is not None
     assert all(
         unit_placement.unit_instance_id != _WEBWAY_UNIT_ID
@@ -2693,7 +2679,7 @@ def test_archraider_lord_of_deceit_lifecycle_pauses_and_resumes_stratagem_cost()
     use_record = state.stratagem_use_records[0]
     assert use_record.command_point_cost == 2
     assert use_record.command_point_modifier_ids == (enhancements.ARCHRAIDER_COST_MODIFIER_ID,)
-    assert use_record.command_point_modifier_source_ids == (enhancements.SOURCE_RULE_ID,)
+    assert use_record.command_point_modifier_source_ids == (enhancements.ARCHRAIDER_SOURCE_RULE_ID,)
     assert any(
         record.event_type == enhancements.ARCHRAIDER_COST_MODIFIER_USED_EVENT
         for record in lifecycle.decision_controller.event_log.records
@@ -4507,6 +4493,45 @@ def _corsair_lifecycle_for_state(*, config: GameConfig, state: GameState) -> Gam
     return lifecycle
 
 
+def _corsair_runtime_bundle_for_state(state: GameState) -> RuntimeContentBundle:
+    catalog = _corsair_mustering_catalog()
+    armies = tuple(state.army_definitions)
+    activation = RuntimeContentActivation.from_armies(armies=armies, catalog=catalog)
+    return RuntimeContentBundle.from_contributions(
+        activation=activation.with_reachable_content(
+            reachable_content_ids=activation.roster_content_ids(),
+            selected_module_paths=(),
+            source_package_ids=(),
+            source_package_hashes=(),
+            selected_execution_record_ids=_corsair_selected_enhancement_execution_record_ids(
+                activation.selected_enhancement_ids
+            ),
+            unsupported_content_ids=(),
+            unsupported_reasons_by_content_id={},
+        ),
+        armies=armies,
+        catalog=catalog,
+        contributions=(manifest.runtime_contribution(),),
+        faction_execution_records=faction_execution_2026_27.execution_records(),
+    )
+
+
+def _corsair_selected_enhancement_execution_record_ids(
+    enhancement_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    selected_ids = set(enhancement_ids)
+    record_ids: list[str] = []
+    if enhancements.ARCHRAIDER_ENHANCEMENT_ID in selected_ids:
+        record_ids.append(enhancements.ARCHRAIDER_SOURCE_RULE_ID)
+    if enhancements.INFAMY_ENHANCEMENT_ID in selected_ids:
+        record_ids.append(enhancements.INFAMY_SOURCE_RULE_ID)
+    if enhancements.VOIDSTONE_ENHANCEMENT_ID in selected_ids:
+        record_ids.append(enhancements.VOIDSTONE_SOURCE_RULE_ID)
+    if enhancements.WEBWAY_PATHSTONE_ENHANCEMENT_ID in selected_ids:
+        record_ids.append(enhancements.WEBWAY_PATHSTONE_SOURCE_RULE_ID)
+    return tuple(sorted(record_ids))
+
+
 def _use_source_backed_lifecycle_armies(*, config: GameConfig, state: GameState) -> None:
     positions_by_unit_id = _unit_x_positions_by_id(state)
     if _ENEMY_UNIT_ID in positions_by_unit_id:
@@ -5272,7 +5297,7 @@ def _record_archraider_model_selection(state: GameState) -> None:
             state_id=f"{enhancements.ARCHRAIDER_SETUP_HOOK_ID}:{_ARCHRAIDER_UNIT_ID}:selected",
             player_id="player-a",
             faction_id="aeldari",
-            source_rule_id=enhancements.SOURCE_RULE_ID,
+            source_rule_id=enhancements.ARCHRAIDER_SOURCE_RULE_ID,
             state_kind=enhancements.ARCHRAIDER_STATE_KIND,
             setup_step=SetupStep.DECLARE_BATTLE_FORMATIONS,
             request_id="request-archraider-selection",

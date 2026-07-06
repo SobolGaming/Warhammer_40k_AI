@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Protocol, cast
@@ -10,14 +10,16 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityContext,
     AdvanceEligibilityGrant,
 )
-from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedHandler,
 )
+from warhammer40k_core.engine.battle_formation_hooks import (
+    BattleFormationRequestContext,
+    BattleFormationResultContext,
+)
 from warhammer40k_core.engine.decision_request import DecisionRequest
-from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, PersistingEffect
+from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.enhancement_effects import EnhancementEffectContext
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     FightPhaseStartRequestContext,
     FightPhaseStartResultContext,
@@ -26,7 +28,6 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
 )
-from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHandler,
 )
@@ -35,11 +36,12 @@ from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeGrant,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
-from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
+    SaveOptionModifierContext,
     WeaponProfileModifierHandler,
 )
+from warhammer40k_core.engine.saves import SaveOption
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedContext,
     ShootingUnitSelectedGrant,
@@ -48,18 +50,18 @@ from warhammer40k_core.engine.sticky_objective_control import (
     PhaseEndObjectiveControlContext,
     StickyObjectiveControlState,
 )
+from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
+    StratagemCostChoiceRequestContext,
+    StratagemCostChoiceResultContext,
+)
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierContext
 from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
     TargetRestriction,
 )
 from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext, TurnEndResultContext
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
-from warhammer40k_core.rules.rule_ir import (
-    RuleEffectKind,
-    RuleIR,
-    RuleTargetKind,
-    parameter_payload,
-)
+from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
 )
@@ -77,8 +79,12 @@ class GenericRuleAbilityHookFamily(StrEnum):
     WEAPON_PROFILE_MODIFIER = "weapon_profile_modifier"
     MOVEMENT_END_SURGE = "movement_end_surge"
     PHASE_END_OBJECTIVE_CONTROL = "phase_end_objective_control"
+    BATTLE_FORMATION = "battle_formation"
     ENHANCEMENT_EFFECT = "enhancement_effect"
     OBJECTIVE_CONTROL_MODIFIER = "objective_control_modifier"
+    STRATAGEM_COST_CHOICE = "stratagem_cost_choice"
+    STRATAGEM_COST_MODIFIER = "stratagem_cost_modifier"
+    SAVE_OPTION_MODIFIER = "save_option_modifier"
     UNIT_DESTROYED = "unit_destroyed"
     TURN_END = "turn_end"
     FIGHT_PHASE_START = "fight_phase_start"
@@ -153,6 +159,14 @@ type PhaseEndObjectiveControlStateBuilder = Callable[
     [PhaseEndObjectiveControlContext, GenericRuleAbilitySource],
     tuple[StickyObjectiveControlState, ...],
 ]
+type BattleFormationRequestBuilder = Callable[
+    [BattleFormationRequestContext, GenericRuleAbilitySource],
+    DecisionRequest | None,
+]
+type BattleFormationResultBuilder = Callable[
+    [BattleFormationResultContext, GenericRuleAbilitySource],
+    bool,
+]
 type EnhancementEffectContextPredicate = Callable[
     [EnhancementEffectContext, GenericRuleAbilitySource],
     bool,
@@ -168,6 +182,30 @@ type ObjectiveControlModifierContextPredicate = Callable[
 type ObjectiveControlModifierBuilder = Callable[
     [ObjectiveControlModifierContext, GenericRuleAbilitySource],
     int,
+]
+type StratagemCostChoiceRequestBuilder = Callable[
+    [StratagemCostChoiceRequestContext, GenericRuleAbilitySource],
+    DecisionRequest | None,
+]
+type StratagemCostChoiceResultBuilder = Callable[
+    [StratagemCostChoiceResultContext, GenericRuleAbilitySource],
+    bool,
+]
+type StratagemCostModifierContextPredicate = Callable[
+    [StratagemCostModifierContext, GenericRuleAbilitySource],
+    bool,
+]
+type StratagemCostModifierBuilder = Callable[
+    [StratagemCostModifierContext, GenericRuleAbilitySource],
+    int,
+]
+type SaveOptionModifierContextPredicate = Callable[
+    [SaveOptionModifierContext, GenericRuleAbilitySource],
+    bool,
+]
+type SaveOptionModifierBuilder = Callable[
+    [SaveOptionModifierContext, GenericRuleAbilitySource],
+    tuple[SaveOption, ...],
 ]
 type UnitDestroyedBuilder = Callable[
     [UnitDestroyedContext, GenericRuleAbilitySource], object | None
@@ -661,6 +699,57 @@ class GenericRulePhaseEndObjectiveControlAbility:
 
 
 @dataclass(frozen=True, slots=True)
+class GenericRuleBattleFormationAbility:
+    ability_id: str
+    coverage_descriptor_id: str
+    source_rule_id: str
+    hook_id_builder: GenericRuleHookIdBuilder
+    request_builder: BattleFormationRequestBuilder
+    result_builder: BattleFormationResultBuilder
+
+    @property
+    def hook_family(self) -> GenericRuleAbilityHookFamily:
+        return GenericRuleAbilityHookFamily.BATTLE_FORMATION
+
+    def __post_init__(self) -> None:
+        _validate_single_descriptor_fields(
+            self.ability_id,
+            coverage_descriptor_id=self.coverage_descriptor_id,
+            source_rule_id=self.source_rule_id,
+            set_validated_values=self._set_validated_identity,
+        )
+        _validate_callable(
+            "Generic battle-formation ability hook_id_builder",
+            self.hook_id_builder,
+        )
+        _validate_callable(
+            "Generic battle-formation ability request_builder",
+            self.request_builder,
+        )
+        _validate_callable(
+            "Generic battle-formation ability result_builder",
+            self.result_builder,
+        )
+
+    def _set_validated_identity(
+        self,
+        *,
+        ability_id: str,
+        coverage_descriptor_id: str,
+        source_rule_id: str,
+    ) -> None:
+        object.__setattr__(self, "ability_id", ability_id)
+        object.__setattr__(self, "coverage_descriptor_id", coverage_descriptor_id)
+        object.__setattr__(self, "source_rule_id", source_rule_id)
+
+    def ability_ids(self) -> tuple[str, ...]:
+        return (self.ability_id,)
+
+    def hook_id(self, source: GenericRuleAbilitySource) -> str:
+        return _validate_identifier("hook_id", self.hook_id_builder(source))
+
+
+@dataclass(frozen=True, slots=True)
 class GenericRuleEnhancementEffectAbility:
     ability_id: str
     coverage_descriptor_id: str
@@ -742,6 +831,159 @@ class GenericRuleObjectiveControlModifierAbility:
         )
         _validate_callable(
             "Generic objective-control modifier ability modifier_builder",
+            self.modifier_builder,
+        )
+
+    def _set_validated_identity(
+        self,
+        *,
+        ability_id: str,
+        coverage_descriptor_id: str,
+        source_rule_id: str,
+    ) -> None:
+        object.__setattr__(self, "ability_id", ability_id)
+        object.__setattr__(self, "coverage_descriptor_id", coverage_descriptor_id)
+        object.__setattr__(self, "source_rule_id", source_rule_id)
+
+    def ability_ids(self) -> tuple[str, ...]:
+        return (self.ability_id,)
+
+    def modifier_id(self, source: GenericRuleAbilitySource) -> str:
+        return _validate_identifier("modifier_id", self.modifier_id_builder(source))
+
+
+@dataclass(frozen=True, slots=True)
+class GenericRuleStratagemCostChoiceAbility:
+    ability_id: str
+    coverage_descriptor_id: str
+    source_rule_id: str
+    hook_id_builder: GenericRuleHookIdBuilder
+    request_builder: StratagemCostChoiceRequestBuilder
+    result_builder: StratagemCostChoiceResultBuilder
+
+    @property
+    def hook_family(self) -> GenericRuleAbilityHookFamily:
+        return GenericRuleAbilityHookFamily.STRATAGEM_COST_CHOICE
+
+    def __post_init__(self) -> None:
+        _validate_single_descriptor_fields(
+            self.ability_id,
+            coverage_descriptor_id=self.coverage_descriptor_id,
+            source_rule_id=self.source_rule_id,
+            set_validated_values=self._set_validated_identity,
+        )
+        _validate_callable(
+            "Generic stratagem cost choice ability hook_id_builder",
+            self.hook_id_builder,
+        )
+        _validate_callable(
+            "Generic stratagem cost choice ability request_builder",
+            self.request_builder,
+        )
+        _validate_callable(
+            "Generic stratagem cost choice ability result_builder",
+            self.result_builder,
+        )
+
+    def _set_validated_identity(
+        self,
+        *,
+        ability_id: str,
+        coverage_descriptor_id: str,
+        source_rule_id: str,
+    ) -> None:
+        object.__setattr__(self, "ability_id", ability_id)
+        object.__setattr__(self, "coverage_descriptor_id", coverage_descriptor_id)
+        object.__setattr__(self, "source_rule_id", source_rule_id)
+
+    def ability_ids(self) -> tuple[str, ...]:
+        return (self.ability_id,)
+
+    def hook_id(self, source: GenericRuleAbilitySource) -> str:
+        return _validate_identifier("hook_id", self.hook_id_builder(source))
+
+
+@dataclass(frozen=True, slots=True)
+class GenericRuleStratagemCostModifierAbility:
+    ability_id: str
+    coverage_descriptor_id: str
+    source_rule_id: str
+    modifier_id_builder: GenericRuleModifierIdBuilder
+    context_predicate: StratagemCostModifierContextPredicate
+    modifier_builder: StratagemCostModifierBuilder
+
+    @property
+    def hook_family(self) -> GenericRuleAbilityHookFamily:
+        return GenericRuleAbilityHookFamily.STRATAGEM_COST_MODIFIER
+
+    def __post_init__(self) -> None:
+        _validate_single_descriptor_fields(
+            self.ability_id,
+            coverage_descriptor_id=self.coverage_descriptor_id,
+            source_rule_id=self.source_rule_id,
+            set_validated_values=self._set_validated_identity,
+        )
+        _validate_callable(
+            "Generic stratagem cost modifier ability modifier_id_builder",
+            self.modifier_id_builder,
+        )
+        _validate_callable(
+            "Generic stratagem cost modifier ability context_predicate",
+            self.context_predicate,
+        )
+        _validate_callable(
+            "Generic stratagem cost modifier ability modifier_builder",
+            self.modifier_builder,
+        )
+
+    def _set_validated_identity(
+        self,
+        *,
+        ability_id: str,
+        coverage_descriptor_id: str,
+        source_rule_id: str,
+    ) -> None:
+        object.__setattr__(self, "ability_id", ability_id)
+        object.__setattr__(self, "coverage_descriptor_id", coverage_descriptor_id)
+        object.__setattr__(self, "source_rule_id", source_rule_id)
+
+    def ability_ids(self) -> tuple[str, ...]:
+        return (self.ability_id,)
+
+    def modifier_id(self, source: GenericRuleAbilitySource) -> str:
+        return _validate_identifier("modifier_id", self.modifier_id_builder(source))
+
+
+@dataclass(frozen=True, slots=True)
+class GenericRuleSaveOptionModifierAbility:
+    ability_id: str
+    coverage_descriptor_id: str
+    source_rule_id: str
+    modifier_id_builder: GenericRuleModifierIdBuilder
+    context_predicate: SaveOptionModifierContextPredicate
+    modifier_builder: SaveOptionModifierBuilder
+
+    @property
+    def hook_family(self) -> GenericRuleAbilityHookFamily:
+        return GenericRuleAbilityHookFamily.SAVE_OPTION_MODIFIER
+
+    def __post_init__(self) -> None:
+        _validate_single_descriptor_fields(
+            self.ability_id,
+            coverage_descriptor_id=self.coverage_descriptor_id,
+            source_rule_id=self.source_rule_id,
+            set_validated_values=self._set_validated_identity,
+        )
+        _validate_callable(
+            "Generic save option modifier ability modifier_id_builder",
+            self.modifier_id_builder,
+        )
+        _validate_callable(
+            "Generic save option modifier ability context_predicate",
+            self.context_predicate,
+        )
+        _validate_callable(
+            "Generic save option modifier ability modifier_builder",
             self.modifier_builder,
         )
 
@@ -931,12 +1173,28 @@ class GenericRuleAbilityRegistry:
         GenericRulePhaseEndObjectiveControlAbility,
         ...,
     ] = ()
+    battle_formation_abilities: tuple[
+        GenericRuleBattleFormationAbility,
+        ...,
+    ] = ()
     enhancement_effect_abilities: tuple[
         GenericRuleEnhancementEffectAbility,
         ...,
     ] = ()
     objective_control_modifier_abilities: tuple[
         GenericRuleObjectiveControlModifierAbility,
+        ...,
+    ] = ()
+    stratagem_cost_choice_abilities: tuple[
+        GenericRuleStratagemCostChoiceAbility,
+        ...,
+    ] = ()
+    stratagem_cost_modifier_abilities: tuple[
+        GenericRuleStratagemCostModifierAbility,
+        ...,
+    ] = ()
+    save_option_modifier_abilities: tuple[
+        GenericRuleSaveOptionModifierAbility,
         ...,
     ] = ()
     unit_destroyed_abilities: tuple[
@@ -1027,6 +1285,14 @@ class GenericRuleAbilityRegistry:
         )
         object.__setattr__(
             self,
+            "battle_formation_abilities",
+            _validate_descriptor_tuple(
+                self.battle_formation_abilities,
+                descriptor_type=GenericRuleBattleFormationAbility,
+            ),
+        )
+        object.__setattr__(
+            self,
             "enhancement_effect_abilities",
             _validate_descriptor_tuple(
                 self.enhancement_effect_abilities,
@@ -1039,6 +1305,30 @@ class GenericRuleAbilityRegistry:
             _validate_descriptor_tuple(
                 self.objective_control_modifier_abilities,
                 descriptor_type=GenericRuleObjectiveControlModifierAbility,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "stratagem_cost_choice_abilities",
+            _validate_descriptor_tuple(
+                self.stratagem_cost_choice_abilities,
+                descriptor_type=GenericRuleStratagemCostChoiceAbility,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "stratagem_cost_modifier_abilities",
+            _validate_descriptor_tuple(
+                self.stratagem_cost_modifier_abilities,
+                descriptor_type=GenericRuleStratagemCostModifierAbility,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "save_option_modifier_abilities",
+            _validate_descriptor_tuple(
+                self.save_option_modifier_abilities,
+                descriptor_type=GenericRuleSaveOptionModifierAbility,
             ),
         )
         object.__setattr__(
@@ -1065,295 +1355,6 @@ class GenericRuleAbilityRegistry:
                 descriptor_type=GenericRuleFightPhaseStartAbility,
             ),
         )
-
-
-def rule_ir_grants_any_ability(rule_ir: RuleIR, *, abilities: tuple[str, ...]) -> bool:
-    if type(rule_ir) is not RuleIR:
-        raise GameLifecycleError("Generic RuleIR ability lookup requires RuleIR.")
-    expected = set(_validate_ability_ids("generic ability", abilities))
-    for clause in rule_ir.clauses:
-        for effect in clause.effects:
-            if effect.kind is not RuleEffectKind.GRANT_ABILITY:
-                continue
-            ability = parameter_payload(effect.parameters).get("ability")
-            if type(ability) is str and ability in expected:
-                return True
-    return False
-
-
-def generic_rule_ability_effects_for_unit(
-    *,
-    state: GameState,
-    source: GenericRuleAbilitySource,
-    unit_instance_id: str,
-    ability: str,
-) -> tuple[PersistingEffect, ...]:
-    if type(state) is not GameState:
-        raise GameLifecycleError("Generic RuleIR ability effects require GameState.")
-    if type(source) is not GenericRuleAbilitySource:
-        raise GameLifecycleError("Generic RuleIR ability effects require source.")
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    requested_ability = _validate_identifier("ability", ability)
-    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=requested_unit_id)
-    matches: list[PersistingEffect] = []
-    for effect in state.persisting_effects_for_unit(rules_unit.unit_instance_id):
-        if not _generic_rule_effect_grants_ability(
-            effect=effect,
-            source=source,
-            rules_unit=rules_unit,
-            ability=requested_ability,
-        ):
-            continue
-        matches.append(effect)
-    return tuple(sorted(matches, key=lambda effect: effect.effect_id))
-
-
-def generic_rule_ability_source_context_payload(
-    *,
-    source: GenericRuleAbilitySource,
-    matching_effects: tuple[PersistingEffect, ...],
-    source_rule_id: str,
-    extra_context: Mapping[str, JsonValue],
-) -> JsonValue:
-    return validate_json_value(
-        {
-            "source_rule_id": _validate_identifier("source_rule_id", source_rule_id),
-            "coverage_descriptor_id": source.record.coverage_descriptor_id,
-            "execution_id": source.record.execution_id,
-            "rule_ir_source_id": source.rule_ir.source_id,
-            "rule_ir_hash": source.rule_ir.ir_hash(),
-            "persisting_effect_ids": generic_rule_persisting_effect_ids(matching_effects),
-            **dict(extra_context),
-        }
-    )
-
-
-def _generic_rule_effect_grants_ability(
-    *,
-    effect: PersistingEffect,
-    source: GenericRuleAbilitySource,
-    rules_unit: RulesUnitView,
-    ability: str,
-) -> bool:
-    payload = _generic_rule_effect_payload_or_none(effect=effect, source=source)
-    if payload is None:
-        return False
-    rule_effect = _payload_object(payload, key="effect")
-    if rule_effect.get("kind") != RuleEffectKind.GRANT_ABILITY.value:
-        return False
-    parameters = _effect_parameters(rule_effect)
-    if parameters.get("ability") != ability:
-        return False
-    return _required_keywords_apply(parameters=parameters, rules_unit=rules_unit)
-
-
-def _generic_rule_effect_payload_or_none(
-    *,
-    effect: PersistingEffect,
-    source: GenericRuleAbilitySource,
-) -> dict[str, JsonValue] | None:
-    if type(effect) is not PersistingEffect:
-        raise GameLifecycleError("Generic RuleIR ability lookup requires PersistingEffect.")
-    payload = effect.effect_payload
-    if not isinstance(payload, dict):
-        return None
-    if payload.get("effect_kind") != GENERIC_RULE_EFFECT_KIND:
-        return None
-    if payload.get("coverage_descriptor_id") != source.record.coverage_descriptor_id:
-        return None
-    target_payload = payload.get("target")
-    if target_payload is not None:
-        if not isinstance(target_payload, dict):
-            raise GameLifecycleError("Generic RuleIR ability target payload is malformed.")
-        if target_payload.get("kind") != RuleTargetKind.THIS_UNIT.value:
-            raise GameLifecycleError("Generic RuleIR ability effect target drift.")
-    return dict(payload)
-
-
-def _payload_object(payload: Mapping[str, JsonValue], *, key: str) -> dict[str, JsonValue]:
-    value = payload.get(key)
-    if not isinstance(value, dict):
-        raise GameLifecycleError(f"Generic RuleIR ability payload requires {key}.")
-    return dict(value)
-
-
-def _effect_parameters(effect_payload: Mapping[str, JsonValue]) -> dict[str, JsonValue]:
-    raw_parameters = effect_payload.get("parameters")
-    if not isinstance(raw_parameters, list):
-        raise GameLifecycleError("Generic RuleIR ability effect parameters must be a list.")
-    parameters: dict[str, JsonValue] = {}
-    for raw_parameter in raw_parameters:
-        if not isinstance(raw_parameter, dict):
-            raise GameLifecycleError("Generic RuleIR ability effect parameter must be an object.")
-        key = raw_parameter.get("key")
-        if type(key) is not str:
-            raise GameLifecycleError("Generic RuleIR ability effect parameter requires key.")
-        resolved_key = _validate_identifier("parameter key", key)
-        if resolved_key in parameters:
-            raise GameLifecycleError("Generic RuleIR ability effect parameters must be unique.")
-        parameters[resolved_key] = validate_json_value(raw_parameter.get("value"))
-    return parameters
-
-
-def _required_keywords_apply(
-    *,
-    parameters: Mapping[str, JsonValue],
-    rules_unit: RulesUnitView,
-) -> bool:
-    required_keywords = _required_keyword_values(
-        parameters=parameters,
-        singular_key="required_keyword",
-        sequence_key="required_keyword_sequence",
-    )
-    required_faction_keywords = _required_keyword_values(
-        parameters=parameters,
-        singular_key="required_faction_keyword",
-        sequence_key="required_faction_keyword_sequence",
-    )
-    required_keyword_any = _required_keyword_any_values(parameters=parameters)
-    if not required_keywords and not required_faction_keywords and required_keyword_any is None:
-        return True
-    if not all(_rules_unit_has_keyword(rules_unit, keyword) for keyword in required_keywords):
-        return False
-    if not all(
-        _rules_unit_has_faction_keyword(rules_unit, keyword)
-        for keyword in required_faction_keywords
-    ):
-        return False
-    if required_keyword_any is not None:
-        return any(_rules_unit_has_keyword(rules_unit, keyword) for keyword in required_keyword_any)
-    return True
-
-
-def _required_keyword_values(
-    *,
-    parameters: Mapping[str, JsonValue],
-    singular_key: str,
-    sequence_key: str,
-) -> tuple[str, ...]:
-    required_keywords: list[str] = []
-    required_keyword = parameters.get(singular_key)
-    if required_keyword is not None:
-        if type(required_keyword) is not str:
-            raise GameLifecycleError(f"Generic RuleIR ability {singular_key} must be a string.")
-        required_keywords.append(required_keyword)
-    required_sequence = parameters.get(sequence_key)
-    if required_sequence is not None:
-        if not isinstance(required_sequence, list):
-            raise GameLifecycleError(f"Generic RuleIR ability {sequence_key} must be a list.")
-        for item in required_sequence:
-            if type(item) is not str:
-                raise GameLifecycleError(
-                    f"Generic RuleIR ability {sequence_key} must contain strings."
-                )
-            required_keywords.append(item)
-    return tuple(required_keywords)
-
-
-def _required_keyword_any_values(*, parameters: Mapping[str, JsonValue]) -> tuple[str, ...] | None:
-    required_keyword_any = parameters.get("required_keyword_any")
-    if required_keyword_any is None:
-        return None
-    if not isinstance(required_keyword_any, list):
-        raise GameLifecycleError("Generic RuleIR ability required_keyword_any must be a list.")
-    if not required_keyword_any:
-        raise GameLifecycleError("Generic RuleIR ability required_keyword_any must not be empty.")
-    required_keywords: list[str] = []
-    for item in required_keyword_any:
-        if type(item) is not str:
-            raise GameLifecycleError("Generic RuleIR ability required_keyword_any item is invalid.")
-        required_keywords.append(item)
-    return tuple(required_keywords)
-
-
-def _rules_unit_has_keyword(rules_unit: RulesUnitView, keyword: str) -> bool:
-    if type(rules_unit) is not RulesUnitView:
-        raise GameLifecycleError("Generic RuleIR ability keyword lookup requires RulesUnitView.")
-    requested_keyword = _canonical_keyword(_validate_identifier("keyword", keyword))
-    return requested_keyword in {_canonical_keyword(stored) for stored in rules_unit.keywords}
-
-
-def _rules_unit_has_faction_keyword(rules_unit: RulesUnitView, keyword: str) -> bool:
-    if type(rules_unit) is not RulesUnitView:
-        raise GameLifecycleError("Generic RuleIR ability keyword lookup requires RulesUnitView.")
-    requested_keyword = _canonical_keyword(_validate_identifier("keyword", keyword))
-    return requested_keyword in {
-        _canonical_keyword(stored) for stored in rules_unit.faction_keywords
-    }
-
-
-def generic_rule_persisting_effect_ids(matching_effects: tuple[PersistingEffect, ...]) -> list[str]:
-    if type(matching_effects) is not tuple:
-        raise GameLifecycleError("Generic RuleIR ability effects must be a tuple.")
-    effect_ids: list[str] = []
-    for effect in matching_effects:
-        if type(effect) is not PersistingEffect:
-            raise GameLifecycleError("Generic RuleIR ability effects require PersistingEffect.")
-        effect_ids.append(effect.effect_id)
-    return effect_ids
-
-
-def generic_rule_ability_unit_for_player_context(
-    *,
-    state: GameState,
-    player_id: str,
-    unit_instance_id: str,
-    source: GenericRuleAbilitySource,
-) -> RulesUnitView | None:
-    army = generic_rule_army_for_player(state=state, player_id=player_id)
-    if not generic_rule_army_uses_record(army=army, source=source):
-        return None
-    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
-    if rules_unit.owner_player_id != player_id:
-        raise GameLifecycleError("Generic RuleIR ability unit owner drift.")
-    return rules_unit
-
-
-def generic_rule_army_for_player(*, state: GameState, player_id: str) -> ArmyDefinition:
-    requested_player_id = _validate_identifier("player_id", player_id)
-    for army in state.army_definitions:
-        if army.player_id == requested_player_id:
-            return army
-    raise GameLifecycleError("Generic RuleIR ability player army is unknown.")
-
-
-def generic_rule_army_uses_record(
-    *, army: ArmyDefinition, source: GenericRuleAbilitySource
-) -> bool:
-    if type(army) is not ArmyDefinition:
-        raise GameLifecycleError("Generic RuleIR ability source requires ArmyDefinition.")
-    if source.record.detachment_id is None:
-        raise GameLifecycleError("Generic RuleIR ability detachment record requires detachment_id.")
-    return (
-        army.detachment_selection.faction_id == source.record.faction_id
-        and source.record.detachment_id in army.detachment_selection.detachment_ids
-    )
-
-
-def generic_rule_advance_context_unit_id(context: AdvanceEligibilityContext) -> str:
-    if type(context) is not AdvanceEligibilityContext:
-        raise GameLifecycleError("Generic RuleIR advance ability requires context.")
-    return context.unit_instance_id
-
-
-def generic_rule_shooting_target_restriction_target_unit_id(
-    context: ShootingTargetRestrictionContext,
-) -> str:
-    if type(context) is not ShootingTargetRestrictionContext:
-        raise GameLifecycleError("Generic RuleIR target restriction ability requires context.")
-    return context.target_unit_instance_id
-
-
-def generic_rule_shooting_unit_selected_unit_id(context: ShootingUnitSelectedContext) -> str:
-    if type(context) is not ShootingUnitSelectedContext:
-        raise GameLifecycleError("Generic RuleIR shooting grant ability requires context.")
-    return context.unit_instance_id
-
-
-def generic_rule_fight_unit_selected_unit_id(context: FightUnitSelectedContext) -> str:
-    if type(context) is not FightUnitSelectedContext:
-        raise GameLifecycleError("Generic RuleIR fight grant ability requires context.")
-    return context.unit_instance_id
 
 
 class _SingleDescriptorIdentitySetter(Protocol):
@@ -1386,8 +1387,12 @@ type _AnyGenericRuleAbilityDescriptor = (
     | GenericRuleWeaponProfileModifierAbility
     | GenericRuleMovementEndSurgeAbility
     | GenericRulePhaseEndObjectiveControlAbility
+    | GenericRuleBattleFormationAbility
     | GenericRuleEnhancementEffectAbility
     | GenericRuleObjectiveControlModifierAbility
+    | GenericRuleStratagemCostChoiceAbility
+    | GenericRuleStratagemCostModifierAbility
+    | GenericRuleSaveOptionModifierAbility
     | GenericRuleUnitDestroyedAbility
     | GenericRuleTurnEndAbility
     | GenericRuleFightPhaseStartAbility
@@ -1490,10 +1495,6 @@ def _validate_record_rule_ir_hash(*, record: _Phase17FExecutionRecord, rule_ir: 
         raise GameLifecycleError("Generic RuleIR ability execution record requires rule_ir_hash.")
     if rule_ir.ir_hash() != record.rule_ir_hash:
         raise GameLifecycleError("Generic RuleIR ability execution record has stale RuleIR hash.")
-
-
-def _canonical_keyword(value: str) -> str:
-    return value.strip().upper().replace("_", " ").replace("-", " ")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

@@ -14,16 +14,24 @@ from warhammer40k_core.engine.effects import (
     generic_rule_persisting_effect,
 )
 from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari.detachments.corsair_coterie import (  # noqa: E501
+    enhancements as corsair_enhancements,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as dark_pacts,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children.detachments.court_of_the_phoenician import (  # noqa: E501
+    rule as court_rule,
+)
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.generic_rule_ability_effects import (
+    generic_rule_ability_effects_for_unit,
+    rule_ir_grants_any_ability,
+)
 from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleAbilityHookFamily,
     GenericRuleAbilityRegistry,
     GenericRuleAbilitySource,
-    generic_rule_ability_effects_for_unit,
-    rule_ir_grants_any_ability,
 )
 from warhammer40k_core.engine.generic_rule_ability_registry_defaults import (
     DEFAULT_GENERIC_RULE_ABILITY_REGISTRY,
@@ -35,10 +43,16 @@ from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_aeldari_corsair_coterie_ir_support_2026_27 as corsair_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
@@ -251,6 +265,171 @@ def test_default_generic_rule_ability_registry_maps_shadow_legion_enhancement_gr
     )
 
 
+def test_default_generic_rule_ability_registry_maps_corsair_coterie_enhancement_grants() -> None:
+    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
+
+    archraider_source = _aeldari_corsair_coterie_source(
+        corsair_ir.ARCHRAIDER_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    archraider = next(
+        descriptor
+        for descriptor in registry.enhancement_effect_abilities
+        if descriptor.ability_ids() == (corsair_ir.ARCHRAIDER_MARKER_ABILITY,)
+    )
+    assert archraider.hook_family is GenericRuleAbilityHookFamily.ENHANCEMENT_EFFECT
+    assert archraider.source_rule_id == corsair_ir.ARCHRAIDER_SOURCE_RULE_ID
+    assert archraider.enhancement_id == corsair_ir.ARCHRAIDER_ENHANCEMENT_ID
+    assert archraider.effect_id(archraider_source) == corsair_enhancements.ARCHRAIDER_EFFECT_ID
+
+    archraider_setup = next(
+        descriptor
+        for descriptor in registry.battle_formation_abilities
+        if descriptor.ability_ids() == (corsair_ir.ARCHRAIDER_MODEL_SELECTION_ABILITY,)
+    )
+    assert archraider_setup.hook_family is GenericRuleAbilityHookFamily.BATTLE_FORMATION
+    assert archraider_setup.source_rule_id == corsair_ir.ARCHRAIDER_SOURCE_RULE_ID
+    assert (
+        archraider_setup.hook_id(archraider_source) == corsair_enhancements.ARCHRAIDER_SETUP_HOOK_ID
+    )
+
+    archraider_cost_choice = next(
+        descriptor
+        for descriptor in registry.stratagem_cost_choice_abilities
+        if descriptor.ability_ids() == (corsair_ir.ARCHRAIDER_STRATAGEM_COST_CHOICE_ABILITY,)
+    )
+    assert archraider_cost_choice.hook_family is GenericRuleAbilityHookFamily.STRATAGEM_COST_CHOICE
+    assert archraider_cost_choice.source_rule_id == corsair_ir.ARCHRAIDER_SOURCE_RULE_ID
+    assert (
+        archraider_cost_choice.hook_id(archraider_source)
+        == corsair_enhancements.ARCHRAIDER_COST_CHOICE_HOOK_ID
+    )
+
+    archraider_cost_modifier = next(
+        descriptor
+        for descriptor in registry.stratagem_cost_modifier_abilities
+        if descriptor.ability_ids() == (corsair_ir.ARCHRAIDER_STRATAGEM_COST_MODIFIER_ABILITY,)
+    )
+    assert (
+        archraider_cost_modifier.hook_family is GenericRuleAbilityHookFamily.STRATAGEM_COST_MODIFIER
+    )
+    assert archraider_cost_modifier.source_rule_id == corsair_ir.ARCHRAIDER_SOURCE_RULE_ID
+    assert (
+        archraider_cost_modifier.modifier_id(archraider_source)
+        == corsair_enhancements.ARCHRAIDER_COST_MODIFIER_ID
+    )
+
+    infamy_source = _aeldari_corsair_coterie_source(corsair_ir.INFAMY_ENHANCEMENT_DESCRIPTOR_ID)
+    infamy = next(
+        descriptor
+        for descriptor in registry.enhancement_effect_abilities
+        if descriptor.ability_ids() == (corsair_ir.INFAMY_MARKER_ABILITY,)
+    )
+    assert infamy.source_rule_id == corsair_ir.INFAMY_SOURCE_RULE_ID
+    assert infamy.enhancement_id == corsair_ir.INFAMY_ENHANCEMENT_ID
+    assert infamy.effect_id(infamy_source) == corsair_enhancements.INFAMY_EFFECT_ID
+
+    infamy_oc = next(
+        descriptor
+        for descriptor in registry.objective_control_modifier_abilities
+        if descriptor.ability_ids() == (corsair_ir.INFAMY_OBJECTIVE_CONTROL_ABILITY,)
+    )
+    assert infamy_oc.hook_family is GenericRuleAbilityHookFamily.OBJECTIVE_CONTROL_MODIFIER
+    assert infamy_oc.source_rule_id == corsair_ir.INFAMY_SOURCE_RULE_ID
+    assert (
+        infamy_oc.modifier_id(infamy_source)
+        == corsair_enhancements.INFAMY_OBJECTIVE_CONTROL_MODIFIER_ID
+    )
+
+    voidstone_source = _aeldari_corsair_coterie_source(
+        corsair_ir.VOIDSTONE_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    voidstone = next(
+        descriptor
+        for descriptor in registry.enhancement_effect_abilities
+        if descriptor.ability_ids() == (corsair_ir.VOIDSTONE_MARKER_ABILITY,)
+    )
+    assert voidstone.source_rule_id == corsair_ir.VOIDSTONE_SOURCE_RULE_ID
+    assert voidstone.enhancement_id == corsair_ir.VOIDSTONE_ENHANCEMENT_ID
+    assert voidstone.effect_id(voidstone_source) == corsair_enhancements.VOIDSTONE_EFFECT_ID
+
+    voidstone_save = next(
+        descriptor
+        for descriptor in registry.save_option_modifier_abilities
+        if descriptor.ability_ids() == (corsair_ir.VOIDSTONE_SAVE_OPTION_ABILITY,)
+    )
+    assert voidstone_save.hook_family is GenericRuleAbilityHookFamily.SAVE_OPTION_MODIFIER
+    assert voidstone_save.source_rule_id == corsair_ir.VOIDSTONE_SOURCE_RULE_ID
+    assert (
+        voidstone_save.modifier_id(voidstone_source)
+        == corsair_enhancements.VOIDSTONE_SAVE_MODIFIER_ID
+    )
+
+    webway_source = _aeldari_corsair_coterie_source(
+        corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    webway = next(
+        descriptor
+        for descriptor in registry.enhancement_effect_abilities
+        if descriptor.ability_ids() == (corsair_ir.WEBWAY_PATHSTONE_MARKER_ABILITY,)
+    )
+    assert webway.source_rule_id == corsair_ir.WEBWAY_PATHSTONE_SOURCE_RULE_ID
+    assert webway.enhancement_id == corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_ID
+    assert webway.effect_id(webway_source) == corsair_enhancements.WEBWAY_PATHSTONE_EFFECT_ID
+
+    webway_deep_strike = next(
+        descriptor
+        for descriptor in registry.enhancement_effect_abilities
+        if descriptor.ability_ids() == (corsair_ir.WEBWAY_PATHSTONE_DEEP_STRIKE_ABILITY,)
+    )
+    assert webway_deep_strike.source_rule_id == corsair_ir.WEBWAY_PATHSTONE_SOURCE_RULE_ID
+    assert webway_deep_strike.enhancement_id == corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_ID
+    assert (
+        webway_deep_strike.effect_id(webway_source)
+        == corsair_enhancements.WEBWAY_PATHSTONE_DEEP_STRIKE_EFFECT_ID
+    )
+
+    webway_turn_end = next(
+        descriptor
+        for descriptor in registry.turn_end_abilities
+        if descriptor.ability_ids() == (corsair_ir.WEBWAY_PATHSTONE_RESERVES_ABILITY,)
+    )
+    assert webway_turn_end.hook_family is GenericRuleAbilityHookFamily.TURN_END
+    assert webway_turn_end.source_rule_id == corsair_ir.WEBWAY_PATHSTONE_SOURCE_RULE_ID
+    assert (
+        webway_turn_end.hook_id(webway_source)
+        == corsair_enhancements.WEBWAY_PATHSTONE_TURN_END_HOOK_ID
+    )
+
+
+def test_default_generic_rule_ability_registry_maps_court_detachment_cost_grant() -> None:
+    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
+    source = _court_of_the_phoenician_source()
+
+    master_of_the_pageant = next(
+        descriptor
+        for descriptor in registry.stratagem_cost_modifier_abilities
+        if descriptor.ability_ids()
+        == (court_ir.MASTER_OF_THE_PAGEANT_STRATAGEM_COST_REDUCTION_ABILITY,)
+    )
+
+    assert master_of_the_pageant.hook_family is GenericRuleAbilityHookFamily.STRATAGEM_COST_MODIFIER
+    assert master_of_the_pageant.coverage_descriptor_id == (
+        court_ir.COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID
+    )
+    assert master_of_the_pageant.source_rule_id == court_rule.COURT_OF_THE_PHOENICIAN_RULE_SOURCE_ID
+    assert (
+        master_of_the_pageant.modifier_id(source)
+        == court_rule.MASTER_OF_THE_PAGEANT_COST_MODIFIER_ID
+    )
+
+
+def test_court_runtime_contribution_delegates_cost_modifier_to_generic_ir() -> None:
+    contribution = court_rule.runtime_contribution()
+
+    assert contribution.contribution_id == court_rule.CONTRIBUTION_ID
+    assert contribution.stratagem_cost_modifier_bindings == ()
+
+
 def test_generic_rule_ability_registry_rejects_duplicate_descriptors() -> None:
     descriptor = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.advance_eligibility_abilities[0]
 
@@ -378,6 +557,19 @@ def _blood_legion_source() -> GenericRuleAbilitySource:
     return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
 
 
+def _court_of_the_phoenician_source() -> GenericRuleAbilitySource:
+    record = next(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.coverage_descriptor_id
+        == court_ir.COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID
+    )
+    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+        record.coverage_descriptor_id
+    )
+    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
+
+
 def _shadow_legion_enhancement_source(coverage_descriptor_id: str) -> GenericRuleAbilitySource:
     record = next(
         record
@@ -391,6 +583,18 @@ def _shadow_legion_enhancement_source(coverage_descriptor_id: str) -> GenericRul
 
 
 def _aeldari_path_of_the_outcast_source(coverage_descriptor_id: str) -> GenericRuleAbilitySource:
+    record = next(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.coverage_descriptor_id == coverage_descriptor_id
+    )
+    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+        record.coverage_descriptor_id
+    )
+    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
+
+
+def _aeldari_corsair_coterie_source(coverage_descriptor_id: str) -> GenericRuleAbilitySource:
     record = next(
         record
         for record in faction_execution_2026_27.execution_records()

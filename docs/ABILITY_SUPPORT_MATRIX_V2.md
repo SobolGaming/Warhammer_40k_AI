@@ -184,7 +184,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Faction | Detachments | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows | File |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | Orks | 12 | 1 | 44 | 66 | 1 | [orks](factions/orks.md) |
-| Aeldari | 15 | 2 | 51 | 75 | 14 | [aeldari](factions/aeldari.md) |
+| Aeldari | 15 | 2 | 51 | 75 | 10 | [aeldari](factions/aeldari.md) |
 | Drukhari | 9 | 0 | 24 | 36 | 1 | [drukhari](factions/drukhari.md) |
 | Tyranids | 10 | 0 | 32 | 48 | 1 | [tyranids](factions/tyranids.md) |
 | Genestealer Cults | 9 | 0 | 20 | 30 | 1 | [genestealer-cults](factions/genestealer-cults.md) |
@@ -344,13 +344,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:aeldari:army_rule:star_engines` | Battle Focus - Star Engines |
 | `warhammer_40000_11th:aeldari:army_rule:sudden_strike` | Battle Focus - Sudden Strike |
 | `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind` | Battle Focus - Swift as the Wind |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider` | Archraider |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:lord_of_deceit` | Archraider |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:lord_of_deceit_choice` | Archraider |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:select_model` | Archraider |
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:cloak_and_shadow` | Cloak and Shadow |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:infamy` | Infamy |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:infamy:objective_control` | Infamy |
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:into_the_breach` | Into the Breach |
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:lethal_ruse` | Lethal Ruse |
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:outcast_ambush` | Outcast Ambush |
@@ -358,11 +352,6 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:relentless_raiders` | Relentless Raiders |
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:vengeful_sorrow` | Vengeful Sorrow |
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:void_thieves` | Void Thieves |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:voidstone` | Voidstone |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:voidstone:save_option` | Voidstone |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone` | Webway Pathstone |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone:deep_strike` | Webway Pathstone |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone:turn_end_reserves` | Webway Pathstone |
 | `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:casting_back_the_veil` | Casting Back the Veil |
 | `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:eldritch_suppression` | Eldritch Suppression |
 | `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:nomads_of_the_hidden_way` | Nomads of the Hidden Way |
@@ -414,7 +403,6 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility` | Thrill Seekers |
 | `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction` | Thrill Seekers |
-| `warhammer_40000_11th:emperors_children:detachment:court_of_the_phoenician:master_of_the_pageant:cp_cost_reduction` | CP Cost Reduction |
 | `warhammer_40000_11th:emperors_children:spectacle_of_slaughter:beguiling_grotesquerie:snap_target_restriction` | Snap Target Restriction |
 | `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush` | Cult Ambush |
 | `warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush:initial_resurgence` | Cult Ambush |

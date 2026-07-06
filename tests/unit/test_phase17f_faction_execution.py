@@ -22,6 +22,9 @@ from warhammer40k_core.engine.faction_rule_execution import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_execution import RuleExecutionResult
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_aeldari_corsair_coterie_ir_support_2026_27 as corsair_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -58,6 +61,27 @@ ASSASSINS_EYE_RUNTIME_CONSUMERS = (
 CAMOUFLAGED_SNIPERS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:camouflaged_snipers_upgrade",
 )
+CORSAIR_RUNTIME_CONSUMERS_BY_DESCRIPTOR_ID = {
+    corsair_ir.ARCHRAIDER_ENHANCEMENT_DESCRIPTOR_ID: (
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider",
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:lord_of_deceit",
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:lord_of_deceit_choice",
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:select_model",
+    ),
+    corsair_ir.INFAMY_ENHANCEMENT_DESCRIPTOR_ID: (
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:infamy",
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:infamy:objective_control",
+    ),
+    corsair_ir.VOIDSTONE_ENHANCEMENT_DESCRIPTOR_ID: (
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:voidstone",
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:voidstone:save_option",
+    ),
+    corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_DESCRIPTOR_ID: (
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone",
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone:deep_strike",
+        "warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone:turn_end_reserves",
+    ),
+}
 GENERIC_SOURCE_UNIT_CONTEXT_EXECUTION_ID = (
     "phase17f:phase17e:enhancement:orks:more-dakka:000009991003"
 )
@@ -225,6 +249,14 @@ CAVALCADE_OF_CHAOS_GENERIC_DESCRIPTOR_IDS = frozenset(
 )
 SHADOW_LEGION_GENERIC_DESCRIPTOR_IDS = frozenset({"phase17e:chaos-daemons:shadow-legion:rule"})
 BLOOD_LEGION_GENERIC_DESCRIPTOR_IDS = frozenset({"phase17e:chaos-daemons:blood-legion:rule"})
+CORSAIR_COTERIE_GENERIC_DESCRIPTOR_IDS = frozenset(
+    {
+        corsair_ir.ARCHRAIDER_ENHANCEMENT_DESCRIPTOR_ID,
+        corsair_ir.INFAMY_ENHANCEMENT_DESCRIPTOR_ID,
+        corsair_ir.VOIDSTONE_ENHANCEMENT_DESCRIPTOR_ID,
+        corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_DESCRIPTOR_ID,
+    }
+)
 
 
 def test_phase17f_execution_package_covers_every_phase17e_coverage_row() -> None:
@@ -764,6 +796,28 @@ def test_phase17f_blood_legion_detachment_rule_is_executable_generic_ir() -> Non
         assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
         assert record.runtime_support_status == "engine_consumed"
         assert record.runtime_consumer_ids == tuple(sorted(BLOOD_LEGION_RUNTIME_CONSUMERS))
+        assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+        assert record.block_reason is None
+        assert record.handler_id is None
+        assert record.rule_ir_hash == (
+            generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(descriptor_id)
+        )
+
+
+def test_phase17f_corsair_coterie_rows_are_executable_generic_ir() -> None:
+    records_by_descriptor_id = {
+        record.coverage_descriptor_id: record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+    }
+
+    assert set(records_by_descriptor_id) >= CORSAIR_COTERIE_GENERIC_DESCRIPTOR_IDS
+    for descriptor_id in CORSAIR_COTERIE_GENERIC_DESCRIPTOR_IDS:
+        record = records_by_descriptor_id[descriptor_id]
+        assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+        assert record.runtime_support_status == "engine_consumed"
+        assert (
+            record.runtime_consumer_ids == CORSAIR_RUNTIME_CONSUMERS_BY_DESCRIPTOR_ID[descriptor_id]
+        )
         assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
         assert record.block_reason is None
         assert record.handler_id is None

@@ -16,6 +16,9 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedHookBinding,
 )
+from warhammer40k_core.engine.battle_formation_hooks import (
+    BattleFormationHookBinding,
+)
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectBinding,
@@ -55,6 +58,10 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrantHandler,
 )
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.generic_rule_ability_effects import (
+    generic_rule_ability_effects_for_unit,
+    rule_ir_grants_any_ability,
+)
 from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleAbilitySource,
     GenericRuleAdvanceEligibilityAbility,
@@ -68,14 +75,20 @@ from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleShootingUnitSelectedGrantAbility,
     GenericRuleTurnEndAbility,
     GenericRuleUnitDestroyedAbility,
-    generic_rule_ability_effects_for_unit,
-    rule_ir_grants_any_ability,
 )
 from warhammer40k_core.engine.generic_rule_ability_registry_defaults import (
     DEFAULT_GENERIC_RULE_ABILITY_REGISTRY,
 )
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_payload_grants_ability,
+)
+from warhammer40k_core.engine.generic_rule_lifecycle_hook_handlers import (
+    battle_formation_request_handler_for_descriptor,
+    battle_formation_result_handler_for_descriptor,
+    save_option_modifier_handler_for_descriptor,
+    stratagem_cost_choice_request_handler_for_descriptor,
+    stratagem_cost_choice_result_handler_for_descriptor,
+    stratagem_cost_modifier_handler_for_descriptor,
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHookBinding,
@@ -96,6 +109,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierBinding,
     ObjectiveControlModifierContext,
     ObjectiveControlModifierHandler,
+    SaveOptionModifierBinding,
     WeaponProfileModifierBinding,
 )
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
@@ -109,6 +123,12 @@ from warhammer40k_core.engine.sticky_objective_control import (
     PhaseEndObjectiveControlHandler,
     PhaseEndObjectiveControlHookBinding,
     StickyObjectiveControlState,
+)
+from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
+    StratagemCostChoiceHookBinding,
+)
+from warhammer40k_core.engine.stratagem_cost_modifiers import (
+    StratagemCostModifierBinding,
 )
 from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
@@ -403,6 +423,36 @@ def phase_end_objective_control_hook_bindings(
     return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
 
 
+def battle_formation_hook_bindings(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+) -> tuple[BattleFormationHookBinding, ...]:
+    bindings: list[BattleFormationHookBinding] = []
+    for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.battle_formation_abilities:
+        for source in _generic_rule_enhancement_ability_sources(
+            activation=activation,
+            execution_records=execution_records,
+            coverage_descriptor_id=descriptor.coverage_descriptor_id,
+            ability_ids=descriptor.ability_ids(),
+        ):
+            bindings.append(
+                BattleFormationHookBinding(
+                    hook_id=descriptor.hook_id(source),
+                    source_id=descriptor.source_rule_id,
+                    request_handler=battle_formation_request_handler_for_descriptor(
+                        source,
+                        descriptor,
+                    ),
+                    result_handler=battle_formation_result_handler_for_descriptor(
+                        source,
+                        descriptor,
+                    ),
+                )
+            )
+    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+
+
 def enhancement_effect_bindings(
     *,
     activation: RuntimeContentActivation,
@@ -446,6 +496,97 @@ def objective_control_modifier_bindings(
                     modifier_id=descriptor.modifier_id(source),
                     source_id=descriptor.source_rule_id,
                     handler=_objective_control_modifier_handler_for_descriptor(
+                        source,
+                        descriptor,
+                    ),
+                )
+            )
+    return tuple(sorted(bindings, key=lambda binding: binding.modifier_id))
+
+
+def stratagem_cost_choice_hook_bindings(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+) -> tuple[StratagemCostChoiceHookBinding, ...]:
+    bindings: list[StratagemCostChoiceHookBinding] = []
+    for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.stratagem_cost_choice_abilities:
+        for source in _generic_rule_enhancement_ability_sources(
+            activation=activation,
+            execution_records=execution_records,
+            coverage_descriptor_id=descriptor.coverage_descriptor_id,
+            ability_ids=descriptor.ability_ids(),
+        ):
+            bindings.append(
+                StratagemCostChoiceHookBinding(
+                    hook_id=descriptor.hook_id(source),
+                    source_id=descriptor.source_rule_id,
+                    request_handler=stratagem_cost_choice_request_handler_for_descriptor(
+                        source,
+                        descriptor,
+                    ),
+                    result_handler=stratagem_cost_choice_result_handler_for_descriptor(
+                        source,
+                        descriptor,
+                    ),
+                )
+            )
+    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+
+
+def stratagem_cost_modifier_bindings(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+) -> tuple[StratagemCostModifierBinding, ...]:
+    bindings: list[StratagemCostModifierBinding] = []
+    for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.stratagem_cost_modifier_abilities:
+        descriptor_sources = (
+            *_generic_rule_ability_sources(
+                activation=activation,
+                execution_records=execution_records,
+                coverage_descriptor_id=descriptor.coverage_descriptor_id,
+                ability_ids=descriptor.ability_ids(),
+            ),
+            *_generic_rule_enhancement_ability_sources(
+                activation=activation,
+                execution_records=execution_records,
+                coverage_descriptor_id=descriptor.coverage_descriptor_id,
+                ability_ids=descriptor.ability_ids(),
+            ),
+        )
+        for source in descriptor_sources:
+            bindings.append(
+                StratagemCostModifierBinding(
+                    modifier_id=descriptor.modifier_id(source),
+                    source_id=descriptor.source_rule_id,
+                    handler=stratagem_cost_modifier_handler_for_descriptor(
+                        source,
+                        descriptor,
+                    ),
+                )
+            )
+    return tuple(sorted(bindings, key=lambda binding: binding.modifier_id))
+
+
+def save_option_modifier_bindings(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+) -> tuple[SaveOptionModifierBinding, ...]:
+    bindings: list[SaveOptionModifierBinding] = []
+    for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.save_option_modifier_abilities:
+        for source in _generic_rule_enhancement_ability_sources(
+            activation=activation,
+            execution_records=execution_records,
+            coverage_descriptor_id=descriptor.coverage_descriptor_id,
+            ability_ids=descriptor.ability_ids(),
+        ):
+            bindings.append(
+                SaveOptionModifierBinding(
+                    modifier_id=descriptor.modifier_id(source),
+                    source_id=descriptor.source_rule_id,
+                    handler=save_option_modifier_handler_for_descriptor(
                         source,
                         descriptor,
                     ),

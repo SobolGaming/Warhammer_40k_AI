@@ -5,10 +5,7 @@ from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_payload_grants_ability,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.stratagem_cost_modifiers import (
-    StratagemCostModifierBinding,
-    StratagemCostModifierContext,
-)
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
@@ -30,16 +27,7 @@ MASTER_OF_THE_PAGEANT_STRATAGEM_IDS = frozenset({"000010655003", "000010655004"}
 
 
 def runtime_contribution() -> RuntimeContentContribution:
-    return RuntimeContentContribution(
-        contribution_id=CONTRIBUTION_ID,
-        stratagem_cost_modifier_bindings=(
-            StratagemCostModifierBinding(
-                modifier_id=MASTER_OF_THE_PAGEANT_COST_MODIFIER_ID,
-                source_id=COURT_OF_THE_PHOENICIAN_RULE_SOURCE_ID,
-                handler=master_of_the_pageant_command_point_cost_modifier,
-            ),
-        ),
-    )
+    return RuntimeContentContribution(contribution_id=CONTRIBUTION_ID)
 
 
 def master_of_the_pageant_command_point_cost_modifier(

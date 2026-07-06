@@ -36,6 +36,7 @@ FULGRIM_KEYWORD = "FULGRIM"
 LORD_EXULTANT_KEYWORD = "LORD EXULTANT"
 CHARACTER_KEYWORD = "CHARACTER"
 TRIGGERED_NORMAL_MOVE_ABILITY = "triggered_normal_move"
+MASTER_OF_THE_PAGEANT_STRATAGEM_COST_REDUCTION_ABILITY = "stratagem_cp_cost_reduction"
 
 COURT_OF_THE_PHOENICIAN_DETACHMENT_RULE_DESCRIPTOR_ID = (
     "phase17e:emperors-children:court-of-the-phoenician:rule"
@@ -172,7 +173,7 @@ def _detachment_rule_payload() -> RuleIRPayload:
             target_kind="player",
             target_text="you",
             effect_text="reduce the CP cost of that use of that Stratagem by 1CP",
-            ability="stratagem_cp_cost_reduction",
+            ability=MASTER_OF_THE_PAGEANT_STRATAGEM_COST_REDUCTION_ABILITY,
             duration=_permanent_duration(normalized_text),
             extra_parameters=(
                 _parameter("cost_reduction", 1),
