@@ -31,6 +31,13 @@ ARCHRAIDER_SOURCE_ROW_ID = "enhancement:aeldari:corsair-coterie:archraider"
 ARCHRAIDER_ENHANCEMENT_DESCRIPTOR_ID = f"phase17e:{ARCHRAIDER_SOURCE_ROW_ID}"
 ARCHRAIDER_SOURCE_RULE_ID = f"phase17f:{ARCHRAIDER_ENHANCEMENT_DESCRIPTOR_ID}"
 ARCHRAIDER_MARKER_ABILITY = "aeldari:corsair-coterie:archraider:marker"
+ARCHRAIDER_MODEL_SELECTION_ABILITY = "aeldari:corsair-coterie:archraider:model-selection"
+ARCHRAIDER_STRATAGEM_COST_CHOICE_ABILITY = (
+    "aeldari:corsair-coterie:archraider:stratagem-cost-choice"
+)
+ARCHRAIDER_STRATAGEM_COST_MODIFIER_ABILITY = (
+    "aeldari:corsair-coterie:archraider:stratagem-cost-modifier"
+)
 
 INFAMY_ENHANCEMENT_ID = "infamy"
 INFAMY_SOURCE_ROW_ID = "enhancement:aeldari:corsair-coterie:infamy"
@@ -44,6 +51,7 @@ VOIDSTONE_SOURCE_ROW_ID = "enhancement:aeldari:corsair-coterie:voidstone"
 VOIDSTONE_ENHANCEMENT_DESCRIPTOR_ID = f"phase17e:{VOIDSTONE_SOURCE_ROW_ID}"
 VOIDSTONE_SOURCE_RULE_ID = f"phase17f:{VOIDSTONE_ENHANCEMENT_DESCRIPTOR_ID}"
 VOIDSTONE_MARKER_ABILITY = "aeldari:corsair-coterie:voidstone:marker"
+VOIDSTONE_SAVE_OPTION_ABILITY = "aeldari:corsair-coterie:voidstone:save-option"
 
 WEBWAY_PATHSTONE_ENHANCEMENT_ID = "webway-pathstone"
 WEBWAY_PATHSTONE_SOURCE_ROW_ID = "enhancement:aeldari:corsair-coterie:webway-pathstone"
@@ -76,7 +84,11 @@ def supported_coverage_descriptor_ids() -> tuple[str, ...]:
 
 
 def _archraider_payload() -> RuleIRPayload:
-    normalized_text = "ANHRATHE CHARACTER bearer gains the Archraider marker for Lord of Deceit."
+    normalized_text = (
+        "ANHRATHE CHARACTER bearer gains the Archraider marker, selects an enemy model "
+        "for Lord of Deceit before the battle, can choose Lord of Deceit when an eligible "
+        "Stratagem is used, and increases that Stratagem's Command Point cost by 1."
+    )
     return _enhancement_payload(
         source_row_id=ARCHRAIDER_SOURCE_ROW_ID,
         normalized_text=normalized_text,
@@ -88,6 +100,25 @@ def _archraider_payload() -> RuleIRPayload:
                 effect_text="gains the Archraider marker",
                 ability=ARCHRAIDER_MARKER_ABILITY,
                 hook_family="enhancement_effect",
+            ),
+            _ability_clause_spec(
+                source_text="selects an enemy model for Lord of Deceit before the battle",
+                effect_text="selects an enemy model for Lord of Deceit before the battle",
+                ability=ARCHRAIDER_MODEL_SELECTION_ABILITY,
+                hook_family="battle_formation",
+            ),
+            _ability_clause_spec(
+                source_text="can choose Lord of Deceit when an eligible Stratagem is used",
+                effect_text="can choose Lord of Deceit when an eligible Stratagem is used",
+                ability=ARCHRAIDER_STRATAGEM_COST_CHOICE_ABILITY,
+                hook_family="stratagem_cost_choice",
+            ),
+            _ability_clause_spec(
+                source_text="increases that Stratagem's Command Point cost by 1",
+                effect_text="increases that Stratagem's Command Point cost by 1",
+                ability=ARCHRAIDER_STRATAGEM_COST_MODIFIER_ABILITY,
+                hook_family="stratagem_cost_modifier",
+                extra_parameters=(_parameter("command_point_cost_delta", 1),),
             ),
         ),
     )
@@ -123,7 +154,7 @@ def _infamy_payload() -> RuleIRPayload:
 
 def _voidstone_payload() -> RuleIRPayload:
     normalized_text = (
-        "ANHRATHE INFANTRY bearer gains the Voidstone marker for a 5+ invulnerable save."
+        "ANHRATHE INFANTRY bearer gains the Voidstone marker and gains a 5+ invulnerable save."
     )
     return _enhancement_payload(
         source_row_id=VOIDSTONE_SOURCE_ROW_ID,
@@ -136,6 +167,12 @@ def _voidstone_payload() -> RuleIRPayload:
                 effect_text="gains the Voidstone marker",
                 ability=VOIDSTONE_MARKER_ABILITY,
                 hook_family="enhancement_effect",
+            ),
+            _ability_clause_spec(
+                source_text="gains a 5+ invulnerable save",
+                effect_text="gains a 5+ invulnerable save",
+                ability=VOIDSTONE_SAVE_OPTION_ABILITY,
+                hook_family="save_option_modifier",
                 extra_parameters=(_parameter("invulnerable_save_target", 5),),
             ),
         ),

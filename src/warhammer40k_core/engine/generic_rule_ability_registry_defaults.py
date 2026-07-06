@@ -32,6 +32,18 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrant,
 )
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.generic_rule_ability_effects import (
+    generic_rule_ability_effects_for_unit,
+    generic_rule_ability_source_context_payload,
+    generic_rule_ability_unit_for_player_context,
+    generic_rule_advance_context_unit_id,
+    generic_rule_army_for_player,
+    generic_rule_army_uses_record,
+    generic_rule_fight_unit_selected_unit_id,
+    generic_rule_persisting_effect_ids,
+    generic_rule_shooting_target_restriction_target_unit_id,
+    generic_rule_shooting_unit_selected_unit_id,
+)
 from warhammer40k_core.engine.generic_rule_ability_registry import (
     FightUnitSelectedGrantBuilder,
     GenericRuleAbilityRegistry,
@@ -52,20 +64,14 @@ from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleUnitDestroyedAbility,
     GenericRuleWeaponProfileModifierAbility,
     ShootingUnitSelectedGrantBuilder,
-    generic_rule_ability_effects_for_unit,
-    generic_rule_ability_source_context_payload,
-    generic_rule_ability_unit_for_player_context,
-    generic_rule_advance_context_unit_id,
-    generic_rule_army_for_player,
-    generic_rule_army_uses_record,
-    generic_rule_fight_unit_selected_unit_id,
-    generic_rule_persisting_effect_ids,
-    generic_rule_shooting_target_restriction_target_unit_id,
-    generic_rule_shooting_unit_selected_unit_id,
 )
 from warhammer40k_core.engine.generic_rule_ability_registry_aeldari_defaults import (
+    aeldari_corsair_coterie_battle_formation_abilities,
     aeldari_corsair_coterie_enhancement_effect_abilities,
     aeldari_corsair_coterie_objective_control_modifier_abilities,
+    aeldari_corsair_coterie_save_option_modifier_abilities,
+    aeldari_corsair_coterie_stratagem_cost_choice_abilities,
+    aeldari_corsair_coterie_stratagem_cost_modifier_abilities,
     aeldari_corsair_coterie_turn_end_abilities,
     aeldari_path_of_the_outcast_enhancement_effect_abilities,
 )
@@ -1390,6 +1396,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             state_builder=_blood_legion_blood_tainted_sticky_states,
         ),
     ),
+    battle_formation_abilities=(*aeldari_corsair_coterie_battle_formation_abilities(),),
     enhancement_effect_abilities=(
         *aeldari_path_of_the_outcast_enhancement_effect_abilities(),
         *aeldari_corsair_coterie_enhancement_effect_abilities(),
@@ -1414,6 +1421,11 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
         ),
         *aeldari_corsair_coterie_objective_control_modifier_abilities(),
     ),
+    stratagem_cost_choice_abilities=(*aeldari_corsair_coterie_stratagem_cost_choice_abilities(),),
+    stratagem_cost_modifier_abilities=(
+        *aeldari_corsair_coterie_stratagem_cost_modifier_abilities(),
+    ),
+    save_option_modifier_abilities=(*aeldari_corsair_coterie_save_option_modifier_abilities(),),
     unit_destroyed_abilities=(
         GenericRuleUnitDestroyedAbility(
             ability_id=shadow_legion_ir.FADE_TO_DARKNESS_RESERVES_ABILITY,

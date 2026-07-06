@@ -269,19 +269,11 @@ def test_corsair_coterie_runtime_contribution_registers_rule_and_enhancement_hoo
         binding.hook_id for binding in contribution.phase_end_objective_control_hook_bindings
     }
     assert contribution.enhancement_effect_bindings == ()
-    assert {binding.hook_id for binding in contribution.battle_formation_hook_bindings} == {
-        enhancements.ARCHRAIDER_SETUP_HOOK_ID,
-    }
-    assert {binding.hook_id for binding in contribution.stratagem_cost_choice_hook_bindings} == {
-        enhancements.ARCHRAIDER_COST_CHOICE_HOOK_ID,
-    }
-    assert {binding.modifier_id for binding in contribution.stratagem_cost_modifier_bindings} == {
-        enhancements.ARCHRAIDER_COST_MODIFIER_ID,
-    }
+    assert contribution.battle_formation_hook_bindings == ()
+    assert contribution.stratagem_cost_choice_hook_bindings == ()
+    assert contribution.stratagem_cost_modifier_bindings == ()
     assert contribution.objective_control_modifier_bindings == ()
-    assert {binding.modifier_id for binding in contribution.save_option_modifier_bindings} == {
-        enhancements.VOIDSTONE_SAVE_MODIFIER_ID,
-    }
+    assert contribution.save_option_modifier_bindings == ()
     assert contribution.turn_end_hook_bindings == ()
     assert {record.definition.stratagem_id for record in contribution.stratagem_records} == {
         stratagems.PIRATES_DUE_STRATAGEM_ID,
@@ -339,6 +331,11 @@ def test_corsair_coterie_runtime_bundle_exposes_new_hook_registries_and_summary(
         enhancements.WEBWAY_PATHSTONE_EFFECT_ID,
         enhancements.WEBWAY_PATHSTONE_DEEP_STRIKE_EFFECT_ID,
     }
+    assert {
+        binding.hook_id for binding in bundle.battle_formation_hook_registry.all_bindings()
+    } == {
+        enhancements.ARCHRAIDER_SETUP_HOOK_ID,
+    }
     assert {binding.hook_id for binding in bundle.turn_end_hook_registry.all_bindings()} == {
         enhancements.WEBWAY_PATHSTONE_TURN_END_HOOK_ID
     }
@@ -367,6 +364,7 @@ def test_corsair_coterie_runtime_bundle_exposes_new_hook_registries_and_summary(
         enhancements.WEBWAY_PATHSTONE_EFFECT_ID,
         enhancements.WEBWAY_PATHSTONE_DEEP_STRIKE_EFFECT_ID,
     ]
+    assert summary["battle_formation_hook_ids"] == [enhancements.ARCHRAIDER_SETUP_HOOK_ID]
     assert summary["turn_end_hook_ids"] == [enhancements.WEBWAY_PATHSTONE_TURN_END_HOOK_ID]
     assert summary["unit_move_completed_mortal_wound_hook_ids"] == [rule.RELENTLESS_RAIDERS_HOOK_ID]
     assert summary["stratagem_cost_choice_hook_ids"] == [

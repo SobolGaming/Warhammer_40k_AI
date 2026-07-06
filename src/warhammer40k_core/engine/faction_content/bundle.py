@@ -1312,9 +1312,19 @@ class RuntimeContentBundle:
             handler_registry=event_handler_registry,
         )
         battle_formation_hook_registry = BattleFormationHookRegistry.from_bindings(
-            generic_detachment_rule_effects.battle_formation_hook_bindings(activation, records)
-            + _contribution_values(
-                validated_contributions, lambda c: c.battle_formation_hook_bindings
+            (
+                *generic_detachment_rule_effects.battle_formation_hook_bindings(
+                    activation,
+                    records,
+                ),
+                *generic_rule_lifecycle_hooks.battle_formation_hook_bindings(
+                    activation=activation,
+                    execution_records=records,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda c: c.battle_formation_hook_bindings,
+                ),
             )
         )
         battle_round_start_hook_registry = BattleRoundStartHookRegistry.from_bindings(
@@ -1618,15 +1628,27 @@ class RuntimeContentBundle:
             )
         )
         stratagem_cost_choice_hook_registry = StratagemCostChoiceHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.stratagem_cost_choice_hook_bindings,
+            (
+                *generic_rule_lifecycle_hooks.stratagem_cost_choice_hook_bindings(
+                    activation=activation,
+                    execution_records=records,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.stratagem_cost_choice_hook_bindings,
+                ),
             )
         )
         stratagem_cost_modifier_registry = StratagemCostModifierRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.stratagem_cost_modifier_bindings,
+            (
+                *generic_rule_lifecycle_hooks.stratagem_cost_modifier_bindings(
+                    activation=activation,
+                    execution_records=records,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.stratagem_cost_modifier_bindings,
+                ),
             )
         )
         damaged_runtime = CatalogDamagedEffectRuntime(armies=validated_armies)
@@ -1644,9 +1666,15 @@ class RuntimeContentBundle:
                 validated_contributions,
                 lambda contribution: contribution.wound_roll_modifier_bindings,
             ),
-            save_option_modifier_bindings=_contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.save_option_modifier_bindings,
+            save_option_modifier_bindings=(
+                generic_rule_lifecycle_hooks.save_option_modifier_bindings(
+                    activation=activation,
+                    execution_records=records,
+                )
+                + _contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.save_option_modifier_bindings,
+                )
             ),
             movement_budget_modifier_bindings=_contribution_values(
                 validated_contributions,

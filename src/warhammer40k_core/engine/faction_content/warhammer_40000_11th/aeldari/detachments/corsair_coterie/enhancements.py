@@ -6,7 +6,6 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, EnhancementAssignment
 from warhammer40k_core.engine.battle_formation_hooks import (
     SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE,
-    BattleFormationHookBinding,
     BattleFormationRequestContext,
     BattleFormationResultContext,
 )
@@ -36,21 +35,16 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, Setu
 from warhammer40k_core.engine.reserves import ReserveOrigin
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
-    SaveOptionModifierBinding,
     SaveOptionModifierContext,
 )
 from warhammer40k_core.engine.saves import SaveKind, SaveOption
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
-    StratagemCostChoiceHookBinding,
     StratagemCostChoiceRequestContext,
     StratagemCostChoiceResultContext,
     source_result_payload_for_cost_choice,
 )
-from warhammer40k_core.engine.stratagem_cost_modifiers import (
-    StratagemCostModifierBinding,
-    StratagemCostModifierContext,
-)
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierContext
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     TurnEndRequestContext,
@@ -110,39 +104,7 @@ ARCHRAIDER_COST_MODIFIER_DECLINED_EVENT = "aeldari_corsair_coterie_lord_of_decei
 
 
 def runtime_contribution() -> RuntimeContentContribution:
-    return RuntimeContentContribution(
-        contribution_id=CONTRIBUTION_ID,
-        battle_formation_hook_bindings=(
-            BattleFormationHookBinding(
-                hook_id=ARCHRAIDER_SETUP_HOOK_ID,
-                source_id=ARCHRAIDER_SOURCE_RULE_ID,
-                request_handler=archraider_model_selection_request,
-                result_handler=apply_archraider_model_selection_result,
-            ),
-        ),
-        stratagem_cost_choice_hook_bindings=(
-            StratagemCostChoiceHookBinding(
-                hook_id=ARCHRAIDER_COST_CHOICE_HOOK_ID,
-                source_id=ARCHRAIDER_SOURCE_RULE_ID,
-                request_handler=archraider_command_point_cost_choice_request,
-                result_handler=apply_archraider_command_point_cost_choice_result,
-            ),
-        ),
-        stratagem_cost_modifier_bindings=(
-            StratagemCostModifierBinding(
-                modifier_id=ARCHRAIDER_COST_MODIFIER_ID,
-                source_id=ARCHRAIDER_SOURCE_RULE_ID,
-                handler=archraider_command_point_cost_modifier,
-            ),
-        ),
-        save_option_modifier_bindings=(
-            SaveOptionModifierBinding(
-                modifier_id=VOIDSTONE_SAVE_MODIFIER_ID,
-                source_id=VOIDSTONE_SOURCE_RULE_ID,
-                handler=voidstone_save_option_modifier,
-            ),
-        ),
-    )
+    return RuntimeContentContribution(contribution_id=CONTRIBUTION_ID)
 
 
 def archraider_effect(

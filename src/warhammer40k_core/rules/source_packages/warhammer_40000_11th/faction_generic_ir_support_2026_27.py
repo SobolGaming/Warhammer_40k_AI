@@ -687,9 +687,14 @@ def _ability_parameter(effect: RuleEffectSpec) -> str:
 
 
 def _grant_ability_expected_effect_count(source_row_id: str) -> int:
+    if source_row_id == corsair_coterie_ir.ARCHRAIDER_SOURCE_ROW_ID:
+        return 4
     if source_row_id == corsair_coterie_ir.WEBWAY_PATHSTONE_SOURCE_ROW_ID:
         return 3
-    if source_row_id == corsair_coterie_ir.INFAMY_SOURCE_ROW_ID:
+    if source_row_id in {
+        corsair_coterie_ir.INFAMY_SOURCE_ROW_ID,
+        corsair_coterie_ir.VOIDSTONE_SOURCE_ROW_ID,
+    }:
         return 2
     return 1
 

@@ -21,12 +21,14 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_m
     army_rule as dark_pacts,
 )
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.generic_rule_ability_effects import (
+    generic_rule_ability_effects_for_unit,
+    rule_ir_grants_any_ability,
+)
 from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleAbilityHookFamily,
     GenericRuleAbilityRegistry,
     GenericRuleAbilitySource,
-    generic_rule_ability_effects_for_unit,
-    rule_ir_grants_any_ability,
 )
 from warhammer40k_core.engine.generic_rule_ability_registry_defaults import (
     DEFAULT_GENERIC_RULE_ABILITY_REGISTRY,
@@ -273,6 +275,43 @@ def test_default_generic_rule_ability_registry_maps_corsair_coterie_enhancement_
     assert archraider.enhancement_id == corsair_ir.ARCHRAIDER_ENHANCEMENT_ID
     assert archraider.effect_id(archraider_source) == corsair_enhancements.ARCHRAIDER_EFFECT_ID
 
+    archraider_setup = next(
+        descriptor
+        for descriptor in registry.battle_formation_abilities
+        if descriptor.ability_ids() == (corsair_ir.ARCHRAIDER_MODEL_SELECTION_ABILITY,)
+    )
+    assert archraider_setup.hook_family is GenericRuleAbilityHookFamily.BATTLE_FORMATION
+    assert archraider_setup.source_rule_id == corsair_ir.ARCHRAIDER_SOURCE_RULE_ID
+    assert (
+        archraider_setup.hook_id(archraider_source) == corsair_enhancements.ARCHRAIDER_SETUP_HOOK_ID
+    )
+
+    archraider_cost_choice = next(
+        descriptor
+        for descriptor in registry.stratagem_cost_choice_abilities
+        if descriptor.ability_ids() == (corsair_ir.ARCHRAIDER_STRATAGEM_COST_CHOICE_ABILITY,)
+    )
+    assert archraider_cost_choice.hook_family is GenericRuleAbilityHookFamily.STRATAGEM_COST_CHOICE
+    assert archraider_cost_choice.source_rule_id == corsair_ir.ARCHRAIDER_SOURCE_RULE_ID
+    assert (
+        archraider_cost_choice.hook_id(archraider_source)
+        == corsair_enhancements.ARCHRAIDER_COST_CHOICE_HOOK_ID
+    )
+
+    archraider_cost_modifier = next(
+        descriptor
+        for descriptor in registry.stratagem_cost_modifier_abilities
+        if descriptor.ability_ids() == (corsair_ir.ARCHRAIDER_STRATAGEM_COST_MODIFIER_ABILITY,)
+    )
+    assert (
+        archraider_cost_modifier.hook_family is GenericRuleAbilityHookFamily.STRATAGEM_COST_MODIFIER
+    )
+    assert archraider_cost_modifier.source_rule_id == corsair_ir.ARCHRAIDER_SOURCE_RULE_ID
+    assert (
+        archraider_cost_modifier.modifier_id(archraider_source)
+        == corsair_enhancements.ARCHRAIDER_COST_MODIFIER_ID
+    )
+
     infamy_source = _aeldari_corsair_coterie_source(corsair_ir.INFAMY_ENHANCEMENT_DESCRIPTOR_ID)
     infamy = next(
         descriptor
@@ -306,6 +345,18 @@ def test_default_generic_rule_ability_registry_maps_corsair_coterie_enhancement_
     assert voidstone.source_rule_id == corsair_ir.VOIDSTONE_SOURCE_RULE_ID
     assert voidstone.enhancement_id == corsair_ir.VOIDSTONE_ENHANCEMENT_ID
     assert voidstone.effect_id(voidstone_source) == corsair_enhancements.VOIDSTONE_EFFECT_ID
+
+    voidstone_save = next(
+        descriptor
+        for descriptor in registry.save_option_modifier_abilities
+        if descriptor.ability_ids() == (corsair_ir.VOIDSTONE_SAVE_OPTION_ABILITY,)
+    )
+    assert voidstone_save.hook_family is GenericRuleAbilityHookFamily.SAVE_OPTION_MODIFIER
+    assert voidstone_save.source_rule_id == corsair_ir.VOIDSTONE_SOURCE_RULE_ID
+    assert (
+        voidstone_save.modifier_id(voidstone_source)
+        == corsair_enhancements.VOIDSTONE_SAVE_MODIFIER_ID
+    )
 
     webway_source = _aeldari_corsair_coterie_source(
         corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_DESCRIPTOR_ID

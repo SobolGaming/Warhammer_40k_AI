@@ -2,16 +2,33 @@ from __future__ import annotations
 
 from typing import Protocol, cast
 
+from warhammer40k_core.engine.battle_formation_hooks import (
+    BattleFormationRequestContext,
+    BattleFormationResultContext,
+)
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.enhancement_effects import EnhancementEffectContext
 from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleAbilitySource,
+    GenericRuleBattleFormationAbility,
     GenericRuleEnhancementEffectAbility,
     GenericRuleObjectiveControlModifierAbility,
+    GenericRuleSaveOptionModifierAbility,
+    GenericRuleStratagemCostChoiceAbility,
+    GenericRuleStratagemCostModifierAbility,
     GenericRuleTurnEndAbility,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.runtime_modifiers import ObjectiveControlModifierContext
+from warhammer40k_core.engine.runtime_modifiers import (
+    ObjectiveControlModifierContext,
+    SaveOptionModifierContext,
+)
+from warhammer40k_core.engine.saves import SaveOption
+from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
+    StratagemCostChoiceRequestContext,
+    StratagemCostChoiceResultContext,
+)
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierContext
 from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext, TurnEndResultContext
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_aeldari_corsair_coterie_ir_support_2026_27 as corsair_ir,
@@ -38,8 +55,12 @@ class _PathOfTheOutcastEnhancementsModule(Protocol):
 
 class _CorsairCoterieEnhancementsModule(Protocol):
     ARCHRAIDER_EFFECT_ID: str
+    ARCHRAIDER_SETUP_HOOK_ID: str
+    ARCHRAIDER_COST_CHOICE_HOOK_ID: str
+    ARCHRAIDER_COST_MODIFIER_ID: str
     INFAMY_EFFECT_ID: str
     VOIDSTONE_EFFECT_ID: str
+    VOIDSTONE_SAVE_MODIFIER_ID: str
     WEBWAY_PATHSTONE_EFFECT_ID: str
     WEBWAY_PATHSTONE_DEEP_STRIKE_EFFECT_ID: str
     INFAMY_OBJECTIVE_CONTROL_MODIFIER_ID: str
@@ -49,6 +70,31 @@ class _CorsairCoterieEnhancementsModule(Protocol):
         self,
         context: EnhancementEffectContext,
     ) -> tuple[object, ...]: ...
+
+    def archraider_model_selection_request(
+        self,
+        context: BattleFormationRequestContext,
+    ) -> DecisionRequest | None: ...
+
+    def apply_archraider_model_selection_result(
+        self,
+        context: BattleFormationResultContext,
+    ) -> bool: ...
+
+    def archraider_command_point_cost_choice_request(
+        self,
+        context: StratagemCostChoiceRequestContext,
+    ) -> DecisionRequest | None: ...
+
+    def apply_archraider_command_point_cost_choice_result(
+        self,
+        context: StratagemCostChoiceResultContext,
+    ) -> bool: ...
+
+    def archraider_command_point_cost_modifier(
+        self,
+        context: StratagemCostModifierContext,
+    ) -> int: ...
 
     def infamy_effect(
         self,
@@ -74,6 +120,11 @@ class _CorsairCoterieEnhancementsModule(Protocol):
         self,
         context: ObjectiveControlModifierContext,
     ) -> int: ...
+
+    def voidstone_save_option_modifier(
+        self,
+        context: SaveOptionModifierContext,
+    ) -> tuple[SaveOption, ...]: ...
 
     def webway_pathstone_turn_end_request(
         self,
@@ -163,6 +214,21 @@ def aeldari_corsair_coterie_enhancement_effect_abilities() -> tuple[
     )
 
 
+def aeldari_corsair_coterie_battle_formation_abilities() -> tuple[
+    GenericRuleBattleFormationAbility, ...
+]:
+    return (
+        GenericRuleBattleFormationAbility(
+            ability_id=corsair_ir.ARCHRAIDER_MODEL_SELECTION_ABILITY,
+            coverage_descriptor_id=corsair_ir.ARCHRAIDER_ENHANCEMENT_DESCRIPTOR_ID,
+            source_rule_id=corsair_ir.ARCHRAIDER_SOURCE_RULE_ID,
+            hook_id_builder=_corsair_archraider_setup_hook_id,
+            request_builder=_corsair_archraider_model_selection_request,
+            result_builder=_corsair_apply_archraider_model_selection_result,
+        ),
+    )
+
+
 def aeldari_corsair_coterie_objective_control_modifier_abilities() -> tuple[
     GenericRuleObjectiveControlModifierAbility, ...
 ]:
@@ -174,6 +240,51 @@ def aeldari_corsair_coterie_objective_control_modifier_abilities() -> tuple[
             modifier_id_builder=_corsair_infamy_objective_control_modifier_id,
             context_predicate=_corsair_objective_control_context_predicate,
             modifier_builder=_corsair_infamy_objective_control_modifier,
+        ),
+    )
+
+
+def aeldari_corsair_coterie_stratagem_cost_choice_abilities() -> tuple[
+    GenericRuleStratagemCostChoiceAbility, ...
+]:
+    return (
+        GenericRuleStratagemCostChoiceAbility(
+            ability_id=corsair_ir.ARCHRAIDER_STRATAGEM_COST_CHOICE_ABILITY,
+            coverage_descriptor_id=corsair_ir.ARCHRAIDER_ENHANCEMENT_DESCRIPTOR_ID,
+            source_rule_id=corsair_ir.ARCHRAIDER_SOURCE_RULE_ID,
+            hook_id_builder=_corsair_archraider_cost_choice_hook_id,
+            request_builder=_corsair_archraider_cost_choice_request,
+            result_builder=_corsair_apply_archraider_cost_choice_result,
+        ),
+    )
+
+
+def aeldari_corsair_coterie_stratagem_cost_modifier_abilities() -> tuple[
+    GenericRuleStratagemCostModifierAbility, ...
+]:
+    return (
+        GenericRuleStratagemCostModifierAbility(
+            ability_id=corsair_ir.ARCHRAIDER_STRATAGEM_COST_MODIFIER_ABILITY,
+            coverage_descriptor_id=corsair_ir.ARCHRAIDER_ENHANCEMENT_DESCRIPTOR_ID,
+            source_rule_id=corsair_ir.ARCHRAIDER_SOURCE_RULE_ID,
+            modifier_id_builder=_corsair_archraider_cost_modifier_id,
+            context_predicate=_corsair_stratagem_cost_modifier_context_predicate,
+            modifier_builder=_corsair_archraider_cost_modifier,
+        ),
+    )
+
+
+def aeldari_corsair_coterie_save_option_modifier_abilities() -> tuple[
+    GenericRuleSaveOptionModifierAbility, ...
+]:
+    return (
+        GenericRuleSaveOptionModifierAbility(
+            ability_id=corsair_ir.VOIDSTONE_SAVE_OPTION_ABILITY,
+            coverage_descriptor_id=corsair_ir.VOIDSTONE_ENHANCEMENT_DESCRIPTOR_ID,
+            source_rule_id=corsair_ir.VOIDSTONE_SOURCE_RULE_ID,
+            modifier_id_builder=_corsair_voidstone_save_option_modifier_id,
+            context_predicate=_corsair_save_option_context_predicate,
+            modifier_builder=_corsair_voidstone_save_option_modifier,
         ),
     )
 
@@ -240,6 +351,28 @@ def _corsair_objective_control_context_predicate(
     return True
 
 
+def _corsair_stratagem_cost_modifier_context_predicate(
+    context: StratagemCostModifierContext,
+    source: GenericRuleAbilitySource,
+) -> bool:
+    if type(context) is not StratagemCostModifierContext:
+        raise GameLifecycleError("Corsair Coterie stratagem cost modifier requires context.")
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Corsair Coterie stratagem cost modifier requires source.")
+    return True
+
+
+def _corsair_save_option_context_predicate(
+    context: SaveOptionModifierContext,
+    source: GenericRuleAbilitySource,
+) -> bool:
+    if type(context) is not SaveOptionModifierContext:
+        raise GameLifecycleError("Corsair Coterie save option modifier requires context.")
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Corsair Coterie save option modifier requires source.")
+    return True
+
+
 def _camouflaged_snipers_effect_id(source: GenericRuleAbilitySource) -> str:
     if type(source) is not GenericRuleAbilitySource:
         raise GameLifecycleError("Camouflaged Snipers effect ID requires source.")
@@ -285,6 +418,71 @@ def _corsair_archraider_effect(
     return _corsair_coterie_enhancements().archraider_effect(context)
 
 
+def _corsair_archraider_setup_hook_id(source: GenericRuleAbilitySource) -> str:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Archraider setup hook ID requires source.")
+    return _corsair_coterie_enhancements().ARCHRAIDER_SETUP_HOOK_ID
+
+
+def _corsair_archraider_model_selection_request(
+    context: BattleFormationRequestContext,
+    source: GenericRuleAbilitySource,
+) -> DecisionRequest | None:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Archraider model selection request requires source.")
+    return _corsair_coterie_enhancements().archraider_model_selection_request(context)
+
+
+def _corsair_apply_archraider_model_selection_result(
+    context: BattleFormationResultContext,
+    source: GenericRuleAbilitySource,
+) -> bool:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Archraider model selection result requires source.")
+    return _corsair_coterie_enhancements().apply_archraider_model_selection_result(context)
+
+
+def _corsair_archraider_cost_choice_hook_id(source: GenericRuleAbilitySource) -> str:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Archraider cost choice hook ID requires source.")
+    return _corsair_coterie_enhancements().ARCHRAIDER_COST_CHOICE_HOOK_ID
+
+
+def _corsair_archraider_cost_choice_request(
+    context: StratagemCostChoiceRequestContext,
+    source: GenericRuleAbilitySource,
+) -> DecisionRequest | None:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Archraider cost choice request requires source.")
+    return _corsair_coterie_enhancements().archraider_command_point_cost_choice_request(context)
+
+
+def _corsair_apply_archraider_cost_choice_result(
+    context: StratagemCostChoiceResultContext,
+    source: GenericRuleAbilitySource,
+) -> bool:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Archraider cost choice result requires source.")
+    return _corsair_coterie_enhancements().apply_archraider_command_point_cost_choice_result(
+        context
+    )
+
+
+def _corsair_archraider_cost_modifier_id(source: GenericRuleAbilitySource) -> str:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Archraider cost modifier ID requires source.")
+    return _corsair_coterie_enhancements().ARCHRAIDER_COST_MODIFIER_ID
+
+
+def _corsair_archraider_cost_modifier(
+    context: StratagemCostModifierContext,
+    source: GenericRuleAbilitySource,
+) -> int:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Archraider cost modifier requires source.")
+    return _corsair_coterie_enhancements().archraider_command_point_cost_modifier(context)
+
+
 def _corsair_infamy_effect_id(source: GenericRuleAbilitySource) -> str:
     if type(source) is not GenericRuleAbilitySource:
         raise GameLifecycleError("Infamy effect ID requires source.")
@@ -313,6 +511,21 @@ def _corsair_voidstone_effect(
     if type(source) is not GenericRuleAbilitySource:
         raise GameLifecycleError("Voidstone effect requires source.")
     return _corsair_coterie_enhancements().voidstone_effect(context)
+
+
+def _corsair_voidstone_save_option_modifier_id(source: GenericRuleAbilitySource) -> str:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Voidstone save option modifier ID requires source.")
+    return _corsair_coterie_enhancements().VOIDSTONE_SAVE_MODIFIER_ID
+
+
+def _corsair_voidstone_save_option_modifier(
+    context: SaveOptionModifierContext,
+    source: GenericRuleAbilitySource,
+) -> tuple[SaveOption, ...]:
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Voidstone save option modifier requires source.")
+    return _corsair_coterie_enhancements().voidstone_save_option_modifier(context)
 
 
 def _corsair_webway_pathstone_effect_id(source: GenericRuleAbilitySource) -> str:
