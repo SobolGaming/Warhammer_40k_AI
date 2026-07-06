@@ -19,6 +19,9 @@ from warhammer40k_core.rules.rule_templates import (
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_aeldari_corsair_coterie_ir_support_2026_27 as corsair_coterie_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -79,6 +82,10 @@ _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 _SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         CAVALCADE_OF_CHAOS_SOUL_SHATTERING_CHARGE_SOURCE_ROW_ID,
+        corsair_coterie_ir.ARCHRAIDER_SOURCE_ROW_ID,
+        corsair_coterie_ir.INFAMY_SOURCE_ROW_ID,
+        corsair_coterie_ir.VOIDSTONE_SOURCE_ROW_ID,
+        corsair_coterie_ir.WEBWAY_PATHSTONE_SOURCE_ROW_ID,
         path_outcast_ir.ASSASSINS_EYE_SOURCE_ROW_ID,
         path_outcast_ir.CAMOUFLAGED_SNIPERS_SOURCE_ROW_ID,
         "enhancement:emperors-children:court-of-the-phoenician:000010654002",
@@ -257,6 +264,8 @@ def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> Ru
     if payload is None:
         payload = path_outcast_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
+        payload = corsair_coterie_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
+    if payload is None:
         raise Phase17FGenericIrSupportError("Generic IR coverage descriptor is not registered.")
     return RuleIR.from_payload(payload)
 
@@ -320,7 +329,7 @@ def _validate_supported_enhancement_ir(
             expected_template_ids=_SUPPORTED_GRANT_ABILITY_TEMPLATE_IDS,
             effect_kind=RuleEffectKind.GRANT_ABILITY,
             effect_family_name="ability",
-            expected_effect_count=1,
+            expected_effect_count=_grant_ability_expected_effect_count(source_row.source_row_id),
         )
     elif (
         source_row.source_row_id
@@ -675,6 +684,14 @@ def _ability_parameter(effect: RuleEffectSpec) -> str:
     if type(ability) is not str:
         raise Phase17FGenericIrSupportError("Generic grant ability effect requires ability.")
     return ability
+
+
+def _grant_ability_expected_effect_count(source_row_id: str) -> int:
+    if source_row_id == corsair_coterie_ir.WEBWAY_PATHSTONE_SOURCE_ROW_ID:
+        return 3
+    if source_row_id == corsair_coterie_ir.INFAMY_SOURCE_ROW_ID:
+        return 2
+    return 1
 
 
 def _supported_enhancement_source_row_ids() -> frozenset[str]:

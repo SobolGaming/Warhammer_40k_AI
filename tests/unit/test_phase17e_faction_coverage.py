@@ -12,6 +12,9 @@ import pytest
 from tools.fetch_official_sources import load_official_source_manifest
 
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_aeldari_corsair_coterie_ir_support_2026_27 as corsair_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -65,6 +68,25 @@ ASSASSINS_EYE_RUNTIME_CONSUMERS = (
 CAMOUFLAGED_SNIPERS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:camouflaged_snipers_upgrade",
 )
+CORSAIR_ARCHRAIDER_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider",
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:lord_of_deceit",
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:lord_of_deceit_choice",
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:archraider:select_model",
+)
+CORSAIR_INFAMY_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:infamy",
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:infamy:objective_control",
+)
+CORSAIR_VOIDSTONE_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:voidstone",
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:voidstone:save_option",
+)
+CORSAIR_WEBWAY_PATHSTONE_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone",
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone:deep_strike",
+    "warhammer_40000_11th:aeldari:detachment:corsair_coterie:webway_pathstone:turn_end_reserves",
+)
 FADE_TO_DARKNESS_SOURCE_ROW_ID = "enhancement:chaos-daemons:shadow-legion:000009980004"
 FADE_TO_DARKNESS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
@@ -101,6 +123,10 @@ GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
 )
 GENERIC_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
+        corsair_ir.ARCHRAIDER_SOURCE_ROW_ID,
+        corsair_ir.INFAMY_SOURCE_ROW_ID,
+        corsair_ir.VOIDSTONE_SOURCE_ROW_ID,
+        corsair_ir.WEBWAY_PATHSTONE_SOURCE_ROW_ID,
         path_outcast_ir.ASSASSINS_EYE_SOURCE_ROW_ID,
         path_outcast_ir.CAMOUFLAGED_SNIPERS_SOURCE_ROW_ID,
         FADE_TO_DARKNESS_SOURCE_ROW_ID,
@@ -155,6 +181,10 @@ GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     }
 )
 GENERIC_ENGINE_CONSUMED_ENHANCEMENT_RUNTIME_CONSUMERS_BY_SOURCE_ROW_ID = {
+    corsair_ir.ARCHRAIDER_SOURCE_ROW_ID: CORSAIR_ARCHRAIDER_RUNTIME_CONSUMERS,
+    corsair_ir.INFAMY_SOURCE_ROW_ID: CORSAIR_INFAMY_RUNTIME_CONSUMERS,
+    corsair_ir.VOIDSTONE_SOURCE_ROW_ID: CORSAIR_VOIDSTONE_RUNTIME_CONSUMERS,
+    corsair_ir.WEBWAY_PATHSTONE_SOURCE_ROW_ID: CORSAIR_WEBWAY_PATHSTONE_RUNTIME_CONSUMERS,
     path_outcast_ir.ASSASSINS_EYE_SOURCE_ROW_ID: ASSASSINS_EYE_RUNTIME_CONSUMERS,
     path_outcast_ir.CAMOUFLAGED_SNIPERS_SOURCE_ROW_ID: CAMOUFLAGED_SNIPERS_RUNTIME_CONSUMERS,
     FADE_TO_DARKNESS_SOURCE_ROW_ID: FADE_TO_DARKNESS_RUNTIME_CONSUMERS,
@@ -875,6 +905,68 @@ def test_phase17e_malice_made_manifest_exact_row_is_generic_rule_ir_supported() 
     assert coverage_row.runtime_support_status is not None
     assert coverage_row.runtime_support_status.value == "engine_consumed"
     assert coverage_row.runtime_consumer_ids == MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS
+    assert coverage_row.handler_id is None
+    assert coverage_row.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+            coverage_row.descriptor_id
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    ("source_row_id", "rule_id", "name", "runtime_consumers"),
+    [
+        (
+            corsair_ir.ARCHRAIDER_SOURCE_ROW_ID,
+            corsair_ir.ARCHRAIDER_ENHANCEMENT_ID,
+            "Archraider",
+            CORSAIR_ARCHRAIDER_RUNTIME_CONSUMERS,
+        ),
+        (
+            corsair_ir.INFAMY_SOURCE_ROW_ID,
+            corsair_ir.INFAMY_ENHANCEMENT_ID,
+            "Infamy",
+            CORSAIR_INFAMY_RUNTIME_CONSUMERS,
+        ),
+        (
+            corsair_ir.VOIDSTONE_SOURCE_ROW_ID,
+            corsair_ir.VOIDSTONE_ENHANCEMENT_ID,
+            "Voidstone",
+            CORSAIR_VOIDSTONE_RUNTIME_CONSUMERS,
+        ),
+        (
+            corsair_ir.WEBWAY_PATHSTONE_SOURCE_ROW_ID,
+            corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_ID,
+            "Webway Pathstone",
+            CORSAIR_WEBWAY_PATHSTONE_RUNTIME_CONSUMERS,
+        ),
+    ],
+)
+def test_phase17e_corsair_coterie_rows_are_generic_rule_ir_supported(
+    source_row_id: str,
+    rule_id: str,
+    name: str,
+    runtime_consumers: tuple[str, ...],
+) -> None:
+    source_row = next(
+        row
+        for row in faction_subrule_source.enhancement_rows()
+        if row.source_row_id == source_row_id
+    )
+    coverage_row = next(
+        row
+        for row in faction_coverage_source.coverage_rows()
+        if row.descriptor_id == f"phase17e:{source_row_id}"
+    )
+
+    assert source_row.name == name
+    assert source_row.enhancement_id == rule_id
+    assert source_row.runtime_support_status.value == "engine_consumed"
+    assert source_row.runtime_consumer_ids == runtime_consumers
+    assert coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+    assert coverage_row.runtime_support_status is not None
+    assert coverage_row.runtime_support_status.value == "engine_consumed"
+    assert coverage_row.runtime_consumer_ids == runtime_consumers
     assert coverage_row.handler_id is None
     assert coverage_row.rule_ir_hash == (
         generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(

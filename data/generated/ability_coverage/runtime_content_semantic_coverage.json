@@ -519,7 +519,7 @@
             "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:aeldari:corsair-coterie:aeldari:corsair-coterie:pirates-due",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:aeldari:corsair-coterie:aeldari:corsair-coterie:vengeful-sorrow",
             "gw-11e-phase17e-faction-coverage-2026-27:source-pdf:aeldari",
-            "phase17g:aeldari:corsair-coterie:enhancements",
+            "phase17f:phase17e:aeldari:corsair-coterie:enhancements",
             "phase17g:aeldari:corsair-coterie:stratagems"
           ]
         },
@@ -7092,6 +7092,6 @@
     }
   ],
   "schema_version": "runtime-content-semantic-coverage-v1",
-  "source_package_hash": "22c1402e0cde3b3173c9029173fa9b89fc7d121d5acea3c54f4fd97ead103cc6",
+  "source_package_hash": "97596313651472e28ffdabbc630fbe1fb7c740a838c32ed029d823bbea804d6a",
   "source_package_id": "gw-11e-phase17f-faction-execution-2026-27"
 }

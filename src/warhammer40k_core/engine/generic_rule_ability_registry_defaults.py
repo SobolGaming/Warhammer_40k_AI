@@ -64,6 +64,9 @@ from warhammer40k_core.engine.generic_rule_ability_registry import (
     generic_rule_shooting_unit_selected_unit_id,
 )
 from warhammer40k_core.engine.generic_rule_ability_registry_aeldari_defaults import (
+    aeldari_corsair_coterie_enhancement_effect_abilities,
+    aeldari_corsair_coterie_objective_control_modifier_abilities,
+    aeldari_corsair_coterie_turn_end_abilities,
     aeldari_path_of_the_outcast_enhancement_effect_abilities,
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
@@ -1389,6 +1392,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
     ),
     enhancement_effect_abilities=(
         *aeldari_path_of_the_outcast_enhancement_effect_abilities(),
+        *aeldari_corsair_coterie_enhancement_effect_abilities(),
         GenericRuleEnhancementEffectAbility(
             ability_id=shadow_legion_ir.LEAPING_SHADOWS_SCOUTS_ABILITY,
             coverage_descriptor_id=shadow_legion_ir.LEAPING_SHADOWS_ENHANCEMENT_DESCRIPTOR_ID,
@@ -1408,6 +1412,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             context_predicate=_shadow_legion_objective_control_context_predicate,
             modifier_builder=_shadow_legion_mantle_of_gloom_modifier,
         ),
+        *aeldari_corsair_coterie_objective_control_modifier_abilities(),
     ),
     unit_destroyed_abilities=(
         GenericRuleUnitDestroyedAbility(
@@ -1427,6 +1432,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             request_builder=_shadow_legion_fade_to_darkness_turn_end_request,
             result_builder=_shadow_legion_fade_to_darkness_turn_end_result,
         ),
+        *aeldari_corsair_coterie_turn_end_abilities(),
     ),
     fight_phase_start_abilities=(
         GenericRuleFightPhaseStartAbility(

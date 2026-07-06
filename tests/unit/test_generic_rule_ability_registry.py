@@ -14,6 +14,9 @@ from warhammer40k_core.engine.effects import (
     generic_rule_persisting_effect,
 )
 from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari.detachments.corsair_coterie import (  # noqa: E501
+    enhancements as corsair_enhancements,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule as dark_pacts,
 )
@@ -34,6 +37,9 @@ from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_aeldari_corsair_coterie_ir_support_2026_27 as corsair_ir,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
 )
@@ -251,6 +257,93 @@ def test_default_generic_rule_ability_registry_maps_shadow_legion_enhancement_gr
     )
 
 
+def test_default_generic_rule_ability_registry_maps_corsair_coterie_enhancement_grants() -> None:
+    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
+
+    archraider_source = _aeldari_corsair_coterie_source(
+        corsair_ir.ARCHRAIDER_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    archraider = next(
+        descriptor
+        for descriptor in registry.enhancement_effect_abilities
+        if descriptor.ability_ids() == (corsair_ir.ARCHRAIDER_MARKER_ABILITY,)
+    )
+    assert archraider.hook_family is GenericRuleAbilityHookFamily.ENHANCEMENT_EFFECT
+    assert archraider.source_rule_id == corsair_ir.ARCHRAIDER_SOURCE_RULE_ID
+    assert archraider.enhancement_id == corsair_ir.ARCHRAIDER_ENHANCEMENT_ID
+    assert archraider.effect_id(archraider_source) == corsair_enhancements.ARCHRAIDER_EFFECT_ID
+
+    infamy_source = _aeldari_corsair_coterie_source(corsair_ir.INFAMY_ENHANCEMENT_DESCRIPTOR_ID)
+    infamy = next(
+        descriptor
+        for descriptor in registry.enhancement_effect_abilities
+        if descriptor.ability_ids() == (corsair_ir.INFAMY_MARKER_ABILITY,)
+    )
+    assert infamy.source_rule_id == corsair_ir.INFAMY_SOURCE_RULE_ID
+    assert infamy.enhancement_id == corsair_ir.INFAMY_ENHANCEMENT_ID
+    assert infamy.effect_id(infamy_source) == corsair_enhancements.INFAMY_EFFECT_ID
+
+    infamy_oc = next(
+        descriptor
+        for descriptor in registry.objective_control_modifier_abilities
+        if descriptor.ability_ids() == (corsair_ir.INFAMY_OBJECTIVE_CONTROL_ABILITY,)
+    )
+    assert infamy_oc.hook_family is GenericRuleAbilityHookFamily.OBJECTIVE_CONTROL_MODIFIER
+    assert infamy_oc.source_rule_id == corsair_ir.INFAMY_SOURCE_RULE_ID
+    assert (
+        infamy_oc.modifier_id(infamy_source)
+        == corsair_enhancements.INFAMY_OBJECTIVE_CONTROL_MODIFIER_ID
+    )
+
+    voidstone_source = _aeldari_corsair_coterie_source(
+        corsair_ir.VOIDSTONE_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    voidstone = next(
+        descriptor
+        for descriptor in registry.enhancement_effect_abilities
+        if descriptor.ability_ids() == (corsair_ir.VOIDSTONE_MARKER_ABILITY,)
+    )
+    assert voidstone.source_rule_id == corsair_ir.VOIDSTONE_SOURCE_RULE_ID
+    assert voidstone.enhancement_id == corsair_ir.VOIDSTONE_ENHANCEMENT_ID
+    assert voidstone.effect_id(voidstone_source) == corsair_enhancements.VOIDSTONE_EFFECT_ID
+
+    webway_source = _aeldari_corsair_coterie_source(
+        corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    webway = next(
+        descriptor
+        for descriptor in registry.enhancement_effect_abilities
+        if descriptor.ability_ids() == (corsair_ir.WEBWAY_PATHSTONE_MARKER_ABILITY,)
+    )
+    assert webway.source_rule_id == corsair_ir.WEBWAY_PATHSTONE_SOURCE_RULE_ID
+    assert webway.enhancement_id == corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_ID
+    assert webway.effect_id(webway_source) == corsair_enhancements.WEBWAY_PATHSTONE_EFFECT_ID
+
+    webway_deep_strike = next(
+        descriptor
+        for descriptor in registry.enhancement_effect_abilities
+        if descriptor.ability_ids() == (corsair_ir.WEBWAY_PATHSTONE_DEEP_STRIKE_ABILITY,)
+    )
+    assert webway_deep_strike.source_rule_id == corsair_ir.WEBWAY_PATHSTONE_SOURCE_RULE_ID
+    assert webway_deep_strike.enhancement_id == corsair_ir.WEBWAY_PATHSTONE_ENHANCEMENT_ID
+    assert (
+        webway_deep_strike.effect_id(webway_source)
+        == corsair_enhancements.WEBWAY_PATHSTONE_DEEP_STRIKE_EFFECT_ID
+    )
+
+    webway_turn_end = next(
+        descriptor
+        for descriptor in registry.turn_end_abilities
+        if descriptor.ability_ids() == (corsair_ir.WEBWAY_PATHSTONE_RESERVES_ABILITY,)
+    )
+    assert webway_turn_end.hook_family is GenericRuleAbilityHookFamily.TURN_END
+    assert webway_turn_end.source_rule_id == corsair_ir.WEBWAY_PATHSTONE_SOURCE_RULE_ID
+    assert (
+        webway_turn_end.hook_id(webway_source)
+        == corsair_enhancements.WEBWAY_PATHSTONE_TURN_END_HOOK_ID
+    )
+
+
 def test_generic_rule_ability_registry_rejects_duplicate_descriptors() -> None:
     descriptor = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.advance_eligibility_abilities[0]
 
@@ -391,6 +484,18 @@ def _shadow_legion_enhancement_source(coverage_descriptor_id: str) -> GenericRul
 
 
 def _aeldari_path_of_the_outcast_source(coverage_descriptor_id: str) -> GenericRuleAbilitySource:
+    record = next(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.coverage_descriptor_id == coverage_descriptor_id
+    )
+    rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+        record.coverage_descriptor_id
+    )
+    return GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
+
+
+def _aeldari_corsair_coterie_source(coverage_descriptor_id: str) -> GenericRuleAbilitySource:
     record = next(
         record
         for record in faction_execution_2026_27.execution_records()
