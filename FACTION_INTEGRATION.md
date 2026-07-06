@@ -501,7 +501,12 @@ Steady-state content drops follow the IR-first loop:
 6. Implement only the flagged residue: approved named handlers, approved source
    gaps, or new Phase 17C template families.
 7. Run the WS15 policy-evaluation gate against the new catalog hashes before
-   promotion.
+   promotion: fixed-seed, fixed-matchup policy-vs-policy batches must diff win
+   rates, VP distributions, illegal-candidate counts, and mask statistics
+   against the pre-update baseline. Stale-policy drift beyond the configured
+   threshold blocks promotion to the new catalog hash until the artifact is
+   fine-tuned or retrained. Any cross-version evaluation override must be
+   recorded in the self-play summary and DecisionRecord corpus metadata.
 
 The success target is that a typical monthly dataslate requires zero new Python,
 and a typical codex requires only a small approved named-handler residue after

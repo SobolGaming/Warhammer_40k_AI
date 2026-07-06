@@ -4984,6 +4984,9 @@ Invariants:
 - candidate generation never bypasses authoritative validation;
 - illegal candidates are masked before ranking;
 - candidate payloads include enough context for training and replay diagnostics;
+- candidate and mask payloads expose descriptor-derived characteristics, rules
+  state, and legal-action context, not one-hot unit, datasheet, or faction
+  identity encodings;
 - bounded search budgets are deterministic and report timeout/skip reasons.
 
 ## Phase 19C: hierarchical AI policy orchestration: General, Commanders, Rankers
@@ -5002,13 +5005,24 @@ Objects:
 - `PhaseCommander`
 - `ActionRanker`
 - `PolicyBundle`
+- `PolicyProvenance`
 - `CandidateScore`
 
 Invariants:
 
 - General chooses strategic posture/goals;
 - Commanders own phase/domain-specific candidate interpretation;
-- Rankers score already-legal candidates;
+- Rankers score already-legal candidates and default to bounded,
+  deterministic lookahead through the headless engine plus a learned state
+  evaluation function;
+- pure learned policies are allowed only as optimized artifacts that pass the
+  Phase 19E content-drop evaluation gate for the target catalog hashes;
+- every General, Commander, Ranker, and evaluation-function artifact carries
+  policy provenance: catalog package IDs and hashes, ruleset descriptor
+  identity, engine version, and reward-profile version;
+- loading a policy artifact against mismatched catalog or ruleset provenance is
+  a typed fail-fast error unless an explicit cross-version evaluation override
+  is enabled and recorded;
 - AI never mutates engine state directly;
 - AI decisions submit ordinary `DecisionResult`s;
 - AI-selected decisions produce normal `DecisionRecord`s;
@@ -5027,6 +5041,9 @@ Invariants:
 
 - AI-vs-AI self-play can run without UI;
 - games produce DecisionRecord corpora;
+- every self-play game tags catalog package hashes, ruleset descriptor hash,
+  layout and mission identity, policy artifact IDs, reward-profile version, and
+  any policy-provenance override used for that run;
 - replay artifacts can be saved for each game;
 - failed games produce structured diagnostics;
 - parallel workers preserve deterministic per-game seeds;
@@ -5037,6 +5054,7 @@ Required outputs:
 - JSONL/SQLite DecisionRecord export;
 - replay manifest;
 - self-play summary report;
+- policy provenance compatibility summary;
 - failure triage report.
 
 ## Phase 19E: training-data, reward annotation, and evaluation pipeline
@@ -5045,7 +5063,25 @@ Invariants:
 
 - reward profiles are explicit and versioned;
 - generated corpora include game result, VP deltas, action context, legal mask, chosen action, and policy metadata;
+- training-row input features are characteristics-based and descriptor-derived:
+  statlines, canonical keywords, weapon profiles, points, ability IR
+  components, mission state, rules state, and legal-action context;
+- unit, datasheet, faction, detachment, army, or model identity IDs can appear
+  only as provenance/debug metadata, never as learned-model input features;
+- the training-row schema validates the characteristics-not-identity rule before
+  rows enter the corpus;
+- self-play DecisionRecord corpora include catalog package hashes, layout and
+  mission identity, policy artifact IDs, and reward-profile version so training
+  jobs can filter or reweight across content versions;
 - evaluation can compare policies on fixed seed/matchup batches;
+- after each dataslate, codex, MFM, or FAQ ingest, the evaluation harness runs
+  fixed-seed policy-vs-policy batches and diffs win rates, VP distributions,
+  illegal-candidate counts, and mask statistics against the pre-update
+  baseline;
+- stale-policy drift beyond the configured threshold blocks promotion to the
+  new catalog hash until the artifact is fine-tuned or retrained;
+- cross-version policy evaluation overrides are recorded in self-play summaries
+  and DecisionRecord corpus metadata;
 - training data schema is stable and validated.
 
 Event Companion scenario coverage:
