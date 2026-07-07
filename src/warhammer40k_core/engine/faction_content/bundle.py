@@ -10,6 +10,7 @@ from warhammer40k_core.engine import (
     catalog_turn_end_reserves,
     generic_detachment_rule_effects,
     generic_rule_lifecycle_hooks,
+    generic_target_restriction_effects,
 )
 from warhammer40k_core.engine.abilities import (
     AbilityCatalogIndex,
@@ -1502,6 +1503,7 @@ class RuntimeContentBundle:
         shooting_target_restriction_hook_registry = (
             ShootingTargetRestrictionHookRegistry.from_bindings(
                 (
+                    *generic_target_restriction_effects.shooting_target_restriction_hook_bindings(),
                     *generic_rule_lifecycle_hooks.shooting_target_restriction_hook_bindings(
                         activation=activation,
                         execution_records=records,

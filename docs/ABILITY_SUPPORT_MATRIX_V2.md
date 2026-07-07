@@ -327,7 +327,6 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `descriptor:movement:deep-strike-placement` | Deep Strike |
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
 | `generic:rule-ir` | CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Casting Back the Veil<br>Cloak and Shadow<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>Vengeful Sorrow<br>Warp-Riders |
-| `phase17g:aeldari:corsair-coterie:stratagems:cloak-and-shadow:target-restriction` | Cloak and Shadow |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start` | Acts of Faith |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed` | Acts of Faith |
