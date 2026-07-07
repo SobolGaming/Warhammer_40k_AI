@@ -735,6 +735,24 @@ def test_phase17f_execution_statuses_are_explicit_for_all_phase17e_rows() -> Non
     assert all(record.is_approved_blocked for record in execution_package.blocked_records())
 
 
+def test_phase17f_hit_target_cover_denial_stratagem_is_executable_generic_ir() -> None:
+    descriptor_id = "phase17e:stratagem:astra-militarum:steel-hammer:000010788005"
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_descriptor_id == descriptor_id
+    )
+
+    assert record.rule_name == "SHATTERING SALVO"
+    assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.block_reason is None
+    assert record.handler_id is None
+    assert record.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(descriptor_id)
+    )
+
+
 def test_phase17f_court_of_the_phoenician_rows_are_executable_generic_ir() -> None:
     records_by_descriptor_id = {
         record.coverage_descriptor_id: record

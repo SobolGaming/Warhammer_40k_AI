@@ -25,7 +25,7 @@ Load support and semantic execution support are distinct. A row with `support_st
 | Family | Placeholder | Partial | Implemented |
 | --- | ---: | ---: | ---: |
 | Faction | 5 | 23 | 0 |
-| Detachment | 244 | 18 | 4 |
+| Detachment | 243 | 19 | 4 |
 
 | Faction | Faction semantic status | Placeholder detachments | Partial detachments | Implemented detachments |
 | --- | --- | ---: | ---: | ---: |
@@ -51,7 +51,7 @@ Load support and semantic execution support are distinct. A row with `support_st
 | Thousand Sons | `partial` | 9 | 0 | 0 |
 | Chaos Knights | `partial` | 8 | 0 | 0 |
 | Chaos Daemons | `partial` | 5 | 3 | 1 |
-| Astra Militarum | `partial` | 11 | 0 | 0 |
+| Astra Militarum | `partial` | 10 | 1 | 0 |
 | Adepta Sororitas | `partial` | 8 | 0 | 0 |
 | Adeptus Mechanicus | `partial` | 10 | 0 | 0 |
 | Imperial Knights | `partial` | 7 | 1 | 0 |

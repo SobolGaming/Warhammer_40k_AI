@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import replace
 from typing import cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.command_points import CommandPointSourceKind
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpirationBoundary
 from warhammer40k_core.engine.faction_content.stratagem_activation import (
     source_backed_detachment_stratagem_activation_records,
@@ -21,7 +25,11 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
     WargearSelection,
 )
-from warhammer40k_core.engine.phase import GameLifecycleStage
+from warhammer40k_core.engine.phase import (
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.rule_execution import (
     GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     RuleExecutionContext,
@@ -30,9 +38,19 @@ from warhammer40k_core.engine.rule_execution import (
     execute_rule_ir,
 )
 from warhammer40k_core.engine.selected_target_context import SELECTED_TARGET_UNIT_CONTEXT_KEY
-from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
+from warhammer40k_core.engine.stratagems import (
+    HIT_ENEMY_UNIT_CONTEXT_KEY,
+    HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+    HIT_TARGET_UNIT_CONTEXT_KEY,
+    JUST_SHOT_UNIT_CONTEXT_KEY,
+    StratagemCatalogIndex,
+    StratagemEligibilityContext,
+    apply_stratagem_decision,
+    request_stratagem_use_from_index,
+)
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
-from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
+from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload, parameter_payload
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
 )
@@ -88,8 +106,8 @@ def test_ws14_generated_stratagem_rule_ir_freezes_supported_effect_durations() -
         )
     ]
 
-    assert len(effect_profiles) == 171
-    assert len(duration_profiles) == 167
+    assert len(effect_profiles) == 172
+    assert len(duration_profiles) == 168
 
     payload = effect_profiles[0].rule_ir_payload()
     payload["rule_id"] = "tampered"
@@ -131,6 +149,140 @@ def test_ws14_source_backed_stratagem_activation_records_are_runtime_loadable() 
         rule_ir_payload = payload["rule_ir"]
         assert isinstance(rule_ir_payload, dict)
         RuleIR.from_payload(cast(RuleIRPayload, rule_ir_payload))
+
+
+def test_ws14_shattering_salvo_activation_payload_selects_hit_enemy_unit() -> None:
+    profile = next(
+        profile
+        for profile in faction_stratagem_activation_2026_27.stratagem_activation_profiles()
+        if profile.profile_id == "phase17s:stratagem:astra-militarum:steel-hammer:000010788005"
+    )
+    effect_payload = profile.effect_payload()
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, effect_payload["rule_ir"]))
+    effect_clause = rule_ir.clauses[1]
+
+    assert (
+        profile.rule_ir_hash == "7115cfeaecb2ea2a9fa60c98892ce5bdaa0105162368c50f6f4689ed9738abef"
+    )
+    assert effect_payload["effect_selection_kind"] == HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND
+    assert rule_ir.ir_hash() == profile.rule_ir_hash
+    assert effect_clause.target is not None
+    assert parameter_payload(effect_clause.target.parameters) == {
+        "allegiance": "enemy",
+        "target_relationship": "hit_by_those_attacks",
+    }
+    assert parameter_payload(effect_clause.effects[0].parameters) == {
+        "effect_selection_kind": HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+        "operation": "deny",
+        "rules_context": "status_denial",
+        "status": "benefit_of_cover",
+        "status_label": "Benefit of Cover",
+        "target_scope": "selected_unit",
+    }
+
+
+def test_ws14_shattering_salvo_stratagem_denies_cover_to_selected_hit_enemy() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    friendly_unit = replace(
+        _unit(
+            catalog=catalog,
+            army_id="army-alpha",
+            unit_selection_id="shattering-titanic-unit",
+        ),
+        keywords=("CHARACTER", "INFANTRY", "TITANIC"),
+    )
+    enemy_unit = _unit(
+        catalog=catalog,
+        army_id="army-beta",
+        unit_selection_id="shattering-hit-enemy-unit",
+    )
+    state = _state(
+        _army(
+            catalog=catalog,
+            player_id="player-a",
+            army_id="army-alpha",
+            unit=friendly_unit,
+            faction_id="astra-militarum",
+            detachment_id="steel-hammer",
+        ),
+        _army(
+            catalog=catalog,
+            player_id="player-b",
+            army_id="army-beta",
+            unit=enemy_unit,
+            faction_id="space-marines",
+            detachment_id="gladius-task-force",
+        ),
+        active_player_id="player-a",
+    )
+    _set_battle_phase(state, BattlePhaseKind.SHOOTING)
+    state.gain_command_points(
+        player_id="player-a",
+        amount=1,
+        source_id="ws14-shattering-salvo-cp",
+        source_kind=CommandPointSourceKind.OTHER,
+        cap_exempt=True,
+    )
+    decisions = DecisionController()
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id="player-a",
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+        trigger_payload={
+            JUST_SHOT_UNIT_CONTEXT_KEY: friendly_unit.unit_instance_id,
+            HIT_TARGET_UNIT_CONTEXT_KEY: [enemy_unit.unit_instance_id],
+        },
+    )
+    status = request_stratagem_use_from_index(
+        state=state,
+        decisions=decisions,
+        index=StratagemCatalogIndex.from_records(
+            source_backed_detachment_stratagem_activation_records()
+        ),
+        context=context,
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = status.decision_request
+    assert request is not None
+    selected_option = next(
+        option
+        for option in request.options
+        if _option_stratagem_id(option.payload) == "000010788005"
+        and _option_target_unit_id(option.payload) == friendly_unit.unit_instance_id
+    )
+    result = DecisionResult.for_request(
+        result_id="ws14-shattering-salvo-result",
+        request=request,
+        selected_option_id=selected_option.option_id,
+    )
+    decisions.submit_result(result)
+
+    use_record = apply_stratagem_decision(
+        state=state,
+        result=result,
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+    )
+
+    assert use_record.effect_selection == {
+        "effect_selection_kind": HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+        HIT_ENEMY_UNIT_CONTEXT_KEY: enemy_unit.unit_instance_id,
+    }
+    assert use_record.targeted_unit_instance_ids == (friendly_unit.unit_instance_id,)
+    effects = state.persisting_effects_for_unit(enemy_unit.unit_instance_id)
+    assert len(effects) == 1
+    effect_payload = cast(dict[str, object], effects[0].effect_payload)
+    assert effect_payload["effect_kind"] == "generic_stratagem_benefit_of_cover_denial"
+    assert effect_payload["target_unit_instance_id"] == enemy_unit.unit_instance_id
+    assert effect_payload["status"] == "benefit_of_cover"
+    assert effect_payload["benefit_of_cover_denied"] is True
+    assert effects[0].expiration.to_payload() == {
+        "expiration_kind": "end_phase",
+        "battle_round": 1,
+        "phase": "shooting",
+        "player_id": "player-a",
+    }
 
 
 def test_ws14_court_of_the_phoenician_stratagem_profiles_use_court_rule_ir() -> None:
@@ -314,6 +466,8 @@ def _army(
     player_id: str,
     army_id: str,
     unit: UnitInstance,
+    faction_id: str | None = None,
+    detachment_id: str | None = None,
 ) -> ArmyDefinition:
     detachment = catalog.detachments[0]
     return ArmyDefinition(
@@ -323,8 +477,8 @@ def _army(
         source_package_id=catalog.source_package_id,
         ruleset_id=catalog.ruleset_id,
         detachment_selection=DetachmentSelection(
-            faction_id=detachment.faction_id,
-            detachment_ids=(detachment.detachment_id,),
+            faction_id=detachment.faction_id if faction_id is None else faction_id,
+            detachment_ids=(detachment.detachment_id if detachment_id is None else detachment_id,),
         ),
         units=(unit,),
     )
@@ -349,3 +503,45 @@ def _state(*armies: ArmyDefinition, active_player_id: str) -> GameState:
     for army in armies:
         state.record_army_definition(army)
     return state
+
+
+def _set_battle_phase(state: GameState, phase: BattlePhaseKind) -> None:
+    state.battle_phase_index = state.battle_phase_sequence.index(phase)
+
+
+def _payload_mapping(payload: object, label: str) -> Mapping[str, object]:
+    if not isinstance(payload, dict):
+        raise GameLifecycleError(f"{label} must be an object.")
+    return cast(Mapping[str, object], payload)
+
+
+def _option_stratagem_id(payload: object) -> str | None:
+    payload_mapping = _payload_mapping(payload, "Stratagem option payload")
+    catalog_record = _payload_mapping(
+        payload_mapping.get("catalog_record"),
+        "Stratagem option catalog_record",
+    )
+    definition = _payload_mapping(
+        catalog_record.get("definition"),
+        "Stratagem option definition",
+    )
+    stratagem_id = definition.get("stratagem_id")
+    if stratagem_id is None:
+        return None
+    if type(stratagem_id) is not str:
+        raise GameLifecycleError("Stratagem option stratagem_id must be a string.")
+    return stratagem_id
+
+
+def _option_target_unit_id(payload: object) -> str | None:
+    payload_mapping = _payload_mapping(payload, "Stratagem option payload")
+    target_binding = _payload_mapping(
+        payload_mapping.get("target_binding"),
+        "Stratagem option target_binding",
+    )
+    target_unit_id = target_binding.get("target_unit_instance_id")
+    if target_unit_id is None:
+        return None
+    if type(target_unit_id) is not str:
+        raise GameLifecycleError("Stratagem option target_unit_instance_id must be a string.")
+    return target_unit_id

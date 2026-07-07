@@ -181,9 +181,10 @@ _ENEMY_UNIT_FALLS_BACK_NEAR_ABILITY_RE = re.compile(
     re.IGNORECASE,
 )
 _POST_SHOOT_HIT_TARGET_SELECTION_RE = re.compile(
-    r"\b(?:(?:in|during)\s+your\s+Shooting\s+phase,\s*)?"
+    r"\b(?:(?:(?:in|during)\s+your\s+Shooting\s+phase,\s*)?"
     r"(?:(?:after|each\s+time)\s+)?"
     r"(?P<subject>this\s+model|this\s+unit|the\s+bearer|bearer)\s+has\s+shot,\s+"
+    r")?"
     r"select\s+one\s+enemy\s+unit\s+(?:that\s+was\s+)?hit\s+by\s+one\s+or\s+more\s+of\s+"
     r"those\s+attacks\b",
     re.IGNORECASE,
@@ -892,7 +893,7 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
             ),
         )
     post_shoot_match = _POST_SHOOT_HIT_TARGET_SELECTION_RE.search(clause_text.text)
-    if post_shoot_match is not None:
+    if post_shoot_match is not None and post_shoot_match.group("subject") is not None:
         return RuleTrigger(
             kind=RuleTriggerKind.TIMING_WINDOW,
             source_span=_span_from_match(clause_text, post_shoot_match),
@@ -1437,6 +1438,15 @@ def _parse_target(
             kind=target_kind,
             source_span=_span_from_match(clause_text, tracked_selection_match),
             parameters=parameters_from_pairs((("allegiance", allegiance),)),
+        )
+    hit_target_match = _POST_SHOOT_HIT_TARGET_SELECTION_RE.search(clause_text.text)
+    if hit_target_match is not None:
+        return RuleTargetSpec(
+            kind=RuleTargetKind.ENEMY_UNIT,
+            source_span=_span_from_match(clause_text, hit_target_match),
+            parameters=parameters_from_pairs(
+                (("allegiance", "enemy"), ("target_relationship", "hit_by_those_attacks"))
+            ),
         )
     match = _TARGET_RE.search(clause_text.text)
     if match is not None:

@@ -1,15 +1,19 @@
 from __future__ import annotations
 
+from typing import cast
+
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.rules.rule_ir import (
     RuleDurationKind,
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
+    RuleIRPayload,
     parameter_payload,
 )
 from warhammer40k_core.rules.rule_templates import (
     CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
+    CONTEXTUAL_STATUS_TEMPLATE_ID,
     DESPERATE_ESCAPE_TEMPLATE_ID,
     DICE_ROLL_MODIFIER_TEMPLATE_ID,
     GRANT_ABILITY_TEMPLATE_ID,
@@ -48,6 +52,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_spectacle_of_slaughter_ir_support_2026_27 as spectacle_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_stratagem_activation_2026_27 as stratagem_activation,
 )
 
 SOURCE_PACKAGE_ID = static_payloads.SOURCE_PACKAGE_ID
@@ -120,6 +127,11 @@ _SUPPORTED_CAVALCADE_OF_CHAOS_STRATAGEM_SOURCE_ROW_IDS = frozenset(
         CAVALCADE_OF_CHAOS_FROM_BEYOND_THE_VEIL_SOURCE_ROW_ID,
         CAVALCADE_OF_CHAOS_INESCAPABLE_MANIFESTATIONS_SOURCE_ROW_ID,
         CAVALCADE_OF_CHAOS_WARP_RIDERS_SOURCE_ROW_ID,
+    }
+)
+_SUPPORTED_HIT_TARGET_COVER_DENIAL_STRATAGEM_SOURCE_ROW_IDS = frozenset(
+    {
+        "stratagem:astra-militarum:steel-hammer:000010788005",
     }
 )
 _SUPPORTED_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
@@ -247,6 +259,13 @@ def generic_supported_stratagem_rule_ir_hash(
         rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
         _validate_cavalcade_of_chaos_stratagem_rule_ir(rule_ir=rule_ir, source_row=source_row)
         return rule_ir.ir_hash()
+    if source_row.source_row_id in _SUPPORTED_HIT_TARGET_COVER_DENIAL_STRATAGEM_SOURCE_ROW_IDS:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_hit_target_cover_denial_stratagem_rule_ir(
+            rule_ir=rule_ir,
+            source_row=source_row,
+        )
+        return rule_ir.ir_hash()
     rule_ir_hash = corsair_coterie_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
@@ -286,12 +305,29 @@ def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> Ru
     if payload is None:
         payload = corsair_coterie_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
+        payload = _hit_target_cover_denial_stratagem_rule_ir_payload_by_descriptor_id(descriptor_id)
+    if payload is None:
         raise Phase17FGenericIrSupportError("Generic IR coverage descriptor is not registered.")
     return RuleIR.from_payload(payload)
 
 
 def generic_rule_ir_hash_by_coverage_descriptor_id(coverage_descriptor_id: str) -> str:
     return generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id).ir_hash()
+
+
+def _hit_target_cover_denial_stratagem_rule_ir_payload_by_descriptor_id(
+    descriptor_id: str,
+) -> RuleIRPayload | None:
+    prefix = "phase17e:"
+    if not descriptor_id.startswith(prefix):
+        return None
+    source_row_id = descriptor_id.removeprefix(prefix)
+    if source_row_id not in _SUPPORTED_HIT_TARGET_COVER_DENIAL_STRATAGEM_SOURCE_ROW_IDS:
+        return None
+    for profile in stratagem_activation.stratagem_activation_profiles():
+        if profile.source_row_id == source_row_id:
+            return cast(RuleIRPayload, profile.rule_ir_payload())
+    raise Phase17FGenericIrSupportError("Hit-target cover denial Stratagem profile is missing.")
 
 
 def supported_conditional_weapon_ability_enhancement_source_row_ids() -> tuple[str, ...]:
@@ -320,6 +356,10 @@ def supported_court_of_the_phoenician_mixed_enhancement_source_row_ids() -> tupl
 
 def supported_cavalcade_of_chaos_stratagem_source_row_ids() -> tuple[str, ...]:
     return tuple(sorted(_SUPPORTED_CAVALCADE_OF_CHAOS_STRATAGEM_SOURCE_ROW_IDS))
+
+
+def supported_hit_target_cover_denial_stratagem_source_row_ids() -> tuple[str, ...]:
+    return tuple(sorted(_SUPPORTED_HIT_TARGET_COVER_DENIAL_STRATAGEM_SOURCE_ROW_IDS))
 
 
 def supported_generic_enhancement_source_row_ids() -> tuple[str, ...]:
@@ -745,6 +785,91 @@ def _validate_cavalcade_of_chaos_stratagem_rule_ir(
             )
     else:
         raise Phase17FGenericIrSupportError("Cavalcade Stratagem support row is not registered.")
+
+
+def _validate_hit_target_cover_denial_stratagem_rule_ir(
+    *,
+    rule_ir: RuleIR,
+    source_row: faction_subrules_2026_27.SourceStratagemRow,
+) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Hit-target cover denial support requires RuleIR.")
+    if type(source_row) is not faction_subrules_2026_27.SourceStratagemRow:
+        raise Phase17FGenericIrSupportError("Hit-target cover denial support requires source row.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Hit-target cover denial Stratagem RuleIR must deserialize as supported."
+        )
+    if rule_ir.source_id != source_row.source_id:
+        raise Phase17FGenericIrSupportError(
+            "Hit-target cover denial Stratagem produced an unexpected source ID."
+        )
+    if len(rule_ir.clauses) != 2:
+        raise Phase17FGenericIrSupportError(
+            "Hit-target cover denial Stratagem RuleIR must contain two clauses."
+        )
+    target_binding_clause, effect_clause = rule_ir.clauses
+    if target_binding_clause.template_id != stratagem_activation.RULE_IR_TEMPLATE_ID:
+        raise Phase17FGenericIrSupportError(
+            "Hit-target cover denial Stratagem missing activation target binding."
+        )
+    if target_binding_clause.effects:
+        raise Phase17FGenericIrSupportError(
+            "Hit-target cover denial activation binding must not include effects."
+        )
+    if effect_clause.template_id != CONTEXTUAL_STATUS_TEMPLATE_ID:
+        raise Phase17FGenericIrSupportError(
+            "Hit-target cover denial Stratagem uses an unexpected template family."
+        )
+    if effect_clause.unsupported_reason is not None or effect_clause.diagnostics:
+        raise Phase17FGenericIrSupportError(
+            "Hit-target cover denial Stratagem includes unsupported diagnostics."
+        )
+    if (
+        effect_clause.duration is None
+        or effect_clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT
+        or parameter_payload(effect_clause.duration.parameters).get("endpoint") != "phase"
+    ):
+        raise Phase17FGenericIrSupportError(
+            "Hit-target cover denial Stratagem must expire at the end of the phase."
+        )
+    if effect_clause.target is None or effect_clause.target.kind.value != "enemy_unit":
+        raise Phase17FGenericIrSupportError("Hit-target cover denial Stratagem requires target.")
+    target_parameters = parameter_payload(effect_clause.target.parameters)
+    if target_parameters.get("target_relationship") != "hit_by_those_attacks":
+        raise Phase17FGenericIrSupportError(
+            "Hit-target cover denial Stratagem target must be hit by those attacks."
+        )
+    _validate_hit_target_cover_denial_effect(effect_clause.effects)
+
+
+def _validate_hit_target_cover_denial_effect(effects: tuple[RuleEffectSpec, ...]) -> None:
+    if len(effects) != 1:
+        raise Phase17FGenericIrSupportError(
+            "Hit-target cover denial Stratagem must include one effect."
+        )
+    effect = effects[0]
+    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        raise Phase17FGenericIrSupportError(
+            "Hit-target cover denial Stratagem has unexpected effect kind."
+        )
+    parameters = parameter_payload(effect.parameters)
+    expected_parameters = {
+        "rules_context": "status_denial",
+        "operation": "deny",
+        "status": "benefit_of_cover",
+        "status_label": "Benefit of Cover",
+        "effect_selection_kind": "hit_enemy_unit",
+    }
+    for key, value in expected_parameters.items():
+        if parameters.get(key) != value:
+            raise Phase17FGenericIrSupportError(
+                "Hit-target cover denial Stratagem has unexpected effect parameters."
+            )
+    if parameters.get("target_scope") not in {"selected_unit", "models_in_selected_unit"}:
+        raise Phase17FGenericIrSupportError(
+            "Hit-target cover denial Stratagem has unsupported target scope."
+        )
 
 
 def _validate_aeldari_stratagem_rule_ir(

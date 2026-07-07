@@ -214,6 +214,7 @@ GENERIC_STRATAGEM_SOURCE_ROW_IDS = frozenset(
         path_outcast_ir.CASTING_BACK_THE_VEIL_SOURCE_ROW_ID,
         path_outcast_ir.ELDRITCH_SUPPRESSION_SOURCE_ROW_ID,
         path_outcast_ir.NOMADS_OF_THE_HIDDEN_WAY_SOURCE_ROW_ID,
+        "stratagem:astra-militarum:steel-hammer:000010788005",
         "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:from-beyond-the-veil",
         "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:inescapable-manifestations",
         "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:warp-riders",
@@ -1241,6 +1242,24 @@ def test_phase17e_source_backed_army_rule_is_engine_consumed(
     assert coverage_row.runtime_support_status.value == "engine_consumed"
     assert coverage_row.runtime_consumer_ids == tuple(sorted(runtime_consumers))
     assert coverage_row.handler_id == next(iter(sorted(runtime_consumers)))
+
+
+def test_phase17e_hit_target_cover_denial_stratagem_is_generic_supported() -> None:
+    source_row_id = "stratagem:astra-militarum:steel-hammer:000010788005"
+    descriptor_id = "phase17e:stratagem:astra-militarum:steel-hammer:000010788005"
+    coverage_row = next(
+        row for row in faction_coverage_source.coverage_rows() if row.descriptor_id == descriptor_id
+    )
+    rule_ir = generic_ir_support_source.generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+
+    assert set(
+        generic_ir_support_source.supported_hit_target_cover_denial_stratagem_source_row_ids()
+    ) == {source_row_id}
+    assert coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+    assert coverage_row.rule_ir_hash == rule_ir.ir_hash()
+    assert coverage_row.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(descriptor_id)
+    )
 
 
 def test_phase17e_coverage_report_groups_supported_and_approved_unsupported_rows() -> None:
