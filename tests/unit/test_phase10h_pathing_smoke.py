@@ -138,6 +138,78 @@ def test_semantic_permission_allows_vehicle_to_move_over_friendly_vehicle_blocke
     assert result.is_valid
 
 
+def test_semantic_permission_moves_through_models_but_rejects_excluded_titanic_blocker() -> None:
+    mover = _model("mover", 1.0, 1.0, radius=0.7)
+    enemy_infantry = _model("enemy-infantry", 3.0, 1.0, radius=0.9)
+    enemy_titanic = _model("enemy-titanic", 3.0, 1.0, radius=0.9)
+    base_context = _normal_legality_context()
+    context = replace(
+        base_context,
+        capabilities=replace(
+            base_context.capabilities,
+            can_move_through_models=True,
+            can_move_through_enemy_models=True,
+            can_transit_enemy_engagement_range=True,
+            enemy_model_transit_blocker_keywords=("TITANIC",),
+        ),
+    )
+
+    transit_result = _path_context(
+        context,
+        moving_model=mover,
+        enemy_models=(enemy_infantry,),
+        end_pose=Pose.at(8.0, 1.0),
+    ).validate()
+    blocked_result = _path_context(
+        context,
+        moving_model=mover,
+        enemy_models=(enemy_titanic,),
+        enemy_model_transit_blocker_ids=("enemy-titanic",),
+        end_pose=Pose.at(5.0, 1.0),
+    ).validate()
+    endpoint_result = _path_context(
+        context,
+        moving_model=mover,
+        enemy_models=(_model("enemy-engagement", 5.0, 2.5),),
+        middle_pose=Pose.at(3.0, 1.0),
+        end_pose=Pose.at(5.0, 1.0),
+    ).validate()
+
+    assert transit_result.is_valid
+    assert not blocked_result.is_valid
+    assert blocked_result.violations[0].violation_code == "enemy_model_transit_forbidden"
+    assert blocked_result.violations[0].blocker_id == "enemy-titanic"
+    assert not endpoint_result.is_valid
+    assert endpoint_result.violations[0].violation_code == "enemy_engagement_range_end_forbidden"
+
+
+def test_semantic_permission_rejects_excluded_friendly_model_blocker() -> None:
+    mover = _model("mover", 1.0, 1.0, radius=0.7)
+    friendly_titanic = _model("friendly-titanic", 3.0, 1.0, radius=0.9)
+    base_context = _normal_legality_context()
+    context = replace(
+        base_context,
+        capabilities=replace(
+            base_context.capabilities,
+            can_move_through_models=True,
+            can_move_through_friendly_models=True,
+            friendly_model_transit_blocker_keywords=("TITANIC",),
+        ),
+    )
+
+    result = _path_context(
+        context,
+        moving_model=mover,
+        friendly_models=(friendly_titanic,),
+        friendly_model_transit_blocker_ids=("friendly-titanic",),
+        end_pose=Pose.at(5.0, 1.0),
+    ).validate()
+
+    assert not result.is_valid
+    assert result.violations[0].violation_code == "friendly_model_transit_forbidden"
+    assert result.violations[0].blocker_id == "friendly-titanic"
+
+
 def test_fly_normal_move_can_transit_enemy_models_and_engagement_range() -> None:
     mover = _model("fly-mover", 1.0, 1.0)
     enemy_base_blocker = _model("enemy-base-blocker", 3.0, 1.0)
@@ -511,6 +583,8 @@ def _path_context(
     terrain: tuple[TerrainVolume, ...] = (),
     friendly_vehicle_monster_model_ids: tuple[str, ...] = (),
     enemy_vehicle_monster_model_ids: tuple[str, ...] = (),
+    friendly_model_transit_blocker_ids: tuple[str, ...] = (),
+    enemy_model_transit_blocker_ids: tuple[str, ...] = (),
     middle_pose: Pose | None = None,
     end_pose: Pose,
     sample_interval_inches: float = 0.5,
@@ -537,5 +611,7 @@ def _path_context(
         terrain=terrain,
         friendly_vehicle_monster_model_ids=friendly_vehicle_monster_model_ids,
         enemy_vehicle_monster_model_ids=enemy_vehicle_monster_model_ids,
+        friendly_model_transit_blocker_ids=friendly_model_transit_blocker_ids,
+        enemy_model_transit_blocker_ids=enemy_model_transit_blocker_ids,
         sample_interval_inches=sample_interval_inches,
     )

@@ -632,7 +632,7 @@ def test_generic_rule_ir_movement_transit_permissions_are_consumed_by_model_cont
             current_model_instance_ids=current_model_instance_ids,
             movement_mode=MovementMode.NORMAL.value,
         )
-    with pytest.raises(GameLifecycleError, match="unsupported"):
+    assert (
         catalog_movement_transit_permissions_for_model(
             ability_index=matching_index,
             unit=unit,
@@ -640,6 +640,8 @@ def test_generic_rule_ir_movement_transit_permissions_are_consumed_by_model_cont
             current_model_instance_ids=current_model_instance_ids,
             movement_mode=MovementMode.FALL_BACK.value,
         )
+        == ()
+    )
     with pytest.raises(GameLifecycleError, match="must not duplicate values"):
         CatalogMovementTransitPermission(
             record_id="record",
@@ -670,6 +672,99 @@ def test_generic_rule_ir_movement_transit_permissions_are_consumed_by_model_cont
             model_keyword_any=("MONSTER", "VEHICLE"),
             terrain_height_max_inches=-1.0,
         )
+
+
+def test_generic_rule_ir_move_through_models_and_terrain_permissions_are_consumed() -> None:
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    army = muster_army(
+        catalog=catalog,
+        request=_muster_request(
+            catalog,
+            unit_selections=(
+                _unit_selection(
+                    unit_selection_id="transport-1",
+                    datasheet_id="core-transport",
+                    model_profile_id="core-transport",
+                    model_count=1,
+                ),
+            ),
+        ),
+    )
+    unit = army.units[0]
+    model_instance_id = unit.own_models[0].model_instance_id
+    current_model_instance_ids = unit.own_model_ids()
+    rule_ir = compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="phase12d:test:move-through-models-terrain-auto-pass",
+            raw_text=(
+                "Each time this unit makes a Normal, Advance or Fall Back move, it can move "
+                "through models (excluding Titanic models) and terrain features. When doing so, "
+                "it can move within Engagement Range of enemy models, but cannot end that move "
+                "within Engagement Range of them, and any Desperate Escape test is automatically "
+                "passed."
+            ),
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    ).rule_ir
+    matching_record = _ability_record(
+        "semantic-move-through-models-terrain",
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+        handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+        source_kind=AbilitySourceKind.DATASHEET,
+        datasheet_id=unit.datasheet_id,
+        replay_payload=cast(JsonValue, {"rule_ir": rule_ir.to_payload()}),
+    )
+    matching_index = AbilityCatalogIndex.from_records(
+        (*eleventh_edition_ability_catalog_records(), matching_record)
+    )
+    direct_permissions = catalog_movement_transit_permissions_for_model(
+        ability_index=matching_index,
+        unit=unit,
+        model_instance_id=model_instance_id,
+        current_model_instance_ids=current_model_instance_ids,
+        movement_mode=MovementMode.FALL_BACK.value,
+    )
+    fall_back_context = MovementLegalityContext.from_keywords(
+        keywords=unit.keywords,
+        ruleset_descriptor=descriptor,
+        movement_mode=MovementMode.FALL_BACK,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK.value,
+        displacement_kind=ModelDisplacementKind.FALL_BACK,
+        ability_index=matching_index,
+        unit=unit,
+        model_instance_id=model_instance_id,
+        current_model_instance_ids=current_model_instance_ids,
+    )
+    normal_context = MovementLegalityContext.from_keywords(
+        keywords=unit.keywords,
+        ruleset_descriptor=descriptor,
+        movement_mode=MovementMode.NORMAL,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE.value,
+        displacement_kind=ModelDisplacementKind.NORMAL_MOVE,
+        ability_index=matching_index,
+        unit=unit,
+        model_instance_id=model_instance_id,
+        current_model_instance_ids=current_model_instance_ids,
+    )
+
+    assert len(direct_permissions) == 2
+    assert tuple(permission.permission for permission in direct_permissions) == (
+        "move_through_models",
+        "move_through_terrain_features",
+    )
+    assert direct_permissions[0].excluded_model_keyword_any == ("TITANIC",)
+    assert direct_permissions[0].enemy_engagement_range_transit
+    assert direct_permissions[0].desperate_escape_tests_auto_passed
+    for context in (fall_back_context, normal_context):
+        assert context.capabilities.can_move_through_models
+        assert context.capabilities.can_move_through_friendly_models
+        assert context.capabilities.can_move_through_enemy_models
+        assert context.capabilities.can_move_through_terrain
+        assert context.capabilities.can_transit_enemy_engagement_range
+        assert context.capabilities.enemy_model_transit_blocker_keywords == ("TITANIC",)
+        assert context.capabilities.friendly_model_transit_blocker_keywords == ("TITANIC",)
+        assert context.capabilities.desperate_escape_tests_auto_passed
 
 
 def test_malformed_passive_query_movement_transit_ir_fails_closed_at_runtime() -> None:

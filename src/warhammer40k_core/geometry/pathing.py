@@ -24,6 +24,11 @@ from warhammer40k_core.geometry.movement_envelope import (
     MovementEnvelope,
     MovementEnvelopePayload,
 )
+from warhammer40k_core.geometry.pathing_model_references import (
+    validate_disjoint_path_validation_model_ids,
+    validate_model_tuple_for_path_validation,
+    validate_path_validation_model_reference_ids,
+)
 from warhammer40k_core.geometry.pose import (
     Facing,
     GeometryError,
@@ -138,6 +143,8 @@ class PathValidationContextPayload(TypedDict):
     terrain: list[TerrainVolumePayload]
     friendly_vehicle_monster_model_ids: list[str]
     enemy_vehicle_monster_model_ids: list[str]
+    friendly_model_transit_blocker_ids: list[str]
+    enemy_model_transit_blocker_ids: list[str]
     aircraft_model_ids: list[str]
     may_transit_enemy_models: bool
     may_transit_enemy_engagement: bool
@@ -382,6 +389,8 @@ class PathValidationContext:
     terrain: tuple[TerrainVolume, ...] = ()
     friendly_vehicle_monster_model_ids: tuple[str, ...] = ()
     enemy_vehicle_monster_model_ids: tuple[str, ...] = ()
+    friendly_model_transit_blocker_ids: tuple[str, ...] = ()
+    enemy_model_transit_blocker_ids: tuple[str, ...] = ()
     aircraft_model_ids: tuple[str, ...] = ()
     may_transit_enemy_models: bool = False
     may_transit_enemy_engagement: bool = False
@@ -412,15 +421,15 @@ class PathValidationContext:
                 self.battlefield_depth_inches,
             ),
         )
-        friendly_models = _validate_model_tuple(
+        friendly_models = validate_model_tuple_for_path_validation(
             "PathValidationContext friendly_models",
             self.friendly_models,
         )
-        enemy_models = _validate_model_tuple(
+        enemy_models = validate_model_tuple_for_path_validation(
             "PathValidationContext enemy_models",
             self.enemy_models,
         )
-        _validate_disjoint_model_ids(
+        validate_disjoint_path_validation_model_ids(
             moving_model=self.moving_model,
             friendly_models=friendly_models,
             enemy_models=enemy_models,
@@ -432,47 +441,24 @@ class PathValidationContext:
             "terrain",
             _validate_terrain_tuple("PathValidationContext terrain", self.terrain),
         )
-        friendly_vehicle_monster_model_ids = _validate_identifier_tuple(
-            "PathValidationContext friendly_vehicle_monster_model_ids",
-            self.friendly_vehicle_monster_model_ids,
+        model_reference_ids = validate_path_validation_model_reference_ids(
+            friendly_models=friendly_models,
+            enemy_models=enemy_models,
+            friendly_vehicle_monster_model_ids=self.friendly_vehicle_monster_model_ids,
+            enemy_vehicle_monster_model_ids=self.enemy_vehicle_monster_model_ids,
+            friendly_model_transit_blocker_ids=self.friendly_model_transit_blocker_ids,
+            enemy_model_transit_blocker_ids=self.enemy_model_transit_blocker_ids,
+            aircraft_model_ids=self.aircraft_model_ids,
+            validate_identifier=_validate_identifier,
         )
-        friendly_model_ids = {model.model_id for model in friendly_models}
-        if any(
-            model_id not in friendly_model_ids for model_id in friendly_vehicle_monster_model_ids
-        ):
-            raise GeometryError(
-                "PathValidationContext friendly_vehicle_monster_model_ids must reference "
-                "friendly models."
-            )
-        object.__setattr__(
-            self,
+        for field_name in (
             "friendly_vehicle_monster_model_ids",
-            friendly_vehicle_monster_model_ids,
-        )
-        enemy_vehicle_monster_model_ids = _validate_identifier_tuple(
-            "PathValidationContext enemy_vehicle_monster_model_ids",
-            self.enemy_vehicle_monster_model_ids,
-        )
-        enemy_model_ids = {model.model_id for model in enemy_models}
-        if any(model_id not in enemy_model_ids for model_id in enemy_vehicle_monster_model_ids):
-            raise GeometryError(
-                "PathValidationContext enemy_vehicle_monster_model_ids must reference enemy models."
-            )
-        object.__setattr__(
-            self,
             "enemy_vehicle_monster_model_ids",
-            enemy_vehicle_monster_model_ids,
-        )
-        aircraft_model_ids = _validate_identifier_tuple(
-            "PathValidationContext aircraft_model_ids",
-            self.aircraft_model_ids,
-        )
-        blocker_model_ids = {model.model_id for model in (*friendly_models, *enemy_models)}
-        if any(model_id not in blocker_model_ids for model_id in aircraft_model_ids):
-            raise GeometryError(
-                "PathValidationContext aircraft_model_ids must reference blocker models."
-            )
-        object.__setattr__(self, "aircraft_model_ids", aircraft_model_ids)
+            "friendly_model_transit_blocker_ids",
+            "enemy_model_transit_blocker_ids",
+            "aircraft_model_ids",
+        ):
+            object.__setattr__(self, field_name, getattr(model_reference_ids, field_name))
         _validate_bool(
             "PathValidationContext may_transit_enemy_models",
             self.may_transit_enemy_models,
@@ -570,9 +556,13 @@ class PathValidationContext:
                 if enemy_model.model_id in self.aircraft_model_ids:
                     continue
                 if _models_overlap_with_volume(sampled_model, enemy_model):
+                    enemy_transit_blocker_ids = {
+                        *self.enemy_vehicle_monster_model_ids,
+                        *self.enemy_model_transit_blocker_ids,
+                    }
                     if (
                         self.may_transit_enemy_models
-                        and enemy_model.model_id not in self.enemy_vehicle_monster_model_ids
+                        and enemy_model.model_id not in enemy_transit_blocker_ids
                     ):
                         continue
                     if (
@@ -582,6 +572,18 @@ class PathValidationContext:
                         return _invalid_path_validation(
                             "enemy_vehicle_monster_transit_forbidden",
                             "Path witness crosses an enemy VEHICLE/MONSTER blocker.",
+                            model_id=self.moving_model.model_id,
+                            blocker_id=enemy_model.model_id,
+                            metrics=metrics,
+                            movement_distance_witness=movement_distance_witness,
+                        )
+                    if (
+                        self.may_transit_enemy_models
+                        and enemy_model.model_id in self.enemy_model_transit_blocker_ids
+                    ):
+                        return _invalid_path_validation(
+                            "enemy_model_transit_forbidden",
+                            "Path witness crosses an excluded enemy model blocker.",
                             model_id=self.moving_model.model_id,
                             blocker_id=enemy_model.model_id,
                             metrics=metrics,
@@ -599,9 +601,21 @@ class PathValidationContext:
                 metrics.model_collision_check_count += 1
                 if friendly_model.model_id in self.aircraft_model_ids:
                     continue
-                if friendly_model.model_id not in self.friendly_vehicle_monster_model_ids:
+                if (
+                    friendly_model.model_id not in self.friendly_vehicle_monster_model_ids
+                    and friendly_model.model_id not in self.friendly_model_transit_blocker_ids
+                ):
                     continue
                 if _models_overlap_with_volume(sampled_model, friendly_model):
+                    if friendly_model.model_id in self.friendly_model_transit_blocker_ids:
+                        return _invalid_path_validation(
+                            "friendly_model_transit_forbidden",
+                            "Path witness crosses an excluded friendly model blocker.",
+                            model_id=self.moving_model.model_id,
+                            blocker_id=friendly_model.model_id,
+                            metrics=metrics,
+                            movement_distance_witness=movement_distance_witness,
+                        )
                     return _invalid_path_validation(
                         "friendly_vehicle_monster_transit_forbidden",
                         "Path witness crosses a friendly VEHICLE/MONSTER blocker.",
@@ -638,10 +652,10 @@ class PathValidationContext:
                     vertical_inches=self.enemy_engagement_vertical_inches,
                 ):
                     continue
-                if (
-                    self.may_transit_enemy_models
-                    and enemy_model.model_id not in self.enemy_vehicle_monster_model_ids
-                ):
+                if self.may_transit_enemy_models and enemy_model.model_id not in {
+                    *self.enemy_vehicle_monster_model_ids,
+                    *self.enemy_model_transit_blocker_ids,
+                }:
                     continue
                 if self.may_transit_enemy_engagement:
                     continue
@@ -706,6 +720,8 @@ class PathValidationContext:
             "terrain": [terrain.to_payload() for terrain in self.terrain],
             "friendly_vehicle_monster_model_ids": list(self.friendly_vehicle_monster_model_ids),
             "enemy_vehicle_monster_model_ids": list(self.enemy_vehicle_monster_model_ids),
+            "friendly_model_transit_blocker_ids": list(self.friendly_model_transit_blocker_ids),
+            "enemy_model_transit_blocker_ids": list(self.enemy_model_transit_blocker_ids),
             "aircraft_model_ids": list(self.aircraft_model_ids),
             "may_transit_enemy_models": self.may_transit_enemy_models,
             "may_transit_enemy_engagement": self.may_transit_enemy_engagement,
@@ -730,6 +746,8 @@ class PathValidationContext:
             terrain=tuple(terrain_volume_from_payload(terrain) for terrain in payload["terrain"]),
             friendly_vehicle_monster_model_ids=tuple(payload["friendly_vehicle_monster_model_ids"]),
             enemy_vehicle_monster_model_ids=tuple(payload["enemy_vehicle_monster_model_ids"]),
+            friendly_model_transit_blocker_ids=tuple(payload["friendly_model_transit_blocker_ids"]),
+            enemy_model_transit_blocker_ids=tuple(payload["enemy_model_transit_blocker_ids"]),
             aircraft_model_ids=tuple(payload["aircraft_model_ids"]),
             may_transit_enemy_models=payload["may_transit_enemy_models"],
             may_transit_enemy_engagement=payload["may_transit_enemy_engagement"],
@@ -1921,16 +1939,6 @@ def _validate_bool(field_name: str, value: object) -> None:
         raise GeometryError(f"{field_name} must be a bool.")
 
 
-def _validate_model_tuple(field_name: str, values: object) -> tuple[Model, ...]:
-    if type(values) is not tuple:
-        raise GeometryError(f"{field_name} must be a tuple.")
-    models = tuple(
-        _validate_model(f"{field_name} model", value) for value in cast(tuple[object, ...], values)
-    )
-    _validate_unique_model_ids_for_path_validation(field_name, models)
-    return tuple(sorted(models, key=lambda model: model.model_id))
-
-
 def _validate_terrain_tuple(field_name: str, values: object) -> tuple[TerrainVolume, ...]:
     if type(values) is not tuple:
         raise GeometryError(f"{field_name} must be a tuple.")
@@ -1983,44 +1991,6 @@ def _validate_keyword_tuple(field_name: str, values: object) -> tuple[str, ...]:
         seen.add(keyword)
         keywords.append(keyword)
     return tuple(sorted(keywords))
-
-
-def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise GeometryError(f"{field_name} must be a tuple.")
-    identifiers: list[str] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        identifier = _validate_identifier(f"{field_name} value", value)
-        if identifier in seen:
-            raise GeometryError(f"{field_name} must not contain duplicate identifiers.")
-        seen.add(identifier)
-        identifiers.append(identifier)
-    return tuple(sorted(identifiers))
-
-
-def _validate_unique_model_ids_for_path_validation(
-    field_name: str,
-    models: tuple[Model, ...],
-) -> None:
-    seen: set[str] = set()
-    for model in models:
-        if model.model_id in seen:
-            raise GeometryError(f"{field_name} must not contain duplicate model IDs.")
-        seen.add(model.model_id)
-
-
-def _validate_disjoint_model_ids(
-    *,
-    moving_model: Model,
-    friendly_models: tuple[Model, ...],
-    enemy_models: tuple[Model, ...],
-) -> None:
-    blocker_ids = {model.model_id for model in (*friendly_models, *enemy_models)}
-    if moving_model.model_id in blocker_ids:
-        raise GeometryError("PathValidationContext blockers must not include the moving model.")
-    if {model.model_id for model in friendly_models} & {model.model_id for model in enemy_models}:
-        raise GeometryError("PathValidationContext friendly and enemy models must be disjoint.")
 
 
 def _validate_path_constraint_violations(
@@ -2081,12 +2051,6 @@ def _validate_terrain_path_segment(
 ) -> TerrainPathSegment:
     if type(value) is not TerrainPathSegment:
         raise GeometryError(f"{field_name} must be a TerrainPathSegment.")
-    return value
-
-
-def _validate_model(field_name: str, value: object) -> Model:
-    if type(value) is not Model:
-        raise GeometryError(f"{field_name} must be a Model.")
     return value
 
 

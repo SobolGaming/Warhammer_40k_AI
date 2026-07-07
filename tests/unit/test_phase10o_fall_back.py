@@ -32,6 +32,11 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.effects import (
+    GENERIC_RULE_EFFECT_KIND,
+    EffectExpiration,
+    PersistingEffect,
+)
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
@@ -43,6 +48,7 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
+    GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
 )
@@ -179,6 +185,77 @@ def test_fall_back_enemy_model_overflight_creates_one_desperate_escape_requireme
     assert requirement.enemy_model_ids == (
         "army-beta:intercessor-unit-2:core-intercessor-like:001",
     )
+
+
+def test_generic_movement_transit_auto_passes_enemy_overflight_desperate_escape() -> None:
+    scenario = _engaged_scenario(enemy_pose=Pose.at(6.0, 8.0, facing_degrees=180.0))
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    state = _state_for_scenario_with_effects(
+        scenario,
+        effects=(
+            _generic_movement_transit_effect(
+                target_unit_instance_id=unit_placement.unit_instance_id
+            ),
+        ),
+    )
+    resolution = resolve_fall_back_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        state=state,
+        path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
+    )
+    battle_shocked_resolution = resolve_fall_back_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        state=state,
+        path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
+        battle_shocked_unit_ids=(unit_placement.unit_instance_id,),
+    )
+
+    assert resolution.is_valid
+    assert resolution.desperate_escape_requirements == ()
+    assert len(battle_shocked_resolution.desperate_escape_requirements) == len(
+        unit_placement.model_placements
+    )
+    first_requirement = battle_shocked_resolution.desperate_escape_requirements[0]
+    assert first_requirement.reasons == (DesperateEscapeRequirementReason.BATTLE_SHOCKED,)
+    assert first_requirement.enemy_model_ids == ()
+
+
+def test_generic_movement_transit_fall_back_rejects_excluded_titanic_overflight() -> None:
+    scenario = _engaged_scenario(
+        enemy_pose=Pose.at(6.0, 8.0, facing_degrees=180.0),
+        enemy_keywords=("TITANIC",),
+    )
+    unit_placement = scenario.battlefield_state.unit_placement_by_id(
+        "army-alpha:intercessor-unit-1"
+    )
+    state = _state_for_scenario_with_effects(
+        scenario,
+        effects=(
+            _generic_movement_transit_effect(
+                target_unit_instance_id=unit_placement.unit_instance_id
+            ),
+        ),
+    )
+
+    resolution = resolve_fall_back_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        state=state,
+        path_witness=_fall_back_witness(unit_placement, first_model_end_pose=Pose.at(6.0, 12.0)),
+    )
+
+    assert not resolution.is_valid
+    assert resolution.path_validation_results[0].violations[0].violation_code == (
+        "enemy_model_transit_forbidden"
+    )
+    assert resolution.desperate_escape_requirements == ()
 
 
 def test_fall_back_full_unit_no_op_witness_emits_only_changed_displacement() -> None:
@@ -865,6 +942,63 @@ def test_desperate_escape_domain_validators_fail_fast() -> None:
         )
 
 
+def _generic_movement_transit_effect(*, target_unit_instance_id: str) -> PersistingEffect:
+    return PersistingEffect(
+        effect_id="phase10o-generic-movement-transit",
+        source_rule_id="phase10o-source-generic-movement-transit",
+        owner_player_id="player-a",
+        target_unit_instance_ids=(target_unit_instance_id,),
+        started_battle_round=1,
+        started_phase=BattlePhase.MOVEMENT,
+        expiration=EffectExpiration.end_phase(
+            battle_round=1,
+            phase=BattlePhase.MOVEMENT,
+            player_id="player-a",
+        ),
+        effect_payload={
+            "effect_kind": GENERIC_RULE_EFFECT_KIND,
+            "effect": {
+                "kind": "movement_transit_permission",
+                "parameters": [
+                    {"key": "permission", "value": "move_through_models"},
+                    {"key": "movement_modes", "value": ["normal", "advance", "fall_back"]},
+                    {"key": "model_allegiance", "value": "any"},
+                    {"key": "excluded_model_keyword_any", "value": ["TITANIC"]},
+                    {"key": "enemy_engagement_range_transit", "value": True},
+                    {"key": "enemy_engagement_range_end_allowed", "value": False},
+                    {"key": "desperate_escape_tests_auto_passed", "value": True},
+                ],
+            },
+        },
+    )
+
+
+def _state_for_scenario_with_effects(
+    scenario: BattlefieldScenario,
+    *,
+    effects: tuple[PersistingEffect, ...],
+) -> GameState:
+    ruleset = RulesetDescriptor.warhammer_40000_eleventh()
+    battle_phases = tuple(ruleset.battle_phase_sequence.phases)
+    return GameState(
+        game_id="phase10o-generic-transit-auto-pass",
+        ruleset_descriptor_hash=ruleset.descriptor_hash,
+        stage=GameLifecycleStage.BATTLE,
+        setup_sequence=tuple(ruleset.setup_sequence.steps),
+        battle_phase_sequence=battle_phases,
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        tactical_secondary_draw_count=2,
+        setup_step_index=None,
+        battle_phase_index=battle_phases.index(BattlePhase.MOVEMENT),
+        battle_round=1,
+        active_player_id="player-a",
+        army_definitions=list(scenario.armies),
+        battlefield_state=scenario.battlefield_state,
+        persisting_effects=list(effects),
+    )
+
+
 def _advance_to_fall_back_action_request(
     *,
     game_id: str = "phase10o-desperate",
@@ -993,11 +1127,13 @@ def _engaged_scenario(
     *,
     enemy_pose: Pose | None = None,
     active_keywords: tuple[str, ...] = ("INFANTRY",),
+    enemy_keywords: tuple[str, ...] = ("INFANTRY",),
 ) -> BattlefieldScenario:
     scenario = _scenario()
     active_unit_id = "army-alpha:intercessor-unit-1"
+    enemy_unit_id = "army-beta:intercessor-unit-2"
     friendly = scenario.battlefield_state.unit_placement_by_id(active_unit_id)
-    enemy = scenario.battlefield_state.unit_placement_by_id("army-beta:intercessor-unit-2")
+    enemy = scenario.battlefield_state.unit_placement_by_id(enemy_unit_id)
     first_friendly_pose = friendly.model_placements[0].pose
     updated_enemy = _with_first_model_pose(
         enemy,
@@ -1015,6 +1151,8 @@ def _engaged_scenario(
             units=tuple(
                 replace(unit, keywords=active_keywords)
                 if unit.unit_instance_id == active_unit_id
+                else replace(unit, keywords=enemy_keywords)
+                if unit.unit_instance_id == enemy_unit_id
                 else unit
                 for unit in army.units
             ),

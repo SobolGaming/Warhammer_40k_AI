@@ -17,6 +17,7 @@ from warhammer40k_core.engine.unit_rule_effects import (
     embark_transport_forbidden_effect_source_ids,
     fire_overwatch_forbidden_by_effects,
     movement_bonus_inches_from_effects,
+    movement_model_transit_permissions_from_effects,
     movement_transit_through_terrain_features_allowed,
 )
 
@@ -295,6 +296,75 @@ def test_charge_transit_through_non_vehicle_monster_models_requires_supported_ru
             )
 
 
+def test_model_transit_effects_expose_exclusions_engagement_and_auto_pass() -> None:
+    effects = (
+        _generic_rule_effect(
+            "model-transit",
+            parameters=(
+                ("permission", "move_through_models"),
+                ("movement_modes", ["normal", "advance", "fall_back"]),
+                ("model_allegiance", "any"),
+                ("excluded_model_keyword_any", ["TITANIC"]),
+                ("enemy_engagement_range_transit", True),
+                ("enemy_engagement_range_end_allowed", False),
+                ("desperate_escape_tests_auto_passed", True),
+            ),
+        ),
+        _generic_rule_effect(
+            "model-transit-other-owner",
+            owner_player_id="player-b",
+            parameters=(
+                ("permission", "move_through_models"),
+                ("movement_modes", ["fall_back"]),
+                ("model_allegiance", "any"),
+                ("excluded_model_keyword_any", []),
+            ),
+        ),
+    )
+
+    permissions = movement_model_transit_permissions_from_effects(
+        effects,
+        owner_player_id="player-a",
+        movement_mode="fall_back",
+        model_allegiance="enemy",
+    )
+
+    assert len(permissions) == 1
+    assert permissions[0].movement_modes == ("normal", "advance", "fall_back")
+    assert permissions[0].model_allegiance == "any"
+    assert permissions[0].excluded_model_keyword_any == ("TITANIC",)
+    assert permissions[0].enemy_engagement_range_transit
+    assert not permissions[0].enemy_engagement_range_end_allowed
+    assert permissions[0].desperate_escape_tests_auto_passed
+    assert (
+        movement_model_transit_permissions_from_effects(
+            effects,
+            owner_player_id="player-a",
+            movement_mode="charge",
+            model_allegiance="enemy",
+        )
+        == ()
+    )
+    with pytest.raises(GameLifecycleError, match="must be a bool"):
+        movement_model_transit_permissions_from_effects(
+            (
+                _generic_rule_effect(
+                    "model-transit-bad-bool",
+                    parameters=(
+                        ("permission", "move_through_models"),
+                        ("movement_modes", ["normal"]),
+                        ("model_allegiance", "enemy"),
+                        ("excluded_model_keyword_any", []),
+                        ("desperate_escape_tests_auto_passed", "yes"),
+                    ),
+                ),
+            ),
+            owner_player_id="player-a",
+            movement_mode="normal",
+            model_allegiance="enemy",
+        )
+
+
 def test_terrain_transit_effects_validate_modes_keywords_and_required_keyword_gate() -> None:
     base_parameters: tuple[tuple[str, JsonValue], ...] = (
         ("permission", "move_horizontally_through_terrain_features"),
@@ -361,6 +431,21 @@ def test_terrain_transit_effects_validate_modes_keywords_and_required_keyword_ga
         (_generic_rule_effect("terrain-transit-no-required-keyword", parameters=base_parameters),),
         owner_player_id="player-a",
         movement_mode="normal",
+        unit_keywords=("BEAST",),
+    )
+    assert movement_transit_through_terrain_features_allowed(
+        (
+            _generic_rule_effect(
+                "terrain-transit-direct-permission",
+                parameters=(
+                    ("permission", "move_through_terrain_features"),
+                    ("movement_modes", ["fall_back"]),
+                    ("terrain_features", True),
+                ),
+            ),
+        ),
+        owner_player_id="player-a",
+        movement_mode="fall_back",
         unit_keywords=("BEAST",),
     )
 
