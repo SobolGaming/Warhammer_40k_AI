@@ -475,10 +475,11 @@ just-shot enemy in `shot_unit_instance_id` for effect dispatch. Stratagems whose
 effect chooses an enemy hit by those attacks carry `effect_selection` with
 `effect_selection_kind: "hit_enemy_unit"` and
 `hit_enemy_unit_instance_id`; adapters must submit one emitted option and must
-not invent or substitute hit targets. Accepted handlers may record Battle-shock
-results, detection-range persisting effects, or emit a nested triggered-movement
-selection/proposal request. That follow-up movement request remains engine-owned
-and must be answered through `GameLifecycle.submit_decision(...)`.
+not invent or substitute hit targets. Accepted `generic:rule-ir` handlers may
+record Battle-shock results, detection-range persisting effects, or emit a
+nested triggered-movement selection/proposal request. That follow-up movement
+request remains engine-owned and must be answered through
+`GameLifecycle.submit_decision(...)`.
 
 Corsair Coterie adds additional `use_stratagem` timing windows without creating
 new adapter submission types. Active Shooting and Fight phase windows use trigger
@@ -503,9 +504,10 @@ shot, the reacting player may receive trigger kind
 `just_after_enemy_unit_has_shot` with `shot_unit_instance_id`,
 `hit_target_unit_instance_ids`, `destroyed_target_unit_instance_ids`,
 `destroyed_enemy_unit_instance_ids`, shooting player ID, attack sequence ID, and
-completion event ID. Accepted handlers may record source-backed wound-reroll
-permissions, phase-scoped weapon-profile modifiers, charge-after-Fall-Back
-effects, target-range restrictions, or nested triggered movement requests.
+completion event ID. Accepted `generic:rule-ir` handlers may record
+source-backed wound-reroll permissions, phase-scoped weapon-profile effects,
+charge-after-Fall-Back effects, target-range restrictions, mortal wounds, or
+nested triggered movement requests.
 Adapters must not apply AP, Stealth, target-range limits, charge permissions,
 mortal wounds, or surge/triggered moves locally.
 

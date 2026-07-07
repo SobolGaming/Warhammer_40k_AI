@@ -239,6 +239,16 @@ def generic_supported_stratagem_rule_ir_hash(
         rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
         _validate_cavalcade_of_chaos_stratagem_rule_ir(rule_ir=rule_ir, source_row=source_row)
         return rule_ir.ir_hash()
+    rule_ir_hash = corsair_coterie_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_aeldari_stratagem_rule_ir(rule_ir=rule_ir, source_row=source_row)
+        return rule_ir_hash
+    rule_ir_hash = path_outcast_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_aeldari_stratagem_rule_ir(rule_ir=rule_ir, source_row=source_row)
+        return rule_ir_hash
     rule_ir_hash = more_dakka_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         return rule_ir_hash
@@ -656,6 +666,33 @@ def _validate_cavalcade_of_chaos_stratagem_rule_ir(
             )
     else:
         raise Phase17FGenericIrSupportError("Cavalcade Stratagem support row is not registered.")
+
+
+def _validate_aeldari_stratagem_rule_ir(
+    *,
+    rule_ir: RuleIR,
+    source_row: faction_subrules_2026_27.SourceStratagemRow,
+) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Aeldari Stratagem support requires RuleIR.")
+    if type(source_row) is not faction_subrules_2026_27.SourceStratagemRow:
+        raise Phase17FGenericIrSupportError("Aeldari Stratagem support requires source row.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Aeldari Stratagem RuleIR must deserialize as supported."
+        )
+    expected_source_id = f"{SOURCE_PACKAGE_ID}:phase17e:{source_row.source_row_id}:source-text"
+    if rule_ir.source_id != expected_source_id:
+        raise Phase17FGenericIrSupportError(
+            "Aeldari Stratagem support row produced an unexpected source ID."
+        )
+    effect_count = 0
+    for clause in rule_ir.clauses:
+        if clause.unsupported_reason is not None or clause.diagnostics:
+            raise Phase17FGenericIrSupportError("Aeldari Stratagem RuleIR includes diagnostics.")
+        effect_count += len(clause.effects)
+    if effect_count == 0:
+        raise Phase17FGenericIrSupportError("Aeldari Stratagem RuleIR must include effects.")
 
 
 def _validate_single_effect_family(

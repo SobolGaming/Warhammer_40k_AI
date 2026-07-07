@@ -16,6 +16,7 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTargetSpecPayload,
 )
 from warhammer40k_core.rules.rule_templates import (
+    CONTEXTUAL_STATUS_TEMPLATE_ID,
     GRANT_ABILITY_TEMPLATE_ID,
     KEYWORD_GATE_TEMPLATE_ID,
 )
@@ -43,6 +44,23 @@ ASSASSINS_EYE_SOURCE_RULE_ID = f"phase17f:{ASSASSINS_EYE_ENHANCEMENT_DESCRIPTOR_
 ASSASSINS_EYE_CHARACTER_AP_BONUS_ABILITY = (
     "aeldari:path-of-the-outcast:assassins-eye:character-target-ap-bonus"
 )
+
+ELDRITCH_SUPPRESSION_SOURCE_ROW_ID = (
+    "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:eldritch-suppression"
+)
+CASTING_BACK_THE_VEIL_SOURCE_ROW_ID = (
+    "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:casting-back-the-veil"
+)
+NOMADS_OF_THE_HIDDEN_WAY_SOURCE_ROW_ID = (
+    "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:nomads-of-the-hidden-way"
+)
+
+ELDRITCH_SUPPRESSION_DESCRIPTOR_ID = f"phase17e:{ELDRITCH_SUPPRESSION_SOURCE_ROW_ID}"
+CASTING_BACK_THE_VEIL_DESCRIPTOR_ID = f"phase17e:{CASTING_BACK_THE_VEIL_SOURCE_ROW_ID}"
+NOMADS_OF_THE_HIDDEN_WAY_DESCRIPTOR_ID = f"phase17e:{NOMADS_OF_THE_HIDDEN_WAY_SOURCE_ROW_ID}"
+
+CASTING_BACK_DETECTION_EFFECT_KIND = "aeldari_path_of_the_outcast_casting_back_the_veil"
+NOMADS_RESTRICTION_EFFECT_KIND = "aeldari_path_of_the_outcast_nomads_restriction"
 
 
 class AeldariPathOfTheOutcastIrSupportError(ValueError):
@@ -111,6 +129,155 @@ def _assassins_eye_payload() -> RuleIRPayload:
             _parameter("hook_family", "enhancement_effect"),
             _parameter("required_keyword_any", required_keyword_any),
             _parameter("target_required_keyword", "CHARACTER"),
+        ),
+    )
+
+
+def _eldritch_suppression_payload() -> RuleIRPayload:
+    normalized_text = (
+        "Select one enemy unit hit by Rangers or Shroud Runners ranged attacks. That enemy "
+        "unit makes a Battle-shock roll, with -1 if a model in that enemy unit was destroyed "
+        "by those attacks."
+    )
+    return _coverage_payload(
+        ELDRITCH_SUPPRESSION_SOURCE_ROW_ID,
+        normalized_text,
+        (
+            _effect_clause(
+                clause_id=_coverage_clause_id(ELDRITCH_SUPPRESSION_SOURCE_ROW_ID, "effect:001"),
+                template_id=CONTEXTUAL_STATUS_TEMPLATE_ID,
+                normalized_text=normalized_text,
+                source_text="makes a Battle-shock roll",
+                target=None,
+                effects=(
+                    _effect(
+                        "set_contextual_status",
+                        normalized_text,
+                        "Battle-shock roll",
+                        (
+                            _parameter("status", "force_battle_shock_test"),
+                            _parameter("effect_selection_kind", "hit_enemy_unit"),
+                            _parameter("modifier_if_destroyed_target", -1),
+                            _parameter("modifier_source_suffix", "eldritch-suppression:-1"),
+                        ),
+                    ),
+                ),
+                duration=None,
+            ),
+        ),
+    )
+
+
+def _casting_back_the_veil_payload() -> RuleIRPayload:
+    normalized_text = (
+        "Select one enemy unit hit by Rangers or Shroud Runners ranged attacks. That enemy "
+        "unit has +6 inches detection range until the end of the Shooting phase."
+    )
+    return _coverage_payload(
+        CASTING_BACK_THE_VEIL_SOURCE_ROW_ID,
+        normalized_text,
+        (
+            _effect_clause(
+                clause_id=_coverage_clause_id(CASTING_BACK_THE_VEIL_SOURCE_ROW_ID, "effect:001"),
+                template_id=CONTEXTUAL_STATUS_TEMPLATE_ID,
+                normalized_text=normalized_text,
+                source_text="+6 inches detection range until the end of the Shooting phase",
+                target=None,
+                effects=(
+                    _effect(
+                        "set_contextual_status",
+                        normalized_text,
+                        "+6 inches detection range",
+                        (
+                            _parameter("status", "detection_range_bonus"),
+                            _parameter("effect_selection_kind", "hit_enemy_unit"),
+                            _parameter("bonus_inches", 6),
+                            _parameter("source_rule_kind", CASTING_BACK_DETECTION_EFFECT_KIND),
+                            _parameter("source_unit_context_key", "just_shot_unit"),
+                        ),
+                    ),
+                ),
+                duration=_timing_endpoint_duration(
+                    normalized_text,
+                    "end of the Shooting phase",
+                    "phase",
+                ),
+            ),
+        ),
+    )
+
+
+def _nomads_of_the_hidden_way_payload() -> RuleIRPayload:
+    normalized_text = (
+        "Rangers or Shroud Runners unit can make a Normal move of up to D6 inches. Until "
+        "the end of the turn, that unit cannot declare a charge or embark within a Transport."
+    )
+    return _coverage_payload(
+        NOMADS_OF_THE_HIDDEN_WAY_SOURCE_ROW_ID,
+        normalized_text,
+        (
+            _effect_clause(
+                clause_id=_coverage_clause_id(NOMADS_OF_THE_HIDDEN_WAY_SOURCE_ROW_ID, "effect:001"),
+                template_id=GRANT_ABILITY_TEMPLATE_ID,
+                normalized_text=normalized_text,
+                source_text="Normal move of up to D6 inches",
+                target=_target("this_unit", normalized_text, "Rangers or Shroud Runners unit"),
+                effects=(
+                    _effect(
+                        "grant_ability",
+                        normalized_text,
+                        "Normal move of up to D6 inches",
+                        (
+                            _parameter("ability", "triggered_normal_move"),
+                            _parameter("movement_kind", "triggered"),
+                            _parameter("movement_mode", "normal"),
+                            _parameter("roll_quantity", 1),
+                            _parameter("roll_sides", 6),
+                            _parameter("distance_bonus", 0),
+                            _parameter(
+                                "roll_type",
+                                "generic_rule_ir.nomads_of_the_hidden_way_distance",
+                            ),
+                            _parameter("source_step", "nomads_of_the_hidden_way"),
+                            _parameter(
+                                "source_event_id_context_key",
+                                "attack_sequence_completed_event_id",
+                            ),
+                            _parameter("allow_battle_shocked", False),
+                            _parameter("allow_within_engagement_range", False),
+                            _parameter("optional", True),
+                            _parameter("one_per_phase", False),
+                            _parameter("replay_effect_kind", "nomads_of_the_hidden_way_move"),
+                            _parameter(
+                                "phase_body_status",
+                                "nomads_of_the_hidden_way_move_pending",
+                            ),
+                        ),
+                    ),
+                ),
+                duration=None,
+            ),
+            _effect_clause(
+                clause_id=_coverage_clause_id(NOMADS_OF_THE_HIDDEN_WAY_SOURCE_ROW_ID, "effect:002"),
+                template_id=CONTEXTUAL_STATUS_TEMPLATE_ID,
+                normalized_text=normalized_text,
+                source_text="cannot declare a charge or embark within a Transport",
+                target=_target("this_unit", normalized_text, "Rangers or Shroud Runners unit"),
+                effects=(
+                    _effect(
+                        "set_contextual_status",
+                        normalized_text,
+                        "cannot declare a charge or embark within a Transport",
+                        (
+                            _parameter("status", "unit_action_restriction"),
+                            _parameter("effect_kind", NOMADS_RESTRICTION_EFFECT_KIND),
+                            _parameter("charge_forbidden", True),
+                            _parameter("embark_transport_forbidden", True),
+                        ),
+                    ),
+                ),
+                duration=_timing_endpoint_duration(normalized_text, "end of the turn", "turn"),
+            ),
         ),
     )
 
@@ -331,6 +498,21 @@ def _permanent_duration(normalized_text: str) -> RuleDurationPayload:
     )
 
 
+def _timing_endpoint_duration(
+    normalized_text: str,
+    source_text: str,
+    endpoint: str,
+) -> RuleDurationPayload:
+    return cast(
+        RuleDurationPayload,
+        {
+            "kind": "until_timing_endpoint",
+            "source_span": _span(normalized_text, source_text),
+            "parameters": [_parameter("endpoint", endpoint)],
+        },
+    )
+
+
 def _parameter(
     key: str,
     value: str | int | float | bool | None | tuple[str, ...],
@@ -348,6 +530,9 @@ def _payload_rows() -> Mapping[str, RuleIRPayload]:
     return {
         CAMOUFLAGED_SNIPERS_SOURCE_ROW_ID: _camouflaged_snipers_payload(),
         ASSASSINS_EYE_SOURCE_ROW_ID: _assassins_eye_payload(),
+        ELDRITCH_SUPPRESSION_SOURCE_ROW_ID: _eldritch_suppression_payload(),
+        CASTING_BACK_THE_VEIL_SOURCE_ROW_ID: _casting_back_the_veil_payload(),
+        NOMADS_OF_THE_HIDDEN_WAY_SOURCE_ROW_ID: _nomads_of_the_hidden_way_payload(),
     }
 
 

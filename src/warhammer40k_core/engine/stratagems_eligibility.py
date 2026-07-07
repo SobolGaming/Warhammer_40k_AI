@@ -204,7 +204,13 @@ def _handler_unavailable_reason(
         )
     if definition.handler_id == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID:
         _rule_ir_from_stratagem_definition(definition)
-        return None
+        return _generic_rule_ir_stratagem_unavailable_reason(
+            state=state,
+            definition=definition,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=effect_selection,
+        )
     return None
 
 
@@ -380,6 +386,158 @@ def _definition_forces_fall_back_unit_desperate_escape(
         for clause in rule_ir.clauses
         for effect in clause.effects
     )
+
+
+def _generic_rule_ir_stratagem_unavailable_reason(
+    *,
+    state: GameState,
+    definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+    effect_selection: JsonValue,
+) -> str | None:
+    effect_payload = definition.effect_payload
+    if not isinstance(effect_payload, dict):
+        raise GameLifecycleError("Generic RuleIR stratagem effect payload must be an object.")
+    trigger_context_error = _generic_required_trigger_context_error(
+        effect_payload=effect_payload,
+        context=context,
+    )
+    if trigger_context_error is not None:
+        return trigger_context_error
+    target_unit_id = target_binding.target_unit_instance_id if target_binding is not None else None
+    if (
+        _optional_generic_metadata_bool(
+            effect_payload,
+            key="target_forbidden_if_battle_shocked",
+        )
+        and target_unit_id is not None
+        and target_unit_id in state.battle_shocked_unit_ids
+    ):
+        return "target_battle_shocked"
+    if (
+        _optional_generic_metadata_bool(
+            effect_payload,
+            key="target_forbidden_if_within_engagement_range",
+        )
+        and target_unit_id is not None
+        and _unit_is_within_enemy_engagement_range(
+            state=state,
+            player_id=context.player_id,
+            unit_instance_id=target_unit_id,
+        )
+    ):
+        return "target_within_engagement_range"
+    effect_selection_battle_shock_key = _optional_generic_metadata_identifier(
+        effect_payload,
+        key="effect_selection_unit_forbidden_if_battle_shocked",
+    )
+    if effect_selection_battle_shock_key is not None:
+        selected_unit_id = _generic_effect_selection_identifier_or_none(
+            effect_selection=effect_selection,
+            key=effect_selection_battle_shock_key,
+        )
+        if selected_unit_id is not None and selected_unit_id in state.battle_shocked_unit_ids:
+            return "target_already_battle_shocked"
+    return None
+
+
+def _generic_required_trigger_context_error(
+    *,
+    effect_payload: dict[str, JsonValue],
+    context: StratagemEligibilityContext,
+) -> str | None:
+    raw_keys = effect_payload.get("required_non_empty_trigger_context_keys")
+    if raw_keys is None:
+        return None
+    if not isinstance(raw_keys, list):
+        raise GameLifecycleError("Generic required trigger context keys must be a list.")
+    trigger_payload = context.trigger_payload
+    if not isinstance(trigger_payload, dict):
+        return "missing_trigger_payload"
+    for raw_key in raw_keys:
+        if type(raw_key) is not str:
+            raise GameLifecycleError("Generic required trigger context key must be a string.")
+        key = _generic_metadata_identifier("Generic required trigger context key", raw_key)
+        values = _generic_trigger_identifier_list(
+            trigger_payload=trigger_payload,
+            key=key,
+            field_name=f"Generic trigger context {key}",
+        )
+        if values:
+            continue
+        if key == DESTROYED_ENEMY_UNIT_CONTEXT_KEY:
+            return "no_enemy_unit_destroyed"
+        if key == DESTROYED_TARGET_UNIT_CONTEXT_KEY:
+            return "target_models_not_destroyed"
+        return f"{key}_required"
+    return None
+
+
+def _optional_generic_metadata_bool(
+    effect_payload: dict[str, JsonValue],
+    *,
+    key: str,
+) -> bool:
+    value = effect_payload.get(key)
+    if value is None:
+        return False
+    if type(value) is not bool:
+        raise GameLifecycleError(f"{key} must be a bool.")
+    return value
+
+
+def _optional_generic_metadata_identifier(
+    effect_payload: dict[str, JsonValue],
+    *,
+    key: str,
+) -> str | None:
+    value = effect_payload.get(key)
+    if value is None:
+        return None
+    return _generic_metadata_identifier(key, value)
+
+
+def _generic_effect_selection_identifier_or_none(
+    *,
+    effect_selection: JsonValue,
+    key: str,
+) -> str | None:
+    if not isinstance(effect_selection, dict):
+        return None
+    value = effect_selection.get(key)
+    if value is None:
+        return None
+    return _generic_metadata_identifier(key, value)
+
+
+def _generic_trigger_identifier_list(
+    *,
+    trigger_payload: dict[str, JsonValue],
+    key: str,
+    field_name: str,
+) -> tuple[str, ...]:
+    raw_values = trigger_payload.get(key)
+    if raw_values is None:
+        return ()
+    if not isinstance(raw_values, list):
+        raise GameLifecycleError(f"{field_name} must be a list.")
+    values: list[str] = []
+    seen: set[str] = set()
+    for raw_value in raw_values:
+        identifier = _generic_metadata_identifier(field_name, raw_value)
+        if identifier in seen:
+            raise GameLifecycleError(f"{field_name} must not contain duplicates.")
+        seen.add(identifier)
+        values.append(identifier)
+    return tuple(values)
+
+
+_generic_metadata_identifier_validator = IdentifierValidator(GameLifecycleError)
+
+
+def _generic_metadata_identifier(field_name: str, value: object) -> str:
+    return _generic_metadata_identifier_validator(field_name, value)
 
 
 def _rule_ir_from_stratagem_definition(definition: StratagemDefinition) -> RuleIR:

@@ -184,7 +184,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Faction | Detachments | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-consumed rows | File |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | Orks | 12 | 1 | 44 | 66 | 1 | [orks](factions/orks.md) |
-| Aeldari | 15 | 2 | 51 | 75 | 10 | [aeldari](factions/aeldari.md) |
+| Aeldari | 15 | 2 | 51 | 75 | 1 | [aeldari](factions/aeldari.md) |
 | Drukhari | 9 | 0 | 24 | 36 | 1 | [drukhari](factions/drukhari.md) |
 | Tyranids | 10 | 0 | 32 | 48 | 1 | [tyranids](factions/tyranids.md) |
 | Genestealer Cults | 9 | 0 | 20 | 30 | 1 | [genestealer-cults](factions/genestealer-cults.md) |
@@ -326,9 +326,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `core:smokescreen` | Smokescreen |
 | `descriptor:movement:deep-strike-placement` | Deep Strike |
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
-| `generic:rule-ir` | CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>EUPHORIC INSPIRATION<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Inescapable Manifestations<br>LONG, UNCONTROLLED BURSTS<br>ORKS IS STILL ORKS<br>PRIDEFUL SUPERIORITY<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>Warp-Riders |
+| `generic:rule-ir` | CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Casting Back the Veil<br>Cloak and Shadow<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>Vengeful Sorrow<br>Warp-Riders |
 | `phase17g:aeldari:corsair-coterie:stratagems:cloak-and-shadow:target-restriction` | Cloak and Shadow |
-| `phase17g:aeldari:corsair-coterie:stratagems:outcast-ambush:weapon-profile` | Outcast Ambush |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start` | Acts of Faith |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed` | Acts of Faith |
@@ -344,17 +343,8 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:aeldari:army_rule:star_engines` | Battle Focus - Star Engines |
 | `warhammer_40000_11th:aeldari:army_rule:sudden_strike` | Battle Focus - Sudden Strike |
 | `warhammer_40000_11th:aeldari:army_rule:swift_as_the_wind` | Battle Focus - Swift as the Wind |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:cloak_and_shadow` | Cloak and Shadow |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:into_the_breach` | Into the Breach |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:lethal_ruse` | Lethal Ruse |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:outcast_ambush` | Outcast Ambush |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:pirates_due` | Pirates' Due |
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:relentless_raiders` | Relentless Raiders |
-| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:vengeful_sorrow` | Vengeful Sorrow |
 | `warhammer_40000_11th:aeldari:detachment:corsair_coterie:void_thieves` | Void Thieves |
-| `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:casting_back_the_veil` | Casting Back the Veil |
-| `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:eldritch_suppression` | Eldritch Suppression |
-| `warhammer_40000_11th:aeldari:detachment:path_of_the_outcast:nomads_of_the_hidden_way` | Nomads of the Hidden Way |
 | `warhammer_40000_11th:aeldari:path_of_the_outcast:far_reaching_doom:selected_shooting_unit` | Far-reaching Doom |
 | `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command` | Voice of Command |
 | `warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:battle-shock` | Voice of Command |

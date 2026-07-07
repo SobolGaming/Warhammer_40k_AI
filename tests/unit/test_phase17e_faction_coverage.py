@@ -204,6 +204,15 @@ GENERIC_DETACHMENT_RULE_KEYS = frozenset(
 )
 GENERIC_STRATAGEM_SOURCE_ROW_IDS = frozenset(
     {
+        corsair_ir.CLOAK_AND_SHADOW_SOURCE_ROW_ID,
+        corsair_ir.INTO_THE_BREACH_SOURCE_ROW_ID,
+        corsair_ir.LETHAL_RUSE_SOURCE_ROW_ID,
+        corsair_ir.OUTCAST_AMBUSH_SOURCE_ROW_ID,
+        corsair_ir.PIRATES_DUE_SOURCE_ROW_ID,
+        corsair_ir.VENGEFUL_SORROW_SOURCE_ROW_ID,
+        path_outcast_ir.CASTING_BACK_THE_VEIL_SOURCE_ROW_ID,
+        path_outcast_ir.ELDRITCH_SUPPRESSION_SOURCE_ROW_ID,
+        path_outcast_ir.NOMADS_OF_THE_HIDDEN_WAY_SOURCE_ROW_ID,
         "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:from-beyond-the-veil",
         "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:inescapable-manifestations",
         "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:warp-riders",
@@ -1431,11 +1440,10 @@ def test_phase17e_coverage_rows_reject_malformed_runtime_shape_tokens() -> None:
         if row.coverage_kind is Phase17ECoverageKind.DETACHMENT_RULE
         and row.status is Phase17ECoverageStatus.IMPLEMENTED
     )
-    implemented_exact_row = next(
+    exact_runtime_row = next(
         row
         for row in package.coverage_rows
-        if row.coverage_kind in _EXACT_SUBRULE_TEST_KINDS
-        and row.status is Phase17ECoverageStatus.IMPLEMENTED
+        if row.coverage_kind in _EXACT_SUBRULE_TEST_KINDS and row.runtime_support_status is not None
     )
     datasheet_row = next(
         row
@@ -1478,7 +1486,7 @@ def test_phase17e_coverage_rows_reject_malformed_runtime_shape_tokens() -> None:
         replace(named_handler_row, source_ids=("duplicate-source", "duplicate-source"))
 
     with pytest.raises(Phase17EFactionCoverageError, match="Exact subrule coverage"):
-        replace(implemented_exact_row, runtime_support_status=None)
+        replace(exact_runtime_row, runtime_support_status=None)
 
     with pytest.raises(Phase17EFactionCoverageError, match="Detachment rule coverage"):
         replace(implemented_detachment_row, rule_id="unexpected-exact-rule-id")

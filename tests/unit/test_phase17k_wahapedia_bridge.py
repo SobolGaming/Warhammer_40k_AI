@@ -4667,7 +4667,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "[aeldari](factions/aeldari.md)" in generated_markdown
     assert "Faction-pack Stratagems" not in generated_markdown
     assert "Faction-pack Enhancements" not in generated_markdown
-    assert "| Aeldari | 15 | 2 | 51 | 75 | 10 | [aeldari](factions/aeldari.md) |" in (
+    assert "| Aeldari | 15 | 2 | 51 | 75 | 1 | [aeldari](factions/aeldari.md) |" in (
         generated_markdown
     )
     assert (
@@ -5039,7 +5039,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "## Detachment Rule Coverage Rows" in chaos_daemons_markdown
     assert "| Corsair Coterie | Pirates' Due |" in aeldari_markdown
     assert "| Corsair Coterie | Archraider |" in aeldari_markdown
-    assert "`implemented` / `engine_consumed`" in aeldari_markdown
+    assert "`generic_supported` / `engine_consumed`" in aeldari_markdown
     assert "`named_handler_required` / `source_only`" in aeldari_markdown
     assert "| Cavalcade of Chaos | Warp-Riders |" in chaos_daemons_markdown
     assert "| Cavalcade of Chaos | Apocalyptic Steeds Upgrade |" in chaos_daemons_markdown
@@ -5066,8 +5066,11 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     ) in generated_markdown
     assert "| `core:command-reroll` | Command Re-roll |" in generated_markdown
     assert "From Beyond the Veil<br>GET STUCK IN, LADZ!" in generated_markdown
-    assert "Inescapable Manifestations<br>LONG, UNCONTROLLED BURSTS" in generated_markdown
-    assert "SPESHUL SHELLS<br>Warp-Riders |" in generated_markdown
+    assert "Casting Back the Veil<br>Cloak and Shadow" in generated_markdown
+    assert "Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS" in (
+        generated_markdown
+    )
+    assert "SPESHUL SHELLS<br>Vengeful Sorrow<br>Warp-Riders |" in generated_markdown
     assert (
         "| `warhammer_40000_11th:aeldari:detachment:corsair_coterie:"
         "relentless_raiders` | Relentless Raiders |"

@@ -77,6 +77,7 @@ from warhammer40k_core.engine.shooting_unit_selected_hooks import (
 )
 from warhammer40k_core.engine.stratagems import (
     DESTROYED_TARGET_UNIT_CONTEXT_KEY,
+    GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     HIT_ENEMY_UNIT_CONTEXT_KEY,
     HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
     HIT_TARGET_UNIT_CONTEXT_KEY,
@@ -110,11 +111,15 @@ def test_path_of_the_outcast_runtime_contribution_registers_content() -> None:
         stratagems.CASTING_BACK_THE_VEIL_STRATAGEM_ID,
         stratagems.NOMADS_OF_THE_HIDDEN_WAY_STRATAGEM_ID,
     }
-    assert {binding.handler_id for binding in contribution.stratagem_handler_bindings} == {
-        stratagems.ELDRITCH_SUPPRESSION_HANDLER_ID,
-        stratagems.CASTING_BACK_THE_VEIL_HANDLER_ID,
-        stratagems.NOMADS_OF_THE_HIDDEN_WAY_HANDLER_ID,
+    assert {record.definition.handler_id for record in contribution.stratagem_records} == {
+        GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     }
+    assert all(
+        isinstance(record.definition.effect_payload, dict)
+        and isinstance(record.definition.effect_payload.get("rule_ir"), dict)
+        for record in contribution.stratagem_records
+    )
+    assert contribution.stratagem_handler_bindings == ()
     assert contribution.enhancement_effect_bindings == ()
     assert {binding.hook_id for binding in contribution.shooting_unit_selected_hook_bindings} == {
         rule.FAR_REACHING_DOOM_HOOK_ID,
@@ -410,9 +415,18 @@ def test_path_of_the_outcast_post_shot_records_use_structured_context() -> None:
     assert eldritch.target_spec.required_keywords_any == ("RANGERS", "SHROUD RUNNERS")
     assert casting.target_spec.required_keywords_any == ("RANGERS", "SHROUD RUNNERS")
     assert nomads.target_spec.required_keywords_any == ("RANGERS", "SHROUD RUNNERS")
-    assert eldritch.effect_payload == {"effect_selection_kind": "hit_enemy_unit"}
-    assert casting.effect_payload == {"effect_selection_kind": "hit_enemy_unit"}
-    assert nomads.effect_payload == {"effect_kind": "nomads_of_the_hidden_way"}
+    assert isinstance(eldritch.effect_payload, dict)
+    assert isinstance(casting.effect_payload, dict)
+    assert isinstance(nomads.effect_payload, dict)
+    assert isinstance(eldritch.effect_payload.get("rule_ir"), dict)
+    assert isinstance(casting.effect_payload.get("rule_ir"), dict)
+    assert isinstance(nomads.effect_payload.get("rule_ir"), dict)
+    assert eldritch.effect_payload["effect_selection_kind"] == "hit_enemy_unit"
+    assert casting.effect_payload["effect_selection_kind"] == "hit_enemy_unit"
+    assert (
+        eldritch.effect_payload["effect_selection_unit_forbidden_if_battle_shocked"]
+        == HIT_ENEMY_UNIT_CONTEXT_KEY
+    )
 
 
 def test_character_target_ap_bonus_only_modifies_character_targets() -> None:

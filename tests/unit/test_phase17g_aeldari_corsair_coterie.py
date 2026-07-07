@@ -166,6 +166,7 @@ from warhammer40k_core.engine.stratagems import (
     ENGAGED_ENEMY_UNIT_CONTEXT_KEY,
     ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
     ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY,
+    GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     HIT_TARGET_UNIT_CONTEXT_KEY,
     JUST_FELL_BACK_UNIT_CONTEXT_KEY,
     JUST_SHOT_UNIT_CONTEXT_KEY,
@@ -283,17 +284,16 @@ def test_corsair_coterie_runtime_contribution_registers_rule_and_enhancement_hoo
         stratagems.CLOAK_AND_SHADOW_STRATAGEM_ID,
         stratagems.VENGEFUL_SORROW_STRATAGEM_ID,
     }
-    assert {binding.handler_id for binding in contribution.stratagem_handler_bindings} == {
-        stratagems.PIRATES_DUE_HANDLER_ID,
-        stratagems.LETHAL_RUSE_HANDLER_ID,
-        stratagems.OUTCAST_AMBUSH_HANDLER_ID,
-        stratagems.INTO_THE_BREACH_HANDLER_ID,
-        stratagems.CLOAK_AND_SHADOW_HANDLER_ID,
-        stratagems.VENGEFUL_SORROW_HANDLER_ID,
+    assert {record.definition.handler_id for record in contribution.stratagem_records} == {
+        GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     }
-    assert {binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings} == {
-        stratagems.OUTCAST_AMBUSH_WEAPON_PROFILE_MODIFIER_ID,
-    }
+    assert all(
+        isinstance(record.definition.effect_payload, dict)
+        and isinstance(record.definition.effect_payload.get("rule_ir"), dict)
+        for record in contribution.stratagem_records
+    )
+    assert contribution.stratagem_handler_bindings == ()
+    assert contribution.weapon_profile_modifier_bindings == ()
     assert {
         binding.hook_id for binding in contribution.shooting_target_restriction_hook_bindings
     } == {
@@ -1151,16 +1151,18 @@ def test_lethal_ruse_request_option_carries_engaged_enemy_effect_selection() -> 
 
     assert use_record.effect_selection == effect_selection
     assert use_record.affected_unit_instance_ids == (_CORSAIR_UNIT_ID, _ENEMY_UNIT_ID)
-    assert any(
+    lethal_effects = tuple(
         effect.effect_payload
-        == {
-            "effect_kind": "charge_after_fall_back_allowed",
-            "source_effect_kind": stratagems.LETHAL_RUSE_EFFECT_KIND,
-            "stratagem_id": stratagems.LETHAL_RUSE_STRATAGEM_ID,
-            "stratagem_use_id": use_record.use_id,
-        }
         for effect in state.persisting_effects_for_unit(_CORSAIR_UNIT_ID)
+        if isinstance(effect.effect_payload, dict)
+        and effect.effect_payload.get("source_effect_kind") == stratagems.LETHAL_RUSE_EFFECT_KIND
     )
+    assert len(lethal_effects) == 1
+    lethal_effect = lethal_effects[0]
+    assert lethal_effect["effect_kind"] == "charge_after_fall_back_allowed"
+    assert lethal_effect["stratagem_id"] == stratagems.LETHAL_RUSE_STRATAGEM_ID
+    assert lethal_effect["stratagem_use_id"] == use_record.use_id
+    assert isinstance(lethal_effect["generic_rule_effect"], dict)
 
 
 def test_lethal_ruse_rejects_malformed_engaged_enemy_effect_selection_payloads() -> None:
