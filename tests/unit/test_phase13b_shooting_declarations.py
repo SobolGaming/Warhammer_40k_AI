@@ -5723,8 +5723,10 @@ def test_phase14f_indirect_stationary_friendly_visibility_uses_one_to_three_fail
     )
     assert remaining_sequence is None
     assert status is None
-    assert cast(dict[str, object], hit_payload["payload"])["minimum_unmodified_success"] == 4
-    assert cast(dict[str, object], hit_payload["payload"])["successful"] is False
+    hit = cast(dict[str, object], hit_payload["payload"])
+    assert hit["minimum_unmodified_success"] == 4
+    assert hit["unmodified_success_threshold_active"] is False
+    assert hit["successful"] is False
 
 
 def test_phase13d_fire_overwatch_hits_only_on_unmodified_sixes() -> None:
@@ -5800,6 +5802,7 @@ def test_phase13d_fire_overwatch_hits_only_on_unmodified_sixes() -> None:
         )
         hit = cast(dict[str, object], hit_payload["payload"])
         assert hit["minimum_unmodified_success"] == 6
+        assert hit["unmodified_success_threshold_active"] is False
         assert hit["target_number"] == 3
         assert hit["modifier"] == 1
         assert hit["successful"] is (roll_value == 6)
@@ -5849,7 +5852,7 @@ def test_phase13d_generic_rule_ir_fire_overwatch_threshold_status_applies() -> N
         weapon_profile = replace(
             _first_weapon_profile(lifecycle, attacker),
             profile_id=f"{sequence_id}-profile",
-            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 3),
+            skill=CharacteristicValue.from_raw(Characteristic.BALLISTIC_SKILL, 6),
         )
         state.record_persisting_effect(
             _generic_fire_overwatch_threshold_effect(
@@ -5928,6 +5931,10 @@ def test_phase13d_generic_rule_ir_fire_overwatch_threshold_status_applies() -> N
         )
         hit = cast(dict[str, object], hit_payload["payload"])
         assert hit["minimum_unmodified_success"] == expected_minimum
+        assert hit["unmodified_success_threshold_active"] is True
+        assert hit["target_number"] == 6
+        assert hit["modifier"] == 0
+        assert hit["final_roll"] == roll_value
         assert hit["successful"] is True
 
 
@@ -6074,6 +6081,7 @@ def test_phase14f_snap_shooting_rule_hits_only_on_unmodified_sixes() -> None:
         )
         hit = cast(dict[str, object], hit_payload["payload"])
         assert hit["minimum_unmodified_success"] == 6
+        assert hit["unmodified_success_threshold_active"] is False
         assert hit["target_number"] == 2
         assert hit["modifier"] == 1
         assert hit["successful"] is (roll_value == 6)
@@ -13711,6 +13719,21 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
         actor_id="player-a",
     )
     hit_roll_state = DiceRollManager("phase13c-invalid-hit").roll_fixed(hit_spec, [2])
+    threshold_hit_roll_state = DiceRollManager("phase13c-threshold-hit").roll_fixed(hit_spec, [5])
+    threshold_hit = HitRoll(
+        target_number=6,
+        roll_state=threshold_hit_roll_state,
+        unmodified_roll=5,
+        modifier=0,
+        capped_modifier=0,
+        final_roll=5,
+        successful=True,
+        critical=False,
+        minimum_unmodified_success=5,
+        unmodified_success_threshold_active=True,
+    )
+    assert threshold_hit.to_payload()["unmodified_success_threshold_active"] is True
+    assert HitRoll.from_payload(threshold_hit.to_payload()) == threshold_hit
     with pytest.raises(GameLifecycleError, match="success flag"):
         HitRoll(
             target_number=3,
@@ -13722,6 +13745,18 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
             successful=True,
             critical=False,
         )
+    with pytest.raises(GameLifecycleError, match="unmodified_success_threshold_active"):
+        HitRoll(
+            target_number=3,
+            roll_state=hit_roll_state,
+            unmodified_roll=2,
+            modifier=0,
+            capped_modifier=0,
+            final_roll=2,
+            successful=False,
+            critical=False,
+            unmodified_success_threshold_active="bad",  # type: ignore[arg-type]
+        )
     with pytest.raises(GameLifecycleError, match="Skipped HitRoll"):
         HitRoll(
             target_number=3,
@@ -13732,6 +13767,19 @@ def test_phase13c_invalid_attack_save_and_damage_payloads_fail_fast() -> None:
             final_roll=None,
             successful=True,
             critical=False,
+            skipped=True,
+        )
+    with pytest.raises(GameLifecycleError, match="unmodified success threshold"):
+        HitRoll(
+            target_number=3,
+            roll_state=None,
+            unmodified_roll=None,
+            modifier=0,
+            capped_modifier=0,
+            final_roll=None,
+            successful=True,
+            critical=False,
+            unmodified_success_threshold_active=True,
             skipped=True,
         )
     with pytest.raises(GameLifecycleError, match="capped_modifier must be an integer"):

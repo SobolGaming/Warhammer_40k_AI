@@ -101,13 +101,13 @@ def _roll_hit(
     capped_modifier = _cap_roll_modifier(modifier)
     final_roll = unmodified + capped_modifier
     if is_snap_shooting:
-        minimum_success = 6
+        base_minimum_success = 6
     elif INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID in pool.targeting_rule_ids:
-        minimum_success = (
+        base_minimum_success = (
             4 if INDIRECT_FIRE_STATIONARY_VISIBLE_RULE_ID in pool.targeting_rule_ids else 6
         )
     else:
-        minimum_success = 2
+        base_minimum_success = 2
     minimum_success = _runtime_modifier_registry(
         runtime_modifier_registry
     ).minimum_unmodified_hit_success(
@@ -122,9 +122,10 @@ def _roll_hit(
             target_unit_instance_id=pool.target_unit_instance_id,
             weapon_profile=pool.weapon_profile,
             targeting_rule_ids=pool.targeting_rule_ids,
-            current_minimum_unmodified_success=minimum_success,
+            current_minimum_unmodified_success=base_minimum_success,
         )
     )
+    unmodified_success_threshold_active = minimum_success < base_minimum_success
     target_keywords = rules_unit_view_by_id(
         state=state,
         unit_instance_id=pool.target_unit_instance_id,
@@ -159,9 +160,14 @@ def _roll_hit(
         modifier=modifier,
         capped_modifier=capped_modifier,
         final_roll=final_roll,
-        successful=unmodified == 6 or (unmodified >= minimum_success and final_roll >= skill),
+        successful=(
+            unmodified == 6
+            or (unmodified_success_threshold_active and unmodified >= minimum_success)
+            or (unmodified >= minimum_success and final_roll >= skill)
+        ),
         critical=unmodified == 6,
         minimum_unmodified_success=minimum_success,
+        unmodified_success_threshold_active=unmodified_success_threshold_active,
         generated_hits=generated_hits,
     )
 
