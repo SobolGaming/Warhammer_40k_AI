@@ -24,7 +24,7 @@ from tools.generate_ability_support_matrix import (
 )
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
     MUSTERING_WARLORD_FORBIDDEN,
     MUSTERING_WARLORD_REQUIRED,
@@ -42,16 +42,22 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionConditionKind,
     WargearOptionEffectKind,
 )
-from warhammer40k_core.core.dice import RerollComponentSelectionPolicy
+from warhammer40k_core.core.dice import DiceRollResult, RerollComponentSelectionPolicy
 from warhammer40k_core.core.model_geometry_catalog import (
     GeometryMeasurementKind,
     GeometrySourceUnits,
 )
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    CoverEffect,
+    CoverPolicyDescriptor,
+    RulesetDescriptor,
+)
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AbilityKind,
     AntiKeywordMatchMode,
+    DamageProfile,
     RangeProfile,
     TargetKeywordMatchMode,
     WeaponKeyword,
@@ -93,6 +99,9 @@ from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
     AttackSequenceEvent,
     AttackSequenceStep,
+    attack_sequence_hit_roll_spec,
+    attack_sequence_wound_roll_spec,
+    resolve_attack_sequence_until_blocked,
 )
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
@@ -203,6 +212,7 @@ from warhammer40k_core.engine.catalog_turn_end_reserves import (
     CatalogTurnEndReserveRuntime,
 )
 from warhammer40k_core.engine.charge_declaration import ChargeRollRequest, ChargeRollResult
+from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
 from warhammer40k_core.engine.damage_allocation import FeelNoPainAttackCondition
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -277,6 +287,11 @@ from warhammer40k_core.engine.phases.shooting import ShootingPhaseHandler, Shoot
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
+)
+from warhammer40k_core.engine.saves import (
+    SaveKind,
+    SaveResolutionRule,
+    saving_throw_roll_spec,
 )
 from warhammer40k_core.engine.shooting_phase_start_hooks import (
     SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
@@ -2369,6 +2384,12 @@ def test_phase17k_post_shoot_hit_target_cover_denial_records_and_applies_effect(
     assert effect_payload["effect_kind"] == CATALOG_POST_SHOOT_HIT_TARGET_STATUS_EFFECT_KIND
     assert effect_payload["benefit_of_cover_denied"] is True
     assert effect_payload["catalog_record_id"] == cover_record.record_id
+    assert effect_payload["rule_ir_hash"] == rule_ir.ir_hash()
+    assert effects[0].expiration == EffectExpiration.end_phase(
+        battle_round=state.battle_round,
+        phase=BattlePhase.SHOOTING,
+        player_id=army.player_id,
+    )
     selected_events = tuple(
         event
         for event in decisions.event_log.records
@@ -2616,6 +2637,236 @@ def test_phase17k_post_shoot_hit_target_cover_denial_records_and_applies_effect(
         )
         == ()
     )
+
+
+def test_phase17k_datasheet_post_shoot_cover_denial_suppresses_save_cover() -> None:
+    package = _post_shoot_cover_denial_package()
+    unit = _named_weapon_choice_unit(package=package)
+    target_unit_with_invulnerable = _named_weapon_choice_unit(
+        package=package,
+        army_id="army-opponent",
+        unit_selection_id="enemy-lord-of-change-1",
+    )
+    target_model = replace(
+        target_unit_with_invulnerable.own_models[0],
+        characteristics=tuple(
+            CharacteristicValue.from_raw(Characteristic.SAVE, 2)
+            if characteristic.characteristic is Characteristic.SAVE
+            else characteristic
+            for characteristic in target_unit_with_invulnerable.own_models[0].characteristics
+            if characteristic.characteristic is not Characteristic.INVULNERABLE_SAVE
+        ),
+    )
+    target_unit = replace(target_unit_with_invulnerable, own_models=(target_model,))
+    army = _flesh_hounds_army(package=package, unit=unit)
+    enemy_army = _flesh_hounds_army(
+        package=package,
+        unit=target_unit,
+        army_id="army-opponent",
+        player_id="player-opponent",
+    )
+    player_index = _player_ability_index(package=package, army=army)
+    enemy_player_index = _player_ability_index(package=package, army=enemy_army)
+    records_by_name = {record.definition.name: record for record in player_index.all_records()}
+    cover_record = records_by_name["Purge and Cleanse"]
+    replay_payload = cast(dict[str, JsonValue], cover_record.definition.replay_payload)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    battlefield = _flesh_hounds_battlefield_state(
+        army=army,
+        unit=unit,
+        enemy_army=enemy_army,
+        enemy_unit=target_unit,
+        enemy_x=24.0,
+    )
+    state = _battle_state_with_armies(
+        armies=(army, enemy_army),
+        battlefield=battlefield,
+        active_player_id=army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    decisions = DecisionController()
+    completed_sequence = _completed_post_shoot_attack_sequence(
+        package=package,
+        attacker=unit,
+        target=target_unit,
+    )
+    _emit_successful_hit(
+        decisions=decisions,
+        attack_sequence=completed_sequence,
+        successful=True,
+    )
+    completed_event = decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            "sequence_id": completed_sequence.sequence_id,
+            "attacker_player_id": army.player_id,
+            "attacking_unit_instance_id": unit.unit_instance_id,
+        },
+    )
+    status = CatalogPostShootHitTargetStatusRuntime(
+        ability_indexes_by_player_id={
+            army.player_id: player_index,
+            enemy_army.player_id: enemy_player_index,
+        },
+        armies=(army, enemy_army),
+    ).request_handler(
+        AttackSequenceCompletedContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            source_phase=BattlePhase.SHOOTING,
+            attack_sequence=completed_sequence,
+            attack_sequence_completed_event_id=completed_event.event_id,
+        )
+    )
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = decisions.queue.peek_next()
+    result = DecisionResult.for_request(
+        result_id="phase17k-datasheet-cover-denial-save-consumer",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    decisions.submit_result(result)
+    assert (
+        apply_catalog_post_shoot_hit_target_status_result(
+            state=state,
+            decisions=decisions,
+            result=result,
+        )
+        is None
+    )
+    denial_effects = state.persisting_effects_for_unit(target_unit.unit_instance_id)
+    assert len(denial_effects) == 1
+    denial_payload = cast(dict[str, JsonValue], denial_effects[0].effect_payload)
+    assert denial_payload["effect_kind"] == CATALOG_POST_SHOOT_HIT_TARGET_STATUS_EFFECT_KIND
+    assert denial_payload["benefit_of_cover_denied"] is True
+    assert denial_payload["rule_ir_hash"] == rule_ir.ir_hash()
+
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="phase17k-target-cover-grant",
+            source_rule_id=SMOKESCREEN_EFFECT_KIND,
+            owner_player_id=enemy_army.player_id,
+            target_unit_instance_ids=(target_unit.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhase.SHOOTING,
+            expiration=EffectExpiration.end_phase(
+                battle_round=state.battle_round,
+                phase=BattlePhase.SHOOTING,
+                player_id=army.player_id,
+            ),
+            effect_payload=validate_json_value(
+                {
+                    "effect_kind": SMOKESCREEN_EFFECT_KIND,
+                    "benefit_of_cover": True,
+                }
+            ),
+        )
+    )
+    weapon_profile = replace(
+        completed_sequence.attack_pools[0].weapon_profile,
+        profile_id="phase17k-cover-denial-save-bolt",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -1),
+        damage_profile=DamageProfile.fixed(1),
+    )
+    save_sequence_id = "phase17k-cover-denial-save-consumer"
+    attack_context_id = f"{save_sequence_id}:pool-001:attack-001"
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id=army.player_id,
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id=army.player_id,
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id=enemy_army.player_id,
+        allocated_model_id=target_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+    base_ruleset = RulesetDescriptor.warhammer_40000_eleventh()
+    save_bonus_ruleset = replace(
+        base_ruleset,
+        terrain_visibility_policy=replace(
+            base_ruleset.terrain_visibility_policy,
+            cover_effect=CoverEffect.SAVE_BONUS,
+            cover_policy=CoverPolicyDescriptor(cover_effect=CoverEffect.SAVE_BONUS),
+        ),
+        descriptor_hash="",
+    )
+
+    remaining_sequence, allocated_model_ids, resolve_status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=save_bonus_ruleset,
+        attack_sequence=AttackSequence.start(
+            sequence_id=save_sequence_id,
+            attacker_player_id=army.player_id,
+            attacking_unit_instance_id=unit.unit_instance_id,
+            attack_pools=(
+                replace(
+                    completed_sequence.attack_pools[0],
+                    weapon_profile_id=weapon_profile.profile_id,
+                    weapon_profile=weapon_profile,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            save_sequence_id,
+            event_log=decisions.event_log,
+            injected_results=(
+                DiceRollResult.from_values(
+                    roll_id=f"{save_sequence_id}:hit",
+                    spec=hit_spec,
+                    values=(6,),
+                    source="fixed",
+                ),
+                DiceRollResult.from_values(
+                    roll_id=f"{save_sequence_id}:wound",
+                    spec=wound_spec,
+                    values=(6,),
+                    source="fixed",
+                ),
+                DiceRollResult.from_values(
+                    roll_id=f"{save_sequence_id}:save",
+                    spec=save_spec,
+                    values=(2,),
+                    source="fixed",
+                ),
+            ),
+        ),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+    save_events = tuple(
+        cast(dict[str, object], event.payload)
+        for event in decisions.event_log.records
+        if event.event_type == "attack_sequence_step"
+        and cast(dict[str, object], event.payload).get("sequence_id") == save_sequence_id
+        and cast(dict[str, object], event.payload).get("step") == AttackSequenceStep.SAVE.value
+    )
+    assert len(save_events) == 1
+    save_payload = cast(dict[str, object], save_events[0]["payload"])
+    save_option = cast(dict[str, object], save_payload["option"])
+
+    assert remaining_sequence is None
+    assert allocated_model_ids == (target_model.model_instance_id,)
+    assert resolve_status is None
+    assert save_payload["save_kind"] == SaveKind.ARMOUR.value
+    assert save_payload["target_number"] == 2
+    assert save_payload["unmodified_roll"] == 2
+    assert save_payload["final_roll"] == 1
+    assert save_payload["successful"] is False
+    assert save_payload["resolution_rule"] == SaveResolutionRule.FAILED.value
+    assert save_option["target_number"] == 3
+    assert save_option["cover_result"] is None
+    assert save_option["cover_applied"] is False
+    assert save_option["source_rule_ids"] == []
 
 
 def test_phase17k_post_shoot_hit_target_status_requires_successful_hit_not_wound() -> None:
