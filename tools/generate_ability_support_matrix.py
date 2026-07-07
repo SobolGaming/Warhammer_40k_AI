@@ -556,7 +556,7 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
         "daemonic-incursion",
     ): SupportSectionRow(
         subject="Daemonic Incursion",
-        engine="Warp Rifts reserve-arrival distance hook",
+        engine="Warp Rifts generic IR reserve-arrival distance hook",
         documentation="Source row, execution record, and generated matrix",
         tests="Focused runtime hook and Deep Strike placement tests",
         overall="Full",

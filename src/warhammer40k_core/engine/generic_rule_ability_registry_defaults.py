@@ -75,6 +75,9 @@ from warhammer40k_core.engine.generic_rule_ability_registry_aeldari_defaults imp
     aeldari_corsair_coterie_turn_end_abilities,
     aeldari_path_of_the_outcast_enhancement_effect_abilities,
 )
+from warhammer40k_core.engine.generic_rule_ability_registry_daemonic_incursion_defaults import (
+    daemonic_incursion_reserve_arrival_distance_abilities,
+)
 from warhammer40k_core.engine.generic_rule_ability_registry_emperors_children_defaults import (
     emperors_children_court_of_the_phoenician_stratagem_cost_modifier_abilities,
 )
@@ -1389,6 +1392,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
             grant_builder=_blood_legion_murdercall_grants,
         ),
     ),
+    reserve_arrival_distance_abilities=daemonic_incursion_reserve_arrival_distance_abilities,
     phase_end_objective_control_abilities=(
         GenericRulePhaseEndObjectiveControlAbility(
             ability_id=blood_legion_ir.BLOOD_TAINTED_STICKY_OBJECTIVE_ABILITY,

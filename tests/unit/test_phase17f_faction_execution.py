@@ -467,7 +467,7 @@ def test_phase17f_aeldari_path_of_the_outcast_upgrade_records_are_generic_rule_i
         ),
     ],
 )
-def test_phase17f_chaos_daemons_detachment_rule_execution_record_is_named_handler(
+def test_phase17f_chaos_daemons_detachment_rule_execution_record_is_generic_rule_ir(
     detachment_id: str,
     rule_name: str,
     runtime_consumers: tuple[str, ...],
@@ -483,8 +483,13 @@ def test_phase17f_chaos_daemons_detachment_rule_execution_record_is_named_handle
     assert record.rule_name == rule_name
     assert record.runtime_support_status == "engine_consumed"
     assert record.runtime_consumer_ids == tuple(sorted(runtime_consumers))
-    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER
-    assert record.handler_id == runtime_consumers[0]
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.handler_id is None
+    assert record.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+            record.coverage_descriptor_id
+        )
+    )
     assert record.block_reason is None
 
 

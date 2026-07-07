@@ -31,6 +31,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_daemonic_incursion_ir_support_2026_27 as daemonic_incursion_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27,
     faction_subrules_2026_27,
 )
@@ -210,6 +213,11 @@ def generic_supported_detachment_rule_ir_hash(
         rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
         _validate_cavalcade_of_chaos_detachment_rule_ir(rule_ir)
         return rule_ir.ir_hash()
+    rule_ir_hash = daemonic_incursion_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_daemonic_incursion_detachment_rule_ir(rule_ir)
+        return rule_ir_hash
     rule_ir_hash = more_dakka_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         return rule_ir_hash
@@ -261,6 +269,8 @@ def generic_supported_stratagem_rule_ir_hash(
 def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> RuleIR:
     descriptor_id = _validate_identifier("coverage_descriptor_id", coverage_descriptor_id)
     payload = _STATIC_GENERIC_RULE_IR_PAYLOADS_BY_COVERAGE_DESCRIPTOR_ID.get(descriptor_id)
+    if payload is None:
+        payload = daemonic_incursion_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         payload = more_dakka_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
@@ -509,6 +519,75 @@ def _validate_cavalcade_of_chaos_detachment_rule_ir(rule_ir: RuleIR) -> None:
         raise Phase17FGenericIrSupportError(
             "Cavalcade of Chaos detachment RuleIR has unexpected granted abilities."
         )
+
+
+def _validate_daemonic_incursion_detachment_rule_ir(rule_ir: RuleIR) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Daemonic Incursion detachment requires RuleIR.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Daemonic Incursion detachment RuleIR must deserialize as supported."
+        )
+    expected_source_id = (
+        f"{SOURCE_PACKAGE_ID}:phase17e:chaos-daemons:daemonic-incursion:rule:source-text"
+    )
+    if rule_ir.source_id != expected_source_id:
+        raise Phase17FGenericIrSupportError(
+            "Daemonic Incursion detachment RuleIR produced an unexpected source ID."
+        )
+    template_ids = frozenset(
+        clause.template_id for clause in rule_ir.clauses if clause.template_id is not None
+    )
+    if template_ids != frozenset({GRANT_ABILITY_TEMPLATE_ID}):
+        raise Phase17FGenericIrSupportError(
+            "Daemonic Incursion detachment RuleIR uses an unregistered template family."
+        )
+    granted_abilities = frozenset(
+        _ability_parameter(effect)
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.GRANT_ABILITY
+    )
+    if granted_abilities != frozenset(
+        {daemonic_incursion_ir.WARP_RIFTS_DEEP_STRIKE_DISTANCE_ABILITY}
+    ):
+        raise Phase17FGenericIrSupportError(
+            "Daemonic Incursion detachment RuleIR has unexpected granted abilities."
+        )
+    for clause in rule_ir.clauses:
+        for effect in clause.effects:
+            if effect.kind is not RuleEffectKind.GRANT_ABILITY:
+                continue
+            parameters = parameter_payload(effect.parameters)
+            if parameters.get("hook_family") != daemonic_incursion_ir.WARP_RIFTS_HOOK_FAMILY:
+                raise Phase17FGenericIrSupportError(
+                    "Daemonic Incursion detachment RuleIR has unexpected hook family."
+                )
+            if parameters.get("placement_kind") != daemonic_incursion_ir.WARP_RIFTS_PLACEMENT_KIND:
+                raise Phase17FGenericIrSupportError(
+                    "Daemonic Incursion detachment RuleIR has unexpected placement kind."
+                )
+            if (
+                parameters.get("enemy_horizontal_distance_inches")
+                != daemonic_incursion_ir.WARP_RIFTS_ENEMY_DISTANCE_INCHES
+            ):
+                raise Phase17FGenericIrSupportError(
+                    "Daemonic Incursion detachment RuleIR has unexpected distance grant."
+                )
+            if (
+                parameters.get("required_faction_keyword")
+                != daemonic_incursion_ir.LEGIONES_DAEMONICA_KEYWORD
+            ):
+                raise Phase17FGenericIrSupportError(
+                    "Daemonic Incursion detachment RuleIR has unexpected faction keyword gate."
+                )
+            if (
+                parameters.get("condition_family")
+                != daemonic_incursion_ir.WARP_RIFTS_CONDITION_FAMILY
+            ):
+                raise Phase17FGenericIrSupportError(
+                    "Daemonic Incursion detachment RuleIR has unexpected condition family."
+                )
 
 
 def _validate_shadow_legion_detachment_rule_ir(rule_ir: RuleIR) -> None:

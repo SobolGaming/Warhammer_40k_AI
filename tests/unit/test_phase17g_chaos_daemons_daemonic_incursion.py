@@ -8,6 +8,7 @@ from tests.phase10p_reserves_helpers import (
     battle_state_with_reserve,
     decision_request,
     last_event_payload,
+    reserve_placement,
     single_model_reserve_placement,
     south_edge_touching_pose,
     submit_handler_decision,
@@ -24,10 +25,15 @@ from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRe
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldScenario,
+    ModelPlacement,
+    UnitPlacement,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle
+from warhammer40k_core.engine.faction_content.runtime import (
+    build_runtime_content_bundle,
+    build_runtime_content_bundle_for_armies,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.daemonic_incursion import (  # noqa: E501
     rule,
 )
@@ -44,6 +50,7 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseState,
 )
 from warhammer40k_core.engine.reserve_arrival_hooks import (
+    ReserveArrivalDistanceContext,
     ReserveArrivalDistanceHookRegistry,
 )
 from warhammer40k_core.engine.reserves import (
@@ -56,6 +63,16 @@ from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_daemonic_incursion_ir_support_2026_27 as daemonic_incursion_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_execution_2026_27,
+    faction_generic_ir_support_2026_27,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
+    Phase17FExecutionStatus,
+)
 
 _DAEMONIC_INCURSION_DATASHEET_ID = "phase17g-daemonic-incursion-daemon"
 _OTHER_DAEMON_DETACHMENT_ID = "warptide"
@@ -70,6 +87,7 @@ def test_daemonic_incursion_runtime_hook_materializes_only_for_selected_detachme
 
     assert direct_contribution.contribution_id == rule.CONTRIBUTION_ID
     assert not direct_contribution.contribution_id.endswith(":scaffold")
+    assert direct_contribution.reserve_arrival_distance_hook_bindings == ()
     assert rule.WARP_RIFTS_HOOK_ID in summary["reserve_arrival_distance_hook_ids"]
     assert rule.SOURCE_RULE_ID in summary["selected_execution_record_ids"]
     assert any(
@@ -85,6 +103,18 @@ def test_daemonic_incursion_runtime_hook_materializes_only_for_selected_detachme
     ).to_summary_payload()
 
     assert rule.WARP_RIFTS_HOOK_ID not in other_summary["reserve_arrival_distance_hook_ids"]
+
+
+def test_daemonic_incursion_execution_record_is_generic_rule_ir() -> None:
+    record = _daemonic_incursion_execution_record()
+
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.handler_id is None
+    assert record.rule_ir_hash == (
+        faction_generic_ir_support_2026_27.generic_rule_ir_hash_by_coverage_descriptor_id(
+            daemonic_incursion_ir.DAEMONIC_INCURSION_DETACHMENT_RULE_DESCRIPTOR_ID
+        )
+    )
 
 
 def test_warp_rifts_shadow_allows_deep_strike_more_than_six_from_enemy() -> None:
@@ -190,6 +220,166 @@ def test_warp_rifts_does_not_reduce_strategic_reserves_enemy_distance() -> None:
     assert remaining_state.status is ReserveStatus.IN_RESERVES
 
 
+def test_warp_rifts_requires_attempted_placement_to_match_reserve_unit() -> None:
+    state, reserve_state, reserve_unit = _daemonic_incursion_reserve_state()
+    target_pose = Pose.at(x=16.0, y=4.25, z=0.0, facing_degrees=0.0)
+    anchor_unit = _unit_by_id(state, _ANCHOR_UNIT_ID)
+    drifted_placement = UnitPlacement(
+        army_id="army-alpha",
+        player_id="player-a",
+        unit_instance_id=anchor_unit.unit_instance_id,
+        model_placements=(
+            ModelPlacement(
+                army_id="army-alpha",
+                player_id="player-a",
+                unit_instance_id=anchor_unit.unit_instance_id,
+                model_instance_id=anchor_unit.own_models[0].model_instance_id,
+                pose=target_pose,
+            ),
+        ),
+    )
+
+    grants = _runtime_reserve_arrival_registry(state).grants_for(
+        _reserve_arrival_distance_context(
+            state=state,
+            reserve_state=reserve_state,
+            reserve_unit=reserve_unit,
+            attempted_placement=drifted_placement,
+            placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+        )
+    )
+
+    assert grants == ()
+
+
+def test_warp_rifts_requires_legiones_daemonica() -> None:
+    state, reserve_state, reserve_unit = _daemonic_incursion_reserve_state()
+    reserve_unit = replace(reserve_unit, faction_keywords=())
+    state.army_definitions = [
+        replace(
+            army,
+            units=tuple(
+                reserve_unit if unit.unit_instance_id == reserve_unit.unit_instance_id else unit
+                for unit in army.units
+            ),
+        )
+        if army.player_id == reserve_state.player_id
+        else army
+        for army in state.army_definitions
+    ]
+    target_pose = Pose.at(x=16.0, y=4.25, z=0.0, facing_degrees=0.0)
+
+    grants = _runtime_reserve_arrival_registry(state).grants_for(
+        _reserve_arrival_distance_context(
+            state=state,
+            reserve_state=reserve_state,
+            reserve_unit=reserve_unit,
+            attempted_placement=single_model_reserve_placement(
+                reserve_unit=reserve_unit,
+                pose=target_pose,
+            ),
+            placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+        )
+    )
+
+    assert grants == ()
+
+
+def test_warp_rifts_requires_named_greater_daemon_anchor() -> None:
+    state, reserve_state, reserve_unit = _daemonic_incursion_reserve_state()
+    _rename_unit(state, unit_instance_id=_ANCHOR_UNIT_ID, name="Daemon Prince")
+    target_pose = Pose.at(x=30.0, y=22.0, z=0.0, facing_degrees=0.0)
+    _place_anchor_at_base_distance(
+        state=state,
+        target_pose=target_pose,
+        distance_inches=4.0,
+    )
+
+    grants = _runtime_reserve_arrival_registry(state).grants_for(
+        _reserve_arrival_distance_context(
+            state=state,
+            reserve_state=reserve_state,
+            reserve_unit=reserve_unit,
+            attempted_placement=single_model_reserve_placement(
+                reserve_unit=reserve_unit,
+                pose=target_pose,
+            ),
+            placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+        )
+    )
+
+    assert grants == ()
+
+
+def test_warp_rifts_requires_every_arriving_model_within_anchor_range() -> None:
+    state, _scenario, reserve_state, _reserve_unit = battle_state_with_reserve(
+        reserve_base_diameter_mm=_RESERVE_BASE_DIAMETER_MM,
+        reserve_model_count=2,
+    )
+    state.army_definitions = list(
+        _with_daemonic_incursion_units(
+            tuple(state.army_definitions),
+            reserve_god_keyword="Khorne",
+            anchor_god_keyword="Khorne",
+        )
+    )
+    updated_reserve_state = replace(reserve_state, reserve_kind=ReserveKind.DEEP_STRIKE)
+    state.replace_reserve_state(updated_reserve_state)
+    reserve_unit = _unit_by_id(state, _RESERVE_UNIT_ID)
+    near_pose = Pose.at(x=30.0, y=22.0, z=0.0, facing_degrees=0.0)
+    far_pose = Pose.at(x=42.0, y=22.0, z=0.0, facing_degrees=0.0)
+    _place_anchor_at_base_distance(
+        state=state,
+        target_pose=near_pose,
+        distance_inches=4.0,
+    )
+
+    grants = _runtime_reserve_arrival_registry(state).grants_for(
+        _reserve_arrival_distance_context(
+            state=state,
+            reserve_state=updated_reserve_state,
+            reserve_unit=reserve_unit,
+            attempted_placement=reserve_placement(
+                reserve_unit=reserve_unit,
+                poses=(near_pose, far_pose),
+            ),
+            placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+        )
+    )
+
+    assert grants == ()
+
+
+def test_warp_rifts_replay_payload_preserves_generic_rule_ir_source_context() -> None:
+    state, reserve_state, reserve_unit = _daemonic_incursion_reserve_state()
+    target_pose = Pose.at(x=16.0, y=4.25, z=0.0, facing_degrees=0.0)
+
+    grants = _runtime_reserve_arrival_registry(state).grants_for(
+        _reserve_arrival_distance_context(
+            state=state,
+            reserve_state=reserve_state,
+            reserve_unit=reserve_unit,
+            attempted_placement=single_model_reserve_placement(
+                reserve_unit=reserve_unit,
+                pose=target_pose,
+            ),
+            placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+        )
+    )
+
+    assert len(grants) == 1
+    payload = grants[0].replay_payload
+    assert isinstance(payload, dict)
+    assert payload["source_rule_id"] == rule.SOURCE_RULE_ID
+    assert payload["rule_ir_hash"] == _daemonic_incursion_execution_record().rule_ir_hash
+    assert payload["placement_kind"] == BattlefieldPlacementKind.DEEP_STRIKE.value
+    assert payload["base_enemy_horizontal_distance_inches"] == 9.0
+    assert payload["enemy_horizontal_distance_inches"] == 6.0
+    assert payload["shadow_of_chaos"] is True
+    assert payload["greater_daemon_anchor"] is False
+    assert payload["shared_god_keywords"] == ["KHORNE"]
+
+
 def _daemonic_incursion_reserve_state(
     *,
     reserve_god_keyword: str = "Khorne",
@@ -244,9 +434,7 @@ def _submit_reserve_arrival(
     _set_movement_ready_for_reinforcements(state, battle_round=battle_round)
     handler = MovementPhaseHandler(
         ruleset_descriptor=_ruleset(),
-        reserve_arrival_distance_hooks=ReserveArrivalDistanceHookRegistry.from_bindings(
-            rule.runtime_contribution().reserve_arrival_distance_hook_bindings
-        ),
+        reserve_arrival_distance_hooks=_runtime_reserve_arrival_registry(state),
     )
     decisions = DecisionController()
     selection_status = handler.begin_phase(state=state, decisions=decisions)
@@ -281,6 +469,63 @@ def _submit_reserve_arrival(
         status_kind=result_status.status_kind,
         payload=result_status.payload,
         decisions=decisions,
+    )
+
+
+def _runtime_reserve_arrival_registry(state: GameState) -> ReserveArrivalDistanceHookRegistry:
+    bundle = build_runtime_content_bundle_for_armies(
+        config=_daemonic_incursion_config(game_id=f"{state.game_id}:runtime-content"),
+        armies=tuple(state.army_definitions),
+    )
+    return bundle.reserve_arrival_distance_hook_registry
+
+
+def _reserve_arrival_distance_context(
+    *,
+    state: GameState,
+    reserve_state: ReserveState,
+    reserve_unit: UnitInstance,
+    attempted_placement: UnitPlacement,
+    placement_kind: BattlefieldPlacementKind,
+) -> ReserveArrivalDistanceContext:
+    if state.battlefield_state is None:
+        raise AssertionError("test context requires battlefield_state")
+    if state.mission_setup is None:
+        raise AssertionError("test context requires mission_setup")
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    return ReserveArrivalDistanceContext(
+        state=state,
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        reserve_state=reserve_state,
+        unit=reserve_unit,
+        attempted_placement=attempted_placement,
+        placement_kind=placement_kind,
+        battle_round=state.battle_round,
+        battlefield_width_inches=state.battlefield_state.battlefield_width_inches,
+        battlefield_depth_inches=state.battlefield_state.battlefield_depth_inches,
+        terrain_features=state.battlefield_state.terrain_features,
+        objective_markers=tuple(
+            marker.to_objective_marker() for marker in state.mission_setup.objective_markers
+        ),
+        enemy_deployment_zones=tuple(
+            zone
+            for zone in state.mission_setup.deployment_zones
+            if zone.player_id != reserve_state.player_id
+        ),
+        base_enemy_horizontal_distance_inches=9.0,
+    )
+
+
+def _daemonic_incursion_execution_record() -> faction_execution_2026_27.Phase17FExecutionRecord:
+    return next(
+        record
+        for record in faction_execution_2026_27.phase17f_execution_package().execution_records
+        if record.coverage_descriptor_id
+        == daemonic_incursion_ir.DAEMONIC_INCURSION_DETACHMENT_RULE_DESCRIPTOR_ID
     )
 
 
@@ -437,6 +682,19 @@ def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
             if unit.unit_instance_id == unit_instance_id:
                 return unit
     raise AssertionError(f"unit not found: {unit_instance_id}")
+
+
+def _rename_unit(state: GameState, *, unit_instance_id: str, name: str) -> None:
+    state.army_definitions = [
+        replace(
+            army,
+            units=tuple(
+                replace(unit, name=name) if unit.unit_instance_id == unit_instance_id else unit
+                for unit in army.units
+            ),
+        )
+        for army in state.army_definitions
+    ]
 
 
 def _with_base_size(model: ModelInstance, *, base_diameter_mm: float) -> ModelInstance:
