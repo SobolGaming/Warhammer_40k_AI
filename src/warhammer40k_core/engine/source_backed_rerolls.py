@@ -141,6 +141,7 @@ def source_backed_reroll_permission_context_for_unit(
         state=state,
         player_id=requested_player_id,
         unit_instance_id=requested_unit_id,
+        model_instance_id=requested_model_id,
         roll_type=requested_roll_type,
         timing_window=requested_timing_window,
         target_unit_instance_id=requested_target_unit_id,

@@ -21,6 +21,7 @@ UNIT_EFFECT_TARGET_KINDS = (
     RuleTargetKind.FRIENDLY_UNIT,
     RuleTargetKind.SELECTED_TARGET,
     RuleTargetKind.SELECTED_UNIT,
+    RuleTargetKind.THIS_MODEL,
     RuleTargetKind.THIS_UNIT,
 )
 TARGET_SCOPED_EFFECT_KINDS = (
@@ -84,7 +85,10 @@ def effect_clause_target_unavailable_reason(
         if target_keyword_reason is not None:
             return target_keyword_reason
         return None
-    if clause.target is not None and clause.target.kind is RuleTargetKind.THIS_UNIT:
+    if clause.target is not None and clause.target.kind in {
+        RuleTargetKind.THIS_MODEL,
+        RuleTargetKind.THIS_UNIT,
+    }:
         return "missing_input:source_unit_instance_id"
     return "missing_target:unit_instance_ids"
 
@@ -116,7 +120,7 @@ def target_binding_clause_unavailable_reason(
         if target_keyword_reason is not None:
             return target_keyword_reason
         return None
-    if clause.target.kind is RuleTargetKind.THIS_UNIT:
+    if clause.target.kind in {RuleTargetKind.THIS_MODEL, RuleTargetKind.THIS_UNIT}:
         return "missing_input:source_unit_instance_id"
     return "missing_target:unit_instance_ids"
 
@@ -202,7 +206,10 @@ def target_unit_instance_ids_for_clause(
     context: RuleTargetExecutionContext,
     target_unit_instance_ids: tuple[str, ...] | None,
 ) -> tuple[str, ...]:
-    if clause.target is not None and clause.target.kind is RuleTargetKind.THIS_UNIT:
+    if clause.target is not None and clause.target.kind in {
+        RuleTargetKind.THIS_MODEL,
+        RuleTargetKind.THIS_UNIT,
+    }:
         if context.source_unit_instance_id is None:
             return ()
         return (context.source_unit_instance_id,)

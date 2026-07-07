@@ -931,6 +931,66 @@ def test_phase17d_duration_effect_records_generic_persisting_effect() -> None:
     assert effect_payload["effect_kind"] == "generic_rule_execution"
 
 
+def test_phase17d_this_model_half_strength_hit_modifier_persists_source_model_conditions() -> None:
+    state = _battle_state_with_scenario()
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    source_model_id = _unit_by_id(state, source_unit_id).own_models[0].model_instance_id
+    compiled = _compiled(
+        "Until the end of the phase, each time this model makes an attack that targets "
+        "an enemy unit that is not below Half-strength, add 1 to the Hit roll."
+    )
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=state,
+            source_unit_instance_id=source_unit_id,
+            source_model_instance_id=source_model_id,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+    effect = result.created_persisting_effects[0]
+    effect_payload = _json_object(effect.effect_payload)
+    conditions = cast(list[JsonValue], effect_payload["conditions"])
+    target_constraint = _json_object(conditions[0])
+
+    assert result.status is RuleExecutionStatus.APPLIED
+    assert effect.target_unit_instance_ids == (source_unit_id,)
+    assert state.persisting_effects_for_unit(source_unit_id) == (effect,)
+    assert effect_payload["target_unit_instance_ids"] == [source_unit_id]
+    assert _json_object(effect_payload["context"])["source_model_instance_id"] == source_model_id
+    assert _json_object(effect_payload["target"])["kind"] == "this_model"
+    assert target_constraint["kind"] == "target_constraint"
+    assert target_constraint["parameters"] == [
+        {"key": "gate_subject", "value": "attack_target"},
+        {"key": "relationship", "value": "this_model_makes_attack"},
+        {"key": "target_allegiance", "value": "enemy"},
+        {"key": "target_constraint", "value": "target_not_below_half_strength"},
+    ]
+
+
+def test_phase17d_this_model_half_strength_hit_modifier_requires_source_model() -> None:
+    state = _battle_state_with_scenario()
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    compiled = _compiled(
+        "Until the end of the phase, each time this model makes an attack that targets "
+        "an enemy unit that is not below Half-strength, add 1 to the Hit roll."
+    )
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=state,
+            source_unit_instance_id=source_unit_id,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.status is RuleExecutionStatus.INVALID
+    assert result.reason == "missing_input:source_model_instance_id"
+    assert state.persisting_effects_for_unit(source_unit_id) == ()
+
+
 @pytest.mark.parametrize(
     ("raw_text", "expected_expiration_kind"),
     [

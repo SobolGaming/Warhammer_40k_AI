@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword, WeaponProfile
@@ -319,6 +321,75 @@ def test_ws14_generic_attack_hooks_observe_persisting_effect_expiry() -> None:
     assert registry.hit_roll_modifier(context) == 0
 
 
+def test_ws14_generic_this_model_half_strength_hit_modifier_gates_target() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender-unit")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    profile = _weapon_profile(catalog, attacker.own_models[0].wargear_ids[0])
+    registry = RuntimeModifierRegistry.empty()
+    source_model_id = attacker.own_models[0].model_instance_id
+
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:this-model-half-strength-hit-bonus",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(attacker.unit_instance_id,),
+            target_kind="this_model",
+            effect_kind="modify_dice_roll",
+            parameters={"roll_type": "hit", "delta": 1},
+            conditions=(
+                {
+                    "kind": "target_constraint",
+                    "parameters": [
+                        {"key": "gate_subject", "value": "attack_target"},
+                        {"key": "relationship", "value": "this_model_makes_attack"},
+                        {"key": "target_allegiance", "value": "enemy"},
+                        {
+                            "key": "target_constraint",
+                            "value": "target_not_below_half_strength",
+                        },
+                    ],
+                },
+            ),
+            source_model_instance_id=source_model_id,
+        )
+    )
+    context = HitRollModifierContext(
+        state=state,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attacker_model_instance_id=source_model_id,
+        target_unit_instance_id=defender.unit_instance_id,
+        weapon_profile=profile,
+        source_phase=BattlePhase.SHOOTING,
+    )
+
+    assert registry.hit_roll_modifier(context) == 1
+    assert (
+        registry.hit_roll_modifier(
+            replace(
+                context,
+                attacker_model_instance_id=defender.own_models[0].model_instance_id,
+            )
+        )
+        == 0
+    )
+    assert (
+        registry.hit_roll_modifier(
+            replace(context, target_unit_instance_id=attacker.unit_instance_id)
+        )
+        == 0
+    )
+
+    below_half_wounds = _below_half_wounds(defender.own_models[0].starting_wounds)
+    _replace_unit(state, _unit_with_model_wounds(defender, wounds_remaining=below_half_wounds))
+
+    assert registry.hit_roll_modifier(context) == 0
+
+
 def _unit(*, catalog: ArmyCatalog, army_id: str, unit_selection_id: str) -> UnitInstance:
     datasheet = catalog.datasheet_by_id("core-character-leader")
     profile = datasheet.model_profiles[0]
@@ -404,6 +475,8 @@ def _generic_effect(
     target_kind: str,
     effect_kind: str,
     parameters: dict[str, JsonValue],
+    conditions: tuple[dict[str, JsonValue], ...] = (),
+    source_model_instance_id: str | None = None,
 ) -> PersistingEffect:
     parameter_payloads: list[dict[str, JsonValue]] = [
         {"key": key, "value": value} for key, value in sorted(parameters.items())
@@ -435,6 +508,7 @@ def _generic_effect(
                 },
                 "target_unit_instance_ids": list(target_unit_instance_ids),
                 "duration": None,
+                "conditions": list(conditions),
                 "effect": {
                     "kind": effect_kind,
                     "source_span": {"start": 0, "end": 1, "text": "x"},
@@ -444,7 +518,41 @@ def _generic_effect(
                     "state": None,
                     "player_id": owner_player_id,
                     "phase": BattlePhase.SHOOTING.value,
+                    "source_model_instance_id": source_model_instance_id,
                 },
             }
         ),
     )
+
+
+def _unit_with_model_wounds(unit: UnitInstance, *, wounds_remaining: int) -> UnitInstance:
+    return replace(
+        unit,
+        own_models=(
+            replace(unit.own_models[0], wounds_remaining=wounds_remaining),
+            *unit.own_models[1:],
+        ),
+    )
+
+
+def _below_half_wounds(starting_wounds: int) -> int:
+    if starting_wounds <= 2:
+        return 0
+    return max(1, (starting_wounds - 1) // 2)
+
+
+def _replace_unit(state: GameState, replacement: UnitInstance) -> None:
+    updated_armies: list[ArmyDefinition] = []
+    did_update = False
+    for army in state.army_definitions:
+        updated_units: list[UnitInstance] = []
+        for unit in army.units:
+            if unit.unit_instance_id == replacement.unit_instance_id:
+                updated_units.append(replacement)
+                did_update = True
+            else:
+                updated_units.append(unit)
+        updated_armies.append(replace(army, units=tuple(updated_units)))
+    if not did_update:
+        raise AssertionError(f"Unknown unit id: {replacement.unit_instance_id}")
+    state.army_definitions = updated_armies
