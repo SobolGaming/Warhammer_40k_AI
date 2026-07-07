@@ -184,10 +184,10 @@ Current status:
   Veil, and Nomads of the Hidden Way through the shared Shooting, Stratagem,
   Battle-shock, Hidden/detection, and triggered-movement paths. Aeldari
   Corsair Coterie supports Veterans of the Void, Relentless Raiders, Void
-  Thieves, Infamy, Webway Pathstone, Archraider, Voidstone, and all six named
-  Stratagems through shared mustering, objective-control, movement/charge-
+  Thieves, Infamy, Webway Pathstone, Archraider, Voidstone, and all six Corsair
+  Coterie Stratagems through shared mustering, objective-control, movement/charge-
   completion, reserves, setup, turn-end, Stratagem-cost, attack-reroll,
-  triggered-movement, targeting-restriction, and runtime-modifier paths. Space
+  triggered-movement, targeting-restriction, and generic RuleIR runtime paths. Space
   Marines Oath of Moment supports Command phase target selection, target-scoped
   Hit-roll rerolls, the Codex Space Marines Detachment Wound-roll bonus gate,
   and Black Templars, Space Wolves, and Deathwatch Chapter mustering

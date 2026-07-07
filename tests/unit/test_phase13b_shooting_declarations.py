@@ -9628,6 +9628,18 @@ def test_phase13c_damage_mortal_wounds_and_feel_no_pain_hosts_round_trip() -> No
     )
     assert no_spill_application.remaining_mortal_wounds_lost == 1
 
+    overkill_lifecycle, overkill_units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    overkill_state = _state(overkill_lifecycle)
+    overkill_defender = overkill_units["enemy"]
+    overkill_application = apply_mortal_wounds_to_unit(
+        state=overkill_state,
+        target_unit_instance_id=overkill_defender.unit_instance_id,
+        mortal_wounds=99,
+        spill_over=True,
+    )
+    assert overkill_application.applications
+    assert overkill_application.remaining_mortal_wounds_lost > 0
+
     source_a = FeelNoPainSource(source_id="feel-no-pain-a", threshold=5)
     source_b = FeelNoPainSource(source_id="feel-no-pain-b", threshold=6)
     source_c = FeelNoPainSource(

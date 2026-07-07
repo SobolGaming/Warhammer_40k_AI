@@ -2226,8 +2226,7 @@ def continue_mortal_wound_application(
         model_id = legal_model_ids[0]
         sources = _state_feel_no_pain_sources(state=state, model_instance_id=model_id)
         decline_allowed = _state_feel_no_pain_decline_allowed(
-            state=state,
-            model_instance_id=model_id,
+            state=state, model_instance_id=model_id
         )
         if len(sources) > 1 or (sources and decline_allowed):
             request = build_feel_no_pain_request(
@@ -2429,12 +2428,13 @@ def apply_mortal_wounds_to_unit(
     feel_no_pain_resolutions: list[FeelNoPainResolution] = []
     ignored_mortal_wounds = 0
     remaining_lost = 0
+    target_unit_id = target_unit_instance_id
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
     while remaining > 0:
-        context = allocation_context_for_unit(
-            state=state,
-            target_unit_instance_id=target_unit_instance_id,
-            already_allocated_model_ids=(),
-        )
+        if not alive_placed_models_for_rules_unit(state=state, rules_unit=rules_unit):
+            remaining_lost = remaining
+            break
+        context = allocation_context_for_unit(state=state, target_unit_instance_id=target_unit_id)
         legal_model_ids = context.legal_model_ids()
         if not legal_model_ids:
             remaining_lost = remaining

@@ -22,7 +22,6 @@ from warhammer40k_core.engine.faction_content.common import (
     canonical_keyword as _canonical_keyword,
 )
 from warhammer40k_core.engine.faction_content.stratagem_handlers import (
-    StratagemHandlerBinding,
     StratagemHandlerContext,
     StratagemHandlerExecutionResult,
 )
@@ -30,6 +29,7 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.ranged_rule_effects import detection_range_bonus_payload
 from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWindowKind
 from warhammer40k_core.engine.stratagems import (
+    GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     HIT_ENEMY_UNIT_CONTEXT_KEY,
     HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
     JUST_SHOT_UNIT_CONTEXT_KEY,
@@ -53,6 +53,9 @@ from warhammer40k_core.engine.triggered_movement import (
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
+)
 
 from .rule import (
     AELDARI_FACTION_ID,
@@ -89,23 +92,6 @@ def runtime_contribution() -> RuntimeContentContribution:
             _eldritch_suppression_record(),
             _casting_back_the_veil_record(),
             _nomads_of_the_hidden_way_record(),
-        ),
-        stratagem_handler_bindings=(
-            StratagemHandlerBinding(
-                handler_id=ELDRITCH_SUPPRESSION_HANDLER_ID,
-                handler=apply_eldritch_suppression,
-                validator=validate_eldritch_suppression,
-            ),
-            StratagemHandlerBinding(
-                handler_id=CASTING_BACK_THE_VEIL_HANDLER_ID,
-                handler=apply_casting_back_the_veil,
-                validator=validate_casting_back_the_veil,
-            ),
-            StratagemHandlerBinding(
-                handler_id=NOMADS_OF_THE_HIDDEN_WAY_HANDLER_ID,
-                handler=apply_nomads_of_the_hidden_way,
-                validator=validate_nomads_of_the_hidden_way,
-            ),
         ),
     )
 
@@ -374,8 +360,11 @@ def _eldritch_suppression_record() -> StratagemCatalogRecord:
             "Battle-shock roll, with -1 if a model in that enemy unit was destroyed by those "
             "attacks."
         ),
-        handler_id=ELDRITCH_SUPPRESSION_HANDLER_ID,
-        effect_payload={"effect_selection_kind": HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND},
+        effect_payload={
+            **_generic_rule_ir_payload(path_outcast_ir.ELDRITCH_SUPPRESSION_DESCRIPTOR_ID),
+            "effect_selection_kind": HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+            "effect_selection_unit_forbidden_if_battle_shocked": HIT_ENEMY_UNIT_CONTEXT_KEY,
+        },
     )
 
 
@@ -389,8 +378,10 @@ def _casting_back_the_veil_record() -> StratagemCatalogRecord:
             'Select one enemy unit hit by those ranged attacks. That enemy unit has +6" '
             "detection range."
         ),
-        handler_id=CASTING_BACK_THE_VEIL_HANDLER_ID,
-        effect_payload={"effect_selection_kind": HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND},
+        effect_payload={
+            **_generic_rule_ir_payload(path_outcast_ir.CASTING_BACK_THE_VEIL_DESCRIPTOR_ID),
+            "effect_selection_kind": HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+        },
     )
 
 
@@ -404,8 +395,9 @@ def _nomads_of_the_hidden_way_record() -> StratagemCatalogRecord:
             'Your unit can make a Normal move of up to D6". Until the end of the turn, '
             "your unit is not eligible to declare a charge or embark within a TRANSPORT."
         ),
-        handler_id=NOMADS_OF_THE_HIDDEN_WAY_HANDLER_ID,
-        effect_payload={"effect_kind": "nomads_of_the_hidden_way"},
+        effect_payload=_generic_rule_ir_payload(
+            path_outcast_ir.NOMADS_OF_THE_HIDDEN_WAY_DESCRIPTOR_ID,
+        ),
     )
 
 
@@ -416,7 +408,6 @@ def _post_shot_record(
     name: str,
     category: StratagemCategory,
     effect_descriptor: str,
-    handler_id: str,
     effect_payload: JsonValue,
 ) -> StratagemCatalogRecord:
     return StratagemCatalogRecord(
@@ -444,7 +435,7 @@ def _post_shot_record(
                 target_policy_id=JUST_SHOT_UNIT_TARGET_POLICY_ID,
                 required_keywords_any=(RANGERS, SHROUD_RUNNERS),
             ),
-            handler_id=handler_id,
+            handler_id=GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
             effect_payload=effect_payload,
         ),
         availability_kind=StratagemAvailabilityKind.DETACHMENT,
@@ -466,7 +457,10 @@ def _validate_path_stratagem(
             handler_id=handler_id,
             reason="wrong_stratagem",
         )
-    if context.definition.handler_id != handler_id:
+    if (
+        context.definition.handler_id != handler_id
+        and context.definition.handler_id != GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
+    ):
         return StratagemHandlerExecutionResult.invalid(
             handler_id=handler_id,
             reason="wrong_handler",
@@ -516,6 +510,13 @@ def _validate_path_stratagem(
                 reason="target_already_battle_shocked",
             )
     return StratagemHandlerExecutionResult.applied(handler_id=handler_id)
+
+
+def _generic_rule_ir_payload(coverage_descriptor_id: str) -> dict[str, JsonValue]:
+    payload = path_outcast_ir.coverage_rule_ir_payload_by_descriptor_id(coverage_descriptor_id)
+    if payload is None:
+        raise GameLifecycleError("Path of the Outcast Stratagem RuleIR descriptor is unknown.")
+    return {"rule_ir": validate_json_value(payload)}
 
 
 def _eldritch_suppression_modifiers(

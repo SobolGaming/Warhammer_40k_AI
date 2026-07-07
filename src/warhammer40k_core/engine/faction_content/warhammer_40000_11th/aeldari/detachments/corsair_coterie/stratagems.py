@@ -31,7 +31,6 @@ from warhammer40k_core.engine.faction_content.common import (
     canonical_keyword as _canonical_keyword,
 )
 from warhammer40k_core.engine.faction_content.stratagem_handlers import (
-    StratagemHandlerBinding,
     StratagemHandlerContext,
     StratagemHandlerExecutionResult,
 )
@@ -48,20 +47,24 @@ from warhammer40k_core.engine.reaction_windows import ReactionWindow, ReactionWi
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
-    WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_effect_payload,
 )
 from warhammer40k_core.engine.stratagems import (
+    DESTROYED_ENEMY_UNIT_CONTEXT_KEY,
+    DESTROYED_TARGET_UNIT_CONTEXT_KEY,
     ENGAGED_ENEMY_UNIT_CONTEXT_KEY,
     ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
     ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY,
+    GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     JUST_FELL_BACK_UNIT_CONTEXT_KEY,
     JUST_FELL_BACK_UNIT_TARGET_POLICY_ID,
     JUST_SHOT_UNIT_CONTEXT_KEY,
     JUST_SHOT_UNIT_TARGET_POLICY_ID,
+    NOT_SELECTED_TO_FIGHT_TARGET_POLICY_ID,
+    NOT_SELECTED_TO_SHOOT_TARGET_POLICY_ID,
     SELECTED_TARGET_CONTROLLED_OBJECTIVE_INFANTRY_TARGET_POLICY_ID,
     StratagemAvailabilityKind,
     StratagemCatalogRecord,
@@ -74,11 +77,6 @@ from warhammer40k_core.engine.stratagems import (
     destroyed_enemy_unit_ids_from_context,
     destroyed_target_unit_ids_from_context,
 )
-from warhammer40k_core.engine.target_restriction_hooks import (
-    ShootingTargetRestrictionContext,
-    ShootingTargetRestrictionHookBinding,
-    TargetRestriction,
-)
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptor,
@@ -87,7 +85,9 @@ from warhammer40k_core.engine.triggered_movement import (
     triggered_movement_unit_selection_request,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
-from warhammer40k_core.geometry.volume import Model as GeometryModel
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_aeldari_corsair_coterie_ir_support_2026_27 as corsair_coterie_ir,
+)
 
 from .rule import ANHRATHE, CORSAIR_COTERIE_DETACHMENT_ID
 
@@ -133,9 +133,6 @@ OUTCAST_AMBUSH_EFFECT_KIND = "aeldari_corsair_coterie_outcast_ambush"
 CLOAK_AND_SHADOW_EFFECT_KIND = "aeldari_corsair_coterie_cloak_and_shadow"
 
 OUTCAST_AMBUSH_WEAPON_PROFILE_MODIFIER_ID = f"{SOURCE_RULE_ID}:outcast-ambush:weapon-profile"
-CLOAK_AND_SHADOW_TARGET_RESTRICTION_HOOK_ID = (
-    f"{SOURCE_RULE_ID}:cloak-and-shadow:target-restriction"
-)
 CLOAK_AND_SHADOW_MAX_RANGE_INCHES = 18.0
 
 
@@ -149,52 +146,6 @@ def runtime_contribution() -> RuntimeContentContribution:
             _into_the_breach_record(),
             _cloak_and_shadow_record(),
             _vengeful_sorrow_record(),
-        ),
-        stratagem_handler_bindings=(
-            StratagemHandlerBinding(
-                handler_id=PIRATES_DUE_HANDLER_ID,
-                handler=apply_pirates_due,
-                validator=validate_pirates_due,
-            ),
-            StratagemHandlerBinding(
-                handler_id=LETHAL_RUSE_HANDLER_ID,
-                handler=apply_lethal_ruse,
-                validator=validate_lethal_ruse,
-            ),
-            StratagemHandlerBinding(
-                handler_id=OUTCAST_AMBUSH_HANDLER_ID,
-                handler=apply_outcast_ambush,
-                validator=validate_outcast_ambush,
-            ),
-            StratagemHandlerBinding(
-                handler_id=INTO_THE_BREACH_HANDLER_ID,
-                handler=apply_into_the_breach,
-                validator=validate_into_the_breach,
-            ),
-            StratagemHandlerBinding(
-                handler_id=CLOAK_AND_SHADOW_HANDLER_ID,
-                handler=apply_cloak_and_shadow,
-                validator=validate_cloak_and_shadow,
-            ),
-            StratagemHandlerBinding(
-                handler_id=VENGEFUL_SORROW_HANDLER_ID,
-                handler=apply_vengeful_sorrow,
-                validator=validate_vengeful_sorrow,
-            ),
-        ),
-        weapon_profile_modifier_bindings=(
-            WeaponProfileModifierBinding(
-                modifier_id=OUTCAST_AMBUSH_WEAPON_PROFILE_MODIFIER_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=outcast_ambush_weapon_profile_modifier,
-            ),
-        ),
-        shooting_target_restriction_hook_bindings=(
-            ShootingTargetRestrictionHookBinding(
-                hook_id=CLOAK_AND_SHADOW_TARGET_RESTRICTION_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=cloak_and_shadow_target_restriction,
-            ),
         ),
     )
 
@@ -651,39 +602,6 @@ def outcast_ambush_weapon_profile_modifier(
     )
 
 
-def cloak_and_shadow_target_restriction(
-    context: ShootingTargetRestrictionContext,
-) -> TargetRestriction | None:
-    if type(context) is not ShootingTargetRestrictionContext:
-        raise GameLifecycleError("Cloak and Shadow requires a shooting target context.")
-    effect = _cloak_and_shadow_effect(context)
-    if effect is None:
-        return None
-    attacker_model_id = context.attacker_model_instance_id
-    if attacker_model_id is None:
-        raise GameLifecycleError("Cloak and Shadow target restriction requires attacker model.")
-    if _attacker_model_within_target_range(
-        context,
-        attacker_model_instance_id=attacker_model_id,
-        target_unit_instance_id=context.target_unit_instance_id,
-        max_range_inches=CLOAK_AND_SHADOW_MAX_RANGE_INCHES,
-    ):
-        return None
-    return TargetRestriction(
-        hook_id=CLOAK_AND_SHADOW_TARGET_RESTRICTION_HOOK_ID,
-        source_id=SOURCE_RULE_ID,
-        violation_code="cloak_and_shadow_range",
-        message='Cloak and Shadow only permits attacks from models within 18".',
-        replay_payload={
-            "effect_kind": CLOAK_AND_SHADOW_EFFECT_KIND,
-            "persisting_effect_id": effect.effect_id,
-            "attacker_model_instance_id": attacker_model_id,
-            "target_unit_instance_id": context.target_unit_instance_id,
-            "max_range_inches": CLOAK_AND_SHADOW_MAX_RANGE_INCHES,
-        },
-    )
-
-
 def _pirates_due_record() -> StratagemCatalogRecord:
     return _stratagem_record(
         record_id=PIRATES_DUE_RECORD_ID,
@@ -703,9 +621,12 @@ def _pirates_due_record() -> StratagemCatalogRecord:
         target_spec=StratagemTargetSpec(
             target_kind=StratagemTargetKind.FRIENDLY_UNIT,
             enumerable=True,
+            target_policy_id=NOT_SELECTED_TO_FIGHT_TARGET_POLICY_ID,
             required_faction_keywords=(AELDARI,),
         ),
-        handler_id=PIRATES_DUE_HANDLER_ID,
+        effect_payload=_generic_rule_ir_payload(
+            corsair_coterie_ir.PIRATES_DUE_DESCRIPTOR_ID,
+        ),
     )
 
 
@@ -735,8 +656,8 @@ def _lethal_ruse_record() -> StratagemCatalogRecord:
             target_policy_id=JUST_FELL_BACK_UNIT_TARGET_POLICY_ID,
             required_faction_keywords=(AELDARI,),
         ),
-        handler_id=LETHAL_RUSE_HANDLER_ID,
         effect_payload={
+            **_generic_rule_ir_payload(corsair_coterie_ir.LETHAL_RUSE_DESCRIPTOR_ID),
             "effect_selection_kind": ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
             "effect_selection_required_target_keywords": [ANHRATHE],
         },
@@ -762,10 +683,13 @@ def _outcast_ambush_record() -> StratagemCatalogRecord:
         target_spec=StratagemTargetSpec(
             target_kind=StratagemTargetKind.FRIENDLY_UNIT,
             enumerable=True,
+            target_policy_id=NOT_SELECTED_TO_SHOOT_TARGET_POLICY_ID,
             required_keywords_any=(RANGERS, SHROUD_RUNNERS),
             required_faction_keywords=(AELDARI,),
         ),
-        handler_id=OUTCAST_AMBUSH_HANDLER_ID,
+        effect_payload=_generic_rule_ir_payload(
+            corsair_coterie_ir.OUTCAST_AMBUSH_DESCRIPTOR_ID,
+        ),
     )
 
 
@@ -795,7 +719,10 @@ def _into_the_breach_record() -> StratagemCatalogRecord:
             required_keywords=(ANHRATHE,),
             required_faction_keywords=(AELDARI,),
         ),
-        handler_id=INTO_THE_BREACH_HANDLER_ID,
+        effect_payload={
+            **_generic_rule_ir_payload(corsair_coterie_ir.INTO_THE_BREACH_DESCRIPTOR_ID),
+            "required_non_empty_trigger_context_keys": [DESTROYED_ENEMY_UNIT_CONTEXT_KEY],
+        },
     )
 
 
@@ -827,7 +754,9 @@ def _cloak_and_shadow_record() -> StratagemCatalogRecord:
             required_keywords=(INFANTRY,),
             required_faction_keywords=(AELDARI,),
         ),
-        handler_id=CLOAK_AND_SHADOW_HANDLER_ID,
+        effect_payload=_generic_rule_ir_payload(
+            corsair_coterie_ir.CLOAK_AND_SHADOW_DESCRIPTOR_ID,
+        ),
     )
 
 
@@ -853,7 +782,12 @@ def _vengeful_sorrow_record() -> StratagemCatalogRecord:
             required_keywords=(INFANTRY,),
             required_faction_keywords=(AELDARI,),
         ),
-        handler_id=VENGEFUL_SORROW_HANDLER_ID,
+        effect_payload={
+            **_generic_rule_ir_payload(corsair_coterie_ir.VENGEFUL_SORROW_DESCRIPTOR_ID),
+            "required_non_empty_trigger_context_keys": [DESTROYED_TARGET_UNIT_CONTEXT_KEY],
+            "target_forbidden_if_battle_shocked": True,
+            "target_forbidden_if_within_engagement_range": True,
+        },
     )
 
 
@@ -868,7 +802,6 @@ def _stratagem_record(
     effect_descriptor: str,
     timing: StratagemTimingDescriptor,
     target_spec: StratagemTargetSpec,
-    handler_id: str,
     effect_payload: JsonValue = None,
 ) -> StratagemCatalogRecord:
     return StratagemCatalogRecord(
@@ -886,7 +819,7 @@ def _stratagem_record(
             timing=timing,
             restriction_policy=StratagemRestrictionPolicy(),
             target_spec=target_spec,
-            handler_id=handler_id,
+            handler_id=GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
             effect_payload=effect_payload,
         ),
         availability_kind=StratagemAvailabilityKind.DETACHMENT,
@@ -910,7 +843,10 @@ def _validate_corsair_stratagem(
             handler_id=handler_id,
             reason="wrong_stratagem",
         )
-    if context.definition.handler_id != handler_id:
+    if (
+        context.definition.handler_id != handler_id
+        and context.definition.handler_id != GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
+    ):
         return StratagemHandlerExecutionResult.invalid(
             handler_id=handler_id,
             reason="wrong_handler",
@@ -940,6 +876,13 @@ def _validate_corsair_stratagem(
             reason="target_not_aeldari",
         )
     return StratagemHandlerExecutionResult.applied(handler_id=handler_id)
+
+
+def _generic_rule_ir_payload(coverage_descriptor_id: str) -> dict[str, JsonValue]:
+    payload = corsair_coterie_ir.coverage_rule_ir_payload_by_descriptor_id(coverage_descriptor_id)
+    if payload is None:
+        raise GameLifecycleError("Corsair Coterie Stratagem RuleIR descriptor is unknown.")
+    return {"rule_ir": validate_json_value(payload)}
 
 
 def _apply_lethal_ruse_mortal_wounds(context: StratagemHandlerContext) -> JsonValue:
@@ -1097,51 +1040,6 @@ def _ability_integer_value(ability: AbilityDescriptor) -> int:
     if type(parameter.value) is not int:
         raise GameLifecycleError("Rapid Fire ability value must be an integer.")
     return parameter.value
-
-
-def _cloak_and_shadow_effect(
-    context: ShootingTargetRestrictionContext,
-) -> PersistingEffect | None:
-    for effect in context.state.persisting_effects_for_unit(context.target_unit_instance_id):
-        payload = effect.effect_payload
-        if not isinstance(payload, dict):
-            continue
-        if (
-            payload.get("effect_kind") == SMOKESCREEN_EFFECT_KIND
-            and payload.get("source_effect_kind") == CLOAK_AND_SHADOW_EFFECT_KIND
-        ):
-            return effect
-    return None
-
-
-def _attacker_model_within_target_range(
-    context: ShootingTargetRestrictionContext,
-    *,
-    attacker_model_instance_id: str,
-    target_unit_instance_id: str,
-    max_range_inches: float,
-) -> bool:
-    battlefield = context.state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Cloak and Shadow requires battlefield state.")
-    attacker_model = _geometry_model_by_model_id(
-        context.state,
-        model_instance_id=attacker_model_instance_id,
-    )
-    try:
-        target_placement = battlefield.unit_placement_by_id(target_unit_instance_id)
-    except PlacementError as exc:
-        raise GameLifecycleError("Cloak and Shadow target unit is not placed.") from exc
-    target_models = tuple(
-        geometry_model_for_placement(
-            model=_model_instance_by_id(context.state, placement.model_instance_id),
-            placement=placement,
-        )
-        for placement in target_placement.model_placements
-    )
-    return any(
-        attacker_model.range_to(target_model) <= max_range_inches for target_model in target_models
-    )
 
 
 def _unit_within_controlled_objective_range(
@@ -1420,27 +1318,6 @@ def _model_instance_by_id(state: object, model_instance_id: str) -> ModelInstanc
                 if model.model_instance_id == requested_model_id:
                     return model
     raise GameLifecycleError("Corsair Coterie model is unknown.")
-
-
-def _geometry_model_by_model_id(state: object, *, model_instance_id: str) -> GeometryModel:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Corsair Coterie geometry lookup requires GameState.")
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Corsair Coterie geometry lookup requires battlefield state.")
-    requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
-    for placed_army in battlefield.placed_armies:
-        for unit_placement in placed_army.unit_placements:
-            for placement in unit_placement.model_placements:
-                if placement.model_instance_id != requested_model_id:
-                    continue
-                return geometry_model_for_placement(
-                    model=_model_instance_by_id(state, requested_model_id),
-                    placement=placement,
-                )
-    raise GameLifecycleError("Corsair Coterie model is not placed.")
 
 
 def _armies_for_state(state: object) -> tuple[ArmyDefinition, ...]:

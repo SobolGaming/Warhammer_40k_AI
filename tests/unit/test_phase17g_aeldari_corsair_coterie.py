@@ -112,6 +112,12 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
+from warhammer40k_core.engine.generic_target_restriction_effects import (
+    GENERIC_PERSISTED_SHOOTING_TARGET_RANGE_RESTRICTION_HOOK_ID,
+    GENERIC_PERSISTED_SHOOTING_TARGET_RANGE_RESTRICTION_SOURCE_ID,
+    GENERIC_PERSISTED_SHOOTING_TARGET_RANGE_RESTRICTION_VIOLATION_CODE,
+    generic_persisted_shooting_target_range_restriction,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -166,6 +172,7 @@ from warhammer40k_core.engine.stratagems import (
     ENGAGED_ENEMY_UNIT_CONTEXT_KEY,
     ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
     ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY,
+    GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     HIT_TARGET_UNIT_CONTEXT_KEY,
     JUST_FELL_BACK_UNIT_CONTEXT_KEY,
     JUST_SHOT_UNIT_CONTEXT_KEY,
@@ -283,22 +290,17 @@ def test_corsair_coterie_runtime_contribution_registers_rule_and_enhancement_hoo
         stratagems.CLOAK_AND_SHADOW_STRATAGEM_ID,
         stratagems.VENGEFUL_SORROW_STRATAGEM_ID,
     }
-    assert {binding.handler_id for binding in contribution.stratagem_handler_bindings} == {
-        stratagems.PIRATES_DUE_HANDLER_ID,
-        stratagems.LETHAL_RUSE_HANDLER_ID,
-        stratagems.OUTCAST_AMBUSH_HANDLER_ID,
-        stratagems.INTO_THE_BREACH_HANDLER_ID,
-        stratagems.CLOAK_AND_SHADOW_HANDLER_ID,
-        stratagems.VENGEFUL_SORROW_HANDLER_ID,
+    assert {record.definition.handler_id for record in contribution.stratagem_records} == {
+        GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     }
-    assert {binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings} == {
-        stratagems.OUTCAST_AMBUSH_WEAPON_PROFILE_MODIFIER_ID,
-    }
-    assert {
-        binding.hook_id for binding in contribution.shooting_target_restriction_hook_bindings
-    } == {
-        stratagems.CLOAK_AND_SHADOW_TARGET_RESTRICTION_HOOK_ID,
-    }
+    assert all(
+        isinstance(record.definition.effect_payload, dict)
+        and isinstance(record.definition.effect_payload.get("rule_ir"), dict)
+        for record in contribution.stratagem_records
+    )
+    assert contribution.stratagem_handler_bindings == ()
+    assert contribution.weapon_profile_modifier_bindings == ()
+    assert contribution.shooting_target_restriction_hook_bindings == ()
 
 
 def test_corsair_coterie_runtime_bundle_exposes_new_hook_registries_and_summary() -> None:
@@ -357,6 +359,10 @@ def test_corsair_coterie_runtime_bundle_exposes_new_hook_registries_and_summary(
         binding.modifier_id
         for binding in bundle.runtime_modifier_registry.all_save_option_bindings()
     } == {enhancements.VOIDSTONE_SAVE_MODIFIER_ID}
+    assert {
+        binding.hook_id
+        for binding in bundle.shooting_target_restriction_hook_registry.all_bindings()
+    } == {GENERIC_PERSISTED_SHOOTING_TARGET_RANGE_RESTRICTION_HOOK_ID}
     assert summary["enhancement_effect_binding_ids"] == [
         enhancements.ARCHRAIDER_EFFECT_ID,
         enhancements.INFAMY_EFFECT_ID,
@@ -375,6 +381,9 @@ def test_corsair_coterie_runtime_bundle_exposes_new_hook_registries_and_summary(
         enhancements.INFAMY_OBJECTIVE_CONTROL_MODIFIER_ID
     ]
     assert summary["save_option_modifier_ids"] == [enhancements.VOIDSTONE_SAVE_MODIFIER_ID]
+    assert summary["shooting_target_restriction_hook_ids"] == [
+        GENERIC_PERSISTED_SHOOTING_TARGET_RANGE_RESTRICTION_HOOK_ID
+    ]
     assert summary["bundle_summary_hash"]
 
 
@@ -714,7 +723,9 @@ def test_cloak_and_shadow_records_stealth_effect_and_blocks_distant_attacking_mo
     )
     assert effect_payload["effect_kind"] == SMOKESCREEN_EFFECT_KIND
     assert effect_payload["source_effect_kind"] == stratagems.CLOAK_AND_SHADOW_EFFECT_KIND
-    restriction = stratagems.cloak_and_shadow_target_restriction(
+    restrictions = _corsair_runtime_bundle_for_state(
+        state
+    ).shooting_target_restriction_hook_registry.restrictions_for(
         ShootingTargetRestrictionContext(
             state=state,
             player_id="player-b",
@@ -724,8 +735,16 @@ def test_cloak_and_shadow_records_stealth_effect_and_blocks_distant_attacking_mo
             target_unit_instance_id=_CORSAIR_UNIT_ID,
         )
     )
-    assert restriction is not None
-    assert restriction.violation_code == "cloak_and_shadow_range"
+    assert len(restrictions) == 1
+    restriction = restrictions[0]
+    assert restriction.hook_id == GENERIC_PERSISTED_SHOOTING_TARGET_RANGE_RESTRICTION_HOOK_ID
+    assert restriction.source_id == GENERIC_PERSISTED_SHOOTING_TARGET_RANGE_RESTRICTION_SOURCE_ID
+    assert restriction.violation_code == (
+        GENERIC_PERSISTED_SHOOTING_TARGET_RANGE_RESTRICTION_VIOLATION_CODE
+    )
+    restriction_payload = _json_object(restriction.replay_payload)
+    assert restriction_payload["source_effect_kind"] == stratagems.CLOAK_AND_SHADOW_EFFECT_KIND
+    assert restriction_payload["max_range_inches"] == stratagems.CLOAK_AND_SHADOW_MAX_RANGE_INCHES
 
 
 def test_vengeful_sorrow_uses_destroyed_model_context_and_requests_surge_move() -> None:
@@ -1151,16 +1170,18 @@ def test_lethal_ruse_request_option_carries_engaged_enemy_effect_selection() -> 
 
     assert use_record.effect_selection == effect_selection
     assert use_record.affected_unit_instance_ids == (_CORSAIR_UNIT_ID, _ENEMY_UNIT_ID)
-    assert any(
+    lethal_effects = tuple(
         effect.effect_payload
-        == {
-            "effect_kind": "charge_after_fall_back_allowed",
-            "source_effect_kind": stratagems.LETHAL_RUSE_EFFECT_KIND,
-            "stratagem_id": stratagems.LETHAL_RUSE_STRATAGEM_ID,
-            "stratagem_use_id": use_record.use_id,
-        }
         for effect in state.persisting_effects_for_unit(_CORSAIR_UNIT_ID)
+        if isinstance(effect.effect_payload, dict)
+        and effect.effect_payload.get("source_effect_kind") == stratagems.LETHAL_RUSE_EFFECT_KIND
     )
+    assert len(lethal_effects) == 1
+    lethal_effect = lethal_effects[0]
+    assert lethal_effect["effect_kind"] == "charge_after_fall_back_allowed"
+    assert lethal_effect["stratagem_id"] == stratagems.LETHAL_RUSE_STRATAGEM_ID
+    assert lethal_effect["stratagem_use_id"] == use_record.use_id
+    assert isinstance(lethal_effect["generic_rule_effect"], dict)
 
 
 def test_lethal_ruse_rejects_malformed_engaged_enemy_effect_selection_payloads() -> None:
@@ -1313,9 +1334,9 @@ def test_cloak_and_shadow_restriction_noops_when_close_or_unmodified_and_stays_s
         target_unit_instance_id=_CORSAIR_UNIT_ID,
     )
 
-    assert stratagems.cloak_and_shadow_target_restriction(base_restriction_context) is None
+    assert generic_persisted_shooting_target_range_restriction(base_restriction_context) is None
     with pytest.raises(GameLifecycleError, match="shooting target context"):
-        stratagems.cloak_and_shadow_target_restriction(
+        generic_persisted_shooting_target_range_restriction(
             cast(ShootingTargetRestrictionContext, object())
         )
 
@@ -1330,16 +1351,97 @@ def test_cloak_and_shadow_restriction_noops_when_close_or_unmodified_and_stays_s
         trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
     )
     assert stratagems.apply_cloak_and_shadow(apply_context).reason is None
-    assert stratagems.cloak_and_shadow_target_restriction(base_restriction_context) is None
+    assert generic_persisted_shooting_target_range_restriction(base_restriction_context) is None
 
     with pytest.raises(GameLifecycleError, match="requires attacker model"):
-        stratagems.cloak_and_shadow_target_restriction(
+        generic_persisted_shooting_target_range_restriction(
             replace(base_restriction_context, attacker_model_instance_id=None)
         )
 
     state.battlefield_state = None
     with pytest.raises(GameLifecycleError, match="requires battlefield state"):
-        stratagems.cloak_and_shadow_target_restriction(base_restriction_context)
+        generic_persisted_shooting_target_range_restriction(base_restriction_context)
+
+
+def test_generic_persisted_target_range_restriction_rejects_malformed_effect_payloads() -> None:
+    state, _corsair_army, _enemy_army = _corsair_state(
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-b",
+        corsair_x=30.0,
+        enemy_x=55.0,
+    )
+    apply_context = _corsair_stratagem_handler_context(
+        state=state,
+        player_id="player-a",
+        stratagem_id=stratagems.CLOAK_AND_SHADOW_STRATAGEM_ID,
+        handler_id=stratagems.CLOAK_AND_SHADOW_HANDLER_ID,
+        target_unit_id=_CORSAIR_UNIT_ID,
+        phase=BattlePhase.SHOOTING,
+        trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
+        trigger_payload={SELECTED_TARGET_UNIT_CONTEXT_KEY: [_CORSAIR_UNIT_ID]},
+    )
+    assert stratagems.apply_cloak_and_shadow(apply_context).reason is None
+    restriction_context = ShootingTargetRestrictionContext(
+        state=state,
+        player_id="player-b",
+        battle_round=state.battle_round,
+        attacking_unit_instance_id=_ENEMY_UNIT_ID,
+        attacker_model_instance_id=f"{_ENEMY_UNIT_ID}:model-001",
+        target_unit_instance_id=_CORSAIR_UNIT_ID,
+    )
+
+    _replace_first_persisting_effect_payload(state, "not-an-object")
+    assert generic_persisted_shooting_target_range_restriction(restriction_context) is None
+
+    _replace_first_persisting_effect_payload(
+        state,
+        {"effect_kind": "other-effect", "targeting_max_range_inches": 18.0},
+    )
+    with pytest.raises(GameLifecycleError, match="requires smokescreen effect_kind"):
+        generic_persisted_shooting_target_range_restriction(restriction_context)
+
+    _replace_first_persisting_effect_payload(
+        state,
+        {"effect_kind": SMOKESCREEN_EFFECT_KIND, "targeting_max_range_inches": True},
+    )
+    with pytest.raises(GameLifecycleError, match="max range must be numeric"):
+        generic_persisted_shooting_target_range_restriction(restriction_context)
+
+    _replace_first_persisting_effect_payload(
+        state,
+        {"effect_kind": SMOKESCREEN_EFFECT_KIND, "targeting_max_range_inches": 0.0},
+    )
+    with pytest.raises(GameLifecycleError, match="max range must be positive"):
+        generic_persisted_shooting_target_range_restriction(restriction_context)
+
+    _replace_first_persisting_effect_payload(
+        state,
+        {"effect_kind": SMOKESCREEN_EFFECT_KIND, "targeting_max_range_inches": 18.0},
+    )
+    restriction = generic_persisted_shooting_target_range_restriction(restriction_context)
+    assert restriction is not None
+    assert _json_object(restriction.replay_payload)["source_effect_kind"] is None
+
+    _replace_first_persisting_effect_payload(
+        state,
+        {
+            "effect_kind": SMOKESCREEN_EFFECT_KIND,
+            "targeting_max_range_inches": 18.0,
+            "source_effect_kind": 1,
+        },
+    )
+    with pytest.raises(GameLifecycleError, match="payload source_effect_kind must be a string"):
+        generic_persisted_shooting_target_range_restriction(restriction_context)
+
+    _replace_first_persisting_effect_payload(
+        state,
+        {"effect_kind": SMOKESCREEN_EFFECT_KIND, "targeting_max_range_inches": 18.0},
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models((f"{_ENEMY_UNIT_ID}:model-001",))
+    with pytest.raises(GameLifecycleError, match="model is not placed"):
+        generic_persisted_shooting_target_range_restriction(restriction_context)
 
 
 def test_corsair_stratagem_guardrails_raise_on_drifted_internal_context() -> None:
@@ -1374,7 +1476,6 @@ def test_corsair_stratagem_guardrails_raise_on_drifted_internal_context() -> Non
     unit_by_id_for_state = vars(stratagems)["_unit_by_id_for_state"]
     unit_owner = vars(stratagems)["_unit_owner"]
     model_instance_by_id = vars(stratagems)["_model_instance_by_id"]
-    geometry_model_by_model_id = vars(stratagems)["_geometry_model_by_model_id"]
     armies_for_state = vars(stratagems)["_armies_for_state"]
     validate_identifier = vars(stratagems)["_validate_identifier"]
 
@@ -1525,20 +1626,6 @@ def test_corsair_stratagem_guardrails_raise_on_drifted_internal_context() -> Non
         unit_owner(context, unit_instance_id="unknown-unit")
     with pytest.raises(GameLifecycleError, match="model is unknown"):
         model_instance_by_id(state, "unknown-model")
-    with pytest.raises(GameLifecycleError, match="geometry lookup requires GameState"):
-        geometry_model_by_model_id(object(), model_instance_id=f"{_CORSAIR_UNIT_ID}:model-001")
-    no_battlefield_state, _no_battlefield_corsair_army, _no_battlefield_enemy_army = _corsair_state(
-        phase=BattlePhase.MOVEMENT,
-        active_player_id="player-a",
-    )
-    no_battlefield_state.battlefield_state = None
-    with pytest.raises(GameLifecycleError, match="geometry lookup requires battlefield state"):
-        geometry_model_by_model_id(
-            no_battlefield_state,
-            model_instance_id=f"{_CORSAIR_UNIT_ID}:model-001",
-        )
-    with pytest.raises(GameLifecycleError, match="model is not placed"):
-        geometry_model_by_model_id(state, model_instance_id="unknown-model")
     with pytest.raises(GameLifecycleError, match="army lookup requires GameState"):
         armies_for_state(object())
     with pytest.raises(GameLifecycleError, match="must be a string"):
@@ -1631,7 +1718,7 @@ def test_corsair_stratagem_guardrails_raise_on_drifted_internal_context() -> Non
     assert apply_result.reason is None
     _remove_unit_placement(unplaced_target_state, _CORSAIR_UNIT_ID)
     with pytest.raises(GameLifecycleError, match="target unit is not placed"):
-        stratagems.cloak_and_shadow_target_restriction(
+        generic_persisted_shooting_target_range_restriction(
             ShootingTargetRestrictionContext(
                 state=unplaced_target_state,
                 player_id="player-b",
@@ -5371,3 +5458,9 @@ def _remove_unit_placement(state: GameState, unit_instance_id: str) -> None:
             for placed_army in battlefield.placed_armies
         ),
     )
+
+
+def _replace_first_persisting_effect_payload(state: GameState, payload: JsonValue) -> None:
+    if not state.persisting_effects:
+        raise AssertionError("Expected at least one persisting effect.")
+    state.persisting_effects[0] = replace(state.persisting_effects[0], effect_payload=payload)

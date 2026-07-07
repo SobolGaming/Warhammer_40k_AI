@@ -685,9 +685,6 @@ _RUNTIME_SOURCE_LABEL_OVERRIDES: Mapping[str, str] = {
 }
 
 _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
-    "phase17g:aeldari:corsair-coterie:stratagems:cloak-and-shadow:target-restriction": (
-        "Cloak and Shadow"
-    ),
     "phase17g:aeldari:corsair-coterie:stratagems:outcast-ambush:weapon-profile": ("Outcast Ambush"),
     "warhammer_40000_11th:aeldari:army_rule:fade_back": "Battle Focus - Fade Back",
     "warhammer_40000_11th:aeldari:army_rule:flitting_shadows": ("Battle Focus - Flitting Shadows"),
