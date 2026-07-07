@@ -766,9 +766,6 @@ class MovementLegalityContext:
             fly_transit_applies and self.capabilities.can_move_through_enemy_models
         ):
             enemy_vehicle_monster_blockers = enemy_vehicle_monster_model_ids
-        generic_enemy_model_blockers = enemy_model_transit_blocker_ids
-        if self.movement_mode is MovementMode.FALL_BACK:
-            generic_enemy_model_blockers = ()
         return PathValidationContext(
             moving_model=moving_model,
             witness=witness,
@@ -780,7 +777,7 @@ class MovementLegalityContext:
             friendly_vehicle_monster_model_ids=friendly_vehicle_monster_blockers,
             enemy_vehicle_monster_model_ids=enemy_vehicle_monster_blockers,
             friendly_model_transit_blocker_ids=friendly_model_transit_blocker_ids,
-            enemy_model_transit_blocker_ids=generic_enemy_model_blockers,
+            enemy_model_transit_blocker_ids=enemy_model_transit_blocker_ids,
             aircraft_model_ids=aircraft_model_ids,
             may_transit_enemy_models=may_transit_enemy_models,
             may_transit_enemy_engagement=may_transit_enemy_engagement,
