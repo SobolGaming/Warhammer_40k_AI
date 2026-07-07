@@ -45,8 +45,10 @@ __all__ = (
     "_enemy_engagement_model_ids_for_unit",
     "_enemy_geometry_models_for_player",
     "_enemy_model_ids_crossed_by_witness",
+    "_enemy_model_ids_with_keyword_any_for_player",
     "_enemy_vehicle_monster_model_ids_for_player",
     "_friendly_geometry_models_for_path",
+    "_friendly_model_ids_with_keyword_any",
     "_friendly_vehicle_monster_model_ids",
     "_geometry_models_for_unit_placement",
     "_hover_mode_state_for_unit",
@@ -208,6 +210,7 @@ def _desperate_escape_requirements_for_fall_back(
     battle_round: int,
     battle_shocked_unit_ids: tuple[str, ...],
     forced_desperate_escape_source_rule_ids: tuple[str, ...] = (),
+    overflight_auto_pass_model_ids: tuple[str, ...] = (),
 ) -> tuple[DesperateEscapeRequirement, ...]:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Desperate Escape requirements require a scenario.")
@@ -230,6 +233,12 @@ def _desperate_escape_requirements_for_fall_back(
     forced_source_ids = _validate_identifier_tuple(
         "forced_desperate_escape_source_rule_ids",
         forced_desperate_escape_source_rule_ids,
+    )
+    auto_pass_model_ids = set(
+        _validate_identifier_tuple(
+            "overflight_auto_pass_model_ids",
+            overflight_auto_pass_model_ids,
+        )
     )
     unit = scenario.unit_instance_for_placement(unit_placement)
     unit_keyword_set = {_canonical_keyword(keyword) for keyword in unit.keywords}
@@ -256,8 +265,10 @@ def _desperate_escape_requirements_for_fall_back(
                 witness=witness,
                 enemy_models=enemy_models,
             )
-            if enemy_model_ids:
+            if enemy_model_ids and placement.model_instance_id not in auto_pass_model_ids:
                 reasons.append(DesperateEscapeRequirementReason.ENEMY_MODEL_OVERFLIGHT)
+            elif enemy_model_ids:
+                enemy_model_ids = ()
         if not reasons:
             continue
         requirements.append(
@@ -446,9 +457,72 @@ def _enemy_vehicle_monster_model_ids_for_player(
     return tuple(sorted(model_ids))
 
 
+def _friendly_model_ids_with_keyword_any(
+    *,
+    scenario: BattlefieldScenario,
+    player_id: str,
+    moving_model_instance_id: str,
+    keyword_any: tuple[str, ...],
+) -> tuple[str, ...]:
+    requested_player_id = _validate_identifier("player_id", player_id)
+    moving_model_id = _validate_identifier("moving_model_instance_id", moving_model_instance_id)
+    requested_keywords = _canonical_keyword_set(keyword_any)
+    if not requested_keywords:
+        return ()
+    model_ids: list[str] = []
+    for placed_army in scenario.battlefield_state.placed_armies:
+        if placed_army.player_id != requested_player_id:
+            continue
+        for unit_placement in placed_army.unit_placements:
+            unit = scenario.unit_instance_for_placement(unit_placement)
+            if not _unit_has_keyword_any(unit.keywords, requested_keywords):
+                continue
+            model_ids.extend(
+                placement.model_instance_id
+                for placement in unit_placement.model_placements
+                if placement.model_instance_id != moving_model_id
+            )
+    return tuple(sorted(model_ids))
+
+
+def _enemy_model_ids_with_keyword_any_for_player(
+    *,
+    scenario: BattlefieldScenario,
+    player_id: str,
+    keyword_any: tuple[str, ...],
+) -> tuple[str, ...]:
+    requested_player_id = _validate_identifier("player_id", player_id)
+    requested_keywords = _canonical_keyword_set(keyword_any)
+    if not requested_keywords:
+        return ()
+    model_ids: list[str] = []
+    for placed_army in scenario.battlefield_state.placed_armies:
+        if placed_army.player_id == requested_player_id:
+            continue
+        for unit_placement in placed_army.unit_placements:
+            unit = scenario.unit_instance_for_placement(unit_placement)
+            if not _unit_has_keyword_any(unit.keywords, requested_keywords):
+                continue
+            model_ids.extend(
+                placement.model_instance_id for placement in unit_placement.model_placements
+            )
+    return tuple(sorted(model_ids))
+
+
 def _unit_has_vehicle_or_monster_keyword(keywords: tuple[str, ...]) -> bool:
     keyword_set = {_canonical_keyword(keyword) for keyword in keywords}
     return "VEHICLE" in keyword_set or "MONSTER" in keyword_set
+
+
+def _unit_has_keyword_any(keywords: tuple[str, ...], keyword_any: frozenset[str]) -> bool:
+    keyword_set = {_canonical_keyword(keyword) for keyword in keywords}
+    return bool(keyword_set.intersection(keyword_any))
+
+
+def _canonical_keyword_set(keywords: tuple[str, ...]) -> frozenset[str]:
+    if type(keywords) is not tuple:
+        raise GameLifecycleError("keyword_any must be a tuple.")
+    return frozenset(_canonical_keyword(keyword) for keyword in keywords)
 
 
 def _unit_has_deep_strike_keyword(unit: UnitInstance) -> bool:

@@ -34,6 +34,9 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_support_rollup_for_ability,
     ability_support_rollup_for_rule_ir,
 )
+from warhammer40k_core.engine.catalog_movement_transit import (
+    movement_mode_tokens_or_none as _movement_mode_tokens_or_none,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_ADVANCE_ROLL_REROLL_CONSUMER_ID,
     CATALOG_IR_CAN_FALLBACK_AND_SHOOT_CONSUMER_ID,
@@ -52,8 +55,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
     CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
     _feel_no_pain_source_from_effect,  # pyright: ignore[reportPrivateUsage]
-    _movement_mode_tokens_or_none,  # pyright: ignore[reportPrivateUsage]
-    _movement_transit_permission_from_clause,  # pyright: ignore[reportPrivateUsage]
+    _movement_transit_permissions_from_clause,  # pyright: ignore[reportPrivateUsage]
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
 )
@@ -195,6 +197,12 @@ MOVE_OVER_MONSTER_VEHICLE_TERRAIN_TEXT = (
     "Each time this model makes a Normal or Advance move, it can move over friendly "
     'Monster and Vehicle models and terrain features that are 4" or less in height '
     "as if they were not there."
+)
+MOVE_THROUGH_MODELS_TERRAIN_AUTO_PASS_TEXT = (
+    "Each time this unit makes a Normal, Advance or Fall Back move, it can move "
+    "through models (excluding Titanic models) and terrain features. When doing so, "
+    "it can move within Engagement Range of enemy models, but cannot end that move "
+    "within Engagement Range of them, and any Desperate Escape test is automatically passed."
 )
 
 
@@ -763,6 +771,49 @@ def test_phase17c_move_over_permission_supports_single_move_mode_and_decimal_hei
     )
 
 
+def test_phase17c_move_through_models_terrain_and_auto_pass_compiles_to_semantic_ir() -> None:
+    rule_ir = _compiled(MOVE_THROUGH_MODELS_TERRAIN_AUTO_PASS_TEXT).rule_ir
+    clause = rule_ir.clauses[0]
+    assert clause.trigger is not None
+    assert clause.target is not None
+
+    assert rule_ir.is_supported
+    assert len(rule_ir.clauses) == 1
+    assert clause.trigger.kind is RuleTriggerKind.TIMING_WINDOW
+    assert parameter_payload(clause.trigger.parameters) == {
+        "edge": "during",
+        "movement_modes": ("advance", "fall_back", "normal"),
+        "phase": "movement",
+        "subject": "this_unit",
+        "timing_window": "unit_makes_move",
+    }
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert tuple(effect.kind for effect in clause.effects) == (
+        RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION,
+        RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION,
+    )
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "desperate_escape_tests_auto_passed": True,
+        "enemy_engagement_range_end_allowed": False,
+        "enemy_engagement_range_transit": True,
+        "excluded_model_keyword_any": ("TITANIC",),
+        "model_allegiance": "any",
+        "movement_modes": ("advance", "fall_back", "normal"),
+        "permission": "move_through_models",
+    }
+    assert parameter_payload(clause.effects[1].parameters) == {
+        "movement_modes": ("advance", "fall_back", "normal"),
+        "permission": "move_through_terrain_features",
+        "terrain_features": True,
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
+    )
+
+
 def test_phase17c_movement_transit_consumer_normalizes_mode_order() -> None:
     rule_ir = _compiled(MOVE_OVER_MONSTER_VEHICLE_TERRAIN_TEXT).rule_ir
     clause = rule_ir.clauses[0]
@@ -806,7 +857,7 @@ def test_phase17c_movement_transit_consumer_fails_closed_for_malformed_mode_toke
 
     malformed_values: tuple[RuleParameterValue, ...] = (
         ("normal", "normal"),
-        ("normal", "fall_back"),
+        ("normal", "charge"),
     )
 
     for malformed_value in malformed_values:
@@ -847,12 +898,12 @@ def test_phase17c_movement_transit_clause_extraction_rejects_wrong_types() -> No
     )
 
     with pytest.raises(GameLifecycleError, match="ability record"):
-        _movement_transit_permission_from_clause(
+        _movement_transit_permissions_from_clause(
             record=cast(AbilityCatalogRecord, object()),
             clause=clause,
         )
     with pytest.raises(GameLifecycleError, match="RuleClause"):
-        _movement_transit_permission_from_clause(
+        _movement_transit_permissions_from_clause(
             record=record,
             clause=cast(RuleClause, object()),
         )

@@ -7,6 +7,7 @@ from typing import cast
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_tokens
 from warhammer40k_core.rules.parsed_tokens import DistancePredicateToken, ParsedRuleText, TextSpan
+from warhammer40k_core.rules.rule_clause_merging import merge_rule_clause_spans
 from warhammer40k_core.rules.rule_duration_parser import parse_rule_duration
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -46,6 +47,21 @@ from warhammer40k_core.rules.rule_templates import (
     TRACKED_TARGET_SELECTION_TEMPLATE_ID,
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
     rule_template_by_id,
+)
+from warhammer40k_core.rules.rule_token_normalization import (
+    keyword_any_tokens as _keyword_any_tokens,
+)
+from warhammer40k_core.rules.rule_token_normalization import (
+    keyword_list_tokens as _keyword_list_tokens,
+)
+from warhammer40k_core.rules.rule_token_normalization import (
+    keyword_token as _keyword_token,
+)
+from warhammer40k_core.rules.rule_token_normalization import (
+    model_keyword_any_token as _model_keyword_any_token,
+)
+from warhammer40k_core.rules.rule_token_normalization import (
+    movement_modes_token as _movement_modes_token,
 )
 from warhammer40k_core.rules.selected_target_parser import (
     is_structural_target_keyword,
@@ -142,6 +158,13 @@ _CHARGE_MOVE_END_RE = re.compile(
 _THIS_MODEL_NORMAL_OR_ADVANCE_MOVE_RE = re.compile(
     r"\beach\s+time\s+this\s+model\s+makes\s+a\s+"
     r"(?P<modes>Normal(?:\s+or\s+Advance)?|Advance(?:\s+or\s+Normal)?)\s+move\b",
+    re.IGNORECASE,
+)
+_THIS_UNIT_NORMAL_ADVANCE_FALL_BACK_MOVE_RE = re.compile(
+    r"\beach\s+time\s+this\s+unit\s+makes\s+a\s+"
+    r"(?P<modes>(?:Normal|Advance|Fall\s+Back)"
+    r"(?:(?:\s*,\s*|\s+or\s+|\s+and\s+)(?:Normal|Advance|Fall\s+Back))*)"
+    r"\s+move\b",
     re.IGNORECASE,
 )
 _ENEMY_UNIT_FALLS_BACK_NEAR_ABILITY_RE = re.compile(
@@ -319,6 +342,19 @@ _MOVE_OVER_FRIENDLY_MONSTER_VEHICLE_AND_TERRAIN_RE = re.compile(
     r"as\s+if\s+they\s+were\s+not\s+there\b",
     re.IGNORECASE,
 )
+_MOVE_THROUGH_MODELS_AND_TERRAIN_RE = re.compile(
+    r"\bit\s+can\s+move\s+through\s+models"
+    r"(?:\s+\(excluding\s+(?P<excluded_model_keywords>[^)]+)\))?"
+    r"\s+and\s+terrain\s+features\b",
+    re.IGNORECASE,
+)
+_MOVE_THROUGH_ENGAGEMENT_AUTO_PASS_RE = re.compile(
+    r"\bwhen\s+doing\s+so,\s+it\s+can\s+move\s+within\s+Engagement\s+Range\s+of\s+"
+    r"enemy\s+models,\s+but\s+cannot\s+end\s+that\s+move\s+within\s+Engagement\s+"
+    r"Range\s+of\s+them,\s+and\s+any\s+Desperate\s+Escape\s+test\s+is\s+"
+    r"automatically\s+passed\b",
+    re.IGNORECASE,
+)
 _WEAPON_KEYWORD_PATTERN = "|".join(
     re.escape(keyword)
     for keyword in sorted(canonical_weapon_keyword_tokens(), key=len, reverse=True)
@@ -328,7 +364,6 @@ _ABILITY_CHOICE_PREFIX_RE = re.compile(
     r"\bselect\s+one\s+of\s+the\s+following\s+abilities\s*:",
     re.IGNORECASE,
 )
-_THAT_ABILITY_APPLICATION_RE = re.compile(r"\bthat\s+ability\b", re.IGNORECASE)
 _WEAPON_ABILITY_CHOICE_TOKEN_RE = re.compile(
     rf"\[\s*(?P<ability>{_WEAPON_KEYWORD_PATTERN})"
     rf"(?:\s+(?P<ability_value>{_WEAPON_ABILITY_VALUE_PATTERN}))?\s*\]",
@@ -608,8 +643,13 @@ def _split_clause_text(normalized_text: str) -> tuple[_ClauseText, ...]:
         for coarse_clause in coarse_clauses
         for split_clause in _split_repeated_trigger_anchors(coarse_clause)
     ]
-    clauses = list(_merge_ability_choice_application_clauses(normalized_text, tuple(clauses)))
-    clauses = list(_merge_post_shoot_hit_target_status_clauses(normalized_text, tuple(clauses)))
+    clauses = [
+        _ClauseText(span=span)
+        for span in merge_rule_clause_spans(
+            normalized_text,
+            tuple(clause.span for clause in clauses),
+        )
+    ]
     if not clauses:
         full_span = TextSpan(text=normalized_text, start=0, end=len(normalized_text))
         return (_ClauseText(span=full_span),)
@@ -624,66 +664,6 @@ def _semicolon_inside_ability_choice_list(
 ) -> bool:
     segment = normalized_text[start:index]
     return _ABILITY_CHOICE_PREFIX_RE.search(segment) is not None and "." not in segment
-
-
-def _merge_ability_choice_application_clauses(
-    normalized_text: str,
-    clauses: tuple[_ClauseText, ...],
-) -> tuple[_ClauseText, ...]:
-    merged: list[_ClauseText] = []
-    index = 0
-    while index < len(clauses):
-        current = clauses[index]
-        if (
-            index + 1 < len(clauses)
-            and _ABILITY_CHOICE_PREFIX_RE.search(current.text) is not None
-            and _THAT_ABILITY_APPLICATION_RE.search(clauses[index + 1].text) is not None
-        ):
-            next_clause = clauses[index + 1]
-            merged.append(
-                _ClauseText(
-                    span=TextSpan(
-                        text=normalized_text[current.span.start : next_clause.span.end],
-                        start=current.span.start,
-                        end=next_clause.span.end,
-                    )
-                )
-            )
-            index += 2
-            continue
-        merged.append(current)
-        index += 1
-    return tuple(merged)
-
-
-def _merge_post_shoot_hit_target_status_clauses(
-    normalized_text: str,
-    clauses: tuple[_ClauseText, ...],
-) -> tuple[_ClauseText, ...]:
-    merged: list[_ClauseText] = []
-    index = 0
-    while index < len(clauses):
-        current = clauses[index]
-        if (
-            index + 1 < len(clauses)
-            and _POST_SHOOT_HIT_TARGET_SELECTION_RE.search(current.text) is not None
-            and _CONTEXTUAL_STATUS_DENIAL_RE.search(clauses[index + 1].text) is not None
-        ):
-            next_clause = clauses[index + 1]
-            merged.append(
-                _ClauseText(
-                    span=TextSpan(
-                        text=normalized_text[current.span.start : next_clause.span.end],
-                        start=current.span.start,
-                        end=next_clause.span.end,
-                    )
-                )
-            )
-            index += 2
-            continue
-        merged.append(current)
-        index += 1
-    return tuple(merged)
 
 
 def _split_repeated_trigger_anchors(clause_text: _ClauseText) -> tuple[_ClauseText, ...]:
@@ -1020,6 +1000,22 @@ def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
                     ("phase", "movement"),
                     ("timing_window", "model_makes_move"),
                     ("subject", "this_model"),
+                    ("movement_modes", movement_modes),
+                )
+            ),
+        )
+    unit_move_match = _THIS_UNIT_NORMAL_ADVANCE_FALL_BACK_MOVE_RE.search(clause_text.text)
+    if unit_move_match is not None:
+        movement_modes = _movement_modes_token(unit_move_match.group("modes"))
+        return RuleTrigger(
+            kind=RuleTriggerKind.TIMING_WINDOW,
+            source_span=_span_from_match(clause_text, unit_move_match),
+            parameters=parameters_from_pairs(
+                (
+                    ("edge", "during"),
+                    ("phase", "movement"),
+                    ("timing_window", "unit_makes_move"),
+                    ("subject", "this_unit"),
                     ("movement_modes", movement_modes),
                 )
             ),
@@ -2201,28 +2197,77 @@ def _parse_movement_transit_permission_effects(
 ) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
     trigger_match = _THIS_MODEL_NORMAL_OR_ADVANCE_MOVE_RE.search(clause_text.text)
-    if trigger_match is None:
+    if trigger_match is not None:
+        movement_modes = _movement_modes_token(trigger_match.group("modes"))
+        for match in _MOVE_OVER_FRIENDLY_MONSTER_VEHICLE_AND_TERRAIN_RE.finditer(clause_text.text):
+            keywords = _model_keyword_any_token(
+                match.group("first_model_keyword"),
+                match.group("second_model_keyword"),
+            )
+            if keywords != ("MONSTER", "VEHICLE"):
+                continue
+            effects.append(
+                RuleEffectSpec(
+                    kind=RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION,
+                    source_span=_span_from_match(clause_text, match),
+                    parameters=parameters_from_pairs(
+                        (
+                            ("permission", "move_over_as_if_not_there"),
+                            ("movement_modes", movement_modes),
+                            ("model_allegiance", "friendly"),
+                            ("model_keyword_any", keywords),
+                            ("terrain_scope", "terrain_features"),
+                            ("terrain_height_max_inches", float(match.group("height"))),
+                        )
+                    ),
+                )
+            )
+        return tuple(effects)
+
+    unit_trigger_match = _THIS_UNIT_NORMAL_ADVANCE_FALL_BACK_MOVE_RE.search(clause_text.text)
+    if unit_trigger_match is None:
         return ()
-    movement_modes = _movement_modes_token(trigger_match.group("modes"))
-    for match in _MOVE_OVER_FRIENDLY_MONSTER_VEHICLE_AND_TERRAIN_RE.finditer(clause_text.text):
-        keywords = _model_keyword_any_token(
-            match.group("first_model_keyword"),
-            match.group("second_model_keyword"),
+    movement_modes = _movement_modes_token(unit_trigger_match.group("modes"))
+    engagement_match = _MOVE_THROUGH_ENGAGEMENT_AUTO_PASS_RE.search(clause_text.text)
+    engagement_auto_pass = engagement_match is not None
+    for match in _MOVE_THROUGH_MODELS_AND_TERRAIN_RE.finditer(clause_text.text):
+        excluded_keywords = match.group("excluded_model_keywords")
+        effect_span = (
+            _span_from_bounds(clause_text, match.start(), engagement_match.end())
+            if engagement_match is not None
+            else _span_from_match(clause_text, match)
         )
-        if keywords != ("MONSTER", "VEHICLE"):
-            continue
         effects.append(
             RuleEffectSpec(
                 kind=RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION,
-                source_span=_span_from_match(clause_text, match),
+                source_span=effect_span,
                 parameters=parameters_from_pairs(
                     (
-                        ("permission", "move_over_as_if_not_there"),
+                        ("permission", "move_through_models"),
                         ("movement_modes", movement_modes),
-                        ("model_allegiance", "friendly"),
-                        ("model_keyword_any", keywords),
-                        ("terrain_scope", "terrain_features"),
-                        ("terrain_height_max_inches", float(match.group("height"))),
+                        ("model_allegiance", "any"),
+                        (
+                            "excluded_model_keyword_any",
+                            ()
+                            if excluded_keywords is None
+                            else _keyword_list_tokens(excluded_keywords),
+                        ),
+                        ("enemy_engagement_range_transit", engagement_auto_pass),
+                        ("enemy_engagement_range_end_allowed", False),
+                        ("desperate_escape_tests_auto_passed", engagement_auto_pass),
+                    )
+                ),
+            )
+        )
+        effects.append(
+            RuleEffectSpec(
+                kind=RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION,
+                source_span=effect_span,
+                parameters=parameters_from_pairs(
+                    (
+                        ("permission", "move_through_terrain_features"),
+                        ("movement_modes", movement_modes),
+                        ("terrain_features", True),
                     )
                 ),
             )
@@ -2526,6 +2571,12 @@ def _span_from_match(clause_text: _ClauseText, match: re.Match[str]) -> TextSpan
     return TextSpan(text=clause_text.span.text[match.start() : match.end()], start=start, end=end)
 
 
+def _span_from_bounds(clause_text: _ClauseText, start_offset: int, end_offset: int) -> TextSpan:
+    start = clause_text.start + start_offset
+    end = clause_text.start + end_offset
+    return TextSpan(text=clause_text.span.text[start_offset:end_offset], start=start, end=end)
+
+
 def _token_inside_clause(token: DistancePredicateToken, clause_text: _ClauseText) -> bool:
     return clause_text.span.start <= token.span.start and token.span.end <= clause_text.span.end
 
@@ -2628,10 +2679,6 @@ def _quantity_token(value: str) -> str:
     return value.lower().replace(" ", "_").replace("-", "_")
 
 
-def _keyword_token(value: str) -> str:
-    return value.strip().upper().replace(" ", "_").replace("-", "_")
-
-
 def _keyword_sequence_tokens(
     value: str,
     *,
@@ -2650,57 +2697,6 @@ def _keyword_sequence_tokens(
     if not tokens:
         raise RuleIRError("Keyword sequence must contain at least one keyword.")
     return tokens
-
-
-def _keyword_any_tokens(value: str) -> tuple[str, ...]:
-    tokens: list[str] = []
-    for raw_token in re.split(r"\s+or\s+|\s*,\s*", value.strip(), flags=re.IGNORECASE):
-        token = raw_token.strip()
-        if token:
-            tokens.append(_keyword_token(token))
-    if not tokens:
-        raise RuleIRError("Keyword any gate must contain at least one keyword.")
-    return tuple(dict.fromkeys(tokens))
-
-
-def _model_keyword_any_token(first: str, second: str) -> tuple[str, ...]:
-    tokens = tuple(dict.fromkeys((_singular_keyword_token(first), _singular_keyword_token(second))))
-    if len(tokens) != 2:
-        raise RuleIRError("Model keyword-any token requires two distinct keywords.")
-    return tuple(sorted(tokens))
-
-
-def _movement_modes_token(value: str) -> tuple[str, ...]:
-    tokens: list[str] = []
-    for raw_token in re.split(r"\s+or\s+|\s+and\s+|\s*,\s*", value.strip(), flags=re.IGNORECASE):
-        token = raw_token.strip()
-        if token:
-            tokens.append(token.lower().replace(" ", "_").replace("-", "_"))
-    if not tokens:
-        raise RuleIRError("Movement modes token must contain at least one mode.")
-    unique_tokens = tuple(dict.fromkeys(tokens))
-    allowed_tokens = {"advance", "normal"}
-    if not set(unique_tokens).issubset(allowed_tokens):
-        raise RuleIRError("Movement modes token contains unsupported movement modes.")
-    return tuple(sorted(unique_tokens))
-
-
-def _keyword_list_tokens(value: str) -> tuple[str, ...]:
-    tokens: list[str] = []
-    for raw_token in re.split(r"\s+or\s+|\s+and\s+|\s*,\s*", value.strip(), flags=re.IGNORECASE):
-        token = raw_token.strip()
-        if token:
-            tokens.append(_singular_keyword_token(token))
-    if not tokens:
-        raise RuleIRError("Keyword list gate must contain at least one keyword.")
-    return tuple(dict.fromkeys(tokens))
-
-
-def _singular_keyword_token(value: str) -> str:
-    token = _keyword_token(value)
-    if token in {"CHARACTERS", "MONSTERS", "VEHICLES"}:
-        return token[:-1]
-    return token
 
 
 def _keyword_sequence_parameter_pairs(

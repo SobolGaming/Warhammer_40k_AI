@@ -32,6 +32,8 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_rule_effects import (
+    MovementModelTransitPermission,
+    movement_model_transit_permissions_from_effects,
     movement_transit_through_terrain_features_allowed,
 )
 from warhammer40k_core.geometry.pathing import (
@@ -70,11 +72,17 @@ class MovementCapabilitySetPayload(TypedDict):
     is_hover: bool
     can_traverse_ruins_walls: bool
     can_move_through_models: bool
+    can_move_through_friendly_models: bool
+    can_move_through_enemy_models: bool
     can_move_through_terrain: bool
+    can_transit_enemy_engagement_range: bool
     ignores_vertical_distance: bool
     blocks_friendly_vehicle_monster_pass_through: bool
     can_move_over_friendly_vehicle_monster_models: bool
     terrain_as_if_absent_height_inches: float | None
+    friendly_model_transit_blocker_keywords: list[str]
+    enemy_model_transit_blocker_keywords: list[str]
+    desperate_escape_tests_auto_passed: bool
 
 
 class EngagementMovementPolicyPayload(TypedDict):
@@ -125,6 +133,7 @@ _MOVEMENT_TRANSIT_PERMISSION_MODES = frozenset(
     {
         MovementMode.NORMAL,
         MovementMode.ADVANCE,
+        MovementMode.FALL_BACK,
     }
 )
 
@@ -144,11 +153,17 @@ class MovementCapabilitySet:
     is_hover: bool
     can_traverse_ruins_walls: bool
     can_move_through_models: bool
+    can_move_through_friendly_models: bool
+    can_move_through_enemy_models: bool
     can_move_through_terrain: bool
+    can_transit_enemy_engagement_range: bool
     ignores_vertical_distance: bool
     blocks_friendly_vehicle_monster_pass_through: bool
     can_move_over_friendly_vehicle_monster_models: bool
     terrain_as_if_absent_height_inches: float | None
+    friendly_model_transit_blocker_keywords: tuple[str, ...] = ()
+    enemy_model_transit_blocker_keywords: tuple[str, ...] = ()
+    desperate_escape_tests_auto_passed: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -176,7 +191,13 @@ class MovementCapabilitySet:
             ("is_hover", self.is_hover),
             ("can_traverse_ruins_walls", self.can_traverse_ruins_walls),
             ("can_move_through_models", self.can_move_through_models),
+            ("can_move_through_friendly_models", self.can_move_through_friendly_models),
+            ("can_move_through_enemy_models", self.can_move_through_enemy_models),
             ("can_move_through_terrain", self.can_move_through_terrain),
+            (
+                "can_transit_enemy_engagement_range",
+                self.can_transit_enemy_engagement_range,
+            ),
             ("ignores_vertical_distance", self.ignores_vertical_distance),
             (
                 "blocks_friendly_vehicle_monster_pass_through",
@@ -186,6 +207,7 @@ class MovementCapabilitySet:
                 "can_move_over_friendly_vehicle_monster_models",
                 self.can_move_over_friendly_vehicle_monster_models,
             ),
+            ("desperate_escape_tests_auto_passed", self.desperate_escape_tests_auto_passed),
         ):
             _validate_bool(f"MovementCapabilitySet {field_name}", value)
         object.__setattr__(
@@ -194,6 +216,22 @@ class MovementCapabilitySet:
             _validate_optional_non_negative_number(
                 "MovementCapabilitySet terrain_as_if_absent_height_inches",
                 self.terrain_as_if_absent_height_inches,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "friendly_model_transit_blocker_keywords",
+            _validate_keyword_tuple(
+                "MovementCapabilitySet friendly_model_transit_blocker_keywords",
+                self.friendly_model_transit_blocker_keywords,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "enemy_model_transit_blocker_keywords",
+            _validate_keyword_tuple(
+                "MovementCapabilitySet enemy_model_transit_blocker_keywords",
+                self.enemy_model_transit_blocker_keywords,
             ),
         )
 
@@ -240,6 +278,18 @@ class MovementCapabilitySet:
             movement_mode=movement_mode,
             unit_keywords=normalized_keywords,
         )
+        friendly_model_effect_permissions = _unit_effect_model_transit_permissions(
+            effects=unit_persisting_effects,
+            owner_player_id=owner_player_id,
+            movement_mode=movement_mode,
+            model_allegiance="friendly",
+        )
+        enemy_model_effect_permissions = _unit_effect_model_transit_permissions(
+            effects=unit_persisting_effects,
+            owner_player_id=owner_player_id,
+            movement_mode=movement_mode,
+            model_allegiance="enemy",
+        )
         has_fly = "has_fly" in flags
         is_titanic = "is_titanic" in flags
         is_infantry = "is_infantry" in flags
@@ -253,12 +303,42 @@ class MovementCapabilitySet:
                 keywords=normalized_keywords,
             )
         )
-        can_move_through_models = has_fly and descriptor.fly_policy.may_move_through_models
+        fly_moves_through_models = (
+            has_fly
+            and descriptor.fly_policy.may_move_through_models
+            and _fly_transit_applies_for_mode(movement_mode)
+        )
+        catalog_friendly_model_permissions = _catalog_model_transit_permissions(
+            catalog_permissions,
+            model_allegiance="friendly",
+        )
+        catalog_enemy_model_permissions = _catalog_model_transit_permissions(
+            catalog_permissions,
+            model_allegiance="enemy",
+        )
+        can_move_through_friendly_models = bool(
+            fly_moves_through_models
+            or catalog_friendly_model_permissions
+            or friendly_model_effect_permissions
+        )
+        can_move_through_enemy_models = bool(
+            fly_moves_through_models
+            or catalog_enemy_model_permissions
+            or enemy_model_effect_permissions
+        )
+        can_move_through_models = can_move_through_friendly_models or can_move_through_enemy_models
         can_move_through_terrain = (
             can_traverse_ruins_walls
             or (has_fly and descriptor.fly_policy.may_move_through_terrain)
             or terrain_transit_permission
+            or _catalog_terrain_transit_allowed(catalog_permissions)
         )
+        can_transit_enemy_engagement_range = _catalog_transits_enemy_engagement(
+            catalog_enemy_model_permissions
+        ) or _effect_transits_enemy_engagement(enemy_model_effect_permissions)
+        desperate_escape_tests_auto_passed = _catalog_desperate_escape_auto_passed(
+            catalog_enemy_model_permissions
+        ) or _effect_desperate_escape_auto_passed(enemy_model_effect_permissions)
         ignores_vertical_distance = has_fly and descriptor.fly_policy.ignores_vertical_distance
         return cls(
             ruleset_descriptor_hash=descriptor.descriptor_hash,
@@ -274,13 +354,27 @@ class MovementCapabilitySet:
             is_hover="is_hover" in flags,
             can_traverse_ruins_walls=can_traverse_ruins_walls,
             can_move_through_models=can_move_through_models,
+            can_move_through_friendly_models=can_move_through_friendly_models,
+            can_move_through_enemy_models=can_move_through_enemy_models,
             can_move_through_terrain=can_move_through_terrain,
+            can_transit_enemy_engagement_range=can_transit_enemy_engagement_range,
             ignores_vertical_distance=ignores_vertical_distance,
             blocks_friendly_vehicle_monster_pass_through=(
                 "blocks_friendly_vehicle_monster_pass_through" in flags
             ),
-            can_move_over_friendly_vehicle_monster_models=bool(catalog_permissions),
+            can_move_over_friendly_vehicle_monster_models=(
+                _catalog_move_over_friendly_vehicle_monster_allowed(catalog_permissions)
+            ),
             terrain_as_if_absent_height_inches=_max_terrain_height(catalog_permissions),
+            friendly_model_transit_blocker_keywords=_combined_model_transit_blocker_keywords(
+                catalog_friendly_model_permissions,
+                friendly_model_effect_permissions,
+            ),
+            enemy_model_transit_blocker_keywords=_combined_model_transit_blocker_keywords(
+                catalog_enemy_model_permissions,
+                enemy_model_effect_permissions,
+            ),
+            desperate_escape_tests_auto_passed=desperate_escape_tests_auto_passed,
         )
 
     def to_payload(self) -> MovementCapabilitySetPayload:
@@ -298,7 +392,10 @@ class MovementCapabilitySet:
             "is_hover": self.is_hover,
             "can_traverse_ruins_walls": self.can_traverse_ruins_walls,
             "can_move_through_models": self.can_move_through_models,
+            "can_move_through_friendly_models": self.can_move_through_friendly_models,
+            "can_move_through_enemy_models": self.can_move_through_enemy_models,
             "can_move_through_terrain": self.can_move_through_terrain,
+            "can_transit_enemy_engagement_range": self.can_transit_enemy_engagement_range,
             "ignores_vertical_distance": self.ignores_vertical_distance,
             "blocks_friendly_vehicle_monster_pass_through": (
                 self.blocks_friendly_vehicle_monster_pass_through
@@ -307,6 +404,11 @@ class MovementCapabilitySet:
                 self.can_move_over_friendly_vehicle_monster_models
             ),
             "terrain_as_if_absent_height_inches": self.terrain_as_if_absent_height_inches,
+            "friendly_model_transit_blocker_keywords": list(
+                self.friendly_model_transit_blocker_keywords
+            ),
+            "enemy_model_transit_blocker_keywords": list(self.enemy_model_transit_blocker_keywords),
+            "desperate_escape_tests_auto_passed": self.desperate_escape_tests_auto_passed,
         }
 
     @classmethod
@@ -328,7 +430,10 @@ class MovementCapabilitySet:
             is_hover=raw_payload["is_hover"],
             can_traverse_ruins_walls=raw_payload["can_traverse_ruins_walls"],
             can_move_through_models=raw_payload["can_move_through_models"],
+            can_move_through_friendly_models=raw_payload["can_move_through_friendly_models"],
+            can_move_through_enemy_models=raw_payload["can_move_through_enemy_models"],
             can_move_through_terrain=raw_payload["can_move_through_terrain"],
+            can_transit_enemy_engagement_range=raw_payload["can_transit_enemy_engagement_range"],
             ignores_vertical_distance=raw_payload["ignores_vertical_distance"],
             blocks_friendly_vehicle_monster_pass_through=raw_payload[
                 "blocks_friendly_vehicle_monster_pass_through"
@@ -337,6 +442,13 @@ class MovementCapabilitySet:
                 "can_move_over_friendly_vehicle_monster_models"
             ],
             terrain_as_if_absent_height_inches=raw_payload["terrain_as_if_absent_height_inches"],
+            friendly_model_transit_blocker_keywords=tuple(
+                raw_payload["friendly_model_transit_blocker_keywords"]
+            ),
+            enemy_model_transit_blocker_keywords=tuple(
+                raw_payload["enemy_model_transit_blocker_keywords"]
+            ),
+            desperate_escape_tests_auto_passed=raw_payload["desperate_escape_tests_auto_passed"],
         )
 
 
@@ -618,6 +730,8 @@ class MovementLegalityContext:
         terrain: tuple[TerrainVolume, ...] = (),
         friendly_vehicle_monster_model_ids: tuple[str, ...] = (),
         enemy_vehicle_monster_model_ids: tuple[str, ...] = (),
+        friendly_model_transit_blocker_ids: tuple[str, ...] = (),
+        enemy_model_transit_blocker_ids: tuple[str, ...] = (),
         aircraft_model_ids: tuple[str, ...] = (),
         sample_interval_inches: float = 0.5,
         movement_distance_budget_inches: float | None = None,
@@ -627,25 +741,34 @@ class MovementLegalityContext:
             self.capabilities.is_vehicle or self.capabilities.is_monster
         ) and self.movement_mode in _VEHICLE_MONSTER_ENEMY_TRANSIT_MOVEMENT_MODES
         may_transit_enemy_models = (
-            (self.capabilities.can_move_through_models and fly_transit_applies)
+            (
+                (self.capabilities.can_move_through_enemy_models and fly_transit_applies)
+                or self.capabilities.can_move_through_enemy_models
+            )
             or self.movement_mode is MovementMode.FALL_BACK
             or vehicle_monster_enemy_transit_applies
         )
         may_transit_enemy_engagement = (
-            self.engagement_policy.may_transit_enemy_engagement or fly_transit_applies
+            self.engagement_policy.may_transit_enemy_engagement
+            or fly_transit_applies
+            or self.capabilities.can_transit_enemy_engagement_range
         )
         friendly_vehicle_monster_blockers = friendly_vehicle_monster_model_ids
         if (
-            self.capabilities.can_move_over_friendly_vehicle_monster_models
+            self.capabilities.can_move_through_friendly_models
+            or self.capabilities.can_move_over_friendly_vehicle_monster_models
             or not self.capabilities.blocks_friendly_vehicle_monster_pass_through
-            or (fly_transit_applies and self.capabilities.can_move_through_models)
+            or (fly_transit_applies and self.capabilities.can_move_through_friendly_models)
         ):
             friendly_vehicle_monster_blockers = ()
         enemy_vehicle_monster_blockers: tuple[str, ...] = ()
         if vehicle_monster_enemy_transit_applies and not (
-            fly_transit_applies and self.capabilities.can_move_through_models
+            fly_transit_applies and self.capabilities.can_move_through_enemy_models
         ):
             enemy_vehicle_monster_blockers = enemy_vehicle_monster_model_ids
+        generic_enemy_model_blockers = enemy_model_transit_blocker_ids
+        if self.movement_mode is MovementMode.FALL_BACK:
+            generic_enemy_model_blockers = ()
         return PathValidationContext(
             moving_model=moving_model,
             witness=witness,
@@ -656,6 +779,8 @@ class MovementLegalityContext:
             terrain=terrain,
             friendly_vehicle_monster_model_ids=friendly_vehicle_monster_blockers,
             enemy_vehicle_monster_model_ids=enemy_vehicle_monster_blockers,
+            friendly_model_transit_blocker_ids=friendly_model_transit_blocker_ids,
+            enemy_model_transit_blocker_ids=generic_enemy_model_blockers,
             aircraft_model_ids=aircraft_model_ids,
             may_transit_enemy_models=may_transit_enemy_models,
             may_transit_enemy_engagement=may_transit_enemy_engagement,
@@ -901,21 +1026,136 @@ def _unit_effect_terrain_transit_permission(
     )
 
 
+def _unit_effect_model_transit_permissions(
+    *,
+    effects: tuple[PersistingEffect, ...],
+    owner_player_id: str | None,
+    movement_mode: object | None,
+    model_allegiance: str,
+) -> tuple[MovementModelTransitPermission, ...]:
+    if not effects:
+        return ()
+    if owner_player_id is None:
+        raise MovementLegalityError("Unit effect model transit requires owner_player_id.")
+    mode = movement_mode_from_token(movement_mode)
+    return movement_model_transit_permissions_from_effects(
+        effects,
+        owner_player_id=owner_player_id,
+        movement_mode=mode.value,
+        model_allegiance=model_allegiance,
+    )
+
+
+def _catalog_model_transit_permissions(
+    permissions: tuple[CatalogMovementTransitPermission, ...],
+    *,
+    model_allegiance: str,
+) -> tuple[CatalogMovementTransitPermission, ...]:
+    requested_allegiance = _validate_identifier("model_allegiance", model_allegiance)
+    if requested_allegiance not in {"enemy", "friendly"}:
+        raise MovementLegalityError("Catalog model transit allegiance is unsupported.")
+    return tuple(
+        permission
+        for permission in _validated_catalog_permissions(permissions)
+        if permission.permission == "move_through_models"
+        and permission.model_allegiance in {"any", requested_allegiance}
+    )
+
+
+def _catalog_move_over_friendly_vehicle_monster_allowed(
+    permissions: tuple[CatalogMovementTransitPermission, ...],
+) -> bool:
+    return any(
+        permission.permission == "move_over_as_if_not_there"
+        for permission in _validated_catalog_permissions(permissions)
+    )
+
+
+def _catalog_terrain_transit_allowed(
+    permissions: tuple[CatalogMovementTransitPermission, ...],
+) -> bool:
+    return any(
+        permission.permission == "move_through_terrain_features" and permission.terrain_features
+        for permission in _validated_catalog_permissions(permissions)
+    )
+
+
+def _catalog_transits_enemy_engagement(
+    permissions: tuple[CatalogMovementTransitPermission, ...],
+) -> bool:
+    return any(
+        permission.enemy_engagement_range_transit
+        for permission in _validated_catalog_permissions(permissions)
+    )
+
+
+def _effect_transits_enemy_engagement(
+    permissions: tuple[MovementModelTransitPermission, ...],
+) -> bool:
+    return any(permission.enemy_engagement_range_transit for permission in permissions)
+
+
+def _catalog_desperate_escape_auto_passed(
+    permissions: tuple[CatalogMovementTransitPermission, ...],
+) -> bool:
+    return any(
+        permission.desperate_escape_tests_auto_passed
+        for permission in _validated_catalog_permissions(permissions)
+    )
+
+
+def _effect_desperate_escape_auto_passed(
+    permissions: tuple[MovementModelTransitPermission, ...],
+) -> bool:
+    return any(permission.desperate_escape_tests_auto_passed for permission in permissions)
+
+
+def _combined_model_transit_blocker_keywords(
+    catalog_permissions: tuple[CatalogMovementTransitPermission, ...],
+    effect_permissions: tuple[MovementModelTransitPermission, ...],
+) -> tuple[str, ...]:
+    keywords: set[str] = set()
+    for permission in _validated_catalog_permissions(catalog_permissions):
+        keywords.update(permission.excluded_model_keyword_any)
+    for effect_permission in effect_permissions:
+        if type(effect_permission) is not MovementModelTransitPermission:
+            raise MovementLegalityError(
+                "Movement effect transit permissions must contain model permissions."
+            )
+        keywords.update(effect_permission.excluded_model_keyword_any)
+    return tuple(sorted(keywords))
+
+
 def _max_terrain_height(
     permissions: tuple[CatalogMovementTransitPermission, ...],
 ) -> float | None:
+    heights: list[float] = []
+    for permission in _validated_catalog_permissions(permissions):
+        if permission.permission != "move_over_as_if_not_there":
+            continue
+        if permission.terrain_height_max_inches is None:
+            raise MovementLegalityError("Move-over permissions require a terrain height.")
+        heights.append(permission.terrain_height_max_inches)
+    return None if not heights else max(heights)
+
+
+def _validated_catalog_permissions(
+    permissions: tuple[CatalogMovementTransitPermission, ...],
+) -> tuple[CatalogMovementTransitPermission, ...]:
     if type(permissions) is not tuple:
         raise MovementLegalityError("Movement transit permissions must be a tuple.")
-    if not permissions:
-        return None
-    heights: list[float] = []
     for permission in permissions:
         if type(permission) is not CatalogMovementTransitPermission:
             raise MovementLegalityError(
                 "Movement transit permissions must contain catalog permissions."
             )
-        heights.append(permission.terrain_height_max_inches)
-    return max(heights)
+    return permissions
+
+
+def _fly_transit_applies_for_mode(movement_mode: object | None) -> bool:
+    if movement_mode is None:
+        return True
+    return movement_mode_from_token(movement_mode) in _FLY_TRANSIT_MOVEMENT_MODES
 
 
 def _validate_optional_movement_phase_action(value: object | None) -> str | None:

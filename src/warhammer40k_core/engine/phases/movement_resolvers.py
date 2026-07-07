@@ -16,6 +16,10 @@ from warhammer40k_core.engine.phases.movement_action_decisions import *
 from warhammer40k_core.engine.phases.movement_resolution_flow import *
 from warhammer40k_core.engine.phases.movement_fall_back_embark import *
 from warhammer40k_core.engine.phases.movement_options_dice import *
+from warhammer40k_core.engine.phases.movement_geometry import (
+    _enemy_model_ids_with_keyword_any_for_player,
+    _friendly_model_ids_with_keyword_any,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -230,6 +234,7 @@ def resolve_fall_back_move(
         battle_round=battle_round,
         battle_shocked_unit_ids=battle_shocked_unit_ids,
         forced_desperate_escape_source_rule_ids=forced_source_ids,
+        overflight_auto_pass_model_ids=resolved.desperate_escape_auto_pass_model_ids,
     )
     movement_payload = {
         **resolved.movement_payload,
@@ -346,6 +351,7 @@ def _resolve_unit_move(
     path_validation_results: list[PathValidationResult] = []
     terrain_path_legality_results: list[TerrainPathLegalityResult] = []
     model_movements: list[JsonValue] = []
+    desperate_escape_auto_pass_model_ids: list[str] = []
     max_movement_inches = 0.0
     for placement in unit_placement.model_placements:
         model = scenario.model_instance_for_placement(placement)
@@ -432,6 +438,17 @@ def _resolve_unit_move(
                 scenario=scenario,
                 player_id=unit_placement.player_id,
             ),
+            friendly_model_transit_blocker_ids=_friendly_model_ids_with_keyword_any(
+                scenario=scenario,
+                player_id=unit_placement.player_id,
+                moving_model_instance_id=placement.model_instance_id,
+                keyword_any=legality_context.capabilities.friendly_model_transit_blocker_keywords,
+            ),
+            enemy_model_transit_blocker_ids=_enemy_model_ids_with_keyword_any_for_player(
+                scenario=scenario,
+                player_id=unit_placement.player_id,
+                keyword_any=legality_context.capabilities.enemy_model_transit_blocker_keywords,
+            ),
             aircraft_model_ids=tuple(
                 model_id
                 for model_id in aircraft_model_ids
@@ -439,6 +456,8 @@ def _resolve_unit_move(
             ),
             movement_distance_budget_inches=movement_distance_budget_inches,
         ).validate()
+        if legality_context.capabilities.desperate_escape_tests_auto_passed:
+            desperate_escape_auto_pass_model_ids.append(placement.model_instance_id)
         aircraft_violations: tuple[AircraftMovementViolation, ...] = ()
         if (
             aircraft_policy.uses_aircraft_rules
@@ -550,6 +569,7 @@ def _resolve_unit_move(
         coherency_result=coherency_result,
         rollback_record=rollback_record,
         movement_payload=movement_payload,
+        desperate_escape_auto_pass_model_ids=tuple(sorted(desperate_escape_auto_pass_model_ids)),
     )
 
 

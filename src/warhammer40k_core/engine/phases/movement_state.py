@@ -965,3 +965,4 @@ class _ResolvedUnitMove:
     coherency_result: UnitCoherencyResult
     rollback_record: MovementRollbackRecord | None
     movement_payload: dict[str, JsonValue]
+    desperate_escape_auto_pass_model_ids: tuple[str, ...] = ()
