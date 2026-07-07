@@ -71,6 +71,7 @@ from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleMovementEndSurgeAbility,
     GenericRuleObjectiveControlModifierAbility,
     GenericRulePhaseEndObjectiveControlAbility,
+    GenericRuleReserveArrivalDistanceAbility,
     GenericRuleShootingTargetRestrictionAbility,
     GenericRuleShootingUnitSelectedGrantAbility,
     GenericRuleTurnEndAbility,
@@ -100,6 +101,12 @@ from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeHookBinding,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.reserve_arrival_hooks import (
+    ReserveArrivalDistanceContext,
+    ReserveArrivalDistanceGrant,
+    ReserveArrivalDistanceHandler,
+    ReserveArrivalDistanceHookBinding,
+)
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     RuleExecutionStatus,
@@ -392,6 +399,32 @@ def movement_end_surge_hook_bindings(
                     hook_id=descriptor.hook_id(source),
                     source_id=descriptor.source_rule_id,
                     handler=_movement_end_surge_handler_for_descriptor(source, descriptor),
+                )
+            )
+    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+
+
+def reserve_arrival_distance_hook_bindings(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+) -> tuple[ReserveArrivalDistanceHookBinding, ...]:
+    bindings: list[ReserveArrivalDistanceHookBinding] = []
+    for descriptor in DEFAULT_GENERIC_RULE_ABILITY_REGISTRY.reserve_arrival_distance_abilities:
+        for source in _generic_rule_ability_sources(
+            activation=activation,
+            execution_records=execution_records,
+            coverage_descriptor_id=descriptor.coverage_descriptor_id,
+            ability_ids=descriptor.ability_ids(),
+        ):
+            bindings.append(
+                ReserveArrivalDistanceHookBinding(
+                    hook_id=descriptor.hook_id(source),
+                    source_id=descriptor.source_rule_id,
+                    handler=_reserve_arrival_distance_handler_for_descriptor(
+                        source,
+                        descriptor,
+                    ),
                 )
             )
     return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
@@ -866,6 +899,29 @@ def _movement_end_surge_handler_for_descriptor(
         grants = descriptor.grant_builder(context, source)
         if type(grants) is not tuple:
             raise GameLifecycleError("Generic RuleIR movement-end surge grants must be a tuple.")
+        return grants
+
+    return handler
+
+
+def _reserve_arrival_distance_handler_for_descriptor(
+    source: GenericRuleAbilitySource,
+    descriptor: GenericRuleReserveArrivalDistanceAbility,
+) -> ReserveArrivalDistanceHandler:
+    def handler(
+        context: ReserveArrivalDistanceContext,
+    ) -> tuple[ReserveArrivalDistanceGrant, ...]:
+        if type(context) is not ReserveArrivalDistanceContext:
+            raise GameLifecycleError(
+                "Generic RuleIR reserve-arrival distance ability requires context."
+            )
+        if not descriptor.context_predicate(context, source):
+            return ()
+        grants = descriptor.grant_builder(context, source)
+        if type(grants) is not tuple:
+            raise GameLifecycleError(
+                "Generic RuleIR reserve-arrival distance grants must be a tuple."
+            )
         return grants
 
     return handler

@@ -195,6 +195,7 @@ GENERIC_ENGINE_CONSUMED_ENHANCEMENT_RUNTIME_CONSUMERS_BY_SOURCE_ROW_ID = {
 GENERIC_DETACHMENT_RULE_KEYS = frozenset(
     {
         ("chaos-daemons", "blood-legion"),
+        ("chaos-daemons", "daemonic-incursion"),
         ("chaos-daemons", "shadow-legion"),
         ("chaos-daemons", "cavalcade-of-chaos"),
         ("emperors-children", "court-of-the-phoenician"),
@@ -277,11 +278,10 @@ SHADOW_LEGION_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
     "disciples-of-belakor:weapon-profile",
 )
-CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY = {
-    ("chaos-daemons", "daemonic-incursion"): DAEMONIC_INCURSION_RUNTIME_CONSUMERS,
-}
+CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY: dict[tuple[str, str], tuple[str, ...]] = {}
 GENERIC_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY = {
     ("chaos-daemons", "blood-legion"): BLOOD_LEGION_RUNTIME_CONSUMERS,
+    ("chaos-daemons", "daemonic-incursion"): DAEMONIC_INCURSION_RUNTIME_CONSUMERS,
 }
 AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:aeldari:army_rule:fade_back",
@@ -1008,11 +1008,16 @@ def test_phase17e_chaos_daemons_detachment_rule_is_engine_consumed(
     )
 
     assert coverage_row.rule_name == rule_name
-    assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
+    assert coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
     assert coverage_row.runtime_support_status is not None
     assert coverage_row.runtime_support_status.value == "engine_consumed"
     assert coverage_row.runtime_consumer_ids == tuple(sorted(runtime_consumers))
-    assert coverage_row.handler_id == runtime_consumers[0]
+    assert coverage_row.handler_id is None
+    assert coverage_row.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+            coverage_row.descriptor_id
+        )
+    )
 
 
 @pytest.mark.parametrize(
@@ -1434,11 +1439,11 @@ def test_phase17e_coverage_rows_reject_malformed_runtime_shape_tokens() -> None:
         if row.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
         and row.status is Phase17ECoverageStatus.IMPLEMENTED
     )
-    implemented_detachment_row = next(
+    generic_detachment_row = next(
         row
         for row in package.coverage_rows
         if row.coverage_kind is Phase17ECoverageKind.DETACHMENT_RULE
-        and row.status is Phase17ECoverageStatus.IMPLEMENTED
+        and row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
     )
     exact_runtime_row = next(
         row
@@ -1489,19 +1494,19 @@ def test_phase17e_coverage_rows_reject_malformed_runtime_shape_tokens() -> None:
         replace(exact_runtime_row, runtime_support_status=None)
 
     with pytest.raises(Phase17EFactionCoverageError, match="Detachment rule coverage"):
-        replace(implemented_detachment_row, rule_id="unexpected-exact-rule-id")
+        replace(generic_detachment_row, rule_id="unexpected-exact-rule-id")
 
     with pytest.raises(Phase17EFactionCoverageError, match="requires runtime consumers"):
-        replace(implemented_detachment_row, runtime_consumer_ids=())
+        replace(generic_detachment_row, runtime_consumer_ids=())
 
     with pytest.raises(Phase17EFactionCoverageError, match="require runtime support"):
-        replace(implemented_detachment_row, runtime_support_status=None)
+        replace(generic_detachment_row, runtime_support_status=None)
 
     with pytest.raises(Phase17EFactionCoverageError, match="Only exact subrule coverage"):
         replace(datasheet_row, rule_id="unexpected-rule-id")
 
     with pytest.raises(Phase17EFactionCoverageError, match="detachment_point_cost must be"):
-        replace(implemented_detachment_row, detachment_point_cost=0)
+        replace(generic_detachment_row, detachment_point_cost=0)
 
 
 def test_phase17e_local_raw_faction_pdfs_match_manifest_when_present() -> None:

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.battlefield_state import (
@@ -8,6 +10,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.faction_content.common import (
     canonical_keyword as _canonical_keyword,
@@ -29,11 +32,13 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserve_arrival_hooks import (
     ReserveArrivalDistanceContext,
     ReserveArrivalDistanceGrant,
-    ReserveArrivalDistanceHookBinding,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.volume import Model as GeometryModel
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.generic_rule_ability_registry import GenericRuleAbilitySource
 
 CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:rule:warp_rifts"
 WARP_RIFTS_HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts"
@@ -50,21 +55,18 @@ GOD_KEYWORDS = ("KHORNE", "TZEENTCH", "NURGLE", "SLAANESH")
 def runtime_contribution() -> RuntimeContentContribution:
     return RuntimeContentContribution(
         contribution_id=CONTRIBUTION_ID,
-        reserve_arrival_distance_hook_bindings=(
-            ReserveArrivalDistanceHookBinding(
-                hook_id=WARP_RIFTS_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=warp_rifts_distance_grants,
-            ),
-        ),
     )
 
 
 def warp_rifts_distance_grants(
     context: ReserveArrivalDistanceContext,
+    *,
+    source: GenericRuleAbilitySource | None = None,
 ) -> tuple[ReserveArrivalDistanceGrant, ...]:
     if type(context) is not ReserveArrivalDistanceContext:
         raise GameLifecycleError("Warp Rifts requires a reserve arrival distance context.")
+    if source is not None:
+        _validate_generic_rule_source(source)
     if context.placement_kind is not BattlefieldPlacementKind.DEEP_STRIKE:
         return ()
     if context.attempted_placement.unit_instance_id != context.reserve_state.unit_instance_id:
@@ -90,23 +92,54 @@ def warp_rifts_distance_grants(
             hook_id=WARP_RIFTS_HOOK_ID,
             source_id=SOURCE_RULE_ID,
             enemy_horizontal_distance_inches=WARP_RIFTS_ENEMY_DISTANCE_INCHES,
-            replay_payload={
-                "effect_kind": "warp_rifts",
-                "detachment_id": DAEMONIC_INCURSION_DETACHMENT_ID,
-                "player_id": context.reserve_state.player_id,
-                "unit_instance_id": context.reserve_state.unit_instance_id,
-                "placement_kind": context.placement_kind.value,
-                "base_enemy_horizontal_distance_inches": (
-                    context.base_enemy_horizontal_distance_inches
-                ),
-                "enemy_horizontal_distance_inches": WARP_RIFTS_ENEMY_DISTANCE_INCHES,
-                "shadow_of_chaos": within_shadow,
-                "greater_daemon_anchor": within_anchor,
-                "required_faction_keyword": LEGIONES_DAEMONICA,
-                "shared_god_keywords": list(_god_keywords_for_unit(context.unit)),
-            },
+            replay_payload=_warp_rifts_replay_payload(
+                context=context,
+                source=source,
+                within_shadow=within_shadow,
+                within_anchor=within_anchor,
+            ),
         ),
     )
+
+
+def _warp_rifts_replay_payload(
+    *,
+    context: ReserveArrivalDistanceContext,
+    source: GenericRuleAbilitySource | None,
+    within_shadow: bool,
+    within_anchor: bool,
+) -> JsonValue:
+    payload: dict[str, object] = {
+        "effect_kind": "warp_rifts",
+        "source_rule_id": SOURCE_RULE_ID,
+        "detachment_id": DAEMONIC_INCURSION_DETACHMENT_ID,
+        "player_id": context.reserve_state.player_id,
+        "unit_instance_id": context.reserve_state.unit_instance_id,
+        "placement_kind": context.placement_kind.value,
+        "base_enemy_horizontal_distance_inches": context.base_enemy_horizontal_distance_inches,
+        "enemy_horizontal_distance_inches": WARP_RIFTS_ENEMY_DISTANCE_INCHES,
+        "shadow_of_chaos": within_shadow,
+        "greater_daemon_anchor": within_anchor,
+        "required_faction_keyword": LEGIONES_DAEMONICA,
+        "shared_god_keywords": list(_god_keywords_for_unit(context.unit)),
+    }
+    if source is not None:
+        payload.update(
+            {
+                "coverage_descriptor_id": source.record.coverage_descriptor_id,
+                "execution_id": source.record.execution_id,
+                "rule_ir_source_id": source.rule_ir.source_id,
+                "rule_ir_hash": source.rule_ir.ir_hash(),
+            }
+        )
+    return validate_json_value(payload)
+
+
+def _validate_generic_rule_source(source: object) -> None:
+    from warhammer40k_core.engine.generic_rule_ability_registry import GenericRuleAbilitySource
+
+    if type(source) is not GenericRuleAbilitySource:
+        raise GameLifecycleError("Warp Rifts generic RuleIR source requires ability source.")
 
 
 def _attempted_unit_wholly_within_shadow(

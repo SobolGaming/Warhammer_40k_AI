@@ -36,6 +36,10 @@ from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeGrant,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.reserve_arrival_hooks import (
+    ReserveArrivalDistanceContext,
+    ReserveArrivalDistanceGrant,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
     SaveOptionModifierContext,
@@ -88,6 +92,7 @@ class GenericRuleAbilityHookFamily(StrEnum):
     UNIT_DESTROYED = "unit_destroyed"
     TURN_END = "turn_end"
     FIGHT_PHASE_START = "fight_phase_start"
+    RESERVE_ARRIVAL_DISTANCE = "reserve_arrival_distance"
 
 
 @dataclass(frozen=True, slots=True)
@@ -222,6 +227,14 @@ type FightPhaseStartRequestBuilder = Callable[
 type FightPhaseStartResultBuilder = Callable[
     [FightPhaseStartResultContext, GenericRuleAbilitySource],
     bool | LifecycleStatus,
+]
+type ReserveArrivalDistanceContextPredicate = Callable[
+    [ReserveArrivalDistanceContext, GenericRuleAbilitySource],
+    bool,
+]
+type ReserveArrivalDistanceGrantBuilder = Callable[
+    [ReserveArrivalDistanceContext, GenericRuleAbilitySource],
+    tuple[ReserveArrivalDistanceGrant, ...],
 ]
 
 
@@ -1139,6 +1152,57 @@ class GenericRuleFightPhaseStartAbility:
 
 
 @dataclass(frozen=True, slots=True)
+class GenericRuleReserveArrivalDistanceAbility:
+    ability_id: str
+    coverage_descriptor_id: str
+    source_rule_id: str
+    hook_id_builder: GenericRuleHookIdBuilder
+    context_predicate: ReserveArrivalDistanceContextPredicate
+    grant_builder: ReserveArrivalDistanceGrantBuilder
+
+    @property
+    def hook_family(self) -> GenericRuleAbilityHookFamily:
+        return GenericRuleAbilityHookFamily.RESERVE_ARRIVAL_DISTANCE
+
+    def __post_init__(self) -> None:
+        _validate_single_descriptor_fields(
+            self.ability_id,
+            coverage_descriptor_id=self.coverage_descriptor_id,
+            source_rule_id=self.source_rule_id,
+            set_validated_values=self._set_validated_identity,
+        )
+        _validate_callable(
+            "Generic reserve-arrival distance ability hook_id_builder",
+            self.hook_id_builder,
+        )
+        _validate_callable(
+            "Generic reserve-arrival distance ability context_predicate",
+            self.context_predicate,
+        )
+        _validate_callable(
+            "Generic reserve-arrival distance ability grant_builder",
+            self.grant_builder,
+        )
+
+    def _set_validated_identity(
+        self,
+        *,
+        ability_id: str,
+        coverage_descriptor_id: str,
+        source_rule_id: str,
+    ) -> None:
+        object.__setattr__(self, "ability_id", ability_id)
+        object.__setattr__(self, "coverage_descriptor_id", coverage_descriptor_id)
+        object.__setattr__(self, "source_rule_id", source_rule_id)
+
+    def ability_ids(self) -> tuple[str, ...]:
+        return (self.ability_id,)
+
+    def hook_id(self, source: GenericRuleAbilitySource) -> str:
+        return _validate_identifier("hook_id", self.hook_id_builder(source))
+
+
+@dataclass(frozen=True, slots=True)
 class GenericRuleAbilityRegistry:
     advance_eligibility_abilities: tuple[GenericRuleAdvanceEligibilityAbility, ...] = ()
     shooting_target_restriction_abilities: tuple[
@@ -1209,152 +1273,13 @@ class GenericRuleAbilityRegistry:
         GenericRuleFightPhaseStartAbility,
         ...,
     ] = ()
+    reserve_arrival_distance_abilities: tuple[
+        GenericRuleReserveArrivalDistanceAbility,
+        ...,
+    ] = ()
 
     def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "advance_eligibility_abilities",
-            _validate_descriptor_tuple(
-                self.advance_eligibility_abilities,
-                descriptor_type=GenericRuleAdvanceEligibilityAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "shooting_target_restriction_abilities",
-            _validate_descriptor_tuple(
-                self.shooting_target_restriction_abilities,
-                descriptor_type=GenericRuleShootingTargetRestrictionAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "shooting_unit_selected_grant_abilities",
-            _validate_descriptor_tuple(
-                self.shooting_unit_selected_grant_abilities,
-                descriptor_type=GenericRuleShootingUnitSelectedGrantAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "fight_unit_selected_grant_abilities",
-            _validate_descriptor_tuple(
-                self.fight_unit_selected_grant_abilities,
-                descriptor_type=GenericRuleFightUnitSelectedGrantAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "attack_sequence_completed_abilities",
-            _validate_descriptor_tuple(
-                self.attack_sequence_completed_abilities,
-                descriptor_type=GenericRuleAttackSequenceCompletedAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "mortal_wound_feel_no_pain_abilities",
-            _validate_descriptor_tuple(
-                self.mortal_wound_feel_no_pain_abilities,
-                descriptor_type=GenericRuleMortalWoundFeelNoPainAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "weapon_profile_modifier_abilities",
-            _validate_descriptor_tuple(
-                self.weapon_profile_modifier_abilities,
-                descriptor_type=GenericRuleWeaponProfileModifierAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "movement_end_surge_abilities",
-            _validate_descriptor_tuple(
-                self.movement_end_surge_abilities,
-                descriptor_type=GenericRuleMovementEndSurgeAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "phase_end_objective_control_abilities",
-            _validate_descriptor_tuple(
-                self.phase_end_objective_control_abilities,
-                descriptor_type=GenericRulePhaseEndObjectiveControlAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "battle_formation_abilities",
-            _validate_descriptor_tuple(
-                self.battle_formation_abilities,
-                descriptor_type=GenericRuleBattleFormationAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "enhancement_effect_abilities",
-            _validate_descriptor_tuple(
-                self.enhancement_effect_abilities,
-                descriptor_type=GenericRuleEnhancementEffectAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "objective_control_modifier_abilities",
-            _validate_descriptor_tuple(
-                self.objective_control_modifier_abilities,
-                descriptor_type=GenericRuleObjectiveControlModifierAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "stratagem_cost_choice_abilities",
-            _validate_descriptor_tuple(
-                self.stratagem_cost_choice_abilities,
-                descriptor_type=GenericRuleStratagemCostChoiceAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "stratagem_cost_modifier_abilities",
-            _validate_descriptor_tuple(
-                self.stratagem_cost_modifier_abilities,
-                descriptor_type=GenericRuleStratagemCostModifierAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "save_option_modifier_abilities",
-            _validate_descriptor_tuple(
-                self.save_option_modifier_abilities,
-                descriptor_type=GenericRuleSaveOptionModifierAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "unit_destroyed_abilities",
-            _validate_descriptor_tuple(
-                self.unit_destroyed_abilities,
-                descriptor_type=GenericRuleUnitDestroyedAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "turn_end_abilities",
-            _validate_descriptor_tuple(
-                self.turn_end_abilities,
-                descriptor_type=GenericRuleTurnEndAbility,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "fight_phase_start_abilities",
-            _validate_descriptor_tuple(
-                self.fight_phase_start_abilities,
-                descriptor_type=GenericRuleFightPhaseStartAbility,
-            ),
-        )
+        _validate_registry_descriptor_fields(self)
 
 
 class _SingleDescriptorIdentitySetter(Protocol):
@@ -1396,7 +1321,43 @@ type _AnyGenericRuleAbilityDescriptor = (
     | GenericRuleUnitDestroyedAbility
     | GenericRuleTurnEndAbility
     | GenericRuleFightPhaseStartAbility
+    | GenericRuleReserveArrivalDistanceAbility
 )
+
+
+_REGISTRY_DESCRIPTOR_FIELDS: tuple[tuple[str, type[object]], ...] = (
+    ("advance_eligibility_abilities", GenericRuleAdvanceEligibilityAbility),
+    ("shooting_target_restriction_abilities", GenericRuleShootingTargetRestrictionAbility),
+    ("shooting_unit_selected_grant_abilities", GenericRuleShootingUnitSelectedGrantAbility),
+    ("fight_unit_selected_grant_abilities", GenericRuleFightUnitSelectedGrantAbility),
+    ("attack_sequence_completed_abilities", GenericRuleAttackSequenceCompletedAbility),
+    ("mortal_wound_feel_no_pain_abilities", GenericRuleMortalWoundFeelNoPainAbility),
+    ("weapon_profile_modifier_abilities", GenericRuleWeaponProfileModifierAbility),
+    ("movement_end_surge_abilities", GenericRuleMovementEndSurgeAbility),
+    ("phase_end_objective_control_abilities", GenericRulePhaseEndObjectiveControlAbility),
+    ("battle_formation_abilities", GenericRuleBattleFormationAbility),
+    ("enhancement_effect_abilities", GenericRuleEnhancementEffectAbility),
+    ("objective_control_modifier_abilities", GenericRuleObjectiveControlModifierAbility),
+    ("stratagem_cost_choice_abilities", GenericRuleStratagemCostChoiceAbility),
+    ("stratagem_cost_modifier_abilities", GenericRuleStratagemCostModifierAbility),
+    ("save_option_modifier_abilities", GenericRuleSaveOptionModifierAbility),
+    ("unit_destroyed_abilities", GenericRuleUnitDestroyedAbility),
+    ("turn_end_abilities", GenericRuleTurnEndAbility),
+    ("fight_phase_start_abilities", GenericRuleFightPhaseStartAbility),
+    ("reserve_arrival_distance_abilities", GenericRuleReserveArrivalDistanceAbility),
+)
+
+
+def _validate_registry_descriptor_fields(registry: GenericRuleAbilityRegistry) -> None:
+    for field_name, descriptor_type in _REGISTRY_DESCRIPTOR_FIELDS:
+        object.__setattr__(
+            registry,
+            field_name,
+            _validate_descriptor_tuple(
+                getattr(registry, field_name),
+                descriptor_type=descriptor_type,
+            ),
+        )
 
 
 def _validate_single_descriptor_fields(

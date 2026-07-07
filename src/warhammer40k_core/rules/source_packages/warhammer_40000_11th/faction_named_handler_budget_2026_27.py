@@ -30,7 +30,6 @@ _APPROVED_PRE_WS14_NAMED_HANDLER_EXECUTION_IDS = (
     "phase17f:phase17e:astra-militarum:army-rule",
     "phase17f:phase17e:black-templars:army-rule",
     "phase17f:phase17e:chaos-daemons:army-rule",
-    "phase17f:phase17e:chaos-daemons:daemonic-incursion:rule",
     "phase17f:phase17e:chaos-knights:army-rule",
     "phase17f:phase17e:chaos-space-marines:army-rule",
     "phase17f:phase17e:death-guard:army-rule",

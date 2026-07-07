@@ -1459,9 +1459,15 @@ class RuntimeContentBundle:
             )
         )
         reserve_arrival_distance_hook_registry = ReserveArrivalDistanceHookRegistry.from_bindings(
-            _contribution_values(
-                validated_contributions,
-                lambda contribution: contribution.reserve_arrival_distance_hook_bindings,
+            (
+                *generic_rule_lifecycle_hooks.reserve_arrival_distance_hook_bindings(
+                    activation=activation,
+                    execution_records=records,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.reserve_arrival_distance_hook_bindings,
+                ),
             )
         )
         unit_move_completed_mortal_wound_hook_registry = (

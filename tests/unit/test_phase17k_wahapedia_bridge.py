@@ -4671,7 +4671,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         generated_markdown
     )
     assert (
-        "| Chaos Daemons | 9 | 4 | 28 | 43 | 2 | [chaos-daemons](factions/chaos-daemons.md) |"
+        "| Chaos Daemons | 9 | 4 | 28 | 43 | 1 | [chaos-daemons](factions/chaos-daemons.md) |"
         in (generated_markdown)
     )
     assert (
@@ -5033,7 +5033,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
     assert "| 8 | 0 | 24 | 36 | 1 |" in imperial_knights_markdown
     assert "| 10 | 0 | 32 | 48 | 1 |" in tyranids_markdown
     assert (
-        "| Daemonic Incursion | `Full` | Warp Rifts reserve-arrival distance hook |"
+        "| Daemonic Incursion | `Full` | Warp Rifts generic IR reserve-arrival distance hook |"
     ) in chaos_daemons_markdown
     assert "| Legion of Excess | `None` | Generated scaffold only |" in chaos_daemons_markdown
     assert "## Detachment Rule Coverage Rows" in chaos_daemons_markdown
