@@ -89,6 +89,8 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.modifiers import ModifierStack, RollModifier
 from warhammer40k_core.core.ruleset_descriptor import (
+    CoverEffect,
+    CoverPolicyDescriptor,
     RulesetDescriptor,
     TerrainFeatureKind,
 )
@@ -144,6 +146,7 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.catalog_rule_consumption import (
     record_core_feel_no_pain_sources_for_unit,
 )
+from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
 from warhammer40k_core.engine.damage_allocation import (
     DECLINE_DESTRUCTION_REACTION_OPTION_ID,
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
@@ -6742,6 +6745,136 @@ def test_phase17_post_shoot_cover_denial_suppresses_cover_hit_penalty() -> None:
     assert payload["target_number"] == 3
     assert payload["modifier"] == 0
     assert payload["successful"] is True
+
+
+def test_phase17_post_shoot_cover_denial_suppresses_cover_save_eligibility() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    attacker = units["intercessor-1"]
+    defender = units["enemy"]
+    defender_model = defender.own_models[0]
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_removed_models(
+        tuple(model.model_instance_id for model in defender.own_models[1:])
+    )
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase17-cover-denial-save-rifle",
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, -1),
+        damage_profile=DamageProfile.fixed(1),
+    )
+    cover_result = replace(
+        _benefit_of_cover_result(),
+        cover_effect=CoverEffect.SAVE_BONUS,
+    )
+    cover_armour_option = next(
+        option
+        for option in save_options_for_model(
+            model=defender_model,
+            armor_penetration=weapon_profile.armor_penetration.final,
+            cover_result=cover_result,
+        )
+        if option.save_kind is SaveKind.ARMOUR
+    )
+    assert cover_armour_option.cover_applied is True
+    assert cover_armour_option.target_number == cover_armour_option.characteristic_target_number
+
+    state.record_persisting_effect(
+        replace(
+            _phase13f_cover_effect(defender.unit_instance_id),
+            effect_id="phase17-save-cover-only",
+            source_rule_id="core-stratagem:smokescreen",
+            effect_payload={
+                "effect_kind": SMOKESCREEN_EFFECT_KIND,
+                "benefit_of_cover": True,
+                "hit_roll_modifier": 0,
+            },
+        )
+    )
+    state.record_persisting_effect(
+        _phase17_post_shoot_cover_denial_effect(defender.unit_instance_id)
+    )
+    base_ruleset = _ruleset()
+    save_bonus_ruleset = replace(
+        base_ruleset,
+        terrain_visibility_policy=replace(
+            base_ruleset.terrain_visibility_policy,
+            cover_effect=CoverEffect.SAVE_BONUS,
+            cover_policy=CoverPolicyDescriptor(cover_effect=CoverEffect.SAVE_BONUS),
+        ),
+        descriptor_hash="",
+    )
+    sequence_id = "phase17-cover-denial-save"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    hit_spec = attack_sequence_hit_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=weapon_profile.profile_id,
+        attack_context_id=attack_context_id,
+        attacker_player_id="player-a",
+    )
+    save_spec = saving_throw_roll_spec(
+        save_kind=SaveKind.ARMOUR,
+        player_id="player-b",
+        allocated_model_id=defender_model.model_instance_id,
+        attack_context_id=attack_context_id,
+    )
+
+    remaining_sequence, allocated_model_ids, status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=save_bonus_ruleset,
+        attack_sequence=AttackSequence.start(
+            sequence_id=sequence_id,
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(roll_id=f"{sequence_id}:hit", spec=hit_spec, value=6),
+                _fixed_roll_result(roll_id=f"{sequence_id}:wound", spec=wound_spec, value=6),
+                _fixed_roll_result(roll_id=f"{sequence_id}:save", spec=save_spec, value=3),
+            ),
+        ),
+    )
+    save_payload = _attack_step_payload(
+        _event_payloads(lifecycle, "attack_sequence_step"),
+        AttackSequenceStep.SAVE,
+    )
+    payload = cast(dict[str, object], save_payload["payload"])
+    option = cast(dict[str, object], payload["option"])
+
+    assert remaining_sequence is None
+    assert allocated_model_ids == (defender_model.model_instance_id,)
+    assert status is None
+    assert payload["save_kind"] == SaveKind.ARMOUR.value
+    assert payload["target_number"] == cover_armour_option.characteristic_target_number
+    assert payload["unmodified_roll"] == 3
+    assert payload["final_roll"] == 2
+    assert payload["successful"] is False
+    assert payload["resolution_rule"] == SaveResolutionRule.FAILED.value
+    assert option["target_number"] == cover_armour_option.characteristic_target_number + 1
+    assert (
+        option["characteristic_target_number"] == cover_armour_option.characteristic_target_number
+    )
+    assert option["cover_result"] is None
+    assert option["cover_applied"] is False
+    assert option["source_rule_ids"] == []
 
 
 def test_hit_roll_bonus_cap_applies_after_ballistic_skill_modifier() -> None:

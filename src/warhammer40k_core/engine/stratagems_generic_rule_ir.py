@@ -295,6 +295,15 @@ def _record_generic_rule_ir_stratagem_runtime_effects(
                     rule_result=rule_result,
                     effect_payload=effect_payload,
                 )
+            elif status == "benefit_of_cover":
+                _record_generic_benefit_of_cover_denial_effect(
+                    state=state,
+                    decisions=decisions,
+                    context=context,
+                    use_record=use_record,
+                    rule_result=rule_result,
+                    effect_payload=effect_payload,
+                )
             elif status == "force_battle_shock_test":
                 _resolve_generic_forced_battle_shock_test(
                     state=state,
@@ -527,6 +536,71 @@ def _record_generic_detection_range_bonus_effect(
             "generic_rule_execution_result": validate_json_value(rule_result.to_payload()),
             "generic_rule_effect": validate_json_value(effect_payload),
         },
+    )
+
+
+def _record_generic_benefit_of_cover_denial_effect(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    use_record: StratagemUseRecord,
+    rule_result: RuleExecutionResult,
+    effect_payload: dict[str, JsonValue],
+) -> None:
+    if _required_rule_effect_string_parameter(effect_payload, "rules_context") != "status_denial":
+        raise GameLifecycleError("Generic cover denial requires status-denial context.")
+    if _required_rule_effect_string_parameter(effect_payload, "operation") != "deny":
+        raise GameLifecycleError("Generic cover denial requires deny operation.")
+    if _required_rule_effect_string_parameter(effect_payload, "status") != "benefit_of_cover":
+        raise GameLifecycleError("Generic cover denial requires Benefit of Cover status.")
+    target_scope = _required_rule_effect_string_parameter(effect_payload, "target_scope")
+    if target_scope not in {"selected_unit", "models_in_selected_unit"}:
+        raise GameLifecycleError("Generic cover denial target scope is unsupported.")
+    source_rule_id = _rule_effect_source_id(effect_payload)
+    effect_selection_kind = _required_rule_effect_string_parameter(
+        effect_payload, "effect_selection_kind"
+    )
+    target_unit_id = _effect_selection_unit_id(
+        use_record,
+        expected_selection_kind=effect_selection_kind,
+    )
+    effect = PersistingEffect(
+        effect_id=f"{use_record.use_id}:benefit-of-cover-denial:{target_unit_id}",
+        source_rule_id=source_rule_id,
+        owner_player_id=use_record.player_id,
+        target_unit_instance_ids=(target_unit_id,),
+        started_battle_round=use_record.battle_round,
+        started_phase=use_record.phase,
+        expiration=_expiration_for_rule_effect_payload(
+            effect_payload=effect_payload,
+            context=context,
+            use_record=use_record,
+        ),
+        effect_payload={
+            "effect_kind": "generic_stratagem_benefit_of_cover_denial",
+            "stratagem_id": use_record.stratagem_id,
+            "stratagem_use_id": use_record.use_id,
+            "source_rule_id": source_rule_id,
+            "target_unit_instance_id": target_unit_id,
+            "status": "benefit_of_cover",
+            "status_label": "Benefit of Cover",
+            "operation": "deny",
+            "target_scope": target_scope,
+            "benefit_of_cover_denied": True,
+            "generic_rule_execution_result": validate_json_value(rule_result.to_payload()),
+            "generic_rule_effect": validate_json_value(effect_payload),
+        },
+    )
+    state.record_persisting_effect(effect)
+    decisions.event_log.append(
+        "generic_stratagem_benefit_of_cover_denial_registered",
+        _generic_runtime_effect_event_payload(
+            state=state,
+            context=context,
+            use_record=use_record,
+            effect=effect,
+        ),
     )
 
 

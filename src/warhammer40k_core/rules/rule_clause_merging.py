@@ -12,6 +12,16 @@ _POST_SHOOT_HIT_TARGET_SELECTION_RE = re.compile(
     r"those\s+attacks\b",
     re.IGNORECASE,
 )
+_HIT_BY_THOSE_ATTACKS_TARGET_SELECTION_RE = re.compile(
+    r"\bselect\s+one\s+enemy\s+unit\s+(?:that\s+was\s+)?hit\s+by\s+one\s+or\s+"
+    r"more\s+of\s+those\s+attacks\b",
+    re.IGNORECASE,
+)
+_POST_SHOOT_OR_HIT_TARGET_SELECTION_RE = re.compile(
+    rf"(?:{_POST_SHOOT_HIT_TARGET_SELECTION_RE.pattern})|"
+    rf"(?:{_HIT_BY_THOSE_ATTACKS_TARGET_SELECTION_RE.pattern})",
+    re.IGNORECASE,
+)
 _CONTEXTUAL_STATUS_DENIAL_RE = re.compile(
     r"\b(?P<subject>"
     r"that\s+enemy\s+unit|that\s+unit|selected\s+unit|target\s+unit|"
@@ -61,7 +71,7 @@ def merge_rule_clause_spans(
     merged = _merge_adjacent_clause_spans(
         normalized_text=normalized_text,
         spans=merged,
-        current_patterns=(_POST_SHOOT_HIT_TARGET_SELECTION_RE,),
+        current_patterns=(_POST_SHOOT_OR_HIT_TARGET_SELECTION_RE,),
         next_pattern=_CONTEXTUAL_STATUS_DENIAL_RE,
     )
     return _merge_adjacent_clause_spans(

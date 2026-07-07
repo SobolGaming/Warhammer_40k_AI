@@ -14,6 +14,12 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14,
     faction_subrules_2026_27,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_spectacle_of_slaughter_ir_support_2026_27 as spectacle_ir,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_STRATAGEMS_PATH = (
@@ -76,6 +82,79 @@ REGULAR_TARGET_KEYWORDS = (
     "WALKER",
 )
 
+SOURCE_ROW_REQUIRED_KEYWORD_OVERRIDES: dict[str, tuple[str, ...]] = {
+    "stratagem:emperors-children:court-of-the-phoenician:000010655004": ("DAEMON",),
+    "stratagem:emperors-children:court-of-the-phoenician:000010655006": ("DAEMON",),
+}
+
+
+@dataclass(frozen=True, slots=True)
+class SourceOnlyActivationMetadata:
+    when_descriptor: str
+    target_descriptor: str
+    effect_descriptor: str
+    trigger_kind: str
+    phase_tokens: tuple[str, ...]
+    target_kind: str
+    target_policy_id: str
+    required_keywords: tuple[str, ...] = ()
+    required_keywords_any: tuple[str, ...] = ()
+    required_faction_keywords: tuple[str, ...] = ()
+    excluded_keywords: tuple[str, ...] = ()
+    excluded_faction_keywords: tuple[str, ...] = ()
+
+
+SOURCE_ONLY_ACTIVATION_METADATA_BY_ROW_ID: dict[str, SourceOnlyActivationMetadata] = {
+    "stratagem:emperors-children:spectacle-of-slaughter:000010901002": (
+        SourceOnlyActivationMetadata(
+            when_descriptor="Either player's turn; Fight phase",
+            target_descriptor="One friendly FLAWLESS BLADES unit that was selected to fight.",
+            effect_descriptor=(
+                "Until the end of the phase, melee weapons equipped by models in your unit "
+                "have the [PRECISION] ability."
+            ),
+            trigger_kind="just_after_friendly_unit_selected_to_fight",
+            phase_tokens=("fight",),
+            target_kind="friendly_unit",
+            target_policy_id="friendly_unit",
+            required_faction_keywords=("FLAWLESS BLADES",),
+        )
+    ),
+    "stratagem:emperors-children:spectacle-of-slaughter:000010901003": (
+        SourceOnlyActivationMetadata(
+            when_descriptor="Your Charge phase, when a FLAWLESS BLADES unit starts a Charge move.",
+            target_descriptor="One friendly FLAWLESS BLADES unit that is starting a Charge move.",
+            effect_descriptor=(
+                "Until the end of the phase, models in your unit can move through models, "
+                "excluding MONSTER and VEHICLE models."
+            ),
+            trigger_kind="start_phase",
+            phase_tokens=("charge",),
+            target_kind="friendly_unit",
+            target_policy_id="friendly_unit",
+            required_faction_keywords=("FLAWLESS BLADES",),
+        )
+    ),
+    "stratagem:emperors-children:spectacle-of-slaughter:000010901004": (
+        SourceOnlyActivationMetadata(
+            when_descriptor=(
+                "Your opponent's Movement phase, just after an enemy unit that was within "
+                "Engagement Range of a friendly FLAWLESS BLADES unit ends a Fall Back move."
+            ),
+            target_descriptor=(
+                "One friendly FLAWLESS BLADES unit that was within Engagement Range of that "
+                "enemy unit and is not within Engagement Range of one or more enemy units."
+            ),
+            effect_descriptor="Your unit can make a Normal move of up to D3+3 inches.",
+            trigger_kind="after_enemy_unit_ends_move",
+            phase_tokens=("movement",),
+            target_kind="friendly_unit",
+            target_policy_id="friendly_unit",
+            required_faction_keywords=("FLAWLESS BLADES",),
+        )
+    ),
+}
+
 
 @dataclass(frozen=True, slots=True)
 class ActivationProfile:
@@ -103,6 +182,7 @@ class ActivationProfile:
     excluded_faction_keywords: tuple[str, ...]
     rule_ir_hash: str
     compiled_rule_ir_payload: RuleIRPayload | None
+    effect_selection_kind: str | None
 
     def constructor_line(self) -> str:
         values = (
@@ -137,11 +217,10 @@ class ActivationProfile:
 def main() -> None:
     raw_rows = _raw_stratagem_rows_by_id()
     profiles = tuple(
-        _activation_profile(source_row=row, raw_row=raw_rows[row.stratagem_id])
-        for row in faction_subrules_2026_27.stratagem_rows()
-        if not row.runtime_consumer_ids
+        _activation_profile_for_source_row(source_row=row, raw_rows=raw_rows)
+        for row in _source_rows_with_activation_profiles(raw_rows)
     )
-    _validate_profile_coverage(profiles)
+    _validate_profile_coverage(profiles, raw_rows=raw_rows)
     OUTPUT_PATH.write_text(_module_text(profiles), encoding="utf-8", newline="\n")
 
 
@@ -159,6 +238,41 @@ def _raw_stratagem_rows_by_id() -> dict[str, dict[str, object]]:
             raise ValueError("Stratagem source snapshot row is missing source_row_id.")
         raw_rows[source_row_id] = row
     return raw_rows
+
+
+def _source_rows_with_activation_profiles(
+    raw_rows: dict[str, dict[str, object]],
+) -> tuple[faction_subrules_2026_27.SourceStratagemRow, ...]:
+    rows: list[faction_subrules_2026_27.SourceStratagemRow] = []
+    for row in faction_subrules_2026_27.stratagem_rows():
+        if row.runtime_consumer_ids:
+            continue
+        if (
+            row.stratagem_id in raw_rows
+            or row.source_row_id in SOURCE_ONLY_ACTIVATION_METADATA_BY_ROW_ID
+        ):
+            rows.append(row)
+    return tuple(rows)
+
+
+def _activation_profile_for_source_row(
+    *,
+    source_row: faction_subrules_2026_27.SourceStratagemRow,
+    raw_rows: dict[str, dict[str, object]],
+) -> ActivationProfile:
+    raw_row = raw_rows.get(source_row.stratagem_id)
+    if raw_row is not None:
+        return _activation_profile(source_row=source_row, raw_row=raw_row)
+    metadata = SOURCE_ONLY_ACTIVATION_METADATA_BY_ROW_ID.get(source_row.source_row_id)
+    if metadata is None:
+        raise ValueError(
+            f"Stratagem source row lacks raw source and source-only metadata: "
+            f"{source_row.source_row_id}."
+        )
+    return _activation_profile_from_source_only_metadata(
+        source_row=source_row,
+        metadata=metadata,
+    )
 
 
 def _activation_profile(
@@ -190,14 +304,18 @@ def _activation_profile(
         rule_target_kind=rule_target_kind,
         effect_descriptor=sections["effect"],
     )
-    if compiled_rule_ir_payload is None:
+    overlay_rule_ir_payload = _overlay_rule_ir_payload_or_none(profile_id)
+    effective_rule_ir_payload = overlay_rule_ir_payload
+    if effective_rule_ir_payload is None:
+        effective_rule_ir_payload = compiled_rule_ir_payload
+    if effective_rule_ir_payload is None:
         rule_ir_hash = _rule_ir_hash(
             profile_id=profile_id,
             source_id=source_row.source_id,
             rule_target_kind=rule_target_kind,
         )
     else:
-        rule_ir_hash = str(compiled_rule_ir_payload["ir_hash"])
+        rule_ir_hash = str(effective_rule_ir_payload["ir_hash"])
     return ActivationProfile(
         profile_id=profile_id,
         source_row_id=source_row.source_row_id,
@@ -216,14 +334,68 @@ def _activation_profile(
         phase_tokens=_phase_tokens(_field_string(fields, "phase")),
         target_kind=target_kind,
         target_policy_id=target_policy_id,
-        required_keywords=_required_keywords(target_descriptor),
+        required_keywords=_required_keywords(
+            source_row_id=source_row.source_row_id,
+            target_descriptor=target_descriptor,
+        ),
         required_keywords_any=(),
         required_faction_keywords=(),
         excluded_keywords=_excluded_keywords(target_descriptor),
         excluded_faction_keywords=(),
         rule_ir_hash=rule_ir_hash,
         compiled_rule_ir_payload=compiled_rule_ir_payload,
+        effect_selection_kind=_effect_selection_kind_from_rule_ir_payload(
+            effective_rule_ir_payload
+        ),
     )
+
+
+def _activation_profile_from_source_only_metadata(
+    *,
+    source_row: faction_subrules_2026_27.SourceStratagemRow,
+    metadata: SourceOnlyActivationMetadata,
+) -> ActivationProfile:
+    profile_id = (
+        "phase17s:stratagem:"
+        f"{source_row.faction_id}:{source_row.detachment_id}:{source_row.stratagem_id}"
+    )
+    overlay_rule_ir_payload = _overlay_rule_ir_payload_or_none(profile_id)
+    if overlay_rule_ir_payload is None:
+        raise ValueError(f"Source-only activation profile lacks RuleIR overlay: {profile_id}.")
+    return ActivationProfile(
+        profile_id=profile_id,
+        source_row_id=source_row.source_row_id,
+        source_id=source_row.source_id,
+        faction_id=source_row.faction_id,
+        detachment_id=source_row.detachment_id,
+        stratagem_id=source_row.stratagem_id,
+        name=source_row.name,
+        command_point_cost=source_row.command_point_cost,
+        category=_category_token(source_row.category),
+        when_descriptor=metadata.when_descriptor,
+        target_descriptor=metadata.target_descriptor,
+        effect_descriptor=metadata.effect_descriptor,
+        restrictions_descriptor="matched play same stratagem per phase",
+        trigger_kind=metadata.trigger_kind,
+        phase_tokens=metadata.phase_tokens,
+        target_kind=metadata.target_kind,
+        target_policy_id=metadata.target_policy_id,
+        required_keywords=metadata.required_keywords,
+        required_keywords_any=metadata.required_keywords_any,
+        required_faction_keywords=metadata.required_faction_keywords,
+        excluded_keywords=metadata.excluded_keywords,
+        excluded_faction_keywords=metadata.excluded_faction_keywords,
+        rule_ir_hash=str(overlay_rule_ir_payload["ir_hash"]),
+        compiled_rule_ir_payload=None,
+        effect_selection_kind=_effect_selection_kind_from_rule_ir_payload(overlay_rule_ir_payload),
+    )
+
+
+def _overlay_rule_ir_payload_or_none(profile_id: str) -> RuleIRPayload | None:
+    court_payload = court_ir.stratagem_activation_rule_ir_payload_by_profile_id(profile_id)
+    if court_payload is not None:
+        return court_payload
+    return spectacle_ir.stratagem_activation_rule_ir_payload_by_profile_id(profile_id)
 
 
 def _field_string(fields: dict[object, object], key: str) -> str:
@@ -354,13 +526,16 @@ def _target_kind_and_policy(
     return ("friendly_unit", "friendly_unit")
 
 
-def _required_keywords(target_descriptor: str) -> tuple[str, ...]:
+def _required_keywords(*, source_row_id: str, target_descriptor: str) -> tuple[str, ...]:
     canonical = _canonical_keyword_text(target_descriptor)
     required = [
         keyword
         for keyword in REGULAR_TARGET_KEYWORDS
         if re.search(rf"(?<![A-Z0-9_]){re.escape(keyword)}(?![A-Z0-9_])", canonical)
     ]
+    for keyword in SOURCE_ROW_REQUIRED_KEYWORD_OVERRIDES.get(source_row_id, ()):
+        if keyword not in required:
+            required.append(keyword)
     return tuple(required)
 
 
@@ -444,6 +619,7 @@ def _compiled_stratagem_rule_ir_payload_or_none(
                 clause_id=f"{profile_id}:effect:{index:03d}",
             )
         )
+    clauses = _clauses_with_stratagem_effect_selection_parameters(tuple(clauses))
     payload = {
         "rule_id": profile_id,
         "source_id": source_id,
@@ -456,6 +632,130 @@ def _compiled_stratagem_rule_ir_payload_or_none(
     }
     payload["ir_hash"] = _sha256_payload(payload)
     return RuleIR.from_payload(cast(RuleIRPayload, payload)).to_payload()
+
+
+def _clauses_with_stratagem_effect_selection_parameters(
+    clauses: tuple[dict[str, object], ...],
+) -> list[dict[str, object]]:
+    return [
+        _clause_with_hit_enemy_effect_selection(clause)
+        if _clause_uses_hit_enemy_effect_selection(clause)
+        else clause
+        for clause in clauses
+    ]
+
+
+def _clause_uses_hit_enemy_effect_selection(clause: dict[str, object]) -> bool:
+    target = clause.get("target")
+    if not isinstance(target, dict):
+        return False
+    if target.get("kind") != "enemy_unit":
+        return False
+    target_parameters = _component_parameter_mapping(target)
+    if target_parameters.get("target_relationship") != "hit_by_those_attacks":
+        return False
+    return any(
+        _effect_is_benefit_of_cover_denial(effect)
+        for effect in _object_list(clause.get("effects"), "effects")
+    )
+
+
+def _clause_with_hit_enemy_effect_selection(clause: dict[str, object]) -> dict[str, object]:
+    updated = dict(clause)
+    updated["effects"] = [
+        _effect_with_parameter(effect, key="effect_selection_kind", value="hit_enemy_unit")
+        if _effect_is_benefit_of_cover_denial(effect)
+        else effect
+        for effect in _object_list(clause.get("effects"), "effects")
+    ]
+    return updated
+
+
+def _effect_is_benefit_of_cover_denial(effect: object) -> bool:
+    if not isinstance(effect, dict):
+        raise TypeError("Compiled RuleIR effect must be an object.")
+    if effect.get("kind") != "set_contextual_status":
+        return False
+    parameters = _component_parameter_mapping(effect)
+    return (
+        parameters.get("rules_context") == "status_denial"
+        and parameters.get("operation") == "deny"
+        and parameters.get("status") == "benefit_of_cover"
+        and parameters.get("target_scope") in {"selected_unit", "models_in_selected_unit"}
+    )
+
+
+def _effect_with_parameter(effect: object, *, key: str, value: str) -> dict[str, object]:
+    if not isinstance(effect, dict):
+        raise TypeError("Compiled RuleIR effect must be an object.")
+    parameters = _object_list(effect.get("parameters"), "parameters")
+    existing_value = _parameter_value(parameters, key)
+    if existing_value is not None and existing_value != value:
+        raise ValueError("Compiled RuleIR effect selection kind drift.")
+    if existing_value == value:
+        return dict(effect)
+    updated = dict(effect)
+    updated["parameters"] = sorted(
+        [*parameters, {"key": key, "value": value}],
+        key=_parameter_sort_key,
+    )
+    return updated
+
+
+def _parameter_sort_key(parameter: object) -> str:
+    if not isinstance(parameter, dict):
+        raise TypeError("Compiled RuleIR parameter must be an object.")
+    key = parameter.get("key")
+    if type(key) is not str:
+        raise TypeError("Compiled RuleIR parameter key must be a string.")
+    return key
+
+
+def _component_parameter_mapping(component: dict[str, object]) -> dict[str, object]:
+    parameters = _object_list(component.get("parameters"), "parameters")
+    mapping: dict[str, object] = {}
+    for parameter in parameters:
+        if not isinstance(parameter, dict):
+            raise TypeError("Compiled RuleIR parameter must be an object.")
+        key = parameter.get("key")
+        if type(key) is not str:
+            raise TypeError("Compiled RuleIR parameter key must be a string.")
+        mapping[key] = parameter.get("value")
+    return mapping
+
+
+def _parameter_value(parameters: list[object], key: str) -> object:
+    for parameter in parameters:
+        if not isinstance(parameter, dict):
+            raise TypeError("Compiled RuleIR parameter must be an object.")
+        if parameter.get("key") == key:
+            return parameter.get("value")
+    return None
+
+
+def _effect_selection_kind_from_rule_ir_payload(
+    rule_ir_payload: RuleIRPayload | None,
+) -> str | None:
+    if rule_ir_payload is None:
+        return None
+    kinds: set[str] = set()
+    for clause in _object_list(rule_ir_payload.get("clauses"), "clauses"):
+        if not isinstance(clause, dict):
+            raise TypeError("Compiled RuleIR clause must be an object.")
+        for effect in _object_list(clause.get("effects"), "effects"):
+            if not isinstance(effect, dict):
+                raise TypeError("Compiled RuleIR effect must be an object.")
+            value = _component_parameter_mapping(effect).get("effect_selection_kind")
+            if value is None:
+                continue
+            if type(value) is not str:
+                raise TypeError("Compiled RuleIR effect_selection_kind must be a string.")
+            kinds.add(value)
+    if not kinds:
+        return None
+    if kinds != {"hit_enemy_unit"}:
+        raise ValueError("Compiled RuleIR has unsupported effect selection kind.")
+    return "hit_enemy_unit"
 
 
 def _target_binding_clause_payload(
@@ -575,9 +875,19 @@ def _rule_ir_payload(
     }
 
 
-def _validate_profile_coverage(profiles: tuple[ActivationProfile, ...]) -> None:
+def _validate_profile_coverage(
+    profiles: tuple[ActivationProfile, ...],
+    *,
+    raw_rows: dict[str, dict[str, object]],
+) -> None:
     source_only_rows = tuple(
-        row for row in faction_subrules_2026_27.stratagem_rows() if not row.runtime_consumer_ids
+        row
+        for row in faction_subrules_2026_27.stratagem_rows()
+        if not row.runtime_consumer_ids
+        and (
+            row.stratagem_id in raw_rows
+            or row.source_row_id in SOURCE_ONLY_ACTIVATION_METADATA_BY_ROW_ID
+        )
     )
     expected = {row.source_row_id for row in source_only_rows}
     actual = {profile.source_row_id for profile in profiles}
@@ -592,6 +902,11 @@ def _module_text(profiles: tuple[ActivationProfile, ...]) -> str:
         for profile in profiles
         if profile.compiled_rule_ir_payload is not None
     )
+    effect_selection_kind_lines = "\n".join(
+        (f"    {_py_value(profile.profile_id)}: {_py_value(profile.effect_selection_kind)},")
+        for profile in profiles
+        if profile.effect_selection_kind is not None
+    )
     return "\n".join(
         (
             "# Generated by tools/generate_faction_stratagem_activation_support.py.",
@@ -599,7 +914,7 @@ def _module_text(profiles: tuple[ActivationProfile, ...]) -> str:
                 "# Regenerate with `uv run python "
                 "tools/generate_faction_stratagem_activation_support.py`."
             ),
-            "# ruff: noqa: E501",
+            "# ruff: noqa: E501, I001",
             "# fmt: off",
             "from __future__ import annotations",
             "",
@@ -607,6 +922,11 @@ def _module_text(profiles: tuple[ActivationProfile, ...]) -> str:
             "import json",
             "from copy import deepcopy",
             "from dataclasses import dataclass",
+            "",
+            "from warhammer40k_core.rules.source_packages.warhammer_40000_11th import "
+            "faction_court_of_the_phoenician_ir_support_2026_27 as court_ir",
+            "from warhammer40k_core.rules.source_packages.warhammer_40000_11th import "
+            "faction_spectacle_of_slaughter_ir_support_2026_27 as spectacle_ir",
             "",
             f'SOURCE_PACKAGE_ID = "{SOURCE_PACKAGE_ID}"',
             f'SOURCE_TITLE = "{SOURCE_TITLE}"',
@@ -646,7 +966,7 @@ def _module_text(profiles: tuple[ActivationProfile, ...]) -> str:
             '    rule_ir_hash: str = ""',
             "",
             "    def rule_ir_payload(self) -> dict[str, object]:",
-            "        static_payload = _STATIC_RULE_IR_PAYLOADS_BY_PROFILE_ID.get(self.profile_id)",
+            "        static_payload = _static_rule_ir_payload_by_profile_id(self.profile_id)",
             "        if static_payload is not None:",
             "            return deepcopy(static_payload)",
             "        return _rule_ir_payload(",
@@ -660,11 +980,17 @@ def _module_text(profiles: tuple[ActivationProfile, ...]) -> str:
             "        )",
             "",
             "    def effect_payload(self) -> dict[str, object]:",
-            "        return {",
+            "        payload: dict[str, object] = {",
             '            "rule_ir": self.rule_ir_payload(),',
             '            "activation_profile_id": self.profile_id,',
             '            "activation_template_id": RULE_IR_TEMPLATE_ID,',
             "        }",
+            "        effect_selection_kind = _EFFECT_SELECTION_KIND_BY_PROFILE_ID.get(",
+            "            self.profile_id",
+            "        )",
+            "        if effect_selection_kind is not None:",
+            '            payload["effect_selection_kind"] = effect_selection_kind',
+            "        return payload",
             "",
             "    def to_payload(self) -> dict[str, object]:",
             "        return {",
@@ -771,6 +1097,32 @@ def _module_text(profiles: tuple[ActivationProfile, ...]) -> str:
             "}",
             "",
             "",
+            "_EFFECT_SELECTION_KIND_BY_PROFILE_ID: dict[str, str] = {",
+            effect_selection_kind_lines,
+            "}",
+            "",
+            "",
+            "def _static_rule_ir_payload_by_profile_id(",
+            "    profile_id: str,",
+            ") -> dict[str, object] | None:",
+            "    court_payload = court_ir.stratagem_activation_rule_ir_payload_by_profile_id(",
+            "        profile_id",
+            "    )",
+            "    if court_payload is not None:",
+            "        return dict(court_payload)",
+            "    static_payload = _STATIC_RULE_IR_PAYLOADS_BY_PROFILE_ID.get(profile_id)",
+            "    if static_payload is not None:",
+            "        return static_payload",
+            "    spectacle_payload = (",
+            "        spectacle_ir.stratagem_activation_rule_ir_payload_by_profile_id(",
+            "            profile_id",
+            "        )",
+            "    )",
+            "    if spectacle_payload is None:",
+            "        return None",
+            "    return dict(spectacle_payload)",
+            "",
+            "",
             "def _validate_profiles(",
             "    profiles: tuple[SourceStratagemActivationProfile, ...]",
             ") -> tuple[SourceStratagemActivationProfile, ...]:",
@@ -789,7 +1141,7 @@ def _module_text(profiles: tuple[ActivationProfile, ...]) -> str:
                 '            raise ValueError("Stratagem activation profile phases must not '
                 'be empty.")'
             ),
-            "        static_payload = _STATIC_RULE_IR_PAYLOADS_BY_PROFILE_ID.get(",
+            "        static_payload = _static_rule_ir_payload_by_profile_id(",
             "            profile.profile_id",
             "        )",
             "        if static_payload is not None:",

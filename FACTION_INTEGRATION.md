@@ -116,7 +116,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v2`
 - source-payload SHA-256 checksum:
-  `eb7de1e0e14a148ea9b29fd9c5b3c252418ba91f5e81e856fc548ebef3e43444`
+  `2fb0be3840f43cc0930f2f429167c3a63140c4e0cabd1915f6443328dca0ea36`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -139,7 +139,7 @@ RuleIR path. The Cavalcade of Chaos detachment rule, two Enhancements, and
 three Stratagem rows are also generic-supported through semantic RuleIR.
 The Chaos Daemons Shadow Legion, Blood Legion, and Daemonic Incursion
 detachment rules are generic-supported through semantic RuleIR. Aeldari Corsair
-Coterie and Path of the Outcast add nine generic-supported Stratagem rows, for a total of 70
+Coterie and Path of the Outcast add nine generic-supported Stratagem rows, for a total of 71
 generic-supported rows; exact rows outside generic IR with existing runtime consumers are marked
 implemented. No
 aggregate faction-pack Enhancement or Stratagem row is used to
@@ -170,13 +170,13 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v2`
 - source-payload SHA-256 checksum:
-  `0021697b72d7e8c6692927e963c0c29c3274394913b1eac9269cc2296998a940`
+  `9a14ffda23d1241e0dad0b348a5188b3296afaa281cd21b7f2d29b37dfc51568`
 - upstream Phase 17E checksum:
-  `eb7de1e0e14a148ea9b29fd9c5b3c252418ba91f5e81e856fc548ebef3e43444`
+  `2fb0be3840f43cc0930f2f429167c3a63140c4e0cabd1915f6443328dca0ea36`
 
 The package emits 2145 execution records, one for every Phase 17E coverage row:
-2024 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, 70 rows are executable generic IR
+2023 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, 71 rows are executable generic IR
 rows, and 23 rows are executable named-handler rows because they already have
 runtime consumers: 23 faction army rules.
 The engine dispatcher can route every record and returns typed `unsupported`
@@ -437,15 +437,15 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `2fc6f146f69c680b84075c95547174739961a668498b85d531d6e680ccfe4818`
+  `69e4e24dc5073d1710339ca8e29d4eaea64fc5799cb11c7c9910d73e400dd787`
 - upstream Phase 17F checksum:
-  `0021697b72d7e8c6692927e963c0c29c3274394913b1eac9269cc2296998a940`
+  `9a14ffda23d1241e0dad0b348a5188b3296afaa281cd21b7f2d29b37dfc51568`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
 
-The report emits 2024 classification rows, one for every Phase 17F row blocked
-as `blocked_structured_semantics_required`. It compiles 1933 rows from Wahapedia
+The report emits 2023 classification rows, one for every Phase 17F row blocked
+as `blocked_structured_semantics_required`. It compiles 1932 rows from Wahapedia
 bridge descriptions through Phase 17C and marks 91 rows as
 `source_text_not_available` metadata-only rows. Each row records the existing
 Phase 17C template IDs and template families that can already express clauses,
@@ -479,9 +479,9 @@ WS14 step 3 is enforced as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-named-handler-budget-v1`
 - source-payload SHA-256 checksum:
-  `5edbc37a676661136b7e0911b3ee76f4e7c01b616abd5cff411246458532aa22`
+  `a5a601857afa50a96d840b09aa4a6cac41c2a1f409a9b531a3d99e5f39127f13`
 - upstream Phase 17F checksum:
-  `0021697b72d7e8c6692927e963c0c29c3274394913b1eac9269cc2296998a940`
+  `9a14ffda23d1241e0dad0b348a5188b3296afaa281cd21b7f2d29b37dfc51568`
 
 The budget report tracks 23 executable named-handler Phase 17F rows and 23
 approved entries. The current approved reason is
@@ -756,7 +756,8 @@ already engine-consumed named handlers.
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 11 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 54 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 53 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 1 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Adepta Sororitas Execution Status

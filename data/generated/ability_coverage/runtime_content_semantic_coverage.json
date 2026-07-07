@@ -1,8 +1,8 @@
 {
   "detachment_status_counts": {
     "implemented": 4,
-    "partial": 18,
-    "placeholder": 244
+    "partial": 19,
+    "placeholder": 243
   },
   "faction_status_counts": {
     "implemented": 0,
@@ -5664,8 +5664,8 @@
     {
       "detachment_status_counts": {
         "implemented": 0,
-        "partial": 0,
-        "placeholder": 11
+        "partial": 1,
+        "placeholder": 10
       },
       "detachments": [
         {
@@ -5943,7 +5943,7 @@
           "detachment_name": "Steel Hammer",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.astra_militarum.detachments.steel_hammer.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:astra-militarum:steel-hammer",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010787002",
@@ -7092,6 +7092,6 @@
     }
   ],
   "schema_version": "runtime-content-semantic-coverage-v1",
-  "source_package_hash": "0021697b72d7e8c6692927e963c0c29c3274394913b1eac9269cc2296998a940",
+  "source_package_hash": "9a14ffda23d1241e0dad0b348a5188b3296afaa281cd21b7f2d29b37dfc51568",
   "source_package_id": "gw-11e-phase17f-faction-execution-2026-27"
 }

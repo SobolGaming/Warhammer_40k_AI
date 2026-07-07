@@ -2203,6 +2203,34 @@ def test_phase17c_post_shoot_hit_target_cover_denial_compiles_to_semantic_ir() -
     )
 
 
+def test_phase17c_hit_target_cover_denial_effect_clause_compiles_to_semantic_ir() -> None:
+    rule_ir = _compiled(
+        "Select one enemy unit hit by one or more of those attacks. Until the end of the phase, "
+        "that enemy unit cannot have the Benefit of Cover."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+    effect = clause.effects[0]
+
+    assert rule_ir.is_supported
+    assert clause.trigger is None
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.ENEMY_UNIT
+    assert parameter_payload(clause.target.parameters) == {
+        "allegiance": "enemy",
+        "target_relationship": "hit_by_those_attacks",
+    }
+    assert clause.duration is not None
+    assert parameter_payload(clause.duration.parameters) == {"endpoint": "phase"}
+    assert effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS
+    assert parameter_payload(effect.parameters) == {
+        "operation": "deny",
+        "rules_context": "status_denial",
+        "status": "benefit_of_cover",
+        "status_label": "Benefit of Cover",
+        "target_scope": "selected_unit",
+    }
+
+
 @pytest.mark.parametrize(
     ("raw_text", "expected_parameters"),
     [

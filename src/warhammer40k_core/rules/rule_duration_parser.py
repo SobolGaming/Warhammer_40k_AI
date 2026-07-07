@@ -69,7 +69,9 @@ def parse_rule_duration(*, text: str, span: TextSpan) -> RuleDuration | None:
         return RuleDuration(
             kind=RuleDurationKind.UNTIL_TIMING_ENDPOINT,
             source_span=_span_from_match(span=span, match=match),
-            parameters=parameters_from_pairs((("endpoint", _lower_group(match, "endpoint")),)),
+            parameters=parameters_from_pairs(
+                (("endpoint", _endpoint_token(match.group("endpoint"))),)
+            ),
         )
 
     if _AURA_RE.search(text) is not None and "while" in text.lower():
@@ -95,3 +97,10 @@ def _span_from_match(*, span: TextSpan, match: re.Match[str]) -> TextSpan:
 
 def _lower_group(match: re.Match[str], group_name: str) -> str:
     return match.group(group_name).lower()
+
+
+def _endpoint_token(endpoint: str) -> str:
+    normalized = endpoint.lower()
+    if normalized == "battle round":
+        return "battle_round"
+    return normalized
