@@ -46,6 +46,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_FIRST_DEATH_RETURN_CONSUMER_ID,
     CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
+    CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
     CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
@@ -168,6 +169,10 @@ CHAMPION_SLAYER_TEXT = (
     "Each time this model makes a melee attack that targets a Character or Monster unit, "
     "you can re-roll the Wound roll. Each time this model destroys an enemy Character or "
     "Monster unit, this model regains up to D6 lost wounds."
+)
+THIS_MODEL_NOT_BELOW_HALF_HIT_MODIFIER_TEXT = (
+    "Each time this model makes an attack that targets an enemy unit that is not below "
+    "Half-strength, add 1 to the Hit roll."
 )
 PREY_TARGET_TEXT = (
     "At the start of the first battle round, select one enemy unit to be this model\u2019s "
@@ -337,6 +342,38 @@ def test_phase17c_champion_slayer_clause_one_has_melee_target_gate_and_wound_rer
     }
     assert tuple(effect.kind for effect in clause.effects) == (RuleEffectKind.REROLL_PERMISSION,)
     assert parameter_payload(clause.effects[0].parameters) == {"roll_type": "wound"}
+
+
+def test_phase17c_this_model_half_strength_attack_hit_modifier_compiles_to_generic_ir() -> None:
+    rule_ir = _compiled(THIS_MODEL_NOT_BELOW_HALF_HIT_MODIFIER_TEXT).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.DICE_ROLL
+    assert parameter_payload(clause.trigger.parameters) == {
+        "actor": "this_model",
+        "roll_type": "hit",
+        "target_allegiance": "enemy",
+        "timing_window": "attack_sequence.hit",
+    }
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert _condition_payload(clause, RuleConditionKind.TARGET_CONSTRAINT) == {
+        "gate_subject": "attack_target",
+        "relationship": "this_model_makes_attack",
+        "target_allegiance": "enemy",
+        "target_constraint": "target_not_below_half_strength",
+    }
+    assert tuple(effect.kind for effect in clause.effects) == (RuleEffectKind.MODIFY_DICE_ROLL,)
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "delta": 1,
+        "roll_type": "hit",
+    }
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+    )
+    assert CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID in catalog_rule_ir_hook_ids_for_rule(rule_ir)
 
 
 def test_phase17c_champion_slayer_clause_two_has_destroyed_unit_gate_and_heal() -> None:

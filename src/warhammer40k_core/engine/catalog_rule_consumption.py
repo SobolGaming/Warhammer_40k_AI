@@ -3796,6 +3796,10 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
         for effect in clause.effects:
             if _effect_is_feel_no_pain_grant(effect):
                 consumer_ids.add(CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID)
+            if _clause_is_supported_this_model_attack_roll_modifier(clause, effect):
+                modifier_consumer_id = _roll_modifier_consumer_id_for_effect(effect)
+                if modifier_consumer_id is not None:
+                    consumer_ids.add(modifier_consumer_id)
     if _clause_targets_shadow_of_chaos_aura(clause):
         consumer_ids.add(CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID)
     if _clause_is_named_weapon_ability_choice(clause):
@@ -4751,6 +4755,48 @@ def _clause_has_melee_attack_target_gate(clause: RuleClause) -> bool:
     ) and bool(_clause_required_keyword_any(clause=clause, gate_subject="attack_target"))
 
 
+def _clause_is_supported_this_model_attack_roll_modifier(
+    clause: RuleClause,
+    effect: RuleEffectSpec,
+) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer classification requires RuleClause.")
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if not clause.is_supported:
+        return False
+    if clause.target is None or clause.target.kind is not RuleTargetKind.THIS_MODEL:
+        return False
+    if effect.kind is not RuleEffectKind.MODIFY_DICE_ROLL:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    roll_type = parameters.get("roll_type")
+    if type(roll_type) is not str:
+        return False
+    if not _clause_has_roll_trigger(clause, roll_type=roll_type):
+        return False
+    return any(
+        _condition_is_supported_this_model_attack_half_strength_gate(condition)
+        for condition in clause.conditions
+    )
+
+
+def _condition_is_supported_this_model_attack_half_strength_gate(
+    condition: RuleCondition,
+) -> bool:
+    if type(condition) is not RuleCondition:
+        raise GameLifecycleError("Catalog rule consumer requires RuleCondition values.")
+    if condition.kind is not RuleConditionKind.TARGET_CONSTRAINT:
+        return False
+    parameters = parameter_payload(condition.parameters)
+    return (
+        parameters.get("relationship") == "this_model_makes_attack"
+        and parameters.get("gate_subject") == "attack_target"
+        and parameters.get("target_allegiance") == "enemy"
+        and parameters.get("target_constraint") == "target_not_below_half_strength"
+    )
+
+
 def _clause_has_destroyed_enemy_unit_gate(clause: RuleClause) -> bool:
     return any(
         condition.kind is RuleConditionKind.TARGET_CONSTRAINT
@@ -5005,6 +5051,18 @@ def _roll_reroll_consumer_id_for_effect(effect: RuleEffectSpec) -> str | None:
     if type(roll_type) is not str:
         return None
     return _CATALOG_IR_ROLL_REROLL_CONSUMER_IDS.get(_catalog_ir_lookup_token(roll_type))
+
+
+def _roll_modifier_consumer_id_for_effect(effect: RuleEffectSpec) -> str | None:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.MODIFY_DICE_ROLL:
+        return None
+    parameters = parameter_payload(effect.parameters)
+    roll_type = parameters.get("roll_type")
+    if type(roll_type) is not str:
+        return None
+    return _CATALOG_IR_ROLL_MODIFIER_CONSUMER_IDS.get(_catalog_ir_lookup_token(roll_type))
 
 
 def _weapon_keyword_grant_consumer_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:

@@ -21,12 +21,19 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfileError,
     weapon_keyword_from_token,
 )
-from warhammer40k_core.engine.battlefield_state import (
-    PlacementError,
-    geometry_model_for_placement,
-)
 from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.generic_rule_attack_conditions import (
+    generic_rule_conditions_from_payload,
+    generic_rule_conditions_require_source_model_instance_id,
+    generic_rule_parameters_from_effect_payload,
+    generic_rule_source_model_applies,
+    generic_rule_source_model_instance_id_from_payload,
+    generic_rule_target_allegiance_applies,
+    generic_rule_target_allegiance_values,
+    generic_rule_target_constraint_values,
+    generic_rule_target_constraints_apply,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.runtime_modifiers import (
     DamageRollModifierContext,
@@ -39,8 +46,6 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WoundRollModifierContext,
 )
 from warhammer40k_core.engine.saves import SaveOption
-from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
-from warhammer40k_core.geometry.volume import Model
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
 
 type AttackRole = Literal["attacker", "target"]
@@ -91,6 +96,8 @@ class _GenericAttackEffect:
     target_kind: RuleTargetKind | None
     effect_kind: RuleEffectKind
     parameters: dict[str, JsonValue]
+    conditions: tuple[dict[str, JsonValue], ...]
+    source_model_instance_id: str | None
 
 
 def generic_rule_hit_roll_modifier(context: HitRollModifierContext) -> int:
@@ -99,6 +106,7 @@ def generic_rule_hit_roll_modifier(context: HitRollModifierContext) -> int:
     return _dice_roll_modifier_for_attack(
         state=context.state,
         attacking_unit_instance_id=context.attacking_unit_instance_id,
+        attacker_model_instance_id=context.attacker_model_instance_id,
         target_unit_instance_id=context.target_unit_instance_id,
         source_phase=context.source_phase,
         weapon_profile=context.weapon_profile,
@@ -126,6 +134,7 @@ def generic_rule_wound_roll_modifier(context: WoundRollModifierContext) -> int:
     return _dice_roll_modifier_for_attack(
         state=context.state,
         attacking_unit_instance_id=context.attacking_unit_instance_id,
+        attacker_model_instance_id=context.attacker_model_instance_id,
         target_unit_instance_id=context.target_unit_instance_id,
         source_phase=context.source_phase,
         weapon_profile=context.weapon_profile,
@@ -155,6 +164,7 @@ def generic_rule_damage_roll_modifier(context: DamageRollModifierContext) -> int
     return _dice_roll_modifier_for_attack(
         state=context.state,
         attacking_unit_instance_id=context.attacking_unit_instance_id,
+        attacker_model_instance_id=context.attacker_model_instance_id,
         target_unit_instance_id=context.target_unit_instance_id,
         source_phase=context.source_phase,
         weapon_profile=context.weapon_profile,
@@ -192,6 +202,7 @@ def generic_rule_modified_save_options(
     for effect in _matching_generic_attack_effects(
         state=context.state,
         attacking_unit_instance_id=context.attacking_unit_instance_id,
+        attacker_model_instance_id=context.attacker_model_instance_id,
         target_unit_instance_id=context.target_unit_instance_id,
         source_phase=context.source_phase,
         weapon_profile=context.weapon_profile,
@@ -228,6 +239,7 @@ def generic_rule_modified_weapon_profile(context: WeaponProfileModifierContext) 
     for effect in _matching_generic_attack_effects(
         state=context.state,
         attacking_unit_instance_id=context.attacking_unit_instance_id,
+        attacker_model_instance_id=context.attacker_model_instance_id,
         target_unit_instance_id=context.target_unit_instance_id,
         source_phase=context.source_phase,
         weapon_profile=profile,
@@ -241,6 +253,7 @@ def generic_rule_modified_weapon_profile(context: WeaponProfileModifierContext) 
     for effect in _matching_generic_attack_effects(
         state=context.state,
         attacking_unit_instance_id=context.attacking_unit_instance_id,
+        attacker_model_instance_id=context.attacker_model_instance_id,
         target_unit_instance_id=context.target_unit_instance_id,
         source_phase=context.source_phase,
         weapon_profile=profile,
@@ -257,6 +270,7 @@ def generic_rule_reroll_permission_context_for_unit(
     state: object,
     player_id: str,
     unit_instance_id: str,
+    model_instance_id: str | None = None,
     roll_type: str,
     timing_window: str,
     target_unit_instance_id: str | None,
@@ -267,6 +281,11 @@ def generic_rule_reroll_permission_context_for_unit(
         raise GameLifecycleError("Generic RuleIR reroll lookup requires GameState.")
     requested_player_id = _validate_identifier("player_id", player_id)
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    requested_model_id = (
+        None
+        if model_instance_id is None
+        else _validate_identifier("model_instance_id", model_instance_id)
+    )
     requested_roll_type = _validate_identifier("roll_type", roll_type)
     requested_timing_window = _validate_identifier("timing_window", timing_window)
     requested_target_id = (
@@ -279,6 +298,7 @@ def generic_rule_reroll_permission_context_for_unit(
     for effect in _matching_generic_attack_effects(
         state=state,
         attacking_unit_instance_id=requested_unit_id,
+        attacker_model_instance_id=requested_model_id,
         target_unit_instance_id=requested_target_id,
         source_phase=None,
         effect_kind=RuleEffectKind.REROLL_PERMISSION,
@@ -376,6 +396,7 @@ def _dice_roll_modifier_for_attack(
     *,
     state: object,
     attacking_unit_instance_id: str,
+    attacker_model_instance_id: str | None,
     target_unit_instance_id: str,
     source_phase: object,
     expected_roll_type: str,
@@ -389,6 +410,7 @@ def _dice_roll_modifier_for_attack(
     for effect in _matching_generic_attack_effects(
         state=state,
         attacking_unit_instance_id=attacking_unit_instance_id,
+        attacker_model_instance_id=attacker_model_instance_id,
         target_unit_instance_id=target_unit_instance_id,
         source_phase=source_phase,
         attack_strength=attack_strength,
@@ -434,6 +456,7 @@ def _matching_generic_attack_effects(
     *,
     state: object,
     attacking_unit_instance_id: str,
+    attacker_model_instance_id: str | None = None,
     target_unit_instance_id: str | None,
     source_phase: object,
     effect_kind: RuleEffectKind,
@@ -449,6 +472,11 @@ def _matching_generic_attack_effects(
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR attack hooks require GameState.")
     attacker_id = _validate_identifier("attacking_unit_instance_id", attacking_unit_instance_id)
+    attacker_model_id = (
+        None
+        if attacker_model_instance_id is None
+        else _validate_identifier("attacker_model_instance_id", attacker_model_instance_id)
+    )
     target_id = (
         None
         if target_unit_instance_id is None
@@ -487,6 +515,7 @@ def _matching_generic_attack_effects(
                 state=state,
                 effect=generic_effect,
                 attacking_unit_instance_id=attacker_id,
+                attacker_model_instance_id=attacker_model_id,
                 target_unit_instance_id=target_id,
                 source_phase=source_phase,
                 weapon_profile=weapon_profile,
@@ -528,7 +557,9 @@ def _generic_attack_effect_or_none(
         clause_id=_required_identifier_payload(payload, "clause_id"),
         target_kind=_target_kind_from_payload(payload),
         effect_kind=effect_kind,
-        parameters=_parameters_from_effect_payload(effect_payload),
+        parameters=generic_rule_parameters_from_effect_payload(effect_payload),
+        conditions=generic_rule_conditions_from_payload(payload),
+        source_model_instance_id=generic_rule_source_model_instance_id_from_payload(payload),
     )
 
 
@@ -585,12 +616,22 @@ def _generic_effect_context_applies(
     state: object,
     effect: _GenericAttackEffect,
     attacking_unit_instance_id: str,
+    attacker_model_instance_id: str | None,
     target_unit_instance_id: str | None,
     source_phase: object,
     weapon_profile: WeaponProfile | None,
     attack_strength: int | None,
     target_toughness: int | None,
 ) -> bool:
+    if not generic_rule_source_model_applies(
+        target_kind=effect.target_kind,
+        source_model_instance_id=effect.source_model_instance_id,
+        attacker_model_instance_id=attacker_model_instance_id,
+        requires_source_model_instance_id=generic_rule_conditions_require_source_model_instance_id(
+            effect.conditions
+        ),
+    ):
+        return False
     if not _generic_effect_source_phase_applies(effect=effect, source_phase=source_phase):
         return False
     if not _generic_effect_required_ability_gate_applies(
@@ -614,6 +655,16 @@ def _generic_effect_context_applies(
     if not _generic_effect_required_keyword_sequence_applies(
         state=state,
         effect=effect,
+        attacking_unit_instance_id=attacking_unit_instance_id,
+        target_unit_instance_id=target_unit_instance_id,
+    ):
+        return False
+    if not generic_rule_target_allegiance_applies(
+        state=state,
+        allegiances=generic_rule_target_allegiance_values(
+            parameters=effect.parameters,
+            conditions=effect.conditions,
+        ),
         attacking_unit_instance_id=attacking_unit_instance_id,
         target_unit_instance_id=target_unit_instance_id,
     ):
@@ -801,34 +852,17 @@ def _generic_effect_target_constraint_applies(
     attack_strength: int | None,
     target_toughness: int | None,
 ) -> bool:
-    constraint = effect.parameters.get("target_constraint")
-    if constraint is None:
-        return True
-    if type(constraint) is not str:
-        raise GameLifecycleError("Generic RuleIR target_constraint must be a string.")
-    if constraint == "closest_eligible_target_within_18":
-        if target_unit_instance_id is None:
-            return False
-        return _target_is_closest_enemy_within_distance(
-            state=state,
-            attacking_unit_instance_id=attacking_unit_instance_id,
-            target_unit_instance_id=target_unit_instance_id,
-            distance_inches=18.0,
-        )
-    if constraint == "attack_strength_greater_than_target_toughness":
-        if attack_strength is None or target_toughness is None:
-            return False
-        return attack_strength > target_toughness
-    if constraint == "eligible_unit_within_12":
-        if target_unit_instance_id is None:
-            return False
-        return _target_is_enemy_within_distance(
-            state=state,
-            attacking_unit_instance_id=attacking_unit_instance_id,
-            target_unit_instance_id=target_unit_instance_id,
-            distance_inches=12.0,
-        )
-    raise GameLifecycleError("Unsupported generic RuleIR target_constraint.")
+    return generic_rule_target_constraints_apply(
+        state=state,
+        constraints=generic_rule_target_constraint_values(
+            parameters=effect.parameters,
+            conditions=effect.conditions,
+        ),
+        attacking_unit_instance_id=attacking_unit_instance_id,
+        target_unit_instance_id=target_unit_instance_id,
+        attack_strength=attack_strength,
+        target_toughness=target_toughness,
+    )
 
 
 def _source_phase_value_or_none(source_phase: object) -> str | None:
@@ -1074,26 +1108,6 @@ def _target_kind_from_payload(payload: dict[str, JsonValue]) -> RuleTargetKind |
         raise GameLifecycleError("Generic RuleIR target kind is unsupported.") from exc
 
 
-def _parameters_from_effect_payload(effect_payload: dict[str, JsonValue]) -> dict[str, JsonValue]:
-    raw_parameters = effect_payload.get("parameters")
-    if not isinstance(raw_parameters, list):
-        raise GameLifecycleError("Generic RuleIR effect parameters must be a list.")
-    parameters: dict[str, JsonValue] = {}
-    for raw_parameter in raw_parameters:
-        if not isinstance(raw_parameter, dict):
-            raise GameLifecycleError("Generic RuleIR parameter must be an object.")
-        key = raw_parameter.get("key")
-        if type(key) is not str:
-            raise GameLifecycleError("Generic RuleIR parameter key must be a string.")
-        parameter_key = _validate_identifier("parameter key", key)
-        if parameter_key in parameters:
-            raise GameLifecycleError("Generic RuleIR parameters must not duplicate keys.")
-        if "value" not in raw_parameter:
-            raise GameLifecycleError("Generic RuleIR parameter requires value.")
-        parameters[parameter_key] = validate_json_value(raw_parameter["value"])
-    return parameters
-
-
 def _attack_role_parameter(parameters: dict[str, JsonValue]) -> AttackRole | None:
     value = parameters.get("attack_role")
     if value is None:
@@ -1216,83 +1230,6 @@ def _conditional_wound_reroll_payload(
     return payload
 
 
-def _target_is_closest_enemy_within_distance(
-    *,
-    state: object,
-    attacking_unit_instance_id: str,
-    target_unit_instance_id: str,
-    distance_inches: float,
-) -> bool:
-    attacker_owner = _unit_owner(state=state, unit_instance_id=attacking_unit_instance_id)
-    target_owner = _unit_owner(state=state, unit_instance_id=target_unit_instance_id)
-    if attacker_owner == target_owner:
-        return False
-    target_distance = _closest_unit_distance_inches(
-        state=state,
-        first_unit_instance_id=attacking_unit_instance_id,
-        second_unit_instance_id=target_unit_instance_id,
-    )
-    if target_distance > distance_inches:
-        return False
-    for enemy_unit_id in _enemy_unit_ids_for_player(state=state, player_id=attacker_owner):
-        candidate_distance = _closest_unit_distance_inches(
-            state=state,
-            first_unit_instance_id=attacking_unit_instance_id,
-            second_unit_instance_id=enemy_unit_id,
-        )
-        if candidate_distance < target_distance:
-            return False
-    return True
-
-
-def _target_is_enemy_within_distance(
-    *,
-    state: object,
-    attacking_unit_instance_id: str,
-    target_unit_instance_id: str,
-    distance_inches: float,
-) -> bool:
-    attacker_owner = _unit_owner(state=state, unit_instance_id=attacking_unit_instance_id)
-    target_owner = _unit_owner(state=state, unit_instance_id=target_unit_instance_id)
-    if attacker_owner == target_owner:
-        return False
-    return (
-        _closest_unit_distance_inches(
-            state=state,
-            first_unit_instance_id=attacking_unit_instance_id,
-            second_unit_instance_id=target_unit_instance_id,
-        )
-        <= distance_inches
-    )
-
-
-def _enemy_unit_ids_for_player(*, state: object, player_id: str) -> tuple[str, ...]:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Generic RuleIR target constraints require GameState.")
-    requested_player_id = _validate_identifier("player_id", player_id)
-    ids: list[str] = []
-    for army in state.army_definitions:
-        if army.player_id == requested_player_id:
-            continue
-        ids.extend(unit.unit_instance_id for unit in army.units)
-    return tuple(sorted(ids))
-
-
-def _unit_owner(*, state: object, unit_instance_id: str) -> str:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Generic RuleIR target constraints require GameState.")
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return army.player_id
-    raise GameLifecycleError("Generic RuleIR target constraint unit is unknown.")
-
-
 def _unit_has_keyword(*, state: object, unit_instance_id: str, keyword: str) -> bool:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -1329,62 +1266,6 @@ def _keyword_sequence_parameter(value: object) -> tuple[str, ...]:
 
 def _canonical_keyword(value: str) -> str:
     return value.strip().upper().replace("_", " ").replace("-", " ")
-
-
-def _closest_unit_distance_inches(
-    *,
-    state: object,
-    first_unit_instance_id: str,
-    second_unit_instance_id: str,
-) -> float:
-    first_models = _geometry_models_for_unit(
-        state=state,
-        unit_instance_id=first_unit_instance_id,
-    )
-    second_models = _geometry_models_for_unit(
-        state=state,
-        unit_instance_id=second_unit_instance_id,
-    )
-    if not first_models or not second_models:
-        raise GameLifecycleError("Generic RuleIR target constraint requires placed models.")
-    return min(
-        DistanceMeasurementContext.from_models(first_model, second_model).closest_distance_inches()
-        for first_model in first_models
-        for second_model in second_models
-    )
-
-
-def _geometry_models_for_unit(
-    *,
-    state: object,
-    unit_instance_id: str,
-) -> tuple[Model, ...]:
-    from warhammer40k_core.engine.game_state import GameState
-
-    if type(state) is not GameState:
-        raise GameLifecycleError("Generic RuleIR target constraints require GameState.")
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Generic RuleIR target constraint requires battlefield_state.")
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id != requested_unit_id:
-                continue
-            try:
-                return tuple(
-                    geometry_model_for_placement(
-                        model=model,
-                        placement=battlefield_state.model_placement_by_id(model.model_instance_id),
-                    )
-                    for model in unit.own_models
-                    if model.is_alive
-                )
-            except PlacementError as exc:
-                raise GameLifecycleError(
-                    "Generic RuleIR target constraint placement is invalid."
-                ) from exc
-    raise GameLifecycleError("Generic RuleIR target constraint unit is unknown.")
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

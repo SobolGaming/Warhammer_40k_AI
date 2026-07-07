@@ -1058,7 +1058,7 @@ def _effect_payload(
         context=context,
         target_unit_instance_ids=target_unit_instance_ids,
     )
-    return _json_object(
+    payload = _json_object(
         {
             "effect_kind": GENERIC_RULE_EFFECT_KIND,
             "rule_id": rule_ir.rule_id,
@@ -1073,6 +1073,11 @@ def _effect_payload(
             "context": context.to_payload(),
         }
     )
+    if clause.conditions:
+        payload["conditions"] = validate_json_value(
+            [condition.to_payload() for condition in clause.conditions]
+        )
+    return payload
 
 
 def _persisting_effect_or_none(

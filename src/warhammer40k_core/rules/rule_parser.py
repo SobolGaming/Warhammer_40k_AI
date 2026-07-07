@@ -6,6 +6,12 @@ from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.weapon_profiles import canonical_weapon_keyword_tokens
+from warhammer40k_core.rules.attack_target_parser import (
+    has_this_model_attack_target,
+    parse_this_model_attack_target_conditions,
+    parse_this_model_attack_target_trigger,
+    this_model_attack_target_match_ranges,
+)
 from warhammer40k_core.rules.parsed_tokens import DistancePredicateToken, ParsedRuleText, TextSpan
 from warhammer40k_core.rules.rule_clause_merging import merge_rule_clause_spans
 from warhammer40k_core.rules.rule_duration_parser import parse_rule_duration
@@ -731,6 +737,7 @@ def _compile_clause(
             *_parse_aura_conditions(clause_text),
             *_parse_leading_unit_conditions(clause_text),
             *_parse_tracked_target_conditions(clause_text),
+            *parse_this_model_attack_target_conditions(clause_text.span),
             *_parse_return_on_death_conditions(clause_text),
             *_parse_frequency_conditions(clause_text),
             *_parse_keyword_conditions(clause_text, parser_context=parser_context),
@@ -808,6 +815,9 @@ def _compile_clause(
 
 
 def _parse_trigger(clause_text: _ClauseText) -> RuleTrigger | None:
+    attack_target_trigger = parse_this_model_attack_target_trigger(clause_text.span)
+    if attack_target_trigger is not None:
+        return attack_target_trigger
     melee_target_match = _THIS_MODEL_MELEE_ATTACK_TARGET_RE.search(clause_text.text)
     if melee_target_match is not None:
         return RuleTrigger(
@@ -1190,6 +1200,7 @@ def _parse_keyword_conditions(
     target_match_ranges: list[tuple[int, int]] = []
     for match in _TRACKED_TARGET_SELECTION_RE.finditer(clause_text.text):
         target_match_ranges.append((match.start(), match.end()))
+    target_match_ranges.extend(this_model_attack_target_match_ranges(clause_text.text))
     for match in _ENEMY_UNIT_FALLS_BACK_NEAR_ABILITY_RE.finditer(clause_text.text):
         target_match_ranges.append((match.start(), match.end()))
         excluded_keywords = match.group("excluded_keywords")
@@ -1390,6 +1401,7 @@ def _parse_target(
         )
     if (
         _THIS_MODEL_MELEE_ATTACK_TARGET_RE.search(clause_text.text) is not None
+        or has_this_model_attack_target(clause_text.text)
         or _RESTORE_LOST_WOUNDS_RE.search(clause_text.text) is not None
     ):
         match = _THIS_MODEL_RE.search(clause_text.text)
