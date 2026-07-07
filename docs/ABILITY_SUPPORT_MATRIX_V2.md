@@ -263,6 +263,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-modifier` | No current generated rows |
 | `catalog-ir:leadership-characteristic-query` | Daemonic Icon |
+| `catalog-ir:minimum-unmodified-hit-success` | No current generated rows |
 | `catalog-ir:movement-characteristic-modifier` | No current generated rows |
 | `catalog-ir:movement-characteristic-query` | No current generated rows |
 | `catalog-ir:movement-transit-permission` | No current generated rows |

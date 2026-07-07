@@ -12,6 +12,10 @@ from warhammer40k_core.rules.attack_target_parser import (
     parse_this_model_attack_target_trigger,
     this_model_attack_target_match_ranges,
 )
+from warhammer40k_core.rules.hit_success_threshold_parser import (
+    has_hit_success_threshold,
+    hit_success_threshold_effects,
+)
 from warhammer40k_core.rules.parsed_tokens import DistancePredicateToken, ParsedRuleText, TextSpan
 from warhammer40k_core.rules.rule_clause_merging import merge_rule_clause_spans
 from warhammer40k_core.rules.rule_duration_parser import parse_rule_duration
@@ -32,6 +36,12 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTriggerKind,
     RuleUnsupportedReason,
     parameters_from_pairs,
+)
+from warhammer40k_core.rules.rule_keyword_sequences import (
+    keyword_sequence_parameter_pairs as _keyword_sequence_parameter_pairs,
+)
+from warhammer40k_core.rules.rule_keyword_sequences import (
+    keyword_sequence_tokens as _keyword_sequence_tokens,
 )
 from warhammer40k_core.rules.rule_templates import (
     AURA_TEMPLATE_ID,
@@ -59,9 +69,6 @@ from warhammer40k_core.rules.rule_token_normalization import (
 )
 from warhammer40k_core.rules.rule_token_normalization import (
     keyword_list_tokens as _keyword_list_tokens,
-)
-from warhammer40k_core.rules.rule_token_normalization import (
-    keyword_token as _keyword_token,
 )
 from warhammer40k_core.rules.rule_token_normalization import (
     model_keyword_any_token as _model_keyword_any_token,
@@ -761,7 +768,7 @@ def _compile_clause(
             *_parse_tracked_target_selection_effects(clause_text),
             *_parse_return_on_death_effects(clause_text),
             *_parse_grant_ability_effects(clause_text),
-            *_parse_contextual_status_effects(clause_text),
+            *_parse_contextual_status_effects(clause_text, parser_context=parser_context),
             *_parse_weapon_ability_effects(clause_text),
             *_parse_placement_effects(clause_text),
             *_parse_restore_lost_wounds_effects(clause_text),
@@ -1305,7 +1312,7 @@ def _keyword_gate_conditions_from_match(
         )
         for keyword in _keyword_sequence_tokens(
             match.group("keyword"),
-            parser_context=parser_context,
+            source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
         )
     )
 
@@ -1411,6 +1418,13 @@ def _parse_target(
                 kind=RuleTargetKind.THIS_MODEL,
                 source_span=_span_from_match(clause_text, match),
             )
+    if has_hit_success_threshold(clause_text.text):
+        match = _THIS_UNIT_RE.search(clause_text.text)
+        if match is not None:
+            return RuleTargetSpec(
+                kind=RuleTargetKind.THIS_UNIT,
+                source_span=_span_from_match(clause_text, match),
+            )
     return_on_death_match = _FIRST_DEATH_RETURN_TRIGGER_RE.search(clause_text.text)
     if (
         return_on_death_match is not None
@@ -1460,7 +1474,7 @@ def _parse_target(
             pairs.extend(
                 _keyword_sequence_parameter_pairs(
                     keyword_text,
-                    parser_context=parser_context,
+                    source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
                 )
             )
         return RuleTargetSpec(
@@ -1531,7 +1545,7 @@ def _aura_target_parameter_pairs(
         pairs.extend(
             _keyword_sequence_parameter_pairs(
                 keyword_text,
-                parser_context=parser_context,
+                source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
             )
         )
     return tuple(pairs)
@@ -1932,7 +1946,11 @@ def _parse_grant_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSp
     return tuple(effects)
 
 
-def _parse_contextual_status_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
+def _parse_contextual_status_effects(
+    clause_text: _ClauseText,
+    *,
+    parser_context: _RuleParserContext,
+) -> tuple[RuleEffectSpec, ...]:
     effects: list[RuleEffectSpec] = []
     for match in _SHADOW_OF_CHAOS_STATUS_RE.finditer(clause_text.text):
         effects.append(
@@ -1948,6 +1966,13 @@ def _parse_contextual_status_effects(clause_text: _ClauseText) -> tuple[RuleEffe
                 ),
             )
         )
+    effects.extend(
+        hit_success_threshold_effects(
+            clause_text=clause_text.text,
+            clause_start=clause_text.start,
+            source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
+        )
+    )
     for match in _CONTEXTUAL_STATUS_DENIAL_RE.finditer(clause_text.text):
         if _span_matches_existing_effect(
             clause_text=clause_text,
@@ -2573,7 +2598,7 @@ def _distance_relation_parameter_pairs(
         pairs.extend(
             _keyword_sequence_parameter_pairs(
                 keyword_text,
-                parser_context=parser_context,
+                source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
             )
         )
     object_owner = match.group("object_owner")
@@ -2699,65 +2724,6 @@ def _object_kind_token(value: str) -> str:
 
 def _quantity_token(value: str) -> str:
     return value.lower().replace(" ", "_").replace("-", "_")
-
-
-def _keyword_sequence_tokens(
-    value: str,
-    *,
-    parser_context: _RuleParserContext,
-) -> tuple[str, ...]:
-    normalized = " ".join(value.strip().upper().replace("-", " ").split())
-    if not normalized:
-        raise RuleIRError("Keyword sequence must not be empty.")
-    tokens = tuple(
-        _keyword_token(token)
-        for token in _split_source_keyword_sequence(
-            normalized,
-            parser_context=parser_context,
-        )
-    )
-    if not tokens:
-        raise RuleIRError("Keyword sequence must contain at least one keyword.")
-    return tokens
-
-
-def _keyword_sequence_parameter_pairs(
-    value: str,
-    *,
-    parser_context: _RuleParserContext,
-) -> tuple[tuple[str, RuleParameterValue], ...]:
-    tokens = _keyword_sequence_tokens(value, parser_context=parser_context)
-    if len(tokens) == 1:
-        return (("required_keyword", tokens[0]),)
-    return (("required_keyword_sequence", tokens),)
-
-
-def _split_source_keyword_sequence(
-    value: str,
-    *,
-    parser_context: _RuleParserContext,
-) -> tuple[str, ...]:
-    remaining = value
-    tokens: list[str] = []
-    while remaining:
-        match = _longest_source_keyword_prefix(remaining, parser_context=parser_context)
-        if match is None:
-            tokens.append(remaining)
-            break
-        tokens.append(match)
-        remaining = remaining[len(match) :].strip()
-    return tuple(tokens)
-
-
-def _longest_source_keyword_prefix(
-    value: str,
-    *,
-    parser_context: _RuleParserContext,
-) -> str | None:
-    for keyword in parser_context.source_keyword_sequence_parts:
-        if value == keyword or value.startswith(f"{keyword} "):
-            return keyword
-    return None
 
 
 def _ability_token(value: str) -> str:

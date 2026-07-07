@@ -56,6 +56,30 @@ _MOVE_THROUGH_ENGAGEMENT_AUTO_PASS_RE = re.compile(
     r"automatically\s+passed\b",
     re.IGNORECASE,
 )
+_FIRE_OVERWATCH_HIT_SUCCESS_THRESHOLD_BASE_RE = re.compile(
+    r"\beach\s+time\s+you\s+target\s+this\s+unit\s+with\s+the\s+"
+    r"Fire\s+Overwatch\s+Stratagem,\s+hits\s+are\s+scored\s+on\s+"
+    r"unmodified\s+Hit\s+rolls\s+of\s+[2-6]\+",
+    re.IGNORECASE,
+)
+_WHEN_RESOLVING_THAT_STRATAGEM_RE = re.compile(
+    r"\bwhen\s+resolving\s+that\s+Stratagem\b",
+    re.IGNORECASE,
+)
+_FIRE_OVERWATCH_HIT_SUCCESS_THRESHOLD_RE = re.compile(
+    r"\beach\s+time\s+you\s+target\s+this\s+unit\s+with\s+the\s+"
+    r"Fire\s+Overwatch\s+Stratagem,\s+hits\s+are\s+scored\s+on\s+"
+    r"unmodified\s+Hit\s+rolls\s+of\s+[2-6]\+\s+when\s+resolving\s+"
+    r"that\s+Stratagem\b",
+    re.IGNORECASE,
+)
+_THOSE_ATTACKS_PROXIMITY_HIT_SUCCESS_THRESHOLD_RE = re.compile(
+    r"\bfor\s+each\s+of\s+those\s+attacks\s+that\s+targets\s+an\s+enemy\s+unit\s+"
+    r"within\s+\d+(?:\.\d+)?\"\s+of\s+one\s+or\s+more\s+.+?\s+units\s+from\s+"
+    r"your\s+army,\s+a\s+hit\s+is\s+scored\s+on\s+an?\s+unmodified\s+Hit\s+roll\s+"
+    r"of\s+[2-6]\+\s+instead\b",
+    re.IGNORECASE,
+)
 
 
 def merge_rule_clause_spans(
@@ -73,6 +97,18 @@ def merge_rule_clause_spans(
         spans=merged,
         current_patterns=(_POST_SHOOT_OR_HIT_TARGET_SELECTION_RE,),
         next_pattern=_CONTEXTUAL_STATUS_DENIAL_RE,
+    )
+    merged = _merge_adjacent_clause_spans(
+        normalized_text=normalized_text,
+        spans=merged,
+        current_patterns=(_FIRE_OVERWATCH_HIT_SUCCESS_THRESHOLD_BASE_RE,),
+        next_pattern=_WHEN_RESOLVING_THAT_STRATAGEM_RE,
+    )
+    merged = _merge_adjacent_clause_spans(
+        normalized_text=normalized_text,
+        spans=merged,
+        current_patterns=(_FIRE_OVERWATCH_HIT_SUCCESS_THRESHOLD_RE,),
+        next_pattern=_THOSE_ATTACKS_PROXIMITY_HIT_SUCCESS_THRESHOLD_RE,
     )
     return _merge_adjacent_clause_spans(
         normalized_text=normalized_text,

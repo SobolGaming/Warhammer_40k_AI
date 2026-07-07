@@ -108,6 +108,23 @@ def _roll_hit(
         )
     else:
         minimum_success = 2
+    minimum_success = _runtime_modifier_registry(
+        runtime_modifier_registry
+    ).minimum_unmodified_hit_success(
+        HitRollMinimumUnmodifiedSuccessContext(
+            state=state,
+            source_phase=source_phase,
+            attacking_unit_instance_id=_unit_instance_id_for_model(
+                state=state,
+                model_instance_id=pool.attacker_model_instance_id,
+            ),
+            attacker_model_instance_id=pool.attacker_model_instance_id,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            weapon_profile=pool.weapon_profile,
+            targeting_rule_ids=pool.targeting_rule_ids,
+            current_minimum_unmodified_success=minimum_success,
+        )
+    )
     target_keywords = rules_unit_view_by_id(
         state=state,
         unit_instance_id=pool.target_unit_instance_id,

@@ -129,6 +129,7 @@ _movement_transit_permissions_from_clause = (
 CATALOG_IR_CHARGE_ROLL_CONSUMER_ID = "catalog-ir:charge-roll-modifier"
 CATALOG_IR_LEADERSHIP_QUERY_CONSUMER_ID = "catalog-ir:leadership-characteristic-query"
 CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:hit-roll-modifier"
+CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID = "catalog-ir:minimum-unmodified-hit-success"
 CATALOG_IR_WOUND_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:wound-roll-modifier"
 CATALOG_IR_SAVE_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:save-roll-modifier"
 CATALOG_IR_INVULNERABLE_SAVE_ROLL_MODIFIER_CONSUMER_ID = (
@@ -1369,6 +1370,7 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,
         CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
         CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+        CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,
         CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
         CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
         CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
@@ -3804,6 +3806,10 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
                     consumer_ids.add(modifier_consumer_id)
     if _clause_targets_shadow_of_chaos_aura(clause):
         consumer_ids.add(CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID)
+    if _clause_targets_attacker_status_unit(clause):
+        for effect in clause.effects:
+            if _effect_is_minimum_unmodified_hit_success(effect):
+                consumer_ids.add(CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID)
     if _clause_is_named_weapon_ability_choice(clause):
         for effect in clause.effects:
             consumer_ids.update(_weapon_keyword_grant_consumer_ids_for_effect(effect))
@@ -4645,6 +4651,17 @@ def _clause_targets_this_model(clause: RuleClause) -> bool:
     return clause.target is not None and clause.target.kind is RuleTargetKind.THIS_MODEL
 
 
+def _clause_targets_attacker_status_unit(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog rule consumer requires RuleClause values.")
+    return clause.target is not None and clause.target.kind in {
+        RuleTargetKind.FRIENDLY_UNIT,
+        RuleTargetKind.SELECTED_UNIT,
+        RuleTargetKind.THIS_MODEL,
+        RuleTargetKind.THIS_UNIT,
+    }
+
+
 def _clause_targets_roll_reroll_unit(clause: RuleClause) -> bool:
     if _clause_targets_this_unit(clause):
         return True
@@ -5142,6 +5159,22 @@ def _effect_is_shadow_of_chaos_status(effect: RuleEffectSpec) -> bool:
         parameters.get("status") == "within_shadow_of_chaos"
         and parameters.get("rules_context") == "shadow_of_chaos"
         and parameters.get("owner") == "your_army"
+    )
+
+
+def _effect_is_minimum_unmodified_hit_success(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Catalog rule consumer requires RuleEffectSpec values.")
+    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    threshold = parameters.get("minimum_unmodified_success")
+    return (
+        parameters.get("status") == "minimum_unmodified_hit_success"
+        and parameters.get("roll_type") == "hit"
+        and parameters.get("attack_role") == "attacker"
+        and type(threshold) is int
+        and 2 <= threshold <= 6
     )
 
 
@@ -5824,6 +5857,8 @@ def _catalog_ir_hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
         return (CATALOG_IR_FEEL_NO_PAIN_SOURCE_CONSUMER_ID,)
     if _effect_is_shadow_of_chaos_status(effect):
         return (CATALOG_IR_SHADOW_OF_CHAOS_AURA_CONSUMER_ID,)
+    if _effect_is_minimum_unmodified_hit_success(effect):
+        return (CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,)
     if effect.kind is RuleEffectKind.RESTORE_LOST_WOUNDS:
         return (CATALOG_IR_DESTROYED_UNIT_RESTORE_LOST_WOUNDS_CONSUMER_ID,)
     if effect.kind in {

@@ -47,6 +47,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_FIRST_DEATH_RETURN_PHASE_END_CONSUMER_ID,
     CATALOG_IR_FORCE_DESPERATE_ESCAPE_CONSUMER_ID,
     CATALOG_IR_HIT_ROLL_MODIFIER_CONSUMER_ID,
+    CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,
     CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
     CATALOG_IR_NAMED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_STATUS_CONSUMER_ID,
@@ -62,6 +63,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.rules.hit_success_threshold_parser import hit_success_threshold_effects
 from warhammer40k_core.rules.parsed_tokens import (
     ParsedRuleText,
     ParsedRuleTextPayload,
@@ -111,6 +113,7 @@ from warhammer40k_core.rules.rule_ir import (
     rule_trigger_kind_from_token,
     rule_unsupported_reason_from_token,
 )
+from warhammer40k_core.rules.rule_keyword_sequences import keyword_sequence_tokens
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
@@ -2229,6 +2232,100 @@ def test_phase17c_hit_target_cover_denial_effect_clause_compiles_to_semantic_ir(
         "status_label": "Benefit of Cover",
         "target_scope": "selected_unit",
     }
+
+
+def test_phase17c_fire_overwatch_hit_threshold_compiles_to_generic_status_ir() -> None:
+    rule_ir = _compiled(
+        "Each time you target this unit with the Fire Overwatch Stratagem, hits are scored "
+        "on unmodified Hit rolls of 5+ when resolving that Stratagem. For each of those "
+        'attacks that targets an enemy unit within 9" of one or more Thousand Sons Psyker '
+        "units from your army, a hit is scored on an unmodified Hit roll of 4+ instead."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert len(rule_ir.clauses) == 1
+    assert clause.trigger is not None
+    assert clause.trigger.kind is RuleTriggerKind.DICE_ROLL
+    assert parameter_payload(clause.trigger.parameters) == {"roll_type": "hit"}
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.THIS_UNIT
+    assert tuple(effect.kind for effect in clause.effects) == (
+        RuleEffectKind.SET_CONTEXTUAL_STATUS,
+        RuleEffectKind.SET_CONTEXTUAL_STATUS,
+    )
+    assert tuple(parameter_payload(effect.parameters) for effect in clause.effects) == (
+        {
+            "attack_role": "attacker",
+            "minimum_unmodified_success": 5,
+            "required_targeting_rule_id": "core:fire-overwatch",
+            "roll_type": "hit",
+            "status": "minimum_unmodified_hit_success",
+        },
+        {
+            "attack_role": "attacker",
+            "minimum_unmodified_success": 4,
+            "required_targeting_rule_id": "core:fire-overwatch",
+            "roll_type": "hit",
+            "status": "minimum_unmodified_hit_success",
+            "target_proximity_distance_inches": 9,
+            "target_proximity_required_keyword_sequence": ("THOUSAND_SONS", "PSYKER"),
+            "target_proximity_unit_allegiance": "friendly",
+        },
+    )
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,
+    )
+    assert catalog_rule_ir_hook_ids_for_rule(rule_ir) == (
+        CATALOG_IR_MINIMUM_UNMODIFIED_HIT_SUCCESS_CONSUMER_ID,
+    )
+
+
+def test_phase17c_fire_overwatch_hit_threshold_accepts_decimal_proximity_distance() -> None:
+    rule_ir = _compiled(
+        "Each time you target this unit with the Fire Overwatch Stratagem, hits are scored "
+        "on unmodified Hit rolls of 5+ when resolving that Stratagem. For each of those "
+        'attacks that targets an enemy unit within 4.5" of one or more Thousand Sons '
+        "Psyker units from your army, a hit is scored on an unmodified Hit roll of 4+ "
+        "instead."
+    ).rule_ir
+
+    assert parameter_payload(rule_ir.clauses[0].effects[1].parameters) == {
+        "attack_role": "attacker",
+        "minimum_unmodified_success": 4,
+        "required_targeting_rule_id": "core:fire-overwatch",
+        "roll_type": "hit",
+        "status": "minimum_unmodified_hit_success",
+        "target_proximity_distance_inches": 4.5,
+        "target_proximity_required_keyword_sequence": ("THOUSAND_SONS", "PSYKER"),
+        "target_proximity_unit_allegiance": "friendly",
+    }
+
+
+def test_phase17c_hit_threshold_helper_without_targeting_rule_keeps_status_payload() -> None:
+    effects = hit_success_threshold_effects(
+        clause_text="Hits are scored on unmodified Hit rolls of 5+.",
+        clause_start=12,
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    )
+
+    assert tuple(parameter_payload(effect.parameters) for effect in effects) == (
+        {
+            "attack_role": "attacker",
+            "minimum_unmodified_success": 5,
+            "roll_type": "hit",
+            "status": "minimum_unmodified_hit_success",
+        },
+    )
+    assert effects[0].source_span.start == 12
+
+
+def test_phase17c_keyword_sequence_tokens_reject_empty_text() -> None:
+    with pytest.raises(RuleIRError, match="Keyword sequence must not be empty"):
+        keyword_sequence_tokens(
+            "   ",
+            source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+        )
 
 
 @pytest.mark.parametrize(

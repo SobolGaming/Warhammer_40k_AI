@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import replace
 
+import pytest
+
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword, WeaponProfile
@@ -14,15 +16,19 @@ from warhammer40k_core.engine.effects import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.generic_rule_attack_conditions import (
+    generic_rule_target_proximity_keyword_gate_applies,
+)
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     ModelProfileSelection,
     UnitMusterSelection,
     WargearSelection,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.runtime_modifiers import (
     DamageRollModifierContext,
+    HitRollMinimumUnmodifiedSuccessContext,
     HitRollModifierContext,
     RuntimeModifierRegistry,
     SaveOptionModifierContext,
@@ -34,6 +40,7 @@ from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_context_for_unit,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
+from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 
 
 def test_ws14_generic_attack_roll_hooks_bind_attacker_and_target_roles() -> None:
@@ -319,6 +326,156 @@ def test_ws14_generic_attack_hooks_observe_persisting_effect_expiry() -> None:
     )
 
     assert registry.hit_roll_modifier(context) == 0
+
+
+def test_ws14_generic_minimum_unmodified_hit_success_status_is_targeting_rule_gated() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender-unit")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    profile = _weapon_profile(catalog, attacker.own_models[0].wargear_ids[0])
+    registry = RuntimeModifierRegistry.empty()
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:fire-overwatch-hit-threshold",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(attacker.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="set_contextual_status",
+            parameters={
+                "status": "minimum_unmodified_hit_success",
+                "roll_type": "hit",
+                "attack_role": "attacker",
+                "required_targeting_rule_id": FIRE_OVERWATCH_RULE_ID,
+                "minimum_unmodified_success": 5,
+            },
+        )
+    )
+    context = HitRollMinimumUnmodifiedSuccessContext(
+        state=state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        target_unit_instance_id=defender.unit_instance_id,
+        weapon_profile=profile,
+        targeting_rule_ids=(FIRE_OVERWATCH_RULE_ID,),
+        current_minimum_unmodified_success=6,
+    )
+
+    assert registry.minimum_unmodified_hit_success(context) == 5
+    assert registry.minimum_unmodified_hit_success(replace(context, targeting_rule_ids=())) == 6
+    assert (
+        registry.minimum_unmodified_hit_success(
+            replace(context, current_minimum_unmodified_success=4)
+        )
+        == 4
+    )
+
+
+def test_ws14_target_proximity_keyword_gate_is_ignored_when_not_configured() -> None:
+    assert (
+        generic_rule_target_proximity_keyword_gate_applies(
+            state=object(),
+            parameters={},
+            attacking_unit_instance_id="attacker",
+            target_unit_instance_id=None,
+        )
+        is True
+    )
+
+
+def test_ws14_target_proximity_keyword_gate_requires_target_unit() -> None:
+    assert (
+        generic_rule_target_proximity_keyword_gate_applies(
+            state=object(),
+            parameters={
+                "target_proximity_distance_inches": 9,
+                "target_proximity_required_keyword_sequence": ["THOUSAND_SONS", "PSYKER"],
+                "target_proximity_unit_allegiance": "friendly",
+            },
+            attacking_unit_instance_id="attacker",
+            target_unit_instance_id=None,
+        )
+        is False
+    )
+
+
+@pytest.mark.parametrize(
+    ("parameters", "error"),
+    [
+        (
+            {
+                "target_proximity_distance_inches": "9",
+                "target_proximity_required_keyword_sequence": ["THOUSAND_SONS", "PSYKER"],
+                "target_proximity_unit_allegiance": "friendly",
+            },
+            "target_proximity_distance_inches must be numeric",
+        ),
+        (
+            {
+                "target_proximity_distance_inches": -1,
+                "target_proximity_required_keyword_sequence": ["THOUSAND_SONS", "PSYKER"],
+                "target_proximity_unit_allegiance": "friendly",
+            },
+            "target_proximity_distance_inches must not be negative",
+        ),
+        (
+            {
+                "target_proximity_distance_inches": 9,
+                "target_proximity_required_keyword_sequence": ["THOUSAND_SONS", "PSYKER"],
+                "target_proximity_unit_allegiance": 1,
+            },
+            "target_proximity_unit_allegiance must be a string",
+        ),
+        (
+            {
+                "target_proximity_distance_inches": 9,
+                "target_proximity_required_keyword_sequence": ["THOUSAND_SONS", "PSYKER"],
+                "target_proximity_unit_allegiance": "neutral",
+            },
+            "Unsupported generic RuleIR target proximity allegiance",
+        ),
+        (
+            {
+                "target_proximity_distance_inches": 9,
+                "target_proximity_required_keyword_sequence": "THOUSAND_SONS",
+                "target_proximity_unit_allegiance": "friendly",
+            },
+            "target_proximity_required_keyword_sequence must be a list",
+        ),
+        (
+            {
+                "target_proximity_distance_inches": 9,
+                "target_proximity_required_keyword_sequence": ["THOUSAND_SONS", 1],
+                "target_proximity_unit_allegiance": "friendly",
+            },
+            "target_proximity_required_keyword_sequence must contain strings",
+        ),
+        (
+            {
+                "target_proximity_distance_inches": 9,
+                "target_proximity_required_keyword_sequence": [],
+                "target_proximity_unit_allegiance": "friendly",
+            },
+            "target_proximity_required_keyword_sequence must not be empty",
+        ),
+    ],
+)
+def test_ws14_target_proximity_keyword_gate_rejects_malformed_descriptor_parameters(
+    *,
+    parameters: dict[str, JsonValue],
+    error: str,
+) -> None:
+    with pytest.raises(GameLifecycleError, match=error):
+        generic_rule_target_proximity_keyword_gate_applies(
+            state=object(),
+            parameters=parameters,
+            attacking_unit_instance_id="attacker",
+            target_unit_instance_id="target",
+        )
 
 
 def test_ws14_generic_this_model_half_strength_hit_modifier_gates_target() -> None:

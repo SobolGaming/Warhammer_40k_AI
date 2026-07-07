@@ -33,10 +33,12 @@ from warhammer40k_core.engine.generic_rule_attack_conditions import (
     generic_rule_target_allegiance_values,
     generic_rule_target_constraint_values,
     generic_rule_target_constraints_apply,
+    generic_rule_target_proximity_keyword_gate_applies,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.runtime_modifiers import (
     DamageRollModifierContext,
+    HitRollMinimumUnmodifiedSuccessContext,
     HitRollModifierContext,
     MovementBudgetModifierContext,
     ObjectiveControlModifierContext,
@@ -184,6 +186,41 @@ def generic_rule_damage_roll_modifier(context: DamageRollModifierContext) -> int
             <= 0
         ),
     )
+
+
+def generic_rule_minimum_unmodified_hit_success(
+    context: HitRollMinimumUnmodifiedSuccessContext,
+) -> int:
+    if type(context) is not HitRollMinimumUnmodifiedSuccessContext:
+        raise GameLifecycleError(
+            "Generic minimum hit success hooks require HitRollMinimumUnmodifiedSuccessContext."
+        )
+    current = context.current_minimum_unmodified_success
+    for effect in _matching_generic_attack_effects(
+        state=context.state,
+        attacking_unit_instance_id=context.attacking_unit_instance_id,
+        attacker_model_instance_id=context.attacker_model_instance_id,
+        target_unit_instance_id=context.target_unit_instance_id,
+        source_phase=context.source_phase,
+        weapon_profile=context.weapon_profile,
+        effect_kind=RuleEffectKind.SET_CONTEXTUAL_STATUS,
+        legacy_attacker_role_allowed=lambda _candidate: True,
+        legacy_target_role_allowed=lambda _candidate: False,
+    ):
+        if (
+            _required_string_parameter(effect.parameters, key="status")
+            != "minimum_unmodified_hit_success"
+        ):
+            continue
+        if not _roll_type_matches(effect.parameters, expected="hit"):
+            continue
+        if not _targeting_rule_gate_applies(
+            effect.parameters,
+            targeting_rule_ids=context.targeting_rule_ids,
+        ):
+            continue
+        current = min(current, _minimum_unmodified_success_parameter(effect.parameters))
+    return current
 
 
 def generic_rule_modified_save_options(
@@ -659,6 +696,13 @@ def _generic_effect_context_applies(
         target_unit_instance_id=target_unit_instance_id,
     ):
         return False
+    if not generic_rule_target_proximity_keyword_gate_applies(
+        state=state,
+        parameters=effect.parameters,
+        attacking_unit_instance_id=attacking_unit_instance_id,
+        target_unit_instance_id=target_unit_instance_id,
+    ):
+        return False
     if not generic_rule_target_allegiance_applies(
         state=state,
         allegiances=generic_rule_target_allegiance_values(
@@ -1129,6 +1173,28 @@ def _required_int_parameter(parameters: dict[str, JsonValue], *, key: str) -> in
     if type(value) is not int:
         raise GameLifecycleError(f"Generic RuleIR parameter {key} must be an int.")
     return value
+
+
+def _minimum_unmodified_success_parameter(parameters: dict[str, JsonValue]) -> int:
+    value = _required_int_parameter(parameters, key="minimum_unmodified_success")
+    if not 2 <= value <= 6:
+        raise GameLifecycleError(
+            "Generic RuleIR parameter minimum_unmodified_success must be between 2 and 6."
+        )
+    return value
+
+
+def _targeting_rule_gate_applies(
+    parameters: dict[str, JsonValue],
+    *,
+    targeting_rule_ids: tuple[str, ...],
+) -> bool:
+    required_rule = parameters.get("required_targeting_rule_id")
+    if required_rule is None:
+        return True
+    if type(required_rule) is not str:
+        raise GameLifecycleError("Generic RuleIR required_targeting_rule_id must be a string.")
+    return _validate_identifier("required_targeting_rule_id", required_rule) in targeting_rule_ids
 
 
 def _required_numeric_parameter(parameters: dict[str, JsonValue], *, key: str) -> float:

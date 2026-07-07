@@ -152,6 +152,7 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     DamageRollModifierContext,
+    HitRollMinimumUnmodifiedSuccessContext,
     HitRollModifierContext,
     RuntimeModifierRegistry,
     SaveOptionModifierContext,
@@ -301,6 +302,7 @@ __all__ = (
     "GameLifecycleStage",
     "GeometryModel",
     "HAZARDOUS_RULE_ID",
+    "HitRollMinimumUnmodifiedSuccessContext",
     "HitRollModifierContext",
     "INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID",
     "INDIRECT_FIRE_NO_HIT_REROLLS_RULE_ID",
