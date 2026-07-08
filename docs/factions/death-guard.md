@@ -32,7 +32,16 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Death Guard | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+| Defiler (`000004209`) | `Partial` | Full | Full | Full | Full | Partial | Partial; supported detachments 0/9 (None) | Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:post-shoot-hit-target-status`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only | `000008396` Nurgle's Gift (Aura): `descriptor_only` Faction ability row is not fully consumed; detachment support 0/9. |
+
+### Datasheet Ability Details
+
+| Datasheet | Ability | Source kind | Support stage | Semantic categories | Runtime consumers | Diagnostics |
+| --- | --- | --- | --- | --- | --- | --- |
+| Defiler (`000004209`) | Deadly Demise (`000008339`) | `core` | `engine_consumed` | `core.deadly_demise` | `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:destruction-reaction:deadly-demise-resolution` | None |
+| Defiler (`000004209`) | Barrage of Filth (`000004209:barrage-of-filth`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.set_contextual_status.enemy_unit` | `catalog-ir:post-shoot-hit-target-status` | None |
+| Defiler (`000004209`) | Scuttling Walker (`000004209:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
+| Defiler (`000004209`) | Nurgle's Gift (Aura) (`000008396`) | `faction` | `descriptor_only` | `unknown.ability_text` | None | None |
 
 ## Detachment Rule Coverage Rows
 

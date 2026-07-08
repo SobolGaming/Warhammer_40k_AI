@@ -31,7 +31,16 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for World Eaters | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+| Defiler (`000004207`) | `Partial` | Full | Full | Full | Full | Partial | Partial; supported detachments 0/8 (None) | Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:setup-reactive-shoot-charge`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only | `000008428` Blessings of Khorne: `descriptor_only` Faction ability row is not fully consumed; detachment support 0/8. |
+
+### Datasheet Ability Details
+
+| Datasheet | Ability | Source kind | Support stage | Semantic categories | Runtime consumers | Diagnostics |
+| --- | --- | --- | --- | --- | --- | --- |
+| Defiler (`000004207`) | Deadly Demise (`000008339`) | `core` | `engine_consumed` | `core.deadly_demise` | `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:destruction-reaction:deadly-demise-resolution` | None |
+| Defiler (`000004207`) | Scuttling Walker (`000004207:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
+| Defiler (`000004207`) | Unleash Wrath (`000004207:unleash-wrath`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.out_of_phase_action.enemy_unit` | `catalog-ir:setup-reactive-shoot-charge` | None |
+| Defiler (`000004207`) | Blessings of Khorne (`000008428`) | `faction` | `descriptor_only` | `unknown.ability_text` | None | None |
 
 ## Detachment Rule Coverage Rows
 

@@ -115,6 +115,10 @@ from warhammer40k_core.engine.stratagem_catalog import (
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
+from warhammer40k_core.rules.source_overlay import apply_source_release_overlays
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_defiler_datasheet_overlay_2026_06 as chaos_defiler_overlay,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
     faction_detachments_2026_27,
@@ -125,9 +129,12 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_covera
     Phase17ECoverageStatus,
 )
 from warhammer40k_core.rules.wahapedia_bridge import (
-    CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     ModelHeightOverride,
     build_wahapedia_canonical_bridge_artifacts,
+)
+from warhammer40k_core.rules.wahapedia_bridge_defaults import (
+    CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
+    CHAOS_DEFILER_HEIGHT_OVERRIDES,
 )
 from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaJsonArtifact,
@@ -148,6 +155,8 @@ DEFAULT_FACTION_DOCS_DIR = Path("docs") / "factions"
 GENERATED_BY_COMMAND = "uv run python tools/generate_ability_support_matrix.py"
 RUNTIME_CONTENT_SEMANTIC_COVERAGE_SCHEMA_VERSION = "runtime-content-semantic-coverage-v1"
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
+CHAOS_DEFILER_DATASHEET_IDS = chaos_defiler_overlay.DEFILER_DATASHEET_IDS
+ABILITY_SUPPORT_DATASHEET_IDS = (*DAEMON_WARGEAR_DATASHEET_IDS, *CHAOS_DEFILER_DATASHEET_IDS)
 DATASHEET_SUPPORT_FULL = "Full"
 DATASHEET_SUPPORT_PLAYABLE = "Playable"
 DATASHEET_SUPPORT_PARTIAL = "Partial"
@@ -1186,14 +1195,20 @@ def _ability_support_catalog_package(
 ) -> CanonicalCatalogPackage:
     source_json_dir = _resolve_repo_path(source_json_dir)
     artifacts = _load_source_artifacts(source_json_dir)
-    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+    overlaid_artifacts = apply_source_release_overlays(
         source_artifacts=artifacts,
+        release_manifest=chaos_defiler_overlay.source_release_manifest(),
+        overlay_packs=(chaos_defiler_overlay.overlay_pack(),),
+    )
+    bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=overlaid_artifacts,
         bridge_package_id=_bridge_package_id(),
-        datasheet_ids=DAEMON_WARGEAR_DATASHEET_IDS,
+        datasheet_ids=ABILITY_SUPPORT_DATASHEET_IDS,
         height_overrides=(
             CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES
             + BLOODLETTERS_HEIGHT_OVERRIDES
             + FLESH_HOUNDS_HEIGHT_OVERRIDES
+            + CHAOS_DEFILER_HEIGHT_OVERRIDES
         ),
     )
     return build_canonical_catalog_package(
@@ -1210,7 +1225,7 @@ def _ability_support_matrix_rows_from_package(
         raise ValueError("Ability support matrix rows require a canonical catalog package.")
     rows = ability_coverage_rows_from_catalog(
         package.army_catalog,
-        datasheet_ids=DAEMON_WARGEAR_DATASHEET_IDS,
+        datasheet_ids=ABILITY_SUPPORT_DATASHEET_IDS,
     )
     return (*rows, *_runtime_faction_army_rule_rows())
 

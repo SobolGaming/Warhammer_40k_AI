@@ -33,7 +33,16 @@ This table reports datasheet-level playability evidence. `Full` means catalog/mo
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Emperor's Children | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+| Defiler (`000004208`) | `Partial` | Full | Full | Full | Full | Partial | Partial; supported detachments 1/10 (`spectacle-of-slaughter`) | Runtime consumers: `catalog-ir:hit-roll-modifier`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only | `000009994` Thrill Seekers: `descriptor_only` Faction ability row is not fully consumed; detachment support 1/10. |
+
+### Datasheet Ability Details
+
+| Datasheet | Ability | Source kind | Support stage | Semantic categories | Runtime consumers | Diagnostics |
+| --- | --- | --- | --- | --- | --- | --- |
+| Defiler (`000004208`) | Deadly Demise (`000008339`) | `core` | `engine_consumed` | `core.deadly_demise` | `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:destruction-reaction:deadly-demise-resolution` | None |
+| Defiler (`000004208`) | Revel in Desecration (`000004208:revel-in-desecration`) | `datasheet` | `engine_consumed` | `datasheet.roll_modifier.hit.this_model` | `catalog-ir:hit-roll-modifier` | None |
+| Defiler (`000004208`) | Scuttling Walker (`000004208:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
+| Defiler (`000004208`) | Thrill Seekers (`000009994`) | `faction` | `descriptor_only` | `unknown.ability_text` | None | None |
 
 ## Detachment Rule Coverage Rows
 

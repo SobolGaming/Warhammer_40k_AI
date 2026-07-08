@@ -111,5 +111,135 @@
     "tests_evidence": "Runtime consumers: `catalog-ir:can-be-placed-in-reserves`, `catalog-ir:feel-no-pain-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004209/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000004209/datasheet/000004209:barrage-of-filth/none",
+      "chaos-daemons-bridge-catalog/000004209/datasheet/000004209:scuttling-walker/none",
+      "chaos-daemons-bridge-catalog/000004209/faction/000008396/none"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Partial",
+    "datasheet_id": "000004209",
+    "datasheet_name": "Defiler",
+    "detachment_ids": [
+      "champions-of-contagion",
+      "contagion-engines",
+      "death-lords-chosen",
+      "flyblown-host",
+      "mortarions-hammer",
+      "paragons-of-putrescence",
+      "shamblerot-vectorium",
+      "tallyband-summoners",
+      "virulent-vectorium"
+    ],
+    "faction_id": "death-guard",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "`000008396` Nurgle's Gift (Aura): `descriptor_only` Faction ability row is not fully consumed; detachment support 0/9.",
+    "overall": "Partial",
+    "supported_detachment_ids": [],
+    "tests_evidence": "Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:post-shoot-hit-target-status`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004208/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000004208/datasheet/000004208:revel-in-desecration/none",
+      "chaos-daemons-bridge-catalog/000004208/datasheet/000004208:scuttling-walker/none",
+      "chaos-daemons-bridge-catalog/000004208/faction/000009994/none"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Partial",
+    "datasheet_id": "000004208",
+    "datasheet_name": "Defiler",
+    "detachment_ids": [
+      "carnival-of-excess",
+      "coterie-of-the-conceited",
+      "court-of-the-phoenician",
+      "elegant-brutes",
+      "frenzied-host",
+      "mercurial-host",
+      "peerless-bladesmen",
+      "rapid-evisceration",
+      "slaaneshs-chosen",
+      "spectacle-of-slaughter"
+    ],
+    "faction_id": "emperors-children",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "`000009994` Thrill Seekers: `descriptor_only` Faction ability row is not fully consumed; detachment support 1/10.",
+    "overall": "Partial",
+    "supported_detachment_ids": [
+      "spectacle-of-slaughter"
+    ],
+    "tests_evidence": "Runtime consumers: `catalog-ir:hit-roll-modifier`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001030/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000001030/core/000008338/none",
+      "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:destroyer-of-futures/none",
+      "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:scuttling-walker/none"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Full",
+    "datasheet_id": "000001030",
+    "datasheet_name": "Defiler",
+    "detachment_ids": [
+      "changehost-of-deceit",
+      "grand-coven",
+      "hexwarp-thrallband",
+      "ritual-of-regeneration",
+      "rubricae-phalanx",
+      "sekhetar-cohort",
+      "servants-of-change",
+      "warpforged-cabal",
+      "warpmeld-pact"
+    ],
+    "faction_id": "thousand-sons",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "No source-backed faction ability row; detachment support 0/9.",
+    "overall": "Playable",
+    "supported_detachment_ids": [],
+    "tests_evidence": "Runtime consumers: `catalog-ir:minimum-unmodified-hit-success`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:lost-wound:feel-no-pain-resolution`, `descriptor:lost-wound:feel-no-pain-source`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004207/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000004207/datasheet/000004207:scuttling-walker/none",
+      "chaos-daemons-bridge-catalog/000004207/datasheet/000004207:unleash-wrath/none",
+      "chaos-daemons-bridge-catalog/000004207/faction/000008428/none"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Partial",
+    "datasheet_id": "000004207",
+    "datasheet_name": "Defiler",
+    "detachment_ids": [
+      "berzerker-warband",
+      "brazen-engines",
+      "butchers-of-khorne",
+      "cult-of-blood",
+      "goretrack-onslaught",
+      "khorne-daemonkin",
+      "possessed-slaughterband",
+      "vessels-of-wrath"
+    ],
+    "faction_id": "world-eaters",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "`000008428` Blessings of Khorne: `descriptor_only` Faction ability row is not fully consumed; detachment support 0/8.",
+    "overall": "Partial",
+    "supported_detachment_ids": [],
+    "tests_evidence": "Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:setup-reactive-shoot-charge`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
   }
 ]
