@@ -26,6 +26,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     turn_end_hook_ids: list[str]
     command_phase_start_hook_ids: list[str]
     fight_phase_start_hook_ids: list[str]
+    fight_phase_end_hook_ids: list[str]
     shooting_phase_start_hook_ids: list[str]
     unit_destroyed_hook_ids: list[str]
     battle_shock_hook_ids: list[str]
@@ -108,6 +109,9 @@ def runtime_content_bundle_summary_payload(
         ],
         "fight_phase_start_hook_ids": [
             binding.hook_id for binding in bundle.fight_phase_start_hook_registry.all_bindings()
+        ],
+        "fight_phase_end_hook_ids": [
+            binding.hook_id for binding in bundle.fight_phase_end_hook_registry.all_bindings()
         ],
         "shooting_phase_start_hook_ids": [
             binding.hook_id for binding in bundle.shooting_phase_start_hook_registry.all_bindings()

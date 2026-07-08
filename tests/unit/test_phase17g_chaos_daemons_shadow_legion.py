@@ -78,6 +78,7 @@ from warhammer40k_core.engine.fight_phase_start_hooks import (
     FightPhaseStartHookRegistry,
     FightPhaseStartRequestContext,
     FightPhaseStartResultContext,
+    invalid_fight_phase_start_faction_rule_status,
 )
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     DECLINE_FIGHT_UNIT_GRANT_OPTION_ID,
@@ -105,7 +106,6 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.phases.fight import (
     FightPhaseHandler,
     _request_fight_unit_selected_grant_decision_if_available,  # pyright: ignore[reportPrivateUsage]
-    invalid_fight_phase_start_faction_rule_status,
 )
 from warhammer40k_core.engine.phases.shooting import (
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,

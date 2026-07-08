@@ -4,6 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self
 
+from warhammer40k_core.core.ruleset_descriptor import FightPhaseStepKind
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -21,22 +22,22 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 
-SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE = (
-    "select_faction_rule_fight_phase_start_option"
+SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE = (
+    "select_faction_rule_fight_phase_end_option"
 )
 
-type FightPhaseStartRequestHandler = Callable[
-    ["FightPhaseStartRequestContext"],
+type FightPhaseEndRequestHandler = Callable[
+    ["FightPhaseEndRequestContext"],
     DecisionRequest | None,
 ]
-type FightPhaseStartResultHandler = Callable[
-    ["FightPhaseStartResultContext"],
+type FightPhaseEndResultHandler = Callable[
+    ["FightPhaseEndResultContext"],
     bool | LifecycleStatus,
 ]
 
 
 @dataclass(frozen=True, slots=True)
-class FightPhaseStartRequestContext:
+class FightPhaseEndRequestContext:
     state: GameState
     decisions: DecisionController
 
@@ -44,16 +45,16 @@ class FightPhaseStartRequestContext:
         from warhammer40k_core.engine.game_state import GameState
 
         if type(self.state) is not GameState:
-            raise GameLifecycleError("FightPhaseStartRequestContext state must be GameState.")
+            raise GameLifecycleError("FightPhaseEndRequestContext state must be GameState.")
         if type(self.decisions) is not DecisionController:
             raise GameLifecycleError(
-                "FightPhaseStartRequestContext decisions must be DecisionController."
+                "FightPhaseEndRequestContext decisions must be DecisionController."
             )
-        _validate_fight_phase_start_state(self.state)
+        _validate_fight_phase_end_state(self.state)
 
 
 @dataclass(frozen=True, slots=True)
-class FightPhaseStartResultContext:
+class FightPhaseEndResultContext:
     state: GameState
     decisions: DecisionController
     request: DecisionRequest
@@ -63,43 +64,41 @@ class FightPhaseStartResultContext:
         from warhammer40k_core.engine.game_state import GameState
 
         if type(self.state) is not GameState:
-            raise GameLifecycleError("FightPhaseStartResultContext state must be GameState.")
+            raise GameLifecycleError("FightPhaseEndResultContext state must be GameState.")
         if type(self.decisions) is not DecisionController:
             raise GameLifecycleError(
-                "FightPhaseStartResultContext decisions must be DecisionController."
+                "FightPhaseEndResultContext decisions must be DecisionController."
             )
         if type(self.request) is not DecisionRequest:
-            raise GameLifecycleError(
-                "FightPhaseStartResultContext request must be DecisionRequest."
-            )
+            raise GameLifecycleError("FightPhaseEndResultContext request must be DecisionRequest.")
         if type(self.result) is not DecisionResult:
-            raise GameLifecycleError("FightPhaseStartResultContext result must be DecisionResult.")
-        if self.request.decision_type != SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE:
-            raise GameLifecycleError("FightPhaseStartResultContext request decision_type drift.")
-        _validate_fight_phase_start_state(self.state)
+            raise GameLifecycleError("FightPhaseEndResultContext result must be DecisionResult.")
+        if self.request.decision_type != SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE:
+            raise GameLifecycleError("FightPhaseEndResultContext request decision_type drift.")
+        _validate_fight_phase_end_state(self.state)
 
 
 @dataclass(frozen=True, slots=True)
-class FightPhaseStartHookBinding:
+class FightPhaseEndHookBinding:
     hook_id: str
     source_id: str
-    request_handler: FightPhaseStartRequestHandler | None = None
-    result_handler: FightPhaseStartResultHandler | None = None
+    request_handler: FightPhaseEndRequestHandler | None = None
+    result_handler: FightPhaseEndResultHandler | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
         if self.request_handler is None and self.result_handler is None:
-            raise GameLifecycleError("FightPhaseStartHookBinding requires a handler.")
+            raise GameLifecycleError("FightPhaseEndHookBinding requires a handler.")
         if self.request_handler is not None and not callable(self.request_handler):
-            raise GameLifecycleError("FightPhaseStartHookBinding request_handler must be callable.")
+            raise GameLifecycleError("FightPhaseEndHookBinding request_handler must be callable.")
         if self.result_handler is not None and not callable(self.result_handler):
-            raise GameLifecycleError("FightPhaseStartHookBinding result_handler must be callable.")
+            raise GameLifecycleError("FightPhaseEndHookBinding result_handler must be callable.")
 
 
 @dataclass(frozen=True, slots=True)
-class FightPhaseStartHookRegistry:
-    bindings: tuple[FightPhaseStartHookBinding, ...]
+class FightPhaseEndHookRegistry:
+    bindings: tuple[FightPhaseEndHookBinding, ...]
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "bindings", _validate_hook_bindings(self.bindings))
@@ -109,18 +108,18 @@ class FightPhaseStartHookRegistry:
         return cls(bindings=())
 
     @classmethod
-    def from_bindings(cls, bindings: tuple[FightPhaseStartHookBinding, ...]) -> Self:
+    def from_bindings(cls, bindings: tuple[FightPhaseEndHookBinding, ...]) -> Self:
         return cls(bindings=bindings)
 
-    def all_bindings(self) -> tuple[FightPhaseStartHookBinding, ...]:
+    def all_bindings(self) -> tuple[FightPhaseEndHookBinding, ...]:
         return self.bindings
 
     def next_request_for(
         self,
-        context: FightPhaseStartRequestContext,
+        context: FightPhaseEndRequestContext,
     ) -> DecisionRequest | None:
-        if type(context) is not FightPhaseStartRequestContext:
-            raise GameLifecycleError("Fight-phase start request hooks require context.")
+        if type(context) is not FightPhaseEndRequestContext:
+            raise GameLifecycleError("Fight-phase end request hooks require context.")
         requests: list[DecisionRequest] = []
         for binding in self.bindings:
             if binding.request_handler is None:
@@ -130,20 +129,20 @@ class FightPhaseStartHookRegistry:
                 continue
             if type(request) is not DecisionRequest:
                 raise GameLifecycleError(
-                    "Fight-phase start request handlers must return DecisionRequest or None."
+                    "Fight-phase end request handlers must return DecisionRequest or None."
                 )
             requests.append(request)
         if len(requests) > 1:
             raise GameLifecycleError(
-                "Fight-phase start hooks produced multiple simultaneous requests."
+                "Fight-phase end hooks produced multiple simultaneous requests."
             )
         if not requests:
             return None
         return requests[0]
 
-    def apply_result(self, context: FightPhaseStartResultContext) -> bool | LifecycleStatus:
-        if type(context) is not FightPhaseStartResultContext:
-            raise GameLifecycleError("Fight-phase start result hooks require context.")
+    def apply_result(self, context: FightPhaseEndResultContext) -> bool | LifecycleStatus:
+        if type(context) is not FightPhaseEndResultContext:
+            raise GameLifecycleError("Fight-phase end result hooks require context.")
         handled_results: list[bool | LifecycleStatus] = []
         for binding in self.bindings:
             if binding.result_handler is None:
@@ -151,47 +150,47 @@ class FightPhaseStartHookRegistry:
             handled = binding.result_handler(context)
             if type(handled) is not bool and type(handled) is not LifecycleStatus:
                 raise GameLifecycleError(
-                    "Fight-phase start result handlers must return bool or status."
+                    "Fight-phase end result handlers must return bool or status."
                 )
             if handled:
                 handled_results.append(handled)
         if len(handled_results) > 1:
-            raise GameLifecycleError("Fight-phase start result was handled by multiple hooks.")
+            raise GameLifecycleError("Fight-phase end result was handled by multiple hooks.")
         if not handled_results:
             return False
         return handled_results[0]
 
 
-def apply_fight_phase_start_result(
+def apply_fight_phase_end_result(
     *,
-    registry: FightPhaseStartHookRegistry,
+    registry: FightPhaseEndHookRegistry,
     state: GameState,
     decisions: DecisionController,
     result: DecisionResult,
 ) -> LifecycleStatus | None:
-    phase_start_result = registry.apply_result(
-        FightPhaseStartResultContext(
+    phase_end_result = registry.apply_result(
+        FightPhaseEndResultContext(
             state=state,
             decisions=decisions,
             request=decisions.record_for_result(result).request,
             result=result,
         )
     )
-    if type(phase_start_result) is LifecycleStatus:
-        return phase_start_result
-    if phase_start_result:
+    if type(phase_end_result) is LifecycleStatus:
+        return phase_end_result
+    if phase_end_result:
         return None
-    raise GameLifecycleError("Faction rule Fight-phase start decision was not handled.")
+    raise GameLifecycleError("Faction rule Fight-phase end decision was not handled.")
 
 
-def request_fight_phase_start_rule_if_available(
+def request_fight_phase_end_rule_if_available(
     *,
-    registry: FightPhaseStartHookRegistry,
+    registry: FightPhaseEndHookRegistry,
     state: GameState,
     decisions: DecisionController,
 ) -> LifecycleStatus | None:
     request = registry.next_request_for(
-        FightPhaseStartRequestContext(
+        FightPhaseEndRequestContext(
             state=state,
             decisions=decisions,
         )
@@ -200,7 +199,7 @@ def request_fight_phase_start_rule_if_available(
         return None
     decisions.request_decision(request)
     decisions.event_log.append(
-        "fight_phase_start_faction_rule_requested",
+        "fight_phase_end_faction_rule_requested",
         validate_json_value(
             {
                 "game_id": state.game_id,
@@ -220,14 +219,14 @@ def request_fight_phase_start_rule_if_available(
             {
                 "phase": BattlePhase.FIGHT.value,
                 "active_player_id": _active_player_id(state),
-                "phase_body_status": "fight_phase_start_faction_rule_pending",
+                "phase_body_status": "fight_phase_end_faction_rule_pending",
                 "request_id": request.request_id,
             }
         ),
     )
 
 
-def invalid_fight_phase_start_faction_rule_status(
+def invalid_fight_phase_end_faction_rule_status(
     *,
     state: GameState,
     request: DecisionRequest,
@@ -237,13 +236,13 @@ def invalid_fight_phase_start_faction_rule_status(
         state=state,
         request=request,
         result=result,
-        invalid_reason="invalid_fight_phase_start_faction_rule_result",
+        invalid_reason="invalid_fight_phase_end_faction_rule_result",
     )
     if invalid_status is not None:
         return invalid_status
     payload = _decision_payload_object(result.payload)
     request_payload = _decision_payload_object(request.payload)
-    drift_reason = _fight_phase_start_faction_rule_drift_reason(
+    drift_reason = _fight_phase_end_faction_rule_drift_reason(
         state=state,
         request=request,
         result=result,
@@ -254,7 +253,7 @@ def invalid_fight_phase_start_faction_rule_status(
         return None
     return LifecycleStatus.invalid(
         stage=state.stage,
-        message="Fight phase start faction rule option drifted.",
+        message="Fight phase end faction rule option drifted.",
         payload=validate_json_value(
             {
                 "game_id": state.game_id,
@@ -269,7 +268,7 @@ def invalid_fight_phase_start_faction_rule_status(
     )
 
 
-def _fight_phase_start_faction_rule_drift_reason(
+def _fight_phase_end_faction_rule_drift_reason(
     *,
     state: GameState,
     request: DecisionRequest,
@@ -299,26 +298,38 @@ def _fight_phase_start_faction_rule_drift_reason(
         return "request_active_player_drift"
     if state.current_battle_phase is not BattlePhase.FIGHT:
         return "phase_drift"
-    if state.fight_phase_state is not None:
-        return "fight_phase_start_window_closed"
+    fight_state = state.fight_phase_state
+    if fight_state is None:
+        return "fight_phase_state_missing"
+    if fight_state.current_step is not FightPhaseStepKind.END:
+        return "fight_phase_end_window_not_open"
+    if fight_state.phase_complete:
+        return "fight_phase_end_window_closed"
     return None
 
 
-def _validate_hook_bindings(value: object) -> tuple[FightPhaseStartHookBinding, ...]:
+def _validate_hook_bindings(value: object) -> tuple[FightPhaseEndHookBinding, ...]:
     return validate_hook_bindings(
         value,
-        lifecycle_event=LifecycleHookEvent.FIGHT_PHASE_START,
-        binding_type=FightPhaseStartHookBinding,
-        registry_name="FightPhaseStartHookRegistry",
-        invalid_binding_message="FightPhaseStartHookRegistry requires hook bindings.",
+        lifecycle_event=LifecycleHookEvent.FIGHT_PHASE_END,
+        binding_type=FightPhaseEndHookBinding,
+        registry_name="FightPhaseEndHookRegistry",
+        invalid_binding_message="FightPhaseEndHookRegistry requires hook bindings.",
     )
 
 
-def _validate_fight_phase_start_state(state: GameState) -> None:
+def _validate_fight_phase_end_state(state: GameState) -> None:
     if state.stage is not GameLifecycleStage.BATTLE:
-        raise GameLifecycleError("Fight-phase start hooks require battle stage.")
+        raise GameLifecycleError("Fight-phase end hooks require battle stage.")
     if state.current_battle_phase is not BattlePhase.FIGHT:
-        raise GameLifecycleError("Fight-phase start hooks require Fight phase.")
+        raise GameLifecycleError("Fight-phase end hooks require Fight phase.")
+    fight_state = state.fight_phase_state
+    if fight_state is None:
+        raise GameLifecycleError("Fight-phase end hooks require fight phase state.")
+    if fight_state.current_step is not FightPhaseStepKind.END:
+        raise GameLifecycleError("Fight-phase end hooks require the Fight phase end step.")
+    if fight_state.phase_complete:
+        raise GameLifecycleError("Fight-phase end hooks require an incomplete Fight phase.")
 
 
 def _decision_payload_object(payload: JsonValue) -> dict[str, JsonValue]:

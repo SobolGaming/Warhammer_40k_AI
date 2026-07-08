@@ -1129,6 +1129,29 @@ Required Phase 17G Fight-start faction-rule tests:
 - deterministic JSON-safe decision, event, lifecycle, and replay payload round-trip;
 - viewer-scoped projection/event redaction for any future hidden Fight-start faction-rule selections.
 
+## Phase 17G Fight-End Faction-Rule Decisions
+
+Phase 17G adds opt-in Fight-end decisions for faction runtime content. These decisions are emitted only when the current battle phase is Fight, the normal `FightPhaseState` is at the `end` step, and a registered Fight-end hook has at least one legal source-backed option. The current implemented hook is Chaos Daemons Bloodthirster Relentless Carnage.
+
+Phase 17G exposes the finite decision type `select_faction_rule_fight_phase_end_option`. The pending request payload contains game ID, battle round, phase `fight`, active player ID, player ID, source rule ID, hook ID, source unit ID, source rules-unit ID, eligible enemy rules-unit IDs, and the decline option ID. Current Relentless Carnage options use the forms `chaos-daemons:bloodthirster:relentless-carnage:<source_rules_unit_instance_id>:decline` and `chaos-daemons:bloodthirster:relentless-carnage:<source_rules_unit_instance_id>:target:<target_enemy_unit_instance_id>`.
+
+Relentless Carnage option payloads include `submission_kind: "chaos_daemons_bloodthirster_relentless_carnage"`, game ID, battle round, active player ID, phase `fight`, player ID, source rule ID, hook ID, source unit ID, source rules-unit ID, `use_ability`, and a target enemy unit ID for use options. Adapters must not invent target IDs, infer Engagement Range locally, roll the eight D6, apply mortal wounds, or resolve Feel No Pain locally.
+
+Accepted Relentless Carnage use selections validate the source datasheet ability, confirm the selected enemy rules unit was in the request snapshot and is still within Engagement Range of the source attached rules unit, then roll eight source-backed D6 through the deterministic dice manager. Each 4+ applies one mortal wound through the shared mortal-wound application path. If the target has multiple eligible mortal-wound Feel No Pain sources, the handler emits the standard `select_feel_no_pain` finite decision and resumes through the registered Relentless Carnage continuation hook after the player chooses the FNP source. Accepted decline selections emit a replay-safe decline event and do not mutate battlefield state.
+
+Malformed, stale, wrong-actor, wrong-game, wrong-round, wrong-phase, wrong-active-player, wrong-hook, unsupported-option, option-payload drift, source drift, target drift, closed Fight-end window, and no-longer-engaged submissions reject before the pending queue is popped and before a `DecisionRecord`, dice roll, mortal-wound application, or event is created.
+
+Fight-end faction-rule choices are public table information in the current Phase 17G rules scope. If a future Fight-end faction rule hides choices, pending requests, option lists, decision records, damage events, projections, and event deltas must be viewer-scoped and must not leak hidden opponent information through option counts, target snapshots, selected payloads, damage routing, or derived engine values.
+
+Required Phase 17G Fight-end faction-rule tests:
+
+- valid Relentless Carnage target selection through `FiniteOptionSubmission -> DecisionResult -> GameLifecycle.submit_decision(...)`;
+- deterministic eight-D6 roll payloads and mortal-wound application events;
+- mortal-wound Feel No Pain routing through the shared FNP decision and continuation hook;
+- stale, drifted, malformed, wrong-context, and ineligible submissions reject before mutation;
+- deterministic JSON-safe decision, event, lifecycle, and replay payload round-trip;
+- viewer-scoped projection/event redaction for any future hidden Fight-end faction-rule selections.
+
 ## Phase 17G Shooting-Start Faction-Rule Decisions
 
 Phase 17G adds opt-in Shooting-start decisions for faction runtime content. These decisions are emitted only when the current battle phase is Shooting, before the normal `ShootingPhaseState` opens, and only when a registered Shooting-start hook has at least one legal source-backed option. The current implemented hooks are T'au Empire For the Greater Good, Thousand Sons Cabal of Sorcerers, and catalog RuleIR named-weapon ability choices.

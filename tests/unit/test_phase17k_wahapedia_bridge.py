@@ -5001,8 +5001,8 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "<br>Soul Shattering Charge Upgrade |"
     ) in chaos_daemons_markdown
     assert (
-        "| Nurgle | None | Nurglings (`000001133`)<br>Plague Drones (`000001135`)"
-        "<br>Plaguebearers (`000001132`)"
+        "| Nurgle | Plaguebearers (`000001132`) | Nurglings (`000001133`)"
+        "<br>Plague Drones (`000001135`)"
     ) in chaos_daemons_markdown
     for khorne_datasheet_id in (
         "000001104",
@@ -5035,8 +5035,16 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "IR parsed; host needed |"
     ) in chaos_daemons_markdown
     assert (
-        "| Bloodthirster (`000002582`) | PDF pages 16-17; supersedes Wahapedia. | "
-        "IR parsed; host needed |"
+        "| Bloodthirster (`000002582`) | PDF pages 16-17; supersedes Wahapedia. | All consumed |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Lord of Change (`000001120`) | PDF pages 40-41; supersedes Wahapedia. | All consumed |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Plaguebearers (`000001132`) | PDF pages 78-79; supersedes Wahapedia. | All consumed |"
+    ) in chaos_daemons_markdown
+    assert (
+        "| Shalaxi Helbane (`000001648`) | PDF pages 88-89; supersedes Wahapedia. | All consumed |"
     ) in chaos_daemons_markdown
     assert (
         "| Skull Altar (`000001588`) | PDF pages 36-37; supersedes Wahapedia. | "
@@ -5105,62 +5113,7 @@ def test_phase17k_daemon_wargear_ability_coverage_snapshot_is_current() -> None:
         "| Daemon Prince of Chaos (`000001149`) | PDF pages 116-117; supersedes "
         "Wahapedia. | Unsupported IR |"
     ) in chaos_daemons_markdown
-    assert "### Wahapedia-only rows excluded from PDF review" in chaos_daemons_markdown
-    for excluded_wahapedia_id in (
-        "000001329",
-        "000004040",
-        "000001333",
-        "000004039",
-        "000004069",
-        "000001336",
-        "000001337",
-        "000001340",
-        "000004041",
-        "000004055",
-        "000004056",
-        "000004061",
-        "000004070",
-        "000001139",
-        "000001141",
-        "000001146",
-        "000001147",
-        "000001332",
-        "000004042",
-        "000004071",
-        "000004101",
-        "000001150",
-        "000001338",
-        "000001339",
-        "000004036",
-        "000004037",
-        "000004038",
-        "000004043",
-        "000004044",
-        "000004045",
-        "000004046",
-        "000004047",
-        "000004048",
-        "000004049",
-        "000004050",
-        "000004051",
-        "000004052",
-        "000004053",
-        "000004054",
-        "000004057",
-        "000004058",
-        "000004059",
-        "000004060",
-        "000004062",
-        "000004063",
-        "000004064",
-        "000004065",
-        "000004066",
-        "000004067",
-        "000004068",
-        "000004072",
-        "000004073",
-    ):
-        assert f"(`{excluded_wahapedia_id}`)" in chaos_daemons_markdown
+    assert "### Wahapedia-only rows excluded from PDF review" not in chaos_daemons_markdown
     assert "### Datasheet Ability Details" in chaos_daemons_markdown
     assert "Flesh Hounds (`000001112`) | `Playable` | Full | Full | Full | Full | Full" in (
         chaos_daemons_markdown

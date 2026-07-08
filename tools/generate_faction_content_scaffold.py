@@ -41,6 +41,7 @@ THOUSAND_SONS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.thousand_sons.army_ru
 IMPERIAL_KNIGHTS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.imperial_knights.army_rule"
 TYRANIDS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.tyranids.army_rule"
 GENESTEALER_CULTS_ARMY_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.genestealer_cults.army_rule"
+CHAOS_DAEMONS_DATASHEETS_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_daemons.datasheets"
 SHADOW_LEGION_RULE_MODULE_PATH = f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.shadow_legion.rule"
 SHADOW_LEGION_ENHANCEMENTS_MODULE_PATH = (
     f"{BASE_IMPORT_PATH}.chaos_daemons.detachments.shadow_legion.enhancements"
@@ -104,6 +105,7 @@ IMPLEMENTED_CONTRIBUTION_IDS_BY_MODULE_PATH = {
     GENESTEALER_CULTS_ARMY_RULE_MODULE_PATH: (
         "warhammer_40000_11th:genestealer_cults:army_rule:cult_ambush"
     ),
+    CHAOS_DAEMONS_DATASHEETS_MODULE_PATH: "warhammer_40000_11th:chaos_daemons:datasheets",
     SHADOW_LEGION_RULE_MODULE_PATH: (
         "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule"
     ),
@@ -420,6 +422,16 @@ def _agent_runtime_module_content(*, contribution_id: str) -> str:
 
 def _faction_manifest_content(*, faction_module: str) -> str:
     contribution_id = f"warhammer_40000_11th:{faction_module}:faction_manifest:scaffold"
+    datasheet_import = (
+        "from .datasheets import runtime_contribution as datasheet_contribution\n"
+        if faction_module == "chaos_daemons"
+        else ""
+    )
+    contributions = (
+        "        contributions=(army_rule_contribution(), datasheet_contribution()),\n"
+        if faction_module == "chaos_daemons"
+        else "        contributions=(army_rule_contribution(),),\n"
+    )
     return (
         f"{_generated_header()}\n"
         "from warhammer40k_core.engine.faction_content.bundle import (\n"
@@ -428,6 +440,7 @@ def _faction_manifest_content(*, faction_module: str) -> str:
         ")\n"
         "\n"
         "from .army_rule import runtime_contribution as army_rule_contribution\n"
+        f"{datasheet_import}"
         "\n"
         f"{_contribution_id_assignment(contribution_id)}\n"
         "\n"
@@ -435,7 +448,7 @@ def _faction_manifest_content(*, faction_module: str) -> str:
         "def runtime_contribution() -> RuntimeContentContribution:\n"
         "    return combine_runtime_content_contributions(\n"
         "        contribution_id=CONTRIBUTION_ID,\n"
-        "        contributions=(army_rule_contribution(),),\n"
+        f"{contributions}"
         "    )\n"
     )
 

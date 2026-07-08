@@ -16,6 +16,7 @@ class LifecycleHookEvent(StrEnum):
     TURN_END = "turn_end"
     COMMAND_PHASE_START = "command_phase_start"
     FIGHT_PHASE_START = "fight_phase_start"
+    FIGHT_PHASE_END = "fight_phase_end"
     SHOOTING_PHASE_START = "shooting_phase_start"
     UNIT_DESTROYED = "unit_destroyed"
     BATTLE_SHOCK = "battle_shock"

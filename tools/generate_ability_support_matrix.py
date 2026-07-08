@@ -847,6 +847,22 @@ _RUNTIME_ID_LABEL_OVERRIDES: Mapping[str, str] = {
         "Unholy Avalanche"
     ),
     "warhammer_40000_11th:chaos_daemons:detachment:daemonic_incursion:warp_rifts": ("Warp Rifts"),
+    "warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:daemon_lord_of_khorne": (
+        "Daemon Lord of Khorne"
+    ),
+    "warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage": (
+        "Relentless Carnage"
+    ),
+    (
+        "warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:"
+        "relentless_carnage:mortal-wound-fnp"
+    ): "Relentless Carnage - Mortal Wound Feel No Pain",
+    "warhammer_40000_11th:chaos_daemons:datasheet:lord_of_change:daemon_lord_of_tzeentch": (
+        "Daemon Lord of Tzeentch"
+    ),
+    "warhammer_40000_11th:chaos_daemons:datasheet:plaguebearers:infected_outbreak": (
+        "Infected Outbreak"
+    ),
     adepta_sororitas_army_rule.BATTLE_ROUND_START_HOOK_ID: "Acts of Faith",
     adepta_sororitas_army_rule.UNIT_DESTROYED_HOOK_ID: "Acts of Faith",
     adeptus_custodes_army_rule.DACATARAI_HOOK_ID: "Martial Ka'tah - Dacatarai",
@@ -2936,7 +2952,7 @@ def _chaos_daemons_datasheet_review_markdown() -> list[str]:
                 "11th edition Chaos Daemons Faction Pack pages 38-63. Those PDF pages "
                 "are authoritative for Tzeentch datasheets in this review and supersede "
                 "Wahapedia rows where both sources have a unit. Wahapedia-only Tzeentch "
-                "rows absent from the PDF are excluded from the review and listed below."
+                "rows absent from the PDF are excluded from this review."
             ),
             rows=_chaos_daemons_tzeentch_review_rows(),
         )
@@ -2949,7 +2965,7 @@ def _chaos_daemons_datasheet_review_markdown() -> list[str]:
                 "11th edition Chaos Daemons Faction Pack pages 64-87. Those PDF pages "
                 "are authoritative for Nurgle datasheets in this review and supersede "
                 "Wahapedia rows where both sources have a unit. Wahapedia-only Nurgle "
-                "rows absent from the PDF are excluded from the review and listed below."
+                "rows absent from the PDF are excluded from this review."
             ),
             rows=_chaos_daemons_nurgle_review_rows(),
         )
@@ -2962,7 +2978,7 @@ def _chaos_daemons_datasheet_review_markdown() -> list[str]:
                 "11th edition Chaos Daemons Faction Pack pages 88-111. Those PDF pages "
                 "are authoritative for Slaanesh datasheets in this review and supersede "
                 "Wahapedia rows where both sources have a unit. Wahapedia-only Slaanesh "
-                "rows absent from the PDF are excluded from the review and listed below."
+                "rows absent from the PDF are excluded from this review."
             ),
             rows=_chaos_daemons_slaanesh_review_rows(),
         )
@@ -2976,12 +2992,11 @@ def _chaos_daemons_datasheet_review_markdown() -> list[str]:
                 "to a formal Khorne, Tzeentch, Nurgle, or Slaanesh allegiance section. "
                 "The PDF does not use an `Undivided` keyword for these rows, but Shadow "
                 "Legion rules refer to them as Undivided. Wahapedia-only no-god rows absent "
-                "from the PDF are excluded from the review and listed below."
+                "from the PDF are excluded from this review."
             ),
             rows=_chaos_daemons_undivided_review_rows(),
         )
     )
-    lines.extend(_chaos_daemons_excluded_wahapedia_rows_markdown())
     return lines
 
 
@@ -3128,13 +3143,13 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Bloodthirster",
             datasheet_id="000002582",
             source_basis="PDF pages 16-17; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
-            supported_semantics="Deep Strike and The Shadow of Chaos are consumed.",
-            semantics_needed=(
-                "Deadly Demise descriptor consumer evidence; Daemon Lord of Khorne hit-roll "
-                "aura host; Greater Daemon of Khorne Shadow aura host; Relentless Carnage "
-                "end-of-Fight mortal wounds."
+            ir_coverage="All consumed",
+            supported_semantics=(
+                "Deep Strike, Deadly Demise descriptor evidence, The Shadow of Chaos, "
+                "Daemon Lord of Khorne hit-roll aura, Greater Daemon of Khorne Shadow aura, "
+                "and Relentless Carnage end-of-Fight mortal wounds are consumed."
             ),
+            semantics_needed="None.",
             catalog_blockers="No known catalog blocker.",
         ),
         DatasheetGroupReviewRow(
@@ -3358,15 +3373,13 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             datasheet="Lord of Change",
             datasheet_id="000001120",
             source_basis="PDF pages 40-41; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
-                "Deep Strike, Deadly Demise D6, The Shadow of Chaos, and Master of Magicks "
-                "named weapon ability choice semantics are structured paths."
+                "Deep Strike, Deadly Demise D6, The Shadow of Chaos, Master of Magicks "
+                "named weapon ability choice semantics, Greater Daemon of Tzeentch Shadow "
+                "aura, and Daemon Lord of Tzeentch ranged Strength aura are consumed."
             ),
-            semantics_needed=(
-                "Greater Daemon of Tzeentch Shadow aura host; Daemon Lord of Tzeentch "
-                "ranged Strength aura host."
-            ),
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3530,12 +3543,13 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Plaguebearers",
             datasheet_id="000001132",
             source_basis="PDF pages 78-79; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, The Shadow of Chaos, Daemonic Icon Leadership, and "
-                "Instrument of Chaos charge modifier semantics are structured paths."
+                "Instrument of Chaos charge modifier semantics, and Infected Outbreak "
+                "sticky-objective control are consumed."
             ),
-            semantics_needed="Infected Outbreak sticky-objective host.",
+            semantics_needed="None.",
             catalog_blockers="No known catalog blocker.",
         ),
         DatasheetGroupReviewRow(
@@ -3702,13 +3716,13 @@ def _chaos_daemons_slaanesh_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             datasheet="Shalaxi Helbane",
             datasheet_id="000001648",
             source_basis="PDF pages 88-89; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D6, The Shadow of Chaos, No Prey Too Great "
-                "Advance/Charge rerolls, and Monarch of the Hunt quarry rerolls are "
-                "structured paths."
+                "Advance/Charge rerolls, Monarch of the Hunt quarry rerolls, and Greater "
+                "Daemon of Slaanesh Shadow aura are consumed."
             ),
-            semantics_needed="Greater Daemon of Slaanesh Shadow aura host.",
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3844,114 +3858,6 @@ def _chaos_daemons_undivided_review_rows() -> tuple[DatasheetGroupReviewRow, ...
                 "Scuttling Walker movement through friendly Monster/Vehicle models and terrain."
             ),
             catalog_blockers="No known catalog blocker.",
-        ),
-    )
-
-
-def _chaos_daemons_excluded_wahapedia_rows_markdown() -> list[str]:
-    lines = [
-        "### Wahapedia-only rows excluded from PDF review",
-        "",
-        (
-            "These source rows are present in Wahapedia-derived data but absent from the "
-            "11th edition Chaos Daemons Faction Pack allegiance page ranges reviewed above, "
-            "so they are not treated as current Chaos Daemons datasheets in this review."
-        ),
-        "",
-        "| Allegiance bucket | Excluded Wahapedia rows absent from PDF |",
-        "| --- | --- |",
-    ]
-    for allegiance, rows in _chaos_daemons_excluded_wahapedia_rows():
-        labels = tuple(
-            f"{_markdown_text(name)} (`{_markdown_text(datasheet_id)}`)"
-            for datasheet_id, name in rows
-        )
-        lines.append(f"| {_markdown_text(allegiance)} | {'<br>'.join(labels)} |")
-    lines.append("")
-    return lines
-
-
-def _chaos_daemons_excluded_wahapedia_rows() -> tuple[
-    tuple[str, tuple[tuple[str, str], ...]],
-    ...,
-]:
-    return (
-        (
-            "Khorne",
-            (
-                ("000001329", "An'ggrath the Unbound"),
-                ("000004040", "Chaos Lord On Juggernaut"),
-            ),
-        ),
-        (
-            "Tzeentch",
-            (
-                ("000001333", "Aetaos'rau'keres"),
-                ("000004039", "Chaos Lord On Disc Of Tzeentch"),
-                ("000004069", "Sorcerer On Disc Of Tzeentch"),
-            ),
-        ),
-        (
-            "Nurgle",
-            (
-                ("000001336", "Plague Toads"),
-                ("000001337", "Pox Riders"),
-                ("000001340", "Scabeiathrax The Bloated"),
-                ("000004041", "Chaos Lord On Palanquin Of Nurgle"),
-                ("000004055", "Gellerpox Infected"),
-                ("000004056", "Mutoid Vermin"),
-                ("000004061", "Renegade Plague Ogryns"),
-                ("000004070", "Sorcerer On Palanquin Of Nurgle"),
-            ),
-        ),
-        (
-            "Slaanesh",
-            (
-                ("000001139", "Herald Of Slaanesh On Steed Of Slaanesh"),
-                ("000001141", "Tormentbringer On Exalted Seeker Chariot"),
-                ("000001146", "Seeker Chariot"),
-                ("000001147", "Exalted Seeker Chariot"),
-                ("000001332", "Zarakynel"),
-                ("000004042", "Chaos Lord On Steed Of Slaanesh"),
-                ("000004071", "Sorcerer On Steed Of Slaanesh"),
-                ("000004101", "Hellflayer"),
-            ),
-        ),
-        (
-            "Undivided / no god keyword",
-            (
-                ("000001150", "Furies"),
-                ("000001338", "Spined Chaos Beast"),
-                ("000001339", "Giant Chaos Spawn"),
-                ("000004036", "Chaos Lord"),
-                ("000004037", "Chaos Lord In Terminator Armour"),
-                ("000004038", "Chaos Lord with Jump Pack"),
-                ("000004043", "Chaos Terminator Squad"),
-                ("000004044", "Chosen"),
-                ("000004045", "Cultist Firebrand"),
-                ("000004046", "Dark Commune"),
-                ("000004047", "Traitor Enforcer"),
-                ("000004048", "Renegade Enforcer"),
-                ("000004049", "Rogue Psyker"),
-                ("000004050", "Cultist Mob"),
-                ("000004051", "Cultist Mob with Firearms"),
-                ("000004052", "Accursed Cultists"),
-                ("000004053", "Fellgor Beastmen"),
-                ("000004054", "Traitor Guardsmen Squad"),
-                ("000004057", "Negavolt Cultists"),
-                ("000004058", "Renegade Heavy Weapons Squad"),
-                ("000004059", "Renegade Ogryn Beast Handler"),
-                ("000004060", "Renegade Ogryn Brutes"),
-                ("000004062", "Dark Apostle"),
-                ("000004063", "Havocs"),
-                ("000004064", "Legionaries"),
-                ("000004065", "Master Of Possession"),
-                ("000004066", "Possessed"),
-                ("000004067", "Raptors"),
-                ("000004068", "Sorcerer"),
-                ("000004072", "Sorcerer In Terminator Armour"),
-                ("000004073", "Warp Talons"),
-            ),
         ),
     )
 
@@ -4290,6 +4196,14 @@ def _add_runtime_content_inventory_entries(
         (
             (binding.hook_id, binding.source_id)
             for binding in contribution.command_phase_start_hook_bindings
+        ),
+        labels_by_id,
+    )
+    _add_hook_bindings(
+        inventory,
+        (
+            (binding.hook_id, binding.source_id)
+            for binding in contribution.fight_phase_end_hook_bindings
         ),
         labels_by_id,
     )
