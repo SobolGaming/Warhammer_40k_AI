@@ -853,6 +853,12 @@ def test_phase17k_keeper_of_secrets_bridge_supports_required_one_of_wargear() ->
         resolve_wargear_selections(
             catalog=package.army_catalog,
             datasheet=datasheet,
+            requested_selections=(),
+        )
+    with pytest.raises(ListValidationError, match="minimum selections"):
+        resolve_wargear_selections(
+            catalog=package.army_catalog,
+            datasheet=datasheet,
             requested_selections=(
                 WargearSelection(
                     option_id=option_id,
@@ -925,6 +931,25 @@ def test_phase17k_keeper_of_secrets_bridge_supports_required_one_of_wargear() ->
     assert "Shining Aegis" not in whip_records_by_name
     assert aegis_records_by_name["Shining Aegis"].wargear_id == shining_aegis_id
     assert package.to_payload() == type(package).from_payload(package.to_payload()).to_payload()
+
+
+def test_phase17k_keeper_bridge_rejects_non_single_item_equipment_choice() -> None:
+    with pytest.raises(WahapediaBridgeError, match="single-item additive choices"):
+        build_wahapedia_canonical_bridge_artifacts(
+            source_artifacts=_keeper_of_secrets_non_single_item_choice_source_artifacts(),
+            bridge_package_id=_bridge_package_id(),
+            datasheet_ids=("000001137",),
+            height_overrides=(
+                ModelHeightOverride(
+                    datasheet_id="000001137",
+                    model_name="Keeper of Secrets",
+                    height=5.6,
+                    height_units=GeometrySourceUnits.INCHES,
+                    height_source_id="geometry-review:chaos-daemons:keeper-of-secrets:height",
+                    height_document_reference="Chaos Daemons Faction Pack p.90-91",
+                ),
+            ),
+        )
 
 
 def test_phase17k_soul_grinder_bridge_supports_warpclaw_replacement_wargear() -> None:
@@ -8119,6 +8144,21 @@ def _keeper_of_secrets_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     )
 
 
+def _keeper_of_secrets_non_single_item_choice_source_artifacts() -> tuple[
+    WahapediaJsonArtifact, ...
+]:
+    return _source_artifacts_with_datasheet_option_description(
+        datasheet_id="000001137",
+        option_row_id="000001137:1",
+        description=(
+            "This model can be equipped with one of the following:\n"
+            "- 2 Living whips\n"
+            "- Ritual knife\n"
+            "- Shining aegis"
+        ),
+    )
+
+
 def _soul_grinder_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     return build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=_wahapedia_source_artifacts(),
@@ -9607,6 +9647,40 @@ def _artifact_from_csv(table_name: str, csv_text: str) -> WahapediaJsonArtifact:
         source_package_id=_bridge_package_id(),
         table=WahapediaCsvTable.from_csv_text(table_name=table_name, csv_text=f"{csv_text}\n"),
     )
+
+
+def _source_artifacts_with_datasheet_option_description(
+    *,
+    datasheet_id: str,
+    option_row_id: str,
+    description: str,
+) -> tuple[WahapediaJsonArtifact, ...]:
+    artifacts: list[WahapediaJsonArtifact] = []
+    patched = False
+    for artifact in _wahapedia_source_artifacts():
+        if artifact.source_table != "Datasheets_options":
+            artifacts.append(artifact)
+            continue
+        patched_rows: list[NormalizedSourceRow] = []
+        for row in artifact.rows:
+            fields = row.runtime_fields_payload()
+            if fields["datasheet_id"] == datasheet_id and row.source_row_id == option_row_id:
+                patched = True
+                patched_rows.append(
+                    replace(
+                        row,
+                        fields=tuple(
+                            (column, description if column == "description" else value)
+                            for column, value in row.fields
+                        ),
+                    )
+                )
+                continue
+            patched_rows.append(row)
+        artifacts.append(replace(artifact, rows=tuple(patched_rows)))
+    if not patched:
+        raise AssertionError("Missing Datasheets_options row to patch.")
+    return tuple(artifacts)
 
 
 def _csv_field(value: str) -> str:
