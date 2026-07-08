@@ -27,6 +27,14 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battle_shock import (
+    BattleShockTestReason,
+    BattleShockTestRequest,
+)
+from warhammer40k_core.engine.battle_shock_hooks import (
+    BattleShockHookRegistry,
+    BattleShockModifierContext,
+)
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.damage_allocation import MortalWoundApplicationProgress
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -70,11 +78,14 @@ from warhammer40k_core.engine.phases.fight import FightPhaseHandler
 from warhammer40k_core.engine.rules_units import RulesUnitView
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
+    MovementBudgetModifierContext,
+    ObjectiveControlModifierContext,
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.sticky_objective_control import PhaseEndObjectiveControlContext
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 
 
 def test_daemon_lord_auras_apply_only_to_matching_legiones_daemonica_keywords() -> None:
@@ -156,6 +167,248 @@ def test_daemon_lord_auras_apply_only_to_matching_legiones_daemonica_keywords() 
     )
     assert modified_ranged.strength.final == 6
     assert datasheets.LORD_OF_CHANGE_DAEMON_LORD_SOURCE_ID in modified_ranged.source_ids
+
+
+def test_skarbrand_and_keeper_weapon_auras_modify_friendly_melee_profiles() -> None:
+    state = battle_state(
+        player_a_units=(
+            default_unit_selection("intercessor-unit-1"),
+            default_unit_selection("intercessor-unit-2"),
+        )
+    )
+    state.game_id = "phase17g-chaos-daemons-melee-profile-auras"
+    _mark_player_as_chaos_daemons(state, player_id="player-a")
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-alpha:intercessor-unit-2"
+    target_model_id = unit_by_id(state, target_unit_id).own_models[0].model_instance_id
+    registry = _datasheet_runtime_modifier_registry()
+
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Character", "Monster", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(_datasheet_ability(datasheets.SKARBRAND_RAGE_EMBODIED_SOURCE_ID),),
+    )
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("Infantry", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+    )
+    _place_units_near_center(
+        state,
+        source_unit_id=source_unit_id,
+        target_unit_id=target_unit_id,
+        target_offset=(1.0, 0.0),
+    )
+
+    rage_modified = registry.modified_weapon_profile(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.FIGHT,
+            attacking_unit_instance_id=target_unit_id,
+            attacker_model_instance_id=target_model_id,
+            target_unit_instance_id="army-beta:intercessor-unit-3",
+            weapon_profile=_melee_profile(),
+        )
+    )
+    assert rage_modified.attack_profile.fixed_attacks == 2
+    assert rage_modified.armor_penetration.final == -1
+    assert datasheets.SKARBRAND_RAGE_EMBODIED_SOURCE_ID in rage_modified.source_ids
+
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Character", "Monster", "Slaanesh"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(_datasheet_ability(datasheets.KEEPER_DAEMON_LORD_SLAANESH_SOURCE_ID),),
+    )
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("Infantry", "Slaanesh"),
+        faction_keywords=("Legiones Daemonica",),
+    )
+
+    slaanesh_modified = registry.modified_weapon_profile(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.FIGHT,
+            attacking_unit_instance_id=target_unit_id,
+            attacker_model_instance_id=target_model_id,
+            target_unit_instance_id="army-beta:intercessor-unit-3",
+            weapon_profile=_melee_profile(),
+        )
+    )
+    assert slaanesh_modified.attack_profile.fixed_attacks == 1
+    assert slaanesh_modified.armor_penetration.final == -2
+    assert datasheets.KEEPER_DAEMON_LORD_SLAANESH_SOURCE_ID in slaanesh_modified.source_ids
+
+
+def test_rotigus_deluge_modifies_enemy_move_and_objective_control_within_aura() -> None:
+    state = battle_state_with_center_objective_positions(
+        player_a_offsets=((0.0, 0.0),),
+        player_b_offsets=((1.0, 0.0),),
+    )
+    state.game_id = "phase17g-rotigus-deluge"
+    _mark_player_as_chaos_daemons(state, player_id="player-a")
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-beta:intercessor-unit-3"
+    target_model_id = unit_by_id(state, target_unit_id).own_models[0].model_instance_id
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Character", "Monster", "Nurgle"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(_datasheet_ability(datasheets.ROTIGUS_DELUGE_SOURCE_ID),),
+    )
+    registry = _datasheet_runtime_modifier_registry()
+
+    movement_context = MovementBudgetModifierContext(
+        state=state,
+        unit_instance_id=target_unit_id,
+        model_instance_id=target_model_id,
+        base_movement_inches=6.0,
+        current_movement_inches=6.0,
+    )
+    objective_control_context = ObjectiveControlModifierContext(
+        state=state,
+        unit_instance_id=target_unit_id,
+        model_instance_id=target_model_id,
+        base_objective_control=2,
+        current_objective_control=2,
+    )
+    assert registry.modified_movement_inches(movement_context) == 4.0
+    assert registry.modified_objective_control(objective_control_context) == 1
+
+    _place_units_near_center(
+        state,
+        source_unit_id=source_unit_id,
+        target_unit_id=target_unit_id,
+        target_offset=(8.0, 0.0),
+    )
+    assert registry.modified_movement_inches(movement_context) == 6.0
+    assert registry.modified_objective_control(objective_control_context) == 2
+
+
+def test_nurglings_mischief_makers_modifies_enemy_melee_hits_in_engagement_range() -> None:
+    state = battle_state_with_center_objective_positions(
+        player_a_offsets=((0.0, 0.0),),
+        player_b_offsets=((0.5, 0.0),),
+    )
+    state.game_id = "phase17g-mischief-makers"
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    _mark_player_as_chaos_daemons(state, player_id="player-a")
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    attacking_unit_id = "army-beta:intercessor-unit-3"
+    attacking_model_id = unit_by_id(state, attacking_unit_id).own_models[0].model_instance_id
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Swarm", "Nurgle"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(_datasheet_ability(datasheets.NURGLINGS_MISCHIEF_MAKERS_SOURCE_ID),),
+    )
+    registry = _datasheet_runtime_modifier_registry()
+
+    assert (
+        registry.hit_roll_modifier(
+            HitRollModifierContext(
+                state=state,
+                attacking_unit_instance_id=attacking_unit_id,
+                attacker_model_instance_id=attacking_model_id,
+                target_unit_instance_id=source_unit_id,
+                weapon_profile=_melee_profile(),
+                source_phase=BattlePhase.FIGHT,
+            )
+        )
+        == -1
+    )
+
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=attacking_unit_id,
+        keywords=("Vehicle", "Titanic"),
+        faction_keywords=(),
+    )
+    assert (
+        registry.hit_roll_modifier(
+            HitRollModifierContext(
+                state=state,
+                attacking_unit_instance_id=attacking_unit_id,
+                attacker_model_instance_id=attacking_model_id,
+                target_unit_instance_id=source_unit_id,
+                weapon_profile=_melee_profile(),
+                source_phase=BattlePhase.FIGHT,
+            )
+        )
+        == 0
+    )
+
+
+def test_poxbringer_feculent_despair_modifies_enemy_battle_shock_within_aura() -> None:
+    state = battle_state_with_center_objective_positions(
+        player_a_offsets=((0.0, 0.0),),
+        player_b_offsets=((1.0, 0.0),),
+    )
+    state.game_id = "phase17g-feculent-despair"
+    state.active_player_id = "player-b"
+    _set_current_battle_phase(state, BattlePhase.COMMAND)
+    _mark_player_as_chaos_daemons(state, player_id="player-a")
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-beta:intercessor-unit-3"
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Character", "Nurgle"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(_datasheet_ability(datasheets.POXBRINGER_FECULENT_DESPAIR_SOURCE_ID),),
+    )
+    target_unit = unit_by_id(state, target_unit_id)
+    request = BattleShockTestRequest.for_unit(
+        request_id="phase17g-feculent-despair-request",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id="player-b",
+        unit_instance_id=target_unit_id,
+        reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
+        leadership_target=6,
+        below_half_strength_context=BelowHalfStrengthContext.from_unit(
+            player_id="player-b",
+            unit=target_unit,
+            starting_strength=state.starting_strength_record_for_unit(target_unit_id),
+            current_model_ids=target_unit.own_model_ids(),
+        ),
+    )
+    hooks = BattleShockHookRegistry.from_bindings(
+        datasheets.runtime_contribution().battle_shock_hook_bindings
+    )
+    context = BattleShockModifierContext(
+        state=state,
+        request=request,
+        active_player_id="player-b",
+        phase=BattlePhase.COMMAND,
+        phase_start_battle_shocked_unit_ids=(),
+    )
+
+    modifiers = hooks.modifiers_for(context)
+
+    assert len(modifiers) == 1
+    modifier = modifiers[0]
+    assert modifier.modifier_id == (
+        f"{datasheets.FECULENT_DESPAIR_HOOK_ID}:{request.request_id}:player-a"
+    )
+    assert modifier.source_id == datasheets.POXBRINGER_FECULENT_DESPAIR_SOURCE_ID
+    assert modifier.operand == -1
+
+    _place_units_near_center(
+        state,
+        source_unit_id=source_unit_id,
+        target_unit_id=target_unit_id,
+        target_offset=(8.0, 0.0),
+    )
+    assert hooks.modifiers_for(context) == ()
 
 
 def test_infected_outbreak_records_sticky_state_when_plaguebearers_control_objective() -> None:
@@ -565,6 +818,26 @@ def test_datasheet_public_handlers_reject_wrong_context_types() -> None:
         datasheets.daemon_lord_of_tzeentch_weapon_profile_modifier(
             cast(WeaponProfileModifierContext, object())
         )
+    with pytest.raises(GameLifecycleError, match="WeaponProfileModifierContext"):
+        datasheets.rage_embodied_weapon_profile_modifier(
+            cast(WeaponProfileModifierContext, object())
+        )
+    with pytest.raises(GameLifecycleError, match="WeaponProfileModifierContext"):
+        datasheets.daemon_lord_of_slaanesh_weapon_profile_modifier(
+            cast(WeaponProfileModifierContext, object())
+        )
+    with pytest.raises(GameLifecycleError, match="MovementBudgetModifierContext"):
+        datasheets.deluge_movement_budget_modifier(cast(MovementBudgetModifierContext, object()))
+    with pytest.raises(GameLifecycleError, match="ObjectiveControlModifierContext"):
+        datasheets.deluge_objective_control_modifier(
+            cast(ObjectiveControlModifierContext, object())
+        )
+    with pytest.raises(GameLifecycleError, match="HitRollModifierContext"):
+        datasheets.mischief_makers_hit_roll_modifier(cast(HitRollModifierContext, object()))
+    with pytest.raises(GameLifecycleError, match="BattleShockModifierContext"):
+        datasheets.feculent_despair_battle_shock_modifiers(
+            cast(BattleShockModifierContext, object())
+        )
     with pytest.raises(GameLifecycleError, match="phase-end context"):
         datasheets.infected_outbreak_sticky_objective_states(
             cast(PhaseEndObjectiveControlContext, object())
@@ -881,10 +1154,24 @@ def test_datasheet_runtime_contribution_registers_all_consumed_bindings() -> Non
     contribution = datasheets.runtime_contribution()
 
     assert [binding.modifier_id for binding in contribution.hit_roll_modifier_bindings] == [
-        datasheets.KHORNE_HIT_MODIFIER_ID
+        datasheets.KHORNE_HIT_MODIFIER_ID,
+        datasheets.MISCHIEF_MAKERS_HIT_MODIFIER_ID,
+    ]
+    assert [binding.modifier_id for binding in contribution.movement_budget_modifier_bindings] == [
+        datasheets.DELUGE_MOVEMENT_MODIFIER_ID,
+    ]
+    assert [
+        binding.modifier_id for binding in contribution.objective_control_modifier_bindings
+    ] == [
+        datasheets.DELUGE_OBJECTIVE_CONTROL_MODIFIER_ID,
     ]
     assert [binding.modifier_id for binding in contribution.weapon_profile_modifier_bindings] == [
-        datasheets.TZEENTCH_STRENGTH_MODIFIER_ID
+        datasheets.RAGE_EMBODIED_ATTACKS_MODIFIER_ID,
+        datasheets.SLAANESH_AP_MODIFIER_ID,
+        datasheets.TZEENTCH_STRENGTH_MODIFIER_ID,
+    ]
+    assert [binding.hook_id for binding in contribution.battle_shock_hook_bindings] == [
+        datasheets.FECULENT_DESPAIR_HOOK_ID
     ]
     objective_hook_ids = [
         binding.hook_id for binding in contribution.phase_end_objective_control_hook_bindings
@@ -1488,6 +1775,8 @@ def _datasheet_runtime_modifier_registry() -> RuntimeModifierRegistry:
     contribution = datasheets.runtime_contribution()
     return RuntimeModifierRegistry.from_bindings(
         hit_roll_modifier_bindings=contribution.hit_roll_modifier_bindings,
+        movement_budget_modifier_bindings=contribution.movement_budget_modifier_bindings,
+        objective_control_modifier_bindings=contribution.objective_control_modifier_bindings,
         weapon_profile_modifier_bindings=contribution.weapon_profile_modifier_bindings,
     )
 

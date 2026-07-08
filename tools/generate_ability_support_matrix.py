@@ -587,8 +587,8 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
         overall="Full",
         notes=(
             "Allows qualifying LEGIONES DAEMONICA Deep Strike units wholly within Shadow "
-            "of Chaos or within 6 inches of a matching named Greater Daemon anchor to use "
-            "the 6 inch enemy distance."
+            "of Chaos or within 6 inches of a matching source-backed Greater Daemon anchor "
+            "to use the 6 inch enemy distance."
         ),
     ),
     (
@@ -3199,12 +3199,10 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             source_basis="PDF pages 14-15; supersedes Wahapedia.",
             ir_coverage="IR parsed; host needed",
             supported_semantics=(
-                "Deep Strike, Murderlust Advance-and-Charge, and The Shadow of Chaos."
+                "Deep Strike, Murderlust Advance-and-Charge, The Shadow of Chaos, Greater "
+                "Daemon of Khorne Shadow aura, and Rage Embodied melee Attacks aura are consumed."
             ),
-            semantics_needed=(
-                "Deadly Demise descriptor consumer evidence; Greater Daemon of Khorne "
-                "Shadow aura host; Rage Embodied characteristic-modifier aura host."
-            ),
+            semantics_needed="Deadly Demise descriptor consumer evidence.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3365,11 +3363,11 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             source_basis="PDF pages 38-39; supersedes Wahapedia.",
             ir_coverage="Unsupported IR",
             supported_semantics=(
-                "Deep Strike, Deadly Demise D6, and The Shadow of Chaos are known structured paths."
+                "Deep Strike, Deadly Demise D6, The Shadow of Chaos, and Greater Daemon of "
+                "Tzeentch Shadow aura are known structured paths."
             ),
             semantics_needed=(
-                "Greater Daemon of Tzeentch Shadow aura host; Leadership-test CP gain; "
-                "One Head Looks Back Stratagem-cost increase."
+                "Leadership-test CP gain; One Head Looks Back Stratagem-cost increase."
             ),
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
@@ -3493,11 +3491,11 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             ir_coverage="Unsupported IR",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D6, Feel No Pain 6+, The Shadow of Chaos, and "
-                "Daemon Lord of Nurgle Toughness modifier semantics are structured paths."
+                "Daemon Lord of Nurgle Toughness modifier semantics and Greater Daemon of "
+                "Nurgle Shadow aura are structured paths."
             ),
             semantics_needed=(
-                "Greater Daemon of Nurgle Shadow aura host; Nurgle's Rot Toughness debuff "
-                "host; Reverberating Summons Plaguebearer revival."
+                "Nurgle's Rot Toughness debuff host; Reverberating Summons Plaguebearer revival."
             ),
             catalog_blockers="No known catalog blocker.",
         ),
@@ -3520,12 +3518,12 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Nurglings",
             datasheet_id="000001133",
             source_basis="PDF pages 80-81; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Infiltrators, The Shadow of Chaos, and Mischief Makers melee "
-                "hit modifier semantics are structured paths."
+                "hit modifier engagement-range aura are consumed."
             ),
-            semantics_needed="Engagement-range aura host for Mischief Makers.",
+            semantics_needed="None.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3563,11 +3561,10 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             ir_coverage="IR parsed; host needed",
             supported_semantics=(
                 "Deep Strike, Feel No Pain 5+, The Shadow of Chaos, and critical-hit-on-5+ "
-                "semantics are structured paths."
+                "semantics, plus Feculent Despair Battle-shock modifier aura, are structured "
+                "paths."
             ),
-            semantics_needed=(
-                "Feculent Despair Battle-shock modifier aura host; Leader row consumer evidence."
-            ),
+            semantics_needed="Leader row consumer evidence.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3577,12 +3574,10 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             ir_coverage="IR parsed; host needed",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D6, Feel No Pain 6+, The Shadow of Chaos, and "
-                "Virulent Blessing damage modifier semantics are structured paths."
+                "Virulent Blessing damage modifier semantics, Greater Daemon of Nurgle Shadow "
+                "aura, and Deluge Move/OC aura are structured paths."
             ),
-            semantics_needed=(
-                "Greater Daemon of Nurgle Shadow aura host; Deluge Move and OC aura host; "
-                "targeted damage bonus phase/query host."
-            ),
+            semantics_needed="Targeted damage bonus phase/query host.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(
@@ -3691,14 +3686,13 @@ def _chaos_daemons_slaanesh_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             datasheet="Keeper of Secrets",
             datasheet_id="000001137",
             source_basis="PDF pages 90-91; supersedes Wahapedia.",
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D6, The Shadow of Chaos, Mesmerising Form hit "
-                "modifier, and Shining Aegis save semantics are structured paths."
+                "modifier, Shining Aegis save semantics, Greater Daemon of Slaanesh Shadow "
+                "aura, and Daemon Lord of Slaanesh AP aura are consumed."
             ),
-            semantics_needed=(
-                "Greater Daemon of Slaanesh Shadow aura host; Daemon Lord of Slaanesh AP aura host."
-            ),
+            semantics_needed="None.",
             catalog_blockers="No known catalog blocker.",
         ),
         DatasheetGroupReviewRow(

@@ -19,14 +19,12 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
     CHAOS_DAEMONS_FACTION_ID as _CHAOS_DAEMONS_FACTION_ID,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.army_rule import (
-    GREATER_DAEMON_NAMES as _GREATER_DAEMON_NAMES,
+    GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_SOURCE_ID,
+    ShadowRegion,
+    shadow_regions_for_player,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.army_rule import (
     LEGIONES_DAEMONICA as _LEGIONES_DAEMONICA,
-)
-from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.army_rule import (
-    ShadowRegion,
-    shadow_regions_for_player,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserve_arrival_hooks import (
@@ -45,7 +43,6 @@ WARP_RIFTS_HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:daemonic_inc
 SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:daemonic-incursion:rule"
 CHAOS_DAEMONS_FACTION_ID = _CHAOS_DAEMONS_FACTION_ID
 LEGIONES_DAEMONICA = _LEGIONES_DAEMONICA
-GREATER_DAEMON_NAMES = _GREATER_DAEMON_NAMES
 DAEMONIC_INCURSION_DETACHMENT_ID = "daemonic-incursion"
 WARP_RIFTS_ENEMY_DISTANCE_INCHES = 6.0
 WARP_RIFTS_ANCHOR_RANGE_INCHES = 6.0
@@ -211,9 +208,8 @@ def _attempted_unit_wholly_within_matching_greater_daemon_anchor(
     for source_unit in army.units:
         if source_unit.unit_instance_id == context.unit.unit_instance_id:
             continue
-        if not _unit_is_named_greater_daemon(source_unit):
-            continue
-        if not (target_god_keywords & _god_keywords_for_unit(source_unit)):
+        anchor_god_keywords = _greater_daemon_anchor_keywords(source_unit)
+        if not (target_god_keywords & anchor_god_keywords):
             continue
         source_placement = _placed_unit_for_army(
             scenario=context.scenario,
@@ -300,8 +296,15 @@ def _army_has_daemonic_incursion_detachment(army: ArmyDefinition) -> bool:
     )
 
 
-def _unit_is_named_greater_daemon(unit: UnitInstance) -> bool:
-    return _canonical_keyword(unit.name) in GREATER_DAEMON_NAMES
+def _greater_daemon_anchor_keywords(unit: UnitInstance) -> frozenset[str]:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Warp Rifts Greater Daemon anchor lookup requires UnitInstance.")
+    keywords: set[str] = set()
+    for ability in unit.datasheet_abilities:
+        for source_id, keyword in GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_SOURCE_ID:
+            if ability.source_id == source_id:
+                keywords.add(keyword)
+    return frozenset(keywords)
 
 
 def _god_keywords_for_unit(unit: UnitInstance) -> frozenset[str]:
